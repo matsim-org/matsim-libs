@@ -113,7 +113,7 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 		
 		MATSim4UrbanSimParcelZurichCaseStudy m4uZurich = new MATSim4UrbanSimParcelZurichCaseStudy(args);
 		m4uZurich.runMATSim();
-		m4uZurich.matim4UrbanSimShutdown();
+		m4uZurich.matsim4UrbanSimShutdown();
 		
 		log.info("Computation took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}

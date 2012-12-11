@@ -139,14 +139,12 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		this.bikeGrid = bikeGrid;
 		assert (walkGrid != null);
 		this.walkGrid = walkGrid;
-		assert (fileExtension != null);
-		CellBasedAccessibilityControlerListenerV2.fileExtension = fileExtension;
 		assert (benchmark != null);
 		this.benchmark = benchmark;
 
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
-		AnalysisCellBasedAccessibilityCSVWriterV2.initAnalysisCellBasedAccessibilityCSVWriterV2(fileExtension);
+		AnalysisCellBasedAccessibilityCSVWriterV2.initAnalysisCellBasedAccessibilityCSVWriterV2();
 		
 		initAccessibilityParameter(scenario);
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV2!");
@@ -341,22 +339,18 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(freeSpeedGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// freespeed results for plotting in R
 				+ "freeSpeedAccessibility_cellsize_" + freeSpeedGrid.getResolution()
-				+ CellBasedAccessibilityControlerListenerV2.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(carGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
 				+ "carAccessibility_cellsize_" + carGrid.getResolution()
-				+ CellBasedAccessibilityControlerListenerV2.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(bikeGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
 				+ "bikeAccessibility_cellsize_" + bikeGrid.getResolution()
-				+ CellBasedAccessibilityControlerListenerV2.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(walkGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
 				+ "walkAccessibility_cellsize_" + walkGrid.getResolution()
-				+ CellBasedAccessibilityControlerListenerV2.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 
 		// tnicolai: google earth outputs can be left in final release since
@@ -367,28 +361,24 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 							InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "freeSpeedAccessibility_cellsize_"
 										+ freeSpeedGrid.getResolution()
-										+ CellBasedAccessibilityControlerListenerV2.fileExtension
 										+ InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(measuringPointsCell,								// car results for google earth
 								carGrid,
 								InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "carAccessibility_cellsize_"
 										+ carGrid.getResolution()
-										+ CellBasedAccessibilityControlerListenerV2.fileExtension
 										+ InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(measuringPointsCell,								// bike results for google earth
 								bikeGrid,
 								InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "bikeAccessibility_cellsize_"
 										+ bikeGrid.getResolution()
-										+ CellBasedAccessibilityControlerListenerV2.fileExtension
 										+ InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(measuringPointsCell,								// walk results for google earth
 								walkGrid,
 								InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "walkAccessibility_cellsize_"
 										+ walkGrid.getResolution()
-										+ CellBasedAccessibilityControlerListenerV2.fileExtension
 										+ InternalConstants.FILE_TYPE_KMZ);
 		log.info("Writing plotting files done!");
 	}

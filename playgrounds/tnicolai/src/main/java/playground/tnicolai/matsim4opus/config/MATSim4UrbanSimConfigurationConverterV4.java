@@ -25,20 +25,18 @@ package playground.tnicolai.matsim4opus.config;
 
 import java.io.File;
 import java.util.Arrays;
-
-import javax.sound.midi.SysexMessage;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -73,7 +71,7 @@ import playground.tnicolai.matsim4opus.utils.io.Paths;
  * improvements aug'12
  * - extended the MATSim4UrbanSim configuration: 
  *   - added a switch to select between between radius or shape-file distribution of locations within a zone
- *   - added a field "project_name" of the UrbanSim sceanario as an identifier
+ *   - added a field "project_name" of the UrbanSim scenario as an identifier
  *   - added a time-of-a-day parameter
  *   - added beta parameter for mode bike
  *   
@@ -82,6 +80,8 @@ import playground.tnicolai.matsim4opus.utils.io.Paths;
  * 
  * changes dec'12
  * - switched matsim4urbansim config v2 parameters from v3 are out sourced into external matsim config
+ * - introducing pseudo pt (configurable via external MATSim config)
+ * - introducing new strategy module "changeSingeLegMode" (configurable via external MATSim config)
  *
  */
 public class MATSim4UrbanSimConfigurationConverterV4 {
@@ -98,9 +98,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	
 	
 	// module and param names for matsim4urbansim settings stored in an external MATSim config file
-	private static final String MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG = "matsim4urbansimParameter";
-	private static final String SPATIAL_UNIT = "spatialUnit";
-	private static final String TIME_OF_DAY = "timeOfDay";
+	private static final String MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG = "matsim4urbansimParameter";// module
+	// parameter names in matsim4urbansimParameter module
+	private static final String TIME_OF_DAY = "timeOfDay";								
 	private static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
 	private static final String BETA_BIKE_TRAVEL_TIME = "betaBikeTravelTime";
 	private static final String BETA_BIKE_TRAVEL_TIME_POWER2 = "betaBikeTravelTimePower2";
@@ -111,7 +111,6 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	private static final String BETA_BIKE_TRAVEL_COST = "betaBikeTravelCost";
 	private static final String BETA_BIKE_TRAVEL_COST_POWER2 = "betaBikeTravelCostPower2";
 	private static final String BETA_BIKE_LN_TRAVEL_COST = "betaBikeLnTravelCost";
-	private static final String CHANGE_SINGLE_LEG_MODE = "changeSingleLegMode";
 	
 	/**
 	 * constructor
@@ -197,13 +196,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		if(externalMATSimConfig != null && Paths.pathExsits(externalMATSimConfig)){
 			log.info("Initializing MATSim settings from external MATSim config: " + externalMATSimConfig);
 			scenario = (ScenarioImpl)ScenarioUtils.createScenario(ConfigUtils.loadConfig( externalMATSimConfig.trim() ));
-			log.info("NOTE: Some external config settigs can be overwritten by UrbanSim settings from the travel model configuration section!");
-		
-			matsim4UrbanSimModule = scenario.getConfig().getModule(MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-			if(matsim4UrbanSimModule == null)
-				log.info("No additional MATSim4UrbanSim setting found in " + externalMATSimConfig);
-			else
-				log.info("Found additional MATSim4UrbanSim setting found in " + externalMATSimConfig);
+			log.info("NOTE: Some external config settigs can be overwritten by the travel model configuration settings in UrbanSim !");
+			
+			// loading additional matsim4urbansim parameter settings from external config
+			matsim4UrbanSimModule = setModule(MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG, externalMATSimConfig);
 		}
 		else{
 			log.info("Creating an empty MATSim scenario.");
@@ -211,6 +207,18 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		}
 		
 		log.info("...done!");
+	}
+
+	/**
+	 * @param externalMATSimConfig
+	 */
+	private Module setModule(String moduleName, String externalMATSimConfig) {
+		Module module = scenario.getConfig().getModule(moduleName);
+		if(module == null)
+			log.info("No \""+ moduleName + "\" settings found in " + externalMATSimConfig);
+		else
+			log.info("Found \""+ moduleName + "\" settings in " + externalMATSimConfig);
+		return module;
 	}
 	
 	/**
@@ -252,19 +260,6 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		double populationSamplingRate = matsim4UrbanSimParameter.getUrbansimParameter().getPopulationSamplingRate();
 		int year 				= matsim4UrbanSimParameter.getUrbansimParameter().getYear().intValue();
 		
-		String spatialUnit = null;	 // meaning parcel or zone
-		if(matsim4UrbanSimModule != null)
-			spatialUnit = matsim4UrbanSimModule.getValue(SPATIAL_UNIT);
-
-		if(spatialUnit == null || !(spatialUnit.equalsIgnoreCase("parcel") || spatialUnit.equalsIgnoreCase("zone")) ){
-			log.error("The spatial unit (parcel or zone) of the current UrbanSim application is not given.");
-			log.error("Enter the spatial unit in the external MATSim config file as follows:");
-			log.error("<module name=\"matsim4urbansimParameter\" >");
-			log.error("<param name=\"spatialUnit\" value=\"parcel\" />");
-			log.error("</module>");
-			System.exit(InternalConstants.INCOMPLETE_PARAMETER_SETTINGS);
-		}
-		
 		boolean useShapefileLocationDistribution = false;
 		String urbanSimZoneShapefileLocationDistribution = null;
 		double randomLocationDistributionRadiusForUrbanSimZone = matsim4UrbanSimParameter.getUrbansimParameter().getRandomLocationDistributionRadiusForUrbanSimZone();
@@ -272,7 +267,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		if(matsim4UrbanSimModule != null)
 			urbanSimZoneShapefileLocationDistribution = matsim4UrbanSimModule.getValue(URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION);
 		log.info("This message affects UrbanSim ZONE applications only:");
-		if(Paths.pathExsits(urbanSimZoneShapefileLocationDistribution)){
+		if(urbanSimZoneShapefileLocationDistribution != null && Paths.pathExsits(urbanSimZoneShapefileLocationDistribution)){
 			useShapefileLocationDistribution = true;
 			log.info("Found a zone shape file: " + urbanSimZoneShapefileLocationDistribution);
 			log.info("This activates the distribution of persons within a zone using the zone boundaries of this shape file."); 
@@ -299,7 +294,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		// // set parameter in module 
 		UrbanSimParameterConfigModuleV3 module = this.getUrbanSimParameterConfig();
 		module.setProjectName(projectName);
-		module.setSpatialUnitFlag(spatialUnit);
+		// module.setSpatialUnitFlag(spatialUnit); // tnicolai not needed anymore dec'12
 		module.setPopulationSampleRate(populationSamplingRate);
 		module.setYear(year);
 		module.setOpusHome(opusHome);
@@ -386,6 +381,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 				timeOfDay = tmp;
 			} catch(Exception e){
 				log.info("No time of day for accessibility calulation given or given time has wrong format.");
+				log.info("By default, MATSim calulates accessibilities for the following time of day: " + timeOfDay );
 				log.info("In order to use another time of day enter it in the external MATSim config file as follows:");
 				log.info("<module name=\"matsim4urbansimParameter\" >");
 				log.info("<param name=\"timeOfDay\" value=\"28800\" />");
@@ -450,7 +446,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		boolean useMATSimBikeParameter			= !useCustomMarginalUtilitiesBike(); // true if relevant settings in the external MATSim config is found
 		boolean useMATSimWalkParameter			= matsim4UrbanSimParameter.getAccessibilityParameter().isUseWalkParameterFromMATSim();
 		boolean useRawSum						= matsim4UrbanSimParameter.getAccessibilityParameter().isUseRawSumsWithoutLn();
-		
+
 		if(useMATSimLogitScaleParameter)
 			logitScaleParameter = scenario.getConfig().planCalcScore().getBrainExpBeta();
 		else
@@ -677,7 +673,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		
 		// setting target location for hot start plans file
 		if(!hotStart.equals("")){
-			log.info("Storing plans file from current run. This enables hot start for next MATSim run.");
+			log.info("The resulting plans file after this MATSim run is stored at a specified place to enable hot start for the following MATSim run.");
+			log.info("The specified place is : " + hotStart);
 			module.setHotStartTargetLocation(hotStart);
 		}
 		else
@@ -822,10 +819,6 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		// configure strategies for re-planning (should be something like 5)
 		scenario.getConfig().strategy().setMaxAgentPlanMemorySize( matsimParameter.getStrategy().getMaxAgentPlanMemorySize().intValue() );
 		
-		// clear if any strategy is defined
-		if(!scenario.getConfig().strategy().getStrategySettings().isEmpty())
-			scenario.getConfig().strategy().getStrategySettings().clear();
-		
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
 		timeAlocationMutator.setModuleName("TimeAllocationMutator"); 	// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		timeAlocationMutator.setProbability( matsimParameter.getStrategy().getTimeAllocationMutatorProbability() ); // should be something like 0.1
@@ -841,31 +834,55 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
 		reroute.setModuleName("ReRoute_Dijkstra");						// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
-		reroute.setProbability( matsimParameter.getStrategy().getReRouteDijkstraProbability() ); // should be something like 0.1
+		reroute.setProbability( matsimParameter.getStrategy().getReRouteDijkstraProbability() ); 	// should be something like 0.1
 		reroute.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(reroute);
 		
-		double strategyProbability = 0.1;
-		if(matsim4UrbanSimModule != null){
-			try{
-				double tmp = Double.parseDouble(matsim4UrbanSimModule.getValue(CHANGE_SINGLE_LEG_MODE));
-				strategyProbability = tmp;
-			}catch(Exception e){}
+		// check if a 4th module is given in the external MATSim config
+		StrategyConfigGroup.StrategySettings changeLegMode = getChangeLegModeStrategySettings();
+		boolean set4thStrategyModule = ( changeLegMode != null && 
+									   (changeLegMode.getModuleName().equalsIgnoreCase("ChangeLegMode") || changeLegMode.getModuleName().equalsIgnoreCase("ChangeSingleLegMode")) && 
+									    changeLegMode.getProbability() > 0.);
+		if(set4thStrategyModule){
+			// to be consistent, setting the same iteration number as in the strategies above 
+			changeLegMode.setDisableAfter(disableStrategyAfterIteration);
+			// check if other modes are set
+			Module changelegMode = scenario.getConfig().getModule("changeLegMode");
+			if(changelegMode != null && changelegMode.getValue("modes") != null)
+				log.info("Following modes are found: " + changelegMode.getValue("modes"));
 		}
-		StrategyConfigGroup.StrategySettings changeSingleLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
-		changeSingleLegMode.setModuleName("ChangeSingleLegMode");		// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
-		changeSingleLegMode.setProbability( strategyProbability );
-		changeSingleLegMode.setDisableAfter(disableStrategyAfterIteration);
-		scenario.getConfig().strategy().addStrategySettings(changeSingleLegMode);
+		
+		// tnicolai old version
+		// StrategyConfigGroup.StrategySettings changeLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
+		// changeLegMode.setModuleName(moduleName);		// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
+		// changeLegMode.setProbability( module4Probability );
+		// changeLegMode.setDisableAfter(disableStrategyAfterIteration);
+		// scenario.getConfig().strategy().addStrategySettings(changeLegMode);‚
 		// this sets some additional modes. by default car and pt is available
-		scenario.getConfig().setParam("changeLegMode", "modes", TransportMode.car +","+ TransportMode.pt +"," + TransportMode.bike + "," + TransportMode.walk);
+		// scenario.getConfig().setParam("changeLegMode", "modes", TransportMode.car +","+ TransportMode.pt +"," + TransportMode.bike + "," + TransportMode.walk);
 		
 		log.info("StrategyConfigGroup settings:");
 		log.info("Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability: " + timeAlocationMutator.getProbability() + " Disable After Itereation: " + timeAlocationMutator.getDisableAfter() ); 
 		log.info("Strategy_2: " + changeExpBeta.getModuleName() + " Probability: " + changeExpBeta.getProbability() );
 		log.info("Strategy_3: " + reroute.getModuleName() + " Probability: " + reroute.getProbability() + " Disable After Itereation: " + reroute.getDisableAfter() );
-		log.info("Strategy_4: " + changeSingleLegMode.getModuleName() + " Probability: " + changeSingleLegMode.getProbability() + " Disable After Itereation: " + changeSingleLegMode.getDisableAfter() );
+		if(set4thStrategyModule)
+			log.info("Strategy_4: " + changeLegMode.getModuleName() + " Probability: " + changeLegMode.getProbability() + " Disable After Itereation: " + changeLegMode.getDisableAfter() );
 		log.info("... done!");
+	}
+
+	/**
+	 * 
+	 */
+	private StrategyConfigGroup.StrategySettings getChangeLegModeStrategySettings() {
+		Iterator<StrategyConfigGroup.StrategySettings> iter = scenario.getConfig().strategy().getStrategySettings().iterator();
+		StrategyConfigGroup.StrategySettings setting = null;
+		while(iter.hasNext()){
+			setting = iter.next();
+			if(setting.getModuleName().equalsIgnoreCase("ChangeLegMode") || setting.getModuleName().equalsIgnoreCase("ChangeSingleLegMode"))
+				break;
+			setting = null;
+		}
+		return setting;
 	}
 	
 	/**
@@ -873,10 +890,15 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	 */
 	private void initPlanCalcRoute(){
 		log.info("Setting PlanCalcRouteGroup to config...");
+		
+		double defaultWalkSpeed = 1.38888889; 	// 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
+		double defaultBicycleSpeed = 4.16666666;// 4.16666666m/s corresponds to 15 km/h
+		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
+		
 		// setting teleportation speeds in router
-		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
-		scenario.getConfig().plansCalcRoute().setBikeSpeed(4.16666666); // 4.16666666m/s corresponds to 15 km/h
-		scenario.getConfig().plansCalcRoute().setPtSpeed(6.94444444);	// 6.94444444m/s corresponds to 25 km/h
+		scenario.getConfig().plansCalcRoute().setWalkSpeed( defaultWalkSpeed ); 
+		scenario.getConfig().plansCalcRoute().setBikeSpeed( defaultBicycleSpeed );
+		scenario.getConfig().plansCalcRoute().setPtSpeed( defaultPtSpeed );
 
 		log.info("PlanCalcRouteGroup settings:");							 
 		log.info("Walk Speed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );

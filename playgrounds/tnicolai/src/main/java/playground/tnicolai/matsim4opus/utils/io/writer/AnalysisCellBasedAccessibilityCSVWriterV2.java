@@ -21,10 +21,10 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	/**
 	 * writes the header of accessibility data csv file
 	 */
-	public static void initAnalysisCellBasedAccessibilityCSVWriterV2(String fileExtension){
+	public static void initAnalysisCellBasedAccessibilityCSVWriterV2(){
 		try{
 			log.info("Initializing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
-			accessibilityDataWriter = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + fileExtension + FILE_NAME );
+			accessibilityDataWriter = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME );
 			
 			// create header
 			accessibilityDataWriter.write( InternalConstants.ZONE_ID + "," +

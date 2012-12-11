@@ -123,7 +123,7 @@ public class RandomLocationDistributor {
 			return getRandomPointInFeature(feature);
 		}
 		else
-			return getRandomPointinRadius(coord);
+			return getRandomPointInRadius(coord);
 	}
 	
 	/**
@@ -134,7 +134,7 @@ public class RandomLocationDistributor {
 	 * @param radius
 	 * @return
 	 */
-	private Coord getRandomPointinRadius(Coord zoneCoordinate){
+	private Coord getRandomPointInRadius(Coord zoneCoordinate){
 		Coord p = null;
 		double x, y;
 		double distance;

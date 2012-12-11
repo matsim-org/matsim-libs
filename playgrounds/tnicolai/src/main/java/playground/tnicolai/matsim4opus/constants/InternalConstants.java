@@ -108,7 +108,6 @@ public class InternalConstants {
 	public static final String OUTPUT_PARCEL_FILE_XML	= "parcels.xml";
 	public static final String OUTPUT_ZONES_FILE_GZ	 	= "zones.xml.gz";
 	public static final String OUTPUT_ZONES_FILE_XML	= "zones.xml";
-	public static final String TRAVEL_DATA_FILE_CSV		= "travel_data.csv";
 	public static final String GRID_DATA_FILE_CSV 		= "grid_data.csv";
 	public static final String ZONES_COMPLETE_FILE_CSV 	= "zones_complete.csv";
 

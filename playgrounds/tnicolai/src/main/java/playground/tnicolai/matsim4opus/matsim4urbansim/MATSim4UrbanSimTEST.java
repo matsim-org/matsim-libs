@@ -43,7 +43,7 @@ import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.io.BackupRun;
+import playground.tnicolai.matsim4opus.utils.io.BackupMATSimOutput;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
@@ -142,7 +142,7 @@ public class MATSim4UrbanSimTEST implements MATSim4UrbanSimInterface{
 		modifyNetwork(network);
 		cleanNetwork(network);
 		
-		readFromUrbanSim();
+		initReadFromUrbanSim();
 		
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = null;
@@ -176,7 +176,7 @@ public class MATSim4UrbanSimTEST implements MATSim4UrbanSimInterface{
 	/**
 	 * 
 	 */
-	protected void readFromUrbanSim() {
+	protected void initReadFromUrbanSim() {
 		// get the data from UrbanSim (parcels and persons)
 		if(getUrbanSimParameterConfig().isUseShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
@@ -306,10 +306,8 @@ public class MATSim4UrbanSimTEST implements MATSim4UrbanSimInterface{
 			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
 			
 			ZoneLayer<Id>  measuringPoints;
-			String fileExtension;
 
 			if(computeParcelBasedAccessibilitiesNetwork){
-				fileExtension = ParcelBasedAccessibilityControlerListenerV3.NETWORK;
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
 																			   nwBoundaryBox.getBoundingBox());
 				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
@@ -318,7 +316,6 @@ public class MATSim4UrbanSimTEST implements MATSim4UrbanSimInterface{
 				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			else{
-				fileExtension = ParcelBasedAccessibilityControlerListenerV3.SHAPE_FILE;
 				Geometry boundary = GridUtils.getBoundary(shapeFile);
 				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
 																				   boundary);
@@ -335,8 +332,7 @@ public class MATSim4UrbanSimTEST implements MATSim4UrbanSimInterface{
 																						 carGrid,
 																						 bikeGrid,
 																						 walkGrid, 
-																						 fileExtension, 
-																						 benchmark,
+																						 benchmark, 
 																						 this.scenario));
 		}
 		
@@ -453,7 +449,7 @@ public class MATSim4UrbanSimTEST implements MATSim4UrbanSimInterface{
 	 * triggers backup of MATSim and UrbanSim Output
 	 */
 	void matim4UrbanSimShutdown(){
-		BackupRun.runBackup(scenario);
+		BackupMATSimOutput.runBackup(scenario);
 	}
 	
 	/**

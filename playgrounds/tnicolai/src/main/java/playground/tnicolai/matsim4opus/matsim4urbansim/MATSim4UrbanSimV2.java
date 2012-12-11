@@ -43,7 +43,7 @@ import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.io.BackupRun;
+import playground.tnicolai.matsim4opus.utils.io.BackupMATSimOutput;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
@@ -174,7 +174,7 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 		// get the data from UrbanSim (parcels and persons)
 		if(getUrbanSimParameterConfig().isUseShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-					  getUrbanSimParameterConfig().getOpusHome() + getUrbanSimParameterConfig().getUrbanSimZoneShapefileLocationDistribution(),
+					  getUrbanSimParameterConfig().getUrbanSimZoneShapefileLocationDistribution(),
 					  getUrbanSimParameterConfig().getUrbanSimZoneRadiusLocationDistribution());
 		}
 		else
@@ -300,10 +300,8 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
 			
 			ZoneLayer<Id>  measuringPoints;
-			String fileExtension;
 
 			if(computeParcelBasedAccessibilitiesNetwork){
-				fileExtension = ParcelBasedAccessibilityControlerListenerV3.NETWORK;
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
 																			   nwBoundaryBox.getBoundingBox());
 				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
@@ -312,7 +310,6 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			else{
-				fileExtension = ParcelBasedAccessibilityControlerListenerV3.SHAPE_FILE;
 				Geometry boundary = GridUtils.getBoundary(shapeFile);
 				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
 																				   boundary);
@@ -329,8 +326,7 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 																						 carGrid,
 																						 bikeGrid,
 																						 walkGrid, 
-																						 fileExtension, 
-																						 benchmark,
+																						 benchmark, 
 																						 this.scenario));
 		}
 		
@@ -392,9 +388,8 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 		
 		this.timeOfDay					= moduleMATSim4UrbanSim.getTimeOfDay();
 		
-		
 		// set mode 
-		this.isParcelMode = moduleUrbanSimParameter.isParcelMode();
+		this.isParcelMode 				= moduleUrbanSimParameter.isParcelMode();
 	}
 
 	/**
@@ -436,7 +431,7 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 	 * triggers backup of MATSim and UrbanSim Output
 	 */
 	void matim4UrbanSimShutdown(){
-		BackupRun.runBackup(scenario);
+		BackupMATSimOutput.runBackup(scenario);
 	}
 	
 	/**
@@ -450,6 +445,10 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 		}
 	}
 	
+	/**
+	 * access to AccessibilityParameterConfigModule and related parameter settings
+	 * @return AccessibilityParameterConfigModule
+	 */
 	AccessibilityParameterConfigModule getAccessibilityParameterConfig() {
 		Module m = this.scenario.getConfig().getModule(AccessibilityParameterConfigModule.GROUP_NAME);
 		if (m instanceof AccessibilityParameterConfigModule) {
@@ -460,6 +459,10 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 		return apcm;
 	}
 	
+	/**
+	 * access to MATSim4UrbanSimControlerConfigModuleV3 and related parameter settings
+	 * @return MATSim4UrbanSimControlerConfigModuleV3
+	 */
 	MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig() {
 		Module m = this.scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
@@ -470,6 +473,10 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 		return mccm;
 	}
 	
+	/**
+	 * access to UrbanSimParameterConfigModuleV3 and related parameter settings
+	 * @return UrbanSimParameterConfigModuleV3
+	 */
 	UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig() {
 		Module m = this.scenario.getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModuleV3) {

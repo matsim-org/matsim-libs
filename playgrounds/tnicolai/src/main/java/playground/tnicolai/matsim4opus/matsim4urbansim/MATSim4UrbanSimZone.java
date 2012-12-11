@@ -51,7 +51,7 @@ import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
  * 	the zonz2zone impedance matrix, zone based- and grid based accessibility computation. Modules can be en-disabled
  * 	additional modules can be added by other classes extending MATSim4UrbanSimV2.
  * - Data Processing on Demand:
- *  Particular input data is processed when a corresponding module is enabled, e.g. an array of aggregated workplaces will
+ *  Particular input data is processed when a corresponding module is enabled, e.g. an array of aggregated work places will
  *  be generated when either the zone based- or grid based accessibility computation is activated.
  * - Extensibility:
  * 	This class provides standard functionality such as configuring MATSim, reading UrbanSim input data, running the 
@@ -63,6 +63,7 @@ import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
  *  to match the saved data with the corresponding run or year the folder names contain the "simulation year" and a time stamp.
  * - Other improvements:
  * 	For a better readability some functionality is out-sourced into helper classes
+ * 
  */
 public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 
@@ -80,179 +81,6 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		// set flag to false (needed for ReadFromUrbanSimModel to choose the right method)
 		isParcelMode = false;
 	}
-	
-	/**
-	 * prepare MATSim for traffic flow simulation ...
-	 */
-	@SuppressWarnings("deprecation")
-	@Override
-	void runMATSim(){
-		log.info("Starting MATSim from Urbansim");	
-
-		// checking if this is a test run
-		// a test run only validates the xml config file by initializing the xml config via the xsd.
-		isTestRun();
-
-		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
-		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		Network network = scenario.getNetwork();
-		modifyNetwork(network);
-		cleanNetwork(network);
-		
-		// get the data from UrbanSim (parcels and persons)
-		readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-													  null, // tnicolai april'12: location distribution via shapefile is disabled until a "switch" between Radius and shape-file is implemented getMATSim4UrbaSimControlerConfig().getShapeFileCellBasedAccessibility(),
-													  getUrbanSimParameterConfig().getRandomLocationDistributionRadiusForUrbanSimZone());
-		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
-		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
-		// initializing parcels and zones from UrbanSim input
-		readUrbansimZoneModel(zones);
-		
-		// population generation
-		int pc = benchmark.addMeasure("Population construction");
-		Population newPopulation = readUrbansimPersons(zones, network);
-		modifyPopulation(newPopulation);
-		benchmark.stoppMeasurement(pc);
-		System.out.println("Population construction took: " + benchmark.getDurationInSeconds( pc ) + " seconds.");
-
-		log.info("### DONE with demand generation from urbansim ###");
-
-		// set population in scenario
-		scenario.setPopulation(newPopulation);
-
-		// running mobsim and assigned controller listener
-		runControler(zones);
-	}
-	
-	/**
-	 * read UrbanSim parcel table and build facilities and zones in MATSim
-	 * 
-	 * @param parcels
-	 * @param zones
-	 */
-	void readUrbansimZoneModel(ActivityFacilitiesImpl zones){
-		readFromUrbansim.readFacilitiesZones(zones);
-	}
-	
-	/**
-	 * reads UrbanSim persons table and creates a MATSim population
-	 * @param oldPopulation
-	 * @param zones
-	 * @param network
-	 * @param samplingRate
-	 * @return
-	 */
-	@Override
-	Population readUrbanSimPopulation(Population oldPopulation, ActivityFacilitiesImpl zones, Network network, double samplingRate){
-		return readFromUrbansim.readPersonsZone( oldPopulation, zones, network, samplingRate );
-	}
-	
-	/**
-	 * run simulation
-	 * @param zones
-	 */
-	void runControler( ActivityFacilitiesImpl zones){
-		
-		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
-		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
-		
-		log.info("Adding controler listener ...");
-		addControlerListener(zones, controler);
-		addFurtherControlerListener(controler, zones);
-		log.info("Adding controler listener done!");
-		
-		// tnicolai todo?: count number of cars per h on a link
-		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
-		// get VolumeLinkAnalyzer by "event.getControler.getVolume... and run getVolumesForLink. that returns an int array with the number of cars per hour on an specific link 
-		// see also http://matsim.org/docs/controler
-		
-		// run the iterations, including post-processing:
-		controler.run() ;
-	}
-
-	/**
-	 * The following method register listener that should be done _after_ the iterations were run.
-	 * 
-	 * @param zones
-	 * @param parcels
-	 * @param controler
-	 */
-	void addControlerListener(ActivityFacilitiesImpl zones, Controler controler) {
-
-		// The following lines register what should be done _after_ the iterations are done:
-		if(computeZone2ZoneImpedance)
-			// creates zone2zone impedance matrix
-			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
-																					  null, 
-																					  benchmark) ); 
-		if(computeAgentPerformance)
-			// creates a persons.csv output for UrbanSim
-			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark));
-		
-		if(computeZoneBasedAccessibilities){
-
-			ZoneLayer<Id>  measuringPoints = GridUtils.convertActivityFacilities2ZoneLayer(zones);
-			
-			// creates zone based table of log sums
-			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3( this,
-																						measuringPoints, 				
-																						zones,
-																						benchmark,
-																						this.scenario));
-		}
-		
-		if(computeParcelBasedAccessibility){
-			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
-			
-			ZoneLayer<Id>  measuringPoints;
-			String fileExtension;
-
-			if(computeParcelBasedAccessibilitiesNetwork){
-				fileExtension = ParcelBasedAccessibilityControlerListenerV3.NETWORK;
-				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
-																			   nwBoundaryBox.getBoundingBox());
-				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				bikeGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-			}
-			else{
-				fileExtension = ParcelBasedAccessibilityControlerListenerV3.SHAPE_FILE;
-				Geometry boundary = GridUtils.getBoundary(shapeFile);
-				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
-																				   boundary);
-				freeSpeedGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				bikeGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-			}
-			
-			controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3( this,
-																						 measuringPoints, 
-																						 zones,
-																						 freeSpeedGrid,
-																						 carGrid,
-																						 bikeGrid,
-																						 walkGrid, 
-																						 fileExtension, 
-																						 benchmark,
-																						 this.scenario));
-		}
-		
-		if(dumpPopulationData)
-			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
-		
-//		if(dumpAggegatedWorkplaceData){
-//			// init aggregatedWorkplaces
-//			if(aggregatedOpportunities == null)
-//				aggregatedOpportunities = readUrbansimJobs(zones, opportunitySampleRate);
-//			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(aggregatedOpportunities);
-//		}
-	}
 
 	/**
 	 * Entry point
@@ -264,7 +92,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		
 		MATSim4UrbanSimZone m4u = new MATSim4UrbanSimZone(args);
 		m4u.runMATSim();
-		m4u.matim4UrbanSimShutdown();
+		m4u.matsim4UrbanSimShutdown();
 		MATSim4UrbanSimZone.isSuccessfulMATSimRun = Boolean.TRUE;
 		
 		log.info("Computation took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");

@@ -70,6 +70,8 @@ import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	private static final Logger log = Logger.getLogger(Zone2ZoneImpedancesControlerListener.class);
 
+	public static final String FILE_NAME = "travel_data.csv";
+	
 	private ActivityFacilitiesImpl zones;
 	private ActivityFacilitiesImpl parcels;
 	private String travelDataPath;
@@ -85,7 +87,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		this.zones = zones;
 		assert(parcels != null);
 		this.parcels = parcels;
-		this.travelDataPath = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.TRAVEL_DATA_FILE_CSV;
+		this.travelDataPath = InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
 	}

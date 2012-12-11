@@ -32,18 +32,18 @@ public class ConfigurationModule {
 		return null;
 	}
 
-	public static MATSim4UrbanSimControlerConfigModule getMATSim4UrbaSimControlerConfigModule(ScenarioImpl scenario){
+	public static MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigModule(ScenarioImpl scenario){
 		Module m = scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModule.GROUP_NAME);
-		if (m instanceof MATSim4UrbanSimControlerConfigModule) {
-			return (MATSim4UrbanSimControlerConfigModule) m;
+		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
+			return (MATSim4UrbanSimControlerConfigModuleV3) m;
 		}
 		return null;
 	}
 	
-	public static UrbanSimParameterConfigModule getUrbanSimParameterConfigModule(ScenarioImpl scenario){
+	public static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigModule(ScenarioImpl scenario){
 		Module m = scenario.getConfig().getModule(UrbanSimParameterConfigModule.GROUP_NAME);
-		if (m instanceof UrbanSimParameterConfigModule) {
-			return (UrbanSimParameterConfigModule) m;
+		if (m instanceof UrbanSimParameterConfigModuleV3) {
+			return (UrbanSimParameterConfigModuleV3) m;
 		}
 		return null;
 	}

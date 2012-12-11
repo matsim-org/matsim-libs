@@ -294,6 +294,7 @@ public class ReadFromUrbanSimModel {
 		RandomLocationDistributor rld = new RandomLocationDistributor(this.shapefile, this.radius);
 		
 		boolean compensationFlag = false;
+		ZoneLocations zoneLocation = null;
 
 		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
@@ -326,12 +327,14 @@ public class ReadFromUrbanSimModel {
 				
 				// see reason of this flag below
 				compensationFlag = false;
+				zoneLocation	 = new ZoneLocations();
 				
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				// get home location id
 				Id homeZoneId = new IdImpl( parts[ indexZoneID_HOME ] );
 				ActivityFacility homeLocation = zones.getFacilities().get( homeZoneId ); // the home location is the zone centroid
+				zoneLocation.setHomeLocation(homeZoneId, homeLocation);
 				if ( homeLocation==null ){
 					log.warn( "homeLocation==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this );
 					continue;
@@ -353,8 +356,9 @@ public class ReadFromUrbanSimModel {
 					newPerson.setEmployed(Boolean.FALSE);
 				else {
 					newPerson.setEmployed(Boolean.TRUE);
-					Id workZoneId = new IdImpl( parts[ indexZoneID_WORK ] ) ;
-					ActivityFacility jobLocation = zones.getFacilities().get( workZoneId ) ;
+					Id workZoneId = new IdImpl( parts[ indexZoneID_WORK ] );
+					ActivityFacility jobLocation = zones.getFacilities().get( workZoneId );
+					zoneLocation.setWorkLocation(workZoneId, jobLocation);
 					if ( jobLocation == null ) {
 						// show warning message only once
 						if ( cnt.jobLocationIdNullCnt < 1 ) {
@@ -379,7 +383,7 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
-				mergePopulation(oldPop, mergePop, network, backupPop, cnt, personId, newPerson);
+				mergePopulation(oldPop, mergePop, newPerson, backupPop, network, cnt, false, zoneLocation);
 			}
 			log.info("Done with merging population ...");
 
@@ -446,8 +450,8 @@ public class ReadFromUrbanSimModel {
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				// get home location id
-				Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] ) ;
-				ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId ) ;
+				Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] );
+				ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId );
 				if ( homeLocation==null ) {
 					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
@@ -492,7 +496,7 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
-				mergePopulation(oldPop, mergePop, network, backupPop, cnt, personId, newPerson);
+				mergePopulation(oldPop, mergePop, newPerson, backupPop, network, cnt, true, null);
 			}
 			log.info("Done with merging population ...");
 
@@ -606,15 +610,16 @@ public class ReadFromUrbanSimModel {
 	/**
 	 * @param oldPop
 	 * @param newPop
-	 * @param network
-	 * @param backupPop
-	 * @param cnt
-	 * @param personId
 	 * @param newPerson
+	 * @param backupPop
+	 * @param network
+	 * @param cnt
+	 * @param zoneLocation
 	 */
 	private void mergePopulation(final Population oldPop,
-			final Population newPop, final Network network,
-			Population backupPop, PopulationCounter cnt, Id personId, PersonImpl newPerson) {
+			final Population newPop, PersonImpl newPerson,
+			Population backupPop, final Network network, 
+			PopulationCounter cnt, boolean isParcel, ZoneLocations zoneLocation) {
 		
 		while ( true ) { // loop from which we can "break":
 
@@ -624,7 +629,7 @@ public class ReadFromUrbanSimModel {
 			if ( oldPop==null ) { // no pre-existing population.  Accept:
 				newPop.addPerson(newPerson);
 				break;
-			} else if ( (oldPerson=oldPop.getPersons().get(personId))==null ) { // person not found in old population. Store temporarily in backup.
+			} else if ( (oldPerson=oldPop.getPersons().get( newPerson.getId() )) == null ) { // person not found in old population. Store temporarily in backup.
 				backupPop.addPerson( newPerson );
 				cnt.newPersonCnt++;
 				break;
@@ -633,13 +638,29 @@ public class ReadFromUrbanSimModel {
 				cnt.employmentChangedCnt++;
 				break;
 			}
+			
+			// get home location from old plans file and current UrbanSim data
 			Activity oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
 			Activity newHomeAct = ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity();
-			if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // if act changed. Accept new person:
+			
+			// for parcels check if activity location has changed. if true accept as new person
+			if ( isParcel && actHasChanged ( oldHomeAct, newHomeAct, network ) ) {
 				newPop.addPerson(newPerson);
 				cnt.homelocationChangedCnt++;
 				break;
 			}
+			// for zones TODO
+//			else if( !isParcel ){
+//				if(zoneLocation == null){
+//					newPop.addPerson(newPerson);
+//					cnt.homelocationChangedCnt++;
+//					break;
+//				}
+//				else if(this.shapefile != null){
+//					
+//										
+//				}
+//			}
 
 			// check if new person works
 			if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter. TODO fix this when other activities are considered
@@ -704,66 +725,6 @@ public class ReadFromUrbanSimModel {
 		
 		return jobClusterArray;
 	}
-	
-//	/**
-//	 * Aggregates jobs with same nearest node 
-//	 * @param parcelsOrZones
-//	 * @param jobSample
-//	 * @param network
-//	 * @return
-//	 */
-//	public AggregateObject2NearestNode[] getAggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final NetworkImpl network, final boolean isParcel){
-//		
-//		// readJobs creates a hash map of job with key = job id
-//		// this hash map includes jobs according to job sample size
-//		List<PersonAndJobsObject> jobSampleList = readJobs(parcelsOrZones, jobSample, isParcel);
-//		assert( jobSampleList != null );
-//		
-//		// Since the aggregated opportunities in jobClusterArray does contain coordinates of their nearest node 
-//		// this result is dumped out here    tnicolai dec'12
-//		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(InternalConstants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
-//		
-//		log.info("Aggregating workplaces with identical nearest node ...");
-//		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
-//		
-//		ProgressBar bar = new ProgressBar( jobSampleList.size() );
-//
-//		for(int i = 0; i < jobSampleList.size(); i++){
-//			bar.update();
-//			
-//			PersonAndJobsObject jo = jobSampleList.get( i );
-//			assert( jo.getCoord() != null );
-//			Node nearestNode = network.getNearestNode( jo.getCoord() );
-//			assert( nearestNode != null );
-//
-//			// get euclidian distance to nearest node
-//			double distance = NetworkUtil.getEuclidianDistance(jo.getCoord(), nearestNode.getCoord());
-//			
-//			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
-//				AggregateObject2NearestNode jco = opportunityClusterMap.get( nearestNode.getId() );
-//				jco.addObject( jo.getObjectID(), distance );
-//			}
-//			else
-//				opportunityClusterMap.put(
-//						nearestNode.getId(),
-//						new AggregateObject2NearestNode(jo.getObjectID(), 
-//														jo.getParcelID(), 
-//														jo.getZoneID(), 
-//														nearestNode.getCoord(), 
-//														nearestNode, 
-//														distance));
-//		}
-//
-//		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ opportunityClusterMap.size() ];
-//		Iterator<AggregateObject2NearestNode> jobClusterIterator = opportunityClusterMap.values().iterator();
-//
-//		for(int i = 0; jobClusterIterator.hasNext(); i++)
-//			jobClusterArray[i] = jobClusterIterator.next();
-//		
-//		log.info("Aggregated " + jobSampleList.size() + " number of workplaces (sampling rate: " + jobSample + ") to " + jobClusterArray.length + " nodes.");
-//		
-//		return jobClusterArray;
-//	}
 
 	/**
 	 * reads jobs from UrbanSim output and return a list of jobs according
@@ -1071,6 +1032,40 @@ public class ReadFromUrbanSimModel {
 		} catch (Exception e) {e.printStackTrace();}
 	}
 
+	//////////////////////////////
+	// helper classes
+	//////////////////////////////
+	
+	public class ZoneLocations{
+		
+		private Id zoneIdHome = null;
+		private Id zoneIdWork = null;
+		private Coord homeCoord = null;
+		private Coord workCoord = null;
+		
+		public void setHomeLocation(Id zoneId, ActivityFacility home){
+			this.zoneIdHome = zoneId;
+			this.homeCoord  = home.getCoord();
+		}
+		public void setWorkLocation(Id zoneId, ActivityFacility work){
+			this.zoneIdWork = zoneId;
+			this.workCoord  = work.getCoord();
+		}
+		
+		public Id getHomeId(){
+			return this.zoneIdHome;
+		}
+		public Id getWorkId(){
+			return this.zoneIdWork;
+		}
+		public Coord getHomeCoord(){
+			return this.homeCoord;
+		}
+		public Coord getWorkCoord(){
+			return this.workCoord;
+		}
+	}
+	
 	public class PopulationCounter{
 		
 		public long numberOfUrbanSimPersons = 0;// total number of UrbanSim Persons	

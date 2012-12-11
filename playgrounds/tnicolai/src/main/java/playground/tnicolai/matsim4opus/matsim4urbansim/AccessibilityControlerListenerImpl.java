@@ -53,11 +53,12 @@ public class AccessibilityControlerListenerImpl{
 	
 	protected static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
 	
-	protected MATSim4UrbanSimInterface main = null;
+	public static final String FREESEED_FILENAME = "freeSpeedAccessibility_cellsize_";
+	public static final String CAR_FILENAME = "carAccessibility_cellsize_";
+	public static final String BIKE_FILENAME = "bikeAccessibility_cellsize_";
+	public static final String WALK_FILENAME = "walkAccessibility_cellsize_";
 	
-	public static final String SHAPE_FILE = "SF";
-	public static final String NETWORK 	= "NW";
-	protected static String fileExtension;
+	protected MATSim4UrbanSimInterface main = null;
 	
 	protected static int ZONE_BASED 	= 0;
 	protected static int PARCEL_BASED 	= 1;

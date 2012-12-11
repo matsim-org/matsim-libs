@@ -113,15 +113,14 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 	// ////////////////////////////////////////////////////////////////////
 	
 	public ParcelBasedAccessibilityControlerListenerV3(MATSim4UrbanSimInterface main,	
-													 ZoneLayer<Id> startZones, 								// needed for google earth plots
+													 ZoneLayer<Id> startZones, 									// needed for google earth plots
 													 // AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations (like workplaces)
 													 ActivityFacilitiesImpl parcels,							// parcel coordinates for accessibility feedback
 													 SpatialGrid freeSpeedGrid,									// table for free speed car travel times in accessibility computation
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
 													 SpatialGrid bikeGrid,										// table for bike travel times in accessibility computation
 													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
-													 String fileExtension,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
-													 Benchmark benchmark,										// Benchmark tool
+													 Benchmark benchmark,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
 													 ScenarioImpl scenario){
 								
 		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
@@ -142,14 +141,12 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		this.bikeGrid = bikeGrid;
 		assert (walkGrid != null);
 		this.walkGrid = walkGrid;
-		assert (fileExtension != null);
-		ParcelBasedAccessibilityControlerListenerV3.fileExtension = fileExtension;
 		assert (benchmark != null);
 		this.benchmark = benchmark;
 
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
-		AnalysisCellBasedAccessibilityCSVWriterV2.initAnalysisCellBasedAccessibilityCSVWriterV2(fileExtension);
+		AnalysisCellBasedAccessibilityCSVWriterV2.initAnalysisCellBasedAccessibilityCSVWriterV2();
 		
 		initAccessibilityParameter(scenario);
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
@@ -251,23 +248,19 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		log.info("Writing plotting files ...");
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(freeSpeedGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// freespeed results for plotting in R
-				+ "freeSpeedAccessibility_cellsize_" + freeSpeedGrid.getResolution()
-				+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
+				+ FREESEED_FILENAME + freeSpeedGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(carGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
-				+ "carAccessibility_cellsize_" + carGrid.getResolution()
-				+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
+				+ CAR_FILENAME + carGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(bikeGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
-				+ "bikeAccessibility_cellsize_" + bikeGrid.getResolution()
-				+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
+				+ BIKE_FILENAME + bikeGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(walkGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
-				+ "walkAccessibility_cellsize_" + walkGrid.getResolution()
-				+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
+				+ WALK_FILENAME + walkGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 
 
