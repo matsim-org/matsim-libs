@@ -94,7 +94,7 @@ public class DataPloter {
 		BoxAndWhiskersChart chart = new BoxAndWhiskersChart(
 			title,
 			DEUTSCH ? "Zeit [h]" : "time of day (h)",
-			DEUTSCH ? "Anzahl Fahrzeugfahrer" : "number of joinable trips",
+			DEUTSCH ? "Anzahl potentiell geteilter Wege" : "number of joinable trips",
 			1,
 			PLOT_STD_DEV);
 
@@ -129,7 +129,7 @@ public class DataPloter {
 		BoxAndWhiskersChart chart = new BoxAndWhiskersChart(
 			title,
 			DEUTSCH ? "Lange der Fahrten [km]" : "trip length (km)",
-			DEUTSCH ? "Anzahl Fahrzeugfahrer" : "number of joinable trips",
+			DEUTSCH ? "Anzahl potentiell geteilter Wege" : "number of joinable trips",
 			1,
 			PLOT_STD_DEV);
 
@@ -164,7 +164,7 @@ public class DataPloter {
 			new TwoCategoriesBoxAndWhiskerChart(
 				title ,
 				"",
-				DEUTSCH ? "Anzahl Fahrzeugfahrer" : "number of possible joint trips",
+				DEUTSCH ? "Anzahl potentiell geteilter Wege" : "number of possible joint trips",
 				PLOT_STD_DEV);
 
 		Collections.sort(conditions, new ConditionComparator());
