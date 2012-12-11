@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.replanning.grouping;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
@@ -41,6 +42,10 @@ import playground.thibautd.socnetsim.population.JointPlanFactory;
 public class GroupPlans {
 	private final Collection<JointPlan> jointPlans;
 	private final Collection<Plan> individualPlans;
+
+	public GroupPlans() {
+		this( Collections.EMPTY_LIST , Collections.EMPTY_LIST );
+	}
 
 	public GroupPlans(
 			final Collection<JointPlan> jointPlans,
