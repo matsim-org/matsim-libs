@@ -43,11 +43,13 @@ public class InVehicleModeHistogramImproved implements PersonEntersVehicleEventH
 	
 	private int binSize = 5 * 60;
 	
+	private int tripsTotal;
 	
 	@Override
 	public void reset(int iteration) {
 		this.histogram = new CategoryHistogram(binSize);
 		this.enterVehEventByPersId = new HashMap<Id, PersonEntersVehicleEvent>();
+		this.tripsTotal = 0;
 	}
 
 	@Override
@@ -63,6 +65,7 @@ public class InVehicleModeHistogramImproved implements PersonEntersVehicleEventH
 		if (! event.getPersonId().toString().startsWith("pt_")){
 			PersonEntersVehicleEvent enterEvent = this.enterVehEventByPersId.remove(event.getPersonId());
 			if (enterEvent != null){
+				this.tripsTotal++;
 				this.histogram.increase(enterEvent.getTime(), 1, "pt");
 				this.histogram.decrease(event.getTime(), 1, "pt");
 			}
@@ -74,4 +77,8 @@ public class InVehicleModeHistogramImproved implements PersonEntersVehicleEventH
 		return this.histogram;
 	}
 
+	public int getTotalTrips(){
+		return this.tripsTotal;
+	}
+	
 }
