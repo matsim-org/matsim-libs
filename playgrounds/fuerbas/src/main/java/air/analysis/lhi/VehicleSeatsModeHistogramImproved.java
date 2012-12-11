@@ -87,7 +87,7 @@ public class VehicleSeatsModeHistogramImproved implements
 		VehicleDepartsAtFacilityEvent departureEvent = this.vehDepartsEventsByVehicleId.get(event.getVehicleId());
 		if (departureEvent != null){
 			Vehicle vehicle = this.vehicles.getVehicles().get(event.getVehicleId());
-			int seats = vehicle.getType().getCapacity().getSeats();
+			int seats = vehicle.getType().getCapacity().getSeats() - 1;
 			this.seatsTotal += seats;
 			this.histogram.increase(departureEvent.getTime(), seats, "seats");
 			this.histogram.decrease(event.getTime(), seats, "seats");
