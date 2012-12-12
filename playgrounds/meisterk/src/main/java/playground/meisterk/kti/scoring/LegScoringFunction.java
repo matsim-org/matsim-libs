@@ -241,6 +241,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 
 	}
 
+	// balmermi: changed org.matsim.core.scoring.functions.CharyparNagelLegScoring.getDistance(Route route) to protected
 	/*
 	 * EventsToLegs creates dummy routes from events.
 	 * If a car leg starts and end on the same link, a GenericRouteImpl
@@ -248,13 +249,13 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 	 * check whether the route is a NetworkRoute or not when
 	 * calculating its distance.
 	 */
-	private double getDistance(Route route) {
-		double dist;
-		if (route instanceof NetworkRoute) {
-			dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
-		} else {
-			dist = route.getDistance();
-		}
-		return dist;
-	}
+//	private double getDistance(Route route) {
+//		double dist;
+//		if (route instanceof NetworkRoute) {
+//			dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
+//		} else {
+//			dist = route.getDistance();
+//		}
+//		return dist;
+//	}
 }
