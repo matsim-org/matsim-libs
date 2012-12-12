@@ -61,7 +61,7 @@ public class TransitRouterImpl implements TransitRouter {
 	private final TransitTravelDisutility travelDisutility;
 	private final TravelTime travelTime;
 	
-	private final DepartureTimeCache data = new DepartureTimeCache();
+	private DepartureTimeCache cache = new DepartureTimeCache();
 
 	public TransitRouterImpl(final TransitRouterConfig config, final TransitSchedule schedule) {
 		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config);
@@ -80,6 +80,10 @@ public class TransitRouterImpl implements TransitRouter {
 		this.travelDisutility = travelDisutility;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
 //		this.dijkstra = null; // enable to save memory if no routing should be done
+	}
+	
+	public void setDepartureTimeCache(final DepartureTimeCache cache) {
+		this.cache = cache;
 	}
 	
 	private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Coord coord, double departureTime){
@@ -158,7 +162,7 @@ public class TransitRouterImpl implements TransitRouter {
 					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 					leg.setRoute(ptRoute);
 					double arrivalOffset = (((TransitRouterNetworkLink) link).getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? ((TransitRouterNetworkLink) link).fromNode.stop.getArrivalOffset() : ((TransitRouterNetworkLink) link).fromNode.stop.getDepartureOffset();
-					double arrivalTime = this.data.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+					double arrivalTime = this.cache.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
 					legs.add(leg);
@@ -209,7 +213,7 @@ public class TransitRouterImpl implements TransitRouter {
 			double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 					(prevLink).toNode.stop.getArrivalOffset()
 					: (prevLink).toNode.stop.getDepartureOffset();
-			double arrivalTime = this.data.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+			double arrivalTime = this.cache.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 			leg.setTravelTime(arrivalTime - time);
 
 			legs.add(leg);
