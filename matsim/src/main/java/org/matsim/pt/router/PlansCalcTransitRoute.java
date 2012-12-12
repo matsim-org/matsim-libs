@@ -20,11 +20,13 @@
 
 package org.matsim.pt.router;
 
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -68,6 +70,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 public class PlansCalcTransitRoute extends PlansCalcRoute {
 
+	private static final Logger log = Logger.getLogger(PlansCalcTransitRoute.class);
+	
 	private class PtLegHandler implements LegRouter {
 
 		@Override
@@ -131,6 +135,9 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	}
 
 	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime, final Person person) {
+		if (fromAct.getCoord() == null || toAct.getCoord() == null) {
+			log.error("The Activities of Person " + person.getId() + " have no coordinates set. This is required to route a pt leg. In consequence you'll probably get an exception.");
+		}
 		List<Leg> legs= this.transitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime, person);
 		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 
