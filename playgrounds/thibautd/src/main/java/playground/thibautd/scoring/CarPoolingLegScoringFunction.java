@@ -153,7 +153,9 @@ public class CarPoolingLegScoringFunction extends CharyparNagelLegScoring {
 
 	}
 
-	private double getDistance(final Route r) {
+	// balmermi: changed org.matsim.core.scoring.functions.CharyparNagelLegScoring.getDistance(Route route) to protected
+	@Override
+	protected double getDistance(final Route r) {
 		if (r instanceof NetworkRoute) {
 			NetworkRoute nr = (NetworkRoute) r;
 			return nr.getDistance() > 0 ?
