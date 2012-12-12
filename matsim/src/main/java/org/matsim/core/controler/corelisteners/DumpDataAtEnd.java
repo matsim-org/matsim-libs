@@ -40,6 +40,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.vehicles.VehicleWriterV1;
 
 public class DumpDataAtEnd implements ShutdownListener {
 
@@ -69,13 +71,19 @@ public class DumpDataAtEnd implements ShutdownListener {
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
 					((NetworkImpl) scenarioData.getNetwork()).getNetworkChangeEvents());
 		}
-		if (scenarioData.getConfig().scenario().isUseHouseholds()) {
+		if (this.scenarioData.getConfig().scenario().isUseTransit()) {
+			new TransitScheduleWriter(this.scenarioData.getTransitSchedule()).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
+		}
+		if (this.scenarioData.getConfig().scenario().isUseVehicles()) {
+			new VehicleWriterV1(((ScenarioImpl) this.scenarioData).getVehicles()).writeFile(controlerIO.getOutputFilename("vehicles.xml.gz"));
+		}
+		if (this.scenarioData.getConfig().scenario().isUseHouseholds()) {
 			new HouseholdsWriterV10(((ScenarioImpl) scenarioData).getHouseholds()).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
 		}
-		if (scenarioData.getConfig().scenario().isUseLanes()) {
+		if (this.scenarioData.getConfig().scenario().isUseLanes()) {
 			new LaneDefinitionsWriter20(scenarioData.getScenarioElement(LaneDefinitions20.class)).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
 		}
-		if (!event.isUnexpected()&& scenarioData.getConfig().vspExperimental().isWritingOutputEvents()) {
+		if (!event.isUnexpected() && scenarioData.getConfig().vspExperimental().isWritingOutputEvents()) {
 			File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));
 			File fromFile = new File(controlerIO.getIterationFilename(scenarioData.getConfig().controler().getLastIteration(), "events.xml.gz"));
 			IOUtils.copyFile(fromFile, toFile);
