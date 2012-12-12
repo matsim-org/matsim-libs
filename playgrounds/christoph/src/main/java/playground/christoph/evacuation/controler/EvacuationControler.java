@@ -35,10 +35,8 @@ import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -141,7 +139,7 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class EvacuationControler extends WithinDayController implements MobsimInitializedListener, 
-		MobsimAfterSimStepListener, IterationStartsListener, StartupListener, AfterMobsimListener {
+		MobsimAfterSimStepListener, IterationStartsListener, AfterMobsimListener {
 
 //	public static final String referenceEventsFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac_reference/ITERS/it.0/evac.1.0.events.xml.gz";
 	public static final String referenceEventsFile = null;
@@ -292,15 +290,22 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 			new TransitRouterNetworkReaderMatsimV1(scenarioData, routerNetwork).parse(EvacuationConfig.transitRouterFile);
 		}
 	}
-	
+
 	/*
 	 * When the Controller Startup Event is created, the EventsManager
 	 * has already been initialized. Therefore we can initialize now
 	 * all Objects, that have to be registered at the EventsManager.
+	 * 
+	 * This code was previously called from a StartupListener. However, this
+	 * is not possible anymore since the TripRouterFactory is not initialized
+	 * when the StartupListener is called. cdobler, dec'12
 	 */
 	@Override
-	public void notifyStartup(StartupEvent event) {
+	public void setUp() {
 		
+		// initialze plan router
+		super.setUp();
+
 		/*
 		 * get number of threads from config file
 		 */
