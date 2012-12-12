@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ssix;
+package test.java.playground.ssix;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import main.java.playgrounds.ssix.MyPersonDriverAgentImpl;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -45,6 +47,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -65,10 +68,15 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.PopulationUtils;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import playgrounds.ssix.MyPersonDriverAgentImpl;
+
+
+//import main.java.playgrounds.ssix.MyPersonDriverAgentImpl;
+
 
 public class DreieckStreckeSzenarioTest {
 
@@ -182,12 +190,12 @@ public class DreieckStreckeSzenarioTest {
 	}
 	
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
-	public static double length = 200.;//in m
+	public static double length = 200.;//in m, length of one the triangle sides.
 	
-	private static double FREESPEED = 50.;//in km/h
-	private static double P_TRUCK = 2.;//no need to worry much about those, are normalized when choosing effective transport mode
+	private static double FREESPEED = 90.;//in km/h
+	private static double P_TRUCK = 0.5;//no need to worry much about those, are normalized when choosing effective transport mode
 	//private static double P_MED = 2.;
-	private static double P_FAST = 2.;
+	private static double P_FAST = 0.5;
 	
 	private Scenario scenario;
 	
@@ -215,7 +223,8 @@ public class DreieckStreckeSzenarioTest {
 	
 	public void run(){
 		fillNetworkData();
-		createPopulation((long)55,2);
+		//createRandomPopulation((long)90,2);
+		createWantedPopulation(25,0,10,2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		/*
@@ -300,13 +309,13 @@ public class DreieckStreckeSzenarioTest {
 		Link startLink = this.scenario.getNetwork().getFactory().createLink(startId, startNode, this.scenario.getNetwork().getNodes().get(new IdImpl(0)));
 		startLink.setCapacity(capMax);
 		startLink.setFreespeed(DreieckStreckeSzenarioTest.FREESPEED/3.6);
-		startLink.setLength(50.);
-		startLink.setNumberOfLanes(1.);
+		startLink.setLength(25.);
+		startLink.setNumberOfLanes(2.);
 		network.addLink(startLink);
 		Link endLink = this.scenario.getNetwork().getFactory().createLink(endId, this.scenario.getNetwork().getNodes().get(new IdImpl(DreieckStreckeSzenarioTest.subdivisionFactor)), endNode);
 		endLink.setCapacity(capMax);
 		endLink.setFreespeed(DreieckStreckeSzenarioTest.FREESPEED/3.6);
-		endLink.setLength(50.);
+		endLink.setLength(25.);
 		endLink.setNumberOfLanes(1.);
 		network.addLink(endLink);
 		
@@ -315,10 +324,11 @@ public class DreieckStreckeSzenarioTest {
 		//writer.write("./output/dreieck_network.xml");
 	}
 	
-	private void createPopulation(long numberOfPeople, int sekundenFrequenz){
+	private void createRandomPopulation(long numberOfPeople, int sekundenFrequenz){
 		Population population = scenario.getPopulation();
-		Random rand = new Random();//for more randomness
-		//other option get MatsimRandom() is then more deterministic
+		Random rand = MatsimRandom.getRandom();//for more randomness use new Random()
+		// other option get MatsimRandom(), is then more deterministic and allows introduction of a new person
+		// without changing previous modal split
 		
 		for (long i = 0; i<numberOfPeople; i++){
 			
@@ -370,6 +380,55 @@ public class DreieckStreckeSzenarioTest {
 		//check with xml
 		//PopulationWriter writer = new PopulationWriter(population, scenario.getNetwork());
 		//writer.write("./input/plans.xml");
+	}
+
+	private void createWantedPopulation(long numberOfTrucks, long numberOfMed, long numberOfFast, int sekundenFrequenz){
+		Population population = scenario.getPopulation();
+		long numberOfPeople =  numberOfTrucks+numberOfMed+numberOfFast;
+		
+		for (long i = 0; i<numberOfPeople; i++){
+			
+			Person person = population.getFactory().createPerson(createId(i+1));
+			Map<String, Object> customMap = person.getCustomAttributes();
+			
+			Plan plan = population.getFactory().createPlan();
+			plan.addActivity(createHome(sekundenFrequenz, i+1));
+
+			String transportMode="";
+
+			if (i<numberOfTrucks){
+				transportMode = "truck";
+				//System.out.println("A truck was made.");
+			/*
+			} else if (i<numberOfMed)) {
+				transportMode = "med";
+				//System.out.println("A med was made.");
+			*/
+			} else {
+				transportMode = "fast";
+				//System.out.println("A fast was made.");
+			}
+			customMap.put("transportMode", transportMode);
+			Leg leg = population.getFactory().createLeg(transportMode);
+			
+			//following modification goes with the modification in the prepareForSim method
+			final Id startLinkId = new IdImpl(-1);
+			final Id endLinkId = new IdImpl(3*DreieckStreckeSzenarioTest.subdivisionFactor);
+			//NetworkRoute route = new CompressedNetworkRouteImpl();
+			List<Id> routeDescription = new ArrayList<Id>();
+			for (long j=0; j<3*DreieckStreckeSzenarioTest.subdivisionFactor;j++){
+				routeDescription.add(new IdImpl(j));
+			}
+			NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+			route.setLinkIds(startLinkId, routeDescription, endLinkId);
+			leg.setRoute(route);
+			//end of modification//works!
+			plan.addLeg(leg);
+			plan.addActivity(createWork());
+			
+			person.addPlan(plan);
+			population.addPerson(person);
+		}
 	}
 	
 	private void runqsim(EventsManager events){
@@ -473,15 +532,20 @@ public class DreieckStreckeSzenarioTest {
         Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 		VehicleType truck = VehicleUtils.getFactory().createVehicleType(new IdImpl("truck"));
 		truck.setPcuEquivalents(1.0);
-		truck.setMaximumVelocity(9.0);
+		truck.setMaximumVelocity(12.0);
+		VehicleCapacity cap = new VehicleCapacityImpl();
+		cap.setSeats(4);
+		truck.setCapacity(cap);
 		modeVehicleTypes.put("truck", truck);
 		VehicleType med = VehicleUtils.getFactory().createVehicleType(new IdImpl("med"));
 		med.setPcuEquivalents(1.0);
-		med.setMaximumVelocity(10.0);
+		med.setMaximumVelocity(15.0);
+		med.setCapacity(cap);
 		//modeVehicleTypes.put("med", med);
 		VehicleType fast = VehicleUtils.getFactory().createVehicleType(new IdImpl("fast"));
 		fast.setPcuEquivalents(1.0);
-		fast.setMaximumVelocity(13.88);
+		fast.setMaximumVelocity(18.);
+		fast.setCapacity(cap);
 		modeVehicleTypes.put("fast", fast);
 		
         agentSource.setModeVehicleTypes(modeVehicleTypes);
@@ -496,14 +560,14 @@ public class DreieckStreckeSzenarioTest {
 		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
 		
 		Random r = new Random();
-		///*Method 1: The order of leaving people is guaranteed by the minimum time step between people: first person 1 leaves, then 2, then 3 etc...
+		/*Method 1: The order of leaving people is guaranteed by the minimum time step between people: first person 1 leaves, then 2, then 3 etc...
 		long plannedEndTime = 6*3600 + (identifier-1)*sekundenFrequenz;
 		double endTime = plannedEndTime - sekundenFrequenz/2.0 + r.nextDouble()*sekundenFrequenz;
-		//*/
-		/*Method 2: With the expected frequency, the maximal departure time is computed and people are randomly departing within this huge time chunk.
+		*/
+		///*Method 2: With the expected frequency, the maximal departure time is computed and people are randomly departing within this huge time chunk.
 		long TimeChunkSize = scenario.getPopulation().getPersons().size() * sekundenFrequenz;
 		double endTime = 6 * 3600 + r.nextDouble() * TimeChunkSize; 
-		*/
+		//*/
 		//NB:Method 2 is significantly better for the quality of fundamental diagrams;
 		activity.setEndTime(endTime);
 		
