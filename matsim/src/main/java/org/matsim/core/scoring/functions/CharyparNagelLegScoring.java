@@ -147,7 +147,7 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 		return tmpScore;
 	}
 
-	private double getDistance(Route route) {
+	protected double getDistance(Route route) {
 		double dist;
 		if (route instanceof NetworkRoute) {
 			dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
