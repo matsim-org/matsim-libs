@@ -203,10 +203,10 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 						/ 60. + " minutes).");
 			}
 			// tnicolai: for debugging (remove for release)
-			log.info("Euclidian vs Othogonal Distance:");
-			log.info("Total Counter:" + NetworkUtil.totalCounter);
-			log.info("Euclidian Counter:" + NetworkUtil.euclidianCounter);
-			log.info("Othogonal Counter:" + NetworkUtil.othogonalCounter);
+			//log.info("Euclidian vs Othogonal Distance:");
+			//log.info("Total Counter:" + NetworkUtil.totalCounter);
+			//log.info("Euclidian Counter:" + NetworkUtil.euclidianCounter);
+			//log.info("Othogonal Counter:" + NetworkUtil.othogonalCounter);
 			
 			AnalysisCellBasedAccessibilityCSVWriterV2.close(); 
 			writePlottingData();						// plotting data for visual analysis via R
