@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -108,7 +109,8 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 			System.exit(-1);
 		}
 
-		scenario = connector.getScenario();
+		Config config = connector.getConfig();
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario( config );
 		ScenarioUtils.loadScenario(scenario);
 		setControlerSettings(scenario, args);
 		// init Benchmark as default
