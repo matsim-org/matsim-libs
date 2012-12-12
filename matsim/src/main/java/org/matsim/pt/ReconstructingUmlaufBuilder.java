@@ -29,6 +29,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -57,12 +58,16 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private UmlaufInterpolator umlaufInterpolator;
 
 
+	private Map<Id, Id> umlaufIdsByVehicleId;
+
+
 	public ReconstructingUmlaufBuilder(Network network, Collection<TransitLine> transitLines,
 			Vehicles basicVehicles, PlanCalcScoreConfigGroup config) {
 		super();
 		this.umlaufInterpolator = new UmlaufInterpolator(network, config);
 		this.transitLines = transitLines;
 		this.basicVehicles = basicVehicles;
+		this.umlaufIdsByVehicleId = new HashMap<Id, Id>();
 	}
 
 	@Override
@@ -81,16 +86,26 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private void createUmlaeufe(){
 		int cnt = 0 ;
 		for (UmlaufStueck umlaufStueck : umlaufStuecke) {
-			Umlauf umlauf = umlaeufe.get(umlaufStueck.getDeparture().getVehicleId());
+			Umlauf umlauf = umlaeufe.get(this.getUmlaufIdForVehicleId(umlaufStueck.getDeparture().getVehicleId()));
 			umlaufInterpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
 			cnt++ ;
 			printStatus(cnt);
 		}
 	}
+	
+	private Id getUmlaufIdForVehicleId(Id vehId){
+		return this.umlaufIdsByVehicleId.get(vehId);
+	}
+	
+	private Id createUmlaufIdFromVehicle(Vehicle vehicle){
+		Id id = new IdImpl(vehicle.getId().toString() + "_" + vehicle.getType().getId());
+		this.umlaufIdsByVehicleId.put(vehicle.getId(), id);
+		return id;
+	}
 
 	private void createEmptyUmlaeufe() {
 		for (Vehicle basicVehicle : basicVehicles.getVehicles().values()) {
-			UmlaufImpl umlauf = new UmlaufImpl(basicVehicle.getId());
+			UmlaufImpl umlauf = new UmlaufImpl(this.createUmlaufIdFromVehicle(basicVehicle));
 			umlauf.setVehicleId(basicVehicle.getId());
 			umlaeufe.put(umlauf.getId(), umlauf);
 		}
