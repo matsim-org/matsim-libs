@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OSMNode.java
+ * OSMElement.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,55 +20,16 @@
 
 package playground.gregor.sim2d_v4.io.osmparser;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-public class OSMNode implements OSMElement {
-	
-	private final Id id;
-	private final double lat;
-	private final double lon;
-	private final Map<String,String> tags = new HashMap<String,String>();
-	
-	
-	public OSMNode(double lat, double lon, Id id) {
-		this.id = id;
-		this.lat = lat;
-		this.lon = lon;
-	}
-	
-	public double getLat() {
-		return this.lat;
-	}
-	
-	public double getLon() {
-		return this.lon;
-	}
-	
-	/* (non-Javadoc)
-	 * @see playground.gregor.sim2d_v4.io.osmparser.OSMElement#getId()
-	 */
-	@Override
-	public Id getId() {
-		return this.id;
-	}
-	
-	/* (non-Javadoc)
-	 * @see playground.gregor.sim2d_v4.io.osmparser.OSMElement#addTag(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void addTag(String key, String val) {
-		this.tags.put(key, val);
-	}
-	
-	/* (non-Javadoc)
-	 * @see playground.gregor.sim2d_v4.io.osmparser.OSMElement#getTags()
-	 */
-	@Override
-	public Map<String,String> getTags() {
-		return this.tags;
-	}
+public interface OSMElement {
+
+	public abstract Id getId();
+
+	public abstract void addTag(String key, String val);
+
+	public abstract Map<String, String> getTags();
 
 }

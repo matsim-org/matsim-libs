@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OSM.java
+ * OSMRelation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,67 +21,71 @@
 package playground.gregor.sim2d_v4.io.osmparser;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.Tuple;
 
-public class OSM {
-	
-	private final List<OSMNode> nodes = new ArrayList<OSMNode>();
-	private final List<OSMWay> ways = new ArrayList<OSMWay>();
-	private final Set<Id> refNodes = new HashSet<Id>();
-	private final List<OSMRelation> relations = new ArrayList<OSMRelation>();
+public class OSMRelation implements OSMElement{
 
+	private final Map<String,String> tags = new HashMap<String,String>();
 	
-	private final Set<String> keys = new HashSet<String>();
-	private final Set<Tuple<String,String>> keyValues  = new HashSet<Tuple<String,String>>();
+	private final List<Member> members = new ArrayList<Member>();
 	
-	
-	public void addKey(String key) {
-		this.keys.add(key);
+	private final Id id;
+
+	public OSMRelation(Id id) {
+		this.id = id;
 	}
-	public void addKeyValue(String key, String value) {
-		this.keyValues.add(new Tuple<String,String>(key,value));
+
+	@Override
+	public Id getId() {
+		return this.id;
+	}
+
+	@Override
+	public void addTag(String key, String val) {
+		this.tags.put(key, val);
+		
+	}
+
+	@Override
+	public Map<String, String> getTags() {
+		return this.tags;
 	}
 	
-	/*package*/ List<String> getKeys() {
-		return new ArrayList<String>(this.keys);
+	public void addMember(Member m) {
+		this.members.add(m);
 	}
 	
-	/*package*/ List<Tuple<String,String>> getKeyValues() {
-		return new ArrayList<Tuple<String,String>>(this.keyValues);
+	public List<Member> getMembers() {
+		return this.members;
 	}
 	
-	public List<OSMNode> getNodes() {
-		if (this.nodes.size() > this.refNodes.size()) {
-			Iterator<OSMNode> it = this.nodes.iterator();
-			while (it.hasNext()) {
-				OSMElement node = it.next();
-				if (!this.refNodes.contains(node.getId())) {
-					it.remove();
-				}
-			}
+	public static final class Member {
+		
+		private final String type;
+		private final Id ref;
+		private final String role;
+		
+		public Member(String type, Id ref, String role) {
+			this.type = type;
+			this.ref = ref;
+			this.role = role;
 		}
-		return this.nodes;
+		
+		public String getType() {
+			return this.type;
+		}
+		
+		public Id getRefId() {
+			return this.ref;
+		}
+		
+		public String getRole() {
+			return this.role;
+		}
 	}
 	
-	/*package*/ List<OSMNode> getUnfilteredNodes() {
-		return this.nodes;
-	}
-	
-	/*package*/ Set<Id> getRefNodes() {
-		return this.refNodes;
-	}
-	
-	public List<OSMWay> getWays() {
-		return this.ways;
-	}
-
-	public List<OSMRelation> getRelations() {
-		return this.relations ;
-	}
 }

@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-public class OSMWay {
+public class OSMWay implements OSMElement {
 
 	private final Map<String,String> tags = new HashMap<String,String>();
 	
@@ -39,14 +39,17 @@ public class OSMWay {
 		this.id = id;
 	}
 	
+	@Override
 	public Id getId(){
 		return this.id;
 	}
 	
+	@Override
 	public void addTag(String key, String val) {
 		this.tags.put(key,val);
 	}
 	
+	@Override
 	public Map<String,String> getTags() {
 		return this.tags;
 	}

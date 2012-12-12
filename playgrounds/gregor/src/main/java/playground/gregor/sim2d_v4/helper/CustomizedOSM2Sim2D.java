@@ -20,9 +20,7 @@
 
 package playground.gregor.sim2d_v4.helper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
@@ -102,9 +100,15 @@ public class CustomizedOSM2Sim2D {
 	private final Sim2DEnvironment env;
 	private HashMap<Id, OSMNode> nodes;
 	private final MathTransform transform;
+	private final OSM osm;
 
-	//TODO we need the possibility to have several environments. This means that parse a scenario and not an environment 
+	//TODO we need the possibility to have several environments. This means that we parse a scenario and not an environment 
 	public CustomizedOSM2Sim2D(Sim2DEnvironment env) {
+		this(env,new OSM());
+	}
+	
+
+	public CustomizedOSM2Sim2D(Sim2DEnvironment env, OSM osm) {
 		this.env = env;
 		this.env.setEnvelope(this.e);
 		try {
@@ -112,19 +116,18 @@ public class CustomizedOSM2Sim2D {
 		} catch (FactoryException e) {
 			throw new RuntimeException(e);
 		}
+		this.osm = osm;
 	}
 
+
 	public void processOSMFile(String file) {
-		OSM osm = new OSM();
-		OSMXMLParser parser = new OSMXMLParser(osm);
-		List<String>  keys = new ArrayList<String>();
-		keys.add(K_M_TYPE);
-		parser.setKeyFilter(keys);
+		
+		this.osm.addKey(K_M_TYPE);
+		OSMXMLParser parser = new OSMXMLParser(this.osm);
+		
 		parser.setValidating(false);
 		parser.parse(file);
-		System.out.println(osm.getWays().size());
-		System.out.println(osm.getNodes().size());
-		buildEnvironment(osm);
+		buildEnvironment(this.osm);
 	}
 
 

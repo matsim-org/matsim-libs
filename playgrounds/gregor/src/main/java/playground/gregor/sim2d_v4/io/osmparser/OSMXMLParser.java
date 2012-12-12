@@ -20,29 +20,33 @@
 
 package playground.gregor.sim2d_v4.io.osmparser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import playground.gregor.sim2d_v4.io.osmparser.OSMRelation.Member;
+
 public class OSMXMLParser extends MatsimXmlParser {
-	
+
 	private OSMWay currentWay = null;
 	private OSMNode currentNode = null;
-	
+	private OSMRelation currentRelation = null;
 
-	private List<String> keys = null;
+
+	private List<String> keys = new ArrayList<String>();
+	private List<Tuple<String, String>> keyValues = new ArrayList<Tuple<String,String>>();
 	private final OSM osm;
 
 	public OSMXMLParser(OSM osm){
 		this.osm = osm;
-	}
-	
-	public void setKeyFilter(List<String> keys) {
-		this.keys  = keys;
+		this.keys = osm.getKeys();
+		this.keyValues = osm.getKeyValues();
 	}
 
 	@Override
@@ -53,6 +57,9 @@ public class OSMXMLParser extends MatsimXmlParser {
 			double lon = Double.parseDouble(atts.getValue("lon"));
 			OSMNode node = new OSMNode(lat, lon, id);
 			this.currentNode = node;
+		} else if (name.equals("relation")){
+			Id id = new IdImpl(atts.getValue("id"));
+			this.currentRelation = new OSMRelation(id);
 		} else if (name.equals("way")) {
 			Id id = new IdImpl(atts.getValue("id"));
 			OSMWay way = new OSMWay(id);
@@ -66,8 +73,15 @@ public class OSMXMLParser extends MatsimXmlParser {
 			if (this.currentWay != null) {
 				this.currentWay.addTag(key, val);
 			} else if (this.currentNode != null) {
-				this.currentNode.addTad(key, val);
+				this.currentNode.addTag(key, val);
+			} else if (this.currentRelation != null) {
+				this.currentRelation.addTag(key, val);
 			}
+		} else if (name.equals("member")) {
+			String type = atts.getValue("type");
+			Id refId = new IdImpl(atts.getValue("ref"));
+			String role = atts.getValue("role");
+			this.currentRelation.addMember(new Member(type,refId,role));
 		}
 
 	}
@@ -84,10 +98,20 @@ public class OSMXMLParser extends MatsimXmlParser {
 					break;
 				}
 			}
+
 			this.currentWay = null;
 		}else if (name.equals("node")) {
 			this.osm.getUnfilteredNodes().add(this.currentNode);
 			this.currentNode = null;
+		} else if (name.equals("relation")) {
+			for (Tuple<String, String> keyValue : this.keyValues) {
+				String val = this.currentRelation.getTags().get(keyValue.getFirst());
+				if (val != null && val.equals(keyValue.getSecond())) {
+					this.osm.getRelations().add(this.currentRelation);
+					break;
+				}
+			}
+			this.currentRelation = null;
 		}
 
 	}

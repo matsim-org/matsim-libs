@@ -189,7 +189,7 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 
 	private int [] getOpenings(XMLSectionPropertyType ff) {
 		JAXBElement<XMLOpeningsType> oooo = ff.getOpenings();
-		if (oooo == null) {
+		if (oooo == null || oooo.getValue().getValue().length() == 0) {
 			return null;
 		}
 		XMLOpeningsType xmlOpening = oooo.getValue();
