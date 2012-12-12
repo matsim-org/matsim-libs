@@ -202,7 +202,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
 			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, reactivateLinksBarrier, 
-					separationBarrier, reactivateNodesBarrier, endBarrier, this.getMobsim(), multiModalTravelTimes);
+					separationBarrier, reactivateNodesBarrier, endBarrier, this.getMobsim(), multiModalTravelTimes, this);
 
 			engine.setInternalInterface(this.internalInterface);
 			

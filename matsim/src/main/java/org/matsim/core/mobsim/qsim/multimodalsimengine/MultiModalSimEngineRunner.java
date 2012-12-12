@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.router.util.TravelTime;
@@ -38,10 +39,11 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	private final CyclicBarrier separationBarrier;
 	private final CyclicBarrier reactivateLinksBarrier;
 	private final CyclicBarrier endBarrier;
+	private final MultiModalSimEngine multiModalSimEngine;
 	
 	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier reactivateNodesBarrier,
 			CyclicBarrier separationBarrier, CyclicBarrier reactivateLinksBarrier, CyclicBarrier endBarrier,
-			Netsim sim, Map<String, TravelTime> multiModalTravelTime) {
+			Netsim sim, Map<String, TravelTime> multiModalTravelTime, MultiModalSimEngine multiModalSimEngine) {
 		super(sim, multiModalTravelTime);
 		this.startBarrier = startBarrier;
 		this.reactivateNodesBarrier = reactivateNodesBarrier;
@@ -49,6 +51,7 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 		this.reactivateLinksBarrier = reactivateLinksBarrier;
 		this.endBarrier = endBarrier;
 		this.multiModalTravelTimes = multiModalTravelTime;
+		this.multiModalSimEngine = multiModalSimEngine;
 	}
 
 	/*
@@ -165,5 +168,21 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	@Override
 	public void afterSim() {
 		this.simulationRunning = false;
+	}
+	
+	/*
+	 * Use the map from the ParallelMultiModalSimEngine. This is a read-only access,
+	 * therefore this should be thread-safe.
+	 */
+	/*package*/ MultiModalQNodeExtension getMultiModalQNodeExtension(Id nodeId) {
+		return multiModalSimEngine.getMultiModalQNodeExtension(nodeId);
+	}
+
+	/*
+	 * Use the map from the ParallelMultiModalSimEngine. This is a read-only access,
+	 * therefore this should be thread-safe.
+	 */
+	/*package*/ MultiModalQLinkExtension getMultiModalQLinkExtension(Id linkId) {
+		return multiModalSimEngine.getMultiModalQLinkExtension(linkId);
 	}
 }
