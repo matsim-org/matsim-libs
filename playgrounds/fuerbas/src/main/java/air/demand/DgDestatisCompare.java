@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.collections.Tuple;
 
 
 /**
@@ -95,13 +96,13 @@ public class DgDestatisCompare {
 		DgDestatisCompare compare = new DgDestatisCompare();
 		List<FlightODRelation> diff = compare.createDifferenceList(demand21, demand22);
 		SortedMap<String, SortedMap<String, FlightODRelation>> diffMap = DgDemandUtils.createFromAirportCodeToAirportCodeMap(diff);
-		double variance = DgDemandUtils.calcVariance(diffMap);
+		Tuple<Double, Integer> variance = DgDemandUtils.calcVariance(diffMap);
 		
 		//		List<FlightODRelation> diff = compare.compare(odDemand21, odDemand22);
 		new DgDemandWriter().writeFlightODRelations(odDiffOutput, diffMap, totalDirectFlights, 0, false);
 		new DgDemandWriter().writeFlightODRelations(odDiffOutputAbs, diffMap, totalDirectFlights, 0, true);
 		compare.calculateTotalLineSwitch(diff);
-		System.out.println("Variance " + variance + " std deviation: " + Double.toString(Math.sqrt(variance)));
+		System.out.println("Variance " + variance.getFirst() + " std deviation: " + Double.toString(Math.sqrt(variance.getFirst())));
 	}
 
 }

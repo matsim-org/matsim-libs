@@ -27,11 +27,11 @@ import java.util.SortedMap;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.utils.collections.Tuple;
 
 import air.demand.DgDemandReader;
 import air.demand.DgDemandUtils;
 import air.demand.DgDemandWriter;
-import air.demand.DgDestatisCompare;
 import air.demand.FlightODRelation;
 
 
@@ -48,6 +48,8 @@ public class DgFlightSimDemandAnalyzer {
 //	String outputDiffFile2 = "/home/dgrether/data/work/repos/runs-svn/run1835/ITERS/it.500/1835.500.destatis_2.2.2-simulated_direct_flights.csv";
 //	String outputDiffFileAbs2 = "/home/dgrether/data/work/repos/runs-svn/run1835/ITERS/it.500/1835.500.destatis_2.2.2-simulated_direct_flights_abs.csv";
 	String outputRelativeErrorFile = "/media/data/work/repos/shared-svn/studies/countries/de/flight/demand/destatis/2011_september/demand_september_2011_relative_error_2.2.2-2.2.1.csv";
+	String odDiffOutput = "/media/data/work/repos/shared-svn/studies/countries/de/flight/demand/destatis/2011_september/demand_september_2011_diff_2.2.1-2.2.2.csv";
+	String odDiffOutputAbs = "/media/data/work/repos/shared-svn/studies/countries/de/flight/demand/destatis/2011_september/demand_september_2011_diff_2.2.1-2.2.2abs.csv";
 
 	List<String> results = new ArrayList<String>();
 	
@@ -64,15 +66,21 @@ public class DgFlightSimDemandAnalyzer {
 		if (od.getNumberOfTrips() != null)
 			totalDirectFlights21 += od.getNumberOfTrips();
 	}
-	List<FlightODRelation> diff = new DgDestatisCompare().createDifferenceList(demand21List, demand22List);
-	SortedMap<String, SortedMap<String, FlightODRelation>> diffMap = DgDemandUtils.createFromAirportCodeToAirportCodeMap(diff);
-	double variance = DgDemandUtils.calcVariance(diffMap);
+	
+	SortedMap<String, SortedMap<String, FlightODRelation>> diffMap = DgDemandUtils.createDifferenceMap(destatisDemand21, destatisDemand22);
+	new DgDemandWriter().writeFlightODRelations(odDiffOutput, diffMap, totalDirectFlights21, 0, false);
+	new DgDemandWriter().writeFlightODRelations(odDiffOutputAbs, diffMap, totalDirectFlights21, 0, true);
+	Tuple<Double, Integer> variance = DgDemandUtils.calcVariance(diffMap);
 	
 	SortedMap<String, SortedMap<String, FlightODRelation>> relativeErrorMap = DgDemandUtils.createRelativeErrorMap(destatisDemand22, destatisDemand21);
 	writer.writeFlightODRelations(outputRelativeErrorFile, relativeErrorMap);
-	double meanRelError = DgDemandUtils.calcMeanRelativeError(relativeErrorMap);
+	Tuple<Double, Integer>relErrorSum = DgDemandUtils.calcRelativeErrorSum(relativeErrorMap);
 	
-	String result = "2.2.2 - 2.2.1" + " &  " + "-" + " & " + getStringFromDouble(variance, -1) + " & " + getStringFromDouble(Math.sqrt(variance), -1) + " & " + getStringFromDouble(meanRelError, 4) + " & " + "-" + " & " + "-" + " \\\\";
+	double populationVariance = variance.getFirst() / (double)variance.getSecond();
+	double meanRelError = relErrorSum.getFirst()/(double)relErrorSum.getSecond();
+	String result = "2.2.2 - 2.2.1" + " &  " + "-" + " & " + getStringFromDouble(populationVariance, -1)  + ", " + Integer.toString(variance.getSecond())+ " & " 
+	+ getStringFromDouble(populationVariance, -1) + " & " + getStringFromDouble(meanRelError, 4) 
+	+ ", " + Integer.toString(relErrorSum.getSecond()) + " & " + "-" + " & " + "-" + " \\\\";
 	System.out.println(result);
 	results.add(result);
 
@@ -109,11 +117,16 @@ public class DgFlightSimDemandAnalyzer {
 		
 		relativeErrorMap = DgDemandUtils.createRelativeErrorMap(simulatedDirectFlights, destatisDemand21);
 		writer.writeFlightODRelations(outputRelativeErrorFile, relativeErrorMap);
-		meanRelError = DgDemandUtils.calcMeanRelativeError(relativeErrorMap);
+		relErrorSum = DgDemandUtils.calcRelativeErrorSum(relativeErrorMap);
 		double boardingDenied = handler.getBoardingDenied();
 		double stucked = handler.getStucked();
 		
-		result = runNumber + " & " + iteration + " & " + getStringFromDouble(variance, -1) + " & " + getStringFromDouble(Math.sqrt(variance), -1) + " & " + getStringFromDouble(meanRelError, 4)+ " & " + getStringFromDouble(boardingDenied, -1) + " & " + getStringFromDouble(stucked, -1) + " \\\\";
+		populationVariance = variance.getFirst() / (double)variance.getSecond();
+		meanRelError = relErrorSum.getFirst()/(double)relErrorSum.getSecond();
+		
+		result = runNumber + " & " + iteration + " & " + getStringFromDouble(populationVariance, -1) + ", " + Integer.toString(variance.getSecond()) + " & " 
+		+ getStringFromDouble(Math.sqrt(populationVariance), -1) + " & " + getStringFromDouble(meanRelError, 4) 
+		+ ", " + Integer.toString(relErrorSum.getSecond()) + " & " + getStringFromDouble(boardingDenied, -1) + " & " + getStringFromDouble(stucked, -1) + " \\\\";
 		System.out.println(result);
 		results.add(result);
 	}
@@ -122,7 +135,7 @@ public class DgFlightSimDemandAnalyzer {
 	for (String s : results){
 		System.out.println(s);
 	}
-}
+}	
 
 
 

@@ -77,11 +77,16 @@ public class DgDemandWriter {
 				for (String key2 : entries){
 					FlightODRelation rel = relations.get(key2);
 					if (rel != null){
-						double i = rel.getNumberOfTrips();
-						if (absoluteValues){
-							i = Math.abs(i);
+						if (rel.getNumberOfTrips() != null){
+							double i = rel.getNumberOfTrips();
+							if (absoluteValues){
+								i = Math.abs(i);
+							}
+							bw.append(Double.toString(i));
 						}
-						bw.append(Double.toString(i));
+						else {
+							bw.append("-");
+						}
 					}
 					else {
 						bw.append("-");
