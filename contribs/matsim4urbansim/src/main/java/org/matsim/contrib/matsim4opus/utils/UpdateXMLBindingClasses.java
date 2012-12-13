@@ -27,11 +27,12 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.constants.Constants;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.utils.io.LoadFile;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.contrib.matsim4opus.utils.securityManager.ExitException;
 import org.matsim.contrib.matsim4opus.utils.securityManager.NoExitSecurityManager;
+
 
 import com.sun.tools.xjc.XJCFacade;
 
@@ -135,7 +136,7 @@ public class UpdateXMLBindingClasses {
 			log.warn("XSD location not given (optional)...");
 			String tmpDir = TempDirectoryUtil.createCustomTempDirectory("xsd");
 			// set default location			
-			LoadFile loadFile = new LoadFile(Constants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tmpDir, Constants.CURRENT_XSD_FILE_NAME);
+			LoadFile loadFile = new LoadFile(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tmpDir, InternalConstants.CURRENT_XSD_FILE_NAME);
 			xsdLocation = loadFile.loadMATSim4UrbanSimXSDString();
 			
 			log.warn("Set xsd default location to: " + xsdLocation);
@@ -143,7 +144,7 @@ public class UpdateXMLBindingClasses {
 		if(outputDirectory == null){
 			log.warn("Destination not given (optional)...");
 			// set default location
-			outputDirectory = Constants.MATSIM_WORKING_DIRECTORY + "/src/main/java/";
+			outputDirectory = InternalConstants.MATSIM_WORKING_DIRECTORY + "/src/main/java/";
 			TempDirectoryUtil.createDirectory( outputDirectory );
 			log.warn("Set default destination to: " + outputDirectory);
 		}
@@ -169,7 +170,7 @@ public class UpdateXMLBindingClasses {
 		Package pack = c.getPackage();
 		String name = pack.getName();
 		int dot = name.lastIndexOf(".");
-		name = name.substring(0, dot+1) + Constants.JAXB_PARSER_PACKAGE_NAME;
+		name = name.substring(0, dot+1) + InternalConstants.JAXB_PARSER_PACKAGE_NAME;
 		
 		return name;
 	}
@@ -198,29 +199,3 @@ public class UpdateXMLBindingClasses {
 	}
 		
 }
-
-//class JAXBRun extends Thread{
-//	
-//	private String targetPackage = null;
-//	private String tmpDirectory = null;
-//	private String xsdLocation = null;
-//	
-//	public JAXBRun(String targetPackage, String tmpDirectory, String xsdLocation){
-//		this.targetPackage = targetPackage;
-//		this.tmpDirectory = tmpDirectory;
-//		this.xsdLocation = xsdLocation;
-//	}
-//	
-//	public void run(){
-//		
-//		String[] arg = new String[] { "-p", targetPackage, "-d", tmpDirectory, xsdLocation };
-//		
-//		try {
-//			XJCFacade.main(arg);
-//		} catch (Throwable e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//}
-

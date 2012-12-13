@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.													   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,     *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,51 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
+/**
+ * 
+ */
 package org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * this cost calculator is an attempt to substitute travel distances by travel times
- * 
- * the average walk speed is 5km/h. this speed is independent of the type of road (motorway, sidewalk ...)
- * therefore, walking time can be considered to be linear. it directly correlates with travel distances
- * tnicolai feb'12
- * 
- * @author thomas
+ * A simple cost calculator which only respects time to calculate generalized costs
+ * This is based on org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility 
  *
+ * @author mrieser, thomas
  */
-public class TravelWalkTimeCostCalculator implements TravelDisutility{
+public class TravelTimeBasedTravelDisutility implements TravelDisutility{
 	
-	private static final Logger log = Logger.getLogger(TravelWalkTimeCostCalculator.class);
-	
-	private double meterPerSecWalkSpeed;
-	
-	public TravelWalkTimeCostCalculator(double meterPerSecWalkSpeed){
-		this.meterPerSecWalkSpeed = meterPerSecWalkSpeed;
+	protected final TravelTime timeCalculator;
+	private final double marginalCostOfTime;
+
+	public TravelTimeBasedTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		this.timeCalculator = timeCalculator;
+		/* Usually, the travel-utility should be negative (it's a disutility)
+		 * but the cost should be positive. Thus negate the utility.
+		 */
+		this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 	}
-	
-	/**
-	 * uses network link lengths * walk speed as costs. 
-	 * lengths usually are given in meter and walk speed in meter/sec
-	 */
+
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		if(link != null){
-			double secondWalkTime = link.getLength() / meterPerSecWalkSpeed;
-			return secondWalkTime;
-		}
-		log.warn("Link is null. Returned 0 as walk time.");
-		return 0.;
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
+
+		return this.marginalCostOfTime * travelTime;
 	}
-	
+
 	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		return getLinkTravelDisutility(link, Time.UNDEFINED_TIME, null, null);
+	public double getLinkMinimumTravelDisutility(final Link link) {
+		return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime;
 	}
+
 }

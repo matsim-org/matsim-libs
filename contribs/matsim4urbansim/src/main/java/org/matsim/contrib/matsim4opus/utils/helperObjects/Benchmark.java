@@ -30,9 +30,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.constants.Constants;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
 
 
 /**
@@ -114,9 +115,9 @@ public class Benchmark {
 					MeasurementObject mo = it.next();
 					
 					if(mo.getFile() == null)
-						benchmarkWriter.write( mo.getName() + Constants.TAB + String.valueOf(mo.getDuration()) + Constants.TAB + "-" + Constants.TAB + "-" + Constants.TAB + "-" + Constants.TAB + "-");
+						benchmarkWriter.write( mo.getName() + InternalConstants.TAB + String.valueOf(mo.getDuration()) + InternalConstants.TAB + "-" + InternalConstants.TAB + "-" + InternalConstants.TAB + "-" + InternalConstants.TAB + "-");
 					else
-						benchmarkWriter.write( mo.getName() + Constants.TAB + String.valueOf(mo.getDuration()) + Constants.TAB + (mo.isReading()?mo.getFile().getCanonicalPath():"-") + Constants.TAB + (mo.isReading()?"-":mo.getFile().getCanonicalPath()) + Constants.TAB + String.valueOf(mo.getFileSize()) + Constants.TAB + String.valueOf(mo.getFileSize()/(1024*1024)) );
+						benchmarkWriter.write( mo.getName() + InternalConstants.TAB + String.valueOf(mo.getDuration()) + InternalConstants.TAB + (mo.isReading()?mo.getFile().getCanonicalPath():"-") + InternalConstants.TAB + (mo.isReading()?"-":mo.getFile().getCanonicalPath()) + InternalConstants.TAB + String.valueOf(mo.getFileSize()) + InternalConstants.TAB + String.valueOf(mo.getFileSize()/(1024*1024)) );
 					benchmarkWriter.newLine();
 				}
 				benchmarkWriter.flush();

@@ -4,12 +4,19 @@ import java.io.File;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.constants.Constants;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+
 
 public class Paths {
 	
 	// logger
-		private static final Logger log = Logger.getLogger(Paths.class);
+	private static final Logger log = Logger.getLogger(Paths.class);
+	
+	// MATSim4OPUS Test environment (relative paths)
+	public static final String WARM_START_URBANSIM_OUTPUT 	= "warmstart/urbanSimOutput";
+	public static final String WARM_START_INPUT_PLANS 		= "warmstart/inputPlan";
+	public static final String WARM_START_NETWORK 			= "warmstart/network";
+	public static final String DEFAULT_URBANSIM_OUTPUT 		= "urbanSimOutput";
 	
 	/**
 	 * verifying if args argument contains a valid path. 
@@ -19,20 +26,17 @@ public class Paths {
 		// test the path to matsim config xml
 		if( matsimConfiFile==null || matsimConfiFile.length() <= 0 || !pathExsits( matsimConfiFile ) ){
 			log.error(matsimConfiFile + " is not a valid path to a MATSim configuration file. SHUTDOWN MATSim!");
-			System.exit(Constants.NOT_VALID_PATH);
+			System.exit(InternalConstants.NOT_VALID_PATH);
 		}
 	}
 	
 	/**
-	 * Checks a given path if it exists
+	 * Checks if a given path exists
 	 * @param arg path
 	 * @return true if the given file exists
 	 */
-	public static boolean pathExsits(String matsimConfigFile){
-
-		if( (new File(matsimConfigFile)).exists() )
-			return true;
-		return false;
+	public static boolean pathExsits(String path){
+		return( (new File(path)).exists() );
 	}
 	
 	/**
@@ -115,7 +119,7 @@ public class Paths {
 	 */
 	@SuppressWarnings("all")
 	public static String getWarmStartUrbanSimInputData(Class<?>  classObj){		
-		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + Constants.MATSIM_TEST_DATA_WARM_START_URBANSIM_OUTPUT );
+		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + WARM_START_URBANSIM_OUTPUT );
 	}
 	
 	/**
@@ -124,7 +128,7 @@ public class Paths {
 	 */
 	@SuppressWarnings("all")
 	public static String getWarmStartInputPlansFile(Class<?>  classObj){		
-		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + Constants.MATSIM_TEST_DATA_WARM_START_INPUT_PLANS);
+		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + WARM_START_INPUT_PLANS);
 	}
 	
 	/**
@@ -133,7 +137,7 @@ public class Paths {
 	 */
 	@SuppressWarnings("all")
 	public static String getWarmStartNetwork(Class<?>  classObj){		
-		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + Constants.MATSIM_TEST_DATA_WARM_START_NETWORK );
+		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + WARM_START_NETWORK );
 	}
 	
 	/**
@@ -142,7 +146,6 @@ public class Paths {
 	 */
 	@SuppressWarnings("all")
 	public static String getTestUrbanSimInputDataDir(Class<?>  classObj){
-		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + Constants.MATSIM_TEST_DATA_DEFAULT_URBANSIM_OUTPUT );
+		return Paths.checkPathEnding( Paths.getCurrentPath( classObj ) + DEFAULT_URBANSIM_OUTPUT );
 	}
-
 }

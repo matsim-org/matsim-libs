@@ -32,7 +32,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.constants.Constants;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.xml.sax.InputSource;
+
 
 
 /**
@@ -131,8 +133,8 @@ public class LoadFile {
 		if(! isInternetStream){
 			
 			// This should work for jar files (dtd folder located in root)
-			log.info("Trying to access local dtd folder at standard location " + Constants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR + " ...");
-			File dtdFile = new File( Constants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR );
+			log.info("Trying to access local dtd folder at standard location " + InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR + " ...");
+			File dtdFile = new File( InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR );
 			
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
 				log.info("Using the local DTD " + dtdFile.getAbsolutePath());
@@ -147,7 +149,7 @@ public class LoadFile {
 			int index = (currentDir.indexOf("playground") > 0) ? currentDir.indexOf("playground") : currentDir.indexOf("contrib");
 			String root = currentDir.substring(0, index);
 				
-			dtdFile = new File( root + "/matsim" + Constants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR );
+			dtdFile = new File( root + "/matsim" + InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR );
 			log.info("Trying to access local dtd folder at standard location " + dtdFile.getAbsolutePath() + " ...");
 			
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
