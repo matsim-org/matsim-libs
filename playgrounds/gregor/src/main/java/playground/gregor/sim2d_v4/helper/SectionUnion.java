@@ -48,22 +48,22 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class SectionUnion {
-	
+
 	private final Sim2DEnvironment env;
 	private Map<Id, Id> mapping;
 	private final Map<Id, Id> rmIdMapping = new HashMap<Id,Id>();
-	
+
 
 	/*package*/ SectionUnion(Sim2DEnvironment env) {
 		this.env = env;
 	}
-	
+
 	/*package*/ void processOSMFile(String file) {
 		OSM osm = new OSM();
 		osm.addKeyValue("union", "true");
 		CustomizedOSM2Sim2D envReader = new CustomizedOSM2Sim2D(this.env, osm);
 		envReader.processOSMFile(file);
-//		System.out.println(osm);
+		//		System.out.println(osm);
 		//build osm_id --> matsim_id mapping
 		this.mapping = new HashMap<Id,Id>();
 		for (OSMWay way : osm.getWays()) {
@@ -76,7 +76,7 @@ public class SectionUnion {
 		for (OSMRelation rel : osm.getRelations()) {
 			handleRelation(rel);
 		}
-		
+
 		//revise neighbors - currently the only way to change neighbors is to remove sections and create new ones with revised neighbor relations
 		List<Section> secs = new ArrayList<Section>();
 		Iterator<Section> it = this.env.getSections().values().iterator();
@@ -85,11 +85,27 @@ public class SectionUnion {
 			secs.add(sec);
 			it.remove();
 		}
-		
-		
+		for (Section sec : secs) {
+
+			Id [] n = null;
+			if (sec.getNeighbors() != null) {
+				Set<Id> neighbors = new HashSet<Id>();
+				for (Id id : sec.getNeighbors()) {
+					Id mappedId = this.rmIdMapping.get(id);
+					if (mappedId == null) {
+						neighbors.add(id);
+					} else if (!(mappedId.equals(sec.getId()))){
+						neighbors.add(mappedId);
+					}
+				}
+				n = neighbors.toArray(new Id[0]);
+			}
+			this.env.createAndAddSection(sec.getId(), sec.getPolygon(), sec.getOpenings(), n, sec.getLevel());
+		}
+
 	}
 
-	
+
 	private void handleRelation(OSMRelation rel) {
 		Set<Opening> potentialOpenings = new HashSet<Opening>();
 		Set<Id> potentialNeighbors = new HashSet<Id>();
@@ -110,11 +126,11 @@ public class SectionUnion {
 			oo.c1 = c1;
 			potentialOpenings.add(oo);
 		}
-		
+
 		IdImpl newId = new IdImpl(id.toString()+"union");
 		this.rmIdMapping.put(id, newId);
-		
-		
+
+
 		while (it.hasNext()) {
 			m = it.next();
 			id = this.mapping.get(m.getRefId());
@@ -133,7 +149,7 @@ public class SectionUnion {
 			}
 			geo = geo.union(sec.getPolygon());
 			this.rmIdMapping.put(id, newId);
-		
+
 		}
 		if (!(geo instanceof Polygon)) {
 			throw new RuntimeException("Invalid relation detected. Revise relation with id:" + rel.getId());
@@ -157,7 +173,7 @@ public class SectionUnion {
 		for (int i = 0; i < openingsList.size(); i++) {
 			openingsA[i] = openingsList.get(i);
 		}
-		
+
 		Id[] neighborsA = potentialNeighbors.toArray(new Id[0]);
 		this.env.createAndAddSection(newId, p, openingsA,neighborsA, sec.getLevel());
 	}
@@ -167,7 +183,7 @@ public class SectionUnion {
 	private static final class Opening {
 		private Coordinate c0;
 		private Coordinate c1;
-		
+
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof Opening) {
@@ -182,19 +198,19 @@ public class SectionUnion {
 			}
 			return false;
 		}
-		
+
 	}
-	
+
 	public static void main(String [] args) throws NoSuchAuthorityCodeException, FactoryException {
 		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/osmEnv.osm";
 		Sim2DEnvironment env = new Sim2DEnvironment();
 		env.setCRS(CRS.decode("EPSG:3395"));
 		env.setNetwork(NetworkImpl.createNetwork());
 		new SectionUnion(env).processOSMFile(osmFile);
-//		CustomizedOSM2Sim2D osm2sim2d = new CustomizedOSM2Sim2D(env);
-//		osm2sim2d.processOSMFile(osmFile);
-		
-		new Sim2DEnvironmentWriter02(env).write("/Users/laemmel/devel/burgdorf2d/osm/sim2dEnv_0.gml.gz");
-//		new NetworkWriter(env.getEnvironmentNetwork()).write("/Users/laemmel/devel/burgdorf2d/osm/test.network.xml");
+		//		CustomizedOSM2Sim2D osm2sim2d = new CustomizedOSM2Sim2D(env);
+		//		osm2sim2d.processOSMFile(osmFile);
+
+		new Sim2DEnvironmentWriter02(env).write("/Users/laemmel/devel/burgdorf2d/input/sim2dEnv_0.gml.gz");
+		//		new NetworkWriter(env.getEnvironmentNetwork()).write("/Users/laemmel/devel/burgdorf2d/osm/test.network.xml");
 	}
 }
