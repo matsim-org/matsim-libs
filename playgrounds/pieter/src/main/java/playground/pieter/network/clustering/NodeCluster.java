@@ -132,9 +132,9 @@ public class NodeCluster {
 		if (!nc2.isLeaf)
 			interLinks.putAll(nc2.getInterLinks());
 		interLinks.putAll(newInterlinks);
-		//a new cluster has its kids always at one clusterstep below
-		nc1.setClusterStepParented(this.clusterStepFormed-1);
-		nc2.setClusterStepParented(this.clusterStepFormed-1);
+		// a new cluster has its kids always at one clusterstep below
+		nc1.setClusterStepParented(this.clusterStepFormed - 1);
+		nc2.setClusterStepParented(this.clusterStepFormed - 1);
 	}
 
 	/**
@@ -409,7 +409,10 @@ public class NodeCluster {
 
 	public String toString() {
 
-		return this.getId() + "("+this.getClusterStepParented()+")"
+		return this.getId()
+				+ "("
+				+ this.getClusterStepParented()
+				+ ")"
 				+ (isLeaf ? "" : ("[" + this.getChild1() + ","
 						+ this.getChild2() + "]"));
 
@@ -424,13 +427,13 @@ public class NodeCluster {
 	}
 
 	public TreeMap<Integer, NodeCluster> getChildren() {
-		
+
 		TreeMap<Integer, NodeCluster> childClusters = null;
-		if(!isLeaf){
-			childClusters  = new TreeMap<Integer, NodeCluster>();
+		if (!isLeaf) {
+			childClusters = new TreeMap<Integer, NodeCluster>();
 			childClusters.put(child1.getId(), child1);
 			childClusters.put(child2.getId(), child2);
-			
+
 		}
 		return childClusters;
 	}
@@ -442,5 +445,18 @@ public class NodeCluster {
 	public void setClusterStepParented(int clusterStepParented) {
 		this.clusterStepParented = clusterStepParented;
 	}
-	
+
+	static class StepFormedComparator implements Comparator<NodeCluster> {
+
+		@Override
+		public int compare(NodeCluster o1, NodeCluster o2) {
+			if (o1.getClusterStepFormed() == o2.getClusterStepFormed()) {
+				return Integer.compare(o1.getId(), o2.getId());
+			} else
+
+				return Integer.compare(o1.getClusterStepFormed(),
+						o2.getClusterStepFormed());
+		}
+
+	}
 }

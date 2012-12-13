@@ -1,11 +1,16 @@
 package playground.pieter.network.clustering;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
+import org.apache.commons.collections.list.NodeCachingLinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -13,28 +18,33 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.utils.io.IOUtils;
 
 public abstract class NodeClusteringAlgorithm {
-	private String algorithmName;
 	private LinkedHashMap<Id, ClusterLink> links;
 	private LinkedHashMap<Id, ClusterNode> nodes;
 	private TreeMap<Integer, NodeCluster> leafNodeClusters;
 	// private TreeMap<Integer, NodeCluster> currentNodeClusters;
 	private TreeMap<Integer, NodeCluster> rootClusters;
 	protected Method internalFlowMethod;
+	protected String[] internalFlowMethodParameterTypes;
 	protected Object[] internalFlowMethodParameters;
 	private ArrayList<Double> flowValues;
 	protected int clusterSteps = 0;
 	int outBoundClusterSize = 0;
 	Logger logger;
 	private Network network;
-	
+	private String algorithmName;
+	private TreeMap<Integer, ArrayList> pointersToClusterLevels = null;
+
 	public LinkedHashMap<Id, ClusterLink> getLinks() {
 		return links;
 	}
-	
-	public NodeClusteringAlgorithm(String algorithmName,Network network, String linkMethodName,
-			String[] argTypes, Object[] args) {
+
+	protected NodeClusteringAlgorithm(String algorithmName, Network network,
+			String linkMethodName, String[] argTypes, Object[] args) {
+		this.flowValues = new ArrayList<Double>();
+		this.internalFlowMethodParameterTypes = argTypes;
 		this.internalFlowMethod = getLinkGetMethodWithArgTypes(linkMethodName,
 				argTypes);
 		this.internalFlowMethodParameters = args;
@@ -46,19 +56,37 @@ public abstract class NodeClusteringAlgorithm {
 		for (Link l : network.getLinks().values()) {
 			links.put(l.getId(), new ClusterLink((LinkImpl) l));
 		}
-		nodes = new LinkedHashMap<Id, ClusterNode>(network.getNodes().size());
+		setNodes(new LinkedHashMap<Id, ClusterNode>(network.getNodes().size()));
 		leafNodeClusters = new TreeMap<Integer, NodeCluster>();
 		int i = 0;
 		for (Node n : network.getNodes().values()) {
-			nodes.put(n.getId(), new ClusterNode((NodeImpl) n));
-			leafNodeClusters.put(i, new NodeCluster(nodes.get(n.getId()), this,
-					0, i, internalFlowMethod, internalFlowMethodParameters));
+			getNodes().put(n.getId(), new ClusterNode((NodeImpl) n));
+			leafNodeClusters.put(i, new NodeCluster(getNodes().get(n.getId()),
+					this, 0, i, internalFlowMethod,
+					internalFlowMethodParameters));
 			i++;
 		}
-		this.algorithmName = algorithmName;
+		this.pointersToClusterLevels = new TreeMap<Integer, ArrayList>();
+		this.pointersToClusterLevels.put(0, new ArrayList<NodeCluster>(
+				leafNodeClusters.values()));
+		this.setAlgorithmName(algorithmName);
 	}
-	
-	
+
+	public NodeClusteringAlgorithm(String algorithmName, Network network) {
+		this.flowValues = new ArrayList<Double>();
+		this.network = network;
+		links = new LinkedHashMap<Id, ClusterLink>(network.getLinks().size());
+		for (Link l : network.getLinks().values()) {
+			links.put(l.getId(), new ClusterLink((LinkImpl) l));
+		}
+		this.setNodes(new LinkedHashMap<Id, ClusterNode>(network.getNodes()
+				.size()));
+		leafNodeClusters = new TreeMap<Integer, NodeCluster>();
+		this.setAlgorithmName(algorithmName);
+		rootClusters = null;
+		logger = Logger.getLogger("NodeClusterer");
+	}
+
 	/**
 	 * traverses the root cluster(s) from the top and adds them to an arraylist
 	 * of clusters. needs to use arraylist because the clusters have ids based
@@ -69,13 +97,21 @@ public abstract class NodeClusteringAlgorithm {
 	 * @return an arraylist of clusters
 	 */
 	public ArrayList<NodeCluster> getClustersAtLevel(int level) {
-		if (rootClusters == null) {
-			return null;
+		// if(this.pointersToClusterLevels == null)
+		// initializePointers();
+
+		return pointersToClusterLevels.get(level);
+	}
+
+	private boolean initializePointers() {
+		if (getRootClusters() == null) {
+			return false;
 		}
+		pointersToClusterLevels = new TreeMap<Integer, ArrayList>();
 		ArrayList<NodeCluster> outClusters = null;
 		outClusters = new ArrayList<NodeCluster>();
 		ArrayList<NodeCluster> tempClusters = new ArrayList<NodeCluster>();
-		tempClusters.addAll(rootClusters.values());
+		tempClusters.addAll(getRootClusters().values());
 		boolean levelFound = false;
 		int currentLevel = 0;
 		// first, find the highest nodecluster in the set
@@ -84,7 +120,7 @@ public abstract class NodeClusteringAlgorithm {
 				currentLevel = nc.getClusterStepFormed();
 		}
 		while (!levelFound) {
-			if (currentLevel <= level) {
+			if (currentLevel == 0) {
 				levelFound = true;
 				outClusters.addAll(tempClusters);
 			} else {
@@ -92,10 +128,10 @@ public abstract class NodeClusteringAlgorithm {
 				tempClusters2.addAll(tempClusters);
 				tempClusters = new ArrayList<NodeCluster>();
 				for (NodeCluster nc : tempClusters2) {
-//					if (nc.getClusterStepParented()==maxLevel-1)
-//						outClusters.add(nc);
-//					else 
-					if (nc.getClusterStepFormed()<currentLevel || nc.isLeaf())
+					// if (nc.getClusterStepParented()==maxLevel-1)
+					// outClusters.add(nc);
+					// else
+					if (nc.getClusterStepFormed() < currentLevel || nc.isLeaf())
 						tempClusters.add(nc);
 					else
 						tempClusters.addAll(nc.getChildren().values());
@@ -104,10 +140,8 @@ public abstract class NodeClusteringAlgorithm {
 				currentLevel--;
 			}
 		}
-
-		return outClusters;
+		return true;
 	}
-
 
 	/**
 	 * Procedure that is run after intialization to find nodeclusters with one
@@ -125,11 +159,11 @@ public abstract class NodeClusteringAlgorithm {
 			NodeCluster newCluster = findSingleInLinkClusters(clusters);
 			if (newCluster == null)
 				break;
-			else
-				clusterSteps++;
 			newCluster.freezeCluster();
 			clusters = updateClusterTree(clusters, newCluster);
 			updateLinksAndNodes(newCluster);
+			pointersToClusterLevels.put(clusterSteps,
+					new ArrayList<NodeCluster>(clusters.values()));
 			logger.info(String
 					.format("Step %05d of %05d: c1: %05d + c2: %05d = %05d, flow = %08.2f, deltaFlow = %08.2f",
 							clusterSteps, this.leafNodeClusters.size(),
@@ -137,27 +171,27 @@ public abstract class NodeClusteringAlgorithm {
 									.getChild2().getId(), newCluster.getId(),
 							newCluster.getInternalFlow(), newCluster
 									.getDeltaFlow()));
+			clusterSteps++;
 		}
 		logger.info("Finding loops and long links: DONE");
 		return clusters;
 	}
-	protected abstract NodeCluster findSingleInLinkClusters(TreeMap<Integer, NodeCluster> clusters); 
+
+	protected abstract NodeCluster findSingleInLinkClusters(
+			TreeMap<Integer, NodeCluster> clusters);
 
 	public void run() {
 		logger.info("Starting clustering algo, using the link method "
 				+ internalFlowMethod.toString());
 		clusterSteps = 1;
 
-		// the node clusters are there in case we need to re-initialize
-		this.flowValues = new ArrayList<Double>();
 		TreeMap<Integer, NodeCluster> currentNodeClusters = new TreeMap<Integer, NodeCluster>();
 		currentNodeClusters = findLoopsAndLongLinks(leafNodeClusters);
 		boolean doneClustering = false;
 		NodeCluster newCluster = null;
 		while (!doneClustering) {
 			// get a single new NodeCluster for this step
-			newCluster = findNextCluster(currentNodeClusters,
-					clusterSteps);
+			newCluster = findNextCluster(currentNodeClusters, clusterSteps);
 			if (newCluster == null) {
 				logger.error("Procedure ended with more than one cluster.");
 				break;
@@ -166,7 +200,6 @@ public abstract class NodeClusteringAlgorithm {
 			currentNodeClusters = updateClusterTree(currentNodeClusters,
 					newCluster);
 			updateLinksAndNodes(newCluster);
-			// this.nodeClusterHistory.put(clusterStep, newNCs);
 			flowValues.add(newCluster.getInternalFlow());
 			logger.info(String
 					.format("Step %05d of %05d: %05d + %05d = %05d, f: %08.2f, dF: %08.2f, invoc: %12d, obc: %12d",
@@ -176,6 +209,8 @@ public abstract class NodeClusteringAlgorithm {
 							newCluster.getInternalFlow(), newCluster
 									.getDeltaFlow(), NodeCluster
 									.getInvocations(), outBoundClusterSize));
+			pointersToClusterLevels.put(clusterSteps,
+					new ArrayList<NodeCluster>(currentNodeClusters.values()));
 			if (currentNodeClusters.size() == 1)
 				doneClustering = true;
 			else
@@ -186,7 +221,7 @@ public abstract class NodeClusteringAlgorithm {
 		}
 		logger.info(String.format("number of clusters: %d",
 				currentNodeClusters.size()));
-		rootClusters = currentNodeClusters;
+		setRootClusters(currentNodeClusters);
 		logger.info("DONE");
 	}
 
@@ -212,7 +247,6 @@ public abstract class NodeClusteringAlgorithm {
 		newCluster.getChild2().setParent(newCluster);
 
 	}
-	
 
 	private double sumList(ArrayList<Double> flowValues2) {
 		double result = 0;
@@ -239,7 +273,6 @@ public abstract class NodeClusteringAlgorithm {
 		// System.out.println(currentNCs.size());
 		return currentNCs;
 	}
-	
 
 	private boolean hasSharedLinks(NodeCluster nc1, NodeCluster nc2) {
 		for (ClusterLink l : nc1.getInLinks().values()) {
@@ -254,7 +287,7 @@ public abstract class NodeClusteringAlgorithm {
 		}
 		return false;
 	}
-	
+
 	public static Method getLinkGetMethodWithArgTypes(String methodName,
 			String[] argTypesAsString) {
 		Method linkMethod = null;
@@ -291,7 +324,7 @@ public abstract class NodeClusteringAlgorithm {
 		return linkMethod;
 
 	}
-	
+
 	protected HashSet<ClusterCombo> getViableClusterCombos(
 			TreeMap<Integer, NodeCluster> nodeClusters) {
 		HashSet<ClusterCombo> clusterCheck = new HashSet<ClusterCombo>();
@@ -305,13 +338,113 @@ public abstract class NodeClusteringAlgorithm {
 		// System.out.println("Clustercombos: " + clusterCheck.size());
 		return clusterCheck;
 	}
+
 	public int getClusterSteps() {
 		return clusterSteps;
 	}
-	
-	
-	
+
+	public String getAlgorithmName() {
+		return algorithmName;
+	}
+
+	private void setAlgorithmName(String algorithmName) {
+		this.algorithmName = algorithmName;
+	}
+
+	public TreeMap<Integer, NodeCluster> getRootClusters() {
+		return rootClusters;
+	}
+
+	public void setRootClusters(TreeMap<Integer, NodeCluster> rootClusters) {
+		this.rootClusters = rootClusters;
+	}
+
+	public LinkedHashMap<Id, ClusterNode> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(LinkedHashMap<Id, ClusterNode> nodes) {
+		this.nodes = nodes;
+	}
+
+	public TreeMap<Integer, NodeCluster> getLeafNodeClusters() {
+		return leafNodeClusters;
+	}
+
+	public Method getInternalFlowMethod() {
+		return internalFlowMethod;
+	}
+
+	public void setInternalFlowMethod(Method internalFlowMethod) {
+		this.internalFlowMethod = internalFlowMethod;
+	}
+
+	public String[] getInternalFlowMethodParameterTypes() {
+		return internalFlowMethodParameterTypes;
+	}
+
+	public void setInternalFlowMethodParameterTypes(
+			String[] internalFlowMethodParameterTypes) {
+		this.internalFlowMethodParameterTypes = internalFlowMethodParameterTypes;
+	}
+
+	public Object[] getInternalFlowMethodParameters() {
+		return internalFlowMethodParameters;
+	}
+
+	public void setInternalFlowMethodParameters(
+			Object[] internalFlowMethodParameters) {
+		this.internalFlowMethodParameters = internalFlowMethodParameters;
+	}
+
+	public void createArbitraryClusterTree(int clusterStep, int child1Id,
+			int child2Id, int newId) {
+		if (getRootClusters() == null) {
+			setRootClusters(leafNodeClusters);
+			pointersToClusterLevels = new TreeMap<Integer, ArrayList>();
+			pointersToClusterLevels.put(0, new ArrayList<NodeCluster>(
+					leafNodeClusters.values()));
+		}
+		NodeCluster nc1 = rootClusters.get(child1Id);
+		NodeCluster nc2 = rootClusters.get(child2Id);
+		NodeCluster newCluster = new NodeCluster(nc1, nc2,
+				this.getInternalFlowMethod(),
+				this.getInternalFlowMethodParameters(), clusterStep, newId);
+		newCluster.freezeCluster();
+		flowValues.add(newCluster.getDeltaFlow());
+		rootClusters = updateClusterTree(rootClusters, newCluster);
+		updateLinksAndNodes(newCluster);
+		clusterSteps = clusterStep;
+		logger.info(String
+				.format("Step %05d of %05d: c1: %05d + c2: %05d = %05d, flow = %08.2f, deltaFlow = %08.2f",
+						clusterSteps, this.leafNodeClusters.size(), newCluster
+								.getChild1().getId(), newCluster.getChild2()
+								.getId(), newCluster.getId(), newCluster
+								.getInternalFlow(), newCluster.getDeltaFlow()));
+		pointersToClusterLevels.put(clusterSteps, new ArrayList<NodeCluster>(
+				rootClusters.values()));
+	}
+
+	public NodeCluster getLargestCluster(ArrayList<NodeCluster> clustersAtLevel) {
+		double largest = 0;
+		NodeCluster outCluster = null;
+		for (NodeCluster nc : clustersAtLevel) {
+			if (nc.getInternalFlow() > largest) {
+				largest = nc.getInternalFlow();
+				outCluster = nc;
+			}
+		}
+		if(outCluster==null)
+			outCluster=clustersAtLevel.get(0);
+		return outCluster;
+	}
+
+	public TreeMap<Integer, ArrayList> getPointersToClusterLevels() {
+		return pointersToClusterLevels;
+	}
+
 }
+
 class ClusterCombo {
 	private int id1;
 	private int id2;

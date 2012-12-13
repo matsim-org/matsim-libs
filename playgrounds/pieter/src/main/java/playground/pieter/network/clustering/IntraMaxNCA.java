@@ -1,7 +1,13 @@
 package playground.pieter.network.clustering;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -9,12 +15,18 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class IntraMaxNCA extends NodeClusteringAlgorithm {
-	public IntraMaxNCA(String algorithmName,Network network, String linkMethodName,
-			String[] argTypes, Object[] args){
-		super(algorithmName,network,linkMethodName,argTypes,args);
-	}
+import playground.pieter.mentalsim.mobsim.MentalSim.SimThread;
 
+public class IntraMaxNCA extends NodeClusteringAlgorithm {
+	public static String ALGORITHMNAME = "IntraMAX";
+	public static int NUMTHREADS=4;
+	public IntraMaxNCA(Network network, String linkMethodName,
+			String[] argTypes, Object[] args){
+		super(ALGORITHMNAME,network,linkMethodName,argTypes,args);
+	}
+	public IntraMaxNCA(Network network){
+		super(ALGORITHMNAME, network);
+	}
 	@Override
 	protected NodeCluster findSingleInLinkClusters(
 			TreeMap<Integer, NodeCluster> clusters) {
@@ -64,27 +76,46 @@ public class IntraMaxNCA extends NodeClusteringAlgorithm {
 
 		}
 
+
 		return bestCluster;
 	}
 
+
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		String fileName = "f:/TEMP/siouxfalls.txt";
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
 		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario);
 		// nwr.readFile(args[0]);
 //		 nwr.readFile("F:/TEMP/smallnet.xml");
 		nwr.readFile("f:/matsimWorkspace/matsim/examples/siouxfalls/network-wo-dummy-node.xml");
-		// nwr.readFile("data/singaporev1/network/planningNetwork_CLEAN.xml");
-		IntraMaxNCA nca = new IntraMaxNCA("Intramax",scenario.getNetwork(),
-				"getCapacityTimesLength", null, null);
+//		 nwr.readFile("data/singaporev1/network/planningNetwork_CLEAN.xml");
+		IntraMaxNCA nca = new IntraMaxNCA(scenario.getNetwork(),
+				"getCapacityTimesSpeed", null, null);
 		// ncr.run("getCapacity", new String[] { "java.lang.Double" },
 		// new Object[] { new Double(3600) });
 		nca.run();
-		System.out.println(nca.getClustersAtLevel(2));
+		new ClusterWriter().writeClusters(fileName,nca);
+		IntraMaxNCA nca2 = new IntraMaxNCA(scenario.getNetwork());
+		
+		new ClusterReader().readClusters(fileName, scenario.getNetwork(), nca2);
+		for(int i=0; i<=nca.getClusterSteps();i++){
+			nca.logger.info(nca.getClustersAtLevel(i).size()+": largest = "+nca.getLargestCluster(nca.getClustersAtLevel(i)).getInternalFlow() );
+			nca2.logger.info(nca2.getClustersAtLevel(i).size()+": largest = "+nca2.getLargestCluster(nca2.getClustersAtLevel(i)).getInternalFlow() );
+			
+		}
+		for(int i=nca.getClusterSteps(); i>=0;i--){
+			nca.logger.info(nca.getClustersAtLevel(i).size()+": largest = "+nca.getLargestCluster(nca.getClustersAtLevel(i)).getInternalFlow() );
+			nca2.logger.info(nca2.getClustersAtLevel(i).size()+": largest = "+nca2.getLargestCluster(nca2.getClustersAtLevel(i)).getInternalFlow() );
+			
+		}
+		
 
 	}
+
 
 }

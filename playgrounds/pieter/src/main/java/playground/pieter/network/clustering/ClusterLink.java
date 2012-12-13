@@ -101,6 +101,10 @@ public class ClusterLink implements Link {
 	public double getCapacityTimesLength() {
 		return link.getCapacity() * link.getLength();
 	}
+	
+	public double getCapacityTimesSpeed() {
+		return link.getCapacity() * link.getFreespeed();
+	}
 
 	public double getCapacity(Double time) {
 		return this.getCapacity(time);
