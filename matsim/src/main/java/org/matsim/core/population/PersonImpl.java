@@ -271,7 +271,7 @@ public class PersonImpl implements Person {
 		b.append("[age=").append(this.getAge()).append("]");
 		b.append("[license=").append(this.getLicense()).append("]");
 		b.append("[car_avail=").append(this.getCarAvail()).append("]");
-		b.append("[employed=").append((isEmployed() ? "yes" : "no")).append("]");
+		b.append("[employed=").append((isEmployed() == null ? "null" : (isEmployed ? "yes" : "no"))).append("]");
 		b.append("[travelcards=").append(this.getTravelcards() == null ? "null" : this.getTravelcards().size()).append("]");
 		b.append("[nof_plans=").append(this.getPlans() == null ? "null" : this.getPlans().size()).append("]");
 	  return b.toString();
