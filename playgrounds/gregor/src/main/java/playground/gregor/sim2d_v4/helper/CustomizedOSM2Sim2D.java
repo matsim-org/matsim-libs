@@ -103,12 +103,12 @@ public class CustomizedOSM2Sim2D {
 	private final OSM osm;
 
 	//TODO we need the possibility to have several environments. This means that we parse a scenario and not an environment 
-	public CustomizedOSM2Sim2D(Sim2DEnvironment env) {
+	/*package*/ CustomizedOSM2Sim2D(Sim2DEnvironment env) {
 		this(env,new OSM());
 	}
 	
 
-	public CustomizedOSM2Sim2D(Sim2DEnvironment env, OSM osm) {
+	/*package*/ CustomizedOSM2Sim2D(Sim2DEnvironment env, OSM osm) {
 		this.env = env;
 		this.env.setEnvelope(this.e);
 		try {
@@ -120,7 +120,7 @@ public class CustomizedOSM2Sim2D {
 	}
 
 
-	public void processOSMFile(String file) {
+	/*package*/ void processOSMFile(String file) {
 		
 		this.osm.addKey(K_M_TYPE);
 		OSMXMLParser parser = new OSMXMLParser(this.osm);

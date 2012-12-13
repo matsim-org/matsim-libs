@@ -54,11 +54,11 @@ public class SectionUnion {
 	private final Map<Id, Id> rmIdMapping = new HashMap<Id,Id>();
 	
 
-	public SectionUnion(Sim2DEnvironment env) {
+	/*package*/ SectionUnion(Sim2DEnvironment env) {
 		this.env = env;
 	}
 	
-	public void processOSMFile(String file) {
+	/*package*/ void processOSMFile(String file) {
 		OSM osm = new OSM();
 		osm.addKeyValue("union", "true");
 		CustomizedOSM2Sim2D envReader = new CustomizedOSM2Sim2D(this.env, osm);
@@ -76,6 +76,17 @@ public class SectionUnion {
 		for (OSMRelation rel : osm.getRelations()) {
 			handleRelation(rel);
 		}
+		
+		//revise neighbors - currently the only way to change neighbors is to remove sections and create new ones with revised neighbor relations
+		List<Section> secs = new ArrayList<Section>();
+		Iterator<Section> it = this.env.getSections().values().iterator();
+		while (it.hasNext()) {
+			Section sec = it.next();
+			secs.add(sec);
+			it.remove();
+		}
+		
+		
 	}
 
 	
@@ -175,7 +186,7 @@ public class SectionUnion {
 	}
 	
 	public static void main(String [] args) throws NoSuchAuthorityCodeException, FactoryException {
-		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/sim2d.osm";
+		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/osmEnv.osm";
 		Sim2DEnvironment env = new Sim2DEnvironment();
 		env.setCRS(CRS.decode("EPSG:3395"));
 		env.setNetwork(NetworkImpl.createNetwork());
@@ -183,7 +194,7 @@ public class SectionUnion {
 //		CustomizedOSM2Sim2D osm2sim2d = new CustomizedOSM2Sim2D(env);
 //		osm2sim2d.processOSMFile(osmFile);
 		
-		new Sim2DEnvironmentWriter02(env).write("/Users/laemmel/devel/burgdorf2d/input/sim2dEnv_0.gml.gz");
+		new Sim2DEnvironmentWriter02(env).write("/Users/laemmel/devel/burgdorf2d/osm/sim2dEnv_0.gml.gz");
 //		new NetworkWriter(env.getEnvironmentNetwork()).write("/Users/laemmel/devel/burgdorf2d/osm/test.network.xml");
 	}
 }

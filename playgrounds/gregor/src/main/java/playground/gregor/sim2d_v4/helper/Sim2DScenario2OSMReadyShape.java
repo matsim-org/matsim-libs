@@ -102,7 +102,7 @@ public class Sim2DScenario2OSMReadyShape {
 		}
 	}
 
-	public Sim2DScenario2OSMReadyShape(Sim2DScenario scenario) {
+	/*package*/ Sim2DScenario2OSMReadyShape(Sim2DScenario scenario) {
 		this.scenario = scenario;
 	}
 
@@ -117,7 +117,7 @@ public class Sim2DScenario2OSMReadyShape {
 	}
 	
 	
-	public void writeOSMReadyNetworkShape(String file) {
+	/*package*/ void writeOSMReadyNetworkShape(String file) {
 		GeometryFactory geofac = new GeometryFactory();
 		Collection<Feature> fts = new ArrayList<Feature>();
 		for (Sim2DEnvironment env : this.scenario.getSim2DEnvironments()) {
@@ -159,7 +159,7 @@ public class Sim2DScenario2OSMReadyShape {
 //		new AttributeType[]{l,matsimType,hw,level,mw,mf,mt}
 	}
 
-	public void writeOSMReadyEnvironmentShape(String file) {
+	/*package*/ void writeOSMReadyEnvironmentShape(String file) {
 		Collection<Feature> fts = new ArrayList<Feature>();
 
 		for (Sim2DEnvironment env : this.scenario.getSim2DEnvironments()) {

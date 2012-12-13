@@ -56,17 +56,17 @@ public class NetworkCutter {
 	private static final double THRESHOLD = 1;
 	private final Sim2DScenario sc;
 
-	public NetworkCutter(Sim2DScenario sc) {
+	/*package*/ NetworkCutter(Sim2DScenario sc) {
 		this.sc = sc;
 	}
 
-	public void run() {
+	/*package*/ void run() {
 		for (Sim2DEnvironment env : this.sc.getSim2DEnvironments()) {
 			run(env);
 		}
 	}
 
-	public void run(Sim2DEnvironment env) {
+	/*package*/ void run(Sim2DEnvironment env) {
 		QuadTree<Section> qt = new QuadTree<Section>(env.getEnvelope().getMinX(),env.getEnvelope().getMinY(),env.getEnvelope().getMaxX(),env.getEnvelope().getMaxY());
 		fillQuadtTree(env,qt);
 		Network net = env.getEnvironmentNetwork();
