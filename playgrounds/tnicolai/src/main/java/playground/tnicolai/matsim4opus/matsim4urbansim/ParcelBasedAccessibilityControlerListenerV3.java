@@ -32,7 +32,6 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
 import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 /**
  * improvements sep'11:

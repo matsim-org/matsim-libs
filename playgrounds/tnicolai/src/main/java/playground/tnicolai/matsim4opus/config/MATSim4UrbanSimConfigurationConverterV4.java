@@ -205,7 +205,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			config = ConfigUtils.createConfig();
 		}
 		
-		// changing checking level for vsp defaults
+		// changing checking level to ABORT for vsp defaults means 
+		// that MATSim will stop if any parameter settings differ from that defaults
 		Module vsp = config.getModule("vspExperimental");
 		vsp.addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT);
 		
