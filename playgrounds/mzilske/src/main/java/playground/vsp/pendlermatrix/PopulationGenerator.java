@@ -1,4 +1,4 @@
-package playground.vsp.demandde.pendlermatrix;
+package playground.vsp.pendlermatrix;
 
 import java.util.ArrayList;
 import java.util.Collection;

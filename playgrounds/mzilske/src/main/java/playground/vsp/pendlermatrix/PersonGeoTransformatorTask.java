@@ -1,4 +1,4 @@
-package playground.vsp.demandde.pendlermatrix;
+package playground.vsp.pendlermatrix;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;

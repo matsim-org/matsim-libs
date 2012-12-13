@@ -1,4 +1,4 @@
-package playground.vsp.demandde.pendlermatrix;
+package playground.vsp.pendlermatrix;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
