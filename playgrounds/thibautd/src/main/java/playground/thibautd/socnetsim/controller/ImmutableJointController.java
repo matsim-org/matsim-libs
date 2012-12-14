@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -122,18 +121,11 @@ public class ImmutableJointController extends AbstractController {
 		ParallelPersonAlgorithmRunner.run(
 				registry.getScenario().getPopulation(),
 				registry.getScenario().getConfig().global().getNumberOfThreads(),
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-					@Override
-					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new AbstractPersonAlgorithm() {
-							@Override
-							public void run(final Person person) {
-								checkJointRoutes.run( person );
-								prepareForSim.run( person );
-							}
-						};
-					}
-		});
+				checkJointRoutes);
+		ParallelPersonAlgorithmRunner.run(
+				registry.getScenario().getPopulation(),
+				registry.getScenario().getConfig().global().getNumberOfThreads(),
+				prepareForSim);
 	}
 
 	@Override
