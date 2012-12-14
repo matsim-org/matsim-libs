@@ -19,29 +19,37 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.replanning.modules.jointtimeallocationmutator;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author thibautd
  */
 public class JointTimeAllocationMutatorModule extends AbstractMultithreadedModule {
-	private final Controler controler;
+	private final TripRouterFactory tripRouterFactory;
 	private final double mutationRange;
 
 	public JointTimeAllocationMutatorModule(final Controler controler) {
-		super( controler.getConfig().global() );
-		this.controler = controler;
-		this.mutationRange = controler.getConfig().timeAllocationMutator().getMutationRange();
+		this( controler.getConfig() , controler.getTripRouterFactory() );
+	}
+
+	public JointTimeAllocationMutatorModule(
+			final Config config,
+			final TripRouterFactory tripRouterFactory) {
+		super( config.global() );
+		this.tripRouterFactory = tripRouterFactory;
+		this.mutationRange = config.timeAllocationMutator().getMutationRange();
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		return new JointTimeAllocationMutatorAlgorithm(
 				MatsimRandom.getLocalInstance(),
-				controler.getTripRouterFactory().createTripRouter().getStageActivityTypes(),
+				tripRouterFactory.createTripRouter().getStageActivityTypes(),
 				mutationRange);
 	}
 }
