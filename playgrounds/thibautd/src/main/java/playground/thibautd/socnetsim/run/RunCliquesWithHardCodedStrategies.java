@@ -26,6 +26,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
+import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
@@ -50,10 +51,9 @@ public class RunCliquesWithHardCodedStrategies {
 		final String configFile = args[ 0 ];
 
 		// load "registry"
-		final CliquesConfigGroup cliquesConf = new CliquesConfigGroup();
-		final Config config = ConfigUtils.createConfig();
-		config.addModule( CliquesConfigGroup.GROUP_NAME , cliquesConf );
-		ConfigUtils.loadConfig( config , configFile );
+		final Config config = JointControlerUtils.createConfig( configFile );
+		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
+					config.getModule( CliquesConfigGroup.GROUP_NAME );
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		final ControllerRegistry controllerRegistry =
 			new ControllerRegistry(
