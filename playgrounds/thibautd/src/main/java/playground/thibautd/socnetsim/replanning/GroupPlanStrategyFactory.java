@@ -29,6 +29,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 
+import playground.thibautd.cliquessim.replanning.modules.jointtimeallocationmutator.JointTimeAllocationMutatorModule;
 import playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser.JointTimeModeChooserAlgorithm;
 import playground.thibautd.cliquessim.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
@@ -66,8 +67,10 @@ public class GroupPlanStrategyFactory {
 		strategy.addStrategyModule( createTripsToLegsModule( config , tripRouterFactory ) ) ;
 
 		strategy.addStrategyModule(
-				new IndividualBasedGroupStrategyModule(
-							new TimeAllocationMutator( config )));
+				new JointPlanBasedGroupStrategyModule(
+							new JointTimeAllocationMutatorModule(
+								config,
+								tripRouterFactory)));
 
 		strategy.addStrategyModule( createReRouteModule( config , tripRouterFactory ) );
 
