@@ -22,9 +22,13 @@ package playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -40,53 +44,90 @@ import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.
  * @author thibautd
  */
 public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
-	private final Controler controler;
-	private final DepartureDelayAverageCalculator delay;
 	private final StatisticsCollector statsCollector;
 	private final Random random;
 
-	JointTimeModeChooserAlgorithm(
+	private final DepartureDelayAverageCalculator delay;
+	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final Scenario scenario;
+
+	private final TravelTime travelTimeCalculator;
+	private final TravelDisutilityFactory travelDisutilityFactory;
+	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	private final TripRouterFactory exactRouterFactory;
+
+	public JointTimeModeChooserAlgorithm(
 			final Random random,
 			final StatisticsCollector statsCollector,
-			final Controler controler,
-			final DepartureDelayAverageCalculator delay ) {
+			final DepartureDelayAverageCalculator delay,
+			final Controler controler) {
+		this( random,
+				statsCollector,
+				delay,
+				controler.getScenario(),
+				controler.getScoringFunctionFactory(),
+				controler.getTravelTimeCalculator(),
+				controler.getTravelDisutilityFactory(),
+				controler.getLeastCostPathCalculatorFactory(),
+				controler.getTripRouterFactory());
+	}
+
+	public JointTimeModeChooserAlgorithm(
+			final Random random,
+			final StatisticsCollector statsCollector,
+			final DepartureDelayAverageCalculator delay,
+			final Scenario scenario,
+			final ScoringFunctionFactory scoringFunctionFactory,
+			final TravelTime travelTimeCalculator,
+			final TravelDisutilityFactory travelDisutilityFactory,
+			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
+			final TripRouterFactory tripRouterFactory) {
 		this.random = random;
 		this.statsCollector = statsCollector;
-		this.controler = controler;
 		this.delay = delay;
+		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.scenario = scenario;
+		this.travelTimeCalculator = travelTimeCalculator;
+		this.travelDisutilityFactory = travelDisutilityFactory;
+		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
+		this.exactRouterFactory = tripRouterFactory;
 	}
 
 	@Override
 	public void run(final Plan plan) {
 		JointPlan jointPlan = (JointPlan) plan;
 
-		TripRouterFactory tripRouterFactory =
+		TripRouterFactory estimatorRouterFactory =
 			getAndTuneTripRouterFactory(
 					plan,
 					delay,
-					controler );
+					scenario,
+					travelTimeCalculator,
+					travelDisutilityFactory,
+					leastCostPathCalculatorFactory,
+					exactRouterFactory );
 
 		if (statsCollector != null) {
-			statsCollector.notifyTripRouterFactory( tripRouterFactory );
+			statsCollector.notifyTripRouterFactory( estimatorRouterFactory );
 		}
 
-		ScoringFunctionFactory scoringFunctionFactory = controler.getScoringFunctionFactory();
 		JointTimeModeChooserConfigGroup config = (JointTimeModeChooserConfigGroup)
-			controler.getConfig().getModule( JointTimeModeChooserConfigGroup.GROUP_NAME );
+			scenario.getConfig().getModule( JointTimeModeChooserConfigGroup.GROUP_NAME );
 		JointTimeModeChooserConfigBuilder builder =
 			new JointTimeModeChooserConfigBuilder(
 					random,
 					jointPlan,
 					config,
 					scoringFunctionFactory,
-					tripRouterFactory,
-					config.isDebugMode() ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
+					estimatorRouterFactory,
+					null); // XXX: no debug plots anymore.
+					//config.isDebugMode() ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
 
 		// first run without synchro
 		TabuSearchConfiguration configuration = new TabuSearchConfiguration();
 		Solution initialSolution = new JointTimeModeChooserSolution(
 						(JointPlan) plan,
-						tripRouterFactory.createTripRouter());
+						estimatorRouterFactory.createTripRouter());
 		builder.buildConfiguration(
 				false,
 				initialSolution,
@@ -114,21 +155,25 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 	private static TripRouterFactory getAndTuneTripRouterFactory(
 			final Plan plan,
 			final DepartureDelayAverageCalculator delay,
-			final Controler controler ) {
+			final Scenario scenario,
+			final TravelTime travelTimeCalculator,
+			final TravelDisutilityFactory travelDisutilityFactory,
+			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
+			final TripRouterFactory tripRouterFactory) {
 		return new EstimatorTripRouterFactory(
 				plan,
-				controler.getPopulation().getFactory(),
-				controler.getNetwork(),
-				controler.getTravelTimeCalculator(),
-				controler.getTravelDisutilityFactory(),
-				controler.getLeastCostPathCalculatorFactory(),
-				((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory(),
-				controler.getConfig().scenario().isUseTransit() ?
-					controler.getScenario().getTransitSchedule() :
+				scenario.getPopulation().getFactory(),
+				scenario.getNetwork(),
+				travelTimeCalculator,
+				travelDisutilityFactory,
+				leastCostPathCalculatorFactory,
+				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
+				scenario.getConfig().scenario().isUseTransit() ?
+					scenario.getTransitSchedule() :
 					null,
-				controler.getConfig().plansCalcRoute(),
-				controler.getConfig().planCalcScore(),
+				scenario.getConfig().plansCalcRoute(),
+				scenario.getConfig().planCalcScore(),
 				delay,
-				controler.getTripRouterFactory());
+				tripRouterFactory);
 	}
 }

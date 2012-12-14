@@ -47,8 +47,8 @@ public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
 		return new JointTimeModeChooserAlgorithm(
 				MatsimRandom.getLocalInstance(),
 				statsCollector,
-				controler,
-				delay );
+				delay,
+				controler);
 	}
 
 	@Override
