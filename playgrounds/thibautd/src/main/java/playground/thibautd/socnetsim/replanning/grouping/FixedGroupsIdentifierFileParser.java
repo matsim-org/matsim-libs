@@ -19,8 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.grouping;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
 /**
@@ -83,29 +83,21 @@ public class FixedGroupsIdentifierFileParser {
 	}
 
 	private static Id parseId(final XMLStreamReader streamReader) throws XMLStreamException {
-		while ( streamReader.hasNext() ) {
-			if ( streamReader.next() != XMLStreamConstants.ATTRIBUTE ) {
-				throw new ParsingException( "unexpected event type "+streamReader.getEventType() );
-			}
-
-			if ( streamReader.getAttributeCount() != 1 ) {
-				throw new ParsingException( "unexpected attribute count "+streamReader.getAttributeCount() );
-			}
-
-			if ( !streamReader.getAttributeLocalName( 0 ).equals( "id" ) ) {
-				throw new ParsingException( "unexpected attribute name "+streamReader.getAttributeLocalName( 0 ) );
-			}
-
-			return new IdImpl( streamReader.getAttributeValue( 0 ).intern() );
+		if ( streamReader.getAttributeCount() != 1 ) {
+			throw new ParsingException( "unexpected attribute count "+streamReader.getAttributeCount() );
 		}
-		throw new ParsingException( "could not find an id" );
+
+		if ( !streamReader.getAttributeLocalName( 0 ).equals( "id" ) ) {
+			throw new ParsingException( "unexpected attribute name "+streamReader.getAttributeLocalName( 0 ) );
+		}
+
+		return new IdImpl( streamReader.getAttributeValue( 0 ).intern() );
 	}
 
 	private static XMLStreamReader getStreamReader(final String fileName) {
 		final XMLInputFactory xmlif = XMLInputFactory.newInstance();
-		final File file = new File( fileName );
 		try {
-			final FileInputStream stream = new FileInputStream( file );
+			final InputStream stream = IOUtils.getInputStream( fileName );
 			return xmlif.createXMLStreamReader( stream );
 		}
 		catch (Exception e) {
