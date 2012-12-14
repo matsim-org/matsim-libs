@@ -19,13 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -38,6 +36,7 @@ import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.SplitJointPlansBasedOnJointTripsModule;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
+import playground.thibautd.socnetsim.router.JointPlanRouter;
 
 /**
  * Provides factory methods to create standard strategies.
@@ -186,7 +185,7 @@ public class GroupPlanStrategyFactory {
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override
 					public PlanAlgorithm getPlanAlgoInstance() {
-						return new PlanRouter( tripRouterFactory.createTripRouter() );
+						return new JointPlanRouter( tripRouterFactory.createTripRouter() );
 					}
 				});
 	}
