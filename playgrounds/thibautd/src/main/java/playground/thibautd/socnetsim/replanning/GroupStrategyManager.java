@@ -27,6 +27,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -46,6 +49,9 @@ import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelector
  * @author thibautd
  */
 public class GroupStrategyManager {
+	private static final Logger log =
+		Logger.getLogger(GroupStrategyManager.class);
+
 	private GroupStrategyRegistry registry;
 
 	private final GroupLevelPlanSelector selectorForRemoval;
@@ -86,6 +92,7 @@ public class GroupStrategyManager {
 				strategyAllocations.put( strategy , alloc );
 			}
 
+			logAlloc( g , strategy );
 			alloc.add( g );
 		}
 
@@ -93,6 +100,7 @@ public class GroupStrategyManager {
 			e.getKey().run( e.getValue() );
 		}
 	}
+
 
 	private final void removeExtraPlans(final ReplanningGroup group) {
 		while ( removeOneExtraPlan( group ) ) {} // all is done in the "condition"
@@ -135,6 +143,18 @@ public class GroupStrategyManager {
 			}
 		}
 		throw new IllegalArgumentException();
+	}
+
+
+	private static void logAlloc(
+			final ReplanningGroup g,
+			final GroupPlanStrategy strategy) {
+		if ( !log.isTraceEnabled() ) return;
+	
+		final List<Id> ids = new ArrayList<Id>();
+		for (Person p : g.getPersons()) ids.add( p.getId() );
+
+		log.trace( "group "+ids+" gets strategy "+strategy );
 	}
 }
 

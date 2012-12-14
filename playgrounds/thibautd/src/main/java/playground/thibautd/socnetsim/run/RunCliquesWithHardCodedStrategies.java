@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
@@ -48,6 +51,7 @@ public class RunCliquesWithHardCodedStrategies {
 	}
 
 	public static void main(final String[] args) {
+		Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
 		final String configFile = args[ 0 ];
 
 		// load "registry"

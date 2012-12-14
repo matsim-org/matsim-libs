@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
@@ -83,5 +84,16 @@ public class JointPlanBasedGroupStrategyModule implements GroupStrategyModule {
 			delegate.handlePlan( jp );
 			JointPlanFactory.getPlanLinks().removeJointPlan( jp );
 		}
+	}
+
+	@Override
+	public String toString() {
+		String delegateName = delegate.getClass().getSimpleName();
+		if (delegateName.length() == 0 && delegate instanceof AbstractMultithreadedModule) {
+			// anonymous class
+			delegateName = ((AbstractMultithreadedModule) delegate).getPlanAlgoInstance().getClass().getSimpleName();
+		}
+
+		return "["+getClass().getSimpleName()+": "+delegateName+"]";
 	}
 }

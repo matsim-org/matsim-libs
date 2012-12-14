@@ -77,5 +77,12 @@ public class GroupPlanStrategy {
 			((PersonImpl) p.getPerson()).setSelectedPlan( p );
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "["+getClass().getSimpleName()+": "
+			+selector.getClass().getSimpleName()
+			+";"+strategyModules+"]";
+	}
 }
 
