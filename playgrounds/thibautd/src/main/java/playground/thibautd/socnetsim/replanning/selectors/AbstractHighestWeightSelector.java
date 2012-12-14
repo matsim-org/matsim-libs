@@ -152,7 +152,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 		for (PlanRecord r : records) {
 			r.cachedMaximumWeight = alreadyAllocatedWeight +
-				getMaxWeightFromPersons( r , alreadyAllocatedPersons , remainingPersons );
+				getMaxWeightFromPersons( r , newAllocatedPersons , remainingPersons );
 		}
 
 		// Sort in decreasing order of upper bound: we can stop as soon
@@ -193,6 +193,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			JointPlan jointPlan = r.jointPlan ;
 			if (jointPlan != null) {
+				// normally, it is impossible that it is always the case if there
+				// is a valid plan: a branch were this would be the case would
+				// have a infinitely negative weight and not explored.
 				if ( contains( jointPlan , alreadyAllocatedPersons ) ) continue;
 				tail = getOtherPlansAsString( r , jointPlan , allPersonsRecord , tail);
 				actuallyRemainingPersons = filter( remainingPersons , jointPlan );
@@ -221,6 +224,12 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 		}
 
+		if (constructedString == null) {
+			throw new RuntimeException( "string construction FAILED "+
+					"for person "+currentPerson+" with "+records.size()+" records"
+					+" after having analysed "+alreadyAllocatedPersons);
+		}
+
 		return constructedString;
 	}
 
@@ -242,27 +251,13 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		// we know exactly what plan to get the score from.
 		final JointPlan jointPlanToSelect = planToSelect.jointPlan;
 
-		List<PersonRecord> personsWithChoice = remainingPersons;
-		if (jointPlanToSelect != null) {
-			personsWithChoice = new ArrayList<PersonRecord>();
-
-			Map<Id, Plan> plans = jointPlanToSelect.getIndividualPlans();
-			for (PersonRecord record : remainingPersons) {
-				Plan plan = plans.get( record.person.getId() );
-				if ( plan != null ) {
-					// person is part of joint plan: get the corresponding weight
-					PlanRecord planRecord = record.getRecord( plan );
-					score += planRecord.weight;
-				}
-				else {
-					// put in persons to search
-					personsWithChoice.add( record );
-				}
+		for (PersonRecord record : remainingPersons) {
+			final double max = getMaxWeight( record , personsSelected , jointPlanToSelect );
+			if (log.isTraceEnabled()) {
+				log.trace( "estimated max weight for person "+
+						record.person.getId()+
+						" is "+max );
 			}
-		}
-
-		for (PersonRecord record : personsWithChoice) {
-			final double max = getMaxWeight( record , personsSelected );
 			// if negative, no need to continue
 			if (max == Double.NEGATIVE_INFINITY) return Double.NEGATIVE_INFINITY;
 			score += max;
@@ -277,14 +272,31 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	 */
 	private static double getMaxWeight(
 			final PersonRecord record,
-			final Collection<Id> personsSelected) {
+			final Collection<Id> personsSelected,
+			final JointPlan jointPlanToSelect) {
+		// case in jp: plan is fully determined
+		if (jointPlanToSelect != null) {
+			final Plan plan = jointPlanToSelect.getIndividualPlan( record.person.getId() );
+			if (plan != null) return record.getRecord( plan ).weight;
+		}
+
+		final Collection<Id> idsInJpToSelect =
+			jointPlanToSelect == null ?
+			Collections.EMPTY_SET :
+			jointPlanToSelect.getIndividualPlans().keySet();
+
 		for (PlanRecord plan : record.plans) {
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
-			if (plan.jointPlan == null || !contains( plan.jointPlan , personsSelected )) {
-				return plan.weight;
-			}
+
+			if (plan.jointPlan == null) return plan.weight;
+
+			// skip this plan if its participants already have a plan
+			if (contains( plan.jointPlan , personsSelected )) continue;
+			if (contains( plan.jointPlan , idsInJpToSelect )) continue;
+			return plan.weight;
 		}
+
 		// this combination is impossible
 		return Double.NEGATIVE_INFINITY;
 	}

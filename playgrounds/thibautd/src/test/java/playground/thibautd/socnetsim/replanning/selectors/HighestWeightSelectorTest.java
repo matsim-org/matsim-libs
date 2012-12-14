@@ -87,7 +87,8 @@ public class HighestWeightSelectorTest {
 				new Fixture[]{createPartiallyJointPlansTwoSelectedJps()},
 				new Fixture[]{createPartiallyJointPlansMessOfJointPlans()},
 				new Fixture[]{createPartiallyJointPlansNoSelectedJp()},
-				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent()});
+				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent()},
+				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent2()});
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -599,6 +600,56 @@ public class HighestWeightSelectorTest {
 					Collections.EMPTY_LIST,
 					toBeSelected ) );
 	}
+
+	public static Fixture createOneBigJointPlanDifferentNPlansPerAgent2() {
+		ReplanningGroup group = new ReplanningGroup();
+
+		Map<Id, Plan> jp = new HashMap<Id, Plan>();
+
+		Id id = new IdImpl( "milou" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( 1d );
+		jp.put( id , plan );
+
+		id = new IdImpl( "tintin" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1d );
+		jp.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5000d );
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		jp.put( id , plan );
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -15d );
+		jp.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -5000d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -15000d );
+
+		JointPlan sel = JointPlanFactory.createJointPlan( jp );
+
+		return new Fixture(
+				"one big joint plan order 2",
+				group,
+				new GroupPlans(
+					Arrays.asList( sel ),
+					Collections.EMPTY_LIST ) );
+	}
+
 	@Before
 	public void setupLogging() {
 		Logger.getRootLogger().setLevel( Level.TRACE );
@@ -611,7 +662,13 @@ public class HighestWeightSelectorTest {
 	public void testSelectedPlans() throws Exception {
 		HighestScoreSumSelector selector = new HighestScoreSumSelector();
 
-		GroupPlans selected = selector.selectPlans( fixture.group );
+		GroupPlans selected = null;
+		try {
+			selected = selector.selectPlans( fixture.group );
+		}
+		catch (Exception e) {
+			throw new RuntimeException( "exception thrown for instance <<"+fixture.name+">>", e );
+		}
 
 		Assert.assertEquals(
 				"unexpected selected plan in test instance <<"+fixture.name+">> ",
