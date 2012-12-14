@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -28,8 +29,10 @@ import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 
 import playground.thibautd.cliquessim.run.ImportedJointRoutesChecker;
@@ -111,21 +114,15 @@ public class ImmutableJointController extends AbstractController {
 				registry.getScenario().getConfig(),
 				"Config dump before doIterations:");
 
-		final AbstractPersonAlgorithm prepareForSim =
-				new PersonPrepareForSim(
-						new PlanRouter( registry.getTripRouterFactory().createTripRouter() ),
-						registry.getScenario());
-		final AbstractPersonAlgorithm checkJointRoutes =
-				new ImportedJointRoutesChecker( registry.getTripRouterFactory().createTripRouter() );
-
 		ParallelPersonAlgorithmRunner.run(
 				registry.getScenario().getPopulation(),
 				registry.getScenario().getConfig().global().getNumberOfThreads(),
-				checkJointRoutes);
-		ParallelPersonAlgorithmRunner.run(
-				registry.getScenario().getPopulation(),
-				registry.getScenario().getConfig().global().getNumberOfThreads(),
-				prepareForSim);
+				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+					@Override
+					public PersonAlgorithm getPersonAlgorithm() {
+						return new PreparePersonAlgorithm( registry.getTripRouterFactory() );
+					}
+				});
 	}
 
 	@Override
@@ -136,5 +133,26 @@ public class ImmutableJointController extends AbstractController {
 	public final ControllerRegistry getRegistry() {
 		return registry;
 	}
+
+	public class PreparePersonAlgorithm extends AbstractPersonAlgorithm {
+		private final AbstractPersonAlgorithm prepareForSim;
+		private final AbstractPersonAlgorithm checkJointRoutes;
+
+		public PreparePersonAlgorithm(final TripRouterFactory factory) {
+			prepareForSim =
+				new PersonPrepareForSim(
+						new PlanRouter( registry.getTripRouterFactory().createTripRouter() ),
+						registry.getScenario());
+			checkJointRoutes =
+				new ImportedJointRoutesChecker( registry.getTripRouterFactory().createTripRouter() );
+		}
+
+		@Override
+		public void run(final Person person) {
+			checkJointRoutes.run( person );
+			prepareForSim.run( person );
+		}
+	}
+
 }
 
