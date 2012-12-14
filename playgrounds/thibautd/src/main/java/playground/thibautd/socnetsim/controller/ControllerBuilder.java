@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerBuilder.java
+ * ControllerBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.run;
+package playground.thibautd.socnetsim.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,13 +39,13 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 /**
  * @author thibautd
  */
-public class ControlerBuilder {
+public class ControllerBuilder {
 	private final Scenario scenario;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private GroupIdentifier groupIdentifier;
 	private final GroupStrategyRegistry registry = new GroupStrategyRegistry();
 
-	public ControlerBuilder( final Scenario scenario ) {
+	public ControllerBuilder( final Scenario scenario ) {
 		this.scenario = scenario;
 
 		this.scoringFunctionFactory =
@@ -71,25 +71,25 @@ public class ControlerBuilder {
 		};
 	}
 
-	public ControlerBuilder withScoring( final ScoringFunctionFactory scoringFunctionFactory ) {
+	public ControllerBuilder withScoring( final ScoringFunctionFactory scoringFunctionFactory ) {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		return this;
 	}
 
-	public ControlerBuilder withGroupIdentifier( final GroupIdentifier identifier ) {
+	public ControllerBuilder withGroupIdentifier( final GroupIdentifier identifier ) {
 		this.groupIdentifier = identifier;
 		return this;
 	}
 
-	public ControlerBuilder withStrategy(
+	public ControllerBuilder withStrategy(
 			final GroupPlanStrategy strategy,
 			final double weight) {
 		registry.addStrategy( strategy , weight );
 		return this;
 	}
 
-	public ImmutableJointControler build() {
-		return new ImmutableJointControler(
+	public ImmutableJointController build() {
+		return new ImmutableJointController(
 				scenario,
 				new GroupReplanningListenner(
 					scenario.getPopulation(),

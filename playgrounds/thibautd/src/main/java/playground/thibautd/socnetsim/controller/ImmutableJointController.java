@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.run;
+package playground.thibautd.socnetsim.controller;
 
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -56,7 +56,7 @@ import playground.thibautd.socnetsim.router.JointTripRouterFactory;
  * not be available, and, sadly, modules which require a Controler are not compatible.
  * @author thibautd
  */
-public class ImmutableJointControler extends AbstractController {
+public class ImmutableJointController extends AbstractController {
 	private final Scenario scenario;
 	private final EventsManager events;
 
@@ -68,7 +68,7 @@ public class ImmutableJointControler extends AbstractController {
 	private final MobsimFactory mobsimFactory = new JointQSimFactory();
 	private final TripRouterFactory tripRouterFactory;
 
-	ImmutableJointControler(
+	ImmutableJointController(
 			final Scenario scenario,
 			final ReplanningListener replanner,
 			final ScoringFunctionFactory scoringFunctionFactory) {
