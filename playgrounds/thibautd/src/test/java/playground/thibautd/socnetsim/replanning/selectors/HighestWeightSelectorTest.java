@@ -86,7 +86,8 @@ public class HighestWeightSelectorTest {
 				new Fixture[]{createPartiallyJointPlansOneSelectedJp()},
 				new Fixture[]{createPartiallyJointPlansTwoSelectedJps()},
 				new Fixture[]{createPartiallyJointPlansMessOfJointPlans()},
-				new Fixture[]{createPartiallyJointPlansNoSelectedJp()});
+				new Fixture[]{createPartiallyJointPlansNoSelectedJp()},
+				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent()});
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -454,6 +455,54 @@ public class HighestWeightSelectorTest {
 					Collections.EMPTY_LIST ) );
 	}
 
+	public static Fixture createOneBigJointPlanDifferentNPlansPerAgent() {
+		ReplanningGroup group = new ReplanningGroup();
+
+		Map<Id, Plan> jp = new HashMap<Id, Plan>();
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( 1d );
+		jp.put( id , plan );
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1d );
+		jp.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5000d );
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		jp.put( id , plan );
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -15d );
+		jp.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -5000d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -15000d );
+
+		JointPlan sel = JointPlanFactory.createJointPlan( jp );
+
+		return new Fixture(
+				"one big joint plan",
+				group,
+				new GroupPlans(
+					Arrays.asList( sel ),
+					Collections.EMPTY_LIST ) );
+	}
 
 	public static Fixture createPartiallyJointPlansNoSelectedJp() {
 		ReplanningGroup group = new ReplanningGroup();

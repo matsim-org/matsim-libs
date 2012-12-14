@@ -262,7 +262,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		}
 
 		for (PersonRecord record : personsWithChoice) {
-			score += getMaxWeight( record , personsSelected );
+			final double max = getMaxWeight( record , personsSelected );
+			// if negative, no need to continue
+			if (max == Double.NEGATIVE_INFINITY) return Double.NEGATIVE_INFINITY;
+			score += max;
 		}
 
 		return score;
@@ -282,7 +285,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				return plan.weight;
 			}
 		}
-		throw new RuntimeException( "no valid plan for record "+record+" without persons "+personsSelected );
+		// this combination is impossible
+		return Double.NEGATIVE_INFINITY;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
