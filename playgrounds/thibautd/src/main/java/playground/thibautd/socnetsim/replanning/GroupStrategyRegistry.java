@@ -42,11 +42,11 @@ public final class GroupStrategyRegistry {
 	}
 
 	public GroupPlanStrategy chooseStrategy() {
-		final double choice = MatsimRandom.getRandom().nextDouble();
-		double cumul = 0;
+		final double choice = MatsimRandom.getRandom().nextDouble() * sumOfWeights;
 		int i = 0;
 
 		Iterator<Double> iter = weights.iterator();
+		double cumul = iter.next();
 		while ( choice > cumul ) {
 			cumul += iter.next();
 			i++;
