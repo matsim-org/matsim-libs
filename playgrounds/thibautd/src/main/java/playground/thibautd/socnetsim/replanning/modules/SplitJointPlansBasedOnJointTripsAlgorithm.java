@@ -116,11 +116,11 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GroupPlansAlgo
 	}
 
 	private static Collection<Id> getDependentIds(final Leg leg) {
-		if ( JointActingTypes.DRIVER.contains( leg.getMode() ) ) {
+		if ( JointActingTypes.DRIVER.equals( leg.getMode() ) ) {
 			DriverRoute r = (DriverRoute) leg.getRoute();
 			return r.getPassengersIds();
 		}
-		else if ( JointActingTypes.PASSENGER.contains( leg.getMode() ) ) {
+		else if ( JointActingTypes.PASSENGER.equals( leg.getMode() ) ) {
 			PassengerRoute r = (PassengerRoute) leg.getRoute();
 			return Collections.singleton( r.getDriverId() );
 		}
