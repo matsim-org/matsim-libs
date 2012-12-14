@@ -64,7 +64,8 @@ public class GroupPlanStrategyFactory {
 			final TripRouterFactory tripRouterFactory) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
 
-		strategy.addStrategyModule( createTripsToLegsModule( config , tripRouterFactory ) ) ;
+		// XXX trips to legs does not keeps co-traveler information
+		//strategy.addStrategyModule( createTripsToLegsModule( config , tripRouterFactory ) ) ;
 
 		strategy.addStrategyModule(
 				new JointPlanBasedGroupStrategyModule(
