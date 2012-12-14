@@ -53,7 +53,7 @@ public class GroupPlanStrategy {
 		for (ReplanningGroup group : groups) {
 			GroupPlans plans = selector.selectPlans( group );
 
-			if (plansToHandle.size() > 0) {
+			if (strategyModules.size() > 0) {
 				plans = GroupPlans.copyPlans( plans );
 				plansToHandle.add( plans );
 			}
