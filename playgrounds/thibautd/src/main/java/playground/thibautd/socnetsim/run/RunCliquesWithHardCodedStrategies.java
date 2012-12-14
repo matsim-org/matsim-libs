@@ -81,7 +81,7 @@ public class RunCliquesWithHardCodedStrategies {
 				GroupPlanStrategyFactory.createSubtourModeChoice(
 					config,
 					controllerRegistry.getTripRouterFactory() ),
-				Weights.TIME_MUTATOR);
+				Weights.MODE_MUTATION);
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSelectExpBeta( config ),
 				Weights.LOGIT_SELECT );
