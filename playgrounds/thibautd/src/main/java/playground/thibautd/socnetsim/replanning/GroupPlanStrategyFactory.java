@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -26,10 +27,13 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 
+import playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser.JointTimeModeChooserAlgorithm;
 import playground.thibautd.cliquessim.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
+import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.SplitJointPlansBasedOnJointTripsModule;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
@@ -72,9 +76,9 @@ public class GroupPlanStrategyFactory {
 	}
 
 	public static GroupPlanStrategy createCliqueJointTripMutator(
-			final Config config,
-			final TripRouterFactory tripRouterFactory) {
+			final ControllerRegistry registry) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+		final Config config = registry.getScenario().getConfig();
 
 		strategy.addStrategyModule(
 				new JointPlanMergingModule(
@@ -94,7 +98,7 @@ public class GroupPlanStrategyFactory {
 						public PlanAlgorithm getPlanAlgoInstance() {
 							return new JointTripInsertorAndRemoverAlgorithm(
 								config,
-								tripRouterFactory.createTripRouter(),
+								registry.getTripRouterFactory().createTripRouter(),
 								MatsimRandom.getLocalInstance());
 						}
 					}));
@@ -105,9 +109,34 @@ public class GroupPlanStrategyFactory {
 				new SplitJointPlansBasedOnJointTripsModule(
 					config.global().getNumberOfThreads() ) );
 
-		strategy.addStrategyModule( createReRouteModule( config , tripRouterFactory ) );
+		strategy.addStrategyModule(
+				createReRouteModule(
+					config,
+					registry.getTripRouterFactory() ) );
 
-		if (true) throw new RuntimeException( "TODO: jointimemodechooser" );
+		final DepartureDelayAverageCalculator delay =
+			new DepartureDelayAverageCalculator(
+				registry.getScenario().getNetwork(),
+				registry.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+
+		strategy.addStrategyModule(
+				new JointPlanBasedGroupStrategyModule(
+					new AbstractMultithreadedModule(
+							registry.getScenario().getConfig().global() ) {
+						@Override
+						public PlanAlgorithm getPlanAlgoInstance() {
+							return new JointTimeModeChooserAlgorithm(
+								MatsimRandom.getLocalInstance(),
+								null,
+								delay,
+								registry.getScenario(),
+								registry.getScoringFunctionFactory(),
+								registry.getTravelTime(),
+								registry.getTravelDisutilityFactory(),
+								registry.getLeastCostPathCalculatorFactory(),
+								registry.getTripRouterFactory() );
+						}
+					}));
 
 		return strategy;
 	}
