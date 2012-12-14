@@ -30,7 +30,11 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -76,11 +80,37 @@ public final class ControllerRegistry {
 		this.events.addHandler(travelTime);	
 
 		this.travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
-		this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(
-						scenario.getNetwork(), 
-						travelDisutilityFactory.createTravelDisutility(
-							travelTime,
-							scenario.getConfig().planCalcScore()));
+		switch (scenario.getConfig().controler().getRoutingAlgorithmType()) {
+			case AStarLandmarks:
+				this.leastCostPathCalculatorFactory =
+						new AStarLandmarksFactory(
+									scenario.getNetwork(),
+									travelDisutilityFactory.createTravelDisutility(
+										travelTime,
+										scenario.getConfig().planCalcScore()));
+				break;
+			case Dijkstra:
+				PreProcessDijkstra ppd = new PreProcessDijkstra();
+				ppd.run( scenario.getNetwork() );
+				this.leastCostPathCalculatorFactory = new DijkstraFactory( ppd );
+				break;
+			case FastAStarLandmarks:
+				this.leastCostPathCalculatorFactory =
+						new FastAStarLandmarksFactory(
+									scenario.getNetwork(),
+									travelDisutilityFactory.createTravelDisutility(
+										travelTime,
+										scenario.getConfig().planCalcScore()));
+				break;
+			case FastDijkstra:
+				PreProcessDijkstra ppfd = new PreProcessDijkstra();
+				ppfd.run( scenario.getNetwork() );
+				this.leastCostPathCalculatorFactory = new FastDijkstraFactory( ppfd );
+				break;
+			default:
+				throw new IllegalArgumentException( "unkown algorithm "+scenario.getConfig().controler().getRoutingAlgorithmType() );
+		}
+
 		this.tripRouterFactory = new JointTripRouterFactory(
 				scenario,
 				travelDisutilityFactory,
