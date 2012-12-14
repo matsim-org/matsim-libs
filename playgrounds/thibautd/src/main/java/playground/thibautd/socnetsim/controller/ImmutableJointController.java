@@ -57,122 +57,90 @@ import playground.thibautd.socnetsim.router.JointTripRouterFactory;
  * @author thibautd
  */
 public class ImmutableJointController extends AbstractController {
-	private final Scenario scenario;
-	private final EventsManager events;
-
-	private final TravelTimeCalculator travelTime;
-	private final ScoringFunctionFactory scoringFunctionFactory;
-	private final CalcLegTimes legTimes;
-
+	private final ControllerRegistry registry;
 	private final ReplanningListener replanner;
-	private final MobsimFactory mobsimFactory = new JointQSimFactory();
-	private final TripRouterFactory tripRouterFactory;
 
 	ImmutableJointController(
 			final Scenario scenario,
 			final ReplanningListener replanner,
 			final ScoringFunctionFactory scoringFunctionFactory) {
-		this.scenario = scenario;
 		this.replanner = replanner;
-		this.scoringFunctionFactory = scoringFunctionFactory;
 		checkConfigConsistencyAndWriteToLog(
 				scenario.getConfig(),
 				"Complete config dump after reading the config file:");
+		this.registry =
+			new ControllerRegistry(
+				scenario,
+				scoringFunctionFactory);
 
 		this.setupOutputDirectory(
 				scenario.getConfig().controler().getOutputDirectory(),
 				scenario.getConfig().controler().getRunId(),
 				true);
-
-		this.events = EventsUtils.createEventsManager( scenario.getConfig() );
-
-		// some analysis utils
-		this.events.addHandler(
-				new VolumesAnalyzer(
-					3600, 24 * 3600 - 1,
-					scenario.getNetwork()));
-		this.legTimes = new CalcLegTimes();
-		this.events.addHandler( legTimes );
-		this.travelTime =
-			new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
-					scenario.getNetwork(),
-					scenario.getConfig().travelTimeCalculator());
-		this.events.addHandler(travelTime);	
-
-		final TravelDisutilityFactory costFactory =
-			new TravelCostCalculatorFactoryImpl();
-		this.tripRouterFactory = new JointTripRouterFactory(
-				scenario,
-				costFactory,
-				travelTime,
-				new AStarLandmarksFactory(
-						scenario.getNetwork(), 
-						costFactory.createTravelDisutility(
-							travelTime,
-							scenario.getConfig().planCalcScore())),
-				null); // last arg: transit router factory.
 	}
 
 	public void run() {
-		super.run( scenario.getConfig() );
+		super.run( registry.getScenario().getConfig() );
 	}
 
 	@Override
 	protected void loadCoreListeners() {
-		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenario, controlerIO);
+		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(registry.getScenario(), controlerIO);
 		this.addControlerListener(dumpDataAtEnd);
 		
 		this.addControlerListener( new PlansScoring(
-					scenario,
-					events,
+					registry.getScenario(),
+					registry.getEvents(),
 					controlerIO,
-					scoringFunctionFactory) );
+					registry.getScoringFunctionFactory()) );
 
 		if (replanner == null) throw new NullPointerException();
 		this.addCoreControlerListener( replanner );
 
 		this.addCoreControlerListener(
 				 new PlansDumping(
-					scenario,
-					scenario.getConfig().controler().getFirstIteration(), 
-					scenario.getConfig().controler().getWritePlansInterval(),
+					registry.getScenario(),
+					registry.getScenario().getConfig().controler().getFirstIteration(), 
+					registry.getScenario().getConfig().controler().getWritePlansInterval(),
 					stopwatch,
 					controlerIO ));
 
 		this.addCoreControlerListener(
 				new LegTimesListener(
-					legTimes,
+					registry.getLegTimes(),
 					controlerIO));
 		
 		this.addCoreControlerListener(
 				new EventsHandling(
-						(EventsManagerImpl) events,
-						scenario.getConfig().controler().getWriteEventsInterval(),
-						scenario.getConfig().controler().getEventsFileFormats(),
+						(EventsManagerImpl) registry.getEvents(),
+						registry.getScenario().getConfig().controler().getWriteEventsInterval(),
+						registry.getScenario().getConfig().controler().getEventsFileFormats(),
 						controlerIO ));
 	}
 
 	@Override
 	protected void runMobSim(int iteration) {
-		mobsimFactory.createMobsim( scenario , events ).run();
+		registry.getMobsimFactory().createMobsim(
+				registry.getScenario(),
+				registry.getEvents() ).run();
 	}
 
 	@Override
 	protected void prepareForSim() {
 		checkConfigConsistencyAndWriteToLog(
-				scenario.getConfig(),
+				registry.getScenario().getConfig(),
 				"Config dump before doIterations:");
 
 		final AbstractPersonAlgorithm prepareForSim =
 				new PersonPrepareForSim(
-						new PlanRouter( tripRouterFactory.createTripRouter() ),
-						scenario);
+						new PlanRouter( registry.getTripRouterFactory().createTripRouter() ),
+						registry.getScenario());
 		final AbstractPersonAlgorithm checkJointRoutes =
-				new ImportedJointRoutesChecker( tripRouterFactory.createTripRouter() );
+				new ImportedJointRoutesChecker( registry.getTripRouterFactory().createTripRouter() );
 
 		ParallelPersonAlgorithmRunner.run(
-				scenario.getPopulation(),
-				scenario.getConfig().global().getNumberOfThreads(),
+				registry.getScenario().getPopulation(),
+				registry.getScenario().getConfig().global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
@@ -189,7 +157,11 @@ public class ImmutableJointController extends AbstractController {
 
 	@Override
 	protected boolean continueIterations(int iteration) {
-		return iteration <= scenario.getConfig().controler().getLastIteration();
+		return iteration <= registry.getScenario().getConfig().controler().getLastIteration();
+	}
+
+	public final ControllerRegistry getRegistry() {
+		return registry;
 	}
 }
 
