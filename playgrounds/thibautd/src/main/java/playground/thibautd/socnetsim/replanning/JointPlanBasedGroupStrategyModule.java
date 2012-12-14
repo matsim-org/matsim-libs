@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -36,6 +38,9 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  * @author thibautd
  */
 public class JointPlanBasedGroupStrategyModule implements GroupStrategyModule {
+	private static final Logger log =
+		Logger.getLogger(JointPlanBasedGroupStrategyModule.class);
+
 	private final boolean wrapIndividualPlansAndActOnThem;
 	private final PlanStrategyModule delegate;
 
@@ -56,6 +61,7 @@ public class JointPlanBasedGroupStrategyModule implements GroupStrategyModule {
 			final Collection<GroupPlans> groupPlans) {
 		delegate.prepareReplanning();
 
+		log.info( "handling "+groupPlans.size()+" groups" );
 		for (GroupPlans plans : groupPlans) {
 			handlePlans( plans );
 		}

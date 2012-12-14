@@ -55,6 +55,7 @@ public abstract class AbstractMultithreadedGroupStrategyModule implements GroupS
 
 	@Override
 	public void handlePlans(final Collection<GroupPlans> groupPlans) {
+		log.info( "running "+name+" on "+groupPlans.size()+" groups" );
 		final PlanRunnable[] runnables = getPlanRunnables( groupPlans );
 		final ExceptionHandler exceptionHandler = new ExceptionHandler();
 
@@ -114,7 +115,6 @@ public abstract class AbstractMultithreadedGroupStrategyModule implements GroupS
 				algo.run( p );
 				counter.incCounter();
 			}
-			counter.printCounter();
 		}
 	}
 

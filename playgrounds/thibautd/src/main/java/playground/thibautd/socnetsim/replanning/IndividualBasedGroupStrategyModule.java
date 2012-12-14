@@ -21,6 +21,8 @@ package playground.thibautd.socnetsim.replanning;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 
@@ -32,6 +34,9 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  * @author thibautd
  */
 public class IndividualBasedGroupStrategyModule implements GroupStrategyModule {
+	private static final Logger log =
+		Logger.getLogger(IndividualBasedGroupStrategyModule.class);
+
 	private final boolean actOnPlansInJointPlans;
 	private final PlanStrategyModule delegate;
 
@@ -51,6 +56,7 @@ public class IndividualBasedGroupStrategyModule implements GroupStrategyModule {
 	public void handlePlans(final Collection<GroupPlans> groupPlans) {
 		delegate.prepareReplanning();
 
+		log.info( "handling "+groupPlans.size()+" groups" );
 		for (GroupPlans plans : groupPlans) {
 			handlePlans( plans );
 		}
