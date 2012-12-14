@@ -2,20 +2,14 @@ package playground.pieter.network.clustering;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 
 /**
  * @author fouriep
@@ -450,12 +444,13 @@ public class NodeCluster {
 
 		@Override
 		public int compare(NodeCluster o1, NodeCluster o2) {
-			if (o1.getClusterStepFormed() == o2.getClusterStepFormed()) {
-				return Integer.compare(o1.getId(), o2.getId());
-			} else
-
-				return Integer.compare(o1.getClusterStepFormed(),
-						o2.getClusterStepFormed());
+			throw new RuntimeException("Commented out non-compiling code. Please check your code. mrieser/14dec2012");
+//			if (o1.getClusterStepFormed() == o2.getClusterStepFormed()) {
+//				return Integer.compare(o1.getId(), o2.getId());
+//			} else
+//
+//				return Integer.compare(o1.getClusterStepFormed(),
+//						o2.getClusterStepFormed());
 		}
 
 	}

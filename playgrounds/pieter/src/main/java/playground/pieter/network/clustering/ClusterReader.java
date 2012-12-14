@@ -1,12 +1,11 @@
 package playground.pieter.network.clustering;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
+//import groovy.lang.Binding;
+//import groovy.lang.GroovyShell;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -23,8 +22,11 @@ public class ClusterReader {
 		this.nca = nca;
 		this.network = network;
 		BufferedReader reader = IOUtils.getBufferedReader(fileName);
-		Binding binding = new Binding();
-		GroovyShell shell = new GroovyShell(binding);
+		if (true) {
+			throw new RuntimeException("Commented out non-compiling code. Please check your code. mrieser/14dec2012");
+		}
+//		Binding binding = new Binding();
+//		GroovyShell shell = new GroovyShell(binding);
 //		Object value = shell
 //				.evaluate("for (x=0; x<5; x++){println \"Hello\"}; return x");
 		int i = 0;
@@ -43,10 +45,10 @@ public class ClusterReader {
 					linkMethodName = line;
 					break;
 				case 2:
-					linkMethodParamTypes = (String[]) shell.evaluate(line);
+//					linkMethodParamTypes = (String[]) shell.evaluate(line);
 					break;
 				case 3:
-					linkMethodParameters = (Object[]) shell.evaluate(line);
+//					linkMethodParameters = (Object[]) shell.evaluate(line);
 					break;
 				default:
 					break;
