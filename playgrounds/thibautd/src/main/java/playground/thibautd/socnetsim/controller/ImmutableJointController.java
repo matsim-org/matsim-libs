@@ -19,11 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller;
 
-import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -32,23 +28,12 @@ import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 
 import playground.thibautd.cliquessim.run.ImportedJointRoutesChecker;
-import playground.thibautd.socnetsim.qsim.JointQSimFactory;
-import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 
 /**
  * A simple controler for the process with joint plans.
@@ -60,22 +45,18 @@ public class ImmutableJointController extends AbstractController {
 	private final ControllerRegistry registry;
 	private final ReplanningListener replanner;
 
-	ImmutableJointController(
-			final Scenario scenario,
-			final ReplanningListener replanner,
-			final ScoringFunctionFactory scoringFunctionFactory) {
+	public ImmutableJointController(
+			final ControllerRegistry registry,
+			final ReplanningListener replanner) {
 		this.replanner = replanner;
 		checkConfigConsistencyAndWriteToLog(
-				scenario.getConfig(),
+				registry.getScenario().getConfig(),
 				"Complete config dump after reading the config file:");
-		this.registry =
-			new ControllerRegistry(
-				scenario,
-				scoringFunctionFactory);
+		this.registry = registry;
 
 		this.setupOutputDirectory(
-				scenario.getConfig().controler().getOutputDirectory(),
-				scenario.getConfig().controler().getRunId(),
+				registry.getScenario().getConfig().controler().getOutputDirectory(),
+				registry.getScenario().getConfig().controler().getRunId(),
 				true);
 	}
 
