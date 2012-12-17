@@ -62,28 +62,34 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 	
 	final private static int INDEX_NCOOPS = 0;
 	final private static int INDEX_NCOOPSPOS = 1;
-	final private static int INDEX_NPAX = 2;
-	final private static int INDEX_NPAXPOS = 3;
-	final private static int INDEX_NVEH = 4;
-	final private static int INDEX_NVEHPOS = 5;
-	final private static int INDEX_NBUDGET = 6;
-	final private static int INDEX_NBUDGETPOS = 7;
-	final private static int INDEX_NSCORE = 8;
-	final private static int INDEX_NSCOREPOS = 9;
+	final private static int INDEX_NROUTES = 2;
+	final private static int INDEX_NROUTESPOS = 3;	
+	final private static int INDEX_NPAX = 4;
+	final private static int INDEX_NPAXPOS = 5;
+	final private static int INDEX_NVEH = 6;
+	final private static int INDEX_NVEHPOS = 7;
+	final private static int INDEX_NBUDGET = 8;
+	final private static int INDEX_NBUDGETPOS = 9;
+	final private static int INDEX_NSCORE = 10;
+	final private static int INDEX_NSCOREPOS = 11;
 	
-	final private static int INDEX_SHAREPOSCOOP = 10;
-	final private static int INDEX_SHAREPOSPAX = 11;
-	final private static int INDEX_SHAREPOSVEH = 12;
+	final private static int INDEX_SHAREPOSCOOP = 12;
+	final private static int INDEX_SHAREPOSROUTES = 13;
+	final private static int INDEX_SHAREPOSPAX = 14;
+	final private static int INDEX_SHAREPOSVEH = 15;
 	
-	final private static int INDEX_MEANPOSCOOP = 13;
-	final private static int INDEX_MEANPOSPAX = 14;
-	final private static int INDEX_MEANPOSVEH = 15;
-	final private static int INDEX_SIGMAUPPERPOSCOOP = 16;
-	final private static int INDEX_SIGMAUPPERPOSPAX = 17;
-	final private static int INDEX_SIGMAUPPERPOSVEH = 18;
-	final private static int INDEX_SIGMALOWERPOSCOOP = 19;
-	final private static int INDEX_SIGMALOWERPOSPAX = 20;
-	final private static int INDEX_SIGMALOWERPOSVEH = 21;
+	final private static int INDEX_MEANPOSCOOP = 16;
+	final private static int INDEX_MEANPOSROUTES = 17;
+	final private static int INDEX_MEANPOSPAX = 18;
+	final private static int INDEX_MEANPOSVEH = 19;
+	final private static int INDEX_SIGMAUPPERPOSCOOP = 20;
+	final private static int INDEX_SIGMAUPPERPOSROUTES = 21;
+	final private static int INDEX_SIGMAUPPERPOSPAX = 22;
+	final private static int INDEX_SIGMAUPPERPOSVEH = 23;
+	final private static int INDEX_SIGMALOWERPOSCOOP = 24;
+	final private static int INDEX_SIGMALOWERPOSROUTES = 25;
+	final private static int INDEX_SIGMALOWERPOSPAX = 26;
+	final private static int INDEX_SIGMALOWERPOSVEH = 27;
 
 	private BufferedWriter pStatsWriter;
 
@@ -108,7 +114,7 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 			log.info("enabled");
 			this.pStatsWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pStats.txt"));
 			try {
-				this.pStatsWriter.write("iter\tcoops\t+coops\tpax\t+pax\tveh\t+veh\tbudget\t+budget\tscore\t+score\tsharePosCoop\tsharePosPax\tsharePosVeh\tESmeanCoop+\tESstdDevCoop+\tESmeanPax+\tESstdDevPax+\tESmeanVeh+\tESstdDevVeh+\tmeanCoop+\tstdDevCoop+\tmeanPax+\tstdDevPax+\tmeanVeh+\tstdDevVeh+\t\n");
+				this.pStatsWriter.write("iter\tcoops\t+coops\troutes\t+routes\tpax\t+pax\tveh\t+veh\tbudget\t+budget\tscore\t+score\tsharePosCoop\tsharePosRoutes\tsharePosPax\tsharePosVeh\tESmeanCoop+\tESstdDevCoop+\tESmeanRoutes+\tESstdDevRoutes+\tESmeanPax+\tESstdDevPax+\tESmeanVeh+\tESstdDevVeh+\tmeanCoop+\tstdDevCoop+\tmeanRoutes+\tstdDevRoutes+\tmeanPax+\tstdDevPax+\tmeanVeh+\tstdDevVeh+\t\n");
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -120,7 +126,7 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 		int maxIter = controler.getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 10000) iterations = 10000; // limit the history size
-		this.history = new double[23][iterations+1];
+		this.history = new double[29][iterations+1];
 		this.statsContainer = new RecursiveStatsContainer();
 		this.statsApproxContainer = new RecursiveStatsApproxContainer(0.1, 10);
 	}
@@ -131,6 +137,8 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 			
 			double coop = 0.0;
 			double coopPos = 0.0;
+			double routes = 0.0;
+			double routesPos = 0.0;
 			double pax = 0.0;
 			double paxPos = 0.0;
 			double veh = 0.0;
@@ -143,17 +151,20 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 			for (Cooperative cooperative : this.pBox.getCooperatives()) {
 				List<PPlan> plans = cooperative.getAllPlans();
 				
+				double coopRoutes = 0.0;
 				double coopPax = 0.0;
 				double coopVeh = 0.0;
 				double coopScore = 0.0;				
 
 				for (PPlan plan : plans) {
+					coopRoutes++;
 					coopPax += plan.getTripsServed();
 					coopVeh += plan.getNVehicles();
 					coopScore += plan.getScore();
 				}
 				
 				coop++;
+				routes += coopRoutes;
 				pax += coopPax;				
 				veh += coopVeh;
 				budget += cooperative.getBudget();
@@ -162,6 +173,7 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 				// statistics for each coop in business
 				if(cooperative.getCoopState().equals(CoopState.INBUSINESS)){
 					coopPos++;
+					routesPos += coopRoutes;
 					paxPos += coopPax;
 					vehPos += coopVeh;
 					budgetPos += cooperative.getBudget();
@@ -170,19 +182,20 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 			}
 			
 			double sharePosCoop = coopPos / coop * 100.0;
+			double sharePosRoutes = routesPos / routes * 100.0;
 			double sharePosPax = paxPos / pax * 100.0;
 			double sharePosVeh = vehPos / veh * 100.0;
 			
-			this.statsContainer.handleNewEntry(coopPos, paxPos, vehPos);
-			this.statsApproxContainer.handleNewEntry(coopPos, paxPos, vehPos);
+			this.statsContainer.handleNewEntry(coopPos, routesPos, paxPos, vehPos);
+			this.statsApproxContainer.handleNewEntry(coopPos, routesPos, paxPos, vehPos);
 			
 			try {
-				this.pStatsWriter.write(event.getIteration() + "\t" + (int) coop + "\t" + (int) coopPos + "\t" + (int) pax + "\t" + (int) paxPos + "\t" + (int) veh + "\t" + (int) vehPos + "\t" +
-						(budget / coop) + "\t" + (budgetPos / coopPos) + "\t" + (score / coop) + "\t" + (scorePos / coopPos) + "\t" + sharePosCoop + "\t" + sharePosPax + "\t" + sharePosVeh + "\t" +
-						statsApproxContainer.getArithmeticMeanCoops() + "\t" + statsApproxContainer.getStdDevCoop() + "\t" + statsApproxContainer.getArithmeticMeanPax() + "\t" + statsApproxContainer.getStdDevPax() + "\t" + 
-						statsApproxContainer.getArithmeticMeanVeh() + "\t" + statsApproxContainer.getStdDevVeh() + "\t" +
-						statsContainer.getArithmeticMeanCoops() + "\t" + statsContainer.getStdDevCoop() + "\t" + statsContainer.getArithmeticMeanPax() + "\t" + statsContainer.getStdDevPax() + "\t" + 
-						statsContainer.getArithmeticMeanVeh() + "\t" + statsContainer.getStdDevVeh() + "\n");
+				this.pStatsWriter.write(event.getIteration() + "\t" + (int) coop + "\t" + (int) coopPos + "\t" + (int) routes + "\t" + (int) routesPos + "\t" + (int) pax + "\t" + (int) paxPos + "\t" + (int) veh + "\t" + (int) vehPos + "\t" +
+						(budget / coop) + "\t" + (budgetPos / coopPos) + "\t" + (score / routes) + "\t" + (scorePos / routesPos) + "\t" + sharePosCoop + "\t" + sharePosRoutes + "\t" + sharePosPax + "\t" + sharePosVeh + "\t" +
+						statsApproxContainer.getArithmeticMeanCoops() + "\t" + statsApproxContainer.getStdDevCoop() + "\t" + statsApproxContainer.getArithmeticMeanRoutes() + "\t" + statsApproxContainer.getStdDevRoutes() + "\t" +
+						statsApproxContainer.getArithmeticMeanPax() + "\t" + statsApproxContainer.getStdDevPax() + "\t" + statsApproxContainer.getArithmeticMeanVeh() + "\t" + statsApproxContainer.getStdDevVeh() + "\t" +
+						statsContainer.getArithmeticMeanCoops() + "\t" + statsContainer.getStdDevCoop() + "\t" + statsContainer.getArithmeticMeanRoutes() + "\t" + statsContainer.getStdDevRoutes() + "\t" + 
+						statsContainer.getArithmeticMeanPax() + "\t" + statsContainer.getStdDevPax() + "\t" + statsContainer.getArithmeticMeanVeh() + "\t" + statsContainer.getStdDevVeh() + "\n");
 				this.pStatsWriter.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -193,26 +206,32 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 				
 				this.history[INDEX_NCOOPS][index] = coop;
 				this.history[INDEX_NCOOPSPOS][index] = coopPos;
+				this.history[INDEX_NROUTES][index] = routes;
+				this.history[INDEX_NROUTESPOS][index] = routesPos;
 				this.history[INDEX_NPAX][index] = pax;
 				this.history[INDEX_NPAXPOS][index] = paxPos;
 				this.history[INDEX_NVEH][index] = veh;
 				this.history[INDEX_NVEHPOS][index] = vehPos;
 				this.history[INDEX_NBUDGET][index] = budget / coop;
 				this.history[INDEX_NBUDGETPOS][index] = budgetPos / coopPos;
-				this.history[INDEX_NSCORE][index] = score / coop;
-				this.history[INDEX_NSCOREPOS][index] = scorePos / coopPos;
+				this.history[INDEX_NSCORE][index] = score / routes;
+				this.history[INDEX_NSCOREPOS][index] = scorePos / routesPos;
 				
 				this.history[INDEX_SHAREPOSCOOP][index] = sharePosCoop;
+				this.history[INDEX_SHAREPOSROUTES][index] = sharePosRoutes;
 				this.history[INDEX_SHAREPOSPAX][index] = sharePosPax;
 				this.history[INDEX_SHAREPOSVEH][index] = sharePosVeh;
 				
 				this.history[INDEX_MEANPOSCOOP][index] = statsApproxContainer.getArithmeticMeanCoops();
+				this.history[INDEX_MEANPOSROUTES][index] = statsApproxContainer.getArithmeticMeanRoutes();
 				this.history[INDEX_MEANPOSPAX][index] = statsApproxContainer.getArithmeticMeanPax();
 				this.history[INDEX_MEANPOSVEH][index] = statsApproxContainer.getArithmeticMeanVeh();
 				this.history[INDEX_SIGMAUPPERPOSCOOP][index] = statsApproxContainer.getArithmeticMeanCoops() + statsApproxContainer.getStdDevCoop();
+				this.history[INDEX_SIGMAUPPERPOSROUTES][index] = statsApproxContainer.getArithmeticMeanRoutes() + statsApproxContainer.getStdDevRoutes();
 				this.history[INDEX_SIGMAUPPERPOSPAX][index] = statsApproxContainer.getArithmeticMeanPax() + statsApproxContainer.getStdDevPax();
 				this.history[INDEX_SIGMAUPPERPOSVEH][index] = statsApproxContainer.getArithmeticMeanVeh() + statsApproxContainer.getStdDevVeh();
 				this.history[INDEX_SIGMALOWERPOSCOOP][index] = statsApproxContainer.getArithmeticMeanCoops() - statsApproxContainer.getStdDevCoop();
+				this.history[INDEX_SIGMALOWERPOSROUTES][index] = statsApproxContainer.getArithmeticMeanRoutes() - statsApproxContainer.getStdDevRoutes();
 				this.history[INDEX_SIGMALOWERPOSPAX][index] = statsApproxContainer.getArithmeticMeanPax() - statsApproxContainer.getStdDevPax();
 				this.history[INDEX_SIGMALOWERPOSVEH][index] = statsApproxContainer.getArithmeticMeanVeh() - statsApproxContainer.getStdDevVeh();
 
@@ -220,11 +239,12 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 					if (event.getIteration() != this.minIteration) {
 						// create chart when data of more than one iteration is available.
 
-						XYLineChart size = new XYLineChart("Paratransit Statistics", "iteration", "coops/fleet size");
+						XYLineChart size = new XYLineChart("Paratransit Statistics", "iteration", "coops/routes/fleet size");
 						XYLineChart scores = new XYLineChart("Paratransit Statistics", "iteration", "score/budget");
 						XYLineChart passengers = new XYLineChart("Paratransit Statistics", "iteration", "pax");
 						XYLineChart shares = new XYLineChart("Paratransit Statistics", "iteration", "shares of coops in business");
 						XYLineChart relaxCoop = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of coops");
+						XYLineChart relaxRoutes = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of routes");
 						XYLineChart relaxPax = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of passengers");
 						XYLineChart relaxVeh = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of vehicles");
 
@@ -238,6 +258,10 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 						size.addSeries("N coops", iterations, values);
 						System.arraycopy(this.history[INDEX_NCOOPSPOS], 0, values, 0, index + 1);
 						size.addSeries("N pos coops", iterations, values);
+						System.arraycopy(this.history[INDEX_NROUTES], 0, values, 0, index + 1);
+						size.addSeries("N routes", iterations, values);
+						System.arraycopy(this.history[INDEX_NROUTESPOS], 0, values, 0, index + 1);
+						size.addSeries("N pos routes", iterations, values);
 						System.arraycopy(this.history[INDEX_NVEH], 0, values, 0, index + 1);
 						size.addSeries("N veh", iterations, values);
 						System.arraycopy(this.history[INDEX_NVEHPOS], 0, values, 0, index + 1);
@@ -248,9 +272,9 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 						System.arraycopy(this.history[INDEX_NBUDGETPOS], 0, values, 0, index + 1);
 						scores.addSeries("pos budget per pos coop", iterations, values);
 						System.arraycopy(this.history[INDEX_NSCORE], 0, values, 0, index + 1);
-						scores.addSeries("score per coop", iterations, values);
+						scores.addSeries("score per route", iterations, values);
 						System.arraycopy(this.history[INDEX_NSCOREPOS], 0, values, 0, index + 1);
-						scores.addSeries("pos score per pos coop", iterations, values);
+						scores.addSeries("pos score per pos route", iterations, values);
 						
 						System.arraycopy(this.history[INDEX_NPAX], 0, values, 0, index + 1);
 						passengers.addSeries("N pax", iterations, values);
@@ -259,6 +283,8 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 
 						System.arraycopy(this.history[INDEX_SHAREPOSCOOP], 0, values, 0, index + 1);
 						shares.addSeries("share pos coop", iterations, values);
+						System.arraycopy(this.history[INDEX_SHAREPOSROUTES], 0, values, 0, index + 1);
+						shares.addSeries("share pos routes", iterations, values);
 						System.arraycopy(this.history[INDEX_SHAREPOSPAX], 0, values, 0, index + 1);
 						shares.addSeries("share pos pax", iterations, values);
 						System.arraycopy(this.history[INDEX_SHAREPOSVEH], 0, values, 0, index + 1);
@@ -270,6 +296,13 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 						relaxCoop.addSeries("average number of pos coop + 1 sigma", iterations, values);
 						System.arraycopy(this.history[INDEX_SIGMALOWERPOSCOOP], 0, values, 0, index + 1);
 						relaxCoop.addSeries("average number of pos coop - 1 sigma", iterations, values);
+						
+						System.arraycopy(this.history[INDEX_MEANPOSROUTES], 0, values, 0, index + 1);
+						relaxRoutes.addSeries("average number of pos routes", iterations, values);
+						System.arraycopy(this.history[INDEX_SIGMAUPPERPOSROUTES], 0, values, 0, index + 1);
+						relaxRoutes.addSeries("average number of pos routes + 1 sigma", iterations, values);
+						System.arraycopy(this.history[INDEX_SIGMALOWERPOSROUTES], 0, values, 0, index + 1);
+						relaxRoutes.addSeries("average number of pos routes - 1 sigma", iterations, values);
 
 						System.arraycopy(this.history[INDEX_MEANPOSPAX], 0, values, 0, index + 1);
 						relaxPax.addSeries("average number of pos pax", iterations, values);
@@ -290,6 +323,7 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 						passengers.addMatsimLogo();
 						shares.addMatsimLogo();
 						relaxCoop.addMatsimLogo();
+						relaxRoutes.addMatsimLogo();
 						relaxPax.addMatsimLogo();
 						relaxVeh.addMatsimLogo();
 
@@ -298,6 +332,7 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 						passengers.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_pax.png"), 800, 600);
 						shares.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_shares.png"), 800, 600);
 						relaxCoop.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxCoop.png"), 800, 600);
+						relaxRoutes.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxRoutes.png"), 800, 600);
 						relaxPax.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxPax.png"), 800, 600);
 						relaxVeh.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxVeh.png"), 800, 600);
 					}
