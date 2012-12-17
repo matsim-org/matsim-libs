@@ -173,9 +173,9 @@ public class RandomStopProvider {
 			}
 			
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + currentIteration + ".stopId2stopWeight.txt.gz");
-			writer.write("# stop id; weight"); writer.newLine();
+			writer.write("# stop id; x; y; weight"); writer.newLine();
 			for (Entry<TransitStopFacility, Double> stopEntry : this.stops2Weight.entrySet()) {
-				writer.write(stopEntry.getKey().getId().toString() + "; " + stopEntry.getValue().toString()); writer.newLine();
+				writer.write(stopEntry.getKey().getId().toString() + "; " + stopEntry.getKey().getCoord().getX() + "; " + stopEntry.getKey().getCoord().getY() + "; " + stopEntry.getValue().toString()); writer.newLine();
 			}
 			writer.flush();
 			writer.close();
