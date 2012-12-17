@@ -4,13 +4,14 @@
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml"
 	elementFormDefault="qualified" version="1.0">
 	<xs:import namespace="http://www.opengis.net/gml"
-		schemaLocation="http://schemas.opengis.net/gml/2.1.2/feature.xsd" />
+		schemaLocation="http://schemas.opengis.net/gml/2.1.2/gml.xsd" />
 	<xs:element name="sim2DEnvironment" type="FeatureCollectionType" substitutionGroup="gml:_FeatureCollection"/>
 	<xs:complexType name="FeatureCollectionType">
 		<xs:complexContent>
 			<xs:extension base="gml:AbstractFeatureCollectionType">
 				<xs:attribute name="lockId" type="xs:string" use="optional" />
 				<xs:attribute name="scope" type="xs:string" use="optional" />
+				<xs:attribute name="id" type="xs:ID" use="required" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -30,6 +31,7 @@
 		<xs:complexContent>
 			<xs:extension base="gml:PolygonPropertyType">
 				<xs:sequence>
+					<xs:element name="matsim_type" type="xs:string" fixed="sim2d_section" />
 					<xs:element name="level" type="xs:integer"></xs:element>
 					<xs:element name="openings" type="openingsType"
 						nillable="true" minOccurs="0" maxOccurs="1"></xs:element>
@@ -57,11 +59,11 @@
 	<xs:complexType name="neighborsType">
 		<xs:annotation>
 			<xs:documentation>
-			A list of fid referencing the (reachable) neighbors.
+			A list of fids referencing the (reachable) neighbors.
 			</xs:documentation>
 		</xs:annotation>	
 		<xs:sequence>
-			<xs:element name="FID" type="xs:ID" minOccurs="1" maxOccurs="unbounded"></xs:element>		
+			<xs:element name="fidrefs" type="xs:IDREFS" minOccurs="1" maxOccurs="1"></xs:element>		
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>
