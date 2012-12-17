@@ -40,6 +40,9 @@ public class Sim2DEnvironment implements Identifiable{
 	private final Map<Id, Section> sections = new HashMap<Id,Section>();
 	private final Map<Id,Id> accessorNodeQSimNodeMapping = new HashMap<Id,Id>();
 	private Network net;
+	private  Id id = null;
+	
+	
 	
 	public void setEnvelope(Envelope e) {
 		this.envelope = e;
@@ -93,9 +96,13 @@ public class Sim2DEnvironment implements Identifiable{
 
 	@Override
 	public Id getId() {
-		//TODO fix it
-		throw new RuntimeException("not yet implemented");
+		return this.id;
 	}
+	
+	public void setId(Id id) {
+		this.id = id;
+	}
+
 
 
 	

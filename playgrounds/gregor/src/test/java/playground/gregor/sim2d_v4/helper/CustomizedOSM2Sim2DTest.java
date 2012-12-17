@@ -63,6 +63,8 @@ public class CustomizedOSM2Sim2DTest extends MatsimTestCase{
 		}
 		CustomizedOSM2Sim2D osm2sim2d = new CustomizedOSM2Sim2D(env);
 		osm2sim2d.processOSMFile(inDir + "/sim2d.osm");
+		
+		
 		//now read the same environment from gml
 		Sim2DEnvironment env2 = new Sim2DEnvironment();
 		Sim2DEnvironmentReader02 reader = new Sim2DEnvironmentReader02(env2,false);

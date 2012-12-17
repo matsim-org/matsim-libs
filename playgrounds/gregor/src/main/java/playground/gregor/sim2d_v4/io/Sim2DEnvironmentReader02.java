@@ -178,10 +178,10 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 		if (xmlNeighbors == null) {
 			return null;
 		}
-		Id [] ret = new Id[xmlNeighbors.getNeighborsIds().size()];
+		Id [] ret = new Id[xmlNeighbors.getFidrefs().size()];
 		int idx = 0;
-		for (JAXBElement<String> jxbNeighbor : xmlNeighbors.getNeighborsIds() ) {
-			Id id = new IdImpl(jxbNeighbor.getValue());
+		for (Object  o : xmlNeighbors.getFidrefs()) {
+			Id id = new IdImpl(((XMLSim2DEnvironmentSectionType)o).getFid());
 			ret[idx++] = id;
 		}
 		return ret;

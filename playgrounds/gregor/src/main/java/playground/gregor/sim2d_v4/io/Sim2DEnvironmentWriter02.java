@@ -23,7 +23,9 @@ package playground.gregor.sim2d_v4.io;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -94,7 +96,8 @@ public class Sim2DEnvironmentWriter02 extends MatsimJaxbXmlWriter{
 
 
 		XMLFeatureCollectionType collection = this.sim2dFac.createXMLFeatureCollectionType();
-
+		collection.setFid(this.env.getId().toString());
+		
 		XMLBoundingShapeType bounds = this.gmlFac.createXMLBoundingShapeType();
 		XMLBoxType box = this.gmlFac.createXMLBoxType();
 		XMLCoordinatesType koords = this.gmlFac.createXMLCoordinatesType();
@@ -117,9 +120,27 @@ public class Sim2DEnvironmentWriter02 extends MatsimJaxbXmlWriter{
 
 		collection.setBoundedBy(bounds);
 
+		Map<Id,XMLFeatureAssociationType> mapping = new HashMap<Id, XMLFeatureAssociationType>();
 		for (Section sec : this.env.getSections().values()){
 			XMLFeatureAssociationType fat = getJXBSection(sec);
+			mapping.put(sec.getId(),fat);
 			collection.getFeatureMember().add(fat);
+		}
+		//add neighbors
+		for (Section sec : this.env.getSections().values()) {
+			if (sec.getNeighbors() != null) {
+				XMLFeatureAssociationType fat = mapping.get(sec.getId());
+
+				XMLNeighborsType xmlNeighbors = this.sim2dFac.createXMLNeighborsType();
+
+				XMLSim2DEnvironmentSectionType v = (XMLSim2DEnvironmentSectionType) fat.getFeature().getValue();
+				v.getGeometryProperty().setNeighbors(xmlNeighbors);
+				List<Object> l = xmlNeighbors.getFidrefs();
+				for (Id id : sec.getNeighbors()) {
+					XMLFeatureAssociationType obj = mapping.get(id);
+					l.add(obj.getFeature().getValue());
+				}
+			}
 		}
 
 		JAXBElement<XMLFeatureCollectionType> jcoll = this.sim2dFac.createSim2DEnvironment(collection);
@@ -175,26 +196,26 @@ public class Sim2DEnvironmentWriter02 extends MatsimJaxbXmlWriter{
 			myPolygon.setOpenings(jopenings );
 		}
 
-		if (sec.getNeighbors() != null) {
-			XMLNeighborsType xmlNeighbors = this.sim2dFac.createXMLNeighborsType();
+		//		if (sec.getNeighbors() != null) {
+		//			XMLNeighborsType xmlNeighbors = this.sim2dFac.createXMLNeighborsType();
+		//
+		////			XMLNeighborsType l = xmlNeighbors;
+		//			List<Object> refs = xmlNeighbors.getFidrefs();
+		//			for (Id id : sec.getNeighbors()) {
+		//				refs.add(id.toString());
+		//			}
+		//			myPolygon.setNeighbors(xmlNeighbors);
+		//		}
+		//		
 
-			List<JAXBElement<String>> l = xmlNeighbors.getNeighborsIds();
-			for (Id id : sec.getNeighbors()) {
-				JAXBElement<String> n = this.sim2dFac.createXMLNeighborsTypeNeighborsIds(id.toString());
-				l.add(n);
-			}
-			myPolygon.setNeighbors(xmlNeighbors);
-		}
-		
-		
 		XMLSim2DEnvironmentSectionType testType = this.sim2dFac.createXMLSim2DEnvironmentSectionType();
 		testType.setFid(sec.getId().toString());
 		testType.setGeometryProperty(myPolygon);
 		JAXBElement<? extends XMLAbstractFeatureType> jxb = this.sim2dFac.createSim2DEnvironmentSection(testType);
 		fat.setFeature(jxb);
 
-	
-		
+
+
 		return fat;
 	}
 

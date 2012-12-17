@@ -257,15 +257,15 @@ public class CustomizedOSM2Sim2D {
 	}
 
 	public static void main (String [] args) throws NoSuchAuthorityCodeException, FactoryException {
-		String osmFile = "/Users/laemmel/devel/workspace/playgrounds/gregor/test/input/playground/gregor/sim2d_v4/helper/CustomizedOSM2Sim2DTest/testCustomizedOSM2Sim2D/sim2d.osm";
+		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/sim2d.osm";
 		Sim2DEnvironment env = new Sim2DEnvironment();
 		env.setCRS(CRS.decode("EPSG:3395"));
 		env.setNetwork(NetworkImpl.createNetwork());
 		CustomizedOSM2Sim2D osm2sim2d = new CustomizedOSM2Sim2D(env);
 		osm2sim2d.processOSMFile(osmFile);
 		
-		new Sim2DEnvironmentWriter02(env).write("/Users/laemmel/devel/burgdorf2d/osm/sim2d.osm.gml.gz");
-		new NetworkWriter(env.getEnvironmentNetwork()).write("/Users/laemmel/devel/burgdorf2d/osm/network.xml");
+		new Sim2DEnvironmentWriter02(env).write("/Users/laemmel/devel/burgdorf2d/input/sim2dEnv_0.gml.gz");
+		new NetworkWriter(env.getEnvironmentNetwork()).write("/Users/laemmel/devel/burgdorf2d/input/network2d_0.xml");
 	}
 
 }

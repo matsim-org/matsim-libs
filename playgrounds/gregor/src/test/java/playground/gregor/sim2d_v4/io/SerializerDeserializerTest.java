@@ -109,6 +109,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 		Envelope e = new Envelope(c0,c1);
 		
 		Sim2DEnvironment env = new Sim2DEnvironment();
+		env.setId(new IdImpl("env0"));		
 		env.setEnvelope(e);
 		CoordinateReferenceSystem crs = null;
 		try {
@@ -119,12 +120,12 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			throw new IllegalArgumentException(e1);
 		}
 		env.setCRS(crs);
-		Section sec = env.createAndAddSection(new IdImpl("0"), p, new int[]{0,2}, new Id[]{new IdImpl("3")}, level);
+		Section sec = env.createAndAddSection(new IdImpl("sec0"), p, new int[]{0,2}, new Id[]{new IdImpl("sec0")}, level);
 
 		new Sim2DEnvironmentWriter02(env).write(outDir + "/test.gml");
 
 		Sim2DEnvironment env2 = new Sim2DEnvironment();
-		Sim2DEnvironmentReader02 reader = new Sim2DEnvironmentReader02(env2,false);
+		Sim2DEnvironmentReader02 reader = new Sim2DEnvironmentReader02(env2,true); //validation against gml is very slow. if someone complains we could think about switching it off [gl dec 2012]
 		reader.readFile(outDir + "/test.gml");
 		
 		CoordinateReferenceSystem testCRS = env2.getCRS();
