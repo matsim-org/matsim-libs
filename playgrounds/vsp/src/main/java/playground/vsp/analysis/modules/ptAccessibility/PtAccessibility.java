@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * @author droeder
  *
  */
-public class PtAccesibility extends AbstractAnalyisModule {
+public class PtAccessibility extends AbstractAnalyisModule {
 	
 	public static final String MODULENAME = "ptAccessibility";
 
@@ -86,8 +86,8 @@ public class PtAccesibility extends AbstractAnalyisModule {
 	 * @param distanceCluster, the distances you want to cluster (make up your mind about the used coordinate-system)
 	 * @param activityCluster, the name you want to the see, mapped to the activity-names you want to add to this cluster
 	 */
-	public PtAccesibility(Scenario sc, List<Integer> distanceCluster, int quadrantSegments, SortedMap<String, List<String>> activityCluster) {
-		super(PtAccesibility.class.getSimpleName());
+	public PtAccessibility(Scenario sc, List<Integer> distanceCluster, int quadrantSegments, SortedMap<String, List<String>> activityCluster) {
+		super(PtAccessibility.class.getSimpleName());
 		this.scenario = sc;
 		this.quadrantSegments = quadrantSegments;
 		this.distanceCluster = createClusterCircles(distanceCluster, this.quadrantSegments);

@@ -32,7 +32,7 @@ import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
 import playground.vsp.analysis.modules.boardingAlightingCount.BoardingAlightingCountAnalyzer;
-import playground.vsp.analysis.modules.ptAccessibility.PtAccesibility;
+import playground.vsp.analysis.modules.ptAccessibility.PtAccessibility;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesAnalyzer;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesHandler;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
@@ -151,7 +151,7 @@ public class AnalysisRunner {
 		
 		
 		GetStuckEventsAndPlans writeStuck = new GetStuckEventsAndPlans(sc);
-		PtAccesibility ptAcces = new PtAccesibility(sc, cluster, 1, activityCluster);
+		PtAccessibility ptAcces = new PtAccessibility(sc, cluster, 1, activityCluster);
 		
 		TTtripAnalysis tripAna = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());
 		tripAna.addZones(zones);
