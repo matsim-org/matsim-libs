@@ -44,9 +44,7 @@ public class PlanStrategyRegistrar {
 
 	public PlanStrategyRegistrar() {
 		register.register("KeepLastSelected", new KeepLastSelectedPlanStrategyFactory());
-		register.register("threaded.ReRoute", new ReRoutePlanStrategyFactory());
-		register.register("ReRoute", new ReRoutePlanStrategyFactory());
-		register.register("threaded.TimeAllocationMutator", new TimeAllocationMutatorPlanStrategyFactory());		
+		register.register("ReRoute", new ReRoutePlanStrategyFactory());		
 		register.register("TimeAllocationMutator", new TimeAllocationMutatorPlanStrategyFactory());
 		register.register("BestScore", new SelectBestPlanStrategyFactory());
 		register.register("SelectExpBeta", new SelectExpBetaPlanStrategyFactory());		

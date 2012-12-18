@@ -52,13 +52,13 @@ public final class StrategyManagerConfigLoader {
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
 	private static int externalCounter = 0;
-	
+
 	public static void load(final Controler controler, final StrategyManager manager) {
 		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
 		PlanStrategyFactoryRegister planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
 		load(controler, manager, planStrategyFactoryRegister);
 	}
-	
+
 	public static void load(final Controler controler, final StrategyManager manager, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		Config config = controler.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
@@ -136,15 +136,13 @@ public final class StrategyManagerConfigLoader {
 			em.setIterationNumber(controler.getIterationNumber());
 			strategy.addStrategyModule(em);
 			return strategy;
+		} else if (name.contains(".")) {
+			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
+			return strategy;
 		} else {
 			PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
-			if (planStrategyFactory != null) {
-				PlanStrategy strategy = planStrategyFactory.createPlanStrategy(controler.getScenario(), controler.getEvents());
-				return strategy;
-			} else {
-				PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
-				return strategy;	
-			}
+			PlanStrategy strategy = planStrategyFactory.createPlanStrategy(controler.getScenario(), controler.getEvents());
+			return strategy;
 		} 
 	} 
 

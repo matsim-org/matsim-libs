@@ -18,6 +18,9 @@ public class PlanStrategyFactoryRegister {
 	}
 
 	public void register(String string, PlanStrategyFactory mobsimFactory) {
+		if (string.contains(".")) {
+			throw new IllegalArgumentException("Plan strategy names with a '.' are reserved for direct class loading.");
+		}
 		factoryMap.put(string, mobsimFactory);
 	}
 
