@@ -88,7 +88,8 @@ public class HighestWeightSelectorTest {
 				new Fixture[]{createPartiallyJointPlansMessOfJointPlans()},
 				new Fixture[]{createPartiallyJointPlansNoSelectedJp()},
 				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent()},
-				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent2()});
+				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent2()},
+				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgentWithNullScores()});
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -644,6 +645,57 @@ public class HighestWeightSelectorTest {
 
 		return new Fixture(
 				"one big joint plan order 2",
+				group,
+				new GroupPlans(
+					Arrays.asList( sel ),
+					Collections.EMPTY_LIST ) );
+	}
+
+	public static Fixture createOneBigJointPlanDifferentNPlansPerAgentWithNullScores() {
+		ReplanningGroup group = new ReplanningGroup();
+
+		Map<Id, Plan> jp = new HashMap<Id, Plan>();
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( -1295836d );
+		jp.put( id , plan );
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -12348597d );
+		jp.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( null );
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -1043872360d );
+		jp.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( null );
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -159484723d );
+		jp.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -5000d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( null );
+
+		JointPlan sel = JointPlanFactory.createJointPlan( jp );
+
+		return new Fixture(
+				"one big joint plan, null scores",
 				group,
 				new GroupPlans(
 					Arrays.asList( sel ),

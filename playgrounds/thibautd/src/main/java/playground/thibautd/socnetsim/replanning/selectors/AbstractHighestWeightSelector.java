@@ -259,6 +259,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 						" is "+max );
 			}
 			// if negative, no need to continue
+			// moreover, returning here makes sure the branch has infinitely negative
+			// weight, even if plans in it have infinitely positive weights
 			if (max == Double.NEGATIVE_INFINITY) return Double.NEGATIVE_INFINITY;
 			score += max;
 		}
