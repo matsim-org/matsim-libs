@@ -83,19 +83,16 @@ public class VspAnalyzer {
 		log.info("running " + VspAnalyzer.class.getSimpleName());
 		Gbl.startMeasurement();
 		this.preProcess();
-		Gbl.printElapsedTime();
 		if(!(this.eventsFile == null)){
 			if(new File(this.eventsFile).exists()){
 				this.handleEvents();
-				Gbl.printElapsedTime();
+				Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 			}else{
 				log.warn("can not handle events, because the specified file does not exist!");
 			}
 		}
 		this.postProcess();
-		Gbl.printElapsedTime();
 		this.writeResults();
-		Gbl.printElapsedTime();
 		log.info("finished " + VspAnalyzer.class.getSimpleName());
 	}
 
@@ -107,6 +104,7 @@ public class VspAnalyzer {
 		for(AbstractAnalyisModule module: this.modules){
 			log.info("preprocessing " + module.getName());
 			module.preProcessData();
+			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 		}
 		log.info("preprocessing finished...");
 	}
@@ -135,6 +133,7 @@ public class VspAnalyzer {
 		for(AbstractAnalyisModule module: this.modules){
 			log.info("postprocessing " + module.getName());
 			module.postProcessData();
+			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 		}
 		log.info("post-processing finished...");
 		
@@ -153,6 +152,7 @@ public class VspAnalyzer {
 				new File(outdir).mkdirs();
 			}
 			module.writeResults(outdir);
+			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 		}
 		log.info("writing finished...");
 	}
