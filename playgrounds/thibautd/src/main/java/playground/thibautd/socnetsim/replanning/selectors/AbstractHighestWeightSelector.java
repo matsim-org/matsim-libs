@@ -194,7 +194,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		for (PlanRecord r : records) {
 			// skip impossible plans
-			if ( r.plan != null &&
+			if ( r.jointPlan == null &&
 					forbidenPlans.getIndividualPlans().contains( r.plan ) ) {
 				continue;
 			}
@@ -483,8 +483,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		}
 
 		public double getWeight() {
-			return (planRecord == null ? Double.NEGATIVE_INFINITY : planRecord.weight)
-				+ (tail == null ? 0 : tail.getWeight());
+			return planRecord.weight + (tail == null ? 0 : tail.getWeight());
 		}
 
 		@Override
@@ -583,7 +582,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				}
 
 				if (head.jointPlan == null &&
-						head.plan != null &&
 						!forbidden.getIndividualPlans().contains( head.plan )) {
 					return false;
 				}
