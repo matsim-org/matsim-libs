@@ -180,7 +180,7 @@ public class PtAccessibility extends AbstractAnalyisModule {
 		PtAccessMapShapeWriter.writeAccessMap(cluster2mode2area, this.quadrantSegments, outputFolder);
 		
 		// write activity-cluster
-		PtAccesShapeWriter.writeActivityLocations(this.locationMap, outputFolder + "activityLocations.shp", "activities");
+		PtAccesShapeWriter.writeActivityLocations(this.locationMap, outputFolder, "activities");
 		// write locations to csv
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder + "activityLocations.csv");
 		try {

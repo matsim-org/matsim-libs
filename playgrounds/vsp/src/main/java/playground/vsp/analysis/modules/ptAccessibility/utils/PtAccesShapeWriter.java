@@ -42,13 +42,12 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import playground.vsp.analysis.modules.ptAccessibility.activity.ActivityLocation;
 import playground.vsp.analysis.modules.ptAccessibility.activity.LocationMap;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
 /**
- * @author droeder
+ * @author droeder, aneumann
  * just a helper-class 
  *
  */
@@ -99,7 +98,7 @@ public class PtAccesShapeWriter {
 		}
 	}
 	
-	public static void writeActivityLocations(LocationMap locationMap, String filename, String name){
+	public static void writeActivityLocations(LocationMap locationMap, String outputFolder, String name){
 		AttributeType[] attribs = new AttributeType[3];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
@@ -112,30 +111,30 @@ public class PtAccesShapeWriter {
 		} catch (SchemaException e) {
 			e.printStackTrace();
 		}
-		Collection<Feature> features = new ArrayList<Feature>();
-		
-		Object[] featureAttribs ;
 		
 		GeometryFactory factory = new GeometryFactory();
-		Coordinate[] c;
-		for(Entry<String, List<ActivityLocation>> e: locationMap.getType2Locations().entrySet()){
-			
-			try {
-				for(int i  = 0; i < e.getValue().size(); i++){
-					featureAttribs = new Object[3];
-					featureAttribs[0] = factory.createPoint(e.getValue().get(i).getCoord());
-					featureAttribs[1] = e.getKey() + "_" + String.valueOf(i);
-					featureAttribs[1] = e.getKey();
-					features.add(featureType.create(featureAttribs));
+		for(Entry<String, List<ActivityLocation>> type2LocationEntry: locationMap.getType2Locations().entrySet()){
+			if (!type2LocationEntry.getValue().isEmpty()) {
+				try {
+					Collection<Feature> features = new ArrayList<Feature>();
+					Object[] featureAttribs ;
+					for(int i  = 0; i < type2LocationEntry.getValue().size(); i++){
+						featureAttribs = new Object[3];
+						featureAttribs[0] = factory.createPoint(type2LocationEntry.getValue().get(i).getCoord());
+						featureAttribs[1] = type2LocationEntry.getKey() + "_" + String.valueOf(i);
+						featureAttribs[2] = type2LocationEntry.getKey();
+						features.add(featureType.create(featureAttribs));
+					}
+					
+					ShapeFileWriter.writeGeometries(features, outputFolder + "activityLocations_" + type2LocationEntry.getKey() + ".shp");
+				} catch (IllegalAttributeException e) {
+					e.printStackTrace();
+				} catch(ServiceConfigurationError e){
+					e.printStackTrace();
 				}
-			} catch (IllegalAttributeException e1) {
-				e1.printStackTrace();
+			} else {
+				log.info("No activities found for cluster " + type2LocationEntry.getKey());
 			}
-		}
-		try{
-			ShapeFileWriter.writeGeometries(features, filename);
-		}catch(ServiceConfigurationError e){
-			e.printStackTrace();
 		}
 	}
 
