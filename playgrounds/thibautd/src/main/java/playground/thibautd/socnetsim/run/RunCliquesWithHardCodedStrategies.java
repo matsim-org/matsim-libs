@@ -42,6 +42,8 @@ import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
  * @author thibautd
  */
 public class RunCliquesWithHardCodedStrategies {
+	private static final boolean DO_TRACE = false;
+
 	private static class Weights {
 		public static final double RE_ROUTE = 0.1;
 		public static final double TIME_MUTATOR = 0.1;
@@ -51,7 +53,7 @@ public class RunCliquesWithHardCodedStrategies {
 	}
 
 	public static void main(final String[] args) {
-		Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
+		if (DO_TRACE) Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
 		final String configFile = args[ 0 ];
 
 		// load "registry"
