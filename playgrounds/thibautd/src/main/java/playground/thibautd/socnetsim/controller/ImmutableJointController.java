@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller;
 
+import java.io.File;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
@@ -50,6 +52,12 @@ public class ImmutableJointController extends AbstractController {
 	public ImmutableJointController(
 			final ControllerRegistry registry,
 			final ReplanningListener replanner) {
+		if ( new File( registry.getScenario().getConfig().controler().getOutputDirectory() ).exists() ) {
+			throw new RuntimeException( "output directory "+
+						registry.getScenario().getConfig().controler().getOutputDirectory()
+						+" already exists!" );
+		}
+
 		this.replanner = replanner;
 		checkConfigConsistencyAndWriteToLog(
 				registry.getScenario().getConfig(),
