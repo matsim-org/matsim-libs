@@ -55,7 +55,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	protected LeastCostPathCalculator leastCostPathCalculator;
 	protected CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
 	protected TravelDisutilityFactory travelCostFactory;
-	protected TravelDisutility travelCost;
+	protected TravelDisutility travelDisutility;
 	protected TravelTime travelTime;
 		
 	/*package*/ CostNavigationRoute(Id id, Scenario scenario, InternalInterface internalInterface, Network network,
@@ -67,8 +67,8 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		this.costNavigationTravelTimeLogger = costNavigationTravelTimeLogger;
 		this.travelCostFactory = travelCostFactory;
 		this.travelTime = travelTime;
-		this.travelCost = travelCostFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
-		this.leastCostPathCalculator = routerFactory.createPathCalculator(network, travelCost, travelTime);
+		this.travelDisutility = travelCostFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
+		this.leastCostPathCalculator = routerFactory.createPathCalculator(network, travelDisutility, travelTime);
 	}
 	
 	@Override
@@ -131,11 +131,15 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		double leastCosts = Double.MAX_VALUE;
 		Id leastCostLinkId = null;
 		for (Link outLink : outLinksMap.values()) {
+			Link lookupLink = this.network.getLinks().get(outLink.getId());
+			double outLinkCosts = this.travelDisutility.getLinkTravelDisutility(lookupLink, this.time, null, null);
+			
 			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time, withinDayAgent.getSelectedPlan().getPerson(), null);
 			paths.put(outLink.getId(), path);
-			costs.put(outLink.getId(), path.travelCost);
-			if (path.travelCost < leastCosts) {
-				leastCosts = path.travelCost;
+			double pathCosts = path.travelCost + outLinkCosts;
+			costs.put(outLink.getId(), pathCosts);
+			if (pathCosts < leastCosts) {
+				leastCosts = pathCosts;
 				leastCostLinkId = outLink.getId();
 			}
 		}
@@ -155,7 +159,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 				else probabilities.put(entry.getKey(), 0.0);
 			}
 		}
-		else {		
+		else {
 			double inverseSumLeastCosts = 0.0;
 			for (Entry<Id, Double> entry : costs.entrySet()) {
 				// if it is the least cost link
@@ -194,11 +198,11 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 				sumProb += entry.getValue();
 			}
 		}
-				
+		
 		if (nextLinkId.equals(leastCostLinkId)) costNavigationTravelTimeLogger.setFollowed(personId, true);
 		else {
 			costNavigationTravelTimeLogger.setFollowed(personId, false);
-			double c = travelCost.getLinkTravelDisutility(network.getLinks().get(nextLinkId), time, null, null);
+			double c = travelDisutility.getLinkTravelDisutility(network.getLinks().get(nextLinkId), time, null, null);
 			double expectedAlternativeCosts = c * leastCosts/nextPath.travelCost;
 			costNavigationTravelTimeLogger.setExpectedAlternativeTravelTime(personId, expectedAlternativeCosts);
 		}
