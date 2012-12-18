@@ -181,16 +181,17 @@ public class Test {
 						continue;
 					}
 					if (hasOpenEdge(c0,c1,pi)){
-						neighborsIds.add(new IdImpl(pi.hashCode()));
+						neighborsIds.add(new IdImpl("sec"+pi.hashCode()));
 					}
 
 					
 				}
 			}
 			Id[] n = neighborsIds.toArray(new Id[0]);			
-			env.createAndAddSection(new IdImpl(dec.hashCode()), dec.p, os , n, 0);
+			env.createAndAddSection(new IdImpl("sec" + dec.hashCode()), dec.p, os , n, 0);
 		}
 
+		env.setId(new IdImpl("env0"));
 		new Sim2DEnvironmentWriter02(env).write(output);
 
 		System.out.println(decomposed.size() + " == 105?");
@@ -199,7 +200,6 @@ public class Test {
 
 		Sim2DEnvironment env2 = new Sim2DEnvironment(); 
 
-		//TODO repair schema (does not yet validate!!)
 		new Sim2DEnvironmentReader02(env2, false).readFile(output);
 
 		Sim2DConfig conf = Sim2DConfigUtils.createConfig();
@@ -207,11 +207,6 @@ public class Test {
 		conf.setTimeStepSize(0.1);
 		conf.addSim2DEnvironmentPath(output);
 		conf.addSim2DEnvNetworkMapping(output, network);
-		conf.addSim2DEnvAccessorNode(output, new IdImpl("15699"));
-		conf.addSim2DEnvAccessorNode(output, new IdImpl("7678"));
-		conf.addSim2DAccessorNodeQSimAccessorNodeMapping(new IdImpl("15699"), new IdImpl("607200281"));
-		conf.addSim2DAccessorNodeQSimAccessorNodeMapping(new IdImpl("7678"), new IdImpl("535985128"));
-//		conf.addSim2DAccessorNodeQSimAccessorNodeMapping("7144", "999");
 		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/burgdorf2d/input/sim2dConfig.xml");
 		
 		

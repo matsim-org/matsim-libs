@@ -30,15 +30,12 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.SAXException;
 
 import playground.gregor.sim2d_v4.io.jaxb.sim2config01.ObjectFactory;
-import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLQSimSim2DNetworkNodesMappingType;
-import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLQSimSim2DNetworkNodesMappingsType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLSim2DConfigType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLSim2DEnvironmentType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLSim2DEnvironmentsType;
@@ -93,13 +90,6 @@ public class Sim2DConfigReader01 extends MatsimJaxbXmlParser {
 			
 			this.config.addSim2DEnvironmentPath(envPath);
 			this.config.addSim2DEnvNetworkMapping(envPath, netPAth);
-			XMLQSimSim2DNetworkNodesMappingsType xmlmappings = xmlenv.getQSimSim2DNetworkNodesMappings();
-			for (XMLQSimSim2DNetworkNodesMappingType xmlmapping  : xmlmappings.getQSimSim2DNetworkNodesMapping()){
-				IdImpl qsimNode = new IdImpl(xmlmapping.getQSimNodeId());
-				IdImpl sim2dNode = new IdImpl(xmlmapping.getSim2DNodeId());
-				this.config.addSim2DAccessorNodeQSimAccessorNodeMapping(sim2dNode, qsimNode);
-				this.config.addSim2DEnvAccessorNode(envPath, sim2dNode);
-			}
 			
 		}
 	}

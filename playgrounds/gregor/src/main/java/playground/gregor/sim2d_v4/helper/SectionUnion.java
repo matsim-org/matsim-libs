@@ -28,10 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
@@ -41,7 +43,11 @@ import playground.gregor.sim2d_v4.io.osmparser.OSMRelation;
 import playground.gregor.sim2d_v4.io.osmparser.OSMRelation.Member;
 import playground.gregor.sim2d_v4.io.osmparser.OSMWay;
 import playground.gregor.sim2d_v4.scenario.Section;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -49,20 +55,28 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class SectionUnion {
 
-	private final Sim2DEnvironment env;
 	private Map<Id, Id> mapping;
 	private final Map<Id, Id> rmIdMapping = new HashMap<Id,Id>();
+	private final Scenario sc;
+	private Sim2DEnvironment env;
 
 
-	/*package*/ SectionUnion(Sim2DEnvironment env) {
-		this.env = env;
+	/*package*/ SectionUnion(Scenario sc) {
+		this.sc = sc;
 	}
 
 	/*package*/ void processOSMFile(String file) {
 		OSM osm = new OSM();
 		osm.addKeyValue("union", "true");
-		CustomizedOSM2Sim2D envReader = new CustomizedOSM2Sim2D(this.env, osm);
+		
+		CustomizedOSM2Sim2DExtendedMATSimScenario envReader = new CustomizedOSM2Sim2DExtendedMATSimScenario(this.sc, osm);
 		envReader.processOSMFile(file);
+		Sim2DScenario s2dsc = this.sc.getScenarioElement(Sim2DScenario.class);
+		if (s2dsc.getSim2DEnvironments().size() != 1) {
+			throw new RuntimeException("not yet implemented! use osm file with only one sim2d environment!"); //TODO implement it [gl dec 2012]
+		}
+		this.env = s2dsc.getSim2DEnvironments().iterator().next();
+		
 		//		System.out.println(osm);
 		//build osm_id --> matsim_id mapping
 		this.mapping = new HashMap<Id,Id>();
@@ -77,6 +91,9 @@ public class SectionUnion {
 			handleRelation(rel);
 		}
 
+	
+		
+		
 		//revise neighbors - currently the only way to change neighbors is to remove sections and create new ones with revised neighbor relations
 		List<Section> secs = new ArrayList<Section>();
 		Iterator<Section> it = this.env.getSections().values().iterator();
@@ -202,15 +219,19 @@ public class SectionUnion {
 	}
 
 	public static void main(String [] args) throws NoSuchAuthorityCodeException, FactoryException {
-		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/osmEnv.osm";
-		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setCRS(CRS.decode("EPSG:3395"));
-		env.setNetwork(NetworkImpl.createNetwork());
-		new SectionUnion(env).processOSMFile(osmFile);
+		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/sim2d.osm";
+		Config c = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario(c);
+		
+		Sim2DConfig s2dc = Sim2DConfigUtils.createConfig();
+		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2dc);
+		
+		sc.addScenarioElement(s2dsc);
+		new SectionUnion(sc).processOSMFile(osmFile);
 		//		CustomizedOSM2Sim2D osm2sim2d = new CustomizedOSM2Sim2D(env);
 		//		osm2sim2d.processOSMFile(osmFile);
 
-		new Sim2DEnvironmentWriter02(env).write("/Users/laemmel/devel/burgdorf2d/input/sim2dEnv_0.gml.gz");
+		new Sim2DEnvironmentWriter02(s2dsc.getSim2DEnvironments().iterator().next()).write("/Users/laemmel/devel/burgdorf2d/tmp/sim2dEnv_0.gml.gz");
 		//		new NetworkWriter(env.getEnvironmentNetwork()).write("/Users/laemmel/devel/burgdorf2d/osm/test.network.xml");
 	}
 }

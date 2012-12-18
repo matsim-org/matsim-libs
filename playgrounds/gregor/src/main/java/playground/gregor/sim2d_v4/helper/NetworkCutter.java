@@ -73,8 +73,13 @@ public class NetworkCutter {
 		NetworkFactory fac = net.getFactory();
 		Queue<Link> open = new LinkedList<Link>(net.getLinks().values());
 		int id = 0;
+		Set<Link> rm = new HashSet<Link>();
 		while (open.size() > 0) {
 			Link l = open.poll();
+			if (rm.contains(l)) {
+				continue;
+			}
+			rm.add(l);
 			if (l.getLength() < THRESHOLD) {
 				log.warn("Link with ID:" + l.getId() + " is shorter than the THRESHOLD (=" + THRESHOLD +"). Therefor the correctniss of this algorithm can not be guaranteed!");
 			}
@@ -83,8 +88,20 @@ public class NetworkCutter {
 			Intersect intersection = getFirstIntersection(l,qt);
 			if (intersection != null) {
 				net.removeLink(l.getId());
+				Link rev = null;
+				for (Link tmp : l.getToNode().getOutLinks().values()) {
+					if (tmp.getToNode().equals(l.getFromNode())) {
+						rev = tmp;
+						break;
+					}
+				}
+				net.removeLink(rev.getId());
+				rm.add(rev);
+				
 				Id id0 = new IdImpl(l.getId()+"a");
 				Id id1 = new IdImpl(l.getId()+"b");
+				Id id0r = new IdImpl(rev.getId()+"a");
+				Id id1r = new IdImpl(rev.getId()+"b");
 				Coordinate c = new Coordinate();
 				Algorithms.computeLineIntersection(MGC.coord2Coordinate(l.getFromNode().getCoord()), MGC.coord2Coordinate(l.getToNode().getCoord()), intersection.sec.getPolygon().getCoordinates()[intersection.edge], intersection.sec.getPolygon().getCoordinates()[intersection.edge+1], c);
 				double len0 = c.distance(MGC.coord2Coordinate(l.getFromNode().getCoord()));
@@ -104,8 +121,22 @@ public class NetworkCutter {
 				l1.setNumberOfLanes(l.getNumberOfLanes());
 				l1.setLength(len1);
 				
+				Link l0r = fac.createLink(id0r, n, l.getFromNode());
+				Link l1r = fac.createLink(id1r, l.getToNode(),n);
+				l0r.setFreespeed(l.getFreespeed());
+				l0r.setCapacity(l.getCapacity());
+				l0r.setNumberOfLanes(l.getNumberOfLanes());
+				l0r.setLength(len0);
+				l1r.setFreespeed(l.getFreespeed());
+				l1r.setCapacity(l.getCapacity());
+				l1r.setNumberOfLanes(l.getNumberOfLanes());
+				l1r.setLength(len1);
+				
+				
 				net.addLink(l0);
 				net.addLink(l1);
+				net.addLink(l0r);
+				net.addLink(l1r);
 				open.add(l0);
 				open.add(l1);
 			}

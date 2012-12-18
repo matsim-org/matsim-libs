@@ -29,13 +29,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
 import playground.gregor.sim2d_v4.io.jaxb.sim2config01.ObjectFactory;
-import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLQSimSim2DNetworkNodesMappingType;
-import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLQSimSim2DNetworkNodesMappingsType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLSim2DConfigType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLSim2DEnvironmentType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2config01.XMLSim2DEnvironmentsType;
@@ -86,14 +83,6 @@ public class Sim2DConfigWriter01 extends MatsimJaxbXmlWriter {
 			xmlEnvs.getSim2DEnvironment().add(xmlEnv);
 			xmlEnv.setNetworkFilePath(this.conf.getNetworkPath(env));
 			xmlEnv.setSim2DEnvironmentPath(env);
-			XMLQSimSim2DNetworkNodesMappingsType xmlMappings = fac.createXMLQSimSim2DNetworkNodesMappingsType();
-			for (Id accessor : this.conf.getSim2DEnvAccessorNodes(env)) {
-				XMLQSimSim2DNetworkNodesMappingType xmlMapping = fac.createXMLQSimSim2DNetworkNodesMappingType();
-				xmlMapping.setSim2DNodeId(accessor.toString());
-				xmlMapping.setQSimNodeId(this.conf.getQSimNode(accessor).toString());
-				xmlMappings.getQSimSim2DNetworkNodesMapping().add(xmlMapping );
-			}
-			xmlEnv.setQSimSim2DNetworkNodesMappings(xmlMappings);
 		}
 		
 		JAXBElement<XMLSim2DConfigType> ret = fac.createSim2DConfig(xmlConfType );

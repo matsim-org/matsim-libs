@@ -86,6 +86,7 @@ public class Sim2DScenario2OSMReadyShape {
 		AttributeType level = DefaultAttributeTypeFactory.newAttributeType("level", String.class);
 		AttributeType openings = DefaultAttributeTypeFactory.newAttributeType("openings", String.class);
 		AttributeType neighbors = DefaultAttributeTypeFactory.newAttributeType("neighbors", String.class);
+		AttributeType envId = DefaultAttributeTypeFactory.newAttributeType("env_id", String.class);
 		//network
 		AttributeType l = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class,true,null,null,crs);
 		AttributeType hw = DefaultAttributeTypeFactory.newAttributeType("highway", String.class);
@@ -93,8 +94,8 @@ public class Sim2DScenario2OSMReadyShape {
 		AttributeType mf = DefaultAttributeTypeFactory.newAttributeType("m_fspeed", String.class);
 		AttributeType mt = DefaultAttributeTypeFactory.newAttributeType("m_tra_mode", String.class);
 		try {
-			ftEnv = FeatureTypeFactory.newFeatureType(new AttributeType[]{p,matsimType,id,level,openings,neighbors}, "Sim2DEnvironment");
-			ftNet = FeatureTypeFactory.newFeatureType(new AttributeType[]{l,matsimType,hw,level,mw,mf,mt}, "Sim2DNetwork");
+			ftEnv = FeatureTypeFactory.newFeatureType(new AttributeType[]{p,matsimType,id,level,openings,neighbors,envId}, "Sim2DEnvironment");
+			ftNet = FeatureTypeFactory.newFeatureType(new AttributeType[]{l,matsimType,hw,mw,mf,mt,envId}, "Sim2DNetwork");
 		} catch (FactoryRegistryException e) {
 			throw new RuntimeException(e);
 		} catch (SchemaException e) {
@@ -121,6 +122,7 @@ public class Sim2DScenario2OSMReadyShape {
 		GeometryFactory geofac = new GeometryFactory();
 		Collection<Feature> fts = new ArrayList<Feature>();
 		for (Sim2DEnvironment env : this.scenario.getSim2DEnvironments()) {
+			Id envId = env.getId();
 			CoordinateReferenceSystem crs = env.getCRS();
 			MathTransform transform = getTransform(crs);
 			Network net = env.getEnvironmentNetwork();
@@ -136,7 +138,7 @@ public class Sim2DScenario2OSMReadyShape {
 				LineString ls = geofac.createLineString(new Coordinate[]{from,to});
 				try {
 					LineString lst = (LineString) JTS.transform(ls, transform);
-					Feature ft = createNetFeature(lst, l);
+					Feature ft = createNetFeature(lst, l,envId);
 					fts.add(ft);
 				} catch (MismatchedDimensionException e) {
 					throw new IllegalArgumentException(e);
@@ -148,10 +150,10 @@ public class Sim2DScenario2OSMReadyShape {
 		ShapeFileWriter.writeGeometries(fts, file);
 	}
 
-	private Feature createNetFeature(LineString lst, Link l) {
+	private Feature createNetFeature(LineString lst, Link l, Id envId) {
 
 		try {
-			return ftNet.create(new Object[]{lst,M_T_L,H_W,"0","1.0","1.34","pedestrian"});
+			return ftNet.create(new Object[]{lst,M_T_L,H_W,"1.0","1.34","pedestrian",envId.toString()});
 		} catch (IllegalAttributeException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -165,6 +167,7 @@ public class Sim2DScenario2OSMReadyShape {
 		for (Sim2DEnvironment env : this.scenario.getSim2DEnvironments()) {
 			CoordinateReferenceSystem crs = env.getCRS();
 			MathTransform transform = getTransform(crs);
+			Id envId = env.getId();
 			for (Section sec : env.getSections().values()) {
 				Id id = sec.getId();
 				int level = sec.getLevel();
@@ -173,7 +176,7 @@ public class Sim2DScenario2OSMReadyShape {
 				Polygon p = sec.getPolygon();
 				try {
 					Polygon tp = (Polygon) JTS.transform(p, transform);
-					Feature ft = createEnvFeature(tp,id,level,n,o);
+					Feature ft = createEnvFeature(tp,id,level,n,o,envId);
 					fts.add(ft);
 				} catch (MismatchedDimensionException e) {
 					throw new IllegalArgumentException(e);
@@ -186,7 +189,7 @@ public class Sim2DScenario2OSMReadyShape {
 		ShapeFileWriter.writeGeometries(fts, file);
 	}
 
-	private Feature createEnvFeature(Polygon tp, Id id, int level, Id[] n, int[] o) {
+	private Feature createEnvFeature(Polygon tp, Id id, int level, Id[] n, int[] o, Id envId) {
 
 		StringBuffer os = new StringBuffer();
 		if (o == null) {
@@ -208,14 +211,14 @@ public class Sim2DScenario2OSMReadyShape {
 			}
 		}
 		try {
-			return ftEnv.create(new Object[]{tp,M_T,id.toString(),level+"",os.toString(),ns.toString()});
+			return ftEnv.create(new Object[]{tp,M_T,id.toString(),level+"",os.toString(),ns.toString(),envId.toString()});
 		} catch (IllegalAttributeException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}
 
 	public static void main(String [] args) {
-		String confPath = "/Users/laemmel/devel/burgdorf2d/input/sim2dConfig.xml";
+		String confPath = "/Users/laemmel/devel/burgdorf2d/input/s2d_config.xml";
 		Sim2DConfig conf = Sim2DConfigUtils.loadConfig(confPath);
 		Sim2DScenario sc = Sim2DScenarioUtils.loadSim2DScenario(conf);
 		Sim2DScenario2OSMReadyShape osm = new Sim2DScenario2OSMReadyShape(sc);

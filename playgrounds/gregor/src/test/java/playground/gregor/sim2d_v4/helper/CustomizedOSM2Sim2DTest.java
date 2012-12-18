@@ -22,26 +22,22 @@ package playground.gregor.sim2d_v4.helper;
 
 import java.util.Map.Entry;
 
-import org.geotools.referencing.CRS;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
 import playground.gregor.sim2d_v4.scenario.Section;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -51,17 +47,13 @@ public class CustomizedOSM2Sim2DTest extends MatsimTestCase{
 	public void testCustomizedOSM2Sim2D() {
 		String inDir = getInputDirectory();
 
-		//first read an environment from osm
-		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setNetwork(NetworkImpl.createNetwork());
-		try {
-			env.setCRS(CRS.decode("EPSG:3395"));
-		} catch (NoSuchAuthorityCodeException e) {
-			throw new IllegalArgumentException(e);
-		} catch (FactoryException e) {
-			throw new IllegalArgumentException(e);
-		}
-		CustomizedOSM2Sim2D osm2sim2d = new CustomizedOSM2Sim2D(env);
+		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
+		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);
+
+		Config c0 = ConfigUtils.createConfig();
+		Scenario sc0 = ScenarioUtils.createScenario(c0);
+		sc0.addScenarioElement(s2dsc);
+		CustomizedOSM2Sim2DExtendedMATSimScenario osm2sim2d = new CustomizedOSM2Sim2DExtendedMATSimScenario(sc0);
 		osm2sim2d.processOSMFile(inDir + "/sim2d.osm");
 		
 		
@@ -75,6 +67,9 @@ public class CustomizedOSM2Sim2DTest extends MatsimTestCase{
 		CoordinateReferenceSystem testCRS = env2.getCRS();
 		assertEquals("EPSG:3395", testCRS.getIdentifiers().iterator().next().toString());
 
+		
+		Sim2DEnvironment env = s2dsc.getSim2DEnvironments().iterator().next();
+		
 		Envelope e1 = env.getEnvelope();
 		Envelope e2 = env2.getEnvelope();
 		assertEquals(e1.getMinX(),e2.getMinX(),0.0000001);
@@ -103,28 +98,28 @@ public class CustomizedOSM2Sim2DTest extends MatsimTestCase{
 			}
 		}
 		
-		//read the network
-		Config c = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(c);
-		new MatsimNetworkReader(sc).readFile(inDir + "/network.xml.gz");
-		Network net = env.getEnvironmentNetwork();
-		Network net2 = sc.getNetwork();
-		//compare them
-		assertEquals(net.getNodes().size(), net2.getNodes().size());
-		for (Node n : net.getNodes().values()) {
-			Node n2 = net2.getNodes().get(n.getId());
-			assertEquals(n.getCoord(), n2.getCoord());
-		}
-		assertEquals(net.getLinks().size(),net2.getLinks().size());
-		for (Link l : net.getLinks().values()) {
-			Link l2 = net2.getLinks().get(l.getId());
-			assertEquals(l.getCapacity(), l2.getCapacity());
-			assertEquals(l.getFreespeed(), l2.getFreespeed());
-			assertEquals(l.getLength(), l2.getLength());
-			assertEquals(l.getNumberOfLanes(), l2.getNumberOfLanes());
-			assertEquals(l.getFromNode().getId(), l2.getFromNode().getId());
-			assertEquals(l.getToNode().getId(), l2.getToNode().getId());
-		}
+//		//read the network
+//		Config c = ConfigUtils.createConfig();
+//		Scenario sc = ScenarioUtils.createScenario(c);
+//		new MatsimNetworkReader(sc).readFile(inDir + "/network.xml.gz");
+//		Network net = env.getEnvironmentNetwork();
+//		Network net2 = sc.getNetwork();
+//		//compare them
+//		assertEquals(net.getNodes().size(), net2.getNodes().size());
+//		for (Node n : net.getNodes().values()) {
+//			Node n2 = net2.getNodes().get(n.getId());
+//			assertEquals(n.getCoord(), n2.getCoord());
+//		}
+//		assertEquals(net.getLinks().size(),net2.getLinks().size());
+//		for (Link l : net.getLinks().values()) {
+//			Link l2 = net2.getLinks().get(l.getId());
+//			assertEquals(l.getCapacity(), l2.getCapacity());
+//			assertEquals(l.getFreespeed(), l2.getFreespeed());
+//			assertEquals(l.getLength(), l2.getLength());
+//			assertEquals(l.getNumberOfLanes(), l2.getNumberOfLanes());
+//			assertEquals(l.getFromNode().getId(), l2.getFromNode().getId());
+//			assertEquals(l.getToNode().getId(), l2.getToNode().getId());
+//		}
 		
 		
 

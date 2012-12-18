@@ -20,9 +20,11 @@
 
 package playground.gregor.sim2d_v4.scenario;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,7 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 public class Sim2DScenario {
 	
 	
-	private final List<Sim2DEnvironment> envs = new ArrayList<Sim2DEnvironment>();
+	private final Map<Id,Sim2DEnvironment> envs = new HashMap<Id,Sim2DEnvironment>();
 	private final Sim2DConfig config;
 	
 	/*package*/ Sim2DScenario(Sim2DConfig conf) {
@@ -42,8 +44,8 @@ public class Sim2DScenario {
 		return this.config;
 	}
 	
-	public List<Sim2DEnvironment> getSim2DEnvironments() {
-		return this.envs;
+	public Collection<Sim2DEnvironment> getSim2DEnvironments() {
+		return this.envs.values();
 	}
 	
 	
@@ -51,7 +53,7 @@ public class Sim2DScenario {
 	public void connect(Scenario sc) {
 		sc.addScenarioElement(this);
 		Network scNet = sc.getNetwork();
-		for (Sim2DEnvironment env : this.envs) {
+		for (Sim2DEnvironment env : this.envs.values()) {
 			Network envNet = env.getEnvironmentNetwork();
 			connect(envNet,scNet);
 		}
@@ -60,11 +62,33 @@ public class Sim2DScenario {
 
 	private void connect(Network envNet, Network scNet) {
 		for (Node n : envNet.getNodes().values()) {
-			scNet.addNode(n);
+			Node nn = scNet.getNodes().get(n.getId());
+			if (nn == null) {
+				scNet.addNode(n);
+			}
 		}
 		for (Link l : envNet.getLinks().values()) {
+			Node nFrom = scNet.getNodes().get(l.getFromNode().getId());
+			Node nTo = scNet.getNodes().get(l.getToNode().getId());
+			if (l.getFromNode() != nFrom) {
+				l.setFromNode(nFrom);
+				nFrom.addOutLink(l);
+			}
+			if (l.getToNode() != nTo) {
+				l.setToNode(nTo);
+				nTo.addInLink(l);
+			}
 			scNet.addLink(l); //TODO check if capperiod, effectivecellsize, lanewidth is the same for both networks
 		}
+	}
+
+	public void addSim2DEnvironment(Sim2DEnvironment env) {
+		this.envs.put(env.getId(), env);
+		
+	}
+
+	public Sim2DEnvironment getSim2DEnvironment(Id id) {
+		return this.envs.get(id);
 	}
 	
 

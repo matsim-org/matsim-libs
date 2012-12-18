@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-
 public class Sim2DConfig {
 	
 	//work in progress ...
@@ -39,8 +37,6 @@ public class Sim2DConfig {
 	
 	private final  List<String> sim2DEnvironmentsPaths = new ArrayList<String>();
 	private final Map<String,String> sim2DEnvNetworkMapping = new HashMap<String, String>();
-	private final Map<String,List<Id>> sim2DEnvAccessorNodesMapping = new HashMap<String, List<Id>>();
-	private final Map<Id,Id> sim2DAccessorNodeQSimAccessorNodeMapping = new HashMap<Id, Id>();
 	
 	
 	/*package*/ Sim2DConfig() {}
@@ -78,25 +74,5 @@ public class Sim2DConfig {
 		return this.sim2DEnvNetworkMapping.get(sim2DEnvPath);
 	}
 	
-	public void addSim2DEnvAccessorNode(String sim2DEnvPath, Id accessorNode) {
-		List<Id> l = this.sim2DEnvAccessorNodesMapping.get(sim2DEnvPath);
-		if (l == null) {
-			l = new ArrayList<Id>();
-			this.sim2DEnvAccessorNodesMapping.put(sim2DEnvPath, l);
-		}
-		l.add(accessorNode);
-	}
-	
-	public List<Id> getSim2DEnvAccessorNodes(String sim2DEnvPath) {
-		return this.sim2DEnvAccessorNodesMapping.get(sim2DEnvPath);
-	}
-	
-	public void addSim2DAccessorNodeQSimAccessorNodeMapping(Id sim2DNode, Id qsimNode) {
-		this.sim2DAccessorNodeQSimAccessorNodeMapping.put(sim2DNode, qsimNode);
-	}
-	
-	public Id getQSimNode(Id sim2DNode) {
-		return this.sim2DAccessorNodeQSimAccessorNodeMapping.get(sim2DNode);
-	}
 
 }

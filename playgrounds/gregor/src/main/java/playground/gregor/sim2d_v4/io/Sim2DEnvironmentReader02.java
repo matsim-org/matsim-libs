@@ -74,7 +74,8 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 
 	private static final Logger log = Logger.getLogger(Sim2DEnvironmentReader02.class);
 
-	public static final String SCHEMA = "http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas/sim2dEnvironment_v0.2.xsd";
+//	public static final String SCHEMA = "http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas/sim2dEnvironment_v0.2.xsd";
+	public static final String SCHEMA = "http://matsim.org/files/dtd/sim2dEnvironment_v0.2.xsd";
 
 	private final Sim2DEnvironment env;
 
@@ -127,6 +128,8 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 
 		//convert from Jaxb types to sim2d conform types
 
+		this.env.setId(new IdImpl(xmlcoll.getValue().getFid()));
+		
 		//envelope
 		XMLBoundingShapeType bounds = xmlcoll.getValue().getBoundedBy();
 		String boxSRS = bounds.getBox().getSrsName();

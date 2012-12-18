@@ -21,18 +21,24 @@
 package playground.gregor.sim2d_v4.helper;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.StringUtils;
@@ -43,12 +49,17 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
+import playground.gregor.sim2d_v4.io.Sim2DConfigWriter01;
 import playground.gregor.sim2d_v4.io.Sim2DEnvironmentWriter02;
 import playground.gregor.sim2d_v4.io.osmparser.OSM;
 import playground.gregor.sim2d_v4.io.osmparser.OSMNode;
 import playground.gregor.sim2d_v4.io.osmparser.OSMWay;
 import playground.gregor.sim2d_v4.io.osmparser.OSMXMLParser;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -57,21 +68,20 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * Parses an OSM-file for sim2d environments, writes those environments to matsim network, sim2d config, and environment gml files.
- * There is already an OSM Reader in matsim, however these reader deals with networks only and is not extensible to the current needs. 
+ * Parses an OSM-file for sim2d environments and matsim network, writes those environments to environment network and environment gml files, matsim netowrk, and creates sim2d config and matsim config as well.
+ * There is already an OSM Reader in matsim, however that reader deals with networks only and is not extensible to the current needs. 
  *  
  * @author laemmel
  *
  */
-public class CustomizedOSM2Sim2D {
+public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 	//ped flow params
 	private static final double MAX_DENSITY = 5.4;
 	private static final double BOTTLENECK_FLOW = 1.3;
-	
-	private final Envelope e = new Envelope();
+
 	//	private static final String TAG_HIGHWAY = "highway";
-	//	private static final String K_M_TRA_MODE = "m_tra_mode";
+	private static final String K_M_TRA_MODE = "m_tra_mode";
 	private static final String K_M_TYPE = "m_type";
 	private static final String V_M_TYPE_ENV = "sim2d_section";
 	private static final String V_M_TYPE_NET = "sim2d_link";
@@ -79,11 +89,12 @@ public class CustomizedOSM2Sim2D {
 	private static final String K_NEIGHBORS = "neighbors";
 	private static final String K_OPENINGS = "openings";
 	private static final String K_ID = "id";
+	private static final String ENV_ID = "env_id";
 	private static final String TAG_M_WITDTH = "m_width";
 	private static final String TAG_M_FSPEED = "m_fspeed";
 
 	private static final String LINK_ID_PREFIX = "sim2d_";
-	
+
 	private static final CoordinateReferenceSystem osmCrs;
 	static {
 		try {
@@ -94,37 +105,35 @@ public class CustomizedOSM2Sim2D {
 			throw new IllegalArgumentException(e);
 		} 
 	}
-	
+
 	private static final GeometryFactory geofac = new GeometryFactory();
 
-	private final Sim2DEnvironment env;
 	private HashMap<Id, OSMNode> nodes;
-	private final MathTransform transform;
+	private final Map<CoordinateReferenceSystem,MathTransform> transforms = new HashMap<CoordinateReferenceSystem,MathTransform>();
 	private final OSM osm;
-
-	//TODO we need the possibility to have several environments. This means that we parse a scenario and not an environment 
-	/*package*/ CustomizedOSM2Sim2D(Sim2DEnvironment env) {
-		this(env,new OSM());
-	}
+	private final Sim2DScenario s2dsc;
+	private final Scenario sc;
+	
 	
 
-	/*package*/ CustomizedOSM2Sim2D(Sim2DEnvironment env, OSM osm) {
-		this.env = env;
-		this.env.setEnvelope(this.e);
-		try {
-			this.transform = CRS.findMathTransform(osmCrs, env.getCRS());
-		} catch (FactoryException e) {
-			throw new RuntimeException(e);
-		}
+	/*package*/ CustomizedOSM2Sim2DExtendedMATSimScenario(Scenario sc) {
+		this(sc,new OSM());
+	}
+
+
+	/*package*/ CustomizedOSM2Sim2DExtendedMATSimScenario(Scenario sc, OSM osm) {
+		this.sc = sc;
+		this.s2dsc = sc.getScenarioElement(Sim2DScenario.class);
 		this.osm = osm;
 	}
 
 
 	/*package*/ void processOSMFile(String file) {
-		
+
 		this.osm.addKey(K_M_TYPE);
+		this.osm.addKey(K_M_TRA_MODE);
 		OSMXMLParser parser = new OSMXMLParser(this.osm);
-		
+
 		parser.setValidating(false);
 		parser.parse(file);
 		buildEnvironment(this.osm);
@@ -135,103 +144,159 @@ public class CustomizedOSM2Sim2D {
 		this.nodes = new HashMap<Id,OSMNode>();
 		for (OSMNode node : osm.getNodes()) {
 			this.nodes.put(node.getId(), node);
-			
+
+		}
+		
+		Sim2DEnvironment dummyEnv = new Sim2DEnvironment();
+		dummyEnv.setNetwork(this.sc.getNetwork());
+		try {
+			dummyEnv.setCRS(CRS.decode("EPSG:3395"));
+		} catch (NoSuchAuthorityCodeException e) {
+			throw new IllegalArgumentException(e);
+		} catch (FactoryException e) {
+			throw new IllegalArgumentException(e);
 		}
 
 		for (OSMWay way : osm.getWays()) {
 			String v = way.getTags().get(K_M_TYPE);
-			if (v.equals(V_M_TYPE_ENV)) {
-				createSection(way);
-			} else if (v.equals(V_M_TYPE_NET)) {
-				createLinks(way);
+			if (v != null) { //sim2d 
+				String strEnvId = way.getTags().get(ENV_ID);
+				Sim2DEnvironment env = getOrCreateSim2DEnvironment(new IdImpl(strEnvId));
+				if (v.equals(V_M_TYPE_ENV)) {
+					createSection(way,env);
+				} else if (v.equals(V_M_TYPE_NET)) {
+					createLinks(way,env);
+				}
+			} else if (way.getTags().get(K_M_TRA_MODE) != null) { //standard matsim 
+				createLinks(way,dummyEnv);
+				
 			}
 
 		}
 
 	}
 
-	private void createLinks(OSMWay way) {
+	private void createLinks(OSMWay way, Sim2DEnvironment env) {
 
-		Network net = this.env.getEnvironmentNetwork();
+		Network net = env.getEnvironmentNetwork();
+		//		Network net = this.env.getEnvironmentNetwork();
 		NetworkFactory fac = net.getFactory();
-		
+
 		String smw = way.getTags().get(TAG_M_WITDTH);
 		String sfs = way.getTags().get(TAG_M_FSPEED);
 		double fs = Double.parseDouble(sfs);
 		double mw = Double.parseDouble(smw);
 		double fc = BOTTLENECK_FLOW * mw; 
 		double capacity = net.getCapacityPeriod() * fc;
-		
+
 		double cellSize = ((NetworkImpl)net).getEffectiveCellSize();
 		double nofLanes = mw * MAX_DENSITY * cellSize;
-		
+
 		String IdSuffix = way.getId().toString();
 		for (int i = 0; i < way.getNodeRefs().size()-1; i++) {
-			
-		  Id nid1 = way.getNodeRefs().get(i);
-		  Id nid2 = way.getNodeRefs().get(i+1);
-		  Node n1 = getOrCreateNode(nid1);
-		  Node n2 = getOrCreateNode(nid2);
-		  
-		  Id id0 = new IdImpl(LINK_ID_PREFIX+i+"_"+ IdSuffix);
-		  Link l0 = fac.createLink(id0, n1, n2);
-		  l0.setCapacity(capacity);
-		  l0.setFreespeed(fs);
-		  l0.setNumberOfLanes(nofLanes);
-		  double l = ((CoordImpl)n1.getCoord()).calcDistance(n2.getCoord());
-		  l0.setLength(l);
-		  net.addLink(l0);
-		  Id id1 = new IdImpl(LINK_ID_PREFIX+i+"_rev_"+ IdSuffix);
-		  Link l1 = fac.createLink(id1, n2, n1);
-		  l1.setCapacity(capacity);
-		  l1.setFreespeed(fs);
-		  l1.setNumberOfLanes(nofLanes);
-		  l1.setLength(l);
-		  net.addLink(l1);
-		
+
+			Id nid1 = way.getNodeRefs().get(i);
+			Id nid2 = way.getNodeRefs().get(i+1);
+			Node n1 = getOrCreateNode(nid1,env);
+			Node n2 = getOrCreateNode(nid2,env);
+
+			Id id0 = new IdImpl(LINK_ID_PREFIX+i+"_"+ IdSuffix);
+			Link l0 = fac.createLink(id0, n1, n2);
+			l0.setCapacity(capacity);
+			l0.setFreespeed(fs);
+			l0.setNumberOfLanes(nofLanes);
+			double l = ((CoordImpl)n1.getCoord()).calcDistance(n2.getCoord());
+			l0.setLength(l);
+			net.addLink(l0);
+			Id id1 = new IdImpl(LINK_ID_PREFIX+i+"_rev_"+ IdSuffix);
+			Link l1 = fac.createLink(id1, n2, n1);
+			l1.setCapacity(capacity);
+			l1.setFreespeed(fs);
+			l1.setNumberOfLanes(nofLanes);
+			l1.setLength(l);
+			net.addLink(l1);
+
 		}
-			
+
 	}
 
-	private Node getOrCreateNode(Id nid1) {
-		Node n1 = this.env.getEnvironmentNetwork().getNodes().get(nid1);
-		  if (n1 == null) {
-			  OSMNode node = this.nodes.get(nid1);
-			  Coordinate c = new Coordinate(node.getLon(),node.getLat());
-			  try {
-				JTS.transform(c, c, this.transform);
+	private Sim2DEnvironment getOrCreateSim2DEnvironment(Id id) {
+		Sim2DEnvironment env = this.s2dsc.getSim2DEnvironment(id);
+		if (env == null) {
+			env = new Sim2DEnvironment();
+			env.setEnvelope(new Envelope());
+			env.setId(id);
+			try {
+				env.setCRS(CRS.decode("EPSG:3395"));
+			} catch (NoSuchAuthorityCodeException e) {
+				throw new IllegalArgumentException(e);
+			} catch (FactoryException e) {
+				throw new IllegalArgumentException(e);
+			}
+			env.setNetwork(NetworkImpl.createNetwork());
+			this.s2dsc.addSim2DEnvironment(env);
+		}
+		return env;
+	}
+
+
+	private Node getOrCreateNode(Id nid1, Sim2DEnvironment env) {
+		Node n1 = env.getEnvironmentNetwork().getNodes().get(nid1);
+		MathTransform transform = this.transforms.get(env.getCRS());
+		if (transform == null) {
+			try {
+				transform = CRS.findMathTransform(osmCrs, env.getCRS());
+			} catch (FactoryException e) {
+				throw new IllegalArgumentException(e);
+			}
+		}
+		if (n1 == null) {
+			OSMNode node = this.nodes.get(nid1);
+			Coordinate c = new Coordinate(node.getLon(),node.getLat());
+			try {
+				JTS.transform(c, c, transform);
 			} catch (TransformException e) {
 				throw new IllegalArgumentException(e);
 			}
-			 Coord cc = MGC.coordinate2Coord(c);
-			 n1 = this.env.getEnvironmentNetwork().getFactory().createNode(nid1, cc);
-			 this.env.getEnvironmentNetwork().addNode(n1);
-		  }
-		
+			Coord cc = MGC.coordinate2Coord(c);
+			n1 = env.getEnvironmentNetwork().getFactory().createNode(nid1, cc);
+			env.getEnvironmentNetwork().addNode(n1);
+		}
+
 		return n1;
 	}
 
-	private void createSection(OSMWay way) {
+	private void createSection(OSMWay way, Sim2DEnvironment env) {
+		MathTransform transform = this.transforms.get(env.getCRS());
+		if (transform == null) {
+			try {
+				transform = CRS.findMathTransform(osmCrs, env.getCRS());
+			} catch (FactoryException e) {
+				throw new IllegalArgumentException(e);
+			}
+		}
+
+
 		Coordinate[] coords = new Coordinate[way.getNodeRefs().size()];
 		for (int i = 0; i < way.getNodeRefs().size(); i++) {
 			Id ref = way.getNodeRefs().get(i);
 			OSMNode node = this.nodes.get(ref);
 			coords[i] = new Coordinate(node.getLon(),node.getLat());
 		}
-		
+
 		LinearRing lr = geofac.createLinearRing(coords);
 		try {
-			lr = (LinearRing) JTS.transform(lr, this.transform);
+			lr = (LinearRing) JTS.transform(lr, transform);
 		} catch (MismatchedDimensionException e) {
 			throw new RuntimeException(e);
 		} catch (TransformException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		Id id = new IdImpl(way.getTags().get(K_ID));
 		Polygon p = geofac.createPolygon(lr, null);
 		for (Coordinate bc : p.getBoundary().getCoordinates()) {
-			this.e.expandToInclude(bc);
+			env.getEnvelope().expandToInclude(bc);
 		}
 		String oString = way.getTags().get(K_OPENINGS);
 		int[] o = null;
@@ -251,21 +316,46 @@ public class CustomizedOSM2Sim2D {
 				n[i] = new IdImpl(nStringA[i]);
 			}
 		}
-		
+
 		int l = Integer.parseInt(way.getTags().get(K_LEVEL));
-		this.env.createAndAddSection(id, p, o, n, l);
+		env.createAndAddSection(id, p, o, n, l);
 	}
 
 	public static void main (String [] args) throws NoSuchAuthorityCodeException, FactoryException {
 		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/sim2d.osm";
-		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setCRS(CRS.decode("EPSG:3395"));
-		env.setNetwork(NetworkImpl.createNetwork());
-		CustomizedOSM2Sim2D osm2sim2d = new CustomizedOSM2Sim2D(env);
+		String inputDir = "/Users/laemmel/devel/burgdorf2d/input";
+
+		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
+		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);
+
+		Config c = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario(c);
+		sc.addScenarioElement(s2dsc);
+
+
+		CustomizedOSM2Sim2DExtendedMATSimScenario osm2sim2d = new CustomizedOSM2Sim2DExtendedMATSimScenario(sc);
 		osm2sim2d.processOSMFile(osmFile);
-		
-		new Sim2DEnvironmentWriter02(env).write("/Users/laemmel/devel/burgdorf2d/input/sim2dEnv_0.gml.gz");
-		new NetworkWriter(env.getEnvironmentNetwork()).write("/Users/laemmel/devel/burgdorf2d/input/network2d_0.xml");
+
+		//write s2d envs
+		for (Sim2DEnvironment env : s2dsc.getSim2DEnvironments()) {
+			String envFile = inputDir + "/sim2d_environment_" + env.getId() + ".gml.gz";
+			String netFile = inputDir + "/sim2d_network_" + env.getId() + ".xml.gz";
+			new Sim2DEnvironmentWriter02(env).write(envFile);
+			new NetworkWriter(env.getEnvironmentNetwork()).write(netFile);
+			s2d.addSim2DEnvironmentPath(envFile);
+			s2d.addSim2DEnvNetworkMapping(envFile, netFile);
+		}
+
+		new Sim2DConfigWriter01(s2d).write(inputDir + "/s2d_config.xml");
+
+
+		c.network().setInputFile(inputDir + "/network.xml.gz");
+		new ConfigWriter(c).write(inputDir+ "/config.xml");
+
+		new NetworkWriter(sc.getNetwork()).write(c.network().getInputFile());
+
+
+
 	}
 
 }

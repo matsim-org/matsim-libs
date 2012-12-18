@@ -20,7 +20,6 @@
 
 package playground.gregor.sim2d_v4.scenario;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -32,17 +31,12 @@ import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
 
 public abstract class Sim2DScenarioUtils {
 	
-	//TODO make scenario identifiable so we can have several environments  
 	public static  Sim2DScenario loadSim2DScenario(Sim2DConfig conf) {
 		Sim2DScenario scenario = new Sim2DScenario(conf);
 		for (String envPath : conf.getSim2DEnvironmentPaths()){
 			Sim2DEnvironment env = new Sim2DEnvironment();
 			new Sim2DEnvironmentReader02(env, false).readFile(envPath);
-			scenario.getSim2DEnvironments().add(env);
-			for (Id i : conf.getSim2DEnvAccessorNodes(envPath)) {
-				Id m = conf.getQSimNode(i);
-				env.addAccessorNodeQSimNodeMapping(i,m);
-			}
+			scenario.addSim2DEnvironment(env);
 			String netPath = conf.getNetworkPath(envPath);
 			if (netPath != null) { //not yet clear if this can be null, maybe it even must be null [gl dec 12]
 				Config c = ConfigUtils.createConfig();
@@ -55,5 +49,10 @@ public abstract class Sim2DScenarioUtils {
 		
 		return scenario;
 	}
+	
+	public static Sim2DScenario createSim2dScenario(Sim2DConfig conf) {
+		return new Sim2DScenario(conf);
+	}
+	
 
 }

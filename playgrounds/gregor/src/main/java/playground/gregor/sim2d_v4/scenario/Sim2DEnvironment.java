@@ -38,7 +38,6 @@ public class Sim2DEnvironment implements Identifiable{
 	private Envelope envelope;
 	private CoordinateReferenceSystem crs;
 	private final Map<Id, Section> sections = new HashMap<Id,Section>();
-	private final Map<Id,Id> accessorNodeQSimNodeMapping = new HashMap<Id,Id>();
 	private Network net;
 	private  Id id = null;
 	
@@ -72,13 +71,6 @@ public class Sim2DEnvironment implements Identifiable{
 		return this.sections ;
 	}
 
-
-	public void addAccessorNodeQSimNodeMapping(Id i, Id m) {
-		Id old = this.accessorNodeQSimNodeMapping.put(i, m);
-		if (old != null){
-			throw new RuntimeException("A mapping for node "+ i + " already exist. sim2d nodes can only be mapped to one qsim node.");
-		}
-	}
 
 	public void setNetwork(Network net) {
 		this.net = net;
