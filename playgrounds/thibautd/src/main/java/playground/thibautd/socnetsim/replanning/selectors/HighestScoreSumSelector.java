@@ -27,6 +27,13 @@ import playground.thibautd.socnetsim.population.PlanLinks;
  * @author thibautd
  */
 public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
+	public HighestScoreSumSelector() {}
+
+	// for tests
+	HighestScoreSumSelector(final boolean blocking) {
+		super( blocking );
+	}
+
 	@Override
 	public double getWeight(final Plan indivPlan) {
 		Double score = indivPlan.getScore();

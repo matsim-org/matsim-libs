@@ -62,17 +62,22 @@ public class HighestWeightSelectorTest {
 		final String name;
 		final ReplanningGroup group;
 		final GroupPlans expectedSelectedPlans;
+		final GroupPlans expectedSelectedPlansWhenBlocking;
 
 		public Fixture(
 				final String name,
 				final ReplanningGroup group,
-				final GroupPlans expectedPlans) {
+				final GroupPlans expectedPlans,
+				final GroupPlans expectedSelectedPlansWhenBlocking) {
 			this.name = name;
 			this.group = group;
 			this.expectedSelectedPlans = expectedPlans;
+			this.expectedSelectedPlansWhenBlocking = expectedSelectedPlansWhenBlocking;
 		}
 	}
 
+	// XXX the SAME instance is used for all tests!
+	// should ot be a problem, but this is contrary to the idea of "fixture"
 	public HighestWeightSelectorTest(final Fixture fixture) {
 		this.fixture = fixture;
 		log.info( "fixture "+fixture.name );
@@ -89,7 +94,8 @@ public class HighestWeightSelectorTest {
 				new Fixture[]{createPartiallyJointPlansNoSelectedJp()},
 				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent()},
 				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent2()},
-				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgentWithNullScores()});
+				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgentWithNullScores()},
+				new Fixture[]{createPlanWithDifferentSolutionIfBlocked()});
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -136,10 +142,12 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 
+		GroupPlans exp = new GroupPlans( Collections.EMPTY_LIST , toBeSelected );
 		return new Fixture(
 				"all individual",
 				group,
-				new GroupPlans( Collections.EMPTY_LIST , toBeSelected ) );
+				exp,
+				exp);
 	}
 
 	public static Fixture createFullyJointPlans() {
@@ -205,12 +213,14 @@ public class HighestWeightSelectorTest {
 		JointPlan sel = JointPlanFactory.createJointPlan( jp2 );
 		JointPlanFactory.createJointPlan( jp3 );
 
+		GroupPlans expected = new GroupPlans(
+					Arrays.asList( sel ),
+					Collections.EMPTY_LIST );
 		return new Fixture(
 				"fully joint",
 				group,
-				new GroupPlans(
-					Arrays.asList( sel ),
-					Collections.EMPTY_LIST ) );
+				expected,
+				expected);
 	}
 
 	public static Fixture createPartiallyJointPlansOneSelectedJp() {
@@ -275,12 +285,16 @@ public class HighestWeightSelectorTest {
 		JointPlan sel = JointPlanFactory.createJointPlan( jp2 );
 		JointPlanFactory.createJointPlan( jp3 );
 
+		GroupPlans expected = new GroupPlans(
+					Arrays.asList( sel ),
+					toBeSelected );
+
 		return new Fixture(
 				"partially joint, one selected joint plan",
 				group,
-				new GroupPlans(
-					Arrays.asList( sel ),
-					toBeSelected ) );
+				expected,
+				expected);
+
 	}
 
 	public static Fixture createPartiallyJointPlansTwoSelectedJps() {
@@ -345,12 +359,14 @@ public class HighestWeightSelectorTest {
 		JointPlanFactory.createJointPlan( jp3 );
 		JointPlan sel2 = JointPlanFactory.createJointPlan( jp4 );
 
+		GroupPlans expected = new GroupPlans(
+					Arrays.asList( sel1 , sel2 ),
+					Collections.EMPTY_LIST );
 		return new Fixture(
 				"partially joint, two selected joint plans",
 				group,
-				new GroupPlans(
-					Arrays.asList( sel1 , sel2 ),
-					Collections.EMPTY_LIST ) );
+				expected,
+				expected);
 	}
 
 	public static Fixture createPartiallyJointPlansMessOfJointPlans() {
@@ -449,12 +465,14 @@ public class HighestWeightSelectorTest {
 		JointPlanFactory.createJointPlan( jp7 );
 		JointPlanFactory.createJointPlan( jp8 );
 
+		GroupPlans expected = new GroupPlans(
+					Arrays.asList( sel1 , sel2 ),
+					Collections.EMPTY_LIST );
 		return new Fixture(
 				"partially joint, multiple combinations",
 				group,
-				new GroupPlans(
-					Arrays.asList( sel1 , sel2 ),
-					Collections.EMPTY_LIST ) );
+				expected,
+				expected);
 	}
 
 	public static Fixture createOneBigJointPlanDifferentNPlansPerAgent() {
@@ -498,12 +516,15 @@ public class HighestWeightSelectorTest {
 
 		JointPlan sel = JointPlanFactory.createJointPlan( jp );
 
+		GroupPlans expected = new GroupPlans(
+					Arrays.asList( sel ),
+					Collections.EMPTY_LIST );
+
 		return new Fixture(
 				"one big joint plan",
 				group,
-				new GroupPlans(
-					Arrays.asList( sel ),
-					Collections.EMPTY_LIST ) );
+				expected,
+				null);
 	}
 
 	public static Fixture createPartiallyJointPlansNoSelectedJp() {
@@ -594,12 +615,15 @@ public class HighestWeightSelectorTest {
 		JointPlanFactory.createJointPlan( jp3 );
 		JointPlanFactory.createJointPlan( jp4 );
 
+		GroupPlans expected = new GroupPlans(
+					Collections.EMPTY_LIST,
+					toBeSelected );
+
 		return new Fixture(
 				"partially joint, no selected joint trips",
 				group,
-				new GroupPlans(
-					Collections.EMPTY_LIST,
-					toBeSelected ) );
+				expected,
+				expected);
 	}
 
 	public static Fixture createOneBigJointPlanDifferentNPlansPerAgent2() {
@@ -643,12 +667,15 @@ public class HighestWeightSelectorTest {
 
 		JointPlan sel = JointPlanFactory.createJointPlan( jp );
 
+		GroupPlans expected = new GroupPlans(
+					Arrays.asList( sel ),
+					Collections.EMPTY_LIST );
+
 		return new Fixture(
 				"one big joint plan order 2",
 				group,
-				new GroupPlans(
-					Arrays.asList( sel ),
-					Collections.EMPTY_LIST ) );
+				expected,
+				null);
 	}
 
 	public static Fixture createOneBigJointPlanDifferentNPlansPerAgentWithNullScores() {
@@ -694,12 +721,80 @@ public class HighestWeightSelectorTest {
 
 		JointPlan sel = JointPlanFactory.createJointPlan( jp );
 
+		GroupPlans expected = new GroupPlans(
+					Arrays.asList( sel ),
+					Collections.EMPTY_LIST );
+
 		return new Fixture(
 				"one big joint plan, null scores",
 				group,
-				new GroupPlans(
+				expected,
+				null);
+	}
+
+	public static Fixture createPlanWithDifferentSolutionIfBlocked() {
+		ReplanningGroup group = new ReplanningGroup();
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( 0d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1000d );
+		Plan p1 = plan;
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -1295836d );
+		jp3.put( id , plan );
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 0d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -123445d );
+		jp2.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1000d );
+		Plan p2 = plan;
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1000d );
+		Plan p3 = plan;
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -123454d );
+		jp2.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -1295836d );
+		jp3.put( id , plan );
+
+		JointPlan sel = JointPlanFactory.createJointPlan( jp1 );
+		JointPlanFactory.createJointPlan( jp2 );
+		JointPlanFactory.createJointPlan( jp3 );
+
+		GroupPlans expected = new GroupPlans(
+					Collections.EMPTY_LIST,
+					Arrays.asList( p1 , p2 , p3 ) );
+		GroupPlans expectedBlock = new GroupPlans(
 					Arrays.asList( sel ),
-					Collections.EMPTY_LIST ) );
+					Arrays.asList( p3 ) );
+
+		return new Fixture(
+				"different plans if blocking",
+				group,
+				expected,
+				expectedBlock);
 	}
 
 	@Before
@@ -711,9 +806,17 @@ public class HighestWeightSelectorTest {
 	// Tests
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testSelectedPlans() throws Exception {
-		HighestScoreSumSelector selector = new HighestScoreSumSelector();
+	public void testSelectedPlansNonBlocking() throws Exception {
+		testSelectedPlans( false );
+	}
 
+	@Test
+	public void testSelectedPlansBlocking() throws Exception {
+		testSelectedPlans( true );
+	}
+
+	private void testSelectedPlans( final boolean blocking ) {
+		HighestScoreSumSelector selector = new HighestScoreSumSelector( blocking );
 		GroupPlans selected = null;
 		try {
 			selected = selector.selectPlans( fixture.group );
@@ -724,8 +827,11 @@ public class HighestWeightSelectorTest {
 
 		Assert.assertEquals(
 				"unexpected selected plan in test instance <<"+fixture.name+">> ",
-				fixture.expectedSelectedPlans,
+				blocking ?
+					fixture.expectedSelectedPlansWhenBlocking :
+					fixture.expectedSelectedPlans,
 				selected);
 	}
+
 }
 

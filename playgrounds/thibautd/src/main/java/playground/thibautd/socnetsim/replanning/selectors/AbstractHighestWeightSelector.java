@@ -52,6 +52,16 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	private static final Logger log =
 		Logger.getLogger(AbstractHighestWeightSelector.class);
 
+	private final boolean forbidBlockingCombinations;
+
+	protected AbstractHighestWeightSelector() {
+		this( false );
+	}
+
+	protected AbstractHighestWeightSelector(final boolean isForRemoval) {
+		this.forbidBlockingCombinations = isForRemoval;
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// interface and abstract method
 	// /////////////////////////////////////////////////////////////////////////
@@ -60,16 +70,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		if (log.isTraceEnabled()) log.trace( "handling group "+group );
 		Map<Id, PersonRecord> personRecords = getPersonRecords( group );
 
-		PlanString allocation = buildPlanString(
-				personRecords,
-				new ArrayList<PersonRecord>( personRecords.values() ),
-				Collections.EMPTY_SET,
-				null);
-
-		if (allocation == null) throw new NullPointerException();
+		GroupPlans allocation = selectPlans( personRecords );
 
 		if (log.isTraceEnabled()) log.trace( "returning allocation "+allocation );
-		return toGroupPlans( allocation );
+		return allocation;
 	}
 
 	public abstract double getWeight(final Plan indivPlan);
@@ -114,6 +118,119 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
+	// "outer loop": search and forbid if blocking (if forbid blocking is true)
+	// /////////////////////////////////////////////////////////////////////////
+	private GroupPlans selectPlans( final Map<Id, PersonRecord> personRecords ) {
+		final ForbidenCombinations forbiden = new ForbidenCombinations();
+
+		GroupPlans plans = null;
+
+		do {
+			PlanString allocation = buildPlanString(
+				forbiden,
+				personRecords,
+				new ArrayList<PersonRecord>( personRecords.values() ),
+				Collections.EMPTY_SET,
+				null);
+
+			plans = allocation == null ? null : toGroupPlans( allocation );
+		} while (
+				plans != null &&
+				continueIterations( forbiden , personRecords , plans ) );
+
+		return plans;
+	}
+
+	private boolean continueIterations(
+			final ForbidenCombinations forbiden,
+			final Map<Id, PersonRecord> personRecords,
+			final GroupPlans allocation) {
+		if ( !forbidBlockingCombinations ) return false;
+
+		if (log.isTraceEnabled()) log.trace( "checking if need to continue" );
+
+		if (isBlocking( personRecords, allocation )) {
+			if (log.isTraceEnabled()) {
+				log.trace( allocation+" is blocking" );
+			}
+
+			forbiden.forbid( allocation );
+			return true;
+		}
+
+		if (log.isTraceEnabled()) {
+			log.trace( allocation+" is not blocking" );
+		}
+
+		return false;
+	}
+
+	private boolean isBlocking(
+			final Map<Id, PersonRecord> personRecords,
+			final GroupPlans groupPlan) {
+		return !searchForCombinationsWithoutForbiddenPlans(
+				groupPlan,
+				personRecords,
+				new ArrayList<PersonRecord>( personRecords.values() ),
+				Collections.EMPTY_SET);
+	}
+
+	private boolean searchForCombinationsWithoutForbiddenPlans(
+			final GroupPlans forbidenPlans,
+			final Map<Id, PersonRecord> allPersonsRecord,
+			final List<PersonRecord> personsStillToAllocate,
+			final Set<Id> alreadyAllocatedPersons) {
+		final PersonRecord currentPerson = personsStillToAllocate.get(0);
+
+		// do one step forward: "point" to the next person
+		final List<PersonRecord> remainingPersons =
+			personsStillToAllocate.size() > 1 ?
+			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
+			Collections.EMPTY_LIST;
+		final Set<Id> newAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
+		newAllocatedPersons.add( currentPerson.person.getId() );
+
+		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
+
+		for (PlanRecord r : records) {
+			// skip impossible plans
+			if ( r.plan != null &&
+					forbidenPlans.getIndividualPlans().contains( r.plan ) ) {
+				continue;
+			}
+			if ( r.jointPlan != null &&
+					forbidenPlans.getJointPlans().contains( r.jointPlan ) ) {
+				continue;
+			}
+
+			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
+			JointPlan jointPlan = r.jointPlan ;
+			if (jointPlan != null) {
+				// normally, it is impossible that it is always the case if there
+				// is a valid plan: a branch were this would be the case would
+				// have a infinitely negative weight and not explored.
+				if ( contains( jointPlan , alreadyAllocatedPersons ) ) continue;
+				actuallyRemainingPersons = filter( remainingPersons , jointPlan );
+				newAllocatedPersons.addAll( jointPlan.getIndividualPlans().keySet() );
+			}
+
+			if ( actuallyRemainingPersons.size() > 0 ) {
+				final boolean found = searchForCombinationsWithoutForbiddenPlans(
+						forbidenPlans,
+						allPersonsRecord,
+						actuallyRemainingPersons,
+						newAllocatedPersons);
+				if (found) return true;
+			}
+			else {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
 	// actual branching and bounding methods
 	// /////////////////////////////////////////////////////////////////////////
 	/**
@@ -126,6 +243,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	 * @param str the PlanString of the plan constructed until now
 	 */
 	private PlanString buildPlanString(
+			final ForbidenCombinations forbidenCombinations,
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate,
 			final Set<Id> alreadyAllocatedPersons,
@@ -205,6 +323,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			PlanString newString;
 			if ( actuallyRemainingPersons.size() > 0 ) {
 				newString = buildPlanString(
+						forbidenCombinations,
 						allPersonsRecord,
 						actuallyRemainingPersons,
 						newAllocatedPersons,
@@ -212,6 +331,13 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 			else {
 				newString = new PlanString( r , tail );
+
+				if ( forbidBlockingCombinations && forbidenCombinations.isForbidden( newString ) ) {
+					// we are on a leaf (ie a full plan).
+					// If some combinations are forbidden, check if this one is.
+					if ( log.isTraceEnabled() ) log.trace( "skipping forbiden string "+newString );
+					continue;
+				}
 			}
 
 			if (constructedString == null ||
@@ -222,12 +348,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			else if (log.isTraceEnabled()) {
 				log.trace( "string "+newString+" did not improve" );
 			}
-		}
-
-		if (constructedString == null) {
-			throw new RuntimeException( "string construction FAILED "+
-					"for person "+currentPerson+" with "+records.size()+" records"
-					+" after having analysed "+alreadyAllocatedPersons);
 		}
 
 		return constructedString;
@@ -430,6 +550,46 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		@Override
 		public String toString() {
 			return "{PlanRecord: plan="+plan+"; jointPlan="+jointPlan+"; weight="+weight+"}";
+		}
+	}
+
+	private static class ForbidenCombinations {
+		private final List<GroupPlans> forbidden = new ArrayList<GroupPlans>();
+
+		public void forbid(final GroupPlans plans) {
+			forbidden.add( plans );
+		}
+
+		public boolean isForbidden(final PlanString ps) {
+			for (GroupPlans p : forbidden) {
+				if ( forbids( p , ps ) ) return true;
+			}
+			return false;
+		}
+
+		private static boolean forbids(
+				final GroupPlans forbidden,
+				final PlanString string) {
+			PlanString tail = string;
+
+			// check if all plans in the string are in the groupPlans
+			while (tail != null) {
+				final PlanRecord head = tail.planRecord;
+				tail = tail.tail;
+
+				if (head.jointPlan != null &&
+						!forbidden.getJointPlans().contains( head.jointPlan )) {
+					return false;
+				}
+
+				if (head.jointPlan == null &&
+						head.plan != null &&
+						!forbidden.getIndividualPlans().contains( head.plan )) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 	}
 }
