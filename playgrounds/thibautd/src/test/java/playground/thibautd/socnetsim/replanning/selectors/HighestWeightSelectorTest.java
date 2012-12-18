@@ -779,16 +779,27 @@ public class HighestWeightSelectorTest {
 		plan.setScore( -1295836d );
 		jp3.put( id , plan );
 
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 0d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1000d );
+		Plan p4 = plan;
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -1295836d );
+
 		JointPlan sel = JointPlanFactory.createJointPlan( jp1 );
 		JointPlanFactory.createJointPlan( jp2 );
 		JointPlanFactory.createJointPlan( jp3 );
 
 		GroupPlans expected = new GroupPlans(
 					Collections.EMPTY_LIST,
-					Arrays.asList( p1 , p2 , p3 ) );
+					Arrays.asList( p1 , p2 , p3 , p4 ) );
 		GroupPlans expectedBlock = new GroupPlans(
 					Arrays.asList( sel ),
-					Arrays.asList( p3 ) );
+					Arrays.asList( p3 , p4 ) );
 
 		return new Fixture(
 				"different plans if blocking",
