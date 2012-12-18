@@ -107,6 +107,8 @@ public class GroupStrategyManager {
 	}
 
 	private final boolean removeOneExtraPlan(final ReplanningGroup group) {
+		if (log.isTraceEnabled()) log.trace( "removing plans for group "+group );
+
 		GroupPlans toRemove = null;
 		boolean stillSomethingToRemove = false;
 		for (Person person : group.getPersons()) {
@@ -114,15 +116,21 @@ public class GroupStrategyManager {
 
 			if (toRemove == null) {
 				toRemove = selectorForRemoval.selectPlans( group );
+				if (log.isTraceEnabled()) log.trace( "plans to remove will be taken from "+toRemove );
 			}
 
 			for (Plan plan : toRemove( person , toRemove )) {
+				if (log.isTraceEnabled()) log.trace( "removing plan "+plan+" for person "+plan.getPerson() );
 				plan.getPerson().getPlans().remove( plan );
 			}
 
 			if (!stillSomethingToRemove && person.getPlans().size() > maxPlanPerAgent) {
 				stillSomethingToRemove = true;
 			}
+		}
+
+		if (stillSomethingToRemove && log.isTraceEnabled()) {
+			log.trace( "still something to remove for group "+group );
 		}
 
 		return stillSomethingToRemove;

@@ -45,5 +45,10 @@ public class ReplanningGroup {
 	public Collection<Person> getPersons() {
 		return immutablePersons;
 	}
+
+	@Override
+	public String toString() {
+		return "[ReplanningGroup:"+persons+"]";
+	}
 }
 
