@@ -61,7 +61,7 @@ public class RectangleHullRouteExtensionTest {
 		Assert.assertNotNull("new plan should not be null", plan);
 		Assert.assertEquals(3, plan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(c.getPIdentifier() + "2414", plan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals(c.getPIdentifier() + "1314", plan.getStopsToBeServed().get(1).getId().toString());
+		Assert.assertEquals(c.getPIdentifier() + "2324", plan.getStopsToBeServed().get(1).getId().toString());
 		Assert.assertEquals(c.getPIdentifier() + "3444", plan.getStopsToBeServed().get(2).getId().toString());
 	}
 }
