@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.utils.misc.Counter;
@@ -77,11 +78,9 @@ public class BasePlanStrategy implements PlanStrategy {
 	}
 
 	//Methods
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		
 	}
-	@Override
 	public int getNumberOfStrategyModules() {
 		return 0;
 	}
@@ -93,7 +92,7 @@ public class BasePlanStrategy implements PlanStrategy {
 		}
 	}
 	@Override
-	public void init() {
+	public void init(ReplanningContext replanningContext) {
 		Counter counter = new Counter("[BasePlanStrategy] handled person # ");
 		for (int i=0; i<basePlanThreads.length; i++) {
 			basePlanThreads[i] = new BasePlanThread(counter, "BasePlanStrategy." + i);
@@ -115,7 +114,7 @@ public class BasePlanStrategy implements PlanStrategy {
 			throw new RuntimeException("Some threads crashed, thus not all plans may have been handled.");
 		}
 	}
-	@Override
+	
 	public PlanSelector getPlanSelector() {
 		return new KeepSelected();
 	}

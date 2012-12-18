@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.thibautd.cliquessim.population.Clique;
@@ -62,12 +63,10 @@ public abstract class JointPlanStrategy implements PlanStrategy  {
 	 * Interface methods
 	 * =========================================================================
 	 */
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		this.strategyModules.add(module);
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return this.strategyModules.size();
 	}
@@ -102,13 +101,13 @@ public abstract class JointPlanStrategy implements PlanStrategy  {
 	}
 
 	@Override
-	public void init() {
+	public void init(ReplanningContext replanningContext) {
 	}
 
 	@Override
 	public void finish() {
 		for (PlanStrategyModule module : this.strategyModules) {
-			module.prepareReplanning();
+			module.prepareReplanning(null);
 			for (Plan plan : this.plans) {
 				module.handlePlan(plan);
 			}
@@ -130,7 +129,6 @@ public abstract class JointPlanStrategy implements PlanStrategy  {
 		return name.toString();
 	}
 
-	@Override
 	public PlanSelector getPlanSelector() {
 		return this.planSelector;
 	}

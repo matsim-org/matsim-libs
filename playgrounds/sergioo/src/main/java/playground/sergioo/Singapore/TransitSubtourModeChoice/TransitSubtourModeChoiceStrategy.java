@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -19,15 +20,13 @@ public class TransitSubtourModeChoiceStrategy implements PlanStrategy {
 		delegate = new PlanStrategyImpl(new RandomPlanSelector());
 		delegate.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		delegate.addStrategyModule(new SubtourModeChoice(controler.getConfig()));
-		delegate.addStrategyModule(new ReRoute(controler));
+		delegate.addStrategyModule(new ReRoute(controler.getScenario()));
 	}
 	
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		delegate.addStrategyModule(module);
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return delegate.getNumberOfStrategyModules();
 	}
@@ -38,8 +37,8 @@ public class TransitSubtourModeChoiceStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
-		delegate.init();
+	public void init(ReplanningContext replanningContext) {
+		delegate.init(replanningContext);
 	}
 
 	@Override
@@ -47,9 +46,5 @@ public class TransitSubtourModeChoiceStrategy implements PlanStrategy {
 		delegate.finish();
 	}
 
-	@Override
-	public PlanSelector getPlanSelector() {
-		return delegate.getPlanSelector();
-	}
 
 }

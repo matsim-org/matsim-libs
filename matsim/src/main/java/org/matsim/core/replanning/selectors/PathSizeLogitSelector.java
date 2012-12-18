@@ -48,15 +48,15 @@ public final class PathSizeLogitSelector implements PlanSelector {
 
 	private final double beta;
 	private final double tau;
-	private final Network network;
+	private Network network;
 
-	public PathSizeLogitSelector(final Network network, final PlanCalcScoreConfigGroup config) {
+	public PathSizeLogitSelector(final PlanCalcScoreConfigGroup config, final Network network) {
 		this.beta = config.getPathSizeLogitBeta();
-
+		
 		//in PSL tau is  the equivalent to BrainExpBeta in the multinomial logit model
 		this.tau = config.getBrainExpBeta();
-
 		this.network = network;
+
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 
 		// - now calculate the weights
 		WeightsContainer wc = new WeightsContainer(person.getPlans());
-		calcPSLWeights(person.getPlans(), wc);
+		calcPSLWeights(person.getPlans(), wc, network);
 
 		// choose a random number over interval [0,sumWeights[
 		double selnum = wc.sumWeights*MatsimRandom.getRandom().nextDouble();
@@ -90,7 +90,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 	}
 
 	//updates the path size logit weights
-	void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
+	private void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc, Network network) {
 		// ("plans" is the list of plans of a single person)
 
 		wc.maxScore = Double.NEGATIVE_INFINITY;
@@ -119,7 +119,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 					NetworkRoute r = (NetworkRoute) leg.getRoute();
 					// (yyyy this will fail when the route is not a network route.  kai, oct'12)
 
-					pathSize += RouteUtils.calcDistance(r, this.network);
+					pathSize += RouteUtils.calcDistance(r, network);
 					// (i.e. pathSize will be the sum over all routes of the plan)
 					
 					for (Id linkId : r.getLinkIds()){
@@ -158,7 +158,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 						// (the meaning seems to be: for each link that the plan uses, it checks how many other times the
 						// same link is used by a leg that has roughly the same departure time (*))
 
-						Link link = this.network.getLinks().get(linkId);
+						Link link = network.getLinks().get(linkId);
 						tmp += link.getLength() / denominator;
 						// (for a plan, the weight of a link is divided by the number of times it is used)
 					}

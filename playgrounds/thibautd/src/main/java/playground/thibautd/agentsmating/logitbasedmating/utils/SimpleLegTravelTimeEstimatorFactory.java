@@ -25,9 +25,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
+import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 
 /**
  * Creates travel tim estimators.

@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
@@ -261,7 +262,7 @@ public class ParkAndRideAddStrategy implements PlanStrategyModule {
 	}
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 	}
 	
 }

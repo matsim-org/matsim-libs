@@ -2,11 +2,12 @@ package playground.pieter.mentalsim.replanning;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.replanning.ReplanningContext;
 
 public class ScoreResettingStrategyModule implements PlanStrategyModule {
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 		// TODO Auto-generated method stub
 
 	}

@@ -21,20 +21,14 @@
 package playground.telaviv.replanning;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 
 import playground.telaviv.locationchoice.LocationChoicePlanModule;
 
@@ -46,22 +40,15 @@ import playground.telaviv.locationchoice.LocationChoicePlanModule;
  */
 public class LocationChoiceReRouteAStarPlanStrategy implements PlanStrategy {
 
-	private PlanStrategy planStrategyDelegate = null;
+	private PlanStrategyImpl planStrategyDelegate = null;
 	
 	public LocationChoiceReRouteAStarPlanStrategy(Controler controler) {
-		
 		Scenario scenario = controler.getScenario();
-		Network network = controler.getNetwork();
-		TravelDisutility travelCostCalc = controler.createTravelCostCalculator();
-		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
-		Config config = controler.getConfig();
-		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new LocationChoicePlanModule(scenario));
-		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeAndDisutility(config.planCalcScore()), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory()));
+		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(scenario));
 	}
 	
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		planStrategyDelegate.addStrategyModule(module);
 	}
@@ -71,19 +58,13 @@ public class LocationChoiceReRouteAStarPlanStrategy implements PlanStrategy {
 		planStrategyDelegate.finish();
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
 	@Override
-	public PlanSelector getPlanSelector() {
-		return planStrategyDelegate.getPlanSelector();
-	}
-
-	@Override
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 	}
 
 	@Override

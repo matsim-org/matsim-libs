@@ -39,7 +39,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -66,7 +66,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 	private static final String OCCUPANCYANALYSIS_FILENAME = "cadytsPtOccupancyAnalysis.txt";
 
-	private PlanStrategy delegate = null;
+	private PlanStrategyImpl delegate = null;
 
 	private AnalyticalCalibrator<TransitStopFacility> calibrator = null;
 	private final SimResultsContainerImpl simResults;
@@ -232,12 +232,10 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		}
 	}
 
-	@Override
 	public void addStrategyModule(final PlanStrategyModule module) {
 		this.delegate.addStrategyModule(module);
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return this.delegate.getNumberOfStrategyModules();
 	}
@@ -248,8 +246,8 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	}
 
 	@Override
-	public void init() {
-		this.delegate.init();
+	public void init(ReplanningContext replanningContext) {
+		this.delegate.init(replanningContext);
 	}
 
 	@Override
@@ -262,10 +260,6 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		return this.delegate.toString();
 	}
 
-	@Override
-	public PlanSelector getPlanSelector() {
-		return this.delegate.getPlanSelector();
-	}
 
 	/*package*/ static class SimResultsContainerImpl implements SimResults<TransitStopFacility> {
 		private static final long serialVersionUID = 1L;

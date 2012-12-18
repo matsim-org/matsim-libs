@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.replanning.modules;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
@@ -34,15 +34,13 @@ import org.matsim.population.algorithms.TripsToLegsAlgorithm;
  * @author thibautd
  */
 public class TripsToLegsModule extends AbstractMultithreadedModule {
-	private final Controler controler;
 	private final StageActivityTypes additionalBlackList;
 
 	/**
 	 * Initializes an instance using the stage activity types from the controler
-	 * @param controler
 	 */
-	public TripsToLegsModule(final Controler controler) {
-		this( controler , null );
+	public TripsToLegsModule(Config config) {
+		this( config, null );
 	}
 
 	/**
@@ -52,15 +50,14 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 	 * @param additionalBlackList a {@link StageActivityTypes} instance identifying
 	 * the additionnal types
 	 */
-	public TripsToLegsModule(final Controler controler, final StageActivityTypes additionalBlackList) {
-		super( controler.getConfig().global() );
-		this.controler = controler;
+	public TripsToLegsModule(final Config config, final StageActivityTypes additionalBlackList) {
+		super( config.global() );
 		this.additionalBlackList = additionalBlackList;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TripRouter router = controler.getTripRouterFactory().createTripRouter();
+		TripRouter router = getReplanningContext().getTripRouterFactory().createTripRouter();
 		StageActivityTypes blackListToUse = router.getStageActivityTypes();
 
 		if (additionalBlackList != null) {

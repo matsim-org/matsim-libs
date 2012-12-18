@@ -95,7 +95,7 @@ public class ComputeKValsAndMaxEpsilon {
 			ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(
 					this.scenario, actType, config, this.facilitiesKValues, this.personsKValues, 
 					this.scaleEpsilon, this.actTypeConverter, this.sampler);
-			maxEpsilonComputer.prepareReplanning();
+			maxEpsilonComputer.prepareReplanning(null);
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
 				maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 			}

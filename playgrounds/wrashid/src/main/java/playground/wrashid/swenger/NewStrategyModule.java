@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -69,12 +70,13 @@ public class NewStrategyModule implements PlanStrategyModule {
 	
 	double probabilityOfRouting;
 	double probabilityOfTimeMutator;
-	double lambdaParameter; 
+	double lambdaParameter;
+	private ReplanningContext replanningContext; 
 
 	public NewStrategyModule() {
 		this.timeAllocationMutator = new TimeAllocationMutator(controler.getConfig(), 7200);
 		this.betaExp = new ExpBetaPlanChanger(controler.getConfig().planCalcScore().getBrainExpBeta());
-		this.reRoute = new ReRoute(controler);
+		this.reRoute = new ReRoute(controler.getScenario());
 		this.randomSelector = new RandomPlanSelector();
 
 		Config config = controler.getScenario().getConfig();
@@ -100,9 +102,9 @@ public class NewStrategyModule implements PlanStrategyModule {
 
 	}
 
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 		this.counterPlanMutator = 0;
-		
+		this.replanningContext = replanningContext;
 		betaExpCount=0;
 		timeMutatorCount=0;
 		reRouteCount=0;

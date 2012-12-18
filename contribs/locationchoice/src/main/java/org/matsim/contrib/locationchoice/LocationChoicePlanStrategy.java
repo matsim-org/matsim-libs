@@ -9,12 +9,12 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalC
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 public class LocationChoicePlanStrategy implements PlanStrategy {
@@ -35,7 +35,7 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getScenario().getConfig().planCalcScore()));
 		}
 		delegate.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
-		delegate.addStrategyModule(new ReRoute(controler));
+		delegate.addStrategyModule(new ReRoute(controler.getScenario()));
 		delegate.addStrategyModule(new TimeAllocationMutator(controler.getScenario().getConfig()));
 		if ( locachoiceWrnCnt < 1 ) {
 			locachoiceWrnCnt ++ ;
@@ -51,12 +51,10 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 		
 	}
 	
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		delegate.addStrategyModule(module);
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return delegate.getNumberOfStrategyModules();
 	}
@@ -67,18 +65,13 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
-		delegate.init();
+	public void init(ReplanningContext replanningContext) {
+		delegate.init(replanningContext);
 	}
 
 	@Override
 	public void finish() {
 		delegate.finish();
-	}
-
-	@Override
-	public PlanSelector getPlanSelector() {
-		return delegate.getPlanSelector();
 	}
 	
 }

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
@@ -104,7 +105,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 	}
 
 	@Override
-	protected void beforePopulationRunHook(Population population) {
+	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
 		// ###########################DEPRECATED###########################
 		// this.samplers = new HashMap<Id, ChoiceSampler<Link>>();
 		// ###########################DEPRECATED###########################

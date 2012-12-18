@@ -42,7 +42,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -254,8 +253,8 @@ public class ScenarioCut {
 
 		System.out.println("re-initializing initial routes...");
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
-		ReRouteLandmarks router = new ReRouteLandmarks(scenario.getConfig(), scenario.getNetwork(),timeCostCalc,timeCostCalc,timeCostCalc, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
-		router.prepareReplanning();
+		ReRouteLandmarks router = new ReRouteLandmarks(scenario);
+		router.prepareReplanning(null);
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				router.handlePlan(plan);

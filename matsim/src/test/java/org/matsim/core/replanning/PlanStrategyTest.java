@@ -31,7 +31,7 @@ public class PlanStrategyTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetNumberOfStrategyModules() {
-		final PlanStrategy strategy = new PlanStrategyImpl(new RandomPlanSelector());
+		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		assertEquals(0, strategy.getNumberOfStrategyModules());
 		strategy.addStrategyModule(new DummyStrategyModule());
 		assertEquals(1, strategy.getNumberOfStrategyModules());
@@ -56,7 +56,7 @@ public class PlanStrategyTest extends MatsimTestCase {
 		public void handlePlan(final Plan plan) {
 		}
 
-		public void prepareReplanning() {
+		public void prepareReplanning(ReplanningContext replanningContext) {
 		}
 
 	}

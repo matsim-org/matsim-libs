@@ -42,6 +42,7 @@ public final class PlanStrategyImpl implements PlanStrategy {
 	private final ArrayList<PlanStrategyModule> modules = new ArrayList<PlanStrategyModule>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
 	private long counter = 0;
+	private ReplanningContext replanningContext;
 	private final static Logger log = Logger.getLogger(PlanStrategyImpl.class);
 
 	/**
@@ -53,7 +54,6 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		this.planSelector = planSelector;
 	}
 
-	@Override
 	public void addStrategyModule(final PlanStrategyModule module) {
 		if (this.firstModule == null) {
 			this.firstModule = module;
@@ -62,7 +62,6 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		}
 	}
 	
-	@Override
 	public int getNumberOfStrategyModules() {
 		if (this.firstModule == null) {
 			return 0;
@@ -101,21 +100,21 @@ public final class PlanStrategyImpl implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
+	public void init(ReplanningContext replanningContext) {
+		this.replanningContext = replanningContext;
 		if (this.firstModule != null) {
-			this.firstModule.prepareReplanning();
+			this.firstModule.prepareReplanning(replanningContext);
 		}
 	}
 
 	@Override
 	public void finish() {
-		// yyyy I don't think this needs to be public once StrategyManager.run is final.  kai, sep'10
 		if (this.firstModule != null) {
 			// finish the first module
 				this.firstModule.finishReplanning();
 			// now work through the others
 			for (PlanStrategyModule module : this.modules) {
-				module.prepareReplanning();
+				module.prepareReplanning(replanningContext);
 				for (Plan plan : this.plans) {
 					module.handlePlan(plan);
 				}
@@ -142,7 +141,6 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		return name.toString();
 	}
 
-	@Override
 	public PlanSelector getPlanSelector() {
 		return planSelector;
 	}

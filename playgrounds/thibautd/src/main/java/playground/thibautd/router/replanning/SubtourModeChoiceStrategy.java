@@ -22,12 +22,12 @@ package playground.thibautd.router.replanning;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.modules.TripsToLegsModule;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
@@ -36,22 +36,20 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
  * @author thibautd
  */
 public class SubtourModeChoiceStrategy implements PlanStrategy {
-	private final PlanStrategy strategy;
+	private final PlanStrategyImpl strategy;
 
 	public SubtourModeChoiceStrategy(final Controler controler) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
-		addStrategyModule( new TripsToLegsModule( controler ) );
+		addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );
 		addStrategyModule( new SubtourModeChoice( controler.getConfig() ) );
-		addStrategyModule( new ReRoute( controler ) );
+		addStrategyModule( new ReRoute(controler.getScenario() ) );
 	}
 
-	@Override
 	public void addStrategyModule(final PlanStrategyModule module) {
 		strategy.addStrategyModule(module);
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return strategy.getNumberOfStrategyModules();
 	}
@@ -62,8 +60,8 @@ public class SubtourModeChoiceStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
-		strategy.init();
+	public void init(ReplanningContext replanningContext) {
+		strategy.init(replanningContext);
 	}
 
 	@Override
@@ -76,9 +74,5 @@ public class SubtourModeChoiceStrategy implements PlanStrategy {
 		return strategy.toString();
 	}
 
-	@Override
-	public PlanSelector getPlanSelector() {
-		return strategy.getPlanSelector();
-	}
 }
 

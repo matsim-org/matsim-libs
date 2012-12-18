@@ -139,7 +139,7 @@ public class Emme2PopulationCreator {
 		log.info("mutating populations activity times");
 		scenario.getConfig().global().setNumberOfThreads(8);
 		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(scenario.getConfig(), timeMutationRange);
-		timeAllocationMutator.prepareReplanning();
+		timeAllocationMutator.prepareReplanning(null);
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) timeAllocationMutator.handlePlan(plan);
 		}

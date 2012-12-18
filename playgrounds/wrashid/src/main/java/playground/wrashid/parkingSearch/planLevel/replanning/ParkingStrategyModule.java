@@ -23,6 +23,7 @@ package playground.wrashid.parkingSearch.planLevel.replanning;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.replanning.ReplanningContext;
 
 public class ParkingStrategyModule implements PlanStrategyModule {
 
@@ -35,7 +36,7 @@ public class ParkingStrategyModule implements PlanStrategyModule {
 		this.planAlgo = new ParkingPlanAlgorithm();
 	}
 	
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 		this.counter = 0;
 	}
 

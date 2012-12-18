@@ -46,12 +46,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -88,6 +88,7 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.LinkToLinkTripRouterFactory;
@@ -229,13 +230,13 @@ public class Controler extends AbstractController {
 
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
-
+	private PlanStrategyFactoryRegister planStrategyFactoryRegister;
+	
 	protected boolean dumpDataAtEnd = true;
 	private boolean overwriteFiles = false;
 	private Map<String, TravelTime> multiModalTravelTimes;
 
 	private boolean useTripRouting = true;
-
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -303,6 +304,8 @@ public class Controler extends AbstractController {
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
+		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
+		this.planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
 
 		this.events = EventsUtils.createEventsManager(this.config);
 		this.config.parallelEventHandling().makeLocked();
@@ -415,7 +418,9 @@ public class Controler extends AbstractController {
 		// the default handling of plans
 		this.plansScoring = new PlansScoring( this.scenarioData, this.events, controlerIO, this.scoringFunctionFactory );
 		this.addCoreControlerListener(this.plansScoring);
-		this.addCoreControlerListener(new PlansReplanning());
+
+		this.strategyManager = loadStrategyManager();
+		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
 				this.stopwatch, this.controlerIO ));
 	
@@ -626,7 +631,6 @@ public class Controler extends AbstractController {
 			}
 		}
 	
-		this.strategyManager = loadStrategyManager();
 	}
 
 	/**
@@ -634,7 +638,7 @@ public class Controler extends AbstractController {
 	 */
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(this, manager);
+		StrategyManagerConfigLoader.load(this, manager, this.planStrategyFactoryRegister);
 		return manager;
 	}
 
@@ -831,6 +835,7 @@ public class Controler extends AbstractController {
 	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
 	 *         used for the replanning of plans.
 	 */
+	@Deprecated
 	public final StrategyManager getStrategyManager() {
 		return this.strategyManager;
 	}
@@ -1135,6 +1140,10 @@ public class Controler extends AbstractController {
 
 	public void addSnapshotWriterFactory(final String snapshotWriterName, final SnapshotWriterFactory snapshotWriterFactory) {
 		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);
+	}
+	
+	public void addPlanStrategyFactory(final String planStrategyFactoryName, final PlanStrategyFactory planStrategyFactory) {
+		this.planStrategyFactoryRegister.register(planStrategyFactoryName, planStrategyFactory);
 	}
 
 	public SignalsControllerListenerFactory getSignalsControllerListenerFactory() {

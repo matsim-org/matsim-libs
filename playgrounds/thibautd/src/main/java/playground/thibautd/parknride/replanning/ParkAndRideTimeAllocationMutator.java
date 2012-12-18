@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
 
@@ -35,7 +35,7 @@ import playground.thibautd.router.replanning.TimeAllocationMutatorModule;
  * @author thibautd
  */
 public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
-	private final PlanStrategy strategy;
+	private final PlanStrategyImpl strategy;
 
 	public ParkAndRideTimeAllocationMutator(final Controler controler) {
 		strategy = new PlanStrategyImpl( new RandomPlanSelector() );
@@ -48,12 +48,10 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 
-	@Override
 	public void addStrategyModule(final PlanStrategyModule module) {
 		strategy.addStrategyModule(module);
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return strategy.getNumberOfStrategyModules();
 	}
@@ -64,8 +62,8 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
-		strategy.init();
+	public void init(ReplanningContext replanningContext) {
+		strategy.init(replanningContext);
 	}
 
 	@Override
@@ -76,11 +74,6 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 	@Override
 	public String toString() {
 		return strategy.toString();
-	}
-
-	@Override
-	public PlanSelector getPlanSelector() {
-		return strategy.getPlanSelector();
 	}
 
 	private static class BlackList implements StageActivityTypes {

@@ -38,26 +38,14 @@ public class PlansReplanning implements ReplanningListener {
 	private Population population ;
 	private StrategyManager strategyManager ;
 	
-	private boolean calledViaOldConstructor = false ;
-	
 	public PlansReplanning( StrategyManager strategyManager, Population pop ) {
 		this.population = pop ;
 		this.strategyManager = strategyManager ;
 	}
-	
-	@Deprecated // use other constructor; do not assume that Controler object is accessible from here.  kai, jun'12
-	public PlansReplanning() {
-		this.calledViaOldConstructor = true ;
-	}
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-		if ( this.calledViaOldConstructor ) {
-			this.population = event.getControler().getPopulation() ;
-			this.strategyManager = event.getControler().getStrategyManager() ;
-		}
-		
-		strategyManager.run(population, event.getIteration());
+		strategyManager.run(population, event.getIteration(), event.getReplanningContext());
 	}
 
 }

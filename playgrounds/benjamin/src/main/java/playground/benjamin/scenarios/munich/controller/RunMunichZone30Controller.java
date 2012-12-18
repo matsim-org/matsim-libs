@@ -173,7 +173,7 @@ public class RunMunichZone30Controller extends AbstractController {
 			strategyManager.addStrategy(strategy, 0.9) ;
 		}
 		{
-			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
+			PlanStrategyImpl strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
 			strategy.addStrategyModule( new AbstractMultithreadedModule(this.scenario.getConfig().global().getNumberOfThreads()) {
 
 				@Override

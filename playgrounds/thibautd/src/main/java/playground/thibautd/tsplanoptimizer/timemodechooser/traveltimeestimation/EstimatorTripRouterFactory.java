@@ -33,7 +33,7 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 

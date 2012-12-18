@@ -21,7 +21,7 @@ package playground.thibautd.tsplanoptimizer.timemodechooser;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**

@@ -22,19 +22,19 @@ package playground.yu.tests;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.config.ConfigUtils;
 
 public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 	// the reason why this class needs to be here is that this is defined in the
 	// config file
 
-	PlanStrategy planStrategyDelegate = null;
+	PlanStrategyImpl planStrategyDelegate = null;
 
 	public SubTourModeChoicePlanStrategy(Controler controler) {
 		// also possible: MyStrategy( Scenario scenario ). But then I do not
@@ -57,7 +57,7 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 				controler.getFacilities(), controler.getNetwork());
 		addStrategyModule(stmc);
 
-		addStrategyModule(new ReRoute(controler));
+		addStrategyModule(new ReRoute(controler.getScenario()));
 		// these modules may, at the same time, be events listeners (so that
 		// they can collect information):
 		// controler.getEvents().addHandler(stmc);
@@ -76,12 +76,8 @@ public class SubTourModeChoicePlanStrategy implements PlanStrategy {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
-	public PlanSelector getPlanSelector() {
-		return planStrategyDelegate.getPlanSelector();
-	}
-
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 	}
 
 	public void run(Person person) {

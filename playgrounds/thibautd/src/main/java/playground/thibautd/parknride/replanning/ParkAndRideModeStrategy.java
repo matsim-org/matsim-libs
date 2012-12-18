@@ -24,29 +24,27 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
  * @author thibautd
  */
 public class ParkAndRideModeStrategy implements PlanStrategy {
-	private final PlanStrategy delegate;
+	private final PlanStrategyImpl delegate;
 
 	public ParkAndRideModeStrategy(final Controler controler) {
 		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
 		addStrategyModule( new ParkAndRideChooseModeForSubtourModule(controler) );
-		addStrategyModule( new ReRoute( controler ) );
+		addStrategyModule( new ReRoute(controler.getScenario()) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 
-	@Override
 	public void addStrategyModule(final PlanStrategyModule module) {
 		delegate.addStrategyModule(module);
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return delegate.getNumberOfStrategyModules();
 	}
@@ -57,8 +55,8 @@ public class ParkAndRideModeStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
-		delegate.init();
+	public void init(ReplanningContext replanningContext) {
+		delegate.init(replanningContext);
 	}
 
 	@Override
@@ -71,9 +69,5 @@ public class ParkAndRideModeStrategy implements PlanStrategy {
 		return delegate.toString();
 	}
 
-	@Override
-	public PlanSelector getPlanSelector() {
-		return delegate.getPlanSelector();
-	}
 }
 

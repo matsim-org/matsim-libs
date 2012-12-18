@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -49,7 +50,7 @@ public class TTAStrategyManager extends StrategyManager {
 	}
 	
 	@Override
-	protected void beforePopulationRunHook(Population population) {
+	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
 		for (Person person : TTAPopulation.getPersons().values()) {
 			population.getPersons().remove(person.getId());			
 		}

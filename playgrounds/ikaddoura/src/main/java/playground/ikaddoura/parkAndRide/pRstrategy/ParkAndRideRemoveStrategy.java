@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -150,7 +151,7 @@ public class ParkAndRideRemoveStrategy implements PlanStrategyModule {
 	}
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 	}
 	
 }

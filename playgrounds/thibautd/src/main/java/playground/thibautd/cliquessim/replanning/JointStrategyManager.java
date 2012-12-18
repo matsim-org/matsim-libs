@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -71,7 +72,7 @@ public class JointStrategyManager extends StrategyManager {
 	 * operate selection on PersonImpl agents.
 	 */
 	@Override
-	protected void beforePopulationRunHook(final Population population) {
+	protected void beforePopulationRunHook(final Population population, ReplanningContext replanningContext) {
 		if (population instanceof Cliques) {
 			Cliques cliques = (Cliques) population;
 			int maxNumPlans = super.getMaxPlansPerAgent();

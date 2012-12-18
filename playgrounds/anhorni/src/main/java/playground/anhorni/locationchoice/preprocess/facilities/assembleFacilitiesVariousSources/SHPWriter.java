@@ -82,9 +82,9 @@ public class SHPWriter {
 		mapMZ.put("5", "Pickpay");
 		mapMZ.put("6", "Primo");
 		mapMZ.put("7", "Volg");
-		mapMZ.put("8", "Warenh�user");
+		mapMZ.put("8", "Warenhäuser");
 		mapMZ.put("9", "Supermarkt");
-		mapMZ.put("10", "B�ckerei");
+		mapMZ.put("10", "Bäckerei");
 		mapMZ.put("11", "Metzgerei");
 		mapMZ.put("12", "Grocery, fruits and vegetables");
 	}

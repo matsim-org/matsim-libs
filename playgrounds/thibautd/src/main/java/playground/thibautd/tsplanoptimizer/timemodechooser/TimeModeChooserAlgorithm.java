@@ -28,7 +28,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;

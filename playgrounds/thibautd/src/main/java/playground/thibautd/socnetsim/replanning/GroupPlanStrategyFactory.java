@@ -23,9 +23,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 

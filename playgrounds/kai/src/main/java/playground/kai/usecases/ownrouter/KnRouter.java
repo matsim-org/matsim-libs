@@ -16,6 +16,7 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.replanning.ReplanningContext;
 
 public class KnRouter implements PlanStrategyModule, LinkEnterEventHandler, LinkLeaveEventHandler, 
 AgentArrivalEventHandler {
@@ -45,7 +46,7 @@ AgentArrivalEventHandler {
 	}
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 		// TODO Auto-generated method stub
 
 	}

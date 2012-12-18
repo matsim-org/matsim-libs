@@ -78,7 +78,7 @@ public class StrategyManagerRemoveOldestPlanTest extends MatsimTestCase {
 		{
 			// run with default settings
 			manager.setMaxPlansPerAgent(plans.length - 2);
-			manager.run(pop);
+			manager.run(pop, null);
 
 			List<Plan> planList = p.getPlans();
 			assertEquals("wrong number of plans.", 5, planList.size());
@@ -114,7 +114,7 @@ public class StrategyManagerRemoveOldestPlanTest extends MatsimTestCase {
 		{
 			// run with removeOldestPlan settings
 			manager.setMaxPlansPerAgent(plans.length - 3);
-			manager.run(pop);
+			manager.run(pop, null);
 
 			List<Plan> planList = p.getPlans();
 			assertEquals("wrong number of plans.", 4, planList.size());

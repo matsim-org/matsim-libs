@@ -21,8 +21,9 @@ package playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -52,11 +53,11 @@ public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
 	}
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 		statsCollector = DUMP_STATS ?
 			new StatisticsCollector() :
 			null;
-		super.prepareReplanning();
+		super.prepareReplanning(replanningContext);
 	}
 
 	@Override

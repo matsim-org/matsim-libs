@@ -25,36 +25,20 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.PlanStrategyFactoryRegister;
+import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.ChangeLegMode;
-import org.matsim.core.replanning.modules.ChangeSingleLegMode;
 import org.matsim.core.replanning.modules.ExternalModule;
-import org.matsim.core.replanning.modules.PlanomatModule;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.ReRouteDijkstra;
-import org.matsim.core.replanning.modules.ReRouteLandmarks;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
-import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -68,14 +52,14 @@ public final class StrategyManagerConfigLoader {
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
 	private static int externalCounter = 0;
-
-	/**
-	 * Reads and instantiates the strategy modules specified in the config-object.
-	 *
-	 * @param controler the {@link Controler} that provides miscellaneous data for the replanning modules
-	 * @param manager the {@link StrategyManager} to be configured according to the configuration
-	 */
+	
 	public static void load(final Controler controler, final StrategyManager manager) {
+		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
+		PlanStrategyFactoryRegister planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
+		load(controler, manager, planStrategyFactoryRegister);
+	}
+	
+	public static void load(final Controler controler, final StrategyManager manager, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		Config config = controler.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
@@ -90,7 +74,7 @@ public final class StrategyManagerConfigLoader {
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategy strategy = loadStrategy(controler, classname, settings);
+			PlanStrategy strategy = loadStrategy(controler, classname, settings, planStrategyFactoryRegister);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -130,7 +114,7 @@ public final class StrategyManagerConfigLoader {
 				planSelector = new BestPlanSelector() ;
 				// yyyy this will select _good_ plans for removal--?
 			} else if ( name.equals("PathSizeLogitSelector") ) {
-				planSelector = new PathSizeLogitSelector(controler.getNetwork(), config.planCalcScore() ) ;
+				planSelector = new PathSizeLogitSelector(config.planCalcScore(), controler.getScenario().getNetwork() ) ;
 				// yyyy this will select good? bad? plans for removal--?
 			} else {
 				planSelector = tryToLoadPlanSelectorByName(controler, name);
@@ -139,103 +123,28 @@ public final class StrategyManagerConfigLoader {
 		}
 	}
 
-	protected static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
-		Network network = controler.getNetwork();
-		TravelDisutility travelCostCalc = controler.createTravelCostCalculator();
-		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory();
-		Config config = controler.getConfig();
-		
-		PlanStrategy strategy;
-		
-		if (name.equals("KeepLastSelected")) {
-			strategy = new PlanStrategyImpl(new KeepSelected());
-		} else if (name.equals("ReRoute") || name.equals("threaded.ReRoute")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("ReRoute_Dijkstra")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc, routeFactory));
-		} else if (name.equals("ReRoute_Landmarks")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeAndDisutility(config.planCalcScore()), routeFactory));
-		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			TimeAllocationMutator tam = new TimeAllocationMutator(config);
-			strategy.addStrategyModule(tam);
-		} else if (name.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TimeAllocationMutator(config, 7200));
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeAndDisutility(config.planCalcScore()), routeFactory));
+	private static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
+		PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
+		if (planStrategyFactory != null) {
+			PlanStrategy strategy = planStrategyFactory.createPlanStrategy(controler.getScenario(), controler.getEvents());
+			return strategy;
 		} else if (name.equals("ExternalModule")) {
 			externalCounter++;
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
+			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			String exePath = settings.getExePath();
 			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controler, controler.getScenario());
 			em.setIterationNumber(controler.getIterationNumber());
 			strategy.addStrategyModule(em);
-		} else if (name.equals("Planomat")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelTimeCalculator());
-			strategy.addStrategyModule(planomatStrategyModule);
-		} else if (name.equals("PlanomatReRoute")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelTimeCalculator());
-			strategy.addStrategyModule(planomatStrategyModule);
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("BestScore")) {
-			strategy = new PlanStrategyImpl(new BestPlanSelector());
-		} else if (name.equals("SelectExpBeta")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
-		} else if (name.equals("ChangeExpBeta")) {
-			strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
-		} else if (name.equals("SelectRandom")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		} else if (name.equals("ChangeLegMode")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ChangeLegMode(config));
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("ChangeSingleLegMode")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ChangeSingleLegMode(config));
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("TransitChangeSingleLegMode") || name.equals("ChangeSingleTripMode")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TripsToLegsModule( controler ));
-			strategy.addStrategyModule(new ChangeSingleLegMode(config));
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("SubtourModeChoice")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new SubtourModeChoice(config));
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("TransitChangeLegMode") || name.equals("ChangeTripMode")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TripsToLegsModule( controler ));
-			strategy.addStrategyModule(new ChangeLegMode(config));
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("TransitTimeAllocationMutator")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(config);
-			strategy.addStrategyModule(tam);
-		} else if (name.equals("TransitTimeAllocationMutator_ReRoute") || name.equals( "TripTimeAllocationMutator_ReRoute" )) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TripsToLegsModule( controler ));
-			strategy.addStrategyModule(new TimeAllocationMutator(config));
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("TransitSubtourModeChoice") || name.equals("TripSubtourModeChoice")) {
-			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TripsToLegsModule( controler ));
-			strategy.addStrategyModule(new SubtourModeChoice(config));
-			strategy.addStrategyModule(new ReRoute(controler));
-		} else if (name.equals("SelectPathSizeLogit")) {
-			strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.planCalcScore()));
+			return strategy;
 		} else if (name.equals("LocationChoice")) {
-			strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
+			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
+			return strategy;
 		} else {
-			strategy = tryToLoadPlanStrategyByName(controler, name);
-		}
-		return strategy;
-	}
+			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
+			return strategy;
+		} 
+	} 
+
 
 	private static PlanStrategy tryToLoadPlanStrategyByName(final Controler controler, final String name) {
 		PlanStrategy strategy;
@@ -254,7 +163,7 @@ public final class StrategyManagerConfigLoader {
 				} catch(NoSuchMethodException e){
 					log.info("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. " +
 							"This is not fatal, trying to find other constructor, however a constructor expecting Scenario as " +
-					"single argument is recommended!" );
+							"single argument is recommended!" );
 					log.info("(People who need access to events should ignore this warning.)") ;
 					// I think that one needs events fairly often. kai, sep'10
 					args[0] = Controler.class;
@@ -262,7 +171,7 @@ public final class StrategyManagerConfigLoader {
 					strategy = c.newInstance(controler);
 					log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
 				}
-				
+
 			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			} catch (InstantiationException e) {
@@ -302,7 +211,7 @@ public final class StrategyManagerConfigLoader {
 						strategy = c.newInstance(controler.getScenario(),controler.getEvents()); 
 					} catch(NoSuchMethodException e){
 						log.info("Cannot find Constructor in PlanSelector " + name + " with argument of type (Scenario, EventsManager). " +
-						"This is not fatal, trying to find other constructor ...\n" ) ;
+								"This is not fatal, trying to find other constructor ...\n" ) ;
 					}
 				}
 				if (c == null){

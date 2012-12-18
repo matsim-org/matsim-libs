@@ -5,13 +5,12 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.pieter.mentalsim.replanning.MyDoNothingPlanStrategyModule;
-
 public class MyDoNothingPlanStrategy implements PlanStrategy {
-	PlanStrategy planStrategyDelegate = null;
+	PlanStrategyImpl planStrategyDelegate = null;
 	
 	public MyDoNothingPlanStrategy(Controler controler) {
 	    planStrategyDelegate = new PlanStrategyImpl( new RandomPlanSelector() );
@@ -19,13 +18,10 @@ public class MyDoNothingPlanStrategy implements PlanStrategy {
 	    addStrategyModule(mod) ;
 	}
 
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		planStrategyDelegate.addStrategyModule(module);
-
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		// TODO Auto-generated method stub
 		return planStrategyDelegate.getNumberOfStrategyModules();
@@ -39,8 +35,8 @@ public class MyDoNothingPlanStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 
 	}
 
@@ -50,12 +46,6 @@ public class MyDoNothingPlanStrategy implements PlanStrategy {
 
 	}
 
-	@Override
-	public PlanSelector getPlanSelector() {
-		// TODO Auto-generated method stub
-		return planStrategyDelegate.getPlanSelector();
-	}
-	
 	@Override
 	public String toString(){
 		return planStrategyDelegate.toString();

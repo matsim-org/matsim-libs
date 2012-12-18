@@ -45,7 +45,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 
 import playground.thibautd.agentsmating.logitbasedmating.basic.PlatformBasedModeChooserFactory;
 import playground.thibautd.agentsmating.logitbasedmating.framework.PlatformBasedModeChooser;

@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 public class TemplatePlanStrategy implements PlanStrategy {
 	
-	PlanStrategy planStrategyDelegate = null ;
+	PlanStrategyImpl planStrategyDelegate = null ;
 
 	/**
 	 * @param scenario needed because of the way the class loader works 
@@ -52,12 +52,8 @@ public class TemplatePlanStrategy implements PlanStrategy {
 		return this.planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
-	public PlanSelector getPlanSelector() {
-		return this.planStrategyDelegate.getPlanSelector();
-	}
-
-	public void init() {
-		this.planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		this.planStrategyDelegate.init(replanningContext);
 	}
 
 	public void run(Person person) {

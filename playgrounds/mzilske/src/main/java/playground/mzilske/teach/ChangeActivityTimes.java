@@ -5,11 +5,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.replanning.ReplanningContext;
 
 public class ChangeActivityTimes implements PlanStrategyModule, ActivityEndEventHandler {
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 		System.out.println("prepare.");
 	}
 

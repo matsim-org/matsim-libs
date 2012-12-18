@@ -29,8 +29,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.TravelDisutility;
@@ -46,7 +46,7 @@ import playground.telaviv.locationchoice.ExtendedLocationChoicePlanModule;
  */
 public class ExtendedLocationChoiceReRouteAStarPlanStrategy implements PlanStrategy {
 
-	private PlanStrategy planStrategyDelegate = null;
+	private PlanStrategyImpl planStrategyDelegate = null;
 	
 	public ExtendedLocationChoiceReRouteAStarPlanStrategy(Controler controler) {
 		
@@ -58,10 +58,9 @@ public class ExtendedLocationChoiceReRouteAStarPlanStrategy implements PlanStrat
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new ExtendedLocationChoicePlanModule(scenario, travelTimeCalc));
-		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeAndDisutility(config.planCalcScore()), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory()));
+		planStrategyDelegate.addStrategyModule(new ReRouteLandmarks(scenario));
 	}
 	
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		planStrategyDelegate.addStrategyModule(module);
 	}
@@ -71,19 +70,13 @@ public class ExtendedLocationChoiceReRouteAStarPlanStrategy implements PlanStrat
 		planStrategyDelegate.finish();
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
 	@Override
-	public PlanSelector getPlanSelector() {
-		return planStrategyDelegate.getPlanSelector();
-	}
-
-	@Override
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 	}
 
 	@Override

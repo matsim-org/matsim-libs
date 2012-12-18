@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
@@ -71,12 +72,10 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	}
 
 
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		throw new UnsupportedOperationException("this PlanStrategy is set up with the necessary PlanStrategyModules. Thus it is not allowed to modify them! Abort!");
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return this.modules.size();
 	}
@@ -100,7 +99,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
+	public void init(ReplanningContext replanningContext) {
 		this.plans = new ArrayList<Plan>();
 		this.modules = new ArrayList<PlanStrategyModule>();
 		// TODO[dr] this module is maybe no longer necessary as the pt-routing infrastructure has changed
@@ -126,7 +125,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	public void finish() {
 		//run every module for every plan in the order the modules are added to the list
 		for(PlanStrategyModule module : this.modules){
-			module.prepareReplanning();
+			module.prepareReplanning(null);
 			for(Plan plan : this.plans){
 				module.handlePlan(plan);
 			}
@@ -136,7 +135,6 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 		this.plans.clear();
 	}
 
-	@Override
 	public PlanSelector getPlanSelector() {
 		return this.selector;
 	}

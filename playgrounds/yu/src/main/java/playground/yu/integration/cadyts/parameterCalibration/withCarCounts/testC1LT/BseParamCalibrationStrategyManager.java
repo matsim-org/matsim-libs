@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
@@ -74,7 +75,7 @@ public abstract class BseParamCalibrationStrategyManager extends
 	}
 
 	@Override
-	protected void beforePopulationRunHook(Population population) {
+	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
 		iter++;
 	}
 

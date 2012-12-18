@@ -46,6 +46,6 @@ public class JointPlansReplanning implements ReplanningListener {
 
 		controler.getStrategyManager().run(
 				JointControlerUtils.getCliques( controler.getScenario() ),
-				event.getIteration());
+				event.getIteration(), event.getReplanningContext());
 	}
 }

@@ -31,7 +31,7 @@ public abstract class ControlerEvent {
 	/**
 	 * The Controler instance which fired this event
 	 */
-	private final Controler controler;
+	protected final Controler controler;
 
 	public ControlerEvent(final Controler controler) {
 		this.controler = controler;

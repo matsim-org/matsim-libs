@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -61,6 +62,8 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	private final AtomicBoolean hadException = new AtomicBoolean(false);
 	private final ExceptionHandler exceptionHandler = new ExceptionHandler(this.hadException);
 
+	private ReplanningContext replanningContext;
+
 	static final private Logger log = Logger.getLogger(AbstractMultithreadedModule.class);
 
 	abstract public PlanAlgorithm getPlanAlgoInstance();
@@ -74,13 +77,18 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	}
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
+		this.replanningContext = replanningContext;
 		if (this.numOfThreads == 0) {
 			// it seems, no threads are desired :(
 			this.directAlgo = getPlanAlgoInstance();
 		} else {
-			initThreads();
+			initThreads(replanningContext);
 		}
+	}
+
+	protected ReplanningContext getReplanningContext() {
+		return replanningContext;
 	}
 
 	@Override
@@ -120,10 +128,11 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		// reset
 		this.algothreads = null;
 		this.threads = null;
+		this.replanningContext = null;
 		this.count = 0;
 	}
 
-	private void initThreads() {
+	private void initThreads(ReplanningContext replanningContext) {
 		if (this.threads != null) {
 			throw new RuntimeException("threads are already initialized");
 		}

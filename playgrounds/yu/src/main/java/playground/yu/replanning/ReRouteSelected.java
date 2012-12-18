@@ -24,15 +24,15 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.KeepSelected;
-import org.matsim.core.replanning.selectors.PlanSelector;
 
 public class ReRouteSelected implements PlanStrategy {
 	// the reason why this class needs to be here is that this is defined in the
 	// config file
 
-	PlanStrategy planStrategyDelegate = null;
+	PlanStrategyImpl planStrategyDelegate = null;
 
 	public ReRouteSelected(Controler controler) {
 		// also possible: MyStrategy( Scenario scenario ). But then I do not
@@ -52,7 +52,7 @@ public class ReRouteSelected implements PlanStrategy {
 		// Otherwise, to do something with that plan, one needs to add modules
 		// into the strategy. If there is at least
 		// one module added here, then the plan is copied and then modified.
-		ReRoute reRoute = new ReRoute(controler);
+		ReRoute reRoute = new ReRoute(controler.getScenario());
 		addStrategyModule(reRoute);
 
 		// these modules may, at the same time, be events listeners (so that
@@ -73,12 +73,8 @@ public class ReRouteSelected implements PlanStrategy {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
-	public PlanSelector getPlanSelector() {
-		return planStrategyDelegate.getPlanSelector();
-	}
-
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 	}
 
 	public void run(Person person) {

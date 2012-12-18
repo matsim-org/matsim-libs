@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.pt.router.TransitRouter;
 
 import playground.thibautd.agentsmating.logitbasedmating.basic.AlternativeImpl;
@@ -45,6 +44,7 @@ import playground.thibautd.agentsmating.logitbasedmating.basic.TripRequestImpl;
 import playground.thibautd.agentsmating.logitbasedmating.framework.Alternative;
 import playground.thibautd.agentsmating.logitbasedmating.framework.ChoiceSetFactory;
 import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMaker;
+import playground.thibautd.agentsmating.logitbasedmating.utils.LegTravelTimeEstimator;
 import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTimeEstimatorFactory;
 
 /**

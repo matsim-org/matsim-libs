@@ -114,13 +114,14 @@ public class StrategyManager implements MatsimManager {
 	 *
 	 * @param population
 	 * @param iteration the current iteration we're handling
+	 * @param replanningContext 
 	 */
-	public final void run(final Population population, final int iteration) {
+	public final void run(final Population population, final int iteration, final ReplanningContext replanningContext) {
 		handleChangeRequests(iteration);
-		run(population);
+		run(population, replanningContext);
 	}
 
-	protected void beforePopulationRunHook( Population population ) {
+	protected void beforePopulationRunHook( Population population, ReplanningContext replanningContext ) {
 		// left empty for inheritance
 	}
 
@@ -133,13 +134,14 @@ public class StrategyManager implements MatsimManager {
 	 * strategy on the person.
 	 *
 	 * @param population
+	 * @param replanningContext 
 	 */
-	public final void run( final Population population) {
-		beforePopulationRunHook( population ) ;
+	public final void run( final Population population, final ReplanningContext replanningContext) {
+		beforePopulationRunHook( population, replanningContext ) ;
 
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies) {
-			strategy.init();
+			strategy.init(replanningContext);
 		}
 
 		// then go through the population and ...

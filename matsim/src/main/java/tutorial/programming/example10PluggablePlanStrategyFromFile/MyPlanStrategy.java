@@ -20,18 +20,16 @@
 package tutorial.programming.example10PluggablePlanStrategyFromFile;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.ReplanningContext;
 
 
 public class MyPlanStrategy implements PlanStrategy {
 	// the reason why this class needs to be here is that this is defined in the config file
 	
-	PlanStrategy planStrategyDelegate = null ;
+	PlanStrategyImpl planStrategyDelegate = null ;
 
 	public MyPlanStrategy(Controler controler) {
 		// also possible: MyStrategy( Scenario scenario ).  But then I do not have events.  kai, aug'10
@@ -39,26 +37,22 @@ public class MyPlanStrategy implements PlanStrategy {
 		// A PlanStrategy is something that can be applied to a person(!).  
 		
 		// It first selects one of the plans:
-		planStrategyDelegate = new PlanStrategyImpl( new MyPlanSelector( controler.getScenario() ) );
+		MyPlanSelector planSelector = new MyPlanSelector( controler.getScenario() );
+		planStrategyDelegate = new PlanStrategyImpl( planSelector );
 		
 		// the plan selector may, at the same time, collect events:
-		controler.getEvents().addHandler( (EventHandler) this.getPlanSelector() ) ;
+		controler.getEvents().addHandler( planSelector ) ;
 		
 		// if you just want to select plans, you can stop here.  
 		
 		// Otherwise, to do something with that plan, one needs to add modules into the strategy.  If there is at least 
 		// one module added here, then the plan is copied and then modified.
 		MyPlanStrategyModule mod = new MyPlanStrategyModule( controler ) ;
-		addStrategyModule(mod) ;
+		planStrategyDelegate.addStrategyModule(mod) ;
 
 		// these modules may, at the same time, be events listeners (so that they can collect information):
 		controler.getEvents().addHandler( mod ) ;
 		
-	}
-
-	@Override
-	public void addStrategyModule(PlanStrategyModule module) {
-		planStrategyDelegate.addStrategyModule(module);
 	}
 
 	@Override
@@ -67,28 +61,13 @@ public class MyPlanStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public int getNumberOfStrategyModules() {
-		return planStrategyDelegate.getNumberOfStrategyModules();
-	}
-
-	@Override
-	public PlanSelector getPlanSelector() {
-		return planStrategyDelegate.getPlanSelector();
-	}
-
-	@Override
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 	}
 
 	@Override
 	public void run(Person person) {
 		planStrategyDelegate.run(person);
-	}
-
-	@Override
-	public String toString() {
-		return planStrategyDelegate.toString();
 	}
 
 }

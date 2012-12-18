@@ -20,26 +20,26 @@
 package tutorial.programming.example11PluggablePlanStrategyInCode;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.replanning.ReplanningContext;
 
 public class MyPlanStrategyModule implements PlanStrategyModule, 
 		ActivityEndEventHandler // this is just there as an example
 {
 	private static final Logger log = Logger.getLogger(MyPlanStrategyModule.class);
 
-	ScenarioImpl sc;
+	Scenario sc;
 	Network net;
 	Population pop;
 
-	public MyPlanStrategyModule(Controler controler) {
-		this.sc = controler.getScenario();
+	public MyPlanStrategyModule(Scenario scenario) {
+		this.sc = scenario;
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
 	}
@@ -54,7 +54,7 @@ public class MyPlanStrategyModule implements PlanStrategyModule,
 	}
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 	}
 
 	@Override

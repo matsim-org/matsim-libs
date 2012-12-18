@@ -100,7 +100,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		TestControler controler = new TestControler(config, strategyManager);
-		strategy.addStrategyModule(new ReRoute(controler)); // finish strategy configuration
+		strategy.addStrategyModule(new ReRoute(controler.getScenario())); // finish strategy configuration
 		strategy.addStrategyModule(new TimeAllocationMutator(config));
 		controler.run();
 
@@ -112,7 +112,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		TestControler controler2 = new TestControler(config, strategyManager2);
-		strategy2.addStrategyModule(new ReRoute(controler2)); // finish strategy configuration
+		strategy2.addStrategyModule(new ReRoute(controler2.getScenario())); // finish strategy configuration
 		strategy2.addStrategyModule(new TimeAllocationMutator(config));
 		controler2.run();
 
@@ -150,7 +150,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		Controler controler = new TestControler(config, strategyManager);
-		strategy.addStrategyModule(new ReRoute(controler));
+		strategy.addStrategyModule(new ReRoute(controler.getScenario()));
 		controler.run();
 
 		// setup run2
@@ -161,7 +161,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		config.global().setNumberOfThreads(3); // use a different number of threads because the result must be the same
 		Controler controler2 = new TestControler(config, strategyManager2);
-		strategy2.addStrategyModule(new ReRoute(controler2));
+		strategy2.addStrategyModule(new ReRoute(controler.getScenario()));
 
 		controler2.run();
 
@@ -199,7 +199,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		Controler controler = new TestControler(config, strategyManager);
-		strategy.addStrategyModule(new ReRoute(controler));
+		strategy.addStrategyModule(new ReRoute(controler.getScenario()));
 		controler.run();
 
 		// setup run2
@@ -210,7 +210,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		config.global().setNumberOfThreads(3); // use a different number of threads because the result must be the same
 		Controler controler2 = new TestControler(config, strategyManager2);
-		strategy2.addStrategyModule(new ReRoute(controler2));
+		strategy2.addStrategyModule(new ReRoute(controler.getScenario()));
 		controler2.run();
 
 		for (int i = 0; i <= lastIteration; i++) {

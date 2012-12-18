@@ -63,7 +63,7 @@ public class Controller extends Controler {
 
 //		this.addCoreControlerListener(new CoreControlerListener());
 
-		this.addCoreControlerListener(new PlansReplanning());
+//		this.addCoreControlerListener(new PlansReplanning());
 		this.addCoreControlerListener(new PlansDumping());
 
 		this.addCoreControlerListener(new EventsHandling(this.events)); // must be last being added (=first being executed)

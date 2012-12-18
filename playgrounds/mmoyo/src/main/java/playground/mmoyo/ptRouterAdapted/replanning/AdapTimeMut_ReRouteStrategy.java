@@ -25,14 +25,14 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
 public class AdapTimeMut_ReRouteStrategy implements PlanStrategy {
 	private static final Logger log = Logger.getLogger(AdapTimeMut_ReRouteStrategy.class);
-	PlanStrategy planStrategyDelegate = null ;
+	PlanStrategyImpl planStrategyDelegate = null ;
 	
 	public AdapTimeMut_ReRouteStrategy(Controler controler) {
 		
@@ -61,7 +61,6 @@ public class AdapTimeMut_ReRouteStrategy implements PlanStrategy {
 		//controler.getEvents().addHandler( (EventHandler) this.getPlanSelector() ) ;
 	}
 
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		planStrategyDelegate.addStrategyModule(module);
 	}
@@ -72,19 +71,13 @@ public class AdapTimeMut_ReRouteStrategy implements PlanStrategy {
 		planStrategyDelegate.finish();
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
-	
-	@Override
-	public PlanSelector getPlanSelector() {
-		return planStrategyDelegate.getPlanSelector();
-	}
 
 	@Override
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 	}
 
 	@Override

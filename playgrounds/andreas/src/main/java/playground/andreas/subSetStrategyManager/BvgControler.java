@@ -96,9 +96,9 @@ public class BvgControler extends Controler {
 			PlanStrategy strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.planCalcScore()));
 			mgr.addStrategy(strategy1, 0.9);
 
-			PlanStrategy strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
+			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy2.addStrategyModule(new TransitTimeAllocationMutator(this.config,7200));
-			strategy2.addStrategyModule(new ReRoute(this));
+			strategy2.addStrategyModule(new ReRoute(getScenario()));
 			mgr.addStrategy(strategy2, 0.1);
 			mgr.addChangeRequest(90,strategy2,0.0);
 

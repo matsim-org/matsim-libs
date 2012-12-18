@@ -20,8 +20,6 @@
 package org.matsim.core.replanning;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * Comments:<ul>
@@ -31,22 +29,6 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  */
 public interface PlanStrategy {
 
-	/**
-	 * Adds a strategy module to this strategy.
-	 * <br/>
-	 * Comments:<ul>
-	 * <li> yyyy In my view, should be re-named into addReplanningModule or addReplanner since module is used for 
-	 * something else (the ``whole thing'') in the config file.  kai, may'12
-	 * </ul>
-	 *
-	 * @param module
-	 */
-	public void addStrategyModule(final PlanStrategyModule module);
-
-	/**
-	 * @return the number of strategy modules added to this strategy
-	 */
-	public int getNumberOfStrategyModules();
 
 	/**
 	 * Adds a person to this strategy to be handled. It is not required that
@@ -62,25 +44,15 @@ public interface PlanStrategy {
 	/**
 	 * Tells this strategy to initialize its modules. Called before a bunch of
 	 * person are handed to this strategy.
+	 * @param replanningContext TODO
 	 */
-	public void init();
+	public void init(ReplanningContext replanningContext);
 
 	/**
 	 * Indicates that no additional persons will be handed to this module and
 	 * waits until this strategy has finished handling all persons.
-	 *
 	 * @see #run(Person)
 	 */
 	public void finish();
-
-	/** Returns a descriptive name for this strategy, based on the class names on the used
-	 * {@link PlanSelector plan selector} and {@link PlanStrategyModule strategy modules}.
-	 *
-	 * @return An automatically generated name for this strategy.
-	 */
-	@Override
-	public String toString();
-
-	public PlanSelector getPlanSelector();
 
 }

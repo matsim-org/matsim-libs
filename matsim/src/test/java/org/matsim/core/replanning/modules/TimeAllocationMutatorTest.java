@@ -155,7 +155,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		}
 
 		// setup mutator
-		mutator.prepareReplanning();
+		mutator.prepareReplanning(null);
 
 		// run test
 		double act1Dur = act1.getEndTime();

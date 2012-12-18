@@ -154,7 +154,7 @@ public class KnSimplifiedController extends AbstractController {
 		PlanStrategy strategy1 = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
 		strategyManager.addStrategy(strategy1, 0.9) ;
 
-		PlanStrategy strategy2 = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
+		PlanStrategyImpl strategy2 = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
 		strategy2.addStrategyModule( new AbstractMultithreadedModule(this.scenario.getConfig().global().getNumberOfThreads()) {
 			@Override
 			public PlanAlgorithm getPlanAlgoInstance() {

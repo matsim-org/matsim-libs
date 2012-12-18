@@ -65,7 +65,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 			}
 			String classname = settings.getModuleName();
 
-			PlanStrategyImpl strategy = loadStrategy(classname, settings, network, travelTimeCalc.getTravelTimeCalculator(), travelCostCalc.getTravelCostCalculator(), routeFactory);
+			PlanStrategyImpl strategy = loadStrategy(classname, settings, network, scenario, travelTimeCalc.getTravelTimeCalculator(), travelCostCalc.getTravelCostCalculator(), routeFactory);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -80,11 +80,11 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 				manager.addStrategy(strategy, rate);
 			}
 		}
-		manager.run(scenario.getPopulation());
+		manager.run(scenario.getPopulation(), null);
 		sink.process(scenario);
 	}
 	
-	private PlanStrategyImpl loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, Network network, TravelTime travelTimeCalc, TravelDisutility travelCostCalc, final ModeRouteFactory routeFactory) {
+	private PlanStrategyImpl loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, Network network, Scenario scenario, TravelTime travelTimeCalc, TravelDisutility travelCostCalc, final ModeRouteFactory routeFactory) {
 		PlanStrategyImpl strategy = null;
 		if (name.equals("KeepLastSelected")) {
 			strategy = new PlanStrategyImpl(new KeepSelected());
@@ -106,7 +106,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 		} else if (name.equals("ChangeLegMode")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ChangeLegMode(config));
-			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc, routeFactory));
+			strategy.addStrategyModule(new ReRouteDijkstra(scenario));
 		}
 		return strategy;
 	}

@@ -83,7 +83,7 @@ public class StrategyManagerTest {
 		manager.addChangeRequest(12, strategy4, 0.1);
 
 		// run iteration 1
-		manager.run(population, 1);
+		manager.run(population, 1, null);
 
 		assertEquals(92, strategy1.getCounter());
 		assertEquals(199, strategy2.getCounter());
@@ -96,7 +96,7 @@ public class StrategyManagerTest {
 		strategy4.resetCounter();
 
 		// run iteration 10
-		manager.run(population, 10);
+		manager.run(population, 10, null);
 
 		assertEquals(95, strategy1.getCounter());
 		assertEquals(197, strategy2.getCounter());
@@ -109,7 +109,7 @@ public class StrategyManagerTest {
 		strategy4.resetCounter();
 
 		// run iteration 11, strategy2 and strategy3 should now be disabled
-		manager.run(population, 11);
+		manager.run(population, 11, null);
 
 		assertEquals(173, strategy1.getCounter());
 		assertEquals(0, strategy2.getCounter());
@@ -122,7 +122,7 @@ public class StrategyManagerTest {
 		strategy4.resetCounter();
 
 		// run iteration 12, strategy4 should now have the same weight as strategy1
-		manager.run(population, 12);
+		manager.run(population, 12, null);
 
 		assertEquals(502, strategy1.getCounter());
 		assertEquals(0, strategy2.getCounter());
@@ -155,7 +155,7 @@ public class StrategyManagerTest {
 		manager.addStrategy(strategy2, 0.20);
 
 		// run iteration 1
-		manager.run(population, 1);
+		manager.run(population, 1, null);
 
 		// ensure all strategies were called
 		assertEquals(34, strategy1.getCounter());
@@ -168,7 +168,7 @@ public class StrategyManagerTest {
 		manager.removeStrategy(strategy2);
 
 		// run iteration 2
-		manager.run(population, 2);
+		manager.run(population, 2, null);
 
 		// ensure only strategy1 got plans to handle
 		assertEquals(100, strategy1.getCounter());
@@ -181,7 +181,7 @@ public class StrategyManagerTest {
 		manager.removeStrategy(strategy2);
 
 		// run iteration 3
-		manager.run(population, 3);
+		manager.run(population, 3, null);
 
 		// ensure that strategey1 still gets all plans
 		assertEquals(100, strategy1.getCounter());
@@ -227,7 +227,7 @@ public class StrategyManagerTest {
 
 		// in each "iteration", an unscored plans should be selected
 		for (int i = 0; i < 4; i++) {
-			manager.run(population, i);
+			manager.run(population, i, null);
 			Plan plan = person.getSelectedPlan();
 			assertNull("plan has not undefined score in iteration " + i, plan.getScore());
 			plan.setScore(Double.valueOf(i));
@@ -236,7 +236,7 @@ public class StrategyManagerTest {
 		/* There are no more unscored plans now, so in the next "iteration" our
 		 * bad PlanSelector should be called. */
 		try {
-			manager.run(population, 5);
+			manager.run(population, 5, null);
 			fail("expected UnsupportedOperationException.");
 		}
 		catch (UnsupportedOperationException expected) {
@@ -263,7 +263,7 @@ public class StrategyManagerTest {
 
 		// run with default settings
 		manager.setMaxPlansPerAgent(plans.length - 2);
-		manager.run(pop);
+		manager.run(pop, null);
 
 		assertEquals("wrong number of plans.", 5, p.getPlans().size());
 		// default of StrategyManager is to remove worst plans:
@@ -274,7 +274,7 @@ public class StrategyManagerTest {
 		// change plan selector for removal and run again
 		manager.setPlanSelectorForRemoval(new BestPlanSelector());
 		manager.setMaxPlansPerAgent(plans.length - 4);
-		manager.run(pop);
+		manager.run(pop, null);
 
 		assertEquals("wrong number of plans.", 3, p.getPlans().size());
 		// default of StrategyManager is to remove worst plans:
@@ -340,7 +340,7 @@ public class StrategyManagerTest {
 
 		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 	
-		manager.run(pop, 1);
+		manager.run(pop, 1, null);
 		
 		List<Double> weights = manager.getWeights();
 		Assert.assertEquals(3, weights.size());
@@ -349,7 +349,7 @@ public class StrategyManagerTest {
 		Assert.assertEquals(2.0, weights.get(1), 1e-8);
 		Assert.assertEquals(0.5, weights.get(2), 1e-8);
 
-		manager.run(pop, 5);
+		manager.run(pop, 5, null);
 		
 		weights = manager.getWeights();
 		Assert.assertEquals(3, weights.size());
@@ -358,7 +358,7 @@ public class StrategyManagerTest {
 		Assert.assertEquals(3.0, weights.get(1), 1e-8);
 		Assert.assertEquals(0.5, weights.get(2), 1e-8);
 
-		manager.run(pop, 10);
+		manager.run(pop, 10, null);
 		
 		weights = manager.getWeights();
 		Assert.assertEquals(3, weights.size());
@@ -376,7 +376,7 @@ public class StrategyManagerTest {
 	 */
 	static private class StrategyCounter implements PlanStrategy {
 		
-		private PlanStrategy planStrategyDelegate = null ;
+		private PlanStrategyImpl planStrategyDelegate = null ;
 
 		private int counter = 0;
 
@@ -398,19 +398,17 @@ public class StrategyManagerTest {
 			this.counter = 0;
 		}
 
-		@Override
 		public void addStrategyModule(PlanStrategyModule module) {
 			planStrategyDelegate.addStrategyModule(module);
 		}
 
-		@Override
 		public int getNumberOfStrategyModules() {
 			return planStrategyDelegate.getNumberOfStrategyModules();
 		}
 
 		@Override
-		public void init() {
-			planStrategyDelegate.init();
+		public void init(ReplanningContext replanningContext) {
+			planStrategyDelegate.init(replanningContext);
 		}
 
 		@Override
@@ -423,10 +421,6 @@ public class StrategyManagerTest {
 			return planStrategyDelegate.toString();
 		}
 
-		@Override
-		public PlanSelector getPlanSelector() {
-			return planStrategyDelegate.getPlanSelector();
-		}
 	}
 
 	/**

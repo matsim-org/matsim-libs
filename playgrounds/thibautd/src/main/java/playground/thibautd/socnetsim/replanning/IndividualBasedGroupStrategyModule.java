@@ -55,7 +55,7 @@ public class IndividualBasedGroupStrategyModule implements GroupStrategyModule {
 
 	@Override
 	public void handlePlans(final Collection<GroupPlans> groupPlans) {
-		delegate.prepareReplanning();
+		delegate.prepareReplanning(null);
 
 		log.info( "handling "+groupPlans.size()+" groups" );
 		for (GroupPlans plans : groupPlans) {

@@ -21,6 +21,7 @@
 package org.matsim.api.core.v01.replanning;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.replanning.ReplanningContext;
 
 
 /**
@@ -40,8 +41,9 @@ public interface PlanStrategyModule {
 	 * routine could e.g. open a file here to write the plans out and pass them to
 	 * the external routines. Multi-threaded modules could initialize and start
 	 * their threads in this method.
+	 * @param replanningContext TODO
 	 */
-	public void prepareReplanning();
+	public void prepareReplanning(ReplanningContext replanningContext);
 	
 	/**
 	 * Tells this module to handle the specified plan. It is not required that

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -41,7 +42,7 @@ import playground.telaviv.locationchoice.ExtendedLocationChoicePlanModule;
  */
 public class ExtendedLocationChoiceReRoutePlanStrategy implements PlanStrategy {
 
-	private PlanStrategy planStrategyDelegate = null;
+	private PlanStrategyImpl planStrategyDelegate = null;
 	
 	public ExtendedLocationChoiceReRoutePlanStrategy(Controler controler) {
 		
@@ -50,10 +51,9 @@ public class ExtendedLocationChoiceReRoutePlanStrategy implements PlanStrategy {
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new ExtendedLocationChoicePlanModule(scenario, travelTimeCalc));
-		planStrategyDelegate.addStrategyModule(new ReRoute(controler));
+		planStrategyDelegate.addStrategyModule(new ReRoute(scenario));
 	}
 	
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		planStrategyDelegate.addStrategyModule(module);
 	}
@@ -63,19 +63,13 @@ public class ExtendedLocationChoiceReRoutePlanStrategy implements PlanStrategy {
 		planStrategyDelegate.finish();
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
 	@Override
-	public PlanSelector getPlanSelector() {
-		return planStrategyDelegate.getPlanSelector();
-	}
-
-	@Override
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 	}
 
 	@Override

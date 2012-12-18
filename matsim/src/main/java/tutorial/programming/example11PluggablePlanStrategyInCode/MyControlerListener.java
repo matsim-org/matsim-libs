@@ -22,8 +22,10 @@ package tutorial.programming.example11PluggablePlanStrategyInCode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
 /**
  * @author nagel
@@ -40,7 +42,11 @@ public class MyControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
-		PlanStrategy strategy = new MyPlanStrategy(this.controler);
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector() ) ;
+		strategy.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()) ) ;
+		// ...
+		
+		// see examples in StrategyManagerConfigLoader
 		
 		StrategyManager manager = this.controler.getStrategyManager() ;
 		manager.addStrategy(strategy, 0.1 ) ;

@@ -34,7 +34,7 @@ public class Main {
 		controler.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent controlerEvent) {
-				PlanStrategy strategy = new PlanStrategyImpl(new RandomPlanSelector()) ;
+				PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector()) ;
 				KnRouter knRouter = new KnRouter() ;
 				strategy.addStrategyModule( knRouter ) ;
 				controler.getEvents().addHandler( knRouter ) ;

@@ -11,6 +11,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
@@ -42,15 +43,13 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 		filter.filter(net, modes);
 		addStrategyModule(new LocationChoice(net, controler));
 		addStrategyModule(new TimeAllocationMutator(controler.getConfig()));
-		addStrategyModule(new ReRoute(controler));
+		addStrategyModule(new ReRoute(controler.getScenario()));
 	}
 	
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		delegate.addStrategyModule(module);
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return delegate.getNumberOfStrategyModules();
 	}
@@ -61,8 +60,8 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
-		delegate.init();
+	public void init(ReplanningContext replanningContext) {
+		delegate.init(replanningContext);
 	}
 
 	@Override
@@ -70,9 +69,5 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 		delegate.finish();
 	}
 
-	@Override
-	public PlanSelector getPlanSelector() {
-		return delegate.getPlanSelector();
-	}
 
 }

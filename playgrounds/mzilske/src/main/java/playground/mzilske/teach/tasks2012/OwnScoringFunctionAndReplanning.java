@@ -16,6 +16,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -44,7 +45,7 @@ public class OwnScoringFunctionAndReplanning {
 		}
 
 		@Override
-		public void prepareReplanning() {
+		public void prepareReplanning(ReplanningContext replanningContext) {
 			// TODO Auto-generated method stub
 
 		}
@@ -139,7 +140,7 @@ public class OwnScoringFunctionAndReplanning {
 		controler.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent controlerEvent) {
-				PlanStrategy strategy = new PlanStrategyImpl(new RandomPlanSelector()) ;
+				PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector()) ;
 				strategy.addStrategyModule(new MyTimeMutator() ) ;
 				controler.getStrategyManager().addStrategy(strategy, 1.0 ) ;
 			}

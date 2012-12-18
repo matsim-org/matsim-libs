@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.replanning.ReplanningContext;
 
 public class ChangeActivityTimesAdvanced implements PlanStrategyModule, ActivityStartEventHandler {
 
@@ -23,7 +24,7 @@ public class ChangeActivityTimesAdvanced implements PlanStrategyModule, Activity
 	}
 	
 	
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 		System.out.println("prepare.");
 	}
 

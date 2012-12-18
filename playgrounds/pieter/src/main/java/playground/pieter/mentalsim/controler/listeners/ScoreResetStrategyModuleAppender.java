@@ -5,6 +5,7 @@ import java.util.List;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 
 import playground.pieter.mentalsim.controler.MentalSimControler;
@@ -29,7 +30,7 @@ public class ScoreResetStrategyModuleAppender implements StartupListener {
 			if (strategyName.contains("selector") && strategyName.contains("_")
 			// append the ScoreResettingStrategyModule
 			) {
-				strategy.addStrategyModule(new ScoreResettingStrategyModule());
+				((PlanStrategyImpl) strategy).addStrategyModule(new ScoreResettingStrategyModule());
 			}
 		}
 

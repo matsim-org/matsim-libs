@@ -20,14 +20,10 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -37,24 +33,22 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class ReRouteDijkstra extends AbstractMultithreadedModule {
 
-	TravelDisutility costCalculator = null;
-	TravelTime timeCalculator = null;
-	Network network = null;
-	private PlansCalcRouteConfigGroup configGroup = null;
-	private final ModeRouteFactory routeFactory;
+	private Scenario scenario;
 
-	public ReRouteDijkstra(Config config, final Network network, final TravelDisutility costCalculator, final TravelTime timeCalculator, final ModeRouteFactory routeFactory) {
-		super(config.global());
-		this.network = network;
-		this.costCalculator = costCalculator;
-		this.timeCalculator = timeCalculator;
-		this.configGroup = config.plansCalcRoute();
-		this.routeFactory = routeFactory;
+	public ReRouteDijkstra(Scenario scenario) {
+		super(scenario.getConfig().global());
+		this.scenario = scenario;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlansCalcRoute(this.configGroup, this.network, this.costCalculator, this.timeCalculator, new DijkstraFactory(), this.routeFactory);
+		return new PlansCalcRoute(
+				scenario.getConfig().plansCalcRoute(), 
+				scenario.getNetwork(), 
+				getReplanningContext().getTravelCostCalculator(), 
+				getReplanningContext().getTravelTimeCalculator(), 
+				new DijkstraFactory(), 
+				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
 	}
 
 }

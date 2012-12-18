@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.ReplanningContext;
 
 public class MyPlanStrategyModule implements PlanStrategyModule,
 ActivityEndEventHandler // this is just there as an example
@@ -35,7 +36,7 @@ ActivityEndEventHandler // this is just there as an example
 	}
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 	}
 
 	@Override

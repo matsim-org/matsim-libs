@@ -20,34 +20,39 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class ReRouteLandmarks extends ReRouteDijkstra {
+public class ReRouteLandmarks extends AbstractMultithreadedModule  {
 
-	private final AStarLandmarksFactory factory;
-	private final ModeRouteFactory routeFactory;
+	private AStarLandmarksFactory factory;
 	private PlansCalcRouteConfigGroup configGroup = null;
+	private Scenario scenario;
 
-	public ReRouteLandmarks(Config config, Network network, TravelDisutility costCalculator,
-			TravelTime timeCalculator, TravelDisutility minCostCalculator, final ModeRouteFactory routeFactory) {
-		super(config, network, costCalculator, timeCalculator, routeFactory);
-		this.factory = new AStarLandmarksFactory(network, minCostCalculator, config.global().getNumberOfThreads());
-		this.routeFactory = routeFactory;
-		this.configGroup = config.plansCalcRoute();
+	public ReRouteLandmarks(Scenario scenario) {
+		super(scenario.getConfig().global());
+		this.scenario = scenario;
+		this.configGroup = scenario.getConfig().plansCalcRoute();
+		this.factory = new AStarLandmarksFactory(
+				scenario.getNetwork(), 
+				new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore()), 
+				scenario.getConfig().global().getNumberOfThreads());	
 	}
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlansCalcRoute(this.configGroup, 
-				this.network, this.costCalculator, this.timeCalculator, this.factory, this.routeFactory);
+		return new PlansCalcRoute(
+				this.configGroup, 
+				scenario.getNetwork(), 
+				getReplanningContext().getTravelCostCalculator(), 
+				getReplanningContext().getTravelTimeCalculator(), 
+				this.factory, 
+				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
 	}
 
 }

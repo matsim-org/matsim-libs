@@ -77,7 +77,7 @@ public class ChangeLegModeTest {
 		final ChangeLegMode module = new ChangeLegMode(config);
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 
-		module.prepareReplanning();
+		module.prepareReplanning(null);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		person.setCarAvail("never");
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
@@ -99,7 +99,7 @@ public class ChangeLegModeTest {
 	}
 
 	private void runTest(final ChangeLegMode module, final String[] possibleModes) {
-		module.prepareReplanning();
+		module.prepareReplanning(null);
 
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));

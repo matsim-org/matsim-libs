@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
@@ -59,7 +60,6 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 		this.planSelector = planSelector;
 	}
 
-	@Override
 	public void addStrategyModule(final PlanStrategyModule module) {
 		if (this.firstModule == null) {
 			this.firstModule = module;
@@ -68,7 +68,6 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 		}
 	}
 	
-	@Override
 	public int getNumberOfStrategyModules() {
 		if (this.firstModule == null) {
 			return 0;
@@ -126,9 +125,9 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
+	public void init(ReplanningContext replanningContext) {
 		if (this.firstModule != null) {
-			this.firstModule.prepareReplanning();
+			this.firstModule.prepareReplanning(null);
 		}
 	}
 
@@ -140,7 +139,7 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 				this.firstModule.finishReplanning();
 			// now work through the others
 			for (PlanStrategyModule module : this.modules) {
-				module.prepareReplanning();
+				module.prepareReplanning(null);
 				for (Plan plan : this.plans) {
 					module.handlePlan(plan);
 				}
@@ -167,7 +166,6 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 		return name.toString();
 	}
 
-	@Override
 	public PlanSelector getPlanSelector() {
 		return planSelector;
 	}

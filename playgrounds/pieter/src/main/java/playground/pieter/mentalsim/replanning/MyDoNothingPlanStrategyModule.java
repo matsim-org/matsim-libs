@@ -3,6 +3,7 @@ package playground.pieter.mentalsim.replanning;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.ReplanningContext;
 
 public class MyDoNothingPlanStrategyModule implements PlanStrategyModule {
 
@@ -13,7 +14,7 @@ public class MyDoNothingPlanStrategyModule implements PlanStrategyModule {
 	}
 
 	@Override
-	public void prepareReplanning() {
+	public void prepareReplanning(ReplanningContext replanningContext) {
 		// TODO Auto-generated method stub
 
 	}

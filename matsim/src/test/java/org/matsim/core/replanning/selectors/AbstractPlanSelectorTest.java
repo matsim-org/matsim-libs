@@ -148,4 +148,5 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * @return A new instance of a specific implementation of {@link PlanSelector} for testing.
 	 */
 	protected abstract PlanSelector getPlanSelector();
+	
 }

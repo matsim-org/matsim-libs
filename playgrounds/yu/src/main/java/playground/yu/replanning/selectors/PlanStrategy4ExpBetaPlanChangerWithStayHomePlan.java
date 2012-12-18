@@ -24,14 +24,14 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.ReplanningContext;
 
 public class PlanStrategy4ExpBetaPlanChangerWithStayHomePlan implements
 		PlanStrategy {
 	// the reason why this class needs to be here is that this is defined in the
 	// config file
 
-	PlanStrategy planStrategyDelegate = null;
+	PlanStrategyImpl planStrategyDelegate = null;
 
 	public PlanStrategy4ExpBetaPlanChangerWithStayHomePlan(Controler controler) {
 		// also possible: MyStrategy( Scenario scenario ). But then I do not
@@ -60,7 +60,6 @@ public class PlanStrategy4ExpBetaPlanChangerWithStayHomePlan implements
 
 	}
 
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		planStrategyDelegate.addStrategyModule(module);
 	}
@@ -70,19 +69,13 @@ public class PlanStrategy4ExpBetaPlanChangerWithStayHomePlan implements
 		planStrategyDelegate.finish();
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
 	@Override
-	public PlanSelector getPlanSelector() {
-		return planStrategyDelegate.getPlanSelector();
-	}
-
-	@Override
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 	}
 
 	@Override

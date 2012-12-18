@@ -29,6 +29,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -91,8 +92,8 @@ public class ExtendedLocationChoicePlanModule extends AbstractMultithreadedModul
 	}
 
 	@Override
-	public void prepareReplanning() {
-		super.prepareReplanning();
+	public void prepareReplanning(ReplanningContext replanningContext) {
+		super.prepareReplanning(replanningContext);
 		
 		extendedLocationChoiceProbabilityCreator.calculateDynamicProbabilities();
 		extendedLocationChoiceProbabilityCreator.calculateTotalProbabilities();

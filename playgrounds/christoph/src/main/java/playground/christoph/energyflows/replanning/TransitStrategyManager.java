@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
@@ -47,14 +48,14 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
  */
 public class TransitStrategyManager extends StrategyManager {
 
-	private PlanStrategy reroutingStrategy;
-	private PlanStrategy expBetaSelectorStrategy;
+	private PlanStrategyImpl reroutingStrategy;
+	private PlanStrategyImpl expBetaSelectorStrategy;
 	private double reroutingShare;
 	private Random random;
 	
 	public TransitStrategyManager(Controler controler, double replanningShare) {
 		reroutingStrategy = new PlanStrategyImpl(new RandomPlanSelector());
-		reroutingStrategy.addStrategyModule(new ReRoute(controler));
+		reroutingStrategy.addStrategyModule(new ReRoute(controler.getScenario()));
 		
 		expBetaSelectorStrategy = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getConfig().planCalcScore()));
 		
@@ -63,9 +64,9 @@ public class TransitStrategyManager extends StrategyManager {
 	}
 
 	@Override
-	public void beforePopulationRunHook(Population population) {
-		this.reroutingStrategy.init();
-		this.expBetaSelectorStrategy.init();
+	public void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
+		this.reroutingStrategy.init(replanningContext);
+		this.expBetaSelectorStrategy.init(replanningContext);
 	}
 	
 	@Override

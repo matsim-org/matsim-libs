@@ -20,7 +20,12 @@
 
 package org.matsim.core.controler.events;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * Event class to notify observers that replanning should happen
@@ -44,6 +49,32 @@ public class ReplanningEvent extends ControlerEvent {
 	 */
 	public int getIteration() {
 		return this.iteration;
+	}
+
+	public ReplanningContext getReplanningContext() {
+		return buildReplanningContext();
+	}
+
+	private ReplanningContext buildReplanningContext() {
+		return new ReplanningContext() {
+
+			@Override
+			public TripRouterFactory getTripRouterFactory() {
+				return controler.getTripRouterFactory();
+			}
+
+			@Override
+			public TravelDisutility getTravelCostCalculator() {
+				return controler.getTravelDisutilityFactory().createTravelDisutility(controler.getTravelTimeCalculator(), controler.getConfig().planCalcScore());
+			}
+
+			@Override
+			public TravelTime getTravelTimeCalculator() {
+				return controler.getTravelTimeCalculator();
+			}
+
+		};
+
 	}
 
 }

@@ -20,6 +20,7 @@
 
 package org.matsim.integration.replanning;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -34,10 +35,14 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -77,13 +82,30 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		act.setLinkId(link.getId());
 
 		// setup strategy manager and load from config
-		Controler controler = new Controler(scenario);
-//		controler.setFreespeedTravelTimeCost(new FreespeedTravelTimeCost());
+		final Controler controler = new Controler(scenario);
 		controler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
-		controler.setTripRouterFactory( new TripRouterFactoryImpl( controler ) );
 		final StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(controler, manager);
-		manager.run(population);
+		manager.run(population, new ReplanningContext() {
+
+			@Override
+			public TripRouterFactory getTripRouterFactory() {
+				return new TripRouterFactoryImpl( controler );
+			}
+
+			@Override
+			public TravelDisutility getTravelCostCalculator() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public TravelTime getTravelTimeCalculator() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+		});
 
 		// test that everything worked as expected
 		assertEquals("number of plans in person.", 2, person.getPlans().size());

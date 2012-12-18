@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 
 /**
@@ -54,11 +55,11 @@ public class SubSetStrategyManager extends StrategyManager {
 	}
 
 	@Override
-	protected void beforePopulationRunHook(Population population) {
-		super.beforePopulationRunHook(population);
+	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
+		super.beforePopulationRunHook(population, replanningContext);
 		for (StrategyManager mgr : this.managers.values()) {
 			for (PlanStrategy strategy : mgr.getStrategies()) {
-				strategy.init();
+				strategy.init(replanningContext);
 			}
 		}
 	}

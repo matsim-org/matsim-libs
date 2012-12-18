@@ -39,6 +39,10 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -72,7 +76,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
 	protected PlanSelector getPlanSelector() {
-		return new PathSizeLogitSelector(this.network, this.config.planCalcScore());
+		return new PathSizeLogitSelector(config.planCalcScore(), createNetwork());
 	}
 
 	@Override
@@ -183,6 +187,27 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 	}
 
+	private ReplanningContext buildReplanningContext(final Network network2) {
+		return new ReplanningContext() {
+
+			@Override
+			public TripRouterFactory getTripRouterFactory() {
+				return null;
+			}
+
+			@Override
+			public TravelDisutility getTravelCostCalculator() {
+				return null;
+			}
+
+			@Override
+			public TravelTime getTravelTimeCalculator() {
+				return null;
+			}
+			
+		};
+	}
+
 	@Override
 	public void testZeroScore() {
 		this.network = createNetwork();
@@ -287,7 +312,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.setScore(-10.0);
 		person.addPlan(p3);
 
-		PathSizeLogitSelector selector = new PathSizeLogitSelector(network, this.config.planCalcScore());
+		PathSizeLogitSelector selector = new PathSizeLogitSelector(this.config.planCalcScore(), network);
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

@@ -24,13 +24,14 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 
 public class ChangeActivityTimesStrategy implements PlanStrategy {
 	
-	PlanStrategy planStrategyDelegate;
+	PlanStrategyImpl planStrategyDelegate;
 
 	public ChangeActivityTimesStrategy(Controler controler) {
 		
@@ -51,7 +52,6 @@ public class ChangeActivityTimesStrategy implements PlanStrategy {
 		
 	}
 
-	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		planStrategyDelegate.addStrategyModule(module);
 	}
@@ -61,19 +61,13 @@ public class ChangeActivityTimesStrategy implements PlanStrategy {
 		planStrategyDelegate.finish();
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return planStrategyDelegate.getNumberOfStrategyModules();
 	}
 
 	@Override
-	public PlanSelector getPlanSelector() {
-		return planStrategyDelegate.getPlanSelector();
-	}
-
-	@Override
-	public void init() {
-		planStrategyDelegate.init();
+	public void init(ReplanningContext replanningContext) {
+		planStrategyDelegate.init(replanningContext);
 	}
 
 	@Override

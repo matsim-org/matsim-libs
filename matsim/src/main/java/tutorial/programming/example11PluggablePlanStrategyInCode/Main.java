@@ -19,8 +19,10 @@
 
 package tutorial.programming.example11PluggablePlanStrategyInCode;
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 
 class Main {
@@ -29,14 +31,19 @@ class Main {
 
 		Config config;
 		if ( args.length==0 ) {
-			config = ConfigUtils.loadConfig("examples/tutorial/singleIteration.xml") ;
+			config = ConfigUtils.loadConfig("examples/equil/config.xml") ;
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}
-
+		
+		StrategySettings stratSets = new StrategySettings(new IdImpl(3)); // Number three because two others are already in the example config
+		stratSets.setModuleName("doSomethingSpecial");
+		stratSets.setProbability(0.1);
+		config.strategy().addStrategySettings(stratSets);
+		
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new MyControlerListener(controler)) ;
+		controler.addPlanStrategyFactory("doSomethingSpecial", new MyPlanStrategyFactory());
 		controler.run();
 
 	}

@@ -48,7 +48,7 @@ public class AbstractMultithreadedModuleTest {
 	public void testCrashingThread() {
 		try {
 			DummyCrashingModule testee = new DummyCrashingModule(2);
-			testee.prepareReplanning();
+			testee.prepareReplanning(null);
 			testee.handlePlan(null);
 			testee.handlePlan(null);
 			testee.handlePlan(null);

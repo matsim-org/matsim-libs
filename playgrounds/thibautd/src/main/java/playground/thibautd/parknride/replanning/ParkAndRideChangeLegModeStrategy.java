@@ -19,20 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.replanning;
 
-import java.util.Arrays;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TripsToLegsModule;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 
 import playground.thibautd.parknride.ParkAndRideConstants;
 
@@ -43,23 +40,21 @@ import playground.thibautd.parknride.ParkAndRideConstants;
  * @author thibautd
  */
 public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
-	private final PlanStrategy strategy = new PlanStrategyImpl( new RandomPlanSelector() );
+	private final PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
 	public ParkAndRideChangeLegModeStrategy(final Controler controler) {
 		StageActivityTypes pnrList = ParkAndRideConstants.PARKING_ACT_TYPE;
 
-		addStrategyModule( new TripsToLegsModule( controler , pnrList ) );
+		addStrategyModule( new TripsToLegsModule( controler.getConfig() , pnrList ) );
 		addStrategyModule( new ChangeLegMode( controler.getConfig() ) );
-		addStrategyModule( new ReRoute( controler ) );
+		addStrategyModule( new ReRoute(controler.getScenario() ) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 
-	@Override
 	public void addStrategyModule(final PlanStrategyModule module) {
 		strategy.addStrategyModule(module);
 	}
 
-	@Override
 	public int getNumberOfStrategyModules() {
 		return strategy.getNumberOfStrategyModules();
 	}
@@ -70,8 +65,8 @@ public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void init() {
-		strategy.init();
+	public void init(ReplanningContext replanningContext) {
+		strategy.init(replanningContext);
 	}
 
 	@Override
@@ -82,11 +77,6 @@ public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
 	@Override
 	public String toString() {
 		return strategy.toString();
-	}
-
-	@Override
-	public PlanSelector getPlanSelector() {
-		return strategy.getPlanSelector();
 	}
 
 }
