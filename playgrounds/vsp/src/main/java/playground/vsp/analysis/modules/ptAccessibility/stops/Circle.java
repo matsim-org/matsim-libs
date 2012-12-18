@@ -41,12 +41,13 @@ public class Circle {
 
 	private List<Coordinate> circle;
 	
-	public Circle(Double r, Double detail){
+	public Circle(Double r, int quadrantSegments){
 		this.circle = new ArrayList<Coordinate>();
+		double pointsPerCirlce = quadrantSegments * 4.0;
 		double x,y;
-		for(int i = 0; i < detail; i++){
-			x = r * Math.cos(2. * Math.PI * i / detail);
-			y = r * Math.sin(2. * Math.PI * i / detail);
+		for(int i = 0; i < pointsPerCirlce; i++){
+			x = r * Math.cos(2. * Math.PI * i / pointsPerCirlce);
+			y = r * Math.sin(2. * Math.PI * i / pointsPerCirlce);
 			this.circle.add(new Coordinate(x, y,0.));
 		}
 	}

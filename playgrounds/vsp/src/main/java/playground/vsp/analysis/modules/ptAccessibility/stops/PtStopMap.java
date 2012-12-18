@@ -43,7 +43,7 @@ public class PtStopMap {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(PtStopMap.class);
 	
-	public static final String FILESUFFIX = "AccesMap.shp";
+	public static final String FILESUFFIX = "AccessMap";
 	
 	private GeometryFactory f;
 

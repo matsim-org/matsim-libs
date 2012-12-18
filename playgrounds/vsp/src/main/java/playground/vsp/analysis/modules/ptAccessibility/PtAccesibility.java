@@ -46,6 +46,7 @@ import playground.vsp.analysis.modules.ptAccessibility.stops.Mode2StopMap;
 import playground.vsp.analysis.modules.ptAccessibility.stops.PtStopMap;
 import playground.vsp.analysis.modules.ptAccessibility.utils.DistCluster2ActCnt;
 import playground.vsp.analysis.modules.ptAccessibility.utils.PtAccesShapeWriter;
+import playground.vsp.analysis.modules.ptAccessibility.utils.PtAccessMapShapeWriter;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
@@ -55,7 +56,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  */
 public class PtAccesibility extends AbstractAnalyisModule {
 	
-	public static final String MODULENAME = "ptAccesibility";
+	public static final String MODULENAME = "ptAccessibility";
 
 	private Scenario scenario;
 
@@ -68,6 +69,8 @@ public class PtAccesibility extends AbstractAnalyisModule {
 	private SortedMap<String, DistCluster2ActCnt> mode2DistanceCluster2ActCnt;
 
 	private Mode2StopMap mode2Stop;
+
+	private int quadrantSegments;
 	
 
 
@@ -79,13 +82,15 @@ public class PtAccesibility extends AbstractAnalyisModule {
 	 * the specified clusters. 
 	 * 
 	 * @param sc, the scenario
+	 * @param quadrantSegments, the number of point per quadrant, more point return more accurate shapes but for a higher computational price
 	 * @param distanceCluster, the distances you want to cluster (make up your mind about the used coordinate-system)
 	 * @param activityCluster, the name you want to the see, mapped to the activity-names you want to add to this cluster
 	 */
-	public PtAccesibility(Scenario sc, List<Integer> distanceCluster, SortedMap<String, List<String>> activityCluster) {
+	public PtAccesibility(Scenario sc, List<Integer> distanceCluster, int quadrantSegments, SortedMap<String, List<String>> activityCluster) {
 		super(PtAccesibility.class.getSimpleName());
 		this.scenario = sc;
-		this.distanceCluster = createClusterCircles(distanceCluster);
+		this.quadrantSegments = quadrantSegments;
+		this.distanceCluster = createClusterCircles(distanceCluster, this.quadrantSegments);
 		this.activityCluster = activityCluster;
 		this.activityCluster.put("unknown", new ArrayList<String>());
 	}
@@ -94,10 +99,10 @@ public class PtAccesibility extends AbstractAnalyisModule {
 	 * @param cluster2
 	 * @return
 	 */
-	private Map<String, Circle> createClusterCircles(List<Integer> cluster2) {
+	private Map<String, Circle> createClusterCircles(List<Integer> distances, int quadrantSegments) {
 		Map<String, Circle> circles = new HashMap<String, Circle>();
-		for(Integer i: cluster2){
-			circles.put(i.toString(), new Circle(Double.valueOf(i), 36.));
+		for(Integer i: distances){
+			circles.put(i.toString(), new Circle(Double.valueOf(i), quadrantSegments));
 		}
 		return circles;
 	}
@@ -172,6 +177,7 @@ public class PtAccesibility extends AbstractAnalyisModule {
 		for(Entry<String, Map<String, MultiPolygon>> e: cluster2mode2area.entrySet()){
 			PtAccesShapeWriter.writeMultiPolygons(e.getValue(), outputFolder + e.getKey() + PtStopMap.FILESUFFIX , e.getKey());
 		}
+		PtAccessMapShapeWriter.writeAccessMap(cluster2mode2area, this.quadrantSegments, outputFolder);
 		
 		// write activity-cluster
 		PtAccesShapeWriter.writeActivityLocations(this.locationMap, outputFolder + "activityLocations.shp", "activities");
