@@ -218,7 +218,7 @@ public class Sim2DScenario2OSMReadyShape {
 	}
 
 	public static void main(String [] args) {
-		String confPath = "/Users/laemmel/devel/burgdorf2d/input/s2d_config.xml";
+		String confPath = "/Users/laemmel/devel/burgdorf2d/tmp/sim2dConfig.xml";
 		Sim2DConfig conf = Sim2DConfigUtils.loadConfig(confPath);
 		Sim2DScenario sc = Sim2DScenarioUtils.loadSim2DScenario(conf);
 		Sim2DScenario2OSMReadyShape osm = new Sim2DScenario2OSMReadyShape(sc);

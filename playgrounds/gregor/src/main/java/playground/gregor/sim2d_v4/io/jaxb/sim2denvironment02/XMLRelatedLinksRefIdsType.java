@@ -17,17 +17,16 @@ import javax.xml.bind.annotation.XmlValue;
 
 /**
  * 
- * 				Openings define line segments of the describing polygon that are open like
- * 				doors etc. The value of 'vs' attribute
- * 				is the separator.
+ * 				This type is used for references to links belonging to that section. The
+ * 				value of 'vs' attribute is the separator.
  * 			
  * 
- * <p>Java class for openingsType complex type.
+ * <p>Java class for relatedLinksRefIdsType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="openingsType">
+ * &lt;complexType name="relatedLinksRefIdsType">
  *   &lt;simpleContent>
  *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
  *       &lt;attribute name="vs" type="{http://www.w3.org/2001/XMLSchema}string" default=" " />
@@ -39,10 +38,10 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "openingsType", propOrder = {
+@XmlType(name = "relatedLinksRefIdsType", propOrder = {
     "value"
 })
-public class XMLOpeningsType {
+public class XMLRelatedLinksRefIdsType {
 
     @XmlValue
     protected String value;

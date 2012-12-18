@@ -60,8 +60,10 @@ import playground.gregor.sim2d_v4.io.jaxb.gmlfeature.XMLPolygonType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLFeatureCollectionType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLNeighborsType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLOpeningsType;
+import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLRelatedLinksRefIdsType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLSectionPropertyType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLSim2DEnvironmentSectionType;
+import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -74,8 +76,8 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 
 	private static final Logger log = Logger.getLogger(Sim2DEnvironmentReader02.class);
 
-//	public static final String SCHEMA = "http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas/sim2dEnvironment_v0.2.xsd";
-	public static final String SCHEMA = "http://matsim.org/files/dtd/sim2dEnvironment_v0.2.xsd";
+	public static final String SCHEMA = "http://svn.vsp.tu-berlin.de/repos/public-svn/xml-schemas/sim2dEnvironment_v0.2.xsd";
+//	public static final String SCHEMA = "http://matsim.org/files/dtd/sim2dEnvironment_v0.2.xsd";
 
 	private final Sim2DEnvironment env;
 
@@ -170,7 +172,12 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 			int [] openings = getOpenings(ff);
 			Id[] neighbors = getNeighbors(ff);
 			BigInteger LEVEL = ff.getLevel();
-			this.env.createAndAddSection(id,p,openings,neighbors, LEVEL.intValue());
+			Section s = this.env.createAndAddSection(id,p,openings,neighbors, LEVEL.intValue());
+			List<Id> relatedLinksIds = getRelatedLinkIds(ff);
+			if (relatedLinksIds != null) {
+				s.getRelatedLinkIds().addAll(relatedLinksIds);
+			}
+			
 		}
 
 	}
@@ -187,6 +194,27 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 			Id id = new IdImpl(((XMLSim2DEnvironmentSectionType)o).getFid());
 			ret[idx++] = id;
 		}
+		return ret;
+	}
+	
+	private List<Id> getRelatedLinkIds(XMLSectionPropertyType ff) {
+		XMLRelatedLinksRefIdsType oooo = ff.getRelatedLinksRefIds();
+		if (oooo == null || oooo.getValue().length() == 0) {
+			return null;
+		}
+		String vs = oooo.getVs();
+		String val = oooo.getValue();
+		
+		if (vs.length() > 1) {
+			throw new RuntimeException("Can not tokenize String:" + val);
+		}
+		
+		String[] toks = StringUtils.explode(val, vs.charAt(0));
+		List<Id> ret = new ArrayList<Id>();
+		for (int i = 0; i < toks.length; i++) {
+			ret.add(new IdImpl(toks[i]));
+		}
+		
 		return ret;
 	}
 

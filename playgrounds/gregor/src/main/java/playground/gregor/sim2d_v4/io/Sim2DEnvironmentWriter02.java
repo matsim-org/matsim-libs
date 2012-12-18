@@ -50,6 +50,7 @@ import playground.gregor.sim2d_v4.io.jaxb.gmlfeature.XMLPolygonType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLFeatureCollectionType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLNeighborsType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLOpeningsType;
+import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLRelatedLinksRefIdsType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLSectionPropertyType;
 import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLSim2DEnvironmentSectionType;
 import playground.gregor.sim2d_v4.scenario.Section;
@@ -195,18 +196,28 @@ public class Sim2DEnvironmentWriter02 extends MatsimJaxbXmlWriter{
 			JAXBElement<XMLOpeningsType> jopenings = this.sim2dFac.createXMLSectionPropertyTypeOpenings(xmlOpenings);
 			myPolygon.setOpenings(jopenings );
 		}
+		if (sec.getRelatedLinkIds().size() > 0) {
+			XMLRelatedLinksRefIdsType xmlIds = this.sim2dFac.createXMLRelatedLinksRefIdsType();
+			StringBuffer buf = new StringBuffer();
+			for (Id id : sec.getRelatedLinkIds()) {
+				buf.append(id.toString());
+				buf.append(xmlIds.getVs());
+			}
+			xmlIds.setValue(buf.toString());
+			myPolygon.setRelatedLinksRefIds(xmlIds);
+		}
 
-		//		if (sec.getNeighbors() != null) {
-		//			XMLNeighborsType xmlNeighbors = this.sim2dFac.createXMLNeighborsType();
-		//
-		////			XMLNeighborsType l = xmlNeighbors;
-		//			List<Object> refs = xmlNeighbors.getFidrefs();
-		//			for (Id id : sec.getNeighbors()) {
-		//				refs.add(id.toString());
-		//			}
-		//			myPolygon.setNeighbors(xmlNeighbors);
-		//		}
-		//		
+		if (sec.getNeighbors() != null) {
+			XMLNeighborsType xmlNeighbors = this.sim2dFac.createXMLNeighborsType();
+
+			//			XMLNeighborsType l = xmlNeighbors;
+			List<Object> refs = xmlNeighbors.getFidrefs();
+			for (Id id : sec.getNeighbors()) {
+				refs.add(id.toString());
+			}
+			myPolygon.setNeighbors(xmlNeighbors);
+		}
+
 
 		XMLSim2DEnvironmentSectionType testType = this.sim2dFac.createXMLSim2DEnvironmentSectionType();
 		testType.setFid(sec.getId().toString());

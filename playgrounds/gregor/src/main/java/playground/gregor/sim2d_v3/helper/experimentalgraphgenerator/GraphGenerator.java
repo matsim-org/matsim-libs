@@ -218,10 +218,10 @@ public class GraphGenerator {
 		}
 
 		new GraphGenerator(sc,geos,reader.getBounds()).run();
-		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/burgdorf2d/input/network2d_0.xml");
+		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/burgdorf2d/tmp/network2d_0.xml");
 		//		String [] argsII = {"/Users/laemmel/devel/sim2dDemoII/input/network.xml","/Users/laemmel/devel/sim2dDemoII/raw_input/networkL.shp","/Users/laemmel/devel/sim2dDemoII/raw_input/networkP.shp","EPSG:3395"};
 		//		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/tmp/vis/network.xml");
-		String [] argsII = {"/Users/laemmel/devel/burgdorf2d/input/network2d_0.xml","/Users/laemmel/tmp/vis/networkL.shp","/Users/laemmel/tmp/vis/networkP.shp","EPSG:3395"};
+		String [] argsII = {"/Users/laemmel/devel/burgdorf2d/tmp/network2d_0.xml","/Users/laemmel/tmp/vis/networkL.shp","/Users/laemmel/tmp/vis/networkP.shp","EPSG:3395"};
 		Links2ESRIShape.main(argsII);
 	}
 

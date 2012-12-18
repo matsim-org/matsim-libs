@@ -38,6 +38,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
+import playground.gregor.sim2d_v4.io.Sim2DEnvironmentWriter02;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
@@ -46,6 +47,7 @@ import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class NetworkCutter {
@@ -54,19 +56,45 @@ public class NetworkCutter {
 	
 	
 	private static final double THRESHOLD = 1;
-	private final Sim2DScenario sc;
 
-	/*package*/ NetworkCutter(Sim2DScenario sc) {
-		this.sc = sc;
+	/*package*/ NetworkCutter() {
 	}
 
-	/*package*/ void run() {
-		for (Sim2DEnvironment env : this.sc.getSim2DEnvironments()) {
-			run(env);
+	/*package*/ void run(Sim2DScenario sc) {
+		for (Sim2DEnvironment env : sc.getSim2DEnvironments()) {
+			processLinks(env);
+			mapLinks(env);
 		}
 	}
 
-	/*package*/ void run(Sim2DEnvironment env) {
+	/*package*/ void mapLinks(Sim2DEnvironment env) {
+		QuadTree<Section> qt = new QuadTree<Section>(env.getEnvelope().getMinX(),env.getEnvelope().getMinY(),env.getEnvelope().getMaxX(),env.getEnvelope().getMaxY());
+		fillQuadtTree(env,qt);
+		Network net = env.getEnvironmentNetwork();
+		
+		int mapped = 0;
+		
+		for (Link l : net.getLinks().values()) {
+			Point p = MGC.coord2Point(l.getCoord());
+			Section sec = qt.get(p.getX(), p.getY());
+			if (!sec.getPolygon().contains(p)) {
+				log.info("could not find link section mapping in quadtree using linear search");
+				for (Section sec2 : env.getSections().values()) {
+					if (sec2.getPolygon().contains(p)){
+						env.addLinkSectionMapping(l, sec2);
+						mapped++;
+						break;
+					}
+				}
+			} else {
+				env.addLinkSectionMapping(l, sec);
+				mapped++;
+			}
+		}
+		log.warn("there are " + (net.getLinks().size()-mapped) + " unmapped links! This is not necessarily an error");
+	}
+
+	/*package*/ void processLinks(Sim2DEnvironment env) {
 		QuadTree<Section> qt = new QuadTree<Section>(env.getEnvelope().getMinX(),env.getEnvelope().getMinY(),env.getEnvelope().getMaxX(),env.getEnvelope().getMaxY());
 		fillQuadtTree(env,qt);
 		Network net = env.getEnvironmentNetwork();
@@ -202,6 +230,7 @@ public class NetworkCutter {
 				}
 				old = c;
 			}
+
 		}
 		
 		
@@ -213,12 +242,14 @@ public class NetworkCutter {
 	}
 	
 	public static void main(String [] args) {
-		Sim2DConfig conf = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/input/sim2dConfig.xml");
+		Sim2DConfig conf = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/tmp/sim2dConfig.xml");
 		Sim2DScenario sc = Sim2DScenarioUtils.loadSim2DScenario(conf);
-		new NetworkCutter(sc).run();
-		String n = sc.getSim2DConfig().getNetworkPath(conf.getSim2DEnvironmentPaths().iterator().next());
+		new NetworkCutter().run(sc);
+		
+		String envStr = conf.getSim2DEnvironmentPaths().iterator().next();
+		String n = sc.getSim2DConfig().getNetworkPath(envStr);
 		new NetworkWriter(sc.getSim2DEnvironments().iterator().next().getEnvironmentNetwork()).write(n);
-//		new Sim2DEnvironmentWriter02(sc.getSim2DEnvironments().iterator().next()).write("/Users/laemmel/devel/burgdorf);
+		new Sim2DEnvironmentWriter02(sc.getSim2DEnvironments().iterator().next()).write(envStr);
 		
 	}
 }

@@ -100,6 +100,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 		}
 		env.setCRS(crs);
 		Section sec = env.createAndAddSection(new IdImpl("sec0"), p, new int[]{0,2}, new Id[]{new IdImpl("sec0")}, level);
+		sec.addRelatedLinkId(new IdImpl("666"));
 
 		new Sim2DEnvironmentWriter02(env).write(outDir + "/test.gml");
 
@@ -129,8 +130,11 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 		for (int i = 0; i < sec.getOpenings().length; i++) {
 			assertEquals(sec.getOpenings()[i],testSec.getOpenings()[i]);
 		}
-		
-
+	
+		assertEquals(sec.getRelatedLinkIds(), testSec.getRelatedLinkIds());
+		for (int i = 0; i < sec.getRelatedLinkIds().size(); i++) {
+			assertEquals(sec.getRelatedLinkIds().get(i),testSec.getRelatedLinkIds().get(i));
+		}
 	}
 
 }

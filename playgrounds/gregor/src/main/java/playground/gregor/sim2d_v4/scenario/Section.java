@@ -20,6 +20,9 @@
 
 package playground.gregor.sim2d_v4.scenario;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
@@ -32,6 +35,7 @@ public class Section implements Identifiable {
 	private int[] openings = null;
 	private Id[] neighbors = null;
 	private final int level;
+	private final List<Id> relatedLinks = new ArrayList<Id>();
 
 	/*package*/ Section(Id id, Polygon p, int[] openings, Id[] neighbors, int level) {
 		this.id = id;
@@ -61,5 +65,14 @@ public class Section implements Identifiable {
 	public Id getId() {
 		return this.id;
 	}
+
+	public void addRelatedLinkId(Id id2) {
+		this.relatedLinks.add(id2);
+	}
+	
+	public List<Id> getRelatedLinkIds() {
+		return this.relatedLinks;
+	}
+	
 	
 }

@@ -38,6 +38,7 @@ public class Sim2DEnvironment implements Identifiable{
 	private Envelope envelope;
 	private CoordinateReferenceSystem crs;
 	private final Map<Id, Section> sections = new HashMap<Id,Section>();
+	private final Map<Link,Section> linkSectionMapping = new HashMap<Link,Section>();
 	private Network net;
 	private  Id id = null;
 	
@@ -80,10 +81,16 @@ public class Sim2DEnvironment implements Identifiable{
 		return this.net;
 	}
 	
-	
-	//TODO link --> section mapping (and link --> evironment mapping) [gl dec 2012]
 	public Section getSection(Link link) {
-		return null;
+		return this.linkSectionMapping.get(link);
+	}
+	
+	public void addLinkSectionMapping(Link link, Section sec) {
+		Section tmp = this.linkSectionMapping.put(link, sec);
+		if (tmp != null) {
+			throw new RuntimeException("link: " + link.getId() + " already mapped to section: " + tmp.getId() + "! Links can only be mapped to one section, will not map link to section: " + sec.getId());
+		}
+		sec.addRelatedLinkId(link.getId());
 	}
 
 	@Override

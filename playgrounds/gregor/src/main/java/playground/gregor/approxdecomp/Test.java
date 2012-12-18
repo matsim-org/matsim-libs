@@ -68,8 +68,8 @@ public class Test {
 	public static void main(String [] args) throws NoSuchAuthorityCodeException, FactoryException {
 		//		String ref = "6 6 6 6 4 6 4 5 5 5 5 4 5 7 4 5 4 7 5 6 5";
 		String p = "/Users/laemmel/devel/burgdorf2d/raw_input/raw_env_p_.sliced.shp";
-		String network = "/Users/laemmel/devel/burgdorf2d/input/network2d_0.xml";
-		String output = "/Users/laemmel/devel/burgdorf2d/input/sim2dEnv_0.gml.gz";
+		String network = "/Users/laemmel/devel/burgdorf2d/tmp/network2d_0.xml";
+		String output = "/Users/laemmel/devel/burgdorf2d/tmp/sim2dEnv_0.gml.gz";
 		//		String p = "/Users/laemmel/tmp/dump.shp";
 //				DecompGuiDebugger dbg = new DecompGuiDebugger();
 //				dbg.setVisible(true);
@@ -191,7 +191,7 @@ public class Test {
 			env.createAndAddSection(new IdImpl("sec" + dec.hashCode()), dec.p, os , n, 0);
 		}
 
-		env.setId(new IdImpl("env0"));
+		env.setId(new IdImpl("env1"));
 		new Sim2DEnvironmentWriter02(env).write(output);
 
 		System.out.println(decomposed.size() + " == 105?");
@@ -207,7 +207,7 @@ public class Test {
 		conf.setTimeStepSize(0.1);
 		conf.addSim2DEnvironmentPath(output);
 		conf.addSim2DEnvNetworkMapping(output, network);
-		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/burgdorf2d/input/sim2dConfig.xml");
+		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/burgdorf2d/tmp/sim2dConfig.xml");
 		
 		
 		

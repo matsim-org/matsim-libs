@@ -23,6 +23,7 @@ package playground.gregor.sim2d_v4.helper;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
@@ -39,6 +40,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.StringUtils;
@@ -55,6 +57,7 @@ import playground.gregor.sim2d_v4.io.osmparser.OSM;
 import playground.gregor.sim2d_v4.io.osmparser.OSMNode;
 import playground.gregor.sim2d_v4.io.osmparser.OSMWay;
 import playground.gregor.sim2d_v4.io.osmparser.OSMXMLParser;
+import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
@@ -65,6 +68,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
@@ -75,6 +79,8 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  */
 public class CustomizedOSM2Sim2DExtendedMATSimScenario {
+	
+	private static final Logger log = Logger.getLogger(CustomizedOSM2Sim2DExtendedMATSimScenario.class);
 
 	//ped flow params
 	private static final double MAX_DENSITY = 5.4;
@@ -107,6 +113,8 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 	}
 
 	private static final GeometryFactory geofac = new GeometryFactory();
+	
+	private static final double THRESHOLD = 1;
 
 	private HashMap<Id, OSMNode> nodes;
 	private final Map<CoordinateReferenceSystem,MathTransform> transforms = new HashMap<CoordinateReferenceSystem,MathTransform>();
@@ -173,7 +181,70 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			}
 
 		}
+		
+		mappLinksToSections();
 
+	}
+
+	private void mappLinksToSections() {
+		for (Sim2DEnvironment  env : this.s2dsc.getSim2DEnvironments() ) {
+			QuadTree<Section> qt = new QuadTree<Section>(env.getEnvelope().getMinX(),env.getEnvelope().getMinY(),env.getEnvelope().getMaxX(),env.getEnvelope().getMaxY());
+			fillQuadtTree(env,qt);
+			Network net = env.getEnvironmentNetwork();
+			
+			int mapped = 0;
+			
+			for (Link l : net.getLinks().values()) {
+				Point p = MGC.coord2Point(l.getCoord());
+				Section sec = qt.get(p.getX(), p.getY());
+				if (!sec.getPolygon().contains(p)) {
+					log.info("could not find link section mapping in quadtree using linear search");
+					for (Section sec2 : env.getSections().values()) {
+						if (sec2.getPolygon().contains(p)){
+							env.addLinkSectionMapping(l, sec2);
+							mapped++;
+							break;
+						}
+					}
+				} else {
+					env.addLinkSectionMapping(l, sec);
+					mapped++;
+				}
+			}
+			log.warn("there are " + (net.getLinks().size()-mapped) + " unmapped links! This is not necessarily an error");
+		}
+		
+	}
+
+	private void fillQuadtTree(Sim2DEnvironment env, QuadTree<Section> qt) {
+		for (Section sec : env.getSections().values()) {
+			Polygon p = sec.getPolygon();
+			Coordinate [] coords = p.getExteriorRing().getCoordinates();
+			Coordinate old = coords[0];
+			
+			qt.put(old.x, old.y, sec);
+			for (int i = 1; i < coords.length-1; i++) {
+				Coordinate c = coords[i];
+				qt.put(c.x, c.y, sec);
+				double dist = old.distance(c);
+				if (dist > THRESHOLD) {
+					double incr = dist/THRESHOLD;
+					double dx = (c.x - old.x)/dist;
+					double dy = (c.y - old.y)/dist;
+					double l = incr;
+					while (l < dist) {
+						double x = old.x + dx*l;
+						double y = old.y + dy*l;
+						qt.put(x, y, sec);
+						l += incr;
+					}
+				}
+				old = c;
+			}
+
+		}
+		
+		
 	}
 
 	private void createLinks(OSMWay way, Sim2DEnvironment env) {
