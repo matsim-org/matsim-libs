@@ -29,14 +29,16 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.telaviv.config.TelAvivConfig;
+
 /*
  * Merging internal and external population together.
  */
 public class MergePopulation {
 	
-	private String internalPopulationFile = "../../matsim/mysimulations/telaviv/population/internal_plans_10.xml.gz";
-	private String externalPopulationFile = "../../matsim/mysimulations/telaviv/population/external_plans_10.xml.gz";
-	private String outFile = "../../matsim/mysimulations/telaviv/population/plans_10.xml.gz";
+	private String internalPopulationFile = TelAvivConfig.basePath + "/population/internal_plans_10.xml.gz";
+	private String externalPopulationFile = TelAvivConfig.basePath + "/population/external_plans_10.xml.gz";
+	private String outFile = TelAvivConfig.basePath + "/population/plans_10.xml.gz";
 	
 	private static final Logger log = Logger.getLogger(MergePopulation.class);
 	
