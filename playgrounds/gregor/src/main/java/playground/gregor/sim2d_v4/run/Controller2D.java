@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DScenarioUtils.java
+ * Controller2D.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,40 +18,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.scenario;
+package playground.gregor.sim2d_v4.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
-public abstract class Sim2DScenarioUtils {
+public class Controller2D extends Controler {
+
+	public Controller2D(Scenario scenario) {
+		super(scenario);
+	}
+
 	
-	public static  Sim2DScenario loadSim2DScenario(Sim2DConfig conf) {
-		Sim2DScenario scenario = new Sim2DScenario(conf);
-		for (String envPath : conf.getSim2DEnvironmentPaths()){
-			Sim2DEnvironment env = new Sim2DEnvironment();
-			new Sim2DEnvironmentReader02(env, false).readFile(envPath);
-			scenario.addSim2DEnvironment(env);
-			String netPath = conf.getNetworkPath(envPath);
-			if (netPath != null) { //not yet clear if this can be null, maybe it even must be null [gl dec 12]
-				Config c = ConfigUtils.createConfig();
-				Scenario sc = ScenarioUtils.createScenario(c);
-				new MatsimNetworkReader(sc).readFile(netPath);
-				Network net = sc.getNetwork();
-				env.setNetwork(net);
-			}
+	
+	public static void main(String [] args) {
+		if (args.length != 2) {
+			printUsage();
+			System.exit(-1);
 		}
-		return scenario;
+		String sim2DConf = args[0];
+		String qsimConf = args[1];
+		Sim2DConfig sim2dc = Sim2DConfigUtils.loadConfig(sim2DConf);
+		Sim2DScenario sim2dsc = Sim2DScenarioUtils.loadSim2DScenario(sim2dc);
+		Config c = ConfigUtils.loadConfig(qsimConf);
+		Scenario sc = ScenarioUtils.loadScenario(c);
+		sc.addScenarioElement(sim2dsc);
+		sim2dsc.connect(sc);
+		new Controller2D(sc).run();
 	}
 	
-	public static Sim2DScenario createSim2dScenario(Sim2DConfig conf) {
-		return new Sim2DScenario(conf);
+	protected static void printUsage() {
+		System.out.println();
+		System.out.println("Controller2D");
+		System.out.println("Controller for hybrid sim2d qsim (pedestrian) simulations.");
+		System.out.println();
+		System.out.println("usage : Controller2D sim2d-config-file qsim-config-file");
+		System.out.println();
+		System.out.println("sim2d-config-file:  A sim2d config file.");
+		System.out.println("qsim-config-file:   A MATSim config file.");
+		System.out.println();
+		System.out.println("---------------------");
+		System.out.println("2012, matsim.org");
+		System.out.println();
 	}
-	
-
 }

@@ -85,12 +85,11 @@ public class Sim2DEnvironment implements Identifiable{
 		return this.linkSectionMapping.get(link);
 	}
 	
-	public void addLinkSectionMapping(Link link, Section sec) {
+	/*package*/ void addLinkSectionMapping(Link link, Section sec) {
 		Section tmp = this.linkSectionMapping.put(link, sec);
 		if (tmp != null) {
 			throw new RuntimeException("link: " + link.getId() + " already mapped to section: " + tmp.getId() + "! Links can only be mapped to one section, will not map link to section: " + sec.getId());
 		}
-		sec.addRelatedLinkId(link.getId());
 	}
 
 	@Override

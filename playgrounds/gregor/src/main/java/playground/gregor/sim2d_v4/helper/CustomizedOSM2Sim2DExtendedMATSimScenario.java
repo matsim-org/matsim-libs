@@ -201,13 +201,15 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 					log.info("could not find link section mapping in quadtree using linear search");
 					for (Section sec2 : env.getSections().values()) {
 						if (sec2.getPolygon().contains(p)){
-							env.addLinkSectionMapping(l, sec2);
+//							env.addLinkSectionMapping(l, sec2);
+							sec2.addRelatedLinkId(l.getId());
 							mapped++;
 							break;
 						}
 					}
 				} else {
-					env.addLinkSectionMapping(l, sec);
+//					env.addLinkSectionMapping(l, sec);
+					sec.addRelatedLinkId(l.getId());
 					mapped++;
 				}
 			}

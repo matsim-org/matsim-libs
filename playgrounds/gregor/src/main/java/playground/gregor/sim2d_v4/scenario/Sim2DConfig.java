@@ -32,8 +32,8 @@ public class Sim2DConfig {
 	
 	
 	
-	private double timeStepSize;
-	private int eventsInterval;
+	private double timeStepSize = 0.1;
+	private int eventsInterval = 0;
 	
 	private final  List<String> sim2DEnvironmentsPaths = new ArrayList<String>();
 	private final Map<String,String> sim2DEnvNetworkMapping = new HashMap<String, String>();
