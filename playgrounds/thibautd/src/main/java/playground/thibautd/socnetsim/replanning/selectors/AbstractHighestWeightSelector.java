@@ -336,10 +336,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 					// we are on a leaf (ie a full plan).
 					// If some combinations are forbidden, check if this one is.
 					if ( log.isTraceEnabled() ) log.trace( "skipping forbiden string "+newString );
-					continue;
+					newString = null;
 				}
 			}
 
+			if (newString == null) continue;
 			if (constructedString == null ||
 					newString.getWeight() > constructedString.getWeight()) {
 				constructedString = newString;

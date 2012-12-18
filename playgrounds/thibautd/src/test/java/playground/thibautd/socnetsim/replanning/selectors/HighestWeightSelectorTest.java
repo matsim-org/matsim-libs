@@ -95,7 +95,8 @@ public class HighestWeightSelectorTest {
 				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent()},
 				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent2()},
 				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgentWithNullScores()},
-				new Fixture[]{createPlanWithDifferentSolutionIfBlocked()});
+				new Fixture[]{createPlanWithDifferentSolutionIfBlocked()},
+				new Fixture[]{createPlanWithNoSolutionIfBlocked()});
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -803,6 +804,67 @@ public class HighestWeightSelectorTest {
 
 		return new Fixture(
 				"different plans if blocking",
+				group,
+				expected,
+				expectedBlock);
+	}
+
+	public static Fixture createPlanWithNoSolutionIfBlocked() {
+		ReplanningGroup group = new ReplanningGroup();
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( 10000d );
+		Plan p1 = plan;
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 0d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 100000d );
+		Plan p2 = plan;
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 0d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -123454d );
+		jp2.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10000d );
+		Plan p3 = plan;
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 100000d );
+		Plan p4 = plan;
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 0d );
+		jp2.put( id , plan );
+
+		JointPlanFactory.createJointPlan( jp1 );
+		JointPlanFactory.createJointPlan( jp2 );
+
+		GroupPlans expected = new GroupPlans(
+					Collections.EMPTY_LIST,
+					Arrays.asList( p1 , p2 , p3 , p4 ) );
+		GroupPlans expectedBlock = null;
+
+		return new Fixture(
+				"no plans if blocking",
 				group,
 				expected,
 				expectedBlock);
