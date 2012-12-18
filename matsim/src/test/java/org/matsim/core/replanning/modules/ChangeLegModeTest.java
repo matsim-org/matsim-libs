@@ -111,7 +111,7 @@ public class ChangeLegModeTest {
 			counter.put(mode, Integer.valueOf(0));
 		}
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 50; i++) {
 			module.handlePlan(plan);
 			Integer count = counter.get(leg.getMode());
 			Assert.assertNotNull("unexpected mode: " + leg.getMode(), count);
