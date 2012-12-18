@@ -29,6 +29,7 @@ import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -45,7 +46,7 @@ import playground.thibautd.cliquessim.run.ImportedJointRoutesChecker;
  * not be available, and, sadly, modules which require a Controler are not compatible.
  * @author thibautd
  */
-public class ImmutableJointController extends AbstractController {
+public final class ImmutableJointController extends AbstractController {
 	private final ControllerRegistry registry;
 	private final ReplanningListener replanner;
 
@@ -140,6 +141,10 @@ public class ImmutableJointController extends AbstractController {
 
 	public final ControllerRegistry getRegistry() {
 		return registry;
+	}
+
+	public OutputDirectoryHierarchy getControlerIO() {
+		return super.controlerIO;
 	}
 
 	public class PreparePersonAlgorithm extends AbstractPersonAlgorithm {

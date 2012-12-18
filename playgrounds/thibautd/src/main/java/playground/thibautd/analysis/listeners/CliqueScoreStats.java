@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -39,6 +40,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -76,9 +78,12 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 	//final private PopulationWithCliques population;
 	final private List<CliqueSizeInfo> infoPerSize = new ArrayList<CliqueSizeInfo>();
 
+	private final OutputDirectoryHierarchy controlerIO;
+	private final Scenario scenario;
 	private final String fileName;
 	private boolean createPNG;
-	private int minIteration = 0;
+	private final int minIteration;
+	private final int maxIteration;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructor and relatives
@@ -92,11 +97,30 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 	 * @throws UncheckedIOException
 	 */
 	public CliqueScoreStats(
+			final Controler controler,
 			final String fileName,
 			final boolean createPNG) throws UncheckedIOException {
-		//this.population = population;
+		this( controler.getScenario(),
+				controler.getControlerIO(),
+				controler.getFirstIteration(),
+				controler.getLastIteration(),
+				fileName,
+				createPNG);
+	}
+
+	public CliqueScoreStats(
+			final Scenario scenario,
+			final OutputDirectoryHierarchy controlerIO,
+			final int firstIteration,
+			final int lastIteration,
+			final String fileName,
+			final boolean createPNG) {
 		this.createPNG = createPNG;
 		this.fileName = fileName;
+		this.minIteration = firstIteration;
+		this.maxIteration = lastIteration;
+		this.scenario = scenario;
+		this.controlerIO = controlerIO;
 	}
 
 	private Map<Integer, List<Clique>> getCliques(final Cliques pop) {
@@ -125,22 +149,18 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		Controler controler = event.getControler();
-		this.minIteration = controler.getFirstIteration();
-		int maxIter = controler.getLastIteration();
-		int iterations = maxIter - this.minIteration;
-		if (iterations > 10000) iterations = 1000; // limit the history size
+		int iterations = maxIteration - minIteration;
 		BufferedWriter out;
 		int cliqueSize;
 
 		Map<Integer, List<Clique>> cliquesPerSize =
-			getCliques((Cliques) JointControlerUtils.getCliques( controler.getScenario() ));
+			getCliques((Cliques) JointControlerUtils.getCliques( scenario ));
 
 		try {
 			for (Map.Entry<Integer, List<Clique>> entry : cliquesPerSize.entrySet()) {
 				cliqueSize = entry.getKey();
 				out = IOUtils.getBufferedWriter(
-						controler.getControlerIO().getOutputFilename(
+						controlerIO.getOutputFilename(
 							fileName+"-size-"+cliqueSize+".txt"));
 				out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
 				this.infoPerSize.add(new CliqueSizeInfo(entry.getValue(), out, iterations));
@@ -271,7 +291,7 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 				chart.addSeries("avg. executed score", iterations, values);
 				chart.addMatsimLogo();
 				// XYChartUtils.integerXAxis(chart.getChart());
-				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename(
+				chart.saveAsPng( controlerIO.getOutputFilename(
 							"scorestats-size-"+info.cliqueSize+".png"), 800, 600);
 			}
 			if (index == info.history[0].length) {
@@ -294,7 +314,7 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 
 		for (CliqueSizeInfo info : this.infoPerSize) {
 			XYChartUtils.integerAxes(info.nJointTripsChart.getChart());
-			info.nJointTripsChart.saveAsPng(event.getControler().getControlerIO().getOutputFilename(
+			info.nJointTripsChart.saveAsPng( controlerIO.getOutputFilename(
 						"jointTrips-size-"+info.cliqueSize+".png"), 800, 600);
 		}
 	}

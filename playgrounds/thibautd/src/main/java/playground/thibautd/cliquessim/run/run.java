@@ -39,6 +39,7 @@ public class run {
 
 		Controler controler = JointControlerUtils.createControler(configFile);
 		controler.addControlerListener(new CliqueScoreStats(
+					controler,
 					"scoresStats",
 					true));
 		controler.addControlerListener(new ModeAnalysis( true ));

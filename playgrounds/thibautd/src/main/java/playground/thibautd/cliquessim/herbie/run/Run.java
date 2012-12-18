@@ -47,6 +47,7 @@ public class Run {
 		Scenario sc = JointControlerUtils.createScenario( config ); 
 		Controler controler = new JointHerbieControler( sc );
 		controler.addControlerListener(new CliqueScoreStats(
+					controler,
 					"scoresStats",
 					true));
 		controler.addControlerListener(new ModeAnalysis( true ));

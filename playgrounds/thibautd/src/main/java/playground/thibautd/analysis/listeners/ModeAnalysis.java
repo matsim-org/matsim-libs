@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ControlerEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -79,7 +80,14 @@ public class ModeAnalysis implements
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		event.getControler().getEvents().addHandler(this);
+		Controler c = event.getControler();
+		
+		if (c != null) {
+			c.getEvents().addHandler(this);
+		}
+		else {
+			log.warn( "no Controler returned by StartupEvent. The listener will not add itself to the events manager." );
+		}
 	}
 
 	@Override

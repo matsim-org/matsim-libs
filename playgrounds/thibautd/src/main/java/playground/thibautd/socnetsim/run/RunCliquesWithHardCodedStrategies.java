@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 
@@ -28,6 +27,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
+import playground.thibautd.analysis.listeners.CliqueScoreStats;
+import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
@@ -60,7 +61,7 @@ public class RunCliquesWithHardCodedStrategies {
 		final Config config = JointControlerUtils.createConfig( configFile );
 		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
 					config.getModule( CliquesConfigGroup.GROUP_NAME );
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		final Scenario scenario = JointControlerUtils.createScenario( config );
 		final ControllerRegistry controllerRegistry =
 			new ControllerRegistry(
 					scenario,
@@ -107,6 +108,16 @@ public class RunCliquesWithHardCodedStrategies {
 					new GroupReplanningListenner(
 						scenario.getPopulation(),
 						strategyManager));
+
+		controller.addControlerListener(
+				new CliqueScoreStats(
+					controllerRegistry.getScenario(),
+					controller.getControlerIO(),
+					controllerRegistry.getScenario().getConfig().controler().getFirstIteration(),
+					controllerRegistry.getScenario().getConfig().controler().getLastIteration(),
+					"scoresStats",
+					true));
+		controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
 
 		// run it
 		controller.run();
