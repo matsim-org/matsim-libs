@@ -124,9 +124,9 @@ public final class StrategyManagerConfigLoader {
 	}
 
 	private static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
-		PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
-		if (planStrategyFactory != null) {
-			PlanStrategy strategy = planStrategyFactory.createPlanStrategy(controler.getScenario(), controler.getEvents());
+		// Special cases, scheduled to go away.
+		if (name.equals("LocationChoice")) {
+			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
 			return strategy;
 		} else if (name.equals("ExternalModule")) {
 			externalCounter++;
@@ -136,12 +136,15 @@ public final class StrategyManagerConfigLoader {
 			em.setIterationNumber(controler.getIterationNumber());
 			strategy.addStrategyModule(em);
 			return strategy;
-		} else if (name.equals("LocationChoice")) {
-			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
-			return strategy;
 		} else {
-			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
-			return strategy;
+			PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
+			if (planStrategyFactory != null) {
+				PlanStrategy strategy = planStrategyFactory.createPlanStrategy(controler.getScenario(), controler.getEvents());
+				return strategy;
+			} else {
+				PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
+				return strategy;	
+			}
 		} 
 	} 
 
