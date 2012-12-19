@@ -836,7 +836,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		config.strategy().addStrategySettings(changeExpBeta);
 		
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
-		reroute.setModuleName("ReRoute_Dijkstra");						// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
+		reroute.setModuleName("ReRoute");  // old name "ReRoute_Dijkstra"						// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		reroute.setProbability( matsimParameter.getStrategy().getReRouteDijkstraProbability() ); 	// should be something like 0.1
 		reroute.setDisableAfter(disableStrategyAfterIteration);
 		config.strategy().addStrategySettings(reroute);
