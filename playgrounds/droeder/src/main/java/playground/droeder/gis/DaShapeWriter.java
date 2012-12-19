@@ -185,7 +185,7 @@ public class DaShapeWriter {
 		AttributeType[] attribs;
 		if(attributes == null){
 			if(links){
-				attribs = new AttributeType[5];
+				attribs = new AttributeType[6];
 			}else{
 				attribs = new AttributeType[2];
 			}
@@ -205,8 +205,9 @@ public class DaShapeWriter {
 		}else{
 			if(links){
 				attribs[2] = AttributeTypeFactory.newAttributeType("capacity",Double.class);
-				attribs[3] = AttributeTypeFactory.newAttributeType("length",Double.class);
-				attribs[4] = AttributeTypeFactory.newAttributeType("modes", String.class);
+				attribs[3] = AttributeTypeFactory.newAttributeType("freeSpeed", Double.class);
+				attribs[4] = AttributeTypeFactory.newAttributeType("length",Double.class);
+				attribs[5] = AttributeTypeFactory.newAttributeType("modes", String.class);
 			}
 		}
 		
@@ -286,6 +287,7 @@ public class DaShapeWriter {
 				attr.put("capacity", l.getCapacity());
 				attr.put("length", l.getLength());
 				attr.put("modes", l.getAllowedModes().toString());
+				attr.put("freeSpeed", l.getFreespeed());
 				feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), attr);
 			}else{
 				feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), attributes.get(l.getId()));

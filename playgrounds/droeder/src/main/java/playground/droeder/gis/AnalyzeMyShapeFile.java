@@ -15,7 +15,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 public class AnalyzeMyShapeFile {
 	
 	public static void main(String[] args) throws IOException{
-		new AnalyzeMyShapeFile().run("E:/rsa/server/possibleRoutes.shp");
+		new AnalyzeMyShapeFile().run("E:/rsa/server/runs/jtlu2/cordon.shp");
 	}
 	
 	
