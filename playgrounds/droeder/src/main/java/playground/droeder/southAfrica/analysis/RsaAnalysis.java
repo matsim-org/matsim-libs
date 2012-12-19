@@ -28,7 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
 import playground.vsp.analysis.modules.boardingAlightingCount.BoardingAlightingCountAnalyzer;
-import playground.vsp.analysis.modules.ptAccessibility.PtAccesibility;
+import playground.vsp.analysis.modules.ptAccessibility.PtAccessibility;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesAnalyzer;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
 import playground.vsp.analysis.modules.stuckAgents.GetStuckEventsAndPlans;
@@ -161,7 +161,7 @@ public class RsaAnalysis {
 		
 		
 		GetStuckEventsAndPlans writeStuck = new GetStuckEventsAndPlans(sc);
-		PtAccesibility ptAcces = new PtAccesibility(sc, cluster, activityCluster);
+		PtAccessibility ptAcces = new PtAccessibility(sc, cluster, 36, activityCluster);
 		
 		TTtripAnalysis tripAna = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());
 		tripAna.addZones(zones);
