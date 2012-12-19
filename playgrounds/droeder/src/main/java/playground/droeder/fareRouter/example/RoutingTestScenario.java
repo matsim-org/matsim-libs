@@ -91,12 +91,12 @@ public class RoutingTestScenario {
 		
 		Map<String, Double> ticketType2fare = new HashMap<String, Double>();
 		ticketType2fare.put(ThirtyMinTicket.NAME, new Double(1800.));
-		ticketType2fare.put(TwoHourTicket.NAME, new Double(3600.));
+		ticketType2fare.put(TwoHourTicket.NAME, new Double(3598.));
 		
 		TicketFactory ticketFactory = new MyTicketFactory(scenario.getTransitSchedule().getTransitLinesAttributes(), ticketType2fare);
 		
 		TransitFareTravelDisutility disutility = new TransitFareTravelDisutility(transitRouterNetworkTravelTimeAndDisutility, 
-				scenario.getConfig().planCalcScore(), new TicketMachineImpl(ticketFactory));
+				scenario.getConfig().planCalcScore(), new TicketMachineImpl(ticketFactory, scenario.getTransitSchedule().getTransitLinesAttributes()));
 		
 		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
 		
@@ -105,13 +105,13 @@ public class RoutingTestScenario {
 		for(Person p : scenario.getPopulation().getPersons().values()){
 			Plan plan = p.getSelectedPlan();
 			System.out.println("person " + p.getId().toString() + " planned to go ");
-			System.out.println(p.getCustomAttributes().toString());
 			Coord from, to;
 			Double departureTime;
 			from = ((Activity) plan.getPlanElements().get(0)).getCoord();
 			to = ((Activity) plan.getPlanElements().get(2)).getCoord();
 			departureTime = ((Leg) plan.getPlanElements().get(1)).getDepartureTime();
 			System.out.println("from " + from.toString()  + " to "+ to.toString() + " at " + departureTime);
+			System.out.println(p.getCustomAttributes().toString());
 			System.out.println();
 			System.out.println("he realized:");
 			
@@ -138,7 +138,7 @@ public class RoutingTestScenario {
 		plan = factory.createPlan();
 		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(0., 0.)));
 		leg = factory.createLeg("pt");
-		leg.setDepartureTime(6*3600 - 1);
+		leg.setDepartureTime(6*3600);
 		plan.addLeg(leg);
 		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(3500., 0.)));
 		person.addPlan(plan);
@@ -149,7 +149,7 @@ public class RoutingTestScenario {
 		plan = factory.createPlan();
 		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(0., 0.)));
 		leg = factory.createLeg("pt");
-		leg.setDepartureTime(6*3600 - 1);
+		leg.setDepartureTime(6*3600);
 		plan.addLeg(leg);
 		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(3500., 0.)));
 		person.addPlan(plan);
@@ -212,14 +212,14 @@ public class RoutingTestScenario {
 		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
 		line.addRoute(r2);
 		
-		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
-		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
 		schedule.addTransitLine(line);
 		
 		
 		time += offset;
 		lineId ="2";
-		fareSingleBoarding = 1802.;
+		fareSingleBoarding = 1801.;
 		line = f.createTransitLine(new IdImpl(lineId));
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f2, Time.UNDEFINED_TIME, 0.0));
@@ -237,8 +237,8 @@ public class RoutingTestScenario {
 		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
 		line.addRoute(r2);
 		
-		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
-		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
 		schedule.addTransitLine(line);
 		
 		
@@ -262,8 +262,8 @@ public class RoutingTestScenario {
 		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
 		line.addRoute(r2);
 		
-		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
-		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
 		schedule.addTransitLine(line);
 		
 		
@@ -287,8 +287,8 @@ public class RoutingTestScenario {
 		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
 		line.addRoute(r2);
 		
-		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, SingleBoardingTicket.NAME);
-		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, SingleBoardingTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
 		schedule.addTransitLine(line);
 		
 		
@@ -312,8 +312,8 @@ public class RoutingTestScenario {
 		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
 		line.addRoute(r2);
 		
-		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
-		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
 		schedule.addTransitLine(line);
 		
 		
@@ -337,8 +337,8 @@ public class RoutingTestScenario {
 		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
 		line.addRoute(r2);
 		
-		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
-		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
 		schedule.addTransitLine(line);
 		
 		
@@ -362,8 +362,8 @@ public class RoutingTestScenario {
 		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
 		line.addRoute(r2);
 		
-		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, SingleBoardingTicket.NAME);
-		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), MyTicketFactory.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, SingleBoardingTicket.NAME);
+		schedule.getTransitLinesAttributes().putAttribute(r2.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, ThirtyMinTicket.NAME + "," + TwoHourTicket.NAME);
 		schedule.addTransitLine(line);
 	}
 }

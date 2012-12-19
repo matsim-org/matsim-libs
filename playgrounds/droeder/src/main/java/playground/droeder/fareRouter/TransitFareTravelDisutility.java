@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.vehicles.Vehicle;
@@ -53,41 +54,57 @@ public class TransitFareTravelDisutility implements TransitTravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle, CustomDataManager dataManager) {
+		StringBuffer debugger = new StringBuffer();
 		//get the default disutility
-		Double disutility = this.disutility.getLinkTravelDisutility(link, time, person, vehicle, dataManager);
+		Double disutilityOfTravelling = this.disutility.getLinkTravelDisutility(link, time, person, vehicle, dataManager);
 		TransitRouterNetworkLink l = (TransitRouterNetworkLink) link;
-		// TODO[dr] the object is null, when it should not be null. 
+		debugger.append("handling link " + ((TransitRouterNetworkNode) link.getFromNode()).getStop().getStopFacility().getId() 
+				+ ">" + ((TransitRouterNetworkNode) link.getToNode()).getStop().getStopFacility().getId() + "\t");
+		debugger.append("disutilityOfTravelling: " + disutilityOfTravelling + "\t");
 		Object o = dataManager.getFromNodeCustomData();
 		if(l.getLine() == null){
-			// this is a transferLink, we don't need ticketing here
-			return disutility;
+			// we're on a transit-link. Thus, there is no fare, but we have to store the old ticket again!
+			dataManager.setToNodeCustomData(o);
+			return disutilityOfTravelling;
 		}
 		// calculate the expected travelTime on the link
 		Double expTravelTime = l.toNode.stop.getArrivalOffset() - l.fromNode.stop.getDepartureOffset();
+		debugger.append("TransitLine: " + l.getLine().getId() + "\tTransitRoute: " + l.getRoute().getId() + "\t");
 		// we're traveling on real pt, thus calculate the TransitFareDisutility
 		Ticket t = null;
 		if(o == null){
 			// we're on the first real pt-leg within this trip. Thus, get a new ticket! 
 			t = this.ticketMachine.getNewTicket(l.getRoute().getId(), l.getLine().getId(), person, time, expTravelTime);
+			debugger.append("bought a new " + t.getType() + " without update" + "\t");
 		}else {
 			// we already bought a ticket
 			t = (Ticket) o;
-			// check if it is valid
 			// TODO[dr] implement the distance calculation
 			Double travelledDistance = 0.;
+			// check if it is valid
 			if(!this.ticketMachine.isValid(t, l.getRoute().getId(), l.getLine().getId(), time, expTravelTime, travelledDistance)){
 				// try to upgrade
+				debugger.append("trying to upgrade " + t.getType() + "\t");
 				t = this.ticketMachine.upgrade(t, l.getRoute().getId(), l.getLine().getId(), person, time, expTravelTime, travelledDistance);
 				// if not possible, buy a new one
 				if(t == null){
 					t = this.ticketMachine.getNewTicket(l.getRoute().getId(), l.getLine().getId(), person, time, expTravelTime);
+					debugger.append("no upgrade possible, bought " + t.getType() + "\t");
+				}else{
+					debugger.append("upgraded to " + t.getType() + "\t");
 				}
+			}else{
+				debugger.append("using a valid " + t.getType() + "\t");
 			}
 		}
 		//store the bought ticket
 		dataManager.setToNodeCustomData(t);
 		// and calculate the complete disutility
-		return disutility + (this.margUtilMoney * t.getFare());
+		Double disutilityOfFare = (this.margUtilMoney * t.getFare()); 
+		debugger.append("fareDisutility: " + disutilityOfFare + "\t");
+		debugger.append("time: " + time + "\t");
+		log.debug(debugger.toString());
+		return disutilityOfTravelling + disutilityOfFare;
 	}
 	
 //	private static Double FARELINE1 = 0.;

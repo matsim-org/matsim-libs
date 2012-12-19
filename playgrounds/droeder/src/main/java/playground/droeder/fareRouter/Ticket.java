@@ -64,7 +64,11 @@ public interface Ticket {
 	 */
 	public Double getOriginalFare();
 
-	
+	/**
+	 * 
+	 * @return the name of the ticketType
+	 */
+	public String getType();
 	
 }
 

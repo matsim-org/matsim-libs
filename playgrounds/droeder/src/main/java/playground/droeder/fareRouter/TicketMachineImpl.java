@@ -18,9 +18,11 @@
  * *********************************************************************** */
 package playground.droeder.fareRouter;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
@@ -28,13 +30,24 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  *
  */
 public class TicketMachineImpl implements TicketMachine{
+	
+	/**
+	 * use this tag to put the allowed tickets on a line to the custom-lineAttribs. It should be a comma-separated string!
+	 */
+	public static String ALLOWEDTICKETS = "allowedTickets";
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(TicketMachineImpl.class);
 	private TicketFactory ticketFactory;
+	private ObjectAttributes transitLineAttribs;
 
-	public TicketMachineImpl(TicketFactory ticketFactory) {
+	public TicketMachineImpl(TicketFactory ticketFactory, ObjectAttributes transitLineAttribs) {
 		this.ticketFactory = ticketFactory;
+		this.transitLineAttribs = transitLineAttribs;
+	}
+	
+	protected ObjectAttributes getTransitLineAttribs(){
+		return this.transitLineAttribs;
 	}
 
 	
@@ -45,6 +58,14 @@ public class TicketMachineImpl implements TicketMachine{
 	
 	@Override
 	public boolean isValid(Ticket t, Id routeId, Id lineId, Double time, Double expectedTravelTime, Double travelledDistance) {
+		String[] allowedTickets = ((String) this.transitLineAttribs.getAttribute(routeId.toString(), ALLOWEDTICKETS)).split(",");
+		boolean allowed = false;
+		for(String s : allowedTickets){
+			if(s.equals(t.getType())){
+				allowed = true;
+			}
+		}
+		if(!allowed) return false;
 		if(t.timeExpired(time + expectedTravelTime)) return false;
 		if(t.distanceExpired(travelledDistance)) return false;
 		if(t.lineForbidden(lineId)) return false;
@@ -55,7 +76,7 @@ public class TicketMachineImpl implements TicketMachine{
 
 	@Override
 	public Ticket upgrade(Ticket ticketToUpgrade, Id routeId, Id lineId, Person person, Double time, Double expectedTravelTime, Double travelledDistance) {
-		return this.ticketFactory.upgrade(ticketToUpgrade, routeId, lineId, person, expectedTravelTime, time, travelledDistance);
+		return this.ticketFactory.upgrade(ticketToUpgrade, routeId, lineId, person, time, expectedTravelTime, travelledDistance);
 	}
 }
 

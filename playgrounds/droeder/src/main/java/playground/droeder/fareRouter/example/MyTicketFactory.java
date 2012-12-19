@@ -27,6 +27,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.droeder.fareRouter.Ticket;
 import playground.droeder.fareRouter.TicketFactory;
+import playground.droeder.fareRouter.TicketMachineImpl;
 
 /**
  * @author droeder
@@ -34,12 +35,6 @@ import playground.droeder.fareRouter.TicketFactory;
  */
 public class MyTicketFactory implements TicketFactory{
 	@SuppressWarnings("unused")
-	
-	/**
-	 * use this tag to put the allowed tickets on a line to the custom-lineAttribs. It should be a comma-separated string!
-	 */
-	public static String ALLOWEDTICKETS = "allowedTickets";
-	
 	
 	/**
 	 * use this tag to put a boolean to the persons custom-attributes
@@ -60,7 +55,7 @@ public class MyTicketFactory implements TicketFactory{
 
 	@Override
 	public Ticket createTicket(Id routeId, Id lineId, Person person, Double time, Double expectedTravelTime) {
-		String[] allowedTickets = ((String) this.lineAttribs.getAttribute(routeId.toString(), ALLOWEDTICKETS)).split(",");
+		String[] allowedTickets = ((String) this.lineAttribs.getAttribute(routeId.toString(), TicketMachineImpl.ALLOWEDTICKETS)).split(",");
 		// first check if the person owns a flatrate
 		if((Boolean) person.getCustomAttributes().get(USEFLATRATE)){
 			// now check if the line allows the flatrate
@@ -99,14 +94,14 @@ public class MyTicketFactory implements TicketFactory{
 	public Ticket upgrade(Ticket ticketToUpgrade, Id routeId, Id lineId, Person person, Double time, Double expectedTravelTime, Double travelledDistance) {
 		// we're upgrading only the TwentyMinTicket 
 		if(ticketToUpgrade instanceof ThirtyMinTicket){
-			String[] allowedTickets = ((String) this.lineAttribs.getAttribute(routeId.toString(), ALLOWEDTICKETS)).split(",");
+			String[] allowedTickets = ((String) this.lineAttribs.getAttribute(routeId.toString(), TicketMachineImpl.ALLOWEDTICKETS)).split(",");
 			for(String type: allowedTickets){
 				if(type.equals(TwoHourTicket.NAME)){
-					// a two-hour-ticket is allowed, thus we can upgrade
-					Double newTimeToExpire = ((ThirtyMinTicket) ticketToUpgrade).getTimeToExpire() + (100 * 60);
-					if(newTimeToExpire < (time + expectedTravelTime)){
+					// a two-hour-ticket is allowed, thus we can upgrade. but we have to increase the timeToExpire for ninety minutes.
+					Double newTimeToExpire = ((ThirtyMinTicket) ticketToUpgrade).getTimeToExpire() + ( 90 * 60);
+					if(newTimeToExpire > (time + expectedTravelTime)){
 						// we charge only the difference of the fare, assuming the upgraded ticket is more expensive than the old one
-						return new TwoHourTicket(this.ticketType2Fare.get(type) - this.ticketType2Fare.get(ThirtyMinTicket.NAME), newTimeToExpire);
+						return new TwoHourTicket(this.ticketType2Fare.get(type) - this.ticketType2Fare.get(ThirtyMinTicket.NAME), newTimeToExpire - (2*3600));
 					}
 				}
 			}
@@ -173,6 +168,11 @@ class SingleBoardingTicket implements Ticket{
 	public Double getOriginalFare() {
 		return this.fare;
 	}
+
+	@Override
+	public String getType() {
+		return NAME;
+	}
 }
 
 class TwoHourTicket implements Ticket{
@@ -227,6 +227,11 @@ class TwoHourTicket implements Ticket{
 	@Override
 	public Double getOriginalFare() {
 		return this.fare;
+	}
+	
+	@Override
+	public String getType() {
+		return NAME;
 	}
 }
 
@@ -289,6 +294,11 @@ class ThirtyMinTicket implements Ticket{
 	public Double getOriginalFare() {
 		return this.fare;
 	}
+	
+	@Override
+	public String getType() {
+		return NAME;
+	}
 }
 
 class FlatRate implements Ticket{
@@ -336,6 +346,11 @@ class FlatRate implements Ticket{
 	@Override
 	public Double getOriginalFare() {
 		return this.fare;
+	}
+	
+	@Override
+	public String getType() {
+		return NAME;
 	}
 }
 
