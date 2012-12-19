@@ -21,7 +21,9 @@
 package playground.gregor.sim2d_v4.helper;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
@@ -37,6 +39,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -165,6 +169,12 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			throw new IllegalArgumentException(e);
 		}
 
+		Set<String> walk = new HashSet<String>();
+		walk.add("walk");
+		Set<String> walkWalk2d = new HashSet<String>();
+		walkWalk2d.add("walk");
+		walkWalk2d.add("walk2d");
+		
 		for (OSMWay way : osm.getWays()) {
 			String v = way.getTags().get(K_M_TYPE);
 			if (v != null) { //sim2d 
@@ -173,10 +183,10 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 				if (v.equals(V_M_TYPE_ENV)) {
 					createSection(way,env);
 				} else if (v.equals(V_M_TYPE_NET)) {
-					createLinks(way,env);
+					createLinks(way,env,walkWalk2d);
 				}
 			} else if (way.getTags().get(K_M_TRA_MODE) != null) { //standard matsim 
-				createLinks(way,dummyEnv);
+				createLinks(way,dummyEnv,walk);
 				
 			}
 
@@ -249,7 +259,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		
 	}
 
-	private void createLinks(OSMWay way, Sim2DEnvironment env) {
+	private void createLinks(OSMWay way, Sim2DEnvironment env, Set<String> modes) {
 
 		Network net = env.getEnvironmentNetwork();
 		//		Network net = this.env.getEnvironmentNetwork();
@@ -280,6 +290,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			l0.setNumberOfLanes(nofLanes);
 			double l = ((CoordImpl)n1.getCoord()).calcDistance(n2.getCoord());
 			l0.setLength(l);
+			l0.setAllowedModes(modes);
 			net.addLink(l0);
 			Id id1 = new IdImpl(LINK_ID_PREFIX+i+"_rev_"+ IdSuffix);
 			Link l1 = fac.createLink(id1, n2, n1);
@@ -287,8 +298,8 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			l1.setFreespeed(fs);
 			l1.setNumberOfLanes(nofLanes);
 			l1.setLength(l);
+			l1.setAllowedModes(modes);
 			net.addLink(l1);
-
 		}
 
 	}
@@ -397,7 +408,8 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 	public static void main (String [] args) throws NoSuchAuthorityCodeException, FactoryException {
 		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/sim2d.osm";
 		String inputDir = "/Users/laemmel/devel/burgdorf2d/input";
-
+		String outputDir = "/Users/laemmel/devel/burgdorf2d/output";
+		
 		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);
 
@@ -423,6 +435,43 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 
 		c.network().setInputFile(inputDir + "/network.xml.gz");
+		
+		c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
+		c.strategy().addParam("ModuleProbability_1", "1");
+		
+		c.controler().setOutputDirectory(outputDir);
+		
+		c.plans().setInputFile(inputDir + "/population.xml.gz");
+		
+		ActivityParams pre = new ActivityParams("origin");
+		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
+		// the reason is the double precision. see also comment in ActivityUtilityParameters.java (gl)
+		pre.setMinimalDuration(49);
+		pre.setClosingTime(49);
+		pre.setEarliestEndTime(49);
+		pre.setLatestStartTime(49);
+		pre.setOpeningTime(49);
+
+
+		ActivityParams post = new ActivityParams("destionation");
+		post.setTypicalDuration(49); // dito
+		post.setMinimalDuration(49);
+		post.setClosingTime(49);
+		post.setEarliestEndTime(49);
+		post.setLatestStartTime(49);
+		post.setOpeningTime(49);
+		sc.getConfig().planCalcScore().addActivityParams(pre);
+		sc.getConfig().planCalcScore().addActivityParams(post);
+
+		sc.getConfig().planCalcScore().setLateArrival_utils_hr(0.);
+		sc.getConfig().planCalcScore().setPerforming_utils_hr(0.);
+		
+		
+		QSimConfigGroup qsim = new QSimConfigGroup();
+		qsim.setEndTime(30*3600);
+		c.addModule("qsim", qsim);
+		c.controler().setMobsim("hybridQ2D");
+		
 		new ConfigWriter(c).write(inputDir+ "/config.xml");
 
 		new NetworkWriter(sc.getNetwork()).write(c.network().getInputFile());
