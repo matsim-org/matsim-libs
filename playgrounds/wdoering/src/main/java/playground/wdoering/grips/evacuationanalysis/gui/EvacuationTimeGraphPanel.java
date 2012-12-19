@@ -120,7 +120,8 @@ public class EvacuationTimeGraphPanel extends AbstractDataPanel {
 //			int second = (int)((timeInSeconds % 60));
 			
 //			xs[i] = hour*10000 + minute * 100 + second;
-			xs[i] = arrivalTimes.get(i).getFirst()*1000*60;
+			xs[i] = 1000*60*60*23 + arrivalTimes.get(i).getFirst()*1000;
+//			xs[i] = arrivalTimes.get(i).getFirst()*1000*60;
 //			xs[i] = arrivalTimes.get(i).getFirst();
 			ys[i] = arrivalTimes.get(i).getSecond();
 			
@@ -136,18 +137,18 @@ public class EvacuationTimeGraphPanel extends AbstractDataPanel {
 		JFreeChart freeChart = ChartFactory.createTimeSeriesChart("evacuation time", "time (hh:mm:ss)", "persons", dataset, false, false, false);
 //		JFreeChart freeChart = chart.getChart();
 		
-//		XYPlot plot = (XYPlot)freeChart.getPlot();
+		XYPlot plot = (XYPlot)freeChart.getPlot();
+		((DateAxis)(plot.getDomainAxis())).setDateFormatOverride(new SimpleDateFormat("HH:mm:ss"));
 //		plot.getDomainAxis().setLabelFont(ToolConfig.FONT_DEFAULT_BOLD);
 //		plot.getRangeAxis().setLabelFont(ToolConfig.FONT_DEFAULT_BOLD);
+//		plot.getDomainAxis().setTickUnit(new DateTickUnit(DateTickUnitType.DAY, 1, new SimpleDateFormat("HH:mm:ss")));
 //		
 //		DateAxis dateAxis = new DateAxis("time");
 		
 //		dateAxis.setTickUnit(new DateTickUnit(DateTickUnit.MINUTE, 1));
 //		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 //		dateAxis.setDateFormatOverride(simpleDateFormat);
-//		dateAxis.setTickUnit(new DateTickUnit(DateTickUnitType.DAY, 1, new SimpleDateFormat("HH:mm:ss")));
 		
-//		((DateAxis)(plot.getDomainAxis())).setDateFormatOverride(new SimpleDateFormat("mm:ss"));
 //		simpleDateFormat.
 //		dateAxis.setDateFormatOverride();
 		
