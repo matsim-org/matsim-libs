@@ -93,6 +93,7 @@ public class TTAnalysisTrip  extends AbstractAnalysisTrip implements TTAnalysisT
 	}
 	
 	// not essential but good to prevent mixing up different modes
+	// might run into problems, when using multi-modal-trip-routing /dr dec '12
 	private void findMode(ArrayList<PlanElement> elements) {
 		for(PlanElement p : elements){
 			if(p instanceof Leg){
