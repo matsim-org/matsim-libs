@@ -79,6 +79,7 @@ public class BoardAlightEventHandler implements
 	
 	private Map<Id, LinkedList<String>> endAct;
 	private Map<Id, Tuple<Id, Double>> leaveVehicle;
+	private Map<Id, Double> stops;
 	
 	
 
@@ -94,6 +95,7 @@ public class BoardAlightEventHandler implements
 		this.alightEnd = new Counts();
 		this.endAct = new HashMap<Id, LinkedList<String>>();
 		this.leaveVehicle = new HashMap<Id, Tuple<Id,Double>>();
+		this.stops = new HashMap<Id, Double>();
 	}
 
 	@Override
@@ -186,6 +188,16 @@ public class BoardAlightEventHandler implements
 		if(this.transitVehicles.containsKey(event.getVehicleId())){
 			this.transitVehicles.get(event.getVehicleId()).setLocationId(event.getFacilityId());
 		}
+		Double count = this.stops.get(event.getFacilityId());
+		if(count == null){
+			count = 0.;
+		}
+		count++;
+		this.stops.put(event.getFacilityId(), count);
+	}
+	
+	public Map<Id, Double> getStopToDepartures(){
+		return this.stops;
 	}
 
 	@Override

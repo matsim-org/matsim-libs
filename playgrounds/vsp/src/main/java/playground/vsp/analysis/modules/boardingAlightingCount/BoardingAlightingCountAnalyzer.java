@@ -231,6 +231,21 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 				e.printStackTrace();
 			}
 		}
+		
+		// write departures for stops
+		w = IOUtils.getBufferedWriter(outputFolder + "stop2vehicleDepartures.csv");
+		try {
+			w.write("id;x;y;departures;\n");
+			TransitStopFacility f;
+			for(Entry<Id, Double> e: this.handler.getStopToDepartures().entrySet()){
+				f = this.stops.get(e.getKey());
+				w.write(e.getKey() + ";" + f.getCoord().getX() + ";" + f.getCoord().getY() + ";" + e.getValue().toString() + ";\n"); 
+			}
+			w.flush();
+			w.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 }
 
