@@ -21,6 +21,7 @@
 package org.matsim.contrib.grips.config;
 
 import java.awt.Color;
+import java.awt.Font;
 
 public abstract class ToolConfig {
 	
@@ -46,5 +47,8 @@ public abstract class ToolConfig {
 	
 	//grid
 	public static final Color COLOR_GRID = new Color(0,0,0,150);
+	
+	public static Font FONT_DEFAULT = new Font( "SansSerif", Font.PLAIN, 12 );
+	public static Font FONT_DEFAULT_BOLD = new Font( "SansSerif", Font.BOLD, 12 );
 
 }
