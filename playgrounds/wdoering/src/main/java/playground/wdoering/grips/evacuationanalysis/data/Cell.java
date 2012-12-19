@@ -184,5 +184,9 @@ public class Cell<T>
 			return (lower + upper) / 2.0;
 	    }
 	}
+	
+	public static int getCurrentId() {
+		return currentId;
+	}
 
 }

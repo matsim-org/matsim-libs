@@ -49,7 +49,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis;
 import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
+import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Unit;
 import playground.wdoering.grips.evacuationanalysis.data.AttributeData;
 
 public class KeyPanel extends AbstractDataPanel {
@@ -57,7 +59,6 @@ public class KeyPanel extends AbstractDataPanel {
 	private ChartPanel chartPanel;
 	private Mode mode;
 
-	enum Unit { TIME, PEOPLE };
 
 	//inherited field:
 	//protected EventData data
@@ -97,17 +98,17 @@ public class KeyPanel extends AbstractDataPanel {
 			{
 				classColor[i] =this.data.getEvacuationTimeVisData().getAttribute((IdImpl)clusters.get(i).getFirst());
 				
-				classVal[i] =  getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
+				classVal[i] =  EvacuationAnalysis.getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 			}
 			else if (mode.equals(Mode.CLEARING))
 			{
 				classColor[i] = this.data.getClearingTimeVisData().getAttribute((IdImpl)clusters.get(i).getFirst());
-				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
+				classVal[i] = EvacuationAnalysis.getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 			}
 			else 
 			{
 				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute((IdImpl)clusters.get(i).getFirst()).getSecond();
-				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.PEOPLE);
+				classVal[i] = EvacuationAnalysis.getReadableTime(clusters.get(i).getSecond(), Unit.PEOPLE);
 			}
 			
 //			System.out.println("val:");
@@ -135,7 +136,7 @@ public class KeyPanel extends AbstractDataPanel {
 			keyPanel.add(valueLabels[i], c);
 		}
 		
-		
+		this.add(new JLabel(""+mode));
 		this.add(keyPanel);
 		this.validate();
 		this.setSize(this.width, this.height);
@@ -150,42 +151,6 @@ public class KeyPanel extends AbstractDataPanel {
 		drawDataPanel();
 	}
 	
-	public String getReadableTime(double value, Unit unit)
-	{
-		if (unit.equals(Unit.PEOPLE))
-			return " " + (int)value + " people";
-		
-		double minutes = 0;
-		double hours = 0;
-		double seconds = 0;
-		
-		if (value<0d)
-			return "";
-		else
-		{
-			if (value/60>1d) //check if minutes need to be displayed
-			{
-				if (value/3600>1d) //check if hours need to be displayed
-				{
-					hours = Math.floor(value/3600);
-					minutes = Math.floor((value-hours*3600)/60);
-					seconds = Math.floor((value-(hours*3600)-(minutes*60)));
-					return " > " + (int)hours + "h, " + (int)minutes + "m, " + (int)seconds + "s";
-				}
-				else
-				{
-					minutes = Math.floor(value/60);
-					seconds = Math.floor((value-(minutes*60)));
-					return " > " + (int)minutes + "m, " + (int)seconds + "s";
-					
-				}
-				
-			}
-			else
-			{
-				return " > " + (int)seconds + "s";								
-			}
-		}
-	}
+
 
 }

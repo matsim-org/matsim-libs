@@ -120,6 +120,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private float cellTransparency;
 	
 	private int k;
+	private int cellCount;
+	private boolean ignoreExitLink = true;
 	
 
 	public EventHandler(String eventFilename, Scenario sc, double cellSize, Thread readerThread)
@@ -134,6 +136,14 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	
 	public void setK(int k) {
 		this.k = k;
+	}
+	
+	public void setIgnoreExitLink(boolean ignoreExitLink) {
+		this.ignoreExitLink = ignoreExitLink;
+	}
+	
+	public boolean isIgnoreExitLink() {
+		return ignoreExitLink;
 	}
 	
 	private void init() {
@@ -166,43 +176,18 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			this.links.add(link);
 
 		}		
-		
-//		for (org.matsim.api.core.v01.network.Node n : this.network.getNodes().values()) {
-//			
-//			if ((n.getId().toString().contains("en")) || (n.getId().toString().contains("el")))
-//				continue;
-//			
-//			double x = n.getCoord().getX();
-//			double y = n.getCoord().getY();
-//			
-//			if (x < minX) {
-//				minX = x;
-//			}
-//			
-//			if (x > maxX) {
-//				maxX = x;
-//			}
-//			
-//			if (y < minY) {
-//				minY = y;
-//			}
-//			
-//			if (y > maxY) {
-//				maxY = y;
-//			}
-//		}
-		
+				
 		this.boundingBox = new Rect(minX,minY,maxX,maxY);
 		
 		this.cellTree = new QuadTree<Cell>(minX,minY,maxX,maxY);
 		
+		cellCount = 0;
 		for (double x = minX; x <= maxX; x += cellSize) {
 			for (double y = minY; y <= maxY; y += cellSize) {
 				Cell<List<Event>> cell = new Cell(new LinkedList<Event>());
-				
 				cell.setCoord(new CoordImpl(x, y));
-				
 				this.cellTree.put(x, y, cell);
+				cellCount++;
 			}
 			
 		}
@@ -271,6 +256,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		if (event.getPersonId().toString().contains("veh"))
 			return;
 		
+		
 		//get cell from person id
 		AgentDepartureEvent departure = (AgentDepartureEvent)this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
@@ -281,12 +267,19 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		List<Event> cellEvents = cell.getData();
 		cellEvents.add(event);
 		
+		//do not consider the exit link
+		if ((ignoreExitLink)&&(cell.getId().toString().equals(""+Cell.getCurrentId())))
+			return;
+		
 		double time = event.getTime() - departure.getTime();
 
-		cell.setTimeSum(cell.getTimeSum() + time);
+		if (!cell.getId().toString().equals(cellCount))
+		{
+			cell.setTimeSum(cell.getTimeSum() + time);
 		
-		//update max timesum of all cells
-		this.maxCellTimeSum = Math.max(cell.getTimeSum(), this.maxCellTimeSum);
+			//update max timesum of all cells
+			this.maxCellTimeSum = Math.max(cell.getTimeSum(), this.maxCellTimeSum);
+		}
 		
 		cell.incrementCount();
 		this.timeSum += time;
@@ -323,8 +316,10 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		Link link = this.network.getLinks().get(linkId);
 		Coord c = link.getCoord();
 		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
-		
-//		this.cellTree.get
+
+		//do not consider the exit link
+		if ((ignoreExitLink)&&(cell.getId().toString().equals(""+Cell.getCurrentId())))
+			return;
 		
 		//update cell link enter time
 		cell.addLinkEnterTime(linkId, personId, event.getTime());
@@ -348,6 +343,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkLeaveEvent event)
 	{
+		
 		//get link id
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();
@@ -356,6 +352,10 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		Link link = this.network.getLinks().get(linkId);
 		Coord c = link.getCoord();
 		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
+
+		//do not consider the exit link
+		if ((ignoreExitLink)&&(cell.getId().toString().equals(""+Cell.getCurrentId())))
+			return;
 		
 		//update cell link leave time
 		cell.addLinkLeaveTime(linkId, personId, event.getTime());
@@ -397,6 +397,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		
 		//set visualization attributes
 		setVisualData(eventData);
+		
+		System.out.println("cellcount:" + cellCount);
 		
 		return eventData;
 	}

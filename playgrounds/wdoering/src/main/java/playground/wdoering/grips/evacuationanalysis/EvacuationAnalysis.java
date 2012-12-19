@@ -23,6 +23,7 @@ package playground.wdoering.grips.evacuationanalysis;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -36,6 +37,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -156,6 +159,9 @@ public class EvacuationAnalysis implements ActionListener{
 	private JLabel gridSizeLabel;
 	private String cellSizeText = " cell size: ";
 	private int k = 5;
+	private boolean useCalculateButton = false;
+	public enum Unit { TIME, PEOPLE };
+
 	
 	
 
@@ -231,7 +237,7 @@ public class EvacuationAnalysis implements ActionListener{
 		//basic frame settings
 		//////////////////////////////////////////////////////////////////////////////
 		
-		this.frame = new JFrame();
+		this.frame = new JFrame("Evacuation Analysis");
 		this.frame.setSize(960, 768);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.getContentPane().setLayout(new BorderLayout(0, 0));
@@ -258,23 +264,13 @@ public class EvacuationAnalysis implements ActionListener{
 		//////////////////////////////////////////////////////////////////////////////
 		
 		this.graphPanel = new EvacuationTimeGraphPanel(360,280);
-		this.keyPanel = new KeyPanel(this.mode, 360,140);
+		this.keyPanel = new KeyPanel(this.mode, 360,160);
 		this.keyPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
 		this.controlPanel = new JPanel(new GridLayout(7, 3));
 		this.controlPanel.setPreferredSize(new Dimension(360,220));
 		this.controlPanel.setSize(new Dimension(360,220));
 
-		//FIXME: this part is meant to display the graph in another window
-//		JFrame graphFrame = new JFrame();
-//		graphFrame.setPreferredSize(new Dimension(1000, 1000));
-//		graphFrame.setSize(1000, 1000);
-//		graphFrame.setLocationRelativeTo(null);
-//		graphFrame.add(graphPanel);
-//		graphFrame.setVisible(true);
-//		graphFrame.validate();
-		
-//		this.blockPanel.add(this.panelDescriptions);
 		this.blockPanel.add(graphPanel);
 		this.blockPanel.add(keyPanel);
 		this.blockPanel.add(controlPanel);
@@ -297,6 +293,7 @@ public class EvacuationAnalysis implements ActionListener{
 		this.saveButton = new JButton("Save");
 		this.saveButton.setEnabled(false);
 		this.saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
+		
 		this.calcButton = new JButton("calculate");
 		this.calcButton.setEnabled(false);
 		this.calcButton.addActionListener(this);
@@ -315,11 +312,33 @@ public class EvacuationAnalysis implements ActionListener{
 		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		this.gridSizeSlider = new JSlider(JSlider.HORIZONTAL, 100, 600, (int)this.cellSize);
+		this.gridSizeSlider.setMinorTickSpacing(20);
+		this.gridSizeSlider.setPaintTicks(true);
+		this.gridSizeSlider.setSnapToTicks(true);
 		this.gridSizeSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				updateCellSize( ((JSlider)(e.getSource())).getValue()  );
+				int value = ((JSlider)(e.getSource())).getValue();
+				value = value - (value % 20);
+				updateCellSize( value  );
 			}
+		});
+		
+		this.gridSizeSlider.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent arg0)
+			{
+				if (!useCalculateButton)
+					runCalculation();
+			}
+			@Override
+			public void mousePressed(MouseEvent arg0) {}
+			@Override
+			public void mouseExited(MouseEvent arg0) {}
+			@Override
+			public void mouseEntered(MouseEvent arg0) {}
+			@Override
+			public void mouseClicked(MouseEvent arg0) {}
 		});
 		
 //		this.gridSizeSlider.setActionCommand("changeIteration");
@@ -343,7 +362,8 @@ public class EvacuationAnalysis implements ActionListener{
 		JPanel calculateButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); 
 		calculateButtonPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 7));
 		calculateButtonPanel.add(new JLabel(""));
-		calculateButtonPanel.add(calcButton);
+		if (useCalculateButton)
+			calculateButtonPanel.add(calcButton);
 		calculateButtonPanel.setPreferredSize(new Dimension(220,40));
 		
 		JPanel transparencySliderPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -354,6 +374,22 @@ public class EvacuationAnalysis implements ActionListener{
 			public void stateChanged(ChangeEvent e) {
 				updateTransparency((float)(((JSlider)e.getSource()).getValue())/100f);
 			}
+		});
+		transparencySlider.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent arg0)
+			{
+				if (!useCalculateButton)
+					runCalculation();
+			}
+			@Override
+			public void mousePressed(MouseEvent arg0) {}
+			@Override
+			public void mouseExited(MouseEvent arg0) {}
+			@Override
+			public void mouseEntered(MouseEvent arg0) {}
+			@Override
+			public void mouseClicked(MouseEvent arg0) {}
 		});
 		transparencySlider.setPreferredSize(new Dimension(220,24));
 		transparencySliderPanel.add(new JLabel(" cell transparency: ", SwingConstants.RIGHT));
@@ -512,15 +548,7 @@ public class EvacuationAnalysis implements ActionListener{
 		
 		if (e.getActionCommand() == "calculate")
 		{
-			readEvents();
-			if (this.jMapViewer != null)
-			{
-				this.jMapViewer.repaint();
-			}
-			
-			if (this.gridSizeLabel.getText().contains("*"))
-				this.gridSizeLabel.setText(cellSizeText  + (int)this.cellSize + "m ");
-			
+			runCalculation();
 		}
 
 		if ((e.getActionCommand() == "changeIteration") && (!firstLoad)) 
@@ -528,6 +556,9 @@ public class EvacuationAnalysis implements ActionListener{
 			File newFile = getEventPathFromName(""+iterationsList.getSelectedItem());
 			if (newFile!=null)
 				currentEventFile = newFile;
+			
+			if (!useCalculateButton)
+				runCalculation();
 		}
 		
 		if (e.getActionCommand() == "changeMode")
@@ -547,6 +578,29 @@ public class EvacuationAnalysis implements ActionListener{
 				
 		}
 		
+	}
+
+	private void runCalculation()
+	{
+		try
+		{
+			if (currentEventFile!=null)
+			{
+				readEvents();
+				if (this.jMapViewer != null)
+				{
+					this.jMapViewer.repaint();
+				}
+				
+				if (this.gridSizeLabel.getText().contains("*"))
+					this.gridSizeLabel.setText(cellSizeText  + (int)this.cellSize + "m ");
+			}
+		}
+		finally
+		{
+			this.frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			  this.frame.setCursor(Cursor.getDefaultCursor());
+		}
 	}
 
 	private void setMode(Mode mode)
@@ -937,4 +991,42 @@ public class EvacuationAnalysis implements ActionListener{
 	{
 		return this.cellTransparency;
 	}	
+	
+	public static String getReadableTime(double value, Unit unit)
+	{
+		if (unit.equals(Unit.PEOPLE))
+			return " " + (int)value + " people";
+		
+		double minutes = 0;
+		double hours = 0;
+		double seconds = 0;
+		
+		if (value<0d)
+			return "";
+		else
+		{
+			if (value/60>1d) //check if minutes need to be displayed
+			{
+				if (value/3600>1d) //check if hours need to be displayed
+				{
+					hours = Math.floor(value/3600);
+					minutes = Math.floor((value-hours*3600)/60);
+					seconds = Math.floor((value-(hours*3600)-(minutes*60)));
+					return " > " + (int)hours + "h, " + (int)minutes + "m, " + (int)seconds + "s";
+				}
+				else
+				{
+					minutes = Math.floor(value/60);
+					seconds = Math.floor((value-(minutes*60)));
+					return " > " + (int)minutes + "m, " + (int)seconds + "s";
+					
+				}
+				
+			}
+			else
+			{
+				return " > " + (int)seconds + "s";								
+			}
+		}
+	}
 }

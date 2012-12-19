@@ -23,6 +23,7 @@ package playground.wdoering.grips.evacuationanalysis.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -69,6 +70,7 @@ import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
 import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis;
 import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
+import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Unit;
 import playground.wdoering.grips.evacuationanalysis.data.AttributeData;
 import playground.wdoering.grips.evacuationanalysis.data.Cell;
 import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
@@ -212,47 +214,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		//if left mouse button was clicked
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
-			//if edit mode is off
-//			if (!this.editMode)
-//			{
-//				//if there was no prior selection
-//				if (!this.freezeMode)
-//				{
-//					//activate edition mode (in gui)
-//					this.evacSel.setEditMode(true);
-//
-//					if ((this.currentHoverLinks!=null) && (this.currentHoverLinks.size()>0))
-//					{
-//						//links are being selected. Freeze the selection
-//						this.freezeMode = true;
-//
-//						//give gui the id of the first selected link
-//						this.evacSel.setLink1Id(this.currentHoverLinks.get(0).getId());
-//
-//						//if there are more then just one link in hover
-//						if (this.currentHoverLinks.size()>1)
-//						{
-//							//give gui the second selection link
-//							this.evacSel.setLink2Id(this.currentHoverLinks.get(1).getId());
-//						}
-//						else
-//							//make sure the second link is null then
-//							this.evacSel.setLink2Id(null); 
-//
-//					}
-//					else
-//					{
-//						//if nothing is selected, set them null
-//						this.evacSel.setLink1Id(null);
-//						this.evacSel.setLink2Id(null);						
-//					}
-//				}
-//				else
-//				{
-//					this.evacSel.setEditMode(false);
-//					this.freezeMode = false;
-//				}
-//			}
+
 		}
 
 
@@ -456,8 +418,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							}
 						}
 						
-//						float strokeWidth = (((float)enterTimes.size()/(float)data.getMaxUtilization())*80f) / (float)Math.pow(2,this.getZoom()); 
-								
 						g2D.setStroke(new BasicStroke(strokeWidth));
 						
 						g.setColor(linkColor);
@@ -565,27 +525,30 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 				}
 				
-				
-				
-				g.setColor(Color.BLACK);
-//				System.out.println("w:" + getWidth() + "|h:" + getHeight());
-				g.drawString("w:" + getWidth() + "|h:" + getHeight(), 10, getHeight()-140);
-				
+				//draw tooltip
 				if ((this.selectedCell!=null) && (this.currentMousePosition!=null))
 				{
+					g2D.setStroke(new BasicStroke(1f));
+					g.setColor(new Color(0,0,0,90));
+					g.fillRect(this.currentMousePosition.x-15, this.currentMousePosition.y+30, 260, 85);
 					g.setColor(Color.white);
-					g.fillRect(this.currentMousePosition.x-20, this.currentMousePosition.y+20, 120, 150);
+					g.fillRect(this.currentMousePosition.x-25, this.currentMousePosition.y+20, 260, 85);
 					g.setColor(Color.black);
-					g.drawRect(this.currentMousePosition.x-20, this.currentMousePosition.y+20, 120, 150);
+					g.drawRect(this.currentMousePosition.x-25, this.currentMousePosition.y+20, 260, 85);
 					
-					g.drawString("person count: " + selectedCell.getCount(), this.currentMousePosition.x-15, this.currentMousePosition.y+50);
-					g.drawString("clearing time: " + selectedCell.getClearingTime(), this.currentMousePosition.x-15, this.currentMousePosition.y+70);
-					g.drawString("id:" + this.selectedCell.getId(), this.currentMousePosition.x-15, this.currentMousePosition.y+90);
+					g.setFont( ToolConfig.FONT_DEFAULT_BOLD );
+					g.drawString("person count:", this.currentMousePosition.x-15, this.currentMousePosition.y+40);
+					g.drawString("clearing time:", this.currentMousePosition.x-15, this.currentMousePosition.y+60);
+					g.drawString("average evacuation time:", this.currentMousePosition.x-15, this.currentMousePosition.y+80);
 					
+					g.setFont( ToolConfig.FONT_DEFAULT );
+					g.drawString(EvacuationAnalysis.getReadableTime(selectedCell.getCount(), Unit.PEOPLE), this.currentMousePosition.x+135, this.currentMousePosition.y+40);
+					g.drawString(EvacuationAnalysis.getReadableTime(selectedCell.getClearingTime(), Unit.TIME), this.currentMousePosition.x+135, this.currentMousePosition.y+60);
+					g.drawString(EvacuationAnalysis.getReadableTime(selectedCell.getTimeSum()/selectedCell.getCount(), Unit.TIME), this.currentMousePosition.x+135, this.currentMousePosition.y+80);
+							
+									
 				}
 				g.setColor(Color.black);
-				//////////////////////////////////
-				//////////////////////////////////
 			}
 
 
