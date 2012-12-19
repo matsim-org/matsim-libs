@@ -133,7 +133,7 @@ public class EvacuationTimeGraphPanel extends AbstractDataPanel {
 		dataset.addSeries(timeSeries);
 //		chart.addSeries(data.getEventName(), xs, ys);
 		
-		JFreeChart freeChart = ChartFactory.createTimeSeriesChart("test", "time", "persons", dataset, false, false, false);
+		JFreeChart freeChart = ChartFactory.createTimeSeriesChart("evacuation time", "time (hh:mm:ss)", "persons", dataset, false, false, false);
 //		JFreeChart freeChart = chart.getChart();
 		
 //		XYPlot plot = (XYPlot)freeChart.getPlot();
