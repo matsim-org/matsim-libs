@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
@@ -49,12 +48,20 @@ public class AnalysisRunner {
 
 	/**
 	 * 
-	 * @param args OutputDir RunId iteration nrOfHeatMapTiles shapeFile quadrantSegments
+	 * @param args OutputDir RunId iteration gridSize shapeFile quadrantSegments
 	 */
 	public static void main(String[] args) {
 		
+		String outputDir = args[0];
+		String runId = args[1];
+		int iteration = Integer.parseInt(args[2]);
+		int gridSize = Integer.valueOf(args[3]);
+		String shapeFile = args[4];
+		int quadrantSegments = Integer.parseInt(args[5]);
+		
+		
 		String oldJavaIoTempDir = System.getProperty("java.io.tmpdir");
-		String newJavaIoTempDir = args[0];
+		String newJavaIoTempDir = outputDir;
 		System.out.println("Setting java tmpDir from " + oldJavaIoTempDir + " to " + newJavaIoTempDir);
 		System.setProperty("java.io.tmpdir", newJavaIoTempDir);
 		
@@ -64,12 +71,12 @@ public class AnalysisRunner {
 //		String targetCoordinateSystem = TransformationFactory.WGS84_UTM35S; // Gauteng
 		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
 		
-		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(args[0] + "/" + args[1] + "/", args[1], true, true);
+		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(outputDir + "/" + runId + "/", runId, true, true);
 		
-		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "transitScheduleScored.xml.gz"));
+		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(iteration, "transitScheduleScored.xml.gz"));
 		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
 		new MatsimFacilitiesReader((ScenarioImpl) sc).readFile(dir.getOutputFilename("output_facilities.xml.gz"));
-		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "plans.xml.gz"));
+		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(iteration, "plans.xml.gz"));
 		
 		List<Integer> cluster = new ArrayList<Integer>(){{
 			add(100);
@@ -87,19 +94,18 @@ public class AnalysisRunner {
 			add("car");
 		}};
 		
-		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(args[4]);
+		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(shapeFile);
 		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
 		for(Feature f: features){
 			zones.put((String)f.getAttribute(2), (Geometry) f.getAttribute(0));
 		}
 		
-		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath(), dir.getIterationFilename(Integer.parseInt(args[2]), Controler.FILENAME_EVENTS_XML));
+		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath(), dir.getIterationFilename(iteration, Controler.FILENAME_EVENTS_XML));
 		
 		// works
-		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, Integer.parseInt(args[5]), activityCluster, targetCoordinateSystem);
+		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, quadrantSegments, activityCluster, targetCoordinateSystem);
 		analyzer.addAnalysisModule(ptAccessibility);
 		
-		// testing
 		GetStuckEventsAndPlans getStuckEventsAndPlans = new GetStuckEventsAndPlans(sc);
 		analyzer.addAnalysisModule(getStuckEventsAndPlans);
 		
@@ -115,16 +121,12 @@ public class AnalysisRunner {
 		TransitSchedule2Shp transitSchedule2Shp = new TransitSchedule2Shp(sc, targetCoordinateSystem);
 		analyzer.addAnalysisModule(transitSchedule2Shp);
 		
-		// todo
-		
-		
 		ActivityToModeAnalysis activityToModeAnalysis = new ActivityToModeAnalysis(sc, null, 3600, targetCoordinateSystem);
 		analyzer.addAnalysisModule(activityToModeAnalysis);
 		
 		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = new BoardingAlightingCountAnalyzer(sc, 3600, targetCoordinateSystem);
-		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, Integer.valueOf(args[3]));
+		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, gridSize);
 		
-////		analyzer.addAnalysisModule(waitAna);
 		analyzer.addAnalysisModule(boardingAlightingCountAnalyzes);
 		analyzer.addAnalysisModule(new MyPtCount());
 
