@@ -118,7 +118,8 @@ class MyAgent implements MobsimDriverAgent {
 
 	@Override
 	public void abort(double now) {
-		// I don't think this needs to do anything.
+		this.state = State.ABORT ;
+		log.info( "calling abort; setting state to: " + this.state ) ;
 	}
 
 	@Override
@@ -147,7 +148,7 @@ class MyAgent implements MobsimDriverAgent {
 
 	@Override
 	public String getMode() {
-		return TransportMode.car ; // either car of nothing
+		return TransportMode.car ; // either car or nothing
 	}
 
 	@Override
