@@ -16,18 +16,20 @@ public class MyPlanStrategyFactory implements PlanStrategyFactory {
 		// A PlanStrategy is something that can be applied to a person(!).  
 
 		// It first selects one of the plans:
-		PlanStrategyImpl planStrategyDelegate = new PlanStrategyImpl( new MyPlanSelector(scenario) );
+		PlanStrategyImpl planStrategy = new PlanStrategyImpl( new MyPlanSelector(scenario) );
 
 		// if you just want to select plans, you can stop here.  
 
 		// Otherwise, to do something with that plan, one needs to add modules into the strategy.  If there is at least 
 		// one module added here, then the plan is copied and then modified.
 		MyPlanStrategyModule mod = new MyPlanStrategyModule( scenario ) ;
-		planStrategyDelegate.addStrategyModule(mod) ;
+		planStrategy.addStrategyModule(mod) ;
 
 		// these modules may, at the same time, be events listeners (so that they can collect information):
 		eventsManager.addHandler( mod ) ;
-		return planStrategyDelegate;
+
+		
+		return planStrategy;
 	}
 
 }
