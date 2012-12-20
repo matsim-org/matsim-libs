@@ -20,9 +20,15 @@
 package playground.mmoyo.randomizerPtRouter;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -31,8 +37,8 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterNetworkTravelTimeAndDisutility;
-import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterNetworkTravelTimeAndDisutility.DataCollection;
+import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterNetworkTravelTimeAndDisutility2;
+import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterNetworkTravelTimeAndDisutility2.DataCollection;
 
 public class RndPtRouterLauncher {
 
@@ -41,7 +47,8 @@ public class RndPtRouterLauncher {
 		new TransitRouterFactory() {
 			@Override
 			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterNetworkTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterNetworkTravelTimeAndDisutility(trConfig);
+				RandomizedTransitRouterNetworkTravelTimeAndDisutility2 ttCalculator = 
+					new RandomizedTransitRouterNetworkTravelTimeAndDisutility2(trConfig);
 				ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
 				ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
 				return new TransitRouterImpl(trConfig, routerNetwork, ttCalculator, ttCalculator);
@@ -58,7 +65,27 @@ public class RndPtRouterLauncher {
 		}
 		
 		Config config = ConfigUtils.loadConfig(configFile) ;
-
+		
+		
+		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
+		if ( lastStrategyIdx >= 1 ) {
+			throw new RuntimeException("remove all strategy settings from config; should be done here") ;
+		}
+		
+		{
+		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
+		stratSets.setModuleName("myCadyts");
+		stratSets.setProbability(0.9);
+		config.strategy().addStrategySettings(stratSets);
+		}
+		{
+		StrategySettings stratSets2 = new StrategySettings(new IdImpl(lastStrategyIdx+2));
+		stratSets2.setModuleName("ReRoute"); // test that this does work.  Otherwise define this strategy in config file
+		stratSets2.setProbability(0.9);
+		stratSets2.setDisableAfter(400) ;
+		config.strategy().addStrategySettings(stratSets2);
+		}
+		
 		//load data
 		Scenario scn = ScenarioUtils.loadScenario(config);
 		final TransitRouterConfig trConfig = new TransitRouterConfig( scn.getConfig() ) ; 
@@ -68,10 +95,19 @@ public class RndPtRouterLauncher {
 		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (scn.getTransitSchedule(), trConfig, routerNetwork);
 		
 		//set the controler
-		Controler controler = new Controler(scn);
+		final Controler controler = new Controler(scn);
 		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
 //		controler.addControlerListener(new CadytsPtControlerListener(controler));  //<-set cadyts as controler listener
 		controler.setOverwriteFiles(true);
+		
+		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
+			@Override
+			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+				CadytsPtPlanStrategy cadytsPlanStrategy = new CadytsPtPlanStrategy(scenario, eventsManager) ;
+				controler.addControlerListener(cadytsPlanStrategy) ;
+				return cadytsPlanStrategy ;
+			}
+		});
 		
 		controler.run();
 	}
