@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
@@ -64,6 +63,7 @@ public class ActivityToModeAnalysis extends AbstractAnalyisModule {
 	private HashMap<Integer, Set<Feature>> departureSlotFeatures;
 	private HashMap<Integer, Set<Feature>> arrivalSlotFeatures;
 	private int slotSize;
+	private final String targetCoordinateSystem;
 
 	/**
 	 * a class to create shapefiles per timeSlot for activities mapped to the first mainmode after/before the activity
@@ -71,11 +71,12 @@ public class ActivityToModeAnalysis extends AbstractAnalyisModule {
 	 * @param personsOfInterest, might be null, than all persons are processed
 	 * @param slotSize, timeSlotSize in seconds
 	 */
-	public ActivityToModeAnalysis(Scenario sc, Set<Id> personsOfInterest, int slotSize) {
+	public ActivityToModeAnalysis(Scenario sc, Set<Id> personsOfInterest, int slotSize, String targetCoordinateSystem) {
 		super(ActivityToModeAnalysis.class.getSimpleName());
 		this.net = sc.getNetwork();
 		this.handler = new ActivityToModeAnalysisHandler(this.net, personsOfInterest, ((ScenarioImpl)sc).getActivityFacilities());
 		this.slotSize = slotSize;
+		this.targetCoordinateSystem = targetCoordinateSystem;
 	}
 
 	@Override
@@ -94,7 +95,7 @@ public class ActivityToModeAnalysis extends AbstractAnalyisModule {
 	public void postProcessData() {
 		// creature featureType
 		AttributeType[] attribs = new AttributeType[3];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(this.targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("ActType", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("Mode", String.class);
 		FeatureType featureType = null ;

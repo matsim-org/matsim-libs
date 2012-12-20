@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -64,11 +63,13 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 			.getLogger(TransitSchedule2Shp.class);
 	private Network network;
 	private TransitSchedule schedule;
+	private final String targetCoordinateSystem;
 
-	public TransitSchedule2Shp(Scenario sc) {
+	public TransitSchedule2Shp(Scenario sc, String targetCoordinateSystem) {
 		super(TransitSchedule2Shp.class.getSimpleName());
 		this.schedule =  sc.getTransitSchedule();
 		this.network =  sc.getNetwork();
+		this.targetCoordinateSystem = targetCoordinateSystem;
 	}
 
 	@Override
@@ -92,7 +93,7 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		Collection<Feature> features = new ArrayList<Feature>();
 		// write a shape per line
 		for(TransitLine l: this.schedule.getTransitLines().values()){
-			Collection<Feature> temp = getTransitLineFeatures(l);
+			Collection<Feature> temp = getTransitLineFeatures(l, this.targetCoordinateSystem);
 			features.addAll(temp);
 			try{
 				ShapeFileWriter.writeGeometries(temp, outputFolder + l.getId().toString() + ".shp");
@@ -109,9 +110,9 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 	}
 	
 	
-	private Collection<Feature> getTransitLineFeatures(TransitLine l){
+	private Collection<Feature> getTransitLineFeatures(TransitLine l, String targetCoordinateSystem){
 		AttributeType[] attribs = new AttributeType[7];
-		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("line", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("route", String.class);
 		attribs[3] = AttributeTypeFactory.newAttributeType("mode", String.class);

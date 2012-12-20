@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -54,6 +55,7 @@ public class TransitSchedule2Shape {
 		
 		final String iteration = "380";
 		final String runId = "run71";
+		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
 
 		final String SCHEDULEFILE = "f:/p_runs/txl/" + runId + "/it." + iteration + "/" + runId + "." + iteration + ".transitSchedule.xml.gz";
 		final String COOPLOGGERFILE = "f:/p_runs/txl/" + runId + "/" + runId + ".pCoopLogger.txt";
@@ -92,10 +94,10 @@ public class TransitSchedule2Shape {
 	
 		Map<Id, SortedMap<String, Object>> lineAttributesMap = TransitSchedule2Shape.getAttributesForLines(transitSchedule, pIdentifier);
 		Collection<Id> linesToConvert = TransitSchedule2Shape.getIdsFromAllLinesButParatransitYoungerThanIterationGiven(transitSchedule, pIdentifier, removeAllParatransitLinesYoungerThanIteration);
-		DaShapeWriter.writeTransitLines2Shape(ALLLINESSHAPEOUTFILE, transitSchedule, linesToConvert, lineAttributesMap);
+		DaShapeWriter.writeTransitLines2Shape(ALLLINESSHAPEOUTFILE, transitSchedule, linesToConvert, lineAttributesMap, targetCoordinateSystem);
 		
 		linesToConvert = TransitSchedule2Shape.getIdsFromCoopLoggerInBusinessOnly(transitSchedule, COOPLOGGERFILE);
-		DaShapeWriter.writeTransitLines2Shape(PARAINBUSINESSSHAPEOUTFILE, transitSchedule, linesToConvert, lineAttributesMap);
+		DaShapeWriter.writeTransitLines2Shape(PARAINBUSINESSSHAPEOUTFILE, transitSchedule, linesToConvert, lineAttributesMap, targetCoordinateSystem);
 	}
 	
 	public static Map<Id, SortedMap<String, Object>> getAttributesForLines(TransitSchedule transitSchedule, String pIdentifier){

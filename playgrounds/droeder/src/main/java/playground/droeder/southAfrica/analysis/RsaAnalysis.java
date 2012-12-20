@@ -47,6 +47,8 @@ public class RsaAnalysis {
 	 */
 	public static void main(String[] args) {
 		
+		String targetCoordinateSystem = TransformationFactory.WGS84_UTM35S; // Gauteng
+		
 		Set<String> ptModes = new HashSet<String>(){{
 			add("taxi");
 //			add("bus");
@@ -161,18 +163,18 @@ public class RsaAnalysis {
 		
 		
 		GetStuckEventsAndPlans writeStuck = new GetStuckEventsAndPlans(sc);
-		PtAccessibility ptAcces = new PtAccessibility(sc, cluster, 36, activityCluster);
+		PtAccessibility ptAcces = new PtAccessibility(sc, cluster, 36, activityCluster, targetCoordinateSystem);
 		
 		TTtripAnalysis tripAna = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());
 		tripAna.addZones(zones);
 
 		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = 
-					new BoardingAlightingCountAnalyzer(sc, 3600);
+					new BoardingAlightingCountAnalyzer(sc, 3600, targetCoordinateSystem);
 		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, Integer.valueOf(args[3]));
-		TransitVehicleVolumeAnalyzer ptVehVolAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600.);
-		TransitSchedule2Shp shp = new TransitSchedule2Shp(sc);
-		ActivityToModeAnalysis atm = new ActivityToModeAnalysis(sc, null, 3600);
-		PtPaxVolumesAnalyzer ptVolAna = new PtPaxVolumesAnalyzer(sc, 3600.);
+		TransitVehicleVolumeAnalyzer ptVehVolAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600., targetCoordinateSystem);
+		TransitSchedule2Shp shp = new TransitSchedule2Shp(sc, targetCoordinateSystem);
+		ActivityToModeAnalysis atm = new ActivityToModeAnalysis(sc, null, 3600, targetCoordinateSystem);
+		PtPaxVolumesAnalyzer ptVolAna = new PtPaxVolumesAnalyzer(sc, 3600., targetCoordinateSystem);
 		
 		
 		

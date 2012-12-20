@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -66,6 +65,7 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 	private Scenario sc;
 	private TransitVehicleVolumeHandler handler;
 	private HashMap<String, Map<Id, Double>> mode2Link2Total;
+	private final String targetCoordinateSystem;
 
 	/**
 	 * creates a shapefiles (per pt-mode) containing the links used by pt-vehicles.
@@ -74,10 +74,11 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 	 * @param sc, the scenario containing the links
 	 * @param interval, the interval (normally in seconds)
 	 */
-	public TransitVehicleVolumeAnalyzer(Scenario sc, Double interval) {
+	public TransitVehicleVolumeAnalyzer(Scenario sc, Double interval, String targetCoordinateSystem) {
 		super(TransitVehicleVolumeAnalyzer.class.getSimpleName());
 		this.sc = sc;
 		this.handler = new TransitVehicleVolumeHandler(sc.getTransitSchedule(), interval);
+		this.targetCoordinateSystem = targetCoordinateSystem;
 	}
 
 	@Override
@@ -117,13 +118,13 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 	@Override
 	public void writeResults(String outputFolder) {
 		for(Entry<String, Counts> e: this.handler.getMode2Counts().entrySet()){
-			writeModeShape(e.getKey(), e.getValue(), this.mode2Link2Total.get(e.getKey()), outputFolder + e.getKey() + ".shp");
+			writeModeShape(e.getKey(), e.getValue(), this.mode2Link2Total.get(e.getKey()), outputFolder + e.getKey() + ".shp", this.targetCoordinateSystem);
 		}
 	}
 	
-	private void writeModeShape(String name, Counts counts, Map<Id, Double> mode2Total, String file){
+	private void writeModeShape(String name, Counts counts, Map<Id, Double> mode2Total, String file, String targetCoordinateSystem){
 		AttributeType[] attribs = new AttributeType[3 + this.handler.getMaxTimeSlice() ];
-		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("total", Double.class);
 		for(int  i = 0 ; i< this.handler.getMaxTimeSlice(); i++){

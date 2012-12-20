@@ -36,7 +36,6 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import playground.vsp.analysis.modules.ptAccessibility.activity.ActivityLocation;
@@ -65,9 +64,9 @@ public class PtAccesShapeWriter {
 	 * @param mps
 	 * @param string
 	 */
-	public static void writeMultiPolygons(Map<String, MultiPolygon> mps, String filename, String name) {
+	public static void writeMultiPolygons(Map<String, MultiPolygon> mps, String filename, String name, String targetCoordinateSystem) {
 		AttributeType[] attribs = new AttributeType[2];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon", MultiPolygon.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon", MultiPolygon.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		FeatureType featureType = null ;
 		try {
@@ -98,9 +97,9 @@ public class PtAccesShapeWriter {
 		}
 	}
 	
-	public static void writeActivityLocations(LocationMap locationMap, String outputFolder, String name){
+	public static void writeActivityLocations(LocationMap locationMap, String outputFolder, String name, String targetCoordinateSystem){
 		AttributeType[] attribs = new AttributeType[3];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("type", String.class);
 		FeatureType featureType = null ;

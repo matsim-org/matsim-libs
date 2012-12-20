@@ -64,6 +64,7 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 	private SortedMap<String, HeatMap> heatMaps;
 	private Integer gridSize = Integer.MAX_VALUE;
 	private SortedMap<String, Map<Id, Double>> totals;
+	private final String targetCoordinateSystem;
 
 	/**
 	 * Counts number of boarding and alighting per stop/interval. and differs between boardings 
@@ -72,10 +73,11 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 	 * @param sc, the scenario containing the transitStops
 	 * @param interval, interval-size in seconds
 	 */
-	public BoardingAlightingCountAnalyzer(Scenario sc, int interval) {
+	public BoardingAlightingCountAnalyzer(Scenario sc, int interval, String targetCoordinateSystem) {
 		super(BoardingAlightingCountAnalyzer.class.getSimpleName());
 		this.handler = new BoardAlightEventHandler(interval);
 		this.stops = sc.getTransitSchedule().getFacilities();
+		this.targetCoordinateSystem = targetCoordinateSystem;
 	}
 	
 	/**
@@ -152,16 +154,16 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 	public void writeResults(String outputFolder) {
 		writeCSV(outputFolder);
 		if(this.writeHeatMaps){
-			this.writeHeatMaps(outputFolder);
+			this.writeHeatMaps(outputFolder, this.targetCoordinateSystem);
 		}
 	}
 
 	/**
 	 * @param outputFolder
 	 */
-	private void writeHeatMaps(String outputFolder) {
+	private void writeHeatMaps(String outputFolder, String targetCoordinateSystem) {
 		for(Entry<String, HeatMap> e: this.heatMaps.entrySet()){
-			HeatMap.writeHeatMapShape(e.getKey(), e.getValue(), outputFolder + e.getKey() + ".shp");
+			HeatMap.writeHeatMapShape(e.getKey(), e.getValue(), outputFolder + e.getKey() + ".shp", targetCoordinateSystem);
 		}
 	}
 

@@ -36,7 +36,6 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import playground.vsp.analysis.modules.ptAccessibility.stops.PtStopMap;
@@ -53,13 +52,13 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 public class PtAccessMapShapeWriter {
 
 	@SuppressWarnings("unused")
-//	private static final Logger log = Logger.getLogger(PtAccessMapShapeWriter.class);
+	private static final Logger log = Logger.getLogger(PtAccessMapShapeWriter.class);
 
 	private PtAccessMapShapeWriter() {
 		
 	}
 
-	public static void writeAccessMap(Map<String, Map<String, MultiPolygon>> cluster2mode2area, int quadrantSegments, String outputFolder) {
+	public static void writeAccessMap(Map<String, Map<String, MultiPolygon>> cluster2mode2area, int quadrantSegments, String outputFolder, String targetCoordinateSystem) {
 		// Sort distance clusters
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		for (String distanceString : cluster2mode2area.keySet()) {
@@ -91,7 +90,7 @@ public class PtAccessMapShapeWriter {
 		}
 		
 //		log.info("...done. Start writing shapes.");
-		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_buffer", distances, buffersSmallestFirst);
+		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_buffer", distances, buffersSmallestFirst, targetCoordinateSystem);
 //		log.info("...done. Start creating differences of buffers.");
 		
 		// resort
@@ -124,14 +123,14 @@ public class PtAccessMapShapeWriter {
 		}
 		
 //		log.info("...done. Writing shapes.");
-		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_diffBuffer", distances, buffersToWrite);
+		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_diffBuffer", distances, buffersToWrite, targetCoordinateSystem);
 //		log.info("...done.");
 	}
 
-	private static void writeGeometries(String outputFolderAndFileName, ArrayList<Integer> distances, ArrayList<Geometry> geometries) {
+	private static void writeGeometries(String outputFolderAndFileName, ArrayList<Integer> distances, ArrayList<Geometry> geometries, String targetCoordinateSystem) {
 		// write all to file
 		AttributeType[] attribs = new AttributeType[2];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon", MultiPolygon.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon", MultiPolygon.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		FeatureType featureType = null ;
 		try {

@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -70,12 +69,12 @@ public class DaShapeWriter {
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
-	public static void writeLinks2Shape(String fileName, Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes){
+	public static void writeLinks2Shape(String fileName, Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes, String targetCoordinateSystem){
 		if(attributes == null){
-			initLineFeatureType("links", null, true);
+			initLineFeatureType("links", null, true, targetCoordinateSystem);
 		}else{
 			for(SortedMap<String, Object> m : attributes.values()){
-				initLineFeatureType("links", m);
+				initLineFeatureType("links", m, targetCoordinateSystem);
 				break;
 			}
 		}
@@ -83,17 +82,17 @@ public class DaShapeWriter {
 		write(createLinkFeatures(links, attributes), fileName);
 	}
 	
-	public static void writeNodes2Shape(String fileName, Map<Id, ? extends Node> nodes){
-		initPointFeatureType("nodes", null);
+	public static void writeNodes2Shape(String fileName, Map<Id, ? extends Node> nodes, String targetCoordinateSystem){
+		initPointFeatureType("nodes", null, targetCoordinateSystem);
 		write(createNodeFeatures(nodes), fileName);
 	}
 	
-	public static void writeDefaultPoints2Shape(String fileName, String name, Map<String, Coord> points, Map<String, SortedMap<String, Object>> attributes){
+	public static void writeDefaultPoints2Shape(String fileName, String name, Map<String, Coord> points, Map<String, SortedMap<String, Object>> attributes, String targetCoordinateSystem){
 		if(attributes == null){
-			initPointFeatureType(name, null);
+			initPointFeatureType(name, null, targetCoordinateSystem);
 		}else{
 			for (SortedMap<String, Object> m : attributes.values()){
-				initPointFeatureType(name, m);
+				initPointFeatureType(name, m, targetCoordinateSystem);
 				break;
 			}
 		}
@@ -107,14 +106,14 @@ public class DaShapeWriter {
 	 * @param transitSchedule
 	 * @param lines2write
 	 */
-	public static void writeTransitLines2Shape(String shapeFileOutName, TransitSchedule transitSchedule, Collection<Id> lines2write, Map<Id, SortedMap<String, Object>> attributes){
+	public static void writeTransitLines2Shape(String shapeFileOutName, TransitSchedule transitSchedule, Collection<Id> lines2write, Map<Id, SortedMap<String, Object>> attributes, String targetCoordinateSystem){
 		if(!(attributes == null) && (attributes.size() > 0)){
 			for(SortedMap<String, Object> m : attributes.values()){
-				initLineFeatureType("transitLines", m);
+				initLineFeatureType("transitLines", m, targetCoordinateSystem);
 				break;
 			}
 		}else{
-			initLineFeatureType("transitLines", null);
+			initLineFeatureType("transitLines", null, targetCoordinateSystem);
 		}
 		write(createRouteFeatures(transitSchedule, lines2write, attributes), shapeFileOutName);
 	}
@@ -126,15 +125,15 @@ public class DaShapeWriter {
 	 * @param stops
 	 * @param stops2write
 	 */
-	public static void writeRouteStops2Shape(String fileName, Map<Id, TransitStopFacility> stops, Collection<Id> stops2write){
-		initPointFeatureType("TransitRouteStops", null);
+	public static void writeRouteStops2Shape(String fileName, Map<Id, TransitStopFacility> stops, Collection<Id> stops2write, String targetCoordinateSystem){
+		initPointFeatureType("TransitRouteStops", null, targetCoordinateSystem);
 		write(createStopFeatures(stops, stops2write), fileName);
 	}
 	
 	
-	public static void writePointDist2Shape (String fileName, Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, Object>> attributes){
+	public static void writePointDist2Shape (String fileName, Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, Object>> attributes, String targetCoordinateSystem){
 		for (SortedMap<String, Object> m : attributes.values()){
-			initLineFeatureType("distance", m);
+			initLineFeatureType("distance", m, targetCoordinateSystem);
 			break;
 		}
 		
@@ -146,13 +145,13 @@ public class DaShapeWriter {
 	 * @param lineStrings
 	 * @param attributes
 	 */
-	public static void writeDefaultLineString2Shape(String fileName, String name,  Map<String, SortedMap<Integer, Coord>> lineStrings, Map<String, SortedMap<String, Object>> attributes){
+	public static void writeDefaultLineString2Shape(String fileName, String name,  Map<String, SortedMap<Integer, Coord>> lineStrings, Map<String, SortedMap<String, Object>> attributes, String targetCoordinateSystem){
 		
 		if(attributes == null){
-			initLineFeatureType(name, null);
+			initLineFeatureType(name, null, targetCoordinateSystem);
 		}else{
 			for (SortedMap<String, Object> m : attributes.values()){
-				initLineFeatureType(name, m);
+				initLineFeatureType(name, m, targetCoordinateSystem);
 				break;
 			}
 		}
@@ -160,7 +159,7 @@ public class DaShapeWriter {
 		write(createDefaultLineStringFeature(lineStrings, attributes), fileName);
 	}
 	
-	public static void writeDefaultLineStrings2Shape(String fileName, String name, Map<String, List<Coord>> lineStrings){
+	public static void writeDefaultLineStrings2Shape(String fileName, String name, Map<String, List<Coord>> lineStrings, String targetCoordinateSystem){
 		Map<String, SortedMap<Integer, Coord>> map = new HashMap<String, SortedMap<Integer,Coord>>();
 		SortedMap<Integer, Coord> ls;
 		for(Entry<String, List<Coord>> e: lineStrings.entrySet()){
@@ -170,7 +169,7 @@ public class DaShapeWriter {
 			}
 			map.put(e.getKey(), ls);
 		}
-		writeDefaultLineString2Shape(fileName, name, map, null);
+		writeDefaultLineString2Shape(fileName, name, map, null, targetCoordinateSystem);
 	}
 	
 	private static void write(Collection<Feature> features, String shapeFileOutName){
@@ -182,11 +181,11 @@ public class DaShapeWriter {
 		}
 	}
 	
-	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes){
-		initLineFeatureType(name, attributes, false);
+	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes, String targetCoordinateSystem){
+		initLineFeatureType(name, attributes, false, targetCoordinateSystem);
 	}
 	
-	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes, boolean links) {
+	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes, boolean links, String targetCoordinateSystem) {
 		AttributeType[] attribs;
 		if(attributes == null){
 			if(links){
@@ -198,7 +197,7 @@ public class DaShapeWriter {
 			attribs = new AttributeType[attributes.size() + 2];
 		}
 		
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		Integer count = 2;
 		
@@ -223,14 +222,14 @@ public class DaShapeWriter {
 		}
 	}
 	
-	private static void initPointFeatureType(String name, SortedMap<String, Object> attributes){
+	private static void initPointFeatureType(String name, SortedMap<String, Object> attributes, String targetCoordinateSystem){
 		AttributeType [] attribs;
 		if(attributes == null){
 			attribs = new AttributeType[2];
 		}else{
 			attribs = new AttributeType[attributes.size() + 2];
 		}
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		Integer count = 2;
 		

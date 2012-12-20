@@ -71,6 +71,8 @@ public class PtAccessibility extends AbstractAnalyisModule {
 	private Mode2StopMap mode2Stop;
 
 	private int quadrantSegments;
+
+	private final String targetCoordinateSystem;
 	
 
 
@@ -86,13 +88,14 @@ public class PtAccessibility extends AbstractAnalyisModule {
 	 * @param distanceCluster, the distances you want to cluster (make up your mind about the used coordinate-system)
 	 * @param activityCluster, the name you want to the see, mapped to the activity-names you want to add to this cluster
 	 */
-	public PtAccessibility(Scenario sc, List<Integer> distanceCluster, int quadrantSegments, SortedMap<String, List<String>> activityCluster) {
+	public PtAccessibility(Scenario sc, List<Integer> distanceCluster, int quadrantSegments, SortedMap<String, List<String>> activityCluster, String targetCoordinateSystem) {
 		super(PtAccessibility.class.getSimpleName());
 		this.scenario = sc;
 		this.quadrantSegments = quadrantSegments;
 		this.distanceCluster = createClusterCircles(distanceCluster, this.quadrantSegments);
 		this.activityCluster = activityCluster;
 		this.activityCluster.put("unknown", new ArrayList<String>());
+		this.targetCoordinateSystem = targetCoordinateSystem;
 	}
 
 	/**
@@ -175,12 +178,12 @@ public class PtAccessibility extends AbstractAnalyisModule {
 			}
 		}
 		for(Entry<String, Map<String, MultiPolygon>> e: cluster2mode2area.entrySet()){
-			PtAccesShapeWriter.writeMultiPolygons(e.getValue(), outputFolder + e.getKey() + PtStopMap.FILESUFFIX , e.getKey());
+			PtAccesShapeWriter.writeMultiPolygons(e.getValue(), outputFolder + e.getKey() + PtStopMap.FILESUFFIX , e.getKey(), this.targetCoordinateSystem);
 		}
-		PtAccessMapShapeWriter.writeAccessMap(cluster2mode2area, this.quadrantSegments, outputFolder);
+		PtAccessMapShapeWriter.writeAccessMap(cluster2mode2area, this.quadrantSegments, outputFolder, this.targetCoordinateSystem);
 		
 		// write activity-cluster
-		PtAccesShapeWriter.writeActivityLocations(this.locationMap, outputFolder, "activities");
+		PtAccesShapeWriter.writeActivityLocations(this.locationMap, outputFolder, "activities", this.targetCoordinateSystem);
 		// write locations to csv
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder + "activityLocations.csv");
 		try {

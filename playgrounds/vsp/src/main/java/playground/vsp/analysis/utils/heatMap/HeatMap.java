@@ -36,9 +36,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -184,9 +182,9 @@ public class HeatMap {
 		return this.tiles.values();
 	}
 
-	public static void writeHeatMapShape(String name, HeatMap heatmap, String file){
+	public static void writeHeatMapShape(String name, HeatMap heatmap, String file, String targetCoordinateSystem){
 		AttributeType[] attribs = new AttributeType[3];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon", Polygon.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon", Polygon.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("count", Double.class);
 		FeatureType featureType = null ;

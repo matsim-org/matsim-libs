@@ -63,11 +63,13 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 	private PtPaxVolumesHandler handler;
 	private Scenario sc;
 	private Map<Id, Collection<Feature>> lineId2features;
+	private final String targetCoordinateSystem;
 
-	public PtPaxVolumesAnalyzer(Scenario sc, Double interval) {
+	public PtPaxVolumesAnalyzer(Scenario sc, Double interval, String targetCoordinateSystem) {
 		super(PtPaxVolumesAnalyzer.class.getSimpleName());
 		this.handler =  new PtPaxVolumesHandler(interval);
 		this.sc =  sc;
+		this.targetCoordinateSystem = targetCoordinateSystem;
 	}
 
 	@Override
@@ -86,18 +88,18 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 	public void postProcessData() {
 		this.lineId2features = new HashMap<Id, Collection<Feature>>();
 		for(TransitLine l: this.sc.getTransitSchedule().getTransitLines().values()){
-			this.lineId2features.put(l.getId(), getTransitLineFeatures(l));
+			this.lineId2features.put(l.getId(), getTransitLineFeatures(l, this.targetCoordinateSystem));
 		}
-		this.lineId2features.put(new IdImpl("all"), getAll());
+		this.lineId2features.put(new IdImpl("all"), getAll(this.targetCoordinateSystem));
 		
 	}
 	
 	/**
 	 * @return
 	 */
-	private Collection<Feature> getAll() {
+	private Collection<Feature> getAll(String targetCoordinateSystem) {
 		AttributeType[] attribs = new AttributeType[4 + this.handler.getMaxInterval()];
-		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("line", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("linkId", String.class);
 		attribs[3] =  AttributeTypeFactory.newAttributeType("paxTotal", Double.class);
@@ -152,9 +154,9 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 		return objects;
 	}
 
-	private Collection<Feature> getTransitLineFeatures(TransitLine l){
+	private Collection<Feature> getTransitLineFeatures(TransitLine l, String targetCoordinateSystem){
 		AttributeType[] attribs = new AttributeType[4 + this.handler.getMaxInterval()];
-		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("line", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("linkId", String.class);
 		attribs[3] =  AttributeTypeFactory.newAttributeType("paxTotal", Double.class);

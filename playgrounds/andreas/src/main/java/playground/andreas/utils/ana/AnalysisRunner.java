@@ -24,6 +24,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -53,12 +54,15 @@ public class AnalysisRunner {
 	public static void main(String[] args) {
 		
 		String oldJavaIoTempDir = System.getProperty("java.io.tmpdir");
-		String newJavaIoTempDir = "/net/ils4/neumann/";
+		String newJavaIoTempDir = args[0];
 		System.out.println("Setting java tmpDir from " + oldJavaIoTempDir + " to " + newJavaIoTempDir);
 		System.setProperty("java.io.tmpdir", newJavaIoTempDir);
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
+		
+//		String targetCoordinateSystem = TransformationFactory.WGS84_UTM35S; // Gauteng
+		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
 		
 		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(args[0] + "/" + args[1] + "/", args[1], true, true);
 		
@@ -92,39 +96,37 @@ public class AnalysisRunner {
 		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath(), dir.getIterationFilename(Integer.parseInt(args[2]), Controler.FILENAME_EVENTS_XML));
 		
 		// works
-		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, Integer.parseInt(args[5]), activityCluster);
+		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, Integer.parseInt(args[5]), activityCluster, targetCoordinateSystem);
 		analyzer.addAnalysisModule(ptAccessibility);
 		
 		// testing
 		GetStuckEventsAndPlans getStuckEventsAndPlans = new GetStuckEventsAndPlans(sc);
 		analyzer.addAnalysisModule(getStuckEventsAndPlans);
 		
-		TransitVehicleVolumeAnalyzer transitVehicleVolumeAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600.);
+		TransitVehicleVolumeAnalyzer transitVehicleVolumeAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600., targetCoordinateSystem);
 		analyzer.addAnalysisModule(transitVehicleVolumeAnalyzer);
 		
-		PtPaxVolumesAnalyzer ptPaxVolumesAnalyzer = new PtPaxVolumesAnalyzer(sc, 3600.);
+		PtPaxVolumesAnalyzer ptPaxVolumesAnalyzer = new PtPaxVolumesAnalyzer(sc, 3600., targetCoordinateSystem);
 		analyzer.addAnalysisModule(ptPaxVolumesAnalyzer);
 		
 		TTtripAnalysis ttTripAnalysis = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());	ttTripAnalysis.addZones(zones);
 		analyzer.addAnalysisModule(ttTripAnalysis);
 		
-		TransitSchedule2Shp transitSchedule2Shp = new TransitSchedule2Shp(sc);
+		TransitSchedule2Shp transitSchedule2Shp = new TransitSchedule2Shp(sc, targetCoordinateSystem);
 		analyzer.addAnalysisModule(transitSchedule2Shp);
 		
+		// todo
 		
 		
+		ActivityToModeAnalysis activityToModeAnalysis = new ActivityToModeAnalysis(sc, null, 3600, targetCoordinateSystem);
+		analyzer.addAnalysisModule(activityToModeAnalysis);
 		
+		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = new BoardingAlightingCountAnalyzer(sc, 3600, targetCoordinateSystem);
+		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, Integer.valueOf(args[3]));
 		
-		
-//		ActivityToModeAnalysis activityToModeAnalysis = new ActivityToModeAnalysis(sc, null, 3600);
-//		analyzer.addAnalysisModule(activityToModeAnalysis);
-		
-//		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = new BoardingAlightingCountAnalyzer(sc, 3600);
-//		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, Integer.valueOf(args[3]));
-		
-//////		analyzer.addAnalysisModule(waitAna);
-		//analyzer.addAnalysisModule(boardingAlightingCountAnalyzes);
-		//analyzer.addAnalysisModule(new MyPtCount());
+////		analyzer.addAnalysisModule(waitAna);
+		analyzer.addAnalysisModule(boardingAlightingCountAnalyzes);
+		analyzer.addAnalysisModule(new MyPtCount());
 
 		analyzer.run();
 		
