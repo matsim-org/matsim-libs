@@ -281,13 +281,13 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 			return Color.ORANGE;
 		} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
 			String idstr = agInfo.getId().toString();
-			if ( idstr.contains("line_B")) {
+			if ( idstr.endsWith("_B") ) {
 				return Color.MAGENTA;
-			} else if ( idstr.contains("line_T")) {
+			} else if ( idstr.endsWith("_T") ) {
 				return Color.RED;
-			} else if ( idstr.contains("line_S")) {
+			} else if ( idstr.endsWith("_S")) {
 				return Color.GREEN;
-			} else if ( idstr.contains("line_U")) {
+			} else if ( idstr.endsWith("_U")) {
 				return Color.BLUE;
 			} else {
 				return Color.ORANGE;
