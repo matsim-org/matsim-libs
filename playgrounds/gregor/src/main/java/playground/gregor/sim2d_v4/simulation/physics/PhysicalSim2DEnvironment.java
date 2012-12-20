@@ -36,6 +36,14 @@ public class PhysicalSim2DEnvironment {
 	
 	public void doSimStep(double time) {
 		log.warn("not implemented yet!");
+		
+		//1. update agents' world model (i.e. neighbors, obstacles)
+		//2. update agents' new velocity/acceleration (here the different simulation models will be applied)
+		//3. move agents' 
+		//3. b if agent enters new section:
+		//			precompute relevant exit of new section (needed to recognize that an agent leaves a section) (may be a list of sections to traverse calculated at the beginning would be helpful)
+		//			unregister agent in current section (it.remove());
+		//			register agent in next section (.add(agent) only if sections are not multi-threaded)
 	}
 
 }
