@@ -81,6 +81,8 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	private final CadytsPtPlanChanger cadytsPtPlanChanger;
 	private final Set<Id> calibratedLines;
 
+	public static final String CADYTS_CORRECTION = "cadytsCorrection";
+
 	public CadytsPtPlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTOR, needed for reflection-based instantiation
 		this( controler.getScenario(), controler.getEvents());
 		controler.addControlerListener(this);

@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.cadyts.pt;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -85,6 +87,12 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 			this.cadCorrMessGiven = true;
 		}
 
+		Map<String,Object> planAttributes = currentPlan.getCustomAttributes() ;
+		planAttributes.put(CadytsPtPlanStrategy.CADYTS_CORRECTION,currentPlanCadytsCorrection) ;
+
+		Map<String,Object> planAttributesOther = otherPlan.getCustomAttributes() ;
+		planAttributesOther.put(CadytsPtPlanStrategy.CADYTS_CORRECTION,otherPlanCadytsCorrection) ;
+
 		double weight = Math.exp(0.5 * this.beta * (otherScore - currentScore));
 		// (so far, this is >1 if otherScore>currentScore, and <=1 otherwise)
 		// (beta is the slope (strength) of the operation: large beta means strong reaction)
@@ -103,6 +111,7 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
 //		this.matsimCalibrator.registerChoice(selectedPlanSteps);
 		this.matsimCalibrator.addToDemand(selectedPlanSteps);
+		
 
 		return selectedPlan;
 	}

@@ -21,6 +21,9 @@
 package playground.mmoyo.analysis.comp;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -28,8 +31,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 /**
  * @author manuel
@@ -68,6 +76,29 @@ public class Controler_launcher {
 				return cadytsPlanStrategy ;
 			}
 		});
+		
+		controler.addControlerListener(new IterationEndsListener() {
+			@Override
+			public void notifyIterationEnds(IterationEndsEvent event) {
+				ObjectAttributes attrs = new ObjectAttributes() ;
+				
+				Population pop = event.getControler().getPopulation() ;
+				for ( Person person : pop.getPersons().values() ) {
+					int cnt = 0 ;
+					for ( Plan plan : person.getPlans() ) {
+						Double cadytsCorrection = 0. ;
+						if ( plan.getCustomAttributes() != null ) {
+							cadytsCorrection = (Double) plan.getCustomAttributes().get(CadytsPtPlanStrategy.CADYTS_CORRECTION) ;
+							attrs.putAttribute( person.getId().toString()+Integer.toString(cnt) , CadytsPtPlanStrategy.CADYTS_CORRECTION, cadytsCorrection) ;
+						}
+						System.err.println( " personId: " + person.getId() + " planScore: " + plan.getScore()  + " cadytsCorrection: " + cadytsCorrection ) ; 
+						cnt++ ;
+					}
+				}
+				OutputDirectoryHierarchy hhh = event.getControler().getControlerIO() ;
+				new ObjectAttributesXmlWriter(attrs).writeFile(hhh.getIterationFilename(event.getIteration(), "cadytsCorrections.xml") ) ;
+			}
+		}) ;
 
 		controler.run();
 	} 
