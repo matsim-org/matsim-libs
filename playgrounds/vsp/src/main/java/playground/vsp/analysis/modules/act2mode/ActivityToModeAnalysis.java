@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
@@ -74,7 +73,7 @@ public class ActivityToModeAnalysis extends AbstractAnalyisModule {
 	public ActivityToModeAnalysis(Scenario sc, Set<Id> personsOfInterest, int slotSize, String targetCoordinateSystem) {
 		super(ActivityToModeAnalysis.class.getSimpleName());
 		this.net = sc.getNetwork();
-		this.handler = new ActivityToModeAnalysisHandler(this.net, personsOfInterest, ((ScenarioImpl)sc).getActivityFacilities());
+		this.handler = new ActivityToModeAnalysisHandler(this.net, personsOfInterest);
 		this.slotSize = slotSize;
 		this.targetCoordinateSystem = targetCoordinateSystem;
 	}

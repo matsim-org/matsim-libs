@@ -25,12 +25,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.FeatureType;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -41,15 +38,8 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.PtConstants;
-
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author droeder
@@ -71,9 +61,8 @@ public class ActivityToModeAnalysisHandler implements
 	private Set<Id> personsOfInterest;
 	private Map<Id, ActivityEndEvent> person2DepActAndTime;
 	private Map<Id, String> person2ArrMode;
-	private ActivityFacilitiesImpl facilities;
 	
-	public ActivityToModeAnalysisHandler(Network net, Set<Id> personsOfInterest, ActivityFacilitiesImpl activityFacilities) {
+	public ActivityToModeAnalysisHandler(Network net, Set<Id> personsOfInterest) {
 		this.net = net;
 		this.transitDriver = new ArrayList<Id>();
 		this.departures = new ArrayList<ActivityToMode>();
@@ -81,7 +70,6 @@ public class ActivityToModeAnalysisHandler implements
 		this.personsOfInterest = personsOfInterest;
 		this.person2DepActAndTime = new HashMap<Id, ActivityEndEvent>();
 		this.person2ArrMode = new HashMap<Id, String>();
-		this.facilities = activityFacilities;
 	}
 	
 	private boolean processPerson(Id id){
@@ -118,10 +106,9 @@ public class ActivityToModeAnalysisHandler implements
 			ActivityEndEvent e = this.person2DepActAndTime.remove(event.getPersonId());
 			// and if we stored an event for this person (should not happen, that there is no event..."
 			if(! (e == null) ){
-				// unfortunatelly we need the facility here. Maybe there's a way just with coordinates?!
-				Facility f = this.facilities.getFacilities().get(e.getFacilityId());
+				Link link = this.net.getLinks().get(e.getLinkId());
 				this.departures.add(
-						new ActivityToMode(e.getActType(), event.getLegMode(), e.getTime(), f.getCoord())
+						new ActivityToMode(e.getActType(), event.getLegMode(), e.getTime(), link.getToNode().getCoord())
 						);
 			}
 		}
@@ -145,9 +132,9 @@ public class ActivityToModeAnalysisHandler implements
 		// and in this activityType
 		if(!event.getActType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 			if(this.person2ArrMode.containsKey(event.getPersonId())){
-				Facility f = this.facilities.getFacilities().get(event.getFacilityId());
+				Link link = this.net.getLinks().get(event.getLinkId());
 				this.arrivals.add(
-						new ActivityToMode(event.getActType(), this.person2ArrMode.get(event.getPersonId()), event.getTime(),f.getCoord())
+						new ActivityToMode(event.getActType(), this.person2ArrMode.get(event.getPersonId()), event.getTime(),link.getCoord())
 						);
 			}
 		}
