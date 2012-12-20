@@ -529,6 +529,11 @@ public class Controler extends AbstractController {
 	 * This method is called after the configuration is loaded, after the
 	 * scenario data (network, population) is read, and after all ControlerListeners
 	 * have processed their startup event.
+	 * <p/>
+	 * Design comments/questions:<ul>
+	 * <li> "from the configuration" sounds too narrow.  Should be something like "from everything that there there at this point,
+	 * including, say, factories."  kai, dec'12
+	 * </ul>
 	 */
 	protected void setUp() {
 		if (this.travelTimeCalculatorFactory != null) {
