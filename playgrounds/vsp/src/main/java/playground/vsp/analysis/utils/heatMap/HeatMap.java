@@ -211,10 +211,14 @@ public class HeatMap {
 			}
 			i++;
 		}
-		try{
-			ShapeFileWriter.writeGeometries(features, file);
-		}catch(ServiceConfigurationError e){
-			e.printStackTrace();
+		if (heatmap.getTiles().isEmpty()) {
+			log.info("There are no tiles for " + name);
+		} else {
+			try{
+				ShapeFileWriter.writeGeometries(features, file);
+			}catch(ServiceConfigurationError e){
+				e.printStackTrace();
+			}
 		}
 	}
 }
