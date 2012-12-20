@@ -76,12 +76,9 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		matsimCalibrator.setBruteForce(cadytsPtConfig.useBruteForce());
 		matsimCalibrator.setStatisticsFile(sc.getConfig().controler().getOutputDirectory() + "/calibration-stats.txt");
 
-
-		//int arStartTime_s = 3600*cadytsPtConfig.getStartTime()-3600 ;
-		//int arEndTime_s = 3600*cadytsPtConfig.getEndTime()-1 ;
-		// yyyy would be better to fix this; see email to balmermi and rieser 23/jul/2012 by kai & manuel
-		int arStartTime_s = cadytsPtConfig.getStartTime(); // this version gets directly the startTime and endTime directly in seconds from the cadytsPtConfig 
+		int arStartTime_s = cadytsPtConfig.getStartTime(); 
 		int arEndTime_s = cadytsPtConfig.getEndTime() ;
+		// (this version gets directly the startTime and endTime directly in seconds from the cadytsPtConfig) 
 		
 		TransitSchedule schedule = sc.getTransitSchedule();
 		
@@ -102,8 +99,6 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 				if ( (timeBinIndex%multiple) == (multiple-1) ) {
 					int endTimeOfBin_s   = volume.getHourOfDayStartingWithOne()*3600 - 1 ;
 					if (startTimeOfBin_s >= arStartTime_s && endTimeOfBin_s <= arEndTime_s) {    //add volumes for each bin to calibrator
-						//					int start_s = (volume.getTimeBinIndexStartingWithOne() - 1) * timeBinSize_s ;
-						//					int end_s = volume.getTimeBinIndexStartingWithOne() * timeBinSize_s - 1;
 						double val = val_passager_h/multiple ;
 						matsimCalibrator.addMeasurement(stop, startTimeOfBin_s, endTimeOfBin_s, val, 
 								SingleLinkMeasurement.TYPE.FLOW_VEH_H);

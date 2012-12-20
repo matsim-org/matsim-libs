@@ -38,7 +38,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.balmermi.world.Layer;
 import playground.kai.urbansim.ids.HHId;
 import playground.kai.urbansim.ids.JobIdFactory;
 import playground.kai.urbansim.ids.LocationId;
@@ -181,11 +180,11 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 		}
 	}
 
-	@Override
-	public void readZones(ActivityFacilitiesImpl zones, Layer parcels) {
-		log.fatal("not implemented; aborting ...") ;
-		System.exit(-1);
-	}
+//	@Override
+//	public void readZones(ActivityFacilitiesImpl zones, Layer parcels) {
+//		log.fatal("not implemented; aborting ...") ;
+//		System.exit(-1);
+//	}
 
 
 }
