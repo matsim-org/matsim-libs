@@ -67,8 +67,8 @@ public class ActivityLocationsParatransitUser implements IterationEndsListener {
 	private Set<String> actTypes = new TreeSet<String>();
 	private HashMap<String, GridNode> gridNodeId2GridNode = new HashMap<String, GridNode>();
 
-	public ActivityLocationsParatransitUser(PConfigGroup pConfig, double gridSize) {
-		this(pConfig.getPIdentifier(), gridSize);
+	public ActivityLocationsParatransitUser(PConfigGroup pConfig) {
+		this(pConfig.getPIdentifier(), pConfig.getGridSize());
 	}
 	
 	public ActivityLocationsParatransitUser(String pIdentifier, double gridSize) {

@@ -62,7 +62,7 @@ public class RandomStopProvider {
 
 	
 	public RandomStopProvider(PConfigGroup pConfig, Population population, TransitSchedule pStopsOnly, String outputDir){
-		this.gridSize = pConfig.getRandomStopProviderGridSize();
+		this.gridSize = pConfig.getGridSize();
 		this.lastIteration = -1;
 		
 		this.population = population;
