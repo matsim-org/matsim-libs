@@ -32,7 +32,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -178,10 +177,10 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 					
 					if (lastNode == null) {
 						lastNode = getNodeFromAct(act);
-						lastNode.addActivity(act);
+						lastNode.addPoint(act.getType(), act.getCoord());
 					} else{
 						GridNode currentNode = getNodeFromAct(act);
-						currentNode.addActivity(act);
+						currentNode.addPoint(act.getType(), act.getCoord());
 						
 						if (this.fromNode2toNode2EdgeMap.get(lastNode) == null) {
 							this.fromNode2toNode2EdgeMap.put(lastNode, new HashMap<GridNode, GridEdge>());
@@ -243,12 +242,12 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 			for (String actType : this.actTypes) {
 				XMLAttvalue attValue = new XMLAttvalue();
 				attValue.setFor(actType);
-				attValue.setValue(String.valueOf(node.getCountForAct(actType)));
+				attValue.setValue(String.valueOf(node.getCountForType(actType)));
 				attValue.setStart(Double.toString(0));
 	
 				attContent.getAttvalue().add(attValue);
 				
-				nActs += node.getCountForAct(actType);
+				nActs += node.getCountForType(actType);
 			}			
 			
 			XMLAttvalue attValue = new XMLAttvalue();
@@ -345,7 +344,7 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 		int xSlot = getSpaceSlotForCoord(act.getCoord().getX());
 		int ySlot = getSpaceSlotForCoord(act.getCoord().getY());
 		
-		Id gridNodeId = GridNode.createGridNodeId(xSlot, ySlot);
+		String gridNodeId = GridNode.createGridNodeId(xSlot, ySlot);
 		
 		if (this.gridNodeId2GridNode.get(gridNodeId.toString()) == null) {
 			this.gridNodeId2GridNode.put(gridNodeId.toString(), new GridNode(gridNodeId));

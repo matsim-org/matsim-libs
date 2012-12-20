@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -40,6 +39,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants;
+import playground.andreas.utils.ana.plans2gexf.GridNode;
 
 /**
  * 
@@ -82,7 +82,7 @@ public class RandomStopProvider {
 				if (pE instanceof Activity) {
 					Activity act = (Activity) pE;
 					numberOfActsInPlans++;
-					String gridNodeId = this.getGridNodeIdForCoord(act.getCoord());
+					String gridNodeId = GridNode.getGridNodeIdForCoord(act.getCoord(), this.gridSize);
 					if (gridNodeId2ActsCountMap.get(gridNodeId) == null) {
 						gridNodeId2ActsCountMap.put(gridNodeId, new Integer(0));
 					}
@@ -94,7 +94,7 @@ public class RandomStopProvider {
 		// sort facilities for all grid nodes
 		HashMap<String, List<TransitStopFacility>> gridNodeId2StopsMap = new HashMap<String, List<TransitStopFacility>>();
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
-			String gridNodeId = this.getGridNodeIdForCoord(stop.getCoord());
+			String gridNodeId = GridNode.getGridNodeIdForCoord(stop.getCoord(), this.gridSize);
 			if (gridNodeId2StopsMap.get(gridNodeId) == null) {
 				gridNodeId2StopsMap.put(gridNodeId, new LinkedList<TransitStopFacility>());
 			}
@@ -183,12 +183,5 @@ public class RandomStopProvider {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	private String getGridNodeIdForCoord(Coord coord){
-		int xSlot = (int) (coord.getX() / this.gridSize);
-		int ySlot = (int) (coord.getY() / this.gridSize);
-		String gridNodeId = xSlot + "-" + ySlot;
-		return gridNodeId;
 	}
 }

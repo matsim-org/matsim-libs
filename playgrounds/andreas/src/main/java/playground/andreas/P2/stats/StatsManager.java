@@ -54,7 +54,7 @@ public class StatsManager implements StartupListener{
 		
 		controler.addControlerListener(new PAnalysisManager(pConfig, lineSetter));
 		
-		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig, 100.0));
+		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig, pConfig.getRandomStopProviderGridSize()));
 	}
 
 	@Override

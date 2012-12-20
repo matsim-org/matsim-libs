@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -112,11 +111,11 @@ public class ActivityLocationsParatransitUser implements IterationEndsListener {
 						this.actTypes.add(act.getType());
 						if (lastLegUsesParatransit) {
 							if (lastActAdded == null || !lastActAdded.equals(lastAct)) {
-								getNodeFromAct(lastAct).addActivity(lastAct);
+								getNodeFromAct(lastAct).addPoint(lastAct.getType(), lastAct.getCoord());
 								lastActAdded = lastAct;
 							}
 							if (!lastActAdded.equals(act)) {
-								getNodeFromAct(act).addActivity(act);
+								getNodeFromAct(act).addPoint(act.getType(), act.getCoord());
 								lastActAdded = act;
 							}
 						}
@@ -156,13 +155,13 @@ public class ActivityLocationsParatransitUser implements IterationEndsListener {
 			for (GridNode gridNode : this.gridNodeId2GridNode.values()) {
 				int totalNActs = 0;
 				for (String actType : this.actTypes) {
-					totalNActs += gridNode.getCountForAct(actType);
+					totalNActs += gridNode.getCountForType(actType);
 				}
 				
 				writer.write(gridNode.getX() + "\t" + gridNode.getY() + "\t" + totalNActs);
 				
 				for (String actType : this.actTypes) {
-					writer.write("\t" + gridNode.getCountForAct(actType));
+					writer.write("\t" + gridNode.getCountForType(actType));
 				}
 				
 				writer.newLine();
@@ -177,10 +176,7 @@ public class ActivityLocationsParatransitUser implements IterationEndsListener {
 	}
 	
 	private GridNode getNodeFromAct(Activity act) {
-		int xSlot = getSpaceSlotForCoord(act.getCoord().getX());
-		int ySlot = getSpaceSlotForCoord(act.getCoord().getY());
-		
-		Id gridNodeId = GridNode.createGridNodeId(xSlot, ySlot);
+		String gridNodeId = GridNode.getGridNodeIdForCoord(act.getCoord(), this.gridSize);
 		
 		if (this.gridNodeId2GridNode.get(gridNodeId.toString()) == null) {
 			this.gridNodeId2GridNode.put(gridNodeId.toString(), new GridNode(gridNodeId));
@@ -189,10 +185,6 @@ public class ActivityLocationsParatransitUser implements IterationEndsListener {
 		return this.gridNodeId2GridNode.get(gridNodeId.toString());
 	}
 
-	private int getSpaceSlotForCoord(double coord){
-		return (int) (coord / this.gridSize);
-	}
-	
 	public static void main(String[] args) {
 		
 		Gbl.startMeasurement();
