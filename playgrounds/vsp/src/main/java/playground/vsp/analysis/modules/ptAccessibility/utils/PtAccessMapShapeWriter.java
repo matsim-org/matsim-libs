@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 public class PtAccessMapShapeWriter {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(PtAccessMapShapeWriter.class);
+//	private static final Logger log = Logger.getLogger(PtAccessMapShapeWriter.class);
 
 	private PtAccessMapShapeWriter() {
 		
@@ -73,7 +73,7 @@ public class PtAccessMapShapeWriter {
 		Geometry lastBuffer = null;
 		int lastDistance = 0;
 		
-		log.info("Start creating buffers for distance classes of " + distances.toString());
+//		log.info("Start creating buffers for distance classes of " + distances.toString());
 		
 		for (Integer distance : distances) {
 			if (lastBuffer == null) {
@@ -90,9 +90,9 @@ public class PtAccessMapShapeWriter {
 			buffersSmallestFirst.add(lastBuffer);
 		}
 		
-		log.info("...done. Start writing shapes.");
+//		log.info("...done. Start writing shapes.");
 		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_buffer", distances, buffersSmallestFirst);
-		log.info("...done. Start creating differences of buffers.");
+//		log.info("...done. Start creating differences of buffers.");
 		
 		// resort
 		LinkedList<Geometry> buffersLargestFirst = new LinkedList<Geometry>();
@@ -123,9 +123,9 @@ public class PtAccessMapShapeWriter {
 			buffersToWrite.add(geometry);
 		}
 		
-		log.info("...done. Writing shapes.");
+//		log.info("...done. Writing shapes.");
 		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_diffBuffer", distances, buffersToWrite);
-		log.info("...done.");
+//		log.info("...done.");
 	}
 
 	private static void writeGeometries(String outputFolderAndFileName, ArrayList<Integer> distances, ArrayList<Geometry> geometries) {
@@ -151,7 +151,7 @@ public class PtAccessMapShapeWriter {
 			bufferFeatures = new ArrayList<Feature>();
 			bufferFeatureAttribs = new Object[2];
 			bufferFeatureAttribs[0] = geometry;
-			String distance = distances.get(i).toString() + " m";
+			String distance = distances.get(i).toString();
 			bufferFeatureAttribs[1] = distance;
 			try {
 				bufferFeatures.add(featureType.create(bufferFeatureAttribs));
