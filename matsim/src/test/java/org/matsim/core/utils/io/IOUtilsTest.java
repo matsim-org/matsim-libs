@@ -446,4 +446,22 @@ public class IOUtilsTest {
 		}
 	}
 
+	/**
+	 * Based on a report from a user on the mailing list that he has problems creating files with '+' in the filename.
+	 * 
+	 * @author mrieser
+	 * @throws IOException 
+	 */
+	@Test
+	public void testGetBufferedWriter_withPlusInFilename() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "test+test.txt";
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write("hello world!");
+		writer.close();
+		
+		File file = new File(filename);
+		Assert.assertTrue(file.exists());
+		Assert.assertEquals("test+test.txt", file.getCanonicalFile().getName());
+	}
+
 }

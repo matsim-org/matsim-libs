@@ -113,7 +113,22 @@ public class MatsimXmlParserTest {
 		
 	}
 	
-	
-	
-	
+	@Test
+	public void testParsingPlusSign() {
+		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+				"<dummy someAttribute=\"value+value\">content+content</dummy>";
+		
+		TestParser parser = new TestParser();
+		parser.setValidating(false);
+
+		parser.parse(new ByteArrayInputStream(str.getBytes()));
+		Assert.assertEquals("dummy", parser.lastStartTag);
+		Assert.assertEquals("dummy", parser.lastEndTag);
+		Assert.assertEquals("content+content", parser.lastContent);
+		Assert.assertEquals(1, parser.lastAttributes.getLength());
+		Assert.assertEquals("someAttribute", parser.lastAttributes.getLocalName(0));
+		Assert.assertEquals("value+value", parser.lastAttributes.getValue(0));
+		Assert.assertEquals("value+value", parser.lastAttributes.getValue("someAttribute"));
+	}
+
 }

@@ -110,7 +110,13 @@ public class ShapeFileReader implements MatsimSomeReader {
 			log.info("reading features from: " + filename);
 			File dataFile = new File(filename);
 			HashMap<String, URL> connect = new HashMap<String, URL>();
-			connect.put("url", dataFile.toURL());
+			URL url = dataFile.toURI().toURL();
+			if (filename.contains("+")) {
+				// plus signs in filenames/paths are substituted with spaces due to the URL convention
+				// but if the plus is in the filename, than actually keep it a plus sign
+				url = new URL(url.toString().replace("+", "%2B"));
+			}
+			connect.put("url", url);
 			DataStore dataStore = DataStoreFinder.getDataStore(connect);
 			String[] typeNames = dataStore.getTypeNames();
 			String typeName = typeNames[0];
