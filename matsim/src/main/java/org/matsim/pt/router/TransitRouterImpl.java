@@ -98,7 +98,11 @@ public class TransitRouterImpl implements TransitRouter {
 		for (TransitRouterNetworkNode node : nearestNodes) {
 			double distance = CoordUtils.calcDistance(coord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
+
 			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+			// yyyyyy the above line does not use the TravelDisutility. kai, oct/dec'12 
+			//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
+
 			wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 		return wrappedNearestNodes;
