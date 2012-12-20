@@ -8,11 +8,9 @@
  * check auto-generated config comments; use <i>second</i> config dump for that):
  *     <pre>
  * &lt;module name="cadytsPt"&gt;
- *   &lt;!-- The first hour of the day to be used for calibration (start counting hours with 1, not 0) --&gt;
- *   &lt;param name="startHour" value="5" /&gt;
+ *   &lt;param name="startTime" value="05:00:00" /&gt;
  *
- *   &lt;!-- The last hour of the day to be used for calibration (start counting hours with 1, not 0) --&gt;
- *   &lt;param name="endHour" value="20" /&gt;
+ *   &lt;param name="endTime" value="21:00:00" /&gt;
  *
  *   &lt;!-- Comma-separated list of transit lines to be calibrated. -&gt;
  *   &lt;param name="calibratedLines" value="M44" /&gt;
