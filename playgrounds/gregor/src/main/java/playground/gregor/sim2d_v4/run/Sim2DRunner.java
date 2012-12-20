@@ -28,12 +28,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.gregor.sim2d_v3.simulation.HybridQ2DMobsimFactory;
 import playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanAlgorithm;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
+import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
 
 public class Sim2DRunner {
 
@@ -55,7 +55,7 @@ public class Sim2DRunner {
 		
 		Controler controller = new Controler(sc);
 		
-		//since we want to use our router for initial routes we just prepare person for sim before we run the controller 
+		//since we want to use _our_ router for initial routes we prepare persons for sim before we run the controller 
  		PlanAlgorithm planAlgo = new Sim2DReRoutePlanAlgorithm(controller);
 		PersonPrepareForSim prep = new PersonPrepareForSim(planAlgo, sc);
 		prep.run(sc.getPopulation());
