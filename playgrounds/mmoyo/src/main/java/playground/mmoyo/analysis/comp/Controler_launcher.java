@@ -20,14 +20,16 @@
 
 package playground.mmoyo.analysis.comp;
 
-import java.io.File;
-
-import java.io.FileNotFoundException;
-
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyFactory;
 
 /**
  * @author manuel
@@ -46,10 +48,27 @@ public class Controler_launcher {
 
 		Config config = null;
 		config = ConfigUtils.loadConfig(configFile);
+		
+		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
+		
+		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
+		stratSets.setModuleName("myCadyts");
+		stratSets.setProbability(0.1);
+		config.strategy().addStrategySettings(stratSets);
+
 
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		
+		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
+			@Override
+			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+				CadytsPtPlanStrategy cadytsPlanStrategy = new CadytsPtPlanStrategy(scenario, eventsManager) ;
+				controler.addControlerListener(cadytsPlanStrategy) ;
+				return cadytsPlanStrategy ;
+			}
+		});
+
 		controler.run();
 	} 
 }

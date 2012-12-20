@@ -25,9 +25,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -80,29 +82,36 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	private final Set<Id> calibratedLines;
 
 	public CadytsPtPlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTOR, needed for reflection-based instantiation
+		this( controler.getScenario(), controler.getEvents());
 		controler.addControlerListener(this);
+	}
 
+	/**
+	 * <i>IMPORTANT:</i> If you are using this constructor, you are responsible for adding is as a controler listener!
+	 */
+	public CadytsPtPlanStrategy(final Scenario scenario, final EventsManager events) {
+		Config config = scenario.getConfig() ;
 		CadytsPtConfigGroup cadytsConfig = new CadytsPtConfigGroup();
-		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, cadytsConfig);
+		config.addModule(CadytsPtConfigGroup.GROUP_NAME, cadytsConfig);
 		// addModule() also initializes the config group with the values read from the config file
 
 		this.calibratedLines = cadytsConfig.getCalibratedLines();
 
 		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedLines(), cadytsConfig.getTimeBinSize() );
-		controler.getEvents().addHandler(this.cadytsPtOccupAnalyzer);
+		events.addHandler(this.cadytsPtOccupAnalyzer);
 
-		this.countsScaleFactor = controler.getConfig().ptCounts().getCountsScaleFactor();
+		this.countsScaleFactor = config.ptCounts().getCountsScaleFactor();
 		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer, this.countsScaleFactor);
 
 		// this collects events and generates cadyts plans from it
-		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(controler.getScenario(), cadytsConfig.getCalibratedLines());
-		controler.getEvents().addHandler(ptStep);
+		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedLines());
+		events.addHandler(ptStep);
 
-		String occupancyCountsFilename = controler.getConfig().ptCounts().getOccupancyCountsFileName();
+		String occupancyCountsFilename = config.ptCounts().getOccupancyCountsFileName();
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario(), this.occupCounts /*, cadytsConfig.getTimeBinSize()*/);
+		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.occupCounts /*, cadytsConfig.getTimeBinSize()*/);
 		
 		// finally, we create the PlanStrategy, with the cadyts-based plan selector:
 		this.cadytsPtPlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
