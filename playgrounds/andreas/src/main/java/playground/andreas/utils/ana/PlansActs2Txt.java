@@ -100,11 +100,11 @@ public class PlansActs2Txt extends MatsimJaxbXmlWriter{
 			try {
 				String filename = outputDir + actType + ".csv";
 				BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-				writer.write("x; y; Acts " + actType); writer.newLine();
+				writer.write("x;y;Acts " + actType); writer.newLine();
 				
 				
 				for (GridNode gridNode : this.actType2gridNodeId2GridNode.get(actType).values()) {
-					writer.write(gridNode.getX() + "; " + gridNode.getY() + "; " + gridNode.getCountForType(actType)); writer.newLine();
+					writer.write(gridNode.getX() + ";" + gridNode.getY() + ";" + gridNode.getCountForType(actType)); writer.newLine();
 				}
 				
 				
