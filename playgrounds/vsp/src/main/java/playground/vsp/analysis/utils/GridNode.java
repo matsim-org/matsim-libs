@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * Stores Type-Count pairs clustered to one node. Optional: shifts the node's centroid to the average of all given data points.

@@ -20,6 +20,7 @@ package playground.vsp.analysis.modules.ptAccessibility.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,12 +36,16 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import playground.vsp.analysis.modules.ptAccessibility.activity.ActivityLocation;
 import playground.vsp.analysis.modules.ptAccessibility.activity.LocationMap;
+import playground.vsp.analysis.utils.GridNode;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -97,7 +102,7 @@ public class PtAccesShapeWriter {
 		}
 	}
 	
-	public static void writeActivityLocations(LocationMap locationMap, String outputFolder, String name, String targetCoordinateSystem){
+	public static void writeActivityLocations(LocationMap locationMap, String outputFolder, String name, String targetCoordinateSystem, double gridSize){
 		AttributeType[] attribs = new AttributeType[3];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
@@ -105,6 +110,18 @@ public class PtAccesShapeWriter {
 		FeatureType featureType = null ;
 		try {
 			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
+		} catch (FactoryRegistryException e) {
+			e.printStackTrace();
+		} catch (SchemaException e) {
+			e.printStackTrace();
+		}
+		
+		AttributeType[] clusterAttribs = new AttributeType[2];
+		clusterAttribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
+		clusterAttribs[1] = AttributeTypeFactory.newAttributeType("count", Integer.class);
+		FeatureType clusterFeatureType = null ;
+		try {
+			clusterFeatureType = FeatureTypeBuilder.newFeatureType(clusterAttribs, name);
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (SchemaException e) {
@@ -131,6 +148,41 @@ public class PtAccesShapeWriter {
 				} catch(ServiceConfigurationError e){
 					e.printStackTrace();
 				}
+				
+				// cluster first write then
+				
+				try {
+					Collection<Feature> features = new ArrayList<Feature>();
+					Object[] featureAttribs ;
+					
+					HashMap<String, GridNode> gridNodeId2GridNode = new HashMap<String, GridNode>();
+					
+					// go through all acts of this type
+					for(int i  = 0; i < type2LocationEntry.getValue().size(); i++){
+						Coord coord = new CoordImpl(type2LocationEntry.getValue().get(i).getCoord().x, type2LocationEntry.getValue().get(i).getCoord().y);
+						String gridNodeId = GridNode.getGridNodeIdForCoord(coord, gridSize);
+						
+						if (gridNodeId2GridNode.get(gridNodeId) == null) {
+							gridNodeId2GridNode.put(gridNodeId, new GridNode(gridNodeId));
+						}
+						
+						gridNodeId2GridNode.get(gridNodeId).addPoint(type2LocationEntry.getKey(), coord);
+					}
+					
+					for (GridNode gridNode : gridNodeId2GridNode.values()) {
+						featureAttribs = new Object[2];
+						featureAttribs[0] = factory.createPoint(new Coordinate(gridNode.getX(), gridNode.getY(), 0.));
+						featureAttribs[1] = gridNode.getCountForType(type2LocationEntry.getKey());
+						features.add(clusterFeatureType.create(featureAttribs));
+					}
+					
+					ShapeFileWriter.writeGeometries(features, outputFolder + "activityLocations_clustered_" + type2LocationEntry.getKey() + ".shp");
+				} catch (IllegalAttributeException e) {
+					e.printStackTrace();
+				} catch(ServiceConfigurationError e){
+					e.printStackTrace();
+				}
+				
 			} else {
 				log.info("No activities found for cluster " + type2LocationEntry.getKey());
 			}

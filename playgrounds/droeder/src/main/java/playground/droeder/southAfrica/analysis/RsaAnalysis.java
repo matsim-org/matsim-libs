@@ -49,6 +49,7 @@ public class RsaAnalysis {
 	public static void main(String[] args) {
 		
 		String targetCoordinateSystem = TransformationFactory.WGS84_UTM35S; // Gauteng
+		int gridSize = Integer.valueOf(args[3]);
 		
 		Set<String> ptModes = new HashSet<String>(){{
 			add("taxi");
@@ -164,14 +165,14 @@ public class RsaAnalysis {
 		
 		
 		GetStuckEventsAndPlans writeStuck = new GetStuckEventsAndPlans(sc);
-		PtAccessibility ptAcces = new PtAccessibility(sc, cluster, 36, activityCluster, targetCoordinateSystem);
+		PtAccessibility ptAcces = new PtAccessibility(sc, cluster, 36, activityCluster, targetCoordinateSystem, gridSize);
 		
 		TTtripAnalysis tripAna = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());
 		tripAna.addZones(zones);
 
 		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = 
 					new BoardingAlightingCountAnalyzer(sc, 3600, targetCoordinateSystem);
-		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, Integer.valueOf(args[3]));
+		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, gridSize);
 		TransitVehicleVolumeAnalyzer ptVehVolAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600., targetCoordinateSystem);
 		TransitSchedule2Shp shp = new TransitSchedule2Shp(sc, targetCoordinateSystem);
 		ActivityToModeAnalysis atm = new ActivityToModeAnalysis(sc, null, 3600, targetCoordinateSystem);

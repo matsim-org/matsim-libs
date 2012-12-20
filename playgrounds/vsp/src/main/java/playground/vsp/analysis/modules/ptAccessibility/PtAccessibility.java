@@ -73,6 +73,8 @@ public class PtAccessibility extends AbstractAnalyisModule {
 	private int quadrantSegments;
 
 	private final String targetCoordinateSystem;
+
+	private final int gridSize;
 	
 
 
@@ -88,7 +90,7 @@ public class PtAccessibility extends AbstractAnalyisModule {
 	 * @param distanceCluster, the distances you want to cluster (make up your mind about the used coordinate-system)
 	 * @param activityCluster, the name you want to the see, mapped to the activity-names you want to add to this cluster
 	 */
-	public PtAccessibility(Scenario sc, List<Integer> distanceCluster, int quadrantSegments, SortedMap<String, List<String>> activityCluster, String targetCoordinateSystem) {
+	public PtAccessibility(Scenario sc, List<Integer> distanceCluster, int quadrantSegments, SortedMap<String, List<String>> activityCluster, String targetCoordinateSystem, int gridSize) {
 		super(PtAccessibility.class.getSimpleName());
 		this.scenario = sc;
 		this.quadrantSegments = quadrantSegments;
@@ -96,6 +98,7 @@ public class PtAccessibility extends AbstractAnalyisModule {
 		this.activityCluster = activityCluster;
 		this.activityCluster.put("unknown", new ArrayList<String>());
 		this.targetCoordinateSystem = targetCoordinateSystem;
+		this.gridSize = gridSize;
 	}
 
 	/**
@@ -178,21 +181,21 @@ public class PtAccessibility extends AbstractAnalyisModule {
 			}
 		}
 		for(Entry<String, Map<String, MultiPolygon>> e: cluster2mode2area.entrySet()){
-			PtAccesShapeWriter.writeMultiPolygons(e.getValue(), outputFolder + e.getKey() + PtStopMap.FILESUFFIX , e.getKey(), this.targetCoordinateSystem);
+			PtAccesShapeWriter.writeMultiPolygons(e.getValue(), outputFolder + PtStopMap.FILESUFFIX + "_" + e.getKey(), e.getKey(), this.targetCoordinateSystem);
 		}
 		PtAccessMapShapeWriter.writeAccessMap(cluster2mode2area, this.quadrantSegments, outputFolder, this.targetCoordinateSystem);
 		
 		// write activity-cluster
-		PtAccesShapeWriter.writeActivityLocations(this.locationMap, outputFolder, "activities", this.targetCoordinateSystem);
+		PtAccesShapeWriter.writeActivityLocations(this.locationMap, outputFolder, "activities", this.targetCoordinateSystem, this.gridSize);
 		// write locations to csv
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder + "activityLocations.csv");
 		try {
-			writer.write("index;x;y;type;");
+			writer.write("index;x;y;type");
 			writer.newLine();
 			int i = 0;
 			for(Entry<String, List<ActivityLocation>> e: this.locationMap.getType2Locations().entrySet()){
 				for(ActivityLocation l: e.getValue()){
-					writer.write(String.valueOf(i) + ";" + l.getCoord().x + ";" + l.getCoord().y + ";" + l.getType() + ";");
+					writer.write(String.valueOf(i) + ";" + l.getCoord().x + ";" + l.getCoord().y + ";" + l.getType());
 					writer.newLine();
 					i++;
 				}

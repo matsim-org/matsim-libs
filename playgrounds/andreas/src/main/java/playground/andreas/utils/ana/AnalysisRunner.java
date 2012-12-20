@@ -103,7 +103,7 @@ public class AnalysisRunner {
 		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath(), dir.getIterationFilename(iteration, Controler.FILENAME_EVENTS_XML));
 		
 		// works
-		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, quadrantSegments, activityCluster, targetCoordinateSystem);
+		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, quadrantSegments, activityCluster, targetCoordinateSystem, gridSize);
 		analyzer.addAnalysisModule(ptAccessibility);
 		
 		GetStuckEventsAndPlans getStuckEventsAndPlans = new GetStuckEventsAndPlans(sc);
