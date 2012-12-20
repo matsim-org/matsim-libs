@@ -48,19 +48,19 @@ public class AnalysisRunner {
 
 	/**
 	 * 
-	 * @param args OutputDir RunId iteration nrOfHeatMapTiles
+	 * @param args OutputDir RunId iteration nrOfHeatMapTiles shapeFile quadrantSegments
 	 */
 	public static void main(String[] args) {
+		
+		String oldJavaIoTempDir = System.getProperty("java.io.tmpdir");
+		String newJavaIoTempDir = "/net/ils4/neumann/";
+		System.out.println("Setting java tmpDir from " + oldJavaIoTempDir + " to " + newJavaIoTempDir);
+		System.setProperty("java.io.tmpdir", newJavaIoTempDir);
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
 		
-		
-		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(args[0] + "/" + args[1] + "/", 
-				args[1], true, true);
-//		new TransitScheduleReader(sc).readFile(dir.getOutputFilename("0.transitSchedule.xml.gz"));
-//		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
-//		new MatsimPopulationReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_POPULATION));
+		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(args[0] + "/" + args[1] + "/", args[1], true, true);
 		
 		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "transitScheduleScored.xml.gz"));
 		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
@@ -73,118 +73,64 @@ public class AnalysisRunner {
 			add(1000);
 		}};
 		
-		SortedMap<String, List<String>> activityCluster = new TreeMap<String, List<String>>();
-		List<String> activities = new ArrayList<String>();
-		
-		activities.add("h11");
-		activities.add("h12");
-		activities.add("h13");
-		activities.add("h14");
-		activities.add("h15");
-		activities.add("h21");
-		activities.add("h22");
-		activities.add("h23");
-		activities.add("h24");
-		activities.add("h25");
-		activities.add("h31");
-		activities.add("h32");
-		activities.add("h33");
-		activities.add("h34");
-		activities.add("h35");
-		activities.add("h");
-		activityCluster.put("home", activities);
-		
-		activities = new ArrayList<String>();
-		activities.add("w1");
-		activities.add("w2");
-		activities.add("w3");
-		activities.add("w4");
-		activities.add("w5");
-		activities.add("w");
-		activityCluster.put("work", activities);
-		
-		activities = new ArrayList<String>();
-		activities.add("e1");
-		activities.add("e2");
-		activities.add("e21");
-		activities.add("e22");
-		activities.add("e23");
-		activities.add("e24");
-		activities.add("e25");
-		activities.add("e3");
-		activityCluster.put("edu", activities);
-		
-		activities = new ArrayList<String>();
-		activities.add("l1");
-		activities.add("l2");
-		activities.add("l3");
-		activities.add("l4");
-		activities.add("l5");
-		activityCluster.put("leisure", activities);	
-		
-		activities = new ArrayList<String>();
-		activities.add("s1");
-		activities.add("S2");
-		activities.add("s3");
-		activities.add("s4");
-		activities.add("s5");
-		activityCluster.put("shopping", activities);	
-		
+		SortedMap<String, List<String>> activityCluster = BVG3ActsScheme.createBVG3ActsScheme();		
 		
 		Set<String> ptModes = new HashSet<String>(){{
-			add("taxi");
-			add("bus");
 			add("pt");
 		}};
 		
 		Set<String> networkModes = new HashSet<String>(){{
 			add("car");
-			add("ride");
 		}};
-		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(dir.getOutputPath() + "/Berlin.shp");
 		
+		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(args[4]);
 		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
 		for(Feature f: features){
 			zones.put((String)f.getAttribute(2), (Geometry) f.getAttribute(0));
 		}
-//		
+		
+		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath(), dir.getIterationFilename(Integer.parseInt(args[2]), Controler.FILENAME_EVENTS_XML));
+		
+		// works
+		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, Integer.parseInt(args[5]), activityCluster);
+		analyzer.addAnalysisModule(ptAccessibility);
+		
+		// testing
+		GetStuckEventsAndPlans getStuckEventsAndPlans = new GetStuckEventsAndPlans(sc);
+		analyzer.addAnalysisModule(getStuckEventsAndPlans);
+		
+		TransitVehicleVolumeAnalyzer transitVehicleVolumeAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600.);
+		analyzer.addAnalysisModule(transitVehicleVolumeAnalyzer);
+		
+		PtPaxVolumesAnalyzer ptPaxVolumesAnalyzer = new PtPaxVolumesAnalyzer(sc, 3600.);
+		analyzer.addAnalysisModule(ptPaxVolumesAnalyzer);
+		
+		TTtripAnalysis ttTripAnalysis = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());	ttTripAnalysis.addZones(zones);
+		analyzer.addAnalysisModule(ttTripAnalysis);
+		
+		TransitSchedule2Shp transitSchedule2Shp = new TransitSchedule2Shp(sc);
+		analyzer.addAnalysisModule(transitSchedule2Shp);
 		
 		
-		GetStuckEventsAndPlans writeStuck = new GetStuckEventsAndPlans(sc);
-		PtAccessibility ptAcces = new PtAccessibility(sc, cluster, 1, activityCluster);
-		
-		TTtripAnalysis tripAna = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());
-		tripAna.addZones(zones);
-
-		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = 
-					new BoardingAlightingCountAnalyzer(sc, 3600);
-		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, Integer.valueOf(args[3]));
-		TransitVehicleVolumeAnalyzer ptVehVolAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600.);
-		TransitSchedule2Shp shp = new TransitSchedule2Shp(sc);
-		ActivityToModeAnalysis atm = new ActivityToModeAnalysis(sc, null, 3600);
-		PtPaxVolumesAnalyzer ptVolAna = new PtPaxVolumesAnalyzer(sc, 3600.);
 		
 		
 		
-		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath(), 
-								dir.getIterationFilename(Integer.parseInt(args[2]), Controler.FILENAME_EVENTS_XML));
-		//analyzer.addAnalysisModule(writeStuck);
-		analyzer.addAnalysisModule(ptAcces);
+		
+//		ActivityToModeAnalysis activityToModeAnalysis = new ActivityToModeAnalysis(sc, null, 3600);
+//		analyzer.addAnalysisModule(activityToModeAnalysis);
+		
+//		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = new BoardingAlightingCountAnalyzer(sc, 3600);
+//		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, Integer.valueOf(args[3]));
+		
 //////		analyzer.addAnalysisModule(waitAna);
-		//analyzer.addAnalysisModule(tripAna);
 		//analyzer.addAnalysisModule(boardingAlightingCountAnalyzes);
-		//analyzer.addAnalysisModule(ptVehVolAnalyzer);
-		//analyzer.addAnalysisModule(shp);
-//	//	analyzer.addAnalysisModule(atm);
-		//analyzer.addAnalysisModule(ptVolAna);
 		//analyzer.addAnalysisModule(new MyPtCount());
-		
 
 		analyzer.run();
+		
+		System.out.println("Setting java tmpDir from " + newJavaIoTempDir + " to " + oldJavaIoTempDir);
+		System.setProperty("java.io.tmpdir", oldJavaIoTempDir);
 	}
-	
-	
-	
 }
 
 class MyPtCount extends AbstractAnalyisModule{
