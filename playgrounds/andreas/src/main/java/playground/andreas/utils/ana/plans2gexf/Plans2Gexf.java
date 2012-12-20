@@ -341,19 +341,12 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 	}
 
 	private GridNode getNodeFromAct(Activity act) {
-		int xSlot = getSpaceSlotForCoord(act.getCoord().getX());
-		int ySlot = getSpaceSlotForCoord(act.getCoord().getY());
-		
-		String gridNodeId = GridNode.createGridNodeId(xSlot, ySlot);
+		String gridNodeId = GridNode.getGridNodeIdForCoord(act.getCoord(), this.gridSize);
 		
 		if (this.gridNodeId2GridNode.get(gridNodeId.toString()) == null) {
 			this.gridNodeId2GridNode.put(gridNodeId.toString(), new GridNode(gridNodeId));
 		}
 		
 		return this.gridNodeId2GridNode.get(gridNodeId.toString());
-	}
-
-	private int getSpaceSlotForCoord(double coord){
-		return (int) (coord / this.gridSize);
 	}
 }

@@ -145,7 +145,7 @@ public class GridNode {
 	@Override
 	public String toString() {
 		StringBuffer strB = new StringBuffer();
-		strB.append("Type ");
+		strB.append("Type Count");
 		for (Entry<String, Integer> typeEntry : this.type2countMap.entrySet()) {
 			strB.append(" | " + typeEntry.getKey() + " " + typeEntry.getValue().toString());
 		}
