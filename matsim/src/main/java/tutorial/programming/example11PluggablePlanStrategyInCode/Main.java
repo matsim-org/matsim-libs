@@ -36,7 +36,9 @@ class Main {
 			config = ConfigUtils.loadConfig(args[0]);
 		}
 		
-		StrategySettings stratSets = new StrategySettings(new IdImpl(3)); // Number three because two others are already in the example config
+		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
+		
+		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
 		stratSets.setModuleName("doSomethingSpecial");
 		stratSets.setProbability(0.1);
 		config.strategy().addStrategySettings(stratSets);
