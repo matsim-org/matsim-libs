@@ -29,11 +29,13 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
 
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
+//import org.matsim.core.mobsim.qsim.qnetsimengine.QSim
 
 public class Sim2DEngine implements MobsimEngine {
 
@@ -106,5 +108,12 @@ public class Sim2DEngine implements MobsimEngine {
 		log.info(agent + " \n added!");
 
 	}
+
+
+	public void registerHiResLink(QSim2DTransitionLink hiResLink) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

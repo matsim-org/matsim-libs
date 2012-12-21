@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSim2DNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 public class HybridQ2DMobsimFactory implements MobsimFactory {
@@ -63,26 +64,19 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 //			netsimEngFactory = new DefaultQSimEngineFactory();
 //		}
 
-//		QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, netsimEngFactory);
 
 		QSim qSim = new QSim(sc, eventsManager);
 
-//		Sim2DActivityEngine activityEngine = new Sim2DActivityEngine();
-//		qSim.addMobsimEngine(activityEngine);
-//		qSim.addActivityHandler(activityEngine);
-		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 		
 		Sim2DEngine e = new Sim2DEngine(qSim);
 		this.sim2DEngine = e;
 		qSim.addMobsimEngine(e);
-		Sim2DDepartureHandler d = new Sim2DDepartureHandler(e);
-		qSim.addDepartureHandler(d);
 		
-//		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim); // no longer needed
-//		QNetsimEngine netsimEngine = new QNetsimEngine( qSim, new KaiHybridNetworkFactory( e ) ) ; // use this instead of null version
-		QNetsimEngine netsimEngine = new QNetsimEngine( qSim, null ) ;
+		HybridQSim2DNetworkFactory networkFactory = new HybridQSim2DNetworkFactory(e);
+		
+		QNetsimEngine netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
