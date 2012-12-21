@@ -205,6 +205,11 @@ public class TimeAwareComplexCircleScheduleProvider implements PRouteProvider{
 	public TransitStopFacility getRandomTransitStop(int currentIteration){
 		return this.randomStopProvider.getRandomTransitStop(currentIteration);
 	}
+	
+	@Override
+	public TransitStopFacility drawRandomStopFromList(List<TransitStopFacility> choiceSet) {
+		return this.randomStopProvider.drawRandomStopFromList(choiceSet);
+	}
 
 	@Override
 	public TransitLine createEmptyLine(Id id) {

@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -37,6 +36,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.routeProvider.PRouteProvider;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -144,14 +144,14 @@ public class RandomRouteEndExtension extends AbstractPStrategyModule {
 			stops2serve = null;
 		}else{
 			//find candidate-stops which are within a specified area and not served already...
-			Collection<TransitStopFacility> candidates = findCandidates(alreadyServed, stops2serve.get(indexStopInGreatestDistance));
+			List<TransitStopFacility> candidates = findCandidates(alreadyServed, stops2serve.get(indexStopInGreatestDistance));
 			if(candidates.size() == 0){
 				// should only happen if the end of the route is at the periphery of the network
 				log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
 						cooperative.getCurrentIteration() + ". No unserved stop within the specified distance.");
 				stops2serve = null;
 			}else{
-				stops2serve = addCandidate(candidates, stops2serve, indexStopInGreatestDistance);
+				stops2serve = addCandidate(cooperative.getRouteProvider(), candidates, stops2serve, indexStopInGreatestDistance);
 			}
 		}
 		return stops2serve;
@@ -189,7 +189,7 @@ public class RandomRouteEndExtension extends AbstractPStrategyModule {
 	 * @param stopInGreatestDistance
 	 * @return
 	 */
-	private Collection<TransitStopFacility> findCandidates(List<TransitStopFacility> alreadyServed, TransitStopFacility stopInGreatestDistance) {
+	private List<TransitStopFacility> findCandidates(List<TransitStopFacility> alreadyServed, TransitStopFacility stopInGreatestDistance) {
 		Geometry g = createCandidateArea(alreadyServed.get(0), stopInGreatestDistance);
 		/*
 		 * this step is necessary due to the fact that the QuadTree can only process its own "Rect",
@@ -269,22 +269,24 @@ public class RandomRouteEndExtension extends AbstractPStrategyModule {
 	}
 
 	/**
+	 * @param pRouteProvider 
 	 * @param candidates
 	 * @param stops2serve
 	 * @param indexStopInGreatestDistance 
 	 * @return
 	 */
-	private List<TransitStopFacility> addCandidate(Collection<TransitStopFacility> candidates, List<TransitStopFacility> stops2serve, Integer indexStopInGreatestDistance) {
+	private List<TransitStopFacility> addCandidate(PRouteProvider pRouteProvider, List<TransitStopFacility> candidates, List<TransitStopFacility> stops2serve, Integer indexStopInGreatestDistance) {
 		//draw a random stop from the candidatesList
 		TransitStopFacility temp = null;
-		do{
-			for(TransitStopFacility s: candidates){
-				if(MatsimRandom.getRandom().nextDouble() < (1.0/candidates.size())){
-					temp = s;
-					break;
-				}
-			}
-		}while(temp == null);
+		temp = pRouteProvider.drawRandomStopFromList(candidates);
+//		do{
+//			for(TransitStopFacility s: candidates){
+//				if(MatsimRandom.getRandom().nextDouble() < (1.0/candidates.size())){
+//					temp = s;
+//					break;
+//				}
+//			}
+//		}while(temp == null);
 		stops2serve.add(indexStopInGreatestDistance + 1, temp);
 		return stops2serve;
 	}

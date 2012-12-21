@@ -174,6 +174,11 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	}
 	
 	@Override
+	public TransitStopFacility drawRandomStopFromList(List<TransitStopFacility> choiceSet) {
+		return this.randomStopProvider.drawRandomStopFromList(choiceSet);
+	}
+
+	@Override
 	public TransitLine createEmptyLine(Id id) {
 		return this.scheduleWithStopsOnly.getFactory().createTransitLine(id);
 	}

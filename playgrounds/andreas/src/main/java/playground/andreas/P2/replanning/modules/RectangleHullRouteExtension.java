@@ -26,15 +26,15 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
-import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.routeProvider.PRouteProvider;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -88,7 +88,7 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 			this.findNewHullInteriorStops(cooperative.getRouteProvider().getAllPStops(), currentlyUsedStops, rectangle);
 		
 		// draw a random stop from the candidates-list
-		TransitStopFacility newStop = this.drawStop(newHullInteriorStops);
+		TransitStopFacility newStop = this.drawStop(cooperative.getRouteProvider(), newHullInteriorStops);
 		if(newStop == null){
 			log.error("can not create a new route for cooperative " + cooperative.getId() + " in iteration " + cooperative.getCurrentIteration() +
 					", because there is no unused stop in the convex hull of the old route.");
@@ -286,11 +286,11 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	}
 	
 	/**
+	 * @param pRouteProvider 
 	 * @param newHullInteriorStops
 	 * @return
 	 */
-	private TransitStopFacility drawStop(
-			List<TransitStopFacility> newHullInteriorStops) {
+	private TransitStopFacility drawStop(PRouteProvider pRouteProvider, List<TransitStopFacility> newHullInteriorStops) {
 		if(newHullInteriorStops.size() == 0){
 			return null;
 		}else{
@@ -311,8 +311,11 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 //			}else{
 //				newStop = newHullInteriorStops.get(0);
 //			}
-			int rnd = (int)(MatsimRandom.getRandom().nextDouble() * (newHullInteriorStops.size() - 1));
-			return newHullInteriorStops.get(rnd);
+			
+			// droeder code
+//			int rnd = (int)(MatsimRandom.getRandom().nextDouble() * (newHullInteriorStops.size() - 1));
+//			return newHullInteriorStops.get(rnd);
+			return pRouteProvider.drawRandomStopFromList(newHullInteriorStops);
 		}
 	}
 

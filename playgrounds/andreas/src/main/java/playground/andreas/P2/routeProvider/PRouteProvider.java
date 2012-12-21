@@ -21,6 +21,8 @@ package playground.andreas.P2.routeProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -30,6 +32,8 @@ public interface PRouteProvider {
 	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id routeId);
 
 	public TransitStopFacility getRandomTransitStop(int currentIteration);
+	
+	public TransitStopFacility drawRandomStopFromList(List<TransitStopFacility> choiceSet);
 	
 	public Collection<TransitStopFacility> getAllPStops();
 

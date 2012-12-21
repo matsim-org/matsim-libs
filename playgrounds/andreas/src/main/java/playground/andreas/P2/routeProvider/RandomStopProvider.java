@@ -161,6 +161,51 @@ public class RandomStopProvider {
 		return null;
 	}
 	
+	/**
+	 * Draws one random transit stop facility from the given choice set with respect to their weights.
+	 * 
+	 * @param choiceSet
+	 * @return
+	 */
+	public TransitStopFacility drawRandomStopFromList(List<TransitStopFacility> choiceSet) {
+		if (this.stops2Weight == null) {
+			updateWeights();
+		}
+		double totalWeight = 0.0;
+		for (TransitStopFacility stop : choiceSet) {
+			if (this.stops2Weight.get(stop) != null) {
+				totalWeight += this.stops2Weight.get(stop);
+			}
+		}
+		
+		if (this.totalWeight == 0.0) {
+			// old version
+			int i = 0;
+			double rndTreshold = MatsimRandom.getRandom().nextDouble() * choiceSet.size();
+			for (TransitStopFacility stop : choiceSet) {
+				i++;
+				if(rndTreshold <= i){
+					return stop;
+				}
+			}
+			return null;
+		}
+
+		double accumulatedWeight = 0.0;
+		double rndTreshold = MatsimRandom.getRandom().nextDouble() * totalWeight;
+		for (TransitStopFacility stop : choiceSet) {
+			if (this.stops2Weight.get(stop) != null) {
+				accumulatedWeight += this.stops2Weight.get(stop);
+			}
+			if (rndTreshold <= accumulatedWeight) {
+				return stop;
+			}
+		}
+		
+		log.warn("Could not draw a random stop from the given choice set " + choiceSet);
+		return null;
+	}
+	
 	private void writeToFile(int currentIteration) {
 		if (this.outputDir == null) {
 			return;
