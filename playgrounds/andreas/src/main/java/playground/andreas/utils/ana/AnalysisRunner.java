@@ -61,7 +61,7 @@ public class AnalysisRunner {
 		
 		
 		String oldJavaIoTempDir = System.getProperty("java.io.tmpdir");
-		String newJavaIoTempDir = outputDir;
+		String newJavaIoTempDir = outputDir + "/" + runId + "/tmp";
 		System.out.println("Setting java tmpDir from " + oldJavaIoTempDir + " to " + newJavaIoTempDir);
 		System.setProperty("java.io.tmpdir", newJavaIoTempDir);
 		
