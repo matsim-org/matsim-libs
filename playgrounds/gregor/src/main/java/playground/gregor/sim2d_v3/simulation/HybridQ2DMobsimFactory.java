@@ -33,9 +33,12 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkInternalI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
 
 public class HybridQ2DMobsimFactory implements MobsimFactory {
 
@@ -57,35 +60,43 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 
 		// Get number of parallel Threads
 		int numOfThreads = conf.getNumberOfThreads();
-		QNetsimEngineFactory netsimEngFactory;
-		if (numOfThreads > 1) {
-			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
-			netsimEngFactory = new ParallelQNetsimEngineFactory();
-			log.info("Using parallel QSim with " + numOfThreads + " threads.");
-		} else {
-			netsimEngFactory = new DefaultQSimEngineFactory();
-		}
+
+//		QNetsimEngineFactory netsimEngFactory;
+//		if (numOfThreads > 1) {
+//			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
+//			netsimEngFactory = new ParallelQNetsimEngineFactory();
+//			log.info("Using parallel QSim with " + numOfThreads + " threads.");
+//		} else {
+//			netsimEngFactory = new DefaultQSimEngineFactory();
+//		}
+
 //		QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, netsimEngFactory);
+
 		QSim qSim = new QSim(sc, eventsManager);
+
 		Sim2DActivityEngine activityEngine = new Sim2DActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 		
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-
 		Sim2DEngine e = new Sim2DEngine(qSim);
 		this.sim2DEngine = e;
 		qSim.addMobsimEngine(e);
 		Sim2DDepartureHandler d = new Sim2DDepartureHandler(e);
 		qSim.addDepartureHandler(d);
 		
+//		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim); // no longer needed
+//		QNetsimEngine netsimEngine = new QNetsimEngine( qSim, new KaiHybridNetworkFactory( e ) ) ; // use this instead of null version
+		QNetsimEngine netsimEngine = new QNetsimEngine( qSim, null ) ;
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		qSim.addAgentSource(agentSource);
+
 		return qSim;
 	}
 
