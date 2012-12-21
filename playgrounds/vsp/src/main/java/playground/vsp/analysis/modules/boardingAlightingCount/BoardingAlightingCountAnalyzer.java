@@ -142,8 +142,12 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 		//create for boarding all
 		heatmap = new HeatMap(this.gridSize);
 		for(Entry<Id, Double> e: totals.entrySet()){
-			Coord coord = this.stops.get(e.getKey()).getCoord();
-			heatmap.addValue(coord, e.getValue());
+			if (this.stops.get(e.getKey()) == null) {
+				log.info("No entries for type " + e.getKey());
+			} else {
+				Coord coord = this.stops.get(e.getKey()).getCoord();
+				heatmap.addValue(coord, e.getValue());
+			}
 		}
 		heatmap.createHeatMap();
 		this.heatMaps.put(name, heatmap);
@@ -237,11 +241,15 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 		// write departures for stops
 		w = IOUtils.getBufferedWriter(outputFolder + "stop2vehicleDepartures.csv");
 		try {
-			w.write("id;x;y;departures;\n");
+			w.write("id;x;y;departures"); w.newLine();
 			TransitStopFacility f;
 			for(Entry<Id, Double> e: this.handler.getStopToDepartures().entrySet()){
 				f = this.stops.get(e.getKey());
-				w.write(e.getKey() + ";" + f.getCoord().getX() + ";" + f.getCoord().getY() + ";" + e.getValue().toString() + ";\n"); 
+				if (f.getCoord() == null) {
+					log.info("Stop " + f.getId() + " - " + f.getName() + " has no coordinates associated with. Will ignore this stop and proceed.");
+				} else {
+					w.write(e.getKey() + ";" + f.getCoord().getX() + ";" + f.getCoord().getY() + ";" + e.getValue().toString()); w.newLine();
+				}
 			}
 			w.flush();
 			w.close();
