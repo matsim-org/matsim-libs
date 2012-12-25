@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
+import playground.gregor.sim2d_v4.scenario.TransportMode;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
 
 
@@ -42,8 +43,19 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 
 	@Override
 	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-		if ( link.getId().toString().equals("15") ) {
-			QSim2DTransitionLink hiResLink = new QSim2DTransitionLink(link, network, toQueueNode, this.hybridEngine ) ;
+		boolean transitionLink = link.getAllowedModes().contains(TransportMode.walk2d);
+		if (transitionLink){
+			transitionLink = false;
+			for (Link l : link.getFromNode().getInLinks().values()) {
+				if (!l.getAllowedModes().contains(TransportMode.walk2d)) {
+					transitionLink = true;
+					break;
+				}
+			}
+		}
+		
+		if (transitionLink) {
+			QSim2DTransitionLink hiResLink = new QSim2DTransitionLink(link, network, toQueueNode, this.hybridEngine, new QLinkImpl(link, network, toQueueNode) ) ;
 			this.hybridEngine.registerHiResLink(hiResLink);
 			return hiResLink ;
 		} else {
