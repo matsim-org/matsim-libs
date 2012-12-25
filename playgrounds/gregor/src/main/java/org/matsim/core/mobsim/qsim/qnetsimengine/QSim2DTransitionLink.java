@@ -37,7 +37,7 @@ import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
 public class QSim2DTransitionLink extends QLinkInternalI {
 
 	private static final Logger log = Logger.getLogger(QSim2DTransitionLink.class);
-	
+
 	private final QNode toQueueNode;
 	private final QNetwork qNetwork;
 	private final Link link;
@@ -45,14 +45,24 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 
 	private final QLinkImpl qLinkDelegate;
 
-	private final boolean transferToSim2D = false;
-	
+	private final boolean transferToSim2D = true;
+
 	QSim2DTransitionLink(Link link, QNetwork network, QNode toQueueNode, Sim2DEngine hybridEngine, QLinkImpl qLinkImpl) {
 		this.link = link;
 		this.qNetwork = network;
 		this.toQueueNode = toQueueNode;
 		this.hybridEngine = hybridEngine;
 		this.qLinkDelegate = qLinkImpl;
+		
+		init();
+	}
+
+	private void init() {
+		//TODO 
+		//departure boxes based on flow capacity 
+		//2D Agent initialization??
+		//departure box section implementation 
+		//section coupling 
 	}
 
 	@Override
@@ -61,7 +71,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.addFromIntersection(veh);
 		} else {
-			
+			throw new UnsupportedOperationException() ;			
 		}
 	}
 
@@ -70,9 +80,9 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.addParkedVehicle(vehicle);
 		} else {
-			
+
+			throw new UnsupportedOperationException() ;
 		}
-		throw new UnsupportedOperationException() ;
 	}
 
 	@Override
@@ -80,9 +90,9 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.clearVehicles();
 		} else {
-			
+//			throw new UnsupportedOperationException() ;
+
 		}
-		throw new UnsupportedOperationException() ;
 	}
 
 	@Override
@@ -91,7 +101,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.doSimStep(now);
 		} else {
-			return true;
+			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -100,7 +110,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getToNode();
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -110,7 +120,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getAdditionalAgentsOnLink();
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -120,7 +130,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getVehicle(vehicleId);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -130,7 +140,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.letVehicleDepart(vehicle, now);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -140,7 +150,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.registerAdditionalAgentOnLink(planAgent);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -150,7 +160,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.registerDriverAgentWaitingForCar(agent);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -160,7 +170,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.removeParkedVehicle(vehicleId);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -170,7 +180,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.unregisterAdditionalAgentOnLink(mobsimAgentId);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -181,8 +191,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.isNotOfferingVehicle();
 		} else {
-			
-		throw new UnsupportedOperationException() ;
+
+			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -191,7 +201,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getLastMovementTimeOfFirstVehicle();
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -201,7 +211,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getFirstVehicle();
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -211,7 +221,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.hasGreenForToLink(toLinkId);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -222,8 +232,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.hasSpace();
 		} else {
-			
-		throw new UnsupportedOperationException() ;
+
+			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -232,7 +242,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.popFirstVehicle();
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -242,7 +252,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getAllNonParkedVehicles();
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -252,7 +262,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getAllVehicles();
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -262,8 +272,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getLink();
 		} else {
-			
-			throw new UnsupportedOperationException() ;
+			return this.link;
 		}
 	}
 
@@ -272,7 +281,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.recalcTimeVariantAttributes(time);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -282,7 +291,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getCustomAttributes();
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -292,7 +301,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getVisData();
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -302,8 +311,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getParkedVehicle(vehicleId);
 		} else {
-			
-			return null;
+
+			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -313,8 +322,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.insertPassengerIntoVehicle(passenger, vehicleId, now);
 		} else {
-			
-			return false;
+
+			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -323,7 +332,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.registerDriverAgentWaitingForPassengers(agent);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -333,8 +342,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.unregisterDriverAgentWaitingForPassengers(agentId);
 		} else {
-			
-			return null;
+
+			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -343,7 +352,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.registerPassengerAgentWaitingForCar(agent, vehicleId);
 		} else {
-			
+
 			throw new UnsupportedOperationException() ;
 		}
 	}
@@ -354,8 +363,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.unregisterPassengerAgentWaitingForCar(agent, vehicleId);
 		} else {
-			
-			return null;
+
+			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -364,8 +373,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getAgentsWaitingForCar(vehicleId);
 		} else {
-			
-			return null;
+
+			throw new UnsupportedOperationException() ;
 		}
 	}
 
