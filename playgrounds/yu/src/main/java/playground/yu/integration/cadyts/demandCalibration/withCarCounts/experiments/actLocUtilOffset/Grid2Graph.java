@@ -25,16 +25,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.utils.qgis.X2GraphImpl;
@@ -49,30 +44,23 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 public class Grid2Graph extends X2GraphImpl {
 	private double gridSideLength_m;
 	private Map<Coord/* actLoc */, Tuple<Integer/* cnt */, Double/* sum */>> gridUtilOffsetMap = new HashMap<Coord, Tuple<Integer, Double>>();
-
+	private final PolygonFeatureFactory.Builder factoryBuilder;
+	
 	public Grid2Graph(CoordinateReferenceSystem crs, double gridSideLength_m,
 			Map<Coord, Tuple<Integer, Double>> gridUtilOffsetMap) {
 		this.gridSideLength_m = gridSideLength_m;
 		this.gridUtilOffsetMap = gridUtilOffsetMap;
 
 		this.geofac = new GeometryFactory();
-		features = new ArrayList<Feature>();
+		features = new ArrayList<SimpleFeature>();
 
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, crs);
-		AttributeType ctX = AttributeTypeFactory.newAttributeType("centerX",
-				Double.class);
-		AttributeType ctY = AttributeTypeFactory.newAttributeType("centerY",
-				Double.class);
-		AttributeType avgUtilOffset = AttributeTypeFactory.newAttributeType(
-				"avgUtilOffset", Double.class);
-		AttributeType cnt = AttributeTypeFactory.newAttributeType("#Legs",
-				Double.class);
-
-		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
-		defaultFeatureTypeFactory.setName("grid");
-		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, ctX,
-				ctY, avgUtilOffset, cnt });
+		factoryBuilder = new PolygonFeatureFactory.Builder().
+				setCrs(crs).
+				setName("grid").
+				addAttribute("centerC", Double.class).
+				addAttribute("centerY", Double.class).
+				addAttribute("avgUtilOffset", Double.class).
+				addAttribute("#Legs", Double.class);
 	}
 
 	public double getGridSideLength_m() {
@@ -92,37 +80,36 @@ public class Grid2Graph extends X2GraphImpl {
 		this.gridUtilOffsetMap = gridUtilOffsetMap;
 	}
 
-	public Collection<Feature> getFeatures() throws SchemaException,
-			NumberFormatException, IllegalAttributeException {
-		for (int i = 0; i < attrTypes.size(); i++)
-			defaultFeatureTypeFactory.addType(attrTypes.get(i));
-		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
+	public Collection<SimpleFeature> getFeatures() {
+		for (int i = 0; i < attrTypes.size(); i++) {
+			Tuple<String, Class<?>> att = attrTypes.get(i);
+			factoryBuilder.addAttribute(att.getFirst(), att.getSecond());
+		}
+		PolygonFeatureFactory factory = factoryBuilder.create();
 
 		for (Coord gridCenter : this.gridUtilOffsetMap.keySet()) {
 			LinearRing ls = this.getGridRing(gridCenter);
 			Polygon p = new Polygon(ls, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);
 
-			int size = 5 + parameters.size();
+			int size = 4 + parameters.size();
 			Object[] o = new Object[size];
-			o[0] = mp;
-			o[1] = gridCenter.getX();
-			o[2] = gridCenter.getY();
+			o[0] = gridCenter.getX();
+			o[1] = gridCenter.getY();
 			Tuple<Integer, Double> utilOffsetPair = this.gridUtilOffsetMap
 					.get(gridCenter);
 			int cnt = utilOffsetPair.getFirst();
-			o[3] = utilOffsetPair.getSecond() / (double) cnt /*
+			o[2] = utilOffsetPair.getSecond() / (double) cnt /*
 															 * avg.
 															 * LegUtilOffset
 															 */;
-			o[4] = cnt/* #Legs */;
+			o[3] = cnt/* #Legs */;
 
 			for (int i = 0; i < parameters.size(); i++) {
-				o[i + 5] = parameters.get(i).get(gridCenter);
+				o[i + 4] = parameters.get(i).get(gridCenter);
 			}
 
-			Feature ft = ftRoad.create(o, gridCenter.toString()
-					+ "-UtilOffsets");
+			SimpleFeature ft = factory.createPolygon(mp, o, gridCenter.toString() + "-UtilOffsets");
 			features.add(ft);
 		}
 
@@ -130,7 +117,7 @@ public class Grid2Graph extends X2GraphImpl {
 	}
 
 	protected LinearRing getGridRing(Coord center) {
-		Coordinate ct = getCoordinate(center);
+		Coordinate ct = MGC.coord2Coordinate(center);
 
 		Coordinate A = new Coordinate(ct.x - gridSideLength_m / 2d, ct.y
 				+ gridSideLength_m / 2d);

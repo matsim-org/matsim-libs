@@ -27,16 +27,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.TripUtilOffsetExtractor.TripsWithUtilOffset;
@@ -60,7 +55,8 @@ public class Trips2PolygonGraphRigorous extends X2GraphImpl {
 	private Map<Tuple<Coord, Coord>, TripsWithUtilOffset> tripsWithUtilOffsetMap;
 	private int tripBundleLowLimit = 1;
 	private double barWidthScale = 5;
-
+	private PolygonFeatureFactory.Builder factoryBuilder;
+	
 	public Trips2PolygonGraphRigorous(
 			Map<Tuple<Coord, Coord>, TripsWithUtilOffset> tripsWithUtilOffsetMap,
 			CoordinateReferenceSystem crs, int tripBundleLowLimit) {
@@ -76,26 +72,17 @@ public class Trips2PolygonGraphRigorous extends X2GraphImpl {
 
 		geofac = new GeometryFactory();
 
-		features = new ArrayList<Feature>();
-
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, this.crs);
-		AttributeType ODcoord = AttributeTypeFactory.newAttributeType(
-				"ODcoord", String.class);
-		AttributeType fromGridCoord = AttributeTypeFactory.newAttributeType(
-				"fromGridCoord", String.class);
-		AttributeType toGridCoord = AttributeTypeFactory.newAttributeType(
-				"toGridCoord", String.class);
-		AttributeType avgUtilOffset = AttributeTypeFactory.newAttributeType(
-				"avgUtilOffset", Double.class);
-		AttributeType stddev = AttributeTypeFactory.newAttributeType("stddev",
-				Double.class);
-		AttributeType volume = AttributeTypeFactory.newAttributeType("volume",
-				Integer.class);
-		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
-		defaultFeatureTypeFactory.setName("trips");
-		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, ODcoord,
-				fromGridCoord, toGridCoord, avgUtilOffset, stddev, volume });
+		features = new ArrayList<SimpleFeature>();
+		
+		this.factoryBuilder = new PolygonFeatureFactory.Builder().
+				setCrs(this.crs).
+				setName("trips").
+				addAttribute("ODcoord", String.class).
+				addAttribute("fromGridCoord", String.class).
+				addAttribute("toGridCoord", String.class).
+				addAttribute("avgUtilOffset", Double.class).
+				addAttribute("stddev", Double.class).
+				addAttribute("volume", Integer.class);
 	}
 
 	public void setTripBundleLowLimit(int tripBundleLowLimit) {
@@ -115,9 +102,9 @@ public class Trips2PolygonGraphRigorous extends X2GraphImpl {
 		// //////////////////////////////////////////////////////////////
 		double width = getBarWidth(trips);
 		// //////////////////////////////////////////////////////////////
-		Coordinate from = getCoordinate(trips.getOrig());
+		Coordinate from = MGC.coord2Coordinate(trips.getOrig());
 
-		Coordinate to = getCoordinate(trips.getDest());
+		Coordinate to = MGC.coord2Coordinate(trips.getDest());
 
 		double xdiff = to.x - from.x;
 		double ydiff = to.y - from.y;
@@ -136,12 +123,12 @@ public class Trips2PolygonGraphRigorous extends X2GraphImpl {
 				from, to, toD, toC, fromB, from }), geofac);
 	}
 
-	public Collection<Feature> getFeatures() throws SchemaException,
-			NumberFormatException, IllegalAttributeException {
+	public Collection<SimpleFeature> getFeatures() {
 		for (int i = 0; i < attrTypes.size(); i++) {
-			defaultFeatureTypeFactory.addType(attrTypes.get(i));
+			Tuple<String, Class<?>> att = attrTypes.get(i);
+			factoryBuilder.addAttribute(att.getFirst(), att.getSecond());
 		}
-		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
+		PolygonFeatureFactory factory = factoryBuilder.create();
 		for (TripsWithUtilOffset trips : tripsWithUtilOffsetMap.values()) {
 			double avgUtilOffset = trips.getAverageUtilOffset();
 			double standardDeviation = trips.getStandardDeviation();
@@ -163,20 +150,19 @@ public class Trips2PolygonGraphRigorous extends X2GraphImpl {
 				LinearRing lr = getLinearRing(trips);
 				Polygon p = new Polygon(lr, null, geofac);
 				MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, geofac);
-				int size = 7 + parameters.size();
+				int size = 6 + parameters.size();
 				Object[] o = new Object[size];
-				o[0] = mp;
 				String id = trips.getId();
-				o[1] = id;
-				o[2] = origGrid.toString();
-				o[3] = destGrid.toString();
-				o[4] = avgUtilOffset;
-				o[5] = standardDeviation;
-				o[6] = trips.getVolume();
+				o[0] = id;
+				o[1] = origGrid.toString();
+				o[2] = destGrid.toString();
+				o[3] = avgUtilOffset;
+				o[4] = standardDeviation;
+				o[5] = trips.getVolume();
 				for (int i = 0; i < parameters.size(); i++) {
-					o[i + 7] = parameters.get(i).get(id);
+					o[i + 6] = parameters.get(i).get(id);
 				}
-				Feature ft = ftRoad.create(o, id);
+				SimpleFeature ft = factory.createPolygon(mp, o, null);
 				features.add(ft);
 			}
 		}

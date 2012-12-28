@@ -26,14 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,19 +36,20 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.analysis.RouteSummaryTest.RouteSummary;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class RouteCompare2QGIS extends Route2QGIS {
 	private final static Logger log = Logger.getLogger(RouteCompare2QGIS.class);
 	private final Map<List<Id>, Integer> routeCountersB;
+	private PolygonFeatureFactory factory;
 
 	public RouteCompare2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
@@ -69,31 +62,19 @@ public class RouteCompare2QGIS extends Route2QGIS {
 
 	@Override
 	protected void initFeatureType() {
-		AttributeType[] attrRoute = new AttributeType[6];
-		attrRoute[0] = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, getCrs());
-		attrRoute[1] = AttributeTypeFactory.newAttributeType("DIFF_B-A",
-				Double.class);
-		attrRoute[2] = AttributeTypeFactory.newAttributeType("DIFF_SIGN",
-				Double.class);
-		attrRoute[3] = AttributeTypeFactory.newAttributeType("ROUTEFLOWA",
-				Double.class);
-		attrRoute[4] = AttributeTypeFactory.newAttributeType("ROUTEFLOWB",
-				Double.class);
-		attrRoute[5] = AttributeTypeFactory.newAttributeType("(B-A)/A",
-				Double.class);
-		try {
-			setFeatureTypeRoute(FeatureTypeBuilder.newFeatureType(
-					attrRoute, "route"));
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		this.factory = new PolygonFeatureFactory.Builder().
+				setCrs(this.getCrs()).
+				setName("route").
+				addAttribute("DIFF_B-A", Double.class).
+				addAttribute("DIFF_SIGN", Double.class).
+				addAttribute("ROUTEFLOWA", Double.class).
+				addAttribute("ROUTEFLOWB", Double.class).
+				addAttribute("(B-A)/A", Double.class).
+				create();
 	}
 
 	@Override
-	protected Feature getRouteFeature(final List<Id> routeLinkIds) {
+	protected SimpleFeature getRouteFeature(final List<Id> routeLinkIds) {
 		Integer routeFlowsA = routeCounters.get(routeLinkIds);
 		Integer routeFlowsB = routeCountersB.get(routeLinkIds);
 		if (routeFlowsA != null || routeFlowsB != null) {
@@ -106,37 +87,19 @@ public class RouteCompare2QGIS extends Route2QGIS {
 			if ((routeFlowsA.intValue() > 1 || routeFlowsB.intValue() > 1)
 					&& routeFlowsA.intValue() != routeFlowsB.intValue()) {
 				Coordinate[] coordinates = new Coordinate[(routeLinkIds.size() + 1) * 2 + 1];
-				Double diff = routeFlowsB.doubleValue()
-						- routeFlowsA.doubleValue();
+				Double diff = routeFlowsB.doubleValue() - routeFlowsA.doubleValue();
 				Double absDiff = Math.abs(diff);
-				double width = 100.0 * Math.min(250.0,
-						routeFlowsA.intValue() == 0 ? 10.0 : absDiff
+				double width = 100.0 * Math.min(250.0, routeFlowsA.intValue() == 0 ? 10.0 : absDiff
 								/ routeFlowsA.doubleValue());
-				coordinates = calculateCoordinates(coordinates, width,
-						routeLinkIds);
-				try {
-					return getFeatureTypeRoute()
-							.create(
-									new Object[] {
-											new MultiPolygon(
-													new Polygon[] { new Polygon(
-															getGeofac()
-																	.createLinearRing(
-																			coordinates),
-															null, getGeofac()) },
-													getGeofac()),
-											absDiff,
-											routeFlowsA.intValue() == 0 ? 0
-													: diff / absDiff,
-											routeFlowsA,
-											routeFlowsB,
-											routeFlowsA.intValue() == 0 ? 10
-													: absDiff
-															/ routeFlowsA
-																	.doubleValue() });
-				} catch (IllegalAttributeException e) {
-					e.printStackTrace();
-				}
+				coordinates = calculateCoordinates(coordinates, width, routeLinkIds);
+				return factory.createPolygon(
+						coordinates,
+						new Object[] {absDiff,
+								routeFlowsA.intValue() == 0 ? 0 : diff / absDiff,
+								routeFlowsA,
+								routeFlowsB,
+								routeFlowsA.intValue() == 0 ? 10 : absDiff / routeFlowsA.doubleValue() },
+						null);
 			}
 		}
 		return null;
@@ -144,12 +107,12 @@ public class RouteCompare2QGIS extends Route2QGIS {
 
 	@Override
 	protected void writeRoutes() {
-		ArrayList<Feature> fts = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 		Set<List<Id>> totalKeys = new HashSet<List<Id>>();
 		totalKeys.addAll(routeCounters.keySet());
 		totalKeys.addAll(routeCountersB.keySet());
 		for (List<Id> routeLinkIds : totalKeys) {
-			Feature ft = getRouteFeature(routeLinkIds);
+			SimpleFeature ft = getRouteFeature(routeLinkIds);
 			if (ft != null) {
 				fts.add(ft);
 			}

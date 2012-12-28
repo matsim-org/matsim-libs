@@ -20,24 +20,13 @@
 
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 
-import org.geotools.data.DataUtilities;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.referencing.FactoryException;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.AreaUtilityOffsets;
@@ -45,27 +34,6 @@ import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experime
 import playground.yu.utils.qgis.X2QGIS;
 
 public class ActivityLocationUtilOffset2QGIS4Distribution implements X2QGIS {
-	/**
-	 * this class is only a copy of
-	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class> Gregor
-	 * Laemmel's
-	 * 
-	 * @author ychen
-	 * 
-	 */
-	public static class ShapeFileWriter2 {
-		@SuppressWarnings("deprecation")
-		public static void writeGeometries(final Collection<Feature> features,
-				final String filename) throws IOException, FactoryException,
-				SchemaException {
-			ShapefileDataStore datastore = new ShapefileDataStore(new File(
-					filename).toURI().toURL());
-			FeatureType ft = features.iterator().next().getFeatureType();
-			datastore.createSchema(ft);
-			((FeatureStore) datastore.getFeatureSource(ft.getTypeName()))
-					.addFeatures(DataUtilities.reader(features));
-		}
-	}
 
 	private CoordinateReferenceSystem crs = null;
 	private Grid2Graph4Distribution g2g = null;
@@ -83,19 +51,7 @@ public class ActivityLocationUtilOffset2QGIS4Distribution implements X2QGIS {
 	 *            where the shapefile will be saved
 	 */
 	public void writeShapeFile(final String ShapeFilename) {
-		try {
-			ShapeFileWriter2.writeGeometries(g2g.getFeatures(), ShapeFilename);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(g2g.getFeatures(), ShapeFilename);
 	}
 
 	/**

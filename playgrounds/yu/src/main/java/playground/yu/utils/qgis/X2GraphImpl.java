@@ -25,14 +25,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -45,36 +43,23 @@ public abstract class X2GraphImpl implements X2Graph {
 	protected CoordinateReferenceSystem crs;
 	protected GeometryFactory geofac;
 
-	protected Collection<Feature> features;
-	protected DefaultFeatureTypeFactory defaultFeatureTypeFactory;
+	protected Collection<SimpleFeature> features;
 
 	protected List<Map<Id, ?>> parameters = new ArrayList<Map<Id, ?>>();
-	protected List<AttributeType> attrTypes = new ArrayList<AttributeType>();
-
-	public static Coordinate getCoordinate(Coord coord) {
-		return new Coordinate(coord.getX(), coord.getY());
-	}
+	protected List<Tuple<String, Class<?>>> attrTypes = new ArrayList<Tuple<String, Class<?>>>();
 
 	public void addParameter(String paramName, Class<?> clazz, Map<Id, ?> params) {
-		attrTypes.add(AttributeTypeFactory.newAttributeType(paramName, clazz));
+		attrTypes.add(new Tuple<String, Class<?>>(paramName, clazz));
 		parameters.add(params);
-	}
-
-	// TESTS
-	public void removeParameter(String paramName, Class<?> clazz,
-			Map<Id, ?> params) {
-		attrTypes.remove(AttributeTypeFactory
-				.newAttributeType(paramName, clazz));
-		parameters.remove(params);
 	}
 
 	protected LinearRing getLinearRing(Link link) {
 		// //////////////////////////////////////////////////////////////
 		double width = getLinkWidth(link);
 		// //////////////////////////////////////////////////////////////
-		Coordinate from = getCoordinate(link.getFromNode().getCoord());
+		Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
 
-		Coordinate to = getCoordinate(link.getToNode().getCoord());
+		Coordinate to = MGC.coord2Coordinate(link.getToNode().getCoord());
 
 		double xdiff = to.x - from.x;
 		double ydiff = to.y - from.y;

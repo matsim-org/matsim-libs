@@ -22,16 +22,15 @@ package playground.yu.utils.qgis;
 import java.util.Collection;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.LinearRing;
@@ -52,40 +51,50 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 
 	public static class Counts2PolygonGraph extends Network2PolygonGraph {
 		private Set<Id> linkIds = null;
+		private final PolygonFeatureFactory.Builder factoryBuilder;
 
 		public Counts2PolygonGraph(final Network network,
 				final CoordinateReferenceSystem crs, final Set<Id> linkIds) {
 			super(network, crs);
 			this.linkIds = linkIds;
+			this.factoryBuilder = new PolygonFeatureFactory.Builder().
+					setCrs(this.crs).
+					setName("links").
+					addAttribute("ID", String.class).
+					addAttribute("fromID", String.class).
+					addAttribute("toID", String.class).
+					addAttribute("length", Double.class).
+					addAttribute("capacity", Double.class).
+					addAttribute("type", String.class).
+					addAttribute("freespeed", Double.class).
+					addAttribute("transMode", String.class);
 		}
 
 		@Override
-		public Collection<Feature> getFeatures() throws SchemaException,
-				NumberFormatException, IllegalAttributeException {
+		public Collection<SimpleFeature> getFeatures()  {
 			for (int i = 0; i < attrTypes.size(); i++) {
-				defaultFeatureTypeFactory.addType(attrTypes.get(i));
+				Tuple<String, Class<?>> att = attrTypes.get(i);
+				factoryBuilder.addAttribute(att.getFirst(), att.getSecond());
 			}
-			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
+			PolygonFeatureFactory factory = factoryBuilder.create();
 			for (Id linkId : linkIds) {
 				Link link = network.getLinks().get(linkId);
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, geofac);
 				MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, geofac);
-				int size = 7 + parameters.size();
+				int size = 6 + parameters.size();
 				Object[] o = new Object[size];
-				o[0] = mp;
-				o[1] = link.getId().toString();
-				o[2] = link.getFromNode().getId().toString();
-				o[3] = link.getToNode().getId().toString();
-				o[4] = link.getLength();
-				o[5] = link.getCapacity() / network.getCapacityPeriod()
-						* 3600.0;
-				o[6] = link.getFreespeed();
+				o[0] = link.getId().toString();
+				o[1] = link.getFromNode().getId().toString();
+				o[2] = link.getToNode().getId().toString();
+				o[3] = link.getLength();
+				o[4] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
+				o[5] = link.getFreespeed();
 				for (int i = 0; i < parameters.size(); i++) {
-					o[i + 7] = parameters.get(i).get(link.getId());
+					o[i + 6] = parameters.get(i).get(link.getId());
 				}
 				// parameters.get(link.getId().toString()) }
-				Feature ft = ftRoad.create(o, "network");
+				SimpleFeature ft = factory.createPolygon(mp, o, null);
 				features.add(ft);
 			}
 			return features;

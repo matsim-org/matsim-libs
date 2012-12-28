@@ -25,15 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -44,15 +35,15 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.analysis.DiverseRoutesSummary;
 import playground.yu.analysis.DiverseRoutesSummary.LegRoute;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * This class is a copy of main() from
@@ -61,14 +52,16 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * 
  * @author ychen
  * 
+ * NO, it's not (at least no longer) a copy!
+ * 
  */
 public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		X2QGIS {
 	private final static Logger log = Logger.getLogger(SingleRoute2QGIS.class);
 	protected Map<String, List<LegRoute>> dailyRoutes;
 	protected Network network;
-	private FeatureType featureTypeRoute;
 	private boolean writeRoutes = true;
+	private PolylineFeatureFactory factory;
 
 	public SingleRoute2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
@@ -80,46 +73,23 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 
 	@Override
 	protected void initFeatureType() {
-		AttributeType[] attrRoute = new AttributeType[3];
-		attrRoute[0] = DefaultAttributeTypeFactory.newAttributeType(
-				"LineString", LineString.class, true, null, null, getCrs());
-		attrRoute[1] = AttributeTypeFactory.newAttributeType("PERSON_ID",
-				String.class);
-		attrRoute[2] = AttributeTypeFactory.newAttributeType("PLAN_INDEX",
-				Integer.class);
-		try {
-			setFeatureTypeRoute(FeatureTypeBuilder.newFeatureType(attrRoute,
-					"route"));
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		this.factory = new PolylineFeatureFactory.Builder().
+				setCrs(getCrs()).
+				setName("route").
+				addAttribute("PERSON_ID", String.class).
+				addAttribute("PLAN_INDEX", Integer.class).
+				create();
 	}
 
-	public void setFeatureTypeRoute(final FeatureType featureTypeRoute) {
-		this.featureTypeRoute = featureTypeRoute;
-	}
-
-	protected Feature getRouteFeature(String personLegId, LegRoute dailyRoutes) {
+	protected SimpleFeature getRouteFeature(String personLegId, LegRoute dailyRoutes) {
 		List<Id> routeLinkIds = dailyRoutes.getRouteLinkIds();
 		Coordinate[] coordinates = new Coordinate[routeLinkIds.size() + 1];
 
 		coordinates = calculateCoordinates(coordinates, routeLinkIds);
-		try {
-			return getFeatureTypeRoute().create(
-					new Object[] {
-							new LineString(new CoordinateArraySequence(
-									coordinates), getGeofac()),
-							personLegId.toString()/* 1. element */,
-							dailyRoutes.getPlanIndex() /* 2. element */
-					// ,dailyRoutes.getLegIndex() /* 3. element */
-					});
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-
-		return null;
+		return this.factory.createPolyline(
+				coordinates,
+				new Object[] {personLegId.toString(), dailyRoutes.getPlanIndex()},
+				null);
 	}
 
 	protected Coordinate[] calculateCoordinates(Coordinate[] coordinates,
@@ -136,19 +106,14 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		return coordinates;
 	}
 
-	protected FeatureType getFeatureTypeRoute() {
-		return featureTypeRoute;
-	}
-
 	protected void writeRoutes() {
 
-		for (Entry<String, List<LegRoute>> personDailyRoutes : dailyRoutes
-				.entrySet()) {
-			ArrayList<Feature> fts = new ArrayList<Feature>();
+		for (Entry<String, List<LegRoute>> personDailyRoutes : dailyRoutes.entrySet()) {
+			ArrayList<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 
 			String personLegId = personDailyRoutes.getKey();
 			for (LegRoute legRoute : personDailyRoutes.getValue()) {
-				Feature ft = getRouteFeature(personLegId, legRoute);
+				SimpleFeature ft = getRouteFeature(personLegId, legRoute);
 				if (ft != null) {
 					fts.add(ft);
 				}

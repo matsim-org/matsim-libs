@@ -20,41 +20,37 @@
 
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.Feature;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.opengis.referencing.FactoryException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.TripUtilOffsetExtractor;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.TripUtilOffsetExtractor.TripsWithUtilOffset;
 import playground.yu.utils.qgis.X2QGIS;
-import playground.yu.utils.qgis.MATSimNet2QGIS.ShapeFileWriter2;
 import utilities.misc.DynamicData;
 
 public class Trips2QGISRigorous implements X2QGIS {
 	private CoordinateReferenceSystem crs;
 	private Trips2PolygonGraphRigorous t2g;
+	private Collection<SimpleFeature> features;
 
 	public Trips2QGISRigorous(
 			String coordRefSys,
@@ -80,21 +76,9 @@ public class Trips2QGISRigorous implements X2QGIS {
 	 *            where the shapefile will be saved
 	 */
 	public void writeShapeFile(final String ShapeFilename) {
-		try {
-			Collection<Feature> features = t2g.getFeatures();
-			if (features.size() > 0) {
-				ShapeFileWriter2.writeGeometries(features, ShapeFilename);
-			}
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
+		Collection<SimpleFeature> features = t2g.getFeatures();
+		if (features.size() > 0) {
+			ShapeFileWriter.writeGeometries(features, ShapeFilename);
 		}
 	}
 

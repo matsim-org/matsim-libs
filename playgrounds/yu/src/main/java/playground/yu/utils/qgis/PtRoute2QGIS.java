@@ -23,32 +23,25 @@
  */
 package playground.yu.utils.qgis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.opengis.referencing.FactoryException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.utils.container.CollectionMath;
@@ -56,7 +49,6 @@ import playground.yu.utils.container.CollectionMath;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
@@ -67,6 +59,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 public class PtRoute2QGIS extends MATSimNet2QGIS {
 	public static class PtRoute2PolygonGraph extends X2GraphImpl {
 		protected TransitSchedule schedule;
+		private final PolygonFeatureFactory.Builder factoryBuilder;
 
 		public PtRoute2PolygonGraph(CoordinateReferenceSystem crs,
 				TransitSchedule schedule) {
@@ -75,32 +68,24 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 			this.geofac = new GeometryFactory();
 			// this.network = network;
 			this.crs = crs;
-			features = new ArrayList<Feature>();
-
-			AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
-					"MultiPolygon", MultiPolygon.class, true, null, null,
-					this.crs);
-			AttributeType id = AttributeTypeFactory.newAttributeType("ID",
-					String.class);
-			AttributeType transMode = AttributeTypeFactory.newAttributeType(
-					"transMode", String.class);
-			AttributeType links = AttributeTypeFactory.newAttributeType(
-					"links", String.class);
-			AttributeType stops = AttributeTypeFactory.newAttributeType(
-					"stops", String.class);
-
-			defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
-			defaultFeatureTypeFactory.setName("pt-route");
-			defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id,
-					transMode, links, stops });
+			features = new ArrayList<SimpleFeature>();
+			
+			this.factoryBuilder = new PolygonFeatureFactory.Builder().
+					setCrs(this.crs).
+					setName("pt-route").
+					addAttribute("ID", String.class).
+					addAttribute("transMode", String.class).
+					addAttribute("links", String.class).
+					addAttribute("stops", String.class);
 		}
 
 		@Override
-		public Collection<Feature> getFeatures() throws SchemaException,
-				NumberFormatException, IllegalAttributeException {
-			for (int i = 0; i < attrTypes.size(); i++)
-				defaultFeatureTypeFactory.addType(attrTypes.get(i));
-			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
+		public Collection<SimpleFeature> getFeatures() {
+			for (int i = 0; i < attrTypes.size(); i++) {
+				Tuple<String, Class<?>> att = attrTypes.get(i);
+				factoryBuilder.addAttribute(att.getFirst(), att.getSecond());
+			}
+			PolygonFeatureFactory factory = factoryBuilder.create();
 
 			for (TransitLine ptLine : this.schedule.getTransitLines().values())
 				for (TransitRoute ptRoute : ptLine.getRoutes().values()) {
@@ -109,21 +94,20 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 					LinearRing ptRouteRing = getPtRouteRing(ptRoute);
 					Polygon pg = new Polygon(ptRouteRing, null, this.geofac);
 
-					o[0] = new MultiPolygon(new Polygon[] { pg }, this.geofac);
 					Id ptRouteId = ptRoute.getId();
-					o[1] = ptRouteId.toString();
-					o[2] = ptRoute.getTransportMode();
-					o[3] = ptRoute.getRoute().getLinkIds().toString();
+					o[0] = ptRouteId.toString();
+					o[1] = ptRoute.getTransportMode();
+					o[2] = ptRoute.getRoute().getLinkIds().toString();
 					StringBuffer stops = new StringBuffer();
 					for (TransitRouteStop stop : ptRoute.getStops())
 						stops.append(stop.getStopFacility().getId());
 
-					o[4] = stops.toString();
+					o[3] = stops.toString();
 
 					for (int i = 0; i < parameters.size(); i++)
-						o[i + 5] = parameters.get(i).get(ptRouteId);
+						o[i + 4] = parameters.get(i).get(ptRouteId);
 
-					features.add(ftRoad.create(o, "pt-route-network"));
+					features.add(factory.createPolygon(pg, o, null));
 				}
 			return features;
 		}
@@ -234,8 +218,8 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 
 		private Tuple<Coordinate, Coordinate> getOffsetedCoordinatePair(
 				Link link, double width) {
-			Coordinate from = getCoordinate(link.getFromNode().getCoord());
-			Coordinate to = getCoordinate(link.getToNode().getCoord());
+			Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
+			Coordinate to = MGC.coord2Coordinate(link.getToNode().getCoord());
 
 			double xdiff = to.x - from.x;
 			double ydiff = to.y - from.y;
@@ -280,10 +264,6 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 
 	protected PtRoute2PolygonGraph p2g;
 
-	/**
-	 * @param netFilename
-	 * @param coordRefSys
-	 */
 	public PtRoute2QGIS(String netFilename, String coordRefSys,
 			String scheduleFilename) {
 		super(netFilename, coordRefSys);
@@ -293,30 +273,11 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 				.getTransitSchedule());
 	}
 
-	/**
-	 * @param ShapeFilename
-	 *            where the shapefile will be saved
-	 */
 	@Override
 	public void writeShapeFile(final String ShapeFilename) {
-		try {
-			ShapeFileWriter2.writeGeometries(p2g.getFeatures(), ShapeFilename);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(p2g.getFeatures(), ShapeFilename);
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String netFilename = "../berlin-bvg09/pt/nullfall_alles/network.xml";
 		String scheduleFilename = "../berlin-bvg09/pt/nullfall_alles/transitSchedule.xml";

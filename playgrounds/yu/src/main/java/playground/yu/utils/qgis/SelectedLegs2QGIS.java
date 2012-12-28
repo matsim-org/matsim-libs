@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,6 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.RouteUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -56,7 +56,7 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 	@Override
 	protected void writeLegs() throws IOException {
 		String outputFile = this.getOutputDir() + "/legs.shp";
-		ArrayList<Feature> fts = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 		for (PlanImpl plan : this.getOutputSamplePlans()) {
 			if (plan.getFirstActivity().getEndTime() == 21600.0) {
 				String id = plan.getPerson().getId().toString();

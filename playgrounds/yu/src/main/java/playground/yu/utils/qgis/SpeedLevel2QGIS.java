@@ -30,18 +30,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
@@ -60,43 +56,39 @@ import com.vividsolutions.jts.geom.Polygon;
 public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	public static class SpeedLevel2PolygonGraph extends Network2PolygonGraph {
 		private final Set<Id> linkIds;
+		private final PolygonFeatureFactory.Builder factoryBuilder;
 
-		public SpeedLevel2PolygonGraph(Network network,
-				CoordinateReferenceSystem crs, Set<Id> linkIds) {
+		public SpeedLevel2PolygonGraph(Network network, CoordinateReferenceSystem crs, Set<Id> linkIds) {
 			super(network, crs);
 			this.linkIds = linkIds;
 			geofac = new GeometryFactory();
-			features = new ArrayList<Feature>();
-			AttributeType geom = AttributeTypeFactory.newAttributeType(
-					"MultiPolygon", MultiPolygon.class, true, null, null, crs);
-			AttributeType id = AttributeTypeFactory.newAttributeType("ID",
-					String.class);
-			defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
-			defaultFeatureTypeFactory.setName("link");
-			defaultFeatureTypeFactory
-					.addTypes(new AttributeType[] { geom, id });
+			features = new ArrayList<SimpleFeature>();
+			
+			this.factoryBuilder = new PolygonFeatureFactory.Builder().
+					setCrs(crs).
+					setName("links").
+					addAttribute("ID", String.class);
 		}
 
 		@Override
-		public Collection<Feature> getFeatures() throws SchemaException,
-				NumberFormatException, IllegalAttributeException {
+		public Collection<SimpleFeature> getFeatures() {
 			for (int i = 0; i < attrTypes.size(); i++) {
-				defaultFeatureTypeFactory.addType(attrTypes.get(i));
+				Tuple<String, Class<?>> att = attrTypes.get(i);
+				factoryBuilder.addAttribute(att.getFirst(), att.getSecond());
 			}
-			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
+			PolygonFeatureFactory factory = factoryBuilder.create();
 			for (Id linkId : linkIds) {
 				Link link = network.getLinks().get(linkId);
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, geofac);
 				MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, geofac);
-				int size = 2 + parameters.size();
+				int size = 1 + parameters.size();
 				Object[] o = new Object[size];
-				o[0] = mp;
-				o[1] = link.getId().toString();
+				o[0] = link.getId().toString();
 				for (int i = 0; i < parameters.size(); i++) {
-					o[i + 2] = parameters.get(i).get(link.getId());
+					o[i + 1] = parameters.get(i).get(link.getId());
 				}
-				Feature ft = ftRoad.create(o, "network");
+				SimpleFeature ft = factory.createPolygon(mp, o, null);
 				features.add(ft);
 			}
 			return features;

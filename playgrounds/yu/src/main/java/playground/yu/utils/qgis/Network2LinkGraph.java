@@ -23,23 +23,16 @@ package playground.yu.utils.qgis;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * this class is only a copy of <class>NetworkToGraph</class> Gregor Laemmels
@@ -48,66 +41,49 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  */
 public class Network2LinkGraph extends X2GraphImpl implements X2Graph {
 
+	private final PolylineFeatureFactory.Builder factoryBuilder;
+	
 	public Network2LinkGraph(NetworkImpl network,
 			CoordinateReferenceSystem coordinateReferenceSystem) {
 		this.geofac = new GeometryFactory();
 		this.network = network;
 		this.crs = coordinateReferenceSystem;
-		features = new ArrayList<Feature>();
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
-				"LineString", LineString.class, true, null, null, this.crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID",
-				String.class);
-		AttributeType fromNode = AttributeTypeFactory.newAttributeType(
-				"fromID", String.class);
-		AttributeType toNode = AttributeTypeFactory.newAttributeType("toID",
-				String.class);
-		AttributeType length = AttributeTypeFactory.newAttributeType("length",
-				Double.class);
-		AttributeType cap = AttributeTypeFactory.newAttributeType("capacity",
-				Double.class);
-		AttributeType freespeed = AttributeTypeFactory.newAttributeType(
-				"freespeed", Double.class);
-		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
-		defaultFeatureTypeFactory.setName("link");
-		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id,
-				fromNode, toNode, length, cap, freespeed });
+		features = new ArrayList<SimpleFeature>();
+		
+		this.factoryBuilder = new PolylineFeatureFactory.Builder().
+				setCrs(this.crs).
+				setName("links").
+				addAttribute("ID", String.class).
+				addAttribute("fromID", String.class).
+				addAttribute("toID", String.class).
+				addAttribute("length", Double.class).
+				addAttribute("capacity", Double.class).
+				addAttribute("freespeed", Double.class);
 	}
 
-	// ////////////////////////////////////////////
-	/**
-	 * @return the features
-	 * @throws SchemaException
-	 * @throws IllegalAttributeException
-	 * @throws NumberFormatException
-	 */
-	public Collection<Feature> getFeatures() throws SchemaException,
-			NumberFormatException, IllegalAttributeException {
-		for (int i = 0; i < attrTypes.size(); i++)
-			defaultFeatureTypeFactory.addType(attrTypes.get(i));
-		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
+	public Collection<SimpleFeature> getFeatures() {
+		for (int i = 0; i < attrTypes.size(); i++) {
+			Tuple<String, Class<?>> att = attrTypes.get(i);
+			factoryBuilder.addAttribute(att.getFirst(), att.getSecond());
+		}
+		PolylineFeatureFactory factory = factoryBuilder.create();
 		for (Link link : this.network.getLinks().values()) {
-			LineString ls = new LineString(
-					new CoordinateArraySequence(
-							new Coordinate[] {
-									MGC.coord2Coordinate(link.getFromNode()
-											.getCoord()),
-									MGC.coord2Coordinate(link.getToNode()
-											.getCoord()) }), this.geofac);
-			int size = 8 + parameters.size();
+			Coordinate[] coords = new Coordinate[] {
+					MGC.coord2Coordinate(link.getFromNode().getCoord()),
+					MGC.coord2Coordinate(link.getToNode().getCoord())
+				};
+			int size = 6 + parameters.size();
 			Object[] o = new Object[size];
-			o[0] = ls;
-			o[1] = link.getId().toString();
-			o[2] = link.getFromNode().getId().toString();
-			o[3] = link.getToNode().getId().toString();
-			o[4] = link.getLength();
-			o[5] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
-			o[6] = link.getFreespeed();
+			o[0] = link.getId().toString();
+			o[1] = link.getFromNode().getId().toString();
+			o[2] = link.getToNode().getId().toString();
+			o[3] = link.getLength();
+			o[4] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
+			o[5] = link.getFreespeed();
 			for (int i = 0; i < parameters.size(); i++) {
-				o[i + 8] = parameters.get(i).get(link.getId().toString());
+				o[i + 6] = parameters.get(i).get(link.getId().toString());
 			}
-			// parameters.get(link.getId().toString()) }
-			Feature ft = ftRoad.create(o, "network");
+			SimpleFeature ft = factory.createPolyline(coords, o, null);
 			features.add(ft);
 		}
 		return features;

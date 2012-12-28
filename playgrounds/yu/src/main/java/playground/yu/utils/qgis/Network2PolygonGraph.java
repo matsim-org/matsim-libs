@@ -27,18 +27,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -52,38 +47,25 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class Network2PolygonGraph extends X2GraphImpl {
 	protected Set<Link> links2paint = null;
+	private final PolygonFeatureFactory.Builder factoryBuilder;
 
-	/**
-	 * @param network
-	 * @param coordinateReferenceSystem
-	 */
 	public Network2PolygonGraph(Network network, CoordinateReferenceSystem crs) {
 		this.geofac = new GeometryFactory();
 		this.network = network;
 		this.crs = crs;
-		features = new ArrayList<Feature>();
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, this.crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID",
-				String.class);
-		AttributeType fromNode = AttributeTypeFactory.newAttributeType(
-				"fromID", String.class);
-		AttributeType toNode = AttributeTypeFactory.newAttributeType("toID",
-				String.class);
-		AttributeType length = AttributeTypeFactory.newAttributeType("length",
-				Double.class);
-		AttributeType cap = AttributeTypeFactory.newAttributeType("capacity",
-				Double.class);
-		AttributeType type = AttributeTypeFactory.newAttributeType("type",
-				String.class);
-		AttributeType freespeed = AttributeTypeFactory.newAttributeType(
-				"freespeed", Double.class);
-		AttributeType transMode = AttributeTypeFactory.newAttributeType(
-				"transMode", String.class);
-		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
-		defaultFeatureTypeFactory.setName("link");
-		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id,
-				fromNode, toNode, length, cap, type, freespeed, transMode });
+		features = new ArrayList<SimpleFeature>();
+		
+		this.factoryBuilder = new PolygonFeatureFactory.Builder().
+				setCrs(this.crs).
+				setName("links").
+				addAttribute("ID", String.class).
+				addAttribute("fromID", String.class).
+				addAttribute("toID", String.class).
+				addAttribute("length", Double.class).
+				addAttribute("capacity", Double.class).
+				addAttribute("type", String.class).
+				addAttribute("freespeed", Double.class).
+				addAttribute("transMode", String.class);
 	}
 
 	@Override
@@ -92,33 +74,33 @@ public class Network2PolygonGraph extends X2GraphImpl {
 	}
 
 	@Override
-	public Collection<Feature> getFeatures() throws SchemaException,
-			NumberFormatException, IllegalAttributeException {
-		for (int i = 0; i < attrTypes.size(); i++)
-			defaultFeatureTypeFactory.addType(attrTypes.get(i));
-		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
-		for (Link link : (this.links2paint == null ? this.network.getLinks()
-				.values() : this.links2paint)) {
+	public Collection<SimpleFeature> getFeatures() {
+		for (int i = 0; i < attrTypes.size(); i++) {
+			Tuple<String, Class<?>> att = attrTypes.get(i);
+			factoryBuilder.addAttribute(att.getFirst(), att.getSecond());
+		}
+		PolygonFeatureFactory factory = factoryBuilder.create();
+
+		for (Link link : (this.links2paint == null ? this.network.getLinks().values() : this.links2paint)) {
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);
-			int size = 9 + parameters.size();
+			int size = 8 + parameters.size();
 			Object[] o = new Object[size];
-			o[0] = mp;
-			o[1] = link.getId().toString();
-			o[2] = link.getFromNode().getId().toString();
-			o[3] = link.getToNode().getId().toString();
-			o[4] = link.getLength();
-			o[5] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
-			o[6] = (((LinkImpl) link).getType() != null) ? Integer
+			o[0] = link.getId().toString();
+			o[1] = link.getFromNode().getId().toString();
+			o[2] = link.getToNode().getId().toString();
+			o[3] = link.getLength();
+			o[4] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
+			o[5] = (((LinkImpl) link).getType() != null) ? Integer
 					.parseInt(((LinkImpl) link).getType()) : 0;
-			o[7] = link.getFreespeed();
-			o[8] = link.getAllowedModes() != null ? link.getAllowedModes().toString() : TransportMode.car;
+			o[6] = link.getFreespeed();
+			o[7] = link.getAllowedModes() != null ? link.getAllowedModes().toString() : TransportMode.car;
 			for (int i = 0; i < parameters.size(); i++) {
-				o[i + 9] = parameters.get(i).get(link.getId());
+				o[i + 8] = parameters.get(i).get(link.getId());
 			}
 			// parameters.get(link.getId().toString()) }
-			Feature ft = ftRoad.create(o, link.getId().toString());
+			SimpleFeature ft = factory.createPolygon(mp, o, null);
 			features.add(ft);
 		}
 		return features;

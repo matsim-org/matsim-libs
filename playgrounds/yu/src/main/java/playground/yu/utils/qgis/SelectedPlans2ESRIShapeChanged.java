@@ -24,15 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -43,13 +34,15 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * "Simple class to convert MATSim plans to ESRI shape files. Activities will be
@@ -68,24 +61,13 @@ public class SelectedPlans2ESRIShapeChanged extends
 		org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape {
 
 	protected CoordinateReferenceSystem crs;
-	// private final Population population = null;
-	// private double outputSample = 1;
-	// private double actBlurFactor = 0;
 	private double legBlurFactor = 0;
 	protected String outputDir;
 	private ArrayList<PlanImpl> outputSamplePlans;
-	private FeatureType featureTypeAct;
-	private FeatureType featureTypeLeg;
+	private PointFeatureFactory actFactory;
+	private PolylineFeatureFactory legFactory;
 	protected GeometryFactory geofac;
 	private Network network;
-
-	//
-	// public SelectedPlans2ESRIShape() {
-	// this.crs = null;
-	// this.population = null;
-	// this.outputDir = null;
-	// this.geofac = null;
-	// }
 
 	public SelectedPlans2ESRIShapeChanged(Population population, Network network,
 			CoordinateReferenceSystem crs, String outputDir) {
@@ -96,33 +78,9 @@ public class SelectedPlans2ESRIShapeChanged extends
 		initFeatureType();
 	}
 
-	// private void drawOutputSample() {
-	// this.setOutputSamplePlans(new ArrayList<Plan>());
-	// for (Person pers : this.population.getPersons().values()) {
-	// if (MatsimRandom.random.nextDouble() <= this.outputSample) {
-	// this.getOutputSamplePlans().add(pers.getSelectedPlan());
-	// }
-	// }
-	// }
-	//
-	// private void writeActs() throws IOException {
-	// String outputFile = this.getOutputDir() + "/acts.shp";
-	// ArrayList<Feature> fts = new ArrayList<Feature>();
-	// for (Plan plan : this.getOutputSamplePlans()) {
-	// String id = plan.getPerson().getId().toString();
-	// ActIterator iter = plan.getIteratorAct();
-	// while (iter.hasNext()) {
-	// Act act = (Act) iter.next();
-	// fts.add(getActFeature(id, act));
-	// }
-	// }
-	//
-	// ShapeFileWriter.writeGeometries(fts, outputFile);
-	// }
-
 	protected void writeLegs() throws IOException {
 		String outputFile = this.getOutputDir() + "/legs.shp";
-		ArrayList<Feature> fts = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 		for (PlanImpl plan : this.getOutputSamplePlans()) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -137,28 +95,7 @@ public class SelectedPlans2ESRIShapeChanged extends
 		ShapeFileWriter.writeGeometries(fts, outputFile);
 	}
 
-	// private Feature getActFeature(final String id, final Act act) {
-	// String type = act.getType();
-	// String linkId = act.getLinkId().toString();
-	// Double startTime = act.getStartTime();
-	// Double dur = act.getDuration();
-	// Double endTime = act.getEndTime();
-	// double rx = MatsimRandom.random.nextDouble() * this.actBlurFactor;
-	// double ry = MatsimRandom.random.nextDouble() * this.actBlurFactor;
-	// Coord cc = act.getLink().getCenter();
-	// Coord c = new CoordImpl(cc.getX() + rx, cc.getY() + ry);
-	// try {
-	// return this.getFeatureTypeAct().create(
-	// new Object[] { MGC.coord2Point(c), id, type, linkId,
-	// startTime, dur, endTime });
-	// } catch (IllegalAttributeException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// return null;
-	// }
-
-	protected Feature getLegFeature(final Leg leg, final String id) {
+	protected SimpleFeature getLegFeature(final Leg leg, final String id) {
 		String mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
@@ -185,79 +122,38 @@ public class SelectedPlans2ESRIShapeChanged extends
 
 		LineString ls = this.getGeofac().createLineString(coords);
 
-		try {
-			return this.getFeatureTypeLeg().create(
-					new Object[] { ls, id, mode, depTime, travTime, dist });
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-
-		return null;
+		return this.legFactory.createPolyline(ls, new Object[] { id, mode, depTime, travTime, dist }, null);
 	}
 
 	protected void initFeatureType() {
-		AttributeType[] attrAct = new AttributeType[6];
-		attrAct[0] = DefaultAttributeTypeFactory.newAttributeType("Point",
-				Point.class, true, null, null, this.getCrs());
-		attrAct[1] = AttributeTypeFactory.newAttributeType("PERS_ID",
-				String.class);
-		attrAct[2] = AttributeTypeFactory
-				.newAttributeType("TYPE", String.class);
-		attrAct[3] = AttributeTypeFactory.newAttributeType("LINK_ID",
-				String.class);
-		attrAct[4] = AttributeTypeFactory.newAttributeType("START_TIME",
-				Double.class);
-		attrAct[5] = AttributeTypeFactory.newAttributeType("END_TIME",
-				Double.class);
+		this.actFactory = new PointFeatureFactory.Builder().
+			setCrs(this.getCrs()).
+			setName("activities").
+			addAttribute("PERS_ID", String.class).
+			addAttribute("TYPE", String.class).
+			addAttribute("LINK_ID", String.class).
+			addAttribute("START_TIME", Double.class).
+			addAttribute("END_TIME", Double.class).
+			create();
+		
+		this.legFactory = new PolylineFeatureFactory.Builder().
+			setCrs(this.getCrs()).
+			setName("legs").
+			addAttribute("PERS_ID", String.class).
+			addAttribute("MODE", String.class).
+			addAttribute("DEP_TIME", Double.class).
+			addAttribute("TRAV_TIME", Double.class).
+			addAttribute("DIST", Double.class).
+			create();
 
-		AttributeType[] attrLeg = new AttributeType[6];
-		attrLeg[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",
-				LineString.class, true, null, null, this.getCrs());
-		attrLeg[1] = AttributeTypeFactory.newAttributeType("PERS_ID",
-				String.class);
-		attrLeg[2] = AttributeTypeFactory
-				.newAttributeType("MODE", String.class);
-		attrLeg[3] = AttributeTypeFactory.newAttributeType("DEP_TIME",
-				Double.class);
-		attrLeg[4] = AttributeTypeFactory.newAttributeType("TRAV_TIME",
-				Double.class);
-		attrLeg[5] = AttributeTypeFactory
-				.newAttributeType("DIST", Double.class);
-
-		try {
-			this.setFeatureTypeAct(FeatureTypeBuilder.newFeatureType(attrAct,
-					"activity"));
-			this.setFeatureTypeLeg(FeatureTypeBuilder.newFeatureType(attrLeg,
-					"leg"));
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public GeometryFactory getGeofac() {
 		return this.geofac;
 	}
 
-	public void setFeatureTypeLeg(final FeatureType featureTypeLeg) {
-		this.featureTypeLeg = featureTypeLeg;
-	}
-
-	public FeatureType getFeatureTypeLeg() {
-		return this.featureTypeLeg;
-	}
-
 	public CoordinateReferenceSystem getCrs() {
 		return this.crs;
-	}
-
-	public void setFeatureTypeAct(final FeatureType featureTypeAct) {
-		this.featureTypeAct = featureTypeAct;
-	}
-
-	public FeatureType getFeatureTypeAct() {
-		return this.featureTypeAct;
 	}
 
 	public String getOutputDir() {

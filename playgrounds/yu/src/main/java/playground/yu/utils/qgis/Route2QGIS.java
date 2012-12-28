@@ -24,15 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,24 +35,22 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.analysis.RouteSummaryTest.RouteSummary;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 
-
-public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
-		X2QGIS {
+public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements X2QGIS {
 	private final static Logger log = Logger.getLogger(Route2QGIS.class);
 	protected Map<List<Id>, Integer> routeCounters;
 	protected Network network;
-	private FeatureType featureTypeRoute;
 	private boolean writeRoutes = true;
+	private PolygonFeatureFactory factory;
 
 	public Route2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
@@ -74,26 +63,14 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 
 	@Override
 	protected void initFeatureType() {
-		AttributeType[] attrRoute = new AttributeType[2];
-		attrRoute[0] = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, getCrs());
-		attrRoute[1] = AttributeTypeFactory.newAttributeType("ROUTE_FLOW",
-				Double.class);
-		try {
-			setFeatureTypeRoute(FeatureTypeBuilder.newFeatureType(attrRoute,
-					"route"));
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		this.factory = new PolygonFeatureFactory.Builder().
+				setCrs(this.getCrs()).
+				setName("route").
+				addAttribute("ROUTE_FLOW", Double.class).
+				create();
 	}
 
-	public void setFeatureTypeRoute(final FeatureType featureTypeRoute) {
-		this.featureTypeRoute = featureTypeRoute;
-	}
-
-	protected Feature getRouteFeature(final List<Id> routeLinkIds) {
+	protected SimpleFeature getRouteFeature(final List<Id> routeLinkIds) {
 		Integer routeFlows = routeCounters.get(routeLinkIds);
 		if (routeFlows != null) {
 			if (routeFlows.intValue() > 1) {
@@ -101,21 +78,11 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 				double width = 5.0 * Math.min(250.0, routeFlows.doubleValue());
 				coordinates = calculateCoordinates(coordinates, width,
 						routeLinkIds);
-				try {
-					return getFeatureTypeRoute()
-							.create(
-									new Object[] {
-											new MultiPolygon(
-													new Polygon[] { new Polygon(
-															getGeofac()
-																	.createLinearRing(
-																			coordinates),
-															null, getGeofac()) },
-													getGeofac()),
-											routeFlows.doubleValue() });
-				} catch (IllegalAttributeException e) {
-					e.printStackTrace();
-				}
+				return this.factory.createPolygon(
+						coordinates,
+						new Object[] { routeFlows.doubleValue() },
+						null
+						);
 			}
 		}
 		return null;
@@ -154,14 +121,10 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		return coordinates;
 	}
 
-	protected FeatureType getFeatureTypeRoute() {
-		return featureTypeRoute;
-	}
-
 	protected void writeRoutes() {
-		ArrayList<Feature> fts = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 		for (List<Id> routeLinkIds : routeCounters.keySet()) {
-			Feature ft = getRouteFeature(routeLinkIds);
+			SimpleFeature ft = getRouteFeature(routeLinkIds);
 			if (ft != null) {
 				fts.add(ft);
 			}

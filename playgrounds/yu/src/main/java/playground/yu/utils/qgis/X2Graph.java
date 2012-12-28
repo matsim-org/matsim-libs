@@ -25,15 +25,12 @@ package playground.yu.utils.qgis;
 
 import java.util.Collection;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author yu
  * 
  */
 public interface X2Graph {
-	public Collection<Feature> getFeatures() throws SchemaException,
-			NumberFormatException, IllegalAttributeException;
+	public Collection<SimpleFeature> getFeatures();
 }

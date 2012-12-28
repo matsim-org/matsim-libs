@@ -20,22 +20,15 @@ package playground.yu.utils.qgis;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
@@ -46,14 +39,11 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * {@code playground.dgrether.analysis.gis.ShapeFilePolygonWriter}
  * 
  * @author yu
- * 
  */
 public class ShapeFilePolygonWriter {
 
 	protected GeometryFactory geofac;
-	protected DefaultFeatureTypeFactory dftf;
 	private CoordinateReferenceSystem crs;
-	protected List<AttributeType> attrTypes = new ArrayList<AttributeType>();
 
 	public ShapeFilePolygonWriter() {
 		this.geofac = new GeometryFactory();
@@ -61,7 +51,7 @@ public class ShapeFilePolygonWriter {
 
 	public void writePolygon(Coord[] coords, String outfile) {
 
-		Collection<Feature> features = getFeature(getLinearRing(coords));
+		Collection<SimpleFeature> features = getFeature(getLinearRing(coords));
 
 		ShapeFileWriter.writeGeometries(features, outfile);
 	}
@@ -75,35 +65,18 @@ public class ShapeFilePolygonWriter {
 				this.geofac);
 	}
 
-	public Collection<Feature> getFeature(LinearRing ring) {
-		this.dftf = new DefaultFeatureTypeFactory();
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
-				"LineString", LineString.class, true, null, null, this.crs);
-		dftf.addTypes(new AttributeType[] { geom });
-		AttributeType multiPolygonType = DefaultAttributeTypeFactory
-				.newAttributeType("MultiPolygon", MultiPolygon.class, true,
-						null, null, this.crs);
+	public Collection<SimpleFeature> getFeature(LinearRing ring) {
+		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().
+				setCrs(this.crs).
+				setName("polygon").
+				create();
 
 		Polygon p = new Polygon(ring, null, this.geofac);
 		MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);
-		Collection<Feature> features = new ArrayList<Feature>();
-		Object[] o = new Object[1];
-		o[0] = mp;
-		try {
-			for (int i = 0; i < attrTypes.size(); i++) {
-				dftf.addType(attrTypes.get(i));
-			}
-			FeatureType featureType = dftf.newFeatureType(
-					new AttributeType[] { multiPolygonType }, "polygon");
-			Feature f = featureType.create(o, "polygon");
-			features.add(f);
-			return features;
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-		return null;
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		SimpleFeature f = factory.createPolygon(mp, new Object[0], null);
+		features.add(f);
+		return features;
 	}
 
 }
