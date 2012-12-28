@@ -1,6 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariogeneratorpt;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -8,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -54,8 +73,11 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.gregor.grips.scenariogeneratorpt.PopulationFromESRIShapeFielGeneratorPT;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 public class ScenarioGeneratorPT extends ScenarioGenerator {
@@ -180,12 +202,12 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		String dir = "C:/temp/pt_evac_demo/input/transitStops.shp"; //TODO put it in the grips config group
 		ShapeFileReader r = new ShapeFileReader();
 		r.readFileAndInitialize(dir);
-		Set<Feature> fts = r.getFeatureSet();
+		Collection<SimpleFeature> fts = r.getFeatureSet();
 		
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		for (Feature ft : fts) {
+		for (SimpleFeature ft : fts) {
 			long id = (Long)ft.getAttribute("id");
-			TransitStopFacility facility = fac.createTransitStopFacility(new IdImpl(id), MGC.coordinate2Coord(ft.getDefaultGeometry().getCoordinate()), false);
+			TransitStopFacility facility = fac.createTransitStopFacility(new IdImpl(id), MGC.coordinate2Coord(((Geometry) ft.getDefaultGeometry()).getCoordinate()), false);
 			schedule.addStopFacility(facility);
 			TransitRouteStop rs = fac.createTransitRouteStop(facility, 0, 0);
 			stops.add(rs);

@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,6 +43,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.ucsb.UCSBUtils;
 
@@ -55,9 +55,9 @@ public class UCSBSingleTripsConverter {
 
 	private final static Logger log = Logger.getLogger(UCSBSingleTripsConverter.class);
 	
-	private final Map<String,Feature> features;
+	private final Map<String, SimpleFeature> features;
 	
-	public UCSBSingleTripsConverter(Map<String,Feature> features) {
+	public UCSBSingleTripsConverter(Map<String,SimpleFeature> features) {
 		this.features = features;
 	}
 	
@@ -175,7 +175,7 @@ public class UCSBSingleTripsConverter {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("reading "+tazShapeFile+" file...");
-		Map<String,Feature> features = UCSBUtils.getFeatureMap(tazShapeFile, tazIdName);
+		Map<String,SimpleFeature> features = UCSBUtils.getFeatureMap(tazShapeFile, tazIdName);
 		log.info("done. (reading)");
 		UCSBSingleTripsConverter converter = new UCSBSingleTripsConverter(features);
 		File file = new File(inputBase);

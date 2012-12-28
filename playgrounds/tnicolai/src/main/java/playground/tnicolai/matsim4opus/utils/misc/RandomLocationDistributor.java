@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,11 +44,13 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -66,7 +66,7 @@ public class RandomLocationDistributor {
 	private String shapefile 	= null;
 	private double radius 		= 0.;
 	private boolean isShapefile = false;
-	private Map<Id, Feature> featureMap = null;
+	private Map<Id, SimpleFeature> featureMap = null;
 	
 	/**
 	 * constructor
@@ -95,31 +95,18 @@ public class RandomLocationDistributor {
 	 * @param shapefile
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	private Map<Id, Feature> initShapeFeatures(String shapefile) {
-		try {
-			FeatureSource fts = ShapeFileReader.readDataFile(shapefile); // reads in shape file
-			Iterator<Feature> it = fts.getFeatures().iterator();
-			Map<Id, Feature> featureMap = new HashMap<Id, Feature>();
-			
-			while (it.hasNext()) {
-				Feature feature = it.next();
-				featureMap.put(new IdImpl(feature.getAttribute(ZONE_ID)
-						.toString()), feature);
-			}
-			return featureMap;
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
+	private Map<Id, SimpleFeature> initShapeFeatures(String shapefile) {
+		Map<Id, SimpleFeature> featureMap = new HashMap<Id, SimpleFeature>();
+
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(shapefile)) {
+			featureMap.put(new IdImpl(feature.getAttribute(ZONE_ID).toString()), feature);
 		}
-		log.warn("Could not initialize zone freatures from shape-file. Using radius ("
-				+ radius
-				+ " meter) and the zone centroid instead to distribute locations.");
-		return null;
+		return featureMap;
 	}
 	
 	public Coord getRandomLocation(Id zoneID, Coord coord){
 		if(isShapefile){
-			Feature feature = this.featureMap.get( zoneID );
+			SimpleFeature feature = this.featureMap.get( zoneID );
 			return getRandomPointInFeature(feature);
 		}
 		else
@@ -156,14 +143,14 @@ public class RandomLocationDistributor {
 	 * @param feature
 	 * @return
 	 */
-	private Coord getRandomPointInFeature(Feature feature) {
+	private Coord getRandomPointInFeature(SimpleFeature feature) {
 		Point p = null;
 		double x, y;
 		do {
 			x = feature.getBounds().getMinX() + random.nextDouble() * (feature.getBounds().getMaxX() - feature.getBounds().getMinX());
 			y = feature.getBounds().getMinY() + random.nextDouble() * (feature.getBounds().getMaxY() - feature.getBounds().getMinY());
 			p = MGC.xy2Point(x, y);
-		} while (!feature.getDefaultGeometry().contains(p));
+		} while (!((Geometry) feature.getDefaultGeometry()).contains(p));
 		return new CoordImpl(x,y);
 	}
 

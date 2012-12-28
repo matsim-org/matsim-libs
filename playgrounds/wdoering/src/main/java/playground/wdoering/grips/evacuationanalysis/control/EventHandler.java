@@ -19,25 +19,18 @@
  * *********************************************************************** */
 
 package playground.wdoering.grips.evacuationanalysis.control;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
@@ -47,19 +40,11 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.NodeList;
 
-import playground.gregor.sim2d_v3.events.XYVxVyEvent;
-import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
-import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
 import playground.wdoering.grips.evacuationanalysis.control.vis.ClearingTimeVisualizer;
@@ -68,9 +53,6 @@ import playground.wdoering.grips.evacuationanalysis.control.vis.UtilizationVisua
 import playground.wdoering.grips.evacuationanalysis.data.Cell;
 import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
 import playground.wdoering.grips.evacuationanalysis.data.EventData;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 
 
 public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, Runnable {

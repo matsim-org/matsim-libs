@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package tryouts.multiagentsimulation.hw5;
 
 import java.util.ArrayList;
@@ -5,15 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -27,19 +37,17 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 public class PotsdamAnalysis implements Runnable {
 	
 	private Map<Id, AnalysisLink> linkDeltas = new HashMap<Id, AnalysisLink>();
 	
-	private FeatureType featureType;
-	
-	private GeometryFactory geometryFactory = new GeometryFactory();
+	private PolylineFeatureFactory factory;
 	
 	public static void main(String[] args) {
 		PotsdamAnalysis potsdamAnalysis = new PotsdamAnalysis();
@@ -69,7 +77,7 @@ public class PotsdamAnalysis implements Runnable {
 
 		initFeatureType();
 		
-		ArrayList<Feature> features = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		for (Entry<Id, ? extends Link> entry : scenario.getNetwork().getLinks().entrySet()) {
 			features.add(getFeature(entry.getValue()));
 		}
@@ -113,33 +121,22 @@ public class PotsdamAnalysis implements Runnable {
 	}
 	
 	private void initFeatureType() {
-		AttributeType [] attribs = new AttributeType[3];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
-		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("flowDelta", Double.class);
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		this.factory = new PolylineFeatureFactory.Builder().
+				setCrs(MGC.getCRS(TransformationFactory.WGS84_UTM35S)).
+				setName("links").
+				addAttribute("ID", String.class).
+				addAttribute("flowDelta", Double.class).
+				create();
 	}
 	
-	public Feature getFeature(final Link link) {
-		LineString ls = this.geometryFactory.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())});
+	public SimpleFeature getFeature(final Link link) {
+		Object [] attribs = new Object[2];
+		attribs[0] = link.getId().toString();
+		attribs[1] = linkDeltas.get(link.getId()).delta;
 
-		Object [] attribs = new Object[3];
-		attribs[0] = ls;
-		attribs[1] = link.getId().toString();
-		attribs[2] = linkDeltas.get(link.getId()).delta;
-
-		try {
-			return this.featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
-			throw new RuntimeException(e);
-		}
-
+		return this.factory.createPolyline(
+				new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())},
+				attribs, null);
 	}
 	
 }

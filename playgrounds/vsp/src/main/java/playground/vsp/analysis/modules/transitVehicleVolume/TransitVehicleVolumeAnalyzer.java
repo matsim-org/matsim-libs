@@ -27,14 +27,8 @@ import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -45,6 +39,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
@@ -59,9 +54,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  */
 public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(TransitVehicleVolumeAnalyzer.class);
+	private static final Logger log = Logger.getLogger(TransitVehicleVolumeAnalyzer.class);
 	private Scenario sc;
 	private TransitVehicleVolumeHandler handler;
 	private HashMap<String, Map<Id, Double>> mode2Link2Total;
@@ -123,24 +116,19 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 	}
 	
 	private void writeModeShape(String name, Counts counts, Map<Id, Double> mode2Total, String file, String targetCoordinateSystem){
-		AttributeType[] attribs = new AttributeType[3 + this.handler.getMaxTimeSlice() ];
-		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("total", Double.class);
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.setName(name);
+		b.add("name", String.class);
+		b.add("total", Double.class);
 		for(int  i = 0 ; i< this.handler.getMaxTimeSlice(); i++){
-			attribs[3+i] = AttributeTypeFactory.newAttributeType(String.valueOf(i), Double.class);
+			b.add(String.valueOf(i), Double.class);
 		}
-		FeatureType featureType = null ;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
-		Collection<Feature> features = new ArrayList<Feature>();
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		
-		Object[] featureAttribs ;
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		Object[] featureAttribs;
 		for(Count c: counts.getCounts().values()){
 			featureAttribs = new Object[2 + this.handler.getMaxTimeSlice() + 1];
 			//create linestring from link
@@ -166,8 +154,8 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 				}
 			}
 			try {
-				features.add(featureType.create(featureAttribs));
-			} catch (IllegalAttributeException e1) {
+				features.add(builder.buildFeature(l.getId().toString(), featureAttribs));
+			} catch (IllegalArgumentException e1) {
 				e1.printStackTrace();
 			}
 		}

@@ -20,16 +20,16 @@
 package playground.tnicolai.matsim4opus.alpha;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculatorFactory;
 import playground.tnicolai.matsim4opus.gis.CRSUtils;
-import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -72,9 +72,9 @@ public class TestDistance {
 	 */
 	private Geometry getBoundary(String psrcSHPFile) throws IOException {
 		// get boundaries of study area
-		Set<Feature> featureSet = FeatureSHP.readFeatures(psrcSHPFile);
+		Collection<SimpleFeature> featureSet = ShapeFileReader.getAllFeatures(psrcSHPFile);
 		logger.info("Extracting boundary of the shape file ...");
-		Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
+		Geometry boundary = (Geometry) featureSet.iterator().next().getDefaultGeometry();
 		logger.info("Done extracting boundary ...");
 		
 		return boundary;

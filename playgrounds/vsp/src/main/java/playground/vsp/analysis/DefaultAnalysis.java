@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
@@ -49,11 +49,11 @@ public class DefaultAnalysis {
 	private final String iterationOutputDir;
 	private final String eventsFile;
 	private final Scenario scenario;
-	private final Set<Feature> shapeFile;
+	private final Set<SimpleFeature> shapeFile;
 	
 	private final List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
 
-	public DefaultAnalysis(Scenario scenario, String baseFolder, String iterationOutputDir, String eventsFile, Set<Feature> shapeFile) {
+	public DefaultAnalysis(Scenario scenario, String baseFolder, String iterationOutputDir, String eventsFile, Set<SimpleFeature> shapeFile) {
 		this.baseFolder = baseFolder;
 		this.iterationOutputDir = iterationOutputDir;
 		this.eventsFile = eventsFile;

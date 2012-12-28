@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.debugvisualization.controller;
 import java.io.File;
 import java.util.ArrayList;
@@ -9,7 +28,6 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -17,6 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -265,14 +284,11 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 
 	public void readShapeFile(String shapeFileString)
 	{
-				ShapeFileReader shapeFileReader = new ShapeFileReader();
-		
-				shapeFileReader.readFileAndInitialize(shapeFileString);
 		
 				this.geometries  = new ArrayList<Geometry>();
-				for (Feature ft : shapeFileReader.getFeatureSet())
+				for (SimpleFeature ft : ShapeFileReader.getAllFeatures(shapeFileString))
 				{
-					Geometry geo = ft.getDefaultGeometry();
+					Geometry geo = (Geometry) ft.getDefaultGeometry();
 					//System.out.println(ft.getFeatureType());
 					this.geometries.add(geo);
 				}

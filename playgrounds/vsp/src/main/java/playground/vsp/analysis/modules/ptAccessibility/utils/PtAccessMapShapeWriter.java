@@ -25,18 +25,11 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 
-import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.ptAccessibility.stops.PtStopMap;
 
@@ -47,12 +40,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * Calculates and writes buffers to shapes
  * 
  * @author aneumann
- * 
  */
 public class PtAccessMapShapeWriter {
-
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(PtAccessMapShapeWriter.class);
 
 	private PtAccessMapShapeWriter() {
 		
@@ -72,8 +61,6 @@ public class PtAccessMapShapeWriter {
 		Geometry lastBuffer = null;
 		int lastDistance = 0;
 		
-//		log.info("Start creating buffers for distance classes of " + distances.toString());
-		
 		for (Integer distance : distances) {
 			if (lastBuffer == null) {
 				// it's the frist and smallest one
@@ -89,9 +76,7 @@ public class PtAccessMapShapeWriter {
 			buffersSmallestFirst.add(lastBuffer);
 		}
 		
-//		log.info("...done. Start writing shapes.");
 		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_buffer", distances, buffersSmallestFirst, targetCoordinateSystem);
-//		log.info("...done. Start creating differences of buffers.");
 		
 		// resort
 		LinkedList<Geometry> buffersLargestFirst = new LinkedList<Geometry>();
@@ -122,39 +107,32 @@ public class PtAccessMapShapeWriter {
 			buffersToWrite.add(geometry);
 		}
 		
-//		log.info("...done. Writing shapes.");
 		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_diffBuffer", distances, buffersToWrite, targetCoordinateSystem);
-//		log.info("...done.");
 	}
 
 	private static void writeGeometries(String outputFolderAndFileName, ArrayList<Integer> distances, ArrayList<Geometry> geometries, String targetCoordinateSystem) {
 		// write all to file
-		AttributeType[] attribs = new AttributeType[2];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon", MultiPolygon.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType featureType = null ;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, "name");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.setName("name");
+		b.add("location", MultiPolygon.class);
+		b.add("name", String.class);
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		
-		Collection<Feature> bufferFeatures = new ArrayList<Feature>();
+		Collection<SimpleFeature> bufferFeatures = new ArrayList<SimpleFeature>();
 		Object[] bufferFeatureAttribs;
 		
 		for (int i = 0; i < geometries.size(); i++) {
 			Geometry geometry = geometries.get(i);
 
-			bufferFeatures = new ArrayList<Feature>();
+			bufferFeatures = new ArrayList<SimpleFeature>();
 			bufferFeatureAttribs = new Object[2];
 			bufferFeatureAttribs[0] = geometry;
 			String distance = distances.get(i).toString();
 			bufferFeatureAttribs[1] = distance;
 			try {
-				bufferFeatures.add(featureType.create(bufferFeatureAttribs));
-			} catch (IllegalAttributeException e1) {
+				bufferFeatures.add(builder.buildFeature(null, bufferFeatureAttribs));
+			} catch (IllegalArgumentException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
@@ -167,4 +145,3 @@ public class PtAccessMapShapeWriter {
 		
 	}
 }
-

@@ -22,7 +22,6 @@ package playground.ucsb.demand;
 
 import java.util.Map;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -31,6 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.ucsb.UCSBUtils;
 
@@ -40,7 +40,7 @@ import playground.ucsb.UCSBUtils;
  */
 public class UCSBTAZ2Coord {
 
-	public final void assignCoords(Scenario scenario, ObjectAttributes personObjectAttributes, Map<String,Feature> features) {
+	public final void assignCoords(Scenario scenario, ObjectAttributes personObjectAttributes, Map<String, SimpleFeature> features) {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			int actIndex = 0;
 			Coord homeCoord = null;
@@ -51,7 +51,7 @@ public class UCSBTAZ2Coord {
 					Activity activity = (Activity)pe;
 					String zoneId = (String)personObjectAttributes.getAttribute(person.getId().toString(),UCSBStopsParser.ZONE+actIndex);
 					if (zoneId == null) { Gbl.errorMsg("pid="+person.getId()+": object attribute '"+UCSBStopsParser.ZONE+actIndex+"' not found."); }
-					Feature zone = features.get(zoneId);
+					SimpleFeature zone = features.get(zoneId);
 					if (zone == null) { Gbl.errorMsg("zone with id="+zoneId+" not found."); }
 					
 					if (activity.getType().startsWith("home")) {

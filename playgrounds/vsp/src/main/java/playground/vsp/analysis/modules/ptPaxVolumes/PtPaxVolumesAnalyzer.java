@@ -16,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.vsp.analysis.modules.ptPaxVolumes;
 
 import java.util.ArrayList;
@@ -26,24 +27,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
-import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
@@ -53,16 +47,12 @@ import com.vividsolutions.jts.geom.LineString;
 
 /**
  * @author droeder
- *
  */
 public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(PtPaxVolumesAnalyzer.class);
 	private PtPaxVolumesHandler handler;
 	private Scenario sc;
-	private Map<Id, Collection<Feature>> lineId2features;
+	private Map<Id, Collection<SimpleFeature>> lineId2features;
 	private final String targetCoordinateSystem;
 
 	public PtPaxVolumesAnalyzer(Scenario sc, Double interval, String targetCoordinateSystem) {
@@ -86,37 +76,27 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 
 	@Override
 	public void postProcessData() {
-		this.lineId2features = new HashMap<Id, Collection<Feature>>();
+		this.lineId2features = new HashMap<Id, Collection<SimpleFeature>>();
 		for(TransitLine l: this.sc.getTransitSchedule().getTransitLines().values()){
 			this.lineId2features.put(l.getId(), getTransitLineFeatures(l, this.targetCoordinateSystem));
 		}
 		this.lineId2features.put(new IdImpl("all"), getAll(this.targetCoordinateSystem));
-		
 	}
 	
-	/**
-	 * @return
-	 */
-	private Collection<Feature> getAll(String targetCoordinateSystem) {
-		AttributeType[] attribs = new AttributeType[4 + this.handler.getMaxInterval()];
-		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("line", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("linkId", String.class);
-		attribs[3] =  AttributeTypeFactory.newAttributeType("paxTotal", Double.class);
+	private Collection<SimpleFeature> getAll(String targetCoordinateSystem) {
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.setName("all");
+		b.add("location", LineString.class);
+		b.add("line", String.class);
+		b.add("linkId", String.class);
+		b.add("paxTotal", Double.class);
 		for(int i = 0; i < this.handler.getMaxInterval(); i++){
-			attribs[4 + i] = AttributeTypeFactory.newAttributeType("pax_" + String.valueOf(i), Double.class);
+			b.add("pax_" + String.valueOf(i), Double.class);
 		}
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		
-		FeatureType featureType = null ;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, "all");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
-		
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
 		Object[] featureAttribs;
 		for(Link link: this.sc.getNetwork().getLinks().values()){
@@ -124,19 +104,14 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 			// skip links without passengers
 			if(featureAttribs == null) continue;
 			try {
-				features.add(featureType.create(featureAttribs));
-			} catch (IllegalAttributeException e1) {
+				features.add(builder.buildFeature(null, featureAttribs));
+			} catch (IllegalArgumentException e1) {
 				e1.printStackTrace();
 			}
 		}
 		return features;
 	}
 
-	/**
-	 * @param link
-	 * @param objects
-	 * @return
-	 */
 	private Object[] getFeatureAll(Link link, Object[] objects) {
 		Double paxValue = this.handler.getPaxCountForLinkId(link.getId());
 		if(paxValue <= 0) return null;
@@ -154,35 +129,29 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 		return objects;
 	}
 
-	private Collection<Feature> getTransitLineFeatures(TransitLine l, String targetCoordinateSystem){
-		AttributeType[] attribs = new AttributeType[4 + this.handler.getMaxInterval()];
-		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("line", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("linkId", String.class);
-		attribs[3] =  AttributeTypeFactory.newAttributeType("paxTotal", Double.class);
-		for(int i = 0; i < this.handler.getMaxInterval(); i++){
-			attribs[4 + i] = AttributeTypeFactory.newAttributeType("pax_" + String.valueOf(i), Double.class);
+	private Collection<SimpleFeature> getTransitLineFeatures(TransitLine l, String targetCoordinateSystem) {
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.add("location", LineString.class);
+		b.add("line", String.class);
+		b.add("linkId", String.class);
+		b.add("paxTotal", String.class);
+		for (int i = 0; i < this.handler.getMaxInterval(); i++){
+			b.add("pax_" + String.valueOf(i), Double.class);
 		}
 		
-		FeatureType featureType = null ;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, l.getId().toString());
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
 		Object[] featureAttribs;
 		for(Link link: this.sc.getNetwork().getLinks().values()){
 			featureAttribs = getLinkFeatureAttribs(link,l.getId(),  new Object[4 + this.handler.getMaxInterval()]);
 			// skip links without passengers
-			if(featureAttribs == null) continue;
+			if (featureAttribs == null) continue;
 			try {
-				features.add(featureType.create(featureAttribs));
-			} catch (IllegalAttributeException e1) {
+				features.add(builder.buildFeature(link.getId().toString(), featureAttribs));
+			} catch (IllegalArgumentException e1) {
 				e1.printStackTrace();
 			}
 		}
@@ -214,7 +183,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 
 	@Override
 	public void writeResults(String outputFolder) {
-		for(Entry<Id, Collection<Feature>> ee: this.lineId2features.entrySet()){
+		for(Entry<Id, Collection<SimpleFeature>> ee: this.lineId2features.entrySet()){
 			try{
 				if(ee.getValue().size() <= 0) continue;
 				ShapeFileWriter.writeGeometries(ee.getValue(), outputFolder + ee.getKey().toString()+ ".shp");

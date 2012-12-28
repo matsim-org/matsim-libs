@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,6 +44,7 @@ import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.ucsb.UCSBUtils;
 import playground.ucsb.network.algorithms.SCAGShp2Links;
@@ -127,11 +127,11 @@ public class UCSBStops2PlansConverter {
 		log.info("done. (parsing)");
 
 		log.info("reading "+tazShapeFile+" file for cemdap...");
-		Map<String,Feature> cemdapTazFeatures = UCSBUtils.getFeatureMap(tazShapeFile, tazCemdapIdName);
+		Map<String,SimpleFeature> cemdapTazFeatures = UCSBUtils.getFeatureMap(tazShapeFile, tazCemdapIdName);
 		log.info("done. (reading)");
 
 		log.info("reading "+tazShapeFile+" file for goods...");
-		Map<String,Feature> goodsTazFeatures = UCSBUtils.getFeatureMap(tazShapeFile, tazGoodsIdName);
+		Map<String,SimpleFeature> goodsTazFeatures = UCSBUtils.getFeatureMap(tazShapeFile, tazGoodsIdName);
 		log.info("done. (reading)");
 
 		log.info("assigning coordinates to activities...");

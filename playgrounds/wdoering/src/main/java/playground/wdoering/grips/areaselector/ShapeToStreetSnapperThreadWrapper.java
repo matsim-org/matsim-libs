@@ -25,14 +25,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
@@ -48,6 +42,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -222,22 +217,23 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		}
 		
 		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:4326");
-		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
-		AttributeType t = AttributeTypeFactory.newAttributeType(
-				"name", String.class);
+
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(targetCRS);
+		b.setName("EvacuationArea");
+		b.add("location", MultiPolygon.class);
+		b.add("name", String.class);
+		SimpleFeatureBuilder factory = new SimpleFeatureBuilder(b.buildFeatureType());
+		
 		try {
-			FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t }, "EvacuationArea");
 			MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{this.p});
-			Feature f = ft.create(new Object[]{mp,"EvacuationArea"});
-			Collection<Feature> fts = new ArrayList<Feature>();
+			SimpleFeature f = factory.buildFeature(null, new Object[]{mp, "EvacuationArea"});
+			Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 			fts.add(f);
 			ShapeFileWriter.writeGeometries(fts, dest);
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		} catch (IllegalAttributeException e) {
+		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 	}

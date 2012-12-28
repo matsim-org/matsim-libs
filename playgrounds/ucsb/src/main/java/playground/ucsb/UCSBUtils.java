@@ -35,16 +35,14 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -67,8 +65,8 @@ public abstract class UCSBUtils {
 		return geometryFactory.createPoint(new Coordinate(x,y));
 	}
 	
-	public static final Coord getRandomCoordinate(Feature feature) {
-		Geometry geometry = feature.getDefaultGeometry();
+	public static final Coord getRandomCoordinate(SimpleFeature feature) {
+		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		Envelope envelope = geometry.getEnvelopeInternal();
 		while (true) {
 			Point point = getRandomCoordinate(envelope);
@@ -78,14 +76,12 @@ public abstract class UCSBUtils {
 		}
 	}
 	
-	public static final Map<String,Feature> getFeatureMap(String shapeFile, String idName) throws IOException {
-		FeatureSource fs = ShapeFileReader.readDataFile(shapeFile);
-		Map<String,Feature> features = new HashMap<String, Feature>(fs.getFeatures().size());
-		for (Object o: fs.getFeatures()) {
-			Feature f = (Feature)o;
+	public static final Map<String,SimpleFeature> getFeatureMap(String shapeFile, String idName) throws IOException {
+		Map<String,SimpleFeature> features = new HashMap<String, SimpleFeature>();
+		for (SimpleFeature f: ShapeFileReader.getAllFeatures(shapeFile)) {
 			String id = f.getAttribute(idName).toString();
 			if (features.put(id,f) != null) {
-				Gbl.errorMsg("idName="+idName+" is not a unique identifer (id="+id+" exists at least twice).");
+				throw new RuntimeException("idName="+idName+" is not a unique identifer (id="+id+" exists at least twice).");
 			}
 		}
 		log.info(features.size()+" features stored.");

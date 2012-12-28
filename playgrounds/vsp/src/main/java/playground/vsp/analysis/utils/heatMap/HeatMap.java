@@ -24,20 +24,14 @@ import java.util.List;
 import java.util.ServiceConfigurationError;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -178,26 +172,22 @@ public class HeatMap {
 		}
 	}
 	
-	private Collection<Tile> getTiles(){
+	private Collection<Tile> getTiles() {
 		return this.tiles.values();
 	}
 
-	public static void writeHeatMapShape(String name, HeatMap heatmap, String file, String targetCoordinateSystem){
-		AttributeType[] attribs = new AttributeType[3];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon", Polygon.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("count", Double.class);
-		FeatureType featureType = null ;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
-		Collection<Feature> features = new ArrayList<Feature>();
+	public static void writeHeatMapShape(String name, HeatMap heatmap, String file, String targetCoordinateSystem) {
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.setName(name);
+		b.add("location", Polygon.class);
+		b.add("name", String.class);
+		b.add("count", Double.class);
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		
-		Object[] featureAttribs ;
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		Object[] featureAttribs;
 		int i = 0;
 		for(Tile t: heatmap.getTiles()){
 			featureAttribs = new Object[3];
@@ -205,8 +195,8 @@ public class HeatMap {
 			featureAttribs[1] = Integer.valueOf(i);
 			featureAttribs[2] = t.getValue();
 			try {
-				features.add(featureType.create(featureAttribs));
-			} catch (IllegalAttributeException e1) {
+				features.add(builder.buildFeature(null, featureAttribs));
+			} catch (IllegalArgumentException e1) {
 				e1.printStackTrace();
 			}
 			i++;
@@ -222,6 +212,3 @@ public class HeatMap {
 		}
 	}
 }
-
-
-

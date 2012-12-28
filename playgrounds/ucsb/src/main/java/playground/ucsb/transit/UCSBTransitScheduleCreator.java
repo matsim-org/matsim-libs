@@ -35,8 +35,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -68,7 +66,7 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -231,41 +229,35 @@ public class UCSBTransitScheduleCreator {
 		int fCnt = 0;
 		int ptStopsIgnoredCnt = 0;
 		Set<Integer> ilinIgnored = new TreeSet<Integer>();
-		FeatureSource fs = ShapeFileReader.readDataFile(ptStopsFile);
-		try {
-			for (Object o : fs.getFeatures()) {
-				Feature f = (Feature)o;
-				fCnt++;
+		for (SimpleFeature f : ShapeFileReader.getAllFeatures(ptStopsFile)) {
+			fCnt++;
 
-				// data
-				int ilinId = Integer.parseInt(f.getAttribute(ILIN_NAME).toString().trim());
-				int distId = Integer.parseInt(f.getAttribute(DIST_NAME).toString().trim());
-				
-				Coordinate c = f.getBounds().centre();
-				String desc = f.getAttribute(DESC_NAME).toString().trim();
-				String ptModeType = f.getAttribute(MODE_NAME).toString().trim();
-				if (!(ptModeType.equals("1CR") || ptModeType.equals("2LR") ||
-				      ptModeType.equals("3EX") || ptModeType.equals("4RB") ||
-				      ptModeType.equals("5LB") || ptModeType.equals("6TW"))) {
-					Gbl.errorMsg("fCnt "+fCnt+": ptType="+ptModeType+" is neither 1CR, 2LR, 3EX, 4RB, 5LB nor 6TW!");
+			// data
+			int ilinId = Integer.parseInt(f.getAttribute(ILIN_NAME).toString().trim());
+			int distId = Integer.parseInt(f.getAttribute(DIST_NAME).toString().trim());
+			
+			Coordinate c = new Coordinate((f.getBounds().getMinX() + f.getBounds().getMaxX())/2.0, (f.getBounds().getMinY() + f.getBounds().getMaxY())/2.0);
+			String desc = f.getAttribute(DESC_NAME).toString().trim();
+			String ptModeType = f.getAttribute(MODE_NAME).toString().trim();
+			if (!(ptModeType.equals("1CR") || ptModeType.equals("2LR") ||
+			      ptModeType.equals("3EX") || ptModeType.equals("4RB") ||
+			      ptModeType.equals("5LB") || ptModeType.equals("6TW"))) {
+				Gbl.errorMsg("fCnt "+fCnt+": ptType="+ptModeType+" is neither 1CR, 2LR, 3EX, 4RB, 5LB nor 6TW!");
+			}
+
+			PtLine ptLine = ptLines.get(ilinId);
+			if (ptLine == null) { ptStopsIgnoredCnt++; ilinIgnored.add(ilinId); continue; }
+			for (PtRoute ptRoute : ptLine.ptRoutes) {
+				if ((ptRoute.modeType != null) && (!ptRoute.modeType.equals(ptModeType))) {
+					Gbl.errorMsg("fCnt "+fCnt+"; ilin="+ptLine.ilin+": route contains modeType="+ptRoute.modeType+" that does not fit with ptModeType="+ptModeType+".");
 				}
-
-				PtLine ptLine = ptLines.get(ilinId);
-				if (ptLine == null) { ptStopsIgnoredCnt++; ilinIgnored.add(ilinId); continue; }
-				for (PtRoute ptRoute : ptLine.ptRoutes) {
-					if ((ptRoute.modeType != null) && (!ptRoute.modeType.equals(ptModeType))) {
-						Gbl.errorMsg("fCnt "+fCnt+"; ilin="+ptLine.ilin+": route contains modeType="+ptRoute.modeType+" that does not fit with ptModeType="+ptModeType+".");
-					}
-					ptRoute.modeType = ptModeType;
-					PtPoint ptPoint = ptRoute.ptPoints.get(distId);
-					if (ptPoint != null) {
-						ptPoint.coord = new CoordImpl(c.x,c.y);
-						ptPoint.desc = desc;
-					}
+				ptRoute.modeType = ptModeType;
+				PtPoint ptPoint = ptRoute.ptPoints.get(distId);
+				if (ptPoint != null) {
+					ptPoint.coord = new CoordImpl(c.x,c.y);
+					ptPoint.desc = desc;
 				}
 			}
-		} catch (Exception e) {
-			Gbl.errorMsg("fCnt "+fCnt+": IOException while parsing "+ptStopsFile+".");
 		}
 		log.info("fCnt = "+fCnt);
 		log.info("ptStopsIgnoredCnt = "+ptStopsIgnoredCnt);

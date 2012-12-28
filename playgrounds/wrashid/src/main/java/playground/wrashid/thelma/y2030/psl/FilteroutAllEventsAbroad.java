@@ -1,22 +1,29 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.thelma.y2030.psl;
 
 import java.awt.Polygon;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.geometry.JTS;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -24,14 +31,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.StringMatrix;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
 
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.operation.polygonize.Polygonizer;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class FilteroutAllEventsAbroad {
 
@@ -158,23 +165,13 @@ public class FilteroutAllEventsAbroad {
 	}
 	
 	public static Polygon getSwissBorders(double scalingFactor){
-		File file = new File("P:/Daten/GIS_Daten/ArcView/Vector200/staat_CH_polyline.shp");
+		String file = "P:/Daten/GIS_Daten/ArcView/Vector200/staat_CH_polyline.shp";
 
 		Polygon polygon=null;
 		 LinkedList<MultiLine> multiLines=null;
 		try {
-		  Map connect = new HashMap();
-		  connect.put("url", file.toURL());
 
-		  DataStore dataStore = DataStoreFinder.getDataStore(connect);
-		  String[] typeNames = dataStore.getTypeNames();
-		  String typeName = typeNames[0];
 
-		  System.out.println("Reading content " + typeName);
-
-		  FeatureSource featureSource = dataStore.getFeatureSource(typeName);
-		  FeatureCollection collection = featureSource.getFeatures();
-		  FeatureIterator iterator = collection.features();
 			 LinkedList<Geometry> list=null;
 	         // Polyline pl=new FilteroutAllEventsAbroad()
 			  
@@ -186,10 +183,8 @@ public class FilteroutAllEventsAbroad {
 
 			 multiLines=new LinkedList<MultiLine>();
 			  
-			  try {
-			    while (iterator.hasNext()) {
-			      Feature feature = iterator.next();
-			      Geometry sourceGeometry = feature.getDefaultGeometry();
+			  	for (SimpleFeature feature : ShapeFileReader.getAllFeatures(file)) {
+			      Geometry sourceGeometry = (Geometry) feature.getDefaultGeometry();
 			     
 			     // System.out.println(p.within(sourceGeometry));
 			      //System.out.println(sourceGeometry.getGeometryType());
@@ -219,9 +214,6 @@ public class FilteroutAllEventsAbroad {
 				//System.out.println("l: " + coordinates[coordinates.length-1]);
 			     
 			    }
-			  } finally {
-			    iterator.close();
-			  }
 			 //System.out.println(list.size());
 			//  poligonizer.add(list);
 			  

@@ -27,11 +27,12 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.core.utils.gis.ShapeFileReader;
+
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.tnicolai.matsim4opus.gis.CRSUtils;
-import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -73,7 +74,7 @@ public class TestZoneBoundary {
 //			double maxY2 = swissExample2.getEnvelopeInternal().getMaxY();
 //			double minY2 = swissExample2.getEnvelopeInternal().getMinY();
 
-			Geometry boundary = FeatureSHP.readFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
+			Geometry boundary = (Geometry) ShapeFileReader.getAllFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
 			Envelope env = boundary.getEnvelopeInternal();
 			System.out.println("X_MIN: " + env.getMinX() + " , X_MAX: " + env.getMaxX() + " , Y_MIN: " + env.getMinY() + " , Y_MAX: " + env.getMaxY());
 			int srid = boundary.getSRID();

@@ -40,19 +40,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -68,7 +61,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
@@ -80,13 +72,7 @@ import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -94,11 +80,9 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
-import playground.wdoering.debugvisualization.controller.XYVxVyEventThread;
-import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
 import playground.wdoering.grips.evacuationanalysis.control.EventHandler;
 import playground.wdoering.grips.evacuationanalysis.control.EventReaderThread;
 import playground.wdoering.grips.evacuationanalysis.data.Cell;
@@ -955,13 +939,10 @@ public class EvacuationAnalysis implements ActionListener{
 	
 	public void readShapeFile(String shapeFileString)
 	{
-			ShapeFileReader shapeFileReader = new ShapeFileReader();
-			shapeFileReader.readFileAndInitialize(shapeFileString);
-	
 			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
-			for (Feature ft : shapeFileReader.getFeatureSet())
+			for (SimpleFeature ft : ShapeFileReader.getAllFeatures(shapeFileString))
 			{
-				Geometry geo = ft.getDefaultGeometry();
+				Geometry geo = (Geometry) ft.getDefaultGeometry();
 				//System.out.println(ft.getFeatureType());
 				geometries.add(geo);
 			}

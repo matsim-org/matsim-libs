@@ -26,27 +26,19 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author droeder
@@ -59,8 +51,8 @@ public class ActivityToModeAnalysis extends AbstractAnalyisModule {
 			.getLogger(ActivityToModeAnalysis.class);
 	private Network net;
 	private ActivityToModeAnalysisHandler handler;
-	private HashMap<Integer, Set<Feature>> departureSlotFeatures;
-	private HashMap<Integer, Set<Feature>> arrivalSlotFeatures;
+	private HashMap<Integer, Set<SimpleFeature>> departureSlotFeatures;
+	private HashMap<Integer, Set<SimpleFeature>> arrivalSlotFeatures;
 	private int slotSize;
 	private final String targetCoordinateSystem;
 
@@ -93,28 +85,23 @@ public class ActivityToModeAnalysis extends AbstractAnalyisModule {
 	@Override
 	public void postProcessData() {
 		// creature featureType
-		AttributeType[] attribs = new AttributeType[3];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(this.targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("ActType", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("Mode", String.class);
-		FeatureType featureType = null ;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, "activities");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		PointFeatureFactory factory = new PointFeatureFactory.Builder().
+				setCrs(MGC.getCRS(this.targetCoordinateSystem)).
+				setName("activities").
+				addAttribute("ActType", String.class).
+				addAttribute("Mode", String.class).
+				create();
+				
 		//create features for departure
-		this.departureSlotFeatures = new HashMap<Integer, Set<Feature>>();
+		this.departureSlotFeatures = new HashMap<Integer, Set<SimpleFeature>>();
 		for(ActivityToMode atm : this.handler.getDepartures()){
-			createFeatureAndAdd(atm, this.departureSlotFeatures, featureType);
+			createFeatureAndAdd(atm, this.departureSlotFeatures, factory);
 		}
 		
 		//create features for arrivals
-		this.arrivalSlotFeatures = new HashMap<Integer, Set<Feature>>();
+		this.arrivalSlotFeatures = new HashMap<Integer, Set<SimpleFeature>>();
 		for(ActivityToMode atm : this.handler.getArrivals()){
-			createFeatureAndAdd(atm, this.arrivalSlotFeatures, featureType);
+			createFeatureAndAdd(atm, this.arrivalSlotFeatures, factory);
 		}
 
 	}
@@ -125,32 +112,26 @@ public class ActivityToModeAnalysis extends AbstractAnalyisModule {
 	 * @param featureType 
 	 */
 	private void createFeatureAndAdd(ActivityToMode atm, 
-			HashMap<Integer, Set<Feature>> slotFeatures, FeatureType featureType) {
+			HashMap<Integer, Set<SimpleFeature>> slotFeatures, PointFeatureFactory factory) {
 		Integer slice = (int) (atm.getTime() / this.slotSize);
-		Set<Feature> temp = slotFeatures.get(slice);
+		Set<SimpleFeature> temp = slotFeatures.get(slice);
 		if(temp == null) {
-			temp = new HashSet<Feature>();
+			temp = new HashSet<SimpleFeature>();
 		}
 		Object[] featureAttribs = new Object[3];
 		featureAttribs[0] = new GeometryFactory().createPoint(new Coordinate(atm.getCoord().getX(), atm.getCoord().getY(), 0.));
 		featureAttribs[1] = atm.getActType();
 		featureAttribs[2] = atm.getMode();
-		Feature f;
-		try {
-			f = featureType.create(featureAttribs);
-			temp.add(f);
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-		slotFeatures.put(slice, temp);
+		SimpleFeature f = factory.createPoint(atm.getCoord(), new Object[] {atm.getActType(),  atm.getMode()}, null);
+		temp.add(f);
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		for(Entry<Integer, Set<Feature>> e: this.departureSlotFeatures.entrySet()){
+		for(Entry<Integer, Set<SimpleFeature>> e: this.departureSlotFeatures.entrySet()){
 			ShapeFileWriter.writeGeometries(e.getValue(), outputFolder + "departure_" + e.getKey().toString()  + ".shp");
 		}
-		for(Entry<Integer, Set<Feature>> e: this.arrivalSlotFeatures.entrySet()){
+		for(Entry<Integer, Set<SimpleFeature>> e: this.arrivalSlotFeatures.entrySet()){
 			ShapeFileWriter.writeGeometries(e.getValue(), outputFolder + "arrival_" + e.getKey().toString()  + ".shp");
 		}
 	}

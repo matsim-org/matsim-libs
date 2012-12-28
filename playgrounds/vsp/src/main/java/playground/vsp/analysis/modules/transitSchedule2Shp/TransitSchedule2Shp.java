@@ -23,15 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 
-import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,6 +37,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
@@ -54,13 +48,9 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * @author droeder
- *
  */
 public class TransitSchedule2Shp extends AbstractAnalyisModule{
 
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(TransitSchedule2Shp.class);
 	private Network network;
 	private TransitSchedule schedule;
 	private final String targetCoordinateSystem;
@@ -74,7 +64,6 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 
 	@Override
 	public List<EventHandler> getEventHandler() {
-		
 		return new ArrayList<EventHandler>();
 	}
 
@@ -90,10 +79,10 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 
 	@Override
 	public void writeResults(String outputFolder) {
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		// write a shape per line
 		for(TransitLine l: this.schedule.getTransitLines().values()){
-			Collection<Feature> temp = getTransitLineFeatures(l, this.targetCoordinateSystem);
+			Collection<SimpleFeature> temp = getTransitLineFeatures(l, this.targetCoordinateSystem);
 			features.addAll(temp);
 			try{
 				ShapeFileWriter.writeGeometries(temp, outputFolder + l.getId().toString() + ".shp");
@@ -109,43 +98,32 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		}
 	}
 	
-	
-	private Collection<Feature> getTransitLineFeatures(TransitLine l, String targetCoordinateSystem){
-		AttributeType[] attribs = new AttributeType[7];
-		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("line", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("route", String.class);
-		attribs[3] = AttributeTypeFactory.newAttributeType("mode", String.class);
-		attribs[4] = AttributeTypeFactory.newAttributeType("tourLength", Double.class);
-		attribs[5] = AttributeTypeFactory.newAttributeType("tourTime", Double.class);
-		attribs[6] = AttributeTypeFactory.newAttributeType("nrVeh", Double.class);
+	private Collection<SimpleFeature> getTransitLineFeatures(TransitLine l, String targetCoordinateSystem) {
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.add("LineString", LineString.class);
+		b.add("line", String.class);
+		b.add("route", String.class);
+		b.add("mode", String.class);
+		b.add("tourLength", Double.class);
+		b.add("tourTime", Double.class);
+		b.add("nrVeh", Double.class);
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		
-		FeatureType featureType = null ;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, l.getId().toString());
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
-		
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
 		Object[] featureAttribs;
 		for(TransitRoute r: l.getRoutes().values()){
 			featureAttribs = getRouteFeatureAttribs(r,l.getId(),  new Object[7]);
 			try {
-				features.add(featureType.create(featureAttribs));
-			} catch (IllegalAttributeException e1) {
+				features.add(builder.buildFeature(l.getId().toString(), featureAttribs));
+			} catch (IllegalArgumentException e1) {
 				e1.printStackTrace();
 			}
 		}
 		 return features;
 	}
-	/**
-	 * @param r
-	 * @return
-	 */
+
 	private Object[] getRouteFeatureAttribs(TransitRoute r, Id lineId, Object[] o ) {
 		List<Coordinate> coords = new ArrayList<Coordinate>();
 
@@ -175,10 +153,6 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		return o;
 	}
 
-	/**
-	 * @param r
-	 * @return
-	 */
 	private Double getTourLength(TransitRoute r) {
 		Double l = 0.;
 		l += this.network.getLinks().get(r.getRoute().getStartLinkId()).getLength();
@@ -189,10 +163,6 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		return l;
 	}
 
-	/**
-	 * @param r
-	 * @return
-	 */
 	private Double getTourTime(TransitRoute r) {
 		Double t = - Double.MAX_VALUE;
 		for(TransitRouteStop s: r.getStops()){
@@ -203,10 +173,6 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		return t;
 	}
 
-	/**
-	 * @param r
-	 * @return
-	 */
 	private Double getNrVeh(TransitRoute r) {
 		List<Id> ids = new ArrayList<Id>();
 		for(Departure d: r.getDepartures().values()){
@@ -218,4 +184,3 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 	}
 	
 }
-

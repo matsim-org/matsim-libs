@@ -21,7 +21,6 @@
 package playground.ucsb.transit;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -30,8 +29,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -59,6 +56,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -267,79 +265,103 @@ public class UCSBptNetworkParser {
 		Set<Id> nodeIds = new HashSet<Id>();
 		Id prevNodeId = null;
 		int prevIlinId = -1;
-		FeatureSource fs = ShapeFileReader.readDataFile(ptStopsFile);
-		try {
-			for (Object o : fs.getFeatures()) {
-				Feature f = (Feature)o;
-				fCnt++;
+		for (SimpleFeature f : ShapeFileReader.getAllFeatures(ptStopsFile)) {
+			fCnt++;
+			
+			// ilin dist and nodeId
+			int ilinId = Integer.parseInt(f.getAttribute(ILIN_NAME).toString().trim());
+			int distId = Integer.parseInt(f.getAttribute(DIST_NAME).toString().trim());
+			Id nodeId = new IdImpl(ilinId+"-"+distId);
+			if (!nodeIds.add(nodeId)) { Gbl.errorMsg("fCnt "+fCnt+": nodeId="+nodeId+" already created before!"); }
+
+			// node type and switch to sister route flag 
+			String nodeFlag = f.getAttribute(NODEFLAG_NAME).toString().trim();
+			String ptNodeType = null;
+			boolean switchToSisterRoute = false; 
+			if (nodeFlag.length() == 0) {
+				ptNodeType = "waypoint";
+			} else if (nodeFlag.length() == 1) {
+				if (nodeFlag.startsWith("T")) { ptNodeType = "timePoint"; }
+				else if (nodeFlag.startsWith("B")) { ptNodeType = "stopAndTimePoint"; }
+				else if (nodeFlag.startsWith("S")) { ptNodeType = "stopPoint"; }
+				else  { Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=1) is neither T, B nor S"); }
+			} else if (nodeFlag.length() == 2) {
+				if (nodeFlag.startsWith("T")) { ptNodeType = "timePoint"; }
+				else if (nodeFlag.startsWith("B")) { ptNodeType = "stopAndTimePoint"; }
+				else if (nodeFlag.startsWith("S")) { ptNodeType = "stopPoint"; }
+				else  { Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=2) is neither T, B nor S"); }
+				if (nodeFlag.substring(1).equals("S")) { switchToSisterRoute = true; }
+				else { Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=2) is not S"); }
+			} else {
+				Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' does not contain the correct amount of characters!");
+			}
+
+							
+			// node type and switch to sister route flag 
+			String description = f.getAttribute(DESC_NAME).toString().trim();
+
+
+			// parent ilin id
+			int parentIlinId = Integer.parseInt(f.getAttribute(PARENT_ILIN_NAME).toString().trim());
+
+			// parent routeName -> carrier code | line number | alt number { } direction
+			String routeName = f.getAttribute(ROUTE_NAME).toString().trim();
+			if (routeName.length() != 7) { Gbl.errorMsg("fCnt "+fCnt+": routeName="+routeName+" does not have 7 characters!"); }
+			String carrierCode = routeName.substring(0,2);
+			String lineNr = routeName.substring(2,5);
+			String alt = routeName.substring(5,6).trim(); // either a number or empty string
+			String direction = routeName.substring(6);
+			if (!(direction.equals("R") || direction.equals("E") || direction.equals("W") || direction.equals("N") || direction.equals("S"))) {
+				Gbl.errorMsg("fCnt "+fCnt+": routeName="+routeName+" last character is not R, E, W, N nor S!");
+			}
+			
+			// mode
+			String ptModeType = f.getAttribute(MODE_NAME).toString().trim();
+			if (!(ptModeType.equals("1CR") || ptModeType.equals("2LR") || ptModeType.equals("3EX") || ptModeType.equals("4RB") || ptModeType.equals("5LB") || ptModeType.equals("6TW"))) {
+				Gbl.errorMsg("fCnt "+fCnt+": ptType="+ptModeType+" is neither 1CR, 2LR, 3EX, 4RB, 5LB nor 6TW!");
+			}
+			
+			// create only nodes where pt stops
+			if (ptNodeType.startsWith("stop")) {
+				// coordinate
+				Coordinate c = new Coordinate((f.getBounds().getMinX() + f.getBounds().getMaxX())/2.0, (f.getBounds().getMinY() + f.getBounds().getMaxY())/2.0);
 				
-				// ilin dist and nodeId
-				int ilinId = Integer.parseInt(f.getAttribute(ILIN_NAME).toString().trim());
-				int distId = Integer.parseInt(f.getAttribute(DIST_NAME).toString().trim());
-				Id nodeId = new IdImpl(ilinId+"-"+distId);
-				if (!nodeIds.add(nodeId)) { Gbl.errorMsg("fCnt "+fCnt+": nodeId="+nodeId+" already created before!"); }
+				// add node
+				Node n = network.getFactory().createNode(nodeId,new CoordImpl(c.x,c.y));
+				network.addNode(n);
 
-				// node type and switch to sister route flag 
-				String nodeFlag = f.getAttribute(NODEFLAG_NAME).toString().trim();
-				String ptNodeType = null;
-				boolean switchToSisterRoute = false; 
-				if (nodeFlag.length() == 0) {
-					ptNodeType = "waypoint";
-				} else if (nodeFlag.length() == 1) {
-					if (nodeFlag.startsWith("T")) { ptNodeType = "timePoint"; }
-					else if (nodeFlag.startsWith("B")) { ptNodeType = "stopAndTimePoint"; }
-					else if (nodeFlag.startsWith("S")) { ptNodeType = "stopPoint"; }
-					else  { Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=1) is neither T, B nor S"); }
-				} else if (nodeFlag.length() == 2) {
-					if (nodeFlag.startsWith("T")) { ptNodeType = "timePoint"; }
-					else if (nodeFlag.startsWith("B")) { ptNodeType = "stopAndTimePoint"; }
-					else if (nodeFlag.startsWith("S")) { ptNodeType = "stopPoint"; }
-					else  { Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=2) is neither T, B nor S"); }
-					if (nodeFlag.substring(1).equals("S")) { switchToSisterRoute = true; }
-					else { Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=2) is not S"); }
-				} else {
-					Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' does not contain the correct amount of characters!");
+				// add node attributes
+				nodeObjectAttributes.putAttribute(nodeId.toString(),ILIN_NAME,ilinId);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),DIST_NAME,distId);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),"switchNode",switchToSisterRoute);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),"ptNodeType",ptNodeType);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),DESC_NAME,description);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),PARENT_ILIN_NAME,parentIlinId);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),"carrierCode",carrierCode);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),"lineNr",lineNr);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),"alt",alt);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),"direction",direction);
+				nodeObjectAttributes.putAttribute(nodeId.toString(),MODE_NAME,ptModeType);
+
+				if (prevIlinId == ilinId) { // still the same line
+					// create link with Id := ilin-prevDist-dist
+					Link link = network.getFactory().createLink(new IdImpl(prevNodeId.toString()+"-"+distId), network.getNodes().get(prevNodeId), network.getNodes().get(nodeId));
+					double length = 100.0*0.3048*(distId-(Integer)nodeObjectAttributes.getAttribute(prevNodeId.toString(),DIST_NAME)); // differences of distIds in 100 feet converted to meters
+					link.setLength(length);
+					link.setFreespeed(999999.0); // default
+					link.setNumberOfLanes(1.0); // default
+					link.setCapacity(999999.0); // default
+					Set<String> allowedModes = new HashSet<String>(2); allowedModes.add(TransportMode.pt); allowedModes.add(ptModeType);
+					link.setAllowedModes(allowedModes);
+					network.addLink(link);
 				}
-
-								
-				// node type and switch to sister route flag 
-				String description = f.getAttribute(DESC_NAME).toString().trim();
-
-
-				// parent ilin id
-				int parentIlinId = Integer.parseInt(f.getAttribute(PARENT_ILIN_NAME).toString().trim());
-
-				// parent routeName -> carrier code | line number | alt number { } direction
-				String routeName = f.getAttribute(ROUTE_NAME).toString().trim();
-				if (routeName.length() != 7) { Gbl.errorMsg("fCnt "+fCnt+": routeName="+routeName+" does not have 7 characters!"); }
-				String carrierCode = routeName.substring(0,2);
-				String lineNr = routeName.substring(2,5);
-				String alt = routeName.substring(5,6).trim(); // either a number or empty string
-				String direction = routeName.substring(6);
-				if (!(direction.equals("R") || direction.equals("E") || direction.equals("W") || direction.equals("N") || direction.equals("S"))) {
-					Gbl.errorMsg("fCnt "+fCnt+": routeName="+routeName+" last character is not R, E, W, N nor S!");
-				}
-				
-				// mode
-				String ptModeType = f.getAttribute(MODE_NAME).toString().trim();
-				if (!(ptModeType.equals("1CR") || ptModeType.equals("2LR") || ptModeType.equals("3EX") || ptModeType.equals("4RB") || ptModeType.equals("5LB") || ptModeType.equals("6TW"))) {
-					Gbl.errorMsg("fCnt "+fCnt+": ptType="+ptModeType+" is neither 1CR, 2LR, 3EX, 4RB, 5LB nor 6TW!");
-				}
-				
-				// create only nodes where pt stops
-				if (ptNodeType.startsWith("stop")) {
-					// coordinate
-					Coordinate c = f.getBounds().centre();
-					
-					// add node
-					Node n = network.getFactory().createNode(nodeId,new CoordImpl(c.x,c.y));
-					network.addNode(n);
-
-					// add node attributes
+				else { // a new line: insert a pseudo link for the stop facility
+					Node pseudoNode = network.getFactory().createNode(new IdImpl("pn-"+nodeId.toString()),new CoordImpl(c.x,c.y));
+					network.addNode(pseudoNode);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),ILIN_NAME,ilinId);
-					nodeObjectAttributes.putAttribute(nodeId.toString(),DIST_NAME,distId);
+					nodeObjectAttributes.putAttribute(nodeId.toString(),DIST_NAME,-1); // -100 feet
 					nodeObjectAttributes.putAttribute(nodeId.toString(),"switchNode",switchToSisterRoute);
-					nodeObjectAttributes.putAttribute(nodeId.toString(),"ptNodeType",ptNodeType);
+					nodeObjectAttributes.putAttribute(nodeId.toString(),"ptNodeType","waypoint");
 					nodeObjectAttributes.putAttribute(nodeId.toString(),DESC_NAME,description);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),PARENT_ILIN_NAME,parentIlinId);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),"carrierCode",carrierCode);
@@ -347,49 +369,19 @@ public class UCSBptNetworkParser {
 					nodeObjectAttributes.putAttribute(nodeId.toString(),"alt",alt);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),"direction",direction);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),MODE_NAME,ptModeType);
-
-					if (prevIlinId == ilinId) { // still the same line
-						// create link with Id := ilin-prevDist-dist
-						Link link = network.getFactory().createLink(new IdImpl(prevNodeId.toString()+"-"+distId), network.getNodes().get(prevNodeId), network.getNodes().get(nodeId));
-						double length = 100.0*0.3048*(distId-(Integer)nodeObjectAttributes.getAttribute(prevNodeId.toString(),DIST_NAME)); // differences of distIds in 100 feet converted to meters
-						link.setLength(length);
-						link.setFreespeed(999999.0); // default
-						link.setNumberOfLanes(1.0); // default
-						link.setCapacity(999999.0); // default
-						Set<String> allowedModes = new HashSet<String>(2); allowedModes.add(TransportMode.pt); allowedModes.add(ptModeType);
-						link.setAllowedModes(allowedModes);
-						network.addLink(link);
-					}
-					else { // a new line: insert a pseudo link for the stop facility
-						Node pseudoNode = network.getFactory().createNode(new IdImpl("pn-"+nodeId.toString()),new CoordImpl(c.x,c.y));
-						network.addNode(pseudoNode);
-						nodeObjectAttributes.putAttribute(nodeId.toString(),ILIN_NAME,ilinId);
-						nodeObjectAttributes.putAttribute(nodeId.toString(),DIST_NAME,-1); // -100 feet
-						nodeObjectAttributes.putAttribute(nodeId.toString(),"switchNode",switchToSisterRoute);
-						nodeObjectAttributes.putAttribute(nodeId.toString(),"ptNodeType","waypoint");
-						nodeObjectAttributes.putAttribute(nodeId.toString(),DESC_NAME,description);
-						nodeObjectAttributes.putAttribute(nodeId.toString(),PARENT_ILIN_NAME,parentIlinId);
-						nodeObjectAttributes.putAttribute(nodeId.toString(),"carrierCode",carrierCode);
-						nodeObjectAttributes.putAttribute(nodeId.toString(),"lineNr",lineNr);
-						nodeObjectAttributes.putAttribute(nodeId.toString(),"alt",alt);
-						nodeObjectAttributes.putAttribute(nodeId.toString(),"direction",direction);
-						nodeObjectAttributes.putAttribute(nodeId.toString(),MODE_NAME,ptModeType);
-						Link link = network.getFactory().createLink(new IdImpl(pseudoNode.toString()+"-"+distId), pseudoNode, network.getNodes().get(nodeId));
-						double length = 100.0*0.3048*1.0; // 100 feet converted to meters
-						link.setLength(length);
-						link.setFreespeed(100.0); // fast speed for speudo link
-						link.setNumberOfLanes(1.0); // default
-						link.setCapacity(10000.0); // large cap for pseudo link
-						Set<String> allowedModes = new HashSet<String>(2); allowedModes.add(TransportMode.pt); allowedModes.add(ptModeType);
-						link.setAllowedModes(allowedModes);
-						network.addLink(link);
-					}
-					prevIlinId = ilinId;
-					prevNodeId = nodeId;
+					Link link = network.getFactory().createLink(new IdImpl(pseudoNode.toString()+"-"+distId), pseudoNode, network.getNodes().get(nodeId));
+					double length = 100.0*0.3048*1.0; // 100 feet converted to meters
+					link.setLength(length);
+					link.setFreespeed(100.0); // fast speed for speudo link
+					link.setNumberOfLanes(1.0); // default
+					link.setCapacity(10000.0); // large cap for pseudo link
+					Set<String> allowedModes = new HashSet<String>(2); allowedModes.add(TransportMode.pt); allowedModes.add(ptModeType);
+					link.setAllowedModes(allowedModes);
+					network.addLink(link);
 				}
+				prevIlinId = ilinId;
+				prevNodeId = nodeId;
 			}
-		} catch (IOException e) {
-			Gbl.errorMsg("fCnt "+fCnt+": IOException while parsing "+ptStopsFile+".");
 		}
 		log.info("done. (creating ptNodes)");
 

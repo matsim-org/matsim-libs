@@ -20,11 +20,7 @@
 
 package playground.ucsb.network.algorithms;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -34,6 +30,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -64,51 +61,42 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 		this.nodeObjectAttributes = nodeObjectAttributes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.api.internal.NetworkRunnable#run(org.matsim.api.core.v01.network.Network)
-	 */
 	@Override
 	public void run(Network network) {
 		log.info("creating nodes from "+nodeShpFile+" shape file...");
 		int fCnt = 0;
-		FeatureSource fs = ShapeFileReader.readDataFile(nodeShpFile);
-		try {
-			for (Object o : fs.getFeatures()) {
-				Feature f = (Feature)o;
-				fCnt++;
-				
-				// node id
-				Object id = f.getAttribute(ID_NAME);
-				if (id == null) { Gbl.errorMsg("fCnt "+fCnt+": "+ID_NAME+" not found in feature."); }
-				Id nodeId = new IdImpl(id.toString().trim());
+		for (SimpleFeature f : ShapeFileReader.getAllFeatures(nodeShpFile)) {
+			fCnt++;
+			
+			// node id
+			Object id = f.getAttribute(ID_NAME);
+			if (id == null) { Gbl.errorMsg("fCnt "+fCnt+": "+ID_NAME+" not found in feature."); }
+			Id nodeId = new IdImpl(id.toString().trim());
 
-				// ignore node if it is a zone centroid
-				String zoneCentr = f.getAttribute(ZONE_CENTR).toString().trim(); // "Y" := centroid ; "" := not a centroid 
-				if (zoneCentr.equals("Y")) { continue; }
+			// ignore node if it is a zone centroid
+			String zoneCentr = f.getAttribute(ZONE_CENTR).toString().trim(); // "Y" := centroid ; "" := not a centroid 
+			if (zoneCentr.equals("Y")) { continue; }
 
-				// get coord
-				Coordinate c = f.getBounds().centre();
+			// get coord
+			Coordinate c = new Coordinate((f.getBounds().getMinX() + f.getBounds().getMaxX())/2.0, (f.getBounds().getMinY() + f.getBounds().getMaxY())/2.0);
 
-				// add node
-				Node n = network.getFactory().createNode(nodeId, new CoordImpl(c.x,c.y));
-				network.addNode(n);
+			// add node
+			Node n = network.getFactory().createNode(nodeId, new CoordImpl(c.x,c.y));
+			network.addNode(n);
 
-				// node type
-				int nodeType = Integer.parseInt(f.getAttribute(NODE_TYPE).toString().trim()); // range = [0-5]
-				nodeObjectAttributes.putAttribute(nodeId.toString(),NODE_TYPE,nodeType);
-				
-				// metro link station
-				boolean isMetroLinkStation = false;
-				if (Integer.parseInt(f.getAttribute(METROLINK_NODE).toString().trim()) == 1) { isMetroLinkStation = true; }
-				nodeObjectAttributes.putAttribute(nodeId.toString(),METROLINK_NODE,isMetroLinkStation);
-				
-				// urban rail station
-				boolean isUrbanRailStation = false;
-				if (Integer.parseInt(f.getAttribute(URBAN_RAIL_NODE).toString().trim()) == 1) { isUrbanRailStation = true; }
-				nodeObjectAttributes.putAttribute(nodeId.toString(),URBAN_RAIL_NODE,isUrbanRailStation);
-			}
-		} catch (IOException e) {
-			Gbl.errorMsg("fCnt "+fCnt+": IOException while parsing "+nodeShpFile+".");
+			// node type
+			int nodeType = Integer.parseInt(f.getAttribute(NODE_TYPE).toString().trim()); // range = [0-5]
+			nodeObjectAttributes.putAttribute(nodeId.toString(),NODE_TYPE,nodeType);
+			
+			// metro link station
+			boolean isMetroLinkStation = false;
+			if (Integer.parseInt(f.getAttribute(METROLINK_NODE).toString().trim()) == 1) { isMetroLinkStation = true; }
+			nodeObjectAttributes.putAttribute(nodeId.toString(),METROLINK_NODE,isMetroLinkStation);
+			
+			// urban rail station
+			boolean isUrbanRailStation = false;
+			if (Integer.parseInt(f.getAttribute(URBAN_RAIL_NODE).toString().trim()) == 1) { isUrbanRailStation = true; }
+			nodeObjectAttributes.putAttribute(nodeId.toString(),URBAN_RAIL_NODE,isUrbanRailStation);
 		}
 		log.info("done. (creating nodes)");
 	}

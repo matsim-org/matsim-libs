@@ -27,71 +27,52 @@ import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.ptAccessibility.activity.ActivityLocation;
 import playground.vsp.analysis.modules.ptAccessibility.activity.LocationMap;
 import playground.vsp.analysis.utils.GridNode;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author droeder, aneumann
- * just a helper-class 
  *
+ * just a helper-class 
  */
 public class PtAccesShapeWriter {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(PtAccesShapeWriter.class);
+	private static final Logger log = Logger.getLogger(PtAccesShapeWriter.class);
 
 	private PtAccesShapeWriter() {
-		
 	}
 
-	/**
-	 * @param mps
-	 * @param string
-	 */
 	public static void writeMultiPolygons(Map<String, MultiPolygon> mps, String filename, String name, String targetCoordinateSystem) {
-		AttributeType[] attribs = new AttributeType[2];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon", MultiPolygon.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType featureType = null ;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
-		Collection<Feature> features = new ArrayList<Feature>();
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.setName(name);
+		b.add("location", MultiPolygon.class);
+		b.add("name", String.class);
+		SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(b.buildFeatureType());
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		Object[] featureAttribs ;
-		
+		Object[] featureAttribs;
 		for(Entry<String, MultiPolygon> e: mps.entrySet()){
 			featureAttribs = new Object[2];
 			featureAttribs[0] = e.getValue();
 			featureAttribs[1] = e.getKey();
 			try {
-				features.add(featureType.create(featureAttribs));
-			} catch (IllegalAttributeException e1) {
+				features.add(featureBuilder.buildFeature(null, featureAttribs));
+			} catch (IllegalArgumentException e1) {
 				e1.printStackTrace();
 			}
 		}
@@ -103,47 +84,33 @@ public class PtAccesShapeWriter {
 	}
 	
 	public static void writeActivityLocations(LocationMap locationMap, String outputFolder, String name, String targetCoordinateSystem, double gridSize){
-		AttributeType[] attribs = new AttributeType[3];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("type", String.class);
-		FeatureType featureType = null ;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		PointFeatureFactory featureFactory = new PointFeatureFactory.Builder().
+				setCrs(MGC.getCRS(targetCoordinateSystem)).
+				setName(name).
+				addAttribute("location", Point.class).
+				addAttribute("name", String.class).
+				addAttribute("type", String.class).
+				create();
 		
-		AttributeType[] clusterAttribs = new AttributeType[2];
-		clusterAttribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		clusterAttribs[1] = AttributeTypeFactory.newAttributeType("count", Integer.class);
-		FeatureType clusterFeatureType = null ;
-		try {
-			clusterFeatureType = FeatureTypeBuilder.newFeatureType(clusterAttribs, name);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		PointFeatureFactory clusterFeatureFactory = new PointFeatureFactory.Builder().
+				setCrs(MGC.getCRS(targetCoordinateSystem)).
+				setName(name).
+				addAttribute("count", Integer.class).
+				create();
 		
-		GeometryFactory factory = new GeometryFactory();
 		for(Entry<String, List<ActivityLocation>> type2LocationEntry: locationMap.getType2Locations().entrySet()){
 			if (!type2LocationEntry.getValue().isEmpty()) {
 				try {
-					Collection<Feature> features = new ArrayList<Feature>();
-					Object[] featureAttribs ;
+					Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 					for(int i  = 0; i < type2LocationEntry.getValue().size(); i++){
-						featureAttribs = new Object[3];
-						featureAttribs[0] = factory.createPoint(type2LocationEntry.getValue().get(i).getCoord());
-						featureAttribs[1] = type2LocationEntry.getKey() + "_" + String.valueOf(i);
-						featureAttribs[2] = type2LocationEntry.getKey();
-						features.add(featureType.create(featureAttribs));
+						features.add(featureFactory.createPoint(type2LocationEntry.getValue().get(i).getCoord(), new Object[] {
+							type2LocationEntry.getKey() + "_" + String.valueOf(i),
+							type2LocationEntry.getKey()
+							}, null));
 					}
 					
 					ShapeFileWriter.writeGeometries(features, outputFolder + "activityLocations_" + type2LocationEntry.getKey() + ".shp");
-				} catch (IllegalAttributeException e) {
+				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch(ServiceConfigurationError e){
 					e.printStackTrace();
@@ -152,8 +119,7 @@ public class PtAccesShapeWriter {
 				// cluster first write then
 				
 				try {
-					Collection<Feature> features = new ArrayList<Feature>();
-					Object[] featureAttribs ;
+					Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 					
 					HashMap<String, GridNode> gridNodeId2GridNode = new HashMap<String, GridNode>();
 					
@@ -170,14 +136,11 @@ public class PtAccesShapeWriter {
 					}
 					
 					for (GridNode gridNode : gridNodeId2GridNode.values()) {
-						featureAttribs = new Object[2];
-						featureAttribs[0] = factory.createPoint(new Coordinate(gridNode.getX(), gridNode.getY(), 0.));
-						featureAttribs[1] = gridNode.getCountForType(type2LocationEntry.getKey());
-						features.add(clusterFeatureType.create(featureAttribs));
+						features.add(clusterFeatureFactory.createPoint(new Coordinate(gridNode.getX(), gridNode.getY()), new Object[] {gridNode.getCountForType(type2LocationEntry.getKey())}, null));
 					}
 					
 					ShapeFileWriter.writeGeometries(features, outputFolder + "activityLocations_clustered_" + type2LocationEntry.getKey() + ".shp");
-				} catch (IllegalAttributeException e) {
+				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch(ServiceConfigurationError e){
 					e.printStackTrace();
