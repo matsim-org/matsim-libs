@@ -23,7 +23,6 @@ package org.matsim.contrib.grips.algorithms;
 import org.geotools.geometry.jts.JTS;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -76,9 +75,6 @@ public abstract class PolygonalCircleApproximation {
 	public static Geometry transform(Polygon p, MathTransform transform) {
 		try {
 			return JTS.transform(p, transform);
-		} catch (MismatchedDimensionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (TransformException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

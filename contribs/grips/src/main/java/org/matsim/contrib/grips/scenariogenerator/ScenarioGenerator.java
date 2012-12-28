@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,10 +58,10 @@ import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
@@ -328,18 +327,14 @@ public class ScenarioGenerator {
 		// TODO switch to gml by writing a  xsd + corresponding parser. may be geotools is our friend her? The xsd has to make sure that the evacuation area consists of one and only one
 		// polygon
 		FeatureSource fs = ShapeFileReader.readDataFile(gcm.getEvacuationAreaFileName());
-		Feature ft = null;
+		SimpleFeature ft = null;
 		try {
-			ft = (Feature) fs.getFeatures().iterator().next();
-			FeatureTransformer.transform(ft,fs.getSchema().getDefaultGeometry().getCoordinateSystem(),this.c);
+			ft = (SimpleFeature) fs.getFeatures().features().next();
+			FeatureTransformer.transform(ft,fs.getSchema().getCoordinateReferenceSystem(),this.c);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-2);
 		} catch (FactoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(-2);
-		} catch (MismatchedDimensionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.exit(-2);

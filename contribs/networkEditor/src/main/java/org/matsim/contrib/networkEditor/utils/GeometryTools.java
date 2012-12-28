@@ -17,8 +17,8 @@
 
 package org.matsim.contrib.networkEditor.utils;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.RobustLineIntersector;
@@ -86,7 +86,7 @@ public class GeometryTools {
 		return new GeometryFactory().createLinearRing(rectangle);
 	}
 
-	static public LinearRing featureToLinearRing(Feature ft) {
+	static public LinearRing featureToLinearRing(SimpleFeature ft) {
 		return (LinearRing)ft.getDefaultGeometry();
 	}
 

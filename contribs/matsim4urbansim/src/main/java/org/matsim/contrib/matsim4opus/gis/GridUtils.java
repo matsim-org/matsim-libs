@@ -8,17 +8,16 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-
 import org.matsim.contrib.matsim4opus.gis.io.FeatureKMLWriter;
 import org.matsim.contrib.matsim4opus.gis.io.FeatureSHP;
 import org.matsim.contrib.matsim4opus.utils.io.writer.SpatialGridTableWriter;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -42,9 +41,9 @@ public class GridUtils {
 		
 		try{
 			// get boundaries of study area
-			Set<Feature> featureSet = FeatureSHP.readFeatures(shapeFile);
+			Set<SimpleFeature> featureSet = FeatureSHP.readFeatures(shapeFile);
 			log.info("Extracting boundary of the shape file ...");
-			Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
+			Geometry boundary = (Geometry) featureSet.iterator().next().getDefaultGeometry();
 			// boundary.setSRID( srid ); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
 			// log.warn("Using SRID: " + srid);
 			log.info("Done extracting boundary ...");

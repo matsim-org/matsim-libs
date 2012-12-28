@@ -20,27 +20,26 @@
 
 package org.matsim.contrib.grips.algorithms;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.core.config.Config;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public abstract  class FeatureTransformer {
+public abstract class FeatureTransformer {
 
-	public static void transform(Feature ft,
-			CoordinateReferenceSystem coordinateSystem, Config c) throws FactoryException, MismatchedDimensionException, TransformException, IllegalAttributeException {
+	public static void transform(SimpleFeature ft,
+			CoordinateReferenceSystem coordinateSystem, Config c) throws FactoryException, MismatchedDimensionException, TransformException, IllegalArgumentException {
 		CoordinateReferenceSystem target = CRS.decode(c.global().getCoordinateSystem(),true);
 
 		MathTransform transform = CRS.findMathTransform(coordinateSystem, target,true);
-		Geometry geo = ft.getDefaultGeometry();
+		Geometry geo = (Geometry) ft.getDefaultGeometry();
 
 		ft.setDefaultGeometry(JTS.transform(geo, transform));
 

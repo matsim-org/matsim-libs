@@ -23,15 +23,15 @@ package org.matsim.vis.otfvis.opengl.drawer;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -42,8 +42,6 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-
-
 /**
  * SimpleBackgroundDrawer can draw a geotools feature (e.g. shape file?) on screen.
  * @author dstrippgen
@@ -51,25 +49,21 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3686886023386144106L;
 
 	final List<OTFFeature> featureList = new ArrayList<OTFFeature>();
 	
-	public SimpleBackgroundFeatureDrawer(final FeatureSource features, final float [] color) throws IOException{
-		final Iterator<Feature> it = features.getFeatures().iterator();
-		while (it.hasNext()){
-			final Feature ft = it.next();
+	public SimpleBackgroundFeatureDrawer(final SimpleFeatureSource features, final float [] color) throws IOException{
+		SimpleFeatureIterator fIt = features.getFeatures().features();
+		while (fIt.hasNext()){
+			final SimpleFeature ft = fIt.next();
 			featureList.add(getOTFFeature(ft, color));
 		}
-
+		fIt.close();
 	}
 	
-	
-	private OTFFeature getOTFFeature(final Feature feature, final float[] color) {
-		final Geometry geo = feature.getDefaultGeometry();
+	private OTFFeature getOTFFeature(final SimpleFeature feature, final float[] color) {
+		final Geometry geo = (Geometry) feature.getDefaultGeometry();
 		final LineString ls;
 		final int glType;
 		if (geo instanceof Polygon) {

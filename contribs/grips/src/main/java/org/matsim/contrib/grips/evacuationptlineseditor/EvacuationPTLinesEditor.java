@@ -58,7 +58,6 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
@@ -80,6 +79,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleWriterV1;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -832,9 +832,9 @@ public class EvacuationPTLinesEditor implements ActionListener{
 			shapeFileReader.readFileAndInitialize(shapeFileString);
 	
 			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
-			for (Feature ft : shapeFileReader.getFeatureSet())
+			for (SimpleFeature ft : shapeFileReader.getFeatureSet())
 			{
-				Geometry geo = ft.getDefaultGeometry();
+				Geometry geo = (Geometry) ft.getDefaultGeometry();
 				//System.out.println(ft.getFeatureType());
 				geometries.add(geo);
 			}

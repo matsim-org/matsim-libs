@@ -36,7 +36,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -55,7 +54,6 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
@@ -79,6 +77,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -827,9 +826,9 @@ public class RoadClosuresEditor implements ActionListener{
 			shapeFileReader.readFileAndInitialize(shapeFileString);
 	
 			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
-			for (Feature ft : shapeFileReader.getFeatureSet())
+			for (SimpleFeature ft : shapeFileReader.getFeatureSet())
 			{
-				Geometry geo = ft.getDefaultGeometry();
+				Geometry geo = (Geometry) ft.getDefaultGeometry();
 				//System.out.println(ft.getFeatureType());
 				geometries.add(geo);
 			}

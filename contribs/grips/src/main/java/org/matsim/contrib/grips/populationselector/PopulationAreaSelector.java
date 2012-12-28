@@ -56,14 +56,8 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
@@ -77,6 +71,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -603,9 +599,9 @@ public class PopulationAreaSelector implements ActionListener{
 			shapeFileReader.readFileAndInitialize(shapeFileString);
 	
 			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
-			for (Feature ft : shapeFileReader.getFeatureSet())
+			for (SimpleFeature ft : shapeFileReader.getFeatureSet())
 			{
-				Geometry geo = ft.getDefaultGeometry();
+				Geometry geo = (Geometry) ft.getDefaultGeometry();
 				//System.out.println(ft.getFeatureType());
 				geometries.add(geo);
 			}
@@ -630,13 +626,18 @@ public class PopulationAreaSelector implements ActionListener{
 			return;
 			
 		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:4326");
-		AttributeType p = AttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
-		AttributeType t = AttributeTypeFactory.newAttributeType(
-				"persons", Long.class);
+		
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("EvacuationArea");
+		b.setCRS(targetCRS);
+		b.add("location", MultiPolygon.class);
+		b.add("persons", Long.class);
+		SimpleFeatureType ft = b.buildFeatureType();
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(ft);
+
 		try
 		{
-			Collection<Feature> fts = new ArrayList<Feature>();
+			Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 			
 			for (Map.Entry<Integer, Polygon> entry : polygons.entrySet())
 			{
@@ -654,18 +655,13 @@ public class PopulationAreaSelector implements ActionListener{
 					}
 				}
 				
-				FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t }, "EvacuationArea");
 				MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{currentPolygon});
-				Feature f = ft.create(new Object[]{mp,pop});
+				SimpleFeature f = builder.buildFeature(null, new Object[]{mp,pop});
 				fts.add(f);
 			}
 
 			ShapeFileWriter.writeGeometries(fts, popshp);
 		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
 	}

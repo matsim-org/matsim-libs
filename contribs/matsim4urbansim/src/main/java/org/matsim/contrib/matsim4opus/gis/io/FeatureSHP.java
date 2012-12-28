@@ -21,16 +21,14 @@ package org.matsim.contrib.matsim4opus.gis.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.geotools.data.FileDataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Utility class for reading shape (.shp) files.
@@ -49,7 +47,7 @@ public class FeatureSHP {
 	 * @return a set of features.
 	 * @throws IOException
 	 */
-	public static Set<Feature> readFeatures(String filename) throws IOException {
+	public static Set<SimpleFeature> readFeatures(String filename) throws IOException {
 		return FeatureSHP.readFeatures(filename, null);
 	}
 
@@ -65,14 +63,11 @@ public class FeatureSHP {
 	 * @return a set of features
 	 * @throws IOException
 	 */
-	public static Set<Feature> readFeatures(String filename, String type) throws IOException {
-		Map<String, URL> params = new HashMap<String, URL>();
-		params.put("url", new File(filename).toURI().toURL());
-
-		DataStore dataStore = DataStoreFinder.getDataStore(params);
+	public static Set<SimpleFeature> readFeatures(String filename, String type) throws IOException {
+		DataStore dataStore = FileDataStoreFinder.getDataStore(new File(filename));
 		
-		Set<Feature> features = new HashSet<Feature>();
-		if(type == null) {
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+		if (type == null) {
 			for(String fType : dataStore.getTypeNames()) {
 				addFeatures(dataStore.getFeatureSource(fType), features);
 			}
@@ -84,9 +79,11 @@ public class FeatureSHP {
 		
 	}
 	
-	private static void addFeatures(FeatureSource source, Set<Feature> features) throws IOException {
-		for(Object feature : source.getFeatures()) {
-			features.add((Feature) feature);
+	private static void addFeatures(SimpleFeatureSource source, Set<SimpleFeature> features) throws IOException {
+		SimpleFeatureIterator fIt = source.getFeatures().features();
+		while (fIt.hasNext()) {
+			features.add(fIt.next());
 		}
+		fIt.close();
 	}
 }
