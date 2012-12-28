@@ -19,34 +19,40 @@
 
 package playground.michalm.util.gis;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.*;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
+import pl.poznan.put.vrp.dynamic.data.schedule.Schedules;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.MatsimArc;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 public class Schedules2GIS
 {
     private List<Vehicle> vehicles;
     private String filename;
-    private FeatureType featureType;
     private GeometryFactory geofac;
     private MatsimVrpData data;
-    private Collection<Feature> features;
-
+    private Collection<SimpleFeature> features;
+		private PolylineFeatureFactory factory;
 
     public Schedules2GIS(List<Vehicle> vehicles, MatsimVrpData data, String filename)
     {
@@ -68,20 +74,15 @@ public class Schedules2GIS
                 continue;
             }
 
-            features = new ArrayList<Feature>();
+            features = new ArrayList<SimpleFeature>();
 
             while (driveIter.hasNext()) {
                 DriveTask drive = driveIter.next();
-                LineString ls = createLineString(drive);
+                Coordinate[] coords = createLineString(drive);
 
-                if (ls != null) {
-                    try {
-                        features.add(featureType.create(new Object[] { ls, v.getId(), v.getName(),
-                                v.getId(), drive.getTaskIdx() }));
-                    }
-                    catch (IllegalAttributeException e) {
-                        e.printStackTrace();
-                    }
+                if (coords != null) {
+                        features.add(this.factory.createPolyline(coords, new Object[] { v.getId(), v.getName(),
+                                v.getId(), drive.getTaskIdx() }, null));
                 }
             }
 
@@ -90,7 +91,7 @@ public class Schedules2GIS
     }
 
 
-    private LineString createLineString(DriveTask driveTask)
+    private Coordinate[] createLineString(DriveTask driveTask)
     {
         MatsimArc arc = (MatsimArc)driveTask.getArc();
         ShortestPath path = arc.getShortestPath(driveTask.getBeginTime());
@@ -114,29 +115,21 @@ public class Schedules2GIS
             coordList.add(new Coordinate(c.getX(), c.getY()));
         }
 
-        return geofac.createLineString(coordList.toArray(new Coordinate[coordList.size()]));
+        return coordList.toArray(new Coordinate[coordList.size()]);
     }
 
 
     private void initFeatureType(final String coordinateSystem)
     {
         CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
-        AttributeType[] attribs = new AttributeType[5];
-        attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class,
-                true, null, null, crs);
-        attribs[1] = AttributeTypeFactory.newAttributeType("VEH_ID", Integer.class);
-        attribs[2] = AttributeTypeFactory.newAttributeType("VEH_NAME", String.class);
-        attribs[3] = AttributeTypeFactory.newAttributeType("ROUTE_ID", Integer.class);
-        attribs[4] = AttributeTypeFactory.newAttributeType("ARC_IDX", Integer.class);
-
-        try {
-            featureType = FeatureTypeBuilder.newFeatureType(attribs, "vrp_route");
-        }
-        catch (FactoryRegistryException e) {
-            e.printStackTrace();
-        }
-        catch (SchemaException e) {
-            e.printStackTrace();
-        }
+        
+        this.factory = new PolylineFeatureFactory.Builder().
+        		setCrs(crs).
+        		setName("vrp_route").
+        		addAttribute("VEH_ID", Integer.class).
+        		addAttribute("VEH_NAME", String.class).
+        		addAttribute("ROUTE_ID", Integer.class).
+        		addAttribute("ARC_IDX", Integer.class).
+        		create();
     }
 }

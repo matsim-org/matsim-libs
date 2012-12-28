@@ -19,10 +19,10 @@
 
 package playground.mrieser.svi.data;
 
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author mrieser / senozon
@@ -35,8 +35,8 @@ public class ShapeZonesReader {
 	}
 	
 	public void readShapefile(final String filename) {
-		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(filename);
-		for (Feature f : features) {
+		Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(filename);
+		for (SimpleFeature f : features) {
 			this.zones.addZone(f);
 		}
 	}

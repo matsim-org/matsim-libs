@@ -25,14 +25,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -40,17 +41,18 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 
 	private final BufferedWriter out;
-	private final ArrayList<Feature> featuers = new ArrayList<Feature>();
+	private final ArrayList<SimpleFeature> featuers = new ArrayList<SimpleFeature>();
 
 	public TransportModeGeoAnalysis(final BufferedWriter out) {
 		this.out = out;
@@ -58,25 +60,26 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 
 	public void readGemeindegrenzen(final String filename) {
 		try {
-			FeatureSource fs = ShapeFileReader.readDataFile(filename);
-			for (Object o: fs.getFeatures()) {
-				this.featuers.add((Feature) o);
-	//			Coordinate c = feature.getBounds().centre();
+			SimpleFeatureSource fs = ShapeFileReader.readDataFile(filename);
+			SimpleFeatureIterator fIt = fs.getFeatures().features();
+			while (fIt.hasNext()) {
+				this.featuers.add(fIt.next());
 			}
+			fIt.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private Feature findFeature(final Coord coord) {
+	private SimpleFeature findFeature(final Coord coord) {
 		double x = coord.getX();
 		double y = coord.getY();
 
 		GeometryFactory gf = new GeometryFactory();
 		Point p = gf.createPoint(new Coordinate(x, y));
 
-		for (Feature f : this.featuers) {
-			if (f.getBounds().contains(x, y) && (f.getDefaultGeometry().contains(p))) {
+		for (SimpleFeature f : this.featuers) {
+			if (f.getBounds().contains(x, y) && (((Geometry) f.getDefaultGeometry()).contains(p))) {
 				return f;
 			}
 		}
@@ -112,7 +115,7 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 			type = "undefined";
 		}
 		Activity homeAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-		Feature f = findFeature(homeAct.getCoord());
+		SimpleFeature f = findFeature(homeAct.getCoord());
 		Integer gid = f == null ? Integer.valueOf(-9999) : (Integer) f.getAttribute("GMDE");
 		String gname = f == null ? "UNKNOWN" : (String) f.getAttribute("NAME");
 		try {

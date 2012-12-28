@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -46,6 +45,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.telaviv.zones.ZoneMapping;
 
@@ -223,7 +223,7 @@ public class ArrivalZoneAnalyzer implements AgentArrivalEventHandler {
 		else if (activityType.contains("home")) return;	// it is a "home" arrivals - nothing more to count
 		else log.info(activityType);
 		
-		Feature zone = zoneMapping.getLinkMapping().get(event.getLinkId());
+		SimpleFeature zone = zoneMapping.getLinkMapping().get(event.getLinkId());
 		
 		/*
 		 * TTA agents from outside the Tel-Aviv area have no from zone - therefore

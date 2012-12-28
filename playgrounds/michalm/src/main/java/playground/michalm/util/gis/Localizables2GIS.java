@@ -20,21 +20,26 @@
 package playground.michalm.util.gis;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.Localizable;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.network.VertexImpl;
 
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 // taken from org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape
@@ -42,7 +47,7 @@ public class Localizables2GIS<T extends Localizable>
 {
     private List<T> localizables;
     private String filename;
-    private FeatureType featureType;
+    private PointFeatureFactory factory;
 
 
     public Localizables2GIS(List<T> localizables, String filename, String coordinateSystem)
@@ -55,7 +60,7 @@ public class Localizables2GIS<T extends Localizable>
 
     public void write()
     {
-        Collection<Feature> features = new ArrayList<Feature>();
+        Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 
         for (Localizable localizable : localizables) {
             features.add(getFeature(localizable.getVertex()));
@@ -65,14 +70,12 @@ public class Localizables2GIS<T extends Localizable>
     }
 
 
-    private Feature getFeature(Vertex vertex)
+    private SimpleFeature getFeature(Vertex vertex)
     {
-        Point p = MGC.xy2Point(vertex.getX(), vertex.getY());
-
         try {
-            return featureType.create(new Object[] { p, vertex.getId(), vertex.getName() });
+            return this.factory.createPoint(new Coordinate(vertex.getX(), vertex.getY()), new Object[] { vertex.getId(), vertex.getName() }, null);
         }
-        catch (IllegalAttributeException e) {
+        catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
     }
@@ -80,22 +83,13 @@ public class Localizables2GIS<T extends Localizable>
 
     private void initFeatureType(final String coordinateSystem)
     {
-        CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
-        AttributeType[] attribs = new AttributeType[3];
-        attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null,
-                null, crs);
-        attribs[1] = AttributeTypeFactory.newAttributeType("ID", Integer.class);
-        attribs[2] = AttributeTypeFactory.newAttributeType("Name", String.class);
-
-        try {
-            featureType = FeatureTypeBuilder.newFeatureType(attribs, "vrp_node");
-        }
-        catch (FactoryRegistryException e) {
-            e.printStackTrace();
-        }
-        catch (SchemaException e) {
-            e.printStackTrace();
-        }
+    	CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
+    	this.factory = new PointFeatureFactory.Builder().
+    			setCrs(crs).
+    			setName("vrp_node").
+    			addAttribute("ID", Integer.class).
+    			addAttribute("Name", String.class).
+    			create();
     }
 
 

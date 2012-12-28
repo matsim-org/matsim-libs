@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mzilske.deteval;
 
 import java.io.IOException;
@@ -12,8 +31,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,9 +61,11 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.mzilske.deteval.Case.Car;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 public class GeneratePopulation {
@@ -91,7 +110,7 @@ public class GeneratePopulation {
 
 	private Map<Id, Plan> plans = new HashMap<Id, Plan>();
 
-	private Map<Integer, Feature> verkehrszellen = new HashMap<Integer, Feature>();
+	private Map<Integer, SimpleFeature> verkehrszellen = new HashMap<Integer, SimpleFeature>();
 
 	private Map<Activity, Integer> activity2verkehrszelle = new HashMap<Activity, Integer>();
 
@@ -285,29 +304,23 @@ public class GeneratePopulation {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void parseVerkehrszellen() {
-		FeatureSource fts;
-		try {
-			fts = ShapeFileReader.readDataFile(MID_VERKEHRSZELLEN);
-			System.out.println(fts.getFeatures().size());
-			for (Feature feature : (Collection<Feature>) fts.getFeatures()) {
-				Integer no = (Integer) feature.getAttribute("NO");
-				verkehrszellen.put(no, feature);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		Collection<SimpleFeature> fts = ShapeFileReader.getAllFeatures(MID_VERKEHRSZELLEN);
+		System.out.println(fts.size());
+		for (SimpleFeature feature : fts) {
+			Integer no = (Integer) feature.getAttribute("NO");
+			verkehrszellen.put(no, feature);
 		}
 	}
 
-	private static Point getRandomPointInFeature(Random rnd, Feature ft) {
+	private static Point getRandomPointInFeature(Random rnd, SimpleFeature ft) {
 		Point p = null;
 		double x, y;
 		do {
 			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
 			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
 			p = MGC.xy2Point(x, y);
-		} while (!ft.getDefaultGeometry().contains(p));
+		} while (!((Geometry) ft.getDefaultGeometry()).contains(p));
 		return p;
 	}
 
@@ -767,9 +780,9 @@ public class GeneratePopulation {
 	}
 
 	private Coord createCentroidCoordIfAvailable(Integer integer) {
-		Feature verkehrszelle = verkehrszellen.get(integer);
+		SimpleFeature verkehrszelle = verkehrszellen.get(integer);
 		if (verkehrszelle != null) {
-			Point point = verkehrszelle.getDefaultGeometry().getCentroid();
+			Point point = ((Geometry) verkehrszelle.getDefaultGeometry()).getCentroid();
 			return scenario.createCoord(point.getX(), point.getY());
 		} else {
 			return null;

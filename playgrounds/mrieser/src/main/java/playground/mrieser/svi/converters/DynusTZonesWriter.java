@@ -23,8 +23,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.mrieser.svi.data.Zones;
 
@@ -58,7 +58,7 @@ public class DynusTZonesWriter {
 
 			int cntFeatures = 0;
 			int cntCoords = 0;
-			for (Feature f : this.zones.getAllZones()) {
+			for (SimpleFeature f : this.zones.getAllZones()) {
 				cntFeatures++;
 				Object g = f.getDefaultGeometry();
 				if (g instanceof Geometry) {
@@ -74,7 +74,7 @@ public class DynusTZonesWriter {
 			writer.write("node #, x-coordinate, y-coordinate\r\n");
 
 			int idx = 0;
-			for (Feature f : this.zones.getAllZones()) {
+			for (SimpleFeature f : this.zones.getAllZones()) {
 				Object g = f.getDefaultGeometry();
 				if (g instanceof Geometry) {
 					for (Coordinate c : ((Geometry) g).getCoordinates()) {
@@ -93,7 +93,7 @@ public class DynusTZonesWriter {
 
 			int zoneIdx = 0;
 			idx = 0;
-			for (Feature f : this.zones.getAllZones()) {
+			for (SimpleFeature f : this.zones.getAllZones()) {
 				zoneIdx++;
 				Object g = f.getDefaultGeometry();
 				if (g instanceof Geometry) {
@@ -128,7 +128,7 @@ public class DynusTZonesWriter {
 		try {
 			mappingWriter.write("ZONENO,TAZ\r\n");
 			int zoneIdx = 0;
-			for (Feature f : this.zones.getAllZones()) {
+			for (SimpleFeature f : this.zones.getAllZones()) {
 				zoneIdx++;
 				mappingWriter.write(Integer.toString(zoneIdx));
 				mappingWriter.write(",");

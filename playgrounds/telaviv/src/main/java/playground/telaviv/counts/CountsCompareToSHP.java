@@ -31,12 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -47,12 +41,13 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 public class CountsCompareToSHP {
 
@@ -125,32 +120,26 @@ public class CountsCompareToSHP {
 		GeotoolsTransformation transformator = new GeotoolsTransformation(ITM, "WGS84");
 		
 		GeometryFactory geoFac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 			
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("Id", String.class);
-		
-		AttributeType hour6Count = AttributeTypeFactory.newAttributeType("Hour 6 Count Volume", Double.class);
-		AttributeType hour7Count = AttributeTypeFactory.newAttributeType("Hour 7 Count Volume", Double.class);
-		AttributeType hour8Count = AttributeTypeFactory.newAttributeType("Hour 8 Count Volume", Double.class);
-		AttributeType hour9Count = AttributeTypeFactory.newAttributeType("Hour 9 Count Volume", Double.class);
-		
-		AttributeType hour6MATSim = AttributeTypeFactory.newAttributeType("Hour 6 MATSim Volume", Double.class);
-		AttributeType hour7MATSim = AttributeTypeFactory.newAttributeType("Hour 7 MATSim Volume", Double.class);
-		AttributeType hour8MATSim = AttributeTypeFactory.newAttributeType("Hour 8 MATSim Volume", Double.class);
-		AttributeType hour9MATSim = AttributeTypeFactory.newAttributeType("Hour 9 MATSim Volume", Double.class);
-		
-		AttributeType hour6Error = AttributeTypeFactory.newAttributeType("Hour 6 Relative Error", Double.class);
-		AttributeType hour7Error = AttributeTypeFactory.newAttributeType("Hour 7 Relative Error", Double.class);
-		AttributeType hour8Error = AttributeTypeFactory.newAttributeType("Hour 8 Relative Error", Double.class);
-		AttributeType hour9Error = AttributeTypeFactory.newAttributeType("Hour 9 Relative Error", Double.class);
-		
-		AttributeType[] array = new AttributeType[] {geom, id, hour6Count, hour7Count, hour8Count, hour9Count,
-				hour6MATSim, hour7MATSim, hour8MATSim, hour9MATSim, hour6Error, hour7Error, hour8Error, hour9Error};
-		
-		FeatureType ftNode = FeatureTypeBuilder.newFeatureType(array, "node");
-		
+		PointFeatureFactory factory = new PointFeatureFactory.Builder().
+				setCrs(crs).
+				setName("Counts").
+				addAttribute("ID", String.class).
+				addAttribute("Hour 6 Count Volume", Double.class).
+				addAttribute("Hour 7 Count Volume", Double.class).
+				addAttribute("Hour 8 Count Volume", Double.class).
+				addAttribute("Hour 9 Count Volume", Double.class).
+				addAttribute("Hour 6 MATSim Volume", Double.class).
+				addAttribute("Hour 7 MATSim Volume", Double.class).
+				addAttribute("Hour 8 MATSim Volume", Double.class).
+				addAttribute("Hour 9 MATSim Volume", Double.class).
+				addAttribute("Hour 6 Relative Error", Double.class).
+				addAttribute("Hour 7 Relative Error", Double.class).
+				addAttribute("Hour 8 Relative Error", Double.class).
+				addAttribute("Hour 9 Relative Error", Double.class).
+				create();
 		
 		for (List<Line> lines : counts.values()) {
 			Id linkId = scenario.createId(lines.get(0).Link_Id);
@@ -158,7 +147,6 @@ public class CountsCompareToSHP {
 			Coord transformedCoord = transformator.transform(link.getCoord());
 			
 			Coordinate coord = new Coordinate(transformedCoord.getX(), transformedCoord.getY());
-			Point point = geoFac.createPoint(coord);
 			
 			double[] countVolumes = new double[4];
 			double[] MATSimVolumes = new double[4];
@@ -170,12 +158,12 @@ public class CountsCompareToSHP {
 				MATSimVolumes[i] = Double.valueOf(line.MATSIM_Volumes);
 				errors[i] = Double.valueOf(line.Relative_Error);
 			}
-			
-			Object[] object = new Object[] {point, linkId.toString(), countVolumes[0], countVolumes[1], countVolumes[2], 
+
+			Object[] attributes = new Object[] {linkId.toString(), countVolumes[0], countVolumes[1], countVolumes[2], 
 					countVolumes[3], MATSimVolumes[0], MATSimVolumes[1], MATSimVolumes[2], MATSimVolumes[3],
 					errors[0], errors[1], errors[2], errors[3]};
 			
-			Feature ft = ftNode.create(object, "nodes");
+			SimpleFeature ft = factory.createPoint(coord, attributes, linkId.toString());
 			features.add(ft);
 		}
 		

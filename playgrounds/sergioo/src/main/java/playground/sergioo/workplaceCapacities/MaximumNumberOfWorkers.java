@@ -1,15 +1,33 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.sergioo.workplaceCapacities;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -17,15 +35,16 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
+
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import others.sergioo.util.dataBase.DataBaseAdmin;
-import others.sergioo.util.dataBase.NoConnectionException;
 
 public class MaximumNumberOfWorkers {
 
@@ -37,8 +56,8 @@ public class MaximumNumberOfWorkers {
 		Map<Id, Double> maximums = new HashMap<Id, Double>();
 		Map<Id, Polygon> masterAreas = new HashMap<Id, Polygon>();
 		ShapeFileReader shapeFileReader =  new ShapeFileReader();
-		Set<Feature> features = shapeFileReader.readFileAndInitialize(POLYGONS_FILE);
-		for(Feature feature:features)
+		Collection<SimpleFeature> features = shapeFileReader.readFileAndInitialize(POLYGONS_FILE);
+		for(SimpleFeature feature:features)
 			masterAreas.put(new IdImpl((Integer) feature.getAttribute(1)), (Polygon) ((MultiPolygon)feature.getDefaultGeometry()).getGeometryN(0));
 		DataBaseAdmin dataBaseRealState  = new DataBaseAdmin(new File("./data/facilities/DataBaseRealState.properties"));
 		ResultSet buildingsR = dataBaseRealState.executeQuery("SELECT type, longitude, latitude FROM building_directory");

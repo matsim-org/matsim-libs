@@ -21,8 +21,9 @@ package playground.michalm.demand;
 
 import java.util.EnumMap;
 
-import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 public class Zone
@@ -48,7 +49,7 @@ public class Zone
 
     private Id id;
     private Type type;
-    private Feature zonePolygon;
+    private SimpleFeature zonePolygon;
 
     private EnumMap<Group, Integer> groupSizes = new EnumMap<Group, Integer>(Group.class);
 
@@ -75,13 +76,13 @@ public class Zone
     }
 
 
-    public Feature getZonePolygon()
+    public SimpleFeature getZonePolygon()
     {
         return zonePolygon;
     }
 
 
-    public void setZonePolygon(Feature zonePolygon)
+    public void setZonePolygon(SimpleFeature zonePolygon)
     {
         this.zonePolygon = zonePolygon;
     }

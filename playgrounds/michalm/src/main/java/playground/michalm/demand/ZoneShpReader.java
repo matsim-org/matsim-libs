@@ -20,12 +20,13 @@
 package playground.michalm.demand;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.*;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 public class ZoneShpReader
@@ -44,18 +45,13 @@ public class ZoneShpReader
     public void readZones(String file, String idField)
         throws IOException
     {
-        FeatureSource fts = ShapeFileReader.readDataFile(file);
-        FeatureCollection ftColl = fts.getFeatures();
+    	Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(file);
 
-        if (ftColl.size() != zones.size()) {
-            throw new RuntimeException("Features: " + ftColl.size() + "; zones: " + zones.size());
+        if (features.size() != zones.size()) {
+            throw new RuntimeException("Features: " + features.size() + "; zones: " + zones.size());
         }
 
-        @SuppressWarnings("unchecked")
-        Iterator<Feature> iter = ftColl.iterator();
-
-        while (iter.hasNext()) {
-            Feature ft = iter.next();
+        for (SimpleFeature ft : features) {
             String id = ft.getAttribute(idField).toString();
             Zone z = zones.get(scenario.createId(id));
             z.setZonePolygon(ft);

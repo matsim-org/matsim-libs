@@ -25,15 +25,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import playground.mrieser.svi.data.Zones;
 
@@ -78,11 +75,13 @@ public class DynusTZonesReader {
 			}
 			reader.readLine(); // commentary line
 
+			SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+			b.setName("");
+			b.add("location", Polygon.class);
+			b.add("ID", Integer.class);
+			SimpleFeatureType featureType = b.buildFeatureType();
+			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(featureType);
 			GeometryFactory geometryFactory = new GeometryFactory();
-			AttributeType[] attributes = new AttributeType[2];
-			attributes[0] = AttributeTypeFactory.newAttributeType("Polygon", Polygon.class);
-			attributes[1] = AttributeTypeFactory.newAttributeType("ID", Integer.class);
-			FeatureType type = FeatureTypeBuilder.newFeatureType(attributes, "zone");
 
 			for (int i = 0; i < nOfZones; i++) {
 				line = reader.readLine();
@@ -96,14 +95,12 @@ public class DynusTZonesReader {
 				}
 				LinearRing ring = geometryFactory.createLinearRing(coords);
 				Polygon polygon = geometryFactory.createPolygon(ring, null);
-				Feature p = type.create(new Object[] {polygon, zoneId});
+				SimpleFeature p = builder.buildFeature(Integer.toString(zoneId), new Object[] {polygon, zoneId});
 				this.zones.addZone(p);
 			}
 		} catch (final IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (final IllegalAttributeException e) {
-			throw new UncheckedIOException(e);
-		} catch (final SchemaException e) {
+		} catch (final IllegalArgumentException e) {
 			throw new UncheckedIOException(e);
 		} finally {
 			try { reader.close(); }

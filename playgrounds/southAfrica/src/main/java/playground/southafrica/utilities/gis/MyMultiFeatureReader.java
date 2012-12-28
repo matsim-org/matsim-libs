@@ -23,16 +23,16 @@ package playground.southafrica.utilities.gis;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.southafrica.utilities.containers.MyZone;
 
@@ -67,7 +67,6 @@ public class MyMultiFeatureReader {
 	 * </ul>
 	 * @throws IOException if the shapefile does not exist, or is not readable.
 	 */
-	@SuppressWarnings("unchecked")
 	public void readMultizoneShapefile (String shapefile, int idField) throws IOException{
 		File f = new File(shapefile);
 		if(!f.exists() || !f.canRead()){
@@ -76,15 +75,12 @@ public class MyMultiFeatureReader {
 		log.info("Start reading shapefile " + shapefile);
 
 		this.zones = new ArrayList<MyZone>();
-		FeatureSource fs = null;
 		MultiPolygon mp = null;
 		GeometryFactory gf = new GeometryFactory();
-		fs = ShapeFileReader.readDataFile( shapefile );
-		ArrayList<Object> objectArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
-		for (int i = 0; i < objectArray.size(); i++) {
-			Object thisZone = objectArray.get(i);
-			String name = String.valueOf( ((Feature) thisZone).getAttribute( idField ) ); 
-			Geometry shape = ((Feature) thisZone).getDefaultGeometry();
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(shapefile);
+		for (SimpleFeature feature : features) {
+			String name = String.valueOf( feature.getAttribute( idField ) ); 
+			Object shape = feature.getDefaultGeometry();
 			if( shape instanceof MultiPolygon ){
 				mp = (MultiPolygon)shape;
 				if( !mp.isSimple() ){
@@ -133,25 +129,19 @@ public class MyMultiFeatureReader {
 	 * @return {@link List} of {@link Point}s.
 	 */
 	public List<Point> readPoints(String shapefile) {
-		FeatureSource fs = null;
 		List<Point> list = new ArrayList<Point>();
-		try {	
-			fs = ShapeFileReader.readDataFile( shapefile );
-			for(Object o: fs.getFeatures() ){
-				Geometry geo = ((Feature)o).getDefaultGeometry();
-				if(geo instanceof Point){
-					Point ps = (Point)geo;
-					
-					for(int i = 0; i < ps.getNumGeometries(); i++){
-						Point p = (Point) ps.getGeometryN(i);
-						list.add(p);
-					}
-				} else{
-					throw new RuntimeException("The shapefile does not contain Point(s)!");
+		for(SimpleFeature feature : ShapeFileReader.getAllFeatures(shapefile)){
+			Geometry geo = (Geometry) feature.getDefaultGeometry();
+			if(geo instanceof Point){
+				Point ps = (Point)geo;
+				
+				for(int i = 0; i < ps.getNumGeometries(); i++){
+					Point p = (Point) ps.getGeometryN(i);
+					list.add(p);
 				}
+			} else{
+				throw new RuntimeException("The shapefile does not contain Point(s)!");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return list;
 	}
@@ -162,21 +152,15 @@ public class MyMultiFeatureReader {
 	 * @return {@link List} of {@link Coord}s.
 	 */
 	public List<Coord> readCoords(String shapefile) {
-		FeatureSource fs = null;
 		List<Coord> list = new ArrayList<Coord>();
-		try {	
-			fs = ShapeFileReader.readDataFile( shapefile );
-			for(Object o: fs.getFeatures() ){
-				Geometry geo = ((Feature)o).getDefaultGeometry();
-				if(geo instanceof Point){
-					Point ps = (Point)geo;
-					list.add(new CoordImpl(ps.getX(), ps.getY()));
-				} else{
-					throw new RuntimeException("The shapefile does not contain Point(s)!");
-				}
+		for(SimpleFeature feature: ShapeFileReader.getAllFeatures(shapefile)){
+			Geometry geo = (Geometry) feature.getDefaultGeometry();
+			if(geo instanceof Point){
+				Point ps = (Point)geo;
+				list.add(new CoordImpl(ps.getX(), ps.getY()));
+			} else{
+				throw new RuntimeException("The shapefile does not contain Point(s)!");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return list;
 	}

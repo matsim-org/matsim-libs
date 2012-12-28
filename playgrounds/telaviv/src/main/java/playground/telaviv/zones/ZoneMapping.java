@@ -25,14 +25,12 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,7 +45,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
@@ -99,13 +97,13 @@ public class ZoneMapping {
 	private boolean skipHeader = true;
 	
 	private GeometryFactory factory;
-	private Set<Feature> zones;
+	private Set<SimpleFeature> zones;
 	private Scenario scenario;
 	private Network network;
 	
-	private Map<Id, Feature> linkMapping;	// linkId, Zone
+	private Map<Id, SimpleFeature> linkMapping;	// linkId, Zone
 	private Set<Id> externalNodes;	// nodeId
-	private Map<Integer, Feature> zonesMap;	// TAZ, Feature
+	private Map<Integer, SimpleFeature> zonesMap;	// TAZ, Feature
 	private Map<Integer, Emme2Zone> parsedZones;	// TAZ, Emme2Zone
 		
 	/**
@@ -168,15 +166,14 @@ public class ZoneMapping {
 		/*
 		 * read zones shape file
 		 */
-		zones = new HashSet<Feature>();
+		zones = new HashSet<SimpleFeature>();
 
-		FeatureSource featureSource = ShapeFileReader.readDataFile(shapeFile);
-		for (Object o : featureSource.getFeatures()) {
-			zones.add((Feature) o);
+		for (SimpleFeature f : ShapeFileReader.getAllFeatures(shapeFile)) {
+			zones.add(f);
 		}
 	
-		zonesMap = new TreeMap<Integer, Feature>();
-		for (Feature zone : zones) {
+		zonesMap = new TreeMap<Integer, SimpleFeature>();
+		for (SimpleFeature zone : zones) {
 			zonesMap.put((Integer)zone.getAttribute(3), zone);
 		}
 		
@@ -188,7 +185,7 @@ public class ZoneMapping {
 		/*
 		 * iterate over all links
 		 */
-		linkMapping = new TreeMap<Id, Feature>();
+		linkMapping = new TreeMap<Id, SimpleFeature>();
 		int outsideLinks = 0;
 
 		for (Link link : network.getLinks().values()) {
@@ -200,9 +197,9 @@ public class ZoneMapping {
 			// transform.transform(points, 0, points, 0, 1);
 			// Point point = factory.createPoint(new Coordinate(points[0],
 			// points[1]));
-			Feature startZone = null;
-			Feature centerZone = null;
-			Feature endZone = null;
+			SimpleFeature startZone = null;
+			SimpleFeature centerZone = null;
+			SimpleFeature endZone = null;
 
 			Coord fromCoord = coordinateTransformation.transform(link.getFromNode().getCoord());
 			Coord linkCoord = coordinateTransformation.transform(link.getCoord());
@@ -216,8 +213,8 @@ public class ZoneMapping {
 //			Point centerPoint = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
 //			Point endPoint = factory.createPoint(new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()));
 
-			for (Feature zone : zones) {
-				Geometry polygon = zone.getDefaultGeometry();
+			for (SimpleFeature zone : zones) {
+				Geometry polygon = (Geometry) zone.getDefaultGeometry();
 				if (polygon.contains(startPoint)) startZone = zone;
 				if (polygon.contains(centerPoint)) centerZone = zone;
 				if (polygon.contains(endPoint)) endZone = zone;
@@ -255,9 +252,9 @@ public class ZoneMapping {
 			
 //			Point point = factory.createPoint(new Coordinate(node.getCoord().getX(), node.getCoord().getY()));
 			
-			Feature pointZone = null;
-			for (Feature zone : zones) {
-				Geometry polygon = zone.getDefaultGeometry();
+			SimpleFeature pointZone = null;
+			for (SimpleFeature zone : zones) {
+				Geometry polygon = (Geometry) zone.getDefaultGeometry();
 				if (polygon.contains(point)) pointZone = zone;
 			}
 			
@@ -271,7 +268,7 @@ public class ZoneMapping {
 		 * 
 		 * Each Zone Connector Node has the same Id as the TAZ of its zone!
 		 */
-		for (Entry<Integer, Feature> entry : zonesMap.entrySet()) {
+		for (Entry<Integer, SimpleFeature> entry : zonesMap.entrySet()) {
 			
 			Node node = network.getNodes().get(scenario.createId(entry.getKey().toString()));
 			
@@ -296,8 +293,8 @@ public class ZoneMapping {
 		 *  Add found mappings to the zones (fill LinkId Lists)
 		 */
 		log.info("Adding Links to the zones...");
-		for (Entry <Id, Feature> entry : linkMapping.entrySet()) {
-			Feature zone = entry.getValue();
+		for (Entry <Id, SimpleFeature> entry : linkMapping.entrySet()) {
+			SimpleFeature zone = entry.getValue();
 			int TAZ = (Integer) zone.getAttribute(3);
 			
 			Emme2Zone emme2Zone = parsedZones.get(TAZ);
@@ -319,11 +316,11 @@ public class ZoneMapping {
 				
 			}
 		}
-		Set<Feature> zonesWithLinks = new HashSet<Feature>();
+		Set<SimpleFeature> zonesWithLinks = new HashSet<SimpleFeature>();
 		zonesWithLinks.addAll(zones);
-		Iterator<Feature> iter2 = zonesWithLinks.iterator();
+		Iterator<SimpleFeature> iter2 = zonesWithLinks.iterator();
 		while (iter2.hasNext()) {
-			Feature zone = iter2.next();
+			SimpleFeature zone = iter2.next();
 			int TAZ = (Integer) zone.getAttribute(3);
 			
 			Emme2Zone emme2Zone = parsedZones.get(TAZ);
@@ -341,7 +338,7 @@ public class ZoneMapping {
 	 * method is called recursively with the doubled number of sections until a
 	 * clear mapping is found.
 	 */
-	private Feature getLinkMapping(Link link, int sections, CoordinateTransformation coordinateTransformation) {
+	private SimpleFeature getLinkMapping(Link link, int sections, CoordinateTransformation coordinateTransformation) {
 		double fromX = link.getFromNode().getCoord().getX();
 		double fromY = link.getFromNode().getCoord().getY();
 		double toX = link.getToNode().getCoord().getX();
@@ -353,7 +350,7 @@ public class ZoneMapping {
 		double dXSection = dX / sections;
 		double dYSection = dY / sections;
 
-		Map<Feature, Integer> mapping = new TreeMap<Feature, Integer>(new FeatureComparator());
+		Map<SimpleFeature, Integer> mapping = new TreeMap<SimpleFeature, Integer>(new FeatureComparator());
 
 		for (int i = 0; i <= sections; i++) {
 			double x = fromX + i * dXSection;
@@ -364,8 +361,8 @@ public class ZoneMapping {
 			
 //			Point point = factory.createPoint(new Coordinate(x, y));
 
-			for (Feature zone : zones) {
-				Geometry polygon = zone.getDefaultGeometry();
+			for (SimpleFeature zone : zones) {
+				Geometry polygon = (Geometry) zone.getDefaultGeometry();
 				if (polygon.contains(point)) {
 					if (mapping.containsKey(zone)) {
 						int count = mapping.get(zone);
@@ -377,10 +374,10 @@ public class ZoneMapping {
 			}
 		}
 
-		Feature mappedFeature = null;
+		SimpleFeature mappedFeature = null;
 		int maxCount = 0;
 		boolean unclearMapping = false;
-		for (Entry<Feature, Integer> entry : mapping.entrySet()) {
+		for (Entry<SimpleFeature, Integer> entry : mapping.entrySet()) {
 			if (entry.getValue() >= maxCount) {
 				if (entry.getValue() == maxCount) unclearMapping = true;
 				else unclearMapping = false;
@@ -411,12 +408,12 @@ public class ZoneMapping {
 		return this.network;
 	}
 	
-	public Map<Id, Feature> getLinkMapping() {
+	public Map<Id, SimpleFeature> getLinkMapping() {
 		return linkMapping;
 	}
 	
 	public int getLinkTAZ(Id linkId) {
-		Feature zone = linkMapping.get(linkId);
+		SimpleFeature zone = linkMapping.get(linkId);
 		int TAZ = (Integer) zone.getAttribute(3);
 		
 		return TAZ;
@@ -434,10 +431,10 @@ public class ZoneMapping {
 		return parsedZones;
 	}
 	
-	private static class FeatureComparator implements Comparator<Feature> {
+	private static class FeatureComparator implements Comparator<SimpleFeature> {
 		
 		@Override
-		public int compare(Feature f1, Feature f2)
+		public int compare(SimpleFeature f1, SimpleFeature f2)
 		{
 			if (f1.getID().equals(f2.getID())) return 0;
 			else return (f1.getID().compareTo(f2.getID()));

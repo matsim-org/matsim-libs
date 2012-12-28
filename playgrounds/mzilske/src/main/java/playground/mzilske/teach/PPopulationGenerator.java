@@ -1,12 +1,29 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mzilske.teach;
 
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -25,6 +42,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -59,11 +77,8 @@ public class PPopulationGenerator implements Runnable {
   	}
   	
   	private void readShapeFile() {
-  	   ShapeFileReader reader = new ShapeFileReader();
-  	   Set<Feature> features;
-  	   features = reader.readFileAndInitialize("/Users/zilske/workspace2/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp");
-  	   for (Feature feature : features) {
-  		   zoneGeometries.put(Integer.decode((String) feature.getAttribute("Nr")),feature.getDefaultGeometry());
+  	   for (SimpleFeature feature : ShapeFileReader.getAllFeatures("/Users/zilske/workspace2/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp")) {
+  		   zoneGeometries.put(Integer.decode((String) feature.getAttribute("Nr")), (Geometry) feature.getDefaultGeometry());
   	   }
   	}
   	

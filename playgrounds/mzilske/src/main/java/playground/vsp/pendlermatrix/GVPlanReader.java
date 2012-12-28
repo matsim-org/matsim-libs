@@ -1,8 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.vsp.pendlermatrix;
 
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -12,6 +30,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.mzilske.pipeline.PopulationReaderTask;
 import playground.mzilske.pipeline.PopulationWriterTask;
@@ -33,11 +52,11 @@ public class GVPlanReader {
 	
 	private static final String LANDKREISE = "/Users/michaelzilske/workspace/prognose_2025/osm_zellen/landkreise.shp";
 	
-	private static boolean isCoordInShape(Coord linkCoord, Set<Feature> features, GeometryFactory factory) {
+	private static boolean isCoordInShape(Coord linkCoord, Collection<SimpleFeature> features, GeometryFactory factory) {
 		boolean found = false;
 		Geometry geo = factory.createPoint(new Coordinate(linkCoord.getX(), linkCoord.getY()));
-		for (Feature ft : features) {
-			if (ft.getDefaultGeometry().contains(geo)) {
+		for (SimpleFeature ft : features) {
+			if (((Geometry) ft.getDefaultGeometry()).contains(geo)) {
 				found = true;
 				break;
 			}
@@ -50,7 +69,7 @@ public class GVPlanReader {
 		new MatsimNetworkReader(gvNetwork).readFile(GV_NETWORK_FILENAME);
 		Scenario osmNetwork = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
-		Set<Feature> featuresInShape;
+		Collection<SimpleFeature> featuresInShape;
 		featuresInShape = new ShapeFileReader().readFileAndInitialize(FILTER_FILENAME);
 		
 		PopulationReaderTask populationReaderTask = new PopulationReaderTask(GV_PLANS, gvNetwork.getNetwork());

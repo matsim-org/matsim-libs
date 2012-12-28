@@ -22,7 +22,6 @@ package playground.mrieser.svi.controller;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -35,6 +34,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.mrieser.svi.data.ActivityToZoneMappingWriter;
 import playground.mrieser.svi.data.CalculateActivityToZoneMapping;
@@ -98,7 +98,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 				new ZoneIdToIndexMappingReader(this.dc.getZoneIdToIndexMapping()).readFile(this.dc.getZoneIdToIndexMappingFile());
 			} else {
 				log.info("No specific zone to id mapping given, assuming same ids are used in Shape file as in DynusT.");
-				for (Feature f : this.dc.getZones().getAllZones()) {
+				for (SimpleFeature f : this.dc.getZones().getAllZones()) {
 					String zoneId = f.getAttribute(this.dc.getZoneIdAttributeName()).toString();
 					int index = Integer.parseInt(zoneId);
 					this.dc.getZoneIdToIndexMapping().addMapping(zoneId, index);

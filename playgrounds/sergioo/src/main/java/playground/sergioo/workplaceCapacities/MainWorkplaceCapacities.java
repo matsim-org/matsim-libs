@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.sergioo.workplaceCapacities;
 
 import java.io.BufferedReader;
@@ -23,11 +42,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.ArrayRealVector;
@@ -37,7 +56,6 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.stat.clustering.Cluster;
 import org.apache.commons.math.stat.clustering.KMeansPlusPlusClusterer;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -53,8 +71,8 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.AStarLandmarks;
@@ -70,11 +88,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.vehicles.Vehicle;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
+import org.opengis.feature.simple.SimpleFeature;
 
 import others.sergioo.util.algebra.Matrix1DImpl;
 import others.sergioo.util.algebra.Matrix2DImpl;
@@ -93,6 +107,11 @@ import playground.sergioo.workplaceCapacities.gui.WorkersBSPainter;
 import playground.sergioo.workplaceCapacities.hits.PersonSchedule;
 import playground.sergioo.workplaceCapacities.hits.PointPerson;
 import playground.sergioo.workplaceCapacities.hits.Trip;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class MainWorkplaceCapacities {
 
@@ -546,9 +565,8 @@ public class MainWorkplaceCapacities {
 			mPAreasR.close();
 			dataBaseAuxiliar.close();
 			//Load polygons
-			ShapeFileReader shapeFileReader =  new ShapeFileReader();
-			Set<Feature> features = shapeFileReader.readFileAndInitialize(POLYGONS_FILE);
-			for(Feature feature:features) {
+			Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(POLYGONS_FILE);
+			for(SimpleFeature feature:features) {
 				MPAreaData area = dataMPAreas.get(new IdImpl((Integer) feature.getAttribute(1)));
 				if(area!=null)
 					area.setPolygon((Polygon) ((MultiPolygon)feature.getDefaultGeometry()).getGeometryN(0));

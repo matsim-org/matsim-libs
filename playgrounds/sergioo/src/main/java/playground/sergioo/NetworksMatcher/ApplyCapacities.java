@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.sergioo.NetworksMatcher;
 
 import java.io.BufferedReader;
@@ -5,12 +24,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -30,12 +48,14 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-
-import com.vividsolutions.jts.geom.Coordinate;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow;
 import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.Visualizer2D.LayersWindow;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class ApplyCapacities {
 
@@ -57,13 +77,12 @@ public class ApplyCapacities {
 			line = reader.readLine();
 		}
 		reader.close();
-		ShapeFileReader shapeFileReader =  new ShapeFileReader();
-		Set<Feature> features = shapeFileReader.readFileAndInitialize(fileName);
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(fileName);
 		Network network = NetworkImpl.createNetwork();
 		NetworkFactory networkFactory = network.getFactory();
-		for(Feature feature:features)
+		for(SimpleFeature feature : features)
 			if(feature.getFeatureType().getTypeName().equals("emme_links")) {
-				Coordinate[] coords = feature.getDefaultGeometry().getCoordinates();
+				Coordinate[] coords = ((Geometry) feature.getDefaultGeometry()).getCoordinates();
 				Id idFromNode = new IdImpl((Long)feature.getAttribute("INODE"));
 				Node fromNode = network.getNodes().get(idFromNode);
 				if(fromNode==null) {

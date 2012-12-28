@@ -22,7 +22,7 @@ package playground.mrieser.svi.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -34,24 +34,24 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class Zones {
 
-	private final List<Feature> zones = new ArrayList<Feature>();
+	private final List<SimpleFeature> zones = new ArrayList<SimpleFeature>();
 	private final GeometryFactory geoFac = new GeometryFactory();
 	
 	public Zones() {
 	}
 
-	public void addZone(final Feature feature) {
+	public void addZone(final SimpleFeature feature) {
 		this.zones.add(feature);
 	}
 	
-	public List<Feature> getAllZones() {
+	public List<SimpleFeature> getAllZones() {
 		return this.zones;
 	}
 	
-	public Feature getContainingZone(final double x, final double y) {
+	public SimpleFeature getContainingZone(final double x, final double y) {
 		Point p = this.geoFac.createPoint(new Coordinate(x, y));
 
-		for (Feature f : this.zones) {
+		for (SimpleFeature f : this.zones) {
 			Object g = f.getDefaultGeometry();
 			if (g instanceof Geometry) {
 				if (!((Geometry) g).disjoint(p)) {

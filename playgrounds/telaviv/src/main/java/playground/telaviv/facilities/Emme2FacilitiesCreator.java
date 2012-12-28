@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,9 +46,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.zones.Emme2Zone;
@@ -109,7 +108,7 @@ public class Emme2FacilitiesCreator {
 		List<Integer> validTypes = new ArrayList<Integer>();
 		for (int type : validLinkTypes) validTypes.add(type);
 	
-		for (Entry<Id, Feature> entry : zoneMapping.getLinkMapping().entrySet()) {
+		for (Entry<Id, SimpleFeature> entry : zoneMapping.getLinkMapping().entrySet()) {
 			Id id = entry.getKey();
 			
 			if (id.toString().equals("6078")) 
@@ -245,7 +244,7 @@ public class Emme2FacilitiesCreator {
 		boolean hasLeisure = false;
 		
 		// Get the zone where the facility's link is mapped to.
-		Feature zone = zoneMapping.getLinkMapping().get(facility.getLinkId());
+		SimpleFeature zone = zoneMapping.getLinkMapping().get(facility.getLinkId());
 		int TAZ = (Integer) zone.getAttribute(3);
 		
 		Emme2Zone parsedZone = zoneMapping.getParsedZone(TAZ);

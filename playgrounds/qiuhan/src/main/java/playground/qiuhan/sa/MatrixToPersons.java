@@ -27,8 +27,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -47,7 +46,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
+import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 public class MatrixToPersons {
@@ -55,7 +56,7 @@ public class MatrixToPersons {
 	private final Matrix m;
 	private final Map<Id, Person> persons;
 	private Map<String, Coord> zoneIdCoords = null;
-	private Map<String, Feature> zoneIdFeatures = null;
+	private Map<String, SimpleFeature> zoneIdFeatures = null;
 	private static String DUMMY = "dummy";
 	private final Random random;
 	private Set<String> legModes = null;
@@ -97,16 +98,16 @@ public class MatrixToPersons {
 	 * @param network2
 	 * @param legModes2
 	 */
-	public MatrixToPersons(Matrix m, FeatureSource fts, NetworkImpl network,
+	public MatrixToPersons(Matrix m, SimpleFeatureSource fts, NetworkImpl network,
 			Set<String> legModes) {
 		this(m, null, network);
-		zoneIdFeatures = new HashMap<String, Feature>();
+		zoneIdFeatures = new HashMap<String, SimpleFeature>();
 
 		// Iterator to iterate over the features from the shape file
 		try {
-			Iterator<Feature> it = fts.getFeatures().iterator();
+			Iterator<SimpleFeature> it = fts.getFeatures().iterator();
 			while (it.hasNext()) {
-				Feature ft = it.next();
+				SimpleFeature ft = it.next();
 				String zoneId = ft.getAttribute("NO").toString();
 				zoneIdFeatures.put(zoneId, ft);
 			}
@@ -119,19 +120,16 @@ public class MatrixToPersons {
 	public Map<Id, Person> createPersons() {
 		for (Id fromZoneId : m.getFromLocations().keySet()) {
 			if (zoneIdCoords == null)/* zoneIdFeatures!=0 */{
-				Feature fromZoneFeature = zoneIdFeatures.get(fromZoneId
-						.toString());
+				SimpleFeature fromZoneFeature = zoneIdFeatures.get(fromZoneId.toString());
 
 				for (Entry entry : m.getFromLocEntries(fromZoneId)) {
 					Id toZoneId = entry.getToLocation();
-					Feature toZoneFeature = zoneIdFeatures.get(toZoneId
-							.toString());
+					SimpleFeature toZoneFeature = zoneIdFeatures.get(toZoneId.toString());
 					int numberPersons = (int) entry.getValue();
 					for (int i = 0; i < numberPersons; i++) {
 						Id personId = new IdImpl(m.getId() + "-" + fromZoneId
 								+ "-" + toZoneId + "-" + i);
-						Coord fromCoord = this
-								.getRandomPointInFeature(fromZoneFeature);
+						Coord fromCoord = this.getRandomPointInFeature(fromZoneFeature);
 						Coord toCoord = this
 								.getRandomPointInFeature(toZoneFeature);
 						createPerson(personId, fromCoord, toCoord);
@@ -159,7 +157,7 @@ public class MatrixToPersons {
 		return persons;
 	}
 
-	private Coord getRandomPointInFeature(Feature ft) {
+	private Coord getRandomPointInFeature(SimpleFeature ft) {
 		Point p = null;
 		double x, y;
 		do {
@@ -168,7 +166,7 @@ public class MatrixToPersons {
 			y = ft.getBounds().getMinY() + random.nextDouble()
 					* (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
 			p = MGC.xy2Point(x, y);
-		} while (ft.getDefaultGeometry().contains(p));
+		} while (((Geometry) ft.getDefaultGeometry()).contains(p));
 		return new CoordImpl(x, y);
 	}
 

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mzilske.deteval;
 
 import java.io.FileNotFoundException;
@@ -6,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -25,8 +42,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.visum.VisumNetwork;
-import org.matsim.visum.VisumNetworkReader;
 import org.matsim.visum.VisumNetwork.EdgeType;
+import org.matsim.visum.VisumNetworkReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.mzilske.bvg09.StreamingVisumNetworkReader;
 import playground.mzilske.bvg09.VisumNetworkRowHandler;
@@ -73,8 +91,8 @@ public class DataPrepare {
 		final Network network = scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
-		final Set<Feature> featuresInShape;
-		featuresInShape = new ShapeFileReader().readFileAndInitialize(DetailedAreaShape);
+		final Collection<SimpleFeature> featuresInShape;
+		featuresInShape = ShapeFileReader.getAllFeatures(DetailedAreaShape);
 
 		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
 
@@ -157,12 +175,12 @@ public class DataPrepare {
 		}
 	}
 
-	private boolean isEdgeInDetailedArea(Node fromNode, Set<Feature> featuresInShape) {
+	private boolean isEdgeInDetailedArea(Node fromNode, Collection<SimpleFeature> featuresInShape) {
 		boolean isInDetailedArea = false;
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
-		for (Feature ft : featuresInShape) {
-			if (ft.getDefaultGeometry().contains(geo)){
+		for (SimpleFeature ft : featuresInShape) {
+			if (((Geometry) ft.getDefaultGeometry()).contains(geo)){
 				isInDetailedArea = true;
 				break;
 			}

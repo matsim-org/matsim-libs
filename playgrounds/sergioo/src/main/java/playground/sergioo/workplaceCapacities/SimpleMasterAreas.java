@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.sergioo.workplaceCapacities;
 
 import java.io.File;
@@ -7,11 +26,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
@@ -20,12 +37,13 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
@@ -65,9 +83,8 @@ public class SimpleMasterAreas {
 		}
 		mPAreasR.close();
 		//Load polygons
-		ShapeFileReader shapeFileReader =  new ShapeFileReader();
-		Set<Feature> features = shapeFileReader.readFileAndInitialize(POLYGONS_FILE);
-		for(Feature feature:features) {
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(POLYGONS_FILE);
+		for(SimpleFeature feature:features) {
 			MPAreaData area = dataMPAreas.get(new IdImpl((Integer) feature.getAttribute(1)));
 			if(area!=null)
 				area.setPolygon((Polygon) ((MultiPolygon)feature.getDefaultGeometry()).getGeometryN(0));

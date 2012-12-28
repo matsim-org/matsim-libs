@@ -1,11 +1,30 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.sergioo.NetworksMatcher;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -14,6 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -21,7 +41,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.config.ConfigUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.sergioo.NetworkBusLaneAdder.gui.NetworkTwoNodesPainter;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
@@ -31,6 +51,7 @@ import playground.sergioo.NetworksMatcher.kernel.core.MatchingProcess;
 import playground.sergioo.Visualizer2D.LayersWindow;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class NetworksShpXmlMatcherMain {
 
@@ -75,14 +96,13 @@ public class NetworksShpXmlMatcherMain {
 	//Methods
 
 	public static Network getNetworkFromShapeFilePolyline(String fileName) {
-		ShapeFileReader shapeFileReader =  new ShapeFileReader();
-		Set<Feature> features = shapeFileReader.readFileAndInitialize(fileName);
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(fileName);
 		Network network = NetworkImpl.createNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 		long nodeLongId=0, linkLongId=0;
-		for(Feature feature:features)
+		for(SimpleFeature feature:features)
 			if(feature.getFeatureType().getTypeName().equals("emme_links")) {
-				Coordinate[] coords = feature.getDefaultGeometry().getCoordinates();
+				Coordinate[] coords = ((Geometry) feature.getDefaultGeometry()).getCoordinates();
 				Node[] nodes = new Node[coords.length];
 				for(int n=0; n<nodes.length; n++) {
 					Coord coord = new CoordImpl(coords[n].x, coords[n].y);
@@ -115,13 +135,12 @@ public class NetworksShpXmlMatcherMain {
 	}
 	
 	public static Network getNetworkFromShapeFileLength(String fileName) {
-		ShapeFileReader shapeFileReader =  new ShapeFileReader();
-		Set<Feature> features = shapeFileReader.readFileAndInitialize(fileName);
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(fileName);
 		Network network = NetworkImpl.createNetwork();
 		NetworkFactory networkFactory = network.getFactory();
-		for(Feature feature:features)
+		for(SimpleFeature feature:features)
 			if(feature.getFeatureType().getTypeName().equals("emme_links")) {
-				Coordinate[] coords = feature.getDefaultGeometry().getCoordinates();
+				Coordinate[] coords = ((Geometry) feature.getDefaultGeometry()).getCoordinates();
 				Id idFromNode = new IdImpl((Long)feature.getAttribute("INODE"));
 				Node fromNode = network.getNodes().get(idFromNode);
 				if(fromNode==null) {

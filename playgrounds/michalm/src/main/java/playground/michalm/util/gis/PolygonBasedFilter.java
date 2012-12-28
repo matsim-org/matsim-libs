@@ -21,15 +21,18 @@ package playground.michalm.util.gis;
 
 import java.io.IOException;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.*;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
-import com.google.common.base.*;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 
 public class PolygonBasedFilter
@@ -74,27 +77,27 @@ public class PolygonBasedFilter
     }
 
 
-    public static Predicate<Feature> createFeatureInsidePolygonPredicate(
+    public static Predicate<SimpleFeature> createFeatureInsidePolygonPredicate(
             final Geometry polygonGeometry)
     {
-        return new Predicate<Feature>() {
-            public boolean apply(Feature feature)
+        return new Predicate<SimpleFeature>() {
+            public boolean apply(SimpleFeature feature)
             {
-                return polygonGeometry.contains(feature.getDefaultGeometry());
+                return polygonGeometry.contains((Geometry) feature.getDefaultGeometry());
             }
         };
     }
 
 
-    public static Iterable< ? extends Feature> filterFeaturesInsidePolygon(
-            Iterable< ? extends Feature> features, Geometry polygonGeometry)
+    public static Iterable< ? extends SimpleFeature> filterFeaturesInsidePolygon(
+            Iterable< ? extends SimpleFeature> features, Geometry polygonGeometry)
     {
         return Iterables.filter(features, createFeatureInsidePolygonPredicate(polygonGeometry));
     }
 
 
-    public static Iterable< ? extends Feature> filterFeaturesOutsidePolygon(
-            Iterable< ? extends Feature> features, Geometry polygonGeometry)
+    public static Iterable< ? extends SimpleFeature> filterFeaturesOutsidePolygon(
+            Iterable< ? extends SimpleFeature> features, Geometry polygonGeometry)
     {
         return Iterables.filter(features,
                 Predicates.not(createFeatureInsidePolygonPredicate(polygonGeometry)));
@@ -104,14 +107,14 @@ public class PolygonBasedFilter
     public static Geometry readPolygonGeometry(String file)
         throws IOException
     {
-        FeatureSource fts = ShapeFileReader.readDataFile(file);
-        FeatureCollection ftColl = fts.getFeatures();
+        SimpleFeatureSource fts = ShapeFileReader.readDataFile(file);
+        SimpleFeatureCollection ftColl = fts.getFeatures();
 
         if (ftColl.size() != 1) {
             throw new RuntimeException("No. of Features: " + ftColl.size() + "; should be 1");
         }
 
-        Feature polygon = ftColl.features().next();
-        return polygon.getDefaultGeometry();
+        SimpleFeature polygon = ftColl.features().next();
+        return (Geometry) polygon.getDefaultGeometry();
     }
 }

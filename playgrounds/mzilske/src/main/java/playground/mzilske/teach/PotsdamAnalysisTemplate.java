@@ -1,32 +1,44 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mzilske.teach;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 public class PotsdamAnalysisTemplate implements Runnable {
 	
-	private FeatureType featureType;
+	private PolylineFeatureFactory factory;
 	
 	private GeometryFactory geometryFactory = new GeometryFactory();
 
@@ -41,7 +53,7 @@ public class PotsdamAnalysisTemplate implements Runnable {
 	public void run() {
 		analyse();
 		initFeatureType();
-		Collection<Feature> features = createFeatures();
+		Collection<SimpleFeature> features = createFeatures();
 		ShapeFileWriter.writeGeometries(features, "output/links");
 	}
 
@@ -49,10 +61,10 @@ public class PotsdamAnalysisTemplate implements Runnable {
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("examples/equil/config.xml"));
 	}
 
-	private List<Feature> createFeatures() {
-		List<Feature> features = new ArrayList<Feature>();
+	private List<SimpleFeature> createFeatures() {
+		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			Feature feature = getFeature(link);
+			SimpleFeature feature = getFeature(link);
 			features.add(feature);
 		}
 		return features;
@@ -65,21 +77,15 @@ public class PotsdamAnalysisTemplate implements Runnable {
 	 * 
 	 */
 	private void initFeatureType() {
-		AttributeType[] attribs = new AttributeType[] {
-				AttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S)),
-				AttributeTypeFactory.newAttributeType("ID", String.class),
-				AttributeTypeFactory.newAttributeType("length", Double.class)
+		this.factory = new PolylineFeatureFactory.Builder().
+				setCrs(MGC.getCRS(TransformationFactory.WGS84_UTM35S)).
+				setName("links").
+				addAttribute("ID", String.class).
+				addAttribute("length", Double.class).
 				
 				// Hier weitere Attribute anlegen
-		};
-		
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+
+				create();
 	}
 	
 	
@@ -89,21 +95,16 @@ public class PotsdamAnalysisTemplate implements Runnable {
 	 * Es kann um weitere Attribute erweitert werden.
 	 * 
 	 */
-	private Feature getFeature(final Link link) {
+	private SimpleFeature getFeature(final Link link) {
+		Coordinate[] coords = new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())};
 		Object [] attribs = new Object[] {
-				this.geometryFactory.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())}),
 				link.getId().toString(),
 				link.getLength()
 				
 				// Hier die weiteren Attribute ausfüllen
 		};
-		
-		try {
-			return this.featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
-			throw new RuntimeException(e);
-		}
 
+		return this.factory.createPolyline(coords, attribs, null);
 	}
 	
 }

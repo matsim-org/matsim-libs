@@ -1,13 +1,29 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.qiuhan.sa;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.data.FeatureSource;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -81,7 +97,7 @@ public class MatrixToPopulation {
 	 * @param zoneFeatures
 	 *            contains information about polygon of zones
 	 */
-	public void readMatrices(String matricesPath, FeatureSource fts) {
+	public void readMatrices(String matricesPath, SimpleFeatureSource fts) {
 		// output/matrices/1.mtx
 		for (int i = 1; i <= 24; i++) {
 			Matrix smallM = new Matrix(Integer.toString(i), "[matrix from\t"
@@ -174,7 +190,7 @@ public class MatrixToPopulation {
 		String outputPopulationFilename = "output/population/popRandomInShp.xml.gz";
 
 		// reads the shape file in
-		FeatureSource fts = ShapeFileReader.readDataFile(zoneShapeFilename);
+		SimpleFeatureSource fts = ShapeFileReader.readDataFile(zoneShapeFilename);
 
 		// ZoneReader zones = new ZoneReader();
 		// zones.readFile(zoneShapeFilename);

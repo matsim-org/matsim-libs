@@ -20,25 +20,35 @@
 package playground.michalm.demand;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.*;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.BoundingBox;
 import org.xml.sax.SAXException;
 
 import cern.jet.random.Uniform;
 import cern.jet.random.engine.MersenneTwister;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 
 public class AbstractDemandGenerator
@@ -97,15 +107,15 @@ public class AbstractDemandGenerator
 
     Coord getRandomCoordInZone(Zone zone)
     {
-        Feature ft = zone.getZonePolygon();
+        SimpleFeature ft = zone.getZonePolygon();
 
-        Envelope bounds = ft.getBounds();
+        BoundingBox bounds = ft.getBounds();
         double minX = bounds.getMinX();
         double maxX = bounds.getMaxX();
         double minY = bounds.getMinY();
         double maxY = bounds.getMaxY();
 
-        Geometry geometry = ft.getDefaultGeometry();
+        Geometry geometry = (Geometry) ft.getDefaultGeometry();
         Point p = null;
         do {
             double x = uniform.nextDoubleFromTo(minX, maxX);

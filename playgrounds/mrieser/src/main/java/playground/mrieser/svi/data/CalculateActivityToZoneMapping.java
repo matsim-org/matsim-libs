@@ -21,12 +21,12 @@ package playground.mrieser.svi.data;
 
 import java.util.ArrayList;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author mrieser
@@ -50,7 +50,7 @@ public class CalculateActivityToZoneMapping {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
-					Feature zone = this.zones.getContainingZone(act.getCoord().getX(), act.getCoord().getY());
+					SimpleFeature zone = this.zones.getContainingZone(act.getCoord().getX(), act.getCoord().getY());
 					if (zone != null) {
 						zoneIds.add(zone.getAttribute(this.idAttributeName).toString());
 					} else {
