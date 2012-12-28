@@ -39,13 +39,20 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * real functionality of the strategy module is handled by a PlanAlgorithm.
  * Just overwrite getPlanAlgoInstance() to return an instance of your plan
  * algorithm.
- *
- * <code>init()</code> creates the threads, but does not yet start them.
+ * <p/>
+ * <code>init[Threads?]()</code> creates the threads, but does not yet start them.
+ * <p/>
  * <code>handlePlan(Plan)</code> distributes the plans equally to all threads.
- * <code>finish()</code> finally starts the threads and waits for all threads to be finished.
+ * <p/>
+ * <code>finish[Replanning?]()</code> finally starts the threads and waits for all threads to be finished.
+ * <p/>
  * While this approach does not lead to optimal performance gains ("slow threads" vs.
  * "fast threads"), it helps building reproducible runs.  Additionally, as the threads are only
  * started after all to-be-handled plans are added, we can use unsynchronized data structures.
+ * <p/>
+ * Design comments/questions:<ul>
+ * <li> As a consequence of the design, 
+ * </ul>
  *
  * @author mrieser
  */
@@ -103,6 +110,9 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 	@Override
 	public void finishReplanning() {
+		// yyyy in my view, this needs to be final.  Otherwise, people may override this but not call super, in which case the threads
+		// will not be closed. ??  kai, dec'12
+		
 		if (this.directAlgo == null) {
 			// only try to start threads if we did not directly work on all the plans
 			log.info("[" + this.name + "] starting threads, handling " + this.count + " plans");
