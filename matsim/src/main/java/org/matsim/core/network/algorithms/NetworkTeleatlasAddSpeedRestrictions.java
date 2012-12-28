@@ -21,7 +21,6 @@
 package org.matsim.core.network.algorithms;
 
 import java.io.FileInputStream;
-import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
@@ -30,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkReaderTeleatlas;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Adds additional speed restrictions to a MATSim {@link Network network} created
@@ -122,8 +122,8 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 
 	private void run2(final Network network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
-		FileChannel in = new FileInputStream(this.srDbfFileName).getChannel();
-		DbaseFileReader r = new DbaseFileReader(in,true);
+		FileInputStream fis = new FileInputStream(this.srDbfFileName);
+		DbaseFileReader r = new DbaseFileReader(fis.getChannel(), true, IOUtils.CHARSET_WINDOWS_ISO88591);
 		// getting header indices
 		int srIdNameIndex = -1;
 		int srSpeedNameIndex = -1;
@@ -192,6 +192,8 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 		log.info("  "+srCnt+" links with restricted speed assigned.");
 		log.info("  "+srIgnoreCnt+" speed restrictions ignored (while verified = 1).");
 		log.info("done.");
+		r.close();
+		fis.close();
 	}
 
 	//////////////////////////////////////////////////////////////////////

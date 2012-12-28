@@ -25,13 +25,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
 
-import org.geotools.data.DataUtilities;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.feature.Feature;
+import org.geotools.data.shapefile.ShapefileFeatureStore;
+import org.geotools.feature.DefaultFeatureCollections;
+import org.geotools.feature.FeatureCollection;
 import org.matsim.core.api.internal.MatsimSomeWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 /**
  * This is a simple utility class that provides methods to write Feature instances
  * of the geotools framework to an ESRI shape file.
@@ -40,20 +43,24 @@ import org.matsim.core.api.internal.MatsimSomeWriter;
  */
 public class ShapeFileWriter implements MatsimSomeWriter {
 
-	public static void writeGeometries(final Collection<Feature> features, final String filename) {
+	public static void writeGeometries(final Collection<SimpleFeature> features, final String filename) {
+		if (features.isEmpty()) {
+			throw new UncheckedIOException("Cannot write empty collection");
+		}
 		try {
-			URL fileURL = (new File(filename)).toURL();
+			URL fileURL = (new File(filename)).toURI().toURL();
 
 			ShapefileDataStore datastore = new ShapefileDataStore(fileURL);
-			Feature feature = features.iterator().next();
+			SimpleFeature feature = features.iterator().next();
 			datastore.createSchema(feature.getFeatureType());
 
-			//		Feature [] featuresArray = new Feature [features.size()];
-			//		features.toArray(featuresArray);
-			FeatureStore featureStore = (FeatureStore)(datastore.getFeatureSource(feature.getFeatureType().getTypeName()));
-			FeatureReader aReader = DataUtilities.reader(features);
-
-			featureStore.addFeatures( aReader);
+			FeatureCollection<SimpleFeatureType, SimpleFeature> coll = DefaultFeatureCollections.newCollection();
+			coll.addAll(features);
+			
+			SimpleFeatureType featureType = features.iterator().next().getFeatureType();
+			ShapefileFeatureStore store = new ShapefileFeatureStore(datastore, new HashSet<String>(), featureType);
+			
+			store.addFeatures(coll);
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {

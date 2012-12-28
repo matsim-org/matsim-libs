@@ -20,11 +20,11 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.network.Link;
+import org.opengis.feature.simple.SimpleFeature;
 
 public interface FeatureGenerator {
 
-	public Feature getFeature(Link link);
+	public SimpleFeature getFeature(Link link);
 
 }

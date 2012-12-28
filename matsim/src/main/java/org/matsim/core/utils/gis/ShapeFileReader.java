@@ -22,45 +22,42 @@ package org.matsim.core.utils.gis;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.data.FileDataStore;
+import org.geotools.data.FileDataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author glaemmel
  * @author dgrether
+ * @author mrieser // switch to GeoTools 2.7.3
  */
 public class ShapeFileReader implements MatsimSomeReader {
 
-	private static final Logger log = Logger.getLogger(ShapeFileReader.class);
+	private SimpleFeatureSource featureSource = null;
 
-	private FeatureSource featureSource = null;
-
-	private Envelope bounds = null;
+	private ReferencedEnvelope bounds = null;
 
 	private DataStore dataStore = null;
 
-	private FeatureCollection featureCollection = null;
+	private SimpleFeatureCollection featureCollection = null;
 
-	private FeatureType schema = null;
+	private SimpleFeatureType schema = null;
 
-	private Set<Feature> featureSet = null;
+	private Collection<SimpleFeature> featureSet = null;
 
 	private CoordinateReferenceSystem crs;
 
@@ -97,33 +94,15 @@ public class ShapeFileReader implements MatsimSomeReader {
 	 * operations to the same file are performed. In those cases it is recommended to use the method readDataFileToMemory
 	 * of this class.
 	 *
-	 * @param fileName File name of a shape file (ending in <code>*.shp</code>)
+	 * @param filename File name of a shape file (ending in <code>*.shp</code>)
 	 * @return FeatureSource containing all features.
 	 * @throws UncheckedIOException if the file cannot be found or another error happens during reading
 	 */
-	public static FeatureSource readDataFile(final String fileName) throws UncheckedIOException {
-		return new ShapeFileReader().openFeatureSource(fileName);
-	}
-
-	private FeatureSource openFeatureSource(final String filename) throws UncheckedIOException {
+	public static SimpleFeatureSource readDataFile(final String filename) throws UncheckedIOException {
 		try {
-			log.info("reading features from: " + filename);
 			File dataFile = new File(filename);
-			HashMap<String, URL> connect = new HashMap<String, URL>();
-			URL url = dataFile.toURI().toURL();
-			if (filename.contains("+")) {
-				// plus signs in filenames/paths are substituted with spaces due to the URL convention
-				// but if the plus is in the filename, than actually keep it a plus sign
-				url = new URL(url.toString().replace("+", "%2B"));
-			}
-			connect.put("url", url);
-			DataStore dataStore = DataStoreFinder.getDataStore(connect);
-			String[] typeNames = dataStore.getTypeNames();
-			String typeName = typeNames[0];
-			FeatureSource fs = dataStore.getFeatureSource(typeName);
-			return fs;
-		} catch (MalformedURLException e) {
-			throw new UncheckedIOException(e);
+			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
+			return store.getFeatureSource();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -132,41 +111,41 @@ public class ShapeFileReader implements MatsimSomeReader {
 	/**
 	 * Reads all Features in the file into the returned Set and initializes the instance of this class.
 	 */
-	public Set<Feature> readFileAndInitialize(final String filename) throws UncheckedIOException {
+	public Collection<SimpleFeature> readFileAndInitialize(final String filename) throws UncheckedIOException {
 		try {
 			this.featureSource = ShapeFileReader.readDataFile(filename);
 			this.init();
-			Feature ft = null;
-			Iterator it = this.featureSource.getFeatures().iterator();
-			this.featureSet = new HashSet<Feature>();
-			while (it.hasNext()){
-				ft = (Feature) it.next();
+			SimpleFeature ft = null;
+			SimpleFeatureIterator it = this.featureSource.getFeatures().features();
+			this.featureSet = new ArrayList<SimpleFeature>();
+			while (it.hasNext()) {
+				ft = it.next();
 				this.featureSet.add(ft);
 			}
+			it.close();
 			return this.featureSet;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
-
 	private void init() {
 		try {
 			this.bounds = this.featureSource.getBounds();
-			this.dataStore = this.featureSource.getDataStore();
+			this.dataStore = (DataStore) this.featureSource.getDataStore();
 			this.featureCollection = this.featureSource.getFeatures();
 			this.schema = this.featureSource.getSchema();
-			this.crs = this.featureSource.getSchema().getDefaultGeometry().getCoordinateSystem();
+			this.crs = this.featureSource.getSchema().getCoordinateReferenceSystem();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
-	public FeatureSource getFeatureSource() {
+	public SimpleFeatureSource getFeatureSource() {
 		return featureSource;
 	}
 
-	public Envelope getBounds() {
+	public ReferencedEnvelope getBounds() {
 		return bounds;
 	}
 
@@ -174,20 +153,39 @@ public class ShapeFileReader implements MatsimSomeReader {
 		return dataStore;
 	}
 
-	public FeatureCollection getFeatureCollection() {
+	public SimpleFeatureCollection getFeatureCollection() {
 		return featureCollection;
 	}
 
-	public FeatureType getSchema() {
+	public SimpleFeatureType getSchema() {
 		return schema;
 	}
 
-	public Set<Feature> getFeatureSet() {
+	public Collection<SimpleFeature> getFeatureSet() {
 		return featureSet;
 	}
 
 	public CoordinateReferenceSystem getCoordinateSystem(){
 		return this.crs;
+	}
+	
+	public static Collection<SimpleFeature> getAllFeatures(final String filename) {
+		try {
+			File dataFile = new File(filename);
+			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
+			SimpleFeatureSource featureSource = store.getFeatureSource();
+			
+			SimpleFeatureIterator it = featureSource.getFeatures().features();
+			List<SimpleFeature> featureSet = new ArrayList<SimpleFeature>();
+			while (it.hasNext()) {
+				SimpleFeature ft = it.next();
+				featureSet.add(ft);
+			}
+			it.close();
+			return featureSet;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 

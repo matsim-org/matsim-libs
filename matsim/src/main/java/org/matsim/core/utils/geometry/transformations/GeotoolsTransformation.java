@@ -29,7 +29,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -41,9 +40,6 @@ import com.vividsolutions.jts.geom.Point;
 public class GeotoolsTransformation implements CoordinateTransformation {
 
 	private MathTransform transform;
-
-
-
 
 	/**
 	 * Creates a new coordinate transformation that makes use of GeoTools.
@@ -72,8 +68,6 @@ public class GeotoolsTransformation implements CoordinateTransformation {
 		Point p = null;
 		try {
 			p = (Point) JTS.transform(MGC.coord2Point(coord), this.transform);
-		} catch (MismatchedDimensionException e) {
-			throw new RuntimeException(e);
 		} catch (TransformException e) {
 			throw new RuntimeException(e);
 		}

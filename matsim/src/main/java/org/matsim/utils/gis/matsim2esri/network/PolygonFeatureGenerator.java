@@ -20,17 +20,11 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -45,7 +39,7 @@ public class PolygonFeatureGenerator implements FeatureGenerator{
 	private final WidthCalculator widthCalculator;
 	private final CoordinateReferenceSystem crs;
 	private final GeometryFactory geofac;
-	private FeatureType featureType;
+	private SimpleFeatureBuilder builder;
 
 
 	public PolygonFeatureGenerator(final WidthCalculator widthCalculator, final CoordinateReferenceSystem crs) {
@@ -56,31 +50,24 @@ public class PolygonFeatureGenerator implements FeatureGenerator{
 	}
 
 	private void initFeatureType() {
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName("link");
+		typeBuilder.setCRS(this.crs);
+		typeBuilder.add("location", Polygon.class);
+		typeBuilder.add("ID", String.class);
+		typeBuilder.add("fromID", String.class);
+		typeBuilder.add("toID", String.class);
+		typeBuilder.add("length", Double.class);
+		typeBuilder.add("freespeed", Double.class);
+		typeBuilder.add("capacity", Double.class);
+		typeBuilder.add("lanes", Double.class);
+		typeBuilder.add("visWidth", Double.class);
 
-		AttributeType [] attribs = new AttributeType[9];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class, true, null, null, this.crs);
-		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
-		attribs[3] = AttributeTypeFactory.newAttributeType("toID", String.class);
-		attribs[4] = AttributeTypeFactory.newAttributeType("length", Double.class);
-		attribs[5] = AttributeTypeFactory.newAttributeType("freespeed", Double.class);
-		attribs[6] = AttributeTypeFactory.newAttributeType("capacity", Double.class);
-		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
-		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
-
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
-
+		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 	}
 
-
 	@Override
-	public Feature getFeature(final Link link) {
+	public SimpleFeature getFeature(final Link link) {
 		double width = this.widthCalculator.getWidth(link);
 
 		Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
@@ -125,8 +112,8 @@ public class PolygonFeatureGenerator implements FeatureGenerator{
 		attribs[8] = width;
 
 		try {
-			return this.featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
+			return this.builder.buildFeature(null, attribs);
+		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		}
 

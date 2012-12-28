@@ -21,16 +21,15 @@
 package org.matsim.core.network.algorithms;
 
 import java.io.FileInputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
-import org.geotools.feature.Feature;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -43,6 +42,8 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Adds maneuver restrictions to a MATSim {@link Network network} created
@@ -170,8 +171,8 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	private void run2(final Network network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
 		NetworkExpandNode neModule = new NetworkExpandNode(network, expansionRadius, this.linkSeparation);
-		FileChannel in = new FileInputStream(this.mpDbfFileName).getChannel();
-		DbaseFileReader r = new DbaseFileReader(in,true);
+		FileInputStream fis = new FileInputStream(this.mpDbfFileName);
+		DbaseFileReader r = new DbaseFileReader(fis.getChannel(), true, IOUtils.CHARSET_WINDOWS_ISO88591);
 		// get header indices
 		int mpIdNameIndex = -1;
 		int mpSeqNrNameIndex = -1;
@@ -200,19 +201,24 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 			Id linkId = new IdImpl(entries[mpTrpelIDNameIndex].toString());
 			TreeMap<Integer,Id> mSequence = mSequences.get(mpId);
 			if (mSequence == null) { mSequence = new TreeMap<Integer,Id>(); }
-			if (mSequence.put(mpSeqNr,linkId) != null) { throw new IllegalArgumentException(MP_ID_NAME+"="+mpId+": "+MP_SEQNR_NAME+" "+mpSeqNr+" already exists."); }
+			if (mSequence.put(mpSeqNr,linkId) != null) {
+				throw new IllegalArgumentException(MP_ID_NAME+"="+mpId+": "+MP_SEQNR_NAME+" "+mpSeqNr+" already exists.");
+			}
 			mSequences.put(mpId,mSequence);
 		}
 		log.info("    "+mSequences.size()+" maneuvers sequences stored.");
 		log.info("  done.");
+		r.close();
+		fis.close();
 
 		// store the maneuver list of the nodes
 		// TreeMap<NodeId,ArrayList<Tuple<MnId,MnFeatType>>>
 		log.info("  parsing meneuver shape file...");
 		TreeMap<Id,ArrayList<Tuple<Id,Integer>>> maneuvers = new TreeMap<Id,ArrayList<Tuple<Id,Integer>>>();
-		FeatureSource fs = ShapeFileReader.readDataFile(this.mnShpFileName);
-		for (Object o : fs.getFeatures()) {
-			Feature f = (Feature)o;
+		SimpleFeatureSource fs = ShapeFileReader.readDataFile(this.mnShpFileName);
+		SimpleFeatureIterator fIt = fs.getFeatures().features();
+		while (fIt.hasNext()) {
+			SimpleFeature f = fIt.next();
 			int featType = Integer.parseInt(f.getAttribute(MN_FEATTYP_NAME).toString());
 			if ((featType == 2103) || (featType == 2102) || (featType == 2101)) {
 				// keep 'Prohibited Maneuver' (2103), 'Restricted Maneuver' (2102) and 'Calculated/Derived Prohibited Maneuver' (2101)
@@ -230,6 +236,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 				throw new IllegalArgumentException("mnId="+f.getAttribute(MN_ID_NAME)+": "+MN_FEATTYP_NAME+"="+featType+" not known.");
 			}
 		}
+		fIt.close();
 		log.info("    "+maneuvers.size()+" nodes with maneuvers stored.");
 		log.info("  done.");
 

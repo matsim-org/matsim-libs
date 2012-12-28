@@ -20,12 +20,11 @@
 package tutorial.unsupported.example80DemandGenerationFromShapefile;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,7 +38,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -64,7 +65,6 @@ public class DemandGenerator {
 
 	private static final String exampleDirectory = "../matsimExamples/tutorial/example8DemandGeneration/";
 
-	@SuppressWarnings("unchecked")
 	public static void main(String [] args) throws IOException {
 
 		// input files
@@ -72,16 +72,16 @@ public class DemandGenerator {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		FeatureSource fts = ShapeFileReader.readDataFile(zonesFile); //reads the shape file in
+		SimpleFeatureSource fts = ShapeFileReader.readDataFile(zonesFile); //reads the shape file in
 		Random rnd = new Random();
 
-		Feature commercial = null;
-		Feature recreation = null;
+		SimpleFeature commercial = null;
+		SimpleFeature recreation = null;
 
 		//Iterator to iterate over the features from the shape file
-		Iterator<Feature> it = fts.getFeatures().iterator();
+		SimpleFeatureIterator it = fts.getFeatures().features();
 		while (it.hasNext()) {
-			Feature ft = it.next(); //A feature contains a geometry (in this case a polygon) and an arbitrary number
+			SimpleFeature ft = it.next(); //A feature contains a geometry (in this case a polygon) and an arbitrary number
 			//of other attributes
 			if (((String)ft.getAttribute("type")).equals("commercial")) {
 				commercial = ft;
@@ -98,13 +98,14 @@ public class DemandGenerator {
 				throw new RuntimeException("Unknown zone type:" + ft.getAttribute("type"));
 			}
 		}
+		it.close();
 		createActivities(scenario, rnd, recreation, commercial); //this method creates the remaining activities
 		String popFilename = exampleDirectory + "population.xml";
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(popFilename); // and finally the population will be written to a xml file
 		log.info("population written to: " + popFilename);
 	}
 
-	private static void createActivities(Scenario scenario, Random rnd,  Feature recreation, Feature commercial) {
+	private static void createActivities(Scenario scenario, Random rnd,  SimpleFeature recreation, SimpleFeature commercial) {
 		Population pop =  scenario.getPopulation();
 		PopulationFactory pb = pop.getFactory(); //the population builder creates all we need
 
@@ -142,7 +143,7 @@ public class DemandGenerator {
 
 	}
 
-	private static void createPersons(Scenario scenario, Feature ft, Random rnd, int number) {
+	private static void createPersons(Scenario scenario, SimpleFeature ft, Random rnd, int number) {
 		Population pop = scenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		for (; number > 0; number--) {
@@ -156,14 +157,14 @@ public class DemandGenerator {
 		}
 	}
 
-	private static Point getRandomPointInFeature(Random rnd, Feature ft) {
+	private static Point getRandomPointInFeature(Random rnd, SimpleFeature ft) {
 		Point p = null;
 		double x, y;
 		do {
 			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
 			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
 			p = MGC.xy2Point(x, y);
-		} while (ft.getDefaultGeometry().contains(p));
+		} while (((Geometry) ft.getDefaultGeometry()).contains(p));
 		return p;
 	}
 

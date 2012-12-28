@@ -20,20 +20,13 @@
 
 package org.matsim.utils.gis.matsim2esri.plans;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -56,6 +49,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.core.utils.misc.RouteUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -72,7 +66,6 @@ import com.vividsolutions.jts.geom.Point;
  * @author laemmel
  */
 public class SelectedPlans2ESRIShape {
-	private final static Logger log = Logger.getLogger(SelectedPlans2ESRIShape.class);
 	private final CoordinateReferenceSystem crs;
 	private final Population population;
 	private double outputSample = 1;
@@ -82,8 +75,8 @@ public class SelectedPlans2ESRIShape {
 	private boolean writeActs = true;
 	private boolean writeLegs = true;
 	private ArrayList<Plan> outputSamplePlans;
-	private FeatureType featureTypeAct;
-	private FeatureType featureTypeLeg;
+	private SimpleFeatureBuilder actBuilder;
+	private SimpleFeatureBuilder legBuilder;
 	private final GeometryFactory geofac;
 	private final Network network;
 
@@ -141,7 +134,7 @@ public class SelectedPlans2ESRIShape {
 
 	private void writeActs() throws IOException {
 		String outputFile = this.outputDir + "/acts.shp";
-		ArrayList<Feature> fts = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -157,7 +150,7 @@ public class SelectedPlans2ESRIShape {
 
 	private void writeLegs() throws IOException {
 		String outputFile = this.outputDir + "/legs.shp";
-		ArrayList<Feature> fts = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -176,7 +169,7 @@ public class SelectedPlans2ESRIShape {
 		ShapeFileWriter.writeGeometries(fts, outputFile);
 	}
 
-	private Feature getActFeature(final String id, final Activity act) {
+	private SimpleFeature getActFeature(final String id, final Activity act) {
 		String type = act.getType();
 		String linkId = act.getLinkId().toString();
 		Double startTime = act.getStartTime();
@@ -185,16 +178,17 @@ public class SelectedPlans2ESRIShape {
 		double ry = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		Coord cc = this.network.getLinks().get(act.getLinkId()).getCoord();
 		Coord c = new CoordImpl(cc.getX()+rx,cc.getY()+ry);
+		
 		try {
-			return this.featureTypeAct.create(new Object [] {MGC.coord2Point(c),id, type, linkId, startTime, endTime});
-		} catch (IllegalAttributeException e) {
+			return this.actBuilder.buildFeature(null, new Object [] {MGC.coord2Point(c), id, type, linkId, startTime, endTime});
+		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	private Feature getLegFeature(final Leg leg, final String id) {
+	private SimpleFeature getLegFeature(final Leg leg, final String id) {
 		if (!(leg.getRoute() instanceof NetworkRoute)) {
 			return null;
 		}
@@ -224,8 +218,8 @@ public class SelectedPlans2ESRIShape {
 		LineString ls = this.geofac.createLineString(coords);
 
 		try {
-			return this.featureTypeLeg.create(new Object[] {ls,id,mode,depTime,travTime,dist});
-		} catch (IllegalAttributeException e) {
+			return this.legBuilder.buildFeature(null, new Object [] {ls,id,mode,depTime,travTime,dist});
+		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 
@@ -234,30 +228,28 @@ public class SelectedPlans2ESRIShape {
 
 
 	private void initFeatureType() {
-		AttributeType[] attrAct = new AttributeType[6];
-		attrAct[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.crs);
-		attrAct[1] = AttributeTypeFactory.newAttributeType("PERS_ID", String.class);
-		attrAct[2] = AttributeTypeFactory.newAttributeType("TYPE", String.class);
-		attrAct[3] = AttributeTypeFactory.newAttributeType("LINK_ID", String.class);
-		attrAct[4] = AttributeTypeFactory.newAttributeType("START_TIME", Double.class);
-		attrAct[5] = AttributeTypeFactory.newAttributeType("END_TIME", Double.class);
+		SimpleFeatureTypeBuilder actBuilder = new SimpleFeatureTypeBuilder();
+		actBuilder.setName("activity");
+		actBuilder.setCRS(this.crs);
+		actBuilder.add("location", Point.class);
+		actBuilder.add("PERS_ID", String.class);
+		actBuilder.add("TYPE", String.class);
+		actBuilder.add("LINK_ID", String.class);
+		actBuilder.add("START_TIME", Double.class);
+		actBuilder.add("END_TIME", Double.class);
+		
+		SimpleFeatureTypeBuilder legBuilder = new SimpleFeatureTypeBuilder();
+		legBuilder.setName("leg");
+		legBuilder.setCRS(this.crs);
+		legBuilder.add("location", LineString.class);
+		legBuilder.add("PERS_ID", String.class);
+		legBuilder.add("MODE", String.class);
+		legBuilder.add("DEP_TIME", Double.class);
+		legBuilder.add("TRAV_TIME", Double.class);
+		legBuilder.add("DIST", Double.class);
 
-		AttributeType[] attrLeg = new AttributeType[6];
-		attrLeg[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.crs);
-		attrLeg[1] = AttributeTypeFactory.newAttributeType("PERS_ID", String.class);
-		attrLeg[2] = AttributeTypeFactory.newAttributeType("MODE", String.class);
-		attrLeg[3] = AttributeTypeFactory.newAttributeType("DEP_TIME", Double.class);
-		attrLeg[4] = AttributeTypeFactory.newAttributeType("TRAV_TIME", Double.class);
-		attrLeg[5] = AttributeTypeFactory.newAttributeType("DIST", Double.class);
-
-		try {
-			this.featureTypeAct = FeatureTypeBuilder.newFeatureType(attrAct, "activity");
-			this.featureTypeLeg = FeatureTypeBuilder.newFeatureType(attrLeg, "leg");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		this.actBuilder = new SimpleFeatureBuilder(actBuilder.buildFeatureType());
+		this.legBuilder = new SimpleFeatureBuilder(legBuilder.buildFeatureType());
 	}
 
 	public static void main(final String [] args) {
@@ -268,6 +260,7 @@ public class SelectedPlans2ESRIShape {
 		//		final String networkFilename = "./test/scenarios/berlin/network.xml.gz";
 
 		final String outputDir = "./plans/";
+		new File(outputDir).mkdir();
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);

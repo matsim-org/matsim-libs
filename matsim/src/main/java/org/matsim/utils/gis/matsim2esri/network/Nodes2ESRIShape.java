@@ -23,15 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
@@ -41,6 +34,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Point;
@@ -60,7 +54,7 @@ public class Nodes2ESRIShape {
 
 	private final Network network;
 	private final String filename;
-	private FeatureType featureType;
+	private SimpleFeatureBuilder builder;
 
 	public Nodes2ESRIShape(final Network network, final String filename, final String coordinateSystem) {
 		this.network = network;
@@ -69,7 +63,7 @@ public class Nodes2ESRIShape {
 	}
 
 	public void write() {
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		for (Node node : NetworkUtils.getSortedNodes(this.network)) {
 			features.add(getFeature(node));
 		}
@@ -77,29 +71,25 @@ public class Nodes2ESRIShape {
 
 	}
 
-	private Feature getFeature(Node node) {
+	private SimpleFeature getFeature(Node node) {
 		Point p = MGC.coord2Point(node.getCoord());
 		try {
-			return this.featureType.create(new Object[]{p,node.getId().toString()});
-		} catch (IllegalAttributeException e) {
+			return this.builder.buildFeature(null, new Object[]{p,node.getId().toString()});
+		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private void initFeatureType(final String coordinateSystem) {
 		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
-		AttributeType [] attribs = new AttributeType[2];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, crs);
-		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "node");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName("node");
+		typeBuilder.setCRS(crs);
+		typeBuilder.add("location", Point.class);
+		typeBuilder.add("ID", String.class);
 
+		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 	}
 
 	public static void main(String [] args) {
