@@ -54,9 +54,18 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class LocationChoice extends AbstractMultithreadedModule {
 
+	private static final String RANDOM = "random";
+	private static final String BEST_RESPONSE = "bestResponse";
+	private static final String LOCAL_SEARCH_RECURSIVE = "localSearchRecursive";
+	private static final String LOCAL_SEARCH_SINGLE_ACT = "localSearchSingleAct";
 	private final Network network;
 	private final Controler controler;
+
+	/**
+	 * yyyy It is unclear to me why we need this as a collection and not just as a variable.  kai, dec'12
+	 */
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
+
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
@@ -106,7 +115,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		
 		//only compute oa for best response module
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
-		if (algorithm.equals("bestResponse")) {
+		if (algorithm.equals(BEST_RESPONSE)) {
 			this.createEpsilonScaleFactors();
 			this.createObjectAttributes(Long.parseLong(this.controler.getConfig().locationchoice().getRandomSeed()));
 			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues,
@@ -176,17 +185,17 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
 		
-		if (algorithm.equals("localSearchRecursive") || algorithm.equals("localSearchSingleAct")) {
+		if (algorithm.equals(LOCAL_SEARCH_RECURSIVE) || algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
 			int unsuccessfull = 0;
 			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
 				PlanAlgorithm plan_algo = planAlgo_it.next();
 
-				if (algorithm.equals("localSearchSingleAct")) {
+				if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
 					unsuccessfull += ((SingleActLocationMutator)plan_algo).getNumberOfUnsuccessfull();
 					((SingleActLocationMutator)plan_algo).resetUnsuccsessfull();
 				}
-				else if (algorithm.equals("localSearchRecursive")) {
+				else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
 					unsuccessfull += ((RecursiveLocationMutator)plan_algo).getNumberOfUnsuccessfull();
 					((RecursiveLocationMutator)plan_algo).resetUnsuccsessfull();
 				}
@@ -201,19 +210,19 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {		
 		// this is the way location choice should be configured ...
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
-		if (algorithm.equals("random")) {
+		if (algorithm.equals(RANDOM)) {
 			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, 
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		}
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
-		else if (algorithm.equals("bestResponse")) {
+		else if (algorithm.equals(BEST_RESPONSE)) {
 			this.planAlgoInstances.add(new BestResponseLocationMutator(this.network, this.controler,  
 					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
 					this.scaleEpsilon, this.actTypeConverter, this.sampler));
-		} else if (algorithm.equals("localSearchRecursive")) {
+		} else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
 			this.planAlgoInstances.add(new RecursiveLocationMutator(this.network, this.controler,  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-		} else if (algorithm.equals("localSearchSingleAct")) {
+		} else if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
 			this.planAlgoInstances.add(new SingleActLocationMutator(this.network, this.controler, 
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		} else {
@@ -231,7 +240,9 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		return controler;
 	}
 
-	public List<PlanAlgorithm> getPlanAlgoInstances() {
-		return planAlgoInstances;
-	}
+//	public List<PlanAlgorithm> getPlanAlgoInstances() {
+//		return planAlgoInstances;
+//	}
+// this is never called.  Also not clear to me why we need this as a collection in the first place.  kai, dec'12
+
 }
