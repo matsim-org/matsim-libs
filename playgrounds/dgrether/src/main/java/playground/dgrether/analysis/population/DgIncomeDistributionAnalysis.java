@@ -25,15 +25,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -42,7 +37,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -51,9 +48,6 @@ import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
 import playground.dgrether.utils.DgGrid;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 
@@ -61,7 +55,7 @@ public class DgIncomeDistributionAnalysis {
 
 	private static final Logger log = Logger.getLogger(DgIncomeDistributionAnalysis.class);
 	
-	public static void main(String[] args) throws FactoryException, FactoryRegistryException, SchemaException, IllegalAttributeException, IOException{
+	public static void main(String[] args) throws FactoryException, FactoryRegistryException, SchemaException, IllegalArgumentException, IOException{
 		//run number creation
 		String runNumber1 = "749";
 		String runNumber2 = "869";
@@ -91,35 +85,30 @@ public class DgIncomeDistributionAnalysis {
 		log.info("ya esta");
 	}
 
-	private static void writePersons(DgAnalysisPopulation pop, String file, Id runid1, Id runid2) throws FactoryConfigurationError, SchemaException, IllegalAttributeException, IOException {
+	private static void writePersons(DgAnalysisPopulation pop, String file, Id runid1, Id runid2) throws SchemaException, IllegalArgumentException, IOException {
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.CH1903_LV03_GT);
+		PointFeatureFactory factory = new PointFeatureFactory.Builder().
+				setCrs(targetCRS).
+				setName("geometry").
+				addAttribute("Income", Double.class).
+				addAttribute("Delta Utility", Double.class).
+				create();
 		//create features 
-		List<Feature> features = new ArrayList<Feature>();
-	  CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.CH1903_LV03_GT);
-	  AttributeType pointAttribute = DefaultAttributeTypeFactory.newAttributeType("First Activity",Point.class, true, null, null, targetCRS);
-	  AttributeType incomeAttribute = DefaultAttributeTypeFactory.newAttributeType("Income", Double.class);
-	  AttributeType deltaScoreAttribute = DefaultAttributeTypeFactory.newAttributeType("Delta Utility", Double.class);
-//	  AttributeType modeSwitch = DefaultAttributeTypeFactory.newAttributeType("Mode Switch", String.class);
-	  FeatureType ftPolygon = FeatureTypeBuilder.newFeatureType(new AttributeType[] {pointAttribute, incomeAttribute, deltaScoreAttribute, /*modeSwitch*/}, "geometry");
-	  GeometryFactory geofac = new GeometryFactory();
+		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
 	  
 	  for (DgPersonData pd : pop.getPersonData().values()){
 	  	if (pd.getIncome().getIncome() >= 100000) {
-	  		Coordinate coord = new Coordinate(pd.getFirstActivity().getCoord().getX(), pd.getFirstActivity().getCoord().getY());
-	  		Point point = geofac.createPoint(coord);
-//	  	String mode = pd.getPlanData().get(runid1).getPlan().getType() + "->" + pd.getPlanData().get(runid2).getPlan().getType();
-	  		Feature feature = ftPolygon.create(new Object[]{point, pd.getIncome().getIncome(), pd.getDeltaScore(runid1, runid2), /*mode*/});
-	  		//add to collection
+	  		SimpleFeature feature = factory.createPoint(pd.getFirstActivity().getCoord(), new Object[] { pd.getIncome().getIncome(), pd.getDeltaScore(runid1, runid2) }, null);
 	  		features.add(feature);
 	  	}
 	  }
 		//write shape file
 		ShapeFileWriter.writeGeometries(features, file);
-		
 	}
 
 	
 	
-	private static void writeGrid(DgAnalysisPopulation pop, String file, Id runid1, Id runid2) throws FactoryConfigurationError, SchemaException, IllegalAttributeException, IOException {
+	private static void writeGrid(DgAnalysisPopulation pop, String file, Id runid1, Id runid2) throws SchemaException, IllegalArgumentException, IOException {
 		//create grid
 		DgGrid grid = new DgGrid(450, 375, pop.getBoundingBox());
 		//fill quad tree
@@ -134,14 +123,17 @@ public class DgIncomeDistributionAnalysis {
 		}
 
 		//create features 
-		List<Feature> features = new ArrayList<Feature>();
+		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		Iterator<Polygon> pi = grid.iterator();
 	  CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.CH1903_LV03_GT);
-	  AttributeType polygonAttribute = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class, true, null, null, targetCRS);
-	  AttributeType incomeAttribute = DefaultAttributeTypeFactory.newAttributeType("avgIncome", Double.class);
-	  AttributeType deltaScoreAttribute = DefaultAttributeTypeFactory.newAttributeType("deltaScore", Double.class);
-	  AttributeType numberOfPersonsAttribute = DefaultAttributeTypeFactory.newAttributeType("", Integer.class);
-	  FeatureType ftPolygon = FeatureTypeBuilder.newFeatureType(new AttributeType[] {polygonAttribute, incomeAttribute, deltaScoreAttribute, numberOfPersonsAttribute}, "geometry");
+	  
+	  SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+	  b.setCRS(targetCRS);
+	  b.add("location", Polygon.class);
+	  b.add("avgIncome", Double.class);
+	  b.add("deltaScore", Double.class);
+	  b.add("persons", Integer.class);
+	  SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 
 		while (pi.hasNext()){
 		  Polygon p = pi.next();
@@ -160,7 +152,7 @@ public class DgIncomeDistributionAnalysis {
 		  	int numberOfPersons = results.size();
 		  	avgIncome /= numberOfPersons;
 		  	avgDeltaUtility /= numberOfPersons;
-		  	Feature feature = ftPolygon.create(new Object[]{p, avgIncome, avgDeltaUtility, numberOfPersons});
+		  	SimpleFeature feature = builder.buildFeature(null, new Object[] {avgIncome, avgDeltaUtility, numberOfPersons});
 		  	//add to collection
 		  	features.add(feature);
 		  }
@@ -168,7 +160,5 @@ public class DgIncomeDistributionAnalysis {
 		//write shape file
 		ShapeFileWriter.writeGeometries(features, file);
 	}
-	
-	
 	
 }

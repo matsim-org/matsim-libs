@@ -27,19 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -48,12 +40,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
@@ -61,7 +54,6 @@ import playground.dgrether.utils.DoubleArrayTableWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -162,31 +154,29 @@ public class SimSimTrafficAnalyser {
 	}
 
 	private void writeShape(Network net, CoordinateReferenceSystem netCrs, String outfile, Map<Id, List<CountSimComparison>> countSimCompMap){
-		FeatureType featureType = createFeatureType(netCrs);
+		PolylineFeatureFactory factory = createFeatureType(netCrs);
 		GeometryFactory geofac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		for (Link link : net.getLinks().values()) {
-			features.add(this.createFeature(link, geofac, featureType, countSimCompMap.get(link.getId())));
+			features.add(this.createFeature(link, geofac, factory, countSimCompMap.get(link.getId())));
 		}
 		ShapeFileWriter.writeGeometries(features, outfile + ".shp");
 	}
 
-	private Feature createFeature(Link link, GeometryFactory geofac, FeatureType featureType, List<CountSimComparison> countSimComparisonList) {
-		LineString ls = geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
-				MGC.coord2Coordinate(link.getToNode().getCoord())});
+	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolylineFeatureFactory factory, List<CountSimComparison> countSimComparisonList) {
+		Coordinate[] coords = new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())};
 		
-		Object [] attribs = new Object[60];
-		attribs[0] = ls;
-		attribs[1] = link.getId().toString();
-		attribs[2] = link.getFromNode().getId().toString();
-		attribs[3] = link.getToNode().getId().toString();
-		attribs[4] = link.getLength();
-		attribs[5] = link.getFreespeed();
-		attribs[6] = link.getCapacity();
+		Object [] attribs = new Object[59];
+		attribs[0] = link.getId().toString();
+		attribs[1] = link.getFromNode().getId().toString();
+		attribs[2] = link.getToNode().getId().toString();
+		attribs[3] = link.getLength();
+		attribs[4] = link.getFreespeed();
+		attribs[5] = link.getCapacity();
+		attribs[6] = link.getNumberOfLanes();
 		attribs[7] = link.getNumberOfLanes();
-		attribs[8] = link.getNumberOfLanes();
-		attribs[9] = ((LinkImpl) link).getType();
-		int i = 10;
+		attribs[8] = ((LinkImpl) link).getType();
+		int i = 9;
 		double sumRelativeError = 0.0;
 		double relativeError = 0.0;
 		for (CountSimComparison csc : countSimComparisonList){
@@ -196,8 +186,8 @@ public class SimSimTrafficAnalyser {
 			sumRelativeError += relativeError;
 			i++;
 		}
-		attribs[34] = sumRelativeError / 24.0;
-		i = 35;
+		attribs[33] = sumRelativeError / 24.0;
+		i = 34;
 		double difference = 0;
 		double sumDifference = 0;
 		for (CountSimComparison csc : countSimComparisonList){
@@ -207,44 +197,33 @@ public class SimSimTrafficAnalyser {
 			sumDifference += difference;
 			i++;
 		}
-		attribs[59] = sumDifference;
-		try {
-			return featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
-			throw new RuntimeException(e);
-		}
+		attribs[58] = sumDifference;
+		return factory.createPolyline(coords, attribs, link.getId().toString());
 	}
 
 	
-	private FeatureType createFeatureType(CoordinateReferenceSystem crs) {
-		FeatureType featureType = null;
-		AttributeType [] attribs = new AttributeType[60];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, crs);
-		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
-		attribs[3] = AttributeTypeFactory.newAttributeType("toID", String.class);
-		attribs[4] = AttributeTypeFactory.newAttributeType("length", Double.class);
-		attribs[5] = AttributeTypeFactory.newAttributeType("freespeed", Double.class);
-		attribs[6] = AttributeTypeFactory.newAttributeType("capacity", Double.class);
-		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
-		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
-		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);
+	private PolylineFeatureFactory createFeatureType(CoordinateReferenceSystem crs) {
+		PolylineFeatureFactory.Builder builder = new PolylineFeatureFactory.Builder();
+		builder.setCrs(crs);
+		builder.setName("link");
+		builder.addAttribute("ID", String.class);
+		builder.addAttribute("fromID", String.class);
+		builder.addAttribute("toID", String.class);
+		builder.addAttribute("length", Double.class);
+		builder.addAttribute("freespeed", Double.class);
+		builder.addAttribute("capacity", Double.class);
+		builder.addAttribute("lanes", Double.class);
+		builder.addAttribute("visWidth", Double.class);
+		builder.addAttribute("type", String.class);
 		for (int i = 0; i < 24; i++){
-			attribs[10 + i] = AttributeTypeFactory.newAttributeType("re h " + (i + 1), Double.class);
+			builder.addAttribute("re h " + (i + 1), Double.class);
 		}
-		attribs[34] = AttributeTypeFactory.newAttributeType("re 24h", Double.class);
+		builder.addAttribute("re 24h", Double.class);
 		for (int i = 0; i < 24; i++){
-			attribs[35 + i] = AttributeTypeFactory.newAttributeType("abdif_h " + (i + 1), Double.class);
+			builder.addAttribute("abdif_h " + (i + 1), Double.class);
 		}
-		attribs[59] = AttributeTypeFactory.newAttributeType("absdif24h", Double.class);
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
-		return featureType;
+		builder.addAttribute("absdif24h", Double.class);
+		return builder.create();
 	}
 
 
@@ -252,7 +231,7 @@ public class SimSimTrafficAnalyser {
 		log.info("Filtering network...");
 		log.info("Nr links in original network: " + network.getLinks().size());
 		NetworkFilterManager netFilter = new NetworkFilterManager(network);
-		Tuple<CoordinateReferenceSystem, Feature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature("/media/data/work/repos/shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp");
+		Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature("/media/data/work/repos/shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp");
 		FeatureNetworkLinkCenterCoordFilter filter = new FeatureNetworkLinkCenterCoordFilter(networkSrs, cottbusFeatureTuple.getSecond(), cottbusFeatureTuple.getFirst());
 		netFilter.addLinkFilter(filter);
 		Network fn = netFilter.applyFilters();

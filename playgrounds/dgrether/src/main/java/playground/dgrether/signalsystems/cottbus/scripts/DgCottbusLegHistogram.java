@@ -20,7 +20,6 @@
 package playground.dgrether.signalsystems.cottbus.scripts;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,6 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
@@ -57,7 +57,7 @@ public class DgCottbusLegHistogram {
 		String cottbusFeatureFile = DgPaths.REPOS
 				+ "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
 		CoordinateReferenceSystem netCrs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		Tuple<CoordinateReferenceSystem, Feature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature(cottbusFeatureFile);
+		Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature(cottbusFeatureFile);
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);

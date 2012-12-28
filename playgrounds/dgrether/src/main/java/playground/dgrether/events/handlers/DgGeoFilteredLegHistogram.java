@@ -27,7 +27,6 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.feature.Feature;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -50,6 +49,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.events.GeospatialEventTools;
@@ -129,7 +129,7 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
 		this.handleArrivalOrStuck(event, event.getPersonId());
 	}
 
-	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, Feature> cottbusFeatureTuple) {
+	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple) {
 		this.geospatialTools.addCrsFeatureTuple(cottbusFeatureTuple);
 	}
 	

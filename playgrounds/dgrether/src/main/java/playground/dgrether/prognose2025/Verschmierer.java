@@ -1,25 +1,39 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.dgrether.prognose2025;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-
-
-
 
 public class Verschmierer {
 	
@@ -34,19 +48,11 @@ public class Verschmierer {
 		readShape();
 	}
 
-	@SuppressWarnings("unchecked")
 	private void readShape() {
-		FeatureSource landkreisSource;
-		try {
-			landkreisSource = ShapeFileReader.readDataFile(filename);
-			landkreisSource.getFeatures();
-			Collection<Feature> landkreise = landkreisSource.getFeatures();
-			for (Feature landkreis : landkreise) {
-				Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
-				zones.put(gemeindeschluessel, landkreis.getDefaultGeometry());
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		Collection<SimpleFeature> landkreise = ShapeFileReader.getAllFeatures(filename);
+		for (SimpleFeature landkreis : landkreise) {
+			Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
+			zones.put(gemeindeschluessel, (Geometry) landkreis.getDefaultGeometry());
 		}
 	}
 

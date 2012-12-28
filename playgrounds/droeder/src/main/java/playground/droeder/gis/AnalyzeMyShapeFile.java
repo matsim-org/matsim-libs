@@ -1,16 +1,33 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.droeder.gis;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 public class AnalyzeMyShapeFile {
 	
@@ -18,16 +35,16 @@ public class AnalyzeMyShapeFile {
 		new AnalyzeMyShapeFile().run("E:/rsa/server/runs/jtlu2/cordon.shp");
 	}
 	
-	
 	private Map<Integer, Set<String>> values = new HashMap<Integer, Set<String>>();
 	
 	public void run(String shapeFile) throws IOException{
-		FeatureSource features = ShapeFileReader.readDataFile(shapeFile);
-		
-		for(Iterator<Feature> it = features.getFeatures().iterator(); it.hasNext(); ){
-			Feature f = it.next();
+		SimpleFeature ft = null;
+		for (SimpleFeature f : ShapeFileReader.getAllFeatures(shapeFile)) {
+			if (ft == null) {
+				ft = f;
+			}
 			
-			for(int i = 0; i < f.getNumberOfAttributes(); i++){
+			for(int i = 0; i < f.getAttributeCount(); i++){
 				if(this.values.containsKey(i)){
 					if(!this.values.get(i).contains(f.getAttribute(i).toString()) && !(this.values.get(i).size() > 100)){
 						this.values.get(i).add(f.getAttribute(i).toString());
@@ -40,7 +57,6 @@ public class AnalyzeMyShapeFile {
 			}
 		}
 		
-		
 		for(Entry<Integer, Set<String>> e: this.values.entrySet()){
 			System.out.print(e.getKey() + "\t");
 			for(String s : e.getValue()){
@@ -49,10 +65,8 @@ public class AnalyzeMyShapeFile {
 			System.out.println();
 		}
 		
-		
-		Feature ft = (Feature) features.getFeatures().iterator().next();
-		for(int i = 0; i < ft.getNumberOfAttributes(); i++){
-			System.out.print(i + " " + ft.getFeatureType().getAttributeType(i).getName() + "\t" + ft.getAttribute(i).getClass().toString());
+		for(int i = 0; i < ft.getAttributeCount(); i++){
+			System.out.print(i + " " + ft.getFeatureType().getAttributeDescriptors().get(i).getName() + "\t" + ft.getAttribute(i).getClass().toString());
 			System.out.println();
 		}
 	}

@@ -18,26 +18,11 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.gis;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.referencing.factory.GeotoolsFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -50,15 +35,11 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * @author dgrether
@@ -88,56 +69,22 @@ public class PlanScoreAnalysis {
 
 	private CoordinateReferenceSystem coordinateReferenceSystem;
 
-	private AttributeType geom;
-
-	private AttributeType id;
-
-	private AttributeType score;
-
-	private AttributeType[] attType;
-
-	private FeatureType ftHome;
-
-	private final GeometryFactory geofac = new GeometryFactory();
+	private PointFeatureFactory factory = null; 
 
 	private long counter = 0;
 	private long nextMsg = 1;
 
 	private void createOGCTypes() {
-		CRSFactory fac = new GeotoolsFactory();
-		// this.coordinateReferenceSystem = fac.;
-
-		this.geom = DefaultAttributeTypeFactory.newAttributeType("Point",
-				Point.class, true, null, null, this.coordinateReferenceSystem);
-
-		// this.geom =
-		// DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class,
-		// true, null, null, this.coordinateReferenceSystem);
-		this.id = AttributeTypeFactory.newAttributeType("PersonID", String.class);
-		this.score = AttributeTypeFactory.newAttributeType("Score", Double.class);
-
-		this.attType = new AttributeType[] { this.geom, this.id, this.score };
-		try {
-			this.ftHome = FeatureTypeFactory.newFeatureType(this.attType, "ftHome");
-
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		this.factory = new PointFeatureFactory.Builder().
+				setCrs(this.coordinateReferenceSystem).
+				setName("ftHome").
+				addAttribute("PersonID", String.class).
+				addAttribute("Score", Double.class).
+				create();
 	}
 
-	private Feature createHomeFeature(final double score, final Coord loc, final Id id) {
-		Coordinate coord = new Coordinate(loc.getX(), loc.getY());
-		CoordinateSequence coords = new CoordinateArraySequence(
-				new Coordinate[] { coord });
-		Point point = new Point(coords, this.geofac);
-		try {
-			return this.ftHome.create(new Object[] { point, id.toString(), score });
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-			return null;
-		}
+	private SimpleFeature createHomeFeature(final double score, final Coord loc, final Id id) {
+		return this.factory.createPoint(loc, new Object[] {id.toString(), score}, id.toString());
 	}
 
 	private void doAnalysis() {
@@ -204,19 +151,9 @@ public class PlanScoreAnalysis {
 				"completed analysis of plans");
 	}
 
-	private void writeShapeFile(final Collection<Feature> features, final String filename)
+	private void writeShapeFile(final Collection<SimpleFeature> features, final String filename)
 			throws IOException, FactoryException, SchemaException {
-		URL fileURL = (new File(filename)).toURL();
-		ShapefileDataStore datastore = new ShapefileDataStore(fileURL);
-		Feature feature = features.iterator().next();
-		datastore.createSchema(feature.getFeatureType());
-
-		FeatureStore featureStore = (FeatureStore) (datastore
-				.getFeatureSource(feature.getFeatureType().getTypeName()));
-		FeatureReader aReader = DataUtilities.reader(features);
-
-		featureStore.addFeatures(aReader);
-
+		ShapeFileWriter.writeGeometries(features, filename);
 	}
 
 	public static void main(final String[] args) {

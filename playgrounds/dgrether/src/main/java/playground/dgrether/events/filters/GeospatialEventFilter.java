@@ -22,7 +22,6 @@ package playground.dgrether.events.filters;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
@@ -38,11 +37,11 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -56,13 +55,13 @@ import com.vividsolutions.jts.geom.Geometry;
 public class GeospatialEventFilter implements EventFilter {
 
 	private Network network;
-	private List<Tuple<CoordinateReferenceSystem, Feature>> featureTuples;
+	private List<Tuple<CoordinateReferenceSystem, SimpleFeature>> featureTuples;
 	private CoordinateReferenceSystem networkCrs;
 	private List<Geometry> transformedFeatureGeometries;
 	
 	public GeospatialEventFilter(Network network){
 		this.network = network;
-		this.featureTuples = new ArrayList<Tuple<CoordinateReferenceSystem, Feature>>();
+		this.featureTuples = new ArrayList<Tuple<CoordinateReferenceSystem, SimpleFeature>>();
 		this.transformedFeatureGeometries = new ArrayList<Geometry>();
 	}
 	
@@ -71,24 +70,22 @@ public class GeospatialEventFilter implements EventFilter {
 		this.networkCrs = networkCrs;
 	}
 	
-	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, Feature> featureTuple) {
+	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, SimpleFeature> featureTuple) {
 		this.featureTuples.add(featureTuple);
 		if ( !(this.networkCrs == null)){
 			MathTransform transformation;
 			try {
 				transformation = CRS.findMathTransform(featureTuple.getFirst(), this.networkCrs, true);
-				Geometry transformedFeatureGeometry = JTS.transform(featureTuple.getSecond().getDefaultGeometry(), transformation);
+				Geometry transformedFeatureGeometry = JTS.transform((Geometry) featureTuple.getSecond().getDefaultGeometry(), transformation);
 				this.transformedFeatureGeometries.add(transformedFeatureGeometry);
 			} catch (FactoryException e) {
-				e.printStackTrace();
-			} catch (MismatchedDimensionException e) {
 				e.printStackTrace();
 			} catch (TransformException e) {
 				e.printStackTrace();
 			}
 		}
 		else {
-			this.transformedFeatureGeometries.add(featureTuple.getSecond().getDefaultGeometry());
+			this.transformedFeatureGeometries.add((Geometry) featureTuple.getSecond().getDefaultGeometry());
 		}
 	}
 

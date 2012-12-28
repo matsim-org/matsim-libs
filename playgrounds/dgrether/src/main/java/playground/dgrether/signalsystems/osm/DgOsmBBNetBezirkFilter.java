@@ -19,16 +19,12 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.osm;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,6 +36,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.dgrether.visualization.KmlNetworkVisualizer;
 
@@ -56,26 +53,19 @@ public class DgOsmBBNetBezirkFilter {
 	
 	private static final Logger log = Logger.getLogger(DgOsmBBNetBezirkFilter.class);
 	
-	private List<Feature> bezirke = new ArrayList<Feature>();
+	private List<SimpleFeature> bezirke = new ArrayList<SimpleFeature>();
 	
-	private Map<String, Feature> bezirksFeatures = new HashMap<String, Feature>();
+	private Map<String, SimpleFeature> bezirksFeatures = new HashMap<String, SimpleFeature>();
 	
 	public DgOsmBBNetBezirkFilter(String bezirksShape){
 		this.readBezirksShape(bezirksShape);
 	}
 	
 	private void readBezirksShape(final String bezirksShape){
-		try {
-			 FeatureSource fs = ShapeFileReader.readDataFile(bezirksShape);
-			 Iterator it = fs.getFeatures().iterator();
-				while (it.hasNext()) {
-					Feature ft = (Feature) it.next();
-					String name = (String) ft.getAttribute("name");
-					log.info("adding bezirksdata of: " + name);
-					this.bezirksFeatures.put(name, ft);
-				}
-		} catch (IOException e) {
-			e.printStackTrace();
+		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(bezirksShape)) {
+			String name = (String) ft.getAttribute("name");
+			log.info("adding bezirksdata of: " + name);
+			this.bezirksFeatures.put(name, ft);
 		}
 	}
 
@@ -95,9 +85,9 @@ public class DgOsmBBNetBezirkFilter {
 		n.setCapacityPeriod(net.getCapacityPeriod());
 		n.setEffectiveLaneWidth(net.getEffectiveLaneWidth());
 		for (Link orgLink : net.getLinks().values()){
-			for (Feature ft : this.bezirke){
+			for (SimpleFeature ft : this.bezirke){
 				Geometry geo = factory.createPoint(new Coordinate(orgLink.getCoord().getX(), orgLink.getCoord().getY()));
-				if (ft.getDefaultGeometry().contains(geo)){
+				if (((Geometry) ft.getDefaultGeometry()).contains(geo)){
 					Node fromNode = orgLink.getFromNode();
 					Node toNode = orgLink.getToNode();
 					Node nn;

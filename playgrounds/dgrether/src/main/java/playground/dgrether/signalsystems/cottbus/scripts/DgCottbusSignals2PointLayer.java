@@ -24,14 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -39,6 +33,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.signalsystems.data.SignalsData;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
@@ -55,16 +50,13 @@ import com.vividsolutions.jts.geom.MultiPoint;
  */
 public class DgCottbusSignals2PointLayer {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) throws Exception {
 		ScenarioImpl sc = CottbusUtils.loadCottbusScenrio(true);
 		Map<Id, Set<Id>> systemId2NodeIdsMap = DgSignalsUtils.calculateSignalizedNodesPerSystem(sc.getScenarioElement(SignalsData.class).getSignalSystemsData(), sc.getNetwork());
 		String srsId = TransformationFactory.WGS84_UTM33N;
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srsId);
-		FeatureType ft = createMultiPointSignalSystemFeatureType(networkSrs);
-		List<Feature> multiPointFeatures = new ArrayList<Feature>();
+		SimpleFeatureBuilder builder = createMultiPointSignalSystemFeatureBuilder(networkSrs);
+		List<SimpleFeature> multiPointFeatures = new ArrayList<SimpleFeature>();
 		for (Id systemId : systemId2NodeIdsMap.keySet()){
 			Set<Id> nodeIds = systemId2NodeIdsMap.get(systemId);
 			Coordinate[] nodeCoords = new Coordinate[nodeIds.size()];
@@ -75,20 +67,19 @@ public class DgCottbusSignals2PointLayer {
 				i++;
 			}
 			MultiPoint multiPoint = MGC.geoFac.createMultiPoint(nodeCoords);
-			Feature feature = ft.create(new Object[]{multiPoint, systemId.toString()});
+			SimpleFeature feature = builder.buildFeature(null, new Object[]{multiPoint, systemId.toString()});
 			multiPointFeatures.add(feature);
 		}
 		ShapeFileWriter.writeGeometries(multiPointFeatures, DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_system_shape/signal_systems.shp");
 	}
 
-	
-	private static FeatureType createMultiPointSignalSystemFeatureType(CoordinateReferenceSystem crs) throws FactoryConfigurationError, SchemaException{
-		AttributeType[] attrAct = new AttributeType[2];
-		attrAct[0] = DefaultAttributeTypeFactory.newAttributeType("MultiPoint",MultiPoint.class, true, null, null, crs);
-		attrAct[1] = AttributeTypeFactory.newAttributeType("sig_sys_id", String.class);
-		FeatureType featureTypeAct = FeatureTypeBuilder.newFeatureType(attrAct, "signal_system_feature");
-		return featureTypeAct;
+	private static SimpleFeatureBuilder createMultiPointSignalSystemFeatureBuilder(CoordinateReferenceSystem crs) {
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(crs);
+		b.setName("signal_system_feature");
+		b.add("location", MultiPoint.class);
+		b.add("sig_sys_id", String.class);
+		return new SimpleFeatureBuilder(b.buildFeatureType());
 	}
-
 	
 }

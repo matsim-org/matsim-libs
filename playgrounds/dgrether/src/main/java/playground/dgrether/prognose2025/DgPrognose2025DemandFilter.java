@@ -20,12 +20,12 @@
 package playground.dgrether.prognose2025;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -45,7 +46,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.config.ConfigUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -74,7 +75,7 @@ public abstract class DgPrognose2025DemandFilter {
 
 	private Set<Id> linkIdsInShapefile;
 
-	private Set<Feature> featuesInShape;
+	private Collection<SimpleFeature> featuesInShape;
 	
 	public DgPrognose2025DemandFilter(){}
 	
@@ -87,7 +88,7 @@ public abstract class DgPrognose2025DemandFilter {
 	private void readData(String networkFilename, String populationFilename, String filterShapeFileName) throws IOException{
 		this.factory = new GeometryFactory();
 		//read shape file
-		this.featuesInShape = new ShapeFileReader().readFileAndInitialize(filterShapeFileName);
+		this.featuesInShape = ShapeFileReader.getAllFeatures(filterShapeFileName);
 		//read scenario
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader	= new MatsimNetworkReader(scenario);
@@ -118,8 +119,8 @@ public abstract class DgPrognose2025DemandFilter {
 			linkCoord = this.coordinateTransformation.transform(linkCoord);
 		}
 		Geometry geo = factory.createPoint(new Coordinate(linkCoord.getX(), linkCoord.getY()));
-		for (Feature ft : featuesInShape){
-			if (ft.getDefaultGeometry().contains(geo)){
+		for (SimpleFeature ft : featuesInShape){
+			if (((Geometry) ft.getDefaultGeometry()).contains(geo)){
 				found = true;
 				break;
 			}

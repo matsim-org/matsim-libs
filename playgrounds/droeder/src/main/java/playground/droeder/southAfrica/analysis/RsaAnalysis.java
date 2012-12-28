@@ -1,6 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.droeder.southAfrica.analysis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,7 +29,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -25,6 +44,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
@@ -155,13 +175,12 @@ public class RsaAnalysis {
 		
 		
 		
-		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(dir.getOutputPath() + "/cordon.shp");
-		
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(dir.getOutputPath() + "/cordon.shp");
+
 		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
-		for(Feature f: features){
+		for(SimpleFeature f: features){
 			zones.put((String)f.getAttribute(2), (Geometry) f.getAttribute(0));
 		}
-//		
 		
 		
 		GetStuckEventsAndPlans writeStuck = new GetStuckEventsAndPlans(sc);

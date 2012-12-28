@@ -26,11 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -41,9 +36,11 @@ import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.analysis.FeatureNetworkLinkStartEndCoordFilter;
@@ -53,8 +50,6 @@ import playground.dgrether.utils.DgNet2Shape;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
 
 
 public class DgCottbusSmallNetworkGenerator {
@@ -82,7 +77,7 @@ public class DgCottbusSmallNetworkGenerator {
 		for (Set<Id> set : signalizedLinkIdsBySystemIdMap.values()){
 			signalizedLinkIds.addAll(set);
 		}
-		Feature boundingboxFeature = calcBoundingBox(net, signalizedLinkIds, offset);
+		SimpleFeature boundingboxFeature = calcBoundingBox(net, signalizedLinkIds, offset);
 
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
 		filterManager.addLinkFilter(new FeatureNetworkLinkStartEndCoordFilter(networkSrs, boundingboxFeature, networkSrs));
@@ -95,7 +90,7 @@ public class DgCottbusSmallNetworkGenerator {
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		new DgNet2Shape().write(newNetwork, output + ".shp", crs);
 
-		Collection<Feature> boundingBoxCollection = new ArrayList<Feature>();
+		Collection<SimpleFeature> boundingBoxCollection = new ArrayList<SimpleFeature>();
 		boundingBoxCollection.add(boundingboxFeature);
 		ShapeFileWriter.writeGeometries(boundingBoxCollection, outputDirectory + "bounding_box.shp");
 
@@ -128,7 +123,7 @@ public class DgCottbusSmallNetworkGenerator {
 		return this.boundingBox;
 	}
 
-	private Feature calcBoundingBox(Network net, Set<Id> signalizedLinkIds, double offset) {
+	private SimpleFeature calcBoundingBox(Network net, Set<Id> signalizedLinkIds, double offset) {
 		Link l = null;
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
@@ -167,21 +162,13 @@ public class DgCottbusSmallNetworkGenerator {
 
 
 		this.boundingBox = new Envelope(coordinates[0], coordinates[2]);
-		//		this.boundingBox.expandBy(offset, offset);
-		LinearRing linearRing = geoFac.createLinearRing(coordinates);
-		Polygon polygon = geoFac.createPolygon(linearRing, null);
-		FeatureType featureType = null;
-		AttributeType [] attribs = new AttributeType[1];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon", Polygon.class, true, null, null, networkSrs);
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
-			return featureType.create(new Object[] {polygon});
-		} catch (Exception  e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} 
+		
+		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().
+				setCrs(networkSrs).
+				setName("link").
+				create();
+		return factory.createPolygon(coordinates);
 	}
-
 
 	public static void main(String[] args){
 		new DgCottbusSmallNetworkGenerator().createSmallNetwork(args[0], args[1], args[2], Double.valueOf(args[3]));

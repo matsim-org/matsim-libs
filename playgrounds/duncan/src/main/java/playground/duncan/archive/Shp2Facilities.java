@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.duncan.archive;
 
 import java.io.IOException;
@@ -5,9 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureIterator;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -19,6 +37,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -27,21 +46,21 @@ import com.vividsolutions.jts.geom.Polygon;
 public class Shp2Facilities {
 	private static final Logger log = Logger.getLogger(Shp2Facilities.class);
 	
-	private static Collection<Feature> getPolygons(final FeatureSource n, final ScenarioImpl scenario) {
-		final Collection<Feature> polygons = new ArrayList<Feature>(); // not needed
+	private static Collection<SimpleFeature> getPolygons(final SimpleFeatureSource n, final ScenarioImpl scenario) {
+		final Collection<SimpleFeature> polygons = new ArrayList<SimpleFeature>(); // not needed
 
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		facilities.setName("workplaces");
 		long cnt = 0 ;
 		
-		FeatureIterator it = null;
+		SimpleFeatureIterator it = null;
 		try {
 			it = n.getFeatures().features();
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		while (it.hasNext()) {
-			final Feature feature = it.next();
+			final SimpleFeature feature = it.next();
 			
 			String str ;
 			
@@ -71,6 +90,7 @@ public class Shp2Facilities {
 			facility.createActivityOption( (String) feature.getAttribute("LU_DESCRIP") ) ;
 
 		}
+		it.close();
 		
 		new FacilitiesWriter(facilities).write("/home/nagel/landuse.xml.gz") ;
 
@@ -81,7 +101,7 @@ public class Shp2Facilities {
 		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/facilities/shp/landuse.shp";
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Collection<Feature> zones = null;
+		Collection<SimpleFeature> zones = null;
 		try {
 			zones = getPolygons(ShapeFileReader.readDataFile(shpFile), scenario);
 		} catch (final Exception e) {

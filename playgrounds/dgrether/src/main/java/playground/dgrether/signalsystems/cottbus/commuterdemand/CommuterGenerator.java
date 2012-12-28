@@ -20,10 +20,9 @@
 package playground.dgrether.signalsystems.cottbus.commuterdemand;
 
 import java.io.File;
-import java.util.Set;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
@@ -34,6 +33,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
@@ -79,7 +79,7 @@ public class CommuterGenerator {
 		
 		String gemeindenBrandenburgShapeFile = DgPaths.REPOS + "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/gemeinden/dlm_gemeinden.shp";
 		ShapeFileReader gemeindenReader = new ShapeFileReader();
-		Set<Feature> gemeindenFeatures = gemeindenReader.readFileAndInitialize(gemeindenBrandenburgShapeFile);
+		Collection<SimpleFeature> gemeindenFeatures = gemeindenReader.readFileAndInitialize(gemeindenBrandenburgShapeFile);
 		
 		
 		
@@ -88,8 +88,8 @@ public class CommuterGenerator {
 		//landuse
 		if (useLanduse){
 			DgLanduseReader landuseReader = new DgLanduseReader();
-			Tuple<Set<Feature>,CoordinateReferenceSystem> homeLanduse = landuseReader.readLanduseDataHome();
-			Tuple<Set<Feature>,CoordinateReferenceSystem> workLanduse = landuseReader.readLanduseDataWork();
+			Tuple<Collection<SimpleFeature>,CoordinateReferenceSystem> homeLanduse = landuseReader.readLanduseDataHome();
+			Tuple<Collection<SimpleFeature>,CoordinateReferenceSystem> workLanduse = landuseReader.readLanduseDataWork();
 			cdw.addLanduse("home", homeLanduse);
 			cdw.addLanduse("work", workLanduse);
 		}

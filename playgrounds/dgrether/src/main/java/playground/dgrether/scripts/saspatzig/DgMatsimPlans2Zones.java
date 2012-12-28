@@ -20,13 +20,12 @@
 package playground.dgrether.scripts.saspatzig;
 
 import java.io.BufferedWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Scenario;
@@ -34,18 +33,20 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
 import playground.dgrether.DgPaths;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 
@@ -96,7 +97,7 @@ public class DgMatsimPlans2Zones {
 		
 
 		ShapeFileReader shpReader = new ShapeFileReader();
-		Set<Feature> zones = shpReader.readFileAndInitialize(zonesFile);
+		Collection<SimpleFeature> zones = shpReader.readFileAndInitialize(zonesFile);
 		CoordinateReferenceSystem zonesCrs = shpReader.getCoordinateSystem();
 		
 		MathTransform transformation = CRS.findMathTransform(popCrs, zonesCrs, true);
@@ -115,8 +116,8 @@ public class DgMatsimPlans2Zones {
 				Coordinate a2c = MGC.coord2Coordinate(act2.getCoord());
 				a1c = JTS.transform(a1c, a1c, transformation);
 				a2c = JTS.transform(a2c, a2c, transformation);
-				Feature featureFrom = findFeature(zones, a1c);
-				Feature featureTo = findFeature(zones, a2c);
+				SimpleFeature featureFrom = findFeature(zones, a1c);
+				SimpleFeature featureTo = findFeature(zones, a2c);
 				if (featureFrom == null || featureTo == null){
 					log.warn("At least one of the features is not in nuts area!");
 					continue;
@@ -154,25 +155,25 @@ public class DgMatsimPlans2Zones {
 		writer.close();
 	}
 
-	private static Feature findFeature(Set<Feature> zones, Coordinate coordinate) {
+	private static SimpleFeature findFeature(Collection<SimpleFeature> zones, Coordinate coordinate) {
 		Point point = MGC.geoFac.createPoint(coordinate);
-		for (Feature f : zones){
+		for (SimpleFeature f : zones){
 			//STAT_LEVL_
 			Integer level =  (Integer) f.getAttribute("STAT_LEVL_");
-			if (level.equals(3) &&  f.getDefaultGeometry().contains(point)) {
+			if (level.equals(3) &&  ((Geometry) f.getDefaultGeometry()).contains(point)) {
 				return f;
 			}
 		}
 		//if we haven't found something for nuts level 3 we look for nuts level 2
-		for (Feature f : zones){
+		for (SimpleFeature f : zones){
 			Integer level =  (Integer) f.getAttribute("STAT_LEVL_");
-			if (level.equals(2) &&  f.getDefaultGeometry().contains(point)) {
+			if (level.equals(2) &&  ((Geometry) f.getDefaultGeometry()).contains(point)) {
 				return f;
 			}
 		}
-		for (Feature f : zones){
+		for (SimpleFeature f : zones){
 			Integer level =  (Integer) f.getAttribute("STAT_LEVL_");
-			if (level.equals(1) &&  f.getDefaultGeometry().contains(point)) {
+			if (level.equals(1) &&  ((Geometry) f.getDefaultGeometry()).contains(point)) {
 				return f;
 			}
 		}

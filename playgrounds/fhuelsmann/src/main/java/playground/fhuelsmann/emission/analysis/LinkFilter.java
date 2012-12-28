@@ -1,25 +1,43 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.fhuelsmann.emission.analysis;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-
-import org.matsim.api.core.v01.Id;
 
 
 public class LinkFilter {
@@ -35,7 +53,7 @@ public class LinkFilter {
 	this.network = network;
 }
 	
-	Network getRelevantNetwork(Set<Feature> featuresInShape) {
+	Network getRelevantNetwork(Collection<SimpleFeature> featuresInShape) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network filteredNetwork = scenario.getNetwork();
 //		NetworkImpl filteredNetwork = scenario.getNetwork();
@@ -72,7 +90,7 @@ public class LinkFilter {
 		return nodeCollector;
 	}
 	
-	private boolean isNodeInShape(Node node,Set<Feature> featuresInShape) {
+	private boolean isNodeInShape(Node node, Collection<SimpleFeature> featuresInShape) {
 		boolean isInShape = false;
 
 		Coord nodeCoord = node.getCoord();
@@ -82,8 +100,8 @@ public class LinkFilter {
 		//System.out.println("coor   " + coor);
 		Geometry geo = factory.createPoint(coor);
 		//System.out.println("geo   " + geo);
-		for(Feature feature : featuresInShape){
-			if(feature.getDefaultGeometry().contains(geo)){
+		for(SimpleFeature feature : featuresInShape){
+			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
 				//	logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
 				isInShape = true;
 				break;
@@ -93,8 +111,8 @@ public class LinkFilter {
 	}
 	
 	
-	Set<Feature> readShape(String shapeFile) {
-		final Set<Feature> featuresInShape;
+	Collection<SimpleFeature> readShape(String shapeFile) {
+		final Collection<SimpleFeature> featuresInShape;
 		featuresInShape = new ShapeFileReader().readFileAndInitialize(shapeFile);
 		return featuresInShape;
 	}

@@ -27,9 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureIterator;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -48,6 +47,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -57,18 +57,18 @@ import com.vividsolutions.jts.geom.Polygon;
 public class MyControler2 {
 	private static final Logger log = Logger.getLogger(MyControler2.class);
 
-	private static Population createPlansFromShp(final FeatureSource n, final Population population) {
+	private static Population createPlansFromShp(final SimpleFeatureSource n, final Population population) {
 		List<Coord> workPlaces = new ArrayList<Coord>() ;
 
 		int popCnt = 0 ;
 
-		FeatureIterator it = null; try {
+		SimpleFeatureIterator it = null; try {
 			it = n.getFeatures().features();
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		while (it.hasNext()) {
-			final Feature feature = it.next();
+			final SimpleFeature feature = it.next();
 
 			double area = (Double) feature.getAttribute("AREA") ;
 
@@ -106,6 +106,7 @@ public class MyControler2 {
 				workPlaces.add( coord ) ;
 			}
 		}
+		it.close();
 
 		for ( Person pp : population.getPersons().values() ) {
 			Plan plan = pp.getSelectedPlan();

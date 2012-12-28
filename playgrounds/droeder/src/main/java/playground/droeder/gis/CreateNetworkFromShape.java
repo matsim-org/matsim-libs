@@ -1,10 +1,28 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.droeder.gis;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -17,6 +35,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -24,13 +43,12 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
-
 public class CreateNetworkFromShape {
 	
 	private static final Logger log = Logger.getLogger(CreateNetworkFromShape.class);
 	
 	private ShapeFileReader myReader;
-	private Set<Feature> features;
+	private Collection<SimpleFeature> features;
 	private Integer id;
 	private Integer geometry;
 	private String shapeFile;
@@ -87,7 +105,7 @@ public class CreateNetworkFromShape {
 		this.netFac = this.net.getFactory();
 		Geometry g;
 		
-		for(Feature f: this.features){
+		for(SimpleFeature f: this.features){
 			g = (Geometry) f.getAttribute(this.geometry);
 			
 			this.createNodesFromGeometry(g);

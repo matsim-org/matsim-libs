@@ -23,11 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -41,7 +36,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
@@ -49,7 +46,6 @@ import playground.dgrether.DgPaths;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -64,9 +60,9 @@ public class DgMatsimPopulation2Zones {
 	
 	private GeometryFactory geoFac = new GeometryFactory();
 
-	private List<Feature> featureCollection;
+	private List<SimpleFeature> featureCollection;
 
-	private FeatureType featureType;
+	private PolylineFeatureFactory featureFactory;
 
 	//FIXME remove shape file writer
 	public List<DgZone> convert2Zones(Network network, Population pop, List<DgZone> cells, Envelope networkBoundingBox, double startTime, double endTime) {
@@ -81,17 +77,14 @@ public class DgMatsimPopulation2Zones {
 		ShapeFileWriter.writeGeometries(featureCollection, DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/od_pairs.shp");
 	}
 
-	private void initShapeFileWriter(){
+	private void initShapeFileWriter() {
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		this.featureCollection = new ArrayList<Feature>();
-		AttributeType [] attribs = new AttributeType[1];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, crs);
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "od_pair");
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		this.featureCollection = new ArrayList<SimpleFeature>();
+		
+		this.featureFactory = new PolylineFeatureFactory.Builder().
+				setCrs(crs).
+				setName("od_pair").
+				create();
 	}
 
 	
@@ -124,15 +117,8 @@ public class DgMatsimPopulation2Zones {
 
 	private void addFromToRelationshipToShape(Coordinate startCoordinate, Coordinate endCoordinate){
 		Coordinate[] coordinates = {startCoordinate, endCoordinate};
-		LineString lineString = this.geoFac.createLineString(coordinates);
-		Object[] atts = {lineString};
-		try {
-			Feature feature = this.featureType.create(atts);
-			this.featureCollection.add(feature);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		SimpleFeature feature = this.featureFactory.createPolyline(coordinates);
+		this.featureCollection.add(feature);
 	}
 
 	

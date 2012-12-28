@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.footballdemand;
 
+import java.util.Collection;
 import java.util.Random;
-import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
@@ -34,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -44,13 +44,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.population.algorithms.PersonPrepareForSim;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -66,8 +65,8 @@ import com.vividsolutions.jts.io.WKTReader;
  */
 public class SimpleCottbusFanCreator implements CottbusFanCreator {
 
-	private Feature cbFeature;
-	private Feature spnFeature;
+	private SimpleFeature cbFeature;
+	private SimpleFeature spnFeature;
 	private Random random;
 	private int fanId = 1;
 	private double cottbusFansPercentage = 0.25;
@@ -92,9 +91,6 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 		} catch (ParseException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
-		} catch (MismatchedDimensionException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
 		} catch (TransformException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
@@ -107,8 +103,8 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 	private void loadShapeAndGetCBSPNFeatures(String kreisShapeFile) {
 		ShapeFileReader shapeReader = new ShapeFileReader();
 		try {
-			Set<Feature> gemeindenFeatures = shapeReader.readFileAndInitialize(kreisShapeFile);
-			for (Feature f : gemeindenFeatures){
+			Collection<SimpleFeature> gemeindenFeatures = shapeReader.readFileAndInitialize(kreisShapeFile);
+			for (SimpleFeature f : gemeindenFeatures){
 				if (f.getAttribute("Nr").toString().equals("12052000")){
 					this.cbFeature = f;
 				}
@@ -120,10 +116,10 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 			CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 			MathTransform shapeToNetTransformation = CRS.findMathTransform(crs, targetCRS, true);
 			
-			Geometry geometry = JTS.transform(this.cbFeature.getDefaultGeometry(), shapeToNetTransformation);
+			Geometry geometry = JTS.transform((Geometry) this.cbFeature.getDefaultGeometry(), shapeToNetTransformation);
 			this.cbFeature.setDefaultGeometry(geometry);
 		
-			geometry = JTS.transform(this.spnFeature.getDefaultGeometry(), shapeToNetTransformation);
+			geometry = JTS.transform((Geometry) this.spnFeature.getDefaultGeometry(), shapeToNetTransformation);
 			this.spnFeature.setDefaultGeometry(geometry);
 		
 		} catch (Exception e) {
@@ -156,7 +152,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 			pop.addPerson(p);
 			fanPop.addPerson(p);
 			this.fanId++;
-			homeCoordinate = this.getRandomPointInFeature(this.random, this.cbFeature.getDefaultGeometry(), this.sdfGeometry);
+			homeCoordinate = this.getRandomPointInFeature(this.random, (Geometry) this.cbFeature.getDefaultGeometry(), this.sdfGeometry);
 			homeCoord = MGC.coordinate2Coord(homeCoordinate);
 			stadiumCoordinate = this.getRandomPointInFeature(this.random, this.sdfGeometry, null);
 			stadiumCoord = MGC.coordinate2Coord(stadiumCoordinate);
@@ -171,7 +167,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 			pop.addPerson(p);
 			fanPop.addPerson(p);
 			this.fanId++;
-			homeCoordinate = this.getRandomPointInFeature(this.random, this.spnFeature.getDefaultGeometry(), this.cbFeature.getDefaultGeometry());
+			homeCoordinate = this.getRandomPointInFeature(this.random, (Geometry) this.spnFeature.getDefaultGeometry(), (Geometry) this.cbFeature.getDefaultGeometry());
 			homeCoord = MGC.coordinate2Coord(homeCoordinate);
 			stadiumCoordinate = this.getRandomPointInFeature(this.random, this.sdfGeometry, null);
 			stadiumCoord = MGC.coordinate2Coord(stadiumCoordinate);

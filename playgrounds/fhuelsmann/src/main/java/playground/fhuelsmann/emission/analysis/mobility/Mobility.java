@@ -1,11 +1,29 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.fhuelsmann.emission.analysis.mobility;
 
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -20,16 +38,12 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 
-import com.sun.istack.logging.Logger;
-
-
-
 public class Mobility {
-	private static final Logger log = Logger.getLogger(Mobility.class);
 	
 	private static String runDirectory = "../../run980/";
 	private static String eventsFile = runDirectory + "ITERS/it.1000/980.1000.events.xml.gz";
@@ -66,7 +80,7 @@ public class Mobility {
 		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 		reader.readFile(eventsFile);
 		
-		Set<Feature> zoneShape = readShape(shapeFile);
+		Collection<SimpleFeature> zoneShape = readShape(shapeFile);
 
 		Population population = scenario.getPopulation();
 		Population pop = getRelevantPopulation(population,zoneShape);
@@ -150,7 +164,7 @@ public class Mobility {
 		}
 	}*/
 
-	public Population getRelevantPopulation(Population population,	Set<Feature> featuresInShape) {
+	public Population getRelevantPopulation(Population population, Collection<SimpleFeature> featuresInShape) {
 		ScenarioImpl emptyScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = new PopulationImpl(emptyScenario);
 		for(Person person : population.getPersons().values()){
@@ -167,8 +181,8 @@ public class Mobility {
 		return filteredPopulation;
 	}
 	
-	Set<Feature> readShape(String shapeFile) {
-		final Set<Feature> featuresInShape;
+	Collection<SimpleFeature> readShape(String shapeFile) {
+		final Collection<SimpleFeature> featuresInShape;
 		featuresInShape = new ShapeFileReader().readFileAndInitialize(shapeFile);
 		return featuresInShape;
 	}
@@ -178,9 +192,8 @@ public class Mobility {
 		Config config = scenario.getConfig();
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(plansFile);
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario) ;
-		scenarioLoader.loadScenario() ;
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
+		scenarioLoader.loadScenario();
 	}
-	
 	
 }

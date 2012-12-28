@@ -19,16 +19,15 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.commuterdemand;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
@@ -49,6 +48,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonPrepareForSim;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -64,7 +64,7 @@ import com.vividsolutions.jts.geom.Point;
 public class CommuterDemandWriter {
 
 	private static final Logger log = Logger.getLogger(CommuterDemandWriter.class);
-	private HashMap<String, Feature> municipalityMap;
+	private HashMap<String, SimpleFeature> municipalityMap;
 	private List<CommuterDataElement> demand;
 	private double scalefactor = 1.0;
 	private double workStartTime = 7.0 * 3600.0;
@@ -77,7 +77,7 @@ public class CommuterDemandWriter {
 	private CoordinateReferenceSystem targetCrs;
 	private Landuse landuse = null;
 
-	public CommuterDemandWriter(Set<Feature> gemeindenFeatures,
+	public CommuterDemandWriter(Collection<SimpleFeature> gemeindenFeatures,
 			CoordinateReferenceSystem featuresCrs, List<CommuterDataElement> demand,
 			CoordinateReferenceSystem targetCrs) {
 		this.targetCrs = targetCrs;
@@ -87,14 +87,14 @@ public class CommuterDemandWriter {
 		this.tranformFeaturesAndInitMunicipalityMap(gemeindenFeatures, featuresCrs, targetCrs);
 	}
 
-	private void tranformFeaturesAndInitMunicipalityMap(Set<Feature> gemeindenFeatures,
+	private void tranformFeaturesAndInitMunicipalityMap(Collection<SimpleFeature> gemeindenFeatures,
 			CoordinateReferenceSystem featuresCrs, CoordinateReferenceSystem targetCrs) {
 		try {
 			MathTransform transformation = CRS.findMathTransform(featuresCrs, targetCrs, true);
-			this.municipalityMap = new HashMap<String, Feature>();
-			for (Feature ft : gemeindenFeatures) {
+			this.municipalityMap = new HashMap<String, SimpleFeature>();
+			for (SimpleFeature ft : gemeindenFeatures) {
 				String gemeindeId = ft.getAttribute("NR").toString();
-				Geometry geometry = JTS.transform(ft.getDefaultGeometry(), transformation);
+				Geometry geometry = JTS.transform((Geometry) ft.getDefaultGeometry(), transformation);
 				ft.setDefaultGeometry(geometry);
 				this.municipalityMap.put(gemeindeId, ft);
 			}
@@ -162,11 +162,10 @@ public class CommuterDemandWriter {
 		double workEndTime = workStartTime + this.durationWork;
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 
-		Feature feature = this.municipalityMap.get(homeMunicipalityId);
+		SimpleFeature feature = this.municipalityMap.get(homeMunicipalityId);
 		Coord homeCoord = null;
 		do {
-			Coord coord = MGC
-					.coordinate2Coord(this.getRandomPointInFeature(feature.getDefaultGeometry()));
+			Coord coord = MGC.coordinate2Coord(this.getRandomPointInFeature((Geometry) feature.getDefaultGeometry()));
 			Boolean coordInLanduse = isCoordInLanduse(coord, "home", homeMunicipalityId);
 			if (coordInLanduse == null) {
 				return null;
@@ -182,7 +181,7 @@ public class CommuterDemandWriter {
 		feature = this.municipalityMap.get(workMunicipalityId);
 		Coord workCoord = null;
 		do {
-			Coordinate c = this.getRandomPointInFeature(feature.getDefaultGeometry());
+			Coordinate c = this.getRandomPointInFeature((Geometry) feature.getDefaultGeometry());
 			Coord coord = MGC.coordinate2Coord(c);
 			Boolean coordInLanduse = isCoordInLanduse(coord, "work", workMunicipalityId);
 			if (coordInLanduse == null) {
@@ -217,14 +216,14 @@ public class CommuterDemandWriter {
 		}
 		else {
 			Point point = MGC.xy2Point(coord.getX(), coord.getY());
-			Set<Feature> landuseFeatures = this.landuse.getLanduseFeature(actType, municipalityId);
+			Collection<SimpleFeature> landuseFeatures = this.landuse.getLanduseFeature(actType, municipalityId);
 			if (landuseFeatures == null) {
 				log.warn("no landuse for point " + point.getX() + " " + point.getY() + " within municipality id: " + municipalityId + " locating " + actType + " activity somewhere...");
 				return true; //return null; if activity and thus person should be removed from population
 			}
 			else {
-				for (Feature feature : landuseFeatures) {
-					if (feature.getDefaultGeometry().contains(point)) {
+				for (SimpleFeature feature : landuseFeatures) {
+					if (((Geometry) feature.getDefaultGeometry()).contains(point)) {
 						return true;
 					}
 				}
@@ -284,20 +283,20 @@ public class CommuterDemandWriter {
 		this.durationWork = duration;
 	}
 
-	public void addLanduse(String activityType, Tuple<Set<Feature>, CoordinateReferenceSystem> landuse)
+	public void addLanduse(String activityType, Tuple<Collection<SimpleFeature>, CoordinateReferenceSystem> landuse)
 			throws Exception {
 		if (this.landuse == null) {
 			this.landuse = new Landuse();
 		}
 		MathTransform transformation = null;
 		transformation = CRS.findMathTransform(landuse.getSecond(), this.targetCrs, true);
-		for (Feature ft : landuse.getFirst()) {
-			Geometry geometry = JTS.transform(ft.getDefaultGeometry(), transformation);
+		for (SimpleFeature ft : landuse.getFirst()) {
+			Geometry geometry = JTS.transform((Geometry) ft.getDefaultGeometry(), transformation);
 			ft.setDefaultGeometry(geometry);
-			for (Entry<String, Feature> entry : this.municipalityMap.entrySet()) {
-				Feature municipalityFeature = entry.getValue();
-				if (municipalityFeature.getDefaultGeometry().contains(ft.getDefaultGeometry())
-						|| municipalityFeature.getDefaultGeometry().intersects(ft.getDefaultGeometry())) {
+			for (Entry<String, SimpleFeature> entry : this.municipalityMap.entrySet()) {
+				SimpleFeature municipalityFeature = entry.getValue();
+				if (((Geometry) municipalityFeature.getDefaultGeometry()).contains((Geometry) ft.getDefaultGeometry())
+						|| ((Geometry) municipalityFeature.getDefaultGeometry()).intersects((Geometry) ft.getDefaultGeometry())) {
 					this.landuse.addLanduseFeature(activityType, entry.getKey(), ft);
 				}
 			}
@@ -306,19 +305,19 @@ public class CommuterDemandWriter {
 
 	private class Landuse {
 
-		Map<String, Map<String, Set<Feature>>> landuseMap = new HashMap<String, Map<String, Set<Feature>>>();
+		Map<String, Map<String, Collection<SimpleFeature>>> landuseMap = new HashMap<String, Map<String, Collection<SimpleFeature>>>();
 
-		void addLanduseFeature(String activityType, String municipalityId, Feature feature) {
+		void addLanduseFeature(String activityType, String municipalityId, SimpleFeature feature) {
 			if (! landuseMap.containsKey(activityType)) {
-				landuseMap.put(activityType, new HashMap<String, Set<Feature>>());
+				landuseMap.put(activityType, new HashMap<String, Collection<SimpleFeature>>());
 			}
 			if (! landuseMap.get(activityType).containsKey(municipalityId)) {
-				landuseMap.get(activityType).put(municipalityId, new HashSet<Feature>());
+				landuseMap.get(activityType).put(municipalityId, new ArrayList<SimpleFeature>());
 			}
 			landuseMap.get(activityType).get(municipalityId).add(feature);
 		}
 
-		Set<Feature> getLanduseFeature(String activityType, String municipalityId) {
+		Collection<SimpleFeature> getLanduseFeature(String activityType, String municipalityId) {
 			return landuseMap.get(activityType).get(municipalityId);
 		}
 

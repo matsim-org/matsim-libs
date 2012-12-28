@@ -22,10 +22,10 @@ package playground.dgrether.analysis.gis;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * 
@@ -41,16 +41,15 @@ public class ShapeFileAttributesDetector {
 	 */
 	public static void main(String[] args) throws IOException {
 		String shapeFile = args[0];
-		FeatureSource fts = ShapeFileReader.readDataFile(shapeFile);
+		SimpleFeatureSource fts = ShapeFileReader.readDataFile(shapeFile);
 
 		// Iterator to iterate over the features from the shape file
-		Iterator<Feature> it = fts.getFeatures().iterator();
-		Feature ft = it.next(); // A feature contains a geometry (in this case a
+		Iterator<SimpleFeature> it = fts.getFeatures().iterator();
+		SimpleFeature ft = it.next(); // A feature contains a geometry (in this case a
 														// polygon) and an arbitrary number
 		// of other attributes
-		AttributeType[] attributeTypes = ft.getFeatureType().getAttributeTypes();
-		for (int i = 0; i < attributeTypes.length; i++) {
-			System.out.println(attributeTypes[i].getName());
+		for (AttributeDescriptor desc : ft.getFeatureType().getAttributeDescriptors()) {
+			System.out.println(desc.getName());
 		}
 	}
 

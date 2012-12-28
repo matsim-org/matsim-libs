@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -33,10 +32,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.pt.transitSchedule.TransitScheduleImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -87,7 +86,7 @@ public class CreateInitialCooperativesFromShape {
 		reader.readFileAndInitialize(shapeFile);
 		
 		Map<Id, Geometry> geometries = new HashMap<Id, Geometry>();
-		for(Feature f: reader.getFeatureSet()){
+		for(SimpleFeature f: reader.getFeatureSet()){
 			Geometry g = (Geometry) f.getAttribute(0); // should be the Geometry
 			Id id = new IdImpl( (Long) f.getAttribute(1));
 			geometries.put(id, g);

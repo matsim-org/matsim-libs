@@ -19,16 +19,16 @@
  * *********************************************************************** */
 package playground.droeder.bvg09.analysis.preProcess;
 
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.config.ConfigUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.droeder.DRPaths;
 
@@ -44,11 +44,9 @@ public class PlanExtractor {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Set<Feature> features = null;
-		features = new ShapeFileReader().readFileAndInitialize(DRPaths.VSP + "BVG09_Auswertung/BerlinSHP/Berlin.shp");
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(DRPaths.VSP + "BVG09_Auswertung/BerlinSHP/Berlin.shp");
 		
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
-		
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(sc).parse(DRPaths.VSP + "BVG09_Auswertung/input/network.final.xml.gz");

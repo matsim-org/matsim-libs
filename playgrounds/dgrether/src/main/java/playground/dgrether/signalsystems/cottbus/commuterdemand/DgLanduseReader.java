@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.commuterdemand;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -59,26 +59,26 @@ public class DgLanduseReader {
 //	private static final String[] landuse_files_work = {INDUSTRIE_GEWERBEGEBIETE};
 
 	
-	public Tuple<Set<Feature>,CoordinateReferenceSystem> readLanduseDataHome(){
+	public Tuple<Collection<SimpleFeature>,CoordinateReferenceSystem> readLanduseDataHome(){
 		return this.readLanduseData(landuse_files_home);
 	}
 
 	
-	public Tuple<Set<Feature>,CoordinateReferenceSystem> readLanduseDataWork(){
+	public Tuple<Collection<SimpleFeature>,CoordinateReferenceSystem> readLanduseDataWork(){
 		return this.readLanduseData(landuse_files_work);
 	}
 
 	
-	private Tuple<Set<Feature>, CoordinateReferenceSystem> readLanduseData(String[] shapefiles){
+	private Tuple<Collection<SimpleFeature>, CoordinateReferenceSystem> readLanduseData(String[] shapefiles){
 		ShapeFileReader shapeReader = new ShapeFileReader();
-		Set<Feature> allFeatures = new HashSet<Feature>();
-		Set<Feature> currentFeatures = null;
+		Collection<SimpleFeature> allFeatures = new HashSet<SimpleFeature>();
+		Collection<SimpleFeature> currentFeatures = null;
 		for (String filename : shapefiles){
 			currentFeatures = shapeReader.readFileAndInitialize(filename);
 			allFeatures.addAll(currentFeatures);
 		}
 		CoordinateReferenceSystem crs = shapeReader.getCoordinateSystem();
-		return new Tuple<Set<Feature>, CoordinateReferenceSystem>(allFeatures, crs);
+		return new Tuple<Collection<SimpleFeature>, CoordinateReferenceSystem>(allFeatures, crs);
 	}
 
 }

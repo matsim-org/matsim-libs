@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.fhuelsmann.emission.analysis;
 
 import java.io.IOException;
@@ -5,19 +24,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.Map.Entry;
+import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,11 +43,12 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
 
 public class SpatialAveragingForLinkCongestionScenarioComparison {
@@ -58,7 +69,7 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 	
 	Scenario scenario;
 	Network network;
-	private FeatureType featureType;
+	private PointFeatureFactory featureFactory;
 	CongestionPerLinkHandler congestionHandler; 
 	SortedSet<String> listOfPollutants;
 
@@ -95,7 +106,7 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 		Map<Double, Map<Id, Double>> time2CongestionTotalFiltered2 = setNonCalculatedCongestionAndFilter(time2congestionTotal2);
 		Map<Double, Map<Id, Double>> time2deltaCongestionTotal = calculateCongestionDifferences(time2CongestionTotalFiltered1, time2CongestionTotalFiltered2);
 		
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 
 		for(double endOfTimeInterval : time2deltaCongestionTotal.keySet()){
 			Map<Id, Double> deltaCongestionTotal = time2deltaCongestionTotal.get(endOfTimeInterval);
@@ -143,13 +154,10 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 							double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex];
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 						
-							Point point = MGC.xy2Point(cellCentroid.getX(), cellCentroid.getY());
 							try {
-								Feature feature = this.featureType.create(new Object[] {
-										point, dateTimeString, averageValue
-								});
+								SimpleFeature feature = this.featureFactory.createPoint(cellCentroid, new Object[] {dateTimeString, averageValue}, null);
 								features.add(feature);
-							} catch (IllegalAttributeException e1) {
+							} catch (IllegalArgumentException e1) {
 								throw new RuntimeException(e1);
 							}
 						}
@@ -271,29 +279,15 @@ public class SpatialAveragingForLinkCongestionScenarioComparison {
 		reader.readFile(eventsFile);
 	}
 
-	@SuppressWarnings("deprecation")
 	private void initFeatures() {
-		AttributeType point = DefaultAttributeTypeFactory.newAttributeType(
-				"Point", Point.class, true, null, null, this.targetCRS);
-		AttributeType time = AttributeTypeFactory.newAttributeType(
-				"Time", String.class);
-		AttributeType congestion = AttributeTypeFactory.newAttributeType(
-				"congestion", Double.class);
-		
-		Exception ex;
-		try {
-			this.featureType = FeatureTypeFactory.newFeatureType(new AttributeType[]
-			        {point, time, congestion}, "CongestionPoint");
-			return;
-		} catch (FactoryRegistryException e0) {
-			ex = e0;
-		} catch (SchemaException e0) {
-			ex = e0;
-		}
-		throw new RuntimeException(ex);
+		this.featureFactory = new PointFeatureFactory.Builder().
+				setCrs(this.targetCRS).
+				setName("CongestionPoint").
+				addAttribute("time", String.class).
+				addAttribute("congestion", Double.class).
+				create();
 	}
 
-	@SuppressWarnings("deprecation")
 	private void loadScenario(String netFile) {
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);

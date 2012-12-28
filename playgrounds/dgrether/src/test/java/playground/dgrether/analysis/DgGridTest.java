@@ -23,16 +23,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.testcases.MatsimTestCase;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.dgrether.utils.DgGrid;
 
@@ -54,18 +49,13 @@ public class DgGridTest extends MatsimTestCase {
 		DgGrid grid = new DgGrid(10, 10, env);
 		
 		Iterator<Polygon> pi = grid.iterator();
-		List<Feature> features = new ArrayList<Feature>();
+		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
 
-		AttributeType polygonAttribute = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class);
-	  AttributeType incomeAttribute = DefaultAttributeTypeFactory.newAttributeType("avgIncome", Double.class);
-	  FeatureType ftPolygon = null;
-		try {
-			ftPolygon = FeatureTypeBuilder.newFeatureType(new AttributeType[] {polygonAttribute, incomeAttribute}, "geometry");
-		} catch (FactoryConfigurationError e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("grid");
+		b.add("Polygon", Polygon.class);
+		b.add("avgIncome", Double.class);
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 
 		double avgIncome = 0.0;
 		
@@ -74,19 +64,12 @@ public class DgGridTest extends MatsimTestCase {
 			assertEquals(4 * 20.0, p.getLength());
 			avgIncome += 100.0;
 //		  CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.CH1903_LV03_GT);
-		  Feature feature;
-			try {
-				feature = ftPolygon.create(new Object[]{p, avgIncome});
-				features.add(feature);
-			} catch (IllegalAttributeException e) {
-				e.printStackTrace();
-			}
+		  SimpleFeature feature = builder.buildFeature(null,  new Object[]{p, avgIncome});
+			features.add(feature);
 		  //add to collection
 		}
 		
 		ShapeFileWriter.writeGeometries(features, this.getOutputDirectory()+ "testGrid.shp");
-		
-		
 	}
 
 }

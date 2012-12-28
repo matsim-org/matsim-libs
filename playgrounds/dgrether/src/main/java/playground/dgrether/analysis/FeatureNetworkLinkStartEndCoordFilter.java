@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package playground.dgrether.analysis;
 
-import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -42,10 +41,10 @@ import com.vividsolutions.jts.geom.Geometry;
 public class FeatureNetworkLinkStartEndCoordFilter implements NetworkLinkFilter {
 
 	private MathTransform transform;
-	private Feature feature;
+	private SimpleFeature feature;
 	
 	public FeatureNetworkLinkStartEndCoordFilter(CoordinateReferenceSystem networkSrs,
-			Feature feature, CoordinateReferenceSystem featureSrs) {
+			SimpleFeature feature, CoordinateReferenceSystem featureSrs) {
 		this.feature = feature;
 		try {
 			this.transform = CRS.findMathTransform(networkSrs, featureSrs, true);
@@ -63,12 +62,9 @@ public class FeatureNetworkLinkStartEndCoordFilter implements NetworkLinkFilter 
 		try {
 			linkStartPoint = JTS.transform(MGC.coord2Point(linkStartCoord), this.transform);
 			linkEndPoint = JTS.transform(MGC.coord2Point(linkEndCoord), this.transform);
-			if (this.feature.getDefaultGeometry().contains(linkStartPoint) || this.feature.getDefaultGeometry().contains(linkEndPoint)) {
+			if (((Geometry) this.feature.getDefaultGeometry()).contains(linkStartPoint) || ((Geometry) this.feature.getDefaultGeometry()).contains(linkEndPoint)) {
 				return true;
 			}
-		} catch (MismatchedDimensionException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
 		} catch (TransformException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);

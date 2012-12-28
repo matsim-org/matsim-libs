@@ -23,24 +23,20 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
@@ -65,7 +61,7 @@ public class DgBBShapeFileConverter {
 	
 	private final GeometryFactory geoFac = new GeometryFactory();
 	
-	private void convertTxt2Shp(String polygonFile, String shapeFile) throws FileNotFoundException, IOException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
+	private void convertTxt2Shp(String polygonFile, String shapeFile) throws FileNotFoundException, IOException, SchemaException, IllegalArgumentException {
 		//read feature from polygon file
 		List<Coordinate> coordsList = this.readCoordinates(polygonFile);
 		Coordinate[] coordinates = new Coordinate[coordsList.size()];
@@ -85,14 +81,13 @@ public class DgBBShapeFileConverter {
 			log.error("Point in Berlin is NOT contained in converted Shapefile!!!");
 		}
 
-		
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84);
-		final AttributeType[] attribLineString = new AttributeType[1];
-		attribLineString[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class, true, null, null, crs);
-		FeatureType ftLineString  = FeatureTypeBuilder.newFeatureType(attribLineString, "PolygonFeatureType");
-		Object[] objectArray = {poly};
-		Feature feature = ftLineString.create(objectArray);
-		Set<Feature> featureSet = new HashSet<Feature>();
+		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().
+				setCrs(crs).
+				setName("PolygonFeatureType").
+				create();
+		SimpleFeature feature = factory.createPolygon(coordinates);
+		Set<SimpleFeature> featureSet = new HashSet<SimpleFeature>();
 		featureSet.add(feature);
 		
 		ShapeFileWriter.writeGeometries(featureSet, shapeFile);
@@ -140,14 +135,14 @@ public class DgBBShapeFileConverter {
 
 
 	private void testConvertedShp(String shape) throws IOException {
-		Set<Feature> featuesInShape = new ShapeFileReader().readFileAndInitialize(shape);
-		Feature feat = featuesInShape.iterator().next();
+		Collection<SimpleFeature> featuesInShape = ShapeFileReader.getAllFeatures(shape);
+		SimpleFeature feat = featuesInShape.iterator().next();
 		GeometryFactory factory = new GeometryFactory();
 		//somewhere at tempelhof
 		double x= 13.415481;
 		double y =  52.493678;
 		Geometry geo = factory.createPoint(new Coordinate(x, y));
-		if (feat.getDefaultGeometry().contains(geo)){
+		if (((Geometry) feat.getDefaultGeometry()).contains(geo)){
 			System.out.println("Point in Berlin is contained in converted Shapefile.");
 		}
 		else {

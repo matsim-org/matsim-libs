@@ -19,25 +19,22 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus;
 
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.config.ConfigUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 
 /**
  * @author dgrether
- *
  */
 public class CottbusUtils {
 
-	
 	public static ScenarioImpl loadCottbusScenrio(boolean fixedTimeSignals){
 		Config c2 = ConfigUtils.createConfig();
 		c2.scenario().setUseLanes(true);
@@ -56,19 +53,16 @@ public class CottbusUtils {
 		return sc;
 	}
 	
-	
-	public static Tuple<CoordinateReferenceSystem, Feature> loadCottbusFeature(String shapeFile) {
+	public static Tuple<CoordinateReferenceSystem, SimpleFeature> loadCottbusFeature(String shapeFile) {
 		ShapeFileReader shapeReader = new ShapeFileReader();
-		Set<Feature> features;
-		features = shapeReader.readFileAndInitialize(shapeFile);
+		Collection<SimpleFeature> features = shapeReader.readFileAndInitialize(shapeFile);
 		CoordinateReferenceSystem crs = shapeReader.getCoordinateSystem();
-		for (Feature feature : features) {
+		for (SimpleFeature feature : features) {
 			if (feature.getAttribute("NAME").equals("Cottbus")){
-				return new Tuple<CoordinateReferenceSystem, Feature>(crs, feature);
+				return new Tuple<CoordinateReferenceSystem, SimpleFeature>(crs, feature);
 			}
 		}
 		return null;
 	}
-
 	
 }

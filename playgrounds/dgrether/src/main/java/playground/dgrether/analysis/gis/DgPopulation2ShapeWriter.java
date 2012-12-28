@@ -22,31 +22,21 @@ package playground.dgrether.analysis.gis;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -68,20 +58,37 @@ public class DgPopulation2ShapeWriter {
 	public void write(String activityType, String filename, CoordinateReferenceSystem targetCrs){
 		try {
 			MathTransform transformation = CRS.findMathTransform(this.popCrs, targetCrs, true);
-			FeatureType actFeatureType = this.createActFeatureType(targetCrs);
-			List<Feature> features = new ArrayList<Feature>();
-			Feature f = null;
+
+			PointFeatureFactory factory = new PointFeatureFactory.Builder().
+					setCrs(targetCrs).
+					setName("activity").
+					addAttribute("person_id", String.class).
+					addAttribute("activity_type", String.class).
+					addAttribute("start_time", Double.class).
+					addAttribute("end_time", Double.class).
+					create();
+			
+			List<SimpleFeature> features = new ArrayList<SimpleFeature>();
+			SimpleFeature f = null;
 			for (Person p : this.pop.getPersons().values()){
 				Plan plan = p.getSelectedPlan();
 				for (PlanElement pe : plan.getPlanElements()){
 					if (pe instanceof Activity){
 						Activity activity = (Activity) pe;
 						if (activity.getType().compareTo(activityType) == 0){
-							f = this.getActivityFeature(actFeatureType, activity, p.getId(), transformation);
+							
+							String id = p.getId().toString();
+							String type = activity.getType();
+							Double startTime = activity.getStartTime();
+							Double endTime = activity.getEndTime();
+
+							Coordinate actCoordinate = MGC.coord2Coordinate(activity.getCoord());
+							actCoordinate = JTS.transform(actCoordinate, actCoordinate, transformation);
+							
+							f = factory.createPoint(actCoordinate, new Object[] {id, type, startTime, endTime}, null);
 							features.add(f);
 						}
 					}
-					
 				}
 			}
 			
@@ -93,37 +100,4 @@ public class DgPopulation2ShapeWriter {
 	
 	}
 	
-	private Feature getActivityFeature(FeatureType actFeatureType, Activity activity, Id personId, 
-			MathTransform transformation) throws IllegalAttributeException, TransformException{
-		String id = personId.toString();
-		String type = activity.getType();
-		Double startTime = activity.getStartTime();
-		Double endTime = activity.getEndTime();
-
-		Coordinate actCoordinate = MGC.coord2Coordinate(activity.getCoord());
-		actCoordinate = JTS.transform(actCoordinate, actCoordinate, transformation);
-		Point point = MGC.geoFac.createPoint(actCoordinate);
-		
-		return actFeatureType.create(new Object[] {point, id, type, startTime, endTime});
-	}
-	
-	private FeatureType createActFeatureType(CoordinateReferenceSystem crs) throws FactoryConfigurationError, SchemaException{
-		AttributeType[] attrAct = new AttributeType[5];
-		attrAct[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, crs);
-		attrAct[1] = AttributeTypeFactory.newAttributeType("person_id", String.class);
-		attrAct[2] = AttributeTypeFactory.newAttributeType("activity_type", String.class);
-		attrAct[3] = AttributeTypeFactory.newAttributeType("start_time", Double.class);
-		attrAct[4] = AttributeTypeFactory.newAttributeType("end_time", Double.class);
-		FeatureType featureTypeAct = FeatureTypeBuilder.newFeatureType(attrAct, "activity");
-		return featureTypeAct;
-	}
-	
-	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
-	}
-
 }

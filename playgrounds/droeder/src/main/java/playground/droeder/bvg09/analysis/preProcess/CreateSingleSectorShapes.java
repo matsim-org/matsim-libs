@@ -22,14 +22,12 @@ package playground.droeder.bvg09.analysis.preProcess;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author droeder
@@ -42,46 +40,42 @@ public class CreateSingleSectorShapes {
 //		final String SHAPEFILE = "D:/VSP/BVG09_Auswertung/input/Bezirke_BVG_zone.SHP";
 //		final String OUTDIR = "D:/VSP/BVG09_Auswertung/BerlinSHP/sectors/";
 //		FeatureSource features = ShapeFileReader.readDataFile(SHAPEFILE);
-//		HashMap<Integer, Collection<Feature>> newFeatures = new HashMap<Integer, Collection<Feature>>();
+//		HashMap<Integer, Collection<SimpleFeature>> newFeatures = new HashMap<Integer, Collection<SimpleFeature>>();
 //		
 //		Feature f;
-//		Collection<Feature> temp;
-//		for(Iterator<Feature> it = features.getFeatures().iterator(); it.hasNext(); ){
+//		Collection<SimpleFeature> temp;
+//		for(Iterator<SimpleFeature> it = features.getFeatures().iterator(); it.hasNext(); ){
 //			f = it.next();
-//			temp  = new LinkedList<Feature>(); 
+//			temp  = new LinkedList<SimpleFeature>(); 
 //			temp.add(f);
 //			ShapeFileWriter.writeGeometries(temp, OUTDIR + "Berlin_Zone_" + f.getAttribute(4) + "_sector_" + f.getAttribute(1) + ".shp");
 //			if(!newFeatures.containsKey(f.getAttribute(4))){
-//				newFeatures.put((Integer) f.getAttribute(4), new LinkedList<Feature>());
+//				newFeatures.put((Integer) f.getAttribute(4), new LinkedList<SimpleFeature>());
 //			}
 //			newFeatures.get(f.getAttribute(4)).add(f);
 //		}
 //		
-//		for(Entry<Integer, Collection<Feature>> e: newFeatures.entrySet()){
+//		for(Entry<Integer, Collection<SimpleFeature>> e: newFeatures.entrySet()){
 //			ShapeFileWriter.writeGeometries(e.getValue(), OUTDIR + "Berlin_Zone_" + e.getKey() + ".shp");
 //		}
 //		
 //	}
 	
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws IOException{
 		final String SHAPEFILE = "D:/VSP/BVG09_Auswertung/input/Bezirke_BVG_zone.SHP";
 		final String OUTDIR = "D:/VSP/BVG09_Auswertung/BerlinSHP/sectors/";
-		FeatureSource features = ShapeFileReader.readDataFile(SHAPEFILE);
-		HashMap<String, Collection<Feature>> newFeatures = new HashMap<String, Collection<Feature>>();
+		HashMap<String, Collection<SimpleFeature>> newFeatures = new HashMap<String, Collection<SimpleFeature>>();
 		
-		Feature f;
-		for(Iterator<Feature> it = features.getFeatures().iterator(); it.hasNext(); ){
-			f = it.next();
+		for (SimpleFeature f : ShapeFileReader.getAllFeatures(SHAPEFILE)) {
 			if(!((Integer)f.getAttribute(4) == 4)){
 				if(!newFeatures.containsKey(f.getAttribute(1).toString().substring(0, 5))){
-					newFeatures.put(f.getAttribute(1).toString().substring(0, 5), new LinkedList<Feature>());
+					newFeatures.put(f.getAttribute(1).toString().substring(0, 5), new LinkedList<SimpleFeature>());
 				}
 				newFeatures.get(f.getAttribute(1).toString().substring(0, 5)).add(f);
 			}
 		}
 		
-		for(Entry<String, Collection<Feature>> e: newFeatures.entrySet()){
+		for(Entry<String, Collection<SimpleFeature>> e: newFeatures.entrySet()){
 			ShapeFileWriter.writeGeometries(e.getValue(), OUTDIR + "Berlin_Zone_" + e.getKey() + ".shp");
 		}
 	}
@@ -98,7 +92,7 @@ public class CreateSingleSectorShapes {
 //		Feature one = (Feature) features1.getFeatures().iterator().next();
 //		Feature two = (Feature) features2.getFeatures().iterator().next();
 //		
-//		Collection<Feature> features = new LinkedList<Feature>();
+//		Collection<SimpleFeature> features = new LinkedList<SimpleFeature>();
 //		features.add(one);
 //		features.add(two);
 //		

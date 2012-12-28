@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.scripts;
 
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.signalsystems.cottbus.commuterdemand.DgLanduseReader;
@@ -35,18 +35,16 @@ import playground.dgrether.signalsystems.cottbus.commuterdemand.DgLanduseReader;
  */
 public class DgLanduseOneShapeWriter {
 
-
 	public static void main(String[] args) {
 		DgLanduseReader landuseReader = new DgLanduseReader();
-		Tuple<Set<Feature>, CoordinateReferenceSystem> homeLanduse = landuseReader.readLanduseDataHome();
+		Tuple<Collection<SimpleFeature>, CoordinateReferenceSystem> homeLanduse = landuseReader.readLanduseDataHome();
 		ShapeFileWriter.writeGeometries(homeLanduse.getFirst(), "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage_landuse/shapes/landuse_home.shp");
 	
-		Tuple<Set<Feature>, CoordinateReferenceSystem> workLanduse = landuseReader.readLanduseDataWork();
-		for (Feature ft : workLanduse.getFirst()){
+		Tuple<Collection<SimpleFeature>, CoordinateReferenceSystem> workLanduse = landuseReader.readLanduseDataWork();
+		for (SimpleFeature ft : workLanduse.getFirst()){
 		}
 		
 		ShapeFileWriter.writeGeometries(workLanduse.getFirst(), "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage_landuse/shapes/landuse_work.shp");
-		
 	}
 
 

@@ -22,15 +22,9 @@ package playground.dgrether.scripts.saspatzig;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Scenario;
@@ -43,6 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -69,7 +64,7 @@ public class DgOD2ShapeWriter {
 	 * @throws TransformException 
 	 * @throws IllegalAttributeException 
 	 */
-	public static void main(String[] args) throws FactoryConfigurationError, SchemaException, FactoryException, TransformException, IllegalAttributeException {
+	public static void main(String[] args) throws SchemaException, FactoryException, TransformException, IllegalArgumentException {
 		//### bvg project demand 
 		String popFile = DgPaths.REPOS +  "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/scenario/plans.times.xml.gz";
 		CoordinateReferenceSystem popCrs = MGC.getCRS(TransformationFactory.DHDN_GK4);
@@ -96,10 +91,10 @@ public class DgOD2ShapeWriter {
 		
 		CoordinateReferenceSystem targetCrs = MGC.getCRS(TransformationFactory.WGS84);
 		MathTransform transformation = CRS.findMathTransform(popCrs, targetCrs, true);
-		FeatureType mulitPointFt = createMultiPointActFeatureType(targetCrs);
-		List<Feature> multiPointFeatures = new ArrayList<Feature>();
-		FeatureType pointFt = createPointActFeatureType(targetCrs);
-		List<Feature> pointFeatures = new ArrayList<Feature>();
+		SimpleFeatureBuilder mulitPointFt = createMultiPointActFeatureBuilder(targetCrs);
+		List<SimpleFeature> multiPointFeatures = new ArrayList<SimpleFeature>();
+		SimpleFeatureBuilder pointFt = createPointActFeatureBuilder(targetCrs);
+		List<SimpleFeature> pointFeatures = new ArrayList<SimpleFeature>();
 
 		Population pop = scenario.getPopulation();
 		for (Person person : pop.getPersons().values()){
@@ -111,16 +106,16 @@ public class DgOD2ShapeWriter {
 				a1c = JTS.transform(a1c, a1c, transformation);
 				a2c = JTS.transform(a2c, a2c, transformation);
 				MultiPoint multiPoint = MGC.geoFac.createMultiPoint(new Coordinate[]{a1c, a2c});
-				Feature feature = mulitPointFt.create(new Object[]{multiPoint, person.getId(), act1.getType(), act1.getStartTime(), act1.getEndTime(), act2.getStartTime(), act2.getEndTime()});
+				SimpleFeature feature = mulitPointFt.buildFeature(null, new Object[]{multiPoint, person.getId(), act1.getType(), act1.getStartTime(), act1.getEndTime(), act2.getStartTime(), act2.getEndTime()});
 				multiPointFeatures.add(feature);
 				
 				Point point = MGC.geoFac.createPoint(a1c);
-				feature = pointFt.create(new Object[] {point, person.getId(), act1.getType() , act1.getStartTime(), act1.getEndTime()});
-				pointFeatures.add(feature);
-				point = MGC.geoFac.createPoint(a2c);
-				feature = pointFt.create(new Object[] {point, person.getId(), act2.getType() , act2.getStartTime(), act2.getEndTime()});
+				feature = pointFt.buildFeature(null, new Object[] {point, person.getId(), act1.getType() , act1.getStartTime(), act1.getEndTime()});
 				pointFeatures.add(feature);
 				
+				point = MGC.geoFac.createPoint(a2c);
+				feature = pointFt.buildFeature(null, new Object[] {point, person.getId(), act2.getType() , act2.getStartTime(), act2.getEndTime()});
+				pointFeatures.add(feature);
 			}
 		}
 		
@@ -128,28 +123,30 @@ public class DgOD2ShapeWriter {
 		ShapeFileWriter.writeGeometries(pointFeatures, outFeatureFilename + "point.features.shp");
 	}
 
-	private static FeatureType createMultiPointActFeatureType(CoordinateReferenceSystem crs) throws FactoryConfigurationError, SchemaException{
-		AttributeType[] attrAct = new AttributeType[7];
-		attrAct[0] = DefaultAttributeTypeFactory.newAttributeType("MultiPoint",MultiPoint.class, true, null, null, crs);
-		attrAct[1] = AttributeTypeFactory.newAttributeType("person_id", String.class);
-		attrAct[2] = AttributeTypeFactory.newAttributeType("activity_type", String.class);
-		attrAct[3] = AttributeTypeFactory.newAttributeType("act1_start_time", Double.class);
-		attrAct[4] = AttributeTypeFactory.newAttributeType("act1_end_time", Double.class);
-		attrAct[5] = AttributeTypeFactory.newAttributeType("act2_start_time", Double.class);
-		attrAct[6] = AttributeTypeFactory.newAttributeType("act2_end_time", Double.class);
-		FeatureType featureTypeAct = FeatureTypeBuilder.newFeatureType(attrAct, "mulit_activity");
-		return featureTypeAct;
+	private static SimpleFeatureBuilder createMultiPointActFeatureBuilder(CoordinateReferenceSystem crs) {
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(crs);
+		b.setName("multi_activity");
+		b.add("MultiPoint",MultiPoint.class);
+		b.add("person_id", String.class);
+		b.add("activity_type", String.class);
+		b.add("act1_start_time", Double.class);
+		b.add("act1_end_time", Double.class);
+		b.add("act2_start_time", Double.class);
+		b.add("act2_end_time", Double.class);
+		return new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 
-	private static FeatureType createPointActFeatureType(CoordinateReferenceSystem crs) throws FactoryConfigurationError, SchemaException{
-		AttributeType[] attrAct = new AttributeType[5];
-		attrAct[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, crs);
-		attrAct[1] = AttributeTypeFactory.newAttributeType("person_id", String.class);
-		attrAct[2] = AttributeTypeFactory.newAttributeType("activity_type", String.class);
-		attrAct[3] = AttributeTypeFactory.newAttributeType("act_start_time", Double.class);
-		attrAct[4] = AttributeTypeFactory.newAttributeType("act_end_time", Double.class);
-		FeatureType featureTypeAct = FeatureTypeBuilder.newFeatureType(attrAct, "activity");
-		return featureTypeAct;
+	private static SimpleFeatureBuilder createPointActFeatureBuilder(CoordinateReferenceSystem crs) {
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(crs);
+		b.setName("activity");
+		b.add("Point", Point.class);
+		b.add("person_id", String.class);
+		b.add("activity_type", String.class);
+		b.add("act_start_time", Double.class);
+		b.add("act_end_time", Double.class);
+		return new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 
 }

@@ -29,7 +29,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -44,6 +43,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.events.GeospatialEventTools;
@@ -85,7 +85,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	}
 
 	
-	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, Feature> cottbusFeatureTuple) {
+	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple) {
 		if (this.geospatialTools == null) {
 			CoordinateReferenceSystem netcrs = MGC.getCRS(this.scenario.getConfig().global().getCoordinateSystem());
 			if (netcrs == null){
