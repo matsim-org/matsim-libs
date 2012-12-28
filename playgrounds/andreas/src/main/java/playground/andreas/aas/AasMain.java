@@ -19,16 +19,16 @@
 
 package playground.andreas.aas;
 
-import java.util.Set;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.andreas.P2.helper.PConfigGroup;
 
@@ -47,7 +47,7 @@ public class AasMain {
 	private final String eventsFile;
 
 	private ScenarioImpl scenario;
-	private Set<Feature> shapeFile;
+	private Collection<SimpleFeature> shapeFile;
 	
 	/**
 	 * 
@@ -148,7 +148,7 @@ public class AasMain {
 		return this.scenario;
 	}
 	
-	private Set<Feature> getShapeFile() {
+	private Collection<SimpleFeature> getShapeFile() {
 		return this.shapeFile;
 	}
 }

@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
@@ -63,6 +62,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.households.Household;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -85,6 +85,7 @@ import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaActivityCounter;
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
@@ -348,12 +349,12 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 //		this.getFixedOrderSimulationListener().addSimulationListener(householdsUtils);
 //		this.householdsUtils.printStatistics();
 		
-		Set<Feature> features = new HashSet<Feature>();
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
 		SHPFileUtil util = new SHPFileUtil();
 		for (String file : EvacuationConfig.evacuationArea) {
-			features.addAll(util.readFile(file));		
+			features.addAll(ShapeFileReader.getAllFeatures(file));		
 		}
-		affectedArea = util.mergeGeomgetries(features);
+		affectedArea = util.mergeGeometries(features);
 		log.info("Size of affected area: " + affectedArea.getArea());
 		
 		this.penaltyCalculator = new AffectedAreaPenaltyCalculator(this.getNetwork(), affectedArea, 

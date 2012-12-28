@@ -28,7 +28,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -40,11 +39,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -54,6 +53,8 @@ import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Decides which agents would pick up other agents and which ones would not.
@@ -261,10 +262,10 @@ public class PickupModel implements PersonDecisionModel {
 		ObjectAttributes householdObjectAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
 		
-		Set<Feature> features = new HashSet<Feature>();
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
 		SHPFileUtil util = new SHPFileUtil();
-		for (String file : EvacuationConfig.evacuationArea) features.addAll(util.readFile(file));
-		Geometry affectedArea = util.mergeGeomgetries(features);
+		for (String file : EvacuationConfig.evacuationArea) features.addAll(ShapeFileReader.getAllFeatures(file));
+		Geometry affectedArea = util.mergeGeometries(features);
 		
 		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
 		HouseholdsTracker householdsTracker = new HouseholdsTracker(scenario);

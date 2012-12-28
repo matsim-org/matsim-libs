@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,7 +71,6 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.PlanRouterAdapter;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -80,6 +78,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsFactory;
@@ -97,6 +96,7 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -499,10 +499,10 @@ public class MarathonController extends WithinDayController implements StartupLi
 	}
 	
 	private void readAffectedArea() {
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+		features.addAll(ShapeFileReader.getAllFeatures(affectedAreaFile));		
 		SHPFileUtil util = new SHPFileUtil();
-		Set<Feature> features = new HashSet<Feature>();
-		features.addAll(util.readFile(affectedAreaFile));		
-		this.affectedArea = util.mergeGeomgetries(features);
+		this.affectedArea = util.mergeGeometries(features);
 		
 		this.coordAnalyzer = new CoordAnalyzer(this.affectedArea);
 	}

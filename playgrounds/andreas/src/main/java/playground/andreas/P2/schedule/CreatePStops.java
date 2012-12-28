@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -44,6 +43,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.andreas.P2.helper.PConfigGroup;
 
@@ -222,14 +222,14 @@ public class CreatePStops{
 	 * @param serviceAreaFile
 	 */
 	private void createServiceAreaShp(String serviceAreaFile) {
-		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(serviceAreaFile);
+		Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(serviceAreaFile);
 		Collection<Geometry> include = new ArrayList<Geometry>();
 		Collection<Geometry> exclude = new ArrayList<Geometry>();
 		
-		for(Feature f: features){
+		for(SimpleFeature f: features){
 			boolean incl = true;
 			Geometry g = null;
-			for(Object o: f.getAttributes(null)){
+			for(Object o: f.getAttributes()){
 				if(o instanceof Polygon){
 					g = (Geometry) o;
 				}else if (o instanceof MultiPolygon){

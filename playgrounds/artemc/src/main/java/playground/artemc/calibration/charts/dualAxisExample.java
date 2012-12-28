@@ -1,8 +1,8 @@
 package playground.artemc.calibration.charts;
 
 import java.awt.Color;
-
 import java.awt.Font;
+
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;

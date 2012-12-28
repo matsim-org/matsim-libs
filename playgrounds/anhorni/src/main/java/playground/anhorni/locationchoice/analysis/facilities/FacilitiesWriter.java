@@ -23,29 +23,25 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
 public class FacilitiesWriter {
 
-	private FeatureType featureType;
+	private SimpleFeatureBuilder builder;
 
 	public int[] write(List<ActivityFacility> facilities)  {
 
 		this.initGeometries();
-		ArrayList<Feature> features = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		int numberOfShops[] = {0,0,0,0,0,0};
 
 		Iterator<ActivityFacility> facilities_it = facilities.iterator();
@@ -87,28 +83,16 @@ public class FacilitiesWriter {
 
 
 	private void initGeometries() {
-		AttributeType [] attr = new AttributeType[3];
-		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
-		attr[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		attr[2] = AttributeTypeFactory.newAttributeType("Type", String.class);
-
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attr, "point");
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("point");
+		b.add("location", Point.class);
+		b.add("ID", String.class);
+		b.add("Type", String.class);
+		this.builder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 
-	private Feature createFeature(Coord coord, Id id, String type) {
-
-		Feature feature = null;
-
-		try {
-			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord),  id.toString(), type});
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-		return feature;
+	private SimpleFeature createFeature(Coord coord, Id id, String type) {
+		return this.builder.buildFeature(id.toString(), new Object [] {MGC.coord2Point(coord),  id.toString(), type});
 	}
 
 }

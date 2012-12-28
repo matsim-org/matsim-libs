@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.controller;
 
-import java.util.Set;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -50,7 +50,7 @@ public class RunMunichZone30 {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		
-		Set<Feature> featuresInZone30 = readShape(zone30Shape);
+		Collection<SimpleFeature> featuresInZone30 = ShapeFileReader.getAllFeatures(zone30Shape);
 		setZone30(scenario.getNetwork(), featuresInZone30);
 		
 		RunMunichZone30Controller controler = new RunMunichZone30Controller(scenario);
@@ -61,7 +61,7 @@ public class RunMunichZone30 {
 		controler.run();
 	}
 
-	private static void setZone30(Network net, Set<Feature> zone30) {
+	private static void setZone30(Network net, Collection<SimpleFeature> zone30) {
 		for(Link link : net.getLinks().values()){
 			Id linkId = link.getId();
 			LinkImpl ll = (LinkImpl) net.getLinks().get(linkId);
@@ -84,13 +84,13 @@ public class RunMunichZone30 {
 		}
 	}
 
-	private static boolean isLinkInShape(Link link, Set<Feature> zone30) {
+	private static boolean isLinkInShape(Link link, Collection<SimpleFeature> zone30) {
 		boolean isInShape = false;
 		Coord coord = link.getCoord();
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
-		for(Feature feature : zone30){
-			if(feature.getDefaultGeometry().contains(geo)){
+		for(SimpleFeature feature : zone30){
+			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
 				isInShape = true;
 				break;
 			}
@@ -98,9 +98,4 @@ public class RunMunichZone30 {
 		return isInShape;
 	}
 
-	private static Set<Feature> readShape(String shapeFile) {
-		final Set<Feature> featuresInZone30;
-		featuresInZone30 = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		return featuresInZone30;
-	}
 }

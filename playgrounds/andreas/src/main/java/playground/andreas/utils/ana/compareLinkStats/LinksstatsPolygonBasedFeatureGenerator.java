@@ -1,26 +1,37 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.andreas.utils.ana.compareLinkStats;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.WidthCalculator;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 
@@ -29,60 +40,50 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 
 	private final WidthCalculator widthCalculator;
 	private final CoordinateReferenceSystem crs;
-	private final GeometryFactory geofac;
-	private FeatureType featureType;
+	private final PolygonFeatureFactory factory;
 	private final HashMap<String, ArrayList<Double>> compareResultMap;
-
 
 	public LinksstatsPolygonBasedFeatureGenerator(final WidthCalculator widthCalculator, final CoordinateReferenceSystem crs) {
 		this.widthCalculator = widthCalculator;
 		this.crs = crs;
-		this.geofac = new GeometryFactory();
-		initFeatureType();
+		this.factory = initFeatureFactory();
 
 		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles(LinkStatsCompareConfig.linkStatsFileOne, LinkStatsCompareConfig.linkStatsFileTwo);
 	}
 
-	private void initFeatureType() {
-
-		AttributeType [] attribs = new AttributeType[9+8+24+1];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class, true, null, null, this.crs);
-		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
-		attribs[3] = AttributeTypeFactory.newAttributeType("toID", String.class);
-		attribs[4] = AttributeTypeFactory.newAttributeType("length", Double.class);
-		attribs[5] = AttributeTypeFactory.newAttributeType("freespeed", Double.class);
-		attribs[6] = AttributeTypeFactory.newAttributeType("capacity", Double.class);
-		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
-		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
+	private PolygonFeatureFactory initFeatureFactory() {
+		PolygonFeatureFactory.Builder builder = new PolygonFeatureFactory.Builder();
+		builder.setCrs(this.crs);
+		builder.setName("links");
+		
+		builder.addAttribute("ID", String.class);
+		builder.addAttribute("fromID", String.class);
+		builder.addAttribute("toID", String.class);
+		builder.addAttribute("length", Double.class);
+		builder.addAttribute("freespeed", Double.class);
+		builder.addAttribute("capacity", Double.class);
+		builder.addAttribute("lanes", Double.class);
+		builder.addAttribute("visWidth", Double.class);
+		builder.addAttribute("Diff", Integer.class);
 
 		// 3 hour average
 		for (int i = 0; i < 8; i++) {
-			attribs[9 + i] = AttributeTypeFactory.newAttributeType("HRS" + (i + i * 2) + "-" + (i + i * 2 + 3) + "avg", Double.class);
+			builder.addAttribute("HRS" + (i + i * 2) + "-" + (i + i * 2 + 3) + "avg", Double.class);
 		}
-
+		
 		// 1 hour average
 		for (int i = 0; i < 24; i++) {
-			attribs[9 + 8 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);
+			builder.addAttribute("HRS" + i + "-" + (i+1) + "avg", Double.class);
 		}
 		
 		// 24 hour average
-		attribs[9 + 8 + 24] = AttributeTypeFactory.newAttributeType("HRS 24 avg", Double.class);
+		builder.addAttribute("HRS 24 avg", Double.class);
 		
-
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
-
+		return builder.create();
 	}
 
-
 	@Override
-	public Feature getFeature(final Link link) {
+	public SimpleFeature getFeature(final Link link) {
 		double width = this.widthCalculator.getWidth(link);
 		width += 0;
 
@@ -113,46 +114,39 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		Coordinate from2 = new Coordinate(xfrom2,yfrom2);
 		Coordinate to2 = new Coordinate(xto2,yto2);
 
-		Polygon p = this.geofac.createPolygon(this.geofac.createLinearRing(new Coordinate[] {from, to, to2, from2, from}), null);
-		Object [] attribs = new Object[9+8+24+1];
-		attribs[0] = p;
-		attribs[1] = link.getId().toString();
-		attribs[2] = link.getFromNode().getId().toString();
-		attribs[3] = link.getToNode().getId().toString();
-		attribs[4] = link.getLength();
-		attribs[5] = link.getFreespeed();
-		attribs[6] = link.getCapacity();
-		attribs[7] = link.getNumberOfLanes();
-		attribs[8] = width;
-
+		Map<String, Object> attributes = new HashMap<String, Object>();
+		attributes.put("ID", link.getId().toString());
+		attributes.put("fromID", link.getFromNode().getId().toString());
+		attributes.put("toID", link.getToNode().getId().toString());
+		attributes.put("length", link.getLength());
+		attributes.put("freespeed", link.getFreespeed());
+		attributes.put("capacity", link.getCapacity());
+		attributes.put("lanes", link.getNumberOfLanes());
+		attributes.put("visWidth", width);
+		
 		// 3 hour average
-		if(this.compareResultMap.get(link.getId().toString()) != null){
+		if (this.compareResultMap.get(link.getId().toString()) != null) {
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < 8; i++) {
-				attribs[9 + i] = Double.valueOf((tempArray.get(i + i * 2).doubleValue() + tempArray.get(i + 1 + i * 2).doubleValue() + tempArray.get(i + 2 + i * 2).doubleValue()) / 3);
+				attributes.put("HRS" + (i + i * 2) + "-" + (i + i * 2 + 3) + "avg", Double.valueOf((tempArray.get(i + i * 2).doubleValue() + tempArray.get(i + 1 + i * 2).doubleValue() + tempArray.get(i + 2 + i * 2).doubleValue()) / 3));
 			}
 		}
 		
 		double average24hours = 0.0;
-
+		
 		// 1 hour average
-		if(this.compareResultMap.get(link.getId().toString()) != null){
+		if (this.compareResultMap.get(link.getId().toString()) != null) {
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < tempArray.size(); i++) {
-				attribs[9 + 8 + i] = tempArray.get(i);
+				attributes.put("HRS" + i + "-" + (i+1) + "avg", tempArray.get(i));
 				average24hours += tempArray.get(i).doubleValue();
 			}
 		}
-
-		// 24 hour average
-		attribs[9 + 8 + 24] = new Double(average24hours / 24);
 		
-		try {
-			return this.featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
-			throw new RuntimeException(e);
-		}
-
+		// 24 hour average
+		attributes.put("HRS 24 avg", Double.valueOf(average24hours / 24));
+		
+		return this.factory.createPolygon(new Coordinate[] {from, to, to2, from2, from}, attributes, link.getId().toString());
 	}
 
 }

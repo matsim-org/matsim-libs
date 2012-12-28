@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -43,6 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -333,9 +332,7 @@ public class IdentifyActivitiesToRelocate {
 	}
 	
 	protected void readSHPFile() throws Exception {
-		FeatureSource featureSource = ShapeFileReader.readDataFile(cityZurichSHPFile);
-		for (Object o : featureSource.getFeatures()) {
-			Feature feature = (Feature) o;
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(cityZurichSHPFile)) {
 			cityZurichPolygon = (MultiPolygon)feature.getAttribute(0);
 		}
 	}

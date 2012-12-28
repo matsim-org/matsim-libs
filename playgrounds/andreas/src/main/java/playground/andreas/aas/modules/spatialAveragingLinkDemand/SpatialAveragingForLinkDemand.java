@@ -1,22 +1,15 @@
 package playground.andreas.aas.modules.spatialAveragingLinkDemand;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -26,6 +19,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.andreas.aas.modules.AbstractAnalyisModule;
@@ -45,12 +40,12 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 	private final static Logger log = Logger.getLogger(SpatialAveragingForLinkDemand.class);
 
 	private ScenarioImpl scenario;
-	private Set<Feature> shapeFile;
+	private Collection<SimpleFeature> shapeFile;
 	private int noOfTimeBins = 1;
 	
 	private double simulationEndTime;
 	private DemandPerLinkHandler demandHandler; 
-	private ArrayList<Feature> resultingFeatures;
+	private ArrayList<SimpleFeature> resultingFeatures;
 	
 	// This should be configurable by stating a grid size
 	private final int noOfXbins;
@@ -83,7 +78,7 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 		this.targetCRS = MGC.getCRS("EPSG:20004");
 	}
 	
-	public void init(ScenarioImpl scenario, Set<Feature> shapeFile, int noOfTimeBins){
+	public void init(ScenarioImpl scenario, Collection<SimpleFeature> shapeFile, int noOfTimeBins){
 		this.scenario = scenario;
 		this.shapeFile = shapeFile;
 		this.noOfTimeBins = noOfTimeBins;
@@ -108,13 +103,13 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 	@Override
 	public void postProcessData() {
 		
-		FeatureType featureType = createFeatures();
+		SimpleFeatureType featureType = createFeatures();
 		
 		Map<Double, Map<Id, Integer>> time2Counts1 = setNonCalculatedCountsAndFilter(this.demandHandler.getDemandPerLinkAndTimeInterval());
 		this.demandHandler.reset(0); // really needed?!
 		
 		Map<Double, Map<Id, Double>> time2DemandMapToAnalyze = convertMapToDoubleValues(time2Counts1);
-		this.resultingFeatures = new ArrayList<Feature>();
+		this.resultingFeatures = new ArrayList<SimpleFeature>();
 
 		for(double endOfTimeInterval : time2DemandMapToAnalyze.keySet()){
 			Map<Id, Double> demandMapToAnalyze = time2DemandMapToAnalyze.get(endOfTimeInterval);
@@ -152,6 +147,7 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 				else{//do nothing
 				}
 			}
+			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(featureType);
 			for(int xIndex = 0; xIndex < this.noOfXbins; xIndex++){
 				for(int yIndex = 0; yIndex < this.noOfYbins; yIndex++){
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
@@ -164,11 +160,11 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 						
 							Point point = MGC.xy2Point(cellCentroid.getX(), cellCentroid.getY());
 							try {
-								Feature feature = featureType.create(new Object[] {
+								SimpleFeature feature = builder.buildFeature(null, new Object[] {
 										point, dateTimeString, averageValue
 								});
 								this.resultingFeatures.add(feature);
-							} catch (IllegalAttributeException e1) {
+							} catch (IllegalArgumentException e1) {
 								throw new RuntimeException(e1);
 							}
 						}
@@ -189,8 +185,8 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 		boolean isInShape = false;
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()));
-		for(Feature feature : this.shapeFile){
-			if(feature.getDefaultGeometry().contains(geo)){
+		for(SimpleFeature feature : this.shapeFile){
+			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
 				isInShape = true;
 				break;
 			}
@@ -290,20 +286,13 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 		return time2CountsTotalFiltered;
 	}
 	
-	private FeatureType createFeatures() {
-		AttributeType point = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, this.targetCRS);
-		AttributeType time = AttributeTypeFactory.newAttributeType("Time", String.class);
-		AttributeType demand = AttributeTypeFactory.newAttributeType("Congestion", Double.class);
-		
-		Exception ex;
-		try {
-			FeatureType featureType = FeatureTypeFactory.newFeatureType(new AttributeType[]{point, time, demand}, "DemandPoint");
-			return featureType;
-		} catch (FactoryRegistryException e0) {
-			ex = e0;
-		} catch (SchemaException e0) {
-			ex = e0;
-		}
-		throw new RuntimeException(ex);
+	private SimpleFeatureType createFeatures() {
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("DemandPoint");
+		b.setCRS(this.targetCRS);
+		b.add("location", Point.class);
+		b.add("Time", String.class);
+		b.add("Congestion", Double.class);
+		return b.buildFeatureType();
 	}
 }

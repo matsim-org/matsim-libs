@@ -20,18 +20,18 @@
 package playground.andreas.aas;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.andreas.aas.modules.AbstractAnalyisModule;
 import playground.andreas.aas.modules.spatialAveragingLinkDemand.SpatialAveragingForLinkDemand;
@@ -49,13 +49,13 @@ public class AasRunner {
 	private final String iterationOutputDir;
 	private final String eventsFile;
 	private final ScenarioImpl scenario;
-	private final Set<Feature> shapeFile;
+	private final Collection<SimpleFeature> shapeFile;
 	
 	private final List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
 
 	
 
-	public AasRunner(ScenarioImpl scenario, String baseFolder, String iterationOutputDir, String eventsFile, Set<Feature> shapeFile) {
+	public AasRunner(ScenarioImpl scenario, String baseFolder, String iterationOutputDir, String eventsFile, Collection<SimpleFeature> shapeFile) {
 		this.baseFolder = baseFolder;
 		this.iterationOutputDir = iterationOutputDir;
 		this.eventsFile = eventsFile;

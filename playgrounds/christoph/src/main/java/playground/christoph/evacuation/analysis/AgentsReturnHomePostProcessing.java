@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.Event;
@@ -51,8 +50,10 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
@@ -131,12 +132,12 @@ public class AgentsReturnHomePostProcessing {
 		List<ControlerListener> controlerListeners = new ArrayList<ControlerListener>();
 		List<MobsimListener> mobsimListeners = new ArrayList<MobsimListener>();
 		
-		Set<Feature> features = new HashSet<Feature>();
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
 		SHPFileUtil util = new SHPFileUtil();
 		for (String file : EvacuationConfig.evacuationArea) {
-			features.addAll(util.readFile(file));		
+			features.addAll(ShapeFileReader.getAllFeatures(file));		
 		}
-		Geometry affectedArea = util.mergeGeomgetries(features);
+		Geometry affectedArea = util.mergeGeometries(features);
 		
 		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
 

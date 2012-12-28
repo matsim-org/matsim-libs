@@ -29,12 +29,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -67,6 +61,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
@@ -75,13 +70,12 @@ import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.christoph.evacuation.population.CreateMultiModalLegRouters;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 public class CreateMarathonPopulation {
 	
@@ -437,8 +431,7 @@ public class CreateMarathonPopulation {
 	private void writeBarriers(Scenario scenario) {
 		try {
 			log.info("writing barriers to shp file...");
-			GeometryFactory geofac = new GeometryFactory();
-			List<LineString> barriers = new ArrayList<LineString>();
+			List<Coordinate[]> barriers = new ArrayList<Coordinate[]>();
 			
 			Coordinate[] barrier;
 			Coord c1;
@@ -452,7 +445,7 @@ public class CreateMarathonPopulation {
 			c1 = scenario.getNetwork().getNodes().get(scenario.createId("4505")).getCoord();
 			c2 = scenario.getNetwork().getNodes().get(scenario.createId("4505_shifted")).getCoord();
 			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 + 0.3, (c1.getY() + c2.getY()) * 0.5 + 1.0);
-			barriers.add(geofac.createLineString(barrier));
+			barriers.add(barrier);
 
 			// barrier between 4508 and 2951
 			barrier = new Coordinate[2];
@@ -462,7 +455,7 @@ public class CreateMarathonPopulation {
 			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2951_shifted")).getCoord();
 			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2951_shifted_shifted")).getCoord();
 			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 0.3, (c1.getY() + c2.getY()) * 0.5 + 1.0);
-			barriers.add(geofac.createLineString(barrier));
+			barriers.add(barrier);
 
 			// barrier between 2951 and 2531
 			barrier = new Coordinate[2];
@@ -472,7 +465,7 @@ public class CreateMarathonPopulation {
 			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2531")).getCoord();
 			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2531_shifted")).getCoord();
 			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 3.0, (c1.getY() + c2.getY()) * 0.5 - 0.9);
-			barriers.add(geofac.createLineString(barrier));
+			barriers.add(barrier);
 
 			// barrier between 2531 and 2530
 			barrier = new Coordinate[2];
@@ -482,7 +475,7 @@ public class CreateMarathonPopulation {
 			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2530")).getCoord();
 			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2530_shifted")).getCoord();
 			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 0.5, (c1.getY() + c2.getY()) * 0.5 + 1.0);
-			barriers.add(geofac.createLineString(barrier));
+			barriers.add(barrier);
 
 			// barrier left and right the start/end link (2759 to 2952)
 			barrier = new Coordinate[2];
@@ -490,21 +483,23 @@ public class CreateMarathonPopulation {
 			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2952")).getCoord();
 			barrier[0] = new Coordinate(c1.getX() - 5.0, c1.getY() - 5.0);
 			barrier[1] = new Coordinate(c2.getX() - 5.0, c2.getY() + 100.0);
-			barriers.add(geofac.createLineString(barrier));
+			barriers.add(barrier);
 			barrier = new Coordinate[2];
 			barrier[0] = new Coordinate(c1.getX() + 5.0, c1.getY() - 5.0);
 			barrier[1] = new Coordinate(c2.getX() + 5.0, c2.getY() + 100.0);
-			barriers.add(geofac.createLineString(barrier));
+			barriers.add(barrier);
 			
 			CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 4326");
-			AttributeType l = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, targetCRS);
-			AttributeType z = AttributeTypeFactory.newAttributeType("dblAvgZ", Double.class);
-			AttributeType t = AttributeTypeFactory.newAttributeType("name", String.class);
-			FeatureType ftLine = FeatureTypeBuilder.newFeatureType(new AttributeType[] {l, z, t}, "Line");
+			PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder().
+					setCrs(targetCRS).
+					setName("Line").
+					addAttribute("dblAvgZ", Double.class).
+					addAttribute("name", String.class).
+					create();
 			
-			Collection<Feature> fts = new ArrayList<Feature>();
-			for (LineString ls : barriers) {
-				fts.add(ftLine.create(new Object[] {ls, 0, "barrier"}));				
+			Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
+			for (Coordinate[] coords : barriers) {
+				fts.add(factory.createPolyline(coords, new Object[] {0,  "barrier"}, null));				
 			}
 			ShapeFileWriter.writeGeometries(fts, barriersShapeOutFile);
 			log.info("done");
@@ -526,17 +521,17 @@ public class CreateMarathonPopulation {
 				i++;
 			}
 			
-			GeometryFactory geofac = new GeometryFactory();
-			LineString ls = geofac.createLineString(track);
-			Collection<Feature> fts = new  ArrayList<Feature>();
+			Collection<SimpleFeature> fts = new  ArrayList<SimpleFeature>();
 			
 			CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 4326");
-			AttributeType l = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, targetCRS);
-			AttributeType z = AttributeTypeFactory.newAttributeType("dblAvgZ", Double.class);
-			AttributeType t = AttributeTypeFactory.newAttributeType("name", String.class);
-			FeatureType ftLine = FeatureTypeBuilder.newFeatureType(new AttributeType[] {l, z, t}, "Line");
+			PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder().
+					setCrs(targetCRS).
+					setName("Line").
+					addAttribute("dblAvgZ", Double.class).
+					addAttribute("name", String.class).
+					create();
 			
-			fts.add(ftLine.create(new Object[] {ls, 0, "track"}));
+			fts.add(factory.createPolyline(track, new Object[] {0, "track"}, null));
 			ShapeFileWriter.writeGeometries(fts, trackShapeOutFile);
 			log.info("done");
 		} catch (Exception e) {
@@ -548,14 +543,15 @@ public class CreateMarathonPopulation {
 		try {
 			log.info("writing track related links to shp file...");
 					
-			GeometryFactory geofac = new GeometryFactory();
-			Collection<Feature> fts = new  ArrayList<Feature>();
+			Collection<SimpleFeature> fts = new  ArrayList<SimpleFeature>();
 			
 			CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 4326");
-			AttributeType l = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, targetCRS);
-			AttributeType z = AttributeTypeFactory.newAttributeType("dblAvgZ", Double.class);
-			AttributeType t = AttributeTypeFactory.newAttributeType("name", String.class);
-			FeatureType ftLine = FeatureTypeBuilder.newFeatureType(new AttributeType[] {l, z, t}, "Line");
+			PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder().
+					setCrs(targetCRS).
+					setName("Line").
+					addAttribute("dblAvgZ", Double.class).
+					addAttribute("name", String.class).
+					create();
 			
 			for (String linkId : trackRelatedLinks) {
 				Id id = scenario.createId(linkId);
@@ -563,8 +559,7 @@ public class CreateMarathonPopulation {
 				Coordinate[] line = new Coordinate[2];
 				line[0] = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 				line[1] = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
-				LineString ls = geofac.createLineString(line);
-				fts.add(ftLine.create(new Object[] {ls, 0, linkId}));
+				fts.add(factory.createPolyline(line, new Object[] {0, linkId}, null));
 			}
 
 			ShapeFileWriter.writeGeometries(fts, trackRelatedShapeOutFile);

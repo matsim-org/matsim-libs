@@ -28,17 +28,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -47,13 +42,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.config.ConfigUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /*
  * Create a SHP File from a given Facilities File.
@@ -108,14 +103,17 @@ public class FacilitiesToSHP {
 	private void writeFacilitiesToSHP() throws Exception {
 		
 		GeometryFactory geoFac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
+		PointFeatureFactory.Builder builder = new PointFeatureFactory.Builder();
+		builder.setCrs(crs);
+		builder.setName("facility");
+
 		/*
 		 * Basic Facility Attributes
 		 */
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("Id", String.class);
-		AttributeType desc = AttributeTypeFactory.newAttributeType("desc", String.class);
+		builder.addAttribute("Id", String.class);
+		builder.addAttribute("desc", String.class);
 		
 		/*
 		 * ActivityOptions - at the moment we ignore opening times
@@ -125,30 +123,17 @@ public class FacilitiesToSHP {
 		Collections.sort(activityOptions);
 		
 //		AttributeType[] activityOptionType = new AttributeType[activityOptions.size()];
-		AttributeType[] capacities = new AttributeType[activityOptions.size()];
 		for (int i = 0; i < activityOptions.size(); i++) {
 //			activityOptionType[i] = AttributeTypeFactory.newAttributeType("ActivityOption: " + activityOptions.get(i), String.class);
 //			capacities[i] = AttributeTypeFactory.newAttributeType("Capacity (" + activityOptions.get(i) + ")", Double.class);
-			capacities[i] = AttributeTypeFactory.newAttributeType(activityOptions.get(i), Double.class);
+			builder.addAttribute(activityOptions.get(i), Double.class);
 		}
+
+		PointFeatureFactory factory = builder.create();
 		
-		AttributeType[] array = new AttributeType[3 + activityOptions.size()];
-		array[0] = geom;
-		array[1] = id;
-		array[2] = desc;
-		
-		for (int i = 0; i < activityOptions.size(); i++) {
-			array[i + 3] = capacities[i];
-		}
-		
-		FeatureType ftNode = FeatureTypeBuilder.newFeatureType(array, "facility");
-				
 		for (ActivityFacility facility : facilities.getFacilities().values()) {
 			Id facilityId = facility.getId();
 			Coord transformedCoord = transformator.transform(facility.getCoord());
-			
-			Coordinate coord = new Coordinate(transformedCoord.getX(), transformedCoord.getY());
-			Point point = geoFac.createPoint(coord);
 			
 			String description = ((ActivityFacilityImpl) facility).getDesc();
 			
@@ -162,16 +147,15 @@ public class FacilitiesToSHP {
 				capacityValues[index] = activityOption.getCapacity();
 			}
 			
-			Object[] object = new Object[3 + activityOptions.size()];
-			object[0] = point;
-			object[1] = facilityId.toString();
-			object[2] = description;
+			Object[] attributeValues = new Object[3 + activityOptions.size()];
+			attributeValues[0] = facilityId.toString();
+			attributeValues[1] = description;
 			
 			for (int i = 0; i < activityOptions.size(); i++) {
-				object[i + 3] = capacityValues[i];
+				attributeValues[i + 2] = capacityValues[i];
 			}
-			
-			Feature ft = ftNode.create(object, "facilities");
+
+			SimpleFeature ft = factory.createPoint(new Coordinate(transformedCoord.getX(), transformedCoord.getY()), attributeValues, facilityId.toString());
 			features.add(ft);
 		}
 		

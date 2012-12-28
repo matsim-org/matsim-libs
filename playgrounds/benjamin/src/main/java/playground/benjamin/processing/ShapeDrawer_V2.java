@@ -20,18 +20,17 @@
 package playground.benjamin.processing;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.BoundingBox;
 
 import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -58,8 +57,8 @@ public class ShapeDrawer_V2 extends PApplet {
 		size(1000, 1000, P2D);
 //		background(255, 255, 255);
 		
-		Collection<Feature> networkShape = readShape(networkShapeFileName);
-		Collection<Feature> munichShape = readShape(munichShapeFileName);
+		Collection<SimpleFeature> networkShape = readShape(networkShapeFileName);
+		Collection<SimpleFeature> munichShape = readShape(munichShapeFileName);
 		
 		defineBoundingBox(networkShape);
 		
@@ -73,10 +72,10 @@ public class ShapeDrawer_V2 extends PApplet {
 		shape(munich);
 	}
 	
-	private PShape getPShapes(Collection<Feature> featureCollection) {
+	private PShape getPShapes(Collection<SimpleFeature> featureCollection) {
 		PShape shapes = createShape(GROUP);
 		
-		for(Feature ft : featureCollection){
+		for(SimpleFeature ft : featureCollection){
 			PShape featureShape = getPShape(ft);
 			shapes.addChild(featureShape);
 		}
@@ -84,7 +83,7 @@ public class ShapeDrawer_V2 extends PApplet {
 		return shapes;
 	}
 	
-	private PShape getPShape(Feature ft) {
+	private PShape getPShape(SimpleFeature ft) {
 		PShape featureShape;
 		GeometryCollection gc = (GeometryCollection) ft.getDefaultGeometry();
 		PVector[] scrCoords = getScreenCoords(gc);
@@ -137,10 +136,10 @@ public class ShapeDrawer_V2 extends PApplet {
                 		   map(coord.y, tlCorner.y, brCorner.y, topBoarder, bottomBoarder));
 	}
 	
-	private void defineBoundingBox(Collection<Feature> features) {
+	private void defineBoundingBox(Collection<SimpleFeature> features) {
 		
-		for(Feature ft : features){
-			Envelope env = ft.getBounds();
+		for(SimpleFeature ft : features){
+			BoundingBox env = ft.getBounds();
 			float maxX = (float) env.getMaxX();
 			float minX = (float) env.getMinX();
 			float maxY = (float) env.getMaxY();
@@ -168,10 +167,8 @@ public class ShapeDrawer_V2 extends PApplet {
 		}
 	}
 	
-	Set<Feature> readShape(String shapeFile) {
-		final Set<Feature> features;
-		features = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		return features;
+	Collection<SimpleFeature> readShape(String shapeFile) {
+		return ShapeFileReader.getAllFeatures(shapeFile);
 	}
 
 	public static void main(String[] args) {

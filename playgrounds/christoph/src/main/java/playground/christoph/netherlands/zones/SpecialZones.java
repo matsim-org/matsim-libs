@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 public class SpecialZones {
 
@@ -96,7 +96,7 @@ public class SpecialZones {
 	 * therefore I assume that it should be no problem if there are no links /
 	 * facilities assigned to that zone...
 	 */
-	/*package*/ static boolean skipZone(Feature zone) {
+	/*package*/ static boolean skipZone(SimpleFeature zone) {
 //		int id = Integer.valueOf(zone.getID().replace("postcode4.", ""));	// Object Id
 //		int id = ((Long)zone.getAttribute(1)).intValue();	// Zone Id
 		int id = ((Long)zone.getAttribute(3)).intValue();	// PostCode
@@ -117,7 +117,7 @@ public class SpecialZones {
 	 * Drop some zones that should not be respected by the model.
 	 * Examples are the islands which are not connected to the road network. 
 	 */
-	/*package*/ static void dropZones(Map<Integer, Feature> zonesMap) {
+	/*package*/ static void dropZones(Map<Integer, SimpleFeature> zonesMap) {
 		
 		for (int zoneId : zonesToRemove) {
 			zonesMap.remove(zoneId);

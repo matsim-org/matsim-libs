@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.benjamin.scenarios.munich.analysis.nectar;
 
 import java.io.IOException;
@@ -6,19 +25,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,15 +42,16 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
 
 /**
@@ -66,8 +76,7 @@ public class SpatialAveragingForLinkDemand {
 	private final String eventsFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".events.xml.gz";
 	
 	Network network;
-	FeatureType featureType;
-	Set<Feature> featuresInMunich;
+	Collection<SimpleFeature> featuresInMunich;
 	
 	WeightedDemandPerLinkHandler weightedDemandPerLinkHandler;
 	DemandPerLinkHandler demandHandler; 
@@ -98,9 +107,15 @@ public class SpatialAveragingForLinkDemand {
 		this.simulationEndTime = getEndTime(configFile1);
 		Scenario scenario = loadScenario(netFile1);
 		this.network = scenario.getNetwork();
-		initFeatures();
-		this.featuresInMunich = readShape(munichShapeFile);
+		this.featuresInMunich = ShapeFileReader.getAllFeatures(munichShapeFile);
 
+		PointFeatureFactory factory = new PointFeatureFactory.Builder()
+				.setCrs(this.targetCRS)
+				.setName("DemandPoint")
+				.addAttribute("Time", String.class)
+				.addAttribute("Congestion", Double.class)
+				.create();
+		
 		processEvents(eventsFile1);
 //		Map<Double, Map<Id, Integer>> time2Demand1 = this.demandHandler.getDemandPerLinkAndTimeInterval();
 //		Map<Double, Map<Id, Double>> time2Demand1 = this.demandHandler.getCongestionTimePerLinkAndTimeInterval();
@@ -142,7 +157,7 @@ public class SpatialAveragingForLinkDemand {
 			}
 		}
 		
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 
 		for(double endOfTimeInterval : time2DemandMapToAnalyze.keySet()){
 			Map<Id, Double> demandMapToAnalyze = time2DemandMapToAnalyze.get(endOfTimeInterval);
@@ -195,13 +210,10 @@ public class SpatialAveragingForLinkDemand {
 							
 							String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
 						
-							Point point = MGC.xy2Point(cellCentroid.getX(), cellCentroid.getY());
 							try {
-								Feature feature = this.featureType.create(new Object[] {
-										point, dateTimeString, averageValue
-								});
+								SimpleFeature feature = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()), new Object[] {dateTimeString, averageValue}, null);
 								features.add(feature);
-							} catch (IllegalAttributeException e1) {
+							} catch (IllegalArgumentException e1) {
 								throw new RuntimeException(e1);
 							}
 						}
@@ -220,8 +232,8 @@ public class SpatialAveragingForLinkDemand {
 		boolean isInMunichShape = false;
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()));
-		for(Feature feature : this.featuresInMunich){
-			if(feature.getDefaultGeometry().contains(geo)){
+		for (SimpleFeature feature : this.featuresInMunich) {
+			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
 				isInMunichShape = true;
 				break;
 			}
@@ -550,34 +562,6 @@ public class SpatialAveragingForLinkDemand {
 		this.demandHandler = new DemandPerLinkHandler(this.network, this.simulationEndTime, noOfTimeBins);
 		eventsManager.addHandler(this.demandHandler);
 		reader.readFile(eventsFile);
-	}
-
-	private static Set<Feature> readShape(String shapeFile) {
-		final Set<Feature> featuresInMunich;
-		featuresInMunich = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		return featuresInMunich;
-	}
-	
-	@SuppressWarnings("deprecation")
-	private void initFeatures() {
-		AttributeType point = DefaultAttributeTypeFactory.newAttributeType(
-				"Point", Point.class, true, null, null, this.targetCRS);
-		AttributeType time = AttributeTypeFactory.newAttributeType(
-				"Time", String.class);
-		AttributeType demand = AttributeTypeFactory.newAttributeType(
-				"Congestion", Double.class);
-		
-		Exception ex;
-		try {
-			this.featureType = FeatureTypeFactory.newFeatureType(new AttributeType[]
-			        {point, time, demand}, "DemandPoint");
-			return;
-		} catch (FactoryRegistryException e0) {
-			ex = e0;
-		} catch (SchemaException e0) {
-			ex = e0;
-		}
-		throw new RuntimeException(ex);
 	}
 
 	private Scenario loadScenario(String netFile) {

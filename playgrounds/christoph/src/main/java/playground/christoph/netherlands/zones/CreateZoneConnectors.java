@@ -22,17 +22,15 @@ package playground.christoph.netherlands.zones;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +38,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
@@ -51,8 +50,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.kml.KMZWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -72,8 +71,8 @@ public class CreateZoneConnectors {
 	private Scenario scenario;
 	private Network network;
 	
-	private Set<Feature> zones;
-	private Map<Integer, Feature> zonesMap;	// TAZ, Feature
+	private Set<SimpleFeature> zones;
+	private Map<Integer, SimpleFeature> zonesMap;	// TAZ, Feature
 	
 	private GeotoolsTransformation ct = new GeotoolsTransformation("WGS84", "EPSG:28992");
 	
@@ -100,15 +99,14 @@ public class CreateZoneConnectors {
 		/*
 		 * read zones shape file
 		 */
-		zones = new HashSet<Feature>();
+		zones = new HashSet<SimpleFeature>();
 
-		FeatureSource featureSource = ShapeFileReader.readDataFile(shapeFile);
-		for (Object o : featureSource.getFeatures()) {
-			zones.add((Feature) o);
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(shapeFile)) {
+			zones.add(feature);
 		}
 	
-		zonesMap = new TreeMap<Integer, Feature>();
-		for (Feature zone : zones) {
+		zonesMap = new TreeMap<Integer, SimpleFeature>();
+		for (SimpleFeature zone : zones) {
 //			int id = Integer.valueOf(zone.getID().replace("postcode4.", ""));	// Object Id
 //			int id = ((Long)zone.getAttribute(1)).intValue();	// Zone Id
 			int id = ((Long)zone.getAttribute(3)).intValue();	// PostCode
@@ -154,13 +152,13 @@ public class CreateZoneConnectors {
 		 * Try to use the centroid of the polygon. If that does not lie within
 		 * the polygon, use an interior point.
 		 */
-		for (Entry<Integer, Feature> entry : zonesMap.entrySet()) {
+		for (Entry<Integer, SimpleFeature> entry : zonesMap.entrySet()) {
 			int zoneId = entry.getKey();
-			Feature zone = entry.getValue();
+			SimpleFeature zone = entry.getValue();
 			
 			if (SpecialZones.skipZone(zone)) continue;
 			
-			Geometry polygon = zone.getDefaultGeometry();
+			Geometry polygon = (Geometry) zone.getDefaultGeometry();
 			Point point = polygon.getCentroid();
 			if (!polygon.contains(point)) point = polygon.getInteriorPoint();
 			

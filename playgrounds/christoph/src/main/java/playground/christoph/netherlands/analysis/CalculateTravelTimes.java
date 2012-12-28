@@ -31,8 +31,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -53,6 +51,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.christoph.netherlands.zones.SpecialZones;
 import playground.christoph.router.FullNetworkDijkstra;
@@ -218,9 +217,7 @@ public class CalculateTravelTimes {
 
 		nodeIds = new TreeSet<Id>();
 		
-		FeatureSource featureSource = ShapeFileReader.readDataFile(shapeFile);
-		for (Object o : featureSource.getFeatures()) {
-			Feature zone = (Feature) o;
+		for (SimpleFeature zone : ShapeFileReader.getAllFeatures(shapeFile)) {
 			int zoneId = ((Long)zone.getAttribute(3)).intValue();	// PostCode
 			if (SpecialZones.skipZone(zoneId)) continue;	// skip zone if it is invalid
 			Id nodeId = scenario.createId(String.valueOf(zoneId));

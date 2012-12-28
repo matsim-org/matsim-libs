@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -49,6 +47,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -74,7 +73,7 @@ public class IntraZonalTripsAnalyzer implements ActivityStartEventHandler, Activ
 	private final Map<Id, AgentDepartureEvent> previousDepartureEvents = new HashMap<Id, AgentDepartureEvent>();
 	private final Map<Id, Integer> facilityMunicipalities = new HashMap<Id, Integer>();
 	private final Map<Id, Coord> facilityCoords = new HashMap<Id, Coord>();
-	private final Map<Integer, Feature> municipalities = new HashMap<Integer, Feature>();
+	private final Map<Integer, SimpleFeature> municipalities = new HashMap<Integer, SimpleFeature>();
 	
 	private final Counter home2workCounter = new Counter("# home to work trips: ");
 	private final Counter work2homeCounter = new Counter("# work to home trips: ");
@@ -94,9 +93,7 @@ public class IntraZonalTripsAnalyzer implements ActivityStartEventHandler, Activ
 	public IntraZonalTripsAnalyzer(Scenario scenario, String shpFile, String eventsFile, String outputDirectory) throws Exception {
 		
 		log.info("Reading municipalities from shp file...");
-		FeatureSource featureSource = ShapeFileReader.readDataFile(shapeFile);
-		for (Object o : featureSource.getFeatures()) {
-			Feature municipality = (Feature) o;
+		for (SimpleFeature municipality : ShapeFileReader.getAllFeatures(shapeFile)) {
 			municipalities.put((Integer) municipality.getAttribute(1), municipality);
 		}
 		log.info("done.");		
@@ -107,9 +104,9 @@ public class IntraZonalTripsAnalyzer implements ActivityStartEventHandler, Activ
 		for (Facility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
 			Coord coord = facility.getCoord();
 			Point point = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
-			for (Entry<Integer, Feature> entry : municipalities.entrySet()) {
-				Feature municipality = entry.getValue();
-				Geometry polygon = municipality.getDefaultGeometry();
+			for (Entry<Integer, SimpleFeature> entry : municipalities.entrySet()) {
+				SimpleFeature municipality = entry.getValue();
+				Geometry polygon = (Geometry) municipality.getDefaultGeometry();
 				if (polygon.contains(point)) {
 					facilityMunicipalities.put(facility.getId(), entry.getKey());
 					facilityCoords.put(facility.getId(), facility.getCoord());

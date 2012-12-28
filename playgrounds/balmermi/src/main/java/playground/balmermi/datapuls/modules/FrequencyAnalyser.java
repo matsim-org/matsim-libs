@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.balmermi.datapuls.modules;
 
 import java.util.HashMap;
@@ -5,7 +24,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.NullArgumentException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -34,7 +52,7 @@ public class FrequencyAnalyser implements LinkLeaveEventHandler {
 
 	public FrequencyAnalyser(final Network network, Set<Id> linkIdSet) {
 		log.info("init " + this.getClass().getName() + " module...");
-		if (linkIdSet == null) { throw new NullArgumentException("linkIdSet"); }
+		if (linkIdSet == null) { throw new NullPointerException("linkIdSet cannot be null"); }
 		freqs = new HashMap<Id, Set<Id>>((int)(network.getLinks().size()*1.4));
 		for (Id lid : linkIdSet) { freqs.put(lid,new HashSet<Id>()); }
 		log.info("=> "+freqs.size()+" sets allocated.");

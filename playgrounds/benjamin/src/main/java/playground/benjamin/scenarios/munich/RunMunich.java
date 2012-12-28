@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich;
 
-import java.io.IOException;
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author benjamin
@@ -50,16 +49,10 @@ public class RunMunich {
 		controler.setCreateGraphs(true);
 		
 		if(considerZone30){
-			Set<Feature> featuresInZone30 = readShape(zone30Shape);
+			Collection<SimpleFeature> featuresInZone30 = ShapeFileReader.getAllFeatures(zone30Shape);
 			controler.addControlerListener(new SetLinkAttributesControlerListener (featuresInZone30));
 		}
 		controler.run();
 	}
 
-
-	private static Set<Feature> readShape(String shapeFile) {
-		final Set<Feature> featuresInZone30;
-		featuresInZone30 = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		return featuresInZone30;
-	}
 }

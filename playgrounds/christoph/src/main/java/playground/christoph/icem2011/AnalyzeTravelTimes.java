@@ -27,8 +27,6 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,6 +48,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -116,16 +115,11 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 	private void readSHPFiles() throws IOException {
 		
 		log.info("Reading SHP Files...");
-		FeatureSource featureSource;
-		featureSource = ShapeFileReader.readDataFile(citySHPFile);
-		for (Object o : featureSource.getFeatures()) {
-			Feature feature = (Feature) o;
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(citySHPFile)) {
 			cityPolygon = (MultiPolygon)feature.getAttribute(0);
 		}
 		
-		featureSource = ShapeFileReader.readDataFile(cantonSHPFile);
-		for (Object o : featureSource.getFeatures()) {
-			Feature feature = (Feature) o;
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(cantonSHPFile)) {
 			cantonPolygon = (MultiPolygon)feature.getAttribute(0);
 		}
 		log.info("done.");

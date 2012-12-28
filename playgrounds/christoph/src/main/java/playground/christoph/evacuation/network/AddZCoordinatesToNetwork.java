@@ -25,23 +25,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.christoph.evacuation.api.core.v01.Coord3d;
 import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
@@ -97,97 +94,85 @@ public class AddZCoordinatesToNetwork {
 	}
 	
 	public void addZCoordinatesToNetwork() {
-		
-		try {
-			FeatureSource featureSource;
-			
-			// read DHM25 shp file
-			log.info("reading dhm25 data...");
-			Map<Id, Double> dhm25Heights = new HashMap<Id, Double>();
-			featureSource = ShapeFileReader.readDataFile(DHM25);
-			for (Object o : featureSource.getFeatures()) {
-				Feature feature = (Feature) o;
-				Id id = scenario.createId(String.valueOf(feature.getAttribute(1)));
-				double z = (Double) feature.getAttribute(4);
-				if (z != 0.0) dhm25Heights.put(id, z);
-			}
-			log.info("done. read " + dhm25Heights.size() + " height coordinates.");
-			
-			// read DHM25 shp file
-			log.info("reading srtm data...");
-			Map<Id, Double> srtmHeights = new HashMap<Id, Double>();
-			featureSource = ShapeFileReader.readDataFile(SRTM);
-			for (Object o : featureSource.getFeatures()) {
-				Feature feature = (Feature) o;
-				Id id = scenario.createId(String.valueOf(feature.getAttribute(1)));
-				double z = (Double) feature.getAttribute(4);
-				if (z != 0.0) srtmHeights.put(id, z);
-			}
-			log.info("done. read " + srtmHeights.size() + " height coordinates.");
-			
-			log.info("adding height data...");
-			int dhm25Count = 0;
-			int srtmCount = 0;
-			int extrapolateCount = 0;
-			Network network = scenario.getNetwork();
-			
-			// Create a quadtree srtm coordinates which is used to extrapolate coordinates
-			log.info("\t create quad tree for extrapolation...");
-			double minx = Double.POSITIVE_INFINITY;
-			double miny = Double.POSITIVE_INFINITY;
-			double maxx = Double.NEGATIVE_INFINITY;
-			double maxy = Double.NEGATIVE_INFINITY;
-			for (Node node : network.getNodes().values()) {
-				if (node.getCoord().getX() < minx) { minx = node.getCoord().getX(); }
-				if (node.getCoord().getY() < miny) { miny = node.getCoord().getY(); }
-				if (node.getCoord().getX() > maxx) { maxx = node.getCoord().getX(); }
-				if (node.getCoord().getY() > maxy) { maxy = node.getCoord().getY(); }
-			}
-			minx -= 1.0;
-			miny -= 1.0;
-			maxx += 1.0;
-			maxy += 1.0;
-			log.info("\t xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-			
-			QuadTree<Id> quadTree = new QuadTree<Id>(minx, miny, maxx, maxy);
-			for (Node node : network.getNodes().values()) {
-				
-				// add all nodes with a height coordinate in the srtm map
-				if (srtmHeights.containsKey(node.getId())) {
-					quadTree.put(node.getCoord().getX(), node.getCoord().getY(), node.getId());				
-				}
-			}
-			log.info("\t done.");
-			
-			for (Node node : network.getNodes().values()) {
-				
-				// use dhm25 height, if available
-				Double dhm25 = dhm25Heights.get(node.getId());
-				if (dhm25 != null) {
-					addZCoord(node, dhm25);
-					dhm25Count++;
-					continue;
-				}
-				
-				// otherwise use srtm height, if available
-				Double srtm = srtmHeights.get(node.getId());
-				if (srtm != null) {
-					addZCoord(node, srtm);
-					srtmCount++;
-					continue;
-				}
-				
-				// no height value found, therefore interpolate it...
-				Id neighbourId = quadTree.get(node.getCoord().getX(), node.getCoord().getY());
-				addZCoord(node, srtmHeights.get(neighbourId));
-				extrapolateCount++;
-			}
-			log.info("done. got " + dhm25Count + " height values from dhm25 data, " + srtmCount + 
-					" height values from srtm data and " + extrapolateCount + " height values via extrapolation.");	
-		} catch(IOException e) {
-			Gbl.errorMsg(e);
+		// read DHM25 shp file
+		log.info("reading dhm25 data...");
+		Map<Id, Double> dhm25Heights = new HashMap<Id, Double>();
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(DHM25)) {
+			Id id = scenario.createId(String.valueOf(feature.getAttribute(1)));
+			double z = (Double) feature.getAttribute(4);
+			if (z != 0.0) dhm25Heights.put(id, z);
 		}
+		log.info("done. read " + dhm25Heights.size() + " height coordinates.");
 		
+		// read DHM25 shp file
+		log.info("reading srtm data...");
+		Map<Id, Double> srtmHeights = new HashMap<Id, Double>();
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(SRTM)) {
+			Id id = scenario.createId(String.valueOf(feature.getAttribute(1)));
+			double z = (Double) feature.getAttribute(4);
+			if (z != 0.0) srtmHeights.put(id, z);
+		}
+		log.info("done. read " + srtmHeights.size() + " height coordinates.");
+		
+		log.info("adding height data...");
+		int dhm25Count = 0;
+		int srtmCount = 0;
+		int extrapolateCount = 0;
+		Network network = scenario.getNetwork();
+		
+		// Create a quadtree srtm coordinates which is used to extrapolate coordinates
+		log.info("\t create quad tree for extrapolation...");
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		for (Node node : network.getNodes().values()) {
+			if (node.getCoord().getX() < minx) { minx = node.getCoord().getX(); }
+			if (node.getCoord().getY() < miny) { miny = node.getCoord().getY(); }
+			if (node.getCoord().getX() > maxx) { maxx = node.getCoord().getX(); }
+			if (node.getCoord().getY() > maxy) { maxy = node.getCoord().getY(); }
+		}
+		minx -= 1.0;
+		miny -= 1.0;
+		maxx += 1.0;
+		maxy += 1.0;
+		log.info("\t xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		
+		QuadTree<Id> quadTree = new QuadTree<Id>(minx, miny, maxx, maxy);
+		for (Node node : network.getNodes().values()) {
+			
+			// add all nodes with a height coordinate in the srtm map
+			if (srtmHeights.containsKey(node.getId())) {
+				quadTree.put(node.getCoord().getX(), node.getCoord().getY(), node.getId());				
+			}
+		}
+		log.info("\t done.");
+		
+		for (Node node : network.getNodes().values()) {
+			
+			// use dhm25 height, if available
+			Double dhm25 = dhm25Heights.get(node.getId());
+			if (dhm25 != null) {
+				addZCoord(node, dhm25);
+				dhm25Count++;
+				continue;
+			}
+			
+			// otherwise use srtm height, if available
+			Double srtm = srtmHeights.get(node.getId());
+			if (srtm != null) {
+				addZCoord(node, srtm);
+				srtmCount++;
+				continue;
+			}
+			
+			// no height value found, therefore interpolate it...
+			Id neighbourId = quadTree.get(node.getCoord().getX(), node.getCoord().getY());
+			addZCoord(node, srtmHeights.get(neighbourId));
+			extrapolateCount++;
+		}
+		log.info("done. got " + dhm25Count + " height values from dhm25 data, " + srtmCount + 
+				" height values from srtm data and " + extrapolateCount + " height values via extrapolation.");	
 	}
 	
 	/*

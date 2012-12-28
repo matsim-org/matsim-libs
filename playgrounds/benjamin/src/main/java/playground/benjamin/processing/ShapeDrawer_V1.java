@@ -20,18 +20,17 @@
 package playground.benjamin.processing;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.BoundingBox;
 
 import playground.benjamin.utils.FeatureProjector;
 import processing.core.PApplet;
 import processing.core.PVector;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -43,8 +42,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 public class ShapeDrawer_V1 extends PApplet {
 	private static Logger logger = Logger.getLogger(ShapeDrawer_V1.class);
 
-	Collection<Feature> network;
-	Collection<Feature> munich;
+	Collection<SimpleFeature> network;
+	Collection<SimpleFeature> munich;
 	
 	FeatureProjector proj;
 	
@@ -60,8 +59,8 @@ public class ShapeDrawer_V1 extends PApplet {
 		size(1000, 1000);
 		background(255, 255, 255);
 		
-		Set<Feature> networkShape = readShape(networkShapeFileName);
-		Set<Feature> munichShape = readShape(munichShapeFileName);
+		Collection<SimpleFeature> networkShape = readShape(networkShapeFileName);
+		Collection<SimpleFeature> munichShape = readShape(munichShapeFileName);
 		
 		// Transform from "DHDN / 3-degree Gauss zone 4" to "WGS 84"
 		// There is no need to do this, though. "geoToScreen(PVector coord)" defines screen position anyways...
@@ -86,13 +85,13 @@ public class ShapeDrawer_V1 extends PApplet {
 		drawFeaturesToScreen(munich);
 	}
 	
-	private void drawFeaturesToScreen(Collection<Feature> featureCollection) {
-		for(Feature ft : featureCollection){
+	private void drawFeaturesToScreen(Collection<SimpleFeature> featureCollection) {
+		for(SimpleFeature ft : featureCollection){
 			drawFeatureToScreen(ft);
 		}
 	}
 
-	private void drawFeatureToScreen(Feature ft){
+	private void drawFeatureToScreen(SimpleFeature ft){
 		GeometryCollection gc = (GeometryCollection) ft.getDefaultGeometry();
 		Coordinate[] coords = gc.getCoordinates();
 		
@@ -120,10 +119,10 @@ public class ShapeDrawer_V1 extends PApplet {
                 		   map(coord.y, tlCorner.y, brCorner.y, topBoarder, bottomBoarder));
 	}
 	
-	private void defineBoundingBox(Collection<Feature> features) {
+	private void defineBoundingBox(Collection<SimpleFeature> features) {
 		
-		for(Feature ft : features){
-			Envelope env = ft.getBounds();
+		for(SimpleFeature ft : features){
+			BoundingBox env = ft.getBounds();
 			float maxX = (float) env.getMaxX();
 			float minX = (float) env.getMinX();
 			float maxY = (float) env.getMaxY();
@@ -151,10 +150,8 @@ public class ShapeDrawer_V1 extends PApplet {
 		}
 	}
 
-	Set<Feature> readShape(String shapeFile) {
-		final Set<Feature> features;
-		features = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		return features;
+	Collection<SimpleFeature> readShape(String shapeFile) {
+		return ShapeFileReader.getAllFeatures(shapeFile);
 	}
 
 	public static void main(String[] args) {

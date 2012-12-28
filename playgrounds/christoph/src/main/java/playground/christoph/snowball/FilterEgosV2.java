@@ -25,12 +25,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -63,8 +62,8 @@ public class FilterEgosV2 {
 	
 	private MathTransform transform;
 	private GeometryFactory factory;
-	private Set<Feature> germanCantons;
-	private Set<Feature> otherCantons;
+	private Set<SimpleFeature> germanCantons;
+	private Set<SimpleFeature> otherCantons;
 		
 	public FilterEgosV2(String shapeFile)
 	{
@@ -114,8 +113,8 @@ public class FilterEgosV2 {
 		/*
 		 * check if point is in a german Canton
 		 */
-		for (Feature canton : germanCantons) {
-			Geometry polygon = canton.getDefaultGeometry();
+		for (SimpleFeature canton : germanCantons) {
+			Geometry polygon = (Geometry) canton.getDefaultGeometry();
 			if (polygon.contains(point))
 			{
 				return 1;
@@ -124,8 +123,8 @@ public class FilterEgosV2 {
 		/*
 		 * check if point is in an other Canton
 		 */
-		for (Feature canton : otherCantons) {
-			Geometry polygon = canton.getDefaultGeometry();
+		for (SimpleFeature canton : otherCantons) {
+			Geometry polygon = (Geometry) canton.getDefaultGeometry();
 			if (polygon.contains(point)) {
 				return 2;
 			}
@@ -144,16 +143,15 @@ public class FilterEgosV2 {
 		/*
 		 * Cantons shape file
 		 */
-		otherCantons = new HashSet<Feature>();
-		germanCantons = new HashSet<Feature>();
-		FeatureSource featureSource = ShapeFileReader.readDataFile(shapeFile);
-		for (Object o : featureSource.getFeatures()) {
-			germanCantons.add((Feature) o);
+		otherCantons = new HashSet<SimpleFeature>();
+		germanCantons = new HashSet<SimpleFeature>();
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(shapeFile)) {
+			germanCantons.add(feature);
 		}		
 		/*
 		 * print canton names and shortcuts
 		 */
-		for (Feature canton : germanCantons)
+		for (SimpleFeature canton : germanCantons)
 		{
 			System.out.println(canton.getAttribute(2) + " " + canton.getAttribute(3));
 		}
@@ -161,10 +159,10 @@ public class FilterEgosV2 {
 		/*
 		 * filter cantons
 		 */
-		Iterator<Feature> iter = germanCantons.iterator();
+		Iterator<SimpleFeature> iter = germanCantons.iterator();
 		while (iter.hasNext())
 		{
-			Feature canton = iter.next();
+			SimpleFeature canton = iter.next();
 			String cantonShortCut = (String) canton.getAttribute(3);
 			boolean germanCanton = false;
 			for (String shortCut : germanCantonShortCuts)

@@ -36,13 +36,6 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -54,9 +47,11 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.vis.kml.KMZWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -76,7 +71,7 @@ public class CoordinatesToWorld {
 	private String kmzOutFile = "../../matsim/mysimulations/snowball/SnowballAare.kmz";
 	private String shapeOutFile = "../../matsim/mysimulations/snowball/SnowballAare.shp";
 	
-	private Map<Feature, List<Line>> countries;
+	private Map<SimpleFeature, List<Line>> countries;
 	private List<Line> lines;
 	
 	public static void main(String[] args) throws Exception {
@@ -93,11 +88,9 @@ public class CoordinatesToWorld {
 	}
 	
 	private void readShapeFile() throws Exception {
-		countries = new HashMap<Feature, List<Line>>();
+		countries = new HashMap<SimpleFeature, List<Line>>();
 		
-		FeatureSource featureSource = ShapeFileReader.readDataFile(shapeFile);
-		for (Object o : featureSource.getFeatures()) {
-			Feature country = (Feature) o;
+		for (SimpleFeature country : ShapeFileReader.getAllFeatures(shapeFile)) {
 			countries.put(country, new ArrayList<Line>());
 		}
 		log.info("Read " + countries.size() + " countries.");
@@ -157,10 +150,10 @@ public class CoordinatesToWorld {
 				continue;
 			}
 			Point point = factory.createPoint(new Coordinate(x, y));
-			for (Entry<Feature, List<Line>> entry : countries.entrySet()) {
-				Feature country = entry.getKey();
+			for (Entry<SimpleFeature, List<Line>> entry : countries.entrySet()) {
+				SimpleFeature country = entry.getKey();
 				
-				Geometry polygon = country.getDefaultGeometry();
+				Geometry polygon = (Geometry) country.getDefaultGeometry();
 				if (polygon.contains(point)) {
 					List<Line> list = entry.getValue();
 					list.add(line);
@@ -210,12 +203,14 @@ public class CoordinatesToWorld {
 	private void writeSHPFile() throws Exception {
 
 		GeometryFactory geoFac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 			
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", String.class);
-		FeatureType ftNode = FeatureTypeBuilder.newFeatureType(new AttributeType[] {geom, id}, "node");
+		PointFeatureFactory factory = new PointFeatureFactory.Builder().
+				setCrs(crs)
+				.setName("nodes")
+				.addAttribute("ID", String.class)
+				.create();
 		
 		for (Line line : lines) {
 			double x = Double.NaN;
@@ -228,9 +223,8 @@ public class CoordinatesToWorld {
 			}
 			
 			Coordinate coord = new Coordinate(x, y);
-			Point point = geoFac.createPoint(coord);
 			
-			Feature ft = ftNode.create(new Object[] {point, line.Alter_MergeParameter}, "nodes");
+			SimpleFeature ft = factory.createPoint(coord, new Object[] {line.Alter_MergeParameter}, null);
 			features.add(ft);
 		}
 		

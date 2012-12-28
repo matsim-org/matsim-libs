@@ -26,18 +26,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
 
@@ -45,7 +41,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class SHPWriter {
 
-	private FeatureType featureType;
+	private SimpleFeatureBuilder builder;
 
 	private HashMap<Integer, String> mapBZ = new HashMap<Integer, String>();
 	private HashMap<String, String> mapMZ = new HashMap<String, String>();
@@ -94,7 +90,7 @@ public class SHPWriter {
 
 		this.init();
 		this.initGeometries();
-		ArrayList<Feature> features = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
 
 		Iterator<Hectare> hectares_it = hectares.iterator();
 		while (hectares_it.hasNext()) {
@@ -118,16 +114,16 @@ public class SHPWriter {
 
 		this.init();
 		this.initGeometries();
-		ArrayList<Feature> featuresCoop = new ArrayList<Feature>();
-		ArrayList<Feature> featuresMigros = new ArrayList<Feature>();
-		ArrayList<Feature> featuresDenner = new ArrayList<Feature>();
-		ArrayList<Feature> featuresSpar = new ArrayList<Feature>();
-		ArrayList<Feature> featuresPickPay = new ArrayList<Feature>();
-		ArrayList<Feature> featuresPrimo = new ArrayList<Feature>();
-		ArrayList<Feature> featuresVolg = new ArrayList<Feature>();
-		ArrayList<Feature> featuresWarehouses = new ArrayList<Feature>();
-		ArrayList<Feature> featuresSupermarkets = new ArrayList<Feature>();
-		ArrayList<Feature> featuresDiv = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> featuresCoop = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresMigros = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresDenner = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresSpar = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresPickPay = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresPrimo = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresVolg = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresWarehouses = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresSupermarkets = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresDiv = new ArrayList<SimpleFeature>();
 
 		Iterator<ZHFacility> facilities_it = facilities.iterator();
 		while (facilities_it.hasNext()) {
@@ -221,15 +217,15 @@ public class SHPWriter {
 
 		this.init();
 		this.initGeometries();
-		ArrayList<Feature> featuresCoop = new ArrayList<Feature>();
-		ArrayList<Feature> featuresMigros = new ArrayList<Feature>();
-		ArrayList<Feature> featuresDenner = new ArrayList<Feature>();
-		ArrayList<Feature> featuresSpar = new ArrayList<Feature>();
-		ArrayList<Feature> featuresPickPay = new ArrayList<Feature>();
-		ArrayList<Feature> featuresPrimo = new ArrayList<Feature>();
-		ArrayList<Feature> featuresVolg = new ArrayList<Feature>();
-		ArrayList<Feature> featuresWarehouses = new ArrayList<Feature>();
-		ArrayList<Feature> featuresSupermarkets = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> featuresCoop = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresMigros = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresDenner = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresSpar = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresPickPay = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresPrimo = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresVolg = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresWarehouses = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresSupermarkets = new ArrayList<SimpleFeature>();
 
 		Iterator<ZHFacilityComposed> facilities_it = facilities.iterator();
 		while (facilities_it.hasNext()) {
@@ -321,26 +317,14 @@ public class SHPWriter {
 
 
 	private void initGeometries() {
-		AttributeType [] attr = new AttributeType[2];
-		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
-		attr[1] = AttributeTypeFactory.newAttributeType("Types", String.class);
-
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attr, "point");
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("point");
+		b.add("location", Point.class);
+		b.add("Types", String.class);
+		this.builder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 
-	private Feature createFeature(Coord coord, String types) {
-
-		Feature feature = null;
-
-		try {
-			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord), types});
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-		return feature;
+	private SimpleFeature createFeature(Coord coord, String types) {
+		return this.builder.buildFeature(null, new Object [] {MGC.coord2Point(coord), types});
 	}
 }

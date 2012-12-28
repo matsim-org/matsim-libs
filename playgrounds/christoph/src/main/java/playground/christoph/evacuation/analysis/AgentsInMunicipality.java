@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -39,6 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -95,12 +94,8 @@ public class AgentsInMunicipality {
 		this.eventsFile = eventsFile;
 		this.numThreads = numThreads;
 
-		List<Feature> municipalities = new ArrayList<Feature>();
-		FeatureSource featureSource = ShapeFileReader.readDataFile(shpFile);
-		for (Object o : featureSource.getFeatures()) {
-			Feature feature = (Feature) o;
-			municipalities.add(feature);
-		}
+		List<SimpleFeature> municipalities = new ArrayList<SimpleFeature>();
+		municipalities.addAll(ShapeFileReader.getAllFeatures(shpFile));
 		log.info("Found " + municipalities.size() + " municipalities.");
 
 		runnables = new HandlersCreator[numThreads];
@@ -114,14 +109,14 @@ public class AgentsInMunicipality {
 			int startIndex = 0;
 			while (startIndex < municipalities.size()) {
 				int endIndex = Math.min(startIndex + maxParallelMunicipalities, municipalities.size());
-				List<Feature> subList = municipalities.subList(startIndex, endIndex);
+				List<SimpleFeature> subList = municipalities.subList(startIndex, endIndex);
 				handleMunicipalities(subList);
 				startIndex += this.maxParallelMunicipalities;
 			}
 		}
 	}
 	
-	private void handleMunicipalities(List<Feature> municipalities) throws Exception {
+	private void handleMunicipalities(List<SimpleFeature> municipalities) throws Exception {
 		log.info("Handling " + municipalities.size() + " municipalities.");
 				
 		for (HandlersCreator handlersCreator : runnables) handlersCreator.reset();
@@ -129,7 +124,7 @@ public class AgentsInMunicipality {
 		// assign municipalities
 		log.info("\t\tAssigning municipalities to threads...");
 		int roundRobin = 0;
-		for (Feature municipality : municipalities) {
+		for (SimpleFeature municipality : municipalities) {
 			runnables[roundRobin % numThreads].addMunicipality(municipality);
 			roundRobin++;
 		}
@@ -228,7 +223,7 @@ public class AgentsInMunicipality {
 		private final Scenario scenario;
 		private final ObjectAttributes householdObjectAttributes;
 		private final String outputPath;
-		private final List<Feature> municipalities;
+		private final List<SimpleFeature> municipalities;
 		private final List<AgentsInMunicipalityEventsHandler> handlers;
 		
 		public HandlersCreator(Scenario scenario, ObjectAttributes householdObjectAttributes, String outputPath) {
@@ -236,7 +231,7 @@ public class AgentsInMunicipality {
 			this.householdObjectAttributes = householdObjectAttributes;
 			this.outputPath = outputPath;
 			
-			this.municipalities = new ArrayList<Feature>();
+			this.municipalities = new ArrayList<SimpleFeature>();
 			this.handlers = new ArrayList<AgentsInMunicipalityEventsHandler>();
 		}
 		
@@ -249,13 +244,13 @@ public class AgentsInMunicipality {
 			return this.handlers;
 		}
 		
-		public void addMunicipality(Feature municipality) {
+		public void addMunicipality(SimpleFeature municipality) {
 			this.municipalities.add(municipality);
 		}
 		
 		@Override
 		public void run() {
-			for (Feature feature : municipalities) {
+			for (SimpleFeature feature : municipalities) {
 				Integer id = (Integer) feature.getAttribute(1);
 				String name = (String) feature.getAttribute(4);
 				name = name.replace('/', '_');
@@ -263,7 +258,7 @@ public class AgentsInMunicipality {
 				String fileName = name + "_" + id.toString();
 				String outputFile = outputPath + "/" + fileName;
 				
-				Geometry area = feature.getDefaultGeometry();
+				Geometry area = (Geometry) feature.getDefaultGeometry();
 				
 				AgentsInMunicipalityEventsHandler aim = new AgentsInMunicipalityEventsHandler(scenario, householdObjectAttributes, outputFile, area);
 				aim.printInitialStatistics();

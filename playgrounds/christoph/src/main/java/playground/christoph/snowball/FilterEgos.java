@@ -27,15 +27,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -83,21 +82,21 @@ public class FilterEgos {
 			double longitude = Double.parseDouble(tokens[2]);
 			egos.put(egoId, new Coordinate(longitude, latidude));
 		}
+		reader.close();
 		
 		/*
 		 * Cantons shape file
 		 */
-		Set<Feature> otherCantons = new HashSet<Feature>();
-		Set<Feature> germanCantons = new HashSet<Feature>();
-		FeatureSource featureSource = ShapeFileReader.readDataFile(shapeFile);
-		for (Object o : featureSource.getFeatures()) {
-			germanCantons.add((Feature) o);
+		Set<SimpleFeature> otherCantons = new HashSet<SimpleFeature>();
+		Set<SimpleFeature> germanCantons = new HashSet<SimpleFeature>();
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(shapeFile)) {
+			germanCantons.add(feature);
 		}
 		
 		/*
 		 * print canton names and shortcuts
 		 */
-		for (Feature canton : germanCantons)
+		for (SimpleFeature canton : germanCantons)
 		{
 			System.out.println(canton.getAttribute(2) + " " + canton.getAttribute(3));
 		}
@@ -105,10 +104,10 @@ public class FilterEgos {
 		/*
 		 * filter cantons
 		 */
-		Iterator<Feature> iter = germanCantons.iterator();
+		Iterator<SimpleFeature> iter = germanCantons.iterator();
 		while (iter.hasNext())
 		{
-			Feature canton = iter.next();
+			SimpleFeature canton = iter.next();
 			String cantonShortCut = (String) canton.getAttribute(3);
 			boolean germanCanton = false;
 			for (String shortCut : germanCantonShortCuts)
@@ -150,8 +149,8 @@ public class FilterEgos {
 			 * check if point is in a german Canton
 			 */
 			boolean german = false;
-			for (Feature canton : germanCantons) {
-				Geometry polygon = canton.getDefaultGeometry();
+			for (SimpleFeature canton : germanCantons) {
+				Geometry polygon = (Geometry) canton.getDefaultGeometry();
 				if (polygon.contains(point)) {
 					validEgos.add(entry.getKey());
 					german = true;
@@ -162,8 +161,8 @@ public class FilterEgos {
 			 * check if point is in an other Canton
 			 */
 			boolean other = false;
-			for (Feature canton : otherCantons) {
-				Geometry polygon = canton.getDefaultGeometry();
+			for (SimpleFeature canton : otherCantons) {
+				Geometry polygon = (Geometry) canton.getDefaultGeometry();
 				if (polygon.contains(point)) {
 					validEgos.add(entry.getKey());
 					other = true;

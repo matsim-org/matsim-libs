@@ -35,19 +35,13 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -58,18 +52,18 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.kml.KMZWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /*
  * Update the allowed free speeds on a link depending on
@@ -81,9 +75,9 @@ public class UpdateNetworkSpeeds {
 	
 	private CoordinateTransformation transform;
 	private GeometryFactory factory;
-	private Feature france;
-	private Feature germany;
-	private Feature switzerland;
+	private SimpleFeature france;
+	private SimpleFeature germany;
+	private SimpleFeature switzerland;
 
 	private String shapeFile = "../../matsim/mysimulations/Reisezeiten_Metropolitanraum_Basel/Europa_Grenzen/DE_FR_CH_Grenze_GSC_WGS84.shp";
 	private String networkFile = "../../matsim/mysimulations/Reisezeiten_Metropolitanraum_Basel/network.xml";
@@ -144,9 +138,7 @@ public class UpdateNetworkSpeeds {
 	}
 	
 	private void readSHPFile() throws IOException {
-		FeatureSource featureSource = ShapeFileReader.readDataFile(shapeFile);
-		for (Object o : featureSource.getFeatures()) {
-			Feature country = (Feature) o;
+		for (SimpleFeature country : ShapeFileReader.getAllFeatures(shapeFile)) {
 			if (((String)country.getAttribute("NAME")).equals("France")) france = country;
 			else if (((String)country.getAttribute("NAME")).equals("Germany")) germany = country;
 			else if (((String)country.getAttribute("NAME")).equals("Switzerland")) switzerland = country;
@@ -220,37 +212,39 @@ public class UpdateNetworkSpeeds {
 	}
 	
 	private void writeSHPNetwork(Network network) throws Exception {		
-		GeometryFactory geoFac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
-		
+
 		// Links
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("LineString", Geometry.class, true, null, null, crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", String.class);
-		AttributeType fromNode = AttributeTypeFactory.newAttributeType("fromID", String.class);
-		AttributeType toNode = AttributeTypeFactory.newAttributeType("toID", String.class);
-		AttributeType length = AttributeTypeFactory.newAttributeType("length", Double.class);
-		AttributeType type = AttributeTypeFactory.newAttributeType("type", String.class);
-		FeatureType ftRoad = FeatureTypeBuilder.newFeatureType(new AttributeType[] {geom, id, fromNode, toNode, length, type}, "link");
+		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
+				.setCrs(crs)
+				.setName("links")
+				.addAttribute("ID", String.class)
+				.addAttribute("fromID", String.class)
+				.addAttribute("toID", String.class)
+				.addAttribute("length", Double.class)
+				.addAttribute("type", String.class)
+				.create();
 		
 		for (Link link : network.getLinks().values()) {		
-			LineString ls = new LineString(new CoordinateArraySequence(new Coordinate [] {coord2Coordinate(link.getFromNode().getCoord()), coord2Coordinate(link.getCoord()), coord2Coordinate(link.getToNode().getCoord())}), geoFac);
-			Feature ft = ftRoad.create(new Object [] {ls , link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), ((LinkImpl)link).getType()}, "links");
+			Coordinate[] coordinates = new Coordinate [] {coord2Coordinate(link.getFromNode().getCoord()), coord2Coordinate(link.getCoord()), coord2Coordinate(link.getToNode().getCoord())};
+			Object[] attributes = new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), ((LinkImpl)link).getType()};
+			SimpleFeature ft = factory.createPolyline(coordinates, attributes, link.getId().toString());
+			
 			features.add(ft);
 		}
 		ShapeFileWriter.writeGeometries(features, outSHPLinksFile);
 		
 		// Nodes
 		features.clear();
-		geom = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, crs);
-		id = AttributeTypeFactory.newAttributeType("ID", String.class);
-		FeatureType ftNode = FeatureTypeBuilder.newFeatureType(new AttributeType[] {geom, id}, "node");
+		PointFeatureFactory factory2 = new PointFeatureFactory.Builder()
+				.setCrs(crs)
+				.setName("nodes")
+				.addAttribute("ID", String.class)
+				.create();
 		
-		for (Node node : network.getNodes().values())
-		{
-			Point point = geoFac.createPoint(coord2Coordinate(node.getCoord()));
-
-			Feature ft = ftNode.create(new Object[] {point, node.getId().toString()}, "nodes");
+		for (Node node : network.getNodes().values()) {
+			SimpleFeature ft = factory2.createPoint(coord2Coordinate(node.getCoord()), new Object[] {node.getId().toString()}, node.getId().toString());
 			features.add(ft);
 		}
 
@@ -291,11 +285,11 @@ public class UpdateNetworkSpeeds {
 			Coord wgs84LinkCenter = transform.transform(link.getCoord());
 			Point linkCenter = factory.createPoint(new Coordinate(wgs84LinkCenter.getX(), wgs84LinkCenter.getY()));
 			
-			if (france.getDefaultGeometry().contains(linkCenter)) {
+			if (((Geometry) france.getDefaultGeometry()).contains(linkCenter)) {
 				franceCount++;
-			} else if (germany.getDefaultGeometry().contains(linkCenter)) {
+			} else if (((Geometry) germany.getDefaultGeometry()).contains(linkCenter)) {
 				germanyCount++;
-			} else if (switzerland.getDefaultGeometry().contains(linkCenter)) {
+			} else if (((Geometry) switzerland.getDefaultGeometry()).contains(linkCenter)) {
 				switzerlandCount++;
 			} else log.error ("Center of Link is not part of one of the Countries!");
 		}

@@ -25,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -46,6 +44,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.EdgeType;
 import org.matsim.visum.VisumNetworkReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -91,8 +90,7 @@ public class NetworkVisum2Matsim {
 		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
-		final Set<Feature> featuresInShape;
-		featuresInShape = new ShapeFileReader().readFileAndInitialize(DetailedAreaShape);
+		final Collection<SimpleFeature> featuresInShape = ShapeFileReader.getAllFeatures(DetailedAreaShape);
 
 		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
 
@@ -196,12 +194,12 @@ public class NetworkVisum2Matsim {
 		}
 	}
 
-	private boolean isEdgeInDetailedArea(Node fromNode, Set<Feature> featuresInShape) {
+	private boolean isEdgeInDetailedArea(Node fromNode, Collection<SimpleFeature> featuresInShape) {
 		boolean isInDetailedArea = false;
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
-		for (Feature ft : featuresInShape) {
-			if (ft.getDefaultGeometry().contains(geo)){
+		for (SimpleFeature ft : featuresInShape) {
+			if (((Geometry) ft.getDefaultGeometry()).contains(geo)){
 				isInDetailedArea = true;
 				break;
 			}

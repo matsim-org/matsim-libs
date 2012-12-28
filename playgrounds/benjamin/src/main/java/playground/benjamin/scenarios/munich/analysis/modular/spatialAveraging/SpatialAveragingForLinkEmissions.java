@@ -27,19 +27,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -53,8 +44,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
@@ -67,7 +60,6 @@ import playground.vsp.emissions.utils.EmissionUtils;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
 //import playground.julia.interpolation.EmissionUtils;
 
@@ -97,7 +89,7 @@ public class SpatialAveragingForLinkEmissions {
 	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
 
 	Network network;
-	Set<Feature> featuresInMunich;
+	Collection<SimpleFeature> featuresInMunich;
 	EmissionUtils emissionUtils = new EmissionUtils();
 	EmissionsPerLinkWarmEventHandler warmHandler;
 	EmissionsPerLinkColdEventHandler coldHandler;
@@ -137,7 +129,14 @@ public class SpatialAveragingForLinkEmissions {
 		this.listOfPollutants = emissionUtils.getListOfPollutants();
 		Scenario scenario = loadScenario(netFile1);
 		this.network = scenario.getNetwork();
-		FeatureType featureType = initFeatures();
+		
+		PointFeatureFactory factory = new PointFeatureFactory.Builder()
+			.setName("EmissionPoint")
+			.setCrs(this.targetCRS)
+			.addAttribute("Time", String.class)
+			.addAttribute("Emissions", Double.class)
+			.create();
+		
 		this.featuresInMunich = readShape(munichShapeFile);
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze;
 
@@ -181,7 +180,7 @@ public class SpatialAveragingForLinkEmissions {
 //		BufferedWriter writer = IOUtils.getBufferedWriter(outPathStub + "." + pollutant + ".smoothed.txt");
 //		writer.append("xCentroid\tyCentroid\t" + pollutant + "\tTIME\n");
 
-		Collection<Feature> features = new ArrayList<Feature>(); //TODO featerzeug geloescht, neu schreiebn
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>(); //TODO featerzeug geloescht, neu schreiebn
 
 		double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
 		
@@ -360,8 +359,8 @@ public class SpatialAveragingForLinkEmissions {
 		boolean isInMunichShape = false;
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()));
-		for(Feature feature : this.featuresInMunich){
-			if(feature.getDefaultGeometry().contains(geo)){
+		for(SimpleFeature feature : this.featuresInMunich){
+			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
 				isInMunichShape = true;
 				break;
 			}
@@ -588,32 +587,8 @@ public class SpatialAveragingForLinkEmissions {
 		emissionReader.parse(emissionFile);
 	}
 
-	private static Set<Feature> readShape(String shapeFile) {
-		final Set<Feature> featuresInMunich;
-		featuresInMunich = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		return featuresInMunich;
-	}
-
-	@SuppressWarnings("deprecation")
-	private FeatureType initFeatures() {
-		AttributeType point = DefaultAttributeTypeFactory.newAttributeType(
-				"Point", Point.class, true, null, null, this.targetCRS);
-		AttributeType time = AttributeTypeFactory.newAttributeType(
-				"Time", String.class);
-		AttributeType deltaEmissions = AttributeTypeFactory.newAttributeType(
-				"Emissions", Double.class);
-
-		Exception ex;
-		try {
-			FeatureType type = FeatureTypeFactory.newFeatureType(new AttributeType[]
-					{point, time, deltaEmissions}, "EmissionPoint");
-			return type;
-		} catch (FactoryRegistryException e0) {
-			ex = e0;
-		} catch (SchemaException e0) {
-			ex = e0;
-		}
-		throw new RuntimeException(ex);
+	private static Collection<SimpleFeature> readShape(String shapeFile) {
+		return ShapeFileReader.getAllFeatures(shapeFile);
 	}
 
 	private Scenario loadScenario(String netFile) {

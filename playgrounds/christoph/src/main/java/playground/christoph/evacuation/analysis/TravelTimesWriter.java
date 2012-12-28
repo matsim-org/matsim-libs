@@ -28,27 +28,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class TravelTimesWriter {
 
@@ -174,7 +167,7 @@ public class TravelTimesWriter {
 		
 	public void writeAbsoluteSHPTravelTimes(String file, CoordinateReferenceSystem crs, boolean ignoreExitLinks) {
 		try {
-			Collection<Feature> ft = generateSHPFileData(crs, this.network, true, ignoreExitLinks);
+			Collection<SimpleFeature> ft = generateSHPFileData(crs, this.network, true, ignoreExitLinks);
 			ShapeFileWriter.writeGeometries(ft, file);			
 		} catch (Exception e) {
 			Gbl.errorMsg(e);
@@ -183,38 +176,32 @@ public class TravelTimesWriter {
 
 	public void writeRelativeSHPTravelTimes(String file, CoordinateReferenceSystem crs, boolean ignoreExitLinks) {
 		try {
-			Collection<Feature> ft = generateSHPFileData(crs, this.network, false, ignoreExitLinks);
+			Collection<SimpleFeature> ft = generateSHPFileData(crs, this.network, false, ignoreExitLinks);
 			ShapeFileWriter.writeGeometries(ft, file);			
 		} catch (Exception e) {
 			Gbl.errorMsg(e);
 		}
 	}
 	
-	private Collection<Feature> generateSHPFileData(CoordinateReferenceSystem crs, Network network, boolean absolute, boolean ignoreExitLinks) throws Exception {
+	private Collection<SimpleFeature> generateSHPFileData(CoordinateReferenceSystem crs, Network network, boolean absolute, boolean ignoreExitLinks) throws Exception {
 
 		GeometryFactory geoFac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("LineString", Geometry.class, true, null, null, crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", String.class);
-		AttributeType fromNode = AttributeTypeFactory.newAttributeType("fromID", String.class);
-		AttributeType toNode = AttributeTypeFactory.newAttributeType("toID", String.class);
-		AttributeType length = AttributeTypeFactory.newAttributeType("length", Double.class);
-		AttributeType type = AttributeTypeFactory.newAttributeType("fstt", Double.class);
+		PolylineFeatureFactory.Builder builder = new PolylineFeatureFactory.Builder()
+			.setCrs(crs)
+			.setName("links")
+			.addAttribute("ID", String.class)
+			.addAttribute("fromID", String.class)
+			.addAttribute("toID", String.class)
+			.addAttribute("length", Double.class)
+			.addAttribute("fstt", Double.class);
 		
-		AttributeType[] attributes = new AttributeType[6 + this.numSlots];
-		attributes[0] = geom;
-		attributes[1] = id;
-		attributes[2] = fromNode;
-		attributes[3] = toNode;
-		attributes[4] = length;
-		attributes[5] = type;
 		for (int i = 0; i < this.numSlots; i++) {
-			AttributeType slotTravelTime = AttributeTypeFactory.newAttributeType(String.valueOf(i * this.timeSlice), Double.class);
-			attributes[6 + i] = slotTravelTime;
+			builder.addAttribute(String.valueOf(i * this.timeSlice), Double.class);
 		}
-		
-		FeatureType ftRoad = FeatureTypeBuilder.newFeatureType(attributes, "link");
+
+		PolylineFeatureFactory factory = builder.create();
 		for (Link link : network.getLinks().values()) {
 			
 			if (ignoreExitLinks) {
@@ -223,22 +210,20 @@ public class TravelTimesWriter {
 			}
 			
 			Coordinate[] coordArray = new Coordinate[] {coord2Coordinate(link.getFromNode().getCoord()), coord2Coordinate(link.getCoord()), coord2Coordinate(link.getToNode().getCoord())};
-			LineString ls = new LineString(new CoordinateArraySequence(coordArray), geoFac);
 
-			Object[] object = new Object[attributes.length];
-			object[0] = ls;
-			object[1] = link.getId().toString();
-			object[2] = link.getFromNode().getId().toString();
-			object[3] = link.getToNode().getId().toString();
-			object[4] = link.getLength();
-			object[5] = link.getLength()/link.getFreespeed();
+			Object[] attributes = new Object[5 + this.numSlots];
+			attributes[0] = link.getId().toString();
+			attributes[1] = link.getFromNode().getId().toString();
+			attributes[2] = link.getToNode().getId().toString();
+			attributes[3] = link.getLength();
+			attributes[4] = link.getLength()/link.getFreespeed();
 
 //			System.out.println(link.getId().toString());
 			double[] travelTimeArray = this.travelTimes.get(link);
 			for (int i = 0; i < this.numSlots; i++) {
 				
 				if (absolute) {
-					object[6 + i] = travelTimeArray[i];
+					attributes[5 + i] = travelTimeArray[i];
 				} else {
 					double freeSpeedTravelTime = link.getLength() / link.getFreespeed(i * this.timeSlice);
 					double relativeTravelTime = travelTimeArray[i] / freeSpeedTravelTime;
@@ -251,11 +236,11 @@ public class TravelTimesWriter {
 //					} else if (relativeTravelTime == Double.NEGATIVE_INFINITY) {
 //						Log.warn("bla");
 //					}
-					object[6 + i] = relativeTravelTime;
+					attributes[5 + i] = relativeTravelTime;
 				}
 			}
 
-			Feature ft = ftRoad.create(object, "links");
+			SimpleFeature ft = factory.createPolyline(coordArray, attributes, link.getId().toString());
 			features.add(ft);
 		}
 				

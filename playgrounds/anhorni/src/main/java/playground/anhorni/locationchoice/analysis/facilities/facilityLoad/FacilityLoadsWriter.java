@@ -24,74 +24,58 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
 public class FacilityLoadsWriter {
 
-	private FeatureType featureType;
+	private SimpleFeatureBuilder builder;
 	
 	public void write(TreeMap<Id, FacilityLoad> facilityLoads) {
-				
 		this.initGeometries();
 		String shopFileIncreased = "output/postprocessing/shopLoads_Increased.shp";
 		String shopFileDecreased = "output/postprocessing/shopLoads_Decreased.shp";
 		
-		ArrayList<Feature> featuresIncreased = new ArrayList<Feature>();
-		ArrayList<Feature> featuresDecreased = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> featuresIncreased = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresDecreased = new ArrayList<SimpleFeature>();
 		
 		for (FacilityLoad facilityLoad : facilityLoads.values()) {
+			SimpleFeature feature = this.createFeature(
+					facilityLoad.getCoord(), facilityLoad.getFacilityId(), facilityLoad.getLoadDiffRel());
 			
-				Feature feature = this.createFeature(
-						facilityLoad.getCoord(), facilityLoad.getFacilityId(), facilityLoad.getLoadDiffRel());
-				
-				if (facilityLoad.getLoadDiffRel() > 0.8) {
-					featuresIncreased.add(feature);
-				}
-				else if (facilityLoad.getLoadDiffRel() < - 0.8) {
-					featuresDecreased.add(feature);
-				}
+			if (facilityLoad.getLoadDiffRel() > 0.8) {
+				featuresIncreased.add(feature);
+			}
+			else if (facilityLoad.getLoadDiffRel() < -0.8) {
+				featuresDecreased.add(feature);
+			}
 		}
 		if (featuresIncreased.size() > 0) {
-			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresIncreased, shopFileIncreased);
+			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)featuresIncreased, shopFileIncreased);
 		}
 		if (featuresDecreased.size() > 0) { 
-			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresDecreased, shopFileDecreased);
+			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)featuresDecreased, shopFileDecreased);
 		}
 	}
 		
 	private void initGeometries() {
-		AttributeType [] attr = new AttributeType[3];
-		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
-		attr[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		attr[2] = AttributeTypeFactory.newAttributeType("loadDiff", String.class);
-		
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attr, "point");
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("point");
+		b.add("location", Point.class);
+		b.add("ID", String.class);
+		b.add("loadDiff", String.class);
+		this.builder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 	
-	private Feature createFeature(Coord coord, IdImpl id, double loadDiff ) {		
-		Feature feature = null;
-		try {
-			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord), id.toString(), Double.toString(loadDiff)});
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-		return feature;
+	private SimpleFeature createFeature(Coord coord, IdImpl id, double loadDiff ) {
+		return this.builder.buildFeature(id.toString(), new Object [] {MGC.coord2Point(coord), id.toString(), Double.toString(loadDiff)});
 	}
 }

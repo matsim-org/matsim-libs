@@ -1,22 +1,43 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.andreas.aas.modules.cellBasedAccessibility.gis;
 
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.UncheckedIOException;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.andreas.aas.modules.cellBasedAccessibility.gis.io.FeatureKMLWriter;
-import playground.andreas.aas.modules.cellBasedAccessibility.gis.io.FeatureSHP;
 import playground.andreas.aas.modules.cellBasedAccessibility.utils.io.writer.SpatialGridTableWriter;
 import playground.andreas.aas.modules.cellBasedAccessibility.utils.misc.ProgressBar;
 
@@ -42,15 +63,15 @@ public class GridUtils {
 		
 		try{
 			// get boundaries of study area
-			Set<Feature> featureSet = FeatureSHP.readFeatures(shpFile);
+			Collection<SimpleFeature> featureSet = ShapeFileReader.getAllFeatures(shpFile);
 			log.info("Extracting boundary of the shape file ...");
-			Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
+			Geometry boundary = (Geometry) featureSet.iterator().next().getDefaultGeometry();
 			boundary.setSRID( srid );
 			log.warn("Using SRID: " + srid);
 			log.info("Done extracting boundary ...");
 			
 			return boundary;
-		} catch (IOException io){
+		} catch (UncheckedIOException io){
 			io.printStackTrace();
 			log.error("Geometry object containing the study area boundary shape is null !");
 			System.exit(-1);

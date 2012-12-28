@@ -28,21 +28,13 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -53,19 +45,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Counts;
 import org.matsim.vis.kml.KMZWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class NetworkCreator {
 
@@ -131,7 +120,7 @@ public class NetworkCreator {
 		log.info("... done.");
 		
 		log.info("writing shape files...");
-		Collection<Feature> ft;
+		Collection<SimpleFeature> ft;
 		ft = generateNodesFromNet(network);
 		ShapeFileWriter.writeGeometries(ft, shpNodesOutFile);
 			
@@ -139,44 +128,42 @@ public class NetworkCreator {
 		ShapeFileWriter.writeGeometries(ft, shpLinksOutFile);
 		log.info("... done.");
 	}
-		
-	public static Collection<Feature> generateLinksFromNet(Network network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
 
-		GeometryFactory geoFac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+	public static Collection<SimpleFeature> generateLinksFromNet(Network network) {
+
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 		
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("LineString", Geometry.class, true, null, null, crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", String.class);
-		AttributeType fromNode = AttributeTypeFactory.newAttributeType("fromID", String.class);
-		AttributeType toNode = AttributeTypeFactory.newAttributeType("toID", String.class);
-		AttributeType length = AttributeTypeFactory.newAttributeType("length", Double.class);
-		AttributeType type = AttributeTypeFactory.newAttributeType("type", String.class);
-		FeatureType ftRoad = FeatureTypeBuilder.newFeatureType(new AttributeType[] {geom, id, fromNode, toNode, length, type}, "link");
+		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder().
+				setCrs(crs).
+				setName("link").
+				addAttribute("ID", String.class).
+				addAttribute("fromID", String.class).
+				addAttribute("toID", String.class).
+				addAttribute("length", Double.class).
+				addAttribute("type", String.class).
+				create();
 		
 		for (Link link : network.getLinks().values()) {		
-			LineString ls = new LineString(new CoordinateArraySequence(new Coordinate [] {coord2Coordinate(link.getFromNode().getCoord()), coord2Coordinate(link.getCoord()), coord2Coordinate(link.getToNode().getCoord())}), geoFac);
-			Feature ft = ftRoad.create(new Object [] {ls , link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), ((LinkImpl)link).getType()}, "links");
+			SimpleFeature ft = factory.createPolyline(new Coordinate[] {coord2Coordinate(link.getFromNode().getCoord()), coord2Coordinate(link.getCoord()), coord2Coordinate(link.getToNode().getCoord())}, new Object[] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), ((LinkImpl)link).getType()}, link.getId().toString());
 			features.add(ft);
 		}
 				
 		return features;
 	}
 	
-	public static Collection<Feature> generateNodesFromNet(Network network) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
-
-		GeometryFactory geoFac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+	public static Collection<SimpleFeature> generateNodesFromNet(Network network) {
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
-		
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", String.class);
-		FeatureType ftNode = FeatureTypeBuilder.newFeatureType(new AttributeType[] {geom, id}, "node");
+
+		PointFeatureFactory factory = new PointFeatureFactory.Builder().
+				setCrs(crs).
+				setName("nodes").
+				addAttribute("ID", String.class).
+				create();
 		
 		for (Node node : network.getNodes().values()) {
-			Point point = geoFac.createPoint(coord2Coordinate(node.getCoord()));
-
-			Feature ft = ftNode.create(new Object[] {point, node.getId().toString()}, "nodes");
+			SimpleFeature ft = factory.createPoint(node.getCoord(), new Object[] {node.getId().toString()}, node.getId().toString());
 			features.add(ft);
 		}
 		

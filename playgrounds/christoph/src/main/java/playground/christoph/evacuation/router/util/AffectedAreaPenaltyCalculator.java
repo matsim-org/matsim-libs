@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -36,6 +35,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -58,12 +59,12 @@ public class AffectedAreaPenaltyCalculator {
 		
 		new EvacuationConfigReader().readFile("../../matsim/mysimulations/census2000V2/config_evacuation.xml");
 		
-		Set<Feature> features = new HashSet<Feature>();
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
 		SHPFileUtil util = new SHPFileUtil();
 		for (String file : EvacuationConfig.evacuationArea) {
-			features.addAll(util.readFile(file));		
+			features.addAll(ShapeFileReader.getAllFeatures(file));		
 		}
-		Geometry affectedArea = util.mergeGeomgetries(features);
+		Geometry affectedArea = util.mergeGeometries(features);
 		
 		AffectedAreaPenaltyCalculator penaltyCalculator = new AffectedAreaPenaltyCalculator(network, affectedArea, 5000, 1.20);
 		penaltyCalculator.calculatePenaltyFactors();

@@ -23,13 +23,8 @@ package playground.anhorni.locationchoice.analysis;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -44,12 +39,13 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
 public class PrintShopAndLeisureLocations implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	private FeatureType featureType;
+	private SimpleFeatureBuilder builder;
 	
 	public void notifyStartup(final StartupEvent event) {	
 	}
@@ -62,8 +58,8 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 		String shopFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "shopLocations.shp");
 		String leisureFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "leisureLocations.shp");
 		
-		ArrayList<Feature> featuresShop = new ArrayList<Feature>();
-		ArrayList<Feature> featuresLeisure = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> featuresShop = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresLeisure = new ArrayList<SimpleFeature>();
 		
 		Population plans = event.getControler().getPopulation();		
 		for (Person person : plans.getPersons().values()) {
@@ -75,7 +71,7 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 				ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				
 				Coord coord = act.getCoord();
-				Feature feature = this.createFeature(coord, (IdImpl)person.getId());
+				SimpleFeature feature = this.createFeature(coord, (IdImpl)person.getId());
 				
 				if (act.getType().startsWith("shop")) {
 					featuresShop.add(feature);
@@ -93,24 +89,14 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 	}
 		
 	private void initGeometries() {
-		AttributeType [] attr = new AttributeType[2];
-		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
-		attr[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attr, "point");
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("point");
+		b.add("location", Point.class);
+		b.add("ID", String.class);
+		builder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 	
-	private Feature createFeature(Coord coord, IdImpl id) {		
-		Feature feature = null;
-		try {
-			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord), id.toString()});
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-		return feature;
+	private SimpleFeature createFeature(Coord coord, IdImpl id) {
+		return this.builder.buildFeature(id.toString(), new Object [] {MGC.coord2Point(coord), id.toString()});
 	}
 }

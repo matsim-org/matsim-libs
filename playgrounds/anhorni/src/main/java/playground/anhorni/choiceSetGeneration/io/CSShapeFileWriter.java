@@ -25,18 +25,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSetFacility;
@@ -47,8 +43,8 @@ import com.vividsolutions.jts.geom.Point;
 public class CSShapeFileWriter extends CSWriter {
 
 	private final static Logger log = Logger.getLogger(CSShapeFileWriter.class);
-	
-	private FeatureType featureType;
+
+	private SimpleFeatureBuilder featureBuilder;
 	
 	public CSShapeFileWriter() {	
 	}
@@ -67,25 +63,25 @@ public class CSShapeFileWriter extends CSWriter {
 	public void writeChoiceSets(String outdir, String name, List<ChoiceSet> choiceSets) {
 				
 		this.initGeometries();
-		ArrayList<Feature> features = new ArrayList<Feature>();	
+		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();	
 		
 		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 		while (choiceSet_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSet_it.next();
 			
-			ArrayList<Feature> singleFeatures = new ArrayList<Feature>();
+			ArrayList<SimpleFeature> singleFeatures = new ArrayList<SimpleFeature>();
 			Iterator<ChoiceSetFacility> choiceSetFacilities_it = choiceSet.getFacilities().values().iterator();
 			while (choiceSetFacilities_it.hasNext()) {
 				ChoiceSetFacility choiceSetFacility = choiceSetFacilities_it.next();
 				Coord coord = new CoordImpl(choiceSetFacility.getFacility().getMappedPosition().getX(), 
 						choiceSetFacility.getFacility().getMappedPosition().getY());
 				
-				Feature feature = this.createFeature(coord, choiceSet.getId());
+				SimpleFeature feature = this.createFeature(coord, choiceSet.getId());
 				features.add(feature);
 				singleFeatures.add(feature);
 			}
 			if (!singleFeatures.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singlechoicesets/" + 
+				ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)singleFeatures, outdir +"/shapefiles/singlechoicesets/" + 
 					name + choiceSet.getId()+ "_choiceSet.shp");
 			}
 			else {
@@ -94,46 +90,46 @@ public class CSShapeFileWriter extends CSWriter {
 			
 		}
 		if (!features.isEmpty()) {
-			ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/" + name + "_choiceSets.shp");
+			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)features, outdir +"/shapefiles/" + name + "_choiceSets.shp");
 		}
 	}
 	
 	private void writeTrips(String outdir, String name, List<ChoiceSet> choiceSets) {
 	
 		this.initGeometries();
-		ArrayList<Feature> featuresBefore = new ArrayList<Feature>();
-		ArrayList<Feature> featuresShop = new ArrayList<Feature>();
-		ArrayList<Feature> featuresAfter = new ArrayList<Feature>();
+		ArrayList<SimpleFeature> featuresBefore = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresShop = new ArrayList<SimpleFeature>();
+		ArrayList<SimpleFeature> featuresAfter = new ArrayList<SimpleFeature>();
 		
 		Iterator<ChoiceSet> choiceSets_it = choiceSets.iterator();
 		while (choiceSets_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSets_it.next();
 			
-			ArrayList<Feature> singleFeatures = new ArrayList<Feature>();
+			ArrayList<SimpleFeature> singleFeatures = new ArrayList<SimpleFeature>();
 			
 			Coord coordBefore = new CoordImpl(choiceSet.getTrip().getBeforeShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getBeforeShoppingAct().getCoord().getY());
 			
-			Feature featureBefore = this.createFeature(coordBefore, choiceSet.getId());
+			SimpleFeature featureBefore = this.createFeature(coordBefore, choiceSet.getId());
 			featuresBefore.add(featureBefore);
 			singleFeatures.add(featureBefore);
 			
 			Coord coordShopping = new CoordImpl(choiceSet.getTrip().getShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getShoppingAct().getCoord().getY());
 			
-			Feature featureShopping = this.createFeature(coordShopping, choiceSet.getId());
+			SimpleFeature featureShopping = this.createFeature(coordShopping, choiceSet.getId());
 			featuresShop.add(featureShopping);
 			singleFeatures.add(featureShopping);
 			
 			Coord coordAfter = new CoordImpl(choiceSet.getTrip().getAfterShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getAfterShoppingAct().getCoord().getY());
 			
-			Feature featureAfter = this.createFeature(coordAfter, choiceSet.getId());
+			SimpleFeature featureAfter = this.createFeature(coordAfter, choiceSet.getId());
 			featuresAfter.add(featureAfter);
 			singleFeatures.add(featureAfter);
 			
 			if (!singleFeatures.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singletrips/" + name + 
+				ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)singleFeatures, outdir +"/shapefiles/singletrips/" + name + 
 					choiceSet.getId()+"_Trip.shp");
 			}
 			else {
@@ -141,38 +137,25 @@ public class CSShapeFileWriter extends CSWriter {
 			}		
 		}			
 		if (!featuresBefore.isEmpty()) {
-			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripPriorLocations.shp");
+			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripPriorLocations.shp");
 		}
 		if (!featuresShop.isEmpty()) {
-			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresShop, outdir +"/shapefiles/" + name + "_TripShopLocations.shp");
+			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)featuresShop, outdir +"/shapefiles/" + name + "_TripShopLocations.shp");
 		}
 		if (!featuresAfter.isEmpty()) {
-			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresAfter, outdir +"/shapefiles/" + name + "_TripPosteriorLocations.shp");
+			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)featuresAfter, outdir +"/shapefiles/" + name + "_TripPosteriorLocations.shp");
 		}
 	}
 	
 	private void initGeometries() {
-		AttributeType [] attr = new AttributeType[2];
-		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
-		attr[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attr, "point");
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.add("location", Point.class);
+		b.add("ID", String.class);
+		this.featureBuilder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 	
-	private Feature createFeature(Coord coord, Id id) {
-		
-		Feature feature = null;
-		
-		try {
-			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord), id.toString()});
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-		return feature;
+	private SimpleFeature createFeature(Coord coord, Id id) {
+		return this.featureBuilder.buildFeature(id.toString(), new Object [] {MGC.coord2Point(coord), id.toString()});
 	}
 	
 	

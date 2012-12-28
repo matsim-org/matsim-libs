@@ -21,7 +21,6 @@ package playground.benjamin.scenarios.munich;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,8 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -44,6 +41,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -51,8 +49,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.benjamin.BkPaths;
 import playground.benjamin.utils.CheckingTabularFileHandler;
@@ -252,11 +250,9 @@ public class FreightDemandCreatorMunich {
 	 * @return
 	 * @throws IOException 
 	 */
-	@SuppressWarnings("unchecked")
 	private Set<Id> getRegionsFromShape(String shapeFile) throws IOException {
 		Set<Id> regions = new HashSet<Id>();
-		FeatureSource fts = ShapeFileReader.readDataFile(shapeFile);
-		for (Feature ft : (Collection<Feature>) fts.getFeatures()){
+		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(shapeFile)){
 			String kkz = ft.getAttribute("KKZ").toString();
 			Id kkzId = new IdImpl(kkz);
 			regions.add(kkzId);

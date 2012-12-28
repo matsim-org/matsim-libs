@@ -19,9 +19,8 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich;
 
-import java.util.Set;
+import java.util.Collection;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -29,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.LinkImpl;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -40,9 +40,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class SetLinkAttributesControlerListener implements StartupListener {
 
-	private final Set<Feature> featuresInZone30;
+	private final Collection<SimpleFeature> featuresInZone30;
 
-	public SetLinkAttributesControlerListener(Set<Feature> featuresInZone30) {
+	public SetLinkAttributesControlerListener(Collection<SimpleFeature> featuresInZone30) {
 		this.featuresInZone30 = featuresInZone30;
 	}
 
@@ -76,8 +76,8 @@ public class SetLinkAttributesControlerListener implements StartupListener {
 		Coord coord = link.getCoord();
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
-		for(Feature feature : this.featuresInZone30){
-			if(feature.getDefaultGeometry().contains(geo)){
+		for(SimpleFeature feature : this.featuresInZone30){
+			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
 				isInShape = true;
 				break;
 			}

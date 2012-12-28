@@ -24,18 +24,18 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -43,14 +43,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.benjamin.BkPaths;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -99,7 +101,7 @@ public class BkHouseholdsCreatorZurich {
 
 
 		Map<String, Double> gemeindeIncome = this.readMedianIncomeFile(einkommenZurichTextfile);
-		FeatureSource fts = ShapeFileReader.readDataFile(gemeindenKantonZurichShapeFile);
+		SimpleFeatureSource fts = ShapeFileReader.readDataFile(gemeindenKantonZurichShapeFile);
 
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -137,7 +139,7 @@ public class BkHouseholdsCreatorZurich {
 	    // all swiss inhabitants have ids smaller than 1 000 000 000
 	    else {
 	    	//calculate the income
-	    	Feature feature = this.getGemeindeFeatureForPerson(p, fts);
+	    	SimpleFeature feature = this.getGemeindeFeatureForPerson(p, fts);
 	    	if (feature == null) {
 	    		income = incomeCalcSchweiz.calculateIncome(43665.0);
 	    	}
@@ -204,14 +206,14 @@ public class BkHouseholdsCreatorZurich {
 	}
 
 
-	private Map<String, Feature> createFeaturesByName(FeatureSource fts) throws IOException {
-		Map<String, Feature> featuresByName = new HashMap<String, Feature>();
+	private Map<String, SimpleFeature> createFeaturesByName(SimpleFeatureSource fts) throws IOException {
+		Map<String, SimpleFeature> featuresByName = new HashMap<String, SimpleFeature>();
 		//Iterator to iterate over the features from the shape file
-		Iterator<Feature> it = fts.getFeatures().iterator();
+		SimpleFeatureIterator it = fts.getFeatures().features();
 		System.out.println("Found feature for Gemeinden: " );
 		int ii = 0;
 		while (it.hasNext()) {
-			Feature ft = it.next(); //A feature contains a geometry (in this case a polygon) and an arbitrary number
+			SimpleFeature ft = it.next(); //A feature contains a geometry (in this case a polygon) and an arbitrary number
 			//of other attributes
 			String ftname = (String) ft.getAttribute("NAME");
 			if (ii < 5){
@@ -224,6 +226,7 @@ public class BkHouseholdsCreatorZurich {
 			}
 			featuresByName.put(ftname.trim().split(" ")[0], ft);
 		}
+		it.close();
 		return featuresByName;
 	}
 
@@ -231,7 +234,7 @@ public class BkHouseholdsCreatorZurich {
 
 
 
-	private void checkGemeindenForPop(Population population, FeatureSource fsource) throws IOException {
+	private void checkGemeindenForPop(Population population, SimpleFeatureSource fsource) throws IOException {
 		Plan plan;
 		int personsWithGemeinde = 0;
 
@@ -241,16 +244,17 @@ public class BkHouseholdsCreatorZurich {
 				throw new IllegalStateException("Person " + p.getId() + " has no plans");
 			}
 			Coord coord = ((PlanImpl) plan).getFirstActivity().getCoord();
-			Iterator<Feature> it = fsource.getFeatures().iterator();
-			Feature f = null;
+			SimpleFeatureIterator it = fsource.getFeatures().features();
+			SimpleFeature f = null;
 			while (it.hasNext()) {
 				f = it.next();
-				if (f.getDefaultGeometry().contains(MGC.coord2Point(coord))){
+				if (((Geometry) f.getDefaultGeometry()).contains(MGC.coord2Point(coord))){
 					personsWithGemeinde++;
 					break;
 				}
 				f = null;
 			}
+			it.close();
 			if (f == null) {
 				log.error("No Quartier found for person " + p.getId());
 			}
@@ -259,34 +263,35 @@ public class BkHouseholdsCreatorZurich {
 	}
 
 
-	private Feature getGemeindeFeatureForPerson(Person person, FeatureSource fsource) throws IOException {
+	private SimpleFeature getGemeindeFeatureForPerson(Person person, SimpleFeatureSource fsource) throws IOException {
 		Plan plan;
 		plan = person.getPlans().get(0);
 		if (plan == null) {
 			throw new IllegalStateException("Person " + person.getId() + " has no plans");
 		}
 		Coord coord = ((Activity)plan.getPlanElements().get(0)).getCoord();
-		Iterator<Feature> it = fsource.getFeatures().iterator();
-		Feature f = null;
-		while (it.hasNext()) {
-			f = it.next();
-			if (f.getDefaultGeometry().contains(MGC.coord2Point(coord))){
+		SimpleFeatureIterator fIt = fsource.getFeatures().features();
+		SimpleFeature f = null;
+		while (fIt.hasNext()) {
+			f = fIt.next();
+			if (((Geometry) f.getDefaultGeometry()).contains(MGC.coord2Point(coord))){
 				return f;
 			}
 			f = null;
 		}
+		fIt.close();
 		if (f == null) {
 			log.error("No Feature found for person " + person.getId());
 		}
 		return null;
 	}
 
-	private static void findFeatureForGemeinde(Map<String, Double> gemeindeIncome, Map<String, Feature> featuresByName){
+	private static void findFeatureForGemeinde(Map<String, Double> gemeindeIncome, Map<String, SimpleFeature> featuresByName){
 		int gemeindeNotFound = 0;
 		for (Entry<String, Double> entry : gemeindeIncome.entrySet()){
 //			System.out.println("Gemeinde: " + entry.getKey());
 			String gemeindeName = entry.getKey();
-			Feature ft = featuresByName.get(gemeindeName);
+			SimpleFeature ft = featuresByName.get(gemeindeName);
 			if (ft == null) {
 				String searchName = null;
 //				if (gemeindeName.indexOf("ü") != -1) {

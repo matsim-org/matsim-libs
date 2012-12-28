@@ -22,11 +22,9 @@ package playground.andreas.utils.pop;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -47,6 +45,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -166,14 +165,14 @@ public class FilterPopulationByShape implements LinkEnterEventHandler, PersonEnt
 	}
 	
 	private void createServiceAreaShp(String serviceAreaFile) {
-		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(serviceAreaFile);
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(serviceAreaFile);
 		Collection<Geometry> include = new ArrayList<Geometry>();
 		Collection<Geometry> exclude = new ArrayList<Geometry>();
 		
-		for(Feature f: features){
+		for (SimpleFeature f: features) {
 			boolean incl = true;
 			Geometry g = null;
-			for(Object o: f.getAttributes(null)){
+			for(Object o: f.getAttributes()){
 				if(o instanceof Polygon){
 					g = (Geometry) o;
 				}else if (o instanceof MultiPolygon){

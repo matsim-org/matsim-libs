@@ -23,15 +23,13 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -59,28 +57,26 @@ public class FeatureProjector {
 		throw new RuntimeException(ex);
 	}
 	
-	public Collection<Feature> getProjectedFeatures(Collection<Feature> fts) {
-		Collection<Feature> projectedFeatrues = new HashSet<Feature>();
-		for (Feature ft : fts) {
-			Feature projectedFeature = getProjectedFeature(ft);
+	public Collection<SimpleFeature> getProjectedFeatures(Collection<SimpleFeature> fts) {
+		Collection<SimpleFeature> projectedFeatrues = new HashSet<SimpleFeature>();
+		for (SimpleFeature ft : fts) {
+			SimpleFeature projectedFeature = getProjectedFeature(ft);
 			projectedFeatrues.add(projectedFeature);
 		}
 		return projectedFeatrues;
 	}
 	
-	public Feature getProjectedFeature(Feature feature) {
+	public SimpleFeature getProjectedFeature(SimpleFeature feature) {
 		Exception ex;
 		try {
-			Geometry before = feature.getDefaultGeometry();
+			Geometry before = (Geometry) feature.getDefaultGeometry();
 			Geometry after = JTS.transform(before, this.transform);
 			feature.setDefaultGeometry(after);
 //			logger.debug("Setting coordinate of geometry from " + before.getCoordinate() + " to " + after.getCoordinate());
 			return feature;
-		} catch (MismatchedDimensionException e) {
-			ex = e;
 		} catch (TransformException e) {
 			ex = e; 
-		} catch (IllegalAttributeException e) {
+		} catch (IllegalArgumentException e) {
 			ex = e; 
 		}
 		throw new RuntimeException(ex);

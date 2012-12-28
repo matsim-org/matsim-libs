@@ -29,15 +29,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,6 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -65,7 +59,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 public class DaShapeWriter {
 
 	private static final Logger log = Logger.getLogger(DaShapeWriter.class);
-	private static FeatureType featureType;
+	private static SimpleFeatureBuilder builder;
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
@@ -172,7 +166,7 @@ public class DaShapeWriter {
 		writeDefaultLineString2Shape(fileName, name, map, null, targetCoordinateSystem);
 	}
 	
-	private static void write(Collection<Feature> features, String shapeFileOutName){
+	private static void write(Collection<SimpleFeature> features, String shapeFileOutName){
 		if(features.isEmpty()){
 			log.error("can not write " + shapeFileOutName + ", because featurelist is empty...");
 		}else{
@@ -186,72 +180,43 @@ public class DaShapeWriter {
 	}
 	
 	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes, boolean links, String targetCoordinateSystem) {
-		AttributeType[] attribs;
-		if(attributes == null){
-			if(links){
-				attribs = new AttributeType[4];
-			}else{
-				attribs = new AttributeType[2];
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName(name);
+		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.add("location", LineString.class);
+		b.add("name", String.class);
+		if (!(attributes == null)) {
+			for (Entry<String, Object> e: attributes.entrySet()) {
+				b.add(e.getKey(), e.getValue().getClass());
 			}
-		}else{
-			attribs = new AttributeType[attributes.size() + 2];
-		}
-		
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		Integer count = 2;
-		
-		if(!(attributes == null)){
-			for(Entry<String, Object> e: attributes.entrySet()){
-				attribs[count] = AttributeTypeFactory.newAttributeType(e.getKey(), e.getValue().getClass());
-				count++;
-			}
-		}else{
-			if(links){
-				attribs[2] = AttributeTypeFactory.newAttributeType("capacity",Double.class);
-				attribs[3] = AttributeTypeFactory.newAttributeType("length",Double.class);
+		} else {
+			if (links) {
+				b.add("capacity", Double.class);
+				b.add("length", Double.class);
 			}
 		}
-		
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+
+		builder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 	
 	private static void initPointFeatureType(String name, SortedMap<String, Object> attributes, String targetCoordinateSystem){
-		AttributeType [] attribs;
-		if(attributes == null){
-			attribs = new AttributeType[2];
-		}else{
-			attribs = new AttributeType[attributes.size() + 2];
-		}
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(targetCoordinateSystem));
-		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		Integer count = 2;
-		
-		if(!(attributes == null)){
-			for(Entry<String, Object> e: attributes.entrySet()){
-				attribs[count] = AttributeTypeFactory.newAttributeType(e.getKey(), e.getValue().getClass());
-				count++;
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName(name);
+		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.add("location", Point.class);
+		b.add("name", String.class);
+		if (!(attributes == null)) {
+			for (Entry<String, Object> e: attributes.entrySet()) {
+				b.add(e.getKey(), e.getValue().getClass());
 			}
 		}
 		
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
-		} catch (FactoryRegistryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		builder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 	
-	private static Collection<Feature> createRouteFeatures(TransitSchedule schedule, Collection<Id> lines2write, Map<Id, SortedMap<String, Object>> attributes){
-		Collection<Feature> features = new ArrayList<Feature>();
-		Feature feature;
+	private static Collection<SimpleFeature> createRouteFeatures(TransitSchedule schedule, Collection<Id> lines2write, Map<Id, SortedMap<String, Object>> attributes){
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		SimpleFeature feature;
 		Coordinate[] coord;
 		
 		for (TransitLine line : schedule.getTransitLines().values()){
@@ -275,9 +240,9 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createLinkFeatures(Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes) {
-		Collection<Feature> features = new ArrayList<Feature>();
-		Feature feature;
+	private static Collection<SimpleFeature> createLinkFeatures(Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes) {
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		SimpleFeature feature;
 		Coordinate[] coord;
 		SortedMap<String, Object> attr;
 		for(Link l : links.values()){
@@ -297,9 +262,9 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createPointDistanceFeatures(Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, Object>> attributes){
-		Collection<Feature> features = new ArrayList<Feature>();
-		Feature feature;
+	private static Collection<SimpleFeature> createPointDistanceFeatures(Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, Object>> attributes){
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		SimpleFeature feature;
 		Coordinate[] coord;
 		
 		for(Entry<String, Tuple<Coord, Coord>> e : points.entrySet()) {
@@ -313,9 +278,9 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createStopFeatures(Map<Id, TransitStopFacility> stops, Collection<Id> stops2write){
-		Collection<Feature> features = new ArrayList<Feature>();
-		Feature feature;
+	private static Collection<SimpleFeature> createStopFeatures(Map<Id, TransitStopFacility> stops, Collection<Id> stops2write){
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		SimpleFeature feature;
 		
 		for(TransitStopFacility stop : stops.values()){
 			if((stops2write == null) || stops2write.contains(stop.getId())){
@@ -326,9 +291,9 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createNodeFeatures(Map<Id, ? extends Node> nodes){
-		Collection<Feature> features = new ArrayList<Feature>();
-		Feature feature;
+	private static Collection<SimpleFeature> createNodeFeatures(Map<Id, ? extends Node> nodes){
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		SimpleFeature feature;
 		
 		for(Node n : nodes.values()){
 			feature = getPointFeature(n.getCoord(), n.getId().toString(), null);
@@ -337,9 +302,9 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createDefaultPointFeature(Map<String, Coord> points, Map<String, SortedMap<String, Object>> attributes){
-		Collection<Feature> features = new ArrayList<Feature>();
-		Feature feature;
+	private static Collection<SimpleFeature> createDefaultPointFeature(Map<String, Coord> points, Map<String, SortedMap<String, Object>> attributes){
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		SimpleFeature feature;
 		
 		for(Entry<String, Coord> e: points.entrySet()){
 			if(attributes == null){
@@ -353,9 +318,9 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createDefaultLineStringFeature(Map<String, SortedMap<Integer, Coord>> lineStrings,	Map<String, SortedMap<String, Object>> attributes) {
-		Collection<Feature> features = new ArrayList<Feature>();
-		Feature feature;
+	private static Collection<SimpleFeature> createDefaultLineStringFeature(Map<String, SortedMap<Integer, Coord>> lineStrings,	Map<String, SortedMap<String, Object>> attributes) {
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		SimpleFeature feature;
 		Coordinate[] coord;
 		
 		for(Entry<String, SortedMap<Integer, Coord>> points : lineStrings.entrySet()){
@@ -385,7 +350,7 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Feature getLineStringFeature(CoordinateArraySequence c, String name, SortedMap<String, Object> attributes) {
+	private static SimpleFeature getLineStringFeature(CoordinateArraySequence c, String name, SortedMap<String, Object> attributes) {
 		LineString s = geometryFactory.createLineString(c);
 		Object[] attribs ;
 		if(attributes == null){
@@ -405,13 +370,13 @@ public class DaShapeWriter {
 		}
 		
 		try {
-			return featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
+			return builder.buildFeature(name, attribs);
+		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	private static Feature getPointFeature(Coord coord, String id, SortedMap<String, Object> attributes) {
+	private static SimpleFeature getPointFeature(Coord coord, String id, SortedMap<String, Object> attributes) {
 		Point p = geometryFactory.createPoint(MGC.coord2Coordinate(coord));
 		Object [] attribs ;
 		if(attributes == null){
@@ -429,10 +394,10 @@ public class DaShapeWriter {
 				count++;
 			}
 		}
-		
+
 		try {
-			return featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
+			return builder.buildFeature(id, attribs);
+		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		}
 	}

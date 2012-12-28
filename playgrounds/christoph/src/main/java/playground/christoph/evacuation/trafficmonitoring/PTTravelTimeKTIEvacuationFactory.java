@@ -27,12 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,8 +36,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.matrices.Matrix;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.balmermi.world.Layer;
@@ -54,8 +50,6 @@ import playground.meisterk.kti.router.SwissHaltestelle;
 import playground.meisterk.kti.router.SwissHaltestellen;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /*
  * Extended PTTravelTimeKTIFactory that adapted the travel time matrix
@@ -140,42 +134,47 @@ public class PTTravelTimeKTIEvacuationFactory extends PTTravelTimeKTIFactory {
 		try {
 			log.info("writing evacuation pt times to shp file...");
 			
-			GeometryFactory geofac = new GeometryFactory();
-			Collection<Feature> fts;
-			
 			CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 4326");
-			AttributeType po = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, targetCRS);
-			AttributeType zone = AttributeTypeFactory.newAttributeType("zone", String.class);
-			AttributeType stop = AttributeTypeFactory.newAttributeType("stop", String.class);
-			AttributeType time = AttributeTypeFactory.newAttributeType("time", Double.class);
-			AttributeType affected = AttributeTypeFactory.newAttributeType("affected", Boolean.class);
-			FeatureType ftPoint;
 
 			// create and write affected stops
 			if (stopsFile != null) {
-				fts = new ArrayList<Feature>();
-				ftPoint = FeatureTypeBuilder.newFeatureType(new AttributeType[] {po, stop, zone, affected}, "Point");
+				PointFeatureFactory factory = new PointFeatureFactory.Builder()
+					.setCrs(targetCRS)
+					.setName("Point")
+					.addAttribute("stop", String.class)
+					.addAttribute("zone", String.class)
+					.addAttribute("affected", Boolean.class)
+					.create();
+				Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
+				
 				for (SwissHaltestelle swissHaltestelle : swissHaltestellen.getHaltestellenMap().values()) {
 					Coord coord = swissHaltestelle.getCoord();
 					boolean isAffected = coordAnalyzer.isCoordAffected(coord);
 					final List<? extends BasicLocation> froms = municipalities.getNearestLocations(coord);
 					BasicLocation fromMunicipality = froms.get(0);
 					
-					fts.add(ftPoint.create(new Object[] {geofac.createPoint(new Coordinate(coord.getX(), coord.getY())), 
-							swissHaltestelle.getId().toString(), fromMunicipality.getId().toString(), isAffected}));
+					fts.add(factory.createPoint(new Coordinate(coord.getX(), coord.getY()),
+							new Object[] {swissHaltestelle.getId().toString(), fromMunicipality.getId().toString(), isAffected}, swissHaltestelle.getId().toString()));
 				}
 				ShapeFileWriter.writeGeometries(fts, stopsFile);				
 			}
 				
 			// create and write evacuation travel times
 			if (travelTimesFile != null) {
-				fts = new ArrayList<Feature>();
-				ftPoint = FeatureTypeBuilder.newFeatureType(new AttributeType[] {po, zone, time, affected}, "Point");
+				PointFeatureFactory factory = new PointFeatureFactory.Builder()
+					.setCrs(targetCRS)
+					.setName("Point")
+					.addAttribute("zone", String.class)
+					.addAttribute("time", Double.class)
+					.addAttribute("affected", Boolean.class)
+					.create();
+				Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
+				
 				for (Id fromId : municipalities.getLocations().keySet()) {
 					double tt = ptMatrix.getEntry(fromId, rescueLinkId).getValue();
 					boolean isAffected = affectedMunicipalities.contains(fromId);
 					Coord coord = municipalities.getLocation(fromId).getCoord();
-					fts.add(ftPoint.create(new Object[] {geofac.createPoint(new Coordinate(coord.getX(), coord.getY())), fromId.toString(), tt, isAffected}));
+					fts.add(factory.createPoint(new Coordinate(coord.getX(), coord.getY()), new Object[] {fromId.toString(), tt, isAffected}, fromId.toString()));
 				}				
 				ShapeFileWriter.writeGeometries(fts, travelTimesFile);
 			}

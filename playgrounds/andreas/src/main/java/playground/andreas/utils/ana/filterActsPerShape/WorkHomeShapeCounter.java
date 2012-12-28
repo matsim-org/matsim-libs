@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.andreas.utils.ana.filterActsPerShape;
 
 import java.io.BufferedWriter;
@@ -8,8 +27,8 @@ import java.util.HashMap;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -18,6 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
@@ -34,7 +54,7 @@ public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 	
 	private boolean initDone = false;
 	private String shapeFile;
-	private FeatureSource featureSource;
+	private SimpleFeatureSource featureSource;
 	private HashMap<Polygon, Integer> polygonCountMap = new HashMap<Polygon, Integer>();
 	private HashMap<Polygon, String> polyNameMap = new HashMap<Polygon, String>();
 	
@@ -144,10 +164,11 @@ public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 		try {
 			this.featureSource = ShapeFileReader.readDataFile(this.shapeFile);			
 	
-			for (Object obj : this.featureSource.getFeatures()) {				
-				Feature ft = (Feature) obj;
-				for (int i = 0; i < ft.getDefaultGeometry().getNumGeometries(); i++) {
-					Geometry geometry = ft.getDefaultGeometry().getGeometryN(i);
+			SimpleFeatureIterator fIt = this.featureSource.getFeatures().features();
+			while (fIt.hasNext()) {
+				SimpleFeature ft = fIt.next();
+				for (int i = 0; i < ((Geometry) ft.getDefaultGeometry()).getNumGeometries(); i++) {
+					Geometry geometry = ((Geometry) ft.getDefaultGeometry()).getGeometryN(i);
 					if(geometry instanceof Polygon){
 						Polygon poly = (Polygon) geometry;
 						this.polygonCountMap.put(poly, new Integer(0));

@@ -20,45 +20,25 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 /*
- * Read a set of given SHP Files and merges all contained features to a single one.
+ * Merges all contained features to a single one.
  */
 public class SHPFileUtil {
 	
-	public Set<Feature> readFile(String file) {
-		try {
-			Set<Feature> features = new HashSet<Feature>();
-			
-			FeatureSource featureSource = ShapeFileReader.readDataFile(file);
-			for (Object o : featureSource.getFeatures()) {
-				features.add((Feature) o);
-			}
-			return features;
-		} catch (IOException e) {
-			Gbl.errorMsg(e);
-			return null;
-		}
-	}
-	
-	public Geometry mergeGeomgetries(Set<Feature> features) {
+	public Geometry mergeGeometries(Set<SimpleFeature> features) {
 		Geometry geometry = null;
 		
-		for (Feature feature : features) {
+		for (SimpleFeature feature : features) {
 			if (geometry == null) {
-				geometry = (Geometry) feature.getDefaultGeometry().clone();
+				geometry = (Geometry) ((Geometry) feature.getDefaultGeometry()).clone();
 				continue;
-			} else geometry = geometry.union(feature.getDefaultGeometry());
+			} else geometry = geometry.union((Geometry) feature.getDefaultGeometry());
 		}
 		return geometry;
 	}

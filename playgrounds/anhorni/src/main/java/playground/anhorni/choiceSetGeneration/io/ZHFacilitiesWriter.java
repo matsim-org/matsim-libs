@@ -23,17 +23,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
@@ -42,14 +38,14 @@ import com.vividsolutions.jts.geom.Point;
 
 
 public class ZHFacilitiesWriter {
-	
-	private FeatureType featureType;
+
+	private SimpleFeatureBuilder builder;
 
 	public void write(String outdir, ZHFacilities facilities)  {
 						
 		this.initGeometries();
-		ArrayList<Feature> features = new ArrayList<Feature>();	
-		ArrayList<Feature> featuresExact = new ArrayList<Feature>();	
+		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();	
+		ArrayList<SimpleFeature> featuresExact = new ArrayList<SimpleFeature>();	
 		
 		Iterator<ZHFacility> facilities_it = facilities.getZhFacilities().values().iterator();
 		while (facilities_it.hasNext()) {
@@ -59,34 +55,21 @@ public class ZHFacilitiesWriter {
 			featuresExact.add(this.createFeature(facility.getExactPosition(), facility.getId()));
 		}
 		if (!features.isEmpty()) {
-			ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/zhFacilitiesPositionMapped2Net.shp");
-			ShapeFileWriter.writeGeometries((Collection<Feature>)featuresExact, outdir +"/shapefiles/zhFacilitiesExactPosition.shp");
+			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)features, outdir +"/shapefiles/zhFacilitiesPositionMapped2Net.shp");
+			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)featuresExact, outdir +"/shapefiles/zhFacilitiesExactPosition.shp");
 		}
 	}
-
 
 	private void initGeometries() {
-		AttributeType [] attr = new AttributeType[2];
-		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
-		attr[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		
-		try {
-			this.featureType = FeatureTypeBuilder.newFeatureType(attr, "point");
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("point");
+		b.add("location", Point.class);
+		b.add("ID", String.class);
+		this.builder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 	
-	private Feature createFeature(Coord coord, Id id) {
-		
-		Feature feature = null;
-		
-		try {
-			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord),  id.toString()});
-		} catch (IllegalAttributeException e) {
-			e.printStackTrace();
-		}
-		return feature;
+	private SimpleFeature createFeature(Coord coord, Id id) {
+		return this.builder.buildFeature(id.toString(), new Object [] {MGC.coord2Point(coord),  id.toString()});
 	}
 	
 }
