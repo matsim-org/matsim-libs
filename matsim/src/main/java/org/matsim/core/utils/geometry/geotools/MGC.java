@@ -86,7 +86,6 @@ public class MGC {
 	}
 
 
-
 	/**
 	 * Converts a MATSim {@link org.matsim.api.core.v01.Coord} into a Geotools <code>Coordinate</code>
 	 * @param coord MATSim coordinate
@@ -168,7 +167,5 @@ public class MGC {
 		}
 		return crs;
 	}
-
-
 
 }
