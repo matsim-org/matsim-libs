@@ -24,17 +24,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -47,11 +42,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GisDebugger {
 
-	private static FeatureType ft;
-
-	private static FeatureType ftLine;
-
-	private static FeatureType ftPoint;
+	private static PolygonFeatureFactory polygonFactory;
+	private static PolylineFeatureFactory polylineFactory;
+	private static PointFeatureFactory pointFactory;
 
 	private static List<Geometry> geos = new ArrayList<Geometry>();
 
@@ -82,7 +75,7 @@ public class GisDebugger {
 			initFeatures();
 			init = true;
 		}
-		Collection<Feature> fts = new  ArrayList<Feature>();
+		Collection<SimpleFeature> fts = new  ArrayList<SimpleFeature>();
 		double d = 0;
 		Iterator<String> it = null;
 		if (strs.size() == geos.size()) {
@@ -94,32 +87,16 @@ public class GisDebugger {
 			if (it != null) {
 				str = it.next();
 			}
+			Object[] attributes = new Object[] {d++, str};
 			if (geo instanceof MultiPolygon) {
-				try {
-					fts.add(ft.create(new Object[] {geo,d++,str}));
-				} catch (IllegalAttributeException e) {
-					e.printStackTrace();
-				}
+				fts.add(polygonFactory.createPolygon((MultiPolygon) geo, attributes, null));
 			} else if (geo instanceof Polygon) {
-				MultiPolygon mp = geofac.createMultiPolygon(new Polygon[]{(Polygon) geo});
-				try {
-					fts.add(ft.create(new Object[] {mp,d++,str}));
-				} catch (IllegalAttributeException e) {
-					e.printStackTrace();
-				}
-			}else if (geo instanceof LineString) {
-				try {
-					fts.add(ftLine.create(new Object[] {geo,d++,str}));
-				} catch (IllegalAttributeException e) {
-					e.printStackTrace();
-				}
+				fts.add(polygonFactory.createPolygon((Polygon) geo, attributes, null));
+			} else if (geo instanceof LineString) {
+				fts.add(polylineFactory.createPolyline((LineString) geo, attributes, null));
 			} else if (geo instanceof Point) {
-				try {
-					fts.add(ftPoint.create(new Object[] {geo,d++,str}));
-				} catch (IllegalAttributeException e) {
-					e.printStackTrace();
-				}
-			}else {
+				fts.add(pointFactory.createPoint((Point) geo, attributes, null));
+			} else {
 				throw new RuntimeException("type of Geometry is not supported" + geo);
 			}
 
@@ -130,35 +107,26 @@ public class GisDebugger {
 	}
 
 
-
-
-
 	private static void initFeatures() {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(CRS);
-		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
-		AttributeType l = DefaultAttributeTypeFactory.newAttributeType(
-				"LineString", LineString.class, true, null, null, targetCRS);
-		AttributeType po = DefaultAttributeTypeFactory.newAttributeType(
-				"Point", Point.class, true, null, null, targetCRS);
-		AttributeType z = AttributeTypeFactory.newAttributeType(
-				"dblAvgZ", Double.class);
-		AttributeType t = AttributeTypeFactory.newAttributeType(
-				"name", String.class);
-
-		Exception ex;
-		try {
-			ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, z, t }, "MultiPolygon");
-			ftLine = FeatureTypeFactory.newFeatureType(new AttributeType[] { l, z, t }, "Line");
-			ftPoint = FeatureTypeFactory.newFeatureType(new AttributeType[] { po, z, t }, "Point");
-			return;
-		} catch (FactoryRegistryException e) {
-			ex = e;
-		} catch (SchemaException e) {
-			ex = e;
-		}
-		throw new RuntimeException(ex);
-
+		
+		polygonFactory = new PolygonFeatureFactory.Builder().
+				setCrs(targetCRS).
+				addAttribute("dblAvgZ", Double.class).
+				addAttribute("name", String.class).
+				create();
+		
+		polylineFactory = new PolylineFeatureFactory.Builder().
+				setCrs(targetCRS).
+				addAttribute("dblAvgZ", Double.class).
+				addAttribute("name", String.class).
+				create();
+		
+		pointFactory = new PointFeatureFactory.Builder().
+				setCrs(targetCRS).
+				addAttribute("dblAvgZ", Double.class).
+				addAttribute("name", String.class).
+				create();
 	}
 
 	public static void addCircle(Coordinate position, double r, String string) {

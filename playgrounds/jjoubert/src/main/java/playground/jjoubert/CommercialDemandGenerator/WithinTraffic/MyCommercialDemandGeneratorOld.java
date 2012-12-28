@@ -28,14 +28,13 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -45,7 +44,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.config.ConfigUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.fabrice.primloc.CumulativeDistribution;
 import playground.jjoubert.CommercialTraffic.Chain;
@@ -335,23 +334,16 @@ public class MyCommercialDemandGeneratorOld {
 
 
 	private static ArrayList<Point> readLocations( String source ) {
-
-		FeatureSource fs = null;
 		ArrayList<Point> points = new ArrayList<Point>();
 		Point p = null;
-		try {
-			fs = ShapeFileReader.readDataFile( source );
-			for(Object o: fs.getFeatures() ){
-				Geometry geo = ((Feature)o).getDefaultGeometry();
-				if(geo instanceof Point){
-					p = (Point)geo;
-					points.add(p);
-				} else{
-					System.err.println("The shapefile is not made up of only points!");
-				}
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(source)) {
+			Geometry geo = (Geometry) feature.getDefaultGeometry();
+			if(geo instanceof Point){
+				p = (Point)geo;
+				points.add(p);
+			} else{
+				System.err.println("The shapefile is not made up of only points!");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return points;
 	}

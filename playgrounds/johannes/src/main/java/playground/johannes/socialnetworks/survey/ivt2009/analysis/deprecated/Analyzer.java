@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 
 import playground.johannes.sna.gis.CRSUtils;
@@ -77,8 +77,8 @@ public class Analyzer {
 		Set<Point> choiceSet = new HashSet<Point>();
 		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
 		
-		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
-		Geometry geometry = feature.getDefaultGeometry();
+		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		
 		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
 //		graph2.transformToCRS(CRSUtils.getCRS(4326));

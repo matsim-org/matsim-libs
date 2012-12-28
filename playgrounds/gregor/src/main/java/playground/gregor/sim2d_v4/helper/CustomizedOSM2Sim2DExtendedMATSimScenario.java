@@ -53,7 +53,6 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import playground.gregor.sim2d_v4.io.Sim2DConfigWriter01;
 import playground.gregor.sim2d_v4.io.Sim2DEnvironmentWriter02;
@@ -371,8 +370,6 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		LinearRing lr = geofac.createLinearRing(coords);
 		try {
 			lr = (LinearRing) JTS.transform(lr, transform);
-		} catch (MismatchedDimensionException e) {
-			throw new RuntimeException(e);
 		} catch (TransformException e) {
 			throw new RuntimeException(e);
 		}

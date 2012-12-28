@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -61,8 +61,8 @@ public class PropertyGridKMLWriter {
 		
 		ZoneLayer<Double> layer = VertexPropertyGrid.createMeanGrid(graph.getVertices(), Degree.getInstance(), 1000.0);
 		
-		Set<Feature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp");
-		Geometry ch = features.iterator().next().getDefaultGeometry();
+		Set<SimpleFeature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp");
+		Geometry ch = (Geometry) features.iterator().next().getDefaultGeometry();
 		
 		Set<Zone> remove = new HashSet<Zone>();
 		for(Zone z : layer.getZones()) {

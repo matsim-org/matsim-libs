@@ -23,11 +23,12 @@ package playground.gregor.gis.translate;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class Translate {
 	
@@ -50,8 +51,8 @@ public class Translate {
 		
 		Set<Coordinate> handled = new HashSet<Coordinate>();
 		
-		for (Feature ft : reader.getFeatureSet()) {
-			for (Coordinate c : ft.getDefaultGeometry().getCoordinates()) {
+		for (SimpleFeature ft : reader.getFeatureSet()) {
+			for (Coordinate c : ((Geometry) ft.getDefaultGeometry()).getCoordinates()) {
 				if (handled.contains(c)) {
 					System.out.println("hab schon!");
 					continue;

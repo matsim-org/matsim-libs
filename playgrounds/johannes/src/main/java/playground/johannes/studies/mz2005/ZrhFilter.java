@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,6 +32,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
@@ -60,8 +60,8 @@ public class ZrhFilter {
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/09-12-2011/plans.xml");
 
-		Set<Feature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
-		Geometry geometry = features.iterator().next().getDefaultGeometry();
+		Set<SimpleFeature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
+		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
 		
 		Set<Person> remove = new HashSet<Person>();
 		for(Person p : scenario.getPopulation().getPersons().values()) {

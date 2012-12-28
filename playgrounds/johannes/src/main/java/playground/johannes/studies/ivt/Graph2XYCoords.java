@@ -23,7 +23,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.GraphBuilder;
@@ -55,8 +55,8 @@ public class Graph2XYCoords {
 		
 		SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 		
-		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
-		Geometry chBorder = feature.getDefaultGeometry();
+		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+		Geometry chBorder = (Geometry) feature.getDefaultGeometry();
 		chBorder.setSRID(21781);
 		
 		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));

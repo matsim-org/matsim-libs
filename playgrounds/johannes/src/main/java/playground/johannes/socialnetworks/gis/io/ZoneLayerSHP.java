@@ -29,20 +29,15 @@ import java.util.Set;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
@@ -65,18 +60,13 @@ public class ZoneLayerSHP {
 		 * create feature type from zones
 		 */
 		CoordinateReferenceSystem crs = layer.getCRS();
-		AttributeType[] attTypes = new AttributeType[2];
-		attTypes[0] = DefaultAttributeTypeFactory.newAttributeType("polygon", Polygon.class, true, null, null, crs);
-		attTypes[1] = AttributeTypeFactory.newAttributeType("value", Double.class);
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(crs);
+		b.setName("zone");
+		b.add("location", Polygon.class);
+		b.add("value", Double.class);
+		SimpleFeatureType featureType = b.buildFeatureType();
 		
-		FeatureType featureType = null;
-		try {
-			featureType = FeatureTypeBuilder.newFeatureType(attTypes, "zone");
-		} catch (FactoryConfigurationError e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}
 		/*
 		 * Create a data store
 		 */
@@ -89,15 +79,15 @@ public class ZoneLayerSHP {
 		/*
 		 * Create a FeatureWriter and write the attributes
 		 */
-		FeatureWriter writer = datastore.getFeatureWriter(Transaction.AUTO_COMMIT);
+		FeatureWriter<SimpleFeatureType, SimpleFeature> writer = datastore.getFeatureWriter(Transaction.AUTO_COMMIT);
 		for(Zone<T> zone : layer.getZones()) {
-			Feature feature = writer.next();
+			SimpleFeature feature = writer.next();
 			try {
 				feature.setAttribute(0, zone.getGeometry());
 				feature.setAttribute(1, zone.getAttribute());
 			} catch (ArrayIndexOutOfBoundsException e) {
 				e.printStackTrace();
-			} catch (IllegalAttributeException e) {
+			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			}
 			writer.write();
@@ -115,7 +105,7 @@ public class ZoneLayerSHP {
 		File file = new File(filename);
 		if(!file.exists()) {
 			PrintWriter pwriter = new PrintWriter(new File(filename));
-			String wkt = featureType.getDefaultGeometry().getCoordinateSystem().toWKT();
+			String wkt = featureType.getCoordinateReferenceSystem().toWKT();
 			pwriter.write(wkt);
 			pwriter.close();
 		}
@@ -133,7 +123,7 @@ public class ZoneLayerSHP {
 //		GeometryFactory factory = new GeometryFactory();
 		
 		Set<Zone<T>> zones = new HashSet<Zone<T>>();
-		for(Feature feature : FeatureSHP.readFeatures(filename)) {
+		for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
 //			Coordinate[] coordinates = feature.getDefaultGeometry().getCoordinates();
 //			Coordinate[] newCoords = new Coordinate[coordinates.length + 1];
 //			for(int i = 0; i < coordinates.length; i++) {
@@ -143,7 +133,7 @@ public class ZoneLayerSHP {
 //			
 //			LinearRing shell = factory.createLinearRing(newCoords);
 //			zones.add(new Zone<T>(factory.createPolygon(shell, null)));
-			zones.add(new Zone<T>(feature.getDefaultGeometry().getGeometryN(0)));
+			zones.add(new Zone<T>(((Geometry) feature.getDefaultGeometry()).getGeometryN(0)));
 		}
 		
 		return new ZoneLayer<T>(zones);

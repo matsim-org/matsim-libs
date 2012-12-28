@@ -1,5 +1,5 @@
-/* *********************************************************************** *
- * project: org.matsim.*
+/* *********************.************************************************** *
+ * project: org.matsim.*b
  * MyShapeFileWriter.java
  *                                                                         *
  * *********************************************************************** *
@@ -18,42 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.ikaddoura.parkAndRide.analyze.plans;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author Ihab
@@ -62,8 +53,7 @@ import com.vividsolutions.jts.geom.Point;
 public class MyShapeFileWriter {
 	
 	private GeometryFactory geometryFactory = new GeometryFactory();
-	ArrayList<Feature> FeatureList = new ArrayList<Feature>();
-	private FeatureType featureType;
+	ArrayList<SimpleFeature> FeatureList = new ArrayList<SimpleFeature>();
 	
 	public void writeShapeFileLines(Scenario scenario, String path, String outputFile) {
 		File directory = new File(path);
@@ -71,8 +61,8 @@ public class MyShapeFileWriter {
 		
 		String file = path + outputFile;
 		
-		initFeatureType1();
-		Collection<Feature> features = createFeatures1(scenario);
+		PolylineFeatureFactory factory = initFeatureType1();
+		Collection<SimpleFeature> features = createFeatures1(scenario, factory);
 		ShapeFileWriter.writeGeometries(features, file);
 		System.out.println("ShapeFile " + file + " written.");	
 	}
@@ -82,16 +72,16 @@ public class MyShapeFileWriter {
 			System.out.println("Map is empty, shapeFile " + outputFile + " not written!");
 		}
 		else {
-			initFeatureType2();
-			Collection<Feature> features = createFeatures2(scenario, koordinaten);
+			PointFeatureFactory factory = initFeatureType2();
+			Collection<SimpleFeature> features = createFeatures2(scenario, koordinaten, factory);
 			ShapeFileWriter.writeGeometries(features,  outputFile);
 			System.out.println("ShapeFile " + outputFile + " written.");	
 		}
 	}
 	
 	public void writeShapeFileGeometry(Map<Integer, Geometry> nr2geometry, Map<Integer, Double> nr2PRUsersHomeShare, Map<Integer, Double> zoneNr2activityShare_work, Map<Integer, Integer> zoneNr2home_prUsers, Map<Integer, Integer> zoneNr2work_prUsers, Map<Integer, Integer> zoneNr2home_all, Map<Integer, Integer> zoneNr2work_all, String outputFile) {
-		initFeatureType4();
-		Collection<Feature> features = createFeatures4(nr2geometry, nr2PRUsersHomeShare, zoneNr2activityShare_work, zoneNr2home_prUsers, zoneNr2work_prUsers, zoneNr2home_all, zoneNr2work_all);
+		SimpleFeatureBuilder factory = initFeatureType4();
+		Collection<SimpleFeature> features = createFeatures4(nr2geometry, nr2PRUsersHomeShare, zoneNr2activityShare_work, zoneNr2home_prUsers, zoneNr2work_prUsers, zoneNr2home_all, zoneNr2work_all, factory);
 		ShapeFileWriter.writeGeometries(features, outputFile);
 		System.out.println("ShapeFile " + outputFile + " written.");	
 	}
@@ -101,96 +91,70 @@ public class MyShapeFileWriter {
 			System.out.println("Map is empty, shapeFile " + outputFile + " not written!");
 		}
 		
-		initFeatureType3();
-		Collection<Feature> features = createFeatures3(scenario, id2prFacilities, prLinkId2prActs);
+		PolylineFeatureFactory factory = initFeatureType3();
+		Collection<SimpleFeature> features = createFeatures3(scenario, id2prFacilities, prLinkId2prActs, factory);
 		ShapeFileWriter.writeGeometries(features, outputFile);
 		System.out.println("ShapeFile " + outputFile + " written.");	
 	}
 
-	private void initFeatureType1() {
-		AttributeType [] attribs = new AttributeType[2];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
-		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-
-		try {
-		this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
-		} catch (FactoryRegistryException e) {
-		e.printStackTrace();
-		} catch (SchemaException e) {
-		e.printStackTrace();
-		}		
+	private PolylineFeatureFactory initFeatureType1() {
+		return new PolylineFeatureFactory.Builder().
+				setCrs(MGC.getCRS(TransformationFactory.WGS84_UTM35S)).
+				setName("link").
+				addAttribute("ID", String.class).create();
 	}
 	
-	private void initFeatureType2() {
-		AttributeType [] attribs = new AttributeType[2];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
-		attribs[1] = AttributeTypeFactory.newAttributeType("PersonID", String.class);
-		
-		try {
-		this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "point");
-		} catch (FactoryRegistryException e) {
-		e.printStackTrace();
-		} catch (SchemaException e) {
-		e.printStackTrace();
-		}		
+	private PointFeatureFactory initFeatureType2() {
+		return new PointFeatureFactory.Builder().
+				setCrs(MGC.getCRS(TransformationFactory.WGS84_UTM35S)).
+				setName("point").
+				addAttribute("PersonId", String.class).
+				create();
 	}
 	
-	private void initFeatureType3() {
-		AttributeType [] attribs = new AttributeType[4];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
-		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("Stop", String.class);
-		attribs[3] = AttributeTypeFactory.newAttributeType("Users", Integer.class);
-
-
-		try {
-		this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
-		} catch (FactoryRegistryException e) {
-		e.printStackTrace();
-		} catch (SchemaException e) {
-		e.printStackTrace();
-		}	
+	private PolylineFeatureFactory initFeatureType3() {
+		return new PolylineFeatureFactory.Builder().
+				setCrs(MGC.getCRS(TransformationFactory.WGS84_UTM35S)).
+				setName("link").
+				addAttribute("ID", String.class).
+				addAttribute("Stop", String.class).
+				addAttribute("Users", Integer.class).
+				create();
 	}
 	
-	private void initFeatureType4() {
-		AttributeType [] attribs = new AttributeType[8];
-		
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Geometry", Geometry.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
-		attribs[1] = AttributeTypeFactory.newAttributeType("NR", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("HomeAll", Integer.class);
-		attribs[3] = AttributeTypeFactory.newAttributeType("WorkAll", Integer.class);
-		attribs[4] = AttributeTypeFactory.newAttributeType("HomePRUsers", Integer.class);
-		attribs[5] = AttributeTypeFactory.newAttributeType("WorkPRUsers", Integer.class);
-		attribs[6] = AttributeTypeFactory.newAttributeType("HomePRshare", Double.class);
-		attribs[7] = AttributeTypeFactory.newAttributeType("WorkPRshare", Double.class);
-
-		try {
-		this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "geometry");
-		} catch (FactoryRegistryException e) {
-		e.printStackTrace();
-		} catch (SchemaException e) {
-		e.printStackTrace();
-		}		
+	private SimpleFeatureBuilder initFeatureType4() {
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		b.setName("geometry");
+		b.add("location", Geometry.class);
+		b.add("NR", String.class);
+		b.add("HomeAll", Integer.class);
+		b.add("WorkAll", Integer.class);
+		b.add("HomePRUsers", Integer.class);
+		b.add("WorkPRUsers", Integer.class);
+		b.add("HomePRshare", Double.class);
+		b.add("WorkPRshare", Double.class);
+		return new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 	
-	private Collection<Feature> createFeatures1(Scenario scenario) {
-		ArrayList<Feature> liste = new ArrayList<Feature>();
+	private Collection<SimpleFeature> createFeatures1(Scenario scenario, PolylineFeatureFactory factory) {
+		ArrayList<SimpleFeature> liste = new ArrayList<SimpleFeature>();
 		for (Link link : scenario.getNetwork().getLinks().values()){
-			liste.add(getFeature1(link));
+			liste.add(getFeature1(link, factory));
 		}
 		return liste;
 	}
 	
-	private Collection<Feature> createFeatures2(Scenario scenario, SortedMap<Id,Coord> Koordinaten) {
-		ArrayList<Feature> liste = new ArrayList<Feature>();
+	private Collection<SimpleFeature> createFeatures2(Scenario scenario, SortedMap<Id,Coord> Koordinaten, PointFeatureFactory factory) {
+		ArrayList<SimpleFeature> liste = new ArrayList<SimpleFeature>();
 		for (Entry<Id,Coord> entry : Koordinaten.entrySet()){
-			liste.add(getFeature2((Coord)entry.getValue(), (Id)entry.getKey()));
+			liste.add(getFeature2((Coord)entry.getValue(), (Id)entry.getKey(), factory));
 		}
 		return liste;
 	}
 	
-	private Collection<Feature> createFeatures3(Scenario scenario, Map<Id, ParkAndRideFacility> id2prFacilities, Map<Id, Integer> prLinkId2prActs) {
-		ArrayList<Feature> liste = new ArrayList<Feature>();
+	private Collection<SimpleFeature> createFeatures3(Scenario scenario, Map<Id, ParkAndRideFacility> id2prFacilities, Map<Id, Integer> prLinkId2prActs, PolylineFeatureFactory factory) {
+		ArrayList<SimpleFeature> liste = new ArrayList<SimpleFeature>();
 		for (Id linkId : prLinkId2prActs.keySet()){
 			
 			String name = "";
@@ -200,33 +164,27 @@ public class MyShapeFileWriter {
 				}
 			}
 			
-			liste.add(getFeature3(scenario.getNetwork().getLinks().get(linkId), name, prLinkId2prActs.get(linkId)));
+			liste.add(getFeature3(scenario.getNetwork().getLinks().get(linkId), name, prLinkId2prActs.get(linkId), factory));
 		}
 		return liste;
 	}
 	
-	private Collection<Feature> createFeatures4(Map<Integer, Geometry> nr2geometry, Map<Integer, Double> nr2PRUsersHomeShare, Map<Integer, Double> zoneNr2activityShare_work, Map<Integer, Integer> zoneNr2home_prUsers, Map<Integer, Integer> zoneNr2work_prUsers, Map<Integer, Integer> zoneNr2home_all, Map<Integer, Integer> zoneNr2work_all) {
-		ArrayList<Feature> liste = new ArrayList<Feature>();
+	private Collection<SimpleFeature> createFeatures4(Map<Integer, Geometry> nr2geometry, Map<Integer, Double> nr2PRUsersHomeShare, Map<Integer, Double> zoneNr2activityShare_work, Map<Integer, Integer> zoneNr2home_prUsers, Map<Integer, Integer> zoneNr2work_prUsers, Map<Integer, Integer> zoneNr2home_all, Map<Integer, Integer> zoneNr2work_all, SimpleFeatureBuilder factory) {
+		ArrayList<SimpleFeature> liste = new ArrayList<SimpleFeature>();
 		for (Integer nr : nr2geometry.keySet()){
-			liste.add(getFeature4(nr, nr2geometry.get(nr), nr2PRUsersHomeShare, zoneNr2activityShare_work, zoneNr2home_prUsers, zoneNr2work_prUsers, zoneNr2home_all, zoneNr2work_all));
+			liste.add(getFeature4(nr, nr2geometry.get(nr), nr2PRUsersHomeShare, zoneNr2activityShare_work, zoneNr2home_prUsers, zoneNr2work_prUsers, zoneNr2home_all, zoneNr2work_all, factory));
 		}
 		return liste;
 	}
 
-	private Feature getFeature1(Link link) {
-		LineString ls = this.geometryFactory.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())});
-		Object [] attribs = new Object[2];
-		attribs[0] = ls;
-		attribs[1] = link.getId().toString();
-		
-		try {
-		return this.featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
-		throw new RuntimeException(e);
-		}
+	private SimpleFeature getFeature1(Link link, PolylineFeatureFactory factory) {
+		return factory.createPolyline(
+				new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())}, 
+				new Object[] {link.getId().toString()}, 
+				null);
 	}
 	
-	private Feature getFeature4(Integer nr, Geometry geometry, Map<Integer, Double> zoneNr2activityShare_home, Map<Integer, Double> zoneNr2activityShare_work, Map<Integer, Integer> zoneNr2home_prUsers, Map<Integer, Integer> zoneNr2work_prUsers, Map<Integer, Integer> zoneNr2home_all, Map<Integer, Integer> zoneNr2work_all) {
+	private SimpleFeature getFeature4(Integer nr, Geometry geometry, Map<Integer, Double> zoneNr2activityShare_home, Map<Integer, Double> zoneNr2activityShare_work, Map<Integer, Integer> zoneNr2home_prUsers, Map<Integer, Integer> zoneNr2work_prUsers, Map<Integer, Integer> zoneNr2home_all, Map<Integer, Integer> zoneNr2work_all, SimpleFeatureBuilder factory) {
 		Geometry g = this.geometryFactory.createGeometry(geometry);
 		Object [] attribs = new Object[8];
 		attribs[0] = g;
@@ -262,39 +220,17 @@ public class MyShapeFileWriter {
 			attribs[7] = 0;
 		}
 
-		try {
-		return this.featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
-		throw new RuntimeException(e);
-		}
+		return factory.buildFeature(null, attribs);
 	}
 	
-	private Feature getFeature2(Coord coord, Id id) {
-		Coordinate homeCoordinate = new Coordinate(coord.getX(), coord.getY());
-		Point p = this.geometryFactory.createPoint(homeCoordinate);
-		Object [] attribs = new Object[2];
-		attribs[0] = p;
-		attribs[1] = id;
-		
-		try {
-		return this.featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
-		throw new RuntimeException(e);
-		}
+	private SimpleFeature getFeature2(Coord coord, Id id, PointFeatureFactory factory) {
+		return factory.createPoint(coord, new Object[] {id.toString()}, null);
 	}
 	
-	private Feature getFeature3(Link link, String transitStopName, Integer prUsers) {
-		LineString ls = this.geometryFactory.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())});
-		Object [] attribs = new Object[4];
-		attribs[0] = ls;
-		attribs[1] = link.getId().toString();
-		attribs[2] = transitStopName;
-		attribs[3] = prUsers;
-		
-		try {
-			return this.featureType.create(attribs);
-		} catch (IllegalAttributeException e) {
-			throw new RuntimeException(e);
-		}
+	private SimpleFeature getFeature3(Link link, String transitStopName, Integer prUsers, PolylineFeatureFactory factory) {
+		return factory.createPolyline(
+				new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())}, 
+				new Object[] {link.getId().toString(), transitStopName, prUsers},
+				null);
 	}
 }

@@ -21,20 +21,17 @@
 package playground.jjoubert.Utilities.matsim2urbansim;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 
@@ -90,54 +87,46 @@ public class MyZoneReader {
 	 * 		<li> MATSim test - 1 
 	 * </ul>
 	 */
-	@SuppressWarnings("unchecked")
 	public void readZones (int idField){
 		log.info("Reading shapefile " + this.shapefile);		
 		this.zoneList = new ArrayList<MyZone>();
 		this.zoneMap = new HashMap<Id, MyZone>();
-		FeatureSource fs = null;
 		MultiPolygon mp = null;
-		try {	
-			fs = ShapeFileReader.readDataFile( this.shapefile );
-			Collection<Object> objectArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
-			for (Object o : objectArray) {
-				String name = String.valueOf(((Feature) o).getAttribute(idField));
-				Geometry shape = ((Feature) o).getDefaultGeometry();
-				if( shape instanceof MultiPolygon ){
-					mp = (MultiPolygon)shape;
-					if( !mp.isSimple() ){
-						log.warn("This polygon is NOT simple!" );
-					}
-					if(mp.getNumGeometries() > 1){
-						log.warn("MultiPolygon " + name + " has more than one polygon.");
-					}
-					Polygon[] polygonArray = new Polygon[mp.getNumGeometries()];
-					for(int j = 0; j < mp.getNumGeometries(); j++ ){
-						if(mp.getGeometryN(j) instanceof Polygon ){
-							polygonArray[j] = (Polygon) mp.getGeometryN(j);							
-						} else{
-							log.warn("Subset of multipolygon is NOT a polygon.");
-						}
-					}
-					MyZone newZone = new MyZone(polygonArray, mp.getFactory(), new IdImpl(name));
-					zoneList.add(newZone);
-					zoneMap.put(newZone.getId(), newZone);
-
-					/*
-					 * Determine the extent of the QuadTree.
-					 */
-					Point centroid = newZone.getCentroid();
-					this.xMin = Math.min(centroid.getX(), this.xMin);
-					this.xMax = Math.max(centroid.getX(), this.xMax);
-					this.yMin = Math.min(centroid.getY(), this.yMin);
-					this.yMax = Math.max(centroid.getY(), this.yMax);
-				} else{
-					log.warn("This is not a multipolygon!");
+		for (SimpleFeature f: ShapeFileReader.getAllFeatures(this.shapefile)) {
+			String name = String.valueOf(f.getAttribute(idField));
+			Geometry shape = (Geometry) (f.getDefaultGeometry());
+			if( shape instanceof MultiPolygon ){
+				mp = (MultiPolygon)shape;
+				if( !mp.isSimple() ){
+					log.warn("This polygon is NOT simple!" );
 				}
+				if(mp.getNumGeometries() > 1){
+					log.warn("MultiPolygon " + name + " has more than one polygon.");
+				}
+				Polygon[] polygonArray = new Polygon[mp.getNumGeometries()];
+				for(int j = 0; j < mp.getNumGeometries(); j++ ){
+					if(mp.getGeometryN(j) instanceof Polygon ){
+						polygonArray[j] = (Polygon) mp.getGeometryN(j);							
+					} else{
+						log.warn("Subset of multipolygon is NOT a polygon.");
+					}
+				}
+				MyZone newZone = new MyZone(polygonArray, mp.getFactory(), new IdImpl(name));
+				zoneList.add(newZone);
+				zoneMap.put(newZone.getId(), newZone);
+
+				/*
+				 * Determine the extent of the QuadTree.
+				 */
+				Point centroid = newZone.getCentroid();
+				this.xMin = Math.min(centroid.getX(), this.xMin);
+				this.xMax = Math.max(centroid.getX(), this.xMax);
+				this.yMin = Math.min(centroid.getY(), this.yMin);
+				this.yMax = Math.max(centroid.getY(), this.yMax);
+			} else{
+				log.warn("This is not a multipolygon!");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
+		}
 		log.info("Done reading " + shapefile);
 	}
 	

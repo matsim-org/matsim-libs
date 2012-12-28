@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 
 import playground.johannes.sna.gis.CRSUtils;
@@ -82,8 +82,8 @@ public class DensityPlot {
 		
 		Geometry boundary = null;
 		if(MODE.equals("density") || MODE.equals("weighted")) {
-			Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
-			boundary = feature.getDefaultGeometry();
+			SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+			boundary = (Geometry) feature.getDefaultGeometry();
 			boundary.setSRID(21781);
 		} else {
 			GeometryFactory factory = new GeometryFactory();

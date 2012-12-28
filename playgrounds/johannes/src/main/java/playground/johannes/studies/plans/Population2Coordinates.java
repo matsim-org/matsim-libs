@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -36,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 
@@ -60,10 +60,10 @@ public class Population2Coordinates {
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.10.xml");
 		
-		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp").iterator().next();
+		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp").iterator().next();
 		
 		Set<Coord> coords = getCoords(scenario.getPopulation());
-		Set<Point> points = filterCoors(coords, feature.getDefaultGeometry());
+		Set<Point> points = filterCoors(coords, (Geometry) feature.getDefaultGeometry());
 		writePoints(points, "/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/points.zrh.txt");
 
 	}

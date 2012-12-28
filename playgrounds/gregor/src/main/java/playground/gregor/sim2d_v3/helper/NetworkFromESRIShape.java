@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sim2d_v3.helper;
 
 import java.util.ArrayList;
@@ -5,9 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -22,6 +39,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -47,10 +65,10 @@ public class NetworkFromESRIShape {
 
 	public void processShapeFile(String fileName) {
 		ShapeFileReader r = new ShapeFileReader();
-		Set<Feature> fts = r.readFileAndInitialize(fileName);
+		Collection<SimpleFeature> fts = r.readFileAndInitialize(fileName);
 		List<LineString> ls = new ArrayList<LineString>();
-		for (Feature ft : fts) {
-			Geometry geo = ft.getDefaultGeometry();
+		for (SimpleFeature ft : fts) {
+			Geometry geo = (Geometry) ft.getDefaultGeometry();
 			if (geo instanceof LineString) {
 				ls.add((LineString)geo);
 			} else if (geo instanceof MultiLineString) {

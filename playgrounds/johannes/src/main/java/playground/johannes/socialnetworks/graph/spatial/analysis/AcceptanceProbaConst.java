@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.Vertex;
@@ -140,8 +140,8 @@ public class AcceptanceProbaConst extends AbstractVertexProperty {
 		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.005.xml");
 		
 		g.getDelegate().transformToCRS(CRSUtils.getCRS(21781));
-		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
-		Geometry geometry = feature.getDefaultGeometry();
+		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		geometry.setSRID(21781);
 		GraphFilter<SpatialGraph> filter = new SpatialFilter(new SocialSparseGraphBuilder(g.getDelegate().getCoordinateReferenceSysten()), geometry);
 		filter.apply(g.getDelegate());

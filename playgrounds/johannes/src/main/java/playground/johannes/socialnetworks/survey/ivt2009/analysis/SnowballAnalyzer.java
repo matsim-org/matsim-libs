@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV1;
@@ -31,6 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -48,7 +48,6 @@ import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.graph.analysis.FilteredAnalyzerTask;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilter;
-import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilterComposite;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
@@ -102,12 +101,12 @@ public class SnowballAnalyzer {
 		Set<Point> choiceSet = new HashSet<Point>();
 		SpatialSparseGraph graph2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read(config.getParam(MODULE_NAME, "plansfile"));
 		
-		Feature feature = FeatureSHP.readFeatures(config.getParam(MODULE_NAME, "chzone")).iterator().next();
-		chBorder = feature.getDefaultGeometry();
+		SimpleFeature feature = FeatureSHP.readFeatures(config.getParam(MODULE_NAME, "chzone")).iterator().next();
+		chBorder = (Geometry) feature.getDefaultGeometry();
 		chBorder.setSRID(21781);
 		
 		feature = FeatureSHP.readFeatures(config.getParam(MODULE_NAME, "zrhzone")).iterator().next();
-		zrhBorder = feature.getDefaultGeometry();
+		zrhBorder = (Geometry) feature.getDefaultGeometry();
 		zrhBorder.setSRID(21781);
 		
 		String output = config.getParam(MODULE_NAME, "output");

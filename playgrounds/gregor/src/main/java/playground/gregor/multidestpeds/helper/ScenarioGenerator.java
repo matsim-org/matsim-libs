@@ -1,11 +1,30 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.multidestpeds.helper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -25,6 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.gregor.multidestpeds.io.Mat2XYVxVyEvents;
 import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
@@ -161,7 +181,7 @@ public class ScenarioGenerator {
 
 	}
 
-	private static void createNetwork(Scenario sc, String dir, Set<Feature> set) {
+	private static void createNetwork(Scenario sc, String dir, Collection<SimpleFeature> set) {
 
 		createLeftToRight(sc,set);
 		createTopToBottom1(sc,set);
@@ -186,7 +206,7 @@ public class ScenarioGenerator {
 		sc.getConfig().network().setInputFile(networkOutputFile);
 	}
 
-	private static void createLeftToRight(Scenario sc, Set<Feature> set) {
+	private static void createLeftToRight(Scenario sc, Collection<SimpleFeature> set) {
 		List<Link> links = new ArrayList<Link>();
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
@@ -259,7 +279,7 @@ public class ScenarioGenerator {
 
 	}
 	
-	private static void createTopToBottom7(Scenario sc, Set<Feature> set) {
+	private static void createTopToBottom7(Scenario sc, Collection<SimpleFeature> set) {
 		List<Link> links = new ArrayList<Link>();
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
@@ -321,7 +341,7 @@ public class ScenarioGenerator {
 		}
 	}
 	
-	private static void createTopToBottom6(Scenario sc, Set<Feature> set) {
+	private static void createTopToBottom6(Scenario sc, Collection<SimpleFeature> set) {
 		List<Link> links = new ArrayList<Link>();
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
@@ -384,7 +404,7 @@ public class ScenarioGenerator {
 	}
 	
 
-	private static void createTopToBottom5(Scenario sc, Set<Feature> set) {
+	private static void createTopToBottom5(Scenario sc, Collection<SimpleFeature> set) {
 		List<Link> links = new ArrayList<Link>();
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
@@ -442,7 +462,7 @@ public class ScenarioGenerator {
 		}
 	}
 	
-	private static void createTopToBottom4(Scenario sc, Set<Feature> set) {
+	private static void createTopToBottom4(Scenario sc, Collection<SimpleFeature> set) {
 		List<Link> links = new ArrayList<Link>();
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
@@ -500,7 +520,7 @@ public class ScenarioGenerator {
 		}
 	}
 	
-	private static void createTopToBottom3(Scenario sc, Set<Feature> set) {
+	private static void createTopToBottom3(Scenario sc, Collection<SimpleFeature> set) {
 		List<Link> links = new ArrayList<Link>();
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
@@ -557,7 +577,7 @@ public class ScenarioGenerator {
 			links.add(l);
 		}
 	}
-	private static void createTopToBottom2(Scenario sc, Set<Feature> set) {
+	private static void createTopToBottom2(Scenario sc, Collection<SimpleFeature> set) {
 		List<Link> links = new ArrayList<Link>();
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
@@ -626,7 +646,7 @@ public class ScenarioGenerator {
 
 	}
 
-	private static void createTopToBottom1(Scenario sc, Set<Feature> set) {
+	private static void createTopToBottom1(Scenario sc, Collection<SimpleFeature> set) {
 		List<Link> links = new ArrayList<Link>();
 
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(sc.getNetwork());
@@ -698,11 +718,11 @@ public class ScenarioGenerator {
 
 	}
 
-	private static double estWidth(Coordinate c0, Coordinate c1, Set<Feature> set) {
+	private static double estWidth(Coordinate c0, Coordinate c1, Collection<SimpleFeature> set) {
 		LineString ls = GisDebugger.geofac.createLineString(new Coordinate[]{c0,c1});
 		double minDist = 3;
-		for (Feature ft : set) {
-			Geometry geo = ft.getDefaultGeometry();
+		for (SimpleFeature ft : set) {
+			Geometry geo = (Geometry) ft.getDefaultGeometry();
 			double dist = ls.distance(geo);
 			if (dist < minDist) {
 				minDist = dist;

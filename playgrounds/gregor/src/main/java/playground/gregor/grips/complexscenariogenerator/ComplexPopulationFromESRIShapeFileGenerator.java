@@ -30,9 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
-import org.geotools.feature.IllegalAttributeException;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -48,11 +46,12 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 public class ComplexPopulationFromESRIShapeFileGenerator {
@@ -77,22 +76,17 @@ public class ComplexPopulationFromESRIShapeFileGenerator {
 
 	public void run() {
 		
-		FeatureSource fs = ShapeFileReader.readDataFile(this.populationShapeFile);
-		CoordinateReferenceSystem crs = fs.getSchema().getDefaultGeometry().getCoordinateSystem();
+		SimpleFeatureSource fs = ShapeFileReader.readDataFile(this.populationShapeFile);
+		CoordinateReferenceSystem crs = fs.getSchema().getCoordinateReferenceSystem();
 		try {
-			@SuppressWarnings("unchecked")
-			Iterator<Feature> it = fs.getFeatures().iterator();
+			Iterator<SimpleFeature> it = fs.getFeatures().iterator();
 			while (it.hasNext()) {
-				Feature ft = it.next();
+				SimpleFeature ft = it.next();
 				try {
 					FeatureTransformer.transform(ft, crs, this.scenario.getConfig());
-				} catch (MismatchedDimensionException e) {
-					throw new RuntimeException(e);
 				} catch (FactoryException e) {
 					throw new RuntimeException(e);
 				} catch (TransformException e) {
-					throw new RuntimeException(e);
-				} catch (IllegalAttributeException e) {
 					throw new RuntimeException(e);
 				} 
 				
@@ -185,20 +179,20 @@ public class ComplexPopulationFromESRIShapeFileGenerator {
 		return this.depTimeLookup.get((this.id-1)%this.depTimeLookup.size());
 	}
 
-	protected Coord getRandomCoordInsideFeature(Random rnd, Feature ft) {
+	protected Coord getRandomCoordInsideFeature(Random rnd, SimpleFeature ft) {
 		Point p = null;
 		double x, y;
 		do {
 			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
 			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
 			p = MGC.xy2Point(x, y);
-		} while (!ft.getDefaultGeometry().contains(p));
+		} while (!((Geometry) ft.getDefaultGeometry()).contains(p));
 		return MGC.point2Coord(p);
 	}
 	
 
 	private static final class ODRelation {
-		Feature o;
-		Feature d;
+		SimpleFeature o;
+		SimpleFeature d;
 	}
 }

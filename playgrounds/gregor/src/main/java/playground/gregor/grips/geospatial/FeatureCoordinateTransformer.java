@@ -22,18 +22,16 @@ package playground.gregor.grips.geospatial;
 
 import java.util.Collection;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -55,24 +53,20 @@ public class FeatureCoordinateTransformer {
 		throw new RuntimeException(ex);
 	}
 	
-	public void transform(Feature f) {
+	public void transform(SimpleFeature f) {
 		Exception ex;
 		try {
-			Geometry trr = JTS.transform(f.getDefaultGeometry(), this.transform);
+			Geometry trr = JTS.transform((Geometry) f.getDefaultGeometry(), this.transform);
 			f.setDefaultGeometry(trr);
 			return;
-		} catch (MismatchedDimensionException e) {
-			ex = e;
 		} catch (TransformException e) {
-			ex = e; 
-		} catch (IllegalAttributeException e) {
 			ex = e; 
 		}
 		throw new RuntimeException(ex);
 	}
 	
-	public void transform(Collection<Feature> fts) {
-		for (Feature ft : fts) {
+	public void transform(Collection<SimpleFeature> fts) {
+		for (SimpleFeature ft : fts) {
 			transform(ft);
 		}
 	}
@@ -85,7 +79,7 @@ public class FeatureCoordinateTransformer {
 		CoordinateReferenceSystem sourceCRS = reader.getCoordinateSystem();
 		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:3395"); // World Mercator coordinate system change this if needed!
 		FeatureCoordinateTransformer transform = new FeatureCoordinateTransformer(sourceCRS, targetCRS);
-		Collection<Feature> coll = reader.getFeatureSet();
+		Collection<SimpleFeature> coll = reader.getFeatureSet();
 		transform.transform(coll);
 		ShapeFileWriter.writeGeometries(coll, output);
 		

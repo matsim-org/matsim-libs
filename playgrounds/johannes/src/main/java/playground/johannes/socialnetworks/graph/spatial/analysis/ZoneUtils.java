@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.graph.analysis.Degree;
@@ -108,7 +107,7 @@ public class ZoneUtils {
 //		ZoneLayer<Set<SpatialVertex>> layer =  ZoneLayerSHP.read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1G08.shp");
 //		layer.overwriteCRS(CRSUtils.getCRS(21781));
 		
-		Geometry boundary = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
+		Geometry boundary = (Geometry) FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
 		boundary.setSRID(21781);
 		
 		ZoneLayer<Set<SpatialVertex>> layer = Accessibility.createGridLayer(10000, boundary);

@@ -1,11 +1,30 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.gis.visibilitygraph;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 
@@ -16,16 +35,16 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class VisibilityGraph {
 
-	private final Set<Feature> fts;
+	private final Collection<SimpleFeature> fts;
 
-	public VisibilityGraph(Set<Feature> featureSet) {
+	public VisibilityGraph(Collection<SimpleFeature> featureSet) {
 		this.fts = featureSet;
 	}
 
 	public void run() {
 		List<Coordinate> coords = new ArrayList<Coordinate>();
-		for (Feature ft : this.fts) {
-			Geometry geo = ft.getDefaultGeometry();
+		for (SimpleFeature ft : this.fts) {
+			Geometry geo = (Geometry) ft.getDefaultGeometry();
 			for (int i = 0; i < geo.getCoordinates().length; i++) {
 				coords.add(geo.getCoordinates()[i]);
 			}
@@ -46,8 +65,8 @@ public class VisibilityGraph {
 	}
 
 	private boolean crosses(LineString ls) {
-		for (Feature ft : this.fts) {
-			Geometry geo = ft.getDefaultGeometry();
+		for (SimpleFeature ft : this.fts) {
+			Geometry geo = (Geometry) ft.getDefaultGeometry();
 			if (ls.crosses(geo)) {
 				return true;
 			}

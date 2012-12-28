@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sim2d_v3.helper.experimentalgraphgenerator;
 
 
@@ -8,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Scenario;
@@ -23,6 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -213,8 +232,8 @@ public class GraphGenerator {
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(floorplan);
 		Collection<Geometry> geos = new ArrayList<Geometry>();
-		for (Feature ft : reader.getFeatureSet()) {
-			geos.add(ft.getDefaultGeometry());
+		for (SimpleFeature ft : reader.getFeatureSet()) {
+			geos.add((Geometry) ft.getDefaultGeometry());
 		}
 
 		new GraphGenerator(sc,geos,reader.getBounds()).run();

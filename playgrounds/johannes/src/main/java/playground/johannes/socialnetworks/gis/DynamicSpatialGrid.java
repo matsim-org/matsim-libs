@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.GraphBuilder;
@@ -233,8 +233,8 @@ public class DynamicSpatialGrid {
 		
 		SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 		
-		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
-		Geometry chBorder = feature.getDefaultGeometry();
+		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+		Geometry chBorder = (Geometry) feature.getDefaultGeometry();
 		chBorder.setSRID(21781);
 		
 		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));

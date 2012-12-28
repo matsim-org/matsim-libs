@@ -1,8 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.grips.scenariogeneratorpt;
 
 import java.util.List;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -21,6 +39,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -49,7 +68,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 	}
 
 	@Override
-	protected void createPersons(Feature ft) {
+	protected void createPersons(SimpleFeature ft) {
 	
 		Population pop = this.scenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
@@ -64,7 +83,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 		}
 	}
 
-	private void createCAR(PopulationFactory pb, Population pop, Feature ft) {
+	private void createCAR(PopulationFactory pb, Population pop, SimpleFeature ft) {
 		Person pers = pb.createPerson(this.scenario.createId(Integer.toString(this.id++)));
 		pop.addPerson(pers);
 		Plan plan = pb.createPlan();
@@ -99,7 +118,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 		
 	}
 
-	private void createPT(PopulationFactory pb, Population pop, Feature ft) {
+	private void createPT(PopulationFactory pb, Population pop, SimpleFeature ft) {
 		Person pers = pb.createPerson(this.scenario.createId(Integer.toString(this.id++)));
 		pop.addPerson(pers);
 		Plan plan = pb.createPlan();

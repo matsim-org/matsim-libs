@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.gis.buildinglinkmapping;
 
 import java.util.ArrayList;
@@ -6,15 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.evacuation.base.Building;
@@ -30,7 +40,9 @@ import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -38,8 +50,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class BuildingLinkMapping implements AgentDepartureEventHandler, AgentArrivalEventHandler {
-
-	private static FeatureType ft;
 
 	//private final Map<Id,LinkInfo> lis = new HashMap<Id,LinkInfo>();
 
@@ -65,13 +75,13 @@ public class BuildingLinkMapping implements AgentDepartureEventHandler, AgentArr
 		loader.loadData();
 		List<Building> buildings = loader.getBuildings();
 		System.out.println(buildings.size());
-		initFeatures();
+		PolygonFeatureFactory factory = initFeatures();
 
 		Coordinate c0 = new Coordinate(649694.00-100,9894872.00+100);
 		Coordinate c1 = new Coordinate(653053.00+100,9892897.00-100);
 		Envelope ev = new Envelope(c0, c1);
 
-		List<Feature> features = new ArrayList<Feature>();
+		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		Map<Id,BuildingInfo> bldM = new HashMap<Id,BuildingInfo>();
 		for (Building b : buildings) {
 			BuildingInfo bi = new BuildingInfo();
@@ -176,23 +186,17 @@ public class BuildingLinkMapping implements AgentDepartureEventHandler, AgentArr
 			if (!ev.contains(bi.b.getGeo().getCentroid().getCoordinate())){
 				continue;
 			}
-			try {
-				
-				if (time <= 900) {
-					lt15 += bi.b.getPopDay();
-				} else if (time <=1800) {
-					lt30 += bi.b.getPopDay();
-				} else {
-					gt30 += bi.b.getPopDay();
-				}
-				total += bi.b.getPopDay();
-				
-				Feature f = ft.create(new Object[]{bi.b.getGeo(),time,bi.b.getId().toString()});
-				features.add(f);
-			} catch (IllegalAttributeException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			if (time <= 900) {
+				lt15 += bi.b.getPopDay();
+			} else if (time <=1800) {
+				lt30 += bi.b.getPopDay();
+			} else {
+				gt30 += bi.b.getPopDay();
 			}
+			total += bi.b.getPopDay();
+			
+			SimpleFeature f = factory.createPolygon((MultiPolygon) bi.b.getGeo(), new Object[]{time,bi.b.getId().toString()}, null);
+			features.add(f);
 		}
 
 		//		
@@ -240,26 +244,13 @@ public class BuildingLinkMapping implements AgentDepartureEventHandler, AgentArr
 	}
 
 
-	private static void initFeatures() {
+	private static PolygonFeatureFactory initFeatures() {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG: 32747");
-		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
-		AttributeType z = AttributeTypeFactory.newAttributeType(
-				"dblAvgZ", Double.class);
-		AttributeType t = AttributeTypeFactory.newAttributeType(
-				"name", String.class);
-
-		Exception ex;
-		try {
-			ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, z, t }, "MultiPolygon");
-			return;
-		} catch (FactoryRegistryException e) {
-			ex = e;
-		} catch (SchemaException e) {
-			ex = e;
-		}
-		throw new RuntimeException(ex);
-
+		return new PolygonFeatureFactory.Builder().
+				setCrs(targetCRS).
+				addAttribute("dblAvgZ", Double.class).
+				addAttribute("name", String.class).
+				create();
 	}
 
 	//	private static class LinkInfo {

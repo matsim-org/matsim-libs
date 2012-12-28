@@ -1,8 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sim2d_v3.helper;
 
 import java.util.Collection;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,22 +49,22 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GISBasedPopulationGenerator {
 
-
-
 	private final Scenario sc;
-	private final Collection<Feature> fts;
+	private final Collection<SimpleFeature> fts;
 	private int id = 0;
 	private final Id safeLinkId;
 	private final NetworkLegRouter router;
-	private final Collection<Feature> ftsEnv;
+	private final Collection<SimpleFeature> ftsEnv;
 
 	private final GeometryFactory geofac = new GeometryFactory();
 	//	private final Id safeLinkId1 = new IdImpl(501);
@@ -56,7 +74,7 @@ public class GISBasedPopulationGenerator {
 	private final Id safeLinkId2 = new IdImpl(0);
 	private final Id safeLinkId3 = new IdImpl(905);
 
-	public GISBasedPopulationGenerator(Scenario sc, Collection<Feature> population, Collection<Feature> environment, Id destination) {
+	public GISBasedPopulationGenerator(Scenario sc, Collection<SimpleFeature> population, Collection<SimpleFeature> environment, Id destination) {
 		this.sc = sc;
 		this.fts = population;
 		this.ftsEnv = environment;
@@ -70,7 +88,7 @@ public class GISBasedPopulationGenerator {
 	private void run() {
 
 
-		for (Feature ft : this.fts) {
+		for (SimpleFeature ft : this.fts) {
 			createPersons(ft);
 		}
 		UTurnRemover utr = new UTurnRemover(this.sc);
@@ -78,10 +96,10 @@ public class GISBasedPopulationGenerator {
 	}
 
 
-	private void createPersons(Feature ft) {
+	private void createPersons(SimpleFeature ft) {
 		Population pop = this.sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
-		Coordinate cc = ft.getDefaultGeometry().getCoordinate();
+		Coordinate cc = ((Geometry) ft.getDefaultGeometry()).getCoordinate();
 		long number = (Long)ft.getAttribute("persons");
 		for (; number > 0; number--) {
 			Person pers = pb.createPerson(this.sc.createId("g"+Integer.toString(this.id++)));
@@ -155,8 +173,8 @@ public class GISBasedPopulationGenerator {
 		Coordinate c3 = MGC.coord2Coordinate(c);
 		LinearRing shell = this.geofac.createLinearRing(new Coordinate[] {c1, c2, c3, c1});
 		Polygon p = this.geofac.createPolygon(shell, null);
-		for (Feature ft : this.ftsEnv) {
-			if (ft.getDefaultGeometry().intersects(p)) {
+		for (SimpleFeature ft : this.ftsEnv) {
+			if (((Geometry) ft.getDefaultGeometry()).intersects(p)) {
 				return true;
 			}
 		}
@@ -176,11 +194,11 @@ public class GISBasedPopulationGenerator {
 
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(popShape);
-		Collection<Feature> features = reader.getFeatureSet();
+		Collection<SimpleFeature> features = reader.getFeatureSet();
 
 		ShapeFileReader readerII = new ShapeFileReader();
 		readerII.readFileAndInitialize(floorShape);
-		Collection<Feature> featuresII = readerII.getFeatureSet();
+		Collection<SimpleFeature> featuresII = readerII.getFeatureSet();
 
 		new GISBasedPopulationGenerator(sc,features, featuresII,new IdImpl(501)).run();
 

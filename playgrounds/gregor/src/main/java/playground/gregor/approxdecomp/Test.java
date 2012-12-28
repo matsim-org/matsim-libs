@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -100,10 +100,10 @@ public class Test {
 		//		com.vividsolutions.jts.algorithm.CGAlgorithms.isCCW(null)
 
 
-		Set<Feature> geos = reader.getFeatureSet();
+		Collection<SimpleFeature> geos = reader.getFeatureSet();
 		Collection<PolygonInfo> decomposed = new ArrayList<PolygonInfo>();
-		for (Feature ft : geos) {
-			Geometry geo = ft.getDefaultGeometry();
+		for (SimpleFeature ft : geos) {
+			Geometry geo = (Geometry) ft.getDefaultGeometry();
 			List<PolygonInfo> decs = decomp.decompose(geo);
 			for (PolygonInfo  pi : decs) {
 				decomposed.add(pi);

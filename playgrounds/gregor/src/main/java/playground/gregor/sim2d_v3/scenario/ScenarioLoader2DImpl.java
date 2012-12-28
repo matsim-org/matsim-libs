@@ -23,12 +23,12 @@ package playground.gregor.sim2d_v3.scenario;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
 
@@ -91,8 +91,8 @@ public class ScenarioLoader2DImpl  {
 		QuadTree<Coordinate> quad = new QuadTree<Coordinate>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 
 		List<Geometry> geos = new ArrayList<Geometry>();
-		for (Feature ft : reader.getFeatureSet()) {
-			Geometry geo = ft.getDefaultGeometry();
+		for (SimpleFeature ft : reader.getFeatureSet()) {
+			Geometry geo = (Geometry) ft.getDefaultGeometry();
 			geos.add(geo);
 		}
 		DenseMultiPointFromGeometries dmp = new DenseMultiPointFromGeometries();

@@ -25,27 +25,21 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
@@ -67,8 +61,8 @@ public class Sim2DScenario2OSMReadyShape {
 	private static final String M_T = "sim2d_section";
 	private static final String M_T_L = "sim2d_link";
 	private static final String H_W = "footway";
-	private static final FeatureType ftEnv;
-	private static final FeatureType ftNet;
+	private static final PolygonFeatureFactory polygonFactory;
+	private static final PolylineFeatureFactory polylineFactory;
 	private static final CoordinateReferenceSystem crs;
 	static {
 		try {
@@ -79,28 +73,26 @@ public class Sim2DScenario2OSMReadyShape {
 			throw new IllegalArgumentException(e);
 		} 
 
-		//sections
-		AttributeType p = DefaultAttributeTypeFactory.newAttributeType("Polygon", Polygon.class,true,null,null,crs);
-		AttributeType matsimType = DefaultAttributeTypeFactory.newAttributeType("m_type", String.class);
-		AttributeType id = DefaultAttributeTypeFactory.newAttributeType("id", String.class);
-		AttributeType level = DefaultAttributeTypeFactory.newAttributeType("level", String.class);
-		AttributeType openings = DefaultAttributeTypeFactory.newAttributeType("openings", String.class);
-		AttributeType neighbors = DefaultAttributeTypeFactory.newAttributeType("neighbors", String.class);
-		AttributeType envId = DefaultAttributeTypeFactory.newAttributeType("env_id", String.class);
-		//network
-		AttributeType l = DefaultAttributeTypeFactory.newAttributeType("LineString", LineString.class,true,null,null,crs);
-		AttributeType hw = DefaultAttributeTypeFactory.newAttributeType("highway", String.class);
-		AttributeType mw = DefaultAttributeTypeFactory.newAttributeType("m_width", String.class);
-		AttributeType mf = DefaultAttributeTypeFactory.newAttributeType("m_fspeed", String.class);
-		AttributeType mt = DefaultAttributeTypeFactory.newAttributeType("m_tra_mode", String.class);
-		try {
-			ftEnv = FeatureTypeFactory.newFeatureType(new AttributeType[]{p,matsimType,id,level,openings,neighbors,envId}, "Sim2DEnvironment");
-			ftNet = FeatureTypeFactory.newFeatureType(new AttributeType[]{l,matsimType,hw,mw,mf,mt,envId}, "Sim2DNetwork");
-		} catch (FactoryRegistryException e) {
-			throw new RuntimeException(e);
-		} catch (SchemaException e) {
-			throw new RuntimeException(e);
-		}
+		polygonFactory = new PolygonFeatureFactory.Builder().
+				setCrs(crs).
+				addAttribute("m_type", String.class).
+				addAttribute("id", String.class).
+				addAttribute("level", String.class).
+				addAttribute("openings", String.class).
+				addAttribute("neighbors", String.class).
+				addAttribute("env_id", String.class).
+				create();
+		
+		polylineFactory = new PolylineFeatureFactory.Builder().
+				setCrs(crs).
+				addAttribute("m_type", String.class).
+				addAttribute("highway", String.class).
+				addAttribute("m_width", String.class).
+				addAttribute("m_fspeed", String.class).
+				addAttribute("m_tra_mode", String.class).
+				addAttribute("env_id", String.class).
+				create();
+		
 	}
 
 	/*package*/ Sim2DScenario2OSMReadyShape(Sim2DScenario scenario) {
@@ -120,7 +112,7 @@ public class Sim2DScenario2OSMReadyShape {
 	
 	/*package*/ void writeOSMReadyNetworkShape(String file) {
 		GeometryFactory geofac = new GeometryFactory();
-		Collection<Feature> fts = new ArrayList<Feature>();
+		Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 		for (Sim2DEnvironment env : this.scenario.getSim2DEnvironments()) {
 			Id envId = env.getId();
 			CoordinateReferenceSystem crs = env.getCRS();
@@ -138,10 +130,8 @@ public class Sim2DScenario2OSMReadyShape {
 				LineString ls = geofac.createLineString(new Coordinate[]{from,to});
 				try {
 					LineString lst = (LineString) JTS.transform(ls, transform);
-					Feature ft = createNetFeature(lst, l,envId);
+					SimpleFeature ft = createNetFeature(lst, l,envId);
 					fts.add(ft);
-				} catch (MismatchedDimensionException e) {
-					throw new IllegalArgumentException(e);
 				} catch (TransformException e) {
 					throw new IllegalArgumentException(e);
 				}
@@ -150,19 +140,15 @@ public class Sim2DScenario2OSMReadyShape {
 		ShapeFileWriter.writeGeometries(fts, file);
 	}
 
-	private Feature createNetFeature(LineString lst, Link l, Id envId) {
+	private SimpleFeature createNetFeature(LineString lst, Link l, Id envId) {
 
-		try {
-			return ftNet.create(new Object[]{lst,M_T_L,H_W,"1.0","1.34","pedestrian",envId.toString()});
-		} catch (IllegalAttributeException e) {
-			throw new IllegalArgumentException(e);
-		}
+		return polylineFactory.createPolyline(lst, new Object[]{M_T_L,H_W,"1.0","1.34","pedestrian",envId.toString()}, null);
 		
 //		new AttributeType[]{l,matsimType,hw,level,mw,mf,mt}
 	}
 
 	/*package*/ void writeOSMReadyEnvironmentShape(String file) {
-		Collection<Feature> fts = new ArrayList<Feature>();
+		Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
 
 		for (Sim2DEnvironment env : this.scenario.getSim2DEnvironments()) {
 			CoordinateReferenceSystem crs = env.getCRS();
@@ -176,10 +162,8 @@ public class Sim2DScenario2OSMReadyShape {
 				Polygon p = sec.getPolygon();
 				try {
 					Polygon tp = (Polygon) JTS.transform(p, transform);
-					Feature ft = createEnvFeature(tp,id,level,n,o,envId);
+					SimpleFeature ft = createEnvFeature(tp,id,level,n,o,envId);
 					fts.add(ft);
-				} catch (MismatchedDimensionException e) {
-					throw new IllegalArgumentException(e);
 				} catch (TransformException e) {
 					throw new IllegalArgumentException(e);
 				}
@@ -189,7 +173,7 @@ public class Sim2DScenario2OSMReadyShape {
 		ShapeFileWriter.writeGeometries(fts, file);
 	}
 
-	private Feature createEnvFeature(Polygon tp, Id id, int level, Id[] n, int[] o, Id envId) {
+	private SimpleFeature createEnvFeature(Polygon tp, Id id, int level, Id[] n, int[] o, Id envId) {
 
 		StringBuffer os = new StringBuffer();
 		if (o == null) {
@@ -210,11 +194,7 @@ public class Sim2DScenario2OSMReadyShape {
 				ns.append(' ');
 			}
 		}
-		try {
-			return ftEnv.create(new Object[]{tp,M_T,id.toString(),level+"",os.toString(),ns.toString(),envId.toString()});
-		} catch (IllegalAttributeException e) {
-			throw new IllegalArgumentException(e);
-		}
+		return polygonFactory.createPolygon(tp, new Object[]{M_T,id.toString(),level+"",os.toString(),ns.toString(),envId.toString()}, null);
 	}
 
 	public static void main(String [] args) {

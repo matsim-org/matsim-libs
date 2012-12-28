@@ -37,7 +37,6 @@ import net.opengis.kml._2.PolyStyleType;
 import net.opengis.kml._2.PolygonType;
 import net.opengis.kml._2.StyleType;
 
-import org.geotools.feature.Feature;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.vis.kml.KMZWriter;

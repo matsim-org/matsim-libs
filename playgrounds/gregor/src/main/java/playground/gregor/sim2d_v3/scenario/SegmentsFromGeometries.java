@@ -1,8 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.sim2d_v3.scenario;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -22,8 +41,8 @@ public class SegmentsFromGeometries {
 	public SegmentsFromGeometries(ShapeFileReader reader) {
 		Envelope e = reader.getBounds();
 		this.floatSegQuad = new QuadTree<float[]>(e.getMinX()-1000,e.getMinY()-1000,e.getMaxX()+1000,e.getMaxY()+1000);
-		for (Feature ft : reader.getFeatureSet()){
-			Geometry geo = ft.getDefaultGeometry();
+		for (SimpleFeature ft : reader.getFeatureSet()){
+			Geometry geo = (Geometry) ft.getDefaultGeometry();
 			handleGeometry(geo);
 		}
 	}

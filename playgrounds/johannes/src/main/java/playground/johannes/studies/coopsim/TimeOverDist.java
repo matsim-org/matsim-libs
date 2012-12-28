@@ -105,7 +105,7 @@ public class TimeOverDist {
 		// travelTime);
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, travelMinCost);
 		LeastCostPathCalculator router = factory.createPathCalculator(network, travelCost, travelTime);
-		Geometry g = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
+		Geometry g = (Geometry) FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
 
 		TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
 		DistanceCalculator calc = new CartesianDistanceCalculator();

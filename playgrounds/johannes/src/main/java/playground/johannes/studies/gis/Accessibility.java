@@ -30,12 +30,12 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
@@ -117,7 +117,7 @@ public class Accessibility {
 		
 		logger.info("Loading data...");
 		Set<Point> points = loadPoints(popfile);
-		Geometry boundary = FeatureSHP.readFeatures(boundaryFile).iterator().next().getDefaultGeometry();
+		Geometry boundary = (Geometry) FeatureSHP.readFeatures(boundaryFile).iterator().next().getDefaultGeometry();
 		boundary.setSRID(21781);
 		
 		ZoneLayer<Double> startZones;

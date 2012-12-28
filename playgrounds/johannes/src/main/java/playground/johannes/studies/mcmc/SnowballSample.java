@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.analysis.DegreeTask;
@@ -80,8 +80,8 @@ public class SnowballSample {
 		SpatialSparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/ergm/raw/graph.graphml");
 //		SpatialSparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/mcmc/ergm/small/graph.graphml");
 		
-		Set<Feature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
-		Geometry geometry = features.iterator().next().getDefaultGeometry();
+		Set<SimpleFeature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
+		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
 		
 		Sampler<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> sampler = new Sampler<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>();
 		

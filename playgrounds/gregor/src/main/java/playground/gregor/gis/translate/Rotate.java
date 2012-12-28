@@ -23,14 +23,15 @@ package playground.gregor.gis.translate;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import Jama.Matrix;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class Rotate {
 
@@ -53,8 +54,8 @@ public class Rotate {
 		cx /= 2;
 		double cy = e.getMinY() + e.getMaxY();
 		cy /= 2;
-		for (Feature ft : reader.getFeatureSet()) {
-			for (Coordinate c : ft.getDefaultGeometry().getCoordinates()) {
+		for (SimpleFeature ft : reader.getFeatureSet()) {
+			for (Coordinate c : ((Geometry) ft.getDefaultGeometry()).getCoordinates()) {
 				if (handled.contains(c)) {
 					System.out.println("hab schon!");
 					continue;

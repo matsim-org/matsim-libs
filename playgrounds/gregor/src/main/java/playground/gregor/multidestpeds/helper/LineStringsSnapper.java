@@ -1,11 +1,30 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.gregor.multidestpeds.helper;
 
 import java.util.Collection;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -24,7 +43,7 @@ public class LineStringsSnapper {
 		reader.readFileAndInitialize(in);
 		QuadTree<Coordinate> quad = new QuadTree<Coordinate>(reader.getBounds().getMinX(),reader.getBounds().getMinY(),reader.getBounds().getMaxX(),reader.getBounds().getMaxY());
 
-		for (Feature ft : reader.getFeatureSet()) {
+		for (SimpleFeature ft : reader.getFeatureSet()) {
 			MultiLineString ml = (MultiLineString) ft.getDefaultGeometry();
 			for (int i = 0; i < ml.getNumGeometries(); i++) {
 				LineString ls = (LineString) ml.getGeometryN(i);

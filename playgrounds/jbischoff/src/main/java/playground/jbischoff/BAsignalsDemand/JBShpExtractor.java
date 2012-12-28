@@ -1,12 +1,5 @@
 package playground.jbischoff.BAsignalsDemand;
 
-import java.io.IOException;
-import java.util.Iterator;
-
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
-import org.matsim.core.utils.gis.ShapeFileReader;
-
 public class JBShpExtractor {
 //	public static void main(String [] args) throws IOException {
 //		String zonesFile = "/Users/JB/Desktop/BA-Arbeit/sim/spn.shp";

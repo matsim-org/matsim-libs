@@ -21,7 +21,7 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
 import java.io.IOException;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.sna.graph.spatial.SpatialGraph;
 import playground.johannes.sna.snowball.SampledGraphProjection;
@@ -59,8 +59,8 @@ public class GraphClipping {
 		
 		SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = reader.readGraph(args[0]);
 		
-		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
-		Geometry geometry = feature.getDefaultGeometry();
+		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		geometry.setSRID(21781);
 		GraphFilter<SpatialGraph> filter = new SpatialFilter(new SocialSparseGraphBuilder(graph.getDelegate().getCoordinateReferenceSysten()), geometry);
 		filter.apply(graph.getDelegate());

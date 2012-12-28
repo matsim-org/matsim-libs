@@ -55,14 +55,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
@@ -74,8 +66,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -629,9 +623,9 @@ public class ComplexODPopulationGenerator implements ActionListener{
 			shapeFileReader.readFileAndInitialize(shapeFileString);
 	
 			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
-			for (Feature ft : shapeFileReader.getFeatureSet())
+			for (SimpleFeature ft : shapeFileReader.getFeatureSet())
 			{
-				Geometry geo = ft.getDefaultGeometry();
+				Geometry geo = (Geometry) ft.getDefaultGeometry();
 				//System.out.println(ft.getFeatureType());
 				geometries.add(geo);
 			}
@@ -657,69 +651,53 @@ public class ComplexODPopulationGenerator implements ActionListener{
 		}
 			
 		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:4326");
-		AttributeType p = AttributeTypeFactory.newAttributeType(
-				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
-		AttributeType t = AttributeTypeFactory.newAttributeType(
-				"persons", Long.class);
-		AttributeType i = AttributeTypeFactory.newAttributeType(
-				"id", Long.class);
-		AttributeType e = AttributeTypeFactory.newAttributeType(
-				"earliest", Double.class);
-		AttributeType l = AttributeTypeFactory.newAttributeType(
-				"latest", Double.class);
-		AttributeType s = AttributeTypeFactory.newAttributeType(
-				"sigma", Double.class);
-		AttributeType m = AttributeTypeFactory.newAttributeType(
-				"mu", Double.class);
-		
-		try	{
-			FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t, i, e, l,s ,m }, "ODRelation");
-			Collection<Feature> fts = new ArrayList<Feature>();
-			
-			for ( Entry<Integer, ODRelation> entry : odRelations.entrySet()) {
-				
-			    int id = entry.getKey();
-			    ODRelation odRelation = entry.getValue();
+		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().
+				setCrs(targetCRS).
+				setName("ODRelation").
+				addAttribute("persons", Long.class).
+				addAttribute("id", Long.class).
+				addAttribute("earliest", Double.class).
+				addAttribute("latest", Double.class).
+				addAttribute("sigma", Double.class).
+				addAttribute("mu", Double.class).
+				create();
 
-				
-				DefaultTableModel defModel = (DefaultTableModel)this.areaTable.getModel();
-				
-				int pop= 0;
-				double earliest = 0;
-				double latest = 0;
-				double sigma = 0;
-				double mu = 0;
-				for (int j = 0; j < defModel.getRowCount(); j++){
-					if ((Integer) this.areaTable.getModel().getValueAt(j, 0) == id){
-						pop = Integer.parseInt(""+this.areaTable.getModel().getValueAt(j, 1));
-						earliest = Double.parseDouble(""+this.areaTable.getModel().getValueAt(j, 2));
-						latest = Double.parseDouble(""+this.areaTable.getModel().getValueAt(j, 3));
-						sigma = Double.parseDouble(""+this.areaTable.getModel().getValueAt(j, 4));
-						mu = Double.parseDouble(""+this.areaTable.getModel().getValueAt(j, 5));
-						break;
-					}
+		Collection<SimpleFeature> fts = new ArrayList<SimpleFeature>();
+		
+		for ( Entry<Integer, ODRelation> entry : odRelations.entrySet()) {
+			
+	    int id = entry.getKey();
+	    ODRelation odRelation = entry.getValue();
+
+			DefaultTableModel defModel = (DefaultTableModel)this.areaTable.getModel();
+			
+			int pop= 0;
+			double earliest = 0;
+			double latest = 0;
+			double sigma = 0;
+			double mu = 0;
+			for (int j = 0; j < defModel.getRowCount(); j++){
+				if ((Integer) this.areaTable.getModel().getValueAt(j, 0) == id){
+					pop = Integer.parseInt(""+this.areaTable.getModel().getValueAt(j, 1));
+					earliest = Double.parseDouble(""+this.areaTable.getModel().getValueAt(j, 2));
+					latest = Double.parseDouble(""+this.areaTable.getModel().getValueAt(j, 3));
+					sigma = Double.parseDouble(""+this.areaTable.getModel().getValueAt(j, 4));
+					mu = Double.parseDouble(""+this.areaTable.getModel().getValueAt(j, 5));
+					break;
 				}
-				
-				
-				MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{odRelation.o});
-				Feature f = ft.create(new Object[]{mp,pop,id,earliest,latest,sigma,mu});
-				fts.add(f);
-				
-				mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{odRelation.d});
-				f = ft.create(new Object[]{mp,0,id,0,0,0,0});
-				fts.add(f);
 			}
 
-			ShapeFileWriter.writeGeometries(fts, this.popshp);
-		} catch (FactoryRegistryException ex) {
-			ex.printStackTrace();
-		} catch (SchemaException ex) {
-			ex.printStackTrace();
-		} catch (IllegalAttributeException ex) {
-			ex.printStackTrace();
+			MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{odRelation.o});
+			SimpleFeature f = factory.createPolygon(mp, new Object[]{pop,id,earliest,latest,sigma,mu}, null);
+			fts.add(f);
+
+			mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{odRelation.d});
+			f = factory.createPolygon(mp, new Object[]{0,id,0,0,0,0}, null);
+			fts.add(f);
 		}
+
+		ShapeFileWriter.writeGeometries(fts, this.popshp);
 	}
-	
 	
 }
 
@@ -759,5 +737,3 @@ class SelectionListener implements ListSelectionListener
 	}
 
 }
-
-

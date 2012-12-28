@@ -20,8 +20,8 @@
 
 package playground.gregor.gis.polygonizer;
 
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 
@@ -34,8 +34,8 @@ public class Polygonizer {
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(input);
 		Geometry res = null;
-		for (Feature ft : reader.getFeatureSet()) {
-			Geometry geo = ft.getDefaultGeometry();
+		for (SimpleFeature ft : reader.getFeatureSet()) {
+			Geometry geo = (Geometry) ft.getDefaultGeometry();
 			if (res == null) {
 				res = geo;
 			} else {

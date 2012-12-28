@@ -21,15 +21,13 @@
 package playground.jjoubert.Utilities;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 
@@ -102,54 +100,45 @@ public class MyGapReader {
 		log.info("QuadTree<SAZone> completed.");
 	}
 
-	@SuppressWarnings("unchecked")
 	private void readGapShapefile (){
 		String startMessage = "Start reading shapefile for " + this.areaName;
 		log.info(startMessage);
 		
 		this.zones = new ArrayList<SAZone>();
-		FeatureSource fs = null;
 		MultiPolygon mp = null;
 		GeometryFactory gf = new GeometryFactory();
-		try {	
-			fs = ShapeFileReader.readDataFile( this.shapefile );
-			ArrayList<Object> objectArray = (ArrayList<Object>) fs.getFeatures().getAttribute(0);
-			for (int i = 0; i < objectArray.size(); i++) {
-				Object thisZone = objectArray.get(i);
-				// For GAP files, field [1] contains the GAP_ID
-				String name = String.valueOf( ((Feature) thisZone).getAttribute( this.idField ) ); 
-				Geometry shape = ((Feature) thisZone).getDefaultGeometry();
-				if( shape instanceof MultiPolygon ){
-					mp = (MultiPolygon)shape;
-					if( !mp.isSimple() ){
-						log.warn("This polygon is NOT simple!" );
-					}
-					Polygon polygonArray[] = new Polygon[mp.getNumGeometries()];
-					for(int j = 0; j < mp.getNumGeometries(); j++ ){
-						if(mp.getGeometryN(j) instanceof Polygon ){
-							polygonArray[j] = (Polygon) mp.getGeometryN(j);							
-						} else{
-							log.warn("Subset of multipolygon is NOT a polygon.");
-						}
-					}
-					SAZone newZone = new SAZone(polygonArray, gf, name, 0);
-					
-					this.zones.add( newZone );
-					/*
-					 * Determine the extent of the QuadTree.
-					 */
-					Point centroid = newZone.getCentroid();
-					this.xMin = Math.min(centroid.getX(), this.xMin);
-					this.xMax = Math.max(centroid.getX(), this.xMax);
-					this.yMin = Math.min(centroid.getY(), this.yMin);
-					this.yMax = Math.max(centroid.getY(), this.yMax);
-				} else{
-					log.warn("This is not a multipolygon!");
+		for (SimpleFeature thisZone : ShapeFileReader.getAllFeatures(this.shapefile)) {
+			// For GAP files, field [1] contains the GAP_ID
+			String name = String.valueOf( thisZone.getAttribute( this.idField ) ); 
+			Geometry shape = (Geometry) thisZone.getDefaultGeometry();
+			if( shape instanceof MultiPolygon ){
+				mp = (MultiPolygon)shape;
+				if( !mp.isSimple() ){
+					log.warn("This polygon is NOT simple!" );
 				}
+				Polygon polygonArray[] = new Polygon[mp.getNumGeometries()];
+				for(int j = 0; j < mp.getNumGeometries(); j++ ){
+					if(mp.getGeometryN(j) instanceof Polygon ){
+						polygonArray[j] = (Polygon) mp.getGeometryN(j);							
+					} else{
+						log.warn("Subset of multipolygon is NOT a polygon.");
+					}
+				}
+				SAZone newZone = new SAZone(polygonArray, gf, name, 0);
+				
+				this.zones.add( newZone );
+				/*
+				 * Determine the extent of the QuadTree.
+				 */
+				Point centroid = newZone.getCentroid();
+				this.xMin = Math.min(centroid.getX(), this.xMin);
+				this.xMax = Math.max(centroid.getX(), this.xMax);
+				this.yMin = Math.min(centroid.getY(), this.yMin);
+				this.yMax = Math.max(centroid.getY(), this.yMax);
+			} else{
+				log.warn("This is not a multipolygon!");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
+		}
 		log.info("Done reading shapefile.");
 	}
 	

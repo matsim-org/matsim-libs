@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
@@ -72,8 +72,8 @@ public class FracDimOpportunities {
 			targetPoints.add(v.getPoint());
 		}
 
-		Feature feature = FeatureSHP.readFeatures(chborderFile).iterator().next();
-		Geometry geometry = feature.getDefaultGeometry();
+		SimpleFeature feature = FeatureSHP.readFeatures(chborderFile).iterator().next();
+		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		geometry.setSRID(21781);
 		
 		SocialSampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> graph = GraphReaderFacade.read(graphFile);

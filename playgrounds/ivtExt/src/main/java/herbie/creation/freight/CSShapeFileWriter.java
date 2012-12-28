@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package herbie.creation.freight;
 
 import java.util.ArrayList;
@@ -5,61 +24,40 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter; 
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class CSShapeFileWriter {
 	private final static Logger log = Logger.getLogger(CSShapeFileWriter.class);	
 					
 	public void writeODRelations(String outdir, List<ODRelation> relations) {
 		log.info("Writing freight OD relations");			
-		ArrayList<Feature> features =  (ArrayList<Feature>) this.generateRelations(relations);	
+		ArrayList<SimpleFeature> features =  (ArrayList<SimpleFeature>) this.generateRelations(relations);	
 		log.info("Created " + features.size() + " features");
 		if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir + "/heaviestODRelations.shp");
+				ShapeFileWriter.writeGeometries(features, outdir + "/heaviestODRelations.shp");
 		}
 	}
 	
-	public Collection<Feature> generateRelations(List<ODRelation> relations) {
-		GeometryFactory geoFac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+	public Collection<SimpleFeature> generateRelations(List<ODRelation> relations) {
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 		
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("LineString", Geometry.class, true, null, null, crs);
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Double.class);
-		FeatureType ftRel;
-		try {
-			ftRel = FeatureTypeBuilder.newFeatureType(new AttributeType[] {geom, id}, "rel");
-			for (ODRelation relation : relations) {
-				LineString ls = new LineString(new CoordinateArraySequence(
-						new Coordinate [] {MGC.coord2Coordinate(relation.getOrigin()), MGC.coord2Coordinate(relation.getDestination())}), geoFac);
-				try {
-					Feature ft;
-					ft = ftRel.create(new Object [] {ls , relation.getWeight()}, "links");
-					features.add(ft);
-				} catch (IllegalAttributeException e) {
-					e.printStackTrace();
-				}
-			}
-		} catch (SchemaException e) {
-			e.printStackTrace();
-		}		
+		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder().
+				setCrs(crs).setName("rel").addAttribute("ID", Double.class).create();
+		for (ODRelation relation : relations) {
+			SimpleFeature ft;
+			ft = factory.createPolyline(
+					new Coordinate [] {MGC.coord2Coordinate(relation.getOrigin()), MGC.coord2Coordinate(relation.getDestination())},
+					new Object[] {relation.getWeight()}, null);
+			features.add(ft);
+		}
 		return features;
 	}
 }

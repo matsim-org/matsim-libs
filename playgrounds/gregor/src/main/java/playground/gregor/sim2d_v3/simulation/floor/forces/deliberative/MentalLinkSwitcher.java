@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,6 +33,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import playground.gregor.sim2d_v3.scenario.MyDataContainer;
 import playground.gregor.sim2d_v3.simulation.floor.Agent2D;
@@ -138,8 +138,8 @@ public class MentalLinkSwitcher implements LinkSwitcher {
 
 	private void initGeometries() {
 		this.geos = new ArrayList<Geometry>();
-		for (Feature ft : this.sc.getScenarioElement(ShapeFileReader.class).getFeatureSet()) {
-			this.geos.add(ft.getDefaultGeometry());
+		for (SimpleFeature ft : this.sc.getScenarioElement(ShapeFileReader.class).getFeatureSet()) {
+			this.geos.add((Geometry) ft.getDefaultGeometry());
 		}
 
 	}

@@ -25,9 +25,9 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 
 import playground.johannes.sna.gis.CRSUtils;
@@ -36,7 +36,6 @@ import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.graph.GraphBuilder;
 import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.sna.graph.spatial.SpatialVertex;
-import playground.johannes.sna.math.BoundedLinearDiscretizer;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
@@ -78,8 +77,8 @@ public class DensityPlotBiTree {
 		
 		SpatialSparseGraph popData = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/jillenberger/Work/socialnets/data/schweiz/complete/plans/plans.0.10.xml");
 		
-		Feature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
-		Geometry chBorder = feature.getDefaultGeometry();
+		SimpleFeature feature = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next();
+		Geometry chBorder = (Geometry) feature.getDefaultGeometry();
 		chBorder.setSRID(21781);
 		
 		graph.getDelegate().transformToCRS(CRSUtils.getCRS(21781));

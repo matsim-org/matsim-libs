@@ -1,14 +1,30 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.jjoubert.Utilities;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 /**
@@ -38,53 +54,36 @@ public class MyShapefileReader {
 	 * @return <code>MultiPolygon</code>
 	 */
 	public MultiPolygon readMultiPolygon() {
-		FeatureSource fs = null;
 		MultiPolygon mp = null;
-		try {	
-			fs = ShapeFileReader.readDataFile( this.shapefileName );
-			for(Object o: fs.getFeatures() ){
-				Geometry geo = ((Feature)o).getDefaultGeometry();
-				if(geo instanceof MultiPolygon){
-					mp = (MultiPolygon)geo;
-				} else{
-					throw new RuntimeException("The shapefile is not a MultiPolygon!");
-				}
+		for (SimpleFeature f : ShapeFileReader.getAllFeatures(shapefileName)) {
+			Object geo = f.getDefaultGeometry();
+			if(geo instanceof MultiPolygon){
+				mp = (MultiPolygon)geo;
+			} else{
+				throw new RuntimeException("The shapefile is not a MultiPolygon!");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return mp;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
 	public List<Point> readPoints() {
-		FeatureSource fs = null;
 		List<Point> list = new ArrayList<Point>();
-		try {	
-			fs = ShapeFileReader.readDataFile( this.shapefileName );
-			for(Object o: fs.getFeatures() ){
-				Geometry geo = ((Feature)o).getDefaultGeometry();
-				if(geo instanceof Point){
-					Point ps = (Point)geo;
-					
-					for(int i = 0; i < ps.getNumGeometries(); i++){
-						Point p = (Point) ps.getGeometryN(i);
-						list.add(p);
-					}
-				} else{
-					throw new RuntimeException("The shapefile does not contain Point(s)!");
+		for (SimpleFeature f : ShapeFileReader.getAllFeatures(this.shapefileName)) {
+			Object geo = f.getDefaultGeometry();
+			if(geo instanceof Point){
+				Point ps = (Point)geo;
+				
+				for(int i = 0; i < ps.getNumGeometries(); i++){
+					Point p = (Point) ps.getGeometryN(i);
+					list.add(p);
 				}
+			} else{
+				throw new RuntimeException("The shapefile does not contain Point(s)!");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return list;
 	}
 
-	
 	public String getShapefileName() {
 		return shapefileName;
 	}
