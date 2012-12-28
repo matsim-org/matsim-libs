@@ -178,7 +178,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 
 	@Override
-	public void finishReplanning() {
+	public final void finishReplanning() {
 		Gbl.printMemoryUsage();
 
 		super.finishReplanning();
@@ -207,7 +207,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 
 	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {		
+	public final PlanAlgorithm getPlanAlgoInstance() {		
 		// this is the way location choice should be configured ...
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
 		if (algorithm.equals(RANDOM)) {
@@ -236,9 +236,10 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		return network;
 	}
 
-	public Controler getControler() {
-		return controler;
-	}
+//	public Controler getControler() {
+//		return controler;
+//	}
+// this is never called.  kai, dec'12	
 
 //	public List<PlanAlgorithm> getPlanAlgoInstances() {
 //		return planAlgoInstances;
