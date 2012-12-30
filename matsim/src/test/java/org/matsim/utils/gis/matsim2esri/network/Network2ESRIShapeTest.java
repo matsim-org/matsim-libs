@@ -20,6 +20,10 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
+import java.util.Collection;
+
+import junit.framework.Assert;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -27,18 +31,20 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.testcases.MatsimTestCase;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 
 public class Network2ESRIShapeTest extends MatsimTestCase  {
 
-
-	//TODO [GL] - find a way to compare *.dbf files since simple checksum tests are not applicable here. - 08/30/2008 gl
 	public void testPolygonCapacityShape() {
-		String netFileName = "test/scenarios/berlin/network.xml.gz";
+		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = getOutputDirectory() + "./network.shp";
-		String ref = getInputDirectory() + "./network.shp";
 
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
@@ -54,17 +60,14 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
 
-		long checksum1 = CRCChecksum.getCRCFromFile(ref);
-		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
-		assertEquals("different shp-files.", checksum1, checksum2);
-
-
+		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
+		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiPolygon);
 	}
 
 	public void testPolygonLanesShape() {
-		String netFileName = "test/scenarios/berlin/network.xml.gz";
+		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = getOutputDirectory() + "./network.shp";
-		String ref = getInputDirectory() + "./network.shp";
 
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
@@ -79,16 +82,15 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
-
-		long checksum1 = CRCChecksum.getCRCFromFile(ref);
-		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
-		assertEquals("different shp-files.", checksum1, checksum2);
+		
+		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
+		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiPolygon);
 	}
 
 	public void testPolygonFreespeedShape() {
-		String netFileName = "test/scenarios/berlin/network.xml.gz";
+		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = getOutputDirectory() + "./network.shp";
-		String ref = getInputDirectory() + "./network.shp";
 
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
@@ -103,18 +105,15 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
-
-		long checksum1 = CRCChecksum.getCRCFromFile(ref);
-		long checksum2 = CRCChecksum.getCRCFromFile(outputFileP);
-		assertEquals("different shp-files.", checksum1, checksum2);
+		
+		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
+		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiPolygon);
 	}
 
 	public void testLineStringShape() {
-		String netFileName = "test/scenarios/berlin/network.xml.gz";
+		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileShp = getOutputDirectory() + "./network.shp";
-//		String outputFileDbf = getOutputDirectory() + "./network.dbf";
-		String refShp = getInputDirectory() + "./network.shp";
-//		String refDbf = getInputDirectory() + "./network.dbf";
 
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
@@ -129,35 +128,25 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileShp, builder).write();
-
-		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
-		long checksum2 = CRCChecksum.getCRCFromFile(outputFileShp);
-		assertEquals("different shp-files.", checksum1, checksum2);
-
-//		System.out.println("calculating *.dbf file checksums...");
-//		checksum1 = CRCChecksum.getCRCFromFile(refDbf);;
-//		checksum2 = CRCChecksum.getCRCFromFile(outputFileDbf);
-//		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-//		assertEquals(checksum1, checksum2);
+		
+		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
+		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiLineString);
 	}
 
 	public void testNodesShape() {
-		String netFileName = "test/scenarios/berlin/network.xml.gz";
+		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileShp = getOutputDirectory() + "./network.shp";
-//		String outputFileDbf = getOutputDirectory() + "./network.dbf";
-		String refShp = getInputDirectory() + "./network.shp";
-//		String refDbf = getInputDirectory() + "./network.dbf";
 
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 
 		new Nodes2ESRIShape(network,outputFileShp, "DHDN_GK4").write();
-
-		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
-		long checksum2 = CRCChecksum.getCRCFromFile(outputFileShp);
-		assertEquals("different shp-files.", checksum1, checksum2);
+		
+		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
+		Assert.assertEquals(network.getNodes().size(), writtenFeatures.size());
+		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof Point);
 	}
 }

@@ -21,6 +21,9 @@
 package org.matsim.utils.gis.matsim2esri.plans;
 
 import java.io.IOException;
+import java.util.Collection;
+
+import junit.framework.Assert;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -29,24 +32,22 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.testcases.MatsimTestCase;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.Point;
 
-	//TODO [GL] - find a way to compare *.dbf files since simple checksum tests are not applicable here. - 08/30/2008 gl
+public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 	public void testSelectedPlansActsShape() throws IOException {
 		String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		String networkFilename = "./test/scenarios/berlin/network.xml.gz";
 		String outputDir = getOutputDirectory();
 
-		String refShp = getInputDirectory() + "acts.shp";
-//		String refDbf = getInputDirectory() + "acts.dbf";
-
 		String outShp = getOutputDirectory() + "acts.shp";
-//		String outDbf = getOutputDirectory() + "acts.dbf";
 
 		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
 		Network network = scenario.getNetwork();
@@ -57,21 +58,15 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, network, crs, outputDir);
-		sp.setOutputSample(0.9);
+		sp.setOutputSample(0.05);
 		sp.setActBlurFactor(100);
 		sp.setWriteActs(true);
 		sp.setWriteLegs(false);
 		sp.write();
 
-		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
-		long checksum2 = CRCChecksum.getCRCFromFile(outShp);
-		assertEquals("different shp-files.", checksum1, checksum2);
-
-//		System.out.println("calculating *.dbf file checksums...");
-//		checksum1 = CRCChecksum.getCRCFromFile(refDbf);
-//		checksum2 = CRCChecksum.getCRCFromFile(outDbf);
-//		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-//		assertEquals(checksum1, checksum2);
+		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
+		Assert.assertEquals(2235, writtenFeatures.size());
+		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof Point);
 	}
 
 	public void testSelectedPlansLegsShape() throws IOException {
@@ -79,11 +74,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		String networkFilename = "./test/scenarios/berlin/network.xml.gz";
 		String outputDir = getOutputDirectory();
 
-		String refShp = getInputDirectory() + "legs.shp";
-//		String refDbf = getInputDirectory() + "legs.dbf";
-
 		String outShp = getOutputDirectory() + "legs.shp";
-//		String outDbf = getOutputDirectory() + "legs.dbf";
 
 		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
 		Network network = scenario.getNetwork();
@@ -100,15 +91,9 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		sp.setWriteLegs(true);
 		sp.write();
 
-		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
-		long checksum2 = CRCChecksum.getCRCFromFile(outShp);
-		assertEquals("different shp-files.", checksum1, checksum2);
-
-//		System.out.println("calculating *.dbf file checksums...");
-//		checksum1 = CRCChecksum.getCRCFromFile(refDbf);
-//		checksum2 = CRCChecksum.getCRCFromFile(outDbf);
-//		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-//		assertEquals(checksum1, checksum2);
+		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
+		Assert.assertEquals(1431, writtenFeatures.size());
+		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiLineString);
 	}
 
 }
