@@ -40,7 +40,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * &lt;module name="changeLegMode">
  *   &lt!-- provide a comma-separated list of leg modes -->
  *   &lt;param name="modes" value="car,walk,bike" />
- *   %lt;param name="ignoreCarAvailability" value="false" />
+ *   &lt;param name="ignoreCarAvailability" value="false" />
  * &lt;/module>
  * </pre>
  *
