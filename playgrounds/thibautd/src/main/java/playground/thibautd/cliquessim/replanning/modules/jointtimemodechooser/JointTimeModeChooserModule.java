@@ -52,22 +52,40 @@ public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
 				controler);
 	}
 
+//	@Override
+//	public void prepareReplanning(ReplanningContext replanningContext) {
+//		statsCollector = DUMP_STATS ?
+//			new StatisticsCollector() :
+//			null;
+//		super.prepareReplanning(replanningContext);
+//	}
+	
 	@Override
-	public void prepareReplanning(ReplanningContext replanningContext) {
+	public void beforePrepareReplanningHook( ReplanningContext replanningContext ) {
 		statsCollector = DUMP_STATS ?
-			new StatisticsCollector() :
-			null;
-		super.prepareReplanning(replanningContext);
+		new StatisticsCollector() :
+		null;
 	}
 
+//	@Override
+//	public void finishReplanning() {
+//		super.finishReplanning();
+//		if (statsCollector != null) {
+//			statsCollector.dumpStatistics(
+//					controler.getControlerIO().getIterationFilename(
+//						controler.getIterationNumber(),
+//						getClass().getSimpleName()+"Stats.dat" ));
+//		}
+//	}
+	
 	@Override
-	public void finishReplanning() {
-		super.finishReplanning();
+	protected void afterFinishReplanningHook() {
 		if (statsCollector != null) {
 			statsCollector.dumpStatistics(
 					controler.getControlerIO().getIterationFilename(
-						controler.getIterationNumber(),
-						getClass().getSimpleName()+"Stats.dat" ));
+							controler.getIterationNumber(),
+							getClass().getSimpleName()+"Stats.dat" ));
 		}
 	}
+	
 }

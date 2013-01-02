@@ -26,6 +26,11 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * A simple interface to retrieve the disutility to travel on links.
+ * <p/>
+ * Design comments:<ul>
+ * <li>If I understand this correctly, implementations of this interface need to be thread-safe, since the same code may be called from different threads
+ * simultaneously.  If I understand this correctly, this can only be achieved by never writing to fields in any methods besides the constructor.  kai, jan'13
+ * </ul>
  *
  * @author mrieser
  */

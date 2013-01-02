@@ -177,14 +177,43 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
 	}
 
-	@Override
-	public final void finishReplanning() {
-		Gbl.printMemoryUsage();
+//	@Override
+//	public final void finishReplanning() {
+//		Gbl.printMemoryUsage();
+//
+//		super.finishReplanning();
+//		
+//		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
+//		
+//		if (algorithm.equals(LOCAL_SEARCH_RECURSIVE) || algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
+//			int unsuccessfull = 0;
+//			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
+//			while (planAlgo_it.hasNext()) {
+//				PlanAlgorithm plan_algo = planAlgo_it.next();
+//
+//				if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
+//					unsuccessfull += ((SingleActLocationMutator)plan_algo).getNumberOfUnsuccessfull();
+//					((SingleActLocationMutator)plan_algo).resetUnsuccsessfull();
+//				}
+//				else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
+//					unsuccessfull += ((RecursiveLocationMutator)plan_algo).getNumberOfUnsuccessfull();
+//					((RecursiveLocationMutator)plan_algo).resetUnsuccsessfull();
+//				}
+//			}
+//			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);
+//		}
+//		this.planAlgoInstances.clear();
+//	}
 
-		super.finishReplanning();
-		
+	@Override
+	protected void beforeFinishReplanningHook() {
+		Gbl.printMemoryUsage() ;
+	}
+	
+	@Override
+	protected void afterFinishReplanningHook() {
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
-		
+
 		if (algorithm.equals(LOCAL_SEARCH_RECURSIVE) || algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
 			int unsuccessfull = 0;
 			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
@@ -204,8 +233,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		}
 		this.planAlgoInstances.clear();
 	}
-
-
+	
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {		
 		// this is the way location choice should be configured ...

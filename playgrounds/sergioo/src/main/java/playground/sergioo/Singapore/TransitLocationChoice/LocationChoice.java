@@ -167,12 +167,41 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
 	}
 
+//	@Override
+//	public void finishReplanning() {
+//		Gbl.printMemoryUsage();
+//
+//		super.finishReplanning();
+//		
+//		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
+//		
+//		if (algorithm.equals("localSearchRecursive") || algorithm.equals("localSearchSingleAct")) {
+//			int unsuccessfull = 0;
+//			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
+//			while (planAlgo_it.hasNext()) {
+//				PlanAlgorithm plan_algo = planAlgo_it.next();
+//
+//				if (algorithm.equals("localSearchSingleAct")) {
+//					unsuccessfull += ((SingleActLocationMutator)plan_algo).getNumberOfUnsuccessfull();
+//					((SingleActLocationMutator)plan_algo).resetUnsuccsessfull();
+//				}
+//				else if (algorithm.equals("localSearchRecursive")) {
+//					unsuccessfull += ((RecursiveLocationMutator)plan_algo).getNumberOfUnsuccessfull();
+//					((RecursiveLocationMutator)plan_algo).resetUnsuccsessfull();
+//				}
+//			}
+//			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);
+//		}
+//		this.planAlgoInstances.clear();
+//	}
+	
 	@Override
-	public void finishReplanning() {
-		Gbl.printMemoryUsage();
-
-		super.finishReplanning();
-		
+	protected void beforeFinishReplanningHook() {
+		Gbl.printMemoryUsage() ;
+	}
+	
+	@Override
+	protected void afterFinishReplanningHook() {
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
 		
 		if (algorithm.equals("localSearchRecursive") || algorithm.equals("localSearchSingleAct")) {

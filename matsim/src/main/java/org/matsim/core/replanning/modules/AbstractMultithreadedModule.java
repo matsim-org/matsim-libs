@@ -40,18 +40,18 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * Just overwrite getPlanAlgoInstance() to return an instance of your plan
  * algorithm.
  * <p/>
- * <code>init[Threads?]()</code> creates the threads, but does not yet start them.
+ * <code>initThreads()</code> creates the threads, but does not yet start them.
  * <p/>
  * <code>handlePlan(Plan)</code> distributes the plans equally to all threads.
  * <p/>
- * <code>finish[Replanning?]()</code> finally starts the threads and waits for all threads to be finished.
+ * <code>finishReplanning()</code> finally starts the threads and waits for all threads to be finished.
  * <p/>
  * While this approach does not lead to optimal performance gains ("slow threads" vs.
  * "fast threads"), it helps building reproducible runs.  Additionally, as the threads are only
  * started after all to-be-handled plans are added, we can use unsynchronized data structures.
  * <p/>
  * Design comments/questions:<ul>
- * <li> As a consequence of the design, 
+ * <li> As a consequence of the design, the instances that getPlanAlgoInstance() returns, need to be thread-safe.  kai, dec'12
  * </ul>
  *
  * @author mrieser
@@ -73,6 +73,12 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 	static final private Logger log = Logger.getLogger(AbstractMultithreadedModule.class);
 
+	/**
+	 * Design comments:<ul>
+	 * <li> The way I understand this, the instances that this method returns need to be thread-safe (i.e. independent from each other).  They can,
+	 * for example, not rely on the same instance of the router.  kai, dec'12
+	 * </ul>
+	 */
 	abstract public PlanAlgorithm getPlanAlgoInstance();
 
 	public AbstractMultithreadedModule(GlobalConfigGroup globalConfigGroup) {
@@ -82,24 +88,34 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	public AbstractMultithreadedModule(final int numOfThreads) {
 		this.numOfThreads = numOfThreads;
 	}
+	
+	protected void beforePrepareReplanningHook( @SuppressWarnings("unused") ReplanningContext replanningContextTmp ) {
+		// left empty for inheritance
+	}
+
+	protected void afterPrepareReplanningHook( @SuppressWarnings("unused") ReplanningContext replanningContextTmp ) {
+		// left empty for inheritance
+	}
 
 	@Override
-	public void prepareReplanning(ReplanningContext replanningContext) {
-		this.replanningContext = replanningContext;
+	public final void prepareReplanning(ReplanningContext replanningContextTmp) {
+		this.beforePrepareReplanningHook(replanningContextTmp) ;
+		this.replanningContext = replanningContextTmp;
 		if (this.numOfThreads == 0) {
 			// it seems, no threads are desired :(
 			this.directAlgo = getPlanAlgoInstance();
 		} else {
-			initThreads(replanningContext);
+			initThreads();
 		}
+		this.afterPrepareReplanningHook(replanningContextTmp) ;
 	}
 
-	protected ReplanningContext getReplanningContext() {
+	protected final ReplanningContext getReplanningContext() {
 		return replanningContext;
 	}
 
 	@Override
-	public void handlePlan(final Plan plan) {
+	public final void handlePlan(final Plan plan) {
 		if (this.directAlgo == null) {
 			this.algothreads[this.count % this.numOfThreads].handlePlan(plan);
 			this.count++;
@@ -108,10 +124,16 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		}
 	}
 
+	protected void beforeFinishReplanningHook() {
+		// left empty for inheritance
+	}
+	protected void afterFinishReplanningHook() {
+		// left empty for inheritance
+	}
+	
 	@Override
-	public void finishReplanning() {
-		// yyyy in my view, this needs to be final.  Otherwise, people may override this but not call super, in which case the threads
-		// will not be closed. ??  kai, dec'12
+	public final void finishReplanning() {
+		this.beforeFinishReplanningHook() ;
 		
 		if (this.directAlgo == null) {
 			// only try to start threads if we did not directly work on all the plans
@@ -140,9 +162,11 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		this.threads = null;
 		this.replanningContext = null;
 		this.count = 0;
+		
+		this.afterFinishReplanningHook() ;
 	}
 
-	private void initThreads(ReplanningContext replanningContext) {
+	private void initThreads() {
 		if (this.threads != null) {
 			throw new RuntimeException("threads are already initialized");
 		}
@@ -167,7 +191,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		}
 	}
 
-	int getNumOfThreads() {
+	/* package (for a test) */ final int getNumOfThreads() {
 		return numOfThreads;
 	}
 

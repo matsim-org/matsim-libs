@@ -127,6 +127,8 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 			final CustomDataManager dataManager) {
 		
 		if ( !person.getId().equals(this.cachedPersonId)) {
+			// yyyyyy probably not thread safe (?!?!)
+			
 			// person has changed, so ...
 			
 			// ... memorize new person id:

@@ -91,10 +91,16 @@ public class ExtendedLocationChoicePlanModule extends AbstractMultithreadedModul
 				shoppingActivities, otherActivities, workActivities, educationActivities);
 	}
 
+//	@Override
+//	public void prepareReplanning(ReplanningContext replanningContext) {
+//		super.prepareReplanning(replanningContext);
+//		
+//		extendedLocationChoiceProbabilityCreator.calculateDynamicProbabilities();
+//		extendedLocationChoiceProbabilityCreator.calculateTotalProbabilities();
+//	}
+	
 	@Override
-	public void prepareReplanning(ReplanningContext replanningContext) {
-		super.prepareReplanning(replanningContext);
-		
+	public void afterPrepareReplanningHook( ReplanningContext replanningContext ) {
 		extendedLocationChoiceProbabilityCreator.calculateDynamicProbabilities();
 		extendedLocationChoiceProbabilityCreator.calculateTotalProbabilities();
 	}
