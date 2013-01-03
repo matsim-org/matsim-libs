@@ -66,45 +66,45 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 //		return cost;
 //	}
 
-	@Override
-	protected double offVehicleWaitTime(final Link link, final double time) {
-		//calculate off vehicle waiting time as new router parameter
-		double offVehWaitTime=0;
-		double nextVehArrivalTime = getVehArrivalTime(link, time);
-		if (time < nextVehArrivalTime){ // it means the agent waits outside the veh				
-			offVehWaitTime = nextVehArrivalTime-time;
-		}
-		return offVehWaitTime;
-	}
+//	@Override
+//	protected double offVehicleWaitTime(final Link link, final double time) {
+//		//calculate off vehicle waiting time as new router parameter
+//		double offVehWaitTime=0;
+//		double nextVehArrivalTime = getVehArrivalTime(link, time);
+//		if (time < nextVehArrivalTime){ // it means the agent waits outside the veh				
+//			offVehWaitTime = nextVehArrivalTime-time;
+//		}
+//		return offVehWaitTime;
+//	}
 
 	
 	
-	//variables for caching offVehWaitTime
-	Link previousWaitLink;
-	double previousWaitTime;
-	double cachedVehArrivalTime;
-	
-	/* package (for a test) */ double getVehArrivalTime(final Link link, final double now){
-		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
-			return this.cachedVehArrivalTime;
-		}
-		this.previousWaitLink = link;
-		this.previousWaitTime = now;
-		
-		//first find out vehicle arrival time to fromStop according to transit schedule
-		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
-		if (wrapped.getRoute() == null) { 
-			throw new RuntimeException("should not happen") ;
-		}
-		TransitRouteStop fromStop = wrapped.fromNode.stop;
-		
-		double nextDepartureTime = data.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
-		
-		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
-		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station
-		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
-		cachedVehArrivalTime = vehArrivalTime ;
-		return vehArrivalTime ;		
-	}
+//	//variables for caching offVehWaitTime
+//	Link previousWaitLink;
+//	double previousWaitTime;
+//	double cachedVehArrivalTime;
+//	
+//	/* package (for a test) */ double getVehArrivalTime(final Link link, final double now){
+//		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
+//			return this.cachedVehArrivalTime;
+//		}
+//		this.previousWaitLink = link;
+//		this.previousWaitTime = now;
+//		
+//		//first find out vehicle arrival time to fromStop according to transit schedule
+//		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+//		if (wrapped.getRoute() == null) { 
+//			throw new RuntimeException("should not happen") ;
+//		}
+//		TransitRouteStop fromStop = wrapped.fromNode.stop;
+//		
+//		double nextDepartureTime = data.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
+//		
+//		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
+//		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station
+//		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
+//		cachedVehArrivalTime = vehArrivalTime ;
+//		return vehArrivalTime ;		
+//	}
 	
 }

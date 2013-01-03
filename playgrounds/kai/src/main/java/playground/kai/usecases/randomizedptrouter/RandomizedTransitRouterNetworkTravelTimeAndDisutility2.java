@@ -221,28 +221,28 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 	double previousWaitTime;
 	double cachedVehArrivalTime;
 
-	/* package (for a test) */ double getVehArrivalTime(final Link link, final double now){
-		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
-			return this.cachedVehArrivalTime;
-		}
-		this.previousWaitLink = link;
-		this.previousWaitTime = now;
-
-		//first find out vehicle arrival time to fromStop according to transit schedule
-		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
-		if (wrapped.getRoute() == null) { 
-			throw new RuntimeException("should not happen") ;
-		}
-		TransitRouteStop fromStop = wrapped.fromNode.stop;
-
-		double nextDepartureTime = data.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
-
-		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
-		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station
-		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
-		cachedVehArrivalTime = vehArrivalTime ;
-		return vehArrivalTime ;		
-	}
+//	/* package (for a test) */ double getVehArrivalTime(final Link link, final double now){
+//		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
+//			return this.cachedVehArrivalTime;
+//		}
+//		this.previousWaitLink = link;
+//		this.previousWaitTime = now;
+//
+//		//first find out vehicle arrival time to fromStop according to transit schedule
+//		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+//		if (wrapped.getRoute() == null) { 
+//			throw new RuntimeException("should not happen") ;
+//		}
+//		TransitRouteStop fromStop = wrapped.fromNode.stop;
+//
+//		double nextDepartureTime = data.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
+//
+//		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
+//		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station
+//		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
+//		cachedVehArrivalTime = vehArrivalTime ;
+//		return vehArrivalTime ;		
+//	}
 
 
 	public static void main(String[] args) {
