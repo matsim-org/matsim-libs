@@ -113,13 +113,13 @@ public class FlightSimStuckedAnalysis implements AgentDepartureEventHandler, Age
 			if (! entry.getValue().boardingDeniedEvents.isEmpty()){
 				if (entry.getValue().stuckEvent == null){
 					boardingDeniedNoStuck.put(entry.getKey(), entry.getValue());
-					this.printToLog(entry);
 				}
 				else {
 					boardingDeniedAndStuck.put(entry.getKey(), entry.getValue());
 				}
 			}
 			else {
+				this.printToLog(entry);
 				noBoardingDeniedButStuck.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -177,9 +177,9 @@ public class FlightSimStuckedAnalysis implements AgentDepartureEventHandler, Age
 	private void printToLog(Entry<Id, PersonEvents> entry){
 		log.info("Person Id: " + entry.getKey());
 		log.info("  BoardingDeniedEvents: " );
-		for (BoardingDeniedEvent event  : entry.getValue().boardingDeniedEvents){
-			log.info("  " + event);
-		}
+//		for (BoardingDeniedEvent event  : entry.getValue().boardingDeniedEvents){
+//			log.info("  " + event);
+//		}
 		log.info("  StuckEvent: " );
 		log.info("  " + entry.getValue().stuckEvent);
 	}

@@ -79,7 +79,7 @@ public class DgFlightSimDemandAnalyzer {
 	double populationVariance = variance.getFirst() / (double)variance.getSecond();
 	double meanRelError = relErrorSum.getFirst()/(double)relErrorSum.getSecond();
 	String result = "2.2.2 - 2.2.1" + " &  " + "-" + " & " + getStringFromDouble(populationVariance, -1)  + ", " + Integer.toString(variance.getSecond())+ " & " 
-	+ getStringFromDouble(populationVariance, -1) + " & " + getStringFromDouble(meanRelError, 4) 
+	+ getStringFromDouble(Math.sqrt(populationVariance), -1) + " & " + getStringFromDouble(meanRelError, 4) 
 	+ ", " + Integer.toString(relErrorSum.getSecond()) + " & " + "-" + " & " + "-" + " \\\\";
 	System.out.println(result);
 	results.add(result);
