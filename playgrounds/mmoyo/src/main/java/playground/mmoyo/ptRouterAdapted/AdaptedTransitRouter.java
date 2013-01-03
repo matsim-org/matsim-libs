@@ -38,10 +38,11 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -59,14 +60,14 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 	public AdaptedTransitRouter(TransitRouterConfig myTRConfig, final TransitSchedule schedule) {
 		
 		//super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
-		this (schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig), buildNetwork(schedule, myTRConfig.beelineWalkConnectionDistance ));
+		this (schedule, myTRConfig, new TransitRouterNetworkTravelTimeAndDisutility(myTRConfig), buildNetwork(schedule, myTRConfig.beelineWalkConnectionDistance ));
 		//attention : the transit network is created first in the upper class   with "this.adaptedTransitNetwork = buildNetwork()";
 	}
 
 	public AdaptedTransitRouter(
 			TransitSchedule schedule,
 			TransitRouterConfig myTRConfig,
-			AdaptedTransitRouterNetworkTravelTimeCost adaptedTransitRouterNetworkTravelTimeCost,
+			TransitRouterNetworkTravelTimeAndDisutility adaptedTransitRouterNetworkTravelTimeCost,
 			TransitRouterNetwork buildNetwork) {
 		super(myTRConfig, buildNetwork, adaptedTransitRouterNetworkTravelTimeCost, adaptedTransitRouterNetworkTravelTimeCost);
 	}

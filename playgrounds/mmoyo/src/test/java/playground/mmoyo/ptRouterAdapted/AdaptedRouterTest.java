@@ -12,6 +12,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -31,7 +32,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 				scenarioImpl.getConfig().plansCalcRoute(), scenarioImpl.getConfig().transitRouter(),
 				scenarioImpl.getConfig().vspExperimental());
 
-		AdaptedTransitRouterNetworkTravelTimeCost adaptedTravelTimeCost = new AdaptedTransitRouterNetworkTravelTimeCost(myConfig);
+		TransitRouterNetworkTravelTimeAndDisutility adaptedTravelTimeCost = new TransitRouterNetworkTravelTimeAndDisutility(myConfig);
 		AdaptedTransitRouter adaptedTransitRouter = new AdaptedTransitRouter(myConfig, scenarioImpl.getTransitSchedule());
 
 		//test only transit links without transfer

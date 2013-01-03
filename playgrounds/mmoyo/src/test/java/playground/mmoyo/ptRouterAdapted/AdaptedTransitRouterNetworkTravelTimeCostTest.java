@@ -47,7 +47,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouterNetworkTravelTimeAndDisutility tc = new AdaptedTransitRouterNetworkTravelTimeCost(conf);
+		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 
@@ -70,7 +70,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		AdaptedTransitRouterNetworkTravelTimeCost tc = new AdaptedTransitRouterNetworkTravelTimeCost(conf);
+		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 	
@@ -115,7 +115,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		AdaptedTransitRouterNetworkTravelTimeCost tc = new AdaptedTransitRouterNetworkTravelTimeCost(conf);
+		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
@@ -153,7 +153,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouterNetworkTravelTimeAndDisutility tc = new AdaptedTransitRouterNetworkTravelTimeCost(conf);
+		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		
@@ -184,7 +184,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouterNetworkTravelTimeAndDisutility tc = new AdaptedTransitRouterNetworkTravelTimeCost(conf);
+		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		
