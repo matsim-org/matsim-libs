@@ -31,11 +31,16 @@ import org.matsim.testcases.MatsimTestCase;
 
 
 /**
+ * Tests that specifically look at the computation of the out-of-vehicle wait time.  There is overlap with the original tests; it is most
+ * probably possible to combine/condense them.
+ * <p/>
+ * Comments:<ul>
+ * <li> As far as I can tell, it is not tested if other utility values for the out-of-vehicle wait times influences the results.
+ * This should/could be done in org.matsim.examples.simple.PtScoringTest .
+ * 
  * @author manuel after mrieser
  */
 
-/**these are the same tests as in org.matsim.pt.router.TransitRouterNetworkTravelTimeCostTest 
- * using the adapted router instead, to taste the implementation of waiting time as separate routing parameter*/
 public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 
 	public void testTravelTime() {
@@ -44,11 +49,11 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		f.init();
 		
 		//create the adapted router
-		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 
 		// find the link connecting C and G on the red line
@@ -67,11 +72,11 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 	public void testVehArrivalTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 	
 		// find the link connecting C and D on the blue line
@@ -112,11 +117,11 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 	public void testTravelTimeAfterMidnight() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
@@ -150,11 +155,11 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 	public void testTravelCostLineSwitch() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		
 		// find the link connecting C and D on the blue line
@@ -181,11 +186,11 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 	public void testTravelCostLineSwitch_AdditionalTransferTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new MyTransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
-		TransitRouterImpl router = new AdaptedTransitRouter(conf, f.schedule) ;
+		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule) ;
 		TransitRouterNetwork routerNet = router.getTransitRouterNetwork();
 		
 		// find the link connecting C and D on the blue line
