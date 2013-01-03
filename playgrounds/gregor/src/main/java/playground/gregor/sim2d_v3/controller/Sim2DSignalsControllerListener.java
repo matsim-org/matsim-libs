@@ -56,7 +56,7 @@ public class Sim2DSignalsControllerListener implements SignalsControllerListener
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		//init mobility simulation
 		Sim2DSignalEngine signalEngie = new Sim2DSignalEngine(this.signalManager,this.hQ2DFac);
-		event.getControler().getQueueSimulationListener().add(signalEngie);
+		event.getControler().getMobsimListeners().add(signalEngie);
 	}
 	
 	@Override

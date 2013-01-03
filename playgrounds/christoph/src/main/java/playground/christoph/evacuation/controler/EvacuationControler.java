@@ -650,7 +650,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		nonPTModes.add(TransportMode.bike);
 		nonPTModes.add(TransportMode.walk);
 		AgentFilterFactory nonPTLegAgentsFilterFactory = new TransportModeFilterFactory(nonPTModes);
-		this.getQueueSimulationListener().add((TransportModeFilterFactory) nonPTLegAgentsFilterFactory);
+		this.getMobsimListeners().add((TransportModeFilterFactory) nonPTLegAgentsFilterFactory);
 		
 		DuringActivityIdentifierFactory duringActivityFactory;
 		DuringLegIdentifierFactory duringLegFactory;

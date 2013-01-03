@@ -164,7 +164,7 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		duringLegRerouteTransportModes.add(TransportMode.car);
 		
 		carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes);
-		this.getQueueSimulationListener().add(carLegAgentsFilterFactory);
+		this.getMobsimListeners().add(carLegAgentsFilterFactory);
 
 		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap());
 		duringLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);

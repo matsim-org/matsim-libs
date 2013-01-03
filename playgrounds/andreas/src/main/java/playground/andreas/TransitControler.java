@@ -96,7 +96,7 @@ public class TransitControler extends Controler {
 			this.events.addHandler(new FixedHeadwayControler(qSim, transitEngine));
 		}
 
-        for (MobsimListener l : this.getQueueSimulationListener()) {
+        for (MobsimListener l : this.getMobsimListeners()) {
             qSim.addQueueSimulationListeners(l);
         }
         if (this.useOTFVis) {

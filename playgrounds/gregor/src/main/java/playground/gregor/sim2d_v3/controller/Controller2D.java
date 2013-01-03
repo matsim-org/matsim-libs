@@ -126,7 +126,7 @@ public class Controller2D extends Controler implements StartupListener {
 		XYDataWriter xyDataWriter = new XYDataWriter();
 		this.getEvents().addHandler(xyDataWriter);
 		this.addControlerListener(xyDataWriter);
-		this.getQueueSimulationListener().add(xyDataWriter);
+		this.getMobsimListeners().add(xyDataWriter);
 	}
 
 }

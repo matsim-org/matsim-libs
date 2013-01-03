@@ -74,7 +74,7 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 		
 		
 		this.signalEngie = new QSimSignalEngine(this.signalManager);
-		event.getControler().getQueueSimulationListener().add(this.signalEngie);
+		event.getControler().getMobsimListeners().add(this.signalEngie);
 	}
 
 	

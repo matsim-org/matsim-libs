@@ -96,7 +96,7 @@ public class TransitControler extends Controler {
 
 
 		if (simulation instanceof ObservableMobsim){
-			for (MobsimListener l : this.getQueueSimulationListener()) {
+			for (MobsimListener l : this.getMobsimListeners()) {
 				((ObservableMobsim)simulation).addQueueSimulationListeners(l);
 			}
 		}

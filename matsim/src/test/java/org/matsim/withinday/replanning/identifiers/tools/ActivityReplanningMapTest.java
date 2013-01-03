@@ -80,7 +80,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 			fosl.addSimulationListener(arp);
 			fosl.addSimulationListener(listener);
-			event.getControler().getQueueSimulationListener().add(fosl);
+			event.getControler().getMobsimListeners().add(fosl);
 		}
 	}
 

@@ -163,7 +163,7 @@ public class Controler extends AbstractController {
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	Integer iteration = null;
+	Integer thisIteration = null;
 
 	protected final Config config;
 	protected ScenarioImpl scenarioData = null;
@@ -217,12 +217,12 @@ public class Controler extends AbstractController {
 	 * Attribute for the routing factory
 	 */
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	private final List<MobsimListener> simulationListener = new ArrayList<MobsimListener>();
+	private final List<MobsimListener> simulationListeners = new ArrayList<MobsimListener>();
 
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory;
 
 	private TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
-	private MobsimFactory mobsimFactory = null;
+	private MobsimFactory thisMobsimFactory = null;
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
@@ -654,7 +654,7 @@ public class Controler extends AbstractController {
 	
 	@Override
 	protected void runMobSim(int iteration) {
-		this.iteration = iteration;
+		this.thisIteration = iteration;
 		runMobSim();
 	}
 
@@ -664,8 +664,8 @@ public class Controler extends AbstractController {
 	}
 
 	/* package */Mobsim getNewMobsim() {
-		if (this.mobsimFactory != null) {
-			Mobsim simulation = this.mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
+		if (this.thisMobsimFactory != null) {
+			Mobsim simulation = this.thisMobsimFactory.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
 		} else if (this.config.simulation() != null && this.config.simulation().getExternalExe() != null ) {
@@ -703,7 +703,7 @@ public class Controler extends AbstractController {
 
 	private void enrichSimulation(final Mobsim simulation) {
 		if (simulation instanceof ObservableMobsim) {
-			for (MobsimListener l : this.getQueueSimulationListener()) {
+			for (MobsimListener l : this.getMobsimListeners()) {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
 			}
 
@@ -840,7 +840,7 @@ public class Controler extends AbstractController {
 	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
 	 *         used for the replanning of plans.
 	 */
-	@Deprecated
+	@Deprecated // use addPlanStrategyFactory instead. kai, jan'13
 	public final StrategyManager getStrategyManager() {
 		return this.strategyManager;
 	}
@@ -1075,8 +1075,8 @@ public class Controler extends AbstractController {
 		return this.scoreStats;
 	}
 
-	public List<MobsimListener> getQueueSimulationListener() {
-		return this.simulationListener;
+	public List<MobsimListener> getMobsimListeners() {
+		return this.simulationListeners;
 	}
 
 	@Deprecated
@@ -1116,7 +1116,7 @@ public class Controler extends AbstractController {
 	 *         process
 	 */
 	public Integer getIterationNumber() {
-		return this.iteration;
+		return this.thisIteration;
 	}
 	
 	public void setTerminationCriterion(TerminationCriterion terminationCriterion) {
@@ -1124,11 +1124,11 @@ public class Controler extends AbstractController {
 	}
 
 	public MobsimFactory getMobsimFactory() {
-		return this.mobsimFactory;
+		return this.thisMobsimFactory;
 	}
 
 	public void setMobsimFactory(final MobsimFactory mobsimFactory) {
-		this.mobsimFactory = mobsimFactory;
+		this.thisMobsimFactory = mobsimFactory;
 	}
 
 	/**

@@ -62,7 +62,7 @@ public class DgTaSignalControlerListener implements SignalsControllerListener , 
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		
 		SignalEngine engine = new QSimSignalEngine(this.signalManager);
-		event.getControler().getQueueSimulationListener().add(engine);
+		event.getControler().getMobsimListeners().add(engine);
 	}
 
 

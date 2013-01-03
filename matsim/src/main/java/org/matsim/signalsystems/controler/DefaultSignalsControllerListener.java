@@ -50,7 +50,7 @@ public class DefaultSignalsControllerListener implements SignalsControllerListen
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		//init mobility simulation
 		QSimSignalEngine signalEngie = new QSimSignalEngine(this.signalManager);
-		event.getControler().getQueueSimulationListener().add(signalEngie);
+		event.getControler().getMobsimListeners().add(signalEngie);
 	}
 	
 	@Override

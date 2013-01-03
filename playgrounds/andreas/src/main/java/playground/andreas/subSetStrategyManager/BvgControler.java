@@ -76,7 +76,7 @@ public class BvgControler extends Controler {
 //		this.events.addHandler(new LogOutputEventHandler());
 
 		if (simulation instanceof ObservableMobsim) {
-			for (MobsimListener l : this.getQueueSimulationListener()) {
+			for (MobsimListener l : this.getMobsimListeners()) {
 				((ObservableMobsim)simulation).addQueueSimulationListeners(l);
 			}
 		}

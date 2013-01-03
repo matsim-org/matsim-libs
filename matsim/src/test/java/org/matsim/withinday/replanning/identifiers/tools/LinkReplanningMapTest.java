@@ -78,7 +78,7 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 			fosl.addSimulationListener(lrp);
 			fosl.addSimulationListener(listener);
-			event.getControler().getQueueSimulationListener().add(fosl);
+			event.getControler().getMobsimListeners().add(fosl);
 		}
 	}
 

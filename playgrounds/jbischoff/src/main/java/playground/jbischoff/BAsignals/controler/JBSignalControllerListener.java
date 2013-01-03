@@ -78,7 +78,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 		jbBuilder = new JbSignalBuilder(signalsData, builder, this.collh, this.ach);
 		this.manager = jbBuilder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
-		c.getQueueSimulationListener().add(engine);
+		c.getMobsimListeners().add(engine);
 		c.getEvents().addHandler(tch);
 	}	
 	

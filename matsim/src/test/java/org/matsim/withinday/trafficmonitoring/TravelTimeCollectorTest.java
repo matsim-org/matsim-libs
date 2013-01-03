@@ -89,7 +89,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 			fosl.addSimulationListener(travelTime);
 			fosl.addSimulationListener(listener);
-			controler.getQueueSimulationListener().add(fosl);
+			controler.getMobsimListeners().add(fosl);
 			
 			Id id = scenario.createId("6");
 			Link link = scenario.getNetwork().getLinks().get(id);
