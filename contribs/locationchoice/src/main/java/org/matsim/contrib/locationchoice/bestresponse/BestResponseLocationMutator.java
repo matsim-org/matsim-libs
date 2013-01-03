@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
@@ -35,7 +36,6 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -121,7 +121,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 										
 					final Activity actPost = (Activity)actslegs.get(actlegIndex + 2);					
 					double distanceDirect = ((CoordImpl)actPre.getCoord()).calcDistance(actPost.getCoord());
-					double distanceFromEpsilon = this.getMaximumDistanceFromEpsilon((PersonImpl)plan.getPerson(), 
+					double distanceFromEpsilon = this.getMaximumDistanceFromEpsilon(plan.getPerson(), 
 							this.actTypeConverter.convertType(actToMove.getType()));
 					double maxRadius = (distanceDirect +  distanceFromEpsilon) / 2.0;
 					
@@ -139,7 +139,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					// maybe repeat this a couple of times
 					TravelTime travelTime = super.getControler().getTravelTimeCalculator();
 					TravelDisutility travelCost = super.getControler().getTravelDisutilityFactory().
-							createTravelDisutility((TravelTime)travelTime, (PlanCalcScoreConfigGroup)super.getControler().getConfig().getModule("planCalcScore"));
+							createTravelDisutility(travelTime, super.getControler().getConfig().planCalcScore());
 						
 					this.setLocation((ActivityImpl)actToMove, 
 							cs.getWeightedRandomChoice(actlegIndex, actPre.getCoord(),
@@ -148,6 +148,9 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
 					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
+					// yyyy if I understand this correctly, this means that, if the location change is accepted, all subsequent locachoice tests
+					// will be run with that new location.  kai, jan'13
+					
 					// **************************************************
 				}
 			}
@@ -160,7 +163,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
    		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 	}
 	
-	public final void createChoiceSetCircle(Coord center, double radius, String type, ChoiceSet cs, Id personId) {
+	private final void createChoiceSetCircle(Coord center, double radius, String type, ChoiceSet cs, Id personId) {
 		ArrayList<ActivityFacility> list = 
 			(ArrayList<ActivityFacility>) super.quadTreesOfType.get(type).get(center.getX(), center.getY(), radius);
 	
@@ -200,7 +203,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		return score;
 	}
 	
-	private double getMaximumDistanceFromEpsilon(PersonImpl person, String type) {
+	private double getMaximumDistanceFromEpsilon(Person person, String type) {
 		double maxEpsilon = 0.0;
 		double scale = 1.0;
 		
