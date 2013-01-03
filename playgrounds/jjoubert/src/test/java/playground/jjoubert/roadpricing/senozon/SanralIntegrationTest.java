@@ -47,7 +47,8 @@ public class SanralIntegrationTest {
 		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector ec = new EventsCollector();
 		em.addHandler(ec);
-		new MatsimEventsReader(em).readFile(utils.getOutputDirectory() + "ITERS/it.0/0.events.txt.gz");
+//		new MatsimEventsReader(em).readFile(utils.getOutputDirectory() + "ITERS/it.0/0.events.txt.gz");
+		new MatsimEventsReader(em).readFile(utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz");
 		List<AgentMoneyEvent> events = new ArrayList<AgentMoneyEvent>();
 		for (Event e : ec.getEvents()) {
 			if (e instanceof AgentMoneyEvent) {
