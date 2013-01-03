@@ -50,7 +50,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class BestResponseLocationMutator extends RecursiveLocationMutator {
+public final class BestResponseLocationMutator extends RecursiveLocationMutator {
 	private ActivityFacilitiesImpl facilities;
 	private Network network;
 	private ObjectAttributes personsMaxEpsUnscaled;
@@ -76,7 +76,7 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 	}
 	
 	@Override
-	public void handlePlan(final Plan plan){
+	public final void handlePlan(final Plan plan){
 		// if person is not in the analysis population
 		if (Integer.parseInt(plan.getPerson().getId().toString()) > 
 			Integer.parseInt(super.controler.getConfig().locationchoice().getIdExclusion())) return;
@@ -154,7 +154,7 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
    		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 	}
 	
-	public void createChoiceSetCircle(Coord center, double radius, String type, ChoiceSet cs, Id personId) {
+	public final void createChoiceSetCircle(Coord center, double radius, String type, ChoiceSet cs, Id personId) {
 		ArrayList<ActivityFacility> list = 
 			(ArrayList<ActivityFacility>) super.quadTreesOfType.get(type).get(center.getX(), center.getY(), radius);
 	

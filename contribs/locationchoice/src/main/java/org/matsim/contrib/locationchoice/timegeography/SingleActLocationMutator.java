@@ -59,7 +59,7 @@ public class SingleActLocationMutator extends LocationMutator {
 	}
 
 	@Override
-	public void handlePlan(final Plan plan){
+	public final void handlePlan(final Plan plan){
 
 		List<Activity> flexibleActivities = this.getFlexibleActivities(plan);
 
@@ -69,7 +69,7 @@ public class SingleActLocationMutator extends LocationMutator {
 		}
 		Collections.shuffle(flexibleActivities);
 		Activity actToMove = flexibleActivities.get(0);
-		List<? extends PlanElement> actslegs = plan.getPlanElements();
+		List<PlanElement> actslegs = plan.getPlanElements();
 		int indexOfActToMove = actslegs.indexOf(actToMove);
 
 		// starting home and ending home are never flexible
@@ -113,7 +113,7 @@ public class SingleActLocationMutator extends LocationMutator {
 		return flexibleActivities;
 	}
 
-	protected boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius) {
+	protected final boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius) {
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
 		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;
 		ArrayList<ActivityFacility> facilitySet =
@@ -134,11 +134,11 @@ public class SingleActLocationMutator extends LocationMutator {
    		return true;
 	}
 
-	public int getNumberOfUnsuccessfull() {
+	public final int getNumberOfUnsuccessfull() {
 		return this.unsuccessfullLC;
 	}
 
-	public void resetUnsuccsessfull() {
+	public final void resetUnsuccsessfull() {
 		this.unsuccessfullLC = 0;
 	}
 }

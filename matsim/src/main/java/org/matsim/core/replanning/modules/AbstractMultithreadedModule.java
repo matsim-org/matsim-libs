@@ -117,7 +117,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	@Override
 	public final void handlePlan(final Plan plan) {
 		if (this.directAlgo == null) {
-			this.algothreads[this.count % this.numOfThreads].handlePlan(plan);
+			this.algothreads[this.count % this.numOfThreads].addPlanToThread(plan);
 			this.count++;
 		} else {
 			this.directAlgo.run(plan);
@@ -222,7 +222,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 			this.counter = counter;
 		}
 
-		public void handlePlan(final Plan plan) {
+		public void addPlanToThread(final Plan plan) {
 			this.plans.add(plan);
 		}
 

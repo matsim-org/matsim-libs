@@ -87,15 +87,19 @@ public class ConnectHomesAndWorkplaces {
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork(), knowledges);
 		plansWriter.startStreaming(null);//config.plans().getOutputFile());
-		plans.addAlgorithm(locachoice);
-		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
 
-		// I don't know why this works:
-		plansReader.readFile(this.config.plans().getInputFile());
-		plans.printPlansCount();
-		plansWriter.closeStreaming();
+//		plans.addAlgorithm(locachoice);
+		throw new RuntimeException("just deleted the above line; imo, this was never used anyway.  Also commenting out everything below so it compiles. " +
+				"kai, jan'12") ;
 
-		System.out.println("done.");
+//		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
+//
+//		// I don't know why this works:
+//		plansReader.readFile(this.config.plans().getInputFile());
+//		plans.printPlansCount();
+//		plansWriter.closeStreaming();
+//
+//		System.out.println("done.");
 	}
 
 	public static void main(final String[] args) {

@@ -40,7 +40,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
-public abstract class LocationMutator extends AbstractPersonAlgorithm implements PlanAlgorithm {
+public abstract class LocationMutator /*extends AbstractPersonAlgorithm*/ implements PlanAlgorithm {
 
 	protected Network network = null;
 	protected Controler controler = null;
@@ -105,12 +105,13 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	public abstract void handlePlan(final Plan plan);
 
 
-	@Override
-	public void run(final Person person) {
-		for (Plan plan : person.getPlans()) {
-			handlePlan(plan);
-		}
-	}
+//	@Override
+//	public void run(final Person person) {
+//		for (Plan plan : person.getPlans()) {
+//			handlePlan(plan);
+//		}
+//	}
+	// I don't think that this was ever called from anywhere.  kai, jan'13
 
 	@Override
 	public void run(final Plan plan) {
