@@ -108,7 +108,11 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	 */
 	@Deprecated
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
-		return this.eventsToScore.getScoringFunctionForAgent(agentId);
+		if ( eventsToScore != null ) {
+			return this.eventsToScore.getScoringFunctionForAgent(agentId);
+		} else {
+			return this.eventsToScore2.getScoringFunctionForAgent(agentId);
+		}
 	}
 
 }

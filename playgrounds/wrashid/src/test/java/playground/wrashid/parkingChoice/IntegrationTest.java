@@ -57,7 +57,6 @@ public class IntegrationTest  extends TestCase {
 		
 		controler.addControlerListener(afterMobSimListener);
 		
-		//TODO: remove next line...
 		controler.setOverwriteFiles(true);
 		
 		controler.run();

@@ -107,9 +107,9 @@
 		<param name="parkingActivityDurationPenaltyScalingFactor" value="1.0" />
 	</module>
 	
-	<module name="locationchoice">
+	<module name="locationchoice"><!--
 		<param name="constrained" value="true"/>
-		<param name="maxRecursions" value="20"/>
+		--><param name="maxRecursions" value="20"/>
 	</module>
 
 	<module name="parallelEventHandling">
