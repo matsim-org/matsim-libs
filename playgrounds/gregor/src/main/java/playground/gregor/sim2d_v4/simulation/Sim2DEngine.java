@@ -21,11 +21,13 @@
 package playground.gregor.sim2d_v4.simulation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -49,9 +51,11 @@ public class Sim2DEngine implements MobsimEngine {
 
 	private final Sim2DScenario sim2dsc;
 
-	private final List<PhysicalSim2DEnvironment> envs = new ArrayList<PhysicalSim2DEnvironment>();
+	private final Map<Id,PhysicalSim2DEnvironment> penvs = new HashMap<Id,PhysicalSim2DEnvironment>();
 
 	private final double qSimStepSize;
+
+	private final List<QSim2DTransitionLink> hiResLinks = new ArrayList<QSim2DTransitionLink>();
 
 	public Sim2DEngine(QSim sim) {
 		this.scenario = sim.getScenario();
@@ -72,11 +76,10 @@ public class Sim2DEngine implements MobsimEngine {
 
 	@Override
 	public void doSimStep(double time) {
-		log.info("do sim step");
+//		log.info("do sim step");
 		double sim2DTime = time;
 		while (sim2DTime < time + this.qSimStepSize) {
-			//TODO handle departures here!
-			for (PhysicalSim2DEnvironment  env : this.envs) {
+			for (PhysicalSim2DEnvironment  env : this.penvs.values()) { //element order undefined when iterating over a HashSet. will certainly cause problems with checksum tests
 				env.doSimStep(time);
 			}
 			sim2DTime += this.sim2DStepSize;
@@ -87,7 +90,13 @@ public class Sim2DEngine implements MobsimEngine {
 	public void onPrepareSim() {
 		log.info("prepare");
 		for (Sim2DEnvironment  env: this.sim2dsc.getSim2DEnvironments()) {
-			this.envs.add(new PhysicalSim2DEnvironment(env));
+			this.penvs.put(env.getId(),new PhysicalSim2DEnvironment(env, this.sim2dsc));
+		}
+		for (QSim2DTransitionLink hiResLink : this.hiResLinks) {
+			Id id = this.sim2dsc.getSim2DEnvironment(hiResLink.getLink()).getId();
+			PhysicalSim2DEnvironment penv = this.penvs.get(id);
+			penv.createAndAddPhysicalTransitionSections(hiResLink);
+//			penvCreateAndAddTransition
 		}
 
 	}
@@ -103,15 +112,8 @@ public class Sim2DEngine implements MobsimEngine {
 		this.internalInterface = internalInterface;
 	}
 
-
-	public void putDepartingAgentInLimbo(MobsimDriverAgent agent) {
-		log.info(agent + " \n added!");
-
-	}
-
-
 	public void registerHiResLink(QSim2DTransitionLink hiResLink) {
-		// TODO Auto-generated method stub
+		this.hiResLinks .add(hiResLink);
 		
 	}
 

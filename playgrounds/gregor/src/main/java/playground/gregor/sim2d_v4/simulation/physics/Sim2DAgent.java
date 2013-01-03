@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Section.java
+ * Sim2DAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,61 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.scenario;
-
-import java.util.ArrayList;
-import java.util.List;
+package playground.gregor.sim2d_v4.simulation.physics;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-import com.vividsolutions.jts.geom.Polygon;
-
-public class Section implements Identifiable {
-
-	private final Id id;
-	private final Polygon p;
-	private int[] openings = null;
-	private Id[] neighbors = null;
-	private final int level;
-	private final List<Id> relatedLinks = new ArrayList<Id>();
-
-	/*package*/ Section(Id id, Polygon p, int[] openings, Id[] neighbors, int level) {
-		this.id = id;
-		this.p = p; //maybe we can sparse the polygon here and take the coordinate array of its exterior ring instead [gl Jan' 2013]
-		this.openings = openings;
-		this.neighbors = neighbors;
-		this.level = level;
-	}
-
-	public Polygon getPolygon() {
-		return this.p;
-	}
-
-	public int getLevel() {
-		return this.level;
-	}
-
-	public int[] getOpenings() {
-		return this.openings;
-	}
+public interface Sim2DAgent {
 	
-	public Id[] getNeighbors() {
-		return this.neighbors;
-	}
-	
-	@Override
-	public Id getId() {
-		return this.id;
-	}
+	public QVehicle getQVehicle();
 
-	public void addRelatedLinkId(Id id2) {
-		this.relatedLinks.add(id2);
-	}
+//	public void calcNeighbors(PhysicalSim2DSection physicalSim2DSection);
+//
+//	public void setObstacles(Segment[] obstacles);
+
+	public void updateVelocity();
+
+	public void setPSec(PhysicalSim2DSection physicalSim2DSection);
 	
-	public List<Id> getRelatedLinkIds() {
-		return this.relatedLinks;
-	}
+	public void move(float dx, float dy);
+
+	public float[] getVelocity();
+
+	public Id getCurrentLinkId();
+
+	public float[] getPos();
+
+	public Id chooseNextLinkId();
+
+	public Id getId();
+
+	public void notifyMoveOverNode(Id nextLinkId);
 	
 	
+	
+
+
 }

@@ -131,13 +131,13 @@ public class Sim2DReRoutePlanAlgorithm implements PlanAlgorithm {
 		int id = 0;
 		for (; id < fullPath.size(); id++) {
 			Link l = fullPath.get(id);
-			if (switchLegMode(currentLegMode,l)) {
-				Leg leg = createLeg(fullPath, io, id, baseRoute, currentLegMode, startTime);
-				newPlan.add(leg);
-				io = id-1;
-				currentLegMode = currentLegMode.equals(TransportMode.walk) ? TransportMode.walk2d : TransportMode.walk;
-				
-			}
+//			if (switchLegMode(currentLegMode,l)) {
+//				Leg leg = createLeg(fullPath, io, id, baseRoute, currentLegMode, startTime);
+//				newPlan.add(leg);
+//				io = id-1;
+//				currentLegMode = currentLegMode.equals(TransportMode.walk) ? TransportMode.walk2d : TransportMode.walk;
+//				
+//			}
 		}
 		Leg leg = createLeg(fullPath, io, id, baseRoute, currentLegMode, startTime);
 		newPlan.add(leg);
@@ -153,7 +153,7 @@ public class Sim2DReRoutePlanAlgorithm implements PlanAlgorithm {
 		LegImpl leg = new LegImpl(legMode);
 		
 		
-		//DEBUG
+//		DEBUG
 		if (legMode.equals("walk")) {
 			leg = new LegImpl("car");
 		}

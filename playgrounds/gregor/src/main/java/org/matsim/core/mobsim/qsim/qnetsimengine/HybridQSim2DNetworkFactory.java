@@ -19,10 +19,14 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
+import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.TransportMode;
+import playground.gregor.sim2d_v4.simulation.Sim2DAgentBuilder;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
 
 
@@ -36,9 +40,14 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 
 
 	private final Sim2DEngine hybridEngine;
+	private final Sim2DScenario s2dsc;
+	private final Sim2DAgentBuilder agentBuilder;
 
-	public HybridQSim2DNetworkFactory( Sim2DEngine e) {
+	public HybridQSim2DNetworkFactory( Sim2DEngine e, Scenario sc, Sim2DAgentBuilder builder) {
 		this.hybridEngine = e;
+		this.agentBuilder = builder;
+		this.s2dsc = sc.getScenarioElement(Sim2DScenario.class);
+		
 	}
 
 	@Override
@@ -55,7 +64,8 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 		}
 		
 		if (transitionLink) {
-			QSim2DTransitionLink hiResLink = new QSim2DTransitionLink(link, network, toQueueNode, this.hybridEngine, new QLinkImpl(link, network, toQueueNode) ) ;
+			Sim2DEnvironment env = this.s2dsc.getSim2DEnvironment(link);
+			QSim2DTransitionLink hiResLink = new QSim2DTransitionLink(link, network, toQueueNode, this.hybridEngine, new QLinkImpl(link, network, toQueueNode), env, this.agentBuilder) ;
 			this.hybridEngine.registerHiResLink(hiResLink);
 			return hiResLink ;
 		} else {

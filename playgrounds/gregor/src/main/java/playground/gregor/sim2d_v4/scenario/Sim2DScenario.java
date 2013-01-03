@@ -36,9 +36,14 @@ public class Sim2DScenario {
 	private static final Logger log = Logger.getLogger(Sim2DScenario.class);
 	
 	private final Map<Id,Sim2DEnvironment> envs = new HashMap<Id,Sim2DEnvironment>();
+	
+	private final Map<Link,Sim2DEnvironment> linkEnvironmentMapping = new HashMap<Link, Sim2DEnvironment>();
+	
 	private final Sim2DConfig config;
 	
 	private boolean connected = false;
+
+	private Scenario sc;
 	
 	/*package*/ Sim2DScenario(Sim2DConfig conf) {
 		this.config = conf;
@@ -60,6 +65,7 @@ public class Sim2DScenario {
 		}
 		log.info("Connecting 2D scenario.");
 		sc.addScenarioElement(this);
+		this.sc = sc;
 		Network scNet = sc.getNetwork();
 		for (Sim2DEnvironment env : this.envs.values()) {
 			
@@ -69,10 +75,15 @@ public class Sim2DScenario {
 				for (Id refId : sec.getRelatedLinkIds()) {
 					Link l = scNet.getLinks().get(refId);
 					env.addLinkSectionMapping(l, sec);
+					this.linkEnvironmentMapping.put(l, env);
 				}
 			}
 		}
 		this.connected = true;
+	}
+	
+	public Sim2DEnvironment getSim2DEnvironment(Link l) {
+		return this.linkEnvironmentMapping.get(l);
 	}
 
 
@@ -111,6 +122,10 @@ public class Sim2DScenario {
 
 	public Sim2DEnvironment getSim2DEnvironment(Id id) {
 		return this.envs.get(id);
+	}
+	
+	public Scenario getMATSimScenario() {
+		return this.sc;
 	}
 	
 

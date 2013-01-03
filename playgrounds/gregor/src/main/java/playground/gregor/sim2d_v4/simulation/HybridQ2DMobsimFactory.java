@@ -26,6 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -74,7 +75,13 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		this.sim2DEngine = e;
 		qSim.addMobsimEngine(e);
 		
-		HybridQSim2DNetworkFactory networkFactory = new HybridQSim2DNetworkFactory(e);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		
+		Sim2DAgentBuilder aBuilder = new Sim2DAgentBuilder();
+		
+		HybridQSim2DNetworkFactory networkFactory = new HybridQSim2DNetworkFactory(e,sc, aBuilder);
 		
 		QNetsimEngine netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
 		qSim.addMobsimEngine(netsimEngine);

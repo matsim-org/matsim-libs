@@ -20,6 +20,7 @@
 
 package playground.gregor.sim2d_v4.scenario;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,10 +48,19 @@ public class Sim2DEnvironment implements Identifiable{
 	public void setEnvelope(Envelope e) {
 		this.envelope = e;
 	}
+	
+	public Section createSection(Id id, Polygon p, int[] openings,
+			Id[] neighbors, int level) {
+		//Hack: having openings in ascending order makes things much easier, so wie do it here [gl Jan' 13]
+		Arrays.sort(openings);
+		Section s = new Section(id,p,openings,neighbors, level);
+		
+		return s;
+	}
 
 	public Section createAndAddSection(Id id, Polygon p, int[] openings,
 			Id[] neighbors, int level) {
-		Section s = new Section(id,p,openings,neighbors, level);
+		Section s = createSection(id, p, openings, neighbors, level);
 		this.sections.put(id, s);
 		return s;
 	}
