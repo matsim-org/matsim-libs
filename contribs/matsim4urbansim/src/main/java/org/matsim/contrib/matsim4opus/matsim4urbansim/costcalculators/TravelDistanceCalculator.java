@@ -26,6 +26,11 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * cost calculator for travel distances
+ * @author thomas
+ *
+ */
 public class TravelDistanceCalculator implements TravelDisutility{
 
 	private static final Logger log = Logger.getLogger(TravelDistanceCalculator.class);

@@ -38,4 +38,16 @@ public class NetworkBoundaryBox {
 	public double[] getBoundingBox(){
 		return this.boundingBox;
 	}
+	public double getXMin(){
+		return boundingBox[0];
+	}
+	public double getXMax(){
+		return boundingBox[2];
+	}
+	public double getYMin(){
+		return boundingBox[1];
+	}
+	public double getYMax(){
+		return boundingBox[3];
+	}
 }
