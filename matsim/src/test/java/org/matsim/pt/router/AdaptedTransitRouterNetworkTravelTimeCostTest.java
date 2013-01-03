@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.ptRouterAdapted;
+package org.matsim.pt.router;
 
 import junit.framework.TestCase;
 
@@ -28,7 +28,6 @@ import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.testcases.MatsimTestCase;
-
 
 /**
  * Tests that specifically look at the computation of the out-of-vehicle wait time.  There is overlap with the original tests; it is most
