@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.DepartureTimeCache;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -38,10 +39,10 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	private final DepartureTimeCache data = new DepartureTimeCache();
 
 //	private MyTransitRouterConfig config;	
-	public AdaptedTransitRouterNetworkTravelTimeCost(MyTransitRouterConfig config ) {
+	public AdaptedTransitRouterNetworkTravelTimeCost(TransitRouterConfig config ) {
 		super( config ) ;
 		log.error("a problem at this point is that the walk speed comes from the config" );
-		config= (MyTransitRouterConfig) this.config; 
+		config= this.config; 
 	}
 
 //	@Override

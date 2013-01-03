@@ -42,7 +42,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		// find the link connecting C and G on the red line
 		TransitRouterNetworkLink testLink = null;
 		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
-			if ((link.line == f.redLine) &&
+			if ((link.getLine() == f.redLine) &&
 					(link.fromNode.stop.getStopFacility().getName().equals("C")) &&
 					(link.toNode.stop.getStopFacility().getName().equals("G"))) {
 				testLink = link;
@@ -63,7 +63,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
 		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
-			if ((link.line == f.blueLine) &&
+			if ((link.getLine() == f.blueLine) &&
 					(link.fromNode.stop.getStopFacility().getName().equals("C")) &&
 					(link.toNode.stop.getStopFacility().getName().equals("D"))) {
 				testLink = link;
@@ -87,7 +87,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
 		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
-			if ((link.line == f.blueLine) &&
+			if ((link.getLine() == f.blueLine) &&
 					(link.fromNode.stop.getStopFacility().getName().equals("C")) &&
 					(link.toNode.stop.getStopFacility().getName().equals("D"))) {
 				testLink = link;
@@ -113,7 +113,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
 		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
-			if ((link.line == null) &&
+			if ((link.getLine() == null) &&
 					(link.fromNode.stop.getStopFacility().getName().equals("C")) &&
 					(link.toNode.stop.getStopFacility().getName().equals("C"))) {
 				testLink = link;
@@ -142,7 +142,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
 		for (TransitRouterNetworkLink link : routerNet.getLinks().values()) {
-			if ((link.line == null) &&
+			if ((link.getLine() == null) &&
 					(link.fromNode.stop.getStopFacility().getName().equals("C")) &&
 					(link.toNode.stop.getStopFacility().getName().equals("C"))) {
 				testLink = link;
@@ -158,7 +158,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 		double cost3 = tc.getLinkTravelDisutility(testLink, 5.0*3600, null, null, null);
 		assertEquals(-120.0 * conf.getMarginalUtilityOfWaitingPt_utl_s(), cost3 - cost2, MatsimTestCase.EPSILON);
 		// test with custom value for utility of waiting, just in case too many of the default marginal utilities are 0.0
-		tc.config.setMarginalUtilityOfWaitingPt_utl_s(-12.0 / 3600.0);
+		conf.setMarginalUtilityOfWaitingPt_utl_s(-12.0 / 3600.0);
 		double cost4 = tc.getLinkTravelDisutility(testLink, 7.0*3600, null, null, null);
 		assertEquals(120.0 * 12.0 / 3600.0, cost4 - cost2, MatsimTestCase.EPSILON);
 	}

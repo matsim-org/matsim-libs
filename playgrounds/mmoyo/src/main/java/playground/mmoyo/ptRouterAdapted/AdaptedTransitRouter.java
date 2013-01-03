@@ -56,7 +56,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 	
 	
 
-	public AdaptedTransitRouter(MyTransitRouterConfig myTRConfig, final TransitSchedule schedule) {
+	public AdaptedTransitRouter(TransitRouterConfig myTRConfig, final TransitSchedule schedule) {
 		
 		//super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
 		this (schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig), buildNetwork(schedule, myTRConfig.beelineWalkConnectionDistance ));
@@ -65,7 +65,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 
 	public AdaptedTransitRouter(
 			TransitSchedule schedule,
-			MyTransitRouterConfig myTRConfig,
+			TransitRouterConfig myTRConfig,
 			AdaptedTransitRouterNetworkTravelTimeCost adaptedTransitRouterNetworkTravelTimeCost,
 			TransitRouterNetwork buildNetwork) {
 		super(myTRConfig, buildNetwork, adaptedTransitRouterNetworkTravelTimeCost, adaptedTransitRouterNetworkTravelTimeCost);
