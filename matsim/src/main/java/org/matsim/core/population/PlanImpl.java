@@ -249,9 +249,16 @@ public class PlanImpl implements Plan {
 	}
 
 	/** loads a copy of an existing plan, but keeps the person reference
+	 * <p/>
+	 * Design comments:<ul>
+	 * <li> In my intuition, this is really a terrible method: (1) Plan is a data object, not a behavioral object, and thus it should be accessed
+	 * from static, interface-based methods only.  (2) It is adding plan elements, not replacing them, thus not being true to its name. 
+	 * (3) It is not clear about the fact if it is doing a deep or a shallow copy.  The only excuse is that this is one of the oldest parts of 
+	 * matsim.  kai, jan'13
+	 * </ul>
 	 * @param in a plan who's data will be loaded into this plan
 	 **/
-	public void copyPlan(final Plan in) {
+	public void copyFrom(final Plan in) {
 		// TODO should be re-implemented making use of Cloneable
 		// Bloch ("effective Java") strongly advises _against_ the use of cloneable.  kai, jul'10
 		setScore(in.getScore());
@@ -274,7 +281,7 @@ public class PlanImpl implements Plan {
 					l2.setArrivalTime(((LegImpl) pe).getArrivalTime());
 				}
 				if (l.getRoute() != null) {
-					l2.setRoute(((Route) l.getRoute()).clone());
+					l2.setRoute(l.getRoute().clone());
 				}
 			} else {
 				throw new IllegalArgumentException("unrecognized plan element type discovered");

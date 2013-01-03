@@ -68,7 +68,7 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	private static Plan prepareAgentsPlan(Person p) {
 		if (copySelectedPlan) {
 			Plan executedPlan = new PlanImpl(p);
-			((PlanImpl)executedPlan).copyPlan(p.getSelectedPlan());			
+			((PlanImpl)executedPlan).copyFrom(p.getSelectedPlan());			
 			return executedPlan;
 		} else {
 			return p.getSelectedPlan();

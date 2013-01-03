@@ -168,7 +168,7 @@ public class PersonImpl implements Person {
 			return null;
 		}
 		PlanImpl newPlan = new PlanImpl(oldPlan.getPerson());
-		newPlan.copyPlan(oldPlan);
+		newPlan.copyFrom(oldPlan);
 		this.getPlans().add(newPlan);
 		this.setSelectedPlan(newPlan);
 		return newPlan;

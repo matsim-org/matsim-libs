@@ -26,7 +26,7 @@ import org.matsim.core.population.PlanImpl;
 
 public class PlanUtils {
 	
-	public static void copyPlanFields(PlanImpl planTarget, PlanImpl planTemplate) {
+	public static void copyPlanFieldsToFrom(PlanImpl planTarget, PlanImpl planTemplate) {
 		planTarget.setScore(planTemplate.getScore());
 		
 		int actLegIndex = 0;

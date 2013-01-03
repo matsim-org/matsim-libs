@@ -202,7 +202,7 @@ public class BackwardCompatibilityTest {
 		for (Person person : controler.getPopulation().getPersons().values()) {
 			for (Plan withNew : person.getPlans()) {
 				Plan withOld = new PlanImpl( person );
-				((PlanImpl) withOld).copyPlan( withNew );
+				((PlanImpl) withOld).copyFrom( withNew );
 				
 				plansCalcRoute.run( withOld );
 				planRouter.run( withNew );

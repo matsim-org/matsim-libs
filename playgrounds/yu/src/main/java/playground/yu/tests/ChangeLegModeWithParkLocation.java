@@ -142,7 +142,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 				boolean done = false;
 				while (!done) {
 					copyPlan.getPlanElements().clear();
-					copyPlan.copyPlan(plan);
+					copyPlan.copyFrom(plan);
 					// Idx for leg in PlanElements, whose TransportMode
 					// would be
 					// changed.
@@ -167,7 +167,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 					}
 				}
 				pes.clear();
-				((PlanImpl) plan).copyPlan(copyPlan);
+				((PlanImpl) plan).copyFrom(copyPlan);
 			}
 
 		}

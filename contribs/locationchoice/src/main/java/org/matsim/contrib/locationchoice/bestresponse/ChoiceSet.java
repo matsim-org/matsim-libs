@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
@@ -99,10 +98,10 @@ public class ChoiceSet {
 		Collections.shuffle(this.notYetVisited, rnd);
 	}
 	
-	public Id getWeightedRandomChoice(int actlegIndex, Person person,
-			Coord coordPre, Coord coordPost, ActivityFacilities facilities, 
-			ScoringFunctionAccumulator scoringFunction, Plan plan, 
-			TravelTime travelTime, TravelDisutility travelCost, int iteration) {
+	public Id getWeightedRandomChoice(int actlegIndex, Coord coordPre,
+			Coord coordPost, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction, 
+			Plan plan, TravelTime travelTime, 
+			TravelDisutility travelCost, int iteration) {
 				
 		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, facilities, scoringFunction, plan, travelTime, travelCost);
 		
@@ -160,7 +159,7 @@ public class ChoiceSet {
 			
 			scoringFunction.reset();
 			PlanImpl planTmp = new PlanImpl();
-			planTmp.copyPlan(plan);
+			planTmp.copyFrom(plan);
 			this.adaptAndScoreTimes((PlanImpl)plan,  actlegIndex,  planTmp, scoringFunction,
 					leastCostPathCalculatorForward, leastCostPathCalculatorBackward, this.approximationLevel);
 			
@@ -231,9 +230,10 @@ public class ChoiceSet {
 		return mapNormalized;
 	}
 			
-	public void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
-			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, int approximationLevel) {
-		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevel, leastCostPathCalculatorForward, leastCostPathCalculatorBackward, this.network, this.config);
+	/*package*/ void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
+			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, int approximationLevelTmp ) {
+		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp , leastCostPathCalculatorForward, leastCostPathCalculatorBackward, 
+				this.network, this.config);
 		adapter.adaptAndScoreTimes(plan, actlegIndex, planTmp, scoringFunction, router);
 	}
 }

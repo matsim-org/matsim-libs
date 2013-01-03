@@ -218,7 +218,7 @@ public class PlanImplTest {
 		leg.setRoute(route);
 
 		PlanImpl plan2 = new PlanImpl(new PersonImpl(new IdImpl(2)));
-		plan2.copyPlan(plan);
+		plan2.copyFrom(plan);
 
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
@@ -245,7 +245,7 @@ public class PlanImplTest {
 		leg.setRoute(route);
 
 		PlanImpl plan2 = new PlanImpl(new PersonImpl(new IdImpl(2)));
-		plan2.copyPlan(plan);
+		plan2.copyFrom(plan);
 
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());

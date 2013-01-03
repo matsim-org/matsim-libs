@@ -642,7 +642,7 @@ public class GeneralLib {
 	public static Person copyPerson(Person person) {
 		PersonImpl newPerson = new PersonImpl(person.getId());
 		PlanImpl newPlan = new PlanImpl();
-		newPlan.copyPlan(person.getSelectedPlan());
+		newPlan.copyFrom(person.getSelectedPlan());
 		newPlan.setPerson(newPerson);
 		newPerson.addPlan(newPlan);
 		newPerson.setSelectedPlan(newPlan);

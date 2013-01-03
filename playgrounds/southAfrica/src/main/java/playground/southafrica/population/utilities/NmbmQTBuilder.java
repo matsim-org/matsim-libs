@@ -410,7 +410,7 @@ public class NmbmQTBuilder {
 					/* Randomly pick any of the closest plans. and make a COPY of it. */
 					Tuple<Plan, Double> randomTuple = closestPlans.get(getRandomPermutation(closestPlans.size())[0]);
 					PlanImpl plan = new PlanImpl();
-					plan.copyPlan(randomTuple.getFirst());
+					plan.copyFrom(randomTuple.getFirst());
 				
 					distanceList.add(randomTuple.getSecond());
 

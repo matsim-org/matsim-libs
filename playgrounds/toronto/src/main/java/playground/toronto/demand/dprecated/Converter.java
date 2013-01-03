@@ -160,7 +160,7 @@ public class Converter {
 
 				// make a copy of the just finished plan and set it to use public transit mode
 				PlanImpl nonCarPlan = new org.matsim.core.population.PlanImpl(p);
-				nonCarPlan.copyPlan(tmpPl);
+				nonCarPlan.copyFrom(tmpPl);
 				for (PlanElement pe : nonCarPlan.getPlanElements()) {
 					if (pe instanceof Leg) {
 						((Leg) pe).setMode(TransportMode.pt);

@@ -221,7 +221,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(layer, activityChainString, tripStructureAnalysisLayer, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
-			originalPlan.copyPlan(plan);
+			originalPlan.copyFrom(plan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, tripStructureAnalysisLayer);
@@ -239,7 +239,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(layer, activityChainString, tripStructureAnalysisLayer, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
-			originalPlan.copyPlan(plan);
+			originalPlan.copyFrom(plan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
@@ -258,7 +258,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(layer, activityChainString, tripStructureAnalysisLayer, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
-			originalPlan.copyPlan(plan);
+			originalPlan.copyFrom(plan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, tripStructureAnalysisLayer);

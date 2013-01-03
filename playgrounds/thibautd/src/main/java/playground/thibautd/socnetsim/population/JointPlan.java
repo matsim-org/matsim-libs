@@ -95,7 +95,7 @@ public class JointPlan implements Plan {
 
 		for (Map.Entry<Id, Plan> indiv : plan.getIndividualPlans().entrySet()) {
 			PlanImpl newPlan = new PlanImpl( indiv.getValue().getPerson() );
-			newPlan.copyPlan( indiv.getValue() );
+			newPlan.copyFrom( indiv.getValue() );
 			plans.put( indiv.getKey() , newPlan );
 		}
 		

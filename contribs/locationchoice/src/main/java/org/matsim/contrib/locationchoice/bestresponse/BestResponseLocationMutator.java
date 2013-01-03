@@ -51,12 +51,12 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public final class BestResponseLocationMutator extends RecursiveLocationMutator {
-	private ActivityFacilitiesImpl facilities;
-	private Network network;
-	private ObjectAttributes personsMaxEpsUnscaled;
-	private ScaleEpsilon scaleEpsilon;
-	private ActTypeConverter actTypeConverter;
-	private DestinationSampler sampler;
+	private final ActivityFacilitiesImpl facilities;
+	private final Network network;
+	private final ObjectAttributes personsMaxEpsUnscaled;
+	private final ScaleEpsilon scaleEpsilon;
+	private final ActTypeConverter actTypeConverter;
+	private final DestinationSampler sampler;
 	
 	/* TODO: Use Singleton pattern or encapsulating object for the many constructor objects
 	 * Similar to Scenario object
@@ -67,7 +67,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			ObjectAttributes personsMaxEpsUnscaled, ScaleEpsilon scaleEpsilon,
 			ActTypeConverter actTypeConverter, DestinationSampler sampler) {
 		super(network, controler, quad_trees, facilities_of_type, null);
-		facilities = (ActivityFacilitiesImpl) super.controler.getFacilities();
+		this.facilities = (ActivityFacilitiesImpl) super.controler.getFacilities();
 		this.network = network;
 		this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
 		this.scaleEpsilon = scaleEpsilon;
@@ -80,20 +80,26 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// if person is not in the analysis population
 		if (Integer.parseInt(plan.getPerson().getId().toString()) > 
 			Integer.parseInt(super.controler.getConfig().locationchoice().getIdExclusion())) return;
+		
+		// yyyy why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
 				
 		Plan bestPlan = new PlanImpl(plan.getPerson());	
-		// make sure there is a valid plan in bestPlan
-		((PlanImpl)bestPlan).copyPlan(plan);
+
+		// bestPlan is initialized as a copy from the old plan:
+		((PlanImpl)bestPlan).copyFrom(plan);
 		
+		// this will probably generate an improved bestPlan (?):
 		this.handleActivities(plan, bestPlan);
 		
 		// copy the best plan into replanned plan
 		// making a deep copy
-		PlanUtils.copyPlanFields((PlanImpl)plan, (PlanImpl)bestPlan);
+		PlanUtils.copyPlanFieldsToFrom((PlanImpl)plan, (PlanImpl)bestPlan);
+		// yy ( the syntax of this is copy( to, from) !!! )
+		
 		super.resetRoutes(plan);
 	}
 				
-	private void handleActivities(Plan plan, Plan bestPlan) {
+	private void handleActivities(Plan plan, final Plan bestPlan) {
 		int travelTimeApproximationLevel = Integer.parseInt(
 				this.controler.getConfig().locationchoice().getTravelTimeApproximationLevel());
 		
@@ -136,11 +142,11 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 							createTravelDisutility((TravelTime)travelTime, (PlanCalcScoreConfigGroup)super.getControler().getConfig().getModule("planCalcScore"));
 						
 					this.setLocation((ActivityImpl)actToMove, 
-							cs.getWeightedRandomChoice(actlegIndex, plan.getPerson(),
-									actPre.getCoord(), actPost.getCoord(), this.facilities, 
-									scoringFunction, plan, travelTime, travelCost,
-									this.controler.getIterationNumber()));	
+							cs.getWeightedRandomChoice(actlegIndex, actPre.getCoord(),
+									actPost.getCoord(), this.facilities, scoringFunction, 
+									plan, travelTime, travelCost, this.controler.getIterationNumber()));	
 					
+					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
 					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
 					// **************************************************
 				}
@@ -165,18 +171,20 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		}
 	}
 	
-	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlan, ChoiceSet cs, ScoringFunctionAccumulator scoringFunction) {		
+	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlanSoFar, ChoiceSet cs, ScoringFunctionAccumulator scoringFunction) {		
 		double score = this.computeScoreAndAdaptPlan(plan, cs, scoringFunction);	
-		if (score > bestPlan.getScore() + 0.0000000000001) {
+		if (score > bestPlanSoFar.getScore() + 0.0000000000001) {
 			plan.setScore(score);
-			((PlanImpl)bestPlan).getPlanElements().clear();
-			((PlanImpl)bestPlan).copyPlan(plan);
+			((PlanImpl)bestPlanSoFar).getPlanElements().clear();
+			((PlanImpl)bestPlanSoFar).copyFrom(plan);
 		}
 	}
 	
 	private double computeScoreAndAdaptPlan(Plan plan, ChoiceSet cs, ScoringFunctionAccumulator scoringFunction) {
+		// yyyy why is all this plans copying necessary?  kai, jan'13
+		
 		PlanImpl planTmp = new PlanImpl(plan.getPerson());
-		planTmp.copyPlan(plan);			
+		planTmp.copyFrom(plan);			
 		scoringFunction.reset();
 
 // always use travel times
@@ -188,7 +196,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		//scoringFunction.finish();
 		double score = scoringFunction.getScore();
 		scoringFunction.reset();
-		PlanUtils.copyPlanFields((PlanImpl)plan, (PlanImpl)planTmp);		
+		PlanUtils.copyPlanFieldsToFrom((PlanImpl)plan, (PlanImpl)planTmp);	// copy( to, from )
 		return score;
 	}
 	

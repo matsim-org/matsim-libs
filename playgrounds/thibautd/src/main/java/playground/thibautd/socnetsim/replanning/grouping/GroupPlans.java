@@ -91,7 +91,7 @@ public class GroupPlans {
 
 		for (Plan p : plans.getIndividualPlans()) {
 			PlanImpl newPlan = new PlanImpl( p.getPerson() );
-			newPlan.copyPlan( p );
+			newPlan.copyFrom( p );
 			p.getPerson().addPlan( newPlan );
 			ps.add( newPlan );
 		}
