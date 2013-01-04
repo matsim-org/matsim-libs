@@ -24,11 +24,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -52,14 +50,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * 
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
-	
-	private final static String CONFIG_MODULE = "subtourModeChoice";
-	private final static String CONFIG_PARAM_MODES = "modes";
-	private final static String CONFIG_PARAM_CHAINBASEDMODES = "chainBasedModes";
-	
-	private final static String[] DEFAULT_CHAIN_BASED_MODES = new String[] { TransportMode.car, TransportMode.bike };
-	private final static String[] DEFAULT_AVAILABLE_MODES = new String[] { TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk };
-
 	private static class AllowTheseModesForEveryone implements PermissibleModesCalculator {
 
 		private List<String> availableModes;
@@ -82,12 +72,9 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	private String[] modes;
 	
 	public SubtourModeChoice(final Config config) {
-		super(config.global().getNumberOfThreads());
-		String configModes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
-		String chainBasedModes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_CHAINBASEDMODES);
-		this.modes = explodeModesWithDefaults(configModes, DEFAULT_AVAILABLE_MODES);
-		this.chainBasedModes = explodeModesWithDefaults(chainBasedModes, DEFAULT_CHAIN_BASED_MODES);
-		this.permissibleModesCalculator = new AllowTheseModesForEveryone(this.modes);
+		this( config.global().getNumberOfThreads(),
+				config.subtourModeChoice().getModes(),
+				config.subtourModeChoice().getChainBasedModes() );
 	}
 
 	public SubtourModeChoice(final int numberOfThreads, final String[] modes, final String[] chainBasedModes) {
@@ -99,20 +86,6 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	
 	protected String[] getModes() {
 		return modes.clone();
-	}
-
-	private String[] explodeModesWithDefaults(String modes, String[] defaults) {
-		String[] availableModes;
-		if (modes != null) {
-			String[] parts = StringUtils.explode(modes, ',');
-			availableModes = new String[parts.length];
-			for (int i = 0, n = parts.length; i < n; i++) {
-				availableModes[i] = parts[i].trim().intern();
-			}
-		} else {
-			availableModes = defaults;
-		}
-		return availableModes;
 	}
 
 	@Override

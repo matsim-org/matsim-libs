@@ -49,6 +49,7 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
@@ -101,6 +102,7 @@ public class Config {
 	private LinkStatsConfigGroup linkStats = null;
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
 	private TimeAllocationMutatorConfigGroup timeAllocationMutator = null ;
+	private SubtourModeChoiceConfigGroup subtourModeChoice = null;
 
 	// config groups that are elsewhere:
 	private OTFVisConfigGroup otfVis = null;
@@ -209,6 +211,9 @@ public class Config {
 
 		this.transitRouter = new TransitRouterConfigGroup();
 		this.modules.put(TransitRouterConfigGroup.GROUP_NAME, this.transitRouter);
+
+		this.subtourModeChoice = new SubtourModeChoiceConfigGroup();
+		this.modules.put( SubtourModeChoiceConfigGroup.GROUP_NAME , this.subtourModeChoice );
 	}
 
 	/**
@@ -507,6 +512,10 @@ public class Config {
 	
 	public ParallelEventHandlingConfigGroup parallelEventHandling() {
 		return this.parallelEventHandling ;
+	}
+
+	public SubtourModeChoiceConfigGroup subtourModeChoice() {
+		return this.subtourModeChoice;
 	}
 
 	// typed adders:
