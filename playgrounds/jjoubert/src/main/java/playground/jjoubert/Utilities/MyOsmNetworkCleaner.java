@@ -38,6 +38,7 @@ import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -117,29 +118,40 @@ public class MyOsmNetworkCleaner {
 		for(Link l : network.getLinks().values()){
 			Point p1 = gf.createPoint(new Coordinate(l.getFromNode().getCoord().getX(), l.getFromNode().getCoord().getY()));
 			Point p2 = gf.createPoint(new Coordinate(l.getToNode().getCoord().getX(), l.getToNode().getCoord().getY()));
-			if(mp.contains(p1) || mp.contains(p2)){
+			Coordinate[] ca = {p1.getCoordinate(), p2.getCoordinate()};
+			LineString line = gf.createLineString(ca);
+			if(mp.intersects(line) || mp.covers(line)){
+//			if(mp.contains(p1) || mp.contains(p2) || mp.intersects(p1) || mp.intersects(p2)){
 //				sc.getNetwork().addLink(l);
 				Node fNode = l.getFromNode();
+				Node newFNode = nf.createNode(fNode.getId(), fNode.getCoord());
 				if(!sc.getNetwork().getNodes().containsKey(fNode.getId())){
-					sc.getNetwork().addNode(nf.createNode(fNode.getId(), fNode.getCoord()));
+					sc.getNetwork().addNode(newFNode);
 				}
 				Node tNode = l.getToNode();
+				Node newTNode = nf.createNode(tNode.getId(), tNode.getCoord());
 				if(!sc.getNetwork().getNodes().containsKey(tNode.getId())){
-					sc.getNetwork().addNode(nf.createNode(tNode.getId(), tNode.getCoord()));
+					sc.getNetwork().addNode(newTNode);
 				}
 				
-				Link lNew = nf.createLink(l.getId(), fNode.getId(), tNode.getId());
+				Link lNew = nf.createLink(l.getId(), newFNode, newTNode);
 				lNew.setCapacity(l.getCapacity());
 				lNew.setFreespeed(l.getFreespeed());
 				lNew.setLength(l.getLength());
 				lNew.setNumberOfLanes(l.getNumberOfLanes());
 				
-				sc.getNetwork().addLink(lNew);				
+				if(!sc.getNetwork().getLinks().containsKey(lNew.getId())){
+					sc.getNetwork().addLink(lNew);				
+				}
 			}
 		}
 		log.info("Done.");
 		log.info("New network has " + sc.getNetwork().getNodes().size() + " nodes and " + sc.getNetwork().getLinks().size() + " links.");
 		
+		/* This portion creates havoc with the tests... many links and nodes are
+		 * removed that SHOULD actually remain in the network since they indeed
+		 * ARE connected. TODO Find out why they are dropped.
+		 */
 		log.info("Removing unconnected links.");
 		NetworkCleaner nc = new NetworkCleaner();
 		nc.run(sc.getNetwork());

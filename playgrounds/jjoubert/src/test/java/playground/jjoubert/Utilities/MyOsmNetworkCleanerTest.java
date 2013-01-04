@@ -61,7 +61,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
 		nr.parse(getOutputDirectory() + "network.xml.gz");
 
-		assertEquals("Network must have 4 links.", 4, sc.getNetwork().getLinks().size());
+		assertEquals("Network must have 8 links.", 8, sc.getNetwork().getLinks().size());
 
 		MyOsmNetworkCleaner monc = new MyOsmNetworkCleaner();
 		monc.cleanNetwork(sc.getNetwork(), mp);
