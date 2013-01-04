@@ -56,6 +56,7 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
  * @author thibautd
  */
 public class IterativeActionTest {
+	private static int N_COUPLES = 100;
 	private Config config;
 	private TripRouter tripRouter;
 	private Random random;
@@ -80,7 +81,7 @@ public class IterativeActionTest {
 					tripRouter,
 					random,
 					false);
-		JointPlan jointPlan = createPlanWithFourPersonsTwoJointTrips();
+		JointPlan jointPlan = createPlanWithJointTrips();
 		algo.run( jointPlan );
 
 		final String initialPlanDescr = jointPlan.toString();
@@ -101,14 +102,14 @@ public class IterativeActionTest {
 				"unexpected number of driver trips when passing from plan "
 				+initialPlanDescr+" to plan "
 				+finalPlanDescr,
-				1,
+				N_COUPLES - 1,
 				d);
 
 		assertEquals(
 				"unexpected number of passenger trips when passing from plan "
 				+initialPlanDescr+" to plan "
 				+finalPlanDescr,
-				1,
+				N_COUPLES - 1,
 				p);
 	}
 
@@ -120,7 +121,7 @@ public class IterativeActionTest {
 					tripRouter,
 					random,
 					true);
-		JointPlan jointPlan = createPlanWithFourPersonsTwoJointTrips();
+		JointPlan jointPlan = createPlanWithJointTrips();
 		algo.run( jointPlan );
 
 		final String initialPlanDescr = jointPlan.toString();
@@ -160,7 +161,7 @@ public class IterativeActionTest {
 					tripRouter,
 					random,
 					false);
-		JointPlan jointPlan = createPlanWithFourPersonsNoJointTrips();
+		JointPlan jointPlan = createPlanWithoutJointTrips();
 		algo.run( jointPlan );
 
 		final String initialPlanDescr = jointPlan.toString();
@@ -200,7 +201,7 @@ public class IterativeActionTest {
 					tripRouter,
 					random,
 					true);
-		JointPlan jointPlan = createPlanWithFourPersonsNoJointTrips();
+		JointPlan jointPlan = createPlanWithoutJointTrips();
 		algo.run( jointPlan );
 
 		final String initialPlanDescr = jointPlan.toString();
@@ -221,140 +222,90 @@ public class IterativeActionTest {
 				"unexpected number of driver trips when passing from plan "
 				+initialPlanDescr+" to plan "
 				+finalPlanDescr,
-				2,
+				N_COUPLES,
 				d);
 
 		assertEquals(
 				"unexpected number of passenger trips when passing from plan "
 				+initialPlanDescr+" to plan "
 				+finalPlanDescr,
-				2,
+				N_COUPLES,
 				p);
 	}
 
 
-	private JointPlan createPlanWithFourPersonsTwoJointTrips() {
+	private JointPlan createPlanWithJointTrips() {
 		final Map<Id, Plan> individualPlans = new HashMap<Id, Plan>();
 
 		Id puLink = new IdImpl( "pu" );
 		Id doLink = new IdImpl( "do" );
 
-		Id driverId1 = new IdImpl( "driver1" );
-		Person person = new PersonImpl( driverId1 );
-		PlanImpl plan = new PlanImpl( person );
-		individualPlans.put( driverId1 , plan );
-		plan.createAndAddActivity( "first_act_d1" , new IdImpl( "some_link" ) ).setEndTime( 10 );
-		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( JointActingTypes.PICK_UP , puLink ).setMaximumDuration( 0 );
-		Leg driverLeg1 = plan.createAndAddLeg( JointActingTypes.DRIVER );
-		plan.createAndAddActivity( JointActingTypes.DROP_OFF , doLink ).setMaximumDuration( 0 );
-		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( "second_act_d1" , new IdImpl( "nowhere" ) );
+		for (int i=0; i < N_COUPLES; i++) {
+			Id driverId = new IdImpl( "driver"+i );
+			Person person = new PersonImpl( driverId );
+			PlanImpl plan = new PlanImpl( person );
+			individualPlans.put( driverId , plan );
+			plan.createAndAddActivity( "first_act_d"+i , new IdImpl( "some_link" ) ).setEndTime( 10 );
+			plan.createAndAddLeg( TransportMode.car );
+			plan.createAndAddActivity( JointActingTypes.PICK_UP , puLink ).setMaximumDuration( 0 );
+			Leg driverLeg1 = plan.createAndAddLeg( JointActingTypes.DRIVER );
+			plan.createAndAddActivity( JointActingTypes.DROP_OFF , doLink ).setMaximumDuration( 0 );
+			plan.createAndAddLeg( TransportMode.car );
+			plan.createAndAddActivity( "second_act_d"+i , new IdImpl( "nowhere" ) );
 
-		Id driverId2 = new IdImpl( "driver2" );
-		person = new PersonImpl( driverId2 );
-		plan = new PlanImpl( person );
-		individualPlans.put( driverId2 , plan );
-		plan.createAndAddActivity( "first_act_d2" , new IdImpl( "some_other_link" ) ).setEndTime( 10 );
-		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( JointActingTypes.PICK_UP , puLink ).setMaximumDuration( 0 );
-		Leg driverLeg2 = plan.createAndAddLeg( JointActingTypes.DRIVER );
-		plan.createAndAddActivity( JointActingTypes.DROP_OFF , doLink ).setMaximumDuration( 0 );
-		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( "second_act_d2" , new IdImpl( "also_nowhere" ) );
+			Id passengerId = new IdImpl( "passenger"+i );
+			person = new PersonImpl( passengerId );
+			plan = new PlanImpl( person );
+			individualPlans.put( passengerId , plan );
+			plan.createAndAddActivity( "first_act_p"+i , new IdImpl( "earth" ) ).setEndTime( 10 );
+			plan.createAndAddLeg( TransportMode.walk );
+			plan.createAndAddActivity( JointActingTypes.PICK_UP , puLink ).setMaximumDuration( 0 );
+			Leg passengerLeg1 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
+			plan.createAndAddActivity( JointActingTypes.DROP_OFF , doLink ).setMaximumDuration( 0 );
+			plan.createAndAddLeg( TransportMode.walk );
+			plan.createAndAddActivity( "second_act_p"+i , new IdImpl( "space" ) );
 
-		Id passengerId1 = new IdImpl( "passenger1" );
-		person = new PersonImpl( passengerId1 );
-		plan = new PlanImpl( person );
-		individualPlans.put( passengerId1 , plan );
-		plan.createAndAddActivity( "first_act_p1" , new IdImpl( "earth" ) ).setEndTime( 10 );
-		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivity( JointActingTypes.PICK_UP , puLink ).setMaximumDuration( 0 );
-		Leg passengerLeg1 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
-		plan.createAndAddActivity( JointActingTypes.DROP_OFF , doLink ).setMaximumDuration( 0 );
-		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivity( "second_act_p1" , new IdImpl( "space" ) );
+			DriverRoute driverRoute = new DriverRoute( puLink , doLink );
+			driverRoute.addPassenger( passengerId );
+			driverLeg1.setRoute( driverRoute );
 
-		Id passengerId2 = new IdImpl( "passenger2" );
-		person = new PersonImpl( passengerId2 );
-		plan = new PlanImpl( person );
-		individualPlans.put( passengerId2 , plan );
-		plan.createAndAddActivity( "first_act_p2" , new IdImpl( "sea" ) ).setEndTime( 10 );
-		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivity( JointActingTypes.PICK_UP , puLink ).setMaximumDuration( 0 );
-		Leg passengerLeg2 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
-		plan.createAndAddActivity( JointActingTypes.DROP_OFF , doLink ).setMaximumDuration( 0 );
-		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivity( "second_act_p2" , new IdImpl( "mountain" ) );
-
-		DriverRoute driverRoute = new DriverRoute( puLink , doLink );
-		driverRoute.addPassenger( passengerId1 );
-		driverLeg1.setRoute( driverRoute );
-
-		PassengerRoute passengerRoute = new PassengerRoute( puLink , doLink );
-		passengerRoute.setDriverId( driverId1 );
-		passengerLeg1.setRoute( passengerRoute );
-
-		driverRoute = new DriverRoute( puLink , doLink );
-		driverRoute.addPassenger( passengerId2 );
-		driverLeg2.setRoute( driverRoute );
-
-		passengerRoute = new PassengerRoute( puLink , doLink );
-		passengerRoute.setDriverId( driverId2 );
-		passengerLeg2.setRoute( passengerRoute );
+			PassengerRoute passengerRoute = new PassengerRoute( puLink , doLink );
+			passengerRoute.setDriverId( driverId );
+			passengerLeg1.setRoute( passengerRoute );
+		}
 
 		return JointPlanFactory.createJointPlan( individualPlans );
 	}
 
-	private JointPlan createPlanWithFourPersonsNoJointTrips() {
+	private JointPlan createPlanWithoutJointTrips() {
 		final Map<Id, Plan> individualPlans = new HashMap<Id, Plan>();
 
 		Coord coord1 = new CoordImpl( 0 , 0 );
 		Coord coord2 = new CoordImpl( 3600 , 21122012 );
 
-		Id driverId1 = new IdImpl( "driver1" );
-		Person person = new PersonImpl( driverId1 );
-		PlanImpl plan = new PlanImpl( person );
-		individualPlans.put( driverId1 , plan );
-		ActivityImpl act = plan.createAndAddActivity( "first_act_d1" , new IdImpl( "some_link" ) );
-		act.setEndTime( 10 );
-		act.setCoord( coord1 );
-		plan.createAndAddLeg( TransportMode.car );
-		act = plan.createAndAddActivity( "second_act_d1" , new IdImpl( "nowhere" ) );
-		act.setCoord( coord2 );
+		for (int i=0; i < N_COUPLES; i++) {
+			Id driverId1 = new IdImpl( "driver"+i );
+			Person person = new PersonImpl( driverId1 );
+			PlanImpl plan = new PlanImpl( person );
+			individualPlans.put( driverId1 , plan );
+			ActivityImpl act = plan.createAndAddActivity( "first_act_d"+i , new IdImpl( "some_link" ) );
+			act.setEndTime( 10 );
+			act.setCoord( coord1 );
+			plan.createAndAddLeg( TransportMode.car );
+			act = plan.createAndAddActivity( "second_act_d"+i , new IdImpl( "nowhere" ) );
+			act.setCoord( coord2 );
 
-		Id driverId2 = new IdImpl( "driver2" );
-		person = new PersonImpl( driverId2 );
-		plan = new PlanImpl( person );
-		individualPlans.put( driverId2 , plan );
-		act = plan.createAndAddActivity( "first_act_d2" , new IdImpl( "some_other_link" ) );
-		act.setEndTime( 10 );
-		act.setCoord( coord1 );
-		plan.createAndAddLeg( TransportMode.car );
-		act = plan.createAndAddActivity( "second_act_d2" , new IdImpl( "also_nowhere" ) );
-		act.setCoord( coord2 );
-
-		Id passengerId1 = new IdImpl( "passenger1" );
-		person = new PersonImpl( passengerId1 );
-		plan = new PlanImpl( person );
-		individualPlans.put( passengerId1 , plan );
-		act = plan.createAndAddActivity( "first_act_p1" , new IdImpl( "earth" ) );
-		act.setEndTime( 10 );
-		act.setCoord( coord1 );
-		plan.createAndAddLeg( TransportMode.walk );
-		act = plan.createAndAddActivity( "second_act_p1" , new IdImpl( "space" ) );
-		act.setCoord( coord2 );
-
-		Id passengerId2 = new IdImpl( "passenger2" );
-		person = new PersonImpl( passengerId2 );
-		plan = new PlanImpl( person );
-		individualPlans.put( passengerId2 , plan );
-		act = plan.createAndAddActivity( "first_act_p2" , new IdImpl( "sea" ) );
-		act.setEndTime( 10 );
-		act.setCoord( coord1 );
-		plan.createAndAddLeg( TransportMode.walk );
-		act = plan.createAndAddActivity( "second_act_p2" , new IdImpl( "mountain" ) );
-		act.setCoord( coord2 );
+			Id passengerId1 = new IdImpl( "passenger"+i );
+			person = new PersonImpl( passengerId1 );
+			plan = new PlanImpl( person );
+			individualPlans.put( passengerId1 , plan );
+			act = plan.createAndAddActivity( "first_act_p"+i , new IdImpl( "earth" ) );
+			act.setEndTime( 10 );
+			act.setCoord( coord1 );
+			plan.createAndAddLeg( TransportMode.walk );
+			act = plan.createAndAddActivity( "second_act_p"+i , new IdImpl( "space" ) );
+			act.setCoord( coord2 );
+		}
 
 		return JointPlanFactory.createJointPlan( individualPlans );
 	}

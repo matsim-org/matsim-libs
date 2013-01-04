@@ -63,7 +63,7 @@ public class JointTripRemoverAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		if (plan instanceof JointPlan) run( (JointPlan) plan );
+		if (plan instanceof JointPlan) run( (JointPlan) plan , Collections.EMPTY_LIST );
 		else throw new IllegalArgumentException( getClass().getSimpleName()+" can only operate on joint plans!" );
 	}
 
@@ -76,13 +76,33 @@ public class JointTripRemoverAlgorithm implements PlanAlgorithm {
 			return null;
 		}
 
-		JointTrip toRemove = structure.getJointTrips().get( random.nextInt( structure.getJointTrips().size() ) );
+		// TODO: remove joint trips with agents to ignore before selection
+		final List<JointTrip> choiceSet = getChoiceSet( structure , agentsToIgnore );
+		if (choiceSet.isEmpty()) return null;
+
+		JointTrip toRemove = choiceSet.get( random.nextInt( choiceSet.size() ) );
 
 		removePassengerTrip( toRemove , plan );
 		removeDriverTrip( toRemove , plan );
 		return new ActedUponInformation(
 				toRemove.getDriverId(),
 				toRemove.getPassengerId() );
+	}
+
+	private static List<JointTrip> getChoiceSet(
+			final JointTravelStructure structure,
+			final Collection<Id> agentsToIgnore) {
+		if (agentsToIgnore.isEmpty()) return structure.getJointTrips();
+
+		final List<JointTrip> choiceSet = new ArrayList<JointTrip>();
+
+		for (JointTrip t : structure.getJointTrips()) {
+			if ( agentsToIgnore.contains( t.getDriverId() ) ) continue;
+			if ( agentsToIgnore.contains( t.getPassengerId() ) ) continue;
+			choiceSet.add( t );
+		}
+
+		return choiceSet;
 	}
 
 	// package protected for tests
