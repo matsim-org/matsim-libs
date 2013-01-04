@@ -24,7 +24,10 @@ import org.matsim.api.core.v01.population.Plan;
 /**
  * @author thibautd
  */
-public class LowestScoreSumSelector extends AbstractHighestWeightSelector {
+public class LowestScoreSumSelectorForRemoval extends AbstractHighestWeightSelector {
+	public LowestScoreSumSelectorForRemoval() {
+		super( true );
+	}
 
 	@Override
 	public double getWeight(final Plan indivPlan) {

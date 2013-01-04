@@ -41,7 +41,7 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelector;
+import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 
 /**
  * Implements the group-level replanning logic.
@@ -62,7 +62,7 @@ public class GroupStrategyManager {
 			final GroupIdentifier groupIdentifier,
 			final GroupStrategyRegistry registry,
 			final int maxPlanPerAgent) {
-		this( new LowestScoreSumSelector() , registry , groupIdentifier , maxPlanPerAgent );
+		this( new LowestScoreSumSelectorForRemoval() , registry , groupIdentifier , maxPlanPerAgent );
 	}
 
 	public GroupStrategyManager(
