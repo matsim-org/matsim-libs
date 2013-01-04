@@ -79,6 +79,20 @@ public class GroupPlanStrategyFactory {
 
 	public static GroupPlanStrategy createCliqueJointTripMutator(
 			final ControllerRegistry registry) {
+		return createCliqueJointTripMutator( registry , true );
+	}
+
+	/**
+	 * for tests only!!!
+	 */
+	public static GroupPlanStrategy createNonOptimizingCliqueJointTripMutator(
+			final ControllerRegistry registry) {
+		return createCliqueJointTripMutator( registry , false );
+	}
+
+	private static GroupPlanStrategy createCliqueJointTripMutator(
+			final ControllerRegistry registry,
+			final boolean optimize) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
 		final Config config = registry.getScenario().getConfig();
 
@@ -112,28 +126,30 @@ public class GroupPlanStrategyFactory {
 					config,
 					registry.getTripRouterFactory() ) );
 
-		final DepartureDelayAverageCalculator delay =
-			new DepartureDelayAverageCalculator(
-				registry.getScenario().getNetwork(),
-				registry.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		if (optimize) {
+			final DepartureDelayAverageCalculator delay =
+				new DepartureDelayAverageCalculator(
+					registry.getScenario().getNetwork(),
+					registry.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
 
-		strategy.addStrategyModule(
-				new JointPlanBasedGroupStrategyModule(
-					new AbstractMultithreadedModule(
-							registry.getScenario().getConfig().global() ) {
-						@Override
-						public PlanAlgorithm getPlanAlgoInstance() {
-							return new JointTimeModeChooserAlgorithm(
-								MatsimRandom.getLocalInstance(),
-								null,
-								delay,
-								registry.getScenario(),
-								registry.getScoringFunctionFactory(),
-								registry.getTravelTime(),
-								registry.getLeastCostPathCalculatorFactory(),
-								registry.getTripRouterFactory() );
-						}
-					}));
+			strategy.addStrategyModule(
+					new JointPlanBasedGroupStrategyModule(
+						new AbstractMultithreadedModule(
+								registry.getScenario().getConfig().global() ) {
+							@Override
+							public PlanAlgorithm getPlanAlgoInstance() {
+								return new JointTimeModeChooserAlgorithm(
+									MatsimRandom.getLocalInstance(),
+									null,
+									delay,
+									registry.getScenario(),
+									registry.getScoringFunctionFactory(),
+									registry.getTravelTime(),
+									registry.getLeastCostPathCalculatorFactory(),
+									registry.getTripRouterFactory() );
+							}
+						}));
+		}
 
 		return strategy;
 	}
