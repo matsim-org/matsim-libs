@@ -30,6 +30,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
@@ -94,7 +96,7 @@ public class PhysicalSim2DSection {
 	
 	
 	
-	public void moveAgents() {
+	public void moveAgents(double time) {
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
@@ -121,7 +123,9 @@ public class PhysicalSim2DSection {
 							QVehicle veh = agent.getQVehicle();
 							veh.setCurrentLink(loResLink.getLink());
 							loResLink.addFromIntersection(veh);
+							this.penv.getEventsManager().processEvent(new LinkLeaveEvent(time, agent.getId(), currentLinkId, agent.getQVehicle().getId()));
 							agent.notifyMoveOverNode(nextLinkId);
+							this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
 						} else {
 							dx = 0;
 							dy = 0;
@@ -129,10 +133,14 @@ public class PhysicalSim2DSection {
 					} else {
 						it.remove(); //removing the agent from the agents list
 						nextSection.addAgentToInBuffer(agent);
+						this.penv.getEventsManager().processEvent(new LinkLeaveEvent(time, agent.getId(), currentLinkId, agent.getQVehicle().getId()));
 						agent.notifyMoveOverNode(nextLinkId);
+						this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
 					}
 				} else {
+					this.penv.getEventsManager().processEvent(new LinkLeaveEvent(time, agent.getId(), currentLinkId, agent.getQVehicle().getId()));
 					agent.notifyMoveOverNode(nextLinkId);
+					this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
 				}
 			}
 			agent.move(dx, dy);

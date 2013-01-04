@@ -21,6 +21,9 @@
 package playground.gregor.sim2d_v4.debugger;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -48,10 +51,16 @@ public class VisDebugger extends PApplet {
 
 	private static final int W = 1000;
 
-	private float scale = 5;
+	private float scale = 50;
 	private List<Object> elements = Collections.synchronizedList(new ArrayList<Object>());
 	private final List<Object> newElements = new ArrayList<Object>();
-
+	protected int dragX = 0;
+	protected int dragY = 0;
+	protected int mx = 0;
+	protected int my = 0;
+	protected int omy;
+	protected int omx;
+	
 	@Override
 	public void setup() {
 		addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
@@ -59,6 +68,57 @@ public class VisDebugger extends PApplet {
 			public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) { 
 				mouseWheel(evt.getWheelRotation());
 			}}); 
+		addMouseMotionListener(new MouseMotionListener() {
+			
+			@Override
+			public void mouseMoved(MouseEvent e) {
+//				System.out.println(e.getX() + " " + e.getY());
+				
+			}
+			
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				VisDebugger.this.dragX = e.getX()-VisDebugger.this.mx;
+				VisDebugger.this.dragY = e.getY()-VisDebugger.this.my;
+//				System.out.println(VisDebugger.this.dragX + " " + VisDebugger.this.dragY);
+				
+			}
+		});
+		addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				VisDebugger.this.omx += VisDebugger.this.dragX; 
+				VisDebugger.this.dragX = 0;
+				VisDebugger.this.omy += VisDebugger.this.dragY; 
+				VisDebugger.this.dragY = 0;
+				System.out.println(VisDebugger.this.omx + " " + VisDebugger.this.omy);
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				VisDebugger.this.mx = arg0.getX();
+				VisDebugger.this.my = arg0.getY();
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		size(W,W);
 		background(0);
 	}
@@ -96,8 +156,8 @@ public class VisDebugger extends PApplet {
 		stroke(p.r,p.g,p.b,p.a);
 		beginShape();
 		for (int i = 0; i < p.x.length; i++) {
-			float x = scaleFl(p.x[i]);
-			float y = scaleFl(p.y[i]);
+			float x = scaleFlX(p.x[i]);
+			float y = scaleFlY(p.y[i]);
 			vertex(x,y);
 		}
 		endShape();
@@ -107,21 +167,28 @@ public class VisDebugger extends PApplet {
 	private void drawCircle(Circle c) {
 		fill(c.r,c.g,c.b,c.a);
 		stroke(c.r,c.g,c.b,c.a);
-		ellipse(scaleFl(c.x),scaleFl(c.y),scaleFl(c.rr),scaleFl(c.rr));
+		ellipse(scaleFlX(c.x),scaleFlY(c.y),scaleFl(c.rr),scaleFl(c.rr));
 	}
 
 	private void drawLine(Line l) {
 		stroke(l.r, l.g, l.b, l.a);
 		//		stroke(20);
 		strokeWeight(2);
-		line(scaleFl(l.x0),scaleFl(l.y0),scaleFl(l.x1),scaleFl(l.y1));
+		line(scaleFlX(l.x0),scaleFlY(l.y0),scaleFlX(l.x1),scaleFlY(l.y1));
 		
 	}
 
 	private float scaleFl(float y1) {
-		return this.scale * y1;
+		return this.scale/10 * y1;
+	}
+	
+	private float scaleFlX(float y1) {
+		return this.scale/10 * y1 + this.dragX + this.omx;
 	}
 
+	private float scaleFlY(float y1) {
+		return this.scale/10 * y1 + this.dragY + this.omy;
+	}
 	public void addLine(float x0, float y0, float x1, float y1, int r, int g, int b, int a) {
 		Line l = new Line();
 		l.x0 = x0;

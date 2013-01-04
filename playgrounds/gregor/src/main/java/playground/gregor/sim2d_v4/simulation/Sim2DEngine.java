@@ -93,7 +93,7 @@ public class Sim2DEngine implements MobsimEngine {
 	public void onPrepareSim() {
 		log.info("prepare");
 		for (Sim2DEnvironment  env: this.sim2dsc.getSim2DEnvironments()) {
-			this.penvs.put(env.getId(),new PhysicalSim2DEnvironment(env, this.sim2dsc));
+			this.penvs.put(env.getId(),new PhysicalSim2DEnvironment(env, this.sim2dsc, this.sim.getEventsManager()));
 		}
 		for (QSim2DTransitionLink hiResLink : this.hiResLinks) {
 			Id id = this.sim2dsc.getSim2DEnvironment(hiResLink.getLink()).getId();

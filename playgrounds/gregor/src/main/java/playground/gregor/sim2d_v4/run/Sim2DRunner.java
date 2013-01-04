@@ -52,6 +52,7 @@ public class Sim2DRunner {
 		
 		Controler controller = new Controler(sc);
 		
+		controller.setOverwriteFiles(true);
 		
 		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
 		controller.addMobsimFactory("hybridQ2D", factory);

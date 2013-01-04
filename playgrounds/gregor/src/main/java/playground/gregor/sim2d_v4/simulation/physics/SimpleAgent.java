@@ -28,7 +28,7 @@ import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.LinkIn
 
 public class SimpleAgent implements Sim2DAgent {
 	
-	private final float v0 = 1.34f;
+	private final float v0 = 1.f;
 	
 	private final float [] pos = {0,0};
 	

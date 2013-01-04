@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
@@ -59,15 +60,18 @@ public class PhysicalSim2DEnvironment {
 	private final double offsetY;
 
 	//DEBUG
-	private final VisDebugger visDebugger = new VisDebugger();
+	private static final VisDebugger visDebugger = new VisDebugger();
 
 	private Map<Id, Sim2DQTransitionLink> lowResLinks;
 
-	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc) {
+	private final EventsManager eventsManager;
+
+	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc, EventsManager eventsManager) {
 		this.env = env;
 		this.offsetX = env.getEnvelope().getMinX();
 		this.offsetY = env.getEnvelope().getMinY();
 		this.sim2dsc = sim2dsc;
+		this.eventsManager = eventsManager;
 		init();
 	}
 
@@ -103,7 +107,7 @@ public class PhysicalSim2DEnvironment {
 			psec.updateAgents();
 		}
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			psec.moveAgents();
+			psec.moveAgents(time);
 		}
 
 		//		if (time  % 10 == 0){
@@ -116,9 +120,9 @@ public class PhysicalSim2DEnvironment {
 		}
 		if (hasAgent){
 			for (PhysicalSim2DSection psec : this.psecs.values()) {
-				psec.debug(this.visDebugger);
+				psec.debug(visDebugger);
 			}	
-			this.visDebugger.update();
+			visDebugger.update();
 		}
 		//		}
 		//		log.info("sim step done.");
@@ -216,5 +220,10 @@ public class PhysicalSim2DEnvironment {
 	/*package*/ Sim2DQTransitionLink getLowResLink(Id nextLinkId) {
 		return this.lowResLinks.get(nextLinkId);
 	}
+	
+	/*package*/ EventsManager getEventsManager() {
+		return this.eventsManager;
+	}
+
 
 }

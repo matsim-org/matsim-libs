@@ -436,7 +436,9 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		
 //		c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
 		c.strategy().addParam("Module_1", "ReRoute");
-		c.strategy().addParam("ModuleProbability_1", "1");
+		c.strategy().addParam("ModuleProbability_1", ".5");
+		c.strategy().addParam("Module_2", "KeepLastSelected");
+		c.strategy().addParam("ModuleProbability_2", ".5");
 		
 		c.controler().setOutputDirectory(outputDir);
 		

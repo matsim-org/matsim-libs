@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -97,6 +98,10 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 			}
 			Sim2DAgent agent = this.agentBuilder.buildAgent(veh,dbox.spawnX,dbox.spawnY);
 			psecBox.addAgentToInBuffer(agent);
+			double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+			this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(
+					new LinkEnterEvent(now, veh.getDriver().getId(),
+							this.getLink().getId(), veh.getId()));
 		}
 	}
 

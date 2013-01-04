@@ -36,7 +36,7 @@ public class DepartureBox extends PhysicalSim2DSection {
 	}
 
 	@Override
-	public void moveAgents() {
+	public void moveAgents(double time) {
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
