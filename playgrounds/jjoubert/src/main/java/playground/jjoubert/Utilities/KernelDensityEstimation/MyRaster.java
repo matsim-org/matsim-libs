@@ -110,8 +110,14 @@ public class MyRaster{
 		 * origin will always be (0,0).
 		 */
 		envelope = polygon.getEnvelope();
-		originX = envelope.getCoordinates()[3].x;
-		originY = envelope.getCoordinates()[3].y;
+		
+		/* Determine the origin of the raster. */
+		originX = Double.POSITIVE_INFINITY;
+		originY = Double.NEGATIVE_INFINITY;
+		for(Coordinate c : envelope.getCoordinates()){
+			originX = Math.min(originX, c.x);
+			originY = Math.max(originY, c.y);
+		}
 		this.radius = radius;
 		this.KdeType = KdeType;
 		this.color = color;
@@ -268,7 +274,7 @@ public class MyRaster{
 			if(x < 0){
 				log.error("Negative x-entry found for raster.");
 			}
-			if(x < 0){
+			if(y < 0){
 				log.error("Negative y-entry found for raster.");
 			}
 

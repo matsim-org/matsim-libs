@@ -56,14 +56,14 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author jwjoubert
  */
 public class MyRasterTest extends MatsimTestCase{
-	private final Polygon polygon = buildTestPolygon();
-	private final List<Coord> points = buildTestPoints();
 	
 	
 	 /**
 	  *  
 	 */
 	public void testRastorConstructor(){
+		Polygon polygon = buildTestPolygon();
+
 		// Test a valid raster with stride 1.
 		MyRaster mr1 = new MyRaster(polygon, 1, null, 0, Color.BLACK);
 		assertEquals("X-extent (width) is incorrect.", 4, mr1.getBufferedImage().getWidth());
@@ -85,6 +85,9 @@ public class MyRasterTest extends MatsimTestCase{
 	}
 	
 	public void testProcessPoint(){
+		Polygon polygon = buildTestPolygon();
+		List<Coord> points = buildTestPoints();
+
 		/*
 		 * Perform tests with no radius, i.e. null, and a KDE type that only 
 		 * looks at the individual pixels (case `0').
@@ -115,6 +118,9 @@ public class MyRasterTest extends MatsimTestCase{
 	 * Check that the image matrix values are correctly processed.
 	 */
 	public void testProcessPoints(){
+		Polygon polygon = buildTestPolygon();
+		List<Coord> points = buildTestPoints();
+
 		/*
 		 * Create a raster with stride of 1: raster is 4x3. 
 		 */
@@ -197,6 +203,9 @@ public class MyRasterTest extends MatsimTestCase{
 	 * The output images are also written to file for visual inspection.
 	 */
 	public void testConvertMatrixToRaster(){
+		Polygon polygon = buildTestPolygon();
+		List<Coord> points = buildTestPoints();
+
 		/*
 		 * Create a raster with stride of 1: raster is 4x3. 
 		 */
@@ -247,6 +256,9 @@ public class MyRasterTest extends MatsimTestCase{
 	}
 	
 	public void testWriteRasterForR(){
+		Polygon polygon = buildTestPolygon();
+		List<Coord> points = buildTestPoints();
+
 		/*
 		 * Create a raster with stride of 1: raster is 4x3. 
 		 */
@@ -259,9 +271,9 @@ public class MyRasterTest extends MatsimTestCase{
 	
 	
 	/**
-	 * TODO Fixe this test
-	  * Just check that the test case is actually created correctly ;-)
-	  */
+	 * TODO Fix this test
+	 * Just check that the test case is actually created correctly ;-)
+	 */
 //	 public void testTestCase(){
 //		 assertEquals( "Point p1 should not be in polygon!", false, polygon.contains(points.get(0)));		
 //		 assertEquals( "Point p1 should not be in polygon envelope!", false, polygon.getEnvelope().contains(points.get(0)));		
