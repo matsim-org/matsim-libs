@@ -29,11 +29,11 @@ public class AllTests {
 	public static Test suite(){
 		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
 		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
 		suite.addTestSuite(MyFileSamplerTest.class);
 		suite.addTestSuite(MyLinkStatsReaderTest.class);
 		suite.addTestSuite(MyOsmNetworkCleanerTest.class);
+		suite.addTestSuite(MyVehicleIdentifierTest.class);
+		suite.addTestSuite(MyXmlConverterTest.class);
 		
 		suite.addTest(playground.jjoubert.Utilities.KernelDensityEstimation.AllTests.suite());
 		suite.addTest(playground.jjoubert.Utilities.matsim2urbansim.AllTests.suite());

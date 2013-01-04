@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.CommercialDemand");
+		TestSuite suite = new TestSuite("Tests for playground.jjoubert.CommercialDemandGeneration");
 		
 		suite.addTestSuite(MyCommercialDemandGenerator01Test.class);
 		
