@@ -53,13 +53,24 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		Logger.getLogger(AbstractHighestWeightSelector.class);
 
 	private final boolean forbidBlockingCombinations;
+	private final boolean exploreAll;
 
 	protected AbstractHighestWeightSelector() {
 		this( false );
 	}
 
 	protected AbstractHighestWeightSelector(final boolean isForRemoval) {
+		this( isForRemoval , false );
+	}
+
+	/**
+	 * @param exploreAll for test purposes
+	 */
+	protected AbstractHighestWeightSelector(
+			final boolean isForRemoval,
+			final boolean exploreAll) {
 		this.forbidBlockingCombinations = isForRemoval;
+		this.exploreAll = exploreAll;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -269,8 +280,13 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 		for (PlanRecord r : records) {
-			r.cachedMaximumWeight = alreadyAllocatedWeight +
-				getMaxWeightFromPersons( r , newAllocatedPersons , remainingPersons );
+			r.cachedMaximumWeight = exploreAll ?
+				Double.POSITIVE_INFINITY :
+				alreadyAllocatedWeight +
+					getMaxWeightFromPersons(
+							r,
+							newAllocatedPersons,
+							remainingPersons );
 		}
 
 		// Sort in decreasing order of upper bound: we can stop as soon
@@ -307,17 +323,19 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 			PlanString tail = str;
 			// TODO: find a better way to filter persons (should be
-			// possible in PlanString)
+			// possible in PlanString), ie without having to create new collections
+			// over and over, which is messy and inefficient
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
-			JointPlan jointPlan = r.jointPlan ;
-			if (jointPlan != null) {
+			Set<Id> actuallyAllocatedPersons = newAllocatedPersons;
+			if (r.jointPlan != null) {
 				// normally, it is impossible that it is always the case if there
 				// is a valid plan: a branch were this would be the case would
 				// have a infinitely negative weight and not explored.
-				if ( contains( jointPlan , alreadyAllocatedPersons ) ) continue;
-				tail = getOtherPlansAsString( r , jointPlan , allPersonsRecord , tail);
-				actuallyRemainingPersons = filter( remainingPersons , jointPlan );
-				newAllocatedPersons.addAll( jointPlan.getIndividualPlans().keySet() );
+				if ( contains( r.jointPlan , alreadyAllocatedPersons ) ) continue;
+				tail = getOtherPlansAsString( r , allPersonsRecord , tail);
+				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
+				actuallyAllocatedPersons = new HashSet<Id>( newAllocatedPersons );
+				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
 			}
 
 			PlanString newString;
@@ -326,7 +344,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 						forbidenCombinations,
 						allPersonsRecord,
 						actuallyRemainingPersons,
-						newAllocatedPersons,
+						actuallyAllocatedPersons,
 						new PlanString( r , tail ));
 			}
 			else {
@@ -344,10 +362,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			if (constructedString == null ||
 					newString.getWeight() > constructedString.getWeight()) {
 				constructedString = newString;
-				if (log.isTraceEnabled()) log.trace( "new string "+constructedString );
+				if (log.isTraceEnabled()) log.trace( "new string "+constructedString+" with weight "+constructedString.getWeight() );
 			}
 			else if (log.isTraceEnabled()) {
-				log.trace( "string "+newString+" did not improve" );
+				log.trace( "string "+newString+" with weight "+newString.getWeight()+" did not improve" );
 			}
 		}
 
@@ -443,12 +461,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 	private static PlanString getOtherPlansAsString(
 			final PlanRecord r,
-			final JointPlan jointPlan,
 			final Map<Id, PersonRecord> allPersonsRecords,
 			final PlanString additionalTail) {
 		PlanString str = additionalTail;
 
-		for (Plan p : jointPlan.getIndividualPlans().values()) {
+		for (Plan p : r.jointPlan.getIndividualPlans().values()) {
 			if (p == r.plan) continue;
 
 			str = new PlanString(
@@ -549,7 +566,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		@Override
 		public String toString() {
-			return "{PlanRecord: plan="+plan+"; jointPlan="+jointPlan+"; weight="+weight+"}";
+			return "{PlanRecord: "+plan.getPerson().getId()+":"+plan.getScore()+
+				" linkedWith:"+(jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())+
+				" weight="+weight+"}";
 		}
 	}
 

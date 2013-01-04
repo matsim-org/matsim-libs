@@ -879,17 +879,22 @@ public class HighestWeightSelectorTest {
 	// Tests
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
+	public void testSelectedPlansNonBlockingFullExploration() throws Exception {
+		testSelectedPlans( false , true );
+	}
+
+	@Test
 	public void testSelectedPlansNonBlocking() throws Exception {
-		testSelectedPlans( false );
+		testSelectedPlans( false , false );
 	}
 
 	@Test
 	public void testSelectedPlansBlocking() throws Exception {
-		testSelectedPlans( true );
+		testSelectedPlans( true , false );
 	}
 
-	private void testSelectedPlans( final boolean blocking ) {
-		HighestScoreSumSelector selector = new HighestScoreSumSelector( blocking );
+	private void testSelectedPlans( final boolean blocking , final boolean exploreAll ) {
+		HighestScoreSumSelector selector = new HighestScoreSumSelector( blocking , exploreAll );
 		GroupPlans selected = null;
 		try {
 			selected = selector.selectPlans( fixture.group );
@@ -905,6 +910,5 @@ public class HighestWeightSelectorTest {
 					fixture.expectedSelectedPlans,
 				selected);
 	}
-
 }
 

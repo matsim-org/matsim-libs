@@ -34,6 +34,11 @@ public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
 		super( blocking );
 	}
 
+
+	HighestScoreSumSelector(final boolean blocking , final boolean exploreAll) {
+		super( blocking , exploreAll );
+	}
+
 	@Override
 	public double getWeight(final Plan indivPlan) {
 		Double score = indivPlan.getScore();
