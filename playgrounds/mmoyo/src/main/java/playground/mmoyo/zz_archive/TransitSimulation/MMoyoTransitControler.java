@@ -62,6 +62,12 @@ public class MMoyoTransitControler extends Controler {
 	}
 
 	@Override
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return createRoutingAlgorithm(
+				this.createTravelCostCalculator(),
+				this.getTravelTimeCalculator());
+	}
+
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		return new MMoyoPlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(), this.scenarioData.getTransitSchedule(), new TransitConfigGroup());

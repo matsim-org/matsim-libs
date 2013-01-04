@@ -62,6 +62,12 @@ public class UCSBControler extends Controler {
 	}
 
 	@Override
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return createRoutingAlgorithm(
+				this.createTravelCostCalculator(),
+				this.getTravelTimeCalculator());
+	}
+
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, final TravelTime travelTimes) {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 

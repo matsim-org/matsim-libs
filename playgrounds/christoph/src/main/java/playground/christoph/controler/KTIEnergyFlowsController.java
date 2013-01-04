@@ -148,17 +148,18 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));
 		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
 	}
-	
+
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
+				createKtiRoutingAlgorithm(
+						this.createTravelCostCalculator(),
+						this.getTravelTimeCalculator()) :
+				super.createRoutingAlgorithm();
+	}
 
-		PlanAlgorithm router = null;
-
-		if (!this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			router = super.createRoutingAlgorithm(travelCosts, travelTimes);
-		} else {
-
-			router = new PlansCalcRouteKti(
+	private PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+		return new PlansCalcRouteKti(
 					super.getConfig().plansCalcRoute(),
 					super.network,
 					travelCosts,
@@ -166,9 +167,6 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 					super.getLeastCostPathCalculatorFactory(),
 					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
 					this.plansCalcRouteKtiInfo);
-		}
-
-		return router;
 	}
 	
 	public static void main(final String[] args) {

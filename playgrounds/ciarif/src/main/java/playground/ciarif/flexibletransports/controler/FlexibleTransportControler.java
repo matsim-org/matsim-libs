@@ -111,16 +111,18 @@ public class FlexibleTransportControler extends Controler
     this.addControlerListener(new CarSharingListener(this.ftConfigGroup));
   }
 
-  @Override
-	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes)
-  {
-    PlanAlgorithm router = null;
+	@Override
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return this.ftConfigGroup.isUsePlansCalcRouteFt() ?
+				createFtRoutingAlgorithm(
+						this.createTravelCostCalculator(),
+						this.getTravelTimeCalculator()) :
+				super.createRoutingAlgorithm();
+	}
 
-    if (!(this.ftConfigGroup.isUsePlansCalcRouteFt())) {
-      router = super.createRoutingAlgorithm(travelCosts, travelTimes);
-    }
-    else {
-      router = new PlansCalcRouteFT(
+	private PlanAlgorithm createFtRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes)
+  {
+      return new PlansCalcRouteFT(
         super.getConfig().plansCalcRoute(), 
         super.network, 
         travelCosts, 
@@ -128,9 +130,6 @@ public class FlexibleTransportControler extends Controler
         super.getLeastCostPathCalculatorFactory(),
         ((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
         this.plansCalcRouteFtInfo);
-    }
-
-    return router;
   }
 
   public static void main(String[] args)

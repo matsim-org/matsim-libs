@@ -106,9 +106,7 @@ public class JointControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(
-			final TravelDisutility travelCosts,
-			final TravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm() {
 		TripRouterFactory tripRouterFactory = getTripRouterFactory();
 		return new JointPlanRouter( tripRouterFactory.createTripRouter() );
 	}

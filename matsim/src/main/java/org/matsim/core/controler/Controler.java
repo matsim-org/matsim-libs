@@ -854,25 +854,26 @@ public class Controler extends AbstractController {
 		this.leastCostPathCalculatorFactory = factory;
 	}
 
-	/**
-	 * @param travelCosts
-	 *            the travel costs to be used for the routing
-	 * @param travelTimes
-	 *            the travel times to be used for the routing
+	/**Design comments:<ul>
+	 * <li> yyyy It seems to me that one would need a factory at <i>this</i> level. kai, may'12
+	 * <li> An issue is that the TravelTime(Calculator) object needs to be passed into the factory.  I don't think that
+	 * this is a large problem, but it needs to be dealt with. kai, may'12
+	 * </ul>
+	 *
 	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
-	 *         of plans with the specified travelCosts and travelTimes. Only to
-	 *         be used by a single thread, use multiple instances for multiple
-	 *         threads!
+	 *         of plans with the default (= the current from the last or current
+	 *         iteration) travel costs and travel times. Only to be used by a
+	 *         single thread, use multiple instances for multiple threads!
 	 */
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		if ( !useTripRouting ) {
-			return createOldRoutingAlgorithm(travelCosts, travelTimes);
-		} else {
-			return new PlanRouter(
-					getTripRouterFactory().createTripRouter(),
-					getScenario().getActivityFacilities());
-		}
-	}	
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return useTripRouting ?
+			new PlanRouter(
+				getTripRouterFactory().createTripRouter(),
+				getScenario().getActivityFacilities()) :
+			createOldRoutingAlgorithm(
+				this.createTravelCostCalculator(),
+				this.getTravelTimeCalculator());
+	}
 
 	private PlanAlgorithm createOldRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
@@ -980,22 +981,6 @@ public class Controler extends AbstractController {
 			throw new IllegalStateException( "cannot get the trip router: useTripRouting is false" );
 		}
 		return tripRouterFactory;
-	}
-
-	/**Design comments:<ul>
-	 * <li> yyyy It seems to me that one would need a factory at <i>this</i> level. kai, may'12
-	 * <li> An issue is that the TravelTime(Calculator) object needs to be passed into the factory.  I don't think that
-	 * this is a large problem, but it needs to be dealt with. kai, may'12
-	 * </ul>
-	 *
-	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
-	 *         of plans with the default (= the current from the last or current
-	 *         iteration) travel costs and travel times. Only to be used by a
-	 *         single thread, use multiple instances for multiple threads!
-	 */
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return createRoutingAlgorithm(this.createTravelCostCalculator(),
-				this.getTravelTimeCalculator());
 	}
 
 	public void setTripRouterFactory(final TripRouterFactory factory) {

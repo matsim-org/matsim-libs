@@ -54,8 +54,14 @@ public class Controller extends Controler {
 		this.addMobsimFactory("prioQ",factory);
 	}
 
-
 	@Override
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return createRoutingAlgorithm(
+				this.createTravelCostCalculator(),
+				this.getTravelTimeCalculator());
+	}
+
+
 	public PlanAlgorithm createRoutingAlgorithm(
 			TravelDisutility travelCosts,
 			TravelTime travelTimes) {

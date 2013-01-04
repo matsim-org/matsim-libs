@@ -86,6 +86,12 @@ public class Controller2D extends Controler implements StartupListener {
 	}
 
 	@Override
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return createRoutingAlgorithm(
+				this.createTravelCostCalculator(),
+				this.getTravelTimeCalculator());
+	}
+
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
 		
 		PlanRouterAdapter plansCalcRoute = new PlanRouterAdapter( this );

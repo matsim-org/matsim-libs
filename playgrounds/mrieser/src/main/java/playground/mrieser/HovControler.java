@@ -61,6 +61,12 @@ public class HovControler extends Controler {
 	}
 
 	@Override
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return createRoutingAlgorithm(
+				this.createTravelCostCalculator(),
+				this.getTravelTimeCalculator());
+	}
+
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 

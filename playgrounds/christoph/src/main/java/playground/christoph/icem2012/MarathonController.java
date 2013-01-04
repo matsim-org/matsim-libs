@@ -337,8 +337,14 @@ public class MarathonController extends WithinDayController implements StartupLi
 			return this.sim2DEngine;
 		}
 	}
-	
+
 	@Override
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return createRoutingAlgorithm(
+				this.createTravelCostCalculator(),
+				this.getTravelTimeCalculator());
+	}
+
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
 		
 		// the contructor does not call createRoutingAlgorithm on the argument, so it is ok (td)

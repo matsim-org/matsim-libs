@@ -65,9 +65,4 @@ public class TRBControler extends Controler {
 		this.addControlerListener(new TravelDistanceDistribution());
 		super.run();
 	}
-
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		return super.createRoutingAlgorithm(travelCosts, travelTimes);
-	}
 }

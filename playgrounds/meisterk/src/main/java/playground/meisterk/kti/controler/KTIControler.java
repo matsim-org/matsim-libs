@@ -111,15 +111,16 @@ public class KTIControler extends Controler {
 	}
 
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm() {
+		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
+				createKtiRoutingAlgorithm(
+						this.createTravelCostCalculator(),
+						this.getTravelTimeCalculator()) :
+				super.createRoutingAlgorithm();
+	}
 
-		PlanAlgorithm router = null;
-
-		if (!this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			router = super.createRoutingAlgorithm(travelCosts, travelTimes);
-		} else {
-
-			router = new PlansCalcRouteKti(
+	public PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+		return new PlansCalcRouteKti(
 					super.getConfig().plansCalcRoute(),
 					super.network,
 					travelCosts,
@@ -127,9 +128,6 @@ public class KTIControler extends Controler {
 					super.getLeastCostPathCalculatorFactory(),
 					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
 					this.plansCalcRouteKtiInfo);
-		}
-
-		return router;
 	}
 
 	/**
