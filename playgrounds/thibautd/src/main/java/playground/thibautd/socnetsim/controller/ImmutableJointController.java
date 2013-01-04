@@ -32,7 +32,6 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -53,11 +52,7 @@ public final class ImmutableJointController extends AbstractController {
 	public ImmutableJointController(
 			final ControllerRegistry registry,
 			final ReplanningListener replanner) {
-		if ( new File( registry.getScenario().getConfig().controler().getOutputDirectory() ).exists() ) {
-			throw new RuntimeException( "output directory "+
-						registry.getScenario().getConfig().controler().getOutputDirectory()
-						+" already exists!" );
-		}
+		checkOutputdir( registry );
 
 		this.replanner = replanner;
 		checkConfigConsistencyAndWriteToLog(
@@ -69,6 +64,19 @@ public final class ImmutableJointController extends AbstractController {
 				registry.getScenario().getConfig().controler().getOutputDirectory(),
 				registry.getScenario().getConfig().controler().getRunId(),
 				true);
+	}
+
+	private static void checkOutputdir(ControllerRegistry registry) {
+		final String path = registry.getScenario().getConfig().controler().getOutputDirectory();
+		final File file = new File( path );
+
+		if ( !file.exists() ) return;
+
+		if ( !file.isDirectory() ) throw new RuntimeException(
+				"output directory "+path+" exists and is a regular file" );
+
+		if ( file.list().length > 0 ) throw new RuntimeException(
+				"output directory "+path+" exists and is not empty" );
 	}
 
 	public void run() {
