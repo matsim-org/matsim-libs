@@ -276,8 +276,12 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 		List<TransitStopFacility> stopCandidates = new ArrayList<TransitStopFacility>();
 		
 		for(TransitStopFacility s: possibleStops){
+//				if(hull.contains(MGC.coord2Point(s.getCoord()))){
 			if(!currentlyUsedStops.contains(s)){
-				if(hull.contains(MGC.coord2Point(s.getCoord()))){
+				// I replaced "contains" by "covers" since the exact interpretation seems to have changed 
+				// with the geotools upgrade. kai, jan'13
+				
+					if(hull.covers(MGC.coord2Point(s.getCoord()))){
 					stopCandidates.add(s);
 				}
 			}
