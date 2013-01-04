@@ -28,6 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 
 /**
@@ -43,7 +44,9 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 
 	@Override
 	public void checkConsistency(Config config) {
-		boolean problem = false ;
+		VspExperimentalConfigGroup vspConfig = config.vspExperimental() ; // convenience variable
+		
+		boolean problem = false ; // ini
 
 		if ( config.planCalcScore().getMonetaryDistanceCostRatePt() > 0 ) {
 			problem = true ;
@@ -91,14 +94,27 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 					" enforced in the future.") ;
 		}
 		
-		// added before nov'12
-		if (VspExperimentalConfigGroup.ActivityDurationInterpretation.endTimeOnly
-				.compareTo(config.vspExperimental().getActivityDurationInterpretation()) == 0 
-				&& config.scenario().isUseTransit()) {
-			problem = true;
-			log.error("You are using " + config.vspExperimental().getActivityDurationInterpretation() + " as activityDurationInterpretation in " +
-			"conjunction with the matsim transit module. This is not working at all as pt interaction activities never have an end time and " +
-			"thus will never end!");
+
+		if ( ActivityDurationInterpretation.endTimeOnly.equals(vspConfig.getActivityDurationInterpretation()) ) {
+			// added jan'13
+			log.warn(ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;
+			// added before nov'12
+			if( config.scenario().isUseTransit()) {
+				problem = true;
+				log.error("You are using " + config.vspExperimental().getActivityDurationInterpretation() + " as activityDurationInterpretation in " +
+						"conjunction with the matsim transit module. This is not working at all as pt interaction activities never have an end time and " +
+				"thus will never end!");
+			}
+		}
+		
+		// added jan'13
+		if ( ActivityDurationInterpretation.minOfDurationAndEndTime.equals(vspConfig.getActivityDurationInterpretation() ) ) {
+			// problem = true ;
+			log.warn("You are using ActivityDurationInterpretation " + vspConfig.getActivityDurationInterpretation() + " ; vsp default is to use " +
+					ActivityDurationInterpretation.tryEndTimeThenDuration + " .  This will be more strictly enforced in the future.  " +
+							"This means you have to add the following lines into the vspExperimental section of your config file: ") ;
+			log.warn( "   <param name=\"activityDurationInterpretation\" value=\"" + ActivityDurationInterpretation.tryEndTimeThenDuration + "\" />" ) ;
+			log.warn("Please report if this causes odd results (this will simplify many code maintenance issues, but is unfortunately not well tested).") ;
 		}
 		
 		// pseudo-pt über Distanz, nicht ptSpeedFactor

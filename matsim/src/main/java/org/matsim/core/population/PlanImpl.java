@@ -343,7 +343,7 @@ public class PlanImpl implements Plan {
 		return null;
 	}
 
-	public int getActLegIndex(final Object o) {
+	public int getActLegIndex(final PlanElement o) {
 		if ((o instanceof Leg) || (o instanceof Activity)) {
 			for (int i = 0; i < getPlanElements().size(); i++) {
 				if (getPlanElements().get(i).equals(o)) {

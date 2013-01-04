@@ -71,7 +71,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	private static final String USE_ACTIVITY_DURATIONS = "useActivityDurations";
 	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
 	
-	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, endTimeOnly } 
+	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly } 
 
 	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.minOfDurationAndEndTime ;
 
@@ -220,21 +220,21 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				"When violating VSP defaults, this results in " +
 		"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
-		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION
-				+ " instead) Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
+//		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION
+//				+ " instead) Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
 		
 		StringBuilder str = new StringBuilder() ;
 		for ( ActivityDurationInterpretation itp : ActivityDurationInterpretation.values() ) {
 			str.append( " " + itp.toString() ) ;
 		}
 		map.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
-				+ ActivityDurationInterpretation.minOfDurationAndEndTime.toString() + " will internally use a different " +
+				+ ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +
 						"(simpler) version of the TimeAllocationMutator.") ;
 
-		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not yet implemented) will remove plan attributes that are presumably not used, such as " +
+		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
 		"activityStartTime. default=false") ;
 
-		map.put(INPUT_MZ05_FILE, "Set this filename of MZ05 daily analysis");
+		map.put(INPUT_MZ05_FILE, "(do not use) Set this filename of MZ05 daily analysis");
 
 		map.put(MODES_FOR_SUBTOURMODECHOICE, "(do not use) set the traffic mode option for subTourModeChoice by Yu");
 		map.put(CHAIN_BASED_MODES, "(do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. \"car,bike\", \"car\"");
@@ -278,6 +278,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			} else {
 				setActivityDurationInterpretation( ActivityDurationInterpretation.endTimeOnly ) ;
 			}
+			log.warn("Config parameter " + USE_ACTIVITY_DURATIONS + " is deprecated; use " 
+					+ ACTIVITY_DURATION_INTERPRETATION + " instead. kai, jan'13") ;
 		} else if ( ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
 			setActivityDurationInterpretation(ActivityDurationInterpretation.valueOf(value)) ;
 		} else if ( REMOVING_UNNECESSARY_PLAN_ATTRIBUTES.equalsIgnoreCase(key)) {
@@ -449,13 +451,14 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	}
 
 	public void setActivityDurationInterpretation(final ActivityDurationInterpretation activityDurationInterpretation) {
-		if (VspExperimentalConfigGroup.ActivityDurationInterpretation.endTimeOnly
-		.compareTo(activityDurationInterpretation) == 0 ){
+		if ( ActivityDurationInterpretation.endTimeOnly.equals(activityDurationInterpretation) ){
 			/*
 			 * I don't think this is the correct place for consistency checks but this bug is so hard to find that the user should be warned in any case. dg 08-2012
 			 */
 			log.warn("You are using " + activityDurationInterpretation + " as activityDurationInterpretation. " +
-					"This is not working in conjunction with the pt module as pt interaction activities will never end!");
+					"This is not working in conjunction with the pt module as pt interaction activities then will never end!");
+			log.warn("ActivityDurationInterpreation " + activityDurationInterpretation + " is deprecated; use " 
+					+ ActivityDurationInterpretation.minOfDurationAndEndTime + " instead. kai, jan'13") ;
 		}
 		this.activityDurationInterpretation = activityDurationInterpretation;
 	}

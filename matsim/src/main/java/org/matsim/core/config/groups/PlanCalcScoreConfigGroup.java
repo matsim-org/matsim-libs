@@ -117,7 +117,11 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private double marginalUtlOfDistanceWalk = 0.0;
 
 	private double waiting = -0.0;
-	private double waitingPt = -0.0 ; // yyyy because of backwards compability reasons. 
+
+	/**
+	 * See the config parameter comment. 
+	 */
+	private Double waitingPt = null ; // yyyy because of backwards compability reasons. 
 	// would make a lot more sense to set this to travelingPt.  kai, oct'12
 
 	private double marginalUtilityOfMoney = 1.0 ;
@@ -317,7 +321,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(WAITING, "[utils/hr] utility offset for waiting.  this comes on top of the opportunity cost of time.  Probably " +
 		"implemented correctly, but not tested.") ;
 		map.put(WAITING_PT, "[utils/hr] utility offset for waiting for a pt vehicle.  this comes on top of the opportunity cost " +
-				"of time." ) ;
+				"of time. Default: if not set explicitly, it is equal to traveling_pt!!!" ) ;
 		map.put(BRAIN_EXP_BETA, "logit model scale parameter. default: 2.  Has name and default value for historical reasons " +
 				"(see Bryan Raney's phd thesis).  Should be in strategyConfigGroup.") ;
 		map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates " +
@@ -526,7 +530,11 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 	
 	public double getMarginalUtlOfWaitingPt_utils_hr() {
-		return this.waitingPt ;
+		if ( this.waitingPt==null ) {
+			return this.travelingPt ;
+		} else {
+			return this.waitingPt ;
+		}
 	}
 
 	private static int setWaitingCnt=0 ;

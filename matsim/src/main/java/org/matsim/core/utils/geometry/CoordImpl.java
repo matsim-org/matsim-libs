@@ -46,6 +46,7 @@ public class CoordImpl implements Serializable, Coord {
 		this.y = coord.getY();
 	}
 
+	@Deprecated // use CoordUtils.calcDistance(.,.).  Coord is a pure data object; should be handled entirely through interface.
 	public final double calcDistance(final Coord other) {
 		//depending on the coordinate system that is used, determining the
 		//distance based on the euclidean distance will lead to wrong results.
