@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
@@ -46,10 +47,16 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 public class ChoiceSet {
 		
 	// *************************************
+	/**
+	 * Presumably some exponent that is used to re-weight scores.  Problem is that it does not work with negative scores.
+	 * Negative scores should not happen because then the activity should be dropped, but clearly the negativeness can
+	 * be a consequence of the approximations, which means that it needs to be handeled.  The way this is done
+	 * looks like a hack to me.  kai, jan'13
+	 */
 	private double exponent;
 	private int numberOfAlternatives;
 	
-	private int approximationLevel;	
+	private ApproximationLevel approximationLevel;	
 	// *************************************	
 	private List<Id> destinations = new Vector<Id>();
 	private List<Id> notYetVisited = new Vector<Id>();
@@ -57,7 +64,7 @@ public class ChoiceSet {
 	private Network network = null;
 	private Config config;
 		
-	public ChoiceSet(int approximationLevel, PlanRouterAdapter router, Network network, Config config) {
+	public ChoiceSet(ApproximationLevel approximationLevel, PlanRouterAdapter router, Network network, Config config) {
 		this.approximationLevel = approximationLevel;
 		this.router = router;
 		this.network = network;
@@ -127,28 +134,35 @@ public class ChoiceSet {
 		
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		
-		DijkstraMultipleDestinationsFactory dijkstraFactory = new DijkstraMultipleDestinationsFactory();
-		LeastCostPathCalculator leastCostPathCalculatorForward = dijkstraFactory.createPathCalculator(network, travelCost, travelTime);
+		// ---
+		
+		ForwardDijkstraMultipleDestinations leastCostPathCalculatorForward = new ForwardDijkstraMultipleDestinations(network, travelCost, travelTime);
 				
-		Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).
-				getPreviousLeg(act));
+		Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
 		Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
-		((ForwardDijkstraMultipleDestinations)leastCostPathCalculatorForward).calcLeastCostTree(fromNode, previousActivity.getEndTime());
+		leastCostPathCalculatorForward.calcLeastCostTree(fromNode, previousActivity.getEndTime());
 		
-		dijkstraFactory.setType("backward");
-		LeastCostPathCalculator leastCostPathCalculatorBackward = dijkstraFactory.createPathCalculator(network, travelCost, travelTime);
-		((BackwardDijkstraMultipleDestinations)leastCostPathCalculatorBackward).setEstimatedStartTime(act.getEndTime());
+		// ---
 		
-		// TODO: adapt startTime here: --------------------------------------------------
-		Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).
-				getNextLeg(act));
+		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
+		Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
 		fromNode = network.getLinks().get(nextActivity.getLinkId()).getToNode();
-		((BackwardDijkstraMultipleDestinations)leastCostPathCalculatorBackward).calcLeastCostTree(fromNode, -1.0);
+
+		leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime());
+		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
+		// at which this is anchored.  (Clearly too early, but probably not that bad as an approximation.)
+
+		leastCostPathCalculatorBackward.calcLeastCostTree(fromNode, -1.0);
+		// "-1.0" is ignored.  It is not clear to me why we first set the (approximated) start time separately, and then ignore the startTime.
+		// (The Dijkstra algo does not care of the start time is approximated or exact.)  kai, jan'13
+		
+		// ---
 		
 		// Handling duplicates. This was may the source for (small) random fluctuations
+		// which duplicates?  and how are they handled?  kai, jan'13
 		List<ScoredAlternative> list = new Vector<ScoredAlternative>();						
 		// if no epsilons are used!
-		double largestValue = -1.0 * Double.MAX_VALUE;
+		double largestValue = -1.0 * Double.MAX_VALUE; // would prefer Double.NEGATIVE_INFINITY. kai, jan'13
 		Id facilityIdWithLargestScore = act.getFacilityId();
 		
 		for (Id destinationId : this.destinations) {
@@ -164,6 +178,7 @@ public class ChoiceSet {
 					leastCostPathCalculatorForward, leastCostPathCalculatorBackward, this.approximationLevel);
 			
 			// not needed anymore
+			// why not?  kai, jan'13
 			//scoringFunction.finish();
 			double score = scoringFunction.getScore();
 			scoringFunction.reset();
@@ -191,14 +206,14 @@ public class ChoiceSet {
 		}
 	}
 	
-	private double getTotalScore(List<ScoredAlternative> list, boolean negativeLargestValue) {
+	private double getTotalScore(List<ScoredAlternative> list, boolean largestValueIsNegative) {
 		int n = 0;
 		double totalScore = 0.0;
 		for (ScoredAlternative sa : list) {
 			if (n >= numberOfAlternatives) break;			
 			double score = Math.pow(sa.getScore(), exponent);
-			if (negativeLargestValue) {
-				// if we only have negative values -> change sign of score
+			if (largestValueIsNegative) {
+				// if we only have negative values -> change sign of score // see my comment at the declaration of this.exponent.  kai, jan'13
 				score *= -1.0;
 			}
 			if (score > 0.0) {
@@ -209,7 +224,7 @@ public class ChoiceSet {
 		return totalScore;
 	}
 	
-	private TreeMap<Double,Id> generateReducedChoiceSet(List<ScoredAlternative> list, double totalScore, boolean negativeLargestValue) {
+	private TreeMap<Double,Id> generateReducedChoiceSet(List<ScoredAlternative> list, double totalScore, boolean largestValueIsNegative) {
 		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
 		int n = 0;
 		double sumScore = 0.0;
@@ -217,8 +232,8 @@ public class ChoiceSet {
 			if (n >= numberOfAlternatives) break;
 			double score = Math.pow(sa.getScore(), exponent);
 			
-			if (negativeLargestValue) {
-				// if we only have negative values -> change sign of score
+			if (largestValueIsNegative) {
+				// if we only have negative values -> change sign of score // see my comment at the declaration of this.exponent.  kai, jan'13
 				score *= -1.0;
 			}			
 			if (score > 0.0) {
@@ -231,7 +246,7 @@ public class ChoiceSet {
 	}
 			
 	/*package*/ void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
-			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, int approximationLevelTmp ) {
+			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, ApproximationLevel approximationLevelTmp ) {
 		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp , leastCostPathCalculatorForward, leastCostPathCalculatorBackward, 
 				this.network, this.config);
 		adapter.adaptAndScoreTimes(plan, actlegIndex, planTmp, scoringFunction, router);

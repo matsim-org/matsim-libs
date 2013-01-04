@@ -40,6 +40,10 @@ public class ForwardDijkstraMultipleDestinations extends Dijkstra {
 
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
+		// yyyyyy could you please explain why this needs to be re-implemented?  I would feel better if this would just use the method of
+		// the original class.  kai, jan'13
+		
+		
 		// now construct the path
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();

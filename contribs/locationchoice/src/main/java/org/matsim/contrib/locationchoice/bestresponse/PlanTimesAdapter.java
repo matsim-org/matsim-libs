@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -36,13 +38,16 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 
 public class PlanTimesAdapter {
+	
+	public static enum ApproximationLevel { COMPLETE_ROUTING, LOCAL_ROUTING, NO_ROUTING } ;
 	
 	// 0: complete routing
 	// 1: local routing
 	// 2: no routing (distance-based approximation)
-	private int approximationLevel = 0; 
+	private ApproximationLevel approximationLevel = ApproximationLevel.COMPLETE_ROUTING ; 
 	private final LeastCostPathCalculator leastCostPathCalculatorForward ;
 	private final LeastCostPathCalculator leastCostPathCalculatorBackward ;
 	private final Network network;
@@ -51,7 +56,7 @@ public class PlanTimesAdapter {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(PlanTimesAdapter.class);
 		
-	/* package */ PlanTimesAdapter(int approximationLevel, LeastCostPathCalculator leastCostPathCalculatorForward, 
+	/* package */ PlanTimesAdapter(ApproximationLevel approximationLevel, LeastCostPathCalculator leastCostPathCalculatorForward, 
 			LeastCostPathCalculator leastCostPathCalculatorBackward, Network network, Config config) {
 		this.approximationLevel = approximationLevel;
 		this.leastCostPathCalculatorForward = leastCostPathCalculatorForward;
@@ -66,6 +71,9 @@ public class PlanTimesAdapter {
 		// yyyy Note: getPrevious/NextLeg/Activity all relies on alternating activities and leg, which was given up as a requirement
 		// a long time ago (which is why it is not in the interface).  kai, jan'13
 		
+		// yy This only works when the ScoringFunction is an implementation of ScoringFunctionAccumulator.  This may not always be the case.
+		// kai, jan'13
+		
 		// iterate through plan and adapt travel and activity times
 		int planElementIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -79,15 +87,15 @@ public class PlanTimesAdapter {
 				}
 				else {
 					double legTravelTime = 0.0;
-					if (approximationLevel == 0) {
+					if (approximationLevel == ApproximationLevel.COMPLETE_ROUTING ) {
 						legTravelTime = computeTravelTimeFromCompleteRouting(plan.getPerson(),
 							plan.getPreviousActivity(plan.getPreviousLeg(act)), 
 							act, router);
 					}
-					else if (approximationLevel == 1){
+					else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
 						legTravelTime = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
 					}
-					else if (approximationLevel == 2) {
+					else if (approximationLevel == ApproximationLevel.NO_ROUTING ) {
 						legTravelTime = approximateTravelTimeFromDistance(plan, actlegIndex, planElementIndex, act);
 					}
 					
@@ -103,14 +111,26 @@ public class PlanTimesAdapter {
 					
 					// set new activity end time
 					Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
-					// yy Isn't this the same as "act"?  (The code originally was a bit different, but also in the original code it was not using the
+					// yy Isn't this the same as "act"?  (The code originally was a bit different, but in the original code it was also not using the
 					// iterated element.)  kai, jan'13
 					
 //					actTmp.setStartTime(arrivalTime);
-					actTmp.setEndTime(arrivalTime + actDur);
-					// (yyyy This sets the activity end time from its maximum duration.  Thus, duration is considered as the more important
-					// attribute than end time.  If anything, this goes against current recommendations (use duration only for "mechanical" things
-					// such as plugging in an electric vehicle).  kai, jan'13)
+
+					if ( config.vspExperimental().getActivityDurationInterpretation()==ActivityDurationInterpretation.endTimeOnly ) {
+						throw new RuntimeException("activity duration interpretation of " 
+								+ config.vspExperimental().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
+										"Use " + ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
+					} else if ( config.vspExperimental().getActivityDurationInterpretation()==ActivityDurationInterpretation.tryEndTimeThenDuration ) {
+						if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
+							actTmp.setEndTime( act.getEndTime() ) ;
+						} else if ( act.getMaximumDuration() == Time.UNDEFINED_TIME) {
+							actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
+						}
+					} else {
+						actTmp.setEndTime(arrivalTime + actDur);
+						// This is the original variant.  I would not make "duration" take absolute precedence over "endTime", but since
+						// VSP should use "tryEndTimeThenDuration", I will leave it for the time being.  kai, jan'13
+					}
 					
 					scoringFunction.startLeg(departureTime, previousLegPlanTmp);
 					scoringFunction.endLeg(arrivalTime);

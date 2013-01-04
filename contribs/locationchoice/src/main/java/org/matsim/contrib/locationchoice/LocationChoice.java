@@ -138,7 +138,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private void createObjectAttributes(long seed) {
 		this.personsMaxEpsUnscaled = new ObjectAttributes();
 		
-		// check if object attributes files are available, other wise do preprocessing
+		// check if object attributes files are available, otherwise do preprocessing
 		String maxEpsValues = this.controler.getConfig().locationchoice().getMaxEpsFile();
 		if (!maxEpsValues.equals("null")) {
 			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);

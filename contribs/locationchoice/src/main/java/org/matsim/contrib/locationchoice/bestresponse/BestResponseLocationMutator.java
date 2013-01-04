@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
@@ -41,7 +42,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.util.TravelDisutility;
@@ -100,13 +100,26 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	}
 				
 	private void handleActivities(Plan plan, final Plan bestPlan) {
-		int travelTimeApproximationLevel = Integer.parseInt(
+		int tmp = Integer.parseInt(
 				this.controler.getConfig().locationchoice().getTravelTimeApproximationLevel());
+		ApproximationLevel travelTimeApproximationLevel ;
+		if ( tmp==0 ) {
+			travelTimeApproximationLevel = ApproximationLevel.COMPLETE_ROUTING ;
+		} else if ( tmp==1 ) {
+			travelTimeApproximationLevel = ApproximationLevel.LOCAL_ROUTING ;
+		} else if ( tmp==2 ) {
+			travelTimeApproximationLevel = ApproximationLevel.NO_ROUTING ;
+		} else {
+			throw new RuntimeException("unknwon travel time approximation level") ;
+		}
+		// yyyy the above is not great, but when I found it, it was passing integers all the way to the method.  kai, jan'13
 		
 		// somehow getting it from the controler causes problems for parallel runs.
 		// -> create a new (but identical) scorer here
 		//ScoringFunctionAccumulator scorer = (ScoringFunctionAccumulator) this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(plan.getPerson().getId());
 		ScoringFunctionAccumulator scoringFunction = (ScoringFunctionAccumulator) this.controler.getScoringFunctionFactory().createNewScoringFunction(plan); 
+		// Conceptually, it is not necessary that this is of type ScoringFunctionAccumlator; ScoringFunction would suffice.  However, the score
+		// calculation in PlanTimesAdapter.adaptAndScoreTimes(...) would need to be adjusted to the other interface.  kai, jan'13
 		
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -121,9 +134,9 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 										
 					final Activity actPost = (Activity)actslegs.get(actlegIndex + 2);					
 					double distanceDirect = ((CoordImpl)actPre.getCoord()).calcDistance(actPost.getCoord());
-					double distanceFromEpsilon = this.getMaximumDistanceFromEpsilon(plan.getPerson(), 
+					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(), 
 							this.actTypeConverter.convertType(actToMove.getType()));
-					double maxRadius = (distanceDirect +  distanceFromEpsilon) / 2.0;
+					double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
 					
 					double x = (actPre.getCoord().getX() + actPost.getCoord().getX()) / 2.0;
 					double y = (actPre.getCoord().getY() + actPost.getCoord().getY()) / 2.0;
@@ -131,9 +144,11 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 										
 					ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, new PlanRouterAdapter( controler ),
 							this.network, this.controler.getConfig());
-					this.createChoiceSetCircle(
-							center, maxRadius, this.actTypeConverter.convertType(((ActivityImpl)actToMove).getType()), cs,
+					this.createChoiceSetFromCircle(
+							center, maxRadius, this.actTypeConverter.convertType(actToMove.getType()), cs,
 							plan.getPerson().getId());
+					// yyyy what is this "convertType" stuff?  It may convert activities such as "leisure1, leisure2, ..." all to "l".  Presumably,
+					// this was useful/needed because of the original Zurich population.  But I find this a bit dangerous ... kai, jan'13
 										
 					// **************************************************
 					// maybe repeat this a couple of times
@@ -141,14 +156,15 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					TravelDisutility travelCost = super.getControler().getTravelDisutilityFactory().
 							createTravelDisutility(travelTime, super.getControler().getConfig().planCalcScore());
 						
-					this.setLocation((ActivityImpl)actToMove, 
-							cs.getWeightedRandomChoice(actlegIndex, actPre.getCoord(),
-									actPost.getCoord(), this.facilities, scoringFunction, 
-									plan, travelTime, travelCost, this.controler.getIterationNumber()));	
+					final Id selectedFacilityId = cs.getWeightedRandomChoice(actlegIndex, actPre.getCoord(),
+							actPost.getCoord(), this.facilities, scoringFunction, 
+							plan, travelTime, travelCost, this.controler.getIterationNumber());
+					this.setLocation((ActivityImpl)actToMove, selectedFacilityId);	
 					
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
 					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
-					// yyyy if I understand this correctly, this means that, if the location change is accepted, all subsequent locachoice tests
+					// yyyy if I understand this correctly, this means that, if the location change is accepted, all subsequent locachoice 
+					// optimization attempts
 					// will be run with that new location.  kai, jan'13
 					
 					// **************************************************
@@ -163,7 +179,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
    		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 	}
 	
-	private final void createChoiceSetCircle(Coord center, double radius, String type, ChoiceSet cs, Id personId) {
+	private final void createChoiceSetFromCircle(Coord center, double radius, String type, ChoiceSet cs, Id personId) {
 		ArrayList<ActivityFacility> list = 
 			(ArrayList<ActivityFacility>) super.quadTreesOfType.get(type).get(center.getX(), center.getY(), radius);
 	
@@ -193,7 +209,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 // always use travel times
 //		if (Boolean.parseBoolean(this.controler.getConfig().locationchoice().getTravelTimes())) {
 			// plan, actToMove, actlegIndex, planTmp, scoringFunction, leastCostPathCalculatorForward, leastCostPathCalculatorBackward, approximationLevel
-			cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, 0);	
+			cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, ApproximationLevel.COMPLETE_ROUTING);	
 //		}
 		// not needed anymore
 		//scoringFunction.finish();
@@ -203,11 +219,16 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		return score;
 	}
 	
-	private double getMaximumDistanceFromEpsilon(Person person, String type) {
+	/**
+	 * Conversion of the "frozen" logit model epsilon into a distance.
+	 */
+	private double convertEpsilonIntoDistance(Person person, String type) {
 		double maxEpsilon = 0.0;
 		double scale = 1.0;
 		
 		this.scaleEpsilon.getEpsilonFactor(type);
+		// yyyyyy what is the above line of code doing?  kai, jan'13
+		
 		maxEpsilon = (Double) this.personsMaxEpsUnscaled.getAttribute(person.getId().toString(), type);
 		
 		maxEpsilon *= scale;

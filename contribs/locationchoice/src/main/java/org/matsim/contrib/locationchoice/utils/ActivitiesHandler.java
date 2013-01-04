@@ -79,10 +79,15 @@ public class ActivitiesHandler {
 		// check if demand = v1
 		if (tentries[0].length() == 1) {
 			this.converter = new ActTypeConverter(true);
+			Logger.getLogger(this.getClass()).error("LocationChoice uses an activity type converter that only uses the first letter of every activity type. " +
+					"For example, `shopping' and `school' may be treated as the same activity.  Make sure this is what you want.") ; // kai, jan'13
 		}
 		else {
 			this.converter = new ActTypeConverter(false);
 		}
+		// yyyy If I understand this correctly, this means: If the first activity in the list of flexible activities is of length
+		// one, then "true" is used (i.e. all activities are reduced to length one).  Otherwise "false".  
+		// I find this "automagic" a bit dangerous.  kai, jan'13
 	}
 
 	// only used by TGSimple
