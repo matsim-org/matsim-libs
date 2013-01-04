@@ -591,6 +591,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			PlanString tail = string;
 
 			// check if all plans in the string are in the groupPlans
+			// copying the list and removing the elements is much faster
+			// than using "contains" on big lists.
+			final List<Plan> plans = new ArrayList<Plan>( forbidden.getIndividualPlans() );
 			while (tail != null) {
 				final PlanRecord head = tail.planRecord;
 				tail = tail.tail;
@@ -601,7 +604,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				}
 
 				if (head.jointPlan == null &&
-						!forbidden.getIndividualPlans().contains( head.plan )) {
+						!plans.remove( head.plan )) {
 					return false;
 				}
 			}
