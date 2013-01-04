@@ -20,6 +20,7 @@
 
 package playground.wdoering.grips.evacuationanalysis;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -29,6 +30,7 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -39,13 +41,22 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -61,6 +72,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
+import org.geotools.geometry.Envelope2D;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
@@ -72,19 +85,30 @@ import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkChangeEventFactory;
+import org.matsim.core.network.NetworkChangeEventFactoryImpl;
+import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import playground.wdoering.debugvisualization.controller.XYVxVyEventThread;
+import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
 import playground.wdoering.grips.evacuationanalysis.control.EventHandler;
 import playground.wdoering.grips.evacuationanalysis.control.EventReaderThread;
+import playground.wdoering.grips.evacuationanalysis.control.TiffExporter;
 import playground.wdoering.grips.evacuationanalysis.data.Cell;
 import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
 import playground.wdoering.grips.evacuationanalysis.data.EventData;
@@ -112,6 +136,7 @@ public class EvacuationAnalysis implements ActionListener{
 	private MyMapViewer jMapViewer;
 	private JButton saveButton;
 	private JButton openBtn;
+	private JButton exportBtn;
 	private JPanel blockPanel;
 	private JPanel panelDescriptions;
 	private Scenario sc;
@@ -144,6 +169,7 @@ public class EvacuationAnalysis implements ActionListener{
 	private String cellSizeText = " cell size: ";
 	private int k = 5;
 	private boolean useCalculateButton = false;
+	private GeotoolsTransformation ctInverse;
 	public enum Unit { TIME, PEOPLE };
 
 	
@@ -214,6 +240,8 @@ public class EvacuationAnalysis implements ActionListener{
 	 */
 	private void initialize()
 	{
+		
+		
 		this.firstLoad = true;
 		this.cellTransparency = .5f;
 		
@@ -284,6 +312,12 @@ public class EvacuationAnalysis implements ActionListener{
 		this.calcButton.setPreferredSize(new Dimension(100,20));
 		this.calcButton.setSize(new Dimension(100,24));
 		
+		this.exportBtn = new JButton("export");
+		this.exportBtn.setEnabled(false);
+		this.exportBtn.addActionListener(this);
+		this.exportBtn.setPreferredSize(new Dimension(100,20));
+		this.exportBtn.setSize(new Dimension(100,24));
+		
 		JPanel iterationSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		iterationSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		this.iterationsList = new JComboBox();
@@ -348,6 +382,8 @@ public class EvacuationAnalysis implements ActionListener{
 		calculateButtonPanel.add(new JLabel(""));
 		if (useCalculateButton)
 			calculateButtonPanel.add(calcButton);
+		
+		calculateButtonPanel.add(exportBtn);
 		calculateButtonPanel.setPreferredSize(new Dimension(220,40));
 		
 		JPanel transparencySliderPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -521,6 +557,9 @@ public class EvacuationAnalysis implements ActionListener{
 				this.openBtn.setEnabled(false);
 				this.saveButton.setEnabled(true);
 				this.calcButton.setEnabled(true);
+				this.exportBtn.setEnabled(true);
+				
+				this.ctInverse = new GeotoolsTransformation(this.getScenario().getConfig().global().getCoordinateSystem(),"EPSG:4326");
 				
 				this.firstLoad = false;
 				
@@ -533,6 +572,33 @@ public class EvacuationAnalysis implements ActionListener{
 		if (e.getActionCommand() == "calculate")
 		{
 			runCalculation();
+		}
+		
+		if (e.getActionCommand() == "export")
+		{
+			if (eventHandler!=null)
+			{
+				
+				Rect boundingBox = eventHandler.getData().getBoundingBox();
+				
+				Coord minValues = this.ctInverse.transform(new CoordImpl(boundingBox.minX, boundingBox.minY));
+				Coord maxValues = this.ctInverse.transform(new CoordImpl(boundingBox.maxX, boundingBox.maxY));
+				
+				double westmost = minValues.getX(); 
+				double soutmost = minValues.getY();
+				double eastmost = maxValues.getX();
+				double northmost = maxValues.getY();
+	
+				Envelope2D env = new Envelope2D(DefaultGeographicCRS.WGS84, westmost, soutmost, eastmost - westmost, northmost - soutmost);
+				
+				try{
+					TiffExporter.writeGEOTiff(env, "C:/temp/testexport2.tiff", (BufferedImage)jMapViewer.createImage(800, 800));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			
+			
 		}
 
 		if ((e.getActionCommand() == "changeIteration") && (!firstLoad)) 
@@ -615,6 +681,7 @@ public class EvacuationAnalysis implements ActionListener{
 
 	private void readEvents() {
 		
+		frame.getGlassPane().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 		
 		//run event reader
 		runEventReader(currentEventFile);
@@ -638,6 +705,10 @@ public class EvacuationAnalysis implements ActionListener{
 			graphPanel.updateData(data);
 			keyPanel.updateData(data);
 		}
+
+		frame.getGlassPane().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		
+		
 	}
 	
 	private ArrayList<File> getAvailableEventFiles(String dirString)
@@ -747,11 +818,6 @@ public class EvacuationAnalysis implements ActionListener{
 	public void setSaveButtonEnabled(boolean enabled)
 	{
 		this.saveButton.setEnabled(enabled);
-	}
-	
-	public synchronized Link getRoadClosure(Id linkId)
-	{
-		return this.sc.getNetwork().getLinks().get(linkId);
 	}
 
 	class TypeHour implements KeyListener 
@@ -939,10 +1005,13 @@ public class EvacuationAnalysis implements ActionListener{
 	
 	public void readShapeFile(String shapeFileString)
 	{
+			ShapeFileReader shapeFileReader = new ShapeFileReader();
+			shapeFileReader.readFileAndInitialize(shapeFileString);
+	
 			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
-			for (SimpleFeature ft : ShapeFileReader.getAllFeatures(shapeFileString))
+			for (SimpleFeature ft : shapeFileReader.getFeatureSet())
 			{
-				Geometry geo = (Geometry) ft.getDefaultGeometry();
+				Geometry geo = (Geometry)ft.getDefaultGeometry();
 				//System.out.println(ft.getFeatureType());
 				geometries.add(geo);
 			}
