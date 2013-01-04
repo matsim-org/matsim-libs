@@ -85,12 +85,7 @@ public class GroupPlanStrategyFactory {
 		strategy.addStrategyModule(
 				new JointPlanMergingModule(
 					config.global().getNumberOfThreads(),
-					// XXX: merge everything: is it the best idea?
-					// on the one hand, it assures we actually have
-					// potential drivers and passengers in the same group.
-					// On the other hand, only one joint trip will be created
-					// or deleted in the whole group, while with partial sub-groups,
-					// each one will be handled separately...
+					// merge everything
 					1.0 ) );
 
 		strategy.addStrategyModule(
@@ -101,7 +96,8 @@ public class GroupPlanStrategyFactory {
 							return new JointTripInsertorAndRemoverAlgorithm(
 								config,
 								registry.getTripRouterFactory().createTripRouter(),
-								MatsimRandom.getLocalInstance());
+								MatsimRandom.getLocalInstance(),
+								true); // "iterative"
 						}
 					}));
 
