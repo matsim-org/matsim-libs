@@ -75,6 +75,7 @@ public class JointTripInsertorAndRemoverAlgorithm implements PlanAlgorithm {
 			// trips by the router!
 			boolean first = true;
 			boolean isPassenger = false;
+			boolean isDriver = false;
 			for (PlanElement pe : struct) {
 				if (first) {
 					first = false;
@@ -87,12 +88,18 @@ public class JointTripInsertorAndRemoverAlgorithm implements PlanAlgorithm {
 						countPassengers++;
 						isPassenger = false;
 					}
+					else if (isDriver) {
+						isDriver = false;
+					}
 					else {
 						countEgoists++;
 					}
 				}
 				else if ( ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
 					isPassenger = true;
+				}
+				else if ( ((Leg) pe).getMode().equals( JointActingTypes.DRIVER ) ) {
+					isDriver = true;
 				}
 			}
 		}
