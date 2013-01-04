@@ -80,14 +80,14 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		assertEquals("Wrong number of links in compared map.", 9, mgc.getCompareMap().size());
 
 		/* Check that links 2, 6 & 10 have the right AVG totals in base file. */
-		assertEquals("Wrong number of vehicles for link 2 in base file.", 13.6, mgc.getBaseMap().get(new IdImpl(2)).doubleValue(), 1.e-8);
-		assertEquals("Wrong number of vehicles for link 6 in base file.", 10.2, mgc.getBaseMap().get(new IdImpl(6)), 1.e-8);
-		assertEquals("Wrong number of vehicles for link 10 in base file.", 11.0, mgc.getBaseMap().get(new IdImpl(10)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 2 in base file.", 13.0, mgc.getBaseMap().get(new IdImpl(2)).doubleValue(), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 6 in base file.", 11.0, mgc.getBaseMap().get(new IdImpl(6)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 10 in base file.", 12.0, mgc.getBaseMap().get(new IdImpl(10)), 1.e-8);
 
 		/* Check that links 2, 6 & 10 have the right AVG totals in comparison file. */
-		assertEquals("Wrong number of vehicles for link 2 in compare file.", 11.0, mgc.getCompareMap().get(new IdImpl(2)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 2 in compare file.", 12.0, mgc.getCompareMap().get(new IdImpl(2)), 1.e-8);
 		assertEquals("Wrong number of vehicles for link 6 in compare file.", 11.0, mgc.getCompareMap().get(new IdImpl(6)), 1.e-8);
-		assertEquals("Wrong number of vehicles for link 10 in compare file.", 15.4, mgc.getCompareMap().get(new IdImpl(10)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 10 in compare file.", 15.0, mgc.getCompareMap().get(new IdImpl(10)), 1.e-8);
 
 	}
 	
@@ -126,23 +126,23 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		}
 		
 		assertTrue("Could not find link 2.", map.containsKey(new IdImpl(2)));
-		assertEquals("Wrong values for link 2.", "2,13.6,11.0,-0.1912", map.get(new IdImpl(2)));
+		assertEquals("Wrong values for link 2.", "2,13.0,12.0,-0.0769", map.get(new IdImpl(2)));
 		assertTrue("Could not find link 3.", map.containsKey(new IdImpl(3)));
-		assertEquals("Wrong values for link 3.", "3,9.6,12.6,0.3125", map.get(new IdImpl(3)));
+		assertEquals("Wrong values for link 3.", "3,9.0,19.0,1.1111", map.get(new IdImpl(3)));
 		assertTrue("Could not find link 4.", map.containsKey(new IdImpl(4)));
-		assertEquals("Wrong values for link 4.", "4,8.8,12.0,0.3636", map.get(new IdImpl(4)));
+		assertEquals("Wrong values for link 4.", "4,7.0,11.0,0.5714", map.get(new IdImpl(4)));
 		assertTrue("Could not find link 5.", map.containsKey(new IdImpl(5)));
-		assertEquals("Wrong values for link 5.", "5,12.6,11.4,-0.0952", map.get(new IdImpl(5)));
+		assertEquals("Wrong values for link 5.", "5,15.0,11.0,-0.2667", map.get(new IdImpl(5)));
 		assertTrue("Could not find link 6.", map.containsKey(new IdImpl(6)));
-		assertEquals("Wrong values for link 6.", "6,10.2,11.0,0.0784", map.get(new IdImpl(6)));
+		assertEquals("Wrong values for link 6.", "6,11.0,11.0,0.0000", map.get(new IdImpl(6)));
 		assertTrue("Could not find link 7.", map.containsKey(new IdImpl(7)));
-		assertEquals("Wrong values for link 7.", "7,10.2,11.2,0.0980", map.get(new IdImpl(7)));
+		assertEquals("Wrong values for link 7.", "7,9.0,12.0,0.3333", map.get(new IdImpl(7)));
 		assertTrue("Could not find link 8.", map.containsKey(new IdImpl(8)));
-		assertEquals("Wrong values for link 8.", "8,10.4,14.0,0.3462", map.get(new IdImpl(8)));
+		assertEquals("Wrong values for link 8.", "8,7.0,13.0,0.8571", map.get(new IdImpl(8)));
 		assertTrue("Could not find link 9.", map.containsKey(new IdImpl(9)));
-		assertEquals("Wrong values for link 9.", "9,13.6,11.4,-0.1618", map.get(new IdImpl(9)));
+		assertEquals("Wrong values for link 9.", "9,17.0,6.0,-0.6471", map.get(new IdImpl(9)));
 		assertTrue("Could not find link 10.", map.containsKey(new IdImpl(10)));
-		assertEquals("Wrong values for link 10.", "10,11.0,15.4,0.4000", map.get(new IdImpl(10)));
+		assertEquals("Wrong values for link 10.", "10,12.0,15.0,0.2500", map.get(new IdImpl(10)));
 	}
 	
 	
@@ -172,49 +172,49 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 					int id = r.getNumberValue("linkId").intValue();
 					switch (id) {
 					case 2:
-						assertEquals("Wrong base count for link " + id, 14, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, -0.1912, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 13, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 12, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, -0.0769, r.getNumberValue("change").doubleValue());
 						break;
 					case 3:
-						assertEquals("Wrong base count for link " + id, 10, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 13, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.3125, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 9, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 19, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 1.1111, r.getNumberValue("change").doubleValue());
 						break;
 					case 4:
-						assertEquals("Wrong base count for link " + id, 9, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 12, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.3636, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 7, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 0.5714, r.getNumberValue("change").doubleValue());
 						break;
 					case 5:
-						assertEquals("Wrong base count for link " + id, 13, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong base count for link " + id, 15, r.getNumberValue("baseCount").intValue());
 						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, -0.0952, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong change value for link " + id, -0.2667, r.getNumberValue("change").doubleValue());
 						break;
 					case 6:
-						assertEquals("Wrong base count for link " + id, 10, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong base count for link " + id, 11, r.getNumberValue("baseCount").intValue());
 						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.0784, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong change value for link " + id, 0.0000, r.getNumberValue("change").doubleValue());
 						break;
 					case 7:
-						assertEquals("Wrong base count for link " + id, 10, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.0980, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 9, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 12, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 0.3333, r.getNumberValue("change").doubleValue());
 						break;
 					case 8:
-						assertEquals("Wrong base count for link " + id, 10, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 14, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.3462, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 7, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 13, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, 0.8571, r.getNumberValue("change").doubleValue());
 						break;
 					case 9:
-						assertEquals("Wrong base count for link " + id, 14, r.getNumberValue("baseCount").intValue());
-						assertEquals("Wrong compare count for link " + id, 11, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, -0.1618, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong base count for link " + id, 17, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong compare count for link " + id, 6, r.getNumberValue("compCount").intValue());
+						assertEquals("Wrong change value for link " + id, -0.6471, r.getNumberValue("change").doubleValue());
 						break;
 					case 10:
-						assertEquals("Wrong base count for link " + id, 11, r.getNumberValue("baseCount").intValue());
+						assertEquals("Wrong base count for link " + id, 12, r.getNumberValue("baseCount").intValue());
 						assertEquals("Wrong compare count for link " + id, 15, r.getNumberValue("compCount").intValue());
-						assertEquals("Wrong change value for link " + id, 0.4000, r.getNumberValue("change").doubleValue());
+						assertEquals("Wrong change value for link " + id, 0.2500, r.getNumberValue("change").doubleValue());
 						break;						
 					default:
 						break;
@@ -236,7 +236,7 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 	private void createLinkstatsFiles(){
 		Config config = loadConfig(getClassInputDirectory() + "config.xml");
 		config.network().setInputFile(getClassInputDirectory() + "networkSmall.xml.gz");
-		config.plans().setInputFile(getClassInputDirectory() + "plans100.xml.gz");
+		config.plans().setInputFile(getClassInputDirectory() + "50.plans100.xml.gz");
 		config.controler().setOutputDirectory(getOutputDirectory() + "Output1/");
 		
 		config.controler().setWriteEventsInterval(0);
@@ -247,7 +247,7 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		c.setDumpDataAtEnd(false);
 		c.run();
 		
-		config.plans().setInputFile(getClassInputDirectory() + "plans110.xml.gz");
+		config.plans().setInputFile(getClassInputDirectory() + "50.plans110.xml.gz");
 		config.controler().setOutputDirectory(getOutputDirectory() + "Output2/");
 		
 		c = new Controler(config);
