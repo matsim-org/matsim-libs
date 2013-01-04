@@ -200,7 +200,7 @@ public class JointControlerUtils {
 				new JointTripInsertorConfigGroup());
 
 		//read the config file
-		ConfigUtils.loadConfig(config, configFile);
+		if (configFile != null) ConfigUtils.loadConfig(config, configFile);
 	}
 
 	/**
