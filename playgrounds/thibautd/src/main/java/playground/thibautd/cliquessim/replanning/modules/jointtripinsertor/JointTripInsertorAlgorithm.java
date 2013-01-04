@@ -21,6 +21,8 @@ package playground.thibautd.cliquessim.replanning.modules.jointtripinsertor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -69,20 +71,28 @@ public class JointTripInsertorAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		JointPlan jointPlan = (JointPlan) plan;
-		ClassifiedTrips trips = extractClassifiedTrips( jointPlan );
-		List<Match> matches = extractMatches( trips );
-		if (matches.size() == 0) return;
-		Match match = chooseMatch( matches );
-		insertMatch( jointPlan , match );
+		run( (JointPlan) plan , Collections.EMPTY_LIST );
 	}
 
+	public ActedUponInformation run(
+			final JointPlan jointPlan,
+			final Collection<Id> agentsToIgnore) {
+		ClassifiedTrips trips = extractClassifiedTrips( jointPlan , agentsToIgnore );
+		List<Match> matches = extractMatches( trips );
+		if (matches.size() == 0) return null;
+		Match match = chooseMatch( matches );
+		insertMatch( jointPlan , match );
+		return match.toInformation();
+	}
 
-	private ClassifiedTrips extractClassifiedTrips(final JointPlan jointPlan) {
+	private ClassifiedTrips extractClassifiedTrips(
+			final JointPlan jointPlan,
+			final Collection<Id> agentsToIgnore) {
 		ClassifiedTrips trips = new ClassifiedTrips();
 
 		for (Map.Entry<Id, Plan> entry : jointPlan.getIndividualPlans().entrySet()) {
 			Id id = entry.getKey();
+			if ( agentsToIgnore.contains( id ) ) continue;
 			Plan plan = entry.getValue();
 
 			Iterator<PlanElement> structure = router.tripsToLegs( plan ).iterator();
@@ -194,7 +204,7 @@ public class JointTripInsertorAlgorithm implements PlanAlgorithm {
 		throw new RuntimeException( "choice procedure failed! this should not happen! choice="+choice+" in thresholds="+Arrays.toString(thresholds) );
 	}
 
-	private void insertMatch(
+	private static void insertMatch(
 			final JointPlan jointPlan,
 			final Match match) {
 		Plan driverPlan = jointPlan.getIndividualPlans().get( match.tripDriver.agentId );
@@ -296,6 +306,12 @@ public class JointTripInsertorAlgorithm implements PlanAlgorithm {
 			this.tripDriver = tripDriver;
 			this.tripPassenger = tripPassenger;
 			this.cost = cost;
+		}
+
+		public ActedUponInformation toInformation() {
+			return new ActedUponInformation(
+					tripDriver.agentId,
+					tripPassenger.agentId);
 		}
 	}
 }

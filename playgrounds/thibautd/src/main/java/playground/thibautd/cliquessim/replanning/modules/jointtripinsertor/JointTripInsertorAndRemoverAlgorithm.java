@@ -19,9 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.replanning.modules.jointtripinsertor;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,14 +43,27 @@ import playground.thibautd.socnetsim.population.JointPlan;
  * @author thibautd
  */
 public class JointTripInsertorAndRemoverAlgorithm implements PlanAlgorithm {
+	private static final Logger log =
+		Logger.getLogger(JointTripInsertorAndRemoverAlgorithm.class);
+
 	private final TripRouter tripRouter;
 	private final Random random;
-	private final PlanAlgorithm insertor, remover;
+	private final JointTripInsertorAlgorithm insertor;
+	private final JointTripRemoverAlgorithm remover;
+	private final boolean iterative;
+
 
 	public JointTripInsertorAndRemoverAlgorithm(
 			final Config config,
 			final TripRouter tripRouter,
 			final Random random) {
+		this( config , tripRouter , random , false );
+	}
+	public JointTripInsertorAndRemoverAlgorithm(
+			final Config config,
+			final TripRouter tripRouter,
+			final Random random,
+			final boolean iterative) {
 		this.tripRouter = tripRouter;
 		this.random = random;
 		this.insertor = new JointTripInsertorAlgorithm(
@@ -53,22 +71,38 @@ public class JointTripInsertorAndRemoverAlgorithm implements PlanAlgorithm {
 				(JointTripInsertorConfigGroup) config.getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
 				tripRouter);
 		this.remover = new JointTripRemoverAlgorithm( random );
+		this.iterative = iterative;
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		if ( random.nextDouble() < getProbRemoval( plan )) {
-			remover.run( plan );
-		}
-		else {
-			insertor.run( plan );
-		}
+		if (log.isTraceEnabled()) log.trace( "handling plan "+plan );
+		final List<Id> agentsToIgnore = new ArrayList<Id>();
+		ActedUponInformation actedUpon = null;
+
+		do {
+			if ( random.nextDouble() < getProbRemoval( plan , agentsToIgnore )) {
+				actedUpon = remover.run( (JointPlan) plan , agentsToIgnore );
+				if (log.isTraceEnabled()) log.trace( "removal: "+actedUpon );
+			}
+			else {
+				actedUpon = insertor.run( (JointPlan) plan , agentsToIgnore );
+				if (log.isTraceEnabled()) log.trace( "insertion: "+actedUpon );
+			}
+
+			if (actedUpon == null) return;
+			agentsToIgnore.add( actedUpon.getDriverId() );
+			agentsToIgnore.add( actedUpon.getPassengerId() );
+		} while ( iterative );
 	}
 
-	private double getProbRemoval(final Plan plan) {
+	private double getProbRemoval(
+			final Plan plan,
+			final Collection<Id> agentsToIgnore) {
 		int countPassengers = 0;
 		int countEgoists = 0;
 		for (Plan indivPlan : ((JointPlan) plan).getIndividualPlans().values()) {
+			if ( agentsToIgnore.contains( indivPlan.getPerson().getId() ) ) continue;
 			List<PlanElement> struct = tripRouter.tripsToLegs( indivPlan );
 			// parse trips, and count "egoists" (non-driver non-passenger) and
 			// passengers. Some care is needed: joint trips are not identified as

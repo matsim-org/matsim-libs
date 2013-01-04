@@ -20,6 +20,7 @@
 package playground.thibautd.cliquessim.replanning.modules.jointtripinsertor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -66,19 +67,22 @@ public class JointTripRemoverAlgorithm implements PlanAlgorithm {
 		else throw new IllegalArgumentException( getClass().getSimpleName()+" can only operate on joint plans!" );
 	}
 
-	private void run( final JointPlan plan ) {
+	public ActedUponInformation run( final JointPlan plan , final Collection<Id> agentsToIgnore ) {
 		JointTravelStructure structure = analyseJointTravel( plan );
 
 		if (structure.getJointTrips().size() == 0) {
 			log.warn( getClass().getSimpleName()+" was called on a plan with no joint trips."
 					+" Make sure it is what you want!" );
-			return;
+			return null;
 		}
 
 		JointTrip toRemove = structure.getJointTrips().get( random.nextInt( structure.getJointTrips().size() ) );
 
 		removePassengerTrip( toRemove , plan );
 		removeDriverTrip( toRemove , plan );
+		return new ActedUponInformation(
+				toRemove.getDriverId(),
+				toRemove.getPassengerId() );
 	}
 
 	// package protected for tests
