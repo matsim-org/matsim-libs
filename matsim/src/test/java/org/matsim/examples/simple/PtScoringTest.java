@@ -296,6 +296,73 @@ public class PtScoringTest {
 
 		}
 		@Test
+		public void test_PtScoring_Wait() {
+			Config config = this.utils.loadConfig("test/scenarios/pt-simple/config.xml");
+			
+			config.planCalcScore().setWriteExperiencedPlans(true);
+			
+			Controler controler = new Controler(config);
+			controler.setOverwriteFiles(true);
+			controler.setCreateGraphs(false);
+
+			controler.run();
+			
+			String inEventsFileName = this.utils.getInputDirectory() + "0.events.xml" ;
+			String outEventsFileName = controler.getControlerIO().getOutputPath() + "/ITERS/it.0/0.events.xml.gz" ;
+			Assert.assertEquals("different event files after iteration 0 ",
+					CRCChecksum.getCRCFromFile( inEventsFileName ) ,
+					CRCChecksum.getCRCFromFile( outEventsFileName ) ) ;
+			
+			
+			PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
+			double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
+			double priority = 1. ;
+			
+			double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration_s);
+			
+			double timeTransitWalk = 18089.-18060. ;
+			// (the pt interaction act takes 1sec)
+			double timeTransitWait = 18302.-18090. ;
+			double timeTransitInVeh = 18423. - 18302. ;
+			// (the pt interaction act takes 1sec)
+			double timeTransitWalk2 = 18447. - 18424. ;
+			double timeHome = 18060. + 24.*3600 - 18447 ;
+			
+			double score = pcs.getTravelingWalk_utils_hr() * (timeTransitWalk/3600.) ;
+			System.out.println("score: " + score ) ;
+
+			// (pt interaction activity) 
+			System.out.println("score: " + score ) ;
+			
+			score += pcs.getMarginalUtlOfWaitingPt_utils_hr() * timeTransitWait/3600. ;
+//			score += pcs.getTravelingPt_utils_hr() * timeTransitWait/3600. ;
+			// yyyy wait is not separately scored!!
+			System.out.println("score: " + score ) ;
+			
+			score += pcs.getTravelingPt_utils_hr() * timeTransitInVeh/3600. ;
+			System.out.println("score: " + score ) ;
+			
+			// (pt interaction activity) 
+			System.out.println("score: " + score ) ;
+
+			score += pcs.getTravelingWalk_utils_hr() * timeTransitWalk2/3600. ;
+			System.out.println("score: " + score ) ;
+
+			score += (pcs.getPerforming_utils_hr()/3600.) * typicalDuration_s * Math.log(timeHome/zeroUtilityDurationHome_s) ;
+			System.out.println("score: " + score ) ;
+			
+			Scenario sc = controler.getScenario();
+			Population pop = sc.getPopulation() ;
+			for ( Person pp : pop.getPersons().values() ) {
+				// (there is only one person, but we need to get it)
+				
+				System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
+				Assert.assertEquals(89.85649384696622, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+			}
+
+		}
+		
+		@Test
 		public void test_PtScoring() {
 			Config config = this.utils.loadConfig("test/scenarios/pt-simple/config.xml");
 			
