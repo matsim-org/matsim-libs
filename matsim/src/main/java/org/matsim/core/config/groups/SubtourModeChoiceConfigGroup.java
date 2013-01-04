@@ -37,9 +37,12 @@ public class SubtourModeChoiceConfigGroup extends Module {
 	
 	public final static String MODES = "modes";
 	public final static String CHAINBASEDMODES = "chainBasedModes";
+	public final static String CARAVAIL = "considerCarAvailability";
 	
 	private String[] chainBasedModes = new String[] { TransportMode.car, TransportMode.bike };
 	private String[] allModes = new String[] { TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk };
+	// default is false for backward compatibility
+	private boolean considerCarAvailability = false;
 
 	public SubtourModeChoiceConfigGroup() {
 		super(GROUP_NAME);
@@ -52,6 +55,9 @@ public class SubtourModeChoiceConfigGroup extends Module {
 		}
 		else if ( CHAINBASEDMODES.equals( key ) ) {
 			return toString( chainBasedModes );
+		}
+		else if ( CARAVAIL.equals( key ) ) {
+			return ""+considerCarAvailability;
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -88,16 +94,21 @@ public class SubtourModeChoiceConfigGroup extends Module {
 		else if ( CHAINBASEDMODES.equals( key ) ) {
 			setChainBasedModes( toArray( value ) );
 		}
+		else if ( CARAVAIL.equals( key ) ) {
+			setConsiderCarAvailability( Boolean.valueOf( value ) );
+		}
 		else {
 			throw new IllegalArgumentException( key );
 		}
 	}
+
 
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(MODES, "Defines all the modes available, including chain-based modes, seperated by commas" );
 		comments.put(CHAINBASEDMODES, "Defines the chain-based modes, seperated by commas" );
+		comments.put(CARAVAIL, "Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car" );
 		return comments;
 	}
 
@@ -125,5 +136,13 @@ public class SubtourModeChoiceConfigGroup extends Module {
 
 	public String[] getChainBasedModes() {
 		return this.chainBasedModes;
+	}
+
+	private void setConsiderCarAvailability(final boolean value) {
+		this.considerCarAvailability = value;
+	}
+
+	public boolean considerCarAvailability() {
+		return considerCarAvailability;
 	}
 }

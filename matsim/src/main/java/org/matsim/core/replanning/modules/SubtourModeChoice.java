@@ -20,15 +20,12 @@
 
 package org.matsim.core.replanning.modules;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
+import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -50,38 +47,30 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * 
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
-	private static class AllowTheseModesForEveryone implements PermissibleModesCalculator {
-
-		private List<String> availableModes;
-
-		public AllowTheseModesForEveryone(String[] availableModes) {
-			this.availableModes = Arrays.asList(availableModes);
-		}
-
-		@Override
-		public Collection<String> getPermissibleModes(Plan plan) {
-			return availableModes; 
-		}
-
-	}
-	
 	private PermissibleModesCalculator permissibleModesCalculator;
 	
-	private String[] chainBasedModes;
-	
-	private String[] modes;
+	private final String[] chainBasedModes;
+	private final String[] modes;
 	
 	public SubtourModeChoice(final Config config) {
 		this( config.global().getNumberOfThreads(),
 				config.subtourModeChoice().getModes(),
-				config.subtourModeChoice().getChainBasedModes() );
+				config.subtourModeChoice().getChainBasedModes(),
+				config.subtourModeChoice().considerCarAvailability());
 	}
 
-	public SubtourModeChoice(final int numberOfThreads, final String[] modes, final String[] chainBasedModes) {
+	public SubtourModeChoice(
+			final int numberOfThreads,
+			final String[] modes,
+			final String[] chainBasedModes,
+			final boolean considerCarAvailability) {
 		super(numberOfThreads);
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
-		this.permissibleModesCalculator = new AllowTheseModesForEveryone(this.modes);
+		this.permissibleModesCalculator =
+			new PermissibleModesCalculatorImpl(
+					this.modes,
+					considerCarAvailability);
 	}
 	
 	protected String[] getModes() {

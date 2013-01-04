@@ -82,7 +82,7 @@ public class SubtourModeChoiceConfigGroupTest {
 		final String msgString = "Wrong string representation";
 
 		group.addParam( 
-		SubtourModeChoiceConfigGroup.CHAINBASEDMODES,
+			SubtourModeChoiceConfigGroup.CHAINBASEDMODES,
 			"foot,car,balloon" );
 		assertArrayEquals(
 				msg,
@@ -119,6 +119,25 @@ public class SubtourModeChoiceConfigGroupTest {
 				"skateboard,unicycle",
 				group.getValue(
 					SubtourModeChoiceConfigGroup.CHAINBASEDMODES));
+	}
+
+	@Test
+	public void testCarAvail() throws Exception {
+		SubtourModeChoiceConfigGroup group = new SubtourModeChoiceConfigGroup();
+
+		assertFalse(
+				"default value is not backward compatible",
+				group.considerCarAvailability() );
+
+		group.addParam( 
+			SubtourModeChoiceConfigGroup.CARAVAIL,
+			"true" );	
+		assertTrue( "the value was not set to true" , group.considerCarAvailability() );
+
+		group.addParam( 
+			SubtourModeChoiceConfigGroup.CARAVAIL,
+			"false" );	
+		assertFalse( "the value was not set to false" , group.considerCarAvailability() );
 	}
 }
 
