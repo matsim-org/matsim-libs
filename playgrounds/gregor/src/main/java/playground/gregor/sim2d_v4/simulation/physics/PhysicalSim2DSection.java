@@ -30,15 +30,18 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class PhysicalSim2DSection {
-
+	
 	private final Section sec;
 
 	Segment [] obstacles;
@@ -53,11 +56,11 @@ public class PhysicalSim2DSection {
 	private final double offsetX;
 	
 	private final List<Sim2DAgent> inBuffer = new LinkedList<Sim2DAgent>();
-	private final List<Sim2DAgent> agents = new LinkedList<Sim2DAgent>();
+	protected final List<Sim2DAgent> agents = new LinkedList<Sim2DAgent>();
 
-	private final float timeStepSize;
+	protected final float timeStepSize;
 
-	private final PhysicalSim2DEnvironment penv;
+	protected final PhysicalSim2DEnvironment penv;
 
 	public PhysicalSim2DSection(Section sec, Sim2DScenario sim2dsc, double offsetX, double offsetY, PhysicalSim2DEnvironment penv) {
 		this.sec = sec;
@@ -89,6 +92,8 @@ public class PhysicalSim2DSection {
 		}
 	}
 	
+	
+	
 	public void moveAgents() {
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
@@ -102,15 +107,31 @@ public class PhysicalSim2DSection {
 			float newXPosX = oldPos[0] + dx;
 			float newXPosY = oldPos[1] + dy;
 			float lefOfFinishLine = CGAL.isLeftOfLine(newXPosX, newXPosY, li.finishLine.x0, li.finishLine.y0, li.finishLine.x1, li.finishLine.y1);
-			if (lefOfFinishLine <= 0) { //agent has reached the end of link
+			if (lefOfFinishLine >= 0) { //agent has reached the end of link
 				Id nextLinkId = agent.chooseNextLinkId();
 				if (nextLinkId == null) {
 					throw new RuntimeException("agent with id:" + agent.getId() + " has reached the end of her current leg, which is not (yet) supported in the Sim2D.");
 				}
 				if (this.linkInfos.get(nextLinkId) == null) { //agent leaves current section
-					it.remove(); //removing the agent from the agents list
 					PhysicalSim2DSection nextSection = this.penv.getPhysicalSim2DSectionAssociatedWithLinkId(nextLinkId);
-					nextSection.addAgentToInBuffer(agent);
+					if (nextSection == null) { //agent intends to leave sim2d
+						Sim2DQTransitionLink loResLink = this.penv.getLowResLink(nextLinkId);
+						if (loResLink.hasSpace()) {
+							it.remove();
+							QVehicle veh = agent.getQVehicle();
+							veh.setCurrentLink(loResLink.getLink());
+							loResLink.addFromIntersection(veh);
+							agent.notifyMoveOverNode(nextLinkId);
+						} else {
+							dx = 0;
+							dy = 0;
+						}
+					} else {
+						it.remove(); //removing the agent from the agents list
+						nextSection.addAgentToInBuffer(agent);
+						agent.notifyMoveOverNode(nextLinkId);
+					}
+				} else {
 					agent.notifyMoveOverNode(nextLinkId);
 				}
 			}
@@ -188,9 +209,9 @@ public class PhysicalSim2DSection {
 				finishLine.x0 = seg.x1;
 				finishLine.y0 = seg.y1;
 				
-				//all polygons are counter clockwise oriented so we rotate to the left here 
-				finishLine.x1 = finishLine.x0 - li.dy;
-				finishLine.y1 = finishLine.y0 + li.dx;
+				//all polygons are clockwise oriented so we rotate to the right here 
+				finishLine.x1 = finishLine.x0 + li.dy;
+				finishLine.y1 = finishLine.y0 - li.dx;
 				li.finishLine = finishLine;
 			}
 		}
@@ -205,7 +226,6 @@ public class PhysicalSim2DSection {
 	/*package*/ void putLinInfo(Id id, LinkInfo li) {
 		this.linkInfos.put(id, li);
 	}
-
 
 	private Segment getTouchingSegment(float x0, float y0, float x1, float y1, Segment[] openings) {
 
@@ -245,5 +265,32 @@ public class PhysicalSim2DSection {
 
 	public Id getId() {
 		return this.sec.getId();
+	}
+
+	public void debug(VisDebugger visDebugger) {
+		for (Segment seg : this.obstacles) {
+			visDebugger.addLine(seg.x0, seg.y0, seg.x1, seg.y1, 0, 0, 0, 128);
+		}
+		for (Segment seg : this.openings) {
+			visDebugger.addLine(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128);
+		}
+		
+		if (this.agents.size() > 0) {
+			Coordinate[] coords = this.sec.getPolygon().getExteriorRing().getCoordinates();
+			float [] x = new float[coords.length];
+			float [] y = new float[coords.length];
+			for (int i = 0; i < coords.length; i++) {
+				Coordinate c = coords[i];
+				x[i] = (float) (c.x - this.offsetX);
+				y[i] = (float) (c.y - this.offsetY);
+			}
+			visDebugger.addPolygon(x, y,32, 255, 64, 128);
+		}
+		
+		for (Sim2DAgent agent : this.agents) {
+			visDebugger.addCircle(agent.getPos()[0], agent.getPos()[1], .5f, 192, 0, 64, 128);
+		}
+		
+		
 	}
 }

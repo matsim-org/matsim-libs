@@ -32,6 +32,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
+import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
@@ -57,6 +58,8 @@ public class Sim2DEngine implements MobsimEngine {
 
 	private final List<QSim2DTransitionLink> hiResLinks = new ArrayList<QSim2DTransitionLink>();
 
+	private final Map<Id,Sim2DQTransitionLink> lowResLinks = new HashMap<Id,Sim2DQTransitionLink>();
+
 	public Sim2DEngine(QSim sim) {
 		this.scenario = sim.getScenario();
 
@@ -80,7 +83,7 @@ public class Sim2DEngine implements MobsimEngine {
 		double sim2DTime = time;
 		while (sim2DTime < time + this.qSimStepSize) {
 			for (PhysicalSim2DEnvironment  env : this.penvs.values()) { //element order undefined when iterating over a HashSet. will certainly cause problems with checksum tests
-				env.doSimStep(time);
+				env.doSimStep(sim2DTime);
 			}
 			sim2DTime += this.sim2DStepSize;
 		}
@@ -96,7 +99,9 @@ public class Sim2DEngine implements MobsimEngine {
 			Id id = this.sim2dsc.getSim2DEnvironment(hiResLink.getLink()).getId();
 			PhysicalSim2DEnvironment penv = this.penvs.get(id);
 			penv.createAndAddPhysicalTransitionSections(hiResLink);
-//			penvCreateAndAddTransition
+		}
+		for (PhysicalSim2DEnvironment penv : this.penvs.values()) {
+			penv.registerLowResLinks(this.lowResLinks);
 		}
 
 	}
@@ -113,8 +118,13 @@ public class Sim2DEngine implements MobsimEngine {
 	}
 
 	public void registerHiResLink(QSim2DTransitionLink hiResLink) {
-		this.hiResLinks .add(hiResLink);
+		this.hiResLinks.add(hiResLink);
 		
+	}
+
+
+	public void registerLowResLink(Sim2DQTransitionLink lowResLink) {
+		this.lowResLinks.put(lowResLink.getLink().getId(),lowResLink);
 	}
 
 

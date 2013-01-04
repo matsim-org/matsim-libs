@@ -170,10 +170,11 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 		Set<String> walk = new HashSet<String>();
 		walk.add("walk");
+		walk.add("car");
 		Set<String> walkWalk2d = new HashSet<String>();
 		walkWalk2d.add("walk");
 		walkWalk2d.add("walk2d");
-		
+		walkWalk2d.add("car");
 		for (OSMWay way : osm.getWays()) {
 			String v = way.getTags().get(K_M_TYPE);
 			if (v != null) { //sim2d 
@@ -433,7 +434,8 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 		c.network().setInputFile(inputDir + "/network.xml.gz");
 		
-		c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
+//		c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
+		c.strategy().addParam("Module_1", "ReRoute");
 		c.strategy().addParam("ModuleProbability_1", "1");
 		
 		c.controler().setOutputDirectory(outputDir);

@@ -25,10 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanAlgorithm;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -55,12 +52,7 @@ public class Sim2DRunner {
 		
 		Controler controller = new Controler(sc);
 		
-		//since we want to use _our_ router for initial routes we prepare persons for sim before we run the controller 
- 		PlanAlgorithm planAlgo = new Sim2DReRoutePlanAlgorithm(controller);
-		PersonPrepareForSim prep = new PersonPrepareForSim(planAlgo, sc);
-		prep.run(sc.getPopulation());
 		
-		//TODO This won't work! implement v4
 		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
 		controller.addMobsimFactory("hybridQ2D", factory);
 		
