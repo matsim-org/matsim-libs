@@ -35,7 +35,7 @@ public class MyFileFilter implements FilenameFilter {
 	 * Constructs an instance of the <code>FilenameFilter</code> interface.
 	 * @param extension the file extension of the created files. <b><i>Note:</i></b> the 
 	 * 		extension must include the '.' (full stop) character. For example, the 
-	 * 		extansion should be specified as <code>".txt"</code> and not just 
+	 * 		extension should be specified as <code>".txt"</code> and not just 
 	 * 		<code>"txt"</code>.
 	 */
 	public MyFileFilter(String extension) {

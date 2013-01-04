@@ -38,27 +38,35 @@ public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 	private Logger log = Logger.getLogger(MyPatronLinkEntryHandler.class);
 	private List<Id> breaks;
 	private List<Id> linkIds;
-	private List<Map<Id,Double>> maps;
+	private List<Map<Id,Double>> valueMaps;
+	private List<Map<Id,Integer>> countMaps;
 	private RoadPricingScheme scheme;
 
 	public MyTollPotentialEventHandler(List<Id> linkIds, List<Id> breaks, RoadPricingScheme scheme) {
 		this.linkIds = linkIds;
 		this.breaks = breaks;
-		maps = new ArrayList<Map<Id,Double>>(breaks.size());
+		valueMaps = new ArrayList<Map<Id,Double>>(breaks.size());
+		countMaps = new ArrayList<Map<Id,Integer>>(breaks.size());
 		for(int i = 0; i < breaks.size(); i++){
-			maps.add(new HashMap<Id, Double>());
+			valueMaps.add(new HashMap<Id, Double>());
+			countMaps.add(new HashMap<Id, Integer>());
 		}
 		this.scheme = scheme;
 	}
 	
-	public List<Map<Id, Double>> getMaps(){
-		return maps;
+	public List<Map<Id, Double>> getValueMaps(){
+		return valueMaps;
+	}
+	
+	public List<Map<Id,Integer>> getCountMaps(){
+		return countMaps;
 	}
 	
 	
 	@Override
 	public void reset(int iteration) {
-		maps = new ArrayList<Map<Id,Double>>(this.breaks.size());
+		valueMaps = new ArrayList<Map<Id,Double>>(this.breaks.size());
+		countMaps = new ArrayList<Map<Id,Integer>>(this.breaks.size());
 	}
 
 	@Override
@@ -81,10 +89,12 @@ public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 					 */
 					double tollFactor = SanralTollFactor.getTollFactor(event.getPersonId(), event.getLinkId(), event.getTime());
 					double toll = tollFactor * this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), null).amount;
-					if(maps.get(breakIndex).containsKey(event.getPersonId())){
-						maps.get(breakIndex).put(event.getPersonId(), maps.get(breakIndex).get(event.getPersonId()) + toll);
+					if(valueMaps.get(breakIndex).containsKey(event.getPersonId())){
+						valueMaps.get(breakIndex).put(event.getPersonId(), valueMaps.get(breakIndex).get(event.getPersonId()) + toll);
+						countMaps.get(breakIndex).put(event.getPersonId(), countMaps.get(breakIndex).get(event.getPersonId()) + 1);
 					} else{
-						maps.get(breakIndex).put(event.getPersonId(), new Double(toll));
+						valueMaps.get(breakIndex).put(event.getPersonId(), new Double(toll));
+						countMaps.get(breakIndex).put(event.getPersonId(), new Integer(1));
 					}
 				} else{
 					breakIndex++;

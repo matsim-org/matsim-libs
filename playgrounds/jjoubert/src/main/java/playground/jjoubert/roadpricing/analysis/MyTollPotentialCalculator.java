@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,8 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 public class MyTollPotentialCalculator {
 	private final static Logger log = Logger.getLogger(MyTollPotentialCalculator.class);
 	private final RoadPricingSchemeImpl scheme;
+	private List<Map<Id,Double>> valueMaps;
+	private List<Map<Id,Integer>> countMaps;
 
 	/**
 	 * Implementing the class to calculate the potential toll. 
@@ -77,8 +78,8 @@ public class MyTollPotentialCalculator {
 		
 		/* Read the baseline file and perform some analysis. */
 		log.info("-------------------------------------------------------------------------------");
-		List<Map<Id,Double>> baseMaps = mtpc.processEventsFile(baseFilename, linkList, breakList, mtpc.scheme);
-		mtpc.writeMaps(outputFolder, baseMaps);
+		mtpc.processEventsFile(baseFilename, linkList, breakList, mtpc.scheme);
+		mtpc.writeMaps(outputFolder);
 		
 		log.info("-------------------------------------------------------------------------------");
 		log.info("                                 Completed");
@@ -86,22 +87,22 @@ public class MyTollPotentialCalculator {
 	}
 	
 	
-	private void writeMaps(String outputFolder, List<Map<Id, Double>> maps) {
+	private void writeMaps(String outputFolder) {
 		File folder = new File(outputFolder);
 		if(!folder.isDirectory() || !folder.canWrite()){
 			throw new RuntimeException("Cannot write output maps to " + outputFolder);
 		}
-		log.info("Writing maps to " + outputFolder);
+		log.info("Writing value maps to " + outputFolder);
 		
 		BufferedWriter bw = null;
-		for(int i = 0; i < maps.size(); i++){
+		for(int i = 0; i < this.valueMaps.size(); i++){
 			try {
-				bw = IOUtils.getBufferedWriter(String.format("%sMaps_%02d.txt", outputFolder, (i+1)));
+				bw = IOUtils.getBufferedWriter(String.format("%sValueMaps_%02d.txt", outputFolder, (i+1)));
 				try{
-					for(Id id : maps.get(i).keySet()){
+					for(Id id : this.valueMaps.get(i).keySet()){
 						bw.write(id.toString());
 						bw.write(",");
-						bw.write(String.valueOf(maps.get(i).get(id)));
+						bw.write(String.valueOf(this.valueMaps.get(i).get(id)));
 						bw.newLine();
 					}
 				} finally{
@@ -114,7 +115,28 @@ public class MyTollPotentialCalculator {
 			}
 		}
 		
+		log.info("Writing count maps to " + outputFolder);
 		
+		bw = null;
+		for(int i = 0; i < this.countMaps.size(); i++){
+			try {
+				bw = IOUtils.getBufferedWriter(String.format("%sCountMaps_%02d.txt", outputFolder, (i+1)));
+				try{
+					for(Id id : this.countMaps.get(i).keySet()){
+						bw.write(id.toString());
+						bw.write(",");
+						bw.write(String.valueOf(this.countMaps.get(i).get(id)));
+						bw.newLine();
+					}
+				} finally{
+					bw.close();
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	
@@ -151,7 +173,7 @@ public class MyTollPotentialCalculator {
 	 * 		the	<i>number</i> of times that agent entered observed links.
 	 * @see MyTollPotentialEventHandler
 	 */
-	public List<Map<Id,Double>> processEventsFile(String eventsFile, List<Id> linkList, List<Id> breakList, RoadPricingScheme scheme){
+	public void processEventsFile(String eventsFile, List<Id> linkList, List<Id> breakList, RoadPricingScheme scheme){
 		log.info("Processing events from " + eventsFile);
 		EventsManager em = EventsUtils.createEventsManager();
 		MyTollPotentialEventHandler eh = new MyTollPotentialEventHandler(linkList, breakList, scheme);
@@ -159,7 +181,8 @@ public class MyTollPotentialCalculator {
 		MatsimEventsReader mer = new MatsimEventsReader(em);
 		mer.readFile(eventsFile);
 		
-		return eh.getMaps();
+		this.valueMaps = eh.getValueMaps();
+		this.countMaps = eh.getCountMaps();
 	}
 
 }

@@ -41,6 +41,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.XY2Links;
 
+import playground.southafrica.utilities.Header;
+
 public class MyPlanMerger {
 	private static final Logger log = Logger.getLogger(MyPlanMerger.class);
 	private String baseFile;
@@ -69,6 +71,7 @@ public class MyPlanMerger {
 	 * </ol>
 	 */
 	public static void main(String[] args) {
+		Header.printHeader(MyPlanMerger.class.toString(), args);
 		MyPlanMerger mpj = new MyPlanMerger();
 		if(args.length == 5){
 			mpj.baseFile = args[0];
@@ -91,9 +94,7 @@ public class MyPlanMerger {
 		mpj.preparePlanMerger();
 		mpj.mergePlans();
 		
-		log.info("------------------------------");
-		log.info("          Completed");
-		log.info("==============================");
+		Header.printFooter();
 	}
 	
 	
