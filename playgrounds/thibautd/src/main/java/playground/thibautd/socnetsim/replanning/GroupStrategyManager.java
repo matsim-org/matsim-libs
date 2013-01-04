@@ -97,10 +97,13 @@ public class GroupStrategyManager {
 		}
 
 		for (Map.Entry<GroupPlanStrategy, List<ReplanningGroup>> e : strategyAllocations.entrySet()) {
-			e.getKey().run( e.getValue() );
+			final GroupPlanStrategy strategy = e.getKey();
+			final List<ReplanningGroup> toHandle = e.getValue();
+			log.info( "passing "+toHandle.size()+" groups to strategy "+strategy );
+			strategy.run( toHandle );
+			log.info( "strategy "+strategy+" finished" );
 		}
 	}
-
 
 	private final void removeExtraPlans(final ReplanningGroup group) {
 		while ( removeOneExtraPlan( group ) ) {} // all is done in the "condition"

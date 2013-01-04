@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -50,8 +51,17 @@ public class GroupPlanStrategy {
 	public void run(final Collection<ReplanningGroup> groups) {
 		List<GroupPlans> plansToHandle = new ArrayList<GroupPlans>();
 
+		Counter selectCounter = new Counter( "["+selector.getClass().getSimpleName()+"] selecting plan # " );
 		for (ReplanningGroup group : groups) {
+			selectCounter.incCounter();
 			GroupPlans plans = selector.selectPlans( group );
+
+			if (plans == null) {
+				// this is a valid output from the selector,
+				// if no plans combination is possible.
+				selectCounter.printCounter();
+				throw new RuntimeException( "no plan returned by the selector for group "+group );
+			}
 
 			if (strategyModules.size() > 0) {
 				plans = GroupPlans.copyPlans( plans );
@@ -60,6 +70,7 @@ public class GroupPlanStrategy {
 
 			select( plans );
 		}
+		selectCounter.printCounter();
 
 		for (GroupStrategyModule module : strategyModules) {
 			module.handlePlans( plansToHandle );
