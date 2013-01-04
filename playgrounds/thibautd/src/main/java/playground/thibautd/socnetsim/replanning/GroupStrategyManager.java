@@ -111,11 +111,15 @@ public class GroupStrategyManager {
 
 	private final boolean removeOneExtraPlan(final ReplanningGroup group) {
 		if (log.isTraceEnabled()) log.trace( "removing plans for group "+group );
+		if (maxPlanPerAgent <= 0) return false;
 
 		GroupPlans toRemove = null;
 		boolean stillSomethingToRemove = false;
-		for (Person person : group.getPersons()) {
+		final List<Person> personsToHandle = new ArrayList<Person>( group.getPersons() );
+		while ( !personsToHandle.isEmpty() ) {
+			final Person person = personsToHandle.remove( 0 );
 			if (person.getPlans().size() <= maxPlanPerAgent) continue;
+			if (log.isTraceEnabled()) log.trace( "Too many plans for person "+person );
 
 			if (toRemove == null) {
 				toRemove = selectorForRemoval.selectPlans( group );
@@ -123,8 +127,16 @@ public class GroupStrategyManager {
 			}
 
 			for (Plan plan : toRemove( person , toRemove )) {
-				if (log.isTraceEnabled()) log.trace( "removing plan "+plan+" for person "+plan.getPerson() );
-				plan.getPerson().getPlans().remove( plan );
+				if (log.isTraceEnabled()) log.trace( "removing plan "+plan+" for person "+person );
+				final Person personToHandle = plan.getPerson();
+
+				if ( personToHandle != person ) {
+					final boolean removed = personsToHandle.remove( personToHandle );
+					if ( !removed ) throw new RuntimeException( "person "+personToHandle+" is not part of the persons to handle!" );
+				}
+
+				final boolean removed = personToHandle.getPlans().remove( plan );
+				if ( !removed ) throw new RuntimeException( "could not remove plan "+plan+" of person "+personToHandle );
 			}
 
 			if (!stillSomethingToRemove && person.getPlans().size() > maxPlanPerAgent) {
