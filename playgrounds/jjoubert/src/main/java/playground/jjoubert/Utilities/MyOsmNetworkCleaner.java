@@ -127,11 +127,15 @@ public class MyOsmNetworkCleaner {
 				Node newFNode = nf.createNode(fNode.getId(), fNode.getCoord());
 				if(!sc.getNetwork().getNodes().containsKey(fNode.getId())){
 					sc.getNetwork().addNode(newFNode);
+				} else{
+					newFNode = sc.getNetwork().getNodes().get(fNode.getId());
 				}
 				Node tNode = l.getToNode();
 				Node newTNode = nf.createNode(tNode.getId(), tNode.getCoord());
 				if(!sc.getNetwork().getNodes().containsKey(tNode.getId())){
 					sc.getNetwork().addNode(newTNode);
+				}else{
+					newTNode = sc.getNetwork().getNodes().get(tNode.getId());
 				}
 				
 				Link lNew = nf.createLink(l.getId(), newFNode, newTNode);
