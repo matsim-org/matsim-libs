@@ -21,7 +21,7 @@ package playground.thibautd.socnetsim.population;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ import playground.thibautd.socnetsim.scoring.ScoresAggregator;
  * @author thibautd
  */
 public class JointPlan implements Plan {
-	private final Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
+	private final Map<Id,Plan> individualPlans = new LinkedHashMap<Id,Plan>();
 	private final boolean setAtIndividualLevel;
 
 	private ScoresAggregator aggregator;
@@ -60,7 +60,6 @@ public class JointPlan implements Plan {
 	 * @param addAtIndividualLevel if true, the plans are added to the Person's plans.
 	 * set to false for a temporary plan (in a replaning for example).
 	 */
-	//TODO: separate in several helpers (too messy)
 	JointPlan(
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel,
@@ -91,7 +90,7 @@ public class JointPlan implements Plan {
 	}
 
 	private static Map<Id, Plan> cloneIndividualPlans(final JointPlan plan) {
-		Map<Id , Plan> plans = new HashMap<Id, Plan>();
+		Map<Id , Plan> plans = new LinkedHashMap<Id, Plan>();
 
 		for (Map.Entry<Id, Plan> indiv : plan.getIndividualPlans().entrySet()) {
 			PlanImpl newPlan = new PlanImpl( indiv.getValue().getPerson() );
