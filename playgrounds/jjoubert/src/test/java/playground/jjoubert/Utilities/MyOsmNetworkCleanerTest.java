@@ -65,11 +65,16 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 
 		MyOsmNetworkCleaner monc = new MyOsmNetworkCleaner();
 		monc.cleanNetwork(sc.getNetwork(), mp);
-		assertEquals("Wrong number of remaining links.", 2, monc.getNewNetwork().getLinks().size());
-
+		/* The resulting network should have 5 nodes and 6 links before the 
+		 * NetworkCleaner is invoked. The largest cluster, however, is the one
+		 * with nodes 3, 4 & 5, and contains 3 nodes and 4 links. 
+		 */
+		assertEquals("Wrong number of remaining links.", 4, monc.getNewNetwork().getLinks().size());
 		Network n = monc.getNewNetwork();
-		assertEquals("Link #2 not in network.", true, n.getLinks().containsKey(new IdImpl("2")));
-		assertEquals("Link #3 not in network.", true, n.getLinks().containsKey(new IdImpl("3")));
+		assertEquals("Link 3-4 is not in network.", true, n.getLinks().containsKey(new IdImpl("34")));
+		assertEquals("Link 4-3 is not in network.", true, n.getLinks().containsKey(new IdImpl("43")));
+		assertEquals("Link 4-5 is not in network.", true, n.getLinks().containsKey(new IdImpl("45")));
+		assertEquals("Link 5-4 is not in network.", true, n.getLinks().containsKey(new IdImpl("54")));
 	}
 
 	/**
@@ -84,8 +89,6 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		MyOsmNetworkCleaner monc = new MyOsmNetworkCleaner();
 		assertNull("No cleaned network should exist.", monc.getNewNetwork());
 
-		//TODO: Add bit to check not null network.
-
 		MyShapefileReader msr = new MyShapefileReader(getInputDirectory() + "Test.shp");
 		MultiPolygon mp = msr.readMultiPolygon();
 
@@ -96,9 +99,28 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		monc.cleanNetwork(sc.getNetwork(), mp);
 		assertNotNull("Cleaned network should exists.", monc.getNewNetwork());
 	}
+	
 
 	/**
 	 * Overwrite the basic setUp() method so that a new MATSim network is created.
+	 * 					
+	 * 				 (6,13) 5<---->6 (8,13)
+	 * 						^
+	 * 						|
+	 * 						|
+	 * 						|
+	 * 						V	
+	 * 						4 (6,8)
+	 * 						^
+	 *        				|       
+	 * (0,5) 1<-------------+--------------->2 (11,5)
+	 * 						|
+	 * 						V
+	 * 						3 (6,2)
+	 * 
+	 * All nodes are connected with bi-directional links, i.e. one in eacj
+	 * direction. 
+	 * 
 	 * @throws Exception
 	 */
 	@Override
@@ -117,33 +139,29 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		n.addNode(n2);
 		Node n3 = nf.createNode(new IdImpl("3"), new CoordImpl(6.0, 2.0));
 		n.addNode(n3);
-		Node n4 = nf.createNode(new IdImpl("4"), new CoordImpl(6.0, 7.0));
+		Node n4 = nf.createNode(new IdImpl("4"), new CoordImpl(6.0, 8.0));
 		n.addNode(n4);
-		Node n5 = nf.createNode(new IdImpl("5"), new CoordImpl(6.0, 12.0));
+		Node n5 = nf.createNode(new IdImpl("5"), new CoordImpl(6.0, 13.0));
 		n.addNode(n5);
-		Node n6 = nf.createNode(new IdImpl("6"), new CoordImpl(8.0, 12.0));
+		Node n6 = nf.createNode(new IdImpl("6"), new CoordImpl(8.0, 13.0));
 		n.addNode(n6);
 
-		// Link 1.
 		Link l12 = nf.createLink(new IdImpl("12"), n1, n2);
 		n.addLink(l12);
 		Link l21 = nf.createLink(new IdImpl("21"), n2, n1);
 		n.addLink(l21);
 
-		// Link 2.
 		Link l34 = nf.createLink(new IdImpl("34"), n3, n4);
 		n.addLink(l34);
 		Link l43 = nf.createLink(new IdImpl("43"), n4, n3);
 		n.addLink(l43);
 		
 		
-		// Link 3.
 		Link l45 = nf.createLink(new IdImpl("45"), n4, n5);
 		n.addLink(l45);
 		Link l54 = nf.createLink(new IdImpl("54"), n5, n4);
 		n.addLink(l54);
 		
-		// Link 4.
 		Link l56 = nf.createLink(new IdImpl("56"), n5, n6);
 		n.addLink(l56);
 		Link l65 = nf.createLink(new IdImpl("65"), n6, n5);
