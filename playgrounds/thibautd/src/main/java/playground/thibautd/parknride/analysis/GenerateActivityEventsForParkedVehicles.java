@@ -30,10 +30,10 @@ import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.handler.BasicEventHandler;
 
 import playground.thibautd.parknride.ParkAndRideConstants;
 

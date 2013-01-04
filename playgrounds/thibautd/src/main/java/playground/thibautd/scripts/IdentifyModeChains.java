@@ -21,7 +21,6 @@ package playground.thibautd.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -32,7 +31,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.PtConstants;
-
 import org.xml.sax.Attributes;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;

@@ -21,7 +21,6 @@ package playground.thibautd.parknride.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Map;
 

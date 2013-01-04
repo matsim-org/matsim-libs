@@ -21,8 +21,6 @@ package playground.thibautd.socnetsim.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.population.PlanLinks;
-
 /**
  * @author thibautd
  */

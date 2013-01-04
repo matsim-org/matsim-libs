@@ -23,11 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;

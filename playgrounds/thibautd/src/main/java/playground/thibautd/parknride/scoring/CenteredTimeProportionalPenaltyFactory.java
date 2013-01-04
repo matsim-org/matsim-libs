@@ -20,7 +20,6 @@
 package playground.thibautd.parknride.scoring;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Plan;
 

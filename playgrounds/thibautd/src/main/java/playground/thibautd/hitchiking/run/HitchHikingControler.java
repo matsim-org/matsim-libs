@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.run;
 
-import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
+import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.runTabuSearch;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,7 +41,6 @@ import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
-import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.runTabuSearch;
 
 /**
  * @author thibautd

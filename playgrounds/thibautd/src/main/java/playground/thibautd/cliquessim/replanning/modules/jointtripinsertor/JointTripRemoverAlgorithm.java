@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.replanning.modules.jointtripinsertor;
 
+import static playground.thibautd.cliquessim.utils.JointPlanUtils.analyseJointTravel;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,14 +30,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -45,8 +46,6 @@ import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTrip;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
-
-import static playground.thibautd.cliquessim.utils.JointPlanUtils.*;
 
 /**
  * @author thibautd

@@ -20,21 +20,18 @@
 package playground.thibautd.socnetsim.replanning.modules;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
 import playground.thibautd.socnetsim.replanning.GroupStrategyModule;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
-import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGroupStrategyModule;
 
 /**
  * @author thibautd

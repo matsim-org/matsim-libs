@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.config;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;

@@ -19,6 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.population.jointtrippossibilities;
 
+import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.DESC_ATT;
+import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.DRIVER_DEST_ATT;
+import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.DRIVER_ID_ATT;
+import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.DRIVER_OR_ATT;
+import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.PASSENGER_DEST_ATT;
+import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.PASSENGER_ID_ATT;
+import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.PASSENGER_OR_ATT;
+import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.POSS_TAG;
+import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.ROOT_TAG;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -30,7 +40,6 @@ import org.xml.sax.Attributes;
 
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities.Od;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities.Possibility;
-import static playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLNames.*;
 
 /**
  * @author thibautd

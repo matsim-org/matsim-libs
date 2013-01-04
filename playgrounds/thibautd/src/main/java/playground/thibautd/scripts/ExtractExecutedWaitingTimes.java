@@ -21,7 +21,6 @@ package playground.thibautd.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,8 +30,8 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 

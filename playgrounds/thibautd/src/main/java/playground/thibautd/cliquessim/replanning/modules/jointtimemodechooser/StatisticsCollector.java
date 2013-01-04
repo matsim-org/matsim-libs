@@ -20,14 +20,10 @@
 package playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser;
 
 import java.io.BufferedWriter;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.utils.io.IOUtils;

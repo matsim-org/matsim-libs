@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import herbie.running.scoring.TravelScoringFunction;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;

@@ -20,7 +20,6 @@
 package playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;

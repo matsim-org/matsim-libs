@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.replanning.strategies;
 
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 
 import playground.thibautd.cliquessim.replanning.JointPlanStrategy;

@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.MZ2010;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;

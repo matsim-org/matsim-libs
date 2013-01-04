@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.router.TransitTravelDisutility;
-
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.scoring.TravelScoringFunction;
 
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**

@@ -21,7 +21,6 @@ package playground.thibautd.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;

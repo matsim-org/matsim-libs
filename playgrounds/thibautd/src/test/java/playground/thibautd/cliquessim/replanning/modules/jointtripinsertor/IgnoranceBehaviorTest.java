@@ -19,22 +19,21 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.replanning.modules.jointtripinsertor;
 
+import static org.junit.Assert.assertNull;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;

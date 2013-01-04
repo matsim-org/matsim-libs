@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.old.activitychainsextractor;
 
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.thibautd.initialdemandgeneration.old.activitychainsextractor.MzConfig.Statistics;
 
 /**

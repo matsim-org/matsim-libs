@@ -26,11 +26,9 @@ import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 import herbie.running.scoring.TravelScoringFunction;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.TravelTime;
@@ -41,7 +39,6 @@ import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.hitchiking.run.HitchHikingControler;
 import playground.thibautd.hitchiking.spotweights.SpotWeighter;
-import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
 
 /**
  * @author thibautd

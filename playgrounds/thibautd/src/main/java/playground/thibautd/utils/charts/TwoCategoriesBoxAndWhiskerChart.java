@@ -22,7 +22,6 @@ package playground.thibautd.utils.charts;
 import java.awt.Color;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.LegendItem;

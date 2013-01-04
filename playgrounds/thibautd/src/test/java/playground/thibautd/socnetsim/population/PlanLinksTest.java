@@ -20,14 +20,12 @@
 package playground.thibautd.socnetsim.population;
 
 import java.lang.ref.WeakReference;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;

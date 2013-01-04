@@ -19,20 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.herbiespecific;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import herbie.running.config.HerbieConfigGroup;
+
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.testcases.MatsimTestUtils;
-
-import herbie.running.config.HerbieConfigGroup;
 
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.parknride.ParkAndRideUtils;

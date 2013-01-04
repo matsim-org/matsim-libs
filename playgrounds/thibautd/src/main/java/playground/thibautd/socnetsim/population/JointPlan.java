@@ -31,10 +31,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.thibautd.socnetsim.scoring.HomogeneousScoreAggregator;
 import playground.thibautd.socnetsim.scoring.ScoresAggregator;
 
 /**

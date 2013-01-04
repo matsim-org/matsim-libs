@@ -19,13 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.replanning;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
-import playground.thibautd.cliquessim.population.Cliques;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**

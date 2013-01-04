@@ -21,14 +21,9 @@ package playground.thibautd.analysis.spacetimeprismjoinabletrips;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;

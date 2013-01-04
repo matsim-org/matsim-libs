@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.herbiespecific;
 
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
-
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
@@ -32,7 +27,6 @@ import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 import herbie.running.scoring.TravelScoringFunction;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;

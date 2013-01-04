@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.replanning.grouping;
 
 import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

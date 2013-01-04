@@ -23,13 +23,13 @@ import java.io.File;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractController;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;

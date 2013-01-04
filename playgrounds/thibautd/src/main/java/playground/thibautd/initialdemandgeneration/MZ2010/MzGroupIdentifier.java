@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.MZ2010;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * @author thibautd

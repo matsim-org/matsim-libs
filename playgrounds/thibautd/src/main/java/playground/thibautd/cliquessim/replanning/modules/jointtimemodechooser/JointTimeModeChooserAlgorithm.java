@@ -19,13 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser;
 
+import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.runTabuSearch;
+
 import java.util.Random;
 
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -37,7 +38,6 @@ import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
-import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.runTabuSearch;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
 
 /**

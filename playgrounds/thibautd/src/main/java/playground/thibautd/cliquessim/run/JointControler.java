@@ -21,11 +21,6 @@ package playground.thibautd.cliquessim.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
-import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.LegTimesListener;
-import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.StrategyManager;

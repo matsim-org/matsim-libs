@@ -28,21 +28,19 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-import playground.thibautd.cliquessim.population.Clique;
 import playground.thibautd.cliquessim.utils.JointPlanUtils.DriverTrip;
-import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTrip;
 import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTravelStructure;
+import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTrip;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;

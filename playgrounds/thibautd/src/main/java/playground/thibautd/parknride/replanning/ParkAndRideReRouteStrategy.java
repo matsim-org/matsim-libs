@@ -22,11 +22,10 @@ package playground.thibautd.parknride.replanning;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
