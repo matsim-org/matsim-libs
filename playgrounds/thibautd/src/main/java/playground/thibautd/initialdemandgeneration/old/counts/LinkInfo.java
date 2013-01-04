@@ -22,7 +22,7 @@ public class LinkInfo {
 	
 	private Aggregator aggregator = new Aggregator();
 	
-	public LinkInfo(String direction, String linkidTeleatlas,
+	public LinkInfo(String linkidTeleatlas,
 			String linkidNavteq, String linkidIVTCH, boolean removeZeroVolumes) {	
 		this.ids.put("teleatlas", linkidTeleatlas);
 		this.ids.put("navteq", linkidNavteq);

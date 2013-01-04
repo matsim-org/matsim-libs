@@ -241,8 +241,8 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 			// reduce score by penalty from capacity restraints
 			Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
 			while (pen_it.hasNext()) {
-				ScoringPenalty penalty = pen_it.next();
-				facilityPenaltiesScore -= penalty.getPenalty();
+				ScoringPenalty currentPenalty = pen_it.next();
+				facilityPenaltiesScore -= currentPenalty.getPenalty();
 			}
 		}
 		return facilityPenaltiesScore;
@@ -315,11 +315,11 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 	}
 	
 	public double getLineSwitchPenaltyScore(){
-		double lineSwitchPenalty = 0.0;
+		double lineSwitchPenalty1 = 0.0;
 		if (this.lineSwitchPenalty) {			
-			lineSwitchPenalty = config.planCalcScore().getUtilityOfLineSwitch();
+			lineSwitchPenalty1 = config.planCalcScore().getUtilityOfLineSwitch();
 		}
-		return lineSwitchPenalty;
+		return lineSwitchPenalty1;
 	}
 
 	private static boolean isPuDo(final String actType) {

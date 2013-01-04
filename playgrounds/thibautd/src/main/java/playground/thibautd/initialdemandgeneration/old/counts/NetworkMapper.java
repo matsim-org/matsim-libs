@@ -82,7 +82,6 @@ public class NetworkMapper {
 					nr = "0" + nr;
 				}
 				
-				String direction = entries[2].trim();
 				String linkidTeleatlas = entries[4].trim();
 				String linkidNavteq = entries[5].trim();
 				String linkidIVTCH = entries[7].trim();
@@ -94,7 +93,7 @@ public class NetworkMapper {
 				if (ys.equals("-")) ys = "-1";
 				CoordImpl coord = new CoordImpl(xs, ys);
 				
-				LinkInfo link = new LinkInfo(direction, linkidTeleatlas, linkidNavteq, linkidIVTCH, this.removeZeroVolumes);
+				LinkInfo link = new LinkInfo(linkidTeleatlas, linkidNavteq, linkidIVTCH, this.removeZeroVolumes);
 				String id = dataset + nr;
 
 				if (!stationsTree.containsKey(id)) {

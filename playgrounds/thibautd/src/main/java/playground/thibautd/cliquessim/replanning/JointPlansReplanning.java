@@ -33,7 +33,6 @@ import playground.thibautd.cliquessim.utils.JointControlerUtils;
  * @author thibautd
  */
 public class JointPlansReplanning implements ReplanningListener {
-	private final static Logger log = Logger.getLogger(JointPlansReplanning.class);
 
 	/**
 	 * Same as in the "PlansReplanning" class, but passes the population of the
@@ -41,6 +40,7 @@ public class JointPlansReplanning implements ReplanningListener {
 	 * {@inheritDoc}
 	 * @see ReplanningListener#notifyReplanning(ReplanningEvent)
 	 */
+	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
 		Controler controler = event.getControler();
 

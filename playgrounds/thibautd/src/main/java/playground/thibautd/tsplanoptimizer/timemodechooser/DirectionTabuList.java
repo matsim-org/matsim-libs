@@ -81,10 +81,12 @@ public class DirectionTabuList implements TabuChecker {
 			sign = move.getAmount() > 0 ? 1 : -1;
 		}
 
+		@Override
 		public int hashCode() {
 			return index + 1000 * sign;
 		}
 
+		@Override
 		public boolean equals(final Object other) {
 			if (other instanceof Direction) {
 				Direction direction = (Direction) other;

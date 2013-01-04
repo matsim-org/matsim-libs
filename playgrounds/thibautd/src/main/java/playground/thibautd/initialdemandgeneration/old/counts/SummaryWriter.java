@@ -17,11 +17,11 @@ public class SummaryWriter {
 	private final static Logger log = Logger.getLogger(SummaryWriter.class);
 	private boolean writeForSpecificArea = false;
 	
-	public void write(Stations stations, String outpath, boolean writeForSpecificArea) {
+	public void write(Stations stations, String outpath, boolean writeForSpecificArea1) {
 		
 		new File(outpath).mkdirs();
 		
-		this.writeForSpecificArea = writeForSpecificArea;
+		this.writeForSpecificArea = writeForSpecificArea1;
 		
 		this.writeRelative(stations, outpath);
 		this.writeAbsoluteDifference(stations, outpath);
@@ -264,14 +264,12 @@ public class SummaryWriter {
 			symbol.setDecimalSeparator('.');
 			formatter.setDecimalFormatSymbols(symbol);
 																	
-			int numberOfStations = 0;
 			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
 			while (stations_it.hasNext()) {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
 				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
-				numberOfStations++;
 				
 				out.write(station.getId() + "_" + "Link1" ); 
 				outScaled.write(station.getId() + "\t" + "Link1" );
@@ -317,15 +315,13 @@ public class SummaryWriter {
 						
 			StdDevBoxPlot boxPlotAbsolute = new StdDevBoxPlot("Standard Deviations Absolute", "Hour", "Standard Deviations [veh]");
 			StdDevBoxPlot boxPlotScaled = new StdDevBoxPlot("Standard Deviations Relative","Hour", "Standard Deviations [%]");
-											
-			int numberOfStations = 0;
+
 			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
 			while (stations_it.hasNext()) {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
 				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
-				numberOfStations++;
 				
 				out.write(station.getId() + "_" + "Link1" ); 
 				outScaled.write(station.getId() + "\t" + "Link1" );
@@ -382,15 +378,13 @@ public class SummaryWriter {
 			DecimalFormatSymbols symbol = new DecimalFormatSymbols();
 			symbol.setDecimalSeparator('.');
 			formatter.setDecimalFormatSymbols(symbol);
-																	
-			int numberOfStations = 0;
+
 			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
 			while (stations_it.hasNext()) {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
 				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
-				numberOfStations++;
 			
 				if (hour > -1) {
 					List<Double> volumes = station.getLink1().getAggregator().getVolumes().get(hour);
@@ -436,15 +430,13 @@ public class SummaryWriter {
 			DecimalFormat formatter = new DecimalFormat("0.0");
 			
 			StdDevBoxPlot boxPlotAbsolute = new StdDevBoxPlot("Volumes Absolute", "hour", "Volumes Absolute [veh]");
-											
-			int numberOfStations = 0;
+
 			Iterator<CountStation> stations_it = stations.getCountStations().iterator();
 			while (stations_it.hasNext()) {
 				CountStation station = stations_it.next();
 				
 				// if station is not in region -> no sim vals
 				if ((station.getLink1().getSimVals().size() == 0 || station.getLink2().getSimVals().size() == 0) && writeForSpecificArea) continue;
-				numberOfStations++;
 				
 				out.write(station.getId() + "\t" + "Link 1\t" );
 				for (int hour = 0; hour < 24; hour++) {	

@@ -61,8 +61,6 @@ public class UglyHerbieMultilegControler extends Controler {
 
 	private final HerbieConfigGroup herbieConfigGroup;
 	private ParkingPenaltyFactory penaltyFactory;
-
-	private static final Logger log = Logger.getLogger(Controler.class);
 	
 	public UglyHerbieMultilegControler( final Scenario scenario ) {
 		super( scenario );

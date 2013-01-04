@@ -49,11 +49,6 @@ public class PlansAnalyse {
 	private static final String S = "s";
 	private static final String L = "l";
 
-	private static final String CAR = "car";
-	private static final String PT = "pt";
-	private static final String BIKE = "bike";
-	private static final String WALK = "walk";
-
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////

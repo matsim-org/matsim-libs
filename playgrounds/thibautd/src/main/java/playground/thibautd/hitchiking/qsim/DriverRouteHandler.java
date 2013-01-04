@@ -139,18 +139,18 @@ public class DriverRouteHandler implements HitchHikingHandler {
 	}
 
 	@Override
-	public boolean endActivityAndComputeNextState(double now) {
-		return nextState( now );
+	public boolean endActivityAndComputeNextState(double now1) {
+		return nextState( now1 );
 	}
 
 	@Override
-	public boolean endLegAndComputeNextState(double now) {
-		return nextState( now );
+	public boolean endLegAndComputeNextState(double now1) {
+		return nextState( now1 );
 	}
 
-	private boolean nextState(final double now) {
+	private boolean nextState(final double now1) {
 		stage = stage.next();
-		this.now = now;
+		this.now = now1;
 
 		if (stage == null) return false;
 
@@ -163,9 +163,9 @@ public class DriverRouteHandler implements HitchHikingHandler {
 				return performDropOff( );
 			case EGRESS:
 				return performEgress( );
+			default:
+				throw new IllegalStateException( "unexpected: "+stage );
 		}
-
-		throw new RuntimeException( "unexpected "+stage );
 	}
 
 	private boolean performCarPool() {
@@ -281,9 +281,9 @@ public class DriverRouteHandler implements HitchHikingHandler {
 				return TransportMode.car;
 			case CAR_POOL:
 				return HitchHikingConstants.DRIVER_MODE;
+			default:
+			 throw new IllegalStateException( "unexpected "+stage );
 		}
-
-		throw new IllegalStateException( ""+stage );
 	}
 
 	@Override

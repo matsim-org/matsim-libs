@@ -41,35 +41,35 @@ public class MzEtappeFactory2000 implements MzEtappeFactory {
 	public MzEtappeFactory2000(final String headLine) {
 		String[] names = headLine.split("\t");
 
-		int modeIndex = -1;
-		int personIndex = -1;
-		int wgnrIndex = -1;
-		int etappenrIndex = -1;
-		int distanceIndex = -1;
+		int modeIndex1 = -1;
+		int personIndex1 = -1;
+		int wgnrIndex1 = -1;
+		int etappenrIndex1 = -1;
+		int distanceIndex1 = -1;
 
 		for (int i=0; i < names.length; i++) {
 			if (names[ i ].equals( PERSON_NAME )) {
-				personIndex = i;
+				personIndex1 = i;
 			}
 			if (names[ i ].equals( WEGNR_NAME )) {
-				wgnrIndex = i;
+				wgnrIndex1 = i;
 			}
 			if (names[ i ].equals( ETAPPENR_NAME )) {
-				etappenrIndex = i;
+				etappenrIndex1 = i;
 			}
 			if (names[ i ].equals( DISTANCE_NAME )) {
-				distanceIndex = i;
+				distanceIndex1 = i;
 			}
 			if (names[ i ].equals( MODE_NAME )) {
-				modeIndex = i;
+				modeIndex1 = i;
 			}
 		}
 
-		this.modeIndex = modeIndex;
-		this.personIndex = personIndex;
-		this.wgnrIndex = wgnrIndex;
-		this.etappenrIndex = etappenrIndex;
-		this.distanceIndex = distanceIndex;
+		this.modeIndex = modeIndex1;
+		this.personIndex = personIndex1;
+		this.wgnrIndex = wgnrIndex1;
+		this.etappenrIndex = etappenrIndex1;
+		this.distanceIndex = distanceIndex1;
 	}
 
 	@Override

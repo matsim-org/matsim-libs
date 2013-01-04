@@ -28,12 +28,9 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author thibautd
  */
 public class HitchHikingInsertionRemovalModule extends AbstractMultithreadedModule {
-	private final Controler controler;
-
 	public HitchHikingInsertionRemovalModule(
 			final Controler controler) {
 		super( controler.getConfig().global() );
-		this.controler = controler;
 	}
 
 	@Override

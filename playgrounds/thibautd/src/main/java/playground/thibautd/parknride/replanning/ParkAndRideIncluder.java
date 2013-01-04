@@ -123,7 +123,7 @@ public class ParkAndRideIncluder {
 					depTime,
 					plan.getPerson()) );
 
-		tripRouter.insertTrip(
+		TripRouter.insertTrip(
 				plan,
 				origin,
 				trip,

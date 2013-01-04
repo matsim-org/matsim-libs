@@ -106,6 +106,8 @@ public class FixedGroupsIdentifierFileParser {
 	}
 
 	public static class ParsingException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
 		private ParsingException(final String m) {
 			super( m );
 		}

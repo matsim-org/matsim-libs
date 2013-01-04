@@ -29,7 +29,7 @@ import playground.thibautd.cliquessim.replanning.JointPlanStrategy;
  * @author thibautd
  */
 public class BestScoreStrategy extends JointPlanStrategy {
-	public BestScoreStrategy(final Controler controler) {
+	public BestScoreStrategy() {
 		super( new BestPlanSelector() );
 	}
 }

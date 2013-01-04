@@ -79,7 +79,7 @@ public class IdentifySpotsRough {
 		pruneCloseNodes( hhNodes );
 		Collection<Link> hhLinks = getHhLinks( (NetworkImpl) network , hhNodes );
 		HitchHikingUtils.writeFile(
-				new HitchHikingSpots( network , hhLinks ),
+				new HitchHikingSpots( hhLinks ),
 				outFile);
 		writeXy( hhLinks , outFile + ".xy" );
 	}

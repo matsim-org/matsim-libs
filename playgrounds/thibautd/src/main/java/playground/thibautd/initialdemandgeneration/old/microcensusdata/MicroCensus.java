@@ -52,10 +52,6 @@ public class MicroCensus {
 	private final MzGroupsModule groups;
 	private static final String WORK = "w";
 	private static final String EDUC = "e";
-	private static final String MALE = "m";
-	private static final String FEMALE = "f";
-	private static final String YES = "yes";
-	private static final String NO = "no";
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors

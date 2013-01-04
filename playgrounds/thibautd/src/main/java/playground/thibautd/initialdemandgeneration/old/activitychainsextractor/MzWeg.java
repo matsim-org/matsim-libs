@@ -130,17 +130,17 @@ class MzWeg implements Identifiable {
 		}
 
 		double longestDistance = Double.NEGATIVE_INFINITY;
-		String mode = null;
+		String mode1 = null;
 
 		// main mode is the mode of the longest etap
 		for (MzEtappe etappe : etappen.values()) {
 			if (etappe.getDistance() > longestDistance) {
 				longestDistance = etappe.getDistance();
-				mode = etappe.getMode();
+				mode1 = etappe.getMode();
 			}
 		}
 
-		return mode;
+		return mode1;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

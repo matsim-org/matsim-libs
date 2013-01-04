@@ -108,11 +108,6 @@ public class MzConfig {
 		private int unhandledActivityType = 0;
 		private int nonHomeBased = 0;
 		private int longServePassengerAct = 0;
-		private int numerousServePassengersLegs = 0;
-
-		public void numerousServePassengersLegs() {
-			numerousServePassengersLegs++;
-		}
 
 		public void longServePassengerAct() {
 			longServePassengerAct++;

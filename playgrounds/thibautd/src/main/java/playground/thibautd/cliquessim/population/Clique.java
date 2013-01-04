@@ -56,7 +56,6 @@ public class Clique implements Person {
 
 	// "log only once" variables
 	private static boolean warnKeepOnlySelected = true;
-	private static boolean warnNoJointTripPossibilities = true;
 
 	private int planCount = 0;
 
@@ -74,6 +73,7 @@ public class Clique implements Person {
 	/**
 	 * @deprecated should be removed soon.
 	 */
+	@Deprecated
 	public Clique(final Id id) {
 		this(id, new HashMap<Id, Person>());
 	}
@@ -113,6 +113,7 @@ public class Clique implements Person {
 	 * @deprecated
 	 * @throws UnsupportedOperationException
 	 */
+	@Deprecated
 	@Override
 	public void setId(Id id) {
 		//this.id = id;
@@ -130,6 +131,7 @@ public class Clique implements Person {
 	 * @deprecated
 	 * @throws UnsupportedOperationException
 	 */
+	@Deprecated
 	@Override
 	public boolean addPlan(Plan p) {
 		//cast to joint plan
@@ -261,21 +263,9 @@ public class Clique implements Person {
 	 * Currently used to initialize clique.
 	 * @deprecated
 	 */
+	@Deprecated
 	public void addMember(final Person p) {
 		this.members.put(p.getId(),p);
-	}
-
-	/**
-	 * Unimplemented, as it would break the consistency between clique and JointPlan.
-	 *
-	 * May, or not, be implemented in the future to allow dynamic cliques.
-	 *
-	 * @deprecated
-	 * @throws UnsupportedOperationException
-	 */
-	public void removeMember(final Person p) {
-		throw new UnsupportedOperationException("currently impossible to remove"+
-				" a member from a clique");
 	}
 
 	/**

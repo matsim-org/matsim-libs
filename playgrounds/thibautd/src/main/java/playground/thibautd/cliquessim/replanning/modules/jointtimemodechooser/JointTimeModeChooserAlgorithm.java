@@ -52,7 +52,6 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 	private final Scenario scenario;
 
 	private final TravelTime travelTimeCalculator;
-	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final TripRouterFactory exactRouterFactory;
 
@@ -67,7 +66,6 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 				controler.getScenario(),
 				controler.getScoringFunctionFactory(),
 				controler.getTravelTimeCalculator(),
-				controler.getTravelDisutilityFactory(),
 				controler.getLeastCostPathCalculatorFactory(),
 				controler.getTripRouterFactory());
 	}
@@ -79,7 +77,6 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 			final Scenario scenario,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final TravelTime travelTimeCalculator,
-			final TravelDisutilityFactory travelDisutilityFactory,
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final TripRouterFactory tripRouterFactory) {
 		this.random = random;
@@ -88,7 +85,6 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.scenario = scenario;
 		this.travelTimeCalculator = travelTimeCalculator;
-		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
 		this.exactRouterFactory = tripRouterFactory;
 	}
@@ -103,7 +99,6 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 					delay,
 					scenario,
 					travelTimeCalculator,
-					travelDisutilityFactory,
 					leastCostPathCalculatorFactory,
 					exactRouterFactory );
 
@@ -119,7 +114,6 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 					jointPlan,
 					config,
 					scoringFunctionFactory,
-					estimatorRouterFactory,
 					null); // XXX: no debug plots anymore.
 					//config.isDebugMode() ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
 
@@ -157,7 +151,6 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 			final DepartureDelayAverageCalculator delay,
 			final Scenario scenario,
 			final TravelTime travelTimeCalculator,
-			final TravelDisutilityFactory travelDisutilityFactory,
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final TripRouterFactory tripRouterFactory) {
 		return new EstimatorTripRouterFactory(
@@ -165,14 +158,12 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 				scenario.getPopulation().getFactory(),
 				scenario.getNetwork(),
 				travelTimeCalculator,
-				travelDisutilityFactory,
 				leastCostPathCalculatorFactory,
 				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
 				scenario.getConfig().scenario().isUseTransit() ?
 					scenario.getTransitSchedule() :
 					null,
 				scenario.getConfig().plansCalcRoute(),
-				scenario.getConfig().planCalcScore(),
 				delay,
 				tripRouterFactory);
 	}

@@ -37,8 +37,6 @@ import playground.thibautd.parknride.ParkAndRideFacility;
  * @author thibautd
  */
 public class ParkAndRideFacilities2xy {
-	private static final Logger log =
-		Logger.getLogger(ParkAndRideFacilities2xy.class);
 
 	public static void main(final String[] args) {
 		String inputFileName = args[ 0 ];

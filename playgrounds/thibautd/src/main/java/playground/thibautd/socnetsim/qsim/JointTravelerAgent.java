@@ -100,7 +100,6 @@ public class JointTravelerAgent implements MobsimDriverAgent {
 	 * @param linkId the id of the link the passenger is waiting at.
 	 */
 	public void notifyPassengerArrivedAtLink(
-			final double time,
 			final Id passenger,
 			final Id linkId) {
 		getPassengersAtLink( linkId ).add( passenger );
@@ -129,7 +128,7 @@ public class JointTravelerAgent implements MobsimDriverAgent {
 	 * {@link #notifyPassengerArrivedAtLink(Id,Id)} and the driver arrived at the link.
 	 * @return true if the leg can start
 	 */
-	public boolean isReadyForDeparture(final Id linkId, final double time) {
+	public boolean isReadyForDeparture(final Id linkId) {
 		// cannot depart if not in "leg" mode (ie if still performing an activity
 		// or if execution was aborted)
 		if (getState() != MobsimAgent.State.LEG) return false;
@@ -138,10 +137,10 @@ public class JointTravelerAgent implements MobsimDriverAgent {
 		if ( !getCurrentLinkId().equals( linkId ) ) return false;
 
 		// we are here, in a leg... check for passengers.
-		List<Id> passengersAtLink = getPassengersAtLink( linkId );
+		List<Id> passengersAtLink1 = getPassengersAtLink( linkId );
 		Collection<Id> ps = getPassengersIds();
 
-		return ps.size() == passengersAtLink.size() && passengersAtLink.containsAll( ps );
+		return ps.size() == passengersAtLink1.size() && passengersAtLink1.containsAll( ps );
 	}
 
 	public void notifyJointDeparture(final Id linkId) {

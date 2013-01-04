@@ -134,7 +134,6 @@ public class GroupPlanStrategyFactory {
 								registry.getScenario(),
 								registry.getScoringFunctionFactory(),
 								registry.getTravelTime(),
-								registry.getTravelDisutilityFactory(),
 								registry.getLeastCostPathCalculatorFactory(),
 								registry.getTripRouterFactory() );
 						}

@@ -128,6 +128,7 @@ public class FixedTransitRouteModuleTest {
 			stops.add( r.getEgressStopId() );
 		}
 
+		@Override
 		public boolean equals(final Object o) {
 			if ( !(o instanceof PtTripInfo) ) return false;
 

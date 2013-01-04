@@ -40,11 +40,11 @@ public class MzPersonFactory2010  implements MzPersonFactory {
 	private static final String ARBEIT_MARKET_STATUS_NAME = "AMSTAT";
 
 	// actually, "did you work last week"
-	private static final String EMPLOYED_NAME = "f40500";
+	//private static final String EMPLOYED_NAME = "f40500";
 	private static final String ZPNR_NAME = "ZIELPNR";
 	private static final String HHNR_NAME = "HHNR";
 	private static final String DOW_NAME = "tag";
-	private static final String CAR_AVAIL_NAME = "f42100e";
+	//private static final String CAR_AVAIL_NAME = "f42100e";
 	private static final String CAR_LICENCE_NAME = "f20400a";
 	private static final String MOTORBIKE_LICENCE_NAME = "f20400b";
 	private static final String AGE_NAME = "alter";

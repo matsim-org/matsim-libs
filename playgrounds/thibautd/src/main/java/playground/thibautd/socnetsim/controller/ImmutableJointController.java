@@ -129,7 +129,7 @@ public final class ImmutableJointController extends AbstractController {
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 					@Override
 					public PersonAlgorithm getPersonAlgorithm() {
-						return new PreparePersonAlgorithm( registry.getTripRouterFactory() );
+						return new PreparePersonAlgorithm( registry );
 					}
 				});
 	}
@@ -147,11 +147,11 @@ public final class ImmutableJointController extends AbstractController {
 		return super.controlerIO;
 	}
 
-	public class PreparePersonAlgorithm extends AbstractPersonAlgorithm {
+	private static class PreparePersonAlgorithm extends AbstractPersonAlgorithm {
 		private final AbstractPersonAlgorithm prepareForSim;
 		private final AbstractPersonAlgorithm checkJointRoutes;
 
-		public PreparePersonAlgorithm(final TripRouterFactory factory) {
+		public PreparePersonAlgorithm(final ControllerRegistry registry) {
 			prepareForSim =
 				new PersonPrepareForSim(
 						new PlanRouter( registry.getTripRouterFactory().createTripRouter() ),

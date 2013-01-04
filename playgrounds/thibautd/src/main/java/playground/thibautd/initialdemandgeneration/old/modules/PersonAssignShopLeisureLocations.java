@@ -179,7 +179,9 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 							day.equals( OpeningTime.DayType.thu ) ||
 							day.equals( OpeningTime.DayType.fri );
 				case wkend: return day.equals( OpeningTime.DayType.sat ) ||
-							day.equals( OpeningTime.DayType.sun ); 
+							day.equals( OpeningTime.DayType.sun );
+				default:
+					break; 
 			}
 		}
 		return false;

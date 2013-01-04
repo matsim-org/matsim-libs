@@ -43,12 +43,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class EstimatorTripRouterFactory implements TripRouterFactory {
 	private final TripRouterFactory delegate;
 	private final PlansCalcRouteConfigGroup config;
-	private final PlanCalcScoreConfigGroup configScore;
 	private final Plan plan;
 	private final PopulationFactory populationFactory;
 	private final Network network;
 	private final TravelTime travelTime;
-	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathAlgoFactory;
 	private final ModeRouteFactory modeRouteFactory;
 	private final DepartureDelayAverageCalculator delay;
@@ -59,23 +57,19 @@ public class EstimatorTripRouterFactory implements TripRouterFactory {
 			final PopulationFactory populationFactory,
 			final Network network,
 			final TravelTime travelTime,
-			final TravelDisutilityFactory travelDisutilityFactory,
 			final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
 			final ModeRouteFactory modeRouteFactory,
 			final TransitSchedule transitSchedule,
 			final PlansCalcRouteConfigGroup config,
-			final PlanCalcScoreConfigGroup configScore,
 			final DepartureDelayAverageCalculator delay,
 			final TripRouterFactory delegate) {
 		this.plan = plan;
 		this.config = config;
-		this.configScore = configScore;
 		this.delay = delay;
 		this.delegate = delegate;
 		this.populationFactory = populationFactory;
 		this.network = network;
 		this.travelTime = travelTime;
-		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.leastCostPathAlgoFactory = leastCostPathAlgoFactory;
 		this.modeRouteFactory = modeRouteFactory;
 		this.transitSchedule = transitSchedule;
@@ -94,10 +88,8 @@ public class EstimatorTripRouterFactory implements TripRouterFactory {
 						populationFactory,
 						network,
 						travelTime,
-						travelDisutilityFactory,
 						leastCostPathAlgoFactory,
 						modeRouteFactory,
-						configScore,
 						delay,
 						// TODO: import from somewhere, or detect from the mobsim
 						false,

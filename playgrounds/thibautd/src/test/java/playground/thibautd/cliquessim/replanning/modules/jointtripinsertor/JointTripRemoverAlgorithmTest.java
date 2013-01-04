@@ -155,11 +155,11 @@ public class JointTripRemoverAlgorithmTest {
 		plans.put( driver.getId() , driverPlan );
 
 		Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
-		Leg dLeg1 = driverPlan.createAndAddLeg( "skateboard" );
+		driverPlan.createAndAddLeg( "skateboard" );
 		Activity dPu = driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
 		Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
 		Activity dDo = driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
-		Leg dLeg2 = driverPlan.createAndAddLeg( "elevator" );
+		driverPlan.createAndAddLeg( "elevator" );
 		Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
 
 		PlanImpl passengerPlan1 = new PlanImpl( passenger1 );
@@ -241,15 +241,15 @@ public class JointTripRemoverAlgorithmTest {
 		plans.put( driver.getId() , driverPlan );
 
 		Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
-		Leg dLeg1 = driverPlan.createAndAddLeg( "Rollerblade" );
+		driverPlan.createAndAddLeg( "Rollerblade" );
 		Activity dPu1 = driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
 		Leg jointDriverLeg1 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		Activity dPu2 = driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link3 );
+		driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link3 );
 		Leg jointDriverLeg2 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		Activity dDo1 = driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link4 );
+		driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link4 );
 		Leg jointDriverLeg3 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
 		Activity dDo2 = driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link5 );
-		Leg dLeg2 = driverPlan.createAndAddLeg( "iceskate" );
+		driverPlan.createAndAddLeg( "iceskate" );
 		Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
 
 		PlanImpl passengerPlan1 = new PlanImpl( passenger1 );
@@ -340,15 +340,15 @@ public class JointTripRemoverAlgorithmTest {
 		plans.put( driver.getId() , driverPlan );
 
 		Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
-		Leg dLeg1 = driverPlan.createAndAddLeg( "poney" );
-		Activity dPu1 = driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		driverPlan.createAndAddLeg( "poney" );
+		driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
 		Leg jointDriverLeg1 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
 		Activity dPu2 = driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link3 );
 		Leg jointDriverLeg2 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
 		Activity dDo1 = driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link4 );
 		Leg jointDriverLeg3 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		Activity dDo2 = driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link5 );
-		Leg dLeg2 = driverPlan.createAndAddLeg( "donkey" );
+		driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link5 );
+		driverPlan.createAndAddLeg( "donkey" );
 		Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
 
 		PlanImpl passengerPlan1 = new PlanImpl( passenger1 );

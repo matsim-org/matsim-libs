@@ -41,10 +41,6 @@ import playground.thibautd.utils.charts.WrapperChartUtil;
  * @author thibautd
  */
 public class PlotCliqueSizeDistribution {
-	private static final Log log =
-		LogFactory.getLog(PlotCliqueSizeDistribution.class);
-
-
 	private static final String START_CLIQUE = "\\s*<clique\\s.*";
 	private static final String END_CLIQUE = "\\s*</clique>.*";
 	private static final String PERSON_DEF = "\\s*<person\\s.*";

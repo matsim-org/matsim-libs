@@ -107,7 +107,7 @@ public class SplittingTest {
 			PlanImpl p = new PlanImpl( new PersonImpl( id ) );
 			plans.put( id , p );
 			p.createAndAddActivity( "orig" , origin );
-			Leg l = p.createAndAddLeg( "unicycle" );
+			p.createAndAddLeg( "unicycle" );
 			p.createAndAddActivity( "dest" , destination );
 		}
 

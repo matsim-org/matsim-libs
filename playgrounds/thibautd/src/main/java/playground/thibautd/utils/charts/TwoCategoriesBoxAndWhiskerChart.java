@@ -37,10 +37,6 @@ import org.matsim.core.utils.charts.ChartUtil;
  * @author thibautd
  */
 public class TwoCategoriesBoxAndWhiskerChart extends ChartUtil {
-	private static final Logger log =
-		Logger.getLogger(TwoCategoriesBoxAndWhiskerChart.class);
-
-
 	private final DefaultBoxAndWhiskerCategoryDataset dataset =
 		new DefaultBoxAndWhiskerCategoryDataset();
 	private final DefaultStatisticalCategoryDataset errorBarsDataset =

@@ -301,8 +301,8 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends CharyparNagel
 			// reduce score by penalty from capacity restraints
 			Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
 			while (pen_it.hasNext()) {
-				ScoringPenalty penalty = pen_it.next();
-				facilityPenaltiesScore -= penalty.getPenalty();
+				ScoringPenalty currentPenalty = pen_it.next();
+				facilityPenaltiesScore -= currentPenalty.getPenalty();
 			}
 		}
 		return facilityPenaltiesScore;

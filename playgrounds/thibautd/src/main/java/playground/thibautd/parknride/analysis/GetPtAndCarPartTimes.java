@@ -120,7 +120,7 @@ public class GetPtAndCarPartTimes {
 			Trip trip = trips.get( event.getPersonId() );
 
 			if ( trip != null ) {
-				trip.notifyArrival( event.getTime() , event.getLegMode() );;
+				trip.notifyArrival( event.getTime() );;
 			}		
 		}
 
@@ -184,7 +184,7 @@ public class GetPtAndCarPartTimes {
 			}
 		}
 
-		public void notifyArrival(final double time, final String mode) {
+		public void notifyArrival(final double time) {
 			switch (state) {
 				case car:
 					carArrival = time;

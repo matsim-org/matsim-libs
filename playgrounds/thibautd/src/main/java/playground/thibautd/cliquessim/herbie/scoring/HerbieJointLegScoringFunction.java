@@ -48,7 +48,6 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 
 	private final HerbieConfigGroup ktiConfigGroup;
 	private final Config config;
-	private final Network network;
 	private final TravelScoringFunction travelScoring;
 	private final Plan plan;
 
@@ -61,8 +60,7 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 		super(params, network);
 		this.plan = plan;
 		this.travelScoring = new TravelScoringFunction(params, ktiConfigGroup);
-		this.config = config;
-		this.network = network;
+		this.config = config;;
 		this.ktiConfigGroup = ktiConfigGroup;
 	}
 

@@ -131,10 +131,9 @@ public abstract class AbstractMultithreadedGroupStrategyModule implements GroupS
 
 	@Override
 	public String toString() {
-		String name = getClass().getSimpleName();
 		if (name.length() == 0) {
 			// anonymous class
-			name = createAlgorithm().getClass().getSimpleName();
+			return createAlgorithm().getClass().getSimpleName();
 		}
 
 		return name;

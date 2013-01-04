@@ -47,8 +47,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author thibautd
  */
 public class Cliques implements Population {
-
-	private static final Logger log = Logger.getLogger(Cliques.class);
 	
 	private String name = null;
 

@@ -49,8 +49,6 @@ public class HitchHikingInsertionAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		final Person person = plan.getPerson();
-
 		List<Leg> choiceSet = new ArrayList<Leg>();
 		for (PlanElement pe : plan.getPlanElements()) {
 			if ( pe instanceof Leg &&

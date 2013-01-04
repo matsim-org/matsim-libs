@@ -99,7 +99,6 @@ public class IdentifySpotsAtPtRough {
 		log.info( "write link Ids to "+spotsOutFile );
 		HitchHikingUtils.writeFile(
 				new HitchHikingSpots(
-					carNetwork,
 					hhLinks),
 				spotsOutFile);
 		log.info( "write link coords to "+spotsOutFile+".xy" );

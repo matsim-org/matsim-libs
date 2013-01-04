@@ -136,7 +136,6 @@ public class ParkAndRideTripsAnalyzer {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 					String mode = leg.getMode();
-					double tt = leg.getTravelTime();
 
 					if ( mode.equals( TransportMode.pt ) ) {
 						count++;

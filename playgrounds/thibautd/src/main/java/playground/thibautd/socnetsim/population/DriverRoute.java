@@ -65,8 +65,8 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 		return passengers.remove( passenger );
 	}
 
-	public boolean removePassengers(final Collection<Id> passengers) {
-		return passengers.removeAll( passengers );
+	public boolean removePassengers(final Collection<Id> toRemove) {
+		return this.passengers.removeAll( toRemove );
 	}
 
 	public void setPassengerIds(final Collection<Id> ps) {

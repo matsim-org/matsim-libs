@@ -38,9 +38,6 @@ import org.jfree.data.xy.AbstractIntervalXYDataset;
  * @author thibautd
  */
 public class XYLineHistogramDataset extends AbstractIntervalXYDataset {
-	private static final Log log =
-		LogFactory.getLog(XYLineHistogramDataset.class);
-
 	private static final long serialVersionUID = 1L;
 	private boolean cumulative = false;
 

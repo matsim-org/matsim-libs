@@ -125,10 +125,10 @@ public class JointTimeModeChooserSolution implements Solution {
 
 		while (valueListsIter.hasNext()) {
 			Iterator<PlanElement> pes = peListsIter.next().iterator();
-			Iterator<Value> values = valueListsIter.next().iterator();
+			Iterator<Value> valuesIterator = valueListsIter.next().iterator();
 
-			while (values.hasNext()) {
-				Value val = values.next();
+			while (valuesIterator.hasNext()) {
+				Value val = valuesIterator.next();
 				PlanElement pe = pes.next();
 
 				if (pe instanceof Subtour) {
@@ -161,11 +161,11 @@ public class JointTimeModeChooserSolution implements Solution {
 		Iterator<List<Value>> valueListsIter = values.values.iterator();
 
 		while (valueListsIter.hasNext()) {
-			Iterator<Value> values = valueListsIter.next().iterator();
+			Iterator<Value> valuesIterator = valueListsIter.next().iterator();
 
 			double dur = 0;
-			while (values.hasNext()) {
-				Object val = values.next().getValue();
+			while (valuesIterator.hasNext()) {
+				Object val = valuesIterator.next().getValue();
 
 				if (val instanceof Integer) {
 					dur += (Integer) val;
@@ -359,15 +359,15 @@ public class JointTimeModeChooserSolution implements Solution {
 		}
 	}	
 
-	private void enforceTimeConsistency(final JointPlan plan) {
-		for (Map.Entry< Id , Plan > entry : plan.getIndividualPlans().entrySet()) {
+	private void enforceTimeConsistency(final JointPlan planToActOn) {
+		for (Map.Entry< Id , Plan > entry : planToActOn.getIndividualPlans().entrySet()) {
 			Id currentAgent = entry.getKey();
 			List<PlanElement> planElements = entry.getValue().getPlanElements();
 			double now = 0;
 			for (PlanElement pe : planElements) {
 				if (pe instanceof Activity) {
 					if ( now == Time.UNDEFINED_TIME ) {
-						throw new RuntimeException( "got an undefined start time for plan element "+pe+" in plan "+plan.getPlanElements() );
+						throw new RuntimeException( "got an undefined start time for plan element "+pe+" in plan "+planToActOn.getPlanElements() );
 					}
 					Activity act = (Activity) pe;
 					// System.out.println( "now="+Time.writeTime( now ) );
@@ -404,7 +404,7 @@ public class JointTimeModeChooserSolution implements Solution {
 					if ( ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
 						PassengerRoute route = (PassengerRoute) ((Leg) pe).getRoute();
 						double tt =	searchDriverTravelTime(
-							plan,
+							planToActOn,
 							route.getStartLinkId(),
 							route.getEndLinkId(),
 							route.getDriverId(),

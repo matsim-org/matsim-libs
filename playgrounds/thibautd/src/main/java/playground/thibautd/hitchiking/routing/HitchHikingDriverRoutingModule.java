@@ -141,7 +141,7 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 					public int compare(
 						final IdWithDistance first,
 						final IdWithDistance second) {
-						return first.id.compareTo( second.id );
+						return Double.compare( first.distance , second.distance );
 					}
 				});
 
@@ -157,12 +157,11 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 			final Coord origin,
 			final Coord destination,
 			final Id destinationId,
-			final Collection<Link> spots) {
+			final Collection<Link> spots1) {
 		double maxDetour = CoordUtils.calcDistance( origin , destination ) * ( 1  + config.getMaximumDetourFraction());
-		double currentDetour = Double.POSITIVE_INFINITY;
 		List<Link> possibleSpots = new ArrayList<Link>();
 
-		for (Link l : spots) {
+		for (Link l : spots1) {
 			double detour = CoordUtils.calcDistance( origin, l.getCoord() )
 				+ CoordUtils.calcDistance( l.getCoord() , destination );
 			if (detour <= maxDetour) {

@@ -43,9 +43,6 @@ import playground.thibautd.hitchiking.qsim.PassengerQueuesPerLink.Queue;
  * @author thibautd
  */
 public class PassengerQueuesManager implements MobsimEngine, DepartureHandler {
-	private static final Logger log =
-		Logger.getLogger(PassengerQueuesManager.class);
-
 	private final PassengerQueuesPerLink queues = new PassengerQueuesPerLink();
 	private EventsManager events;
 	private InternalInterface internalInterface = null;

@@ -121,7 +121,6 @@ public class JointPlanUtilsTest {
 		// plan 2
 		// two passenger, two ODs
 		plans = new HashMap<Id, Plan>();
-		List<JointTrip> jointTrips = new ArrayList<JointTrip>();
 		plan = new PlanImpl( driver );
 		plan.createAndAddActivity( "home" , link1 );
 		plan.createAndAddLeg( TransportMode.walk );
@@ -201,7 +200,6 @@ public class JointPlanUtilsTest {
 		// plan 3
 		// two passenger, two ODs, two JT for one passenger
 		plans = new HashMap<Id, Plan>();
-		jointTrips = new ArrayList<JointTrip>();
 		plan = new PlanImpl( driver );
 		plan.createAndAddActivity( "home" , link1 );
 		plan.createAndAddLeg( TransportMode.walk );
@@ -310,7 +308,6 @@ public class JointPlanUtilsTest {
 		// plan 4
 		// two passengers, "midle trip"
 		plans = new HashMap<Id, Plan>();
-		jointTrips = new ArrayList<JointTrip>();
 		plan = new PlanImpl( driver );
 		plan.createAndAddActivity( "home" , link1 );
 		plan.createAndAddLeg( TransportMode.walk );

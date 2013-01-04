@@ -53,55 +53,55 @@ public class MzPersonFactory1994 implements MzPersonFactory {
 	public MzPersonFactory1994(final Statistics stats , final String titleLine) {
 		this.stats = stats;
 		String[] names = titleLine.split("\t");
-		int employedIndex = -1;
-		int educationIndex = -1;
-		int personIndex = -1;
-		int hhIndex = -1;
-		int dayOfWeekIndex = -1;
-		int licenceIndex = -1;
-		int ageIndex = -1;
-		int weightIndex = -1;
-		int genderIndex = -1;
+		int employedIndex1 = -1;
+		int educationIndex1 = -1;
+		int personIndex1 = -1;
+		int hhIndex1 = -1;
+		int dayOfWeekIndex1 = -1;
+		int licenceIndex1 = -1;
+		int ageIndex1 = -1;
+		int weightIndex1 = -1;
+		int genderIndex1 = -1;
 
 		for (int i=0; i < names.length; i++) {
 			if (names[ i ].equals( EMPLOYED_NAME )) {
-				employedIndex = i;
+				employedIndex1 = i;
 			}
 			if (names[ i ].equals( EDUCATION_NAME )) {
-				educationIndex = i;
+				educationIndex1 = i;
 			}
 			else if (names[ i ].equals( PERSON_NAME )) {
-				personIndex  = i;
+				personIndex1  = i;
 			}
 			else if (names[ i ].equals( HH_NAME )) {
-				hhIndex  = i;
+				hhIndex1  = i;
 			}
 			else if (names[ i ].equals( DOW_NAME )) {
-				dayOfWeekIndex = i;
+				dayOfWeekIndex1 = i;
 			}
 			else if (names[ i ].equals( LICENCE_NAME )) {
-				licenceIndex = i;
+				licenceIndex1 = i;
 			}
 			else if (names[ i ].equals( AGE_NAME )) {
-				ageIndex = i;
+				ageIndex1 = i;
 			}
 			else if (names[ i ].equals( WEIGHT_NAME )) {
-				weightIndex = i;
+				weightIndex1 = i;
 			}
 			else if (names[ i ].equals( GENDER_NAME )) {
-				genderIndex = i;
+				genderIndex1 = i;
 			}
 		}
 
-		this.employedIndex = employedIndex;
-		this.educationIndex = educationIndex;
-		this.personIndex = personIndex;
-		this.hhIndex = hhIndex;
-		this.dayOfWeekIndex = dayOfWeekIndex;
-		this.licenceIndex = licenceIndex;
-		this.ageIndex = ageIndex;
-		this.weightIndex = weightIndex;
-		this.genderIndex = genderIndex;
+		this.employedIndex = employedIndex1;
+		this.educationIndex = educationIndex1;
+		this.personIndex = personIndex1;
+		this.hhIndex = hhIndex1;
+		this.dayOfWeekIndex = dayOfWeekIndex1;
+		this.licenceIndex = licenceIndex1;
+		this.ageIndex = ageIndex1;
+		this.weightIndex = weightIndex1;
+		this.genderIndex = genderIndex1;
 	}
 
 	@Override

@@ -61,85 +61,85 @@ public class MzWegFactory1994 implements MzWegFactory {
 
 	public MzWegFactory1994( final String headLine ) {
 		String[] names = headLine.split("\t");
-		int hhIndex = -1;
-		int personIndex = -1;
-		int wegnrIndex = -1;
-		int departureTimeIndex = -1;
-		int arrivalTimeIndex = -1;
-		int distanceIndex = -1;
-		int durationIndex = -1;
-		int purposeIndex = -1;
-		int startOrtIndex = -1;
-		int startStreetIndex = -1;
-		int startStreetNrIndex = -1;
-		int endOrtIndex = -1;
-		int endStreetIndex = -1;
-		int endStreetNrIndex = -1;
-		int modeIndex = -1;
+		int hhIndex1 = -1;
+		int personIndex1 = -1;
+		int wegnrIndex1 = -1;
+		int departureTimeIndex1 = -1;
+		int arrivalTimeIndex1 = -1;
+		int distanceIndex1 = -1;
+		int durationIndex1 = -1;
+		int purposeIndex1 = -1;
+		int startOrtIndex1 = -1;
+		int startStreetIndex1 = -1;
+		int startStreetNrIndex1 = -1;
+		int endOrtIndex1 = -1;
+		int endStreetIndex1 = -1;
+		int endStreetNrIndex1 = -1;
+		int modeIndex1 = -1;
 
 		for (int i=0; i < names.length; i++) {
 			if (names[ i ].equals( HH_NAME )) {
-				hhIndex = i;
+				hhIndex1 = i;
 			}
 			if (names[ i ].equals( PERSON_NAME )) {
-				personIndex = i;
+				personIndex1 = i;
 			}
 			if (names[ i ].equals( WEGNR_NAME )) {
-				wegnrIndex = i;
+				wegnrIndex1 = i;
 			}
 			if (names[ i ].equals( DEPARTURE_TIME_NAME )) {
-				departureTimeIndex = i;
+				departureTimeIndex1 = i;
 			}
 			if (names[ i ].equals( ARRIVAL_TIME_NAME )) {
-				arrivalTimeIndex = i;
+				arrivalTimeIndex1 = i;
 			}
 			if (names[ i ].equals( DISTANCE_NAME )) {
-				distanceIndex = i;
+				distanceIndex1 = i;
 			}
 			if (names[ i ].equals( DURATION_NAME )) {
-				durationIndex = i;
+				durationIndex1 = i;
 			}
 			if (names[ i ].equals( PURPOSE_NAME )) {
-				purposeIndex = i;
+				purposeIndex1 = i;
 			}
 			if (names[ i ].equals( START_ORT_NAME )) {
-				startOrtIndex = i;
+				startOrtIndex1 = i;
 			}
 			if (names[ i ].equals( START_STREET_NAME )) {
-				startStreetIndex = i;
+				startStreetIndex1 = i;
 			}
 			if (names[ i ].equals( START_STREET_NR_NAME )) {
-				startStreetNrIndex = i;
+				startStreetNrIndex1 = i;
 			}
 			if (names[ i ].equals( END_ORT_NAME )) {
-				endOrtIndex = i;
+				endOrtIndex1 = i;
 			}
 			if (names[ i ].equals( END_STREET_NAME )) {
-				endStreetIndex = i;
+				endStreetIndex1 = i;
 			}
 			if (names[ i ].equals( END_STREET_NR_NAME )) {
-				endStreetNrIndex = i;
+				endStreetNrIndex1 = i;
 			}
 			if (names[ i ].equals( MODE_NAME )) {
-				modeIndex = i;
+				modeIndex1 = i;
 			}
 		}
 
-		this.hhIndex = hhIndex;
-		this.personIndex = personIndex;
-		this.wegnrIndex = wegnrIndex;
-		this.departureTimeIndex = departureTimeIndex;
-		this.arrivalTimeIndex = arrivalTimeIndex;
-		this.distanceIndex = distanceIndex;
-		this.durationIndex = durationIndex;
-		this.purposeIndex = purposeIndex;
-		this.startOrtIndex = startOrtIndex;
-		this.startStreetIndex = startStreetIndex;
-		this.startStreetNrIndex = startStreetNrIndex;
-		this.endOrtIndex = endOrtIndex;
-		this.endStreetIndex = endStreetIndex;
-		this.endStreetNrIndex = endStreetNrIndex;
-		this.modeIndex = modeIndex;
+		this.hhIndex = hhIndex1;
+		this.personIndex = personIndex1;
+		this.wegnrIndex = wegnrIndex1;
+		this.departureTimeIndex = departureTimeIndex1;
+		this.arrivalTimeIndex = arrivalTimeIndex1;
+		this.distanceIndex = distanceIndex1;
+		this.durationIndex = durationIndex1;
+		this.purposeIndex = purposeIndex1;
+		this.startOrtIndex = startOrtIndex1;
+		this.startStreetIndex = startStreetIndex1;
+		this.startStreetNrIndex = startStreetNrIndex1;
+		this.endOrtIndex = endOrtIndex1;
+		this.endStreetIndex = endStreetIndex1;
+		this.endStreetNrIndex = endStreetNrIndex1;
+		this.modeIndex = modeIndex1;
 	}
 
 	@Override

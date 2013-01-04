@@ -304,7 +304,7 @@ public class Mater {
 	// /////////////////////////////////////////////////////////////////////////
 	// helper classes
 	// /////////////////////////////////////////////////////////////////////////
-	private class IdFactory {
+	private static class IdFactory {
 		private int id = 0;
 
 		public Id createId() {
@@ -313,7 +313,7 @@ public class Mater {
 		}
 	}
 
-	private class PuNameFactory {
+	private static class PuNameFactory {
 		private static final String PREFIX = 
 			JointActingTypes.PICK_UP_BEGIN +
 			JointActingTypes.PICK_UP_SPLIT_EXPR;

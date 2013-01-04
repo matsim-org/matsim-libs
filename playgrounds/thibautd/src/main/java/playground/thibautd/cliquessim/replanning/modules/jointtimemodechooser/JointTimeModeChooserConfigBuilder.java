@@ -63,9 +63,8 @@ class JointTimeModeChooserConfigBuilder {
 			final Random random,
 			final JointPlan plan,
 			final JointTimeModeChooserConfigGroup config,
-			final ScoringFunctionFactory scoringFunctionFactory,
-			final TripRouterFactory tripRouterFactory) {
-		this( random , plan , config , scoringFunctionFactory , tripRouterFactory , null );
+			final ScoringFunctionFactory scoringFunctionFactory) {
+		this( random , plan , config , scoringFunctionFactory , null );
 	}
 
 	public JointTimeModeChooserConfigBuilder(
@@ -73,7 +72,6 @@ class JointTimeModeChooserConfigBuilder {
 			final JointPlan plan,
 			final JointTimeModeChooserConfigGroup config,
 			final ScoringFunctionFactory scoringFunctionFactory,
-			final TripRouterFactory tripRouterFactory,
 			final String analysisOutputDir) {
 		this.random = random;
 		this.plan = plan;

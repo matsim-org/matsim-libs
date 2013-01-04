@@ -79,7 +79,6 @@ public class HerbieTransitRouterFactory implements TransitRouterFactory {
 				this.config,
 				this.routerNetwork,
 				(TravelTime) ttCalculator,
-				ttCalculator,
-				travelScoring);
+				ttCalculator);
 	}
 }

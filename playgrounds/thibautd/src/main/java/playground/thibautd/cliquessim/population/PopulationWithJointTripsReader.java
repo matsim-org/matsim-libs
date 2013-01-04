@@ -112,8 +112,6 @@ public class PopulationWithJointTripsReader extends MatsimXmlParser implements P
 
 	private final static Logger log = Logger.getLogger(PopulationWithJointTripsReader.class);
 
-	private int warnPlanTypeCount = 0;
-
 	public PopulationWithJointTripsReader(final Scenario scenario) {
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();

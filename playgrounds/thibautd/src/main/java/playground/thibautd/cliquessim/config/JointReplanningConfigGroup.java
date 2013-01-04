@@ -583,24 +583,6 @@ public class JointReplanningConfigGroup extends Module {
 		}
 	}
 
-	private static List<String> getAllModes() {
-		List<String> out = new ArrayList<String>();
-
-		//iterate over all public fields of transport mode
-		//TODO: more precise catches.
-		for (Field field : TransportMode.class.getFields()) {
-			try {
-				out.add((String) field.get(null));
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("error while iterating over "+
-						"TransportMode fields");
-			}
-		}
-
-		return out;
-	}
-
 	public void setModeToOptimize(String value) {
 		this.optimizeMode = Boolean.valueOf(value);
 	}

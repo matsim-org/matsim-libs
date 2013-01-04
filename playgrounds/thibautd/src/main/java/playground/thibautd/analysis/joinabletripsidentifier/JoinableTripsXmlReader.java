@@ -55,14 +55,6 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 		super(false);
 	}
 
-	private void reset() {
-		count.reset();
-		conditions.clear();
-		trips = new HashMap<Id, JoinableTrips.TripRecord>();
-		currentJoinableTrips = null;
-		currentJoinableTrip = null;
-	}
-
 	@Override
 	public void startTag(
 			final String name,

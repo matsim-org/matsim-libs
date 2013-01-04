@@ -38,13 +38,12 @@ public class HitchHikingSpots {
 	public HitchHikingSpots(
 			final Collection<Id> hitchHikableLinks,
 			final Network network) {
-		this( network , getHitchHikableLinks( hitchHikableLinks , network ) );
+		this( getHitchHikableLinks( hitchHikableLinks , network ) );
 	}
 
 	public HitchHikingSpots(
-			final Network network,
 			final Collection<Link> hitchHikableLinks) {
-		this.quadTree = buildQt( hitchHikableLinks , network );
+		this.quadTree = buildQt( hitchHikableLinks );
 	}
 
 	private static Collection<Link> getHitchHikableLinks(
@@ -59,8 +58,7 @@ public class HitchHikingSpots {
 	}
 
 	private static QuadTree<Link> buildQt(
-			final Collection<Link> hitchHikableLinks,
-			final Network network) {
+			final Collection<Link> hitchHikableLinks) {
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;

@@ -53,9 +53,6 @@ public class HHHerbieControler extends HitchHikingControler {
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
 	private final HerbieConfigGroup herbieConfigGroup;
-	private ParkingPenaltyFactory penaltyFactory;
-
-	private static final Logger log = Logger.getLogger(Controler.class);
 	
 	public HHHerbieControler(
 			final Scenario scenario,

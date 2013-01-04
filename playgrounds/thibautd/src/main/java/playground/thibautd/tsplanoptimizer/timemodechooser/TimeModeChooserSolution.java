@@ -219,12 +219,12 @@ public class TimeModeChooserSolution implements Solution {
 		}
 	}	
 
-	private void enforceTimeConsistency(final Plan plan) {
+	private void enforceTimeConsistency(final Plan planToActOn) {
 		double now = 0;
-		for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanElement pe : planToActOn.getPlanElements()) {
 			if (pe instanceof Activity) {
 				if ( now == Time.UNDEFINED_TIME ) {
-					throw new RuntimeException( "got an undefined score for plan element "+pe+" in plan "+plan.getPlanElements() );
+					throw new RuntimeException( "got an undefined score for plan element "+pe+" in plan "+planToActOn.getPlanElements() );
 				}
 				Activity act = (Activity) pe;
 

@@ -146,14 +146,12 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 				((PopulationImpl) controler.getPopulation()).getFactory(),
 				controler.getNetwork(),
 				controler.getTravelTimeCalculator(),
-				controler.getTravelDisutilityFactory(),
 				controler.getLeastCostPathCalculatorFactory(),
 				((PopulationFactoryImpl) ((PopulationImpl) controler.getPopulation()).getFactory()).getModeRouteFactory(),
 				controler.getConfig().scenario().isUseTransit() ?
 					controler.getScenario().getTransitSchedule() :
 					null,
 				controler.getConfig().plansCalcRoute(),
-				controler.getConfig().planCalcScore(),
 				delay,
 				controler.getTripRouterFactory());
 	}

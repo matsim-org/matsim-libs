@@ -313,6 +313,7 @@ class CommutersFilter implements PassengerFilter {
 				 "");
 	}
 
+	@Override
 	public String toString() {
 		return getConditionDescription();
 	}

@@ -34,11 +34,11 @@ public class Aggregator {
 	private double standarddevDay = 0.0;
 		
 	public void aggregate(
-			final TreeMap<Integer, List<Double>> volumes,
-			final TreeMap<Integer, List<Double>> volumesDay,
+			final TreeMap<Integer, List<Double>> volumes1,
+			final TreeMap<Integer, List<Double>> volumesDay1,
 			final boolean removeOutliers) {
-		this.volumes = volumes;	
-		this.volumesDay = volumesDay;
+		this.volumes = volumes1;	
+		this.volumesDay = volumesDay1;
 		if (removeOutliers) this.removeOutliers();
 		this.avg();
 		this.standarddev_s();

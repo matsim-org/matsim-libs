@@ -82,6 +82,7 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 		this.run(person.getSelectedPlan());
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId());
 		if (k == null) {

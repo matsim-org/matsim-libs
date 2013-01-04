@@ -89,6 +89,7 @@ public class TripsPrism {
 		recordsByOrigin = constructQuadTree(
 				trips,
 				new IdGetter() {
+					@Override
 					public Id getId( final Record r ) {
 						return r.getOriginLink();
 					}
@@ -100,6 +101,7 @@ public class TripsPrism {
 		recordsByDestination = constructQuadTree(
 				trips,
 				new IdGetter() {
+					@Override
 					public Id getId( final Record r ) {
 						return r.getDestinationLink();
 					}

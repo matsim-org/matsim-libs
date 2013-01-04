@@ -120,10 +120,6 @@ public class TravelTimeEstimator {
 			links = p.links;
 		}
 
-		private double getDistance() {
-			return distance;
-		}
-
 		private double getTravelTime(
 				final double departureTime,
 				final TravelTime estimator) {

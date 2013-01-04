@@ -149,7 +149,7 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 
 	@Override
 	public double getFaroutCoefficient() {
-		return this.faroutCoefficient;
+		return BoxAndWhiskerXYNumberDataset.faroutCoefficient;
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 
 	@Override
 	public double getOutlierCoefficient() {
-		return this.outlierCoefficient;
+		return BoxAndWhiskerXYNumberDataset.outlierCoefficient;
 	}
 
 	@Override

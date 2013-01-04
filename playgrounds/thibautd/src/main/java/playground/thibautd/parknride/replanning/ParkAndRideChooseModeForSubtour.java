@@ -132,8 +132,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 
 		List< List<PlanElement> > pnrSubtours = new ArrayList< List<PlanElement> >();
 
-		int sub = 0;
-		for ( List<PlanElement> subtour : planAnalyzeSubtours.getSubtourElements() ) {
+		for ( int sub = 0 ; sub < planAnalyzeSubtours.getSubtourElements().size(); sub++ ) {
 			List<PlanElement> cleanSubtour =
 				getSubtourWithoutSubsubtours(
 						sub,
@@ -142,7 +141,6 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 			if ( containsFlaggedPnrTrip( cleanSubtour ) ) {
 				pnrSubtours.add( cleanSubtour );
 			}
-			sub++;
 		}
 		List<PlanElement> choosenSubtour = pnrSubtours.get( rng.nextInt( pnrSubtours.size() ) );
 
@@ -453,22 +451,6 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 			Activity origin = (Activity) iter.next();
 
 			while (iter.hasNext()) {
-				PlanElement pe = iter.next();
-				//if (pe instanceof Activity) {
-				//	// this can happen due to skipping sub-subtours.
-				//	// just do one step forward.
-				//	// Moreover, due to the fact that this method is called
-				//	// on subsets of subtours from the changeLegToPnr,
-				//	// it is not sure that there are still elements...
-				//	if (iter.hasNext()) {
-				//		origin = (Activity) pe;
-				//		iter.next();
-				//	}
-				//	else {
-				//		break;
-				//	}
-				//}
-
 				Activity destination = (Activity) iter.next();
 				List<? extends PlanElement> trip =
 					tripRouter.calcRoute(

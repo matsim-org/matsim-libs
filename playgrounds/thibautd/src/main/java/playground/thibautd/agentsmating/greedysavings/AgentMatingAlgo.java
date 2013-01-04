@@ -49,7 +49,7 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 public class AgentMatingAlgo {
 
 	private static final String HOME_REGEXP = "h.*";
-	private static final String WORK_REGEXP = "w.*";
+	//private static final String WORK_REGEXP = "w.*";
 	private final boolean onlyMateDrivers = false;
 
 	private static final double PU_DUR = 0d;

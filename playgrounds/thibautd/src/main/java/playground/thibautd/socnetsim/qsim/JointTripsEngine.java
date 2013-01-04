@@ -76,7 +76,7 @@ public class JointTripsEngine implements DepartureHandler, MobsimEngine {
 			final Id linkId) {
 		JointTravelerAgent driver = (JointTravelerAgent) agent;
 
-		if ( driver.isReadyForDeparture( linkId , now ) ) {
+		if ( driver.isReadyForDeparture( linkId ) ) {
 			for ( Id p : driver.getPassengersIds() ) {
 				// add only at the time of departure, so that
 				// we are sure we take into account the right
@@ -106,7 +106,7 @@ public class JointTripsEngine implements DepartureHandler, MobsimEngine {
 		JointTravelerAgent driver = getAgent( passenger.getDriverId() );
 		
 		try {
-			driver.notifyPassengerArrivedAtLink(now, passenger.getId(), linkId);
+			driver.notifyPassengerArrivedAtLink(passenger.getId(), linkId);
 		}
 		catch (NullPointerException e) {
 			throw new RuntimeException( "driver "+driver+" with id "+passenger.getDriverId()+" passenger "+passenger.getId()+" link "+linkId );

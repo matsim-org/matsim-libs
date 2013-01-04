@@ -46,9 +46,6 @@ public class JointHerbieControler extends JointControler {
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
 	private final HerbieConfigGroup herbieConfigGroup;
-	private ParkingPenaltyFactory penaltyFactory;
-
-	private static final Logger log = Logger.getLogger(Controler.class);
 	
 	public JointHerbieControler( final Scenario scenario ) {
 		super( scenario );
@@ -101,7 +98,7 @@ public class JointHerbieControler extends JointControler {
 	}
 	
 	
-	private double reroutingShare = 0.05;
+	//private double reroutingShare = 0.05;
 
 	 ///**
 	 // * Create and return a TransitStrategyManager which filters transit agents

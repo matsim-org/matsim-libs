@@ -45,19 +45,19 @@ public class SubtourAndParentsModeMoveGenerator implements MoveGenerator {
 			final Collection<String> modes,
 			final double fraction) {
 		this.random = random;
-		List<Move> moves = new ArrayList<Move>();
+		List<Move> movesList = new ArrayList<Move>();
 
 		int i=0;
 		for (Value value : initialSolution.getRepresentation()) {
 			if (value instanceof SubtourValue) {
 				for (String mode : modes) {
-					moves.add( new SubtourAndParentsModeMove( i , mode ) );
+					movesList.add( new SubtourAndParentsModeMove( i , mode ) );
 				}
 			}
 			i++;
 		}
 
-		this.moves = Collections.unmodifiableList( moves );
+		this.moves = Collections.unmodifiableList( movesList );
 
 		if (fraction < 0) {
 			nMoves = 0;
@@ -66,7 +66,7 @@ public class SubtourAndParentsModeMoveGenerator implements MoveGenerator {
 			nMoves = 1;
 		}
 		else {
-			nMoves = (int) Math.ceil( fraction * moves.size() );
+			nMoves = (int) Math.ceil( fraction * movesList.size() );
 		}
 	}
 

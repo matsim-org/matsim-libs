@@ -82,7 +82,6 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 	private final NetworkLegRouter routingModule;
 	private final TravelTime travelTime;
-	private final TravelDisutility travelCost;
 	private final DepartureDelayAverageCalculator tDepDelayCalc;
 
 	public FixedRouteNetworkRoutingModule(
@@ -91,10 +90,8 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 			final PopulationFactory populationFactory,
 			final Network network,
 			final TravelTime travelTime,
-			final TravelDisutilityFactory travelDisutilityFactory,
 			final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
 			final ModeRouteFactory modeRouteFactory,
-			final PlanCalcScoreConfigGroup scoreConfigGroup,
 			final DepartureDelayAverageCalculator tDepDelayCalc,
 			final boolean isFirstLinkSimulated,
 			final boolean isLastLinkSimulated) {
@@ -106,7 +103,6 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 
 		this.network = network;
 		this.travelTime = travelTime;
-		this.travelCost = travelDisutilityFactory.createTravelDisutility( travelTime , scoreConfigGroup );
 
 		routes = extractRoutes( plan , mainMode );
 
@@ -163,7 +159,7 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 
 		// always "update" the travel time, even for newly created routes,
 		// as routes are computed without congestion
-		updateTravelTime( route , departureTime , person );
+		updateTravelTime( route , departureTime );
 
 		Leg newLeg = populationFactory.createLeg( mode );
 		newLeg.setRoute( route );
@@ -195,8 +191,7 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 
 	private void updateTravelTime(
 			final NetworkRoute route,
-			final double departureTime,
-			final Person person) {
+			final double departureTime) {
 
 		double now = processDeparture( route.getStartLinkId() , departureTime );
 

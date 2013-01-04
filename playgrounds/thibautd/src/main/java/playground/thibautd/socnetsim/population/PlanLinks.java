@@ -76,6 +76,8 @@ public class PlanLinks {
 	}
 
 	public static class PlanLinkException extends RuntimeException {
+		private static final long serialVersionUID = -6189128092802956514L;
+
 		private PlanLinkException( final String msg ) {
 			super( msg );
 		}
