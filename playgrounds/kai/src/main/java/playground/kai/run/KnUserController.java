@@ -22,7 +22,6 @@ package playground.kai.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class KnUserController {
