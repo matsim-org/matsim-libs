@@ -29,6 +29,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,13 +39,13 @@ import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledges;
 
@@ -60,18 +61,18 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	private final static Logger log = Logger.getLogger(LeisureFacilityExtractor.class);
 
 
-	public LocationMutatorTGSimple(final NetworkImpl network, Controler controler,
+	public LocationMutatorTGSimple(final Scenario scenario,
 			Knowledges knowledges,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 
-		super(network, controler, quad_trees, facilities_of_type, new Random(4711));
+		super(scenario, quad_trees, facilities_of_type, new Random(4711));
 
 		log.info("Using modified TGMutator");
 
-		this.defineFlexibleActivities = new ActivitiesHandler(controler.getConfig().locationchoice());
+		this.defineFlexibleActivities = new ActivitiesHandler(scenario.getConfig().locationchoice());
 		this.leisureQuadtree = new FacilityQuadTreeBuilder().buildFacilityQuadTree("leisure",
-				(ActivityFacilitiesImpl)controler.getFacilities());
+				(ActivityFacilitiesImpl)((ScenarioImpl) scenario).getActivityFacilities());
 		leisureFacilityExtractor = new LeisureFacilityExtractor(this.leisureQuadtree);
 	}
 
@@ -148,7 +149,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			return false;
 		}
 		act.setFacilityId(facility.getId());
-   		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
+   		act.setLinkId(((NetworkImpl)scenario.getNetwork()).getNearestLink(facility.getCoord()).getId());
    		act.setCoord(facility.getCoord());
 
    		return true;
@@ -202,7 +203,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		}
 		if (facility != null) {
 			act.setFacilityId(facility.getId());
-	   		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
+	   		act.setLinkId(((NetworkImpl) this.scenario.getNetwork()).getNearestLink(facility.getCoord()).getId());
 	   		act.setCoord(facility.getCoord());
 	   		return true;
 		}

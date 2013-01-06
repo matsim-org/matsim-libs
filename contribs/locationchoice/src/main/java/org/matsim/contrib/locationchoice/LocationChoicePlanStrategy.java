@@ -2,8 +2,6 @@ package org.matsim.contrib.locationchoice;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.controler.Controler;
@@ -34,7 +32,7 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 		} else {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getScenario().getConfig().planCalcScore()));
 		}
-		delegate.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
+		delegate.addStrategyModule(new LocationChoice(controler.getScenario()));
 		delegate.addStrategyModule(new ReRoute(controler.getScenario()));
 		delegate.addStrategyModule(new TimeAllocationMutator(controler.getScenario().getConfig()));
 		if ( locachoiceWrnCnt < 1 ) {
@@ -46,19 +44,7 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 			}
 		}
 	}
-
-	public LocationChoicePlanStrategy(Config config) {
-		
-	}
 	
-	public void addStrategyModule(PlanStrategyModule module) {
-		delegate.addStrategyModule(module);
-	}
-
-	public int getNumberOfStrategyModules() {
-		return delegate.getNumberOfStrategyModules();
-	}
-
 	@Override
 	public void run(Person person) {
 		delegate.run(person);

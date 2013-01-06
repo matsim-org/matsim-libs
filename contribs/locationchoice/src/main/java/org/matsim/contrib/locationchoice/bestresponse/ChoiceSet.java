@@ -38,7 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.old.PlanRouterAdapter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -60,16 +60,13 @@ public class ChoiceSet {
 	// *************************************	
 	private List<Id> destinations = new Vector<Id>();
 	private List<Id> notYetVisited = new Vector<Id>();
-	private PlanRouterAdapter router = null;
-	private Network network = null;
+	private final Network network;
 	private Config config;
 		
-	public ChoiceSet(ApproximationLevel approximationLevel, PlanRouterAdapter router, Network network, Config config) {
+	ChoiceSet(ApproximationLevel approximationLevel, Network network, Config config) {
 		this.approximationLevel = approximationLevel;
-		this.router = router;
 		this.network = network;
 		this.config = config;
-		
 		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
 		this.numberOfAlternatives = Integer.parseInt(config.locationchoice().getProbChoiceSetSize());
 	}
@@ -108,9 +105,9 @@ public class ChoiceSet {
 	public Id getWeightedRandomChoice(int actlegIndex, Coord coordPre,
 			Coord coordPost, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction, 
 			Plan plan, TravelTime travelTime, 
-			TravelDisutility travelCost, int iteration) {
+			TravelDisutility travelCost, TripRouter router, int iteration) {
 				
-		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, facilities, scoringFunction, plan, travelTime, travelCost);
+		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, facilities, scoringFunction, plan, travelTime, travelCost, router);
 		
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
@@ -130,7 +127,7 @@ public class ChoiceSet {
 	}
 	
 	private TreeMap<Double,Id> createChoiceSet(int actlegIndex, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
-			Plan plan, TravelTime travelTime, TravelDisutility travelCost) {
+			Plan plan, TravelTime travelTime, TravelDisutility travelCost, TripRouter router) {
 		
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		
@@ -175,7 +172,7 @@ public class ChoiceSet {
 			PlanImpl planTmp = new PlanImpl();
 			planTmp.copyFrom(plan);
 			this.adaptAndScoreTimes((PlanImpl)plan,  actlegIndex,  planTmp, scoringFunction,
-					leastCostPathCalculatorForward, leastCostPathCalculatorBackward, this.approximationLevel);
+					leastCostPathCalculatorForward, leastCostPathCalculatorBackward, router, this.approximationLevel);
 			
 			// not needed anymore
 			// why not?  kai, jan'13
@@ -245,10 +242,10 @@ public class ChoiceSet {
 		return mapNormalized;
 	}
 			
-	/*package*/ void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
-			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, ApproximationLevel approximationLevelTmp ) {
+	void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
+			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, TripRouter router, ApproximationLevel approximationLevelTmp  ) {
 		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp , leastCostPathCalculatorForward, leastCostPathCalculatorBackward, 
-				this.network, this.config);
-		adapter.adaptAndScoreTimes(plan, actlegIndex, planTmp, scoringFunction, router);
+				this.network, router, this.config);
+		adapter.adaptAndScoreTimes(plan, actlegIndex, planTmp, scoringFunction);
 	}
 }

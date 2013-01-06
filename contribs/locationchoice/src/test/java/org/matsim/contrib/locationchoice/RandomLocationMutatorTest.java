@@ -23,16 +23,19 @@ import java.util.Random;
 
 import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 
 public class RandomLocationMutatorTest  extends MatsimTestCase {
 
+	private ScenarioImpl scenario;
+
 	private RandomLocationMutator initialize() {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
-		return new RandomLocationMutator(initializer.getControler().getNetwork(),
-				initializer.getControler(), new Random(1111));
+		scenario = initializer.getControler().getScenario();
+		return new RandomLocationMutator(scenario, new Random(1111));
 	}
 
 	/*
@@ -40,7 +43,6 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 	 */
 	public void testHandlePlan() {
 		RandomLocationMutator randomlocationmutator = this.initialize();
-		randomlocationmutator.handlePlan(
-				randomlocationmutator.getControler().getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan());
+		randomlocationmutator.handlePlan(scenario.getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan());
 	}
 }

@@ -39,10 +39,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -185,27 +181,6 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		person.addPlan(p1);
 		assertNotNull(selector.selectPlan(person));
 
-	}
-
-	private ReplanningContext buildReplanningContext(final Network network2) {
-		return new ReplanningContext() {
-
-			@Override
-			public TripRouterFactory getTripRouterFactory() {
-				return null;
-			}
-
-			@Override
-			public TravelDisutility getTravelCostCalculator() {
-				return null;
-			}
-
-			@Override
-			public TravelTime getTravelTimeCalculator() {
-				return null;
-			}
-			
-		};
 	}
 
 	@Override

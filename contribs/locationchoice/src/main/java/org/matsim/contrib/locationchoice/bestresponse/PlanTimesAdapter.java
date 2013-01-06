@@ -33,6 +33,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalC
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -52,21 +53,22 @@ public class PlanTimesAdapter {
 	private final LeastCostPathCalculator leastCostPathCalculatorBackward ;
 	private final Network network;
 	private final Config config;
+	private final TripRouter router;
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(PlanTimesAdapter.class);
 		
 	/* package */ PlanTimesAdapter(ApproximationLevel approximationLevel, LeastCostPathCalculator leastCostPathCalculatorForward, 
-			LeastCostPathCalculator leastCostPathCalculatorBackward, Network network, Config config) {
+			LeastCostPathCalculator leastCostPathCalculatorBackward, Network network, TripRouter router, Config config) {
 		this.approximationLevel = approximationLevel;
 		this.leastCostPathCalculatorForward = leastCostPathCalculatorForward;
 		this.leastCostPathCalculatorBackward = leastCostPathCalculatorBackward;
 		this.network = network;
+		this.router = router;
 		this.config = config;
 	}
 	
-	/* package */ void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction,
-			PlanRouterAdapter router) {	
+	/* package */ void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction) {	
 		
 		// yyyy Note: getPrevious/NextLeg/Activity all relies on alternating activities and leg, which was given up as a requirement
 		// a long time ago (which is why it is not in the interface).  kai, jan'13
@@ -90,7 +92,7 @@ public class PlanTimesAdapter {
 					if (approximationLevel == ApproximationLevel.COMPLETE_ROUTING ) {
 						legTravelTime = computeTravelTimeFromCompleteRouting(plan.getPerson(),
 							plan.getPreviousActivity(plan.getPreviousLeg(act)), 
-							act, router);
+							act);
 					}
 					else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
 						legTravelTime = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
@@ -209,30 +211,13 @@ public class PlanTimesAdapter {
 		return distance / speed;
 	}
 	
-	private double computeTravelTimeFromCompleteRouting(Person person, Activity fromAct, Activity toAct, PlanRouterAdapter router) {
+	private double computeTravelTimeFromCompleteRouting(Person person, Activity fromAct, Activity toAct) {
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
-		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());
+		PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());
 		return leg.getTravelTime();
 	}
 
-//	public final LeastCostPathCalculator getLeastCostPathCalculator() {
-//		return leastCostPathCalculatorForward;
-//	}
-
-//	public final void setLeastCostPathCalculator(
-//			LeastCostPathCalculator leastCostPathCalculator) {
-//		this.leastCostPathCalculatorForward = leastCostPathCalculator;
-//	}
-
-//	public final LeastCostPathCalculator getLeastCostPathCalculatorBackward() {
-//		return leastCostPathCalculatorBackward;
-//	}
-
-//	public final void setLeastCostPathCalculatorBackward(
-//			LeastCostPathCalculator leastCostPathCalculatorBackward) {
-//		this.leastCostPathCalculatorBackward = leastCostPathCalculatorBackward;
-//	}
 }

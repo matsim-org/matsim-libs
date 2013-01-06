@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
@@ -41,12 +42,12 @@ import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -58,8 +59,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private static final String BEST_RESPONSE = "bestResponse";
 	private static final String LOCAL_SEARCH_RECURSIVE = "localSearchRecursive";
 	private static final String LOCAL_SEARCH_SINGLE_ACT = "localSearchSingleAct";
-	private final Network network;
-	private final Controler controler;
+
 
 	/**
 	 * yyyy It is unclear to me why we need this as a collection and not just as a variable.  kai, dec'12
@@ -70,76 +70,57 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
 	private ObjectAttributes personsKValues = new ObjectAttributes();
-	
+
 	private ScaleEpsilon scaleEpsilon;
 	private ActivitiesHandler defineFlexibleActivities;
 	private ActTypeConverter actTypeConverter;
 	private DestinationSampler sampler;
 
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
-	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
+
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
+	private final Scenario scenario;
 
-	public LocationChoice(final Network network, Controler controler) {
-		super(controler.getConfig().global());
-		// TODO: why does this module need the control(l)er as argument?  Gets a bit awkward
-		// when you use it in demandmodelling where you don't really need a control(l)er.
-		// kai, jan09
-
-		/*
-		 	Using the controler in the replanning module actually looks quite inconsiderately.
-		 	But controler creates a new instance of router in every iteration!
-		 	Thus, the controler must be given to the replanning module by now (see below).
-
-			controler.getRoutingAlgorithm(f) {
-				return new PlansCalcRoute(this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory());
-			}
-
-			TODO: extend handlePlan() by the argument "router". Maybe some kind of startup method is needed, which is called
-			everytime before handlePlan is called. But that seems to
-			require extended refactorings of replanning code.
-
-			anhorni: april09
-		 */
-		this.network = network;
-		this.controler = controler;
+	public LocationChoice(Scenario scenario) {
+		super(scenario.getConfig().global());
+		this.scenario = scenario;
 		initLocal();
 	}
 
 	private void initLocal() {
-		this.defineFlexibleActivities(this.controler.getConfig().locationchoice());
-		((NetworkImpl) this.network).connect();
-		
+		this.defineFlexibleActivities(this.scenario.getConfig().locationchoice());
+		((NetworkImpl) this.scenario.getNetwork()).connect();
+
 		this.createActivityTypeConverter();
-		this.initTrees(this.controler.getFacilities(), this.controler.getConfig().locationchoice());
-		
+		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());
+
 		//only compute oa for best response module
-		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
+		String algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
 		if (algorithm.equals(BEST_RESPONSE)) {
 			this.createEpsilonScaleFactors();
-			this.createObjectAttributes(Long.parseLong(this.controler.getConfig().locationchoice().getRandomSeed()));
-			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues,
-					this.controler.getConfig().locationchoice());
+			this.createObjectAttributes(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
+			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues, this.scenario.getConfig().locationchoice());
 		}
 	}
-	
+
 	private void defineFlexibleActivities(LocationChoiceConfigGroup config) {
 		this.defineFlexibleActivities = new ActivitiesHandler(config);
 	}
-	
+
 	private void createActivityTypeConverter() {
 		this.actTypeConverter = this.defineFlexibleActivities.getConverter(); 		
 	}
-	
+
 	private void createEpsilonScaleFactors() {
 		this.scaleEpsilon = this.defineFlexibleActivities.createScaleEpsilon();
 	}
-		
+
 	private void createObjectAttributes(long seed) {
 		this.personsMaxEpsUnscaled = new ObjectAttributes();
-		
-		// check if object attributes files are available, otherwise do preprocessing
-		String maxEpsValues = this.controler.getConfig().locationchoice().getMaxEpsFile();
+
+
+		// check if object attributes files are available, other wise do preprocessing
+		String maxEpsValues = this.scenario.getConfig().locationchoice().getMaxEpsFile();
 		if (!maxEpsValues.equals("null")) {
 			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);
 			try {
@@ -153,66 +134,38 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			this.computeAttributes(seed);
 		}
 	}
-	
+
 	private void computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, this.controler.getScenario(), this.controler.getConfig(), 
+				seed, (ScenarioImpl) this.scenario, this.scenario.getConfig(), 
 				this.scaleEpsilon, this.actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
 		computer.run();
 		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
 	}
-	
+
 
 	/**
 	 * Initialize the quadtrees of all available activity types
 	 */
 	private void initTrees(ActivityFacilities facilities, LocationChoiceConfigGroup config) {
 		log.info("Doing location choice for activities: " + defineFlexibleActivities.getFlexibleTypes().toString());
-		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.network, config);
+		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.scenario.getNetwork(), config);
 		treesBuilder.setActTypeConverter(actTypeConverter);
 		treesBuilder.createTrees(facilities);
 		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
 	}
 
-//	@Override
-//	public final void finishReplanning() {
-//		Gbl.printMemoryUsage();
-//
-//		super.finishReplanning();
-//		
-//		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
-//		
-//		if (algorithm.equals(LOCAL_SEARCH_RECURSIVE) || algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
-//			int unsuccessfull = 0;
-//			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
-//			while (planAlgo_it.hasNext()) {
-//				PlanAlgorithm plan_algo = planAlgo_it.next();
-//
-//				if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
-//					unsuccessfull += ((SingleActLocationMutator)plan_algo).getNumberOfUnsuccessfull();
-//					((SingleActLocationMutator)plan_algo).resetUnsuccsessfull();
-//				}
-//				else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
-//					unsuccessfull += ((RecursiveLocationMutator)plan_algo).getNumberOfUnsuccessfull();
-//					((RecursiveLocationMutator)plan_algo).resetUnsuccsessfull();
-//				}
-//			}
-//			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);
-//		}
-//		this.planAlgoInstances.clear();
-//	}
-
 	@Override
 	protected void beforeFinishReplanningHook() {
 		Gbl.printMemoryUsage() ;
 	}
-	
+
 	@Override
 	protected void afterFinishReplanningHook() {
-		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
+		String algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
 
 		if (algorithm.equals(LOCAL_SEARCH_RECURSIVE) || algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
 			int unsuccessfull = 0;
@@ -233,26 +186,27 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		}
 		this.planAlgoInstances.clear();
 	}
-	
+
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {		
 		// this is the way location choice should be configured ...
-		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
+		String algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
 		if (algorithm.equals(RANDOM)) {
-			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, 
+			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-		}
-		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
-		else if (algorithm.equals(BEST_RESPONSE)) {
-			this.planAlgoInstances.add(new BestResponseLocationMutator(this.network, this.controler,  
+		} else if (algorithm.equals(BEST_RESPONSE)) {
+			// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
+			this.planAlgoInstances.add(new BestResponseLocationMutator(this.scenario,   
 					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
-					this.scaleEpsilon, this.actTypeConverter, this.sampler));
+					this.scaleEpsilon, this.actTypeConverter, this.sampler, this.getReplanningContext().getScoringFunctionFactory(),
+					this.getReplanningContext().getTravelTimeCalculator(), this.getReplanningContext().getTravelCostCalculator(), this.getReplanningContext().getTripRouterFactory().createTripRouter(),
+					this.getReplanningContext().getIteration()));
 		} else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
-			this.planAlgoInstances.add(new RecursiveLocationMutator(this.network, this.controler,  
+			this.planAlgoInstances.add(new RecursiveLocationMutator(this.scenario, this.getReplanningContext().getTripRouterFactory().createTripRouter(),  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		} else if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
-			this.planAlgoInstances.add(new SingleActLocationMutator(this.network, this.controler, 
-					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+			this.planAlgoInstances.add(new SingleActLocationMutator(this.scenario, this.quadTreesOfType, 
+					this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		} else {
 			throw new RuntimeException("Location choice configuration error: Please specify a location choice algorithm.");
 		}		
@@ -261,17 +215,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 	// for test cases:
 	/*package*/ Network getNetwork() {
-		return network;
+		return this.scenario.getNetwork();
 	}
-
-//	public Controler getControler() {
-//		return controler;
-//	}
-// this is never called.  kai, dec'12	
-
-//	public List<PlanAlgorithm> getPlanAlgoInstances() {
-//		return planAlgoInstances;
-//	}
-// this is never called.  Also not clear to me why we need this as a collection in the first place.  kai, dec'12
 
 }

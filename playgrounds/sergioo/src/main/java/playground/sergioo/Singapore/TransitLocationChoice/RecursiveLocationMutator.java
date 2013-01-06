@@ -27,8 +27,8 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,11 +37,11 @@ import org.matsim.contrib.locationchoice.timegeography.ManageSubchains;
 import org.matsim.contrib.locationchoice.timegeography.SubChain;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.PlanRouterAdapter;
 
 public class RecursiveLocationMutator extends LocationMutator {
@@ -51,22 +51,24 @@ public class RecursiveLocationMutator extends LocationMutator {
 	private double recursionTravelSpeedChange = 0.1;
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
-	PlanRouterAdapter router = new PlanRouterAdapter( this.controler );
+	private TripRouter router;
 
-	public RecursiveLocationMutator(final Network network, Controler controler,
+	public RecursiveLocationMutator(final Scenario scenario, TripRouter router,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
-		super(network, controler, quad_trees, facilities_of_type, random);
-		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
-		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
-		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
+		super(scenario, quad_trees, facilities_of_type, random);
+		this.recursionTravelSpeedChange = Double.parseDouble(scenario.getConfig().locationchoice().getRecursionTravelSpeedChange());
+		this.maxRecursions = Integer.parseInt(scenario.getConfig().locationchoice().getMaxRecursions());
+		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().locationchoice().getRecursionTravelSpeed());
+		this.router = router;
 	}
 
-	public RecursiveLocationMutator(final Network network, Controler controler, Random random) {
-		super(network, controler, random);
-		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
-		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
-		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
+	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, Random random) {
+		super(scenario, random);
+		this.recursionTravelSpeedChange = Double.parseDouble(scenario.getConfig().locationchoice().getRecursionTravelSpeedChange());
+		this.maxRecursions = Integer.parseInt(scenario.getConfig().locationchoice().getMaxRecursions());
+		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().locationchoice().getRecursionTravelSpeed());
+		this.router = router;
 	}
 
 
@@ -172,7 +174,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 			final ActivityFacility facility = choiceSet.get(super.random.nextInt(choiceSet.size()));
 
 			act.setFacilityId(facility.getId());
-       		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
+       		act.setLinkId(((NetworkImpl) scenario.getNetwork()).getNearestLink(facility.getCoord()).getId());
        		act.setCoord(facility.getCoord());
        		return true;
 		}
@@ -186,7 +188,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
 
-		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());
+		PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());
 		return leg.getTravelTime();
 	}
 

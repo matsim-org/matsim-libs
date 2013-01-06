@@ -20,7 +20,6 @@
 
 package org.matsim.integration.replanning;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -45,6 +44,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -95,14 +95,22 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 			@Override
 			public TravelDisutility getTravelCostCalculator() {
-				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
 			public TravelTime getTravelTimeCalculator() {
-				// TODO Auto-generated method stub
 				return null;
+			}
+
+			@Override
+			public ScoringFunctionFactory getScoringFunctionFactory() {
+				return null;
+			}
+
+			@Override
+			public int getIteration() {
+				return 0;
 			}
 			
 		});

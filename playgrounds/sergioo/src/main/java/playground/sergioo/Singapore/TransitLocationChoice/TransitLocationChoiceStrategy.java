@@ -41,7 +41,7 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 		HashSet<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
-		addStrategyModule(new LocationChoice(net, controler));
+		addStrategyModule(new LocationChoice(controler.getScenario()));
 		addStrategyModule(new TimeAllocationMutator(controler.getConfig()));
 		addStrategyModule(new ReRoute(controler.getScenario()));
 	}

@@ -27,8 +27,8 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,7 +37,6 @@ import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -50,12 +49,12 @@ public class SingleActLocationMutator extends LocationMutator {
 	protected int unsuccessfullLC = 0;
 	private final ActivitiesHandler defineFlexibleActivities;
 
-	public SingleActLocationMutator(final Network network, Controler controler, 
-			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
+	public SingleActLocationMutator(final Scenario scenario, TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees, 
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
+			Random random) {
 
-		super(network, controler, quad_trees, facilities_of_type, random);
-		this.defineFlexibleActivities = new ActivitiesHandler(controler.getConfig().locationchoice());
+		super(scenario, quad_trees, facilities_of_type, random);
+		this.defineFlexibleActivities = new ActivitiesHandler(scenario.getConfig().locationchoice());
 	}
 
 	@Override
@@ -82,13 +81,13 @@ public class SingleActLocationMutator extends LocationMutator {
 		double travelDistancePost = 0.0;
 
 		if (legPre.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePre = RouteUtils.calcDistance((NetworkRoute) legPre.getRoute(), this.network);
+			travelDistancePre = RouteUtils.calcDistance((NetworkRoute) legPre.getRoute(), this.scenario.getNetwork());
 		}
 		else {
 			travelDistancePre = ((CoordImpl)actPre.getCoord()).calcDistance(actToMove.getCoord());
 		}
 		if (legPost.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePost = RouteUtils.calcDistance((NetworkRoute) legPost.getRoute(), this.network);
+			travelDistancePost = RouteUtils.calcDistance((NetworkRoute) legPost.getRoute(), this.scenario.getNetwork());
 		}
 		else {
 			travelDistancePost = ((CoordImpl)actToMove.getCoord()).calcDistance(actPost.getCoord());
@@ -128,7 +127,7 @@ public class SingleActLocationMutator extends LocationMutator {
 			return false;
 		}
 		act.setFacilityId(facility.getId());
-   		act.setLinkId(((NetworkImpl) this.network).getNearestLink(facility.getCoord()).getId());
+   		act.setLinkId(((NetworkImpl) this.scenario.getNetwork()).getNearestLink(facility.getCoord()).getId());
    		act.setCoord(facility.getCoord());
 
    		return true;

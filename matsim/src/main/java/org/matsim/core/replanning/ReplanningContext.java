@@ -3,6 +3,7 @@ package org.matsim.core.replanning;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public interface ReplanningContext {
 
@@ -11,5 +12,9 @@ public interface ReplanningContext {
 	TravelDisutility getTravelCostCalculator();
 
 	TravelTime getTravelTimeCalculator();
+	
+	ScoringFunctionFactory getScoringFunctionFactory();
+
+	int getIteration();
 
 }

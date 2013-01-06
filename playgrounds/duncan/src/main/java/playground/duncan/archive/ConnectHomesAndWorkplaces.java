@@ -80,7 +80,7 @@ public class ConnectHomesAndWorkplaces {
 
 		// create the locachoice object:
 		Knowledges knowledges = scenario.getKnowledges() ;
-		LocationMutator locachoice = new RandomLocationMutator(controler.getNetwork(), controler, MatsimRandom.getRandom()) ;
+		LocationMutator locachoice = new RandomLocationMutator(scenario, MatsimRandom.getRandom()) ;
 
 		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation() ;
 		plans.setIsStreaming(true);

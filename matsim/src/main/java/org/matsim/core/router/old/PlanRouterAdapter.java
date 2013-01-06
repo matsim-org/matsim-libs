@@ -34,6 +34,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -59,6 +60,33 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	private final ModeRouteFactory routeFactory;
 	private final PopulationFactory populationFactory;
 	private final PlanRouter planRouter;
+
+	public static double handleLeg(TripRouter tripRouter, final Person person,
+			final Leg leg, final Activity fromAct, final Activity toAct,
+			final double depTime) {
+		List<? extends PlanElement> trip = tripRouter.calcRoute(
+					leg.getMode(),
+					new ActivityWrapperFacility( fromAct ),
+					new ActivityWrapperFacility( toAct ),
+					depTime,
+					person);
+	
+		if ( trip.size() != 1 ) {
+			throw new IllegalStateException( "This method can only be used with "+
+					"routing modules returning single legs. Got the following trip "+
+					"for mode "+leg.getMode()+": "+trip );
+		}
+	
+		Leg tripLeg = (Leg) trip.get( 0 );
+		leg.setRoute( tripLeg.getRoute() );
+		leg.setTravelTime( tripLeg.getTravelTime() );
+		leg.setDepartureTime( tripLeg.getDepartureTime() );
+		
+		return tripLeg.getRoute() != null &&
+			tripLeg.getRoute().getTravelTime() != Time.UNDEFINED_TIME ?
+				tripLeg.getRoute().getTravelTime() :
+				tripLeg.getTravelTime();
+	}
 
 	public PlanRouterAdapter(
 			final PlanRouter planRouter,
@@ -169,29 +197,8 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 			final Activity fromAct,
 			final Activity toAct,
 			final double depTime) {
-		List<? extends PlanElement> trip =
-			planRouter.getTripRouter().calcRoute(
-					leg.getMode(),
-					new ActivityWrapperFacility( fromAct ),
-					new ActivityWrapperFacility( toAct ),
-					depTime,
-					person);
-
-		if ( trip.size() != 1 ) {
-			throw new IllegalStateException( getClass()+".handleLeg() can only be used with "+
-					"routing modules returning single legs. Got the following trip "+
-					"for mode "+leg.getMode()+": "+trip );
-		}
-
-		Leg tripLeg = (Leg) trip.get( 0 );
-		leg.setRoute( tripLeg.getRoute() );
-		leg.setTravelTime( tripLeg.getTravelTime() );
-		leg.setDepartureTime( tripLeg.getDepartureTime() );
-		
-		return tripLeg.getRoute() != null &&
-			tripLeg.getRoute().getTravelTime() != Time.UNDEFINED_TIME ?
-				tripLeg.getRoute().getTravelTime() :
-				tripLeg.getTravelTime();
+		TripRouter tripRouter = this.planRouter.getTripRouter();
+		return handleLeg(tripRouter, person, leg, fromAct, toAct, depTime);
 	}
 
 	public ModeRouteFactory getRouteFactory() {

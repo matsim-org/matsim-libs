@@ -26,6 +26,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
  * Event class to notify observers that replanning should happen
@@ -71,6 +72,16 @@ public class ReplanningEvent extends ControlerEvent {
 			@Override
 			public TravelTime getTravelTimeCalculator() {
 				return controler.getTravelTimeCalculator();
+			}
+
+			@Override
+			public ScoringFunctionFactory getScoringFunctionFactory() {
+				return controler.getScoringFunctionFactory();
+			}
+
+			@Override
+			public int getIteration() {
+				return iteration;
 			}
 
 		};
