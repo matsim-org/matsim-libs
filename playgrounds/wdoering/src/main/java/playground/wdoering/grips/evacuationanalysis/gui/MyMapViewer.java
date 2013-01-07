@@ -26,8 +26,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Transparency;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -428,128 +432,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				}
 			}
 			
-			/**
-			 * draw grid
-			 * 
-			 */
-			if (!Double.isNaN(minX))
-			{
-				g.setColor(Color.BLACK);
-				g2D.setStroke(new BasicStroke(1F));
-				
-				//get all cells from celltree
-				LinkedList<Cell> cells = new LinkedList<Cell>();
-				cellTree.get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
-				
-				this.selectedCell = null;
-				for (Cell cell : cells)
-				{
-					
-					
-					//get cell coordinate (+ gridsize) and transform into pixel coordinates
-					CoordImpl cellCoord = cell.getCoord();
-					Coord transformedCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX()-gridSize/2, cellCoord.getY()-gridSize/2));
-					Point2D cellCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(transformedCoord.getY(),transformedCoord.getX()), this.getZoom());
-					Coord cellPlusGridCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX()+gridSize/2, cellCoord.getY()+gridSize/2));
-					Point2D cellPlusGridCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(cellPlusGridCoord.getY(),cellPlusGridCoord.getX()), this.getZoom());
-					
-					//adjust viewport
-					int gridX1 = (int)cellCoordP2D.getX()-b.x;
-					int gridY1 = (int)cellCoordP2D.getY()-b.y;
-					int gridX2 = (int)cellPlusGridCoordP2D.getX()-b.x;
-					int gridY2 = (int)cellPlusGridCoordP2D.getY()-b.y;
-					
-					//make sure the first values are the smaller ones, if not: swap
-					if (gridX1>gridX2)
-					{
-						int temp = gridX2;
-						gridX2 = gridX1;
-						gridX1 = temp;
-					}
-					if (gridY1>gridY2)
-					{
-						int temp = gridY2;
-						gridY2 = gridY1;
-						gridY1 = temp;
-					}
-					
-					g2D.setStroke(new BasicStroke(1F));
-					
-
-					//color grid (if mode equals evacuation or clearing time)
-					if ((mode.equals(Mode.EVACUATION)) || (mode.equals(Mode.CLEARING)))
-					{
-						AttributeData<Color> visData;
-						
-						//colorize cell depending on the picked colorization, cell data and the relative travel or clearance time
-						g.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT); //default
-						
-						if (mode.equals(Mode.EVACUATION))
-						{
-							visData = (AttributeData<Color>) data.getEvacuationTimeVisData();
-							if ((cell.getCount()>0))
-								g.setColor(visData.getAttribute(cell.getId()));
-						}
-						else if (mode.equals(Mode.CLEARING))
-						{
-							visData = (AttributeData<Color>) data.getClearingTimeVisData();
-							if (cell.getClearingTime()>0)
-								g.setColor(visData.getAttribute(cell.getId()));
-						}
-						
-						g.fillRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
-					}
-					
-					//draw grid
-					g.setColor(ToolConfig.COLOR_GRID);
-					g.drawRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
-					
-					
-					if (currentMousePosition!=null)
-					{
-						int mouseX = this.currentMousePosition.x;
-						int mouseY = this.currentMousePosition.y;
-						
-						if ((mouseX>=gridX1) && (mouseX<gridX2) && (mouseY>=gridY1) && (mouseY<gridY2))
-						{
-							g.setColor(ToolConfig.COLOR_HOVER);
-							g.fillRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
-							g2D.setStroke(new BasicStroke(3F));
-							g.drawRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
-							
-							this.selectedCell = cell; 
-						}
-						
-					}		
-					
-					
-				}
-				
-				//draw tooltip
-				if ((this.selectedCell!=null) && (this.currentMousePosition!=null))
-				{
-					g2D.setStroke(new BasicStroke(1f));
-					g.setColor(new Color(0,0,0,90));
-					g.fillRect(this.currentMousePosition.x-15, this.currentMousePosition.y+30, 260, 85);
-					g.setColor(Color.white);
-					g.fillRect(this.currentMousePosition.x-25, this.currentMousePosition.y+20, 260, 85);
-					g.setColor(Color.black);
-					g.drawRect(this.currentMousePosition.x-25, this.currentMousePosition.y+20, 260, 85);
-					
-					g.setFont( ToolConfig.FONT_DEFAULT_BOLD );
-					g.drawString("person count:", this.currentMousePosition.x-15, this.currentMousePosition.y+40);
-					g.drawString("clearing time:", this.currentMousePosition.x-15, this.currentMousePosition.y+60);
-					g.drawString("average evacuation time:", this.currentMousePosition.x-15, this.currentMousePosition.y+80);
-					
-					g.setFont( ToolConfig.FONT_DEFAULT );
-					g.drawString(EvacuationAnalysis.getReadableTime(selectedCell.getCount(), Unit.PEOPLE), this.currentMousePosition.x+135, this.currentMousePosition.y+40);
-					g.drawString(EvacuationAnalysis.getReadableTime(selectedCell.getClearingTime(), Unit.TIME), this.currentMousePosition.x+135, this.currentMousePosition.y+60);
-					g.drawString(EvacuationAnalysis.getReadableTime(selectedCell.getTimeSum()/selectedCell.getCount(), Unit.TIME), this.currentMousePosition.x+135, this.currentMousePosition.y+80);
-							
-									
-				}
-				g.setColor(Color.black);
-			}
+			//draw the grid
+			drawGrid(mode, g2D, b);
 
 
 
@@ -557,6 +441,151 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 
 		}
+	}
+
+
+	/**
+	 * draw the grid
+	 * 
+	 */
+	private void drawGrid(Mode mode, Graphics2D g2D, Rectangle b) {
+		if (!Double.isNaN(minX))
+		{
+			g2D.setColor(Color.BLACK);
+			g2D.setStroke(new BasicStroke(1F));
+			
+			//get all cells from celltree
+			LinkedList<Cell> cells = new LinkedList<Cell>();
+			cellTree.get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
+			
+			this.selectedCell = null;
+			for (Cell cell : cells)
+			{
+				
+				
+				//get cell coordinate (+ gridsize) and transform into pixel coordinates
+				CoordImpl cellCoord = cell.getCoord();
+				Coord transformedCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX()-gridSize/2, cellCoord.getY()-gridSize/2));
+				Point2D cellCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(transformedCoord.getY(),transformedCoord.getX()), this.getZoom());
+				Coord cellPlusGridCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX()+gridSize/2, cellCoord.getY()+gridSize/2));
+				Point2D cellPlusGridCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(cellPlusGridCoord.getY(),cellPlusGridCoord.getX()), this.getZoom());
+				
+				//adjust viewport
+				int gridX1 = (int)cellCoordP2D.getX()-b.x;
+				int gridY1 = (int)cellCoordP2D.getY()-b.y;
+				int gridX2 = (int)cellPlusGridCoordP2D.getX()-b.x;
+				int gridY2 = (int)cellPlusGridCoordP2D.getY()-b.y;
+				
+				//make sure the first values are the smaller ones, if not: swap
+				if (gridX1>gridX2)
+				{
+					int temp = gridX2;
+					gridX2 = gridX1;
+					gridX1 = temp;
+				}
+				if (gridY1>gridY2)
+				{
+					int temp = gridY2;
+					gridY2 = gridY1;
+					gridY1 = temp;
+				}
+				
+				g2D.setStroke(new BasicStroke(1F));
+				
+
+				//color grid (if mode equals evacuation or clearing time)
+				if ((mode.equals(Mode.EVACUATION)) || (mode.equals(Mode.CLEARING)))
+				{
+					AttributeData<Color> visData;
+					
+					//colorize cell depending on the picked colorization, cell data and the relative travel or clearance time
+					g2D.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT); //default
+					
+					if (mode.equals(Mode.EVACUATION))
+					{
+						visData = (AttributeData<Color>) data.getEvacuationTimeVisData();
+						if ((cell.getCount()>0))
+							g2D.setColor(visData.getAttribute(cell.getId()));
+					}
+					else if (mode.equals(Mode.CLEARING))
+					{
+						visData = (AttributeData<Color>) data.getClearingTimeVisData();
+						if (cell.getClearingTime()>0)
+							g2D.setColor(visData.getAttribute(cell.getId()));
+					}
+					
+					g2D.fillRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+				}
+				
+				//draw grid
+				g2D.setColor(ToolConfig.COLOR_GRID);
+				g2D.drawRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+				
+				
+				if (currentMousePosition!=null)
+				{
+					int mouseX = this.currentMousePosition.x;
+					int mouseY = this.currentMousePosition.y;
+					
+					if ((mouseX>=gridX1) && (mouseX<gridX2) && (mouseY>=gridY1) && (mouseY<gridY2))
+					{
+						g2D.setColor(ToolConfig.COLOR_HOVER);
+						g2D.fillRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+						g2D.setStroke(new BasicStroke(3F));
+						g2D.drawRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+						
+						this.selectedCell = cell; 
+					}
+					
+				}		
+				
+				
+			}
+			
+			//draw tooltip
+			if ((this.selectedCell!=null) && (this.currentMousePosition!=null))
+			{
+				g2D.setStroke(new BasicStroke(1f));
+				g2D.setColor(new Color(0,0,0,90));
+				g2D.fillRect(this.currentMousePosition.x-15, this.currentMousePosition.y+30, 260, 85);
+				g2D.setColor(Color.white);
+				g2D.fillRect(this.currentMousePosition.x-25, this.currentMousePosition.y+20, 260, 85);
+				g2D.setColor(Color.black);
+				g2D.drawRect(this.currentMousePosition.x-25, this.currentMousePosition.y+20, 260, 85);
+				
+				g2D.setFont( ToolConfig.FONT_DEFAULT_BOLD );
+				g2D.drawString("person count:", this.currentMousePosition.x-15, this.currentMousePosition.y+40);
+				g2D.drawString("clearing time:", this.currentMousePosition.x-15, this.currentMousePosition.y+60);
+				g2D.drawString("average evacuation time:", this.currentMousePosition.x-15, this.currentMousePosition.y+80);
+				
+				g2D.setFont( ToolConfig.FONT_DEFAULT );
+				g2D.drawString(EvacuationAnalysis.getReadableTime(selectedCell.getCount(), Unit.PEOPLE), this.currentMousePosition.x+135, this.currentMousePosition.y+40);
+				g2D.drawString(EvacuationAnalysis.getReadableTime(selectedCell.getClearingTime(), Unit.TIME), this.currentMousePosition.x+135, this.currentMousePosition.y+60);
+				g2D.drawString(EvacuationAnalysis.getReadableTime(selectedCell.getTimeSum()/selectedCell.getCount(), Unit.TIME), this.currentMousePosition.x+135, this.currentMousePosition.y+80);
+						
+								
+			}
+			g2D.setColor(Color.black);
+		}
+	}
+	
+	public BufferedImage getGridAsImage(Mode mode, int width, int height)
+	{
+		  GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		  GraphicsDevice gs = ge.getDefaultScreenDevice();
+		  GraphicsConfiguration gc = gs.getDefaultConfiguration();
+
+		  // Create an image that does not support transparency
+		  BufferedImage bImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+		  
+		  Graphics IG = bImage.getGraphics();
+		  Graphics2D IG2D = (Graphics2D) IG;
+		  
+		  //get viewport offset
+		  Rectangle b = this.getViewportBounds();
+		  drawGrid(mode, IG2D, b);
+		
+		return bImage;
 	}
 
 

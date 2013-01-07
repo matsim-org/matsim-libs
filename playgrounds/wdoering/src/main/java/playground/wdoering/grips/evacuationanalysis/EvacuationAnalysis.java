@@ -591,8 +591,17 @@ public class EvacuationAnalysis implements ActionListener{
 	
 				Envelope2D env = new Envelope2D(DefaultGeographicCRS.WGS84, westmost, soutmost, eastmost - westmost, northmost - soutmost);
 				
+				BufferedImage imgEvacuation = jMapViewer.getGridAsImage(Mode.EVACUATION, 800, 800);
+				BufferedImage imgClearing = jMapViewer.getGridAsImage(Mode.CLEARING, 800, 800);
+				
 				try{
-					TiffExporter.writeGEOTiff(env, "C:/temp/testexport2.tiff", (BufferedImage)jMapViewer.createImage(800, 800));
+					TiffExporter.writeGEOTiff(env, "C:/temp/export"+Mode.EVACUATION+".tiff", imgEvacuation);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+				try{
+					TiffExporter.writeGEOTiff(env, "C:/temp/export"+Mode.CLEARING+".tiff", imgClearing);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
