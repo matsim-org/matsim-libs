@@ -20,14 +20,20 @@
 
 package playground.gregor.sim2d_v4.simulation.physics;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.LinkInfo;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 
-public class SimpleAgent implements Sim2DAgent {
+//for testing only will be removed afterwards
+@Deprecated
+public class ALittleBitSmarterAgent implements Sim2DAgent {
 	
 	private final float v0 = 1.f;
 	
@@ -38,8 +44,10 @@ public class SimpleAgent implements Sim2DAgent {
 	private final QVehicle veh;
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
+	
+	private final Neighbors ncalc = new Neighbors();
 
-	public SimpleAgent(QVehicle veh, float spawnX, float spawnY) {
+	public ALittleBitSmarterAgent(QVehicle veh, float spawnX, float spawnY) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
@@ -63,6 +71,10 @@ public class SimpleAgent implements Sim2DAgent {
 
 	@Override
 	public void updateVelocity() {
+		List<Tuple<Float, Sim2DAgent>> neigbhors = this.ncalc.computeNeighbors(this);
+		
+		
+		
 		Id id = this.driver.getCurrentLinkId();
 		LinkInfo li = this.currentPSec.getLinkInfo(id);
 		this.v[0] = li.dx * this.v0;

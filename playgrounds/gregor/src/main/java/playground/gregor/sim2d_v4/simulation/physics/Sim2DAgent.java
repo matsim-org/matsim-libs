@@ -27,34 +27,33 @@ import playground.gregor.sim2d_v4.debugger.VisDebugger;
 
 public interface Sim2DAgent {
 	
-	public QVehicle getQVehicle();
+	public abstract QVehicle getQVehicle();
 
 //	public void calcNeighbors(PhysicalSim2DSection physicalSim2DSection);
 //
 //	public void setObstacles(Segment[] obstacles);
 
-	public void updateVelocity();
+	public abstract void updateVelocity();
 
-	public void setPSec(PhysicalSim2DSection physicalSim2DSection);
+	public abstract void setPSec(PhysicalSim2DSection physicalSim2DSection);
 	
-	public void move(float dx, float dy);
-
-	public float[] getVelocity();
-
-	public Id getCurrentLinkId();
-
-	public float[] getPos();
-
-	public Id chooseNextLinkId();
-
-	public Id getId();
-
-	public void notifyMoveOverNode(Id nextLinkId);
-
-	public void debug(VisDebugger visDebugger);
+	public abstract PhysicalSim2DSection getPSec();
 	
-	
-	
+	public abstract void move(float dx, float dy);
 
+	public abstract float[] getVelocity();
+
+	public abstract Id getCurrentLinkId();
+
+	public abstract float[] getPos();
+
+	public abstract Id chooseNextLinkId();
+
+	public abstract Id getId();
+
+	public abstract void notifyMoveOverNode(Id nextLinkId);
+
+	public abstract void debug(VisDebugger visDebugger);
+	
 
 }

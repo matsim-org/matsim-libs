@@ -220,7 +220,9 @@ public class PhysicalSim2DEnvironment {
 			float spawnX = (float)(bottomX-this.offsetX) + bx/1.5f + dx/2;
 			float spawnY = (float)(bottomY-this.offsetY) + by/1.5f + dy/2;
 			PhysicalSim2DSection psecBox = createAndAddDepartureBox(s);
-			psecBox.putLinInfo(hiResLinkId, dboxLi);
+			psecBox.putLinkInfo(hiResLinkId, dboxLi);
+			Segment o = psecBox.getOpenings()[0];
+			psecBox.putNeighbor(o,psec);
 			hiResLink.createDepartureBox(psecBox,spawnX,spawnY);
 			bottomX += dx;
 			bottomY += dy;

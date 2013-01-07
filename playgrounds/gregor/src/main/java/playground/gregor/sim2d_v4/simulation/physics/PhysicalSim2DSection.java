@@ -64,6 +64,8 @@ public class PhysicalSim2DSection {
 
 	protected final PhysicalSim2DEnvironment penv;
 
+	private final Map<Segment,PhysicalSim2DSection> neighbors = new HashMap<Segment,PhysicalSim2DSection>();
+
 	public PhysicalSim2DSection(Section sec, Sim2DScenario sim2dsc, double offsetX, double offsetY, PhysicalSim2DEnvironment penv) {
 		this.sec = sec;
 		this.sim2dsc = sim2dsc;
@@ -223,6 +225,17 @@ public class PhysicalSim2DSection {
 				li.finishLine = finishLine;
 			}
 		}
+		for (Id id : this.sec.getRelatedLinkIds()) {
+			Link l = links.get(id);
+			LinkInfo li = this.linkInfos.get(l.getId());
+			for (Link ll : l.getToNode().getOutLinks().values()) {
+//				if (this.linkInfos.get(ll.getId()))
+				PhysicalSim2DSection psec = this.penv.getPhysicalSim2DSectionAssociatedWithLinkId(ll.getId());
+				if (psec != this) {
+					this.neighbors.put(li.finishLine, psec);
+				}
+			}
+		}
 
 	}
 
@@ -231,7 +244,7 @@ public class PhysicalSim2DSection {
 		return this.linkInfos.get(id);
 	}
 
-	/*package*/ void putLinInfo(Id id, LinkInfo li) {
+	/*package*/ void putLinkInfo(Id id, LinkInfo li) {
 		this.linkInfos.put(id, li);
 	}
 
@@ -255,11 +268,11 @@ public class PhysicalSim2DSection {
 	}
 
 
-	/*package*/ static final class Segment {
-		float  x0;
-		float  x1;
-		float  y0;
-		float  y1;
+	public static final class Segment {
+		public float  x0;
+		public float  x1;
+		public float  y0;
+		public float  y1;
 	}
 
 	/*package*/ static final class LinkInfo {
@@ -273,6 +286,15 @@ public class PhysicalSim2DSection {
 
 	public Id getId() {
 		return this.sec.getId();
+	}
+	
+	public List<Sim2DAgent> getAgents() {
+		return this.agents;
+	}
+
+	public Segment [] getOpenings() {
+		return this.openings;
+		
 	}
 
 	public void debug(VisDebugger visDebugger) {
@@ -310,4 +332,14 @@ public class PhysicalSim2DSection {
 			agent.debug(visDebugger);
 		}
 	}
+
+	public PhysicalSim2DSection getNeighbor(Segment opening) {
+		return this.neighbors .get(opening);
+	}
+
+	public void putNeighbor(Segment finishLine, PhysicalSim2DSection psec) {
+		this.neighbors.put(finishLine, psec);
+	}
+
+
 }

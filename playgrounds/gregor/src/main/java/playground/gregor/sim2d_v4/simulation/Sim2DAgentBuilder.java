@@ -22,14 +22,14 @@ package playground.gregor.sim2d_v4.simulation;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
+import playground.gregor.sim2d_v4.simulation.physics.ALittleBitSmarterAgent;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.SimpleAgent;
 
 public class Sim2DAgentBuilder {
 
 	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
-		Sim2DAgent agent = new SimpleAgent(veh,spawnX,spawnY);
-		
+//		Sim2DAgent agent = new SimpleAgent(veh,spawnX,spawnY);
+		Sim2DAgent agent = new ALittleBitSmarterAgent(veh, spawnX, spawnY);
 		return agent;
 	}
 
