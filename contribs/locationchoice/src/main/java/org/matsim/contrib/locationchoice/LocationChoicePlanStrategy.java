@@ -1,10 +1,10 @@
 package org.matsim.contrib.locationchoice;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -21,25 +21,25 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 	
 	private static int locachoiceWrnCnt;
 	
-	public LocationChoicePlanStrategy(Controler controler) {
-		String planSelector = controler.getScenario().getConfig().locationchoice().getPlanSelector();
+	public LocationChoicePlanStrategy(Scenario scenario) {
+		String planSelector = scenario.getConfig().locationchoice().getPlanSelector();
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector());
 		} else if (planSelector.equals("ChangeExpBeta")) {
-			delegate = new PlanStrategyImpl(new ExpBetaPlanChanger(controler.getScenario().getConfig().planCalcScore().getBrainExpBeta()));
+			delegate = new PlanStrategyImpl(new ExpBetaPlanChanger(scenario.getConfig().planCalcScore().getBrainExpBeta()));
 		} else if (planSelector.equals("SelectRandom")) {
 			delegate = new PlanStrategyImpl(new RandomPlanSelector());
 		} else {
-			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getScenario().getConfig().planCalcScore()));
+			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(scenario.getConfig().planCalcScore()));
 		}
-		delegate.addStrategyModule(new LocationChoice(controler.getScenario()));
-		delegate.addStrategyModule(new ReRoute(controler.getScenario()));
-		delegate.addStrategyModule(new TimeAllocationMutator(controler.getScenario().getConfig()));
+		delegate.addStrategyModule(new LocationChoice(scenario));
+		delegate.addStrategyModule(new ReRoute(scenario));
+		delegate.addStrategyModule(new TimeAllocationMutator(scenario.getConfig()));
 		if ( locachoiceWrnCnt < 1 ) {
 			locachoiceWrnCnt ++ ;
 			Logger.getLogger("dummy").warn("I don't think that using TimeAllocationMutator as last step of locationchoice" +
 					" (or of any strategy, for that matter) makes sense. --> please remove from code.   kai, oct'12") ;
-			if ( controler.getScenario().getConfig().vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals(VspExperimentalConfigGroup.ABORT) ) {
+			if (scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals(VspExperimentalConfigGroup.ABORT) ) {
 				throw new RuntimeException("will not use locachoice followed by TimeMutation within VSP. Aborting ...") ;
 			}
 		}
