@@ -43,7 +43,7 @@ import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class PhysicalSim2DSection {
-	
+
 	private final Section sec;
 
 	Segment [] obstacles;
@@ -56,7 +56,7 @@ public class PhysicalSim2DSection {
 	private final double offsetY;
 
 	private final double offsetX;
-	
+
 	private final List<Sim2DAgent> inBuffer = new LinkedList<Sim2DAgent>();
 	protected final List<Sim2DAgent> agents = new LinkedList<Sim2DAgent>();
 
@@ -73,17 +73,17 @@ public class PhysicalSim2DSection {
 		this.penv = penv;
 		init();
 	}
-	
+
 	//physics
 	public int getNumberOfAllAgents() {
 		return this.inBuffer.size() + this.agents.size();
 	}
-	
+
 	public void addAgentToInBuffer(Sim2DAgent agent) {
 		this.inBuffer.add(agent);
 		agent.setPSec(this);
 	}
-	
+
 	public void updateAgents() {
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
@@ -93,9 +93,9 @@ public class PhysicalSim2DSection {
 			updateAgent(agent);
 		}
 	}
-	
-	
-	
+
+
+
 	public void moveAgents(double time) {
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
@@ -148,12 +148,12 @@ public class PhysicalSim2DSection {
 	}
 
 	private void updateAgent(Sim2DAgent agent) {
-//		agent.calcNeighbors(this);
-//		agent.setObstacles(this.obstacles);
+		//		agent.calcNeighbors(this);
+		//		agent.setObstacles(this.obstacles);
 		agent.updateVelocity();
-//		this.agents.r
-//		List<Sim2DAgent> neighbors = calculateNeighbors(agent);
-		
+		//		this.agents.r
+		//		List<Sim2DAgent> neighbors = calculateNeighbors(agent);
+
 	}
 
 	//initialization 
@@ -196,14 +196,14 @@ public class PhysicalSim2DSection {
 			seg.x1 = (float) (to.getX()-this.offsetX);
 			seg.y0 = (float) (from.getY()-this.offsetY);
 			seg.y1 = (float) (to.getY()-this.offsetY);
-			
+
 			float dx = seg.x1-seg.x0;
 			float dy = seg.y1-seg.y0;
 			double length = Math.sqrt(dx*dx+dy*dy);
 			dx /= length;
 			dy /= length;
-			
-//			li.link = seg;
+
+			//			li.link = seg;
 			li.dx = dx;
 			li.dy = dy;
 
@@ -216,7 +216,7 @@ public class PhysicalSim2DSection {
 				Segment finishLine = new Segment();
 				finishLine.x0 = seg.x1;
 				finishLine.y0 = seg.y1;
-				
+
 				//all polygons are clockwise oriented so we rotate to the right here 
 				finishLine.x1 = finishLine.x0 + li.dy;
 				finishLine.y1 = finishLine.y0 - li.dx;
@@ -225,12 +225,12 @@ public class PhysicalSim2DSection {
 		}
 
 	}
-	
+
 	//
 	/*package*/ LinkInfo getLinkInfo(Id id) {
 		return this.linkInfos.get(id);
 	}
-	
+
 	/*package*/ void putLinInfo(Id id, LinkInfo li) {
 		this.linkInfos.put(id, li);
 	}
@@ -263,10 +263,10 @@ public class PhysicalSim2DSection {
 	}
 
 	/*package*/ static final class LinkInfo {
-		
+
 		float dx;
 		float dy;
-//		Segment link;
+		//		Segment link;
 		Segment fromOpening;
 		Segment finishLine;
 	}
@@ -276,13 +276,22 @@ public class PhysicalSim2DSection {
 	}
 
 	public void debug(VisDebugger visDebugger) {
-		for (Segment seg : this.obstacles) {
-			visDebugger.addLine(seg.x0, seg.y0, seg.x1, seg.y1, 0, 0, 0, 128);
-		}
-		for (Segment seg : this.openings) {
-			visDebugger.addLine(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128);
-		}
-		
+		if (visDebugger.isFirst()) {
+			for (Segment seg : this.obstacles) {
+				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 0, 0, 128);
+			}
+			for (Segment seg : this.openings) {
+				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128);
+			}}
+//		for (Id key : this.linkInfos.keySet()) {
+//			Link l = this.sim2dsc.getMATSimScenario().getNetwork().getLinks().get(key);
+//			float x0 = (float) (l.getFromNode().getCoord().getX() - this.offsetX);
+//			float x1 = (float) (l.getToNode().getCoord().getX() - this.offsetX);
+//			float y0 = (float) (l.getFromNode().getCoord().getY() - this.offsetY);
+//			float y1 = (float) (l.getToNode().getCoord().getY() - this.offsetY);
+////			visDebugger.addLineStatic(x0, y0, x1, y1, 0, 0, 0, 255);
+//		}
+
 		if (this.agents.size() > 0) {
 			Coordinate[] coords = this.sec.getPolygon().getExteriorRing().getCoordinates();
 			float [] x = new float[coords.length];
@@ -294,11 +303,11 @@ public class PhysicalSim2DSection {
 			}
 			visDebugger.addPolygon(x, y,32, 255, 64, 128);
 		}
-		
 		for (Sim2DAgent agent : this.agents) {
-			visDebugger.addCircle(agent.getPos()[0], agent.getPos()[1], .5f, 192, 0, 64, 128);
+			agent.debug(visDebugger);
 		}
-		
-		
+		for (Sim2DAgent agent : this.inBuffer) {
+			agent.debug(visDebugger);
+		}
 	}
 }

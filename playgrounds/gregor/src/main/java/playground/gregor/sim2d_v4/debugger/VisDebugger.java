@@ -31,6 +31,8 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import org.matsim.core.utils.misc.Time;
+
 import processing.core.PApplet;
 
 public class VisDebugger extends PApplet {
@@ -41,6 +43,8 @@ public class VisDebugger extends PApplet {
 	private static final long serialVersionUID = 1L;
 	private final JFrame fr;
 
+	public long lastUpdate = -1;
+	
 	public VisDebugger() {
 		this.fr = new JFrame();
 		this.fr.setSize(1000, 1000);
@@ -53,6 +57,7 @@ public class VisDebugger extends PApplet {
 
 	private float scale = 50;
 	private List<Object> elements = Collections.synchronizedList(new ArrayList<Object>());
+	private final List<Object> elementsStatic = Collections.synchronizedList(new ArrayList<Object>());
 	private final List<Object> newElements = new ArrayList<Object>();
 	protected int dragX = 0;
 	protected int dragY = 0;
@@ -61,6 +66,8 @@ public class VisDebugger extends PApplet {
 	protected int omy;
 	protected int omx;
 	
+	private boolean first = true;
+	private String time = "00:00.00.0";
 	@Override
 	public void setup() {
 		addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
@@ -136,6 +143,19 @@ public class VisDebugger extends PApplet {
 		background(255);
 		fill(255);
 
+		synchronized(this.elementsStatic) {
+			Iterator<Object> it = this.elementsStatic.iterator();
+			while (it.hasNext()) {
+				Object el = it.next();
+				if (el instanceof Line) {
+					drawLine((Line) el);
+				} else if (el instanceof Circle) {
+					drawCircle((Circle) el);
+				} else if (el instanceof Polygon) {
+					drawPolygon((Polygon)el);
+				}
+			}
+		}
 		synchronized(this.elements) {
 			Iterator<Object> it = this.elements.iterator();
 			while (it.hasNext()) {
@@ -149,6 +169,17 @@ public class VisDebugger extends PApplet {
 				}
 			}
 		}
+		drawTime();
+	}
+
+	private void drawTime() {
+		String strTime = setTime(-1);
+		fill(128, 128);
+		stroke(0);
+		rect(0, 0, 105, 25);
+		fill(0);
+		text(strTime, 10, 18);
+		
 	}
 
 	private void drawPolygon(Polygon p) {
@@ -189,7 +220,7 @@ public class VisDebugger extends PApplet {
 	private float scaleFlY(float y1) {
 		return this.scale/10 * y1 + this.dragY + this.omy;
 	}
-	public void addLine(float x0, float y0, float x1, float y1, int r, int g, int b, int a) {
+	public void addLineStatic(float x0, float y0, float x1, float y1, int r, int g, int b, int a) {
 		Line l = new Line();
 		l.x0 = x0;
 		l.x1 = x1;
@@ -208,7 +239,7 @@ public class VisDebugger extends PApplet {
 		buf.append(x1);
 		buf.append(' ');
 		buf.append(y1);
-		addElement(l,buf.toString());
+		addElementStatic(l,buf.toString());
 
 	}
 
@@ -251,6 +282,11 @@ public class VisDebugger extends PApplet {
 	private void addElement(Object o, String key) {
 		this.newElements.add(o);
 	}
+	private void addElementStatic(Object o, String key) {
+		synchronized(this.elementsStatic){
+			this.elementsStatic.add(o);
+		}
+	}
 
 	public void update() {
 		synchronized(this.elements) {
@@ -258,8 +294,13 @@ public class VisDebugger extends PApplet {
 			this.elements = Collections.synchronizedList(new ArrayList<Object>(this.newElements));
 			this.newElements.clear();
 		}
+		this.first = false;
 	}
 
+	public boolean isFirst() {
+		return this.first;
+	}
+	
 	private static final class Line {
 		float x0,x1,y0,y1;
 		int r,g,b,a;
@@ -274,5 +315,19 @@ public class VisDebugger extends PApplet {
 		float [] x;
 		float [] y;
 		int r,g,b,a;
+	}
+
+	synchronized public String setTime(double time2) {
+		if (time2 > 0) {
+			String strTime = Time.writeTime(time2, Time.TIMEFORMAT_HHMMSSDOTSS);
+			if (strTime.length() > 11) {
+				strTime = strTime.substring(0, 11);
+			} else if (strTime.length() < 11) {
+				strTime = strTime + "0";
+			}
+			this.time = strTime;
+		}
+		return this.time;
+		
 	}
 }

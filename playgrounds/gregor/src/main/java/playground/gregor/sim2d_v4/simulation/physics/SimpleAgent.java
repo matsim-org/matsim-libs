@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
+import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.LinkInfo;
 
 public class SimpleAgent implements Sim2DAgent {
@@ -109,6 +110,12 @@ public class SimpleAgent implements Sim2DAgent {
 	@Override
 	public void notifyMoveOverNode(Id nextLinkId) {
 		this.driver.notifyMoveOverNode(nextLinkId);
+	}
+
+	@Override
+	public void debug(VisDebugger visDebugger) {
+		visDebugger.addCircle(this.getPos()[0], this.getPos()[1], .5f, 192, 0, 64, 128);
+		
 	}
 
 

@@ -110,7 +110,7 @@ public class PhysicalSim2DEnvironment {
 			psec.moveAgents(time);
 		}
 
-		//		if (time  % 10 == 0){
+		//DEBUG
 		boolean hasAgent = false;
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
 			if (psec.getNumberOfAllAgents() > 0) {
@@ -121,8 +121,24 @@ public class PhysicalSim2DEnvironment {
 		if (hasAgent){
 			for (PhysicalSim2DSection psec : this.psecs.values()) {
 				psec.debug(visDebugger);
-			}	
+			}
+			long timel = System.currentTimeMillis();
+			long last = visDebugger.lastUpdate;
+			long diff = timel - last;
+			if (diff < 100) {
+				long wait = 100-diff;
+				try {
+					Thread.sleep(wait);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+
+			visDebugger.setTime(time);
 			visDebugger.update();
+			visDebugger.lastUpdate = System.currentTimeMillis();
 		}
 		//		}
 		//		log.info("sim step done.");

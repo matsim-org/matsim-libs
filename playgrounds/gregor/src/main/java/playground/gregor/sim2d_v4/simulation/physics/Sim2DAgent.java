@@ -23,6 +23,8 @@ package playground.gregor.sim2d_v4.simulation.physics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
+import playground.gregor.sim2d_v4.debugger.VisDebugger;
+
 public interface Sim2DAgent {
 	
 	public QVehicle getQVehicle();
@@ -48,6 +50,8 @@ public interface Sim2DAgent {
 	public Id getId();
 
 	public void notifyMoveOverNode(Id nextLinkId);
+
+	public void debug(VisDebugger visDebugger);
 	
 	
 	
