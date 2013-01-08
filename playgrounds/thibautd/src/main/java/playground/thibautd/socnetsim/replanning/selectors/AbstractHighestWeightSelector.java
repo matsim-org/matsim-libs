@@ -217,6 +217,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
+			Set<Id> actuallyAllocatedPersons = newAllocatedPersons;
 			JointPlan jointPlan = r.jointPlan ;
 			if (jointPlan != null) {
 				// normally, it is impossible that it is always the case if there
@@ -224,7 +225,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				// have a infinitely negative weight and not explored.
 				if ( contains( jointPlan , alreadyAllocatedPersons ) ) continue;
 				actuallyRemainingPersons = filter( remainingPersons , jointPlan );
-				newAllocatedPersons.addAll( jointPlan.getIndividualPlans().keySet() );
+				actuallyAllocatedPersons = new HashSet<Id>( actuallyAllocatedPersons );
+				actuallyAllocatedPersons.addAll( jointPlan.getIndividualPlans().keySet() );
 			}
 
 			if ( actuallyRemainingPersons.size() > 0 ) {
@@ -232,7 +234,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 						forbidenPlans,
 						allPersonsRecord,
 						actuallyRemainingPersons,
-						newAllocatedPersons);
+						actuallyAllocatedPersons);
 				if (found) return true;
 			}
 			else {
