@@ -148,6 +148,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				plans != null &&
 				continueIterations( forbiden , personRecords , plans ) );
 
+		assert plans == null || !forbiden.isForbidden( plans );
+
 		return plans;
 	}
 
@@ -158,6 +160,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		if ( !forbidBlockingCombinations ) return false;
 
 		if (log.isTraceEnabled()) log.trace( "checking if need to continue" );
+		assert !forbiden.isForbidden( allocation ) : "forbidden combination was re-examined";
 
 		if (isBlocking( personRecords, allocation )) {
 			if (log.isTraceEnabled()) {
@@ -583,6 +586,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				if ( forbids( p , ps ) ) return true;
 			}
 			return false;
+		}
+
+		public boolean isForbidden(final GroupPlans groupPlans) {
+			return forbidden.contains( groupPlans );
 		}
 
 		private static boolean forbids(
