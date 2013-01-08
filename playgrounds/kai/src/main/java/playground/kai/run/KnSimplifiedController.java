@@ -133,7 +133,7 @@ public class KnSimplifiedController extends AbstractController {
 
 		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
 		
-		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) events,
+		final EventsHandling eventsHandling = new EventsHandling(events,
 				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
 				controlerIO );
 		this.addCoreControlerListener(eventsHandling); 
