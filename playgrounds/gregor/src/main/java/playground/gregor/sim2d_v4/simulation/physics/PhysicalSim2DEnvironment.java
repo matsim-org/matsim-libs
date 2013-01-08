@@ -60,7 +60,15 @@ public class PhysicalSim2DEnvironment {
 	private final double offsetY;
 
 	//DEBUG
-	private static final VisDebugger visDebugger = new VisDebugger();
+	private static final boolean DEBUG = false;
+	private static final VisDebugger visDebugger;
+	static {
+		if (DEBUG) {
+			visDebugger = new VisDebugger();
+		} else {
+			visDebugger = null;
+		}
+	}
 
 	private Map<Id, Sim2DQTransitionLink> lowResLinks;
 
@@ -93,7 +101,7 @@ public class PhysicalSim2DEnvironment {
 		this.psecs.put(sec.getId(),psec);
 		return psec;
 	}
-	
+
 	private DepartureBox createAndAddDepartureBox(Section sec) {
 		DepartureBox psec = new DepartureBox(sec,this.sim2dsc,this.offsetX,this.offsetY,this);
 		this.psecs.put(sec.getId(),psec);
@@ -114,6 +122,21 @@ public class PhysicalSim2DEnvironment {
 		}
 
 		//DEBUG
+		if (DEBUG) {
+			debug(time);
+		}
+	}
+	//		}
+	//		log.info("sim step done.");
+
+	//1. update agents' world model (i.e. neighbors, obstacles)
+	//2. update agents' new velocity/acceleration (here the different simulation models will be applied)
+	//3. move agents' 
+	//3. b if agent enters new section:
+	//			precompute relevant exit of new section (needed to recognize that an agent leaves a section) (may be a list of sections to traverse calculated at the beginning would be helpful)
+	//			unregister agent in current section (it.remove());
+	//			register agent in next section (.add(agent) only if sections are not multi-threaded)
+	private void debug(double time) {
 		boolean hasAgent = false;
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
 			if (psec.getNumberOfAllAgents() > 0) {
@@ -137,22 +160,12 @@ public class PhysicalSim2DEnvironment {
 					e.printStackTrace();
 				}
 			}
-			
-
 			visDebugger.setTime(time);
 			visDebugger.update();
 			visDebugger.lastUpdate = System.currentTimeMillis();
-		}
-		//		}
-		//		log.info("sim step done.");
 
-		//1. update agents' world model (i.e. neighbors, obstacles)
-		//2. update agents' new velocity/acceleration (here the different simulation models will be applied)
-		//3. move agents' 
-		//3. b if agent enters new section:
-		//			precompute relevant exit of new section (needed to recognize that an agent leaves a section) (may be a list of sections to traverse calculated at the beginning would be helpful)
-		//			unregister agent in current section (it.remove());
-		//			register agent in next section (.add(agent) only if sections are not multi-threaded)
+		}
+
 	}
 
 	public void createAndAddPhysicalTransitionSections(
@@ -235,13 +248,13 @@ public class PhysicalSim2DEnvironment {
 
 	public void registerLowResLinks(Map<Id, Sim2DQTransitionLink> lowResLinks2) {
 		this.lowResLinks = lowResLinks2;
-		
+
 	}
 
 	/*package*/ Sim2DQTransitionLink getLowResLink(Id nextLinkId) {
 		return this.lowResLinks.get(nextLinkId);
 	}
-	
+
 	/*package*/ EventsManager getEventsManager() {
 		return this.eventsManager;
 	}

@@ -92,13 +92,6 @@ public class PhysicalSim2DSectionTest {
 		DummyAgent a4 = new DummyAgent(-3.f, 3f); //not visible from agentInQuestion
 		this.psec2.getAgents().add(a4);
 		a4.setPSec(this.psec2);
-
-		
-		VisDebugger visd = new VisDebugger();
-		this.psec0.debug(visd);
-		this.psec1.debug(visd);
-		this.psec2.debug(visd);
-		visd.update();
 		
 		Neighbors ncalc = new Neighbors();
 		ncalc.setRangeAndMaxNrOfNeighbors(10, 3);
