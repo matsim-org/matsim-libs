@@ -37,6 +37,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final double marginalUtilityOfEarlyDeparture_s;
 	public final double marginalUtilityOfTraveling_s;
 	public final double marginalUtilityOfTravelingPT_s; // public transport
+	public final double marginalUtilityOfWaitingPt_s;
 	public final double marginalUtilityOfTravelingBike_s;
 	public final double marginalUtilityOfTravelingWalk_s;
 	public final double marginalUtilityOfTravelingOther_s;
@@ -74,6 +75,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;
 		marginalUtilityOfTraveling_s = config.getTraveling_utils_hr() / 3600.0;
 		marginalUtilityOfTravelingPT_s = config.getTravelingPt_utils_hr() / 3600.0;
+		marginalUtilityOfWaitingPt_s = config.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 ;
 		marginalUtilityOfTravelingBike_s = config.getTravelingBike_utils_hr() / 3600.0;
 		marginalUtilityOfTravelingWalk_s = config.getTravelingWalk_utils_hr() / 3600.0;
 		marginalUtilityOfTravelingOther_s = config.getTravelingOther_utils_hr() / 3600.0;

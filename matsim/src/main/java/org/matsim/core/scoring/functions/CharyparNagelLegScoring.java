@@ -32,6 +32,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -54,6 +55,7 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	protected Network network;
 	private boolean nextEnterVehicleIsFirstOfTrip = true ;
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
+	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
 
 	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network) {
 		this.params = params;
@@ -165,12 +167,15 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 				this.nextEnterVehicleIsFirstOfTrip  = true ;
 				this.nextStartPtLegIsFirstOfTrip = true ;
 			}
+			this.lastActivityEndTime = event.getTime() ;
 		} else if ( event instanceof PersonEntersVehicleEvent ) {
 			if ( !this.nextEnterVehicleIsFirstOfTrip ) {
 				// all vehicle entering after the first triggers the disutility of line switch:
 				this.score  += params.utilityOfLineSwitch ;
 			}
 			this.nextEnterVehicleIsFirstOfTrip = false ;
+			// add score of waiting, _minus_ score of travelling (since it is added in the legscoring above):
+			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.marginalUtilityOfTravelingPT_s) ;
 		} else if ( event instanceof AgentDepartureEvent ) {
 			if ( TransportMode.pt.equals( ((AgentDepartureEvent)event).getLegMode() ) ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {

@@ -300,6 +300,7 @@ public class PtScoringTest {
 			Config config = this.utils.loadConfig("test/scenarios/pt-simple/config.xml");
 			
 			config.planCalcScore().setWriteExperiencedPlans(true);
+			config.planCalcScore().setMarginalUtlOfWaitingPt_utils_hr(-18.0) ;
 			
 			Controler controler = new Controler(config);
 			controler.setOverwriteFiles(true);
@@ -334,6 +335,8 @@ public class PtScoringTest {
 			// (pt interaction activity) 
 			System.out.println("score: " + score ) ;
 			
+			System.out.println("marginalUtlOfWaitPt: " + pcs.getMarginalUtlOfWaitingPt_utils_hr() ) ;
+			
 			score += pcs.getMarginalUtlOfWaitingPt_utils_hr() * timeTransitWait/3600. ;
 //			score += pcs.getTravelingPt_utils_hr() * timeTransitWait/3600. ;
 			// yyyy wait is not separately scored!!
@@ -349,15 +352,15 @@ public class PtScoringTest {
 			System.out.println("score: " + score ) ;
 
 			score += (pcs.getPerforming_utils_hr()/3600.) * typicalDuration_s * Math.log(timeHome/zeroUtilityDurationHome_s) ;
-			System.out.println("score: " + score ) ;
+			System.out.println("final score: " + score ) ;
 			
 			Scenario sc = controler.getScenario();
 			Population pop = sc.getPopulation() ;
 			for ( Person pp : pop.getPersons().values() ) {
 				// (there is only one person, but we need to get it)
 				
-				System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
-				Assert.assertEquals(89.85649384696622, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
+				System.out.println("agent score: " + pp.getSelectedPlan().getScore() ) ;
+				Assert.assertEquals(89.14982718029958, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 			}
 
 		}
