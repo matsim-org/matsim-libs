@@ -20,15 +20,17 @@
 
 package playground.christoph.evacuation.pt;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.CustomDataManager;
-import org.matsim.pt.router.DepartureTimeCache;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
 
@@ -53,9 +55,9 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 //	private final ThreadLocal<Double> previousTimes;
 //	private final ThreadLocal<Double> cachedTravelTimes;
 	private final ThreadLocal<BufferedData> bufferedData;
-	private final DepartureTimeCache departureTimeCache;
+	private final PreparedTransitSchedule departureTimeCache;
 
-	public EvacuationTransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config, final DepartureTimeCache departureTimeCache) {
+	public EvacuationTransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config, final PreparedTransitSchedule departureTimeCache) {
 		this.config = config;
 		
 //		this.previousLinks = new ThreadLocal<Link>();
@@ -123,6 +125,18 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 		bd.cachedTravelTime = time2;
 				
 		return time2;
+	}
+	
+	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
+		double initialCost = - (getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		return initialCost;
+	}
+
+	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+		double distance = CoordUtils.calcDistance(coord, toCoord);
+		double initialTime = distance / config.getBeelineWalkSpeed();
+		return initialTime;
 	}
 	
 	/*

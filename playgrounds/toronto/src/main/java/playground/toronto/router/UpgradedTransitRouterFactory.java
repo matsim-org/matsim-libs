@@ -1,5 +1,6 @@
 package playground.toronto.router;
 
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -33,9 +34,9 @@ public class UpgradedTransitRouterFactory implements TransitRouterFactory{
 			
 		return new TransitRouterImpl(
 				config, 
-				this.routerNetwork,
-				calc, 
-				calc);
+				new PreparedTransitSchedule(schedule),
+				this.routerNetwork, 
+				calc, calc);
 	}
 
 }

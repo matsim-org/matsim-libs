@@ -40,7 +40,7 @@ import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.CustomDataManager;
-import org.matsim.pt.router.DepartureTimeCache;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -75,7 +75,7 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 	private Map<DataCollection,Boolean> dataCollectionConfig = new HashMap<DataCollection,Boolean>() ;
 	private Map<DataCollection,StringBuffer> dataCollectionStrings = new HashMap<DataCollection,StringBuffer>() ;
 	
-	private final DepartureTimeCache data = new DepartureTimeCache();
+	private final PreparedTransitSchedule data = new PreparedTransitSchedule();
 	
 	public void setDataCollection( DataCollection item, Boolean bbb ) {
 		Logger.getLogger(this.getClass()).info( " settin data collection of " + item.toString() + " to " + bbb.toString() ) ;
@@ -271,7 +271,7 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 				RandomizedTransitRouterNetworkTravelTimeAndDisutility2 ttCalculator = new RandomizedTransitRouterNetworkTravelTimeAndDisutility2(trConfig);
 				ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
 				ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
-				return new TransitRouterImpl(trConfig, routerNetwork, ttCalculator, ttCalculator);
+				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 			}
 		}) ;
 		

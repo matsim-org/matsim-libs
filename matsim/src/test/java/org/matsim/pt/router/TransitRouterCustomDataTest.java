@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -15,6 +16,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -48,7 +50,7 @@ public class TransitRouterCustomDataTest {
 		
 		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
 
-		TransitRouterImpl router = new TransitRouterImpl(config, transitNetwork, transitRouterNetworkTravelTimeAndDisutility, disutility);
+		TransitRouterImpl router = new TransitRouterImpl(config, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, transitRouterNetworkTravelTimeAndDisutility, disutility);
 		
 		List<Leg> legs = router.calcRoute(scenario.createCoord(-100, 0), new CoordImpl(3100, 0), 5.9*3600, null);
 		Assert.assertEquals(1, legs.size());
@@ -102,6 +104,14 @@ public class TransitRouterCustomDataTest {
 			dataManager.setToNodeCustomData(links);
 			
 			return val;
+		}
+		
+		public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+			return routerDisutility.getTravelDisutility(person, coord, toCoord);
+		}
+
+		public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+			return routerDisutility.getTravelTime(person, coord, toCoord);
 		}
 		
 	}

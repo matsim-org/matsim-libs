@@ -36,6 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.CustomDataManager;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -194,7 +195,7 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility extends Trans
 				RandomizedTransitRouterNetworkTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterNetworkTravelTimeAndDisutility(trConfig);
 				ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
 				ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
-				return new TransitRouterImpl(trConfig, routerNetwork, ttCalculator, ttCalculator);
+				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 			}
 			
 		}) ;

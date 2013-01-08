@@ -30,6 +30,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -51,7 +52,7 @@ public class RndPtRouterLauncher {
 					new RandomizedTransitRouterNetworkTravelTimeAndDisutility2(trConfig);
 				ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
 				ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
-				return new TransitRouterImpl(trConfig, routerNetwork, ttCalculator, ttCalculator);
+				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 			}
 		};
 	}

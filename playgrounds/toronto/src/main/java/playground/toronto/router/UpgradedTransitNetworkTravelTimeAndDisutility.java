@@ -1,9 +1,11 @@
 package playground.toronto.router;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -28,7 +30,7 @@ import playground.toronto.transitfares.NullFareCalculator;
  * @author pkucirek
  *
  */
-public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime, TransitTravelDisutility{
+public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime, TransitTravelDisutility {
 	
 	private static final Logger log = Logger.getLogger(UpgradedTransitNetworkTravelTimeAndDisutility.class);
 	
@@ -169,4 +171,16 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 		return ttime;
 	}
 
+	
+	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
+		double initialCost = - (getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		return initialCost;
+	}
+
+	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+		double distance = CoordUtils.calcDistance(coord, toCoord);
+		double initialTime = distance / config.getBeelineWalkSpeed();
+		return initialTime;
+	}
 }

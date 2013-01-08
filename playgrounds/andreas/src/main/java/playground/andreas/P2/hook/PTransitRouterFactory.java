@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -75,7 +76,7 @@ public class PTransitRouterFactory implements TransitRouterFactory{
 		if (this.routerFactory == null) {
 			// no speedy router available - return old one
 			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.transitRouterConfig);
-			return new TransitRouterImpl(this.transitRouterConfig, routerNetwork, ttCalculator, ttCalculator);
+			return new TransitRouterImpl(this.transitRouterConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 		} else {
 			return this.routerFactory.createTransitRouter();
 		}

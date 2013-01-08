@@ -19,12 +19,12 @@
 
 package playground.toronto.router;
 
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -58,6 +58,6 @@ public class TorontoTransitRouterImplFactory implements TransitRouterFactory {
 	public TransitRouter createTransitRouter() {
 		TorontoTransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TorontoTransitRouterNetworkTravelTimeAndDisutility(
 				config, cache, busPenalty, subwayPenalty, streetcarPenalty);
-		return new TransitRouterImpl(this.config, this.routerNetwork, ttCalculator, ttCalculator);
+		return new TransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, ttCalculator, ttCalculator);
 	}
 }

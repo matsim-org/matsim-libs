@@ -52,7 +52,7 @@ public class TorontoTransitRouterNetworkTravelTimeAndDisutility extends Upgraded
 		this.streetcarWeight = streetcarWeight; 
 	}
 
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+	public double getLinkTravelDisutility(final TransitRouterNetworkLink link, final double time, final Person person, final Vehicle vehicle) {
 		
 		double cost = super.getLinkTravelDisutility(link, time, person, vehicle, /* dataManager */ null); 
 			

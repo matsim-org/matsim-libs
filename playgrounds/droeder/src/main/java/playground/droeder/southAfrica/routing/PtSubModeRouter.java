@@ -39,7 +39,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.router.DepartureTimeCache;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouter;
@@ -74,7 +74,7 @@ public class PtSubModeRouter implements TransitRouter {
 	private final TransitTravelDisutility travelDisutility;
 	private final TravelTime travelTime;
 	
-	private final DepartureTimeCache data = new DepartureTimeCache();
+	private final PreparedTransitSchedule data = new PreparedTransitSchedule();
 
 	public PtSubModeRouter(final TransitRouterConfig config, final TransitSchedule schedule) {
 		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config);

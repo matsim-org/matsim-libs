@@ -6,14 +6,14 @@ import java.util.List;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
@@ -38,7 +38,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		//test only transit links without transfer
 		double accumTime=28800;  //8:00am first departure
 		final String msg = "different result of cost calculation:";
-		for (Link link : adaptedTransitRouter.getTransitRouterNetwork().getLinks().values()){
+		for (TransitRouterNetworkLink link : adaptedTransitRouter.getTransitRouterNetwork().getLinks().values()){
 			double travelCost = adaptedTravelTimeCost.getLinkTravelDisutility(link, accumTime, null, null, null);
 			double travelTime = adaptedTravelTimeCost.getLinkTravelTime(link, accumTime, null, null);
 			Assert.assertEquals(msg , travelCost, -travelTime * myConfig.getMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * myConfig.getMarginalUtilityOfTravelDistancePt_utl_m() , MatsimTestUtils.EPSILON);

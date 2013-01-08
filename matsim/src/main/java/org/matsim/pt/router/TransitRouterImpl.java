@@ -50,6 +50,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
+ * 
+ * Not thread-safe because MultiNodeDijkstra is not. Does not expect the TransitSchedule to change once constructed! michaz '13
+ * 
  * @author mrieser
  */
 public class TransitRouterImpl implements TransitRouter {
@@ -60,33 +63,37 @@ public class TransitRouterImpl implements TransitRouter {
 	private final TransitRouterConfig config;
 	private final TransitTravelDisutility travelDisutility;
 	private final TravelTime travelTime;
-	
-	private DepartureTimeCache cache = new DepartureTimeCache();
+
+
+	private final PreparedTransitSchedule preparedTransitSchedule; 
 
 	public TransitRouterImpl(final TransitRouterConfig config, final TransitSchedule schedule) {
-		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config);
+		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config, preparedTransitSchedule);
 		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
 		this.config = config;
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
 		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
-//		this.transitNetwork = null; // enable to save memory if no routing should be done
+		//		this.transitNetwork = null; // enable to save memory if no routing should be done
 	}
 
-	public TransitRouterImpl(final TransitRouterConfig config, final TransitRouterNetwork routerNetwork, final TravelTime travelTime, TransitTravelDisutility travelDisutility) {
+	public TransitRouterImpl(
+			final TransitRouterConfig config, 
+			final PreparedTransitSchedule preparedTransitSchedule, 
+			final TransitRouterNetwork routerNetwork, 
+			final TravelTime travelTime, 
+			final TransitTravelDisutility travelDisutility) {
 		this.config = config;
 		this.transitNetwork = routerNetwork;
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
-//		this.dijkstra = null; // enable to save memory if no routing should be done
+		this.preparedTransitSchedule = preparedTransitSchedule;
+		//		this.dijkstra = null; // enable to save memory if no routing should be done
 	}
-	
-	public void setDepartureTimeCache(final DepartureTimeCache cache) {
-		this.cache = cache;
-	}
-	
-	private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Coord coord, double departureTime){
+
+	private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime){
 		Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.searchRadius);
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
@@ -96,24 +103,28 @@ public class TransitRouterImpl implements TransitRouter {
 		}
 		Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : nearestNodes) {
-			double distance = CoordUtils.calcDistance(coord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance / this.config.getBeelineWalkSpeed();
-
-			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-			// yyyyyy the above line does not use the TravelDisutility. kai, oct/dec'12 
-			//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
-
+			Coord toCoord = node.stop.getStopFacility().getCoord();
+			double initialTime = getWalkTime(person, coord, toCoord);
+			double initialCost = getWalkCost(person, coord, toCoord);
 			wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 		return wrappedNearestNodes;
+	}
+	
+	private double getWalkTime(Person person, Coord coord, Coord toCoord) {
+		return travelDisutility.getTravelTime(person, coord, toCoord);
+	}
+	
+	private double getWalkCost(Person person, Coord coord, Coord toCoord) {
+		return travelDisutility.getTravelDisutility(person, coord, toCoord);
 	}
 
 	@Override
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
 		// find possible start stops
-		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(fromCoord, departureTime);
+		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromCoord, departureTime);
 		// find possible end stops
-		Map<Node, InitialNode> wrappedToNodes  = this.locateWrappedNearestTransitNodes(toCoord, departureTime);
+		Map<Node, InitialNode> wrappedToNodes  = this.locateWrappedNearestTransitNodes(person, toCoord, departureTime);
 
 		// find routes between start and end stops
 		Path p = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
@@ -122,27 +133,27 @@ public class TransitRouterImpl implements TransitRouter {
 			return null;
 		}
 
-		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		double directWalkCost = getWalkCost(person, fromCoord, toCoord);
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
-		
+
 		if (directWalkCost < pathCost) {
-			return this.createDirectWalkLegList(fromCoord, toCoord);
+			return this.createDirectWalkLegList(null, fromCoord, toCoord);
 		}
-		return convertPathToLegList( departureTime, p, fromCoord, toCoord ) ;
+		return convertPathToLegList( departureTime, p, fromCoord, toCoord, person ) ;
 	}
 
-	private List<Leg> createDirectWalkLegList(Coord fromCoord, Coord toCoord){
+	private List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord){
 		List<Leg> legs = new ArrayList<Leg>();
 		Leg leg = new LegImpl(TransportMode.transit_walk);
-		double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+		double walkTime = getWalkTime(person, fromCoord, toCoord);
 		Route walkRoute = new GenericRouteImpl(null, null);
 		leg.setRoute(walkRoute);
 		leg.setTravelTime(walkTime);
 		legs.add(leg);
 		return legs;
 	}
-	
-	protected List<Leg> convertPathToLegList( double departureTime, Path p, Coord fromCoord, Coord toCoord ) {
+
+	protected List<Leg> convertPathToLegList( double departureTime, Path p, Coord fromCoord, Coord toCoord, Person person ) {
 		// yy there could be a better name for this method.  kai, apr'10
 
 		// now convert the path back into a series of legs with correct routes
@@ -166,7 +177,7 @@ public class TransitRouterImpl implements TransitRouter {
 					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 					leg.setRoute(ptRoute);
 					double arrivalOffset = (((TransitRouterNetworkLink) link).getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? ((TransitRouterNetworkLink) link).fromNode.stop.getArrivalOffset() : ((TransitRouterNetworkLink) link).fromNode.stop.getDepartureOffset();
-					double arrivalTime = this.cache.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+					double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;
 					legs.add(leg);
@@ -186,7 +197,7 @@ public class TransitRouterImpl implements TransitRouter {
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
+								double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord()); // CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
 								leg.setTravelTime(walkTime);
@@ -194,7 +205,7 @@ public class TransitRouterImpl implements TransitRouter {
 								legs.add(leg);
 							} else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
+								double walkTime = getWalkTime(person, fromCoord, egressStop.getCoord());
 								leg.setTravelTime(walkTime);
 								time += walkTime;
 								legs.add(leg);
@@ -217,20 +228,20 @@ public class TransitRouterImpl implements TransitRouter {
 			double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 					(prevLink).toNode.stop.getArrivalOffset()
 					: (prevLink).toNode.stop.getDepartureOffset();
-			double arrivalTime = this.cache.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
-			leg.setTravelTime(arrivalTime - time);
+					double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+					leg.setTravelTime(arrivalTime - time);
 
-			legs.add(leg);
-			transitLegCnt++;
-			accessStop = egressStop;
+					legs.add(leg);
+					transitLegCnt++;
+					accessStop = egressStop;
 		}
 		if (prevLink != null) {
 			leg = new LegImpl(TransportMode.transit_walk);
 			double walkTime;
 			if (accessStop == null) {
-				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+				walkTime = getWalkTime(person, fromCoord, toCoord);
 			} else {
-				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / this.config.getBeelineWalkSpeed();
+				walkTime = getWalkTime(person, accessStop.getCoord(), toCoord);
 			}
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
@@ -239,7 +250,7 @@ public class TransitRouterImpl implements TransitRouter {
 			// it seems, the agent only walked
 			legs.clear();
 			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+			double walkTime = getWalkTime(person, fromCoord, toCoord);
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
 		}

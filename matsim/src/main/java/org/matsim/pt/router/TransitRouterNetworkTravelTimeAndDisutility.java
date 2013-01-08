@@ -21,9 +21,11 @@
 package org.matsim.pt.router;
 
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -45,10 +47,10 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	private double previousTime = Double.NaN;
 	private double cachedTravelTime = Double.NaN;
 
-	private final DepartureTimeCache data;
+	private final PreparedTransitSchedule preparedTransitSchedule;
 
 	/*
-	 * If this constructor is used, every instance used its own DepartureTimeCache which might
+	 * If this constructor is used, every instance used its own PreparedTransitSchedule which might
 	 * consume a lot of memory.
 	 * 
 	 * cdobler, nov'12
@@ -56,12 +58,12 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	@Deprecated
 	public TransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config) {
 		this.config = config;
-		this.data = new DepartureTimeCache();
+		this.preparedTransitSchedule = new PreparedTransitSchedule();
 	}
 	
-	public TransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config, DepartureTimeCache data) {
+	public TransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config, PreparedTransitSchedule preparedTransitSchedule) {
 		this.config = config;
-		this.data = data;
+		this.preparedTransitSchedule = preparedTransitSchedule;
 	}
 
 	@Override
@@ -73,14 +75,8 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			cost = defaultTransferCost(link, time, person, vehicle);
 			
 		} else {
-//			final double inVehTime = getLinkTravelTime(link, time, person, vehicle);
-//			cost = - inVehTime * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
-//			       - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
-
-			double offVehWaitTime = offVehicleWaitTime(link, time);
-			
-			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime ;
-			
+			double offVehWaitTime = offVehicleWaitTime(link, time);		
+			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime ;		
 			cost = - inVehTime                   * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
 					-offVehWaitTime				 * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					-link.getLength() 			 * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
@@ -97,8 +93,6 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	 * @return
 	 */
 	protected double offVehicleWaitTime(final Link link, final double time) {
-//		return 0. ;
-		
 		double offVehWaitTime=0;
 		double nextVehArrivalTime = getVehArrivalTime(link, time);
 		if (time < nextVehArrivalTime){ // it means the agent waits outside the veh				
@@ -146,7 +140,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			// (agent stays on the same route, so use transit line travel time)
 			
 			// get the next departure time:
-			double bestDepartureTime = data.getNextDepartureTime(wrapped.route, fromStop, time);
+			double bestDepartureTime = preparedTransitSchedule.getNextDepartureTime(wrapped.route, fromStop, time);
 
 			// the travel time on the link is 
 			//   the time until the departure (``dpTime - now'')
@@ -173,7 +167,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	double previousWaitTime;
 	double cachedVehArrivalTime;
 	
-	/* package (for a test) */ public double getVehArrivalTime(final Link link, final double now){
+	public double getVehArrivalTime(final Link link, final double now){
 		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
 			return this.cachedVehArrivalTime;
 		}
@@ -187,7 +181,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		}
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
 		
-		double nextDepartureTime = data.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
+		double nextDepartureTime = preparedTransitSchedule.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
 		
 		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
 		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station
@@ -196,5 +190,16 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		return vehArrivalTime ;		
 	}
 
+	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
+		double initialCost = - (getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		return initialCost;
+	}
+
+	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+		double distance = CoordUtils.calcDistance(coord, toCoord);
+		double initialTime = distance / config.getBeelineWalkSpeed();
+		return initialTime;
+	}
 
 }

@@ -25,22 +25,16 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * @author droeder
@@ -102,7 +96,7 @@ public class PtSubModeRouterOld implements TransitRouter{
 			TransitRouterNetworkTravelTimeAndDisutility timeAndDisutility) {
 		
 		for(Entry<String, TransitRouterNetwork> e :networks.entrySet()){
-			this.modeRouter.put(e.getKey(), new TransitRouterImpl(config2, e.getValue(), timeAndDisutility, timeAndDisutility));
+			this.modeRouter.put(e.getKey(), new TransitRouterImpl(config2, new PreparedTransitSchedule(null), e.getValue(), timeAndDisutility, timeAndDisutility));
 		}
 	}
 	

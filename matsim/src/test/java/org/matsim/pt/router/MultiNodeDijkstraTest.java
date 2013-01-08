@@ -25,6 +25,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -460,6 +461,18 @@ public class MultiNodeDijkstraTest extends TestCase {
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
 			return this.travelCosts.get(link.getId()).doubleValue();
 		}
+
+		@Override
+		public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+			return 0;
+		}
+
+		@Override
+		public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+			return 0;
+		}
+		
+		
 		
 	}
 

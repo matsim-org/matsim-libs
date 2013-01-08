@@ -38,12 +38,13 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -69,7 +70,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 			TransitRouterConfig myTRConfig,
 			TransitRouterNetworkTravelTimeAndDisutility adaptedTransitRouterNetworkTravelTimeCost,
 			TransitRouterNetwork buildNetwork) {
-		super(myTRConfig, buildNetwork, adaptedTransitRouterNetworkTravelTimeCost, adaptedTransitRouterNetworkTravelTimeCost);
+		super(myTRConfig, new PreparedTransitSchedule(schedule), buildNetwork, adaptedTransitRouterNetworkTravelTimeCost, adaptedTransitRouterNetworkTravelTimeCost);
 	}
 
 	@Override
@@ -134,7 +135,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 			}
 		}
 
-		return convertPathToLegList( departureTime, p, fromCoord, toCoord ) ;
+		return convertPathToLegList( departureTime, p, fromCoord, toCoord, person ) ;
 	}
 
 	/**necessary to override since it uses a different algo than marcel.  kai, apr'10

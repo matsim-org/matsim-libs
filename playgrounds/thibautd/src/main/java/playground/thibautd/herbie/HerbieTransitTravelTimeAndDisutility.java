@@ -24,6 +24,7 @@ import herbie.running.scoring.TravelScoringFunction;
 
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
@@ -46,6 +47,14 @@ public class HerbieTransitTravelTimeAndDisutility implements TravelTime, Transit
 	private final TravelScoringFunction distanceScoring;
 	private final HerbieConfigGroup herbieConfig;
 	private final TransitRouterConfig config;
+
+	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+		return timeCost.getTravelDisutility(person, coord, toCoord);
+	}
+
+	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+		return timeCost.getTravelTime(person, coord, toCoord);
+	}
 
 	private double distanceCost;
 

@@ -22,6 +22,7 @@ package playground.pbouman.transitfares;
 import java.util.Map;
 
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -66,7 +67,7 @@ public class TransitFareRouterFactoryImpl implements TransitRouterFactory {
 			costCalc = new TransitFareRouterNetworkTimeAndDisutilityCalc(this.config, this.scenario);
 			
 		
-		return new TransitRouterImpl(config, routerNetwork, costCalc, costCalc);
+		return new TransitRouterImpl(config, new PreparedTransitSchedule(schedule), routerNetwork, costCalc, costCalc);
 	}
 
 }

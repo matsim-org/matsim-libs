@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.CustomDataManager;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -68,7 +69,7 @@ public class DemoPeter {
 		@Override
 		public TransitRouter createTransitRouter() {
 			MyTransitRouterNetworkTravelTimeCost ttcalc = new MyTransitRouterNetworkTravelTimeCost(this.config);
-			return new TransitRouterImpl(this.config, this.routerNetwork, ttcalc, ttcalc);
+			return new TransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, ttcalc, ttcalc);
 		}
 	}
 

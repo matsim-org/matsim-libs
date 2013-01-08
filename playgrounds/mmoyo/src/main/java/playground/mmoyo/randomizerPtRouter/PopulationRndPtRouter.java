@@ -33,6 +33,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
@@ -64,7 +65,7 @@ class PopulationRndPtRouter{
 			
 			//create randomizedPtRouter and PlansCalcTransitRoute
 			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterNetworkTravelTimeAndDisutility(trConfig);
-			TransitRouter randomizedPtRouter = new TransitRouterImpl(trConfig, routerNetwork, ttCalculator, ttCalculator);
+			TransitRouter randomizedPtRouter = new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 			final PlansCalcRouteConfigGroup config = scn.getConfig().plansCalcRoute();
 			final Network network = scn.getNetwork();
 			FreespeedTravelTimeAndDisutility freespeedTravelTimeCost = new FreespeedTravelTimeAndDisutility(scn.getConfig().planCalcScore());
