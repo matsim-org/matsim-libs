@@ -21,7 +21,7 @@ package playground.thibautd.socnetsim.replanning.grouping;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 	@Override
 	public Collection<ReplanningGroup> identifyGroups(final Population population) {
 		final List<ReplanningGroup> groups = new ArrayList<ReplanningGroup>();
-		final Map<Id, Person> persons = new HashMap<Id, Person>( population.getPersons() );
+		final Map<Id, Person> persons = new LinkedHashMap<Id, Person>( population.getPersons() );
 
 		int countGroups = 0;
 		int countPersonsExplicit = 0;
