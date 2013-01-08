@@ -23,6 +23,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 import playground.thibautd.analysis.listeners.CliqueScoreStats;
@@ -59,7 +60,12 @@ public class RunCliquesWithHardCodedStrategies {
 		final Config config = JointControlerUtils.createConfig( configFile );
 		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
 					config.getModule( CliquesConfigGroup.GROUP_NAME );
-		final Scenario scenario = JointControlerUtils.createScenario( config );
+		// do not load joint plans (it fails with v5, and contrary to the "cliquessim"
+		// setting, it is not useful if reading plans without joint trips.
+		// XXX reading plans with joint trips will fail!
+		final Scenario scenario = ScenarioUtils.createScenario( config );
+		JointControlerUtils.tuneScenario( scenario );
+		ScenarioUtils.loadScenario( scenario );
 		final ControllerRegistry controllerRegistry =
 			new ControllerRegistry(
 					scenario,

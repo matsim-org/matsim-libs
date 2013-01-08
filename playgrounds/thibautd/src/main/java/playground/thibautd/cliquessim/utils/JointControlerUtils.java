@@ -142,7 +142,7 @@ public class JointControlerUtils {
 		return null;
 	}
 
-	private static void tuneScenario(final Scenario sc) {
+	public static void tuneScenario(final Scenario sc) {
 		ModeRouteFactory rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
 		rFactory.setRouteFactory(
 				JointActingTypes.DRIVER,
