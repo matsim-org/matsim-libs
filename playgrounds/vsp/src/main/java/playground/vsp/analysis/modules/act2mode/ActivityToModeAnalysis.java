@@ -117,6 +117,7 @@ public class ActivityToModeAnalysis extends AbstractAnalyisModule {
 		Set<SimpleFeature> temp = slotFeatures.get(slice);
 		if(temp == null) {
 			temp = new HashSet<SimpleFeature>();
+			slotFeatures.put(slice, temp);
 		}
 		Object[] featureAttribs = new Object[3];
 		featureAttribs[0] = new GeometryFactory().createPoint(new Coordinate(atm.getCoord().getX(), atm.getCoord().getY(), 0.));
