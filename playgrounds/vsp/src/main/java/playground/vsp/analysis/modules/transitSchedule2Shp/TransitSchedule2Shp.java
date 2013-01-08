@@ -101,6 +101,7 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 	private Collection<SimpleFeature> getTransitLineFeatures(TransitLine l, String targetCoordinateSystem) {
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(MGC.getCRS(targetCoordinateSystem));
+		b.setName("transitLineFeature");
 		b.add("LineString", LineString.class);
 		b.add("line", String.class);
 		b.add("route", String.class);
