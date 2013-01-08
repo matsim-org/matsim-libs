@@ -82,6 +82,9 @@ public class PhysicalSim2DEnvironment {
 				this.linkIdPsecsMapping.put(id, psec);
 			}
 		}
+		for (PhysicalSim2DSection psec : this.psecs.values()) {
+			psec.connect();
+		}
 
 	}
 

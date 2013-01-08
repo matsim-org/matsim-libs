@@ -225,18 +225,21 @@ public class PhysicalSim2DSection {
 				li.finishLine = finishLine;
 			}
 		}
+
+	}
+	
+	/*package*/ void connect() {
+		Map<Id, ? extends Link> links = this.sim2dsc.getMATSimScenario().getNetwork().getLinks();
 		for (Id id : this.sec.getRelatedLinkIds()) {
 			Link l = links.get(id);
 			LinkInfo li = this.linkInfos.get(l.getId());
 			for (Link ll : l.getToNode().getOutLinks().values()) {
-//				if (this.linkInfos.get(ll.getId()))
 				PhysicalSim2DSection psec = this.penv.getPhysicalSim2DSectionAssociatedWithLinkId(ll.getId());
 				if (psec != this) {
 					this.neighbors.put(li.finishLine, psec);
 				}
 			}
 		}
-
 	}
 
 	//
@@ -305,14 +308,14 @@ public class PhysicalSim2DSection {
 			for (Segment seg : this.openings) {
 				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128);
 			}}
-//		for (Id key : this.linkInfos.keySet()) {
-//			Link l = this.sim2dsc.getMATSimScenario().getNetwork().getLinks().get(key);
-//			float x0 = (float) (l.getFromNode().getCoord().getX() - this.offsetX);
-//			float x1 = (float) (l.getToNode().getCoord().getX() - this.offsetX);
-//			float y0 = (float) (l.getFromNode().getCoord().getY() - this.offsetY);
-//			float y1 = (float) (l.getToNode().getCoord().getY() - this.offsetY);
-////			visDebugger.addLineStatic(x0, y0, x1, y1, 0, 0, 0, 255);
-//		}
+		for (Id key : this.linkInfos.keySet()) {
+			Link l = this.sim2dsc.getMATSimScenario().getNetwork().getLinks().get(key);
+			float x0 = (float) (l.getFromNode().getCoord().getX() - this.offsetX);
+			float x1 = (float) (l.getToNode().getCoord().getX() - this.offsetX);
+			float y0 = (float) (l.getFromNode().getCoord().getY() - this.offsetY);
+			float y1 = (float) (l.getToNode().getCoord().getY() - this.offsetY);
+			visDebugger.addLineStatic(x0, y0, x1, y1, 0, 0, 0, 255);
+		}
 
 		if (this.agents.size() > 0) {
 			Coordinate[] coords = this.sec.getPolygon().getExteriorRing().getCoordinates();
