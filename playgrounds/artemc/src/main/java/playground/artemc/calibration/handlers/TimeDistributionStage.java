@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -70,9 +72,12 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 	private Map<Id, TravellerChain> chains = new HashMap<Id, TimeDistributionStage.TravellerChain>();
 	private Map<Id, PTVehicle> ptVehicles = new HashMap<Id, TimeDistributionStage.PTVehicle>();
 	private TransitSchedule transitSchedule;
+	private Set<Id> pIdsToExclude;
+
 	
-	public TimeDistributionStage(TransitSchedule transitSchedule) {
+	public TimeDistributionStage(TransitSchedule transitSchedule, Set<Id> pIdsToExclude) {
 		this.transitSchedule = transitSchedule;
+		this.pIdsToExclude = pIdsToExclude;
 	}
 	//Methods
 	@Override
@@ -85,6 +90,7 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 	}
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		if(!event.getPersonId().toString().startsWith("pt_tr"))
 			if(event.getVehicleId().toString().startsWith("tr")) {
 				TravellerChain chain = chains.get(event.getPersonId());
@@ -94,6 +100,7 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 	}
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		TravellerChain chain = chains.get(event.getPersonId());
 		boolean beforeInPT = chain.inPT;
 		if(event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
@@ -112,6 +119,7 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 	}
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		TravellerChain chain = chains.get(event.getPersonId());
 		if(chain == null) {
 			chain = new TravellerChain();
@@ -198,7 +206,7 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 		int iterationsInterval = new Integer(args[2]);
 		for(int i=0; i<=lastIteration; i+=iterationsInterval) {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
-			TimeDistributionStage timeDistribution = new TimeDistributionStage(scenario.getTransitSchedule());
+			TimeDistributionStage timeDistribution = new TimeDistributionStage(scenario.getTransitSchedule(), new HashSet<Id>());
 			eventsManager.addHandler(timeDistribution);
 			new MatsimEventsReader(eventsManager).readFile(args[3]+"/ITERS/it."+i+"/"+i+".events.xml.gz");
 			timeDistribution.printDistribution(timeDistribution.getDistribution(args[4], new String[]{"car","bus","mrt","lrt","transit_walk","walk","other"}), args[5]+"/timeDistribution."+i+".csv");

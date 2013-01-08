@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -57,18 +59,21 @@ public class DistanceDistributionTrip {
 	private Population population;
 	private Network network;
 	private TransitSchedule transitSchedule;
+	private Set<Id> pIdsToExclude;
 	
 	//Constructors
-	public DistanceDistributionTrip(Population population, Network network, TransitSchedule transitSchedule) {
+	public DistanceDistributionTrip(Population population, Network network, TransitSchedule transitSchedule, Set<Id> pIdsToExclude) {
 		this.network = network;
 		this.transitSchedule = transitSchedule;
 		this.population = population;
+		this.pIdsToExclude = pIdsToExclude;
 	}
 	
 	//Methods
 	public void saveChains() {
 		ExperimentalTransitRouteFactory factory =  new ExperimentalTransitRouteFactory();
 		for(Person person:population.getPersons().values()) {
+			if (pIdsToExclude.contains(person.getId())) { continue; }
 			TravellerChain chain = new TravellerChain();
 			boolean inPTLeg = false;
 			boolean onlyWalk = false;
@@ -174,7 +179,7 @@ public class DistanceDistributionTrip {
 		for(int i=0; i<=lastIteration; i+=iterationsInterval) {
 			scenario.setPopulation(new PopulationImpl(scenario));
 			new MatsimPopulationReader(scenario).readFile(args[4]+"/ITERS/it."+i+"/"+i+".plans.xml.gz");
-			DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(scenario.getPopulation(), scenario.getNetwork(), scenario.getTransitSchedule());
+			DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(scenario.getPopulation(), scenario.getNetwork(), scenario.getTransitSchedule(), new HashSet<Id>());
 			distanceDistribution.saveChains();
 			distanceDistribution.printDistribution(distanceDistribution.getDistribution(new String[]{args[5]}, new String[]{"car","pt","walk"}), args[6]+"/distanceDistribution2."+i+".csv");
 		}

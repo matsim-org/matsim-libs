@@ -89,19 +89,19 @@ public class CalibrationGraphGenerator  {
 
 		commonColorScheme = colorScheme;
 
-		createModeShareStackedBarChart("HITS 2008 Mode Share per Distance Class", path+fileTripDistanceByModeBenchmark, surveyDistDataset, "Distance [km]", "Mode share [%]");
+		createModeShareStackedBarChart(surveyName+" Mode Share per Distance Class", path+fileTripDistanceByModeBenchmark, surveyDistDataset, "Distance [km]", "Mode share [%]");
 		createModeShareStackedBarChart("Simulation Mode Share per Distance Class", path+fileTripDistanceByModeSimulation, simulationDistDataset, "Distance [km]", "Mode share [%]");
-		createModeShareComparisonChart("Modeshare per Distance Class - HITS vs. Simulation", path+fileTripDistanceByModeComparison, simulationDistDataset, surveyDistDataset, "Distance [km]", "Bias mode share [%]");
-		createCummulativeModeShareChart("HITS 2008 Cumulative Mode Share per Distance Class",path+fileCumulativeTripDistanceByModeBenchmark,surveyDistDataset, "Distance [km]", "Cumulative mode share [%]");
+		createModeShareComparisonChart("Modeshare per Distance Class - "+surveyName+" vs. Simulation", path+fileTripDistanceByModeComparison, simulationDistDataset, surveyDistDataset, "Distance [km]", "Bias mode share [%]");
+		createCummulativeModeShareChart(surveyName+" Cumulative Mode Share per Distance Class",path+fileCumulativeTripDistanceByModeBenchmark,surveyDistDataset, "Distance [km]", "Cumulative mode share [%]");
 		createCummulativeModeShareChart("Simulation Cumulative Mode Share per Distance Class",path+fileCumulativeTripDistanceByModeSimulation,simulationDistDataset, "Distance [km]", "Cumulative mode share [%]");
-		createCummulativeModeShareComparisonChart("Cummulative Modeshare per Dsitance Class - HITS vs. Simulation", path+fileCumulativeTripDistanceByModeComparison, simulationDistDataset, surveyDistDataset, "Distance [km]", "Bias cumulative mode share (%)");
+		createCummulativeModeShareComparisonChart("Cummulative Modeshare per Distance Class - "+surveyName+" vs. Simulation", path+fileCumulativeTripDistanceByModeComparison, simulationDistDataset, surveyDistDataset, "Distance [km]", "Bias cumulative mode share (%)");
 
-		createModeShareStackedBarChart("HITS 2008 Mode Share per Travel Time Class", path+fileTripTTByModeBenchmark, surveyTTDataset, "Travel Time [min]", "Mode share [%]");
+		createModeShareStackedBarChart(surveyName+" Mode Share per Travel Time Class", path+fileTripTTByModeBenchmark, surveyTTDataset, "Travel Time [min]", "Mode share [%]");
 		createModeShareStackedBarChart("Simulation Mode Share per Travel Time Class", path+fileTripTTByModeSimulation, simulationTTDataset, "Travel Time [min]", "Mode share [%]");
-		createModeShareComparisonChart("Modeshare per Travel Time - HITS vs. Simulation", path+fileTripTTByModeComparison, simulationTTDataset, surveyTTDataset, "Travel Time [min]", "Bias mode share [%]");
-		createCummulativeModeShareChart("HITS 2008 Cumulative Mode Share per Travel Time Class",path+fileCumulativeTripTTByModeBenchmark,surveyTTDataset, "Travel Time [min]", "Cumulative mode share [%]");
+		createModeShareComparisonChart("Modeshare per Travel Time - "+surveyName+" vs. Simulation", path+fileTripTTByModeComparison, simulationTTDataset, surveyTTDataset, "Travel Time [min]", "Bias mode share [%]");
+		createCummulativeModeShareChart(surveyName+" Cumulative Mode Share per Travel Time Class",path+fileCumulativeTripTTByModeBenchmark,surveyTTDataset, "Travel Time [min]", "Cumulative mode share [%]");
 		createCummulativeModeShareChart("Simulation Cumulative Mode Share per Travel Time Class",path+fileCumModeshareTTSimulation,simulationTTDataset, "Travel Time [min]", "Cumulative mode share [%]");
-		createCummulativeModeShareComparisonChart("Cummulative Modeshare per Travel Time Class - HITS vs. Simulation", path+fileCumModeshareTTComparison, simulationTTDataset, surveyTTDataset, "Travel Time [min]", "Bias cumulative mode share (%)");
+		createCummulativeModeShareComparisonChart("Cummulative Modeshare per Travel Time Class - "+surveyName+" vs. Simulation", path+fileCumModeshareTTComparison, simulationTTDataset, surveyTTDataset, "Travel Time [min]", "Bias cumulative mode share (%)");
 
 		createModeShareHistoryChart("Simulation Modeshare", path.substring(0,path.indexOf("ITERS"))+fileModeshareHistory, modeShareHistoryDataset, "Iteration", "Mode share [%]", surveyTTDataset);		
 	}
@@ -267,7 +267,7 @@ public class CalibrationGraphGenerator  {
 		for(int p=0;p<data.getCategories().length;p++)
 			newCategories[p]=data.getCategories()[p];
 		newCategories[newCategories.length-2]="";
-		newCategories[newCategories.length-1]="Srv";
+		newCategories[newCategories.length-1]="Survey";
 
 		StackedBarChart stackedBarChart = new StackedBarChart(title, xLabel, yLabel, newCategories);
 		double[] modeShareArray = new double[newCategories.length];	

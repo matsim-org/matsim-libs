@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -97,13 +99,15 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	private Map<Id, Coord> locations = new HashMap<Id, Coord>();
 	private Network network;
 	private TransitSchedule transitSchedule;
+	private Set<Id> pIdsToExclude;
 	private Map<Id, Integer> acts = new HashMap<Id, Integer>();
 	private int stuck=0;
 	
 	//Constructors
-	public DistanceDistributionStageEvents(Network network, TransitSchedule transitSchedule) {
+	public DistanceDistributionStageEvents(Network network, TransitSchedule transitSchedule, Set<Id> pIdsToExclude) {
 		this.network = network;
 		this.transitSchedule = transitSchedule;
+		this.pIdsToExclude = pIdsToExclude;
 	}
 	
 	//Methods
@@ -117,12 +121,14 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	}
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		if(!event.getPersonId().toString().startsWith("pt_tr"))
 			if(event.getVehicleId().toString().startsWith("tr"))
 				ptVehicles.get(event.getVehicleId()).addPassenger(event.getPersonId());
 	}
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		if(!event.getPersonId().toString().startsWith("pt_tr")) {
 			TravellerChain chain = chains.get(event.getPersonId());
 			if(event.getVehicleId().toString().startsWith("tr")) {
@@ -155,6 +161,7 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	}
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		if(event.getVehicleId().toString().startsWith("tr"))
 			ptVehicles.get(event.getVehicleId()).in = true;
 		else
@@ -162,6 +169,7 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	}
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		if(event.getVehicleId().toString().startsWith("tr")) {
 			PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
 			if(vehicle.in)
@@ -197,6 +205,7 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	}
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		TravellerChain chain = chains.get(event.getPersonId());
 		if(!event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) && chain == null) {
 			chain = new TravellerChain();
@@ -223,11 +232,13 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	}
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		if(!event.getPersonId().toString().startsWith("pt_tr"))
 			locations.put(event.getPersonId(), network.getLinks().get(event.getLinkId()).getCoord());
 	}
 	@Override
 	public void handleEvent(TravelledEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		TravellerChain chain = chains.get(event.getPersonId());
 		if(chain == null) {
 			chain = new TravellerChain();
@@ -245,6 +256,7 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	}
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		if(!event.getPersonId().toString().startsWith("pt_tr")) {
 			TravellerChain chain = chains.get(event.getPersonId());
 			if(chain.distances.size() == chain.modes.size()) {
@@ -322,7 +334,7 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 		int iterationsInterval = new Integer(args[3]);
 		for(int i=0; i<=lastIteration; i+=iterationsInterval) {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
-			DistanceDistributionStageEvents distanceDistribution = new DistanceDistributionStageEvents(scenario.getNetwork(), scenario.getTransitSchedule());
+			DistanceDistributionStageEvents distanceDistribution = new DistanceDistributionStageEvents(scenario.getNetwork(), scenario.getTransitSchedule(), new HashSet<Id>());
 			eventsManager.addHandler(distanceDistribution);
 			new MatsimEventsReader(eventsManager).readFile(args[4]+"/ITERS/it."+i+"/"+i+".events.xml.gz");
 			int tot=0;

@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -44,6 +46,12 @@ public class TimeDistributionTrip implements AgentDepartureEventHandler, Activit
 
 	//Attributes
 	private Map<Id, TravellerChain> chains = new HashMap<Id, TimeDistributionTrip.TravellerChain>();
+	private Set<Id> pIdsToExclude;
+	
+	//Constructor
+	public TimeDistributionTrip(Set<Id> pIdsToExclude) {
+		this.pIdsToExclude = pIdsToExclude;
+	}
 	
 	//Methods
 	@Override
@@ -52,6 +60,7 @@ public class TimeDistributionTrip implements AgentDepartureEventHandler, Activit
 	}
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		TravellerChain chain = chains.get(event.getPersonId());
 		if(event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) && !chain.inPT)
 			chain.inPT = true;
@@ -70,6 +79,7 @@ public class TimeDistributionTrip implements AgentDepartureEventHandler, Activit
 	}
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
+		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		TravellerChain chain = chains.get(event.getPersonId());
 		if(chain == null) {
 			chain = new TravellerChain();
@@ -138,7 +148,7 @@ public class TimeDistributionTrip implements AgentDepartureEventHandler, Activit
 		int iterationsInterval = new Integer(args[1]);
 		for(int i=0; i<=lastIteration; i+=iterationsInterval) {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
-			TimeDistributionTrip timeDistribution = new TimeDistributionTrip();
+			TimeDistributionTrip timeDistribution = new TimeDistributionTrip(new HashSet<Id>());
 			eventsManager.addHandler(timeDistribution);
 			new MatsimEventsReader(eventsManager).readFile(args[2]+"/ITERS/it."+i+"/"+i+".events.xml.gz");
 			timeDistribution.printDistribution(timeDistribution.getDistribution(new String[] {args[3]}, new String[]{"car","pt", "walk"}), args[4]+"/timeDistribution."+i+".csv");

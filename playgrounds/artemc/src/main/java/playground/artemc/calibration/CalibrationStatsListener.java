@@ -22,10 +22,12 @@ package playground.artemc.calibration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -60,6 +62,8 @@ public class CalibrationStatsListener implements IterationEndsListener {
 	private String[] categoriesTTDataset;
 	private String[] modesTTDataset;
 	private SortedMap<Integer, Integer[]> numberTripsPerMode = new TreeMap<Integer, Integer[]>();
+	private Set<Id> pIdsToExclude;
+
 
 	/** Set graph output units, km and min recommended*/
 	private String outputDistanceUnit ="km";
@@ -74,11 +78,12 @@ public class CalibrationStatsListener implements IterationEndsListener {
 	 *  Additional color schemes can be added inside the class GraphEditor 
 	 */ 
 
-	public CalibrationStatsListener(final EventsManager events, final String[] surveyFiles, int interval, String surveyName, String colorScheme) {
+	public CalibrationStatsListener(final EventsManager events, final String[] surveyFiles, int interval, String surveyName, String colorScheme, Set<Id> pIdsToExclude) {
+		this.pIdsToExclude = pIdsToExclude;
 		this.surveyName = surveyName;
 		this.colorScheme = colorScheme; 		
 		this.interval=interval;
-		timeJourneyHandler = new TimeDistributionTrip();
+		timeJourneyHandler = new TimeDistributionTrip(this.pIdsToExclude);
 		events.addHandler(timeJourneyHandler);
 		this.generator = new CalibrationGraphGenerator(outputDistanceUnit, outputTimeUnit);
 		try {
@@ -101,7 +106,7 @@ public class CalibrationStatsListener implements IterationEndsListener {
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(event.getIteration()%interval==0) {
 			try {
-				DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(event.getControler().getPopulation(), event.getControler().getNetwork(), event.getControler().getScenario().getTransitSchedule());
+				DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(event.getControler().getPopulation(), event.getControler().getNetwork(), event.getControler().getScenario().getTransitSchedule(),this.pIdsToExclude);
 				distanceDistribution.saveChains();
 				SortedMap<Integer, Integer[]>  distanceTripsMap = distanceDistribution.getDistribution(categoriesDistanceDataset, modesDistanceDataset);
 				distanceDistribution.printDistribution(distanceTripsMap, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "tripDistanceHistogramByMode.csv"));

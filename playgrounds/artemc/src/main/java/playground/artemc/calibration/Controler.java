@@ -20,7 +20,12 @@
 
 package playground.artemc.calibration;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 
 /**
@@ -44,12 +49,12 @@ public class Controler {
 	
 	public Controler(final String[] args) {
 		this.controler = new org.matsim.core.controler.Controler(args);
-		this.controler.addControlerListener(new CalibrationStatsListener(this.controler.getEvents(), SURVEY_FILES,1, "Travel Survey (Benchmark)", "Red_Scheme"));
+		this.controler.addControlerListener(new CalibrationStatsListener(this.controler.getEvents(), SURVEY_FILES,1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
 	}
 	
 	public Controler(final String configFilename) {
 		this.controler = new org.matsim.core.controler.Controler(configFilename);
-		this.controler.addControlerListener(new CalibrationStatsListener(this.controler.getEvents(), SURVEY_FILES,1, "Travel Survey (Benchmark)", "Red_Scheme"));
+		this.controler.addControlerListener(new CalibrationStatsListener(this.controler.getEvents(), SURVEY_FILES,1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
 	}
 	
 	public void setOverwriteFiles(final boolean overwriteFiles) {
