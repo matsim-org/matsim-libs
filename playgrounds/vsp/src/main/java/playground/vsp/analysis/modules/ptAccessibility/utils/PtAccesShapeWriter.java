@@ -27,12 +27,11 @@ import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -42,7 +41,6 @@ import playground.vsp.analysis.utils.GridNode;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author droeder, aneumann
@@ -57,37 +55,26 @@ public class PtAccesShapeWriter {
 	}
 
 	public static void writeMultiPolygons(Map<String, MultiPolygon> mps, String filename, String name, String targetCoordinateSystem) {
-		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-		b.setCRS(MGC.getCRS(targetCoordinateSystem));
-		b.setName(name);
-		b.add("location", MultiPolygon.class);
-		b.add("name", String.class);
-		SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(b.buildFeatureType());
+		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().
+				setCrs(MGC.getCRS(targetCoordinateSystem)).
+				setName(name).
+				addAttribute("name", String.class).
+				create();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
 		Object[] featureAttribs;
 		for(Entry<String, MultiPolygon> e: mps.entrySet()){
-			featureAttribs = new Object[2];
-			featureAttribs[0] = e.getValue();
-			featureAttribs[1] = e.getKey();
-			try {
-				features.add(featureBuilder.buildFeature(null, featureAttribs));
-			} catch (IllegalArgumentException e1) {
-				e1.printStackTrace();
-			}
+			featureAttribs = new Object[1];
+			featureAttribs[0] = e.getKey();
+			features.add(factory.createPolygon(e.getValue(), featureAttribs, null));
 		}
-		try{
-			ShapeFileWriter.writeGeometries(features, filename);
-		}catch(ServiceConfigurationError e){
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(features, filename);
 	}
 	
 	public static void writeActivityLocations(LocationMap locationMap, String outputFolder, String name, String targetCoordinateSystem, double gridSize){
 		PointFeatureFactory featureFactory = new PointFeatureFactory.Builder().
 				setCrs(MGC.getCRS(targetCoordinateSystem)).
 				setName(name).
-				addAttribute("location", Point.class).
 				addAttribute("name", String.class).
 				addAttribute("type", String.class).
 				create();
