@@ -151,8 +151,8 @@ public class PhysicalSim2DEnvironment {
 			long timel = System.currentTimeMillis();
 			long last = visDebugger.lastUpdate;
 			long diff = timel - last;
-			if (diff < 100) {
-				long wait = 100-diff;
+			if (diff < 10) {
+				long wait = 10-diff;
 				try {
 					Thread.sleep(wait);
 				} catch (InterruptedException e) {
@@ -180,6 +180,7 @@ public class PhysicalSim2DEnvironment {
 
 		//create dbox link info
 		LinkInfo dboxLi = new LinkInfo();
+		dboxLi.link = li.link;
 		dboxLi.dx = li.dx;
 		dboxLi.dy = li.dy;
 		Segment dboxFl = new Segment();

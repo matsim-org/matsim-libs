@@ -205,7 +205,7 @@ public class PhysicalSim2DSection {
 			dx /= length;
 			dy /= length;
 
-			//			li.link = seg;
+			li.link = seg;
 			li.dx = dx;
 			li.dy = dy;
 
@@ -243,7 +243,7 @@ public class PhysicalSim2DSection {
 	}
 
 	//
-	/*package*/ LinkInfo getLinkInfo(Id id) {
+	public LinkInfo getLinkInfo(Id id) {
 		return this.linkInfos.get(id);
 	}
 
@@ -278,11 +278,11 @@ public class PhysicalSim2DSection {
 		public float  y1;
 	}
 
-	/*package*/ static final class LinkInfo {
+	public static final class LinkInfo {
 
-		float dx;
-		float dy;
-		//		Segment link;
+		public float dx;
+		public float dy;
+		public Segment link;
 		Segment fromOpening;
 		Segment finishLine;
 	}
@@ -308,14 +308,14 @@ public class PhysicalSim2DSection {
 			for (Segment seg : this.openings) {
 				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128);
 			}}
-		for (Id key : this.linkInfos.keySet()) {
-			Link l = this.sim2dsc.getMATSimScenario().getNetwork().getLinks().get(key);
-			float x0 = (float) (l.getFromNode().getCoord().getX() - this.offsetX);
-			float x1 = (float) (l.getToNode().getCoord().getX() - this.offsetX);
-			float y0 = (float) (l.getFromNode().getCoord().getY() - this.offsetY);
-			float y1 = (float) (l.getToNode().getCoord().getY() - this.offsetY);
-			visDebugger.addLineStatic(x0, y0, x1, y1, 0, 0, 0, 255);
-		}
+//		for (Id key : this.linkInfos.keySet()) {
+//			Link l = this.sim2dsc.getMATSimScenario().getNetwork().getLinks().get(key);
+//			float x0 = (float) (l.getFromNode().getCoord().getX() - this.offsetX);
+//			float x1 = (float) (l.getToNode().getCoord().getX() - this.offsetX);
+//			float y0 = (float) (l.getFromNode().getCoord().getY() - this.offsetY);
+//			float y1 = (float) (l.getToNode().getCoord().getY() - this.offsetY);
+//			visDebugger.addLineStatic(x0, y0, x1, y1, 0, 0, 0, 255);
+//		}
 
 		if (this.agents.size() > 0) {
 			Coordinate[] coords = this.sec.getPolygon().getExteriorRing().getCoordinates();
@@ -342,6 +342,10 @@ public class PhysicalSim2DSection {
 
 	public void putNeighbor(Segment finishLine, PhysicalSim2DSection psec) {
 		this.neighbors.put(finishLine, psec);
+	}
+
+	public Segment [] getObstacles() {
+		return this.obstacles;
 	}
 
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DAgentBuilder.java
+ * DesiredDirection.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,19 +18,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation;
+package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.api.core.v01.Id;
 
-import playground.gregor.sim2d_v4.simulation.physics.SocialForceAgent;
+import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.LinkInfo;
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
-public class Sim2DAgentBuilder {
+public class DesiredDirection {
+	
+	
+	public float [] computeDesiredDirection(Sim2DAgent agent) {
+		
+		final float [] pos = agent.getPos();
+		final float [] ret = {0,0};
+		PhysicalSim2DSection psec = agent.getPSec();
+		Id id = agent.getCurrentLinkId();
+		LinkInfo li = psec.getLinkInfo(id);
+		final Segment link = li.link;
+		
+		float dx = li.dx;
+		float dy = li.dy;
+		
+		float dist = CGAL.signDistPointLine(pos[0],pos[1], link.x0, link.y0, dx, dy);
+		float px;
+		float py;
+		if (dist < 0) {
+			px = dy;
+			py = -dx;
+		} else {
+			px = -dy;
+			py = dx;
+		}
 
-	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
-//		Sim2DAgent agent = new SimpleAgent(veh,spawnX,spawnY);
-		Sim2DAgent agent = new SocialForceAgent(veh, spawnX, spawnY);
-		return agent;
+		//for testing only!!!!
+		if (dist < 0) {
+			dist = -dist;
+		}
+		
+		float w0 = dist > 2 ? 1 : (dist > 0.5f ? 0.5f : 0);
+		float w1 = 1 - w0;
+		
+		ret[0] = w1 * dx + w0 * px;
+		ret[1] = w1 * dy + w0 * py;
+		
+		return ret;
 	}
 
 }

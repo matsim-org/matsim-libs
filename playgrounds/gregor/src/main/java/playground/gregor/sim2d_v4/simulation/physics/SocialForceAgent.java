@@ -28,12 +28,12 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.LinkInfo;
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 
-//for testing only will be removed afterwards
-@Deprecated
-public class ALittleBitSmarterAgent implements Sim2DAgent {
+
+public class SocialForceAgent implements Sim2DAgent {
 	
 	private final float v0 = 1.f;
 	
@@ -46,8 +46,9 @@ public class ALittleBitSmarterAgent implements Sim2DAgent {
 	private PhysicalSim2DSection currentPSec;
 	
 	private final Neighbors ncalc = new Neighbors();
+	private final DesiredDirection dd = new DesiredDirection();
 
-	public ALittleBitSmarterAgent(QVehicle veh, float spawnX, float spawnY) {
+	public SocialForceAgent(QVehicle veh, float spawnX, float spawnY) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
@@ -72,13 +73,12 @@ public class ALittleBitSmarterAgent implements Sim2DAgent {
 	@Override
 	public void updateVelocity() {
 		List<Tuple<Float, Sim2DAgent>> neigbhors = this.ncalc.computeNeighbors(this);
+		Segment[] obstacles = this.currentPSec.getObstacles();
 		
+		float[] d = this.dd.computeDesiredDirection(this);
 		
-		
-		Id id = this.driver.getCurrentLinkId();
-		LinkInfo li = this.currentPSec.getLinkInfo(id);
-		this.v[0] = li.dx * this.v0;
-		this.v[1] = li.dy * this.v0;
+		this.v[0] = d[0] * this.v0;
+		this.v[1] = d[1] * this.v0;
 	}
 
 	@Override

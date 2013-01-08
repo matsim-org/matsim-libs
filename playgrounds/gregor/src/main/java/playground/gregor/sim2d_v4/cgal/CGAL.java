@@ -61,4 +61,26 @@ public abstract class CGAL {
 		float left = isLeftOfLine(x0,y0,x1,y1,x2,y2);
 		return left*left < EPSILON;
 	}
+	
+	/**
+	 * calculates the signed distance of a point to a line (given by a vector)
+	 * a negative value indicates that the point is on the left side of the defining vector 
+	 * and a positive value indicates that the point is on right side of the defining vector 
+	 * 
+	 * @param px point's x-coordinate
+	 * @param py point's y-coordinate
+	 * @param lx0 x-coordinate of the vector's origin
+	 * @param ly0 y-coordinate of the vector's origin
+	 * @param dxl normalized vector's x-direction
+	 * @param dyl normalized vector's y-direction
+	 * @return signed distance
+	 */
+	public static float signDistPointLine(float px, float py, float lx0, float ly0, float dxl, float dyl) {
+//		float r = (px - lx0) * dxl + (py - ly0) * dyl;
+		float s = ((ly0 - py) * dxl - (lx0 - px) * dyl);
+		
+		return s;
+	}
+	
+	
 }
