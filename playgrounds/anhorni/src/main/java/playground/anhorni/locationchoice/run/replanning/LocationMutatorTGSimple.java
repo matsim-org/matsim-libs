@@ -77,7 +77,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	}
 
 	@Override
-	public void handlePlan(final Plan plan){
+	public void run(final Plan plan){
 		if (!this.handleShopActs((PlanImpl)plan) && !this.handleLeisureActs((PlanImpl)plan)){
 			this.unsuccessfullLC++;
 		}

@@ -41,10 +41,9 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -59,43 +58,41 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private final ScaleEpsilon scaleEpsilon;
 	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
-	private final ScoringFunctionFactory scoringFunctionFactory;
-	private final TravelTime travelTime;
-	private final TravelDisutility travelCost;
-	private final TripRouter tripRouter;
-	private final int iteration;
+//	private final ScoringFunctionFactory scoringFunctionFactory;
+//	private final TravelTime travelTime;
+//	private final TravelDisutility travelCost;
+//	private final TripRouter tripRouter;
+//	private final int iteration;
+	private ReplanningContext replanningContext;
 
 	/* TODO: Use Singleton pattern or encapsulating object for the many constructor objects
-	 * Similar to Scenario object
+	 * Similar to Scenario object. 
+	 * ReplanningContext would already do some of this.  kai, jan'13
+	 * Did that.  kai, jan'13
 	 */
 	public BestResponseLocationMutator(final Scenario scenario,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
 			ObjectAttributes personsMaxEpsUnscaled, ScaleEpsilon scaleEpsilon,
 			ActTypeConverter actTypeConverter, DestinationSampler sampler,
-			ScoringFunctionFactory scoringFunctionFactory,
-			TravelTime travelTime, TravelDisutility travelCost,
-			TripRouter tripRouter, int iteration) {
-		super(scenario, tripRouter, quad_trees, facilities_of_type, null);
+			ReplanningContext replanningContext) {
+		super(scenario, replanningContext.getTripRouterFactory().createTripRouter(), quad_trees, facilities_of_type, null);
 		this.facilities = (ActivityFacilitiesImpl) ((ScenarioImpl) scenario).getActivityFacilities();
 		this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
 		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;
 		this.sampler = sampler;
-		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.travelTime = travelTime;
-		this.travelCost = travelCost;
-		this.tripRouter = tripRouter;
-		this.iteration = iteration;
+		this.replanningContext = replanningContext ;
 	}
 
 	@Override
-	public final void handlePlan(final Plan plan){
+	public final void run(final Plan plan){
 		// if person is not in the analysis population
 		if (Integer.parseInt(plan.getPerson().getId().toString()) > 
 		Integer.parseInt(super.scenario.getConfig().locationchoice().getIdExclusion())) return;
 
-		// yyyy why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
+		// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
+		// (this may be done by now. kai, jan'13)
 
 		Plan bestPlan = new PlanImpl(plan.getPerson());	
 
@@ -125,11 +122,13 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		} else {
 			throw new RuntimeException("unknwon travel time approximation level") ;
 		}
-		// yyyy the above is not great, but when I found it, it was passing integers all the way to the method.  kai, jan'13
+		// yyyy the above is not great, but when I found it, it was passing integers all the way down to the method.  kai, jan'13
 
 		
-		ScoringFunctionAccumulator scoringFunction = (ScoringFunctionAccumulator) this.scoringFunctionFactory.createNewScoringFunction(plan); 
-
+		ScoringFunctionAccumulator scoringFunction = (ScoringFunctionAccumulator) this.replanningContext.getScoringFunctionFactory().createNewScoringFunction(plan); 
+		// (scoringFunction inserted into getWeightedRandomChoice as well as into evaluateAndAdaptPlans.  Presumably, could as well
+		// insert factory (which is already in the replanning context), but this would need to be checked.  kai, jan'13
+		
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
 			actlegIndex++;
@@ -164,13 +163,12 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					this.setLocation((ActivityImpl)actToMove, 
 							cs.getWeightedRandomChoice(actlegIndex, actPre.getCoord(),
 									actPost.getCoord(), this.facilities, scoringFunction, 
-									plan, travelTime, travelCost, tripRouter, iteration));	
+									plan, replanningContext));	
 
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
 					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
 					// yyyy if I understand this correctly, this means that, if the location change is accepted, all subsequent locachoice 
-					// optimization attempts
-					// will be run with that new location.  kai, jan'13
+					// optimization attempts will be run with that new location.  kai, jan'13
 					
 					// **************************************************
 				}
@@ -211,7 +209,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		planTmp.copyFrom(plan);			
 		scoringFunction.reset();
 
-		cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, tripRouter, ApproximationLevel.COMPLETE_ROUTING);	
+		cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, replanningContext.getTripRouterFactory().createTripRouter(), 
+				ApproximationLevel.COMPLETE_ROUTING);	
 		double score = scoringFunction.getScore();
 		scoringFunction.reset();
 		PlanUtils.copyPlanFieldsToFrom((PlanImpl)plan, (PlanImpl)planTmp);	// copy( to, from )

@@ -94,12 +94,15 @@ public abstract class LocationMutator implements PlanAlgorithm {
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
 	}
 
-	public abstract void handlePlan(final Plan plan);
+//	public abstract void run(final Plan plan);
 
-	@Override
-	public void run(final Plan plan) {
-		handlePlan(plan);
-	}
+//	@Override
+//	public final void run(final Plan plan) {
+//		handlePlan(plan);
+//	}
+	
+// I removed this indirection run(plan) --> handlePlan(plan), since it would just pretend to follow the syntax of PlanStrategyModule
+// (which uses handlePlan) while in fact it was a PlanAlgorithm (which uses run). kai, jan'13
 
 	protected void resetRoutes(final Plan plan) {
 		// loop over all <leg>s, remove route-information

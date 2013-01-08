@@ -73,7 +73,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 
 
 	@Override
-	public void handlePlan(final Plan plan){
+	public void run(final Plan plan){
 		List<SubChain> subChains = this.calcActChains(plan);
 		this.handleSubChains(plan, subChains);
 		super.resetRoutes(plan);

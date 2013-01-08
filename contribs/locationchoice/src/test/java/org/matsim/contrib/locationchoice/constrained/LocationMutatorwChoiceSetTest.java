@@ -52,7 +52,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 	public void testHandlePlan() {
 		RecursiveLocationMutator locationmutator = this.initialize();
 		Plan plan = scenario.getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();
-		locationmutator.handlePlan(plan);
+		locationmutator.run(plan);
 		assertEquals(((PlanImpl) plan).getFirstActivity().getCoord().getX(), -25000.0, EPSILON);
 		assertEquals(((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute(), null);
 	}

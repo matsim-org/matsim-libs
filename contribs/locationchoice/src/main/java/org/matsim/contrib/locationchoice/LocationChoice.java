@@ -195,12 +195,19 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		} else if (algorithm.equals(BEST_RESPONSE)) {
+			// this one corresponds to the "frozen epsilon" paper(s)
+			
 			// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
+//			this.planAlgoInstances.add(new BestResponseLocationMutator(this.scenario,   
+//					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
+//					this.scaleEpsilon, this.actTypeConverter, this.sampler, this.getReplanningContext().getScoringFunctionFactory(),
+//					this.getReplanningContext().getTravelTimeCalculator(), this.getReplanningContext().getTravelCostCalculator(), 
+//			          this.getReplanningContext().getTripRouterFactory().createTripRouter(),
+//					this.getReplanningContext().getIteration()));
 			this.planAlgoInstances.add(new BestResponseLocationMutator(this.scenario,   
 					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
-					this.scaleEpsilon, this.actTypeConverter, this.sampler, this.getReplanningContext().getScoringFunctionFactory(),
-					this.getReplanningContext().getTravelTimeCalculator(), this.getReplanningContext().getTravelCostCalculator(), this.getReplanningContext().getTripRouterFactory().createTripRouter(),
-					this.getReplanningContext().getIteration()));
+					this.scaleEpsilon, this.actTypeConverter, this.sampler, this.getReplanningContext()));
+			
 		} else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
 			this.planAlgoInstances.add(new RecursiveLocationMutator(this.scenario, this.getReplanningContext().getTripRouterFactory().createTripRouter(),  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
@@ -214,7 +221,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 
 	// for test cases:
-	/*package*/ Network getNetwork() {
+	/*package*/ final Network getNetwork() {
 		return this.scenario.getNetwork();
 	}
 

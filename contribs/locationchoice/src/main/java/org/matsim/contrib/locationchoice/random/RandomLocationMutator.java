@@ -56,7 +56,7 @@ public class RandomLocationMutator extends LocationMutator {
 	 * plan == selected plan
 	 */
 	@Override
-	public void handlePlan(final Plan plan){
+	public void run(final Plan plan){
 		this.handlePlanForPreDefinedFlexibleTypes(plan);
 		super.resetRoutes(plan);
 	}

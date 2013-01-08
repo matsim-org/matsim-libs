@@ -21,10 +21,10 @@ package org.matsim.contrib.locationchoice.bestresponse;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -104,14 +105,13 @@ public class ChoiceSet {
 	
 	public Id getWeightedRandomChoice(int actlegIndex, Coord coordPre,
 			Coord coordPost, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction, 
-			Plan plan, TravelTime travelTime, 
-			TravelDisutility travelCost, TripRouter router, int iteration) {
+			Plan plan, ReplanningContext replanningContext) {
 				
-		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, facilities, scoringFunction, plan, travelTime, travelCost, router);
+		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, facilities, scoringFunction, plan, replanningContext);
 		
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
-		Random random = new Random(iteration * 102830259L);
+		Random random = new Random(replanningContext.getIteration() * 102830259L);
 		for (int i = 0; i < 10; i++) {
 			random.nextDouble();
 		}
@@ -127,7 +127,10 @@ public class ChoiceSet {
 	}
 	
 	private TreeMap<Double,Id> createChoiceSet(int actlegIndex, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
-			Plan plan, TravelTime travelTime, TravelDisutility travelCost, TripRouter router) {
+			Plan plan, ReplanningContext replanningContext) {
+		TravelTime travelTime = replanningContext.getTravelTimeCalculator() ; 
+		TravelDisutility travelCost = replanningContext.getTravelCostCalculator() ;
+		TripRouter router = replanningContext.getTripRouterFactory().createTripRouter() ;
 		
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		
@@ -243,7 +246,8 @@ public class ChoiceSet {
 	}
 			
 	void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
-			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, TripRouter router, ApproximationLevel approximationLevelTmp  ) {
+			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, TripRouter router, 
+			ApproximationLevel approximationLevelTmp  ) {
 		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp , leastCostPathCalculatorForward, leastCostPathCalculatorBackward, 
 				this.network, router, this.config);
 		adapter.adaptAndScoreTimes(plan, actlegIndex, planTmp, scoringFunction);

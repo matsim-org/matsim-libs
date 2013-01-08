@@ -58,7 +58,7 @@ public class SingleActLocationMutator extends LocationMutator {
 	}
 
 	@Override
-	public final void handlePlan(final Plan plan){
+	public final void run(final Plan plan){
 
 		List<Activity> flexibleActivities = this.getFlexibleActivities(plan);
 
