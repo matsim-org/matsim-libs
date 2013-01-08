@@ -53,6 +53,8 @@ public class GroupPlanStrategy {
 
 		Counter selectCounter = new Counter( "["+selector.getClass().getSimpleName()+"] selecting plan # " );
 		for (ReplanningGroup group : groups) {
+			// TODO: parallelize, as selection is quite heavy for groups, compared
+			// to individuals. Make sure that the results remain deterministic
 			selectCounter.incCounter();
 			GroupPlans plans = selector.selectPlans( group );
 
