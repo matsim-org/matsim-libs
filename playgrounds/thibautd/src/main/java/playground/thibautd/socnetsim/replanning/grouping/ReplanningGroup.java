@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
  * Groups together agents which may interact.
  * @author thibautd
  */
-public class ReplanningGroup {
+public final class ReplanningGroup {
 	private final List<Person> persons = new ArrayList<Person>();
 	private final Collection<Person> immutablePersons = Collections.unmodifiableList( persons );
 
@@ -49,6 +49,21 @@ public class ReplanningGroup {
 	@Override
 	public String toString() {
 		return "[ReplanningGroup:"+persons+"]";
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if ( !(o instanceof ReplanningGroup) ) return false;
+
+		return ((ReplanningGroup) o).persons.size() == persons.size() &&
+				((ReplanningGroup) o).persons.containsAll( persons );
+	}
+
+	@Override
+	public int hashCode() {
+		int c = 0;
+		for (Person p : persons) c += p.hashCode();
+		return c;
 	}
 }
 
