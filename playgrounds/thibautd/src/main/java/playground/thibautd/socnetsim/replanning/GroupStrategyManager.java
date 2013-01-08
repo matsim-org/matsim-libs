@@ -22,15 +22,17 @@ package playground.thibautd.socnetsim.replanning;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
@@ -54,6 +56,7 @@ public class GroupStrategyManager {
 	private final GroupLevelPlanSelector selectorForRemoval;
 	private final GroupIdentifier groupIdentifier;
 	private final int maxPlanPerAgent;
+	private final Random random;
 
 	public GroupStrategyManager(
 			final GroupIdentifier groupIdentifier,
@@ -71,17 +74,18 @@ public class GroupStrategyManager {
 		this.registry = registry;
 		this.groupIdentifier = groupIdentifier;
 		this.maxPlanPerAgent = maxPlanPerAgent;
+		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	public final void run(final Population population) {
 		final Collection<ReplanningGroup> groups = groupIdentifier.identifyGroups( population );
 
 		Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
-			new HashMap<GroupPlanStrategy, List<ReplanningGroup>>();
+			new LinkedHashMap<GroupPlanStrategy, List<ReplanningGroup>>();
 		for (ReplanningGroup g : groups) {
 			removeExtraPlans( g );
 
-			GroupPlanStrategy strategy = registry.chooseStrategy();
+			GroupPlanStrategy strategy = registry.chooseStrategy( random.nextDouble() );
 			List<ReplanningGroup> alloc = strategyAllocations.get( strategy );
 
 			if (alloc == null) {

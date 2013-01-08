@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.core.gbl.MatsimRandom;
-
 /**
  * @author thibautd
  */
@@ -41,8 +39,9 @@ public final class GroupStrategyRegistry {
 		sumOfWeights += weight;
 	}
 
-	public GroupPlanStrategy chooseStrategy() {
-		final double choice = MatsimRandom.getRandom().nextDouble() * sumOfWeights;
+	public GroupPlanStrategy chooseStrategy( final double randomDraw ) {
+		if (randomDraw < 0 || randomDraw > 1) throw new IllegalArgumentException( ""+randomDraw );
+		final double choice = randomDraw * sumOfWeights;
 		int i = 0;
 
 		Iterator<Double> iter = weights.iterator();
@@ -54,8 +53,5 @@ public final class GroupStrategyRegistry {
 
 		return strategies.get( i );
 	}
-
-
-
 }
 
