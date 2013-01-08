@@ -28,8 +28,24 @@ public interface ReplanningContext {
 
 	TripRouterFactory getTripRouterFactory();
 
+	/**
+	 * Comments:<ul>
+	 * <li> In practical terms, this may have to be a factory.  Since in many cases different PlanAlgorithm instances need different
+	 * instances of the TravelDisutilityCalculator in order to be thread safe. kai, jan'13
+	 * </ul>
+	 */
 	TravelDisutility getTravelCostCalculator();
 
+	/**
+	 * Comments:<ul>
+	 * <li> This one is more tricky.  Many implementations of this are EventHandlers in order to collect information about previous
+	 * iterations.  Thus they need to be persistent over the iterations.  HOWEVER, in the end the same may be said about
+	 * the travel cost ... it might, for example, collect toll events. kai, jan'13
+	 * <li> Thus, overall, we will have to separate the "(travel time/travel cost) observer" from the "(travel time/travel cost) calculator".  And they
+	 * probably/possibly all have to be made available here.
+	 * kai, based on input from mzilske, jan'13
+	 * </ul>
+	 */
 	TravelTime getTravelTimeCalculator();
 	
 	ScoringFunctionFactory getScoringFunctionFactory();
