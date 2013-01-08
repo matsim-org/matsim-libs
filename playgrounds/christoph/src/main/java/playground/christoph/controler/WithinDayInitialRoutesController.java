@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -33,7 +34,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -55,9 +58,9 @@ import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 /**
- * Creates initial routes using within-day replanning. Doing so should hopefully
- * result in a more balanced traffic load in the network than creating all routes
- * initially on an empty network. 
+ * Creates initial car routes during the first iteration using within-day replanning. 
+ * Doing so should hopefully result in a more balanced traffic load in the network 
+ * than creating all routes initially on an empty network. 
  * 
  * Since routes are created within-day, we ensure that all plans contain at least
  * dummy routes, otherwise PersonPrepareForSim would create them, which is not
@@ -65,7 +68,8 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
  *  
  * @author cdobler
  */
-public class WithinDayInitialRoutesController extends WithinDayController implements StartupListener {
+public class WithinDayInitialRoutesController extends WithinDayController implements 
+	StartupListener, IterationStartsListener {
 
 	private DuringLegIdentifierFactory duringLegFactory;
 	private DuringLegIdentifierFactory startedLegFactory;
@@ -76,6 +80,9 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 	
 	private double duringLegReroutingShare = 0.10;
 	
+	private boolean duringLegRerouting = true;
+	private boolean initialLegRerouting = true;
+	
 	/*
 	 * ===================================================================
 	 * main
@@ -84,7 +91,7 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
+			System.out.println("Usage: WithinDayInitialRoutesController config-file [dtd-file]");
 			System.out.println();
 		} else {
 			final Controler controler = new WithinDayInitialRoutesController(args);
@@ -93,10 +100,32 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		}
 		System.exit(0);
 	}
+	
+	public WithinDayInitialRoutesController(Scenario scenario) {
+		super(scenario);
 		
+		init();
+	}
+	
 	public WithinDayInitialRoutesController(String[] args) {
 		super(args);
 		
+		init();
+	}
+
+	public void setDuringLegReroutingShare(double share) {
+		this.duringLegReroutingShare = share;
+	}
+	
+	public void setDuringLegReroutingEnabled(boolean enabled) {
+		this.duringLegRerouting = enabled;
+	}
+	
+	public void setInitialLegReroutingEnabled(boolean enabled) {
+		this.initialLegRerouting = enabled;
+	}
+	
+	private void init() {
 		/*
 		 * Change the persons' original plans. By doing so, the (hopefully) optimized
 		 * routes are written to the output plans file.
@@ -106,7 +135,7 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		// register this as a Controller Listener
 		super.addControlerListener(this);
 	}
-
+	
 	@Override
 	protected void loadData() {
 		super.loadData();
@@ -123,22 +152,14 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
-		/*
-		 * Ensure that only a single iteration is performed.
-		 */
-		this.config.controler().setFirstIteration(0);
-		this.config.controler().setLastIteration(0);
-		
+				
 		/*
 		 * Get number of threads from config file.
 		 */
 		int numReplanningThreads = this.config.global().getNumberOfThreads();
 		
 		/*
-		 * Initialize TravelTimeCollector and create a FactoryWrapper which will act as
-		 * factory but returns always the same travel time object, which is possible since
-		 * the TravelTimeCollector is not personalized.
+		 * Initialize TravelTimeCollector.
 		 */
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
@@ -149,7 +170,30 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 */
 		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitLinkReplanningMap();
-			
+	}
+	
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		
+		/*
+		 * Disable Within-Day Replanning after first Iteration.
+		 */
+		if (event.getIteration() > 0) {
+			this.getWithinDayEngine().doInitialReplanning(false);
+			this.getWithinDayEngine().doDuringLegReplanning(false);
+			this.getWithinDayEngine().doDuringActivityReplanning(false);
+		}
+	}
+	
+	@Override
+	protected void setUp() {
+		/*
+		 * The Controler initialized the LeastCostPathCalculatorFactory here, which is required
+		 * by the replanners.
+		 */
+		super.setUp();
+		
 		// initialize Identifiers and Replanners
 		this.initIdentifiers();
 		this.initReplanners();
@@ -163,16 +207,22 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
 		duringLegRerouteTransportModes.add(TransportMode.car);
 		
-		carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes);
-		this.getMobsimListeners().add(carLegAgentsFilterFactory);
+		if (initialLegRerouting || duringLegRerouting) {
+			carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes);
+			this.getMobsimListeners().add(carLegAgentsFilterFactory);			
+		}
 
-		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap());
-		duringLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
-		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
+		if (duringLegRerouting) {
+			duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap());
+			duringLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
+			this.legPerformingIdentifier = duringLegFactory.createIdentifier();			
+		}
 		
-		startedLegFactory = new LegStartedIdentifierFactory(this.getLinkReplanningMap());
-		startedLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
-		this.legStartedIdentifier = startedLegFactory.createIdentifier();
+		if (initialLegRerouting) {
+			startedLegFactory = new LegStartedIdentifierFactory(this.getLinkReplanningMap());
+			startedLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
+			this.legStartedIdentifier = startedLegFactory.createIdentifier();			
+		}
 	}
 	
 	private void initReplanners() {
@@ -180,12 +230,14 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
 								
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();	
-		travelTimes.put(TransportMode.car, this.getTravelTimeCalculator());
+//		travelTimes.put(TransportMode.car, this.getTravelTimeCalculator());	// TravelTimeCalculator?!
+		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
 		
 		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory disutilityFactory = this.getTravelDisutilityFactory();
 
 		LeastCostPathCalculatorFactory factory = this.getLeastCostPathCalculatorFactory();
+	
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, disutilityFactory, travelTimes, factory, routeFactory);
 		
 		/*
@@ -193,13 +245,17 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 */
 		WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 		
-		duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, duringLegReroutingShare);
-		duringLegReplannerFactory.addIdentifier(this.legPerformingIdentifier);
-		this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
+		if (duringLegRerouting) {
+			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, duringLegReroutingShare);
+			duringLegReplannerFactory.addIdentifier(this.legPerformingIdentifier);
+			this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);			
+		}
 		
-		duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
-		duringLegReplannerFactory.addIdentifier(this.legStartedIdentifier);
-		this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
+		if (initialLegRerouting) {
+			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
+			duringLegReplannerFactory.addIdentifier(this.legStartedIdentifier);
+			this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);			
+		}
 	}
 	
 	private static class DummyRoutesCreator extends AbstractPersonAlgorithm implements PlanAlgorithm {
