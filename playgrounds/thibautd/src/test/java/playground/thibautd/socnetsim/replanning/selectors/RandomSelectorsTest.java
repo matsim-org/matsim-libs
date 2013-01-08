@@ -1,0 +1,301 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * RandomSelectorsTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.thibautd.socnetsim.replanning.selectors;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import org.junit.After;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.misc.Counter;
+
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+
+/**
+ * @author thibautd
+ */
+public class RandomSelectorsTest {
+	private static interface SelectorFactory {
+		public GroupLevelPlanSelector create(Random r);
+	}
+
+	private final List<ReplanningGroup> testGroups = new ArrayList<ReplanningGroup>();
+
+	@After
+	public void clear() {
+		testGroups.clear();
+	}
+
+	@Before
+	public void createIndividualPlans() {
+		ReplanningGroup group = new ReplanningGroup();
+		testGroups.add( group );
+
+		PersonImpl person = new PersonImpl( new IdImpl( "tintin" ) );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( 1d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5d );
+
+		person = new PersonImpl( new IdImpl( "milou" ) );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5000d );
+
+		person = new PersonImpl( new IdImpl( "tim" ) );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5000d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -5000d );
+
+		person = new PersonImpl( new IdImpl( "struppy" ) );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -10d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -5000d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -5000d );
+	}
+
+	@Before
+	public void createFullyJointPlans() {
+		ReplanningGroup group = new ReplanningGroup();
+		testGroups.add( group );
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( 1d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5d );
+		jp2.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5000d );
+		jp3.put( id , plan );
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5000d );
+		jp2.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5000d );
+		jp3.put( id , plan );
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5000d );
+		jp2.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -5000d );
+		jp3.put( id , plan );
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -10d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -5000d );
+		jp2.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -5000d );
+		jp3.put( id , plan );
+
+		JointPlanFactory.createJointPlan( jp1 );
+		JointPlanFactory.createJointPlan( jp2 );
+		JointPlanFactory.createJointPlan( jp3 );
+	}
+
+	@Before
+	public void createPartiallyJointPlansMessOfJointPlans() {
+		ReplanningGroup group = new ReplanningGroup();
+		testGroups.add( group );
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp4 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp5 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp6 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp7 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp8 = new HashMap<Id, Plan>();
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 20d );
+		jp3.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 30d );
+		jp5.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 40d );
+		jp7.put( id , plan );
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -200d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -100d );
+		jp4.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 500d );
+		jp5.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 200d );
+		jp8.put( id , plan );
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 100d );
+		jp4.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 11d );
+		jp6.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 101d );
+		jp7.put( id , plan );
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 333d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 666d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 777d );
+		jp6.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 444d );
+		jp8.put( id , plan );
+
+		id = new IdImpl( "haddock" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 500d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5d );
+		jp3.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 100d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		jp5.put( id , plan );
+
+		JointPlanFactory.createJointPlan( jp1 );
+		JointPlanFactory.createJointPlan( jp2 );
+		JointPlanFactory.createJointPlan( jp3 );
+		JointPlanFactory.createJointPlan( jp4 );
+		JointPlanFactory.createJointPlan( jp5 );
+		JointPlanFactory.createJointPlan( jp6 );
+		JointPlanFactory.createJointPlan( jp7 );
+		JointPlanFactory.createJointPlan( jp8 );
+	}
+
+	@Test
+	public void testRandomSelector() throws Exception {
+		testDeterminism( new SelectorFactory() {
+			@Override
+			public GroupLevelPlanSelector create(final Random r) {
+				return new RandomGroupLevelSelector( r );
+			}
+		});
+	}
+
+	private void testDeterminism(
+			final SelectorFactory factory) {
+		final int seed = 1264;
+
+		final Counter count = new Counter( "selection # " );
+		for (ReplanningGroup group : testGroups) {
+			GroupPlans previous = null;
+			for (int i=0; i<100; i++) {
+				count.incCounter();
+				GroupLevelPlanSelector selector = factory.create( new Random( seed ) );
+
+				final GroupPlans selected = selector.selectPlans( group );
+				if (previous != null) {
+					assertEquals(
+							"different results with the same random seed",
+							previous,
+							selected);
+				}
+
+				if (selected == null) throw new NullPointerException( "test is useless if the selector returns null" );
+				previous = selected;
+			}
+		}
+		count.printCounter();
+	}
+}
+
