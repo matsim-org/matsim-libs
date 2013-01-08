@@ -119,6 +119,7 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(MGC.getCRS(targetCoordinateSystem));
 		b.setName(name);
+		b.add("location", LineString.class);
 		b.add("name", String.class);
 		b.add("total", Double.class);
 		for(int  i = 0 ; i< this.handler.getMaxTimeSlice(); i++){
