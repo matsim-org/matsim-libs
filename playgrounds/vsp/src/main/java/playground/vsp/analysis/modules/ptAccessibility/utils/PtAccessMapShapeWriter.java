@@ -137,7 +137,7 @@ public class PtAccessMapShapeWriter {
 				e1.printStackTrace();
 			}
 			try{
-				ShapeFileWriter.writeGeometries(bufferFeatures, outputFolderAndFileName + "_" + distance);
+				ShapeFileWriter.writeGeometries(bufferFeatures, outputFolderAndFileName + "_" + distance + ".shp");
 			}catch(ServiceConfigurationError e){
 				e.printStackTrace();
 			}

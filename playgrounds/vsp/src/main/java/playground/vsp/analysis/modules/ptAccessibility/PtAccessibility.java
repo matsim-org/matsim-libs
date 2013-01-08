@@ -181,7 +181,7 @@ public class PtAccessibility extends AbstractAnalyisModule {
 			}
 		}
 		for(Entry<String, Map<String, MultiPolygon>> e: cluster2mode2area.entrySet()){
-			PtAccesShapeWriter.writeMultiPolygons(e.getValue(), outputFolder + PtStopMap.FILESUFFIX + "_" + e.getKey(), e.getKey(), this.targetCoordinateSystem);
+			PtAccesShapeWriter.writeMultiPolygons(e.getValue(), outputFolder + PtStopMap.FILESUFFIX + "_" + e.getKey() + ".shp", e.getKey(), this.targetCoordinateSystem);
 		}
 		PtAccessMapShapeWriter.writeAccessMap(cluster2mode2area, this.quadrantSegments, outputFolder, this.targetCoordinateSystem);
 		
