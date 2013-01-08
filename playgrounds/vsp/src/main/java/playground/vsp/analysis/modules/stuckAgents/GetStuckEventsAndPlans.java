@@ -24,13 +24,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.plansSubset.GetPlansSubset;

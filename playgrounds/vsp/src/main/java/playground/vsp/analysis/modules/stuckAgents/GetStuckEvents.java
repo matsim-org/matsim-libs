@@ -89,6 +89,7 @@ public class GetStuckEvents extends AbstractAnalyisModule implements AgentStuckE
 		for(Event e: this.stuckEvents){
 			eventWriter.handleEvent(e);
 		}
+		eventWriter.closeFile();
 		log.info("finished...");
 	}
 }
