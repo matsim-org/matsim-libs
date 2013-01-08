@@ -43,26 +43,32 @@ public class PlanStrategyRegistrar {
 	private PlanStrategyFactoryRegister register = new PlanStrategyFactoryRegister();
 
 	public PlanStrategyRegistrar() {
+		// strategy packages that only select:
 		register.register("KeepLastSelected", new KeepLastSelectedPlanStrategyFactory());
-		register.register("ReRoute", new ReRoutePlanStrategyFactory());		
-		register.register("TimeAllocationMutator", new TimeAllocationMutatorPlanStrategyFactory());
 		register.register("BestScore", new SelectBestPlanStrategyFactory());
 		register.register("SelectExpBeta", new SelectExpBetaPlanStrategyFactory());		
 		register.register("ChangeExpBeta", new ChangeExpBetaPlanStrategyFactory());
 		register.register("SelectRandom", new SelectRandomStrategyFactory());
+		register.register("SelectPathSizeLogit", new SelectPathSizeLogitStrategyFactory());
+
+		// strategy packages that select, copy, and modify.  (The copying is done implicitly as soon as "addStrategyModule" is called
+		// at least once).
+		register.register("ReRoute", new ReRoutePlanStrategyFactory());		
+		register.register("TimeAllocationMutator", new TimeAllocationMutatorPlanStrategyFactory());
 		register.register("ChangeLegMode", new ChangeLegModeStrategyFactory());
 		register.register("ChangeSingleLegMode", new ChangeSingleLegModeStrategyFactory());
-		register.register("TransitChangeSingleLegMode", new ChangeSingleTripModeStrategyFactory());
 		register.register("ChangeSingleTripMode", new ChangeSingleTripModeStrategyFactory());
 		register.register("SubtourModeChoice", new SubtourModeChoiceStrategyFactory());
 		register.register("ChangeTripMode", new ChangeTripModeStrategyFactory());
-		register.register("TransitChangeLegMode", new ChangeTripModeStrategyFactory());
 		register.register("TransitTimeAllocationMutator", new TripTimeAllocationMutatorStrategyFactory());
 		register.register("TripTimeAllocationMutator_ReRoute", new TripTimeAllocationMutatorRerouteStrategyFactory());
-		register.register("TransitTimeAllocationMutator_ReRoute", new TripTimeAllocationMutatorRerouteStrategyFactory());
-		register.register("TransitSubtourModeChoice", new TripSubtourModeChoiceStrategyFactory());
 		register.register("TripSubtourModeChoice", new TripSubtourModeChoiceStrategyFactory());
-		register.register("SelectPathSizeLogit", new SelectPathSizeLogitStrategyFactory());
+		
+		// for backwards compatibility:
+		register.register("TransitChangeLegMode", new ChangeTripModeStrategyFactory()); // for backwards compatibility
+		register.register("TransitTimeAllocationMutator_ReRoute", new TripTimeAllocationMutatorRerouteStrategyFactory()); // for backwards compatibility
+		register.register("TransitSubtourModeChoice", new TripSubtourModeChoiceStrategyFactory()); // for backwards compatibility
+		register.register("TransitChangeSingleLegMode", new ChangeSingleTripModeStrategyFactory()); // for backwards compatibility
 	}
 	
 	public PlanStrategyFactoryRegister getFactoryRegister() {
