@@ -166,7 +166,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		this.afterFinishReplanningHook() ;
 	}
 
-	private void initThreads() {
+	private final void initThreads() {
 		if (this.threads != null) {
 			throw new RuntimeException("threads are already initialized");
 		}
@@ -195,7 +195,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		return numOfThreads;
 	}
 
-	private static class ExceptionHandler implements UncaughtExceptionHandler {
+	private final static class ExceptionHandler implements UncaughtExceptionHandler {
 
 		private final AtomicBoolean hadException;
 
@@ -211,7 +211,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 	}
 
-	private static class PlanAlgoThread implements Runnable {
+	private final static class PlanAlgoThread implements Runnable {
 
 		private final PlanAlgorithm planAlgo;
 		private final List<Plan> plans = new LinkedList<Plan>();
