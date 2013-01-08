@@ -22,8 +22,6 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.StringUtils;
@@ -117,6 +115,7 @@ public class SubtourModeChoiceConfigGroup extends Module {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put( MODES , getValue( MODES ) );
 		map.put( CHAINBASEDMODES , getValue( CHAINBASEDMODES ) );
+		map.put( CARAVAIL , getValue( CARAVAIL ) );
 		return map;
 	}
 
