@@ -19,16 +19,22 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.xml.sax.SAXException;
 
 import playground.thibautd.analysis.listeners.CliqueScoreStats;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
+import playground.thibautd.cliquessim.population.CliquesXmlReader;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
@@ -44,28 +50,57 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFi
 public class RunCliquesWithHardCodedStrategies {
 	private static final boolean DO_TRACE = false;
 
-	private static class Weights {
-		public static final double RE_ROUTE = 0.1;
-		public static final double TIME_MUTATOR = 0.1;
-		public static final double JT_MUTATION = 0.1;
-		public static final double MODE_MUTATION = 0.1;
-		public static final double LOGIT_SELECT = 0.6;
+	public static class Weights {
+		public double reRoute = 0.1;
+		public double timeMutator = 0.1;
+		public double jointTripMutation = 0.1;
+		public double modeMutation = 0.1;
+		public double logitSelection = 0.6;
+		public boolean jtmOptimizes = true;
+
+		public void setAllToZero() {
+			reRoute = 0;
+			timeMutator = 0;
+			jointTripMutation = 0;
+			modeMutation = 0;
+			logitSelection = 0;
+		}
+
+		@Override
+		public String toString() {
+			return "{Weights: reRoute="+reRoute+
+				", timeMutator="+timeMutator+
+				", jointTripMutation="+jointTripMutation+
+				(jtmOptimizes ? "with" : "without")+" optimization"+
+				", modeMutation="+modeMutation+
+				", logitSelection="+logitSelection+
+				"}";
+		}
 	}
 
-	public static void main(final String[] args) {
-		if (DO_TRACE) Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
-		final String configFile = args[ 0 ];
-
-		// load "registry"
+	public static Scenario createScenario(final String configFile) {
 		final Config config = JointControlerUtils.createConfig( configFile );
-		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
-					config.getModule( CliquesConfigGroup.GROUP_NAME );
 		// do not load joint plans (it fails with v5, and contrary to the "cliquessim"
 		// setting, it is not useful if reading plans without joint trips.
 		// XXX reading plans with joint trips will fail!
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 		JointControlerUtils.tuneScenario( scenario );
 		ScenarioUtils.loadScenario( scenario );
+		try {
+			new CliquesXmlReader(scenario).parse();
+		}
+		catch (Exception e) {
+			throw new RuntimeException( e );
+		}
+		return scenario;
+	}
+
+	public static void runScenario(
+			final Scenario scenario,
+			final Weights weights) {
+		final Config config = scenario.getConfig();
+		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
+					config.getModule( CliquesConfigGroup.GROUP_NAME );
 		final ControllerRegistry controllerRegistry =
 			new ControllerRegistry(
 					scenario,
@@ -79,23 +114,30 @@ public class RunCliquesWithHardCodedStrategies {
 				GroupPlanStrategyFactory.createReRoute(
 					config,
 					controllerRegistry.getTripRouterFactory() ),
-				Weights.RE_ROUTE);
+				weights.reRoute);
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTimeAllocationMutator(
 					config,
 					controllerRegistry.getTripRouterFactory() ),
-				Weights.TIME_MUTATOR);
-		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createCliqueJointTripMutator( controllerRegistry ),
-				Weights.JT_MUTATION);
+				weights.timeMutator);
+		if (weights.jtmOptimizes) {
+			strategyRegistry.addStrategy(
+					GroupPlanStrategyFactory.createCliqueJointTripMutator( controllerRegistry ),
+					weights.jointTripMutation);
+		}
+		else {
+			strategyRegistry.addStrategy(
+					GroupPlanStrategyFactory.createNonOptimizingCliqueJointTripMutator( controllerRegistry ),
+					weights.jointTripMutation);
+		}
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSubtourModeChoice(
 					config,
 					controllerRegistry.getTripRouterFactory() ),
-				Weights.MODE_MUTATION);
+				weights.modeMutation);
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSelectExpBeta( config ),
-				Weights.LOGIT_SELECT );
+				weights.logitSelection );
 
 		// create strategy manager
 		final GroupStrategyManager strategyManager =
@@ -125,6 +167,15 @@ public class RunCliquesWithHardCodedStrategies {
 
 		// run it
 		controller.run();
+	}
+
+	public static void main(final String[] args) {
+		if (DO_TRACE) Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
+		final String configFile = args[ 0 ];
+
+		// load "registry"
+		final Scenario scenario = createScenario( configFile );
+		runScenario( scenario , new Weights() );
 	}
 }
 
