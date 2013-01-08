@@ -30,7 +30,7 @@ import org.matsim.core.scoring.ScoringFunction;
 public interface DgReplanningBuilder {
 	
 	/**
-	 * event more useful would be createReplanner(Agent a, ScoringFunction sf)
+	 * even more useful would be createReplanner(Agent a, ScoringFunction sf)
 	 */
 	public DgReplanner createReplanner(Person p, ScoringFunction sf);
 
