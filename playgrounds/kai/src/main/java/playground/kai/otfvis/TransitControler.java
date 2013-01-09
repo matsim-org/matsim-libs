@@ -20,6 +20,7 @@
 
 package playground.kai.otfvis;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,16 +33,32 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.PreparedTransitSchedule;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouterImpl;
+import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
+import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
+import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3.DataCollection;
+
 public class TransitControler {
 	
 	private static boolean useTransit = true ;
+	private static boolean useOTFVis = true ;
 
 	public static void main(final String[] args) {
 		//		args[0] = "/Users/nagel/kw/rotterdam/config.xml" ;
+		if ( args.length > 1 ) {
+			useOTFVis = Boolean.parseBoolean(args[1]) ;
+		}
+		
 		Config config = new Config();
 		config.addCoreModules();
 		new MatsimConfigReader(config).readFile(args[0]);
@@ -52,19 +69,42 @@ public class TransitControler {
 		}
 
 		config.getQSimConfigGroup().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT ) ;
+		
+		config.otfVis().setShowTeleportedAgents(true) ;
+		
+		Scenario sc = ScenarioUtils.loadScenario(config) ;
+
+		final TransitSchedule schedule = sc.getTransitSchedule() ;
+		final TransitRouterConfig trConfig = new TransitRouterConfig( sc.getConfig() ) ; 
+		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
 
 		Controler tc = new Controler(config) ;
+		tc.setOverwriteFiles(true);
+		
+		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
+		
+		tc.setTransitRouterFactory( new TransitRouterFactory() {
+			@Override
+			public TransitRouter createTransitRouter() {
+				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
+				ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
+				ttCalculator.setDataCollection(DataCollection.additionalInformation, false) ;
+
+//				TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(trConfig) ;
+
+				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
+			}
+		}) ;
+
 
 		tc.setMobsimFactory(new MyMobsimFactory()) ;
 		tc.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		tc.setOverwriteFiles(true);
 		//		tc.setCreateGraphs(false);
 
 		tc.run();
 	}
 
 	static class MyMobsimFactory implements MobsimFactory {
-		private boolean useOTFVis = true ;
 
 		@Override
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
