@@ -30,6 +30,11 @@ public interface VisMobsim {
 	 */
 	Collection<MobsimAgent> getAgents();
 
+	/**
+	 * Comments:<ul>
+	 * <li> This says NonNetwo(r)k ... but I think that in fact it collects <i>all</i> snapshots. --??  Maybe rename?  kai, jan'13
+	 * </ul>
+	 */
 	VisData getNonNetwokAgentSnapshots();
 
 }
