@@ -91,7 +91,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// This is the first iteration
 		
 		// initialize strategy manager
-		this.strategyManager.init(this.pConfig, event.getControler().getEvents(), this.stageCollectorHandler, this.ticketMachine);
+		this.strategyManager.init(this.pConfig, event.getControler().getEvents(), this.stageCollectorHandler, this.ticketMachine, event.getControler().getControlerIO().getOutputPath());
 		
 		// init fare collector
 		this.stageCollectorHandler.init(event.getControler().getNetwork());

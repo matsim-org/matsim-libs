@@ -42,6 +42,8 @@ import playground.andreas.P2.replanning.modules.ReduceTimeServed;
 import playground.andreas.P2.replanning.modules.ReduceTimeServedRFare;
 import playground.andreas.P2.replanning.modules.RouteEnvelopeExtension;
 import playground.andreas.P2.replanning.modules.TimeReduceDemand;
+import playground.andreas.P2.replanning.modules.WeightedEndTimeExtension;
+import playground.andreas.P2.replanning.modules.WeightedStartTimeExtension;
 import playground.andreas.P2.replanning.modules.deprecated.AddRandomStop;
 import playground.andreas.P2.replanning.modules.deprecated.IncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.modules.deprecated.ReduceStopsToBeServedR;
@@ -69,6 +71,7 @@ public class PStrategyManager {
 	private double totalWeights = 0.0;
 	
 	private String pIdentifier;
+	private TimeProvider timeProvider = null;
 	private ReduceTimeServed reduceTimeServed = null;
 	private ReduceStopsToBeServed reduceStopsToBeServed = null;
 
@@ -77,7 +80,10 @@ public class PStrategyManager {
 	}
 	
 	// TODO[an] always initialize TimeReduceDemand
-	public void init(PConfigGroup pConfig, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine) {
+	public void init(PConfigGroup pConfig, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, String outputDir) {
+		this.timeProvider = new TimeProvider(pConfig, outputDir);
+		eventsManager.addHandler(this.timeProvider);
+		
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
 			String classname = settings.getModuleName();
 			double rate = settings.getProbability();
@@ -163,6 +169,14 @@ public class PStrategyManager {
 			ReduceStopsToBeServedRFare strat = new ReduceStopsToBeServedRFare(settings.getParametersAsArrayList());
 			strat.setTicketMachine(ticketMachine);
 			stageContainerCreator.addStageContainerHandler(strat);
+			strategy = strat;
+		} else if (name.equals(WeightedStartTimeExtension.STRATEGY_NAME)) {
+			WeightedStartTimeExtension strat = new WeightedStartTimeExtension(settings.getParametersAsArrayList());
+			strat.setTimeProvider(this.timeProvider);
+			strategy = strat;
+		} else if (name.equals(WeightedEndTimeExtension.STRATEGY_NAME)) {
+			WeightedEndTimeExtension strat = new WeightedEndTimeExtension(settings.getParametersAsArrayList());
+			strat.setTimeProvider(this.timeProvider);
 			strategy = strat;
 		}
 		

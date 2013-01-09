@@ -59,7 +59,9 @@ public class OperatorInitializer {
 		if (this.pConfig.getStartWith24Hours()) {
 			this.initialStrategy = new CreateNew24hPlan(new ArrayList<String>());
 		} else {
-			this.initialStrategy = new CreateNewPlan(new ArrayList<String>());
+			ArrayList<String> parameter = new ArrayList<String>();
+			parameter.add(Double.toString(pConfig.getTimeSlotSize()));
+			this.initialStrategy = new CreateNewPlan(parameter);
 		}
 	}
 	

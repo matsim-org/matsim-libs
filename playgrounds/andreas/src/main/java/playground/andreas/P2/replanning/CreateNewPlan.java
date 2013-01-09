@@ -39,12 +39,16 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(CreateNewPlan.class);
 	public static final String STRATEGY_NAME = "CreateNewPlan";
+	private final double timeSlotSize;
 
 	public CreateNewPlan(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 0){
-			log.error("Too many parameter. Will ignore: " + parameter);
+		if(parameter.size() != 1){
+			log.error("Wrong number of parameters. Will ignore: " + parameter);
+			log.error("Parameter 1: Time slot size for new start and end times");
 		}
+		
+		this.timeSlotSize = Double.valueOf(parameter.get(0));
 	}
 	
 	@Override
@@ -53,7 +57,25 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 		
 		do {
 			double startTime = MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime());
+			startTime = TimeProvider.getSlotForTime(startTime, this.timeSlotSize) * this.timeSlotSize;
+			
 			double endTime = startTime + cooperative.getMinOperationTime() + MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime() - startTime);
+			endTime = TimeProvider.getSlotForTime(endTime, this.timeSlotSize) * this.timeSlotSize;
+			
+			if (startTime == endTime) {
+				endTime += this.timeSlotSize;
+			}
+			
+			if (startTime + cooperative.getMinOperationTime() > endTime) {
+				endTime += this.timeSlotSize;
+			}
+			
+			if (startTime + cooperative.getMinOperationTime() > endTime) {
+				log.warn("Already increased the time of operation by one time slot in order to meet the minimum time of operation criteria of " + cooperative.getMinOperationTime());
+				log.warn("Start time is: " + startTime);
+				log.warn("End time is: " + endTime);
+				log.warn("Will continue anyway...");
+			}
 			
 			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());

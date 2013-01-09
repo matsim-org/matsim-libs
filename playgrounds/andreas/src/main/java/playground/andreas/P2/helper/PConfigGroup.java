@@ -85,6 +85,7 @@ public class PConfigGroup extends Module{
 	private static final String SPEED_LIMIT_FOR_STOPS = "speedLimitForStops";
 	private static final String PLANNING_SPEED_FACTOR = "planningSpeedFactor";
 	private static final String GRID_SIZE = "gridSize";
+	private static final String TIMESLOT_SIZE = "timeSlotSize";
 	private static final String USE_ADAPTIVE_NUMBER_OF_COOPERATIVES = "useAdaptiveNumberOfCooperatives";
 	private static final String SHARE_OF_COOPERATIVES_WITH_PROFIT = "shareOfCooperativesWithProfit";
 	private static final String DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION = "disableCreationOfNewCooperativesInIteration";
@@ -132,6 +133,7 @@ public class PConfigGroup extends Module{
 	private double speedLimitForStops = Double.MAX_VALUE;
 	private double planningSpeedFactor = 1.0;
 	private double gridSize = Double.MAX_VALUE;
+	private double timeSlotSize = Double.MAX_VALUE;
 	private boolean useAdaptiveNumberOfCooperatives = false;
 	private double shareOfCooperativesWithProfit = 0.50;
 	private int disableCreationOfNewCooperativesInIteration = Integer.MAX_VALUE;
@@ -218,6 +220,8 @@ public class PConfigGroup extends Module{
 			this.planningSpeedFactor = Double.parseDouble(value);
 		} else if (GRID_SIZE.equals(key)){
 			this.gridSize = Double.parseDouble(value);
+		} else if (TIMESLOT_SIZE.equals(key)){
+			this.timeSlotSize = Double.parseDouble(value);
 		} else if (USE_ADAPTIVE_NUMBER_OF_COOPERATIVES.equals(key)){
 			this.useAdaptiveNumberOfCooperatives = Boolean.parseBoolean(value);
 		} else if (SHARE_OF_COOPERATIVES_WITH_PROFIT.equals(key)){
@@ -290,6 +294,7 @@ public class PConfigGroup extends Module{
 		map.put(SPEED_LIMIT_FOR_STOPS, Double.toString(this.speedLimitForStops));
 		map.put(PLANNING_SPEED_FACTOR, Double.toString(this.planningSpeedFactor));
 		map.put(GRID_SIZE, Double.toString(this.gridSize));
+		map.put(TIMESLOT_SIZE, Double.toString(this.timeSlotSize));
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, Boolean.toString(this.useAdaptiveNumberOfCooperatives));
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, Double.toString(this.shareOfCooperativesWithProfit));
 		map.put(DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION, Integer.toString(this.disableCreationOfNewCooperativesInIteration));
@@ -343,7 +348,8 @@ public class PConfigGroup extends Module{
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
 		map.put(SPEED_LIMIT_FOR_STOPS, "Link cannot serve as paratransit stop, if its speed limit is equal or higher than the limit set here. Default is +INF");
 		map.put(PLANNING_SPEED_FACTOR, "Freespeed of link will be modified by factor. Resulting link travel time is written to transit schedule. Default is 1.0 aka freespeed of the link.");
-		map.put(GRID_SIZE, "The grid size (length and height) for aggregating stuff in various modules (RandomStopProvider, ActivityLocationsParatransitUser). Default of Double.maxvalue effectively aggregates all datat point into one gridPoint");
+		map.put(GRID_SIZE, "The grid size (length and height) for aggregating stuff in various modules (RandomStopProvider, ActivityLocationsParatransitUser). Default of Double.maxvalue effectively aggregates all data points into one gridPoint");
+		map.put(TIMESLOT_SIZE, "The size of a time slot aggregating stuff in various modules (TimeProvider, CreateNewPlan). Default of Double.maxvalue effectively aggregates all data points into one time slot");
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, "Will try to adapt the number of cooperatives to meet the given share of profitable coopertives if set to true");
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, "Target share of profitable cooperatives - Set " + USE_ADAPTIVE_NUMBER_OF_COOPERATIVES + "=true to enable this feature");
 		map.put(DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION, "No more new cooperatives will be found beginning with the iteration specified");
@@ -485,6 +491,10 @@ public class PConfigGroup extends Module{
 	
 	public double getGridSize(){
 		return this.gridSize;
+	}
+	
+	public double getTimeSlotSize(){
+		return this.timeSlotSize;
 	}
 	
 	public boolean getUseAdaptiveNumberOfCooperatives() {
