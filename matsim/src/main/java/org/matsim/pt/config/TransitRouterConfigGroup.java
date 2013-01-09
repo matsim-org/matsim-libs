@@ -77,7 +77,7 @@ public class TransitRouterConfigGroup extends Module {
 		comments.put(SEARCH_RADIUS, "the radius in which stop locations are searched, given a start or target coordinate");
 		comments.put(EXTENSION_RADIUS, "step size to increase searchRadius if no stops are found");
 		comments.put(MAX_BEELINE_WALK_CONNECTION_DISTANCE, "maximum beeline distance between stops that agents could transfer to by walking");
-		comments.put(ADDITIONAL_TRANSFER_TIME, "additional time the router allocates when a line switch happens, Can be interpreted as a 'savity' time that agents need to savely transfer from one line to another");
+		comments.put(ADDITIONAL_TRANSFER_TIME, "additional time the router allocates when a line switch happens. Can be interpreted as a 'safety' time that agents need to safely transfer from one line to another");
 		return comments;
 	}
 
