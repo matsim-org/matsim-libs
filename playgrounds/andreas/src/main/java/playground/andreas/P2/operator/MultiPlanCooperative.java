@@ -129,13 +129,11 @@ public class MultiPlanCooperative extends AbstractCooperative{
 			if (strategy != null) {
 				PPlan newPlan = strategy.run(this);
 				if (newPlan != null) {
-					// check, if it is a duplicate of an existing plan
-					for (PPlan plan : this.plans) {
-						if(plan.isSameButVehSize(newPlan)) {
-							newPlan = null;
-							break;
-						}
-					}
+					
+					if(this.getFranchise().planRejected(newPlan)){
+						// plan is rejected by franchise system
+						newPlan = null;
+					}	
 					
 					if (newPlan != null) {
 						// remove vehicle from worst plan

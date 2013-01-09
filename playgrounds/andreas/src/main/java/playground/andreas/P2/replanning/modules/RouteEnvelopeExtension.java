@@ -108,12 +108,6 @@ public class RouteEnvelopeExtension extends AbstractPStrategyModule {
 																		(ArrayList<TransitStopFacility>) stopsToServe, 
 																		new IdImpl(cooperative.getCurrentIteration())));
 			
-			if(cooperative.getFranchise().planRejected(newPlan)){
-				log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
-						cooperative.getCurrentIteration() + ". rejected by franchise.");
-				return null;
-			}
-			
 			return newPlan;
 		}
 	}

@@ -31,7 +31,7 @@ import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 
 /**
- * Simple Franchise system rejecting all routes already operated
+ * Simple Franchise system rejecting all routes already operated with respect to stops served and time of operation
  * 
  * @author aneumann
  *
@@ -58,7 +58,7 @@ public class PFranchise {
 			return false;
 		}
 		
-		String routeHash = generateRouteHash(plan.getStopsToBeServed());
+		String routeHash = generateRouteHash(plan);
 		boolean reject = this.routeHashes.contains(routeHash);
 		this.routeHashes.add(routeHash);
 		
@@ -78,9 +78,12 @@ public class PFranchise {
 			for (Cooperative cooperative : cooperatives) {
 				Set<String> routesHashesOfCooperative = new TreeSet<String>();
 				for (PPlan plan : cooperative.getAllPlans()) {
-					String routeHash = generateRouteHash(plan.getStopsToBeServed());				
+					String routeHash = generateRouteHash(plan);				
 					if (this.routeHashes.contains(routeHash)) {
-						if (!routesHashesOfCooperative.contains(routeHash)) {
+						if (routesHashesOfCooperative.contains(routeHash)) {
+							// This route is already served by the same cooperative
+							log.warn("Cooperative " + cooperative.getId() + " offers the same plan twice. Plan: " + plan.getId() + " managed to circumvent the franchise system with route " + routeHash);
+						} else {
 							// This route is already served by another cooperative
 							log.warn("Cooperative " + cooperative.getId() + " with plan " + plan.getId() + " managed to circumvent the franchise system with route " + routeHash);
 						}
@@ -92,6 +95,11 @@ public class PFranchise {
 		}
 	}
 	
+	private String generateRouteHash(PPlan plan) {
+	//		return generateRouteHash(plan.getStopsToBeServed());
+			return generateRouteHash(plan.getStartTime(), plan.getEndTime(), plan.getStopsToBeServed());
+		}
+
 	/**
 	 * Generates a unique String from the stops given
 	 * 
@@ -109,6 +117,19 @@ public class PFranchise {
 				sB.append(transitStopFacility.getId().toString()); 
 			}			
 		}
+		return sB.toString();
+	}
+
+	private String generateRouteHash(double startTime, double endTime,	ArrayList<TransitStopFacility> stopsToBeServed) {
+		StringBuffer sB = new StringBuffer();
+		sB.append(startTime);
+		sB.append("-" + endTime);
+		
+		for (TransitStopFacility transitStopFacility : stopsToBeServed) {
+			sB.append("-");
+			sB.append(transitStopFacility.getId().toString()); 
+		}
+
 		return sB.toString();
 	}
 }

@@ -112,11 +112,6 @@ public class ReduceStopsToBeServedR extends AbstractPStrategyModule implements T
 		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 		
-		if(cooperative.getFranchise().planRejected(newPlan)){
-			// plan is rejected by franchise system
-			return null;
-		}		
-		
 		return newPlan;
 	}
 
