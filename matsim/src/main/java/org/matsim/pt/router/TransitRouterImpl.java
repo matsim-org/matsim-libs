@@ -105,7 +105,7 @@ public class TransitRouterImpl implements TransitRouter {
 		for (TransitRouterNetworkNode node : nearestNodes) {
 			Coord toCoord = node.stop.getStopFacility().getCoord();
 			double initialTime = getWalkTime(person, coord, toCoord);
-			double initialCost = getWalkCost(person, coord, toCoord);
+			double initialCost = getWalkDisutility(person, coord, toCoord);
 			wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 		return wrappedNearestNodes;
@@ -115,7 +115,7 @@ public class TransitRouterImpl implements TransitRouter {
 		return travelDisutility.getTravelTime(person, coord, toCoord);
 	}
 	
-	private double getWalkCost(Person person, Coord coord, Coord toCoord) {
+	private double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
 		return travelDisutility.getTravelDisutility(person, coord, toCoord);
 	}
 
@@ -133,7 +133,7 @@ public class TransitRouterImpl implements TransitRouter {
 			return null;
 		}
 
-		double directWalkCost = getWalkCost(person, fromCoord, toCoord);
+		double directWalkCost = getWalkDisutility(person, fromCoord, toCoord);
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 
 		if (directWalkCost < pathCost) {

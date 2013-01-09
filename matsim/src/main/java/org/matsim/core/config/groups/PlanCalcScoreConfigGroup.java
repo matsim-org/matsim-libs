@@ -497,6 +497,10 @@ public class PlanCalcScoreConfigGroup extends Module {
 	 * This was discouraged for some time but currently I think this makes sense. kai, mar'12
 	 */
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
+		if ( marginalUtlOfDistanceWalk != 0. ) {
+			log.warn("Setting marginalUtlOfDistanceWalk different from zero has never been tested systematically.  " +
+					"Consider using only walkSpeed and walkTimeDisutility, or write test cases." );
+		}
 		this.marginalUtlOfDistanceWalk = marginalUtlOfDistanceWalk;
 	}
 

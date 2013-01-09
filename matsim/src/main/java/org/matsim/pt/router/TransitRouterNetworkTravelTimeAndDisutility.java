@@ -115,12 +115,15 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		// say that the effective walk time is the transfer time minus some "buffer"
 		double walktime = transfertime - waittime;
 		
-		// weigh the "buffer" not with the walk time disutility, but with the wait time disutility:
+		double walkDistance = link.getLength() ;
+		
+		// weigh this "buffer" not with the walk time disutility, but with the wait time disutility:
 		// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.
 		// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
 		// be the same as the marginal opprotunity cost of time).  kai, nov'11
-		cost = -walktime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
-		       -waittime * this.config.getMarginalUtilityOfWaitingPt_utl_s()
+		cost = - walktime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
+		       - walkDistance * this.config.getMarginalUtilityOfTravelDistancePt_utl_m() 
+		       - waittime * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 		       - this.config.getUtilityOfLineSwitch_utl();
 		return cost;
 	}
@@ -184,16 +187,21 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		double nextDepartureTime = preparedTransitSchedule.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
 		
 		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
-		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station
-		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
+		double vehWaitAtStopTime = fromStop.getDepartureOffset() - fromStopArrivalOffset; //time in which the veh stops at station
+		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime;
 		cachedVehArrivalTime = vehArrivalTime ;
 		return vehArrivalTime ;		
 	}
 
 	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
 		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
-		double initialCost = - (getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-		return initialCost;
+		double timeCost = - getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
+		// (sign: margUtl is negative; overall it should be positive because it is a cost.)
+		
+		double distanceCost = - CoordUtils.calcDistance(coord,toCoord) * config.getMarginalUtilityOfTravelDistancePt_utl_m() ;
+		// (sign: same as above)
+		
+		return timeCost + distanceCost ;
 	}
 
 	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
