@@ -117,7 +117,7 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		for(TransitRoute r: l.getRoutes().values()){
 			featureAttribs = getRouteFeatureAttribs(r,l.getId(),  new Object[7]);
 			try {
-				features.add(builder.buildFeature(l.getId().toString(), featureAttribs));
+				features.add(builder.buildFeature(r.getId().toString(), featureAttribs));
 			} catch (IllegalArgumentException e1) {
 				e1.printStackTrace();
 			}
