@@ -29,6 +29,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.utils.ana.plans2gexf.GridNode;
 
 /**
  * Simple Franchise system rejecting all routes already operated with respect to stops served and time of operation
@@ -41,10 +42,13 @@ public class PFranchise {
 	private final static Logger log = Logger.getLogger(PFranchise.class);
 	
 	private final boolean activated;
+	private final double gridSize;
 	private TreeSet<String> routeHashes = new TreeSet<String>();
+
 	
-	public PFranchise(boolean useFranchise) {
+	public PFranchise(boolean useFranchise, double gridSize) {
 		this.activated = useFranchise;
+		this.gridSize = gridSize;
 		if(this.activated){
 			log.info("Franchise system activated");
 		} else{
@@ -96,9 +100,10 @@ public class PFranchise {
 	}
 	
 	private String generateRouteHash(PPlan plan) {
-	//		return generateRouteHash(plan.getStopsToBeServed());
-			return generateRouteHash(plan.getStartTime(), plan.getEndTime(), plan.getStopsToBeServed());
-		}
+	//	return generateRouteHash(plan.getStopsToBeServed());
+	//	return generateRouteHash(plan.getStartTime(), plan.getEndTime(), plan.getStopsToBeServed());
+		return generateRouteHashWithGridNodes(plan.getStartTime(), plan.getEndTime(), plan.getStopsToBeServed());
+	}
 
 	/**
 	 * Generates a unique String from the stops given
@@ -120,7 +125,7 @@ public class PFranchise {
 		return sB.toString();
 	}
 
-	private String generateRouteHash(double startTime, double endTime,	ArrayList<TransitStopFacility> stopsToBeServed) {
+	private String generateRouteHash(double startTime, double endTime, ArrayList<TransitStopFacility> stopsToBeServed) {
 		StringBuffer sB = new StringBuffer();
 		sB.append(startTime);
 		sB.append("-" + endTime);
@@ -128,6 +133,32 @@ public class PFranchise {
 		for (TransitStopFacility transitStopFacility : stopsToBeServed) {
 			sB.append("-");
 			sB.append(transitStopFacility.getId().toString()); 
+		}
+
+		return sB.toString();
+	}
+	
+	private String generateRouteHashWithGridNodes(double startTime, double endTime, ArrayList<TransitStopFacility> stopsToBeServed) {
+		StringBuffer sB = new StringBuffer();
+		sB.append(startTime);
+		sB.append("-" + endTime);
+		
+		String lastGridNodeId = null;
+		for (TransitStopFacility transitStopFacility : stopsToBeServed) {
+			String gridNodeId = GridNode.getGridNodeIdForCoord(transitStopFacility.getCoord(), this.gridSize);
+			
+			if (lastGridNodeId == null) {
+				lastGridNodeId = gridNodeId;
+			} else {
+				if (gridNodeId.equalsIgnoreCase(lastGridNodeId)) {
+					// still in same gridSquare
+					continue;
+				}
+				lastGridNodeId = gridNodeId;
+			}
+
+			sB.append("-");
+			sB.append(lastGridNodeId); 
 		}
 
 		return sB.toString();

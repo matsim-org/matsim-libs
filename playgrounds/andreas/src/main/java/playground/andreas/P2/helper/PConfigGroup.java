@@ -348,7 +348,7 @@ public class PConfigGroup extends Module{
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
 		map.put(SPEED_LIMIT_FOR_STOPS, "Link cannot serve as paratransit stop, if its speed limit is equal or higher than the limit set here. Default is +INF");
 		map.put(PLANNING_SPEED_FACTOR, "Freespeed of link will be modified by factor. Resulting link travel time is written to transit schedule. Default is 1.0 aka freespeed of the link.");
-		map.put(GRID_SIZE, "The grid size (length and height) for aggregating stuff in various modules (RandomStopProvider, ActivityLocationsParatransitUser). Default of Double.maxvalue effectively aggregates all data points into one gridPoint");
+		map.put(GRID_SIZE, "The grid size (length and height) for aggregating stuff in various modules (RandomStopProvider, ActivityLocationsParatransitUser, PFranchise). Default of Double.maxvalue effectively aggregates all data points into one gridPoint");
 		map.put(TIMESLOT_SIZE, "The size of a time slot aggregating stuff in various modules (TimeProvider, CreateNewPlan). Default of Double.maxvalue effectively aggregates all data points into one time slot");
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, "Will try to adapt the number of cooperatives to meet the given share of profitable coopertives if set to true");
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, "Target share of profitable cooperatives - Set " + USE_ADAPTIVE_NUMBER_OF_COOPERATIVES + "=true to enable this feature");
