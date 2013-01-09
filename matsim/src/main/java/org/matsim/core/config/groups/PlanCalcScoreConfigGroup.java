@@ -540,7 +540,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static int setWaitingCnt=0 ;
 	
 	public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
-		if ( (this.earlyDeparture != 0.) && (setWaitingCnt<1) ) {
+		if ( (waiting != 0.) && (setWaitingCnt<1) ) {
 			setWaitingCnt++ ;
 			log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
 					"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );
