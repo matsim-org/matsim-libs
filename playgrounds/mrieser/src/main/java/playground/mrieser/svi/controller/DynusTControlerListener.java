@@ -36,8 +36,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.mrieser.svi.data.ActivityToZoneMappingWriter;
-import playground.mrieser.svi.data.CalculateActivityToZoneMapping;
+import playground.mrieser.svi.data.ActivityToZoneMappingReader;
 import playground.mrieser.svi.data.ShapeZonesReader;
 import playground.mrieser.svi.data.ZoneIdToIndexMappingReader;
 import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
@@ -90,8 +89,9 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 			new ShapeZonesReader(this.dc.getZones()).readShapefile(this.dc.getZonesShapeFile());
 
 			log.info("Analyzing zones for Population...");
-			new CalculateActivityToZoneMapping(this.dc.getActToZoneMapping(), this.dc.getZones(), this.dc.getZoneIdAttributeName()).run(c.getScenario().getPopulation());
-			new ActivityToZoneMappingWriter(this.dc.getActToZoneMapping()).writeFile(c.getControlerIO().getOutputFilename("actToZoneMapping.txt"));
+			new ActivityToZoneMappingReader(this.dc.getActToZoneMapping()).readFile(this.dc.getActToZoneMappingFilename());
+//			new CalculateActivityToZoneMapping(this.dc.getActToZoneMapping(), this.dc.getZones(), this.dc.getZoneIdAttributeName()).run(c.getScenario().getPopulation());
+//			new ActivityToZoneMappingWriter(this.dc.getActToZoneMapping()).writeFile(c.getControlerIO().getOutputFilename("actToZoneMapping.txt"));
 
 			if (this.dc.getZoneIdToIndexMappingFile() != null) {
 				log.info("Reading zone mapping..." + this.dc.getZoneIdToIndexMappingFile());

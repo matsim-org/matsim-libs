@@ -50,6 +50,7 @@ public abstract class DynusTUtils {
 		dc.setZoneIdToIndexMappingFile(config.findParam("dynus-t", "zoneIdToIndexMapping"));
 		dc.setDemandFactor(Double.parseDouble(config.getParam("dynus-t", "dynusTDemandFactor")));
 		dc.setZoneIdAttributeName(config.getParam("dynus-t", "zoneIdAttributeName"));
+		dc.setActToZoneMappingFilename(config.getParam("dynus-t", "actToZoneMapping"));
 		if (config.findParam("dynus-t", "timeBinSize_min") != null) {
 			dc.setTimeBinSize_min(Integer.parseInt(config.getParam("dynus-t", "timeBinSize_min")));
 		}

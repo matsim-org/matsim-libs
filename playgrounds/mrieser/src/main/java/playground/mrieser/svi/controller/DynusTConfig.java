@@ -49,6 +49,7 @@ public class DynusTConfig {
 	private final Zones zones = new Zones();
 	private final ActivityToZoneMapping actToZoneMapping = new ActivityToZoneMapping();
 	private final ZoneIdToIndexMapping zoneIdToIndexMapping = new ZoneIdToIndexMapping();
+	private String act2zoneMappingFilename = null;
 
 	public String getDynusTDirectory() {
 		return this.dynusTDirectory;
@@ -148,5 +149,13 @@ public class DynusTConfig {
 	
 	public Iterable<Tuple<Double, Double>> getVehTrajectoryExtracts() {
 		return this.vehTrajExtracts;
+	}
+
+	public void setActToZoneMappingFilename(String actToZoneMappingFilename) {
+		this.act2zoneMappingFilename = actToZoneMappingFilename;
+	}
+	
+	public String getActToZoneMappingFilename() {
+		return this.act2zoneMappingFilename;
 	}
 }
