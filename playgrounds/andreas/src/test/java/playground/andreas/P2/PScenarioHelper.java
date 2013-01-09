@@ -77,7 +77,9 @@ public class PScenarioHelper {
 		
 		PRouteProvider rP = new ComplexCircleScheduleProvider(sched, sC.getNetwork(), randomStopProvider, 0, pC.getPlanningSpeedFactor(), pC.getMode());
 		
-		coop.init(rP, new CreateNewPlan(new ArrayList<String>()), 0, 0.0);
+		ArrayList<String> parameter = new ArrayList<String>();
+		parameter.add("900");
+		coop.init(rP, new CreateNewPlan(parameter), 0, 0.0);
 		
 		return coop;
 	}
