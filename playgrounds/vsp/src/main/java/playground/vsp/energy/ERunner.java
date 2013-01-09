@@ -34,8 +34,10 @@ import playground.vsp.energy.trafficstate.TrafficStateControlerListener;
 
 /**
  * @author droeder
- * class to start an ordinary MATSim-Simulation, using the specified configfile.
- *  if an additional plansfile is specified the plans/persons are added with the identifier as prefix to the original population
+ * Class to start an ordinary MATSim-Simulation, using the specified configfile.
+ * If an additional plansfile is specified the plans/persons are added with the identifier as prefix to the original population. 
+ * These persons are supposed to be drivers of electric vehicles.
+ * Furthermore a ControlerListener is added to the MATSim Controler that writes a XML file containing traffic information for each link to file.
  *
  */
 public class ERunner {

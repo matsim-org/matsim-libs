@@ -44,6 +44,11 @@ import playground.vsp.energy.validation.ValidationInfoReader;
 import playground.vsp.energy.validation.ValidationInformation;
 
 /**
+ * This class models electric vehicle functionality for the persons added via the additional population from ERunner.java. 
+ * Electric vehicle functionality is not microsimulated within MATSim. Instead, it is added via a prefix of the person ids in this postprocessing.
+ * Electric vehicle functionality covers charging and discharching performed at "poi" locations during a car is parked.
+ * "poi" locations have capacitiy restrictions and can be full so charging is not always possible.
+ * The code writes some results to an output directory.
  * @author droeder
  *
  */
