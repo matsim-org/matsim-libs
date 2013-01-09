@@ -46,7 +46,7 @@ public class PhysicalSim2DEnvironment {
 
 	private static final Logger log = Logger.getLogger(PhysicalSim2DEnvironment.class);
 
-	private static final float DEP_BOX_WIDTH = .5f; // must be >= agents' diameter
+	private static final float DEP_BOX_WIDTH = 1.f; // must be >= agents' diameter
 
 	private final Sim2DEnvironment env;
 
@@ -151,8 +151,8 @@ public class PhysicalSim2DEnvironment {
 			long timel = System.currentTimeMillis();
 			long last = visDebugger.lastUpdate;
 			long diff = timel - last;
-			if (diff < 10) {
-				long wait = 10-diff;
+			if (diff < 40) {
+				long wait = 40-diff;
 				try {
 					Thread.sleep(wait);
 				} catch (InterruptedException e) {
@@ -178,18 +178,7 @@ public class PhysicalSim2DEnvironment {
 		LinkInfo li = psec.getLinkInfo(hiResLink.getLink().getId());
 		Segment opening = li.fromOpening;
 
-		//create dbox link info
-		LinkInfo dboxLi = new LinkInfo();
-		dboxLi.link = li.link;
-		dboxLi.dx = li.dx;
-		dboxLi.dy = li.dy;
-		Segment dboxFl = new Segment();
-		dboxFl.x1 = li.fromOpening.x0; 
-		dboxFl.x0 = li.fromOpening.x1;
-		dboxFl.y1 = li.fromOpening.y0;
-		dboxFl.y0 = li.fromOpening.y1;
-		dboxLi.finishLine = dboxFl;
-
+		
 		//create departure boxes
 		float dx = opening.x1 - opening.x0;
 		float dy = opening.y1 - opening.y0;
@@ -237,6 +226,30 @@ public class PhysicalSim2DEnvironment {
 			float spawnX = (float)(bottomX-this.offsetX) + bx/1.5f + dx/2;
 			float spawnY = (float)(bottomY-this.offsetY) + by/1.5f + dy/2;
 			PhysicalSim2DSection psecBox = createAndAddDepartureBox(s);
+			
+			//create dbox link info
+			LinkInfo dboxLi = new LinkInfo();
+			Segment link = new Segment();
+			link.x0 = (float)(bottomX-this.offsetX) + bx + dx/2;
+			link.y0 = (float)(bottomY-this.offsetY) + by + dy/2;
+			link.x1 = (float)(bottomX-this.offsetX) + dx/2;
+			link.y1 = (float)(bottomY-this.offsetY) + dy/2;
+			float dbdx = link.x1 - link.x0;
+			float dbdy = link.y1 - link.y0;
+			dbdx /= 1.5f * DEP_BOX_WIDTH;
+			dbdy /= 1.5f * DEP_BOX_WIDTH;
+//			float length = Math.sqrt()
+			dboxLi.link = link;
+			dboxLi.dx = dbdx;
+			dboxLi.dy = dbdy;
+			Segment dboxFl = new Segment();
+			dboxFl.x1 = li.fromOpening.x0; 
+			dboxFl.x0 = li.fromOpening.x1;
+			dboxFl.y1 = li.fromOpening.y0;
+			dboxFl.y0 = li.fromOpening.y1;
+			dboxLi.finishLine = dboxFl;
+			dboxLi.fromOpening = dboxFl;
+			
 			psecBox.putLinkInfo(hiResLinkId, dboxLi);
 			Segment o = psecBox.getOpenings()[0];
 			psecBox.putNeighbor(o,psec);

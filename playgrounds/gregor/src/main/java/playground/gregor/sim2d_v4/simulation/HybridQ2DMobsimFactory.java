@@ -35,6 +35,8 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSim2DNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
+import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+
 public class HybridQ2DMobsimFactory implements MobsimFactory {
 
 	private final static Logger log = Logger.getLogger(HybridQ2DMobsimFactory.class);
@@ -79,7 +81,8 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
-		Sim2DAgentBuilder aBuilder = new Sim2DAgentBuilder();
+		Sim2DScenario sc2d = sc.getScenarioElement(Sim2DScenario.class);
+		Sim2DAgentBuilder aBuilder = new Sim2DAgentBuilder(sc2d.getSim2DConfig());
 		
 		HybridQSim2DNetworkFactory networkFactory = new HybridQSim2DNetworkFactory(e,sc, aBuilder);
 		

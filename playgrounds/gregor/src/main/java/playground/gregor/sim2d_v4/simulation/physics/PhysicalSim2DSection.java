@@ -327,6 +327,7 @@ public class PhysicalSim2DSection {
 				y[i] = (float) (c.y - this.offsetY);
 			}
 			visDebugger.addPolygon(x, y,32, 255, 64, 128);
+//			visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId());
 		}
 		for (Sim2DAgent agent : this.agents) {
 			agent.debug(visDebugger);

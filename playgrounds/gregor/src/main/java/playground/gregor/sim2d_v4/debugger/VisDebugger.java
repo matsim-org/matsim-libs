@@ -166,10 +166,18 @@ public class VisDebugger extends PApplet {
 					drawCircle((Circle) el);
 				} else if (el instanceof Polygon) {
 					drawPolygon((Polygon)el);
+				} else if (el instanceof Text) {
+					drawText((Text)el);
 				}
 			}
 		}
 		drawTime();
+	}
+
+	private void drawText(Text el) {
+		stroke(el.r,el.g,el.b,el.a);
+		fill(el.r,el.g,el.b,el.a);
+		text(el.text,scaleFlX(el.x),scaleFlY(el.y));
 	}
 
 	private void drawTime() {
@@ -242,6 +250,29 @@ public class VisDebugger extends PApplet {
 		addElementStatic(l,buf.toString());
 
 	}
+	
+	public void addLine(float x0, float y0, float x1, float y1, int r, int g, int b, int a) {
+		Line l = new Line();
+		l.x0 = x0;
+		l.x1 = x1;
+		l.y0 = y0;
+		l.y1 = y1;
+		l.r = r;
+		l.g = g;
+		l.b = b;
+		l.a = a;
+		StringBuffer buf = new StringBuffer();
+		buf.append("line");
+		buf.append(x0);
+		buf.append(' ');
+		buf.append(y0);
+		buf.append(' ');
+		buf.append(x1);
+		buf.append(' ');
+		buf.append(y1);
+		addElement(l,buf.toString());
+
+	}
 
 	public void addCircle(float x, float y, float rr, int r, int g, int b, int a) {
 		Circle c = new Circle();
@@ -279,6 +310,15 @@ public class VisDebugger extends PApplet {
 		addElement(p,buf.toString());
 	}
 	
+	public void addText(float x, float y, String string) {
+		Text text = new Text();
+		text.x = x;
+		text.y = y;
+		text.text = string;
+		text.a = 255;
+		addElement(text, string);
+	}
+	
 	private void addElement(Object o, String key) {
 		this.newElements.add(o);
 	}
@@ -299,6 +339,15 @@ public class VisDebugger extends PApplet {
 
 	public boolean isFirst() {
 		return this.first;
+	}
+
+	
+
+	
+	private static final class Text {
+		float x,y;
+		String text;
+		int r,g,b,a;
 	}
 	
 	private static final class Line {
@@ -330,4 +379,6 @@ public class VisDebugger extends PApplet {
 		return this.time;
 		
 	}
+
+
 }

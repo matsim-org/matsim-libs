@@ -82,5 +82,26 @@ public abstract class CGAL {
 		return s;
 	}
 	
+	/**
+	 * calculates the coefficient r a vector has to be multiplied by to get the perpendicular projection on the line 
+	 * defined by the vector for a given point
+	 * @param x x-coordinate of the point
+	 * @param y y-coordinate of the point
+	 * @param v0x first x-coordinate of the vector
+	 * @param v0y first y-coordinate of the vector
+	 * @param v1x second x-coordinate of the vector
+	 * @param v1y second y-coordinate of the vector
+	 * @return the coefficient by which the vector has to be multiplied
+	 */
+	public static float vectorCoefOfPerpendicularProjection(float x, float y, float v0x, float v0y, float v1x, float v1y) {
+		float vdx = v1x - v0x;
+		float vdy = v1y - v0y;
+		float numerator = (x-v0x) * vdx + (y - v0y) * vdy;
+		float denomenator  = vdx * vdx + vdy * vdy; //TODO in most sim2d cases this value can be precalculated [gl Jan'13] 
+		float r = numerator/denomenator;
+		
+		return r;
+		
+	}
 	
 }

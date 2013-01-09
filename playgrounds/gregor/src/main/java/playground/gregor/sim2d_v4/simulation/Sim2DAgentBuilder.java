@@ -22,14 +22,21 @@ package playground.gregor.sim2d_v4.simulation;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-import playground.gregor.sim2d_v4.simulation.physics.SocialForceAgent;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.SocialForceAgent;
 
 public class Sim2DAgentBuilder {
+	
+	private final Sim2DConfig conf;
+
+	public Sim2DAgentBuilder(Sim2DConfig conf) {
+		this.conf = conf;
+	}
 
 	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
 //		Sim2DAgent agent = new SimpleAgent(veh,spawnX,spawnY);
-		Sim2DAgent agent = new SocialForceAgent(veh, spawnX, spawnY);
+		Sim2DAgent agent = new SocialForceAgent(veh, spawnX, spawnY,(float) this.conf.getTimeStepSize());
 		return agent;
 	}
 

@@ -23,12 +23,15 @@ package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 import org.matsim.api.core.v01.Id;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.math.Math;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.LinkInfo;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 public class DesiredDirection {
+	
+	
 	
 	
 	public float [] computeDesiredDirection(Sim2DAgent agent) {
@@ -44,22 +47,23 @@ public class DesiredDirection {
 		float dy = li.dy;
 		
 		float dist = CGAL.signDistPointLine(pos[0],pos[1], link.x0, link.y0, dx, dy);
+		
 		float px;
 		float py;
-		if (dist < 0) {
+		if (dist < 0) { //agent is on the left side of the link
 			px = dy;
 			py = -dx;
-		} else {
+		} else { //agent is on the right side of the link
 			px = -dy;
 			py = dx;
 		}
 
-		//for testing only!!!!
 		if (dist < 0) {
 			dist = -dist;
 		}
 		
-		float w0 = dist > 2 ? 1 : (dist > 0.5f ? 0.5f : 0);
+		float exp = Math.exp(dist);
+		float w0 = 1 - 1/exp;
 		float w1 = 1 - w0;
 		
 		ret[0] = w1 * dx + w0 * px;
