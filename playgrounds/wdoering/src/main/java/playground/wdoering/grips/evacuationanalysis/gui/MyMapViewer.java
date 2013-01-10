@@ -391,49 +391,10 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			
 			//draw utilization
 			if (mode.equals(Mode.UTILIZATION))
-			{
-			
-				HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes = data.getLinkLeaveTimes();
-				HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes = data.getLinkEnterTimes();
-				for (Link link : this.links)
-				{
-					List<Tuple<Id,Double>> leaveTimes = linkLeaveTimes.get(link.getId());
-					List<Tuple<Id,Double>> enterTimes = linkEnterTimes.get(link.getId());
-					
-					if ((enterTimes != null) && (enterTimes.size() > 0) && (leaveTimes!=null))
-					{
-						
-						Coord fromCoord = this.ctInverse.transform(new CoordImpl(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()));
-						Point2D fromP2D = this.getTileFactory().geoToPixel(new GeoPosition(fromCoord.getY(),fromCoord.getX()), this.getZoom());
-						
-						Coord toCoord = this.ctInverse.transform(new CoordImpl(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()));
-						Point2D toP2D = this.getTileFactory().geoToPixel(new GeoPosition(toCoord.getY(),toCoord.getX()), this.getZoom());
-						
-						float strokeWidth = 1;
-						Color linkColor = Color.BLUE;
-						
-						if (data.getLinkUtilizationVisData()!=null)
-						{
-							if (data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId())!=null)
-							{
-								Tuple<Float,Color> currentColoration = data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId());
-								strokeWidth = ((currentColoration.getFirst() *35f) / (float)Math.pow(2,this.getZoom()) );
-								linkColor = currentColoration.getSecond();
-							}
-						}
-						
-						g2D.setStroke(new BasicStroke(strokeWidth));
-						
-						g.setColor(linkColor);
-//						g.setColor(Color.RED);
-						g.drawLine((int)fromP2D.getX()-b.x, (int)fromP2D.getY()-b.y, (int)toP2D.getX()-b.x, (int)toP2D.getY()-b.y);
-					}
-					
-				}
-			}
+				drawUtilization(g2D, b, this.getZoom());
 			
 			//draw the grid
-			drawGrid(mode, g2D, b);
+			drawGrid(mode, g2D, b, this.getZoom());
 
 
 
@@ -444,11 +405,53 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	}
 
 
+	private void drawUtilization(Graphics2D g2D, Rectangle b, int zoom)
+	{
+		HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes = data.getLinkLeaveTimes();
+		HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes = data.getLinkEnterTimes();
+		for (Link link : this.links)
+		{
+			List<Tuple<Id,Double>> leaveTimes = linkLeaveTimes.get(link.getId());
+			List<Tuple<Id,Double>> enterTimes = linkEnterTimes.get(link.getId());
+			
+			if ((enterTimes != null) && (enterTimes.size() > 0) && (leaveTimes!=null))
+			{
+				
+				Coord fromCoord = this.ctInverse.transform(new CoordImpl(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()));
+				Point2D fromP2D = this.getTileFactory().geoToPixel(new GeoPosition(fromCoord.getY(),fromCoord.getX()), zoom);
+				
+				Coord toCoord = this.ctInverse.transform(new CoordImpl(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()));
+				Point2D toP2D = this.getTileFactory().geoToPixel(new GeoPosition(toCoord.getY(),toCoord.getX()), zoom);
+				
+				float strokeWidth = 1;
+				Color linkColor = Color.BLUE;
+				
+				if (data.getLinkUtilizationVisData()!=null)
+				{
+					if (data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId())!=null)
+					{
+						Tuple<Float,Color> currentColoration = data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId());
+						strokeWidth = ((currentColoration.getFirst() *35f) / (float)Math.pow(2,zoom) );
+						linkColor = currentColoration.getSecond();
+					}
+				}
+				
+				g2D.setStroke(new BasicStroke(strokeWidth));
+				
+				g2D.setColor(linkColor);
+//						g.setColor(Color.RED);
+				g2D.drawLine((int)fromP2D.getX()-b.x, (int)fromP2D.getY()-b.y, (int)toP2D.getX()-b.x, (int)toP2D.getY()-b.y);
+			}
+			
+		}
+	}
+
+
 	/**
 	 * draw the grid
 	 * 
 	 */
-	private void drawGrid(Mode mode, Graphics2D g2D, Rectangle b) {
+	private void drawGrid(Mode mode, Graphics2D g2D, Rectangle b, int zoom) {
 		if (!Double.isNaN(minX))
 		{
 			g2D.setColor(Color.BLACK);
@@ -466,11 +469,11 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				//get cell coordinate (+ gridsize) and transform into pixel coordinates
 				CoordImpl cellCoord = cell.getCoord();
 				Coord transformedCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX()-gridSize/2, cellCoord.getY()-gridSize/2));
-				Point2D cellCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(transformedCoord.getY(),transformedCoord.getX()), this.getZoom());
+				Point2D cellCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(transformedCoord.getY(),transformedCoord.getX()), zoom);
 				Coord cellPlusGridCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX()+gridSize/2, cellCoord.getY()+gridSize/2));
-				Point2D cellPlusGridCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(cellPlusGridCoord.getY(),cellPlusGridCoord.getX()), this.getZoom());
+				Point2D cellPlusGridCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(cellPlusGridCoord.getY(),cellPlusGridCoord.getX()), zoom);
 				
-				//adjust viewport
+				//adjust coordinates using the viewport
 				int gridX1 = (int)cellCoordP2D.getX()-b.x;
 				int gridY1 = (int)cellCoordP2D.getY()-b.y;
 				int gridX2 = (int)cellPlusGridCoordP2D.getX()-b.x;
@@ -491,7 +494,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				}
 				
 				g2D.setStroke(new BasicStroke(1F));
-				
 
 				//color grid (if mode equals evacuation or clearing time)
 				if ((mode.equals(Mode.EVACUATION)) || (mode.equals(Mode.CLEARING)))
@@ -571,20 +573,58 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	
 	public BufferedImage getGridAsImage(Mode mode, int width, int height)
 	{
-		  GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		  GraphicsDevice gs = ge.getDefaultScreenDevice();
-		  GraphicsConfiguration gc = gs.getDefaultConfiguration();
-
-		  // Create an image that does not support transparency
-		  BufferedImage bImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-		  
-		  Graphics IG = bImage.getGraphics();
-		  Graphics2D IG2D = (Graphics2D) IG;
-		  
-		  //get viewport offset
-		  Rectangle b = this.getViewportBounds();
-		  drawGrid(mode, IG2D, b);
+			
 		
+		this.setCenterPosition(evacAnalysis.getNetworkCenter());
+
+//		this.updateUI();
+//		this.validate();
+		
+
+
+		// get viewport offset
+		Rectangle b = this.getViewportBounds();
+//		System.out.println("minx: " + minX + "|minY: " + minY);
+//		System.out.println("zoom:" + this.getZoom());
+//		System.exit(223);
+
+		Coord gridFromCoord = this.ctInverse.transform(new CoordImpl(minX-gridSize/2, minY-gridSize/2));
+		Point2D fromGridPoint = this.getTileFactory().geoToPixel(new GeoPosition(gridFromCoord.getY(),gridFromCoord.getX()), 2);
+		
+		Coord gridToCoord = this.ctInverse.transform(new CoordImpl(maxX, maxY));
+		Point2D toGridPoint = this.getTileFactory().geoToPixel(new GeoPosition(gridToCoord.getY(),gridToCoord.getX()), 2);
+		
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice gs = ge.getDefaultScreenDevice();
+		GraphicsConfiguration gc = gs.getDefaultConfiguration();
+		
+		int minX = (int)Math.min(fromGridPoint.getX(), toGridPoint.getX());
+		int maxX = (int)Math.max(fromGridPoint.getX(), toGridPoint.getX());
+		int minY = (int)Math.min(fromGridPoint.getY(), toGridPoint.getY());
+		int maxY = (int)Math.max(fromGridPoint.getY(), toGridPoint.getY());
+
+		BufferedImage bImage = gc.createCompatibleImage(maxX-minX+8, maxY-minY+3, Transparency.TRANSLUCENT);
+		
+		Graphics IG = bImage.getGraphics();
+		Graphics2D IG2D = (Graphics2D) IG;
+
+		IG2D.setColor(new Color(255, 255, 0, 0));
+		IG2D.fillRect(0, 0, width, height);
+		
+		Rectangle gridRect = new Rectangle(minX,minY, 2215,250);
+//		
+//		System.out.println("c min x:\t" + fromGridPoint.getX() + "|y:\t" + fromGridPoint.getY());
+//		System.out.println("b.x\t:" + b.x  + "| b.y: " + b.y);
+//		System.out.println("gridRect x:\t" + gridRect.x + "|y:\t" + gridRect.y);
+////		
+//		
+
+		// draw utilization
+		if (mode.equals(Mode.UTILIZATION))
+			drawUtilization(IG2D, gridRect, 2);
+		else
+			drawGrid(mode, IG2D, gridRect, 2);
+
 		return bImage;
 	}
 

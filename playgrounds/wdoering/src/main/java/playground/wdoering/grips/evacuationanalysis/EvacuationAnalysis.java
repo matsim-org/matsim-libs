@@ -593,18 +593,16 @@ public class EvacuationAnalysis implements ActionListener{
 				
 				BufferedImage imgEvacuation = jMapViewer.getGridAsImage(Mode.EVACUATION, 800, 800);
 				BufferedImage imgClearing = jMapViewer.getGridAsImage(Mode.CLEARING, 800, 800);
+				BufferedImage imgUtilization = jMapViewer.getGridAsImage(Mode.UTILIZATION, 800, 800);
 				
 				try{
 					TiffExporter.writeGEOTiff(env, "C:/temp/export"+Mode.EVACUATION+".tiff", imgEvacuation);
+					TiffExporter.writeGEOTiff(env, "C:/temp/export"+Mode.CLEARING+".tiff", imgClearing);
+					TiffExporter.writeGEOTiff(env, "C:/temp/export"+Mode.UTILIZATION+".tiff", imgUtilization);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 				
-				try{
-					TiffExporter.writeGEOTiff(env, "C:/temp/export"+Mode.CLEARING+".tiff", imgClearing);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
 			}
 			
 			
@@ -761,7 +759,7 @@ public class EvacuationAnalysis implements ActionListener{
 		this.compositePanel.repaint();
 	}
 
-	private GeoPosition getNetworkCenter() {
+	public GeoPosition getNetworkCenter() {
 		if (this.networkCenter != null) {
 			return this.networkCenter;
 		}
