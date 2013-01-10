@@ -32,6 +32,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.xml.sax.SAXException;
 
 import playground.thibautd.analysis.listeners.CliqueScoreStats;
+import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.population.CliquesXmlReader;
@@ -154,6 +155,11 @@ public class RunCliquesWithHardCodedStrategies {
 					new GroupReplanningListenner(
 						scenario.getPopulation(),
 						strategyManager));
+
+		controller.addControlerListener(
+				new LegHistogramListenerWithoutControler(
+					controllerRegistry.getEvents(),
+					controller.getControlerIO() ));
 
 		controller.addControlerListener(
 				new CliqueScoreStats(
