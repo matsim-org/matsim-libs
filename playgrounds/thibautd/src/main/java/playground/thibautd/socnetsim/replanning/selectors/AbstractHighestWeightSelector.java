@@ -126,7 +126,50 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 					new PersonRecord( person , plans ) );
 		}
 
+		for (PersonRecord personRecord : map.values()) {
+			Collections.sort(
+					personRecord.plans,
+					new Comparator<PlanRecord>() {
+						@Override
+						public int compare(
+								final PlanRecord o1,
+								final PlanRecord o2) {
+							// sort in DECREASING order
+							return -Double.compare( o1.weight , o2.weight );
+						}
+					});
+			pruneUnplausiblePlans( personRecord );
+		}
+
 		return map;
+	}
+
+	/**
+	 * removes all plans that will not be selected for sure,
+	 * by keeping only the best joint plan for each agent combination.
+	 * It assumes the plans sorted.
+	 * It increases DRAMATICALLY the performance (several hundreds times faster),
+	 * probably both due to reduced problem sized and tighter lower bounds
+	 */
+	private void pruneUnplausiblePlans(
+			final PersonRecord personRecord) {
+		final Iterator<PlanRecord> plans = personRecord.plans.iterator();
+		final int maxIndivPlans = forbidBlockingCombinations ? 2 : 1;
+		int nIndivPlans = 0;
+		//final Set<Set<Id>> jointPlansGroups = new HashSet<Set<Id>>();
+
+		while (plans.hasNext()) {
+			final PlanRecord plan = plans.next();
+
+			if (plan.jointPlan == null) {
+				nIndivPlans++;
+				if (nIndivPlans > maxIndivPlans) plans.remove();
+			}
+			//else {
+			//	final Set<Id> group = plan.jointPlan.getIndividualPlans().keySet();
+			//	if (!jointPlansGroups.add( group )) plans.remove();
+			//}
+		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
