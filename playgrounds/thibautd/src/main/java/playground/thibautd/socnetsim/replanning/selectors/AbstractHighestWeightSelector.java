@@ -626,19 +626,21 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	// classes: data structures used during the search process
 	// /////////////////////////////////////////////////////////////////////////
 
-	private static class PlanString {
+	private static final class PlanString {
 		public final PlanRecord planRecord;
 		public final PlanString tail;
+		private final double weight;
 
 		public PlanString(
 				final PlanRecord head,
 				final PlanString tail) {
 			this.planRecord = head;
 			this.tail = tail;
+			this.weight = head.weight + (tail == null ? 0 : tail.getWeight());
 		}
 
 		public double getWeight() {
-			return planRecord.weight + (tail == null ? 0 : tail.getWeight());
+			return weight;
 		}
 
 		@Override
