@@ -543,7 +543,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	}
 
 	/**
-	 * @return the highest weight of a plan wich does not pertains to a joint
+	 * @return the lowest weight of a plan wich does not pertains to a joint
 	 * plan shared with agents in personsSelected
 	 */
 	private static double getMinWeight(
@@ -564,7 +564,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		for (Iterator<PlanRecord> it = record.plans.descendingIterator();
 				it.hasNext(); ) {
 			final PlanRecord plan = it.next();
-			// the plans are sorted by decreasing weight:
+			// the plans are iterated in increasing weight order:
 			// consider the first valid plan
 
 			if (plan.jointPlan == null) return plan.weight;
