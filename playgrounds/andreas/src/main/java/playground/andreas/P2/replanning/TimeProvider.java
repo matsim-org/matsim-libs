@@ -100,8 +100,14 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 		int startSlot = TimeProvider.getSlotForTime(startTime, this.timeSlotSize);
 		int endSlot = TimeProvider.getSlotForTime(endTime, this.timeSlotSize);
 		
-		if (startSlot > this.currentWeights.length || endSlot > this.currentWeights.length) {
+		if (startSlot >= this.currentWeights.length) {
+			log.info("Resetting start slot from " + startSlot + " to " + (this.currentWeights.length - 1));
+			startSlot = this.currentWeights.length -1;
+		}
 			
+		if (endSlot >= this.currentWeights.length) {
+			log.info("Resetting end slot from " + endSlot + " to " + (this.currentWeights.length - 1));
+			endSlot = this.currentWeights.length - 1;
 		}
 		
 		int numberOfValidSlots = endSlot - startSlot + 1;
@@ -154,8 +160,8 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 	}
 	
 	private void addOneToTimeSlot(double time) {
-		if(time <= this.maxTime) {
-			int timeSlot = getSlotForTime(time, this.timeSlotSize);
+		int timeSlot = getSlotForTime(time, this.timeSlotSize);
+		if(timeSlot < this.tempWeights.length) {
 			this.tempWeights[timeSlot]++;
 		}
 	}
