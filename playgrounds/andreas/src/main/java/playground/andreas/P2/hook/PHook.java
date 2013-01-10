@@ -95,7 +95,6 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		}
 		
 		controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory));
-		
 		this.statsManager = new StatsManager(controler, pConfig, this.pBox, lineSetter); 
 	}
 	
@@ -116,13 +115,12 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		if(this.agentsStuckHandler != null){
 			event.getControler().getEvents().addHandler(this.agentsStuckHandler);
 		}
-		this.dumpTransitScheduleAndVehicles(event.getControler());
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		final Controler controler = event.getControler();
-		if(event.getIteration() == 0){
+		if(event.getIteration() == controler.getFirstIteration()){
 			log.info("This is the first iteration. All lines were added by notifyStartup event.");
 		} else {
 			this.pBox.notifyIterationStarts(event);
@@ -141,8 +139,8 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 					}
 				});
 			}
-			this.dumpTransitScheduleAndVehicles(event.getControler());
 		}
+		this.dumpTransitScheduleAndVehicles(event.getControler(), event.getIteration());
 	}
 	
 	@Override
@@ -187,16 +185,10 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		return vehicles;
 	}
 	
-	private void dumpTransitScheduleAndVehicles(Controler controler){
-		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(schedule);
+	private void dumpTransitScheduleAndVehicles(Controler controler, int iteration){
+		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(this.schedule);
 		VehicleWriterV1 writer2 = new VehicleWriterV1(controler.getScenario().getVehicles());
-		
-		if (controler.getIterationNumber() == null) {
-			writer.write(controler.getControlerIO().getOutputFilename(controler.getFirstIteration() + ".transitSchedule.xml.gz"));
-			writer2.writeFile(controler.getControlerIO().getOutputFilename(controler.getFirstIteration() + ".vehicles.xml.gz"));
-		} else {
-			writer.write(controler.getControlerIO().getIterationFilename(controler.getIterationNumber().intValue(), "transitSchedule.xml.gz"));
-			writer2.writeFile(controler.getControlerIO().getIterationFilename(controler.getIterationNumber().intValue(), "vehicles.xml.gz"));
-		}
+		writer.write(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
+		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "vehicles.xml.gz"));
 	}
 }
