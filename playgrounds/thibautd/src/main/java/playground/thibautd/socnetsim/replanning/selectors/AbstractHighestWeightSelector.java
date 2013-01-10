@@ -24,7 +24,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -112,7 +114,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		final Map<Id, PersonRecord> map = new LinkedHashMap<Id, PersonRecord>();
 
 		for (Person person : group.getPersons()) {
-			final List<PlanRecord> plans = new ArrayList<PlanRecord>();
+			final LinkedList<PlanRecord> plans = new LinkedList<PlanRecord>();
 			for (Plan plan : person.getPlans()) {
 				plans.add( new PlanRecord(
 							plan,
@@ -143,7 +145,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
 				Collections.EMPTY_SET,
-				null);
+				null,
+				Double.NEGATIVE_INFINITY);
 
 			plans = allocation == null ? null : toGroupPlans( allocation );
 		} while (
@@ -265,7 +268,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate,
 			final Set<Id> alreadyAllocatedPersons,
-			final PlanString str) {
+			final PlanString str,
+			final double minimalWeightToObtain) {
 		final PersonRecord currentPerson = personsStillToAllocate.get(0);
 
 		assert !alreadyAllocatedPersons.contains( currentPerson.person.getId() ) :
@@ -297,6 +301,14 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 							r,
 							newAllocatedPersons,
 							remainingPersons );
+
+			r.cachedMinimumWeight = exploreAll ?
+				Double.NEGATIVE_INFINITY :
+				alreadyAllocatedWeight +
+					getMinWeightFromPersons(
+							r,
+							newAllocatedPersons,
+							remainingPersons );
 		}
 
 		// Sort in decreasing order of upper bound: we can stop as soon
@@ -315,6 +327,21 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 							o2.cachedMaximumWeight );
 					}
 				});
+		final LinkedList<PlanRecord> stillToExploreSortedByLowerBound =
+			new LinkedList<PlanRecord>( records );
+		Collections.sort(
+				stillToExploreSortedByLowerBound,
+				new Comparator<PlanRecord>() {
+					@Override
+					public int compare(
+							final PlanRecord o1,
+							final PlanRecord o2) {
+						return Double.compare(
+							o1.cachedMinimumWeight,
+							o2.cachedMinimumWeight );
+					}
+				});
+		assert stillToExploreSortedByLowerBound.size() == records.size();
 
 		// get the actual allocation, and stop when the allocation
 		// is better than the maximum possible in remaining plans
@@ -326,10 +353,25 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				if (log.isTraceEnabled()) {
 					log.trace( "maximum weight from now on: "+r.cachedMaximumWeight );
 					log.trace( "weight obtained: "+constructedString.getWeight() );
-					log.trace( " => CUTOFF" );
+					log.trace( " => CUTOFF by upper bound" );
 				}
 				break;
 			}
+
+			if (r.cachedMaximumWeight < minimalWeightToObtain) {
+				if (log.isTraceEnabled()) {
+					log.trace( "maximum weight from now on: "+r.cachedMaximumWeight );
+					log.trace( "minimum weight to obtain: "+minimalWeightToObtain );
+					log.trace( " => CUTOFF by lower bound" );
+				}
+				break;
+			}
+
+			stillToExploreSortedByLowerBound.remove( r );
+			final double newMinimumWeightToObtain =
+					stillToExploreSortedByLowerBound.size() > 0 ?
+					stillToExploreSortedByLowerBound.getLast().cachedMinimumWeight :
+					Double.NEGATIVE_INFINITY;
 
 			PlanString tail = str;
 			// TODO: find a better way to filter persons (should be
@@ -355,7 +397,13 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 						allPersonsRecord,
 						actuallyRemainingPersons,
 						actuallyAllocatedPersons,
-						new PlanString( r , tail ));
+						new PlanString( r , tail ),
+						max(
+							minimalWeightToObtain,
+							newMinimumWeightToObtain,
+							constructedString != null ?
+								constructedString.getWeight() :
+								Double.NEGATIVE_INFINITY));
 			}
 			else {
 				newString = new PlanString( r , tail );
@@ -380,6 +428,13 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		}
 
 		return constructedString;
+	}
+
+	private double max(
+			final double d1,
+			final double d2,
+			final double d3) {
+		return d1 > d2 ? Math.max( d1 , d3 ) : Math.max( d2 , d3 );
 	}
 
 	/**
@@ -437,6 +492,78 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			jointPlanToSelect.getIndividualPlans().keySet();
 
 		for (PlanRecord plan : record.plans) {
+			// the plans are sorted by decreasing weight:
+			// consider the first valid plan
+
+			if (plan.jointPlan == null) return plan.weight;
+
+			// skip this plan if its participants already have a plan
+			if (contains( plan.jointPlan , personsSelected )) continue;
+			if (contains( plan.jointPlan , idsInJpToSelect )) continue;
+			return plan.weight;
+		}
+
+		// this combination is impossible
+		return Double.NEGATIVE_INFINITY;
+	}
+
+	/**
+	 * Gets the maximum plan weight that can be obtained from the
+	 * plans of remainingPersons, given the alradySelected has been
+	 * selected, and that planToSelect is about to be selected.
+	 */
+	private static double getMinWeightFromPersons(
+			final PlanRecord planToSelect,
+			// the joint plans linking to persons with a plan
+			// already selected cannot be selected.
+			// This list contains the agent to be selected.
+			final Collection<Id> personsSelected,
+			final List<PersonRecord> remainingPersons) {
+		double score = planToSelect.weight;
+
+		// if the plan to select is a joint plan,
+		// we know exactly what plan to get the score from.
+		final JointPlan jointPlanToSelect = planToSelect.jointPlan;
+
+		for (PersonRecord record : remainingPersons) {
+			final double min = getMinWeight( record , personsSelected , jointPlanToSelect );
+			if (log.isTraceEnabled()) {
+				log.trace( "estimated min weight for person "+
+						record.person.getId()+
+						" is "+min );
+			}
+			// if infinite, no need to continue
+			// moreover, returning here makes sure the branch has infinitely positive
+			// weight, even if plans in it have infinitely negative weights
+			if (min == Double.POSITIVE_INFINITY) return Double.POSITIVE_INFINITY;
+			score += min;
+		}
+
+		return score;
+	}
+
+	/**
+	 * @return the highest weight of a plan wich does not pertains to a joint
+	 * plan shared with agents in personsSelected
+	 */
+	private static double getMinWeight(
+			final PersonRecord record,
+			final Collection<Id> personsSelected,
+			final JointPlan jointPlanToSelect) {
+		// case in jp: plan is fully determined
+		if (jointPlanToSelect != null) {
+			final Plan plan = jointPlanToSelect.getIndividualPlan( record.person.getId() );
+			if (plan != null) return record.getRecord( plan ).weight;
+		}
+
+		final Collection<Id> idsInJpToSelect =
+			jointPlanToSelect == null ?
+			Collections.EMPTY_SET :
+			jointPlanToSelect.getIndividualPlans().keySet();
+
+		for (Iterator<PlanRecord> it = record.plans.descendingIterator();
+				it.hasNext(); ) {
+			final PlanRecord plan = it.next();
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
 
@@ -522,11 +649,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 	private static class PersonRecord {
 		final Person person;
-		final List<PlanRecord> plans;
+		final LinkedList<PlanRecord> plans;
 
 		public PersonRecord(
 				final Person person,
-				final List<PlanRecord> plans) {
+				final LinkedList<PlanRecord> plans) {
 			this.person = person;
 			this.plans = plans;
 			Collections.sort(
@@ -564,6 +691,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		final JointPlan jointPlan;
 		final double weight;
 		double cachedMaximumWeight = Double.NaN;
+		double cachedMinimumWeight = Double.NaN;
 
 		public PlanRecord(
 				final Plan plan,
