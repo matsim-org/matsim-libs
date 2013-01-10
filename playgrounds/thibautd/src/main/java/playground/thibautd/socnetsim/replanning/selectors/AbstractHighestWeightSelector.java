@@ -109,10 +109,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	}
 
 	private Map<Id, PersonRecord> getPersonRecords(final ReplanningGroup group) {
-		Map<Id, PersonRecord> map = new LinkedHashMap<Id, PersonRecord>();
+		final Map<Id, PersonRecord> map = new LinkedHashMap<Id, PersonRecord>();
 
 		for (Person person : group.getPersons()) {
-			List<PlanRecord> plans = new ArrayList<PlanRecord>();
+			final List<PlanRecord> plans = new ArrayList<PlanRecord>();
 			for (Plan plan : person.getPlans()) {
 				plans.add( new PlanRecord(
 							plan,
@@ -135,8 +135,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		GroupPlans plans = null;
 
+		int count = 0;
 		do {
-			PlanString allocation = buildPlanString(
+			count++;
+			final PlanString allocation = buildPlanString(
 				forbiden,
 				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
@@ -148,6 +150,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				plans != null &&
 				continueIterations( forbiden , personRecords , plans ) );
 
+		assert forbidBlockingCombinations || count == 1 : count;
 		assert plans == null || !forbiden.isForbidden( plans );
 
 		return plans;
@@ -265,6 +268,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final PlanString str) {
 		final PersonRecord currentPerson = personsStillToAllocate.get(0);
 
+		assert !alreadyAllocatedPersons.contains( currentPerson.person.getId() ) :
+			"still to allocate: "+personsStillToAllocate+
+			 ", already allocated: "+alreadyAllocatedPersons;
 		if (log.isTraceEnabled()) {
 			log.trace( "looking ar person "+currentPerson.person.getId()+
 					" with already selected "+alreadyAllocatedPersons );
@@ -281,7 +287,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		// get a list of plans in decreasing order of maximum possible weight.
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
-		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
+		final List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 		for (PlanRecord r : records) {
 			r.cachedMaximumWeight = exploreAll ?
