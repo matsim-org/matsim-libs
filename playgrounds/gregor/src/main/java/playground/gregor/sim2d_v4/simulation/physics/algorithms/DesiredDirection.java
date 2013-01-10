@@ -43,6 +43,7 @@ public class DesiredDirection {
 		LinkInfo li = psec.getLinkInfo(id);
 		final Segment link = li.link;
 		
+		
 		float dx = li.dx;
 		float dy = li.dy;
 		
@@ -62,7 +63,7 @@ public class DesiredDirection {
 			dist = -dist;
 		}
 		
-		float exp = Math.exp(dist);
+		float exp = Math.exp(dist/(li.width/2));
 		float w0 = 1 - 1/exp;
 		float w1 = 1 - w0;
 		

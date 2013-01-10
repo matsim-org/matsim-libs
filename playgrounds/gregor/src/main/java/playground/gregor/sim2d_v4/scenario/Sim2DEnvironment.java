@@ -52,6 +52,7 @@ public class Sim2DEnvironment implements Identifiable{
 	public Section createSection(Id id, Polygon p, int[] openings,
 			Id[] neighbors, int level) {
 		//Hack: having openings in ascending order makes things much easier, so wie do it here [gl Jan' 13]
+		if (openings != null)
 		Arrays.sort(openings);
 		Section s = new Section(id,p,openings,neighbors, level);
 		

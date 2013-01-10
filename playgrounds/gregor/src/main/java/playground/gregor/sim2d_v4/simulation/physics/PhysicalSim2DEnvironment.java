@@ -46,7 +46,7 @@ public class PhysicalSim2DEnvironment {
 
 	private static final Logger log = Logger.getLogger(PhysicalSim2DEnvironment.class);
 
-	private static final float DEP_BOX_WIDTH = 1.f; // must be >= agents' diameter
+	private static final float DEP_BOX_WIDTH = 0.8f; // must be >= agents' diameter
 
 	private final Sim2DEnvironment env;
 
@@ -151,8 +151,8 @@ public class PhysicalSim2DEnvironment {
 			long timel = System.currentTimeMillis();
 			long last = visDebugger.lastUpdate;
 			long diff = timel - last;
-			if (diff < 40) {
-				long wait = 40-diff;
+			if (diff < this.sim2dsc.getSim2DConfig().getTimeStepSize()*1000) {
+				long wait = (long) (this.sim2dsc.getSim2DConfig().getTimeStepSize()*1000-diff);
 				try {
 					Thread.sleep(wait);
 				} catch (InterruptedException e) {
@@ -249,6 +249,7 @@ public class PhysicalSim2DEnvironment {
 			dboxFl.y0 = li.fromOpening.y1;
 			dboxLi.finishLine = dboxFl;
 			dboxLi.fromOpening = dboxFl;
+			dboxLi.width = DEP_BOX_WIDTH/2;
 			
 			psecBox.putLinkInfo(hiResLinkId, dboxLi);
 			Segment o = psecBox.getOpenings()[0];

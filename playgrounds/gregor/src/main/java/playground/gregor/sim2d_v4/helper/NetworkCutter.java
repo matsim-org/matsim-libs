@@ -244,7 +244,7 @@ public class NetworkCutter {
 	}
 	
 	public static void main(String [] args) {
-		Sim2DConfig conf = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/tmp/sim2dConfig.xml");
+		Sim2DConfig conf = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/gr90_sim2d_v4/input/s2d_config.xml");
 		Sim2DScenario sc = Sim2DScenarioUtils.loadSim2DScenario(conf);
 		new NetworkCutter().run(sc);
 		

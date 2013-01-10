@@ -43,7 +43,7 @@ import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 public class SocialForceAgent implements Sim2DAgent {
 	
 	//Helbing constants
-	private final float v0 = 1.f; //desired velocity
+	private final float v0 = 1.34f; //desired velocity
 	private final float m = (float) (70 + (MatsimRandom.getRandom().nextDouble()*20)); //mass
 	private final float tau = .5f; //acceleration time
 	private final float A = 2000f; // ??
@@ -51,7 +51,7 @@ public class SocialForceAgent implements Sim2DAgent {
 	private final float k = 1.2f * 100000;
 	private final float kappa = 2.4f * 100000;
 	private final float r = (float) (MatsimRandom.getRandom().nextDouble()*.1 + 0.25); //radius
-	private final float vmx = 5.f;
+	private final float vmx = 1.5f;
 	
 	//additional constants
 	private final float CUTOFF_DIST = 20f;
@@ -68,7 +68,6 @@ public class SocialForceAgent implements Sim2DAgent {
 	private final DesiredDirection dd = new DesiredDirection();
 
 	private final float dT;
-	private VisDebugger visDebugger;
 	
 	private final float [] oldPos = {0,0};
 	private int notMoved = 0;
@@ -161,41 +160,36 @@ public class SocialForceAgent implements Sim2DAgent {
 		float fwy = 0;
 		for (Segment s : obstacles) {
 			float r = CGAL.vectorCoefOfPerpendicularProjection(this.pos[0], this.pos[1], s.x0, s.y0, s.x1, s.y1);
-			float px;
-			float py;
+			float nx;
+			float ny;
+			float dist;
 			if (r < 0) {
-				px = s.x0;
-				py = s.y0;
+				nx = this.pos[0] - s.x0;
+				ny = this.pos[1] - s.y0;
+				dist = (float) Math.sqrt(nx*nx + ny*ny);
+				nx /= dist;
+				ny /= dist;
 			} else if (r > 1) {
-				px = s.x1;
-				py = s.y1;
+				nx = this.pos[0] - s.x1;
+				ny = this.pos[1] - s.y1;
+				dist = (float) Math.sqrt(nx*nx + ny*ny);
+				nx /= dist;
+				ny /= dist;
 			} else {
-				px = s.x0 + r * (s.x1-s.x0);
-				py = s.y0 + r * (s.y1-s.y0);
+				dist = CGAL.signDistPointLine(this.pos[0], this.pos[1], s.x0, s.y0, s.dx, s.dy);
+				if (dist < 0) {
+					dist = -dist;
+					nx = s.dy;
+					ny = -s.dx;
+				} else {
+					nx = s.dy;
+					ny = -s.dx;
+				}
 			}
 			
-
-			
-			float nx = this.pos[0] - px;
-			float ny = this.pos[1] - py;
 			//here we can optimize to avoid the sqrt if 0 <= r <= 1!
-			float dist = (float) Math.sqrt(nx*nx + ny*ny);
 			if (dist > this.CUTOFF_DIST) {
 				continue;
-			}
-			nx /= dist;
-			ny /= dist;
-			
-			//HACK
-			if ( r >=0 && r <= 1) {
-				nx = s.x1 - s.x0;
-				ny = s.y1 - s.y0;
-				float length = (float) Math.sqrt(nx*nx+ny*ny);
-				nx /= length;
-				ny /= length;
-				float tmp = nx;
-				nx = ny;
-				ny = -tmp;
 			}
 			
 			float exp = playground.gregor.sim2d_v4.math.Math.exp((this.r-dist)/this.B);
@@ -214,8 +208,6 @@ public class SocialForceAgent implements Sim2DAgent {
 			fwx += this.A * exp * nx;
 			fwy += this.A * exp * ny;
 		}
-		if (this.visDebugger != null)
-			this.visDebugger.addLine(this.pos[0], this.pos[1], this.pos[0]+fwx/this.m,this.pos[1]+fwy/this.m, 255, 0, 0, 128);
 		
 		float dvx = desiredDVx + fnx/this.m + fwx/this.m;
 		float dvy = desiredDVy + fny/this.m + fwy/this.m;
@@ -281,8 +273,11 @@ public class SocialForceAgent implements Sim2DAgent {
 
 	@Override
 	public void debug(VisDebugger visDebugger) {
-		this.visDebugger = visDebugger;
-		visDebugger.addCircle(this.getPos()[0], this.getPos()[1], .5f, 192, 0, 64, 128);
+		if (getId().toString().contains("g")) {
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 0, 192, 64, 128);
+		} else {
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 192, 0, 64, 128);
+		}
 		
 	}
 

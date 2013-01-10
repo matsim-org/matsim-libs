@@ -186,7 +186,7 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 	private Id[] getNeighbors(XMLSectionPropertyType ff) {
 		XMLNeighborsType xmlNeighbors = ff.getNeighbors();
 		if (xmlNeighbors == null) {
-			return null;
+			return new Id[0];
 		}
 		Id [] ret = new Id[xmlNeighbors.getFidrefs().size()];
 		int idx = 0;
@@ -221,7 +221,7 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 	private int [] getOpenings(XMLSectionPropertyType ff) {
 		JAXBElement<XMLOpeningsType> oooo = ff.getOpenings();
 		if (oooo == null || oooo.getValue().getValue().length() == 0) {
-			return null;
+			return new int[0];
 		}
 		XMLOpeningsType xmlOpening = oooo.getValue();
 		String vs = xmlOpening.getVs();

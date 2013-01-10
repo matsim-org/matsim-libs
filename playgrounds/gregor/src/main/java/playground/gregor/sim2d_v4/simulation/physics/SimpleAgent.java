@@ -39,6 +39,8 @@ public class SimpleAgent implements Sim2DAgent {
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
 
+	private final float r = .5f;
+
 	public SimpleAgent(QVehicle veh, float spawnX, float spawnY) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
@@ -122,6 +124,5 @@ public class SimpleAgent implements Sim2DAgent {
 	public PhysicalSim2DSection getPSec() {
 		return this.currentPSec;
 	}
-
 
 }

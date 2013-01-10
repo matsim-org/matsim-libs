@@ -226,7 +226,7 @@ public class VisDebugger extends PApplet {
 	}
 
 	private float scaleFlY(float y1) {
-		return this.scale/10 * y1 + this.dragY + this.omy;
+		return 50-this.scale/10 * y1 + this.dragY + this.omy;
 	}
 	public void addLineStatic(float x0, float y0, float x1, float y1, int r, int g, int b, int a) {
 		Line l = new Line();

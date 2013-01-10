@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
+import playground.gregor.sim2d_v3.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Section;
@@ -145,6 +146,7 @@ public class PhysicalSim2DSection {
 					this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
 				}
 			}
+			this.penv.getEventsManager().processEvent(new XYVxVyEventImpl(agent.getId(),agent.getPos()[0],agent.getPos()[1],agent.getVelocity()[0],agent.getVelocity()[1],time));
 			agent.move(dx, dy);
 		}
 	}
@@ -175,6 +177,15 @@ public class PhysicalSim2DSection {
 			seg.x1 = (float) (c1.x-this.offsetX);
 			seg.y0 = (float) (c0.y-this.offsetY);
 			seg.y1 = (float) (c1.y-this.offsetY);
+			
+			float dx = seg.x1-seg.x0;
+			float dy = seg.y1-seg.y0;
+			double length = Math.sqrt(dx*dx+dy*dy);
+			dx /= length;
+			dy /= length;
+			seg.dx = dx;
+			seg.dy = dy;
+			
 			if (oidx < openings.length && i == openings[oidx]) {
 				oidx++;
 				open.add(seg);
@@ -214,6 +225,7 @@ public class PhysicalSim2DSection {
 			li.fromOpening = fromOpening;
 			if (toOpening != null) {
 				li.finishLine = toOpening;
+				li.width = (float)Math.sqrt((toOpening.x0-toOpening.x1)*(toOpening.x0-toOpening.x1)+(toOpening.y0-toOpening.y1)*(toOpening.y0-toOpening.y1)); 
 			} else {
 				Segment finishLine = new Segment();
 				finishLine.x0 = seg.x1;
@@ -223,6 +235,7 @@ public class PhysicalSim2DSection {
 				finishLine.x1 = finishLine.x0 + li.dy;
 				finishLine.y1 = finishLine.y0 - li.dx;
 				li.finishLine = finishLine;
+				li.width = 20; //TODO section width [gl Jan'13]
 			}
 		}
 
@@ -276,10 +289,13 @@ public class PhysicalSim2DSection {
 		public float  x1;
 		public float  y0;
 		public float  y1;
+		public float dx;//normalized!!
+		public float dy;//normalized!!
 	}
 
 	public static final class LinkInfo {
 
+		public float width;
 		public float dx;
 		public float dy;
 		public Segment link;
@@ -326,7 +342,7 @@ public class PhysicalSim2DSection {
 				x[i] = (float) (c.x - this.offsetX);
 				y[i] = (float) (c.y - this.offsetY);
 			}
-			visDebugger.addPolygon(x, y,32, 255, 64, 128);
+			visDebugger.addPolygon(x, y,32, 255, 64, 32);
 //			visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId());
 		}
 		for (Sim2DAgent agent : this.agents) {

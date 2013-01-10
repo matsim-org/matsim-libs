@@ -33,12 +33,12 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class Ped {
 
-	String color;
-	Id id;
-	double depart;
-	double arrived;
-	Map<Double, Coordinate> coords = new LinkedHashMap<Double, Coordinate>();
-	Map<Double, Coordinate> velocities = new LinkedHashMap<Double, Coordinate>();
+	public String color;
+	public Id id;
+	public double depart;
+	public double arrived;
+	public Map<Double, Coordinate> coords = new LinkedHashMap<Double, Coordinate>();
+	public Map<Double, Coordinate> velocities = new LinkedHashMap<Double, Coordinate>();
 
 	Coordinate lastPos;
 	Path path;

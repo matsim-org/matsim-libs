@@ -404,9 +404,9 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 	}
 
 	public static void main (String [] args) throws NoSuchAuthorityCodeException, FactoryException {
-		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/sim2d.osm";
-		String inputDir = "/Users/laemmel/devel/burgdorf2d/input";
-		String outputDir = "/Users/laemmel/devel/burgdorf2d/output";
+		String osmFile = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/env.osm";
+		String inputDir = "/Users/laemmel/devel/gr90_sim2d_v4/input";
+		String outputDir = "/Users/laemmel/devel/gr90_sim2d_v4/output";
 		
 		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);

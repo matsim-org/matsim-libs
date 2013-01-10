@@ -83,7 +83,7 @@ public class CustomizedOSM2Sim2DTest extends MatsimTestCase{
 
 			assertEquals(sec2.getId(), sec.getId());
 			assertEquals(sec2.getLevel(), sec.getLevel());
-			if (sec2.getNeighbors() != null) {
+			if (sec2.getNeighbors() != null && sec.getNeighbors() != null)  {
 				assertEquals(sec2.getNeighbors().length,sec.getNeighbors().length);
 
 				for (int i = 0; i < sec2.getNeighbors().length; i++) {

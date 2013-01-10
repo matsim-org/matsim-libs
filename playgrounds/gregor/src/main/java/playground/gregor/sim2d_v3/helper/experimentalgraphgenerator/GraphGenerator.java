@@ -225,7 +225,7 @@ public class GraphGenerator {
 
 	public static void main(String [] args) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
 		//		String floorplan = "/Users/laemmel/tmp/voronoi/test.shp";
-				String floorplan = "/Users/laemmel/devel/burgdorf2d/raw_input/raw_env.shp";
+				String floorplan = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/floorplan.shp";
 //		String floorplan = "/Users/laemmel/devel/convexdecomp/03.shp";
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
@@ -237,10 +237,10 @@ public class GraphGenerator {
 		}
 
 		new GraphGenerator(sc,geos,reader.getBounds()).run();
-		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/burgdorf2d/tmp/network2d_0.xml");
+		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml");
 		//		String [] argsII = {"/Users/laemmel/devel/sim2dDemoII/input/network.xml","/Users/laemmel/devel/sim2dDemoII/raw_input/networkL.shp","/Users/laemmel/devel/sim2dDemoII/raw_input/networkP.shp","EPSG:3395"};
 		//		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/tmp/vis/network.xml");
-		String [] argsII = {"/Users/laemmel/devel/burgdorf2d/tmp/network2d_0.xml","/Users/laemmel/tmp/vis/networkL.shp","/Users/laemmel/tmp/vis/networkP.shp","EPSG:3395"};
+		String [] argsII = {"/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml","/Users/laemmel/tmp/vis/networkL.shp","/Users/laemmel/tmp/vis/networkP.shp","EPSG:3395"};
 		Links2ESRIShape.main(argsII);
 	}
 

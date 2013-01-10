@@ -67,9 +67,9 @@ public class Test {
 
 	public static void main(String [] args) throws NoSuchAuthorityCodeException, FactoryException {
 		//		String ref = "6 6 6 6 4 6 4 5 5 5 5 4 5 7 4 5 4 7 5 6 5";
-		String p = "/Users/laemmel/devel/burgdorf2d/raw_input/raw_env_p_.sliced.shp";
-		String network = "/Users/laemmel/devel/burgdorf2d/tmp/network2d_0.xml";
-		String output = "/Users/laemmel/devel/burgdorf2d/tmp/sim2dEnv_0.gml.gz";
+		String p = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_env.shp";
+		String network = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml";
+		String output = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/sim2dEnv_0.gml.gz";
 		//		String p = "/Users/laemmel/tmp/dump.shp";
 //				DecompGuiDebugger dbg = new DecompGuiDebugger();
 //				dbg.setVisible(true);
@@ -156,7 +156,7 @@ public class Test {
 		for (PolygonInfo dec : decomposed) {
 			GisDebugger.addGeometry(dec.p);
 			nr += dec.p.getNumPoints();
-			int[] os = null;
+			int[] os = {};
 			if (dec.openings.size() > 0) {
 				os = new int[dec.openings.size()];
 				for (int i = 0 ; i < dec.openings.size(); i++) {
@@ -207,7 +207,7 @@ public class Test {
 		conf.setTimeStepSize(0.1);
 		conf.addSim2DEnvironmentPath(output);
 		conf.addSim2DEnvNetworkMapping(output, network);
-		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/burgdorf2d/tmp/sim2dConfig.xml");
+		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/gr90_sim2d_v4/raw_input/sim2dConfig.xml");
 		
 		
 		

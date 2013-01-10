@@ -87,7 +87,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 
 	@Override
 	void addFromIntersection(QVehicle veh) {
-		log.info("add from intersection was called");
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.addFromIntersection(veh);
 		} else {
@@ -127,7 +126,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 
 	@Override
 	boolean doSimStep(double now) {
-		log.info("do sim step was called");
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.doSimStep(now);
 		} else {
@@ -217,7 +215,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 
 	@Override
 	boolean isNotOfferingVehicle() {
-		log.info("isNotOfferingVehicle was called");
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.isNotOfferingVehicle();
 		} else {
@@ -258,7 +255,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 
 	@Override
 	boolean hasSpace() {
-		log.info("hasSpace was called");
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.hasSpace();
 		} else {
