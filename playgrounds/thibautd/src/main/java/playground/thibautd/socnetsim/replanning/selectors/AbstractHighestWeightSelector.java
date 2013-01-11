@@ -153,6 +153,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	 */
 	private void pruneUnplausiblePlans(
 			final PersonRecord personRecord) {
+		if (exploreAll) return;
 		final Iterator<PlanRecord> plans = personRecord.plans.iterator();
 		final int maxIndivPlans = forbidBlockingCombinations ? 2 : 1;
 		int nIndivPlans = 0;
