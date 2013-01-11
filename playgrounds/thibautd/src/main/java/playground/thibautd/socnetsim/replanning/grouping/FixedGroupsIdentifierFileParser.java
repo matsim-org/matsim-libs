@@ -19,43 +19,30 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.grouping;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+
+import playground.thibautd.utils.AbstractParsePullXmlReader;
 
 /**
  * @author thibautd
  */
-public class FixedGroupsIdentifierFileParser {
+public class FixedGroupsIdentifierFileParser extends AbstractParsePullXmlReader<FixedGroupsIdentifier> {
 	public static FixedGroupsIdentifier readCliquesFile(final String fileName) {
-		final XMLStreamReader streamReader = getStreamReader( fileName );
-		try {
-			return parseGroups( streamReader );
-		}
-		catch (XMLStreamException e) {
-			throw new ParsingException( e );
-		}
-		finally {
-			try {
-				streamReader.close();
-			} catch (XMLStreamException e) {
-				throw new ParsingException( e );
-			}
-		}
+		return new FixedGroupsIdentifierFileParser().readFile( fileName );
 	}
 
-	private static FixedGroupsIdentifier parseGroups(
+	@Override
+	protected  FixedGroupsIdentifier parse(
 			final XMLStreamReader streamReader) throws XMLStreamException {
 		final Counter counter = new Counter( "parsing group # " );
 		final List<Collection<Id>> groups = new ArrayList<Collection<Id>>();
@@ -81,7 +68,7 @@ public class FixedGroupsIdentifierFileParser {
 		return new FixedGroupsIdentifier( groups );
 	}
 
-	private static Id parseId(final XMLStreamReader streamReader) throws XMLStreamException {
+	private static Id parseId(final XMLStreamReader streamReader) {
 		if ( streamReader.getAttributeCount() != 1 ) {
 			throw new ParsingException( "unexpected attribute count "+streamReader.getAttributeCount() );
 		}
@@ -91,29 +78,6 @@ public class FixedGroupsIdentifierFileParser {
 		}
 
 		return new IdImpl( streamReader.getAttributeValue( 0 ).intern() );
-	}
-
-	private static XMLStreamReader getStreamReader(final String fileName) {
-		final XMLInputFactory xmlif = XMLInputFactory.newInstance();
-		try {
-			final InputStream stream = IOUtils.getInputStream( fileName );
-			return xmlif.createXMLStreamReader( stream );
-		}
-		catch (Exception e) {
-			throw new ParsingException( e );
-		}
-	}
-
-	public static class ParsingException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-
-		private ParsingException(final String m) {
-			super( m );
-		}
-
-		private ParsingException(final Exception e) {
-			super( e );
-		}
 	}
 }
 
