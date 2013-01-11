@@ -163,7 +163,8 @@ public class Controler extends AbstractController {
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	Integer thisIteration = null;
+	@Deprecated
+	private Integer thisIteration = null;
 
 	protected final Config config;
 	protected ScenarioImpl scenarioData = null;
@@ -1096,11 +1097,13 @@ public class Controler extends AbstractController {
 	}
 
 	/**
-	 * @return the iteration number of the current iteration when the Controler
-	 *         is iterating, null if the Controler is in the startup/shutdown
-	 *         process
+	 * @return The result of this function is not reliable. It is the iteration number, but it is only set  
+	 * before running the Mobsim, not at the proper start of the iteration.
+	 * If you need the iteration number, just be an EventHandler or an IterationStartsListener and you will be told.
 	 */
+	@Deprecated
 	public Integer getIterationNumber() {
+		log.warn("Controler.getIterationNumber() is deprecated and wrong. If you need the iteration number, just be an EventHandler or an IterationStartsListener and you will be told.");
 		return this.thisIteration;
 	}
 	
