@@ -38,6 +38,8 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 
 import playground.thibautd.cliquessim.run.ImportedJointRoutesChecker;
+import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
+import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
 
 /**
  * A simple controler for the process with joint plans.
@@ -85,7 +87,10 @@ public final class ImmutableJointController extends AbstractController {
 
 	@Override
 	protected void loadCoreListeners() {
-		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(registry.getScenario(), controlerIO);
+		final DumpJointDataAtEnd dumpDataAtEnd =
+			new DumpJointDataAtEnd(
+					registry.getScenario(),
+					controlerIO);
 		this.addControlerListener(dumpDataAtEnd);
 		
 		this.addControlerListener( new PlansScoring(
@@ -103,6 +108,13 @@ public final class ImmutableJointController extends AbstractController {
 					registry.getScenario().getConfig().controler().getFirstIteration(), 
 					registry.getScenario().getConfig().controler().getWritePlansInterval(),
 					stopwatch,
+					controlerIO ));
+
+		this.addCoreControlerListener(
+				 new JointPlansDumping(
+					registry.getScenario(),
+					registry.getScenario().getConfig().controler().getFirstIteration(), 
+					registry.getScenario().getConfig().controler().getWritePlansInterval(),
 					controlerIO ));
 
 		this.addCoreControlerListener(
