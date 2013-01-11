@@ -93,7 +93,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	// /////////////////////////////////////////////////////////////////////////
 	// "translation" to and from the internal data structures
 	// /////////////////////////////////////////////////////////////////////////
-	private GroupPlans toGroupPlans(final PlanString allocation) {
+	private static GroupPlans toGroupPlans(final PlanString allocation) {
 		Set<JointPlan> jointPlans = new HashSet<JointPlan>();
 		List<Plan> individualPlans = new ArrayList<Plan>();
 		for (PlanString curr = allocation;
@@ -474,7 +474,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return constructedString;
 	}
 
-	private double max(
+	private static double max(
 			final double d1,
 			final double d2,
 			final double d3) {
