@@ -48,11 +48,19 @@ public class HerbieTransitTravelTimeAndDisutility implements TravelTime, Transit
 	private final HerbieConfigGroup herbieConfig;
 	private final TransitRouterConfig config;
 
-	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+	@Override
+	public double getTravelDisutility(
+			final Person person,
+			final Coord coord,
+			final Coord toCoord) {
 		return timeCost.getTravelDisutility(person, coord, toCoord);
 	}
 
-	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+	@Override
+	public double getTravelTime(
+			final Person person,
+			final Coord coord,
+			final Coord toCoord) {
 		return timeCost.getTravelTime(person, coord, toCoord);
 	}
 
