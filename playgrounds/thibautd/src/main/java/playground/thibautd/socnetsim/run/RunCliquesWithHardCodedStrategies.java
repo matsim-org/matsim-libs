@@ -87,12 +87,6 @@ public class RunCliquesWithHardCodedStrategies {
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 		JointControlerUtils.tuneScenario( scenario );
 		ScenarioUtils.loadScenario( scenario );
-		try {
-			new CliquesXmlReader(scenario).parse();
-		}
-		catch (Exception e) {
-			throw new RuntimeException( e );
-		}
 		return scenario;
 	}
 
@@ -161,14 +155,6 @@ public class RunCliquesWithHardCodedStrategies {
 					controllerRegistry.getEvents(),
 					controller.getControlerIO() ));
 
-		controller.addControlerListener(
-				new CliqueScoreStats(
-					controllerRegistry.getScenario(),
-					controller.getControlerIO(),
-					controllerRegistry.getScenario().getConfig().controler().getFirstIteration(),
-					controllerRegistry.getScenario().getConfig().controler().getLastIteration(),
-					"scoresStats",
-					true));
 		controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
 
 		// run it
