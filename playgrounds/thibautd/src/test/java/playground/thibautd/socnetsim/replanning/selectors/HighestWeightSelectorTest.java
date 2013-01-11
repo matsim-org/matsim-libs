@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -888,6 +889,35 @@ public class HighestWeightSelectorTest {
 	@Test
 	public void testSelectedPlansBlocking() throws Exception {
 		testSelectedPlans( true , false );
+	}
+
+	/**
+	 * Check that plans are not removed from the plans DB in the selection process,
+	 * particularly when pruning unplausible plans.
+	 */
+	@Test
+	public void testNoSideEffects() throws Exception {
+		HighestScoreSumSelector selector = new HighestScoreSumSelector( false , false );
+		final Map<Id, Integer> planCounts = new HashMap<Id, Integer>();
+
+		final int initialGroupSize = fixture.group.getPersons().size();
+		for (Person p : fixture.group.getPersons()) {
+			planCounts.put( p.getId() , p.getPlans().size() );
+		}
+
+		selector.selectPlans( fixture.group );
+
+		Assert.assertEquals(
+				"unexpected change in group size for fixture "+fixture.name,
+				initialGroupSize,
+				fixture.group.getPersons().size() );
+
+		for (Person p : fixture.group.getPersons()) {
+			Assert.assertEquals(
+					"unexpected change in the number of plans for agent "+p.getId()+" in fixture "+fixture.name,
+					planCounts.get( p.getId() ).intValue(),
+					p.getPlans().size() );
+		}
 	}
 
 	private void testSelectedPlans( final boolean blocking , final boolean exploreAll ) {
