@@ -228,7 +228,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return false;
 	}
 
-	private boolean isBlocking(
+	private static boolean isBlocking(
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans groupPlan) {
 		return !searchForCombinationsWithoutForbiddenPlans(
@@ -238,7 +238,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				Collections.EMPTY_SET);
 	}
 
-	private boolean searchForCombinationsWithoutForbiddenPlans(
+	private static boolean searchForCombinationsWithoutForbiddenPlans(
 			final GroupPlans forbidenPlans,
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate,
@@ -394,6 +394,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		for (PlanRecord r : records) {
 			if (constructedString != null &&
 					r.cachedMaximumWeight <= constructedString.getWeight()) {
+				assert !exploreAll;
 				if (log.isTraceEnabled()) {
 					log.trace( "maximum weight from now on: "+r.cachedMaximumWeight );
 					log.trace( "weight obtained: "+constructedString.getWeight() );
@@ -403,6 +404,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 
 			if (r.cachedMaximumWeight < minimalWeightToObtain) {
+				assert !exploreAll;
 				if (log.isTraceEnabled()) {
 					log.trace( "maximum weight from now on: "+r.cachedMaximumWeight );
 					log.trace( "minimum weight to obtain: "+minimalWeightToObtain );

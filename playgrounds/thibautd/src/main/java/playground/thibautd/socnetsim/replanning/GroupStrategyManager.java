@@ -107,7 +107,14 @@ public class GroupStrategyManager {
 	}
 
 	private final void removeExtraPlans(final ReplanningGroup group) {
-		while ( removeOneExtraPlan( group ) ) {} // all is done in the "condition"
+		int c = 0;
+		while ( removeOneExtraPlan( group ) ) c++;
+		if (c > 0) {
+			// in the clique setting, it is impossible.
+			// replace by a warning (or nothing) when there is a setting
+			// in which this makes sense.
+			throw new RuntimeException( (c+1)+" removal iterations were performed for group "+group );
+		}
 	}
 
 	private final boolean removeOneExtraPlan(final ReplanningGroup group) {
@@ -125,6 +132,11 @@ public class GroupStrategyManager {
 			if (toRemove == null) {
 				toRemove = selectorForRemoval.selectPlans( group );
 				if (log.isTraceEnabled()) log.trace( "plans to remove will be taken from "+toRemove );
+				if ( toRemove == null ) {
+					throw new RuntimeException(
+							"The selector for removal returned no plan "
+							+"for group "+group );
+				}
 			}
 
 			for (Plan plan : toRemove( person , toRemove )) {
@@ -152,7 +164,7 @@ public class GroupStrategyManager {
 		return stillSomethingToRemove;
 	}
 
-	private final Collection<Plan> toRemove(
+	private static final Collection<Plan> toRemove(
 			final Person person,
 			final GroupPlans toRemove) {
 		for (Plan plan : person.getPlans()) {
