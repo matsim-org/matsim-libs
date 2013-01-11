@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Counter;
 
 import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.*;
 
@@ -39,7 +40,11 @@ import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.
 public class JointPlansXmlWriter extends MatsimXmlWriter {
 	private final Set<JointPlan> jointPlans = new HashSet<JointPlan>();
 
-	public JointPlansXmlWriter(final Population population) {
+	public static void write( final Population population , final String file ) {
+		new JointPlansXmlWriter( population ).write( file );
+	}
+
+	private JointPlansXmlWriter(final Population population) {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				final JointPlan jp = JointPlanFactory.getPlanLinks().getJointPlan( plan );
@@ -48,12 +53,15 @@ public class JointPlansXmlWriter extends MatsimXmlWriter {
 		}
 	}
 
-	public void write(final String file) {
+	private void write(final String file) {
+		final Counter counter = new Counter( "[JointPlansXmlWriter] dumped jointPlan # " );
 		openFile( file );
 		writeStartTag( ROOT_TAG , Collections.EMPTY_LIST );
 		for (JointPlan jp : jointPlans) {
+			counter.incCounter();
 			writeJointPlan( jp );
 		}
+		counter.printCounter();
 		writeEndTag( JOINT_PLAN_TAG );
 		close();
 	}
