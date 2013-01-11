@@ -32,7 +32,8 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.PersonImpl;
 
-public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
+@Deprecated
+public class KnowledgeImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -114,7 +115,6 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		return activities.add(ka);
 	}
 
-	@Override
 	public void addActivityOption(ActivityOptionImpl activity) {
 		this.addActivityOption(activity, false);
 	}
@@ -251,7 +251,6 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 	 * Returns all {@link ActivityOptionImpl Activities}.
 	 * @return The list of {@link ActivityOptionImpl Activities}. The list may be empty.
 	 */
-	@Override
 	public final ArrayList<ActivityOptionImpl> getActivities() {
 		if (activities == null) { return new ArrayList<ActivityOptionImpl>(0); }
 		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(activities.size());
@@ -358,9 +357,6 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		return false;
 	}
 
-
-
-	@Override
 	public final String getDescription() {
 		return this.desc;
 	}
@@ -414,7 +410,6 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		return true;
 	}
 
-	@Override
 	public void setDescription(String desc) {
 		this.desc = desc;
 	}

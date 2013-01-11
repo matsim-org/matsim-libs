@@ -29,7 +29,9 @@ import org.matsim.core.api.internal.MatsimFactory;
  * See api for better examples.
  * @author dgrether
  *
- */public interface KnowledgesFactory extends MatsimFactory {
+ */
+@Deprecated
+public interface KnowledgesFactory extends MatsimFactory {
 
 	public KnowledgeImpl createKnowledge(final Id personId, final String desc);
 }

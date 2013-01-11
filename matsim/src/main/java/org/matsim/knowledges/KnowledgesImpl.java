@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
+@Deprecated
 public class KnowledgesImpl implements Knowledges {
 
 	private Map<Id, KnowledgeImpl> knowledgeByPersonId = new HashMap<Id, KnowledgeImpl>();

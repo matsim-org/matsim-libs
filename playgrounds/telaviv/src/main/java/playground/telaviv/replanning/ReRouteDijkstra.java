@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ReRoute.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.knowledges;
+package playground.telaviv.replanning;
 
-import java.util.List;
-
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
- * @author dgrether
+ * Uses {@link org.matsim.core.router.Dijkstra} for calculating the routes of plans during Replanning.
+ *
+ * @author mrieser
  */
-public interface Knowledge<A extends ActivityOption> {
+public class ReRouteDijkstra extends AbstractMultithreadedModule {
 
-	public void setDescription(String desc);
+	private Scenario scenario;
 
-	public String getDescription();
+	public ReRouteDijkstra(Scenario scenario) {
+		super(scenario.getConfig().global());
+		this.scenario = scenario;
+	}
 
-	public List<A> getActivities();
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return new PlansCalcRoute(
+				scenario.getConfig().plansCalcRoute(), 
+				scenario.getNetwork(), 
+				getReplanningContext().getTravelCostCalculator(), 
+				getReplanningContext().getTravelTimeCalculator(), 
+				new DijkstraFactory(), 
+				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
+	}
 
-	public void addActivityOption(A activity);
 }

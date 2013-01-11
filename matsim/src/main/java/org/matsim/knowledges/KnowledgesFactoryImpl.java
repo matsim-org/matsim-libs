@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
+@Deprecated
 public class KnowledgesFactoryImpl implements KnowledgesFactory {
 
 	private KnowledgesImpl knowledge;

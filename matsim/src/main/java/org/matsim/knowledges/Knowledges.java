@@ -30,6 +30,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  * @author dgrether
  *
  */
+@Deprecated
 public interface Knowledges extends MatsimToplevelContainer {
 
 	public Map<Id, KnowledgeImpl> getKnowledgesByPersonId();
