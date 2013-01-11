@@ -46,7 +46,6 @@ import playground.thibautd.socnetsim.run.RunCliquesWithHardCodedStrategies.Weigh
  * the results are non-deterministic.
  * @author thibautd
  */
-@Ignore
 public class IntegrationTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -100,6 +99,7 @@ public class IntegrationTest {
 	}
 
 	@Test
+	@Ignore( "this is too expensive. It fails." )
 	public void testDeterminismJointTrips() throws Exception {
 		SimulationParameters params = new SimulationParameters();
 		params.weights.setAllToZero();
