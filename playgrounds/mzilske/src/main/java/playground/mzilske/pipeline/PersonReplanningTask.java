@@ -11,7 +11,6 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.ChangeLegMode;
-import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -106,7 +105,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 		} else if (name.equals("ChangeLegMode")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ChangeLegMode(config));
-			strategy.addStrategyModule(new ReRouteDijkstra(scenario));
+			strategy.addStrategyModule(new ReRoute(network, routeFactory));
 		}
 		return strategy;
 	}

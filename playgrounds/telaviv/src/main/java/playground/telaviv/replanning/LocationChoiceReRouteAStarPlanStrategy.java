@@ -27,7 +27,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.telaviv.locationchoice.LocationChoicePlanModule;
