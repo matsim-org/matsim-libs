@@ -1,4 +1,4 @@
-package org.matsim.contrib.matsim4opus.gis;
+package org.matsim.contrib.matsim4opus.deprecated;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

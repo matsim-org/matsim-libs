@@ -36,9 +36,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.gis.EuclideanDistance;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
+import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -144,7 +144,7 @@ public class RandomLocationDistributor {
 			y = (zoneCoordinate.getY() - radius) + (random.nextDouble() * 2 * radius);
 			p = new CoordImpl(x, y);
 			
-			distance = EuclideanDistance.getEuclidianDistance(zoneCoordinate, p);
+			distance = NetworkUtil.getEuclidianDistance(zoneCoordinate, p);
 			
 		} while ( distance > radius );
 		return p;
@@ -167,7 +167,48 @@ public class RandomLocationDistributor {
 		} while (!((Geometry) feature.getDefaultGeometry()).contains(p));
 		return new CoordImpl(x,y);
 	}
+	
+	/**
+	 * determines if a given coordinate lies within a selected zone.
+	 * the shape of the zone is defined by the respective zone geometry in the shape file
+	 * 
+	 * @param zoneID is an identifyer to select a zone in the shape file
+	 * @param coordinate to be tested if it lies within the selected zone
+	 * @return true if coordinate lies within the selected zone
+	 */
+	public boolean coordinateInZone(Id zoneID, Coord coordinate){
+		Point point = MGC.xy2Point(coordinate.getX(), coordinate.getY());
+		return pointInZone(zoneID, point);
+	}
+	
+	/**
+	 * determines if a given point lies within a selected zone.
+	 * the shape of the zone is defined by the respective zone geometry in the shape file
+	 * 
+	 * @param zoneID is an identifyer to select a zone in the shape file
+	 * @param point to be tested if it lies within the selected zone
+	 * @return true if point lies within the selected zone
+	 */
+	public boolean pointInZone(Id zoneID, Point point){
+		SimpleFeature feature = this.featureMap.get(zoneID);
+		boolean withinZoneGeometry = ((Geometry) feature.getDefaultGeometry()).contains(point);
+		return withinZoneGeometry;
+	}
 
+	/**
+	 * determines if given coordinates are lying within the radius
+	 * 
+	 * @param coordinateA a coordinate
+	 * @param coordinateB a coordinate
+	 * @return true if coordinate lies within the radius
+	 */
+	public boolean coordinatesInRadius(Coord coordinateA, Coord coordinateB){
+		double distance = NetworkUtil.getEuclidianDistance(coordinateA, coordinateB);
+		boolean withinRadius = (distance <= radius);
+		return withinRadius;
+	}
+	
+	
 	/**
 	 * for testing
 	 * @param args

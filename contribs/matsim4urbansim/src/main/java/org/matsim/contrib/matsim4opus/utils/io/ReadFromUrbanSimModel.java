@@ -295,7 +295,7 @@ public class ReadFromUrbanSimModel {
 		RandomLocationDistributor rld = new RandomLocationDistributor(this.shapefile, this.radius);
 		
 		boolean compensationFlag = false;
-		ZoneLocations zoneLocation = null;
+		ZoneLocations currentZoneLocations = null;
 
 		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
@@ -328,14 +328,14 @@ public class ReadFromUrbanSimModel {
 				
 				// see reason of this flag below
 				compensationFlag = false;
-				zoneLocation	 = new ZoneLocations();
+				currentZoneLocations	 = new ZoneLocations();
 				
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				// get home location id
 				Id homeZoneId = new IdImpl( parts[ indexZoneID_HOME ] );
 				ActivityFacility homeLocation = zones.getFacilities().get( homeZoneId ); // the home location is the zone centroid
-				zoneLocation.setHomeLocation(homeZoneId, homeLocation);
+				currentZoneLocations.setHomeZoneIDAndZoneCoordinate(homeZoneId, homeLocation);
 				if ( homeLocation==null ){
 					log.warn( "homeLocation==null; personId: " + personId + " zoneId: " + homeZoneId + ' ' + this );
 					continue;
@@ -359,7 +359,7 @@ public class ReadFromUrbanSimModel {
 					newPerson.setEmployed(Boolean.TRUE);
 					Id workZoneId = new IdImpl( parts[ indexZoneID_WORK ] );
 					ActivityFacility jobLocation = zones.getFacilities().get( workZoneId );
-					zoneLocation.setWorkLocation(workZoneId, jobLocation);
+					currentZoneLocations.setWorkZoneIDAndZoneCoordinate(workZoneId, jobLocation);
 					if ( jobLocation == null ) {
 						// show warning message only once
 						if ( cnt.jobLocationIdNullCnt < 1 ) {
@@ -384,7 +384,7 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
-				mergePopulation(oldPop, mergePop, newPerson, backupPop, network, cnt, false, zoneLocation);
+				mergePopulation(oldPop, mergePop, newPerson, backupPop, network, cnt, false, currentZoneLocations, rld);
 			}
 			log.info("Done with merging population ...");
 
@@ -497,7 +497,7 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
-				mergePopulation(oldPop, mergePop, newPerson, backupPop, network, cnt, true, null);
+				mergePopulation(oldPop, mergePop, newPerson, backupPop, network, cnt, true, null, null);
 			}
 			log.info("Done with merging population ...");
 
@@ -615,12 +615,14 @@ public class ReadFromUrbanSimModel {
 	 * @param backupPop
 	 * @param network
 	 * @param cnt
-	 * @param zoneLocation
+	 * @param currentZoneLocations
+	 * @param rld TODO
 	 */
 	private void mergePopulation(final Population oldPop,
 			final Population newPop, PersonImpl newPerson,
 			Population backupPop, final Network network, 
-			PopulationCounter cnt, boolean isParcel, ZoneLocations zoneLocation) {
+			PopulationCounter cnt, boolean isParcel, 
+			ZoneLocations currentZoneLocations, RandomLocationDistributor rld) {
 		
 		while ( true ) { // loop from which we can "break":
 
@@ -645,38 +647,92 @@ public class ReadFromUrbanSimModel {
 			Activity newHomeAct = ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity();
 			
 			// for parcels check if activity location has changed. if true accept as new person
-			if ( isParcel && actHasChanged ( oldHomeAct, newHomeAct, network ) ) {
+			if ( isParcel && actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // for parcels
 				newPop.addPerson(newPerson);
 				cnt.homelocationChangedCnt++;
 				break;
 			}
-			// for zones TODO
-//			else if( !isParcel ){
-//				if(zoneLocation == null){
-//					newPop.addPerson(newPerson);
-//					cnt.homelocationChangedCnt++;
-//					break;
-//				}
-//				else if(this.shapefile != null){
-//					
-//										
-//				}
-//			}
+			// for zones
+			else if( !isParcel ){ // for zones
+				
+				Coord oldHomeCoord = oldHomeAct.getCoord();
+				
+				if(currentZoneLocations == null || rld == null){
+					log.warn("No warm or hot start possible. All UrbanSim persons are handeld as new agents and thus obtain new plans!");
+					newPop.addPerson(newPerson);
+					cnt.homelocationChangedCnt++;
+					break;
+				}
+				else if(this.shapefile != null){ // check home location via shape file
+					Id newHomeZoneID = currentZoneLocations.getHomeZoneID();
+					if(!rld.coordinateInZone(newHomeZoneID, oldHomeCoord)){
+						// home location changed
+						newPop.addPerson(newPerson);
+						cnt.homelocationChangedCnt++;
+						break;
+					}
+				}
+				else{							// check home location via radius
+					Coord newZoneCoord = currentZoneLocations.getHomeZoneCoord();
+					// testing if the previous home location lies within the 
+					// specified radius located at the current zone centroid/coordinate
+					if(!rld.coordinatesInRadius(oldHomeCoord, newZoneCoord)){
+						// home location changed
+						newPop.addPerson(newPerson);
+						cnt.homelocationChangedCnt++;
+						break;
+					}
+				}
+			}
 
 			// check if new person works
-			if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter. TODO fix this when other activities are considered
+			if ( !newPerson.isEmployed() ) { // person does not move; doesn't matter. fix this when other activities are considered
 				newPop.addPerson(newPerson);
 				cnt.unemployedCnt++;
 				break ;
 			}
 
 			// check if work act has changed:
-			ActivityImpl oldWorkAct = (ActivityImpl) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
-			ActivityImpl newWorkAct = (ActivityImpl) newPerson.getSelectedPlan().getPlanElements().get(2) ;
-			if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
+			ActivityImpl oldWorkAct = (ActivityImpl) oldPerson.getSelectedPlan().getPlanElements().get(2);
+			ActivityImpl newWorkAct = (ActivityImpl) newPerson.getSelectedPlan().getPlanElements().get(2);
+			
+			// for parcels check if activity location has changed. if true accept as new person
+			if ( isParcel && actHasChanged ( oldWorkAct, newWorkAct, network ) ) { // for parcels
 				newPop.addPerson(newPerson);
 				cnt.worklocationChangedCnt++;
 				break ;
+			}
+			// for zones
+			else if( !isParcel ){ // for zones
+				
+				Coord oldWorkCoord = oldWorkAct.getCoord();
+				
+				if(currentZoneLocations == null || rld == null){
+					log.warn("No warm or hot start possible. All UrbanSim persons are handeld as new agents and thus obtain new plans!");
+					newPop.addPerson(newPerson);
+					cnt.worklocationChangedCnt++;
+					break;
+				}
+				else if(this.shapefile != null){ // check work location via shape file
+					Id newWorkZoneID = currentZoneLocations.getWorkZoneID();
+					if(!rld.coordinateInZone(newWorkZoneID, oldWorkCoord)){
+						// work location changed
+						newPop.addPerson(newPerson);
+						cnt.worklocationChangedCnt++;
+						break;
+					}
+				}
+				else{							// check work location via radius
+					Coord newZoneCoord = currentZoneLocations.getWorkZoneCoord();
+					// testing if the previous work location lies within the 
+					// specified radius located at the current zone centroid/coordinate
+					if(!rld.coordinatesInRadius(oldWorkCoord, newZoneCoord)){
+						// work location changed
+						newPop.addPerson(newPerson);
+						cnt.worklocationChangedCnt++;
+						break;
+					}
+				}
 			}
 
 			// no "break" up to here, so new person does the same as the old person. Keep old person (including its
@@ -1044,25 +1100,25 @@ public class ReadFromUrbanSimModel {
 		private Coord homeCoord = null;
 		private Coord workCoord = null;
 		
-		public void setHomeLocation(Id zoneId, ActivityFacility home){
+		public void setHomeZoneIDAndZoneCoordinate(Id zoneId, ActivityFacility home){
 			this.zoneIdHome = zoneId;
 			this.homeCoord  = home.getCoord();
 		}
-		public void setWorkLocation(Id zoneId, ActivityFacility work){
+		public void setWorkZoneIDAndZoneCoordinate(Id zoneId, ActivityFacility work){
 			this.zoneIdWork = zoneId;
 			this.workCoord  = work.getCoord();
 		}
 		
-		public Id getHomeId(){
+		public Id getHomeZoneID(){
 			return this.zoneIdHome;
 		}
-		public Id getWorkId(){
+		public Id getWorkZoneID(){
 			return this.zoneIdWork;
 		}
-		public Coord getHomeCoord(){
+		public Coord getHomeZoneCoord(){
 			return this.homeCoord;
 		}
-		public Coord getWorkCoord(){
+		public Coord getWorkZoneCoord(){
 			return this.workCoord;
 		}
 	}
