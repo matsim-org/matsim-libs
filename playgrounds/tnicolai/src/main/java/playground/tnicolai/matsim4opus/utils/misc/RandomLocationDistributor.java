@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.matsim4opus.gis.EuclideanDistance;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -49,6 +48,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
+import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -130,7 +130,7 @@ public class RandomLocationDistributor {
 			y = (zoneCoordinate.getY() - radius) + (random.nextDouble() * 2 * radius);
 			p = new CoordImpl(x, y);
 			
-			distance = EuclideanDistance.getEuclidianDistance(zoneCoordinate, p);
+			distance = NetworkUtil.getEuclidianDistance(zoneCoordinate, p);
 			
 		} while ( distance > radius );
 		return p;
