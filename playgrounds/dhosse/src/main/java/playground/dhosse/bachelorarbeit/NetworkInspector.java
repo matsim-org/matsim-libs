@@ -84,7 +84,7 @@ public class NetworkInspector {
 	}
 
 	private void createLaneStatisticsFiles(double[] values) throws IOException {
-		File file = new File("./laneStatistics.txt");
+		File file = new File("./test/laneStatistics.txt");
 		FileWriter writer = new FileWriter(file);
 		writer.write("Degree");
 		for(int i=0;i<values.length;i++){
@@ -98,11 +98,11 @@ public class NetworkInspector {
 		
 		BarChart chart = new BarChart("Number of lanes", "number of lanes", "number of objects");
 		chart.addSeries("nlanes", values);
-		chart.saveAsPng("./laneStatistics.png", 800, 600);
+		chart.saveAsPng("./test/laneStatistics.png", 800, 600);
 	}
 
 	private void createLinkLengthComparisonFile() throws IOException {
-		File file = new File("./linkLengthComparison.txt");
+		File file = new File("./test/linkLengthComparison.txt");
 		FileWriter writer = new FileWriter(file);
 		writer.write("Id\tlength\tactualLength\n");
 		for(Link link : net.getLinks().values()){
@@ -112,7 +112,7 @@ public class NetworkInspector {
 	}
 
 	private void createNodeDegreesFiles(double[] inDegrees, double[] outDegrees) throws IOException {
-		File file = new File("./nodeDegrees.txt");
+		File file = new File("./test/nodeDegrees.txt");
 		FileWriter writer = new FileWriter(file);
 		writer.write("in/out\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\nnobjects");
 		
@@ -124,7 +124,7 @@ public class NetworkInspector {
 		BarChart chart = new BarChart("Node degrees", "degree", "number of objects");
 		chart.addSeries("in-degrees", inDegrees);
 		chart.addSeries("out-degrees", outDegrees);
-		chart.saveAsPng("./nodeDegrees.png", 800, 600);
+		chart.saveAsPng("./test/nodeDegrees.png", 800, 600);
 	}
 
 }
