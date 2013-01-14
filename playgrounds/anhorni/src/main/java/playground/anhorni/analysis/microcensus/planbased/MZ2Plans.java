@@ -19,39 +19,38 @@
 
 package playground.anhorni.analysis.microcensus.planbased;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
-public class MZ2Plans {
+public class MZ2Plans {	
+	private final static Logger log = Logger.getLogger(MZ2Plans.class);
 
 	public static void createMZ2Plans(String indir, String outdir) throws Exception {
-
-		System.out.println("MATSim-DB: create Population based on micro census 2005/2010 data.");
-
-		System.out.println("  creating plans object... ");
+		log.info("MATSim-DB: create Population based on micro census 2005/2010 data.");
+		log.info("  creating plans object... ");
 		Population plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  running plans modules... ");
+		log.info("  running plans modules... ");
 		new PlansCreateFromMZ(1, 7).run(plans, indir);
-		new PlansCreateFromMZ(1, 7).run(plans, indir);
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing plans xml file... ");
+		log.info("  writing plans xml file... ");
 		new PopulationWriter(plans, NetworkImpl.createNetwork()).write(outdir + "plansMOSO.xml.gz");
-		System.out.println("  done.");
+		log.info("  done.");
 		
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("Analyzing MC: ... ");
+		log.info("-------------------------------------------------------------");
+		log.info("Analyzing MC: ... ");
 		AnalyzeMicrocensus analyzer = new AnalyzeMicrocensus();
 		analyzer.run("car", "l", outdir + "plansMOSO.xml.gz", indir + "network.xml");
 		analyzer.run("car", "s", outdir + "plansMOSO.xml.gz", indir + "network.xml");
-		System.out.println("-------------------------------------------------------------");
+		log.info("-------------------------------------------------------------");
 	}
 
 	public static void main(final String[] args) throws Exception {

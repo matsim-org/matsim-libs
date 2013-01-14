@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansCreateFromMZ.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,11 +21,13 @@ package playground.anhorni.analysis.microcensus.planbased;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -71,15 +72,14 @@ public class PlansCreateFromMZ {
 	private final int dow_min;
 	private final int dow_max;
 
-
+	private final static Logger log = Logger.getLogger(PlansCreateFromMZ.class);
+	
 	public PlansCreateFromMZ(final int dow_min, final int dow_max) {
 		super();
 		this.dow_min = dow_min;
 		this.dow_max = dow_max;
 	}
 	
-	// TODO: merge with person for day ... income etc.
-
 	private final Set<Id> createPlans2005(final Population plans, final Map<Id,String> person_strings) throws Exception {
 		Set<Id> coord_err_pids = new HashSet<Id>();
 
@@ -127,7 +127,7 @@ public class PlansCreateFromMZ {
 				// departure time (min => sec.). A few arrival times are not given, setting to departure time (trav_time=0)
 				int arrival = departure;
 				if (!entries[8].trim().equals("")) { arrival = Integer.parseInt(entries[8].trim())*60; }
-//				else { System.out.println("        pid="+pid+", tripid="+entries[2]+": no arival time for the trip given. Setting arrival := departue time."); }
+//				else { log.info("        pid="+pid+", tripid="+entries[2]+": no arival time for the trip given. Setting arrival := departue time."); }
 				entries[8] = Integer.toString(arrival);
 
 				// destination activity type ---------------------
@@ -198,9 +198,9 @@ public class PlansCreateFromMZ {
 				person_string_new = person_string_new + str;
 
 				// creating/getting the matsim person
-				PersonImpl person = (PersonImpl) plans.getPersons().get(pid);
+				MZPerson person = (MZPerson) plans.getPersons().get(pid);
 				if (person == null) {
-					person = new PersonImpl(pid);
+					person = new MZPerson(pid);
 					plans.addPerson(person);
 					person.setAge(age);
 					person.setLicence(licence);
@@ -233,7 +233,7 @@ public class PlansCreateFromMZ {
 
 					// coordinate consistency check
 					if ((from_act.getCoord().getX() != from.getX()) || (from_act.getCoord().getY() != from.getY())) {
-//						System.out.println("        pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + from_act.getCoord().calcDistance(from) + ")");
+//						log.info("        pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + from_act.getCoord().calcDistance(from) + ")");
 						coord_err_pids.add(pid);
 					}
 				}
@@ -255,9 +255,9 @@ public class PlansCreateFromMZ {
 			// replacing the person string with the new data
 			if (person_strings.put(pid,person_string_new) == null) { Gbl.errorMsg("That must not happen!"); }
 		}
-		System.out.println("        removing "+pids_dow.size()+" persons not part of the days = ["+this.dow_min+","+this.dow_max+"]...");
+		log.info("        removing "+pids_dow.size()+" persons not part of the days = ["+this.dow_min+","+this.dow_max+"]...");
 		this.removePlans(plans,person_strings,pids_dow);
-		System.out.println("        done.");
+		log.info("        done.");
 		coord_err_pids.removeAll(pids_dow);
 
 		return coord_err_pids;
@@ -310,7 +310,7 @@ public class PlansCreateFromMZ {
 				// departure time (min => sec.). A few arrival times are not given, setting to departure time (trav_time=0)
 				int arrival = departure;
 				if (!entries[8].trim().equals("")) { arrival = Integer.parseInt(entries[8].trim())*60; }
-//				else { System.out.println("        pid="+pid+", tripid="+entries[2]+": no arival time for the trip given. Setting arrival := departue time."); }
+//				else { log.info("        pid="+pid+", tripid="+entries[2]+": no arival time for the trip given. Setting arrival := departue time."); }
 				entries[8] = Integer.toString(arrival);
 
 				// destination activity type ---------------------
@@ -416,7 +416,7 @@ public class PlansCreateFromMZ {
 
 					// coordinate consistency check
 					if ((from_act.getCoord().getX() != from.getX()) || (from_act.getCoord().getY() != from.getY())) {
-//						System.out.println("        pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + from_act.getCoord().calcDistance(from) + ")");
+//						log.info("        pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + from_act.getCoord().calcDistance(from) + ")");
 						coord_err_pids.add(pid);
 					}
 				}
@@ -438,9 +438,9 @@ public class PlansCreateFromMZ {
 			// replacing the person string with the new data
 			if (person_strings.put(pid,person_string_new) == null) { Gbl.errorMsg("That must not happen!"); }
 		}
-		System.out.println("        removing "+pids_dow.size()+" persons not part of the days = ["+this.dow_min+","+this.dow_max+"]...");
+		log.info("        removing "+pids_dow.size()+" persons not part of the days = ["+this.dow_min+","+this.dow_max+"]...");
 		this.removePlans(plans,person_strings,pids_dow);
-		System.out.println("        done.");
+		log.info("        done.");
 		coord_err_pids.removeAll(pids_dow);
 
 		return coord_err_pids;
@@ -468,7 +468,7 @@ public class PlansCreateFromMZ {
 				if ((act.getCoord().getX() == home.getCoord().getX()) && (act.getCoord().getY() == home.getCoord().getY())) {
 					if (!act.getType().equals(HOME)) {
 						act.setType(HOME);
-//						System.out.println("        pid=" + p.getId() + "; act_nr=" + (i/2) + ": set type to '"+HOME+"'");
+//						log.info("        pid=" + p.getId() + "; act_nr=" + (i/2) + ": set type to '"+HOME+"'");
 					}
 				}
 			}
@@ -567,7 +567,7 @@ public class PlansCreateFromMZ {
 					ActivityImpl act2 = (ActivityImpl)plan2.getPlanElements().get(plan2.getPlanElements().size()-1);
 					act2.setEndTime(curr_act.getEndTime());
 					//act2.setDuration(act2.getEndTime()-act2.getStartTime());
-//					System.out.println("        pid=" + p.getId() + ": merging act_nr="+((i-2)/2)+" with act_nr=" + (i/2) + ".");
+//					log.info("        pid=" + p.getId() + ": merging act_nr="+((i-2)/2)+" with act_nr=" + (i/2) + ".");
 					if (!curr_act.getType().equals(prev_act.getType())) {
 						if (curr_act.getType().equals(HOME)) { act2.setType(HOME); }
 						else if (curr_act.getType().equals(WORK)) {
@@ -616,9 +616,9 @@ public class PlansCreateFromMZ {
 				act.setEndTime(24*3600);
 			}
 		}
-		System.out.println("        # round trips removed (with same act types) = " + cnt_sametypes);
-		System.out.println("        # round trips removed (with diff act types) = " + cnt_difftypes);
-		System.out.println("        # persons with removed round trips = " + cnt_p);
+		log.info("        # round trips removed (with same act types) = " + cnt_sametypes);
+		log.info("        # round trips removed (with diff act types) = " + cnt_difftypes);
+		log.info("        # persons with removed round trips = " + cnt_p);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -707,32 +707,67 @@ public class PlansCreateFromMZ {
 		}
 	}
 	
-	public void run(final Population plans, String indir) {
-		Population plans2005 = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		Population plans2010 = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+	public void run(final Population population, String indir) {
+		Population population2005 = ((ScenarioImpl) ScenarioUtils.createScenario(
+				ConfigUtils.createConfig())).getPopulation();
+		Population population2010 = ((ScenarioImpl) ScenarioUtils.createScenario(
+				ConfigUtils.createConfig())).getPopulation();
+				
 		try {
-			int finalId = this.readPersonStrings(plans2005, indir + "/MZ2005trips.dat", 0, "2005");
-			this.readPersonStrings(plans2010, indir + "/MZ2010trips.dat", finalId + 1, "2010");
+			this.readPersonStrings(population2005, indir + "/MZ2005trips.dat", "2005");
+			this.readPersonStrings(population2010, indir + "/MZ2010trips.dat", "2010");
 			
-			for (Person p : plans2005.getPersons().values()) {
-				plans.addPerson(p);
+			for (Person p : population2005.getPersons().values()) {
+				population.addPerson(p);
 			}
-			for (Person p : plans2010.getPersons().values()) {
-				plans.addPerson(p);
-			}
+			for (Person p : population2010.getPersons().values()) {
+				population.addPerson(p);
+			}				
+			this.readPersonAttributes(indir + "/2005Zielpersonen.dat", "2005", population);
+			this.readPersonAttributes(indir + "/2010Zielpersonen.dat", "2010", population);
 			
+			this.readHHAttributes(indir + "/2005Househalte.dat", "2005", population);
+			this.readHHAttributes(indir + "/2010Househalte.dat", "2010", population);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	private void readPersonAttributes(String inputFile, String year, Population population) throws IOException {
+		FileReader fr = new FileReader(inputFile);
+		BufferedReader br = new BufferedReader(fr);
+		String curr_line = br.readLine();  // Skip header
+		int id = Integer.MIN_VALUE;
+		while ((curr_line = br.readLine()) != null) {
+			String[] entries = curr_line.split("\t", -1);
+			id = Integer.parseInt(year) * 1000000 + Integer.parseInt(entries[0].trim());
+			int age = Integer.parseInt(entries[2].trim());
+			int day = Integer.parseInt(entries[3].trim());
+			MZPerson person = (MZPerson) population.getPersons().get(id);
+			person.setAge(age);
+			person.setDay(day);
+		}
+	}
 	
-	
-	private int readPersonStrings(final Population plans, String inputFile, int startId, String year) throws Exception {
-		System.out.println("    running " + this.getClass().getName() + " module...");
+	private void readHHAttributes(String inputFile, String year, Population population) throws IOException {
+		FileReader fr = new FileReader(inputFile);
+		BufferedReader br = new BufferedReader(fr);
+		String curr_line = br.readLine();  // Skip header
+		int id = Integer.MIN_VALUE;
+		while ((curr_line = br.readLine()) != null) {
+			String[] entries = curr_line.split("\t", -1);
+			id = Integer.parseInt(year) * 1000000 + Integer.parseInt(entries[0].trim());
+			int hhIncome = Integer.parseInt(entries[1].trim());
+			MZPerson person = (MZPerson) population.getPersons().get(id);
+			person.setHhIncome(hhIncome);
+		}
+	}
+		
+	private void readPersonStrings(final Population population, String inputFile, String year) throws Exception {
+		log.info("    running " + this.getClass().getName() + " module...");
 
-		if (plans.getName() == null) { plans.setName("created by '" + this.getClass().getName() + "'"); }
-		if (!plans.getPersons().isEmpty()) { Gbl.errorMsg("[plans=" + plans + " is not empty]"); }
+		if (population.getName() == null) { population.setName("created by '" + this.getClass().getName() + "'"); }
+		if (!population.getPersons().isEmpty()) { Gbl.errorMsg("[plans=" + population + " is not empty]"); }
 
 		Map<Id,String> person_strings = new TreeMap<Id,String>();
 		int id = Integer.MIN_VALUE;
@@ -740,7 +775,7 @@ public class PlansCreateFromMZ {
 		Id prev_pid = new IdImpl(prev_id);
 		String person_string = "";
 
-		System.out.println("      persing persons...");
+		log.info("      " + year + ": parsing persons...");
 
 		FileReader fr = new FileReader(inputFile);
 		BufferedReader br = new BufferedReader(fr);
@@ -748,7 +783,7 @@ public class PlansCreateFromMZ {
 		while ((curr_line = br.readLine()) != null) {
 
 			String[] entries = curr_line.split("\t", -1);
-			id = startId + Integer.parseInt(entries[0].trim());
+			id = Integer.parseInt(year) * 1000000 + Integer.parseInt(entries[0].trim());
 			if (id == prev_id) {
 				person_string = person_string + curr_line + "\n"; 
 			}
@@ -766,202 +801,188 @@ public class PlansCreateFromMZ {
 		}
 		br.close();
 		fr.close();
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # of 2005 persons parsed = " + person_strings.size());
-		System.out.println();
+		log.info("      # persons parsed = " + person_strings.size());
 		
 		Set<Id> pids;
 		if (year.equals("2005")) {
-			pids = this.createPlans2005(plans, person_strings);
+			pids = this.createPlans2005(population, person_strings);
 		}
 		else {
-			pids = this.createPlans2010(plans, person_strings);
+			pids = this.createPlans2010(population, person_strings);
 		}
-		System.out.println("      # persons created = " + plans.getPersons().size());
-		System.out.println("      # person_strings  = " + person_strings.size());
-		System.out.println("      # persons with coord inconsistency = \t" + pids.size());
-
-		this.processPlans(plans, person_strings, pids);
-		return id;
+		log.info("      # persons created = " + population.getPersons().size());
+		log.info("      # person_strings  = " + person_strings.size());
+		log.info("      # persons with coord inconsistency = \t" + pids.size());
+		this.processPlans(population, person_strings, pids);
 	}
 	
 	private void processPlans(final Population plans, final Map<Id,String> person_strings, Set<Id> pids) throws Exception {
-		System.out.println("      removing persons with coord inconsistency...");
+		log.info("      removing persons with coord inconsistency...");
 		this.removePlans(plans, person_strings, pids);
-		System.out.println("      done.");
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      done.");
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      setting home locations...");
+		log.info("      setting home locations...");
 		this.setHomeLocations(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      # persons        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      identify plans with inconsistent times...");
+		log.info("      identify plans with inconsistent times...");
 		pids = this.identifyPlansInconsistentTimes(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println("      # person_strings = " + person_strings.size());
-		System.out.println("      # persons with plans with inconsistent times = \t" + pids.size());
+		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # person_strings = " + person_strings.size());
+		log.info("      # persons with plans with inconsistent times = \t" + pids.size());
 
-		System.out.println("      removing persons with plans with inconsistent times...");
+		log.info("      removing persons with plans with inconsistent times...");
 		this.removePlans(plans,person_strings,pids);
-		System.out.println("      done.");
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      done.");
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      identify non home based day plans...");
+		log.info("      identify non home based day plans...");
 		pids = this.identifyNonHomeBasedPlans(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println("      # person_strings = " + person_strings.size());
-		System.out.println("      # persons with non home based plans = \t" + pids.size());
+		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # person_strings = " + person_strings.size());
+		log.info("      # persons with non home based plans = \t" + pids.size());
 
-		System.out.println("      removing persons with non home based plans...");
+		log.info("      removing persons with non home based plans...");
 		this.removePlans(plans,person_strings,pids);
-		System.out.println("      done.");
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      done.");
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      identify plans with act type '"+OTHR+"'...");
+		log.info("      identify plans with act type '"+OTHR+"'...");
 		pids = this.identifyPlansWithTypeOther(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println("      # person_strings = " + person_strings.size());
-		System.out.println("      # persons with plans with act type '"+OTHR+"' = \t" + pids.size());
+		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # person_strings = " + person_strings.size());
+		log.info("      # persons with plans with act type '"+OTHR+"' = \t" + pids.size());
 
-		System.out.println("      removing persons with plans with act type '"+OTHR+"'...");
+		log.info("      removing persons with plans with act type '"+OTHR+"'...");
 		this.removePlans(plans,person_strings,pids);
-		System.out.println("      done.");
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      done.");
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      identify plans with mode '"+UNDF+"'...");
+		log.info("      identify plans with mode '"+UNDF+"'...");
 		pids = this.identifyPlansModeTypeUndef(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println("      # person_strings = " + person_strings.size());
-		System.out.println("      # persons with plans with mode '"+UNDF+"' = \t" + pids.size());
+		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # person_strings = " + person_strings.size());
+		log.info("      # persons with plans with mode '"+UNDF+"' = \t" + pids.size());
 
-		System.out.println("      removing persons with plans with mode '"+UNDF+"'...");
+		log.info("      removing persons with plans with mode '"+UNDF+"'...");
 		this.removePlans(plans,person_strings,pids);
-		System.out.println("      done.");
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      done.");
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      identify plans round trips...");
+		log.info("      identify plans round trips...");
 		pids = this.identifyPlansWithRoundTrips(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println("      # person_strings = " + person_strings.size());
-		System.out.println("      # persons with plans with round trips = \t" + pids.size());
+		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # person_strings = " + person_strings.size());
+		log.info("      # persons with plans with round trips = \t" + pids.size());
 
-		System.out.println("      removing round trips...");
+		log.info("      removing round trips...");
 		this.removingRoundTrips(plans,person_strings);
-		System.out.println("      done.");
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      done.");
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      identify plans neg. route distances...");
+		log.info("      identify plans neg. route distances...");
 		pids = this.identifyPlansNegDistance(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println("      # person_strings = " + person_strings.size());
-		System.out.println("      # persons with plans neg. route distances = \t" + pids.size());
+		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # person_strings = " + person_strings.size());
+		log.info("      # persons with plans neg. route distances = \t" + pids.size());
 
-		System.out.println("      removing persons with plans neg. route distances...");
+		log.info("      removing persons with plans neg. route distances...");
 		this.removePlans(plans,person_strings,pids);
-		System.out.println("      done.");
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      done.");
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      identify plans neg. act coords...");
+		log.info("      identify plans neg. act coords...");
 		pids = this.identifyPlansWithNegCoords(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println("      # person_strings = " + person_strings.size());
-		System.out.println("      # persons with plans neg. act coords = \t" + pids.size());
+		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # person_strings = " + person_strings.size());
+		log.info("      # persons with plans neg. act coords = \t" + pids.size());
 
-		System.out.println("      removing persons with plans neg. act coords...");
+		log.info("      removing persons with plans neg. act coords...");
 		this.removePlans(plans,person_strings,pids);
-		System.out.println("      done.");
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      done.");
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      identify plans with too long walk trips...");
+		log.info("      identify plans with too long walk trips...");
 		pids = this.identifyPlansWithTooLongWalkTrips(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println("      # person_strings = " + person_strings.size());
-		System.out.println("      # persons with plans with too long walk trips = \t" + pids.size());
+		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # person_strings = " + person_strings.size());
+		log.info("      # persons with plans with too long walk trips = \t" + pids.size());
 
-		System.out.println("      removing persons with plans with too long walk trips...");
+		log.info("      removing persons with plans with too long walk trips...");
 		this.removePlans(plans,person_strings,pids);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("      identify single activity plans...");
+		log.info("      identify single activity plans...");
 		pids = this.identifySingleActPlans(plans,person_strings);
-		System.out.println("      done.");
+		log.info("      done.");
 
-		System.out.println("      # persons        = " + plans.getPersons().size());
-		System.out.println("      # person_strings = " + person_strings.size());
-		System.out.println("      # persons with single activity plans = \t" + pids.size());
+		log.info("      # persons        = " + plans.getPersons().size());
+		log.info("      # person_strings = " + person_strings.size());
+		log.info("      # persons with single activity plans = \t" + pids.size());
 
-		System.out.println("      removing persons with single activity plans...");
+		log.info("      removing persons with single activity plans...");
 		this.removePlans(plans,person_strings,pids);
-		System.out.println("      done.");
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("      # persons left        = " + plans.getPersons().size());
-		System.out.println();
+		log.info("      done.");
+		log.info("-------------------------------------------------------------");
+		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println("removing routes");
+		log.info("removing routes");
 		this.removeRoutes(plans);
 
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 }
