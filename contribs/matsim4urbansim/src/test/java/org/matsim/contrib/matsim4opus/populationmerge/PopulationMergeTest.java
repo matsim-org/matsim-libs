@@ -194,7 +194,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 	
 	private void dumpDummyPopulationZone(){
 		
-		String fileLocation = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
+		String fileLocation = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + year + InternalConstants.FILE_TYPE_TAB;
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileLocation);
 		
