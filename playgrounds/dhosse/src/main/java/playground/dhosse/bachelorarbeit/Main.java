@@ -10,7 +10,7 @@ public class Main {
 
 	public static void main(String args[]){
 		
-		String file1 = "./input/network_bridge.xml";
+		String file1 = "./input/brb.xml";
 //		String file2 = "./input/network_bridge.xml";
 		
 		Config config = ConfigUtils.createConfig();

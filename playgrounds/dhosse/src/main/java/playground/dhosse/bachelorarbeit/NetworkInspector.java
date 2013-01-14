@@ -49,7 +49,7 @@ public class NetworkInspector {
 //			}
 //			System.out.println("nlanes: " + link.getNumberOfLanes());
 		}
-		System.out.println("nlinks: "+net.getLinks().size());
+//		System.out.println("nlinks: "+net.getLinks().size());
 	}
 	
 	public void checkNodeAttributes(){
@@ -57,7 +57,7 @@ public class NetworkInspector {
 			inDegrees.put(node.getId(), node.getInLinks().size());
 			outDegrees.put(node.getId(), node.getOutLinks().size());
 		}
-		System.out.println("nnodes: "+net.getNodes().size());
+//		System.out.println("nnodes: "+net.getNodes().size());
 	}
 	
 	private void createHistograms() throws IOException{
@@ -125,6 +125,12 @@ public class NetworkInspector {
 		chart.addSeries("in-degrees", inDegrees);
 		chart.addSeries("out-degrees", outDegrees);
 		chart.saveAsPng("./test/nodeDegrees.png", 800, 600);
+	}
+	
+	private void createLinkCapacityFiles() throws IOException{
+		File file = new File("./test/linkCapacities.txt");
+		FileWriter writer = new FileWriter(file);
+		writer.write("nObjects");
 	}
 
 }

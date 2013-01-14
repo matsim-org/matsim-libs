@@ -1,20 +1,36 @@
 package playground.dhosse.bachelorarbeit;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
+import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.utils.LeastCostPathTree;
+import org.matsim.vehicles.Vehicle;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateList;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
 * @author dhosse
 * 
 */
-
-//output has to be matsim formatted, shp export just to keep it easier for now...
 
 public class Grid {
 	
@@ -167,25 +183,37 @@ public class Grid {
 		return Grid.cells;
 	}
 	
-//	public void calculateTravelTime(Network net){
+	public void calculateTravelTime(Network net){
 //		
-//		LeastCostPathTree lctp = new LeastCostPathTree(new FreeSpeedTravelTimeCalculator(), new TravelCost(){
-//
-//			@Override
-//			public double getLinkGeneralizedTravelCost(Link link, double time) {
-//				return 0;
-//			}
-//			
-//		});
-//		log.info("start calculating free speed travel time");
-//		for(Link link : net.getLinks().values()){
-//			lctp.calculate(net, link.getFromNode(), 0);
-//		}
-//		log.info("done calculating");
-//		for(Node node : net.getNodes().values()){
-//			System.out.println(lctp.getTree().get(node.getId()).getTime());
-//		}
-//	}
+		LeastCostPathTree lctp = new LeastCostPathTree(new TravelTimeCalculator(net, new TravelTimeCalculatorConfigGroup()), new TravelDisutility() {
+			
+			@Override
+			public double getLinkTravelDisutility(Link link, double time,
+					Person person, Vehicle vehicle) {
+				return 0;
+			}
+			
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				return 0;
+			}
+		}){
+
+			@SuppressWarnings("unused")
+			public double getLinkGeneralizedTravelCost(Link link, double time) {
+				return 0;
+			}
+			
+		};
+		log.info("start calculating free speed travel time");
+		for(Link link : net.getLinks().values()){
+			lctp.calculate(net, link.getFromNode(), 0);
+		}
+		log.info("done calculating");
+		for(Node node : net.getNodes().values()){
+			System.out.println(lctp.getTree().get(node.getId()).getTime());
+		}
+	}
 	
 	/**
 	 * Initializes the grid by filling it with cells
