@@ -28,25 +28,73 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
-import playground.gregor.approxdecomp.VisibilityGraph.Link;
-import playground.gregor.approxdecomp.VisibilityGraph.Node;
+import org.matsim.core.utils.collections.Tuple;
 
-//straight forward AStar implementation
-public class AStar {
+import playground.gregor.approxdecomp.Graph.Link;
+import playground.gregor.approxdecomp.Graph.Node;
 
 
+public class ShortestPath {
+
+	//straight forward Dijkstra implementation
+	public Tuple<Node, Double> getFarestNode(Node from) {
+		Set<Node> closed = new HashSet<Node>();
+
+		Map<Node,Double> gScore = new HashMap<Node,Double>();
+
+		gScore.put(from, 0.);
+
+		Queue<Node> open = new PriorityQueue<Node>(10,new NodeComparator(gScore));
+		open.add(from);
+
+		while (open.size() > 0) {
+			Node current = open.poll();
+			if (closed.contains(current)) {
+				continue;
+			}
+			if (open.peek() == null) {
+				boolean done = true;
+				for (Link l : current.outLinks) {
+					Node neighbor = l.n1;
+					if (!closed.contains(neighbor)) {
+						done = false;
+					}	
+				}
+				if (done) {
+					return new Tuple<Node,Double>(current,gScore.get(current));
+				}
+			}
+			closed.add(current);
+			for (Link l : current.outLinks) {
+				Node neighbor = l.n1;
+				if (closed.contains(neighbor)) {
+					continue;
+				}
+				double tentativeGScore = gScore.get(current) + l.length;
+				Double last = gScore.get(neighbor);
+				if (last == null || tentativeGScore < last) {
+					gScore.put(neighbor, tentativeGScore);
+					open.add(neighbor);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	//straight forward AStar implementation
 	public double getCost(Node from, Node to) {
 		Set<Node> closed = new HashSet<Node>();
-		
+
 		Map<Node,Double> gScore = new HashMap<Node,Double>();
 		HashMap<Node, Double> fScore = new HashMap<Node,Double>();
-		
+
 		gScore.put(from, 0.);
 		fScore.put(from,from.c.distance(to.c));
-		
+
 		Queue<Node> open = new PriorityQueue<Node>(10,new NodeComparator(fScore));
 		open.add(from);
-		
+
 		while (open.size() > 0) {
 			Node current = open.poll();
 			if (closed.contains(current)) {
@@ -70,16 +118,16 @@ public class AStar {
 				}
 			}
 		}
-		
+
 		return 0;
 	}
-	
+
 	private static class NodeComparator implements Comparator<Node> {
 
 
-		private final HashMap<Node, Double> fScore;
+		private final Map<Node, Double> fScore;
 
-		public NodeComparator(HashMap<Node, Double> fScore) {
+		public NodeComparator(Map<Node, Double> fScore) {
 			this.fScore = fScore;
 		}
 

@@ -26,13 +26,15 @@ import java.util.List;
 import java.util.Map;
 
 import playground.gregor.approxdecomp.ApproxConvexDecomposer.PocketBridge;
+import playground.gregor.approxdecomp.Graph.Link;
+import playground.gregor.approxdecomp.Graph.Node;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class VisibilityGraph {
 
-	private final AStar aStar = new AStar();
+	private final ShortestPath aStar = new ShortestPath();
 //	private final Coordinate[] shell;
 	private final PocketBridge pb;
 	
@@ -280,43 +282,6 @@ public class VisibilityGraph {
 
 
 
-	/*package*/ static class Node {
-
-		/*package*/ final Coordinate c;
-		private final int id;
-		/*package*/ final List<Link> outLinks = new ArrayList<Link>();
-
-		public Node(Coordinate c, int id) {
-			this.c = c;
-			this.id = id;
-		}
-		
-		public void addOutLink(Link l) {
-			this.outLinks.add(l);
-		}
-		
-
-		
-	}
-	
-	/*package*/ static class Link {
-
-		private final Node n0;
-		/*package*/ final Node n1;
-		/*package*/ double length;
-
-		public Link(Node n0, Node n1) {
-			this.n0 = n0;
-			this.n1 = n1;
-			this.length = n0.c.distance(n1.c);
-		}
-		
-		public void setLength(double length) {
-			this.length = length;
-		}
-		
-	}
-	
 	
 //	//DEBUG
 //	private void dumpGraph() {

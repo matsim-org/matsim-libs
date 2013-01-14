@@ -23,16 +23,25 @@ package playground.gregor.approxdecomp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.Tuple;
 
+import playground.gregor.approxdecomp.Graph.Node;
+import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -60,6 +69,9 @@ public class ApproxConvexDecomposer {
 	private final GeometryFactory geofac = new GeometryFactory();
 
 	private final List<LineString> initOpeningsIntersections;
+	
+	private final MedialAxisApproximator maa = new MedialAxisApproximator();
+	private final ShortestPath sp = new ShortestPath();
 	
 	public ApproxConvexDecomposer(List<LineString> openings) {
 		this.initOpeningsIntersections = openings;
@@ -148,6 +160,11 @@ public class ApproxConvexDecomposer {
 			//TODO holes
 			
 			double[] c = computeShellConcavity(pi.p); 
+			if (pi.p.getNumInteriorRing() > 0) {
+				PolygonInfo resolved = resolveDeepestHole(pi,c);
+				open.add(resolved);
+				continue;
+			}
 
 			double maxConcave = 0;
 			int mostConcaveVertex = 0;
@@ -182,6 +199,267 @@ public class ApproxConvexDecomposer {
 	}
 
 
+
+	private PolygonInfo resolveDeepestHole(PolygonInfo pi, double[] c) {
+		
+		Tuple<CoordinateInfo,CoordinateInfo> resolve = getResolvePair(pi);
+		if (resolve.getFirst().cIdx == 0 || resolve.getSecond().cIdx == 0) {
+			throw new RuntimeException("needs to be rotated, which is not implemented yet!");
+		}
+
+		LinearRing lr2 = (LinearRing) pi.p.getInteriorRingN(resolve.getFirst().pIdx);
+		LinearRing lr1 = null;
+		LinearRing shell = null;
+		LinearRing [] holes = new LinearRing[pi.p.getNumInteriorRing()-1];
+		List<Opening> newOpenings = new ArrayList<Opening>();
+		int holesIdx = 0;
+		if (resolve.getSecond().pIdx == -1) {
+			for (Opening o : pi.openings) {
+				Opening oo = new Opening();
+				if (o.edge < resolve.getSecond().cIdx) {
+					oo.edge = o.edge;
+				} else {
+					oo.edge = o.edge + 2 + lr2.getCoordinates().length-1;
+				}
+				newOpenings.add(oo);
+			}
+			lr1 = (LinearRing) pi.p.getExteriorRing();
+			shell = merge(lr1,lr2,resolve.getSecond().cIdx,resolve.getFirst().cIdx);
+		} else {
+			lr1 = (LinearRing) pi.p.getInteriorRingN(resolve.getSecond().pIdx);
+			LinearRing ring = merge(lr1,lr2,resolve.getSecond().cIdx,resolve.getFirst().cIdx);
+			holes[holesIdx++] = ring;
+			shell = (LinearRing) pi.p.getExteriorRing();
+		}
+		
+		
+		for (int j = 0; j < pi.p.getNumInteriorRing(); j++) {
+			if (j == resolve.getFirst().pIdx || j == resolve.getSecond().pIdx) {
+				continue;
+			}
+			holes[holesIdx++] = (LinearRing) pi.p.getInteriorRingN(j);
+		}
+		
+		
+		Polygon newp = this.geofac.createPolygon(shell, holes);
+		PolygonInfo ret = new PolygonInfo();
+		ret.openings = newOpenings;
+		ret.p = newp;
+		
+		GisDebugger.addGeometry(newp);
+		GisDebugger.dump("/Users/laemmel/tmp/vis/hole.shp");
+		
+		return ret;
+	}
+
+	private LinearRing merge(LinearRing lr1, LinearRing lr2, int idx1, int idx2) {
+		Coordinate[] c1 = lr1.getCoordinates();
+		Coordinate[] c2 = lr2.getCoordinates();
+		Coordinate [] coords = new Coordinate[c1.length+c2.length+1];
+		boolean isCCW1 = CGAlgorithms.isCCW(c1);
+		boolean isCCW2 = CGAlgorithms.isCCW(c2);
+		int idx = 0;
+		for (int i = 0; i < c1.length; i++) {
+			if (i <= idx1 || idx > (idx1+c2.length)) {
+				coords[idx++] = c1[i];
+				
+			} else {
+				i--; i--;
+//				if (isCCW1 == isCCW2) {
+					while (idx1+c2.length >= idx) {
+						int mod = idx2 % c2.length;
+						if (mod != 0) {
+							coords[idx++] = c2[mod];
+						}
+						idx2++;
+					}
+//				} else {
+//					idx2 += c2.length;
+//					while (idx1+c2.length >= idx) {
+//						int mod = idx2 % c2.length;
+//						if (mod != 0) {
+//							coords[idx++] = c2[mod];
+//						}
+//						idx2--;
+//					}
+//				}
+			}
+		}
+		
+		LinearRing lr = this.geofac.createLinearRing(coords);
+
+		return lr;
+	}
+
+	private Tuple<CoordinateInfo, CoordinateInfo> getResolvePair(PolygonInfo pi) {
+		QuadTree<CoordinateInfo> quadTree = buildQuadTree(pi.p);
+		LinkedList<AntipodalPair> open = new LinkedList<AntipodalPair>();
+		for (int i = 0; i < pi.p.getNumInteriorRing(); i++) {
+			LinearRing ring = (LinearRing) pi.p.getInteriorRingN(i);
+			Polygon pring = this.geofac.createPolygon(ring, null);
+			Node n = this.maa.run(pring);
+			Tuple<Node, Double> pInfo = this.sp.getFarestNode(n);
+			Tuple<Node, Double> cwpInfo = this.sp.getFarestNode(pInfo.getFirst());
+			AntipodalPair ap = new AntipodalPair();
+			ap.dist = cwpInfo.getSecond();
+			ap.pIdx = i;
+			double distP = Double.POSITIVE_INFINITY;
+			double distCWP = Double.POSITIVE_INFINITY;
+			for (int j = 0; j < ring.getCoordinates().length; j ++) {
+				Coordinate coord = ring.getCoordinateN(j);
+				double dist = coord.distance(pInfo.getFirst().c);
+				if (dist < distP) {
+					ap.pi = j;
+					distP = dist; 
+				}
+				dist = coord.distance(cwpInfo.getFirst().c); 
+				if (dist < distCWP) {
+					ap.cwpi = j;
+					distCWP = dist;
+				}
+			}
+			open.add(ap);
+		}
+
+		Map<Integer, Double> concavity = new HashMap<Integer,Double>();
+		double mostConcave = 0;
+		Tuple<CoordinateInfo,CoordinateInfo> resolve = null;
+		while (!open.isEmpty()) {
+			Iterator<AntipodalPair> it = open.iterator();
+			while (it.hasNext()) {
+				AntipodalPair element = it.next();
+				Coordinate pc = getCoord(element.pIdx, element.pi, pi.p);
+				Coordinate cwpc = getCoord(element.pIdx, element.cwpi, pi.p);
+				
+				CoordinateInfo pci = getNearestNoneIntersectingCoordinate(element.pi,element.pIdx,quadTree,pi.p, element.dist);
+				Coordinate pcic = getCoord(pci.pIdx, pci.cIdx, pi.p);
+				
+				CoordinateInfo cwpci = getNearestNoneIntersectingCoordinate(element.cwpi,element.pIdx,quadTree,pi.p, element.dist);
+				Coordinate cwpcic = getCoord(pci.pIdx, pci.cIdx, pi.p);
+				double cwdist = cwpcic.distance(cwpc);
+				double dist = pc.distance(pcic);
+				if (cwdist < dist) {
+					double conc  = 0;
+					if (cwpci.pIdx == -1) {
+						conc = cwdist + element.dist;
+						concavity.put(element.pIdx, conc);
+						it.remove();
+					} else {
+						Double oConc = concavity.get(cwpci.pIdx);
+						if (oConc != null) {
+							conc = oConc + cwdist + element.dist;
+							concavity.put(element.pIdx, conc);
+							it.remove();
+						}
+					}
+					
+					if (conc > mostConcave) {
+						mostConcave = conc;
+						CoordinateInfo tmp = new CoordinateInfo();
+						tmp.pIdx = element.pIdx;
+						tmp.cIdx = element.cwpi;
+						resolve = new Tuple<CoordinateInfo,CoordinateInfo>(tmp,cwpci);
+					}
+				} else {
+					double conc  = 0;
+					if (pci.pIdx == -1) {
+						conc = dist + element.dist;
+						concavity.put(element.pIdx, conc);
+						it.remove();
+					} else {
+						Double oConc = concavity.get(pci.pIdx);
+						if (oConc != null) {
+							conc = oConc + dist + element.dist;
+							concavity.put(element.pIdx, conc);
+							it.remove();
+						}
+					}
+					
+					if (conc > mostConcave) {
+						mostConcave = conc;
+						CoordinateInfo tmp = new CoordinateInfo();
+						tmp.pIdx = element.pIdx;
+						tmp.cIdx = element.pi;
+						resolve = new Tuple<CoordinateInfo,CoordinateInfo>(tmp,pci);
+					}				
+				}
+				
+			}
+			if (resolve == null) { //could not resolve any hole to the shell in the first iteration
+				for (AntipodalPair ap : open) {
+					concavity.put(ap.pIdx, 0.);
+				}
+			}
+			
+		}
+		return resolve;
+	}
+
+	private CoordinateInfo getNearestNoneIntersectingCoordinate(int pi,
+			int pIdx, QuadTree<CoordinateInfo> quadTree, Polygon p, double range) {
+		
+		Coordinate c = getCoord(pIdx,pi,p); 
+
+		
+		boolean found = false;
+		CoordinateInfo ret = null;
+		while (!found) {
+			Collection<CoordinateInfo> coll = quadTree.get(c.x, c.y, range);
+			double minDist = Double.POSITIVE_INFINITY;
+			for (CoordinateInfo ci : coll) {
+				if (ci.pIdx != pIdx) {
+					Coordinate tmp = getCoord(ci.pIdx,ci.cIdx,p);
+					double dist = tmp.distance(c);
+					if (dist < minDist) {
+						ret = ci;
+						found = true;
+					}
+				}
+			}
+			range *= 2.;
+		}
+		
+		
+		return ret;
+	}
+
+	private Coordinate getCoord(int pIdx, int pi, Polygon p) {
+		if (pIdx == -1) {
+			return p.getExteriorRing().getCoordinateN(pi);
+		} else {
+			return p.getInteriorRingN(pIdx).getCoordinateN(pi);
+		}
+	}
+
+	private QuadTree<CoordinateInfo> buildQuadTree(Polygon p) {
+		Geometry bounds = p.getBoundary();
+		Envelope e = new Envelope();
+		for (Coordinate cc : bounds.getCoordinates()) {
+			e.expandToInclude(cc);
+		}
+		QuadTree<CoordinateInfo> ret = new QuadTree<CoordinateInfo>(e.getMinX(), e.getMinY(),e.getMaxX(),e.getMaxY());
+		Coordinate[] coords = p.getExteriorRing().getCoordinates();
+		for (int i = 0; i < coords.length; i++) {
+			Coordinate cc = coords[i];
+			CoordinateInfo ci = new CoordinateInfo();
+			ci.cIdx = i;
+			ci.pIdx = -1;
+			ret.put(cc.x, cc.y, ci);
+		}
+		
+		for (int i = 0; i < p.getNumInteriorRing(); i++) {
+			coords = p.getInteriorRingN(i).getCoordinates();
+			for (int j = 0; j < coords.length; j++) {
+				Coordinate cc = coords[j];
+				CoordinateInfo ci = new CoordinateInfo();
+				ci.cIdx = j;
+				ci.pIdx = i;
+				ret.put(cc.x, cc.y, ci);
+			}
+		}
+		
+		return ret;
+	}
 
 	private void rotateRing(PolygonInfo pi) {
 		Coordinate[] ring = pi.p.getExteriorRing().getCoordinates();
@@ -533,6 +811,18 @@ public class ApproxConvexDecomposer {
 	
 	/*package*/ static final class Opening {
 		int edge;
+	}
+	
+	private static final class AntipodalPair {
+		int pi = -1;
+		int cwpi = -1; 
+		double dist;
+		int pIdx;
+	}
+	
+	private static final class CoordinateInfo {
+		int cIdx;
+		int pIdx;
 	}
 
 }
