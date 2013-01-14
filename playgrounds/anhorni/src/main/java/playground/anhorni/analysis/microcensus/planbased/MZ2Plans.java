@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -29,35 +29,18 @@ import org.matsim.core.config.ConfigUtils;
 
 public class MZ2Plans {
 
-	//////////////////////////////////////////////////////////////////////
-	// test run 01
-	//////////////////////////////////////////////////////////////////////
+	public static void createMZ2Plans(String indir, String outdir) throws Exception {
 
-	public static void createMZ2Plans() throws Exception {
-
-		System.out.println("MATSim-DB: create Population based on micro census 2005 data.");
-
-		//////////////////////////////////////////////////////////////////////
-
-		System.out.println("  extracting input directory... ");
-		String indir = "src/main/java/playground/anhorni/input/microcensus/";
-		String outdir = "src/main/java/playground/anhorni/output/microcensus/";
-
-		//////////////////////////////////////////////////////////////////////
+		System.out.println("MATSim-DB: create Population based on micro census 2005/2010 data.");
 
 		System.out.println("  creating plans object... ");
 		Population plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		System.out.println("  done.");
 
 		System.out.println("  running plans modules... ");
-		new PlansCreateFromMZ(indir+"/Wege_merged01112010.dat",outdir+"/Wege_merged01112010.dat",1,7).run(plans);
-//		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",1,5).run(plans);
-//		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",6,6).run(plans);
-//		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",6,7).run(plans);
-//		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",7,7).run(plans);
+		new PlansCreateFromMZ(1, 7).run(plans, indir);
+		new PlansCreateFromMZ(1, 7).run(plans, indir);
 		System.out.println("  done.");
-
-		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing plans xml file... ");
 		new PopulationWriter(plans, NetworkImpl.createNetwork()).write(outdir + "plansMOSO.xml.gz");
@@ -71,13 +54,11 @@ public class MZ2Plans {
 		System.out.println("-------------------------------------------------------------");
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// main
-	//////////////////////////////////////////////////////////////////////
-
 	public static void main(final String[] args) throws Exception {
 		Gbl.startMeasurement();
-		createMZ2Plans();
+		String indir = args[0];
+		String outdir = args[1];
+		createMZ2Plans(indir, outdir);
 		Gbl.printElapsedTime();
 	}
 }

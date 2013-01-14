@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -44,6 +45,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PlansCreateFromMZ {
@@ -57,12 +60,6 @@ public class PlansCreateFromMZ {
 	
 	private static final String EDUC = "e";
 	private static final String OTHR = "o";
-
-	private static final String WALK = "walk";
-	private static final String BIKE = "bike";
-	private static final String CAR = "car";
-	private static final String PT = "pt";
-	private static final String RIDE = "ride";
 	private static final String UNDF = "undefined";
 
 	private static final String MALE = "m";
@@ -71,22 +68,19 @@ public class PlansCreateFromMZ {
 	private static final String YES = "yes";
 	private static final String NO = "no";
 
-	private final String inputfile;
-	private final String outputfile;
-
 	private final int dow_min;
 	private final int dow_max;
 
 
-	public PlansCreateFromMZ(final String inputfile, final String outputfile, final int dow_min, final int dow_max) {
+	public PlansCreateFromMZ(final int dow_min, final int dow_max) {
 		super();
-		this.inputfile = inputfile;
-		this.outputfile = outputfile;
 		this.dow_min = dow_min;
 		this.dow_max = dow_max;
 	}
+	
+	// TODO: merge with person for day ... income etc.
 
-	private final Set<Id> createPlans(final Population plans, final Map<Id,String> person_strings) throws Exception {
+	private final Set<Id> createPlans2005(final Population plans, final Map<Id,String> person_strings) throws Exception {
 		Set<Id> coord_err_pids = new HashSet<Id>();
 
 		Set<Id> pids_dow = new HashSet<Id>();
@@ -261,7 +255,189 @@ public class PlansCreateFromMZ {
 			// replacing the person string with the new data
 			if (person_strings.put(pid,person_string_new) == null) { Gbl.errorMsg("That must not happen!"); }
 		}
+		System.out.println("        removing "+pids_dow.size()+" persons not part of the days = ["+this.dow_min+","+this.dow_max+"]...");
+		this.removePlans(plans,person_strings,pids_dow);
+		System.out.println("        done.");
+		coord_err_pids.removeAll(pids_dow);
 
+		return coord_err_pids;
+	}
+	
+	private final Set<Id> createPlans2010(final Population plans, final Map<Id,String> person_strings) throws Exception {
+		Set<Id> coord_err_pids = new HashSet<Id>();
+
+		Set<Id> pids_dow = new HashSet<Id>();
+
+		for (Id pid : person_strings.keySet()) {
+			String person_string = person_strings.get(pid);
+			String person_string_new = "";
+
+			String[] lines = person_string.split("\n", -1); // last line is always an empty line
+			for (int l=0; l<lines.length-1; l++) {
+				String[] entries = lines[l].split("\t", -1);
+				// ID_PERSON  ID_TOUR  ID_TRIP  F58  S_X     S_Y     Z_X     Z_Y     F514  DURATION_1  DURATION_2
+				// 5751       57511    5751101  540  507720  137360  493620  120600  560   20          20
+				// 0          1        2        3    4       5       6       7       8     9           10
+
+				// PURPOSE  TRIP_MODE  HHNR  ZIELPNR  WEGNR  WP                AGE  GENDER  LICENSE  DAY  TRIP_DISTANCE
+				// 1        3          575   1        1      .422854535571358  30   0       1        5    21.9
+				// 11       12         13    14       15     16                17   18      19       20   21
+				
+				// (newly added)
+				// F521 (Einkaeufe)
+
+				// pid check
+				if (!pid.toString().equals(entries[0].trim())) { Gbl.errorMsg("That must not happen!"); }
+
+				// departure time (min => sec.)
+				int departure = Integer.parseInt(entries[3].trim())*60;
+				entries[3] = Integer.toString(departure);
+
+				// start coordinate (round to hectare)
+				Coord from = new CoordImpl(entries[4].trim(),entries[5].trim());
+				from.setX(Math.round(from.getX()/100.0)*100);
+				from.setY(Math.round(from.getY()/100.0)*100);
+				entries[4] = Double.toString(from.getX());
+				entries[5] = Double.toString(from.getY());
+
+				// start coordinate (round to hectare)
+				Coord to = new CoordImpl(entries[6].trim(),entries[7].trim());
+				to.setX(Math.round(to.getX()/100.0)*100);
+				to.setY(Math.round(to.getY()/100.0)*100);
+				entries[6] = Double.toString(to.getX());
+				entries[7] = Double.toString(to.getY());
+
+				// departure time (min => sec.). A few arrival times are not given, setting to departure time (trav_time=0)
+				int arrival = departure;
+				if (!entries[8].trim().equals("")) { arrival = Integer.parseInt(entries[8].trim())*60; }
+//				else { System.out.println("        pid="+pid+", tripid="+entries[2]+": no arival time for the trip given. Setting arrival := departue time."); }
+				entries[8] = Integer.toString(arrival);
+
+				// destination activity type ---------------------
+				int purpose = Integer.parseInt(entries[11].trim());
+				String acttype = null;
+				if (purpose == 1) { acttype = WORK; }
+				else if (purpose == 2) { acttype = EDUC; }
+				else if (purpose == 3) { acttype = SHOP; }
+				else if (purpose == 4) { acttype = LEIS; }
+				else if (purpose == 5) { acttype = LEIS; } // TODO: check
+				else { Gbl.errorMsg("pid=" + pid + ": purpose=" + purpose + " not known!"); }
+
+				// trip mode type ---------------------------------
+				int m = Integer.parseInt(entries[12].trim());
+				String mode = null;
+				if (m == 1) { mode = TransportMode.walk; }
+				else if (m == 2) { mode = TransportMode.bike; }
+				else if (m == 3) { mode = TransportMode.car; }
+				else if (m == 4) { mode = TransportMode.pt; }
+				else if (m == 5) { mode = TransportMode.ride; }
+				else if (m == 6) { mode = "undefined"; }
+				else { Gbl.errorMsg("pid=" + pid + ": m=" + m + " not known!"); }
+
+				// micro census person weight
+				double weight = Double.parseDouble(entries[16].trim());
+
+				// person age
+				int age = Integer.parseInt(entries[17].trim());
+
+				// person gender
+				int g = Integer.parseInt(entries[18].trim());
+				String gender = null;
+				if (g == 0) { gender = FEMALE; }
+				else if (g == 1) { gender = MALE; }
+				else { Gbl.errorMsg("pid=" + pid + ": g=" + g + " not known!"); }
+
+				// driving license
+				int lic = Integer.parseInt(entries[19].trim());
+				String licence = null;
+				if (lic == 0) { licence = NO; }
+				else if (lic == 1) { licence = YES; }
+				else { Gbl.errorMsg("pid=" + pid + ": lic=" + lic + " not known!"); }
+
+				// day of week
+				int dow = Integer.parseInt(entries[20].trim());
+				if ((dow < 1) || (dow > 7)) { Gbl.errorMsg("pid=" + pid + ": dow=" + dow + " not known!"); }
+				if (!((this.dow_min<=dow) && (dow<=this.dow_max))) { pids_dow.add(pid); }
+
+				// distance (km => m)
+				double distance = Double.parseDouble(entries[21].trim())*1000.0;
+				entries[21] = Double.toString(distance);
+				
+				// shopping purpose ----------------------------------------------
+				double shoppingPurpose = Integer.parseInt(entries[22].trim());
+				if (purpose == 3) {
+					if (shoppingPurpose == 1) {
+						acttype = SHOP_GROCERY;
+					}
+					else {
+						acttype = SHOP_NONGROCERY;
+					}
+				}
+
+				// creating the line with the changed data ------------------------
+				String str = entries[0];
+				for (int i=1; i<entries.length; i++) { str = str + "\t" + entries[i];  }
+				str = str + "\n";
+				person_string_new = person_string_new + str;
+
+				// creating/getting the matsim person
+				PersonImpl person = (PersonImpl) plans.getPersons().get(pid);
+				if (person == null) {
+					person = new PersonImpl(pid);
+					plans.addPerson(person);
+					person.setAge(age);
+					person.setLicence(licence);
+					person.setSex(gender);
+				}
+
+				// creating/getting plan
+				Plan plan = person.getSelectedPlan();
+				if (plan == null) {
+					person.createAndAddPlan(true);
+					plan = person.getSelectedPlan();
+					plan.setScore(weight); // used plans score as a storage for the person weight of the MZ2005
+				}
+
+				// adding acts/legs
+				if (plan.getPlanElements().size() != 0) { // already lines parsed and added
+					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+					from_act.setEndTime(departure);
+					//from_act.setDuration(from_act.getEndTime()-from_act.getStartTime());
+					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
+					leg.setDepartureTime(departure);
+					leg.setTravelTime(arrival-departure);
+					leg.setArrivalTime(arrival);
+					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+					leg.setRoute(route);
+					route.setDistance(distance);
+					route.setTravelTime(leg.getTravelTime());
+					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					act.setStartTime(arrival);
+
+					// coordinate consistency check
+					if ((from_act.getCoord().getX() != from.getX()) || (from_act.getCoord().getY() != from.getY())) {
+//						System.out.println("        pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + from_act.getCoord().calcDistance(from) + ")");
+						coord_err_pids.add(pid);
+					}
+				}
+				else {
+					ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME,from);
+					homeAct.setEndTime(departure);
+					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
+					leg.setDepartureTime(departure);
+					leg.setTravelTime(arrival-departure);
+					leg.setArrivalTime(arrival);
+					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+					leg.setRoute(route);
+					route.setDistance(distance);
+					route.setTravelTime(leg.getTravelTime());
+					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					act.setStartTime(arrival);
+				}
+			}
+			// replacing the person string with the new data
+			if (person_strings.put(pid,person_string_new) == null) { Gbl.errorMsg("That must not happen!"); }
+		}
 		System.out.println("        removing "+pids_dow.size()+" persons not part of the days = ["+this.dow_min+","+this.dow_max+"]...");
 		this.removePlans(plans,person_strings,pids_dow);
 		System.out.println("        done.");
@@ -387,7 +563,7 @@ public class PlansCreateFromMZ {
 				ActivityImpl curr_act = (ActivityImpl)plan.getPlanElements().get(i);
 				Coord prevc = prev_act.getCoord();
 				Coord currc = curr_act.getCoord();
-				if ((currc.getX()==prevc.getX())&&(currc.getY()==prevc.getY())) {
+				if ((currc.getX()==prevc.getX()) && (currc.getY()==prevc.getY())) {
 					ActivityImpl act2 = (ActivityImpl)plan2.getPlanElements().get(plan2.getPlanElements().size()-1);
 					act2.setEndTime(curr_act.getEndTime());
 					//act2.setDuration(act2.getEndTime()-act2.getStartTime());
@@ -398,13 +574,19 @@ public class PlansCreateFromMZ {
 							if (!act2.getType().equals(HOME)) { act2.setType(WORK); }
 						}
 						else if (curr_act.getType().equals(EDUC)) {
-							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK)) { act2.setType(EDUC); }
+							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK)) {
+								act2.setType(EDUC);
+							}
 						}
 						else if (curr_act.getType().equals(SHOP) || curr_act.getType().equals(SHOP_GROCERY) || curr_act.getType().equals(SHOP_NONGROCERY)) {
-							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK) && !act2.getType().equals(EDUC)) { act2.setType(SHOP); }
+							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK) && !act2.getType().equals(EDUC)) { 
+								act2.setType(SHOP);
+							}
 						}
 						else if (curr_act.getType().equals(LEIS)) {
-							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK) && !act2.getType().equals(EDUC) && !act2.getType().equals(SHOP)) { act2.setType(LEIS); }
+							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK) && !act2.getType().equals(EDUC) && !act2.getType().equals(SHOP)) {
+								act2.setType(LEIS);
+							}
 						}
 						else if (curr_act.getType().equals(OTHR)) {
 							Gbl.errorMsg("pid="+p.getId()+", act_type="+OTHR+": Act type not allowed here!");
@@ -515,7 +697,6 @@ public class PlansCreateFromMZ {
 	//////////////////////////////////////////////////////////////////////
 	//remove routes again
 	private final void removeRoutes(final Population plans) {
-		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -525,12 +706,29 @@ public class PlansCreateFromMZ {
 			}
 		}
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// run method
-	//////////////////////////////////////////////////////////////////////
-
-	public void run(final Population plans) throws Exception {
+	
+	public void run(final Population plans, String indir) {
+		Population plans2005 = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population plans2010 = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		try {
+			int finalId = this.readPersonStrings(plans2005, indir + "/MZ2005trips.dat", 0, "2005");
+			this.readPersonStrings(plans2010, indir + "/MZ2010trips.dat", finalId + 1, "2010");
+			
+			for (Person p : plans2005.getPersons().values()) {
+				plans.addPerson(p);
+			}
+			for (Person p : plans2010.getPersons().values()) {
+				plans.addPerson(p);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	private int readPersonStrings(final Population plans, String inputFile, int startId, String year) throws Exception {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
 		if (plans.getName() == null) { plans.setName("created by '" + this.getClass().getName() + "'"); }
@@ -540,27 +738,20 @@ public class PlansCreateFromMZ {
 		int id = Integer.MIN_VALUE;
 		int prev_id = Integer.MIN_VALUE;
 		Id prev_pid = new IdImpl(prev_id);
-		int line_nr = 1;
 		String person_string = "";
 
 		System.out.println("      persing persons...");
 
-		FileReader fr = new FileReader(this.inputfile);
+		FileReader fr = new FileReader(inputFile);
 		BufferedReader br = new BufferedReader(fr);
-		String curr_line = br.readLine(); line_nr++; // Skip header
+		String curr_line = br.readLine();  // Skip header
 		while ((curr_line = br.readLine()) != null) {
 
 			String[] entries = curr_line.split("\t", -1);
-			// ID_PERSON  ID_TOUR  ID_TRIP  F58  S_X     S_Y     Z_X     Z_Y     F514  DURATION_1  DURATION_2
-			// 5751       57511    5751101  540  507720  137360  493620  120600  560   20          20
-			// 0          1        2        3    4       5       6       7       8     9           10
-
-			// PURPOSE  TRIP_MODE  HHNR  ZIELPNR  WEGNR  WP                AGE  GENDER  LICENSE  DAY  TRIP_DISTANCE
-			// 1        3          575   1        1      .422854535571358  30   0       1        5    21.9
-			// 11       12         13    14       15     16                17   18      19       20   21
-
-			id = Integer.parseInt(entries[0].trim());
-			if (id == prev_id) { person_string = person_string + curr_line + "\n"; }
+			id = startId + Integer.parseInt(entries[0].trim());
+			if (id == prev_id) {
+				person_string = person_string + curr_line + "\n"; 
+			}
 			else {
 				if (prev_id != Integer.MIN_VALUE) {
 					if (person_strings.put(prev_pid,person_string) != null) { Gbl.errorMsg("Person id="+prev_pid+" already parsed!"); }
@@ -569,28 +760,35 @@ public class PlansCreateFromMZ {
 				prev_id = id;
 				prev_pid = new IdImpl(prev_id);
 			}
-			line_nr++;
 		}
-		if (person_strings.put(prev_pid,person_string) != null) { Gbl.errorMsg("Person id="+prev_pid+" already parsed!"); }
+		if (person_strings.put(prev_pid,person_string) != null) {
+			Gbl.errorMsg("Person id="+prev_pid+" already parsed!");
+		}
 		br.close();
 		fr.close();
 		System.out.println("      done.");
 
-		System.out.println("      # persons parsed = " + person_strings.size());
+		System.out.println("      # of 2005 persons parsed = " + person_strings.size());
 		System.out.println();
-
-		//////////////////////////////////////////////////////////////////////
-
-		System.out.println("      creating plans...");
-		Set<Id> pids = this.createPlans(plans,person_strings);
-		System.out.println("      done.");
-
+		
+		Set<Id> pids;
+		if (year.equals("2005")) {
+			pids = this.createPlans2005(plans, person_strings);
+		}
+		else {
+			pids = this.createPlans2010(plans, person_strings);
+		}
 		System.out.println("      # persons created = " + plans.getPersons().size());
 		System.out.println("      # person_strings  = " + person_strings.size());
 		System.out.println("      # persons with coord inconsistency = \t" + pids.size());
 
+		this.processPlans(plans, person_strings, pids);
+		return id;
+	}
+	
+	private void processPlans(final Population plans, final Map<Id,String> person_strings, Set<Id> pids) throws Exception {
 		System.out.println("      removing persons with coord inconsistency...");
-		this.removePlans(plans,person_strings,pids);
+		this.removePlans(plans, person_strings, pids);
 		System.out.println("      done.");
 		System.out.println("-------------------------------------------------------------");
 		System.out.println("      # persons left        = " + plans.getPersons().size());
@@ -760,14 +958,6 @@ public class PlansCreateFromMZ {
 		System.out.println();
 
 		//////////////////////////////////////////////////////////////////////
-
-//		FileWriter fw = new FileWriter(outputfile);
-//		BufferedWriter bw = new BufferedWriter(fw);
-//		bw.write("ID_PERSON\tID_TOUR\tID_TRIP\tF58\tS_X\tS_Y\tZ_X\tZ_Y\tF514\tDURATION_1\tDURATION_2\tPURPOSE\tTRIP_MODE\tHHNR\tZIELPNR\tWEGNR\tWP\tAGE\tGENDER\tLICENSE\tDAY\tTRIP_DISTANCE\n");
-//		bw.flush();
-//		for (String str : person_strings.values()) { bw.write(str); }
-//		bw.close();
-//		fw.close();
 		
 		System.out.println("removing routes");
 		this.removeRoutes(plans);
