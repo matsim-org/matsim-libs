@@ -50,7 +50,7 @@ public class SocialForceAgent implements Sim2DAgent {
 	private final float B = .08f; // ??
 	private final float k = 1.2f * 100000;
 	private final float kappa = 2.4f * 100000;
-	private final float r = (float) (MatsimRandom.getRandom().nextDouble()*.1 + 0.15); //radius
+	private final float r = (float) (MatsimRandom.getRandom().nextDouble()*.1 + 0.25); //radius
 	private final float vmx = 1.5f;
 	
 	//additional constants
@@ -80,6 +80,7 @@ public class SocialForceAgent implements Sim2DAgent {
 		this.veh = veh;
 		this.driver = veh.getDriver();
 		this.dT = deltaT;
+		this.ncalc.setRangeAndMaxNrOfNeighbors(5, 8);
 	}
 
 	@Override
@@ -108,6 +109,7 @@ public class SocialForceAgent implements Sim2DAgent {
 		
 		List<Tuple<Float, Sim2DAgent>> neighbors = this.ncalc.computeNeighbors(this);
 		Segment[] obstacles = this.currentPSec.getObstacles();
+
 		
 		float[] e0 = this.dd.computeDesiredDirection(this);
 		float desiredDVx = this.v0 * e0[0] - this.v[0];

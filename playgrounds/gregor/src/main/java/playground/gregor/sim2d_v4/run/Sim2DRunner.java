@@ -89,7 +89,7 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if ((event.getIteration()+1) % 200 == 0) {
+		if ((event.getIteration()) % 10 == 0) {
 			PhysicalSim2DEnvironment.DEBUG = true;
 			this.controller.setCreateGraphs(true);
 		} else {

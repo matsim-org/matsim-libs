@@ -46,7 +46,7 @@ public class PhysicalSim2DEnvironment {
 
 	private static final Logger log = Logger.getLogger(PhysicalSim2DEnvironment.class);
 
-	private static final float DEP_BOX_WIDTH = 0.8f; // must be >= agents' diameter
+	private static final float DEP_BOX_WIDTH = 0.9f; // must be >= agents' diameter
 
 	private final Sim2DEnvironment env;
 
@@ -122,7 +122,7 @@ public class PhysicalSim2DEnvironment {
 		}
 
 		//DEBUG
-		if (this.DEBUG) {
+		if (DEBUG) {
 			debug(time);
 		}
 	}
@@ -204,9 +204,25 @@ public class PhysicalSim2DEnvironment {
 		dx *= DEP_BOX_WIDTH;
 		dy *= DEP_BOX_WIDTH;
 
-		int nrOfBoxes = (int) (width / DEP_BOX_WIDTH + .5f);
+		int nrOfBoxes = (int) (width / DEP_BOX_WIDTH);
+		
+		double flowCap = hiResLink.getLink().getCapacity() / this.sim2dsc.getMATSimScenario().getNetwork().getCapacityPeriod();
+		
+		double maxBoxCap = 1/this.sim2dsc.getMATSimScenario().getConfig().getQSimConfigGroup().getTimeStepSize();
+		
+		int flowCapNrOfBoxes = (int) Math.ceil(flowCap/maxBoxCap);
+		
+		nrOfBoxes = Math.min(flowCapNrOfBoxes, nrOfBoxes);
+		
+		double gap = width - (nrOfBoxes * DEP_BOX_WIDTH);
+		
+		
 		double bottomX = opening.x0+this.offsetX;
 		double bottomY = opening.y0+this.offsetY;
+		
+		bottomX += gap/2 * dx/DEP_BOX_WIDTH;
+		bottomY += gap/2 * dy/DEP_BOX_WIDTH;
+		
 		GeometryFactory geofac = new GeometryFactory();
 		for (int i = 0; i < nrOfBoxes; i++) {
 			Coordinate c0 = new Coordinate(bottomX,bottomY);
