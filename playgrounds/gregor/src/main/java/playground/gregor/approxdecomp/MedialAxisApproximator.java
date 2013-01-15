@@ -28,7 +28,6 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.approxdecomp.Graph.Link;
 import playground.gregor.approxdecomp.Graph.Node;
-import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -36,13 +35,10 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.precision.SimpleGeometryPrecisionReducer;
 import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 public class MedialAxisApproximator {
@@ -55,23 +51,51 @@ public class MedialAxisApproximator {
 
 	public Node run(Polygon p) {
 
-		GisDebugger.addGeometry(p);
-		GisDebugger.dump("/Users/laemmel/tmp/vis/!pp.shp");
+		p = (Polygon) p.clone();
 		
 		Geometry envG = p.getEnvelope();
 		Envelope e = new Envelope();
 		for (Coordinate c : envG.getCoordinates()) {
 			e.expandToInclude(c);
 		}
+		double ox = e.getMinX();
+		double oy = e.getMinY();
+		int nr = p.getCoordinates().length;
+		for (int i = 0; i < nr; i++) {
+			if (i == nr-1 && p.getCoordinates()[i]==p.getCoordinates()[0]) {
+				continue;
+			}
+			Coordinate c = p.getCoordinates()[i];
+			c.x -= e.getMinX();
+			c.y -= e.getMinY();
+		}
+		
+		envG = p.getEnvelope();
+		int nrEnv = envG.getCoordinates().length;
+		for (int i = 0; i < nrEnv; i++) {
+			if (i == nrEnv-1 && envG.getCoordinates()[i]==envG.getCoordinates()[0]){
+				continue;
+			}
+			Coordinate c = envG.getCoordinates()[i];
+			c.x -= e.getMinX();
+			c.y -= e.getMinY();
+		}
+		e = new Envelope();
+		for (Coordinate c : envG.getCoordinates()) {
+			e.expandToInclude(c);
+		}
+		
+		
 		double w = e.getWidth();
 		double h = e.getHeight();
 		double d = Math.sqrt(w*w+h*h);
-		this.stepSize = d/10;
+		this.stepSize = d/100;
 
 		MultiPoint mp = getDenseMultiPointFromPolygon(p);
 
-		PrecisionModel pm = new PrecisionModel(8);
-		mp = (MultiPoint) SimpleGeometryPrecisionReducer.reduce(mp, pm);
+//		PrecisionModel pm = new PrecisionModel(10);
+//		mp = (MultiPoint) SimpleGeometryPrecisionReducer.reduce(mp, pm);
+//		mp = (MultiPoint) mp.intersection(mp);
 		VoronoiDiagramBuilder vdb = new VoronoiDiagramBuilder();
 		vdb.setSites(mp);
 		Geometry diag = vdb.getDiagram(this.geofac);
@@ -128,18 +152,21 @@ public class MedialAxisApproximator {
 				}
 			}
 		}
-		//		
-		
 		for (Node n : quadTree.values()) {
-			for (Link l : n.outLinks) {
-				Coordinate c0 = l.n0.c;
-				Coordinate c1 = l.n1.c;
-				LineString ls = this.geofac.createLineString(new Coordinate[]{c0,c1});
-				GisDebugger.addGeometry(ls);
-			}
+			n.c.x += ox;
+			n.c.y += oy;
 		}
-		GisDebugger.dump("/Users/laemmel/tmp/vis/!v0.shp");
-		
+//		GisDebugger.dump("/Users/laemmel/tmp/vis/!pp.shp");
+//		for (Node n : quadTree.values()) {
+//			for (Link l : n.outLinks) {
+//				Coordinate c0 = l.n0.c;
+//				Coordinate c1 = l.n1.c;
+//				LineString ls = this.geofac.createLineString(new Coordinate[]{c0,c1});
+//			}
+//		}
+//		GisDebugger.dump("/Users/laemmel/tmp/vis/!v0.shp");
+//		throw new RuntimeException();
+
 		return quadTree.get(0, 0);
 	}
 

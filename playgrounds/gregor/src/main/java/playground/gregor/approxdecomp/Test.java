@@ -67,9 +67,12 @@ public class Test {
 
 	public static void main(String [] args) throws NoSuchAuthorityCodeException, FactoryException {
 		//		String ref = "6 6 6 6 4 6 4 5 5 5 5 4 5 7 4 5 4 7 5 6 5";
-		String p = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_env.shp";
+		String p = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_env3.shp";
 		String network = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml";
 		String output = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/sim2dEnv_0.gml.gz";
+//		String p = "/Users/laemmel/devel/burgdorf2d/raw_input/new2.shp";
+//		String network = "/Users/laemmel/devel/burgdorf2d/tmp/network2d_0.xml";
+//		String output = "/Users/laemmel/devel/burgdorf2d/raw_input/sim2dEnv_0.gml.gz";
 		//		String p = "/Users/laemmel/tmp/dump.shp";
 //				DecompGuiDebugger dbg = new DecompGuiDebugger();
 //				dbg.setVisible(true);
