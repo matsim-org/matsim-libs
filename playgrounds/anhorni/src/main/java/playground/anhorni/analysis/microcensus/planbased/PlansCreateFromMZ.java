@@ -63,12 +63,6 @@ public class PlansCreateFromMZ {
 	private static final String OTHR = "o";
 	private static final String UNDF = "undefined";
 
-	private static final String MALE = "m";
-	private static final String FEMALE = "f";
-
-	private static final String YES = "yes";
-	private static final String NO = "no";
-
 	private final int dow_min;
 	private final int dow_max;
 
@@ -191,10 +185,17 @@ public class PlansCreateFromMZ {
 				Coord from = new CoordImpl(entries[9].trim(),entries[10].trim());
 				entries[9] = Double.toString(from.getX());
 				entries[10] = Double.toString(from.getY());
-
+				int fromPLZ = -99;
+				if (!entries[12].trim().isEmpty()) {
+					fromPLZ = Integer.parseInt(entries[12].trim());
+				}
 				Coord to = new CoordImpl(entries[15].trim(),entries[16].trim());
 				entries[15] = Double.toString(to.getX());
 				entries[16] = Double.toString(to.getY());
+				int toPLZ = -99;
+				if (!entries[18].trim().isEmpty()) {
+					toPLZ = Integer.parseInt(entries[18].trim());
+				}
 
 				// departure time (min => sec.). A few arrival times are not given, setting to departure time (trav_time=0)
 				int arrival = departure;
@@ -287,8 +288,9 @@ public class PlansCreateFromMZ {
 
 				// adding acts/legs
 				if (plan.getPlanElements().size() != 0) { // already lines parsed and added
-					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+					MZActivityImpl from_act = (MZActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
+					from_act.setPlz(fromPLZ);
 					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
@@ -296,7 +298,9 @@ public class PlansCreateFromMZ {
 					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 					leg.setRoute(route);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					MZActivityImpl act = new MZActivityImpl(acttype,to);
+					plan.addActivity(act);
+					act.setPlz(toPLZ);
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
@@ -305,8 +309,10 @@ public class PlansCreateFromMZ {
 					}
 				}
 				else {
-					ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME,from);
+					MZActivityImpl homeAct = new MZActivityImpl(HOME,from);
+					plan.addActivity(homeAct);
 					homeAct.setEndTime(departure);
+					homeAct.setPlz(fromPLZ);
 					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
@@ -314,7 +320,9 @@ public class PlansCreateFromMZ {
 					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 					leg.setRoute(route);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					MZActivityImpl act = new MZActivityImpl(acttype,to);
+					plan.addActivity(act);
+					act.setPlz(toPLZ);
 					act.setStartTime(arrival);
 				}
 			}
@@ -362,10 +370,18 @@ public class PlansCreateFromMZ {
 				Coord from = new CoordImpl(entries[12].trim(), entries[13].trim());
 				entries[12] = Double.toString(from.getX());
 				entries[13] = Double.toString(from.getY());
+				int fromPLZ = -99;
+				if (!entries[17].trim().isEmpty()) {
+					fromPLZ = Integer.parseInt(entries[17].trim());
+				}
 
 				Coord to = new CoordImpl(entries[19].trim(), entries[20].trim());
 				entries[19] = Double.toString(to.getX());
 				entries[20] = Double.toString(to.getY());
+				int toPLZ = -99;
+				if (!entries[24].trim().isEmpty()) {
+					toPLZ = Integer.parseInt(entries[24].trim());
+				}
 
 				// departure time (min => sec.). A few arrival times are not given, setting to departure time (trav_time=0)
 				int arrival = departure;
@@ -420,10 +436,8 @@ public class PlansCreateFromMZ {
 				else { 
 					Gbl.errorMsg("pid=" + pid + ": m=" + m + " not known!");
 				}
-
 				// micro census person weight
 				double weight = Double.parseDouble(entries[2].trim());
-
 				
 				// shopping purpose ----------------------------------------------
 				double shoppingPurpose = Integer.parseInt(entries[27].trim());
@@ -460,8 +474,9 @@ public class PlansCreateFromMZ {
 
 				// adding acts/legs
 				if (plan.getPlanElements().size() != 0) { // already lines parsed and added
-					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+					MZActivityImpl from_act = (MZActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
+					from_act.setPlz(fromPLZ);
 					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
@@ -469,17 +484,21 @@ public class PlansCreateFromMZ {
 					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 					leg.setRoute(route);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					MZActivityImpl act = new MZActivityImpl(acttype,to);
+					plan.addActivity(act);
+					act.setPlz(toPLZ);
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
-					if ((from_act.getCoord().getX() != from.getX()) || (from_act.getCoord().getY() != from.getY())) {						
+					if ((from_act.getCoord().getX() != from.getX()) || (from_act.getCoord().getY() != from.getY())) {
 						coord_err_pids.add(pid);
 					}
 				}
 				else {
-					ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME,from);
+					MZActivityImpl homeAct = new MZActivityImpl(HOME,from);
+					plan.addActivity(homeAct);
 					homeAct.setEndTime(departure);
+					homeAct.setPlz(fromPLZ);
 					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
@@ -487,15 +506,19 @@ public class PlansCreateFromMZ {
 					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 					leg.setRoute(route);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					MZActivityImpl act = new MZActivityImpl(acttype,to);
+					plan.addActivity(act);
+					act.setPlz(toPLZ);
 					act.setStartTime(arrival);
 				}
 			}
 			// replacing the person string with the new data
-			if (person_strings.put(pid,person_string_new) == null) { Gbl.errorMsg("That must not happen!"); }
+			if (person_strings.put(pid, person_string_new) == null) { 
+				Gbl.errorMsg("That must not happen!");
+			}
 		}
 		log.info("        removing "+pids_dow.size()+" persons not part of the days = ["+this.dow_min+","+this.dow_max+"]...");
-		this.removePlans(plans,person_strings,pids_dow);
+		this.removePlans(plans, person_strings,pids_dow);
 		log.info("        done.");
 		coord_err_pids.removeAll(pids_dow);
 
@@ -547,8 +570,7 @@ public class PlansCreateFromMZ {
 			if (household == null) {
 				log.info(person.getHh());
 				log.info(households.keySet().toString());
-			}
-			
+			}			
 			person.setHhIncome(household.getSize());
 			person.setHhIncome(household.getHhIncome());		
 		}		

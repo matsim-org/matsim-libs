@@ -35,7 +35,7 @@ public class Controler {
 
 	public static ArrayList<String> modes = new ArrayList<String>(Arrays.asList("car", "pt", "bike", "walk", ""));
 	public static ArrayList<String> frequency = new ArrayList<String>(Arrays.asList("VeryOften", "Often", "OnceAWhile", "Seldom", "Never", "NULL", ""));
-	private TreeMap<Id, Person> population = new TreeMap<Id, Person>();
+	private TreeMap<Id, EstimationPerson> population = new TreeMap<Id, EstimationPerson>();
 	
 	private final static Logger log = Logger.getLogger(Controler.class);
 	
@@ -55,19 +55,6 @@ public class Controler {
 		log.info("finished .......................................");
 	}
 	
-	private void readUniversalCS(String file) {
-		try {
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String curr_line;
-			while ((curr_line = br.readLine()) != null) {
-				String[] entrs = curr_line.split(";", -1);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	
 // 0: username,		1: age,		2: sex,		3: income,	4: hhsize,	5: shoppingPerson,	6: purchasesPerMonth,	
 // 7: H_Street,		8: H_nbr,	9: H_PLZ,	10: H_city, 11: H_Lat, 12: H_Lng,
@@ -84,7 +71,7 @@ public class Controler {
 				String[] entrs = curr_line.split(";", -1);
 				Id userId = new IdImpl(entrs[0].trim().substring(4, 8));
 				
-				Person person = new Person(userId);
+				EstimationPerson person = new EstimationPerson(userId);
 				this.population.put(userId, person);
 				
 				person.setAge(Integer.parseInt(entrs[1].trim()));
@@ -150,7 +137,7 @@ public class Controler {
 				Id shopId = new IdImpl(entrs[1].trim());
 				Id userId = new IdImpl(entrs[2].trim().substring(4, 8));
 				
-				Person person = this.population.get(userId);
+				EstimationPerson person = this.population.get(userId);
 				ShopLocation store = new ShopLocation(shopId);				
 				int aware = 0;
 				int visited = 0;

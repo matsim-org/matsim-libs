@@ -27,6 +27,8 @@ public class MZPerson extends PersonImpl implements Person {
 	private int hhIncome;
 	private int day;
 	private int hh;
+	private int hhSize;
+	private int plz;
 	
 	public MZPerson(Id id) {
 		super(id);
@@ -54,5 +56,17 @@ public class MZPerson extends PersonImpl implements Person {
 	}
 	public void setHh(int hh) {
 		this.hh = hh;
+	}
+	public int getHhSize() {
+		return hhSize;
+	}
+	public void setHhSize(int hhSize) {
+		this.hhSize = hhSize;
+	}
+	public int getPlz() {
+		return plz;
+	}
+	public void setPlz(int plz) {
+		this.plz = plz;
 	}
 }

@@ -20,16 +20,15 @@
 package playground.anhorni.csestimation;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
-public class Person {
-	private Id id;
-	private int age = -99;
-	private String sex;
-	private int hhIncome = -99;
-	private int hhSize = -99;
+import playground.anhorni.analysis.microcensus.planbased.MZPerson;
+
+public class EstimationPerson extends MZPerson {
 	private int nbrPersonShoppingTripsMonth = -99;
 	private String nbrShoppingTripsMonth = "-99";		
 		
@@ -42,8 +41,26 @@ public class Person {
 	private PersonLocations locations = new PersonLocations();
 	private PersonModes modes = new PersonModes();
 	
-	public Person(Id id) {
-		this.id = id;
+	private List<ShoppingTrip> shoppingTrips = new Vector<ShoppingTrip>();
+	
+	public EstimationPerson(Id id) {
+		super(id);
+	}	
+	
+	public EstimationPerson(MZPerson mzPerson) {
+		super(mzPerson.getId());
+		super.setAge(mzPerson.getAge());
+		super.setCarAvail(mzPerson.getCarAvail());
+		super.setDay(mzPerson.getDay());
+		super.setEmployed(mzPerson.isEmployed());
+		super.setHh(mzPerson.getHh());
+		super.setHhIncome(mzPerson.getHhIncome());
+		super.setHhSize(mzPerson.getHhSize());
+		super.setPlz(mzPerson.getPlz());
+		super.addPlan(mzPerson.getSelectedPlan());
+		super.setSelectedPlan(mzPerson.getSelectedPlan());
+		super.setLicence(mzPerson.getLicense());
+		super.setSex(mzPerson.getSex());
 	}
 	
 	public void setHomeLocation(Location location) {
@@ -76,21 +93,6 @@ public class Person {
 	public void setAreaToShop(int index, int value) {
 		this.areaToShop[index] = value;
 	}	
-	public Id getId() {
-		return id;
-	}
-	public int getAge() {
-		return age;
-	}
-	public String sex() {
-		return sex;
-	}
-	public int getHhIncome() {
-		return hhIncome;
-	}
-	public int getHhSize() {
-		return hhSize;
-	}
 	public int getNbrPersonShoppingTripsMonth() {
 		return nbrPersonShoppingTripsMonth;
 	}
@@ -103,32 +105,22 @@ public class Person {
 	public int[] getAreaToShop() {
 		return areaToShop;
 	}
-	public void setId(Id id) {
-		this.id = id;
-	}
-	public void setAge(int age) {
-		this.age = age;
-	}
-	public void setSex(String sex) {
-		this.sex = sex;
-	}
-	public void setHhIncome(int hhIncome) {
-		this.hhIncome = hhIncome;
-	}
-	public void setHhSize(int hhSize) {
-		this.hhSize = hhSize;
-	}
 	public void setNbrShoppingTripsMonth(String nbrShoppingTripsMonth) {
 		this.nbrShoppingTripsMonth = nbrShoppingTripsMonth;
 	}
 	public void setNbrPersonShoppingTripsMonth(int nbrPersonShoppingTripsMonth) {
 		this.nbrPersonShoppingTripsMonth = nbrPersonShoppingTripsMonth;
 	}
-
 	public void setWorker(boolean isWorker) {
 		this.isWorker = isWorker;
 	}
 	public void setAreaToShop(int[] areaToShop) {
 		this.areaToShop = areaToShop;
+	}
+	public void addShoppingTrip(ShoppingTrip t) {
+		this.shoppingTrips.add(t);
+	}
+	public List<ShoppingTrip> getShoppingTrips() {
+		return this.shoppingTrips;
 	}
 }
