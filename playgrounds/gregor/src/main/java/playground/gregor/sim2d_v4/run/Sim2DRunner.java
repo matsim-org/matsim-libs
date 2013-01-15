@@ -24,16 +24,22 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 
-public class Sim2DRunner {
+public class Sim2DRunner implements IterationStartsListener{
 
+	private final VisDebugger visDebugger = new VisDebugger();
+	private Controler controller;
 	
 	public static void main(String [] args) {
 		if (args.length != 2) {
@@ -57,6 +63,12 @@ public class Sim2DRunner {
 		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
 		controller.addMobsimFactory("hybridQ2D", factory);
 		
+		Sim2DRunner runner = new Sim2DRunner();
+		PhysicalSim2DEnvironment.visDebugger = runner.visDebugger;
+		controller.addControlerListener(runner);
+		runner.controller = controller;
+		controller.setCreateGraphs(false);
+		
 		controller.run();
 	}
 	
@@ -73,5 +85,17 @@ public class Sim2DRunner {
 		System.out.println("---------------------");
 		System.out.println("2012, matsim.org");
 		System.out.println();
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if ((event.getIteration()+1) % 200 == 0) {
+			PhysicalSim2DEnvironment.DEBUG = true;
+			this.controller.setCreateGraphs(true);
+		} else {
+			PhysicalSim2DEnvironment.DEBUG = false;
+			this.controller.setCreateGraphs(false);
+		}
+		this.visDebugger.setIteration(event.getIteration());
 	}
 }

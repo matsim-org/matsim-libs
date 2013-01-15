@@ -60,15 +60,15 @@ public class PhysicalSim2DEnvironment {
 	private final double offsetY;
 
 	//DEBUG
-	private static final boolean DEBUG = false;
-	private static final VisDebugger visDebugger;
-	static {
-		if (DEBUG) {
-			visDebugger = new VisDebugger();
-		} else {
-			visDebugger = null;
-		}
-	}
+	public static boolean DEBUG = true;
+	public static  VisDebugger visDebugger;
+//	static {
+//		if (DEBUG) {
+//			visDebugger = new VisDebugger();
+//		} else {
+//			visDebugger = null;
+//		}
+//	}
 
 	private Map<Id, Sim2DQTransitionLink> lowResLinks;
 
@@ -122,7 +122,7 @@ public class PhysicalSim2DEnvironment {
 		}
 
 		//DEBUG
-		if (DEBUG) {
+		if (this.DEBUG) {
 			debug(time);
 		}
 	}

@@ -3,7 +3,6 @@ package playground.gregor.sim2d_v3.helper.experimentalgraphgenerator;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -14,7 +13,7 @@ public class DenseMultiPointFromLineString {
 
 	private final GeometryFactory geofac = new GeometryFactory();
 
-	private static final double STEP_SIZE = .1;
+	public static double STEP_SIZE = .1;
 
 	public MultiPoint getDenseMultiPointFromLineString(List<LineString> ls) {
 		MultiPoint ret = null;

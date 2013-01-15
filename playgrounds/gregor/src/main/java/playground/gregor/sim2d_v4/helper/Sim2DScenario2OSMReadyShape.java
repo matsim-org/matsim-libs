@@ -202,8 +202,8 @@ public class Sim2DScenario2OSMReadyShape {
 		Sim2DConfig conf = Sim2DConfigUtils.loadConfig(confPath);
 		Sim2DScenario sc = Sim2DScenarioUtils.loadSim2DScenario(conf);
 		Sim2DScenario2OSMReadyShape osm = new Sim2DScenario2OSMReadyShape(sc);
-		osm.writeOSMReadyEnvironmentShape("/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/osmEnv.shp");
-		osm.writeOSMReadyNetworkShape("/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/osmNet.shp");
+		osm.writeOSMReadyEnvironmentShape("/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage3/osmEnv.shp");
+		osm.writeOSMReadyNetworkShape("/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage3/osmNet.shp");
 	}
 
 }

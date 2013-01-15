@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -37,7 +36,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.gregor.multidestpeds.io.Importer;
 import playground.gregor.multidestpeds.io.Ped;
@@ -90,9 +88,9 @@ public class PopulationGeneratorSim2DV4 {
 //			Link ol = net.getNearestLinkExactly(MGC.coordinate2Coord(depCoord));
 			Id oid;
 			if (pers.getId().toString().contains("g")) {
-				oid = new IdImpl("sim2d_0_-35330");
+				oid = new IdImpl("sim2d_0_-1611");
 			} else {
-				oid = new IdImpl("sim2d_0_rev_-35320");
+				oid = new IdImpl("sim2d_0_-1616");
 			}
 			Activity act0 = fac.createActivityFromLinkId("origin", oid);
 			act0.setEndTime(dep);
@@ -101,10 +99,9 @@ public class PopulationGeneratorSim2DV4 {
 			plan.addLeg(leg);
 			Id did;
 			if (pers.getId().toString().contains("r")) {
-				did = new IdImpl("sim2d_0_-35315");
+				did = new IdImpl("sim2d_0_rev_-1592");
 			} else {
-				Link dl = net.getNearestLinkExactly(MGC.coordinate2Coord(arrCoord));
-				did = dl.getId();
+				did = new IdImpl("sim2d_0_rev_-1624");
 			}
 			Activity act1 = fac.createActivityFromLinkId("destination", did);
 			plan.addActivity(act1);

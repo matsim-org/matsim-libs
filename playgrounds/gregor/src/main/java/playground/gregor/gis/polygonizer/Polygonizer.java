@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class Polygonizer {
 	
 	public static void main(String args[]) {
-		String input = "/Users/laemmel/devel/gr90/floorplan.shp";
+		String input = "/Users/laemmel/devel/burgdorf2d/raw_input/raw_env.shp";
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(input);
 		Geometry res = null;
@@ -48,7 +48,7 @@ public class Polygonizer {
 		
 		Geometry e2 = e.difference(res2);
 		GisDebugger.addGeometry(e2);
-		GisDebugger.dump("/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_env.shp");
+		GisDebugger.dump("/Users/laemmel/devel/burgdorf2d/raw_input/raw_env2.shp");
 		
 		System.out.println(res);
 		

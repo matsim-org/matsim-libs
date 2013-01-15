@@ -404,7 +404,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 	}
 
 	public static void main (String [] args) throws NoSuchAuthorityCodeException, FactoryException {
-		String osmFile = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/env.osm";
+		String osmFile = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage3/env.osm";
 		String inputDir = "/Users/laemmel/devel/gr90_sim2d_v4/input";
 		String outputDir = "/Users/laemmel/devel/gr90_sim2d_v4/output";
 		
@@ -436,10 +436,10 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		
 //		c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
 		c.strategy().addParam("Module_1", "ReRoute");
-		c.strategy().addParam("ModuleProbability_1", ".5");
-		c.strategy().addParam("ModuleDisableAfterIteration_1", "10");
-		c.strategy().addParam("Module_2", "KeepLastSelected");
-		c.strategy().addParam("ModuleProbability_2", ".5");
+		c.strategy().addParam("ModuleProbability_1", ".1");
+		c.strategy().addParam("ModuleDisableAfterIteration_1", "250");
+		c.strategy().addParam("Module_2", "ChangeExpBeta");
+		c.strategy().addParam("ModuleProbability_2", ".9");
 		
 		c.controler().setOutputDirectory(outputDir);
 		

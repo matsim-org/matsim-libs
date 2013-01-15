@@ -68,6 +68,7 @@ public class VisDebugger extends PApplet {
 	
 	private boolean first = true;
 	private String time = "00:00.00.0";
+	private String iteration = "it: 0";
 	@Override
 	public void setup() {
 		addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
@@ -172,6 +173,7 @@ public class VisDebugger extends PApplet {
 			}
 		}
 		drawTime();
+		drawIteration();
 	}
 
 	private void drawText(Text el) {
@@ -187,6 +189,16 @@ public class VisDebugger extends PApplet {
 		rect(0, 0, 105, 25);
 		fill(0);
 		text(strTime, 10, 18);
+		
+	}
+	
+	private void drawIteration() {
+		String iteration = setIteration(-1);
+		fill(128, 128);
+		stroke(0);
+		rect(0, 26, 105, 25);
+		fill(0);
+		text(iteration, 10, 44);
 		
 	}
 
@@ -206,6 +218,7 @@ public class VisDebugger extends PApplet {
 	private void drawCircle(Circle c) {
 		fill(c.r,c.g,c.b,c.a);
 		stroke(c.r,c.g,c.b,c.a);
+		ellipseMode(CENTER);
 		ellipse(scaleFlX(c.x),scaleFlY(c.y),scaleFl(c.rr),scaleFl(c.rr));
 	}
 
@@ -378,6 +391,13 @@ public class VisDebugger extends PApplet {
 		}
 		return this.time;
 		
+	}
+	
+	synchronized public String setIteration(int it) {
+		if (it > 0) {
+			this.iteration = "iteration: " + it;
+		}
+		return this.iteration;
 	}
 
 
