@@ -23,17 +23,15 @@ public class Writer {
 			for (Person p:population.getPersons().values()) {
 				EstimationPerson person = (EstimationPerson)p;
 				
-				if (!person.getShoppingTrips().isEmpty()) {				
-					bufferedWriter.write(person.getId() + "\t");
-					bufferedWriter.write(person.getAge() + "\t");
-					bufferedWriter.write(person.getHhIncome() + "\t");
-					
-					// TODO: trips and choice rausfummeln
-					int choice = -99;				
-					bufferedWriter.write(choice + "\t");
+				for (ShoppingTrip st:person.getShoppingTrips()) {
+					bufferedWriter.write(person.getId() + ",");
+					bufferedWriter.write(person.getAge() + ",");
+					bufferedWriter.write(person.getHhIncome() + ",");				
+					bufferedWriter.write(st.getShop().getId() + ","); // choice
+					bufferedWriter.write(st.getStart().getX() + "," + st.getStart().getY() + ",");
+					bufferedWriter.write(st.getEnd().getX() + "," + st.getEnd().getY() + ",");
 					bufferedWriter.write("\n");
-				}
-				
+				}				
 			}				
 			bufferedWriter.flush();
 		    bufferedWriter.close();
@@ -44,6 +42,20 @@ public class Writer {
 	}
 	
 	private void writeShops(TreeMap<Id, ShopLocation> shops, String shopsFile) {
-		
+		try {
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(shopsFile)); 			
+			for (ShopLocation shop:shops.values()) {
+				bufferedWriter.write(shop.getId() + ",");
+				bufferedWriter.write(shop.getCoord().getX() + "," + shop.getCoord().getX() + ",");
+				bufferedWriter.write(shop.getSize() + ",");
+				bufferedWriter.write(shop.getPrice() + ",");
+				bufferedWriter.write("\n");				
+			}				
+			bufferedWriter.flush();
+		    bufferedWriter.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

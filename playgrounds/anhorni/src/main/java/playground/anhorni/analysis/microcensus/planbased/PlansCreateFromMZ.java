@@ -254,7 +254,7 @@ public class PlansCreateFromMZ {
 				
 				// shopping purpose ----------------------------------------------
 				double shoppingPurpose = Integer.parseInt(entries[21].trim());
-				if (purpose == 3) {
+				if (purpose == 4) {
 					if (shoppingPurpose == 1) {
 						acttype = SHOP_GROCERY;
 					}
@@ -441,7 +441,7 @@ public class PlansCreateFromMZ {
 				
 				// shopping purpose ----------------------------------------------
 				double shoppingPurpose = Integer.parseInt(entries[27].trim());
-				if (purpose == 3) {
+				if (purpose == 4) {
 					if (shoppingPurpose == 1) {
 						acttype = SHOP_GROCERY;
 					}
@@ -657,19 +657,19 @@ public class PlansCreateFromMZ {
 
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("      identify plans round trips...");
-		pids = this.identifyPlansWithRoundTrips(plans,person_strings);
-		log.info("      done.");
-
-		log.info("      # persons        = " + plans.getPersons().size());
-		log.info("      # person_strings = " + person_strings.size());
-		log.info("      # persons with plans with round trips = \t" + pids.size());
-
-		log.info("      removing round trips...");
-		this.removingRoundTrips(plans,person_strings);
-		log.info("      done.");
-		log.info("-------------------------------------------------------------");
-		log.info("      # persons left        = " + plans.getPersons().size());
+//		log.info("      identify plans round trips...");
+//		pids = this.identifyPlansWithRoundTrips(plans,person_strings);
+//		log.info("      done.");
+//
+//		log.info("      # persons        = " + plans.getPersons().size());
+//		log.info("      # person_strings = " + person_strings.size());
+//		log.info("      # persons with plans with round trips = \t" + pids.size());
+//
+//		log.info("      removing round trips...");
+//		this.removingRoundTrips(plans,person_strings);
+//		log.info("      done.");
+//		log.info("-------------------------------------------------------------");
+//		log.info("      # persons left        = " + plans.getPersons().size());
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -855,29 +855,37 @@ public class PlansCreateFromMZ {
 			plan2.setScore(plan.getScore());
 			plan2.addActivity((ActivityImpl)plan.getPlanElements().get(0));
 
-			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
+			for (int i = 2; i < plan.getPlanElements().size(); i = i + 2) {
 				ActivityImpl prev_act = (ActivityImpl)plan.getPlanElements().get(i-2);
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(i-1);
 				ActivityImpl curr_act = (ActivityImpl)plan.getPlanElements().get(i);
 				Coord prevc = prev_act.getCoord();
 				Coord currc = curr_act.getCoord();
-				if ((currc.getX()==prevc.getX()) && (currc.getY()==prevc.getY())) {
+				
+				if ((currc.getX() == prevc.getX()) && (currc.getY() == prevc.getY())) {
 					ActivityImpl act2 = (ActivityImpl)plan2.getPlanElements().get(plan2.getPlanElements().size()-1);
 					act2.setEndTime(curr_act.getEndTime());
-					//act2.setDuration(act2.getEndTime()-act2.getStartTime());
-//					log.info("        pid=" + p.getId() + ": merging act_nr="+((i-2)/2)+" with act_nr=" + (i/2) + ".");
+					
 					if (!curr_act.getType().equals(prev_act.getType())) {
-						if (curr_act.getType().equals(HOME)) { act2.setType(HOME); }
+						if (curr_act.getType().equals(HOME)) { 
+							act2.setType(HOME);
+						}
 						else if (curr_act.getType().equals(WORK)) {
-							if (!act2.getType().equals(HOME)) { act2.setType(WORK); }
+							if (!act2.getType().equals(HOME)) {
+								act2.setType(WORK);
+							}
 						}
 						else if (curr_act.getType().equals(EDUC)) {
 							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK)) {
 								act2.setType(EDUC);
 							}
 						}
-						else if (curr_act.getType().equals(SHOP) || curr_act.getType().equals(SHOP_GROCERY) || curr_act.getType().equals(SHOP_NONGROCERY)) {
-							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK) && !act2.getType().equals(EDUC)) { 
+						else if (curr_act.getType().equals(SHOP) || 
+								curr_act.getType().equals(SHOP_GROCERY) || 
+								curr_act.getType().equals(SHOP_NONGROCERY)) {
+							if (!act2.getType().equals(HOME) && 
+									!act2.getType().equals(WORK) && 
+									!act2.getType().equals(EDUC)) { 
 								act2.setType(SHOP);
 							}
 						}
