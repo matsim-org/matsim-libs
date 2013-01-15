@@ -40,9 +40,9 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	private final VisDebugger visDebugger = new VisDebugger();
 	private Controler controller;
-	
+
 	public static void main(String [] args) {
-		if (args.length != 2) {
+		if (args.length != 3) {
 			printUsage();
 			System.exit(-1);
 		}
@@ -54,33 +54,37 @@ public class Sim2DRunner implements IterationStartsListener{
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		sc.addScenarioElement(sim2dsc);
 		sim2dsc.connect(sc);
-		
-		
+
+
 		Controler controller = new Controler(sc);
-		
+
 		controller.setOverwriteFiles(true);
-		
+
 		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
 		controller.addMobsimFactory("hybridQ2D", factory);
-		
-		Sim2DRunner runner = new Sim2DRunner();
-		PhysicalSim2DEnvironment.visDebugger = runner.visDebugger;
-		controller.addControlerListener(runner);
-		runner.controller = controller;
+
+		if (args[2].equals("true")) {
+			Sim2DRunner runner = new Sim2DRunner();
+			PhysicalSim2DEnvironment.visDebugger = runner.visDebugger;
+			controller.addControlerListener(runner);
+			runner.controller = controller;
+		}
+
 		controller.setCreateGraphs(false);
-		
+
 		controller.run();
 	}
-	
+
 	protected static void printUsage() {
 		System.out.println();
 		System.out.println("Controller2D");
 		System.out.println("Controller for hybrid sim2d qsim (pedestrian) simulations.");
 		System.out.println();
-		System.out.println("usage : Controller2D sim2d-config-file qsim-config-file");
+		System.out.println("usage : Controller2D sim2d-config-file qsim-config-file visualize");
 		System.out.println();
 		System.out.println("sim2d-config-file:  A sim2d config file.");
 		System.out.println("qsim-config-file:   A MATSim config file.");
+		System.out.println("visualize:   one of {true,false}.");
 		System.out.println();
 		System.out.println("---------------------");
 		System.out.println("2012, matsim.org");

@@ -60,7 +60,7 @@ public class PhysicalSim2DEnvironment {
 	private final double offsetY;
 
 	//DEBUG
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	public static  VisDebugger visDebugger;
 //	static {
 //		if (DEBUG) {

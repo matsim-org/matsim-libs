@@ -50,7 +50,7 @@ public class SocialForceAgent implements Sim2DAgent {
 	private final float B = .08f; // ??
 	private final float k = 1.2f * 100000;
 	private final float kappa = 2.4f * 100000;
-	private final float r = (float) (MatsimRandom.getRandom().nextDouble()*.1 + 0.25); //radius
+	private final float r = (float) (MatsimRandom.getRandom().nextDouble()*.1 + 0.15); //radius
 	private final float vmx = 1.5f;
 	
 	//additional constants
