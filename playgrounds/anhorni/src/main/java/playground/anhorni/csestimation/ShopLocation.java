@@ -19,6 +19,8 @@
 
 package playground.anhorni.csestimation;
 
+import org.matsim.api.core.v01.Id;
+
 public class ShopLocation extends Location {	 
 	private int prevLoc = -99;
 	private int nextLoc = -99;
@@ -27,6 +29,9 @@ public class ShopLocation extends Location {
 	private int [] reasonsForVisit = new int[7];
 	private boolean [] reasonsForNonVisit = new boolean[8];
 	
+	public ShopLocation(Id id) {
+		super(id);
+	}
 	
 	public int getPrevLoc() {
 		return prevLoc;

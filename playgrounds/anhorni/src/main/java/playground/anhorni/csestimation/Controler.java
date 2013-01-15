@@ -51,8 +51,21 @@ public class Controler {
 	public void run(String personFile, String personShopsFile, String addedShopsFile) {
 		this.readDumpedPersons(personFile);
 		log.info(this.population.size() + " persons created");
-		this.readDumpedPersonShops(personShopsFile);
+		this.readDumpedPersonShops(personShopsFile);		
 		log.info("finished .......................................");
+	}
+	
+	private void readUniversalCS(String file) {
+		try {
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			String curr_line;
+			while ((curr_line = br.readLine()) != null) {
+				String[] entrs = curr_line.split(";", -1);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -87,7 +100,7 @@ public class Controler {
 				person.setNbrPersonShoppingTripsMonth(Integer.parseInt(entrs[5].trim()));
 				person.setNbrShoppingTripsMonth(entrs[6].trim());
 
-				Location hlocation = new Location();
+				Location hlocation = new Location(new IdImpl(-1));
 				person.setHomeLocation(hlocation);
 				hlocation.setCity(entrs[10].trim());
 				hlocation.setCoord(new CoordImpl(Double.parseDouble(entrs[11].trim()), Double.parseDouble(entrs[12].trim()))); // TODO: prüfen bei NULL
@@ -98,7 +111,7 @@ public class Controler {
 				person.setModesForShopping(Controler.modes.indexOf("walk"), Controler.frequency.indexOf(entrs[16].trim().substring(1)));
 				
 				if (entrs[17].trim().equals("yes")) {
-					Location wlocation = new Location();
+					Location wlocation = new Location(new IdImpl(-2));
 					person.setWorkLocation(wlocation);
 					wlocation.setCity(entrs[21].trim());
 					wlocation.setCoord(new CoordImpl(Double.parseDouble(entrs[22].trim()), Double.parseDouble(entrs[23].trim())));
@@ -138,8 +151,7 @@ public class Controler {
 				Id userId = new IdImpl(entrs[2].trim().substring(4, 8));
 				
 				Person person = this.population.get(userId);
-				ShopLocation store = new ShopLocation();				
-				store.setId(shopId);
+				ShopLocation store = new ShopLocation(shopId);				
 				int aware = 0;
 				int visited = 0;
 				

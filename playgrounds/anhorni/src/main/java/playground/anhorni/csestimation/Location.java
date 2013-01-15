@@ -27,6 +27,9 @@ public class Location {
 	private Coord coord;	 
 	private String city;
 	
+	public Location(Id id) {
+		this.id = id;
+	}
 	
 	public Id getId() {
 		return id;
