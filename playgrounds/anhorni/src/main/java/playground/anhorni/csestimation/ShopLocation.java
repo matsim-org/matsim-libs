@@ -29,6 +29,9 @@ public class ShopLocation extends Location {
 	private int [] reasonsForVisit = new int[7];
 	private boolean [] reasonsForNonVisit = new boolean[8];
 	
+	private int size = -1;
+	private int price = -1;
+	
 	public ShopLocation(Id id) {
 		super(id);
 	}
@@ -62,5 +65,17 @@ public class ShopLocation extends Location {
 	}
 	public void setVisitFrequency(String visitFrequency) {
 		this.visitFrequency = visitFrequency;
+	}
+	public int getSize() {
+		return size;
+	}
+	public int getPrice() {
+		return price;
+	}
+	public void setSize(int size) {
+		this.size = size;
+	}
+	public void setPrice(int price) {
+		this.price = price;
 	}
 }
