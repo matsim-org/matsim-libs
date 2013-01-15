@@ -149,7 +149,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 	public static void main(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new MinimizeV_CWeightedTimeListener());
-		controler.setWriteEventsInterval(1);
+		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}

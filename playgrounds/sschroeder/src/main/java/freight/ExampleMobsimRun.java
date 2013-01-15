@@ -21,7 +21,7 @@ public class ExampleMobsimRun {
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		Controler controler = new Controler(config);
-		controler.setWriteEventsInterval(1);
+		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setCreateGraphs(false);
 		CarrierConfig carrierConfig = new CarrierConfig();
 		carrierConfig.addCoreModules();

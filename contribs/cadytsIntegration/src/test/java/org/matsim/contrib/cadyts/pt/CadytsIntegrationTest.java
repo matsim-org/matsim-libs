@@ -63,7 +63,7 @@ public class CadytsIntegrationTest {
 
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.setMobsimFactory(new DummyMobsimFactory());
 		controler.run();
@@ -100,7 +100,7 @@ public class CadytsIntegrationTest {
 
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.run();
 		
@@ -215,7 +215,7 @@ public class CadytsIntegrationTest {
 
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		
 //		controler.addControlerListener( new StartupListener() {
@@ -343,7 +343,7 @@ public class CadytsIntegrationTest {
 		
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.run();
 

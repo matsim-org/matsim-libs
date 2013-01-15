@@ -59,7 +59,7 @@ public class MiniScenarioControler extends Controler {
 
 		this.setCreateGraphs(true);
 		this.setDumpDataAtEnd(false);
-		this.setWriteEventsInterval(0);
+		this.getConfig().controler().setWriteEventsInterval(0);
 
 		ObjectAttributes attributes = new ObjectAttributes();
 		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(attributes);

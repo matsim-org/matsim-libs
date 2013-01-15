@@ -43,7 +43,7 @@ public class PlansDumpingTest {
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(3);
 		Controler c = new Controler(config);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.setCreateGraphs(false);
 
 		c.run();
@@ -67,7 +67,7 @@ public class PlansDumpingTest {
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(0);
 		Controler c = new Controler(config);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.setCreateGraphs(false);
 
 		c.run();
@@ -91,7 +91,7 @@ public class PlansDumpingTest {
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(1);
 		Controler c = new Controler(config);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.setCreateGraphs(false);
 
 		c.run();

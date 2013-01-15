@@ -59,7 +59,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.getConfig().controler().setWritePlansInterval(0);
 		
 		controler.run();

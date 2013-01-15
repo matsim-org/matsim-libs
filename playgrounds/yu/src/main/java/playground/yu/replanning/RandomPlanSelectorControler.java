@@ -46,7 +46,7 @@ public class RandomPlanSelectorControler extends Controler {
 
 	public static void main(final String args[]) {
 		Controler controler = new RandomPlanSelectorControler(args);
-		controler.setWriteEventsInterval(10);
+		controler.getConfig().controler().setWriteEventsInterval(10);
 		controler.run();
 	}
 }

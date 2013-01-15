@@ -66,7 +66,7 @@ public class SanralControler_base {
 
 		Controler c = new Controler(config);
 		c.setCreateGraphs(true);
-		c.setWriteEventsInterval(20);
+		c.getConfig().controler().setWriteEventsInterval(20);
 		c.setOverwriteFiles(false);
 		
 		

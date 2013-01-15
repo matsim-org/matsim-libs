@@ -47,7 +47,7 @@ public class MinimizeLeftTurnsControlerListener implements
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
 				.addControlerListener(new MinimizeLeftTurnsControlerListener());
-		controler.setWriteEventsInterval(1);
+		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}

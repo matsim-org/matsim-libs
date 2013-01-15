@@ -251,7 +251,7 @@ public class CountControlerListenerTest {
 		
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
 		
@@ -285,7 +285,7 @@ public class CountControlerListenerTest {
 		
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
 		

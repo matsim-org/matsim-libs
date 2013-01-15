@@ -67,7 +67,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 //		config.strategy().addStrategySettings(reRoute);
 //		
 		controler = new Controler(config);
-		controler.setWriteEventsInterval(1);
+		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setCreateGraphs(false);
 		CarrierConfig carrierConfig = new CarrierConfig();
 		carrierConfig.addCoreModules();

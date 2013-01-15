@@ -65,7 +65,7 @@ public class SingleReRouteSelectedControler extends Controler {
 			Controler controler = new SingleReRouteSelectedControler(args[i]);
 			controler.addControlerListener(new SingleReRouteSelectedListener(
 					1d - i / 2d));
-			controler.setWriteEventsInterval(0);
+			controler.getConfig().controler().setWriteEventsInterval(0);
 			controler.setOverwriteFiles(true);
 			controler.run();
 		}
@@ -80,7 +80,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void distance(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new SingleReRouteSelectedListener(0d));
-		controler.setWriteEventsInterval(1);
+		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -89,7 +89,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void tightTurnPenalty(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new TightTurnPenaltyControlerListener());
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -98,7 +98,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void capacityWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new LinkCapacityWeightedTimeListener());
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -108,7 +108,7 @@ public class SingleReRouteSelectedControler extends Controler {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
 				.addControlerListener(new LinkCapacitySquareWeightedTimeListener());
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -118,7 +118,7 @@ public class SingleReRouteSelectedControler extends Controler {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
 				.addControlerListener(new LinkCapacitySqrtWeightedTimeListener());
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -127,7 +127,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void speedWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new SpeedWeightedTimeListener());
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -136,7 +136,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void speedSquareWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new SpeedSquareWeightedTimeListener());
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -145,7 +145,7 @@ public class SingleReRouteSelectedControler extends Controler {
 	public static void speedSqrtWeightedTravelTimeCost(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new SpeedSqrtWeightedTimeListener());
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
@@ -156,7 +156,7 @@ public class SingleReRouteSelectedControler extends Controler {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler
 				.addControlerListener(new SpeedCapacitySqrtCombiWeightedTimeListener());
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}

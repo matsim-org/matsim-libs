@@ -48,7 +48,7 @@ public class TightTurnPenaltyControlerListener implements
 	public static void main(String[] args) {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new TightTurnPenaltyControlerListener());
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}

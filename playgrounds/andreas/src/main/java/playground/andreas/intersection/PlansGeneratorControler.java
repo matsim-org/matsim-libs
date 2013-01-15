@@ -187,7 +187,7 @@ public class PlansGeneratorControler extends Controler {
 		config = ConfigUtils.loadConfig("./src/playground/andreas/intersection/test/data/bottleneck/config.xml");
 		final PlansGeneratorControler controler = new PlansGeneratorControler(config);
 		controler.setOverwriteFiles(true);
-		controler.setWriteEventsInterval(1);
+		controler.getConfig().controler().setWriteEventsInterval(1);
 
 		controler.run();
 

@@ -77,7 +77,7 @@ public class PSSEventsFileBasedControler {
 
 		addControlerHandlerForReadingAllowedChargingLocationsParameter(controler);
 		
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		
 		//addPHEVSampleFilter_Deprecated_use_EventsFilterSamplingInstead(controler);
 

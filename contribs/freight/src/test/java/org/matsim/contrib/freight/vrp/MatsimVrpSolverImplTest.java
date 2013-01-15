@@ -45,7 +45,7 @@ public class MatsimVrpSolverImplTest extends MatsimTestCase{
 		network = scenario.getNetwork();
 		
 		controler = new Controler(config);
-		controler.setWriteEventsInterval(1);
+		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setCreateGraphs(false);
 	}
 	

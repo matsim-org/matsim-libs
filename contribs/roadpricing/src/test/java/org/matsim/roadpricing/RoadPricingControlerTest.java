@@ -44,7 +44,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertFalse("BaseCase must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
@@ -62,7 +62,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		controler.addControlerListener(new RoadPricing());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertFalse("Distance toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
@@ -80,7 +80,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		controler.addControlerListener(new RoadPricing());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertFalse("Cordon toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
@@ -98,7 +98,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		controler.addControlerListener(new RoadPricing());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertTrue("Area toll should use area-toll router.", router instanceof PlansCalcAreaTollRoute);
@@ -118,7 +118,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler1 = new Controler(config);
 		controler1.setCreateGraphs(false);
 		controler1.setDumpDataAtEnd(false);
-		controler1.setWriteEventsInterval(0);
+		controler1.getConfig().controler().setWriteEventsInterval(0);
 		controler1.run();
 		double scoreBasecase = controler1.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
 
@@ -130,7 +130,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		controler2.addControlerListener(new RoadPricing());
 		controler2.setCreateGraphs(false);
 		controler2.setDumpDataAtEnd(false);
-		controler2.setWriteEventsInterval(0);
+		controler2.getConfig().controler().setWriteEventsInterval(0);
 		controler2.run();
 		double scoreTollcase = controler2.getPopulation().getPersons().get(new IdImpl("1")).getPlans().get(0).getScore().doubleValue();
 

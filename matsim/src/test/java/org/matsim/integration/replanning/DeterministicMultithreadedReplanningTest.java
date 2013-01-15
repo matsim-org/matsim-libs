@@ -239,7 +239,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 			super(config);
 			this.strategyManager = manager;
 			this.setCreateGraphs(false);
-			this.setWriteEventsInterval(1);
+			this.getConfig().controler().setWriteEventsInterval(1);
 			this.setDumpDataAtEnd(false);
 		}
 

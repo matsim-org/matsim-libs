@@ -128,7 +128,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 	}
 
@@ -151,7 +151,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 	}
 

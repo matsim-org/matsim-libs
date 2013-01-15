@@ -81,7 +81,7 @@ public class EventsHandling implements BeforeMobsimListener,
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		if ( calledViaOldConstructor ) {
-			this.writeEventsInterval = event.getControler().getWriteEventsInterval() ;
+			this.writeEventsInterval = event.getControler().getConfig().controler().getWriteEventsInterval() ;
 			this.eventsFileFormats = event.getControler().getConfig().controler().getEventsFileFormats() ;
 			this.controlerIO = event.getControler().getControlerIO() ;
 		}

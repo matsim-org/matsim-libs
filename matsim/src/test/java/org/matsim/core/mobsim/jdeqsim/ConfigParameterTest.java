@@ -31,7 +31,7 @@ public class ConfigParameterTest extends MatsimTestCase {
 		Config config = super.loadConfig(this.getPackageInputDirectory() + "config.xml");
 //		config.controler().setLastIteration(-1); // we don't really want to run the simulation
 		Controler controler = new Controler(config);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 		/* make sure, all simulation parameters are set properly from
 		 * config xml file */

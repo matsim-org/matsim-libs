@@ -17,7 +17,7 @@ public class MyCommercialControlerV01 {
 		
 		// Set some Controler characteristics
 		c.setCreateGraphs(true);
-		c.setWriteEventsInterval(20);
+		c.getConfig().controler().setWriteEventsInterval(20);
 		
 		/*
 		 * Add all the listeners

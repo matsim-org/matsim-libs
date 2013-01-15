@@ -206,7 +206,7 @@ public class CrashExample
 		 * ****************** */
 		
 		Controler c = new Controler(scen);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.setOverwriteFiles(true);
 		
 		c.run();

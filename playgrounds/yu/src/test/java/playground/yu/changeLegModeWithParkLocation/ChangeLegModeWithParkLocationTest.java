@@ -221,7 +221,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener1());
 		ctl.setCreateGraphs(false);
-		ctl.setWriteEventsInterval(0);
+		ctl.getConfig().controler().setWriteEventsInterval(0);
 		ctl.setDumpDataAtEnd(false);
 
 		// !!!NO longer necessary, man can set constanceWalk in
@@ -243,7 +243,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener2());
 		ctl.setCreateGraphs(false);
-		ctl.setWriteEventsInterval(0);
+		ctl.getConfig().controler().setWriteEventsInterval(0);
 		ctl.setDumpDataAtEnd(false);
 		// !!!NO longer necessary, man can set constanceWalk in
 		// "planCalcScore"-Config Group
@@ -264,7 +264,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
 		ctl.addControlerListener(new LegChainModesListener3());
 		ctl.setCreateGraphs(false);
-		ctl.setWriteEventsInterval(0);
+		ctl.getConfig().controler().setWriteEventsInterval(0);
 		ctl.setDumpDataAtEnd(false);
 
 		// !!!NO longer necessary, man can set constanceWalk in

@@ -108,7 +108,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
 		ctl.addControlerListener(new LegChainModesListener());
 		ctl.setCreateGraphs(false);
-		ctl.setWriteEventsInterval(100);
+		ctl.getConfig().controler().setWriteEventsInterval(100);
 		Config config = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).getScenario().getConfig();
 		ctl.run();
 	}

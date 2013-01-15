@@ -62,7 +62,7 @@ public class BseUCControler extends Controler {
 		BseUCControler ctl = new BseUCControler(args);
 		// ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
-		ctl.setWriteEventsInterval(100);
+		ctl.getConfig().controler().setWriteEventsInterval(100);
 		// ctl.setWriteQGISFile(false);
 		ctl.run();
 	}

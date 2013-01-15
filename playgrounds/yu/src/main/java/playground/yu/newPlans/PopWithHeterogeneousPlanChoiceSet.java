@@ -90,7 +90,7 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 				.parseInt(args[1]/* strategyChangerIteration */));
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(100);
+		controler.getConfig().controler().setWriteEventsInterval(100);
 		controler.run();
 	}
 

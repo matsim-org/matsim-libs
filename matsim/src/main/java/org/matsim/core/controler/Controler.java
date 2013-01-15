@@ -195,14 +195,6 @@ public class Controler extends AbstractController {
 	protected StrategyManager strategyManager = null;
 
 
-	/**
-	 * Defines in which iterations the events should be written. <tt>1</tt> is
-	 * in every iteration, <tt>2</tt> in every second, <tt>10</tt> in every
-	 * 10th, and so forth. <tt>0</tt> disables the writing of events completely.
-	 */
-	/* package */int writeEventsInterval = -1;
-	/* package */int writePlansInterval = -1;
-
 	/* default analyses */
 	/* package */CalcLinkStats linkStats = null;
 	/* package */CalcLegTimes legTimes = null;
@@ -316,16 +308,6 @@ public class Controler extends AbstractController {
 	 * Starts the iterations.
 	 */
 	public void run() {
-		/*
-		 * use writeEventsInterval from config file, only if not already
-		 * initialized programmatically
-		 */
-		if (this.writeEventsInterval == -1) {
-			this.writeEventsInterval = this.config.controler().getWriteEventsInterval();
-		}
-		if (this.writePlansInterval == -1) {
-			this.writePlansInterval = this.config.controler().getWritePlansInterval();
-		}
 		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.config.controler().getRunId(), this.overwriteFiles);
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			setupMultiModalSimulation();
@@ -422,7 +404,7 @@ public class Controler extends AbstractController {
 
 		this.strategyManager = loadStrategyManager();
 		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
-		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
+		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.controlerIO ));
 	
 	
@@ -440,7 +422,7 @@ public class Controler extends AbstractController {
 		this.events.addHandler(this.legTimes);
 		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
 	
-		this.addCoreControlerListener(new EventsHandling(this.events, this.getWriteEventsInterval(),
+		this.addCoreControlerListener(new EventsHandling(this.events, this.getConfig().controler().getWriteEventsInterval(),
 				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
 		// must be last being added (=first being executed)
 	
@@ -757,24 +739,6 @@ public class Controler extends AbstractController {
 		this.overwriteFiles = overwrite;
 	}
 
-
-	/**
-	 * Sets in which iterations events should be written to a file. If set to
-	 * <tt>1</tt>, the events will be written in every iteration. If set to
-	 * <tt>2</tt>, the events are written every second iteration. If set to
-	 * <tt>10</tt>, the events are written in every 10th iteration. To disable
-	 * writing of events completely, set the interval to <tt>0</tt> (zero).
-	 *
-	 * @param interval
-	 *            in which iterations events should be written
-	 */
-	public final void setWriteEventsInterval(final int interval) {
-		this.writeEventsInterval = interval;
-	}
-
-	public final int getWriteEventsInterval() {
-		return this.writeEventsInterval;
-	}
 
 	/**
 	 * Sets whether graphs showing some analyses should automatically be
@@ -1155,10 +1119,6 @@ public class Controler extends AbstractController {
 	public void setTransitRouterFactory(
 			final TransitRouterFactory transitRouterFactory) {
 		this.transitRouterFactory = transitRouterFactory;
-	}
-
-	public int getWritePlansInterval() {
-		return this.writePlansInterval;
 	}
 
 	public Map<String, TravelTime> getMultiModalTravelTimes() {

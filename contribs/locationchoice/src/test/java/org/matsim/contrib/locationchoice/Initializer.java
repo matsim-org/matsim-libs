@@ -33,7 +33,7 @@ public class Initializer {
 		Config config = testCase.loadConfig(path);
 		this.controler = new Controler(config);
 		this.controler.setCreateGraphs(false);
-		this.controler.setWriteEventsInterval(0); // disables events-writing
+		this.controler.getConfig().controler().setWriteEventsInterval(0); // disables events-writing
 		this.controler.run();
 	}
 

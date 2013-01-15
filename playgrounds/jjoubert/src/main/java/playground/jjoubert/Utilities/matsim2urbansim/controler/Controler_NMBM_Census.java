@@ -62,7 +62,7 @@ public class Controler_NMBM_Census {
 
 		Controler c = new Controler(config);
 		c.setCreateGraphs(true);
-		c.setWriteEventsInterval(20);
+		c.getConfig().controler().setWriteEventsInterval(20);
 		c.setOverwriteFiles(overwrite);
 		
 		c.run();

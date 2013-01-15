@@ -50,7 +50,7 @@ public class MyControlerConfig2 {
 		// sets, whether Outputfiles are overwritten
 		controler.setCreateGraphs(false);
 		// sets, whether output Graphs are created – set false, if you don't need them
-		controler.setWriteEventsInterval(5);
+		controler.getConfig().controler().setWriteEventsInterval(5);
 		// sets, how often events are written. Set 0 to disable it completely
 
 		// add own controler listener

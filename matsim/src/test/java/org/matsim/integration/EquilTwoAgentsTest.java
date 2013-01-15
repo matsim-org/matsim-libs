@@ -94,7 +94,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.addControlerListener(new StartupListener() {
 			public void notifyStartup(final StartupEvent event) {	
 				double agent1LeaveHomeTime = ((PlanImpl) controler.getPopulation().getPersons().get(id1).getPlans().get(0)).getFirstActivity().getEndTime();

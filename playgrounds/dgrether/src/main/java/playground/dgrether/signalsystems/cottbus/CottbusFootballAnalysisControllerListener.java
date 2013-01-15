@@ -53,7 +53,7 @@ public class CottbusFootballAnalysisControllerListener implements StartupListene
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent e) {
 		Controler controler = e.getControler();
-		if ((controler.getWriteEventsInterval() > 0) && (e.getIteration() % controler.getWriteEventsInterval() == 0)){
+		if ((controler.getConfig().controler().getWriteEventsInterval() > 0) && (e.getIteration() % controler.getConfig().controler().getWriteEventsInterval() == 0)){
 			this.traveltimeHandler = new CottbusFootballTraveltimeHandler();
 			e.getControler().getEvents().addHandler(this.traveltimeHandler);
 		}
@@ -63,7 +63,7 @@ public class CottbusFootballAnalysisControllerListener implements StartupListene
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent e) {
 		Controler controler = e.getControler();
- 		if ((controler.getWriteEventsInterval() > 0) && (e.getIteration() % controler.getWriteEventsInterval() == 0)){
+ 		if ((controler.getConfig().controler().getWriteEventsInterval() > 0) && (e.getIteration() % controler.getConfig().controler().getWriteEventsInterval() == 0)){
  			CottbusFootballTraveltimeWriter traveltimeWriter = new CottbusFootballTraveltimeWriter();
  			
  			String filename = e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "arrival_times_" + CottbusFootballStrings.CB2FB +  ".csv");

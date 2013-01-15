@@ -160,7 +160,7 @@ public class ControlerTest {
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -179,7 +179,7 @@ public class ControlerTest {
 		controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 
 		// test that the plans have the correct times
@@ -213,7 +213,7 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
 		assertTrue("Custom ScoringFunctionFactory was not set.",
 				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
@@ -281,7 +281,7 @@ public class ControlerTest {
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -363,7 +363,7 @@ public class ControlerTest {
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
 		controler.setCreateGraphs(false);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -402,9 +402,9 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
-				3 == controler.getWriteEventsInterval());
-		controler.setWriteEventsInterval(3);
-		assertEquals(3, controler.getWriteEventsInterval());
+				3 == controler.getConfig().controler().getWriteEventsInterval());
+		controler.getConfig().controler().setWriteEventsInterval(3);
+		assertEquals(3, controler.getConfig().controler().getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
@@ -434,12 +434,12 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
-				3 == controler.getWriteEventsInterval());
+				3 == controler.getConfig().controler().getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
-		assertEquals(4, controler.getWriteEventsInterval());
+		assertEquals(4, controler.getConfig().controler().getWriteEventsInterval());
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
@@ -465,9 +465,9 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
-				0 == controler.getWriteEventsInterval());
-		controler.setWriteEventsInterval(0);
-		assertEquals(0, controler.getWriteEventsInterval());
+				0 == controler.getConfig().controler().getWriteEventsInterval());
+		controler.getConfig().controler().setWriteEventsInterval(0);
+		assertEquals(0, controler.getConfig().controler().getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
@@ -489,8 +489,8 @@ public class ControlerTest {
 		config.controler().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
-		controler.setWriteEventsInterval(1);
-		assertEquals(1, controler.getWriteEventsInterval());
+		controler.getConfig().controler().setWriteEventsInterval(1);
+		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
@@ -511,8 +511,8 @@ public class ControlerTest {
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
 		final Controler controler = new Controler(config);
-		controler.setWriteEventsInterval(1);
-		assertEquals(1, controler.getWriteEventsInterval());
+		controler.getConfig().controler().setWriteEventsInterval(1);
+		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
@@ -533,8 +533,8 @@ public class ControlerTest {
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 
 		final Controler controler = new Controler(config);
-		controler.setWriteEventsInterval(1);
-		assertEquals(1, controler.getWriteEventsInterval());
+		controler.getConfig().controler().setWriteEventsInterval(1);
+		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
@@ -555,8 +555,8 @@ public class ControlerTest {
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 
 		final Controler controler = new Controler(config);
-		controler.setWriteEventsInterval(1);
-		assertEquals(1, controler.getWriteEventsInterval());
+		controler.getConfig().controler().setWriteEventsInterval(1);
+		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
@@ -576,7 +576,7 @@ public class ControlerTest {
 		config.controler().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 
@@ -596,7 +596,7 @@ public class ControlerTest {
 		config.controler().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
-		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setCreateGraphs(false);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 

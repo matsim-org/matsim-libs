@@ -52,7 +52,7 @@ public class ControlerMobsimIntegrationTest {
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 		Assert.assertTrue(c.sim instanceof QSim);
 		Assert.assertNull(((QSim) c.sim).getMultiModalSimEngine());
@@ -69,7 +69,7 @@ public class ControlerMobsimIntegrationTest {
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 		Assert.assertTrue(c.sim instanceof QSim);
 	}
@@ -83,7 +83,7 @@ public class ControlerMobsimIntegrationTest {
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 		Assert.assertTrue(c.sim instanceof QueueSimulation);
 	}
@@ -97,7 +97,7 @@ public class ControlerMobsimIntegrationTest {
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 		Assert.assertTrue("sim is of wrong type " + c.sim.getClass().getCanonicalName(), c.sim instanceof JDEQSimulation);
 	}
@@ -113,7 +113,7 @@ public class ControlerMobsimIntegrationTest {
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 		System.out.println(c.sim.getClass().getCanonicalName());
 		Assert.assertTrue(c.sim instanceof QSim);
@@ -131,7 +131,7 @@ public class ControlerMobsimIntegrationTest {
 		c.addMobsimFactory("counting", mf);
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 		Assert.assertEquals(1, mf.callCount);
 	}
@@ -145,7 +145,7 @@ public class ControlerMobsimIntegrationTest {
 		Controler c = new Controler(cfg);
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
-		c.setWriteEventsInterval(0);
+		c.getConfig().controler().setWriteEventsInterval(0);
 		try {
 			c.run();
 			Assert.fail("expected exception, but there was none.");

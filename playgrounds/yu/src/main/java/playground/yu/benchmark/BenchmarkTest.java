@@ -36,7 +36,7 @@ public class BenchmarkTest {
 	 */
 	public static void main(String[] args) {
 		Controler ctl = new Controler("input/config.xml");
-		ctl.setWriteEventsInterval(5);
+		ctl.getConfig().controler().setWriteEventsInterval(5);
 		ctl.setCreateGraphs(false);
 		ctl.run();
 	}
