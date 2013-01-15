@@ -255,7 +255,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		
 		log.info("Computing travel time accessibility ...");
 		
-		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator());
+		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		// init least cost path tree computing shortest paths (according to travel times)
 		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculatorTest(ttc, scenario.getConfig().planCalcScore(), dummyCostFactor));
 		
@@ -312,7 +312,7 @@ public class AccessibilityTest extends MatsimTestCase{
 									final AggregateObject2NearestNode[] dummyJobClusterArray){
 		log.info("Computing travel time accessibility for each square ...");
 		
-		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator());
+		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		// init least cost path tree computing shortest paths (according to travel times)
 		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculatorTest(ttc, scenario.getConfig().planCalcScore(), dummyCostFactor));
 		

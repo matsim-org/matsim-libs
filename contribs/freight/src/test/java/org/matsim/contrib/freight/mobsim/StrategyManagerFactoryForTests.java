@@ -53,13 +53,13 @@ public class StrategyManagerFactoryForTests implements CarrierPlanStrategyManage
 
 		final LeastCostPathCalculator router = new FastDijkstraFactory().createPathCalculator(controler.getScenario()
 						.getNetwork(), new MyTravelCosts(controler
-						.getTravelTimeCalculator()), controler
-						.getTravelTimeCalculator());
+						.getLinkTravelTimes()), controler
+						.getLinkTravelTimes());
 
 
 
 		CarrierReplanningStrategy planStrat_reRoutePlan = new CarrierReplanningStrategy(new SelectBestPlan());
-		planStrat_reRoutePlan.addModule(new ReRouteVehicles(router, controler.getNetwork(),controler.getTravelTimeCalculator()));
+		planStrat_reRoutePlan.addModule(new ReRouteVehicles(router, controler.getNetwork(),controler.getLinkTravelTimes()));
 
 		CarrierReplanningStrategyManager stratManager = new CarrierReplanningStrategyManager();
 		stratManager.addStrategy(planStrat_reRoutePlan, 1.0);

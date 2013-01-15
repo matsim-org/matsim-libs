@@ -73,7 +73,7 @@ public class BKickIncomeControler extends BkControler {
 	public PlanAlgorithm createRoutingAlgorithm() {
 		return createRoutingAlgorithm(
 				this.createTravelCostCalculator(),
-				this.getTravelTimeCalculator());
+				this.getLinkTravelTimes());
 	}
 
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {

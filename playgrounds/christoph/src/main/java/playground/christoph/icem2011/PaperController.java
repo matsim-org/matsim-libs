@@ -209,7 +209,7 @@ public class PaperController extends WithinDayController implements StartupListe
 		for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) super.getNetwork()).getNetworkChangeEvents()) {
 			changedLinks.addAll(networkChangeEvent.getLinks());
 		}
-		LogLinkTravelTime logLinkTravelTime = new LogLinkTravelTime(changedLinks, super.getTravelTimeCollector(), super.getTravelTimeCalculator());
+		LogLinkTravelTime logLinkTravelTime = new LogLinkTravelTime(changedLinks, super.getTravelTimeCollector(), super.getLinkTravelTimes());
 		super.addControlerListener(logLinkTravelTime);
 		super.getFixedOrderSimulationListener().addSimulationListener(logLinkTravelTime);
 	}

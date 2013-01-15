@@ -115,7 +115,7 @@ public class KTIControler extends Controler {
 		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
 				createKtiRoutingAlgorithm(
 						this.createTravelCostCalculator(),
-						this.getTravelTimeCalculator()) :
+						this.getLinkTravelTimes()) :
 				super.createRoutingAlgorithm();
 	}
 

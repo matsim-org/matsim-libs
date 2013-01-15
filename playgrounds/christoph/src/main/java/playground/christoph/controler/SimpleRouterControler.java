@@ -41,7 +41,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
@@ -114,7 +114,7 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 	protected WithinDayInitialReplanner randomCompassReplanner;
 	protected WithinDayInitialReplanner randomDijkstraReplanner;
 
-	protected FreeSpeedTravelTimeCalculator travelTime = new FreeSpeedTravelTimeCalculator();
+	protected FreeSpeedTravelTime travelTime = new FreeSpeedTravelTime();
 	protected TravelDisutilityFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 	protected TravelDisutility travelCost = travelCostFactory.createTravelDisutility(travelTime, null);
 

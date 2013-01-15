@@ -111,7 +111,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		double bikeSpeedMeterPerMinute = 250.; // corresponds to 15 km/h 
 
 		// init least cost path tree in order to calculate travel times and travel costs
-		TravelTime ttc = controler.getTravelTimeCalculator();
+		TravelTime ttc = controler.getLinkTravelTimes();
 		// get the free-speed car travel times (in seconds)
 		LeastCostPathTree lcptFreeSpeedCarTravelTime = new LeastCostPathTree( ttc, new FreeSpeedTravelTimeCostCalculator() );
 		// get the congested car travel time (in seconds)

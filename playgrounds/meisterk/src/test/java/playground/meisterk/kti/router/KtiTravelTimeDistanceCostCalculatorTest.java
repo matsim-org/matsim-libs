@@ -77,7 +77,7 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
 		this.testee =
 			(KtiTravelTimeDistanceCostCalculator) costCalculatorFactory.createTravelDisutility(
-					travelTimeCalculator,
+					travelTimeCalculator.getLinkTravelTimes(),
 					config.planCalcScore());
 
 

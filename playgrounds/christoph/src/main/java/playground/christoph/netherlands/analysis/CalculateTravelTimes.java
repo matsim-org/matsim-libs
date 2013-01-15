@@ -46,7 +46,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
@@ -152,12 +152,13 @@ public class CalculateTravelTimes {
 	
 	private void initCalulators() throws Exception {
 		if (useFreeSpeedTravelTime) {
-			travelTime = new FreeSpeedTravelTimeCalculator();
+			travelTime = new FreeSpeedTravelTime();
 		}
 		else {
-			travelTime = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+			TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+			travelTime = travelTimeCalculator.getLinkTravelTimes();
 			EventsManager eventsManager = EventsUtils.createEventsManager();
-			eventsManager.addHandler((TravelTimeCalculator)travelTime);
+			eventsManager.addHandler(travelTimeCalculator);
 			
 			EventsReaderTXTv1 reader = new EventsReaderTXTv1(eventsManager);
 			reader.readFile(eventsFile);			

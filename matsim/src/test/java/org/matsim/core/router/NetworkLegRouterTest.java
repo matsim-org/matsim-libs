@@ -86,7 +86,7 @@ public class NetworkLegRouterTest {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getModeRouteFactory();
 
 		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl()  ;
-		TravelTime timeObject = ttCalcFactory.createTravelTimeCalculator(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()) ;
+		TravelTime timeObject = ttCalcFactory.createTravelTimeCalculator(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
 		{
 			TravelDisutility costObject = new TravelTimeAndDistanceBasedTravelDisutility(timeObject, f.s.getConfig().planCalcScore() ) ;

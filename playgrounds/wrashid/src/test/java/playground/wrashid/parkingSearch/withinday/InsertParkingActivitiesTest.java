@@ -136,7 +136,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		
 		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
-		TravelTime travelTime = ttCalcFactory.createTravelTimeCalculator(sc.getNetwork(), sc.getConfig().travelTimeCalculator()) ;
+		TravelTime travelTime = ttCalcFactory.createTravelTimeCalculator(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 		TravelDisutility travelCost = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, sc.getConfig().planCalcScore());
 		
 		PlanAlgorithm plansAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), sc.getNetwork(), travelCost, travelTime, routeFactory);

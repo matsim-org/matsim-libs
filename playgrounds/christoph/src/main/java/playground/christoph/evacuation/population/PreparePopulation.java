@@ -108,7 +108,7 @@ public class PreparePopulation {
 		
 		log.info("Setup multi-modal router...");
 		Map<String, LegRouter> legRouters = CreateMultiModalLegRouters.createLegRouters(scenario.getConfig(), 
-				scenario.getNetwork(), travelTime);
+				scenario.getNetwork(), travelTime.getLinkTravelTimes());
 		log.info("done.");
 		
 		log.info("Reading, processing, writing plans...");

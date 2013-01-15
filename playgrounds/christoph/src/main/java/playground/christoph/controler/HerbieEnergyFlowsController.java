@@ -73,7 +73,7 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
 		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
-		TravelTime timeCalculator = super.getTravelTimeCalculator();
+		TravelTime timeCalculator = super.getLinkTravelTimes();
 		PlanCalcScoreConfigGroup cnScoringGroup = null;
 		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
 		this.setTravelDisutilityFactory(costCalculatorFactory);

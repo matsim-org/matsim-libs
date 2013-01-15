@@ -29,7 +29,7 @@ import org.matsim.vehicles.Vehicle;
  * Calculates and returns the FreeSpeedTravelTime on a link at the given time.
  * @author cdobler
  */
-public class FreeSpeedTravelTimeCalculator implements TravelTime {
+public class FreeSpeedTravelTime implements TravelTime {
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {

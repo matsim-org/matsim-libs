@@ -30,7 +30,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.michalm.vrp.data.network.router.*;
 
@@ -85,7 +85,7 @@ public class InterZoneDistanceCalculator
 
     private void initDijkstra(boolean distanceMode) // modes: distance or freeflow-speed time
     {
-        TravelTime ttimeCalc = new FreeSpeedTravelTimeCalculator();
+        TravelTime ttimeCalc = new FreeSpeedTravelTime();
 
         TravelDisutility tcostCalc = distanceMode ? new DistanceAsTravelDisutility()
                 : new TimeAsTravelDisutility(ttimeCalc);

@@ -99,7 +99,7 @@ public class JointTripRouterFactory implements TripRouterFactory {
 		this(
 				controler.getScenario(),
 				controler.getTravelDisutilityFactory(),
-				controler.getTravelTimeCalculator(),
+				controler.getLinkTravelTimes(),
 				controler.getLeastCostPathCalculatorFactory(),
 				controler.getScenario().getConfig().scenario().isUseTransit() ?
 					controler.getTransitRouterFactory() :

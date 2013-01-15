@@ -49,7 +49,7 @@ public class PassivePlanningControler extends Controler{
 	public void setPassivePlaningSocial(boolean b) {
 		if(b==true)
 			if(this.config.scenario().isUseHouseholds())
-				this.setMobsimFactory(new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(this.getScenario().getHouseholds()), (IntermodalLeastCostPathCalculator) this.getLeastCostPathCalculatorFactory().createPathCalculator(network, this.createTravelCostCalculator(), this.getTravelTimeCalculator())));
+				this.setMobsimFactory(new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(this.getScenario().getHouseholds()), (IntermodalLeastCostPathCalculator) this.getLeastCostPathCalculatorFactory().createPathCalculator(network, this.createTravelCostCalculator(), this.getLinkTravelTimes())));
 			else
 				log.error("Households information is neccesary for passive planning with social");
 	}

@@ -94,10 +94,10 @@ public class WithinDayParkingController extends WithinDayController implements S
 		times.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
 		times.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute(),
 				new WalkTravelTime(this.config.plansCalcRoute())));
-		times.put(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+		times.put(TransportMode.ride, new RideTravelTime(this.getLinkTravelTimes(), 
 				new WalkTravelTime(this.config.plansCalcRoute())));
 		times.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), 
-				this.getTravelTimeCalculator(), new WalkTravelTime(this.config.plansCalcRoute())));
+				this.getLinkTravelTimes(), new WalkTravelTime(this.config.plansCalcRoute())));
 		times.put(TransportMode.car, super.getTravelTimeCollector());
 		
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();

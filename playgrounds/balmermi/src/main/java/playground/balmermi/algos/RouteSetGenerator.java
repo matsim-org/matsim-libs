@@ -61,7 +61,7 @@ public class RouteSetGenerator {
 
 	public RouteSetGenerator(NetworkImpl network, Config config) {
 		this.network = network;
-		this.timeFunction = new TravelTimeCalculator(network, config.travelTimeCalculator());
+		this.timeFunction = new TravelTimeCalculator(network, config.travelTimeCalculator()).getLinkTravelTimes();
 		this.preProcessData = new PreProcessLandmarks(new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
 		this.preProcessData.run(network);
 		this.router = new AStarLandmarks(this.network,this.preProcessData,this.timeFunction);

@@ -298,7 +298,7 @@ public class PlanScoreForecasterTravPerf {
 			// for (Plan pl : ps.getPlans()) {
 			Plan pl = ps.getSelectedPlan();
 			double score = new PlanScoreForecasterTravPerf(pl, net,
-					ttc, scoring, -6.0, 6.0).getPlanScore();
+					ttc.getLinkTravelTimes(), scoring, -6.0, 6.0).getPlanScore();
 			if (pl.getScore().intValue() != (int) score)
 				System.out.println("person\t" + ps.getId() + "\tplan\t" + pl
 						+ "\tutil\t" + score);

@@ -81,10 +81,10 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
 		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute(),
 				new WalkTravelTime(this.config.plansCalcRoute())));
-		travelTimes.put(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+		travelTimes.put(TransportMode.ride, new RideTravelTime(this.getLinkTravelTimes(), 
 				new WalkTravelTime(this.config.plansCalcRoute())));
 		travelTimes.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), 
-				this.getTravelTimeCalculator(), new WalkTravelTime(this.config.plansCalcRoute())));
+				this.getLinkTravelTimes(), new WalkTravelTime(this.config.plansCalcRoute())));
 		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();

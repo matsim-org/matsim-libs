@@ -84,11 +84,11 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 	
 		PlansCalcRouteConfigGroup configGroup = config.plansCalcRoute();
 		Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
-		multiModalTravelTimes.put(TransportMode.car, travelTimeCalculator);
+		multiModalTravelTimes.put(TransportMode.car, travelTimeCalculator.getLinkTravelTimes());
 		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
 		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup, new WalkTravelTime(configGroup)));
-		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(travelTimeCalculator, new WalkTravelTime(configGroup)));
-		multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, travelTimeCalculator, new WalkTravelTime(configGroup)));
+		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(travelTimeCalculator.getLinkTravelTimes(), new WalkTravelTime(configGroup)));
+		multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, travelTimeCalculator.getLinkTravelTimes(), new WalkTravelTime(configGroup)));
 		
 		Map<String, LegRouter> legRouters = createLegRouters(config, scenario.getNetwork(), multiModalTravelTimes);
 

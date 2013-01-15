@@ -54,7 +54,7 @@ public class RouteChoiceCostcalculatorTest {
 	
 	private void compareRouteChoices(){
 		
-		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator());
+		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		
 		// init different cost calculators
 		TravelDistanceCostCalculator distanceCostCalculator = new TravelDistanceCostCalculator();

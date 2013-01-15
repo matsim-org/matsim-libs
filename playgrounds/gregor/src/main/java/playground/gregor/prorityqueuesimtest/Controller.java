@@ -58,7 +58,7 @@ public class Controller extends Controler {
 	public PlanAlgorithm createRoutingAlgorithm() {
 		return createRoutingAlgorithm(
 				this.createTravelCostCalculator(),
-				this.getTravelTimeCalculator());
+				this.getLinkTravelTimes());
 	}
 
 

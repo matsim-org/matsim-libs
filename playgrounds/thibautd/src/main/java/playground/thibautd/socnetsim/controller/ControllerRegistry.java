@@ -85,7 +85,7 @@ public final class ControllerRegistry {
 						new AStarLandmarksFactory(
 									scenario.getNetwork(),
 									travelDisutilityFactory.createTravelDisutility(
-										travelTime,
+										travelTime.getLinkTravelTimes(),
 										scenario.getConfig().planCalcScore()));
 				break;
 			case Dijkstra:
@@ -98,7 +98,7 @@ public final class ControllerRegistry {
 						new FastAStarLandmarksFactory(
 									scenario.getNetwork(),
 									travelDisutilityFactory.createTravelDisutility(
-										travelTime,
+										travelTime.getLinkTravelTimes(),
 										scenario.getConfig().planCalcScore()));
 				break;
 			case FastDijkstra:
@@ -113,7 +113,7 @@ public final class ControllerRegistry {
 		this.tripRouterFactory = new JointTripRouterFactory(
 				scenario,
 				travelDisutilityFactory,
-				travelTime,
+				travelTime.getLinkTravelTimes(),
 				leastCostPathCalculatorFactory,
 				null); // last arg: transit router factory.
 	}

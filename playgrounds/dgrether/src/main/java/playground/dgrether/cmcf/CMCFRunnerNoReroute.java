@@ -128,9 +128,9 @@ public class CMCFRunnerNoReroute {
 //			log.info("avg tt on link 4 at 7:00: " + tt4);
 
 			for (int i = 1; i <= 3600; i++) {
-				double tt = controler.getTravelTimeCalculator().getLinkTravelTime(link4, i, null, null);
-				double tt3 = controler.getTravelTimeCalculator().getLinkTravelTime(link3, i, null, null);
-				double tt5 = controler.getTravelTimeCalculator().getLinkTravelTime(link5, i, null, null);
+				double tt = controler.getLinkTravelTimes().getLinkTravelTime(link4, i, null, null);
+				double tt3 = controler.getLinkTravelTimes().getLinkTravelTime(link3, i, null, null);
+				double tt5 = controler.getLinkTravelTimes().getLinkTravelTime(link5, i, null, null);
 				log.info("tt on link 4 at time: " + i + " " + tt);
 				log.info("tt on link 3 at time: " + i + " " + tt3);
 				log.info("tt on link 5 at time: " + i + " " + tt5);

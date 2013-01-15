@@ -89,7 +89,7 @@ public class Controller2D extends Controler implements StartupListener {
 	public PlanAlgorithm createRoutingAlgorithm() {
 		return createRoutingAlgorithm(
 				this.createTravelCostCalculator(),
-				this.getTravelTimeCalculator());
+				this.getLinkTravelTimes());
 	}
 
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {

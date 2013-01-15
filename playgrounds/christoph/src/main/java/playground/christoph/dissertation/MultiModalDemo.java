@@ -63,7 +63,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
@@ -276,7 +276,7 @@ public class MultiModalDemo {
 	 * have the same travel time as an agent walking the other route.
 	 */
 	private static double calculateLinkLength(Scenario scenario, double refNonCarTravelTime) {
-		TravelTime carTravelTime = new FreeSpeedTravelTimeCalculatorFactory().createTravelTime();
+		TravelTime carTravelTime = new FreeSpeedTravelTime();
 		
 		/*
 		 * Car travel time along the unchanged links.

@@ -77,6 +77,7 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngineFactor
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBuffer;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBufferFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.EnsureActivityReachability;
@@ -108,6 +109,7 @@ import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -190,7 +192,6 @@ public class Controler extends AbstractController {
 		
 	};
 	protected TravelTimeCalculator travelTimeCalculator = null;
-	private TravelDisutility travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
@@ -299,8 +300,15 @@ public class Controler extends AbstractController {
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
 		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
 		this.planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
-
 		this.events = EventsUtils.createEventsManager(this.config);
+		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
+			// Actually, this is not so much about multi-modal but about within-day replanning.
+			// It provides last iteration's travel times to be used during the current interation.
+			// It just happens to be used only for the "multi-modal" routers. michaz '13
+			this.travelTimeCalculatorFactory = new TravelTimeCalculatorWithBufferFactory();
+		} else {
+			this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+		}
 		this.config.parallelEventHandling().makeLocked();
 	}
 
@@ -514,20 +522,11 @@ public class Controler extends AbstractController {
 	 * have processed their startup event.
 	 * <p/>
 	 * Design comments/questions:<ul>
-	 * <li> "from the configuration" sounds too narrow.  Should be something like "from everything that there there at this point,
+	 * <li> "from the configuration" sounds too narrow.  Should be something like "from everything that is there at this point,
 	 * including, say, factories."  kai, dec'12
 	 * </ul>
 	 */
 	protected void setUp() {
-		if (this.travelTimeCalculatorFactory != null) {
-			log.info("travelTimeCalculatorFactory already set, ignoring default");
-		} else {
-			if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-				this.travelTimeCalculatorFactory = new TravelTimeCalculatorWithBufferFactory();
-			} else {
-				this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-			}
-		}
 		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 	
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
@@ -549,20 +548,17 @@ public class Controler extends AbstractController {
 	
 			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
 			multiModalTravelTimes = new HashMap<String, TravelTime>();
-			multiModalTravelTimes.put(TransportMode.car, this.getTravelTimeCalculator());
+			multiModalTravelTimes.put(TransportMode.car, this.travelTimeCalculator.getLinkTravelTimes());
 			multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
 			multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
 					new WalkTravelTime(configGroup)));
-			multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+			multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(((TravelTimeCalculatorWithBuffer) this.travelTimeCalculator).getTravelTimesFromPreviousIteration(), 
 					new WalkTravelTime(configGroup)));
 			multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
-					this.getTravelTimeCalculator(), new WalkTravelTime(configGroup)));
+					((TravelTimeCalculatorWithBuffer) this.travelTimeCalculator).getTravelTimesFromPreviousIteration(), new WalkTravelTime(configGroup)));
 	
 		}
 	
-		if (this.travelCostCalculator == null) {
-			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelDisutility(this.travelTimeCalculator, this.config.planCalcScore());
-		}
 		this.events.addHandler(this.travelTimeCalculator);
 	
 		if (this.leastCostPathCalculatorFactory != null) {
@@ -613,7 +609,7 @@ public class Controler extends AbstractController {
 						getScenario(),
 						getLeastCostPathCalculatorFactory(),
 						getTravelDisutilityFactory(),
-						getTravelTimeCalculator(),
+						travelTimeCalculator.getLinkToLinkTravelTimes(),
 						getPopulation().getFactory(),
 						tripRouterFactory);
 			}
@@ -772,11 +768,11 @@ public class Controler extends AbstractController {
 
 	public final TravelDisutility createTravelCostCalculator() {
 		return this.travelCostCalculatorFactory.createTravelDisutility(
-				this.travelTimeCalculator, this.config.planCalcScore());
+				this.travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
 	}
 
-	public final TravelTime getTravelTimeCalculator() {
-		return this.travelTimeCalculator;
+	public final TravelTime getLinkTravelTimes() {
+		return this.travelTimeCalculator.getLinkTravelTimes();
 	}
 
 	/**
@@ -837,10 +833,11 @@ public class Controler extends AbstractController {
 				getScenario().getActivityFacilities()) :
 			createOldRoutingAlgorithm(
 				this.createTravelCostCalculator(),
-				this.getTravelTimeCalculator());
+				travelTimeCalculator.getLinkTravelTimes(),
+				travelTimeCalculator.getLinkToLinkTravelTimes());
 	}
 
-	private PlanAlgorithm createOldRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	private PlanAlgorithm createOldRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes, LinkToLinkTravelTime linkToLinkTravelTime) {
 		PlansCalcRoute plansCalcRoute = null;
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 		if (this.config.scenario().isUseTransit()) {
@@ -934,7 +931,7 @@ public class Controler extends AbstractController {
 		if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
 			//Note that the inverted network is created once per thread
 			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.getScenario(),
-					this.getLeastCostPathCalculatorFactory(), this.getTravelDisutilityFactory(), travelTimes);
+					this.getLeastCostPathCalculatorFactory(), this.getTravelDisutilityFactory(), linkToLinkTravelTime);
 			plansCalcRoute.addLegHandler(TransportMode.car,	invertedNetLegRouter);
 			log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
 		}
@@ -1038,6 +1035,7 @@ public class Controler extends AbstractController {
 		return this.plansScoring;
 	}
 
+	@Deprecated
 	public TravelTimeCalculatorFactory getTravelTimeCalculatorFactory() {
 		return this.travelTimeCalculatorFactory;
 	}

@@ -66,7 +66,7 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 		this(
 				controler.getScenario(),
 				controler.getTravelDisutilityFactory(),
-				controler.getTravelTimeCalculator(),
+				controler.getLinkTravelTimes(),
 				controler.getLeastCostPathCalculatorFactory(),
 				controler.getScenario().getConfig().scenario().isUseTransit() ?
 					controler.getTransitRouterFactory() :

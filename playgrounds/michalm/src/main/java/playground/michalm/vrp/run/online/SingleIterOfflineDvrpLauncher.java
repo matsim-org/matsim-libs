@@ -33,7 +33,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
@@ -112,7 +112,7 @@ public class SingleIterOfflineDvrpLauncher
         new MatsimPopulationReader(scenario).readFile(plansFileName);
 
         ttimeCalc = travelTimesFromEvents ? TravelTimeCalculators.createTravelTimeFromEvents(
-                eventsFileName, scenario) : new FreeSpeedTravelTimeCalculator();
+                eventsFileName, scenario) : new FreeSpeedTravelTime();
         tcostCalc = new OnlyTimeDependentTravelDisutilityCalculator(ttimeCalc);
 
     }

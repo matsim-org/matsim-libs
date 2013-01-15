@@ -48,8 +48,7 @@ public class RideTravelTime implements TravelTime {
 		 * might be walking to the meeting point).
 		 */
 		if (link.getAllowedModes().contains(TransportMode.car)) {
-			if (carTravelTime instanceof BufferedTravelTime) return ((BufferedTravelTime) carTravelTime).getBufferedLinkTravelTime(link, time);
-			else return carTravelTime.getLinkTravelTime(link, time, person, vehicle);
+			return carTravelTime.getLinkTravelTime(link, time, person, vehicle);
 		}
 		else if (link.getAllowedModes().contains(TransportMode.bike) ||link.getAllowedModes().contains(TransportMode.walk)) {
 			return walkTravelTime.getLinkTravelTime(link, time, person, vehicle);

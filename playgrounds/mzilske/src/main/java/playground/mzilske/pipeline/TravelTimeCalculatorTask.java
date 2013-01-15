@@ -67,7 +67,7 @@ public class TravelTimeCalculatorTask implements ScenarioSinkSource, LinkEnterEv
 	}
 
 	public TravelTime getTravelTimeCalculator() {
-		return travelTimeCalculator;
+		return travelTimeCalculator.getLinkTravelTimes();
 	}
 
 	public Object getTravelTime() {

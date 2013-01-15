@@ -39,13 +39,16 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -56,7 +59,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 	public void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
 		strategySettings.setModuleName("ChangeLegMode");
 		strategySettings.setProbability(1.0);
@@ -90,7 +93,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 			@Override
 			public TripRouterFactory getTripRouterFactory() {
-				return new TripRouterFactoryImpl( controler );
+				return new TripRouterFactoryImpl( scenario, new OnlyTimeDependentTravelCostCalculatorFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null );
 			}
 
 			@Override

@@ -116,7 +116,7 @@ public class FlexibleTransportControler extends Controler
 		return this.ftConfigGroup.isUsePlansCalcRouteFt() ?
 				createFtRoutingAlgorithm(
 						this.createTravelCostCalculator(),
-						this.getTravelTimeCalculator()) :
+						this.getLinkTravelTimes()) :
 				super.createRoutingAlgorithm();
 	}
 

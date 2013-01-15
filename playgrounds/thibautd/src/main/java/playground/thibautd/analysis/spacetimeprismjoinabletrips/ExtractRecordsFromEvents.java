@@ -68,14 +68,14 @@ public class ExtractRecordsFromEvents {
 		Network network = getNetwork( networkFile );
 
 		TripsRecordsEventsHandler parser = new TripsRecordsEventsHandler();
-		TravelTimeCalculator travelTime = new TravelTimeCalculator(
+		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(
 				network,
 				new TravelTimeCalculatorConfigGroup());
-		processEvents( parser , travelTime , eventFile );
+		processEvents( parser , travelTimeCalculator , eventFile );
 
 		List<Record> records = extractRecords( parser );
 
-		TripsPrism prism = new TripsPrism( records , travelTime , network );
+		TripsPrism prism = new TripsPrism( records , travelTimeCalculator.getLinkTravelTimes() , network );
 
 		RecordsFlatFormatWriter.writeRecords( records , outPrefix+"records.dat" );
 		RecordsFlatFormatWriter writer = new RecordsFlatFormatWriter( outPrefix+"passengerTrips.dat.gz" );

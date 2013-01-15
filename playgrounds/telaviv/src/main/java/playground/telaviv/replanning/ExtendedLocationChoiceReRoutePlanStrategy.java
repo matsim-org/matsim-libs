@@ -46,7 +46,7 @@ public class ExtendedLocationChoiceReRoutePlanStrategy implements PlanStrategy {
 	public ExtendedLocationChoiceReRoutePlanStrategy(Controler controler) {
 		
 		Scenario scenario = controler.getScenario();
-		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
+		TravelTime travelTimeCalc = controler.getLinkTravelTimes();
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new ExtendedLocationChoicePlanModule(scenario, travelTimeCalc));

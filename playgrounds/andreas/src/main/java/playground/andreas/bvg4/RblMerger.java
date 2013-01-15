@@ -535,8 +535,8 @@ public class RblMerger {
 		HashMap<Id,HashMap<Id,HashMap<Id,NetworkRoute>>> line2route2timeBin2networkRouteMap = new HashMap<Id, HashMap<Id, HashMap<Id, NetworkRoute>>>();
 		
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-		TravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator, scenario.getConfig().planCalcScore());
-		LeastCostPathCalculator routeAlgo = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCostCalculator, travelTimeCalculator);
+		TravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		LeastCostPathCalculator routeAlgo = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCostCalculator, travelTimeCalculator.getLinkTravelTimes());
 		
 		// for all lines
 		for (Entry<Id, HashMap<Id, HashMap<Id, List<TransitRouteStop>>>> line2route2timeBin2TransitRouteStopsListEntry : line2route2timeBin2TransitRouteStopsList.entrySet()) {

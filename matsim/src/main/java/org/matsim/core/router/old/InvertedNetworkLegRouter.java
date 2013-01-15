@@ -78,21 +78,11 @@ public class InvertedNetworkLegRouter implements LegRouter {
 
 	public InvertedNetworkLegRouter(Scenario sc,
 			LeastCostPathCalculatorFactory leastCostPathCalcFactory,
-			TravelDisutilityFactory travelCostCalculatorFactory, TravelTime travelTimes) {
+			TravelDisutilityFactory travelCostCalculatorFactory, LinkToLinkTravelTime travelTimes) {
 		PlanCalcScoreConfigGroup cnScoringGroup = sc.getConfig().planCalcScore();
 		this.routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory())
 				.getModeRouteFactory();
 		this.network = sc.getNetwork();
-
-		if (!(travelTimes instanceof LinkToLinkTravelTime)) {
-			throw new IllegalStateException(
-					"If link to link travel times should be used for routing the TravelTime instance must be an instance of PersonalizableLinkToLinkTravelTime"
-							+ " but is an instance of "
-							+ travelTimes.getClass()
-							+ ". "
-							+ "  Set the enableLinkToLinkRouting config parameter in the"
-							+ " controler config module and the calculateLinkToLinkTravelTimes in the travelTimeCalculator module!");
-		}
 
 		Map<Id, List<TurnInfo>> allowedInLinkTurnInfoMap = this.createAllowedTurnInfos(sc);
 		
@@ -105,8 +95,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 							+ " use the Dijkstra or AStar router instead. ");
 		}
 
-		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network,
-				(LinkToLinkTravelTime) travelTimes);
+		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network, travelTimes);
 		TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(
 				travelTimesProxy, cnScoringGroup);
 

@@ -49,7 +49,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -367,7 +367,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private void createPlanAlgorithm() {
-		TravelTime travelTime = new FreeSpeedTravelTimeCalculatorFactory().createTravelTime();
+		TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutility travelCost = new OnlyTimeDependentTravelDisutilityCalculator(travelTime);
 		planAlgorithm = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
 				travelCost, travelTime, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());

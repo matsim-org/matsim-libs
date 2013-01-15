@@ -48,7 +48,7 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				Collection<? extends Person> persons = personQuadTree.get(f.getCoord().getX(),f.getCoord().getY(),200);
 				log.info(" Persons living around the facility " + f.getId() + " are: " + persons.size());
 //				Object[] links = controler.getNetwork().getLinks().values().toArray();
-				controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+				controler.getLinkStats().addData(controler.getVolumes(), controler.getLinkTravelTimes());
 					double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLinkId());
 					ArrayList<Id> newLinks = new ArrayList<Id>();
 					newLinks.add(f.getLinkId());

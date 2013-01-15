@@ -60,7 +60,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.households.Household;
@@ -617,7 +617,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		
 		// write car travel times
-		TravelTimesWriter travelTimesWriter = new TravelTimesWriter(this.getTravelTimeCalculator(), this.getNetwork(), config.travelTimeCalculator());
+		TravelTimesWriter travelTimesWriter = new TravelTimesWriter(this.getLinkTravelTimes(), this.getNetwork(), config.travelTimeCalculator());
 		travelTimesWriter.collectTravelTimes();
 		
 		String absoluteTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteFile);
@@ -794,9 +794,9 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 
 		travelTimes.put(TransportMode.walk, this.walkTravelTime);
 		travelTimes.put(TransportMode.bike, this.bikeTravelTime);
-		travelTimes.put(TransportMode.car, new FreeSpeedTravelTimeCalculator());
-		travelTimes.put(TransportMode.ride, new FreeSpeedTravelTimeCalculator());
-		travelTimes.put(TransportMode.pt, new FreeSpeedTravelTimeCalculator());
+		travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
+		travelTimes.put(TransportMode.ride, new FreeSpeedTravelTime());
+		travelTimes.put(TransportMode.pt, new FreeSpeedTravelTime());
 
 		return travelTimes;
 	}

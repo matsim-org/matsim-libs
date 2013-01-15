@@ -137,11 +137,11 @@ public class WalkDistanceEstimator {
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator ttc = ttcf.createTravelTimeCalculator(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
 		TravelDisutilityFactory tccf = new TravelCostCalculatorFactoryImpl();
-		TravelDisutility tc = tccf.createTravelDisutility(ttc, sAll.getConfig().planCalcScore());
+		TravelDisutility tc = tccf.createTravelDisutility(ttc.getLinkTravelTimes(), sAll.getConfig().planCalcScore());
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(ttc);
 		new EventsReaderTXTv1(em).readFile(sb.getIterationEventsFile("100"));
-		Dijkstra router = new Dijkstra(sAll.getNetwork(),tc,ttc);
+		Dijkstra router = new Dijkstra(sAll.getNetwork(),tc,ttc.getLinkTravelTimes());
 		Set<String> ptSet = new TreeSet<String>();
 		ptSet.add(TransportMode.pt);
 		

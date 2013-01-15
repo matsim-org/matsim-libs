@@ -51,9 +51,9 @@ import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
@@ -87,7 +87,7 @@ public class SimplifiedControlerUtils {
 	 * </ul>
 	 * May be used as starting point for own variants.
 	 */
-	static ModularPlanRouter createRoutingAlgorithmDefault( Scenario sc, TravelTimeCalculator travelTime ) {
+	static ModularPlanRouter createRoutingAlgorithmDefault( Scenario sc, TravelTime travelTime ) {
 		Population population = sc.getPopulation() ;
 		Network network = sc.getNetwork() ;
 		Config config = sc.getConfig() ;

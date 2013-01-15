@@ -39,7 +39,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 
@@ -201,13 +201,12 @@ public class SingleIterOnlineDvrpLauncher
 
         switch (algorithmConfig.ttimeSource) {
             case FREE_FLOW_SPEED:
-                ttimeCalc = new FreeSpeedTravelTimeCalculator();
+                ttimeCalc = new FreeSpeedTravelTime();
                 break;
 
             case EVENTS_15_MIN:
             case EVENTS_24_H:
-                ttimeCalc = TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
-                        scenario);
+                ttimeCalc = TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName, scenario);
                 break;
 
             default:

@@ -54,7 +54,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -183,7 +183,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 
 	private void createPTSchedule() {
 		Network network = this.sc.getNetwork();
-		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
+		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator dijkstra = new Dijkstra(network, cost, fs);
 		

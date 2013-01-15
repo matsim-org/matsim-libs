@@ -100,7 +100,7 @@ public class PtSubModeControlerOld extends Controler {
 
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(){
-		return this.createRoutingAlgorithm(super.createTravelCostCalculator(), super.getTravelTimeCalculator());
+		return this.createRoutingAlgorithm(super.createTravelCostCalculator(), super.getLinkTravelTimes());
 	}
 	
 	private boolean thrown =  false;

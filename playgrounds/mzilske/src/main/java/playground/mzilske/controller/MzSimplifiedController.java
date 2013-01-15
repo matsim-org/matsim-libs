@@ -195,7 +195,7 @@ public class MzSimplifiedController extends AbstractController {
 
 
 		// travel disutility (generalized cost)
-		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
+		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime.getLinkTravelTimes(), config.planCalcScore());
 		
 		final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 
@@ -208,7 +208,7 @@ public class MzSimplifiedController extends AbstractController {
 		
 		Collection<String> networkModes = this.config.plansCalcRoute().getNetworkModes();
 		for (String mode : networkModes) {
-			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(this.network, leastCostPathFactory.createPathCalculator(network, travelDisutility, travelTime), routeFactory));
+			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(this.network, leastCostPathFactory.createPathCalculator(network, travelDisutility, travelTime.getLinkTravelTimes()), routeFactory));
 		}
 		Map<String, Double> teleportedModeSpeeds = this.config.plansCalcRoute().getTeleportedModeSpeeds();
 		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {

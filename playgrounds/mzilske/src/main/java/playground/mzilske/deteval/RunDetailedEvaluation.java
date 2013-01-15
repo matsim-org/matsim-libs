@@ -81,7 +81,7 @@ public class RunDetailedEvaluation {
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-		final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), scenario.getNetwork(), travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator, config.planCalcScore()), travelTimeCalculator, leastCostPathCalculatorFactory, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
+		final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), scenario.getNetwork(), travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), config.planCalcScore()), travelTimeCalculator.getLinkTravelTimes(), leastCostPathCalculatorFactory, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
 		ParallelPersonAlgorithmRunner.run(backgroundScenario.getPopulation(), 1,
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override

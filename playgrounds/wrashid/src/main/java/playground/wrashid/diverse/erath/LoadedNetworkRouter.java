@@ -101,8 +101,8 @@ public class LoadedNetworkRouter {
 		// and which performs routing based on that
 		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(sl.getScenario(), eventsFile);
 		TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
-		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator, this.config.planCalcScore());
-		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator, ((PopulationFactoryImpl) sl.getScenario().getPopulation().getFactory()).getModeRouteFactory()));
+		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
+		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator.getLinkTravelTimes(), ((PopulationFactoryImpl) sl.getScenario().getPopulation().getFactory()).getModeRouteFactory()));
 
 		// add algorithm to write out the plans
 		plans.addAlgorithm(plansWriter);

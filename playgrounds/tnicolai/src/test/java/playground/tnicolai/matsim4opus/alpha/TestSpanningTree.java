@@ -49,7 +49,7 @@ public class TestSpanningTree {
 		Network network = scenario.getNetwork();
 		
 		// init spanning tree here
-		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator());
+		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		LeastCostPathTree lcpt = new LeastCostPathTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, scenario.getConfig().planCalcScore()));
 		
 		// than set the start node

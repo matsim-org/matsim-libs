@@ -185,7 +185,7 @@ public class Grid {
 	
 	public void calculateTravelTime(Network net){
 //		
-		LeastCostPathTree lctp = new LeastCostPathTree(new TravelTimeCalculator(net, new TravelTimeCalculatorConfigGroup()), new TravelDisutility() {
+		LeastCostPathTree lctp = new LeastCostPathTree(new TravelTimeCalculator(net, new TravelTimeCalculatorConfigGroup()).getLinkTravelTimes(), new TravelDisutility() {
 			
 			@Override
 			public double getLinkTravelDisutility(Link link, double time,

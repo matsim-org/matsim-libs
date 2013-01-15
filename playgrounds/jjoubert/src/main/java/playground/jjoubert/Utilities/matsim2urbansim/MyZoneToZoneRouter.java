@@ -100,7 +100,7 @@ public class MyZoneToZoneRouter {
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = ttcf.createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		TravelDisutilityFactory tccf = new TravelCostCalculatorFactoryImpl();
-		TravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator, scenario.getConfig().planCalcScore());
+		TravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(travelTimeCalculator);
@@ -110,7 +110,7 @@ public class MyZoneToZoneRouter {
 		PreProcessDijkstra pp = new PreProcessDijkstra();
 		pp.run(this.scenario.getNetwork());
 		
-		router = new Dijkstra(scenario.getNetwork(), travelCost, travelTimeCalculator,pp);
+		router = new Dijkstra(scenario.getNetwork(), travelCost, travelTimeCalculator.getLinkTravelTimes(),pp);
 		
 		log.info("Zone to zone router prepared.");
 	}

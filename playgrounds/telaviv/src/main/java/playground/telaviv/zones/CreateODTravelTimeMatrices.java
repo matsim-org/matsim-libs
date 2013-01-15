@@ -67,7 +67,7 @@ public class CreateODTravelTimeMatrices {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		ZoneMapping zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
-		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());		
+		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();		
 		new CreateODTravelTimeMatrices(scenario, zoneMapping, travelTime).calculateODMatrices();
 	}
 	

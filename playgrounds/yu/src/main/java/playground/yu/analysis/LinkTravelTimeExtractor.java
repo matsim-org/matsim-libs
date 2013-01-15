@@ -85,7 +85,7 @@ public class LinkTravelTimeExtractor {
 					.write("TimeBin\tLinkTravelTime\t[s]\tLinkTravelTime\t[m]\tLinkTravelTime\t[h]\n");
 			for (int anI = 0; anI < 24 * 3600; anI = anI + timeBin) {
 				index = (anI) / timeBin;
-				ys[index] = ttc.getLinkTravelTime(network.getLinks().get(new IdImpl("6760")), anI, null, null);
+				ys[index] = ttc.getLinkTravelTimes().getLinkTravelTime(network.getLinks().get(new IdImpl("6760")), (double) anI, null, null);
 				writer.write(anI + "\t" + ys[index] + "\t[s]\t" + ys[index]
 						/ 60.0 + "\t[m]\t" + ys[index] / 3600.0 + "\t[h]\n");
 				ys[index] /= 60.0;

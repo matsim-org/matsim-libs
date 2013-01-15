@@ -41,7 +41,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.gregor.sim2d_v3.events.XYVxVyEvent;
@@ -109,7 +109,7 @@ public class Mat2XYVxVyEvents {
 		List<Double> timeSteps = imp.getTimeSteps();
 
 		Network network = this.sc.getNetwork();
-		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
+		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator dijkstra = new Dijkstra(network, cost, fs);
 

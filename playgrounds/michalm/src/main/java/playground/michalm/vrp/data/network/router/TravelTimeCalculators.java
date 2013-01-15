@@ -21,13 +21,16 @@ package playground.michalm.vrp.data.network.router;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.*;
-import org.matsim.core.trafficmonitoring.*;
+import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 
 
 public class TravelTimeCalculators
 {
-    public static TravelTimeCalculator createTravelTimeFromEvents(String eventFileName,
+    public static TravelTime createTravelTimeFromEvents(String eventFileName,
             Scenario scenario)
     {
         TravelTimeCalculator ttimeCalc = new TravelTimeCalculatorFactoryImpl()
@@ -38,6 +41,6 @@ public class TravelTimeCalculators
         inputEvents.addHandler(ttimeCalc);
         new EventsReaderXMLv1(inputEvents).parse(eventFileName);
 
-        return ttimeCalc;
+        return ttimeCalc.getLinkTravelTimes();
     }
 }

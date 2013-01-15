@@ -185,7 +185,7 @@ public class SpanningTree {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 		Config conf = scenario.getConfig();
-		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, conf.travelTimeCalculator());
+		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, conf.travelTimeCalculator()).getLinkTravelTimes();
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, conf.planCalcScore()));
 		Node origin = network.getNodes().get(new IdImpl(1));
 		st.setOrigin(origin);

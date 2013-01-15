@@ -17,7 +17,7 @@ public class AreaTollControler extends Controler {
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm() {
 		TravelDisutility travelCosts = this.createTravelCostCalculator();
-		TravelTime travelTimes = this.getTravelTimeCalculator();
+		TravelTime travelTimes = this.getLinkTravelTimes();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
 		return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts,

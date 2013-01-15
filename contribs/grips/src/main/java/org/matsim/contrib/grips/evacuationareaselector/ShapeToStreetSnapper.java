@@ -39,7 +39,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -94,7 +94,7 @@ public class ShapeToStreetSnapper {
 
 	public Polygon run(Polygon p) {
 		List<Node> nodes  = getBoundaryNodes(p);
-		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
+		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
 		TravelDisutility cost = new TravelCost(p);
 		LeastCostPathCalculator dijkstra = new Dijkstra(this.sc.getNetwork(), cost, fs);
 		

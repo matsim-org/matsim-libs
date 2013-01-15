@@ -66,12 +66,12 @@ public class ReplanningEvent extends ControlerEvent {
 
 			@Override
 			public TravelDisutility getTravelCostCalculator() {
-				return controler.getTravelDisutilityFactory().createTravelDisutility(controler.getTravelTimeCalculator(), controler.getConfig().planCalcScore());
+				return controler.getTravelDisutilityFactory().createTravelDisutility(controler.getLinkTravelTimes(), controler.getConfig().planCalcScore());
 			}
 
 			@Override
 			public TravelTime getTravelTimeCalculator() {
-				return controler.getTravelTimeCalculator();
+				return controler.getLinkTravelTimes();
 			}
 
 			@Override

@@ -82,7 +82,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -321,14 +321,14 @@ public class PED12ScenarioGenZurich {
 		Network network = scenario.getNetwork();
 		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
 		Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
-		multiModalTravelTimes.put(TransportMode.car, new FreeSpeedTravelTimeCalculator());
+		multiModalTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
 		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
 		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
 				new WalkTravelTime(configGroup)));
-		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(new FreeSpeedTravelTimeCalculator(), 
+		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(new FreeSpeedTravelTime(), 
 				new WalkTravelTime(configGroup)));
 		multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
-				new FreeSpeedTravelTimeCalculator(), new WalkTravelTime(configGroup)));
+				new FreeSpeedTravelTime(), new WalkTravelTime(configGroup)));
 	
 		Map<String, LegRouter> legRouters = createLegRouters(scenario.getConfig(), network, 
 				multiModalTravelTimes);
@@ -390,7 +390,7 @@ public class PED12ScenarioGenZurich {
 	private static void createPEDPopulation(Scenario scenario) {
 		
 		Network network = scenario.getNetwork();
-		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
+		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs, scenario.getConfig().planCalcScore());
 		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
 		Dijkstra dijkstra = (Dijkstra) routerFactory.createPathCalculator(network, cost, fs);

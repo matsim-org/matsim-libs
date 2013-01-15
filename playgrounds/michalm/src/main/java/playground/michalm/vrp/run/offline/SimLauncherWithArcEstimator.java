@@ -97,7 +97,7 @@ public class SimLauncherWithArcEstimator
                 MatsimVertexImpl.createFromXYBuilder(scenario));
         MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
 
-        TravelTime travelTime = controler.getTravelTimeCalculator();
+        TravelTime travelTime = controler.getLinkTravelTimes();
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
         LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory()

@@ -158,8 +158,8 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 				scenario.getConfig().vspExperimental()));
 
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, config.travelTimeCalculator());
-		TravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator, config.planCalcScore());
-		PlansCalcTransitRoute plansCalcRoute = new PlansCalcTransitRoute(config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator,
+		TravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), config.planCalcScore());
+		PlansCalcTransitRoute plansCalcRoute = new PlansCalcTransitRoute(config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator.getLinkTravelTimes(),
 				new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(), config.transit(), router.createTransitRouter(), transitSchedule);
 
 

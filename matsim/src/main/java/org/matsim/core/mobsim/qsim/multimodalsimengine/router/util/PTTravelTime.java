@@ -54,9 +54,7 @@ public class PTTravelTime implements TravelTime {
 		 */
 		Set<String> allowedModes = link.getAllowedModes();
 		if (allowedModes.contains(TransportMode.car) || allowedModes.contains(TransportMode.pt)) {
-			if (carTravelTime instanceof BufferedTravelTime) {
-				return ptScaleFactor * ((BufferedTravelTime) carTravelTime).getBufferedLinkTravelTime(link, time);
-			} else return ptScaleFactor * carTravelTime.getLinkTravelTime(link, time, person, vehicle);
+			return ptScaleFactor * carTravelTime.getLinkTravelTime(link, time, person, vehicle);
 		}
 		else if (allowedModes.contains(TransportMode.bike) ||allowedModes.contains(TransportMode.walk)) {
 			return walkTravelTime.getLinkTravelTime(link, time, person, vehicle);

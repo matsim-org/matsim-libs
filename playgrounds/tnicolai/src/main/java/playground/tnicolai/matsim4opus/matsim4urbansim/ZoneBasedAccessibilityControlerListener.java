@@ -96,7 +96,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		this.walkSpeedMeterPerMin = walkSpeedMeterPerSec * 60.;
 		
 		// init LeastCostPathTree in order to calculate travel times and travel costs
-		TravelTime ttc = controler.getTravelTimeCalculator();
+		TravelTime ttc = controler.getLinkTravelTimes();
 		// calculates the workplace accessibility based on congested travel times:
 		// (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
 		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree( ttc, new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()) );

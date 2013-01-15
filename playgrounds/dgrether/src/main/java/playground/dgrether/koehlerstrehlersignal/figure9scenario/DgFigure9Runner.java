@@ -112,7 +112,7 @@ public class DgFigure9Runner {
 				handler58.iterationsEnds(e.getIteration());
 
 				if ( e.getIteration() % 10 == 0 ) {
-					DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getTravelTimeCalculator());
+					DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getLinkTravelTimes());
 					ttcalcChart.setStartTime(0.0);
 					ttcalcChart.setEndTime(3600.0 * 1.5);
 					List<Id> list = new ArrayList<Id>();

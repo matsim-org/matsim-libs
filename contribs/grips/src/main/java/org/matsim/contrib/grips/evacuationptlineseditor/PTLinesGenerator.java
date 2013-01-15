@@ -42,7 +42,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -68,7 +68,7 @@ public class PTLinesGenerator {
 	public PTLinesGenerator(Scenario sc, Map<Id, BusStop> busStops) {
 		this.sc = sc;
 		this.busStops = busStops;
-		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
+		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
 		Network network = sc.getNetwork();
 		this.dijkstra = new Dijkstra(network, cost, fs);

@@ -115,7 +115,7 @@ public class Events2TTMatrix {
 		new MatsimNetworkReader(scenario).readFile(networkfile);
 
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network,3600,30*3600, scenario.getConfig().travelTimeCalculator());
-		LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, scenario.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc.getLinkTravelTimes(),new TravelTimeAndDistanceBasedTravelDisutility(ttc.getLinkTravelTimes(), scenario.getConfig().planCalcScore()));
 		TTimeMatrixCalculator ttmc = new TTimeMatrixCalculator(parseL2ZMapping(mapfile),hours,st,network);
 
 		// creating events object and assign handlers

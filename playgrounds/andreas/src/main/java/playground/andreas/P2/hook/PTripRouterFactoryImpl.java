@@ -93,7 +93,7 @@ public class PTripRouterFactoryImpl implements TripRouterFactory {
 		this.config = controler.getScenario().getConfig();
 		this.network = controler.getScenario().getNetwork();
 		this.travelDisutilityFactory = controler.getTravelDisutilityFactory();
-		this.travelTime = controler.getTravelTimeCalculator();
+		this.travelTime = controler.getLinkTravelTimes();
 		this.leastCostPathAlgorithmFactory = controler.getLeastCostPathCalculatorFactory();
 		this.modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		this.populationFactory = controler.getScenario().getPopulation().getFactory();

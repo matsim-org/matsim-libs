@@ -197,8 +197,8 @@ public class LeastCostPathTree {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 
-		TravelTime ttc = new TravelTimeCalculator(network, 60, 30 * 3600, scenario.getConfig().travelTimeCalculator());
-		LeastCostPathTree st = new LeastCostPathTree(ttc, new TravelTimeAndDistanceBasedTravelDisutility(ttc, scenario.getConfig()
+		TravelTimeCalculator ttc = new TravelTimeCalculator(network, 60, 30 * 3600, scenario.getConfig().travelTimeCalculator());
+		LeastCostPathTree st = new LeastCostPathTree(ttc.getLinkTravelTimes(), new TravelTimeAndDistanceBasedTravelDisutility(ttc.getLinkTravelTimes(), scenario.getConfig()
 				.planCalcScore()));
 		Node origin = network.getNodes().get(new IdImpl(1));
 		st.calculate(network, origin, 8*3600);

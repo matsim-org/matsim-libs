@@ -75,7 +75,7 @@ public class TimeOverDist {
 		Network network = scenario.getNetwork();
 
 //		final TravelTime travelTime = new TravelTimeDecorator(new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup()));
-		final TravelTime travelTime = new TravelTimeCalculator(network, 900, 86400,	new TravelTimeCalculatorConfigGroup());
+		final TravelTime travelTime = new TravelTimeCalculator(network, 900, 86400,	new TravelTimeCalculatorConfigGroup()).getLinkTravelTimes();
 		TravelDisutility travelCost = new TravelDisutility() {
 			@Override
 			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {

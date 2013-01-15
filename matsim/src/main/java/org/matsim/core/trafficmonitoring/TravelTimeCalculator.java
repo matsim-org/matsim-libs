@@ -66,38 +66,38 @@ import org.matsim.vehicles.Vehicle;
  * @author mrieser
  */
 public class TravelTimeCalculator
-		implements TravelTime, LinkToLinkTravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
-		AgentDepartureEventHandler, AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, 
-		AgentStuckEventHandler {
-	
+implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+AgentDepartureEventHandler, AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, 
+AgentStuckEventHandler {
+
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
-	"agent is not known the turning move travel time cannot be calculated!";
-	
+			"agent is not known the turning move travel time cannot be calculated!";
+
 	/*package*/ final int timeSlice;
 	/*package*/ final int numSlots;
 	private AbstractTravelTimeAggregator aggregator;
-	
+
 	private static final Logger log = Logger.getLogger(TravelTimeCalculator.class);
-	
+
 	private Map<Id, DataContainer> linkData;
-	
+
 	private Map<Tuple<Id, Id>, DataContainer> linkToLinkData;
-	
+
 	private final Map<Id, LinkEnterEvent> linkEnterEvents;
 
 	private final Map<Id, Id> transitVehicleDriverMapping;
-	
+
 	private final Set<Id> agentsToFilter;
 	private final Set<String> analyzedModes;
-	
+
 	private final boolean filterAnalyzedModes;
-	
+
 	private final boolean calculateLinkTravelTimes;
 
 	private final boolean calculateLinkToLinkTravelTimes;
-	
+
 	private TravelTimeDataFactory ttDataFactory = null; 
-	
+
 	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
 	}
@@ -122,7 +122,7 @@ public class TravelTimeCalculator
 		this.transitVehicleDriverMapping = new ConcurrentHashMap<Id, Id>();
 		this.agentsToFilter = new HashSet<Id>();
 		this.analyzedModes = CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes());
-		
+
 		this.reset(0);
 	}
 
@@ -131,7 +131,7 @@ public class TravelTimeCalculator
 		/* if only some modes are analyzed, we check whether the agent
 		 * performs a trip with one of those modes. if not, we skip the event. */
 		if (filterAnalyzedModes && agentsToFilter.contains(e.getPersonId())) return;
-		
+
 		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getPersonId());
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
 			Tuple<Id, Id> fromToLink = new Tuple<Id, Id>(oldEvent.getLinkId(), e.getLinkId());
@@ -146,11 +146,11 @@ public class TravelTimeCalculator
 	public void handleEvent(final LinkLeaveEvent e) {
 		if (this.calculateLinkTravelTimes) {
 			LinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getPersonId());
-	  		if (oldEvent != null) {
-	  			DataContainer data = getTravelTimeData(e.getLinkId(), true);
-	  			this.aggregator.addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
-	  			data.needsConsolidation = true;
-	  		}
+			if (oldEvent != null) {
+				DataContainer data = getTravelTimeData(e.getLinkId(), true);
+				this.aggregator.addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
+				data.needsConsolidation = true;
+			}
 		}
 	}
 
@@ -161,14 +161,14 @@ public class TravelTimeCalculator
 		 * to the filtered agents set. */
 		if (filterAnalyzedModes && !analyzedModes.contains(event.getLegMode())) this.agentsToFilter.add(event.getPersonId());
 	}
-	
+
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		/* remove EnterEvents from list when an agent arrives.
 		 * otherwise, the activity duration would counted as travel time, when the
 		 * agent departs again and leaves the link! */
 		this.linkEnterEvents.remove(event.getPersonId());
-		
+
 		// try to remove agent from set with filtered agents
 		if (filterAnalyzedModes) this.agentsToFilter.remove(event.getPersonId());
 	}
@@ -181,7 +181,7 @@ public class TravelTimeCalculator
 		Id personId = transitVehicleDriverMapping.get(event.getVehicleId());
 		if (personId != null) this.linkEnterEvents.remove(personId);
 	}
-	
+
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		/* we create a mapping between transit vehicles and their drivers. this
@@ -189,7 +189,7 @@ public class TravelTimeCalculator
 		 * they stop on a link (similar to agents who perform an activity at a link. */
 		transitVehicleDriverMapping.put(event.getVehicleId(), event.getDriverId());
 	}
-	
+
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		LinkEnterEvent e = this.linkEnterEvents.remove(event.getPersonId());
@@ -202,11 +202,11 @@ public class TravelTimeCalculator
 				throw new IllegalStateException(ERROR_STUCK_AND_LINKTOLINK);
 			}
 		}
-		
+
 		// try to remove agent from set with filtered agents
 		if (filterAnalyzedModes) this.agentsToFilter.remove(event.getPersonId());
 	}
-	
+
 	private DataContainer getLinkToLinkTravelTimeData(Tuple<Id, Id> fromLinkToLink, final boolean createIfMissing) {
 		DataContainer data = this.linkToLinkData.get(fromLinkToLink);
 		if ((null == data) && createIfMissing) {
@@ -224,40 +224,49 @@ public class TravelTimeCalculator
 		}
 		return data;
 	}
-
+	
+	@Deprecated
+	/**
+	 * @deprecated Use getLinkTravelTimes()
+	 * 
+	 */
 	public double getLinkTravelTime(final Id linkId, final double time) {
-    if (this.calculateLinkTravelTimes) {
-      DataContainer data = getTravelTimeData(linkId, true);
-      if (data.needsConsolidation) {
-        consolidateData(data);
-      }
-      return this.aggregator.getTravelTime(data.ttData, time); 
-    }
-    throw new IllegalStateException("No link travel time is available " +
-        "if calculation is switched off by config option!");
+		return doGetLinkTravelTime(linkId, time);
 	}
-	
 
-	@Override
-	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
-	  return this.getLinkTravelTime(link.getId(), time);
+	private double doGetLinkTravelTime(final Id linkId, final double time) {
+		if (this.calculateLinkTravelTimes) {
+			DataContainer data = getTravelTimeData(linkId, true);
+			if (data.needsConsolidation) {
+				consolidateData(data);
+			}
+			return this.aggregator.getTravelTime(data.ttData, time); 
+		}
+		throw new IllegalStateException("No link travel time is available " +
+				"if calculation is switched off by config option!");
 	}
+
 	
+	@Deprecated
+	/**
+	 * 
+	 * @deprecated Use getLinkToLinkTravelTimes()
+	 */
 	public double getLinkToLinkTravelTime(final Id fromLinkId, final Id toLinkId, double time){
-    if (!this.calculateLinkToLinkTravelTimes) {
-      throw new IllegalStateException("No link to link travel time is available " +
-      "if calculation is switched off by config option!");      
-    }
-    DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<Id, Id>(fromLinkId, toLinkId), true);
-    if (data.needsConsolidation) {
-      consolidateData(data);
-    }
-    return this.aggregator.getTravelTime(data.ttData, time);
+		return doGetLinkToLinkTravelTime(fromLinkId, toLinkId, time);
 	}
-	
-	@Override
-	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
-	  return this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
+
+	private double doGetLinkToLinkTravelTime(final Id fromLinkId,
+			final Id toLinkId, double time) {
+		if (!this.calculateLinkToLinkTravelTimes) {
+			throw new IllegalStateException("No link to link travel time is available " +
+					"if calculation is switched off by config option!");      
+		}
+		DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<Id, Id>(fromLinkId, toLinkId), true);
+		if (data.needsConsolidation) {
+			consolidateData(data);
+		}
+		return this.aggregator.getTravelTime(data.ttData, time);
 	}
 
 	@Override
@@ -278,15 +287,15 @@ public class TravelTimeCalculator
 		this.transitVehicleDriverMapping.clear();
 		this.agentsToFilter.clear();
 	}
-	
+
 	public void setTravelTimeDataFactory(final TravelTimeDataFactory factory) {
 		this.ttDataFactory = factory;
 	}
-	
+
 	public void setTravelTimeAggregator(final AbstractTravelTimeAggregator aggregator) {
 		this.aggregator = aggregator;
 	}
-	
+
 	/**
 	 * Makes sure that the travel times "make sense".
 	 * <p/>
@@ -317,13 +326,13 @@ public class TravelTimeCalculator
 				// changed (1, 0.0) to (0, 0.0) since Michal has convinced me (by a test) that using "1" is wrong
 				// because you get the wrong result for time slot number 1.  This change does not affect the existing
 				// unit tests.  kai, oct'11
-				
+
 				// go from time slot 1 forward in time:
 				for (int i = 1; i < this.numSlots; i++) {
-					
+
 					// once more the getter is weird since it needs both the time slot and the time:
 					double travelTime = r.getTravelTime(i, i * this.timeSlice);
-					
+
 					// if the travel time in the previous time slice was X, then now it is X-S, where S is the time slice:
 					double minTravelTime = prevTravelTime - this.timeSlice;
 
@@ -331,7 +340,7 @@ public class TravelTimeCalculator
 					if (travelTime < minTravelTime) {
 
 						// these TWO statements effectively set the travel time to the minTravelTime:
-//						r.resetTravelTime(i) ; // removing that line again since it makes planomat scores _worse_.  Does
+						//						r.resetTravelTime(i) ; // removing that line again since it makes planomat scores _worse_.  Does
 						// not make sense to me ...  Kai, oct'11
 						r.addTravelTime(i, minTravelTime);
 
@@ -357,14 +366,36 @@ public class TravelTimeCalculator
 	public int getTimeSlice() {
 		return this.timeSlice;
 	}
-	
+
 	private static class DataContainer {
 		/*package*/ final TravelTimeData ttData;
 		/*package*/ volatile boolean needsConsolidation = false;
-		
+
 		/*package*/ DataContainer(final TravelTimeData data) {
 			this.ttData = data;
 		}
+	}
+
+	public TravelTime getLinkTravelTimes() {
+		return new TravelTime() {
+
+			@Override
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+				return TravelTimeCalculator.this.doGetLinkTravelTime(link.getId(), time);
+			}
+
+		};
+
+	}
+
+	public LinkToLinkTravelTime getLinkToLinkTravelTimes() {
+		return new LinkToLinkTravelTime() {
+
+			@Override
+			public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
+				return TravelTimeCalculator.this.doGetLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
+			}
+		};
 	}
 
 }

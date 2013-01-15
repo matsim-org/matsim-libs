@@ -285,7 +285,7 @@ public class BseUCControlerListener implements StartupListener,
 
 		// set up a/r-strategy
 		((BseUCStrategyManager) ctl.getStrategyManager()).init(calibrator,
-				ctl.getTravelTimeCalculator(), events2PlanSteps);
+				ctl.getLinkTravelTimes(), events2PlanSteps);
 
 		// events addhandler e2p
 		events.addHandler(events2PlanSteps);

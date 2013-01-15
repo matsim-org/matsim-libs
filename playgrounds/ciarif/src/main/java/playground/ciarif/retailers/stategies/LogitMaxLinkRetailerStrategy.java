@@ -42,7 +42,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			
 			double[] utils = new double[alternatives];
 			Link[] links = controler.getNetwork().getLinks().values().toArray(new Link[controler.getNetwork().getLinks().size()]);
-			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+			controler.getLinkStats().addData(controler.getVolumes(), controler.getLinkTravelTimes());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLinkId());
 			ArrayList<Id> newLinkIds = new ArrayList<Id>(); 
 			newLinkIds.add(f.getLinkId());

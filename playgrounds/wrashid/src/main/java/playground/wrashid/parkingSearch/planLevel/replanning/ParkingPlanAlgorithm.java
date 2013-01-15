@@ -236,7 +236,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 	}
 
 	private static PlansCalcRoute getRoutingAlgorithm(Controler controler) {
-		TravelTime travelTime = controler.getTravelTimeCalculator();
+		TravelTime travelTime = controler.getLinkTravelTimes();
 		TravelDisutility travelCost = controler.getTravelDisutilityFactory().createTravelDisutility(travelTime,
 				controler.getConfig().planCalcScore());
 

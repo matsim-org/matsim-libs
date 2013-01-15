@@ -144,7 +144,7 @@ public class GroupPlanStrategyFactory {
 									delay,
 									registry.getScenario(),
 									registry.getScoringFunctionFactory(),
-									registry.getTravelTime(),
+									registry.getTravelTime().getLinkTravelTimes(),
 									registry.getLeastCostPathCalculatorFactory(),
 									registry.getTripRouterFactory() );
 							}

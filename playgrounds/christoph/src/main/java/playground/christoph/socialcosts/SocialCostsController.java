@@ -132,7 +132,7 @@ public class SocialCostsController {
 			Controler controler = event.getControler();
 			
 			// initialize the social costs calculator
-			SocialCostCalculator scc = new SocialCostCalculator(controler.getNetwork(), controler.getEvents(), controler.getTravelTimeCalculator());
+			SocialCostCalculator scc = new SocialCostCalculator(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes());
 			controler.addControlerListener(scc);
 			controler.getEvents().addHandler(scc);
 			

@@ -65,7 +65,7 @@ public class UCSBControler extends Controler {
 	public PlanAlgorithm createRoutingAlgorithm() {
 		return createRoutingAlgorithm(
 				this.createTravelCostCalculator(),
-				this.getTravelTimeCalculator());
+				this.getLinkTravelTimes());
 	}
 
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, final TravelTime travelTimes) {

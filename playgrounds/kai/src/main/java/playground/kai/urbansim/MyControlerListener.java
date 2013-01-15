@@ -59,7 +59,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		// get the calling controler:
 		Controler controler = event.getControler() ;
 
-		TravelTime ttc = controler.getTravelTimeCalculator();
+		TravelTime ttc = controler.getLinkTravelTimes();
 		LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()));
 
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;

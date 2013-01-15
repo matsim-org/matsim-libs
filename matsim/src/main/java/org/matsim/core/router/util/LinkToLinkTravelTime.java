@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author dgrether
  *
  */
-public interface LinkToLinkTravelTime extends TravelTime {
+public interface LinkToLinkTravelTime {
 
 	/**
 	 * Returns the travel time at the specified time for the given fromLink inclusive the 

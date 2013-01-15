@@ -109,7 +109,7 @@ public class KTIWithinDayControler extends WithinDayParkingController {
 		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
 				createKtiRoutingAlgorithm(
 						this.createTravelCostCalculator(),
-						this.getTravelTimeCalculator()) :
+						this.getLinkTravelTimes()) :
 				super.createRoutingAlgorithm();
 	}
 

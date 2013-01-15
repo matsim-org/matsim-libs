@@ -48,7 +48,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
@@ -105,7 +105,7 @@ public class CalculateTravelTimes {
 	}
 	
 	private void initCalulators() {
-		travelTime = new FreeSpeedTravelTimeCalculator();
+		travelTime = new FreeSpeedTravelTime();
 		travelCost = new FreeSpeedTravelCost(travelTime);
 		leastCostPathCalculator = new AStarLandmarksFactory(scenario.getNetwork(), travelCost).createPathCalculator(scenario.getNetwork(), travelCost, travelTime);
 	}

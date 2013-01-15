@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.InvertedNetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
 
 /**
  * @author thibautd
@@ -39,14 +39,14 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 	private final Scenario scenario;
 	private final LeastCostPathCalculatorFactory leastCostAlgoFactory;
 	private final TravelDisutilityFactory travelDisutilityFactory;
-	private final TravelTime travelTimes;
+	private final LinkToLinkTravelTime travelTimes;
 	private final PopulationFactory populationFactory;
 
 	public LinkToLinkTripRouterFactory(
 			final Scenario scenario,
 			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
 			final TravelDisutilityFactory travelDisutilityFactory,
-			final TravelTime travelTimes,
+			final LinkToLinkTravelTime travelTimes,
 			final PopulationFactory populationFactory,
 			final TripRouterFactory delegate) {
 		this.scenario = scenario;

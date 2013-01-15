@@ -198,7 +198,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 			
 			Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
 			
-			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+			controler.getLinkStats().addData(controler.getVolumes(), controler.getLinkTravelTimes());
 //			int retailers_count = 0;
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				log.info("THE RETAILER " + r.getId() + " WILL TRY TO RELOCATE ITS FACILITIES");

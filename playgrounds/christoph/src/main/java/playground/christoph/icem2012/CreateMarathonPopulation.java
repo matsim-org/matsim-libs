@@ -57,7 +57,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -595,7 +595,7 @@ public class CreateMarathonPopulation {
 		}
 		
 		Map<String, LegRouter> legRouters = CreateMultiModalLegRouters.createLegRouters(scenario.getConfig(), network, 
-				new FreeSpeedTravelTimeCalculatorFactory().createTravelTime());
+				new FreeSpeedTravelTime());
 		
 		Counter counterRemove = new Counter("persons to remove ");
 		Counter counterAdapt = new Counter("legs to adapt ");

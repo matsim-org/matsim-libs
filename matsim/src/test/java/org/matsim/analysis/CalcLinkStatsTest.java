@@ -34,7 +34,7 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -62,7 +62,7 @@ public class CalcLinkStatsTest {
 		network.addLink(link2);
 		
 		VolumesAnalyzer analyzer = new VolumesAnalyzer(3600, 86400, network);
-		TravelTime ttimes = new FreeSpeedTravelTimeCalculator();
+		TravelTime ttimes = new FreeSpeedTravelTime();
 		CalcLinkStats cls = new CalcLinkStats(network);
 		
 		Id agentId = s.createId("1001");
@@ -136,7 +136,7 @@ public class CalcLinkStatsTest {
 		network.addLink(link2);
 		
 		VolumesAnalyzer analyzer = new VolumesAnalyzer(3600, 86400, network);
-		TravelTime ttimes = new FreeSpeedTravelTimeCalculator();
+		TravelTime ttimes = new FreeSpeedTravelTime();
 		CalcLinkStats cls = new CalcLinkStats(network);
 		
 		Id agentId = s.createId("1001");

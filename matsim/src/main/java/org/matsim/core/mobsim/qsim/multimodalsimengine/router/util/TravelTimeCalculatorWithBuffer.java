@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -41,10 +42,12 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.vehicles.Vehicle;
 
-public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator implements BufferedTravelTime {
+public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator {
 
 	private static final Logger log = Logger.getLogger(TravelTimeCalculatorWithBuffer.class);
 
@@ -130,12 +133,9 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 		return slice;
 	}
 
-	@Override
 	public double getBufferedLinkTravelTime(Link link, double time) {
 		double[] travelTimeArray = bufferedTravelTimes.get(link.getId());
-
 		int slice = getTimeSlotIndex(time);
-
 		return travelTimeArray[slice];
 	}
 
@@ -201,4 +201,16 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 		nonCarAgents.remove(event.getPersonId());
 		super.handleEvent(event);
 	}
+	
+	public TravelTime getTravelTimesFromPreviousIteration() {
+		return new TravelTime() {
+
+			@Override
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+				return getBufferedLinkTravelTime(link, time);
+			}
+			
+		};
+	}
+	
 }

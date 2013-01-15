@@ -50,7 +50,7 @@ public class ExtendedLocationChoiceReRouteDijkstraPlanStrategy implements PlanSt
 		Scenario scenario = controler.getScenario();
 		Network network = controler.getNetwork();
 		TravelDisutility travelCostCalc = controler.createTravelCostCalculator();
-		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
+		TravelTime travelTimeCalc = controler.getLinkTravelTimes();
 		Config config = controler.getConfig();
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());

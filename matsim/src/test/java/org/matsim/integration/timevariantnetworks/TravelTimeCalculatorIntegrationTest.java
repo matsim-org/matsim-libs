@@ -65,7 +65,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		network.addNetworkChangeEvent(change);
 
 		// create a travel time calculator object
-		TravelTime ttcalc = new TravelTimeCalculator(network,config.travelTimeCalculator());
+		TravelTime ttcalc = new TravelTimeCalculator(network,config.travelTimeCalculator()).getLinkTravelTimes();
 
 		// do the tests
 		assertEquals(10.0, ttcalc.getLinkTravelTime(link2, 7*3600.0, null, null), EPSILON);
@@ -104,10 +104,10 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		ttcalc.setTravelTimeDataFactory(new TravelTimeDataHashMapFactory(network));
 
 		// do the tests
-		assertEquals(10.0, ttcalc.getLinkTravelTime(link2, 7*3600.0, null, null), EPSILON);
-		assertEquals(5.0, ttcalc.getLinkTravelTime(link2, 8*3600.0, null, null), EPSILON);
-		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 7*3600.0, null, null), EPSILON);
-		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 8*3600.0, null, null), EPSILON);
+		assertEquals(10.0, ttcalc.getLinkTravelTimes().getLinkTravelTime(link2, 7*3600.0, null, null), EPSILON);
+		assertEquals(5.0, ttcalc.getLinkTravelTimes().getLinkTravelTime(link2, 8*3600.0, null, null), EPSILON);
+		assertEquals(10.0, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7*3600.0, null, null), EPSILON);
+		assertEquals(10.0, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 8*3600.0, null, null), EPSILON);
 	}
 
 }

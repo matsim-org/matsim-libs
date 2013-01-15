@@ -65,7 +65,7 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 				delay,
 				controler.getScenario(),
 				controler.getScoringFunctionFactory(),
-				controler.getTravelTimeCalculator(),
+				controler.getLinkTravelTimes(),
 				controler.getLeastCostPathCalculatorFactory(),
 				controler.getTripRouterFactory());
 	}

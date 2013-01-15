@@ -49,7 +49,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
@@ -159,7 +159,7 @@ public class JointTripRouterFactoryTest {
 						return new TravelTimeAndDistanceBasedTravelDisutility( timeCalculator , cnScoringGroup );
 					}
 				},
-				new FreeSpeedTravelTimeCalculator(),
+				new FreeSpeedTravelTime(),
 				new DijkstraFactory(),
 				null);
 	}

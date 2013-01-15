@@ -73,7 +73,7 @@ public class CalculateDestinationChoice {
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		log.info("done");
 		
-		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		
 		CalculateDestinationChoice cdc = new CalculateDestinationChoice(scenario);
 		

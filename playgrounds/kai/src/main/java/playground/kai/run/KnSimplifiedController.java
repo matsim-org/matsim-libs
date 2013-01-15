@@ -74,7 +74,7 @@ public class KnSimplifiedController extends AbstractController {
 
 	private CalcLegTimes legTimes;
 
-	private TravelTimeCalculator travelTime;
+	private TravelTimeCalculator travelTimeCalculator;
 
 	public KnSimplifiedController(Scenario sc) {
 		this.scenario = sc;
@@ -97,8 +97,8 @@ public class KnSimplifiedController extends AbstractController {
 		this.events.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
 		this.legTimes = new CalcLegTimes();
 		this.events.addHandler(legTimes);
-		this.travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.events.addHandler(travelTime);	
+		this.travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		this.events.addHandler(travelTimeCalculator);	
 		super.run(config);
 	}
 
@@ -183,7 +183,7 @@ public class KnSimplifiedController extends AbstractController {
 	}
 
 	private ModularPlanRouter createRoutingAlgorithm() {
-		return SimplifiedControlerUtils.createRoutingAlgorithmDefault( this.scenario, this.travelTime );
+		return SimplifiedControlerUtils.createRoutingAlgorithmDefault( this.scenario, this.travelTimeCalculator.getLinkTravelTimes() );
 	}
 
 	@Override

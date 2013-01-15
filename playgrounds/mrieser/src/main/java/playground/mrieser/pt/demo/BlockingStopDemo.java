@@ -323,7 +323,7 @@ public class BlockingStopDemo {
 		for (int time = 7*3600; time < (7*3600 + 15*60); time += 120) {
 			System.out.print(Time.writeTime(time));
 			for (int i = 13; i < 26; i++) {
-				System.out.print("\t" + ttc.getLinkTravelTime(network.getLinks().get(this.ids[i]), time, null, null));
+				System.out.print("\t" + ttc.getLinkTravelTimes().getLinkTravelTime(network.getLinks().get(this.ids[i]), (double) time, null, null));
 			}
 			System.out.println();
 		}
@@ -335,7 +335,7 @@ public class BlockingStopDemo {
 		for (int time = 7*3600; time < (7*3600 + 15*60); time += 120) {
 			System.out.print(Time.writeTime(time));
 			for (int i = 0; i < 13; i++) {
-				System.out.print("\t" + ttc.getLinkTravelTime(network.getLinks().get(this.ids[i]), time, null, null));
+				System.out.print("\t" + ttc.getLinkTravelTimes().getLinkTravelTime(network.getLinks().get(this.ids[i]), (double) time, null, null));
 			}
 			System.out.println();
 		}

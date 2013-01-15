@@ -284,7 +284,7 @@ public class PlanScoreForecaster {
 		for (Person ps : pop.getPersons().values()) {
 			// for (Plan pl : ps.getPlans()) {
 			Plan pl = ps.getSelectedPlan();
-			double score = new PlanScoreForecaster(pl, net, ttc,
+			double score = new PlanScoreForecaster(pl, net, ttc.getLinkTravelTimes(),
 					scoring, -6.0, 6.0).getPlanScore();
 			if (pl.getScore().intValue() != (int) score)
 				System.out.println("person\t" + ps.getId() + "\tplan\t" + pl

@@ -48,7 +48,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			int rd = MatsimRandom.getRandom().nextInt(allowedLinks.size());
 			Link link = allowedLinks.get(rd);
 			log.info("The link " + link.getId() + " is proposed as new location for the facility " + f.getId());
-			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+			controler.getLinkStats().addData(controler.getVolumes(), controler.getLinkTravelTimes());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLinkId());
 			double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(link.getId());
 			double currentlink_volume =0;

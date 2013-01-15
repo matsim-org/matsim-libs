@@ -123,7 +123,7 @@ public class DaganzoRunner {
 					//				inoutWriter.addInOutEventHandler(handler4);
 					//				inoutWriter.writeInOutChart(e.getControler().getControlerIO().getIterationPath(e.getIteration()), e.getIteration());
 
-					DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getTravelTimeCalculator());
+					DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getLinkTravelTimes());
 					ttcalcChart.setStartTime(10.0);
 					ttcalcChart.setEndTime(3600.0 * 2.5);
 					List<Id> list = new ArrayList<Id>();

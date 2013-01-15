@@ -97,7 +97,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
 		
-		TravelTime ttc = controler.getTravelTimeCalculator();
+		TravelTime ttc = controler.getLinkTravelTimes();
 		// get the free-speed car travel times (in seconds)
 		LeastCostPathTree lcptFreeSpeedCarTravelTime = new LeastCostPathTree( ttc, new FreeSpeedTravelTimeCostCalculator() );
 		// get the congested car travel time (in seconds)

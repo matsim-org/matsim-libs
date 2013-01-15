@@ -43,7 +43,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class UTurnRemover implements PersonAlgorithm, IterationStartsListener{
@@ -57,7 +57,7 @@ public class UTurnRemover implements PersonAlgorithm, IterationStartsListener{
 
 	public UTurnRemover(Scenario sc){
 		Network network = sc.getNetwork();
-		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
+		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator routeAlgo = new Dijkstra(network, cost, fs);
 		this.router = new NetworkLegRouter(network, routeAlgo, ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory());

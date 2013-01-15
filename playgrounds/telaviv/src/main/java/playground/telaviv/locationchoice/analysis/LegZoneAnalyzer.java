@@ -137,7 +137,7 @@ public class LegZoneAnalyzer {
 		log.info("done.");
 		
 		log.info("Creating LocationChoiceProbabilityCreator...");
-		extendedLocationChoiceProbabilityCreator = new ExtendedLocationChoiceProbabilityCreator(scenario, travelTime);
+		extendedLocationChoiceProbabilityCreator = new ExtendedLocationChoiceProbabilityCreator(scenario, travelTime.getLinkTravelTimes());
 		extendedLocationChoiceProbabilityCreator.calculateDynamicProbabilities();
 		extendedLocationChoiceProbabilityCreator.calculateTotalProbabilities();
 		log.info("done.");

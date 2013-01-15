@@ -64,7 +64,7 @@ public class HovControler extends Controler {
 	public PlanAlgorithm createRoutingAlgorithm() {
 		return createRoutingAlgorithm(
 				this.createTravelCostCalculator(),
-				this.getTravelTimeCalculator());
+				this.getLinkTravelTimes());
 	}
 
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {

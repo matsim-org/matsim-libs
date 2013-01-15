@@ -76,7 +76,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.households.Household;
@@ -342,7 +342,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 	public PlanAlgorithm createRoutingAlgorithm() {
 		return createRoutingAlgorithm(
 				this.createTravelCostCalculator(),
-				this.getTravelTimeCalculator());
+				this.getLinkTravelTimes());
 	}
 
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
@@ -838,9 +838,9 @@ public class MarathonController extends WithinDayController implements StartupLi
 		factory.put(TransportMode.bike, new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
 	
 		// replace modes
-		factory.put(TransportMode.car, new FreeSpeedTravelTimeCalculator());
-		factory.put(TransportMode.ride, new FreeSpeedTravelTimeCalculator());
-		factory.put(TransportMode.pt, new FreeSpeedTravelTimeCalculator());
+		factory.put(TransportMode.car, new FreeSpeedTravelTime());
+		factory.put(TransportMode.ride, new FreeSpeedTravelTime());
+		factory.put(TransportMode.pt, new FreeSpeedTravelTime());
 
 		return factory;
 	}

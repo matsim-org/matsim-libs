@@ -38,7 +38,7 @@ public class SimLauncher
         controler.setOverwriteFiles(true);
         controler.run();
 
-        TravelTime travelTime = controler.getTravelTimeCalculator();
+        TravelTime travelTime = controler.getLinkTravelTimes();
 
         Map<Id, ? extends Link> links = controler.getNetwork().getLinks();
         Id idB = controler.getScenario().createId("B");

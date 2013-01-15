@@ -39,7 +39,7 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 	
 	private void compareRouteChoices(){
 		
-		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator());
+		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		
 		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculatorTest(ttc, scenario.getConfig().planCalcScore(), dummyCostFactor));
 		LeastCostPathTree lcptDistance = new LeastCostPathTree(ttc, new TravelDistanceCostCalculatorTest(ttc, scenario.getConfig().planCalcScore(), dummyCostFactor));

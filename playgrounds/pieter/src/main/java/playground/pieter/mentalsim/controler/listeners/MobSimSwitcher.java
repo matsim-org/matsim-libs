@@ -104,7 +104,7 @@ public class MobSimSwitcher implements ControlerListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		TravelTime ttcalc = controler.getTravelTimeCalculator();
+		TravelTime ttcalc = controler.getLinkTravelTimes();
 
 		if (checkExpensiveIter(event.getIteration())) {
 			log.warn("Running an expensive iteration with full queue simulation");

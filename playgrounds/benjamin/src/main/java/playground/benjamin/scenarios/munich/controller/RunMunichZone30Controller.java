@@ -194,7 +194,7 @@ public class RunMunichZone30Controller extends AbstractController {
 
 
 		// travel disutility (generalized cost)
-		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(this.travelTime, this.config.planCalcScore());
+		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(this.travelTime.getLinkTravelTimes(), this.config.planCalcScore());
 		
 		final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 
@@ -207,7 +207,7 @@ public class RunMunichZone30Controller extends AbstractController {
 		
 		Collection<String> networkModes = this.config.plansCalcRoute().getNetworkModes();
 		for (String mode : networkModes) {
-			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(this.network, leastCostPathFactory.createPathCalculator(this.network, travelDisutility, this.travelTime), routeFactory));
+			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(this.network, leastCostPathFactory.createPathCalculator(this.network, travelDisutility, this.travelTime.getLinkTravelTimes()), routeFactory));
 		}
 		Map<String, Double> teleportedModeSpeeds = this.config.plansCalcRoute().getTeleportedModeSpeeds();
 		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {

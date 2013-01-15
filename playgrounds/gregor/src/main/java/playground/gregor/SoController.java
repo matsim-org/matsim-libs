@@ -66,7 +66,7 @@ public class SoController extends Controler {
 			if (this.travelTimeCalculator == null) {
 				this.travelTimeCalculator = getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 			}
-			this.pluggableTravelCost = new PluggableTravelCostCalculator(this.travelTimeCalculator);
+			this.pluggableTravelCost = new PluggableTravelCostCalculator(this.travelTimeCalculator.getLinkTravelTimes());
 			setTravelDisutilityFactory(new TravelDisutilityFactory() {
 
 				// This is thread-safe because pluggableTravelCost is

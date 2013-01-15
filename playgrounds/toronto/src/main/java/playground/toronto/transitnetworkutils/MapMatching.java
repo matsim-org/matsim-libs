@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.config.ConfigUtils;
@@ -146,7 +146,7 @@ public class MapMatching {
 				LeastCostPathCalculator pather = null;
 				Network subNetwork = null;
 				
-				FreeSpeedTravelTimeCalculator freespeedCalc = new FreeSpeedTravelTimeCalculator();
+				FreeSpeedTravelTime freespeedCalc = new FreeSpeedTravelTime();
 				OnlyTimeDependentTravelDisutilityCalculator disutilityCalc = new OnlyTimeDependentTravelDisutilityCalculator(freespeedCalc);
 				
 				if (route.mode == "train"){					

@@ -49,7 +49,6 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -214,8 +213,8 @@ public class AgentsInEvacuationAreaPostProcessing {
 		// TravelTimeCalculator
 		config.travelTimeCalculator().setFilterModes(true);
 		config.travelTimeCalculator().setAnalyzedModes(TransportMode.car);
-		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-		eventsManager.addHandler((TravelTimeCalculator) travelTime);
+		TravelTimeCalculator travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
+		eventsManager.addHandler(travelTime);
 		
 		String eventsFile = dummyInputController.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML);
 		new EventsReaderXMLv1(eventsManager).parse(eventsFile);
@@ -231,7 +230,7 @@ public class AgentsInEvacuationAreaPostProcessing {
 		/*
 		 * Write car travel times
 		 */
-		TravelTimesWriter travelTimesWriter = new TravelTimesWriter(travelTime, scenario.getNetwork(), config.travelTimeCalculator());
+		TravelTimesWriter travelTimesWriter = new TravelTimesWriter(travelTime.getLinkTravelTimes(), scenario.getNetwork(), config.travelTimeCalculator());
 		travelTimesWriter.collectTravelTimes();
 		
 		String absoluteTravelTimesFile = dummyOutputController.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteFile);
