@@ -23,7 +23,7 @@
  */
 package tryouts.multiagentsimulation.hw4;
 
-import org.matsim.core.api.experimental.controller.Controller;
+import org.matsim.core.controler.Controler;
 
 /**
  * @author thomas
@@ -35,7 +35,7 @@ public class PotsdamRun {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final Controller controller = new Controller("./tnicolai/configs/brandenburg/config-potsdam_after.xml");
+		final Controler controller = new Controler("./tnicolai/configs/brandenburg/config-potsdam_after.xml");
 		controller.setOverwriteFiles(true);
 		controller.run();
 	}

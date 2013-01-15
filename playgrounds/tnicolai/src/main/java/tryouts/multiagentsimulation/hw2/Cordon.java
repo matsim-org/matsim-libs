@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.controller.Controller;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 
@@ -75,9 +75,9 @@ public class Cordon {
 		
 		final MyLinkEventHandler linkLeaveEventHandler = new MyLinkEventHandler(network, inLinks, outLinks);
 			
-		final Controller controller = new Controller(fileName);
+		final Controler controller = new Controler(fileName);
 		controller.setOverwriteFiles(true);
-		controller.addEventHandler(linkLeaveEventHandler);
+		controller.getEvents().addHandler(linkLeaveEventHandler);
 		controller.run();
 		
 		double[] hours = new double[MAXSIZE + 1];

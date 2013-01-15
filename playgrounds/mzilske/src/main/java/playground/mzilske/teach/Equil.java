@@ -7,10 +7,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.controller.Controller;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.vis.otfvis.OTFClientFile;
 
@@ -19,9 +19,9 @@ public class Equil {
 	public static Logger logger = Logger.getLogger(Equil.class);
 	
 	public static void main(String[] args) {
-		String configFile = "./examples/tutorial/config/example5-config.xml";
+		String configFile = "/Users/zilske/matsim-without-history/matsim/trunk/examples/equil/config.xml";
 		final Map<Id, Double> lastEntered = new HashMap<Id, Double>();
-		final Controller controller = new Controller(configFile);
+		final Controler controller = new Controler(configFile);
 		controller.setOverwriteFiles(true) ;
 		
 		final ArrayList<Double> link2 = new ArrayList<Double>();
@@ -66,7 +66,7 @@ public class Equil {
 						
 		};
 		
-		controller.addEventHandler(linkLeaveEventHandler);
+		controller.getEvents().addHandler(linkLeaveEventHandler);
 		
 		controller.run() ;
 		for (Map.Entry<Id, Double> entry : lastEntered.entrySet()) {
