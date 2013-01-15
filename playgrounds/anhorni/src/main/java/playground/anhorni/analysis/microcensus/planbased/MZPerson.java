@@ -26,6 +26,7 @@ import org.matsim.core.population.PersonImpl;
 public class MZPerson extends PersonImpl implements Person {	
 	private int hhIncome;
 	private int day;
+	private int hh;
 	
 	public MZPerson(Id id) {
 		super(id);
@@ -47,5 +48,11 @@ public class MZPerson extends PersonImpl implements Person {
 	}
 	public void setDay(int day) {
 		this.day = day;
+	}
+	public int getHh() {
+		return hh;
+	}
+	public void setHh(int hh) {
+		this.hh = hh;
 	}
 }

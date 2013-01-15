@@ -31,26 +31,27 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class MZ2Plans {	
 	private final static Logger log = Logger.getLogger(MZ2Plans.class);
 
-	public static void createMZ2Plans(String indir, String outdir) throws Exception {
+	public static Population createMZ2Plans(String indir, String outdir) throws Exception {
 		log.info("MATSim-DB: create Population based on micro census 2005/2010 data.");
 		log.info("  creating plans object... ");
-		Population plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		log.info("  done.");
+		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 
 		log.info("  running plans modules... ");
-		new PlansCreateFromMZ(1, 7).run(plans, indir);
-		log.info("  done.");
+		new PlansCreateFromMZ(1, 7).run(population, indir);
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(plans, NetworkImpl.createNetwork()).write(outdir + "plansMOSO.xml.gz");
-		log.info("  done.");
+		new PopulationWriter(population, NetworkImpl.createNetwork()).write(outdir + "plansMOSO.xml.gz");
+
 		
-		log.info("-------------------------------------------------------------");
-		log.info("Analyzing MC: ... ");
-		AnalyzeMicrocensus analyzer = new AnalyzeMicrocensus();
-		analyzer.run("car", "l", outdir + "plansMOSO.xml.gz", indir + "network.xml");
-		analyzer.run("car", "s", outdir + "plansMOSO.xml.gz", indir + "network.xml");
-		log.info("-------------------------------------------------------------");
+//		log.info("-------------------------------------------------------------");
+//		log.info("Analyzing MC: ... ");
+//		AnalyzeMicrocensus analyzer = new AnalyzeMicrocensus();
+//		analyzer.run("car", "l", outdir + "plansMOSO.xml.gz", indir + "network.xml");
+//		analyzer.run("car", "s", outdir + "plansMOSO.xml.gz", indir + "network.xml");
+//		log.info("-------------------------------------------------------------");
+		
+		log.info("Population size: " + population.getPersons().size());
+		return population;
 	}
 
 	public static void main(final String[] args) throws Exception {
@@ -59,5 +60,6 @@ public class MZ2Plans {
 		String outdir = args[1];
 		createMZ2Plans(indir, outdir);
 		Gbl.printElapsedTime();
+		log.info("creation finished =================================================");
 	}
 }
