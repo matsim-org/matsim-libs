@@ -31,7 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class MZ2Plans {	
 	private final static Logger log = Logger.getLogger(MZ2Plans.class);
 
-	public static Population createMZ2Plans(String indir, String outdir) throws Exception {
+	public Population createMZ2Plans(String indir, String outdir) throws Exception {
 		log.info("MATSim-DB: create Population based on micro census 2005/2010 data.");
 		log.info("  creating plans object... ");
 		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
@@ -58,7 +58,9 @@ public class MZ2Plans {
 		Gbl.startMeasurement();
 		String indir = args[0];
 		String outdir = args[1];
-		createMZ2Plans(indir, outdir);
+		
+		MZ2Plans creator = new MZ2Plans();
+		creator.createMZ2Plans(indir, outdir);
 		Gbl.printElapsedTime();
 		log.info("creation finished =================================================");
 	}
