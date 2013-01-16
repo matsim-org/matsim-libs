@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -75,7 +74,7 @@ public class EstimationControler {
 	}
 		
 	private void createShoppingTrips() {
-		QuadTree<ShopLocation> shopQuadTree = Utils.buildShopQuadTree(this.shops); 	// TODO: coord conversion
+		QuadTree<Location> shopQuadTree = Utils.buildLocationQuadTree(this.shops); 	// TODO: coord conversion
 		
 		for (Person p:population.getPersons().values()) {			
 			EstimationPerson person = (EstimationPerson)p;
@@ -86,7 +85,7 @@ public class EstimationControler {
 				if (pe instanceof Activity) {
 					MZActivityImpl act = (MZActivityImpl)plan.getPlanElements().get(actlegIndex);
 					if (act.getType().startsWith("s")) {
-						ShopLocation shop = shopQuadTree.get(act.getCoord().getX(), act.getCoord().getY());	
+						ShopLocation shop = (ShopLocation) shopQuadTree.get(act.getCoord().getX(), act.getCoord().getY());	
 						ShoppingTrip shoppingTrip = new ShoppingTrip();
 						shoppingTrip.setShop(shop);
 						MZActivityImpl start = (MZActivityImpl)plan.getPlanElements().get(actlegIndex - 2);

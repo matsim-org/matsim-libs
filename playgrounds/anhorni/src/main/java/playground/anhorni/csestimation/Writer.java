@@ -41,12 +41,12 @@ public class Writer {
 		}
 	}
 	
-	private void writeShops(TreeMap<Id, ShopLocation> shops, String shopsFile) {
+	public void writeShops(TreeMap<Id, ShopLocation> shops, String shopsFile) {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(shopsFile)); 			
 			for (ShopLocation shop:shops.values()) {
 				bufferedWriter.write(shop.getId() + ",");
-				bufferedWriter.write(shop.getCoord().getX() + "," + shop.getCoord().getX() + ",");
+				bufferedWriter.write(shop.getCoord().getX() + "," + shop.getCoord().getY() + ",");
 				bufferedWriter.write(shop.getSize() + ",");
 				bufferedWriter.write(shop.getPrice() + ",");
 				bufferedWriter.write("\n");				
