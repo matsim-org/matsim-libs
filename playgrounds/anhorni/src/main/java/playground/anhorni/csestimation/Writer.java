@@ -5,11 +5,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 public class Writer {
+	
+	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 	
 	public void write(Population population, TreeMap<Id, ShopLocation> shops, String personsFile, String shopsFile) {
 		this.writePersons(population, shops, personsFile);
@@ -28,8 +32,10 @@ public class Writer {
 					bufferedWriter.write(person.getAge() + ",");
 					bufferedWriter.write(person.getHhIncome() + ",");				
 					bufferedWriter.write(st.getShop().getId() + ","); // choice
-					bufferedWriter.write(st.getStart().getX() + "," + st.getStart().getY() + ",");
-					bufferedWriter.write(st.getEnd().getX() + "," + st.getEnd().getY() + ",");
+					Coord coordStartTrafo = this.trafo.transform(st.getStart());	
+					Coord coordEndTrafo = this.trafo.transform(st.getEnd());
+					bufferedWriter.write(coordStartTrafo.getX() + "," + coordStartTrafo.getY() + ",");
+					bufferedWriter.write(coordEndTrafo.getX() + "," + coordEndTrafo.getY() + ",");
 					bufferedWriter.write("\n");
 				}				
 			}				
@@ -46,7 +52,8 @@ public class Writer {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(shopsFile)); 			
 			for (ShopLocation shop:shops.values()) {
 				bufferedWriter.write(shop.getId() + ",");
-				bufferedWriter.write(shop.getCoord().getX() + "," + shop.getCoord().getY() + ",");
+				Coord coordtrafo = this.trafo.transform(shop.getCoord());
+				bufferedWriter.write(coordtrafo.getX() + "," + coordtrafo.getY() + ",");
 				bufferedWriter.write(shop.getSize() + ",");
 				bufferedWriter.write(shop.getPrice() + "\n");
 			}				
