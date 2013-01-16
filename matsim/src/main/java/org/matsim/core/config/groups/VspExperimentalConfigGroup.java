@@ -39,7 +39,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			logitScaleParamForPlansRemoval,
 			scoreMSAStartsAtIteration,
 			isGeneratingBoardingDeniedEvent,
-			isAbleToOverwritePtInteractionParams
+			isAbleToOverwritePtInteractionParams,
+			isUsingOpportunityCostOfTimeForLocationChoice
 		}
 	
 		private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
@@ -163,6 +164,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			case isAbleToOverwritePtInteractionParams:
 				this.addParam( key, "false" ) ; // default is that this NOT allowed.  kai, nov'12 
 				break;
+			case isUsingOpportunityCostOfTimeForLocationChoice:
+				this.addParam( key, "true" ) ; 
+				break;
 			}
 		}
 	}
@@ -188,6 +192,10 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				map.put(key.toString(), "(do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the " +
 						"parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, " +
 						"set the following to true.") ;
+				break;
+			case isUsingOpportunityCostOfTimeForLocationChoice:
+				map.put(key.toString(), "if an approximation of the opportunity cost of time is included into the radius calculation for location choice." +
+						"`true' will be faster, but it is an approximation.  Default is `true'; `false' is available for backwards compatibility.") ;
 				break;
 			}
 		}
@@ -396,24 +404,6 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 //		log.info( "leaving checkVspDefaults ...") ;
 //	}
 
-
-
-	//	public boolean isUseActivityDurations() {
-	//		return this.useActivityDurations;
-	//	}
-	//
-	//	public void setUseActivityDurations(final boolean useActivityDurations) {
-	//		this.useActivityDurations = useActivityDurations;
-	//	}
-
-//	public String getColoring() {
-//		return this.coloring ;
-//	}
-//	public void setColoring( final String value ) {
-//		this.coloring = value ;
-//	}
-	// this parameter really is in otfvis config. kai, jul'12
-
 	public String getInputMZ05File() {
 		return this.inputMZ05File;
 	}
@@ -437,14 +427,6 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	public void setChainBasedModes(final String chainBasedModes) {
 		this.chainBasedModes = chainBasedModes;
 	}
-
-	//	public double getOffsetWalk() {
-	//		return this.offsetWalk;
-	//	}
-
-	//	public void setOffsetWalk(final double offsetWalk) {
-	//		this.offsetWalk = offsetWalk;
-	//	}
 
 	public ActivityDurationInterpretation getActivityDurationInterpretation() {
 		return this.activityDurationInterpretation;

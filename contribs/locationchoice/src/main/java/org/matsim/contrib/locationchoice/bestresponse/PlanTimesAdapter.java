@@ -122,17 +122,20 @@ public class PlanTimesAdapter {
 						throw new RuntimeException("activity duration interpretation of " 
 								+ config.vspExperimental().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
 										"Use " + ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
-					} else if ( config.vspExperimental().getActivityDurationInterpretation()==ActivityDurationInterpretation.tryEndTimeThenDuration ) {
+					} else 
+//						if ( config.vspExperimental().getActivityDurationInterpretation()==ActivityDurationInterpretation.tryEndTimeThenDuration ) 
+					{
 						if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
 							actTmp.setEndTime( act.getEndTime() ) ;
 						} else if ( act.getMaximumDuration() == Time.UNDEFINED_TIME) {
 							actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
 						}
-					} else {
-						actTmp.setEndTime(arrivalTime + actDur);
-						// This is the original variant.  I would not make "duration" take absolute precedence over "endTime", but since
-						// VSP should use "tryEndTimeThenDuration", I will leave it for the time being.  kai, jan'13
-					}
+					} 
+//					else {
+//						actTmp.setEndTime(arrivalTime + actDur);
+//						// This is the original variant.  I would not make "duration" take absolute precedence over "endTime", but since
+//						// VSP should use "tryEndTimeThenDuration", I will leave it for the time being.  kai, jan'13
+//					}
 					
 					scoringFunction.startLeg(departureTime, previousLegPlanTmp);
 					scoringFunction.endLeg(arrivalTime);

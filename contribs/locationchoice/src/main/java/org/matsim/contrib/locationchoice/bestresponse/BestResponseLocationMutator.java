@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,6 +38,7 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -238,9 +240,18 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		 */
 		double travelSpeedCrowFly = Double.parseDouble(this.scenario.getConfig().locationchoice().getRecursionTravelSpeed());
 		double betaTime = this.scenario.getConfig().planCalcScore().getTraveling_utils_hr();
+		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
+			betaTime -= this.scenario.getConfig().planCalcScore().getPerforming_utils_hr() ;
+			// needs to be negative (I think) since AH uses this as a cost parameter. kai, jan'13
+		}
 		double maxTravelTime = Double.MAX_VALUE;
 		if (betaTime != 0.0) {
+			if ( betaTime >= 0. ) {
+				throw new RuntimeException("betaTime >= 0 in location choice; method not designed for this; aborting ...") ;
+			}
 			maxTravelTime = Math.abs(maxEpsilon / (-1.0 * betaTime) * 3600.0); //[s] // abs used for the case when somebody defines beta > 0
+			// yy maybe one can still used it with betaTime>0 (i.e. traveling brings utility), but taking the "abs" of it is almost certainly not the
+			// correct way.  kai, jan'13
 		}
 		// distance linear
 		double maxDistance = travelSpeedCrowFly * maxTravelTime; 
