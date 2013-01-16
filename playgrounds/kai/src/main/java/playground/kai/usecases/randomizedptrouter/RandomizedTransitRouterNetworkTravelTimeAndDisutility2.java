@@ -244,9 +244,10 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 
 
 	public static void main(String[] args) {
-		String configFile = "/home/dgrether/data/work/repos/shared-svn/projects/andreas-graf/Szenarien/SimplifiedRandomizedPT/config_adapt_rpt_dg.xml";
-//		final Config config = ConfigUtils.loadConfig(args[0]) ;
-		final Config config = ConfigUtils.loadConfig(configFile) ;
+//		String configFile = "/home/dgrether/data/work/repos/shared-svn/projects/andreas-graf/Szenarien/SimplifiedRandomizedPT/config_adapt_rpt_dg.xml";
+		boolean doVisualization = true;
+		final Config config = ConfigUtils.loadConfig(args[0]) ;
+//		final Config config = ConfigUtils.loadConfig(configFile) ;
 
 		config.planCalcScore().setWriteExperiencedPlans(true) ;
 
@@ -278,17 +279,19 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 			}
 		}) ;
 		
-		ctrl.setMobsimFactory(new MobsimFactory(){
-
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
+		if (doVisualization){
+			ctrl.setMobsimFactory(new MobsimFactory(){
 				
-				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-				OTFClientLive.run(sc.getConfig(), server);
-				
-				return qSim ;
-			}}) ;
+				@Override
+				public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+					QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
+					
+					OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+					OTFClientLive.run(sc.getConfig(), server);
+					
+					return qSim ;
+				}}) ;
+		}
 		
 		ctrl.run() ;
 
