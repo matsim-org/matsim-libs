@@ -53,6 +53,7 @@ public class ShopsEnricher {
 			e.printStackTrace();
 		}
 		this.assignSize();
+		this.assignPrice();
 		Writer writer = new Writer();
 		writer.writeShops(this.shops, outShopsFile);
 		log.info("Enriching finished ------------------------------------------");
@@ -137,6 +138,36 @@ public class ShopsEnricher {
 			}
 			else {
 				log.info(shop.getId() + ": no store close by!");
+			}
+		}
+	}
+	
+	private void assignPrice() {
+		for (ShopLocation shop:this.shops.values()) {
+			int lidl_aldi = 1;
+			int denner = 2;
+			int migros_coop = 3;
+			int spar_other = 4;
+			int marinello_globus = 5;			
+			int idint = Integer.parseInt(shop.getId().toString());
+
+			if (idint < 20000) {
+				shop.setPrice(denner);
+			}
+			else if (idint > 20000 && idint < 30000) {
+				shop.setPrice(spar_other);
+			}
+			else if ((idint > 30000 && idint < 50000)) {
+				shop.setPrice(migros_coop);
+			}
+			else if ((idint > 60000 && idint < 70000) || (idint == 100004) || (idint == 100005) || (idint == 100006)) {
+				shop.setPrice(marinello_globus);
+			}
+			else if ((idint > 70000 && idint < 80000) || (idint == 100074) || (idint == 100147) || (idint == 100148)) {
+				shop.setPrice(lidl_aldi);
+			}
+			else {
+				shop.setPrice(spar_other);
 			}
 		}
 	}

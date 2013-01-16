@@ -48,8 +48,7 @@ public class Writer {
 				bufferedWriter.write(shop.getId() + ",");
 				bufferedWriter.write(shop.getCoord().getX() + "," + shop.getCoord().getY() + ",");
 				bufferedWriter.write(shop.getSize() + ",");
-				bufferedWriter.write(shop.getPrice() + ",");
-				bufferedWriter.write("\n");				
+				bufferedWriter.write(shop.getPrice() + "\n");
 			}				
 			bufferedWriter.flush();
 		    bufferedWriter.close();
