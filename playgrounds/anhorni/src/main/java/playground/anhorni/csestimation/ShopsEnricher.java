@@ -103,7 +103,8 @@ public class ShopsEnricher {
 			BZShop closestBZShop = (BZShop) bzQuadTree.get(shop.getCoord().getX(), shop.getCoord().getY());
 			if (((CoordImpl)closestBZShop.getCoord()).calcDistance(shop.getCoord()) < 150) {
 				if (closestBZShop.sizeMultiplyDefined()) {
-					log.info("Store " + shop.getId() + " multiply defined");
+					log.info("Store " + shop.getId() + " multiply defined " + closestBZShop.getSize()[0] + " " + closestBZShop.getSize()[1] + " "
+							+ closestBZShop.getSize()[2] + " " + closestBZShop.getSize()[3] + " " + closestBZShop.getSize()[4] + " " + closestBZShop.getSize()[5]);
 					shop.setSize(-1);
 				}
 				else {
