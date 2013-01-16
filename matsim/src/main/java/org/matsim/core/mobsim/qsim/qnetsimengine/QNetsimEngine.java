@@ -369,8 +369,10 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 		Id linkId = planAgent.getCurrentLinkId(); 
-		QLinkInternalI qLink = network.getNetsimLink(linkId);
-		qLink.registerAdditionalAgentOnLink(planAgent);
+		if (linkId != null) { // may be bushwacking
+			QLinkInternalI qLink = network.getNetsimLink(linkId);
+			qLink.registerAdditionalAgentOnLink(planAgent);
+		}
 	}
 
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {

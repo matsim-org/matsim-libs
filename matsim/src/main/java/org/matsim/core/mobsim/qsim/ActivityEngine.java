@@ -186,7 +186,9 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
 		Id agentId = agent.getId();
 		Id linkId = agent.getCurrentLinkId();
-		internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
+		if (linkId != null) { // may be bushwacking
+			internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
+		}
 	}
 
 }

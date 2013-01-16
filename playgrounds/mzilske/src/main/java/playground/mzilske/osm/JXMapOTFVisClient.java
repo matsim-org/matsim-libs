@@ -80,7 +80,7 @@ public final class JXMapOTFVisClient {
 
 				final OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar, config.otfVis());
 				otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));
-				
+				otfClient.addMapViewer(tf);
 				otfClient.show();
 			}
 		});

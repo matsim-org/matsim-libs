@@ -40,12 +40,18 @@ import javax.swing.JPanel;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
@@ -58,6 +64,9 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import com.jogamp.common.nio.Buffers;
 
@@ -79,7 +88,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	private Id agentId;
 
 	private transient Result result;
-	
+
 	private SimulationViewForQueries simulationView;
 
 	@Override
@@ -114,12 +123,12 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						(float) c2.getY(), act.getType()));
 			}
 		}
+
 		if ( includeRoutes ) {
-			QueryAgentUtils.buildRoute(plan, result, agentId, net, QueryAgentUtils.Level.ROUTES, OTFServerQuadTree.getOTFTransformation() ); 
+			result.buildRoute(plan, agentId, net, Level.ROUTES ); 
 		} else {
-			QueryAgentUtils.buildRoute(plan, result, agentId, net, QueryAgentUtils.Level.PLANELEMENTS, OTFServerQuadTree.getOTFTransformation() ); 
+			result.buildRoute(plan, agentId, net, Level.PLANELEMENTS); 
 		}
-		result.hasPlan = true;
 	}
 
 	@Override
@@ -164,33 +173,117 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		simulationView.removeTrackedAgent(this.agentId);
 	}
 
+
 	public static class Result implements OTFQueryResult {
 
-		/*package*/ String agentId;
-		/*package*/ boolean hasPlan = false;
-		protected float[] vertex = null;
-		protected byte[] colors = null;
-		private transient FloatBuffer vert;
-		/*package*/ List<MyInfoText> acts = new ArrayList<MyInfoText>();
-		private transient List<InfoText> activityTexts;
-		protected transient InfoText agentText = null;
+		private String agentId;
+		private List<Coord> vertex = new ArrayList<Coord>();
+		private List<Color> colors = new ArrayList<Color>();
+		private FloatBuffer vert;
+		private List<MyInfoText> acts = new ArrayList<MyInfoText>();
+		private List<InfoText> activityTexts;
+		private InfoText agentText = null;
 		private ByteBuffer cols;
 
-		private boolean calcOffset = true;
+
+		private void buildRoute(Plan plan, Id agentId, Network net, Level level) {
+			Color carColor = Color.ORANGE;
+			Color actColor = Color.BLUE;
+			Color ptColor = Color.YELLOW;
+			Color walkColor = Color.MAGENTA;
+			Color otherColor = Color.PINK;
+			for (PlanElement planElement : plan.getPlanElements()) {
+				if (planElement instanceof Activity) {
+					Activity act = (Activity) planElement;
+					Coord coord = act.getCoord();
+					if (coord == null) {
+						Link link = net.getLinks().get(act.getLinkId());
+						AgentSnapshotInfo pi = snapshotInfoFactory.createAgentSnapshotInfo(agentId, link, 0.9*link.getLength(), 0);
+						coord = new CoordImpl(pi.getEasting(), pi.getNorthing());
+					}
+					addCoord(coord, actColor);
+				} else if (planElement instanceof Leg) {
+					Leg leg = (Leg) planElement;
+					if ( leg.getRoute() instanceof NetworkRoute && level==Level.ROUTES) {
+						Link startLink = net.getLinks().get(((NetworkRoute) leg.getRoute()).getStartLinkId());
+						Coord from = startLink.getToNode().getCoord();
+						addCoord(from, carColor);
+						for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+							Link driven = net.getLinks().get(linkId);
+							Node node = driven.getToNode();
+							Coord coord = node.getCoord();
+							addCoord(coord, carColor);
+						}
+						Link endLink = net.getLinks().get(((NetworkRoute) leg.getRoute()).getEndLinkId());
+						Coord to = endLink.getToNode().getCoord();
+						addCoord(to, carColor);
+					} else {
+						Link fromLink = net.getLinks().get(leg.getRoute().getStartLinkId());
+						Coord from;
+						if (fromLink != null) {
+							from = fromLink.getToNode().getCoord();
+						} else {
+							from = this.vertex.get(this.vertex.size()-1);
+						}
+						Link toLink = net.getLinks().get(leg.getRoute().getEndLinkId());
+						Coord to;
+						if (toLink != null) {
+							to = toLink.getToNode().getCoord();
+						} else { 
+							to = this.vertex.get(this.vertex.size()-1);
+						}
+												
+						Coord coord = CoordUtils.getCenter(from, to);
+						if (leg.getMode().equals(TransportMode.car)) {
+							addCoord(from, carColor);
+							addCoord(coord, carColor);
+							addCoord(to, carColor);
+						} else if (leg.getMode().equals(TransportMode.pt)) {
+							addCoord(from, ptColor);
+							addCoord(coord, ptColor);
+							addCoord(to, ptColor);
+						} else if (leg.getMode().equals(TransportMode.walk)) {
+							addCoord(from, walkColor);
+							addCoord(coord, walkColor);
+							addCoord(to, walkColor);
+						} else {
+							addCoord(from, otherColor); 
+							addCoord(coord, otherColor);
+							addCoord(to, otherColor);
+						}
+					}
+				}
+			} 
+			this.vert = Buffers.newDirectFloatBuffer(vertex.size()*2);
+			this.vert.rewind();
+			for (Coord coord : this.vertex) {
+				Coord transform = OTFServerQuadTree.getOTFTransformation().transform(coord); 
+				this.vert.put((float) transform.getX());
+				this.vert.put((float) transform.getY());
+			}
+			this.cols = Buffers.newDirectByteBuffer(colors.size()*4);
+			this.cols.rewind();
+			for (Color color : this.colors) {
+				this.cols.put((byte) color.getRed());
+				this.cols.put((byte) color.getGreen());
+				this.cols.put((byte) color.getBlue());
+				this.cols.put((byte) 128);
+			}
+		}
+
+
+		private void addCoord(Coord coord, Color col) {
+			vertex.add(coord);
+			colors.add(col);
+			log.info( " east: " + coord.getX() + " north: " +coord.getY() );
+		}
 
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
-			drawWithGLDrawer(drawer);
-		}
-
-		protected void drawWithGLDrawer(OTFOGLDrawer drawer) {
 			GL2 gl = OTFGLAbstractDrawable.getGl();
-			if (hasPlan) {
-				calcOffsetIfNecessary(drawer);
-				rewindGLBuffers();
-				prepare(gl);
-				createActivityTextsIfNecessary(drawer);
-			}
+			rewindGLBuffers();
+			prepare(gl);
+			createActivityTextsIfNecessary(drawer);
 			OGLAgentPointLayer layer = drawer.getCurrentSceneGraph().getAgentPointLayer();
 			Point2D.Double pos = tryToFindAgentPosition(layer);
 			if (pos != null) {
@@ -204,8 +297,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private Point2D.Double tryToFindAgentPosition(OGLAgentPointLayer layer) {
-			Point2D.Double pos = getAgentPositionFromPointLayer(this.agentId,
-					layer);
+			Point2D.Double pos = getAgentPositionFromPointLayer(this.agentId, layer);
 			return pos;
 		}
 
@@ -220,7 +312,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			gl.glLineWidth(1.f * getLineWidth());
 			gl.glColorPointer(4, GL2.GL_UNSIGNED_BYTE, 0, cols);
 			gl.glVertexPointer(2, GL2.GL_FLOAT, 0, this.vert);
-			gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, this.vertex.length / 2);
+			gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, this.vertex.size());
 			gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
 			gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
 			gl.glDisable(GL2.GL_LINE_SMOOTH);
@@ -256,14 +348,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private Double getAgentPositionFromPointLayer(String agentIdString,
 				OGLAgentPointLayer layer) {
 			return layer.getAgentCoords(agentIdString.toCharArray());
-		}
-
-		private void calcOffsetIfNecessary(OTFOGLDrawer drawer) {
-			if (this.calcOffset == true) {
-				this.calcOffset = false;
-				this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
-				this.cols = Buffers.copyByteBuffer(ByteBuffer.wrap(this.colors));
-			}
 		}
 
 		private void createActivityTextsIfNecessary(OTFOGLDrawer drawer) {
@@ -308,5 +392,13 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			this.name = name;
 		}
 	}
+
+
+	private static SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+	private static AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+
+	enum Level { ROUTES, PLANELEMENTS } 
+
+
 
 }

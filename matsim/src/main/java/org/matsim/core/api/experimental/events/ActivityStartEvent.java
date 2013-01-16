@@ -74,7 +74,9 @@ public class ActivityStartEvent extends Event implements HasPersonId {
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		if (this.linkId != null) {
+			attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		}
 		if (this.facilityId != null) {
 			attr.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
 		}

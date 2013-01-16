@@ -43,6 +43,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 	private boolean doVisualizeTeleportedAgents;
 	private Collection<AgentSnapshotInfo> snapshots = new ArrayList<AgentSnapshotInfo>();
 	
+	
 	public void removeTrackedAgent(Id id) {
 		trackedAgents.remove(id);
 	}
@@ -61,16 +62,38 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 		Leg leg = (Leg) planAgent.getCurrentPlanElement();
 		List<PlanElement> planElements = planAgent.getSelectedPlan().getPlanElements();
 		int idx = planElements.indexOf(leg);
-		Activity fromAct = (Activity) planElements.get(idx-1);
-		Activity toAct = (Activity) planElements.get(idx+1);
+		PlanElement fromAct = planElements.get(idx-1);
+		PlanElement toAct = planElements.get(idx+1);
 		double travTime = agent.getExpectedTravelTime();
-		Coord fromCoord = fromAct.getCoord();
-		Coord toCoord = toAct.getCoord();
+		Coord fromCoord = getCoordFrom(fromAct);
+		Coord toCoord = getCoordto(toAct);
 		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travTime);
 		this.teleportationData.put( agentId , agentInfo );
 		return true;
 	}
+
+
+	private Coord getCoordFrom(PlanElement fromAct) {
+		if (fromAct instanceof Activity) {
+			Activity act = (Activity) fromAct;
+			return act.getCoord();
+		} else {
+			Leg leg = (Leg) fromAct;
+			return internalInterface.getMobsim().getNetsimNetwork().getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getToNode().getCoord();
+		}
+	}
 	
+	
+	private Coord getCoordto(PlanElement toAct) {
+		if (toAct instanceof Activity) {
+			Activity act = (Activity) toAct;
+			return act.getCoord();
+		} else {
+			Leg leg = (Leg) toAct;
+			return internalInterface.getMobsim().getNetsimNetwork().getNetwork().getLinks().get(leg.getRoute().getStartLinkId()).getToNode().getCoord();
+		}
+	}
+
 	public Collection<AgentSnapshotInfo> getTrackedAndTeleportedAgentsView() {
 		return snapshots;
 	}
@@ -97,19 +120,37 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 
 	@Override
 	public void doSimStep(double time) {
-		this.updateTeleportedAgents(time);
-		updateSnapshots();
+		this.updateSnapshots(time);
 		handleTeleportationArrivals();
 	}
 	
-	private void updateTeleportedAgents(double time) {
-		for (TeleportationVisData teleportationVisData : teleportationData.values()) {
-			if (this.doVisualizeTeleportedAgents || trackedAgents.contains(teleportationVisData.getId())) {
+	private void updateSnapshots(double time) {
+		snapshots.clear();
+		if (this.doVisualizeTeleportedAgents) {
+			for (TeleportationVisData teleportationVisData : teleportationData.values()) {
 				teleportationVisData.calculatePosition(time);
+				snapshots.add(teleportationVisData);
+			}
+		}
+		for (Id personId : trackedAgents) {
+			TeleportationVisData teleportationVisData = teleportationData.get(personId);
+			if (teleportationVisData != null) {
+				teleportationVisData.calculatePosition(time);
+				snapshots.add(teleportationVisData);
+			} else {
+				Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+				MobsimAgent agent = agents.get(personId);
+				VisLink visLink = internalInterface.getMobsim().getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
+				visLink.getVisData().getVehiclePositions(positions);
+				for (AgentSnapshotInfo position : positions) {
+					if (position.getId().equals(personId)) {
+						snapshots.add(position);
+					}
+				}
 			}
 		}
 	}
-
+	
 	private void handleTeleportationArrivals() {
 		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		while (teleportationList.peek() != null) {

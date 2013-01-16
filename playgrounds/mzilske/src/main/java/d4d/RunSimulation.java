@@ -24,10 +24,14 @@ public class RunSimulation {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
-
 		config.controler().setLastIteration(20);
 		config.controler().setMobsim("jdeqsim");
 		// config.controler().setMobsim("DoNothing");
+		config.controler().setLastIteration(100);
+		config.controler().setMobsim("jdeqsim");
+		config.controler().setLastIteration(500);
+		// config.controler().setMobsim("jdeqsim");
+		config.controler().setMobsim("DoNothing");
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
 		config.otfVis().setShowTeleportedAgents(false);
@@ -50,10 +54,10 @@ public class RunSimulation {
 		config.planCalcScore().setConstantCar(0);
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		// config.planCalcScore().setWriteExperiencedPlans(true);
-		config.setParam("JDEQSim", "flowCapacityFactor", "0.01");
-		config.setParam("JDEQSim", "storageCapacityFactor", "0.01");
-		double endTime= 60*60*32;
-		config.setParam("JDEQSim", "endTime", Double.toString(endTime));
+//		config.setParam("JDEQSim", "flowCapacityFactor", "0.01");
+//		config.setParam("JDEQSim", "storageCapacityFactor", "0.01");
+//		double endTime= 60*60*32;
+//		config.setParam("JDEQSim", "endTime", Double.toString(endTime));
 		
 		config.setParam("changeLegMode", "modes", "car,other");
 		config.setParam("changeLegMode", "ignoreCarAvailability", "true");
@@ -76,9 +80,15 @@ public class RunSimulation {
 		config.strategy().addStrategySettings(reRoute);
 		config.strategy().addStrategySettings(changeMode);
 		config.strategy().setMaxAgentPlanMemorySize(3);
-		
-		
-		
+		reRoute.setModuleName("ReRoute");
+		// reRoute.setModuleName("Duplicate");
+		reRoute.setProbability(0.2);
+		reRoute.setDisableAfter(450);
+		// changeMode.setModuleName("ChangeLegMode");
+		config.strategy().addStrategySettings(changeExp);
+		config.strategy().addStrategySettings(reRoute);
+		config.strategy().addStrategySettings(changeMode);
+		config.strategy().setMaxAgentPlanMemorySize(3);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
 		AltPopulationReaderMatsimV5 altPopulationReaderMatsimV5 = new AltPopulationReaderMatsimV5(scenario);
@@ -94,6 +104,25 @@ public class RunSimulation {
 		});
 
 		Controler controler = new Controler(scenario);
+		controler.addPlanStrategyFactory("Duplicate", new DuplicatePlanStrategyFactory());
+		controler.setOverwriteFiles(true);
+		controler.addMobsimFactory("DoNothing", new MobsimFactory() {
+
+			@Override
+			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+				return new Mobsim() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						
+					}
+					
+				};
+			}
+			
+		});
+		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("Duplicate", new DuplicatePlanStrategyFactory());
 		controler.setOverwriteFiles(true);
 		controler.addMobsimFactory("DoNothing", new MobsimFactory() {
