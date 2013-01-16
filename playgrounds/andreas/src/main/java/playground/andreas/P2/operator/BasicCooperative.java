@@ -94,7 +94,7 @@ public class BasicCooperative extends AbstractCooperative{
 		}
 		
 		// reinitialize the plan
-		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan.getStartTime(), this.bestPlan.getEndTime(), this.bestPlan.getNVehicles(), this.bestPlan.getStopsToBeServed(), this.bestPlan.getId()));
+		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan));
 		
 		this.updateCurrentTransitLine();
 	}

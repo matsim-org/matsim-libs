@@ -47,6 +47,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.routeProvider.RandomStopProvider;
 
@@ -75,9 +76,13 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		this.randomStopProvider = randomStopProvider;
 		this.transportMode = transportMode;
 	}
-
+	
 	@Override
-	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id routeId){
+	public TransitLine createTransitLine(Id lineId, PPlan plan){
+		return this.createTransitLine(lineId, plan.getStartTime(), plan.getEndTime(), plan.getNVehicles(), plan.getStopsToBeServed(), plan.getId());
+	}
+
+	private TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id routeId){
 		if (stopsToBeServed.size() != 2) {
 			log.warn("This route provider can only handle as much as to stops. Please use a different route provider.");
 			return null;

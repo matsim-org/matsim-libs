@@ -89,11 +89,7 @@ public class MultiPlanCooperative extends AbstractCooperative{
 		return this.bestPlan;
 	}
 
-	public void replan(PStrategyManager pStrategyManager, int iteration) {	
-		this.currentIteration = iteration;
-		
-		// remember the best plan from the last iteration
-		this.getBestPlan();
+	public void replan(PStrategyManager pStrategyManager, int iteration) {
 		
 		// First, balance the budget
 		if(this.budget < 0){
@@ -124,6 +120,13 @@ public class MultiPlanCooperative extends AbstractCooperative{
 
 		
 		// Third, replan
+		if (this.currentIteration != iteration) {
+			// new iteration - replan
+			// get the best plan from the last iteration
+			this.getBestPlan();
+		}
+		this.currentIteration = iteration;
+		
 		if (this.bestPlan != null) {
 			PStrategy strategy = pStrategyManager.chooseStrategy();
 			if (strategy != null) {
@@ -139,13 +142,13 @@ public class MultiPlanCooperative extends AbstractCooperative{
 						// remove vehicle from worst plan
 //					this.findWorstPlanAndRemoveOneVehicle(this.plans);
 						
+						// best plan must contain at least two vehicles, see getBestPlan()
 						this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
 						this.plans.add(newPlan);
 					}
 				}
-				
-				this.bestPlan = null;
 			}
+			this.bestPlan = null;
 		}
 		
 		// Fourth, move one vehicle from the worst negative plan to the best plan, if possible
@@ -194,7 +197,7 @@ public class MultiPlanCooperative extends AbstractCooperative{
 		
 		// Fifth, reinitialize all plans
 		for (PPlan plan : this.plans) {
-			plan.setLine(this.routeProvider.createTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), plan.getNVehicles(), plan.getStopsToBeServed(), plan.getId()));
+			plan.setLine(this.routeProvider.createTransitLine(this.id, plan));
 		}
 		
 		this.updateCurrentTransitLine();

@@ -47,6 +47,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.andreas.P2.replanning.PPlan;
+
 
 /**
  * Generates simple circle route for two given stops and operation time, number of vehicles plying that line can be specified.
@@ -83,7 +85,11 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 	}
 
 	@Override
-	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id routeId){
+	public TransitLine createTransitLine(Id lineId, PPlan plan){
+		return this.createTransitLine(lineId, plan.getStartTime(), plan.getEndTime(), plan.getNVehicles(), plan.getStopsToBeServed(), plan.getId());
+	}
+	
+	private TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id routeId){
 		if (stopsToBeServed.size() != 2) {
 			log.warn("This route provider can only handle as much as to stops. Please use a different route provider.");
 			return null;

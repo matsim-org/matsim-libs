@@ -37,12 +37,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author aneumann
  *
  */
-public class PPlan {
+public class PPlan implements Comparable<PPlan>{
 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PPlan.class);
 	
-	private final Id id;
+	private final Id planId;
 	private final String creator;
 
 	private TransitLine line;
@@ -57,32 +57,15 @@ public class PPlan {
 
 	private Set<Id> vehicleIds;
 	
-	public PPlan(Id id, String creator) {
-		this.id = id;
+	public PPlan(Id planId, String creator) {
+		this.planId = planId;
 		this.creator = creator;
 	}
 	
-	public PPlan(Id id, String creator, ArrayList<TransitStopFacility> stopsToBeServed, double startTime, double endTime){
-		this.id = id;
-		this.creator = creator;
-		this.stopsToBeServed = stopsToBeServed;
-		this.startTime = startTime;
-		this.endTime = endTime;
-	}
-	
-	public PPlan(Id id, String creator, PPlan oldPlan){
-		this.id = id;
-		this.creator = creator;
-		this.stopsToBeServed = oldPlan.getStopsToBeServed();
-		this.startTime = oldPlan.getStartTime();
-		this.endTime = oldPlan.getEndTime();
-		this.line = oldPlan.getLine();
-	}
-
 	@Override
 	public String toString() {
 		StringBuffer sB = new StringBuffer();
-		sB.append("Plan " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
+		sB.append("Plan " + this.planId + ", score: " + this.score + ", score/veh: " + this.getScorePerVehicle()
 				+ ", trips: " + this.tripsServed + ", vehicles: " + this.vehicleIds.size()
 				+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime)
 				+ ", Stops: ");
@@ -96,7 +79,7 @@ public class PPlan {
 	
 	public String toString(double budget) {		
 		StringBuffer sB = new StringBuffer();
-		sB.append("Plan " + this.id + ", score: " + this.score + ", score/veh: " + (this.score / this.vehicleIds.size())
+		sB.append("Plan " + this.planId + ", score: " + this.score + ", score/veh: " + this.getScorePerVehicle()
 				+ ", trips: " + this.tripsServed + ", vehicles: " + this.vehicleIds.size()
 				+ ", Operation time: " + Time.writeTime(this.startTime) + "-" + Time.writeTime(this.endTime)
 				+ ", Stops: ");
@@ -111,7 +94,7 @@ public class PPlan {
 	}
 
 	public Id getId() {
-		return this.id;
+		return this.planId;
 	}
 	
 	public String getCreator() {
@@ -232,5 +215,18 @@ public class PPlan {
 		}
 		
 		return true;
-	}	
+	}
+
+	@Override
+	public int compareTo(PPlan plan) {
+	    if (plan.getScorePerVehicle() > this.getScorePerVehicle()) {
+	      return 1;
+	    }
+	    if (plan.getScorePerVehicle() < this.getScorePerVehicle()) {
+	      return -1;
+	    }
+//	    if (plan.getScorePerVehicle() == this.getScorePerVehicle()) {
+		      return 0;
+//	    }
+	}
 }

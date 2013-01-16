@@ -37,6 +37,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PScenarioHelper;
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.routeProvider.ComplexCircleScheduleProvider;
 import playground.andreas.P2.routeProvider.RandomStopProvider;
 import playground.andreas.P2.routeProvider.SimpleCircleScheduleProvider;
@@ -58,16 +59,18 @@ public class ComplexCircleScheduleProviderTest {
 		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(tS, scenario.getNetwork(), null, 10, pC.getPlanningSpeedFactor(), pC.getMode());
 		
 		Id lineId = new IdImpl("line1");
-		double startTime = 7.0 * 3600.0;
-		double endTime = 9.0 * 3600.0;
-		int numberOfVehicles = 2;
+		Id routeId = new IdImpl("route1");
+		
+		PPlan plan = new PPlan(routeId, "noCreator");
+		plan.setStartTime(7.0 * 3600.0);
+		plan.setEndTime(9.0 * 3600.0);
+		plan.setNVehicles(2);
 		TransitStopFacility startStop = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "1424"));
 		TransitStopFacility endStop = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "4434"));
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
 		stopsToBeServed.add(startStop);
 		stopsToBeServed.add(endStop);
-		
-		Id routeId = new IdImpl("route1");
+		plan.setStopsToBeServed(stopsToBeServed);
 		
 		ArrayList<Id> refIds = new ArrayList<Id>();
 		refIds.add(new IdImpl("1424")); refIds.add(new IdImpl("2434"));
@@ -75,7 +78,7 @@ public class ComplexCircleScheduleProviderTest {
 		refIds.add(new IdImpl("3424")); refIds.add(new IdImpl("2414"));
 		refIds.add(new IdImpl("1424"));
 		
-		TransitLine line = prov.createTransitLine(lineId, startTime, endTime, numberOfVehicles, stopsToBeServed, routeId);
+		TransitLine line = prov.createTransitLine(lineId, plan);
 		
 		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
 		
@@ -115,9 +118,12 @@ public class ComplexCircleScheduleProviderTest {
 		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(tS, scenario.getNetwork(), null, 10, pC.getPlanningSpeedFactor(), pC.getMode());
 		
 		Id lineId = new IdImpl("line1");
-		double startTime = 7.0 * 3600.0;
-		double endTime = 9.0 * 3600.0;
-		int numberOfVehicles = 2;
+		Id routeId = new IdImpl("route1");
+		
+		PPlan plan = new PPlan(routeId, "noCreator");
+		plan.setStartTime(7.0 * 3600.0);
+		plan.setEndTime(9.0 * 3600.0);
+		plan.setNVehicles(2);
 		TransitStopFacility stop1 = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "1424"));
 		TransitStopFacility stop2 = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "2423"));
 		TransitStopFacility stop3 = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "2333"));
@@ -130,7 +136,7 @@ public class ComplexCircleScheduleProviderTest {
 		stopsToBeServed.add(stop4);
 		stopsToBeServed.add(stop5);
 		
-		Id routeId = new IdImpl("route1");
+		plan.setStopsToBeServed(stopsToBeServed);
 		
 		ArrayList<Id> refIds = new ArrayList<Id>();
 		refIds.add(new IdImpl("1424")); refIds.add(new IdImpl("2423"));
@@ -139,7 +145,7 @@ public class ComplexCircleScheduleProviderTest {
 		refIds.add(new IdImpl("3424")); refIds.add(new IdImpl("2414"));
 		refIds.add(new IdImpl("1424"));
 		
-		TransitLine line = prov.createTransitLine(lineId, startTime, endTime, numberOfVehicles, stopsToBeServed, routeId);
+		TransitLine line = prov.createTransitLine(lineId, plan);
 		
 		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
 		

@@ -22,7 +22,6 @@ package playground.andreas.P2.replanning.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
@@ -57,12 +56,9 @@ public class WeightedStartTimeExtension extends AbstractPStrategyModule {
 
 	@Override
 	public PPlan run(Cooperative cooperative) {
-		if (cooperative.getBestPlan().getNVehicles() <= 1) {
-			return null;
-		}
-		
-		// enough vehicles to test, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
+		// change startTime
+		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
 		// get a valid new start time
@@ -75,8 +71,8 @@ public class WeightedStartTimeExtension extends AbstractPStrategyModule {
 			return null;
 		}
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
-
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		
 		return newPlan;
 	}
 	

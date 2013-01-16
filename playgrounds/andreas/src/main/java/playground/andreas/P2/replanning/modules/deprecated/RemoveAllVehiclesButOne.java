@@ -22,8 +22,6 @@ package playground.andreas.P2.replanning.modules.deprecated;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
@@ -51,9 +49,16 @@ public class RemoveAllVehiclesButOne extends AbstractPStrategyModule {
 	@Override
 	public PPlan run(Cooperative cooperative) {
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName(), cooperative.getBestPlan());
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
-
+		PPlan oldPlan = cooperative.getBestPlan();
+		
+		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		newPlan.setNVehicles(oldPlan.getNVehicles());
+		newPlan.setStopsToBeServed(oldPlan.getStopsToBeServed());
+		newPlan.setStartTime(oldPlan.getStartTime());
+		newPlan.setEndTime(oldPlan.getEndTime());
+		
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		
 		return newPlan;
 	}
 

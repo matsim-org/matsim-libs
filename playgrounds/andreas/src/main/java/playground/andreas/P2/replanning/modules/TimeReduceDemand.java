@@ -27,14 +27,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 import playground.andreas.P2.operator.Cooperative;
-import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
 
 /**
  * 
@@ -67,9 +66,6 @@ public class TimeReduceDemand extends AbstractPStrategyModule implements Transit
 	
 	@Override
 	public PPlan run(Cooperative cooperative) {
-		if (cooperative.getBestPlan().getNVehicles() <= 1) {
-			return null;
-		}
 		// get start Time
 		
 		int[] boardingDemand = this.lineId2BoardingDemand.get(cooperative.getId().toString());
@@ -99,12 +95,13 @@ public class TimeReduceDemand extends AbstractPStrategyModule implements Transit
 		}
 				
 		// create new plan
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		newPlan.setStartTime(startTime);
 		newPlan.setEndTime(endTime);
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 		
 		return newPlan;
 	}

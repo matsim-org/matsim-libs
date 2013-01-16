@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -65,12 +64,6 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 	 */
 	@Override
 	public PPlan run(Cooperative cooperative) {
-		if (cooperative.getBestPlan().getNVehicles() <= 1) {
-			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
-					cooperative.getCurrentIteration() + ". to few vehicles.");
-			return null;
-		}
-		
 		// get a List of served stop-facilities in the sequence they are served
 		List<TransitStopFacility> currentlyUsedStops = this.getUsedFacilities(cooperative);
 		// create the convex-hull (geotools-method) of all used stops 
@@ -89,21 +82,18 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 		}else{
 			// create a new plan 
 			PPlan oldPlan = cooperative.getBestPlan();
-			PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
+			PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+			newPlan.setNVehicles(1);
 			newPlan.setStartTime(oldPlan.getStartTime());
 			newPlan.setEndTime(oldPlan.getEndTime());
 			//insert the new stop at the correct point (minimum average Distance from the subroute to the new Stop) in the sequence of stops 2 serve
-			List<TransitStopFacility> stopsToServe = createNewStopsToServe(cooperative, newStop); 
+			ArrayList<TransitStopFacility> stopsToServe = createNewStopsToServe(cooperative, newStop); 
 			if(stopsToServe == null){
 				return null;
 			}
-			newPlan.setStopsToBeServed((ArrayList<TransitStopFacility>) stopsToServe);
-			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), 
-																		newPlan.getStartTime(), 
-																		newPlan.getEndTime(), 
-																		1, 
-																		(ArrayList<TransitStopFacility>) stopsToServe, 
-																		new IdImpl(cooperative.getCurrentIteration())));
+			newPlan.setStopsToBeServed(stopsToServe);
+			
+			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 			
 			return newPlan;
 		}
@@ -115,7 +105,7 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 	 * @param newStop
 	 * @return
 	 */
-	private List<TransitStopFacility> createNewStopsToServe(Cooperative cooperative, TransitStopFacility newStop) {
+	private ArrayList<TransitStopFacility> createNewStopsToServe(Cooperative cooperative, TransitStopFacility newStop) {
 		// find the subroutes, between the stops to be served
 		List<List<TransitStopFacility>> subrouteFacilities = this.findSubroutes(cooperative, newStop);
 		List<Double> avDist = calcAvDist(subrouteFacilities, newStop);
@@ -134,7 +124,7 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 				index = i;
 			}
 		}
-		List<TransitStopFacility> stops2serve = new ArrayList<TransitStopFacility>();
+		ArrayList<TransitStopFacility> stops2serve = new ArrayList<TransitStopFacility>();
 		stops2serve.addAll(cooperative.getBestPlan().getStopsToBeServed());
 		stops2serve.add(index + 1, newStop);
 		

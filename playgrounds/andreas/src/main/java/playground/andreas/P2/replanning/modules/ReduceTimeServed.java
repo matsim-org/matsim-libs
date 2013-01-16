@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
@@ -78,11 +77,6 @@ public class ReduceTimeServed extends AbstractPStrategyModule implements Transit
 	
 	@Override
 	public PPlan run(Cooperative cooperative) {
-		
-		if (cooperative.getBestPlan().getNVehicles() <= 1) {
-			return null;
-		}
-		
 		Tuple<Double,Double> timeToBeServed = getTimeToBeServed(this.line2StartTimeSlot2EndTimeSlot2TripsMap.get(cooperative.getId()), cooperative.getBestPlan().getLine());
 		
 		if (timeToBeServed == null) {
@@ -91,13 +85,14 @@ public class ReduceTimeServed extends AbstractPStrategyModule implements Transit
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
 		newPlan.setStartTime(timeToBeServed.getFirst());
 		newPlan.setEndTime(timeToBeServed.getSecond());
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 		
 		return newPlan;
 	}

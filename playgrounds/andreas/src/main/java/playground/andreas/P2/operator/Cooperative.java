@@ -50,6 +50,8 @@ public interface Cooperative {
 
 	public double getBudget();
 
+	public int getNumberOfVehiclesOwned();
+	
 	public List<PPlan> getAllPlans();
 
 	public int getCurrentIteration();
@@ -59,6 +61,8 @@ public interface Cooperative {
 	public PFranchise getFranchise();
 
 	public Id getId();
+	
+	public Id getNewRouteId();
 
 	public PPlan getBestPlan();
 	

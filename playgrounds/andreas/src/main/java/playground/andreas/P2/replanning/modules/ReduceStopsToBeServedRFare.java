@@ -27,7 +27,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -75,11 +74,6 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 	
 	@Override
 	public PPlan run(Cooperative cooperative) {
-		
-		if (cooperative.getBestPlan().getNVehicles() <= 1) {
-			return null;
-		}
-		
 		// get best plans route id
 		TransitRoute routeToOptimize = null;
 		if (cooperative.getBestPlan().getLine().getRoutes().size() != 1) {
@@ -97,12 +91,13 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(stopsToBeServed);
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 		
 		return newPlan;
 	}

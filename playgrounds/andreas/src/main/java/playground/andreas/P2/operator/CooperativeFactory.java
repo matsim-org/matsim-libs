@@ -51,6 +51,8 @@ public class CooperativeFactory {
 			return new ExtendAndReduceCooperative(id, this.pConfig, this.franchise);
 		} else if(this.pConfig.getCoopType().equalsIgnoreCase(MultiPlanCooperative.COOP_NAME)){
 			return new MultiPlanCooperative(id, this.pConfig, this.franchise);
+		} else if(this.pConfig.getCoopType().equalsIgnoreCase(CarefulMultiPlanCooperative.COOP_NAME)){
+			return new CarefulMultiPlanCooperative(id, this.pConfig, this.franchise);
 		} else {
 			log.error("There is no coop type specified. " + this.pConfig.getCoopType() + " unknown");
 			return null;

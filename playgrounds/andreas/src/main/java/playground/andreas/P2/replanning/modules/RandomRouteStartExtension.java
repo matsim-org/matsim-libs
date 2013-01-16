@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -81,15 +80,10 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	 */
 	@Override
 	public PPlan run(Cooperative cooperative) {
-		if (cooperative.getBestPlan().getNVehicles() <= 1) {
-			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
-					cooperative.getCurrentIteration() + ". To Few vehicles.");
-			return null;
-		}
-		
 		this.initQuadTree(cooperative);
 		PPlan oldPlan = cooperative.getBestPlan();
-		PPlan newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		newPlan.setNVehicles(1);
 		newPlan.setStartTime(oldPlan.getStartTime());
 		newPlan.setEndTime(oldPlan.getEndTime());
 		
@@ -98,12 +92,8 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 			return null;
 		}
 		newPlan.setStopsToBeServed((ArrayList<TransitStopFacility>) stopsToServe);
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), 
-																	newPlan.getStartTime(), 
-																	newPlan.getEndTime(), 
-																	1, 
-																	(ArrayList<TransitStopFacility>) stopsToServe, 
-																	new IdImpl(cooperative.getCurrentIteration())));
+		
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 		
 		return newPlan;
 	}
@@ -113,8 +103,8 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	 * @param tree 
 	 * @return
 	 */
-	private List<TransitStopFacility> createNewStopsToServe(Cooperative cooperative, QuadTree<TransitStopFacility> tree) {
-		List<TransitStopFacility> stops2serve = new ArrayList<TransitStopFacility>();
+	private ArrayList<TransitStopFacility> createNewStopsToServe(Cooperative cooperative, QuadTree<TransitStopFacility> tree) {
+		ArrayList<TransitStopFacility> stops2serve = new ArrayList<TransitStopFacility>();
 		stops2serve.addAll(cooperative.getBestPlan().getStopsToBeServed());
 		// get already served stops in the correct order
 		List<TransitStopFacility> alreadyServed = new ArrayList<TransitStopFacility>(); 
@@ -275,7 +265,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	 * @param indexStopInGreatestDistance 
 	 * @return
 	 */
-	private List<TransitStopFacility> addCandidate(PRouteProvider pRouteProvider, List<TransitStopFacility> candidates, List<TransitStopFacility> stops2serve) {
+	private ArrayList<TransitStopFacility> addCandidate(PRouteProvider pRouteProvider, List<TransitStopFacility> candidates, ArrayList<TransitStopFacility> stops2serve) {
 		//draw a random stop from the candidatesList
 //		TransitStopFacility temp = (TransitStopFacility) candidates.toArray()[(int)(MatsimRandom.getRandom().nextDouble() * candidates.size())];
 		TransitStopFacility temp = pRouteProvider.drawRandomStopFromList(candidates);

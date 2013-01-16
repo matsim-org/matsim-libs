@@ -173,7 +173,10 @@ public class CreateCooperativeFromSchedule implements PStrategy{
 			}
 		}
 		
-		PPlan plan = new PPlan(id, this.getName(), stopsToBeServed, startTime, endTime);
+		PPlan plan = new PPlan(id, this.getName());
+		plan.setStopsToBeServed(stopsToBeServed);
+		plan.setStartTime(startTime);
+		plan.setEndTime(endTime);
 		plan.setNVehicles(nVehicles);
 		return plan;
 	}
@@ -204,7 +207,7 @@ public class CreateCooperativeFromSchedule implements PStrategy{
 	@Override
 	public PPlan run(Cooperative cooperative) {
 		PPlan newPlan = this.lineId2PlanMap.get(cooperative.getId());		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(new IdImpl(cooperative.getId().toString() + "_init"), newPlan.getStartTime(), newPlan.getEndTime(), newPlan.getNVehicles(), newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration() + "_init")));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 		return newPlan;
 	}
 

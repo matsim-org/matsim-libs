@@ -22,7 +22,6 @@ package playground.andreas.P2.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -87,9 +86,14 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 			stopsToBeServed.add(stop1);
 			stopsToBeServed.add(stop2);
 			
-			newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration() + "_init"), this.getName(), stopsToBeServed, startTime, endTime); 
+			newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+			newPlan.setStopsToBeServed(stopsToBeServed);
+			newPlan.setStartTime(startTime);
+			newPlan.setEndTime(endTime);
+			newPlan.setNVehicles(1);
+			newPlan.setStopsToBeServed(stopsToBeServed);
 			
-			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(new IdImpl(cooperative.getId().toString() + "_init"), newPlan.getStartTime(), newPlan.getEndTime(), 1, stopsToBeServed, new IdImpl(cooperative.getCurrentIteration() + "_init")));
+			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 		} while (cooperative.getFranchise().planRejected(newPlan));		
 
 		return newPlan;

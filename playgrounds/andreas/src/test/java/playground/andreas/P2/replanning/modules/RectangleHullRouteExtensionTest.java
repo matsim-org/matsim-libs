@@ -53,8 +53,6 @@ public class RectangleHullRouteExtensionTest {
 		ArrayList<String> parameters = new ArrayList<String>();
 		parameters.add("0.1");
 		PStrategy strategy = new RectangleHullRouteExtension(parameters);
-		// run strategy with initial cooperative
-		Assert.assertNull("new plan should be null", strategy.run(coop));
 		// create new Plan
 		coop.getBestPlan().setNVehicles(2);
 		plan = strategy.run(coop);

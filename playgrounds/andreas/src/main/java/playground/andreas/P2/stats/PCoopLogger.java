@@ -100,7 +100,6 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 				List<PPlan> plans = cooperative.getAllPlans();
 				
 				double coopPax = 0.0;
-				double coopVeh = 0.0;
 				double coopScore = 0.0;
 				
 				for (PPlan plan : plans) {
@@ -108,7 +107,6 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 					coopPax += planPax;
 					
 					double planVeh = plan.getNVehicles();
-					coopVeh += planVeh;
 					
 					double planScore = plan.getScore();
 					coopScore += planScore;
@@ -144,7 +142,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 				
 				try {
 					this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getCoopState() + "\t" + "===" + "\t" 
-							+ "TOTAL" + "\t" + (int) coopVeh + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" 
+							+ "TOTAL" + "\t" + (int) cooperative.getNumberOfVehiclesOwned() + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" 
 							+ "===" + "\t" + "===" + "\t" + "===" + "\t" + "===" + "\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

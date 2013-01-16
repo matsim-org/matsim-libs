@@ -52,13 +52,6 @@ public class MaxRandomEndTimeAllocatorTest {
 		Assert.assertEquals("Compare end time", 40000.0, coop.getBestPlan().getEndTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNull("Test plan should be null", testPlan);
 		
-		// too few vehicles for testing - nothing should change
-		testPlan = strat.run(coop);
-		
-		Assert.assertEquals("Compare number of vehicles", 1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare end time", 40000.0, coop.getBestPlan().getEndTime(), MatsimTestUtils.EPSILON);
-		Assert.assertNull("Test plan should be null", testPlan);
-		
 		coop.getBestPlan().setNVehicles(2);
 		
 		// enough vehicles for testing, but mutation range 0

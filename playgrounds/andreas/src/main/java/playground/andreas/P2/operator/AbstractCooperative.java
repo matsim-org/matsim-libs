@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
@@ -48,6 +49,8 @@ public abstract class AbstractCooperative implements Cooperative{
 	protected final static Logger log = Logger.getLogger(AbstractCooperative.class);
 	
 	protected final Id id;
+	
+	private int numberOfPlansTried;
 	
 	private PFranchise franchise;
 	private final double costPerVehicleBuy;
@@ -85,6 +88,7 @@ public abstract class AbstractCooperative implements Cooperative{
 		this.routeProvider = pRouteProvider;
 		this.bestPlan = initialStrategy.run(this);
 		this.testPlan = null;
+		this.numberOfPlansTried = 0;
 	}
 
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
@@ -120,12 +124,9 @@ public abstract class AbstractCooperative implements Cooperative{
 			// insufficient, sell vehicles
 			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) Math.floor(this.budget / this.costPerVehicleSell));
 			
-			double numberOfVehicles = 0.0;			
-			for (PPlan plan : this.getAllPlans()) {
-				numberOfVehicles += plan.getNVehicles();
-			}
+			int numberOfVehiclesOwned = this.getNumberOfVehiclesOwned();
 			
-			if(numberOfVehicles - numberOfVehiclesToSell < 1){
+			if(numberOfVehiclesOwned - numberOfVehiclesToSell < 1){
 				// can not balance the budget by selling vehicles, bankrupt
 				this.coopState = CoopState.BANKRUPT;
 			}
@@ -136,6 +137,12 @@ public abstract class AbstractCooperative implements Cooperative{
 	
 	public Id getId() {
 		return this.id;
+	}
+	
+	public Id getNewRouteId() {
+		Id routeId = new IdImpl(this.currentIteration + "_" + numberOfPlansTried);
+		this.numberOfPlansTried++;
+		return routeId;
 	}
 	
 	public PFranchise getFranchise(){
@@ -171,6 +178,14 @@ public abstract class AbstractCooperative implements Cooperative{
 	
 	public double getBudget(){
 		return this.budget;
+	}
+
+	public int getNumberOfVehiclesOwned() {
+		int numberOfVehicles = 0;			
+		for (PPlan plan : this.getAllPlans()) {
+			numberOfVehicles += plan.getNVehicles();
+		}
+		return numberOfVehicles;
 	}
 
 	public int getCurrentIteration() {

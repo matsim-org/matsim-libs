@@ -22,8 +22,6 @@ package playground.andreas.P2.replanning.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
@@ -66,9 +64,17 @@ public class AggressiveIncreaseNumberOfVehicles extends AbstractPStrategyModule 
 		}
 			
 		// vehicles were bought - create plan
-		PPlan plan = new PPlan(cooperative.getBestPlan().getId(), this.getName(), cooperative.getBestPlan().getStopsToBeServed(), cooperative.getBestPlan().getStartTime(), cooperative.getBestPlan().getEndTime());
+		PPlan oldPlan = cooperative.getBestPlan();
+		PPlan plan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		plan.setStopsToBeServed(oldPlan.getStopsToBeServed());
+		plan.setStartTime(oldPlan.getStartTime());
+		plan.setEndTime(oldPlan.getEndTime());
 		plan.setScore(cooperative.getBestPlan().getScore());
-		plan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), plan.getStartTime(), plan.getEndTime(), vehicleBought, plan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
+		
+		plan.setNVehicles(vehicleBought);
+		
+		plan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), plan));
+		
 		return plan;
 	}
 

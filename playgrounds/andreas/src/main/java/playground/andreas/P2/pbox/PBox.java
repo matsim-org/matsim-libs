@@ -233,6 +233,12 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 			// too few cooperatives in play, increase to the minimum specified in the config
 			LinkedList<Cooperative> newCoops2 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, (this.pConfig.getNumberOfCooperatives() - this.cooperatives.size()));
 			this.cooperatives.addAll(newCoops2);
+			
+			// all coops are in business, increase by one to ensure minimal mutation
+			if (this.cooperatives.size() == coopsInBusiness) {
+				LinkedList<Cooperative> newCoops3 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, 1);
+				this.cooperatives.addAll(newCoops3);
+			}
 		}
 	}
 
