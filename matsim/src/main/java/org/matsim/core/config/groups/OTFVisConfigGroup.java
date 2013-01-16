@@ -47,6 +47,10 @@ public class OTFVisConfigGroup extends Module {
 
 	public static final String SHOW_TELEPORTATION = "showTeleportation";
 	public static final String LINK_WIDTH = "linkWidth";
+	public static final String DRAW_TRANSIT_FACILITIES = "drawTransitFacilities";
+	public static final String DRAW_TRANSIT_FACILITY_IDS = "drawTransitFacilityIds";
+	public static final String DRAW_NON_MOVING_ITEMS = "drawNonMovingItems";
+	
 
 	private  float agentSize = 120.f;
 	private  String middleMouseFunc = "Pan";
@@ -64,6 +68,7 @@ public class OTFVisConfigGroup extends Module {
 	private boolean drawTime = false;
 	private boolean drawOverlays = true;
 	private boolean drawTransitFacilities = true;
+	private boolean drawTransitFacilityIds = true;
 	private boolean renderImages = false;
 	private boolean modified = false;
 	private int delay_ms = 30;
@@ -230,6 +235,15 @@ public class OTFVisConfigGroup extends Module {
 		else if (MAP_LAYER.equalsIgnoreCase(key)) {
 			this.mapLayer = value;
 		}
+		else if (DRAW_TRANSIT_FACILITIES.equalsIgnoreCase(key)) {
+			this.drawTransitFacilities = Boolean.parseBoolean(value);
+		}
+		else if (DRAW_TRANSIT_FACILITY_IDS.equalsIgnoreCase(key)) {
+			this.drawTransitFacilityIds = Boolean.parseBoolean(value);
+		}
+		else if (DRAW_NON_MOVING_ITEMS.equalsIgnoreCase(key)) {
+			this.showParking = Boolean.parseBoolean(value);
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -252,6 +266,9 @@ public class OTFVisConfigGroup extends Module {
 		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
 		map.put(MAP_BASE_URL, this.mapBaseURL);
 		map.put(MAP_LAYER, this.mapLayer);
+		map.put(DRAW_NON_MOVING_ITEMS, Boolean.toString(this.showParking));
+		map.put(DRAW_TRANSIT_FACILITIES, Boolean.toString(this.drawTransitFacilities));
+		map.put(DRAW_TRANSIT_FACILITY_IDS, Boolean.toString(this.drawTransitFacilityIds));
 		return map;
 	}
 
@@ -276,9 +293,8 @@ public class OTFVisConfigGroup extends Module {
 		
 		
 		map.put(NODE_OFFSET, "Shortens a link's start and end point in the visualization.");
-		//		map.put(SHOW_PARKING, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
-//				"May affect all non-moving items.") ;
-		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
+		map.put(DRAW_NON_MOVING_ITEMS, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
+				"May affect all non-moving items.") ;
 		return map ;
 	}
 
@@ -375,11 +391,11 @@ public class OTFVisConfigGroup extends Module {
 		this.linkWidth = linkWidth;
 	}
 
-	public boolean isShowParking() {
+	public boolean isDrawNonMovingItems() {
 		return this.showParking;
 	}
 
-	public void setShowParking(final boolean showParking) {
+	public void setDrawNonMovingItems(final boolean showParking) {
 		setModified();
 		this.showParking = showParking;
 	}
@@ -445,6 +461,15 @@ public class OTFVisConfigGroup extends Module {
 		return this.drawTransitFacilities;
 	}
 
+	public void setDrawTransitFacilityIds(final boolean drawTransitFacilityIds) {
+		setModified() ;
+		this.drawTransitFacilityIds = drawTransitFacilityIds;
+	}
+
+	public boolean isDrawTransitFacilityIds() {
+		return this.drawTransitFacilityIds;
+	}
+	
 	public boolean isScaleQuadTreeRect() {
 		return this.scaleQuadTreeRect;
 	}
