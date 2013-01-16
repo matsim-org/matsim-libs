@@ -309,10 +309,6 @@ public class StrategyConfigGroup extends Module {
 			return this.id;
 		}
 
-		public void setId(final Id id) {
-			this.id = id;
-		}
-
 	}
 
 	public String getPlanSelectorForRemoval() {
