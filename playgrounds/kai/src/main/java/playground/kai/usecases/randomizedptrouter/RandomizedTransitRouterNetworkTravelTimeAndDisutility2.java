@@ -45,8 +45,8 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -244,12 +244,17 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 
 
 	public static void main(String[] args) {
-		final Config config = ConfigUtils.loadConfig(args[0]) ;
+		String configFile = "/home/dgrether/data/work/repos/shared-svn/projects/andreas-graf/Szenarien/SimplifiedRandomizedPT/config_adapt_rpt_dg.xml";
+//		final Config config = ConfigUtils.loadConfig(args[0]) ;
+		final Config config = ConfigUtils.loadConfig(configFile) ;
 
 		config.planCalcScore().setWriteExperiencedPlans(true) ;
 
-		config.otfVis().setDrawTransitFacilities(false) ; // this DOES work
+		config.otfVis().setDrawTransitFacilities(true) ; // this DOES work
+		config.otfVis().setDrawTransitFacilityIds(false);
 		config.otfVis().setShowTeleportedAgents(true) ;
+		config.otfVis().setDrawNonMovingItems(true);
+		config.otfVis().setScaleQuadTreeRect(true);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
