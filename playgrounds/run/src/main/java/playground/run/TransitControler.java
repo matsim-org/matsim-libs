@@ -27,8 +27,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -68,7 +68,6 @@ public class TransitControler {
 			if ( useOTFVis ) {
 				final OTFVisConfigGroup otfVisConfig = simulation.getScenario().getConfig().otfVis();
 				otfVisConfig.setDrawTransitFacilities(false) ;
-				otfVisConfig.setShowParking(true) ;
 				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, simulation);
 				OTFClientLive.run(sc.getConfig(), server);
 			}
