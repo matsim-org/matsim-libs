@@ -17,13 +17,6 @@
 		<param name="lastIteration" value="10" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="queueSimulation" />
-		<param name="snapshotFormat" value="otfvis" />
-<!-- 		Produces visualiser output in the following formats: -->
-<!-- 		"otfvis": matsim native visualizer format.  Two ways to use it: -->
-<!-- 		          () without hardware acceleration.  Simpler, but slower -->
-<!--                      () with hardware acceleration.  A bit more complicated to set up, but indispensable for larger matsim  -->
-<!--                         scenarios -->
-<!-- 		The visualiser output files are in <outputDirectory>/ITERS/it..../... -->
 	</module>
 
 
@@ -56,7 +49,7 @@
 		<param name="Module_1" value="ChangeExpBeta" />
 
 		<param name="ModuleProbability_2" value="0.1" />
-		<param name="Module_2" value="ReRoute_Dijkstra" />
+		<param name="Module_2" value="ReRoute" />
 
 		<param name="ModuleProbability_3" value="0.1" />
 		<param name="Module_3" value="TimeAllocationMutator" />
