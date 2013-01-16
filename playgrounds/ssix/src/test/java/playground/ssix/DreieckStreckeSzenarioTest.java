@@ -408,6 +408,9 @@ public class DreieckStreckeSzenarioTest {
 
 	private void createWantedPopulation(long numberOfTrucks, long numberOfMed, long numberOfFast, int sekundenFrequenz){
 		Population population = scenario.getPopulation();
+		
+		population.getPersons().clear();
+		
 		long numberOfPeople =  numberOfTrucks+numberOfMed+numberOfFast;
 		
 		for (long i = 0; i<numberOfPeople; i++){
