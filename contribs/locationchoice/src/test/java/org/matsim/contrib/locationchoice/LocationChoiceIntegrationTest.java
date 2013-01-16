@@ -16,7 +16,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -77,7 +76,6 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// setup strategy manager and load from config
 		Controler controler = new Controler(scenario);
 		controler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
-		controler.setTripRouterFactory( new TripRouterFactoryImpl( controler ) );
 		controler.run();
 
 		// test that everything worked as expected
