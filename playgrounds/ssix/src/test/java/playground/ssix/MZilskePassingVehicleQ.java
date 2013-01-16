@@ -1,4 +1,4 @@
-package playground.ssix;
+package test.java.playground.ssix;
 
 import java.util.AbstractQueue;
 import java.util.Comparator;
@@ -8,6 +8,8 @@ import java.util.Queue;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
+
+//A simple copy of mzilske's PassingVehicleQ (couldn't make import work).
 
 public class MZilskePassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
 

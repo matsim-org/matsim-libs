@@ -18,14 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ssix;
+package test.java.playground.ssix;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import main.java.playgrounds.ssix.MyPersonDriverAgentImpl;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -70,13 +74,6 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import playgrounds.ssix.MyPersonDriverAgentImpl;
-
-
-
-//import main.java.playgrounds.ssix.MyPersonDriverAgentImpl;
-
 
 public class DreieckStreckeSzenarioTest {
 
@@ -192,10 +189,14 @@ public class DreieckStreckeSzenarioTest {
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
 	public static double length = 200.;//in m, length of one the triangle sides.
 	
+	private static long N_AGENTS = 89;
+	
 	private static double FREESPEED = 90.;//in km/h
 	private static double P_TRUCK = 0.5;//no need to worry much about those, are normalized when choosing effective transport mode
 	//private static double P_MED = 2.;
 	private static double P_FAST = 0.5;
+	
+	private PrintStream writer;
 	
 	private Scenario scenario;
 	
@@ -218,13 +219,20 @@ public class DreieckStreckeSzenarioTest {
 	}
 	
 	public static void main(String[] args) {
-		new DreieckStreckeSzenarioTest(2600).run();
+		DreieckStreckeSzenarioTest dreieck = new DreieckStreckeSzenarioTest(2600);
+		dreieck.fillNetworkData();
+		
+		for (long i=0; i<N_AGENTS; i++){
+			dreieck.run(i, "constantModalSplit");
+		}
 	}
 	
-	public void run(){
-		fillNetworkData();
-		//createRandomPopulation((long)90,2);
-		createWantedPopulation(25,0,10,2);
+	public void run(long numberOfPeople, String mode){
+		//fillNetworkData();done in main
+		
+		makePopulation(numberOfPeople, mode);
+		//createRandomPopulation((long)39,2);
+		//createWantedPopulation(1,0,2,2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		/*
@@ -235,6 +243,8 @@ public class DreieckStreckeSzenarioTest {
 		events.addHandler(fundi3);
 		
 		runqsim(events);
+		
+		//TODO: writer.doSomething
 	}
 
 	private void fillNetworkData(){
@@ -267,7 +277,8 @@ public class DreieckStreckeSzenarioTest {
 			network.addNode(node);
 		}
 		//nodes of the triangle left side
-		for (int i = 0; i<DreieckStreckeSzenarioTest.subdivisionFactor-1; i++){
+		for (int i = 0;
+ i<DreieckStreckeSzenarioTest.subdivisionFactor-1; i++){
 			double x = DreieckStreckeSzenarioTest.length/2 - (DreieckStreckeSzenarioTest.length/(2*DreieckStreckeSzenarioTest.subdivisionFactor))*(i+1);
 			double y = Math.sqrt(3.)*x;
 			Coord coord = scenario.createCoord(x, y);
@@ -324,8 +335,21 @@ public class DreieckStreckeSzenarioTest {
 		//writer.write("./output/dreieck_network.xml");
 	}
 	
+	private void makePopulation(long n, String mode){
+		
+		if (mode.equals("constantModalSplit")){//This ModalSplit is dicted by P_TRUCK,P_MED and P_FAST
+			long n_trucks = new Double(n*P_TRUCK).longValue();
+			long n_med = 0;/*long n_med = new Double(n*P_MED).longValue();*/
+			long n_fast = n - n_trucks - n_med;
+			createWantedPopulation(n_trucks,n_med,n_fast,2);
+		}
+		
+		//TODO: other experimentations still need implementing.
+	}
+	
 	private void createRandomPopulation(long numberOfPeople, int sekundenFrequenz){
 		Population population = scenario.getPopulation();
+		//population.clear()......????
 		Random rand = MatsimRandom.getRandom();//for more randomness use new Random()
 		// other option get MatsimRandom(), is then more deterministic and allows introduction of a new person
 		// without changing previous modal split
@@ -336,7 +360,7 @@ public class DreieckStreckeSzenarioTest {
 			Map<String, Object> customMap = person.getCustomAttributes();
 			
 			Plan plan = population.getFactory().createPlan();
-			plan.addActivity(createHome(sekundenFrequenz, i+1));
+			plan.addActivity(createHome(sekundenFrequenz, i+1, numberOfPeople));
 			//Assigning this person to a randomly chosen transport mode
 			String transportMode="";
 			double p = rand.nextDouble();
@@ -392,7 +416,7 @@ public class DreieckStreckeSzenarioTest {
 			Map<String, Object> customMap = person.getCustomAttributes();
 			
 			Plan plan = population.getFactory().createPlan();
-			plan.addActivity(createHome(sekundenFrequenz, i+1));
+			plan.addActivity(createHome(sekundenFrequenz, i+1, numberOfPeople));
 
 			String transportMode="";
 
@@ -438,7 +462,7 @@ public class DreieckStreckeSzenarioTest {
 		//Modified QSim with modified agents that go round and round.
 		Netsim qSim = createModifiedQSim(this.scenario, events);
 
-		prepareForSim();
+		//prepareForSim();//-obsolete
 		
 		//OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, (QSim)qSim);
 		
@@ -446,10 +470,11 @@ public class DreieckStreckeSzenarioTest {
 		qSim.run();
 	}
 	
+	/*obsolete method
 	private void prepareForSim() {
 		// make sure all routes are calculated.
-		/*Calculating routes this way will make them direct. On the contrary we want the drivers to go all the way around
-		// * All routes are now implemented in the createPopulation method while creating legs
+		//Calculating routes this way will make them direct. On the contrary we want the drivers to go all the way around
+		// 	-> All routes are now implemented in the createPopulation method while creating legs
 		
 		
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), scenario.getConfig().global().getNumberOfThreads(),
@@ -462,10 +487,8 @@ public class DreieckStreckeSzenarioTest {
 				return new PersonPrepareForSim(plansCalcRoute, (ScenarioImpl)scenario);
 			}
 		});
-		//*/
-		
-		
-	}
+				
+	}*/
 	
 	private QSim createModifiedQSim(Scenario sc, EventsManager events){
 		//From QSimFactory inspired code
@@ -486,7 +509,8 @@ public class DreieckStreckeSzenarioTest {
         }*/
         
         QSim qSim = new QSim(sc, events);
-        ActivityEngine activityEngine = new ActivityEngine();
+        ActivityEngine
+ activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
@@ -555,7 +579,7 @@ public class DreieckStreckeSzenarioTest {
         return qSim;
 	}
 	
-	private Activity createHome(int sekundenFrequenz, long identifier){
+	private Activity createHome(int sekundenFrequenz, long identifier, long numberOfPeople){
 		Id homeLinkId = new IdImpl(-1);
 		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
 		
@@ -565,13 +589,25 @@ public class DreieckStreckeSzenarioTest {
 		double endTime = plannedEndTime - sekundenFrequenz/2.0 + r.nextDouble()*sekundenFrequenz;
 		*/
 		///*Method 2: With the expected frequency, the maximal departure time is computed and people are randomly departing within this huge time chunk.
-		long TimeChunkSize = scenario.getPopulation().getPersons().size() * sekundenFrequenz;
+		long TimeChunkSize = numberOfPeople * sekundenFrequenz;
 		double endTime = 6 * 3600 + r.nextDouble() * TimeChunkSize; 
 		//*/
 		//NB:Method 2 is significantly better for the quality of fundamental diagrams;
 		activity.setEndTime(endTime);
 		
 		return activity;
+	}
+	
+	private void openFile() {
+		try {
+			writer = new PrintStream("./output/data.txt");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private void closeFile() {
+		writer.close();
 	}
 	
 	private Activity createWork(){

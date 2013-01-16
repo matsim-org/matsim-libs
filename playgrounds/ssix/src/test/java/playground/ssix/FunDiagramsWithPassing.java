@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ssix;
+package test.java.playground.ssix;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
-import playgrounds.ssix.FundamentalDiagrams;
+import main.java.playgrounds.ssix.FundamentalDiagrams;
 
 /* A class supposed to go attached to the DreieckStreckeSzenario class (with passing).
  * It aims at analyzing the flow of events in order to detect:
@@ -182,11 +182,12 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				}
 				this.flowTime = new Double(nowTime);
 			}
-			
 			//Permanent Regime handling
 			if (permanentRegime){
 				tourNumber = this.personTour.get(personId);
 				
+				//System.out.println("Agent "+personId.toString()+" driving through.\n"+
+						//"Trying to update permanentGroupVariables from tourNumber "+tourNumber+".");
 				handlePermanentGroupDependentVariables(tourNumber);
 				
 				this.permanentFlow = getActualFlow();//veh/h
@@ -238,7 +239,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				double sn = NumberSpeed.getSecond(); double sn_truck = NumberSpeed_truck.getSecond();//average speed for n people
 				//encountered a few calculatory problems here for still mysterious reasons, 
 				//hence the normally very unnecessary detailed programming
-				double  first = n*sn/(n+1); double first_truck = n_truck*sn_truck/(n_truck+1);
+				double
+  first = n*sn/(n+1); double first_truck = n_truck*sn_truck/(n_truck+1);
 				double second = speed/(n+1); double second_truck = speed/(n_truck+1);
 				Tuple<Integer,Double> newNumberSpeed = new Tuple<Integer,Double>(n+1,first + second/*average speed with n+1 people*/);
 				Tuple<Integer,Double> newNumberSpeed_truck = new Tuple<Integer,Double>(n_truck+1,first_truck + second_truck/*truck average speed with n+1 people*/);
@@ -442,7 +444,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 			
 			
 			//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
-			if (nowTime == this.flowTime_med.doubleValue()){//Still measuring the flow of the same second
+			if (nowTime == this.flowTime_med.doubleValue()){//Still measuring
+ the flow of the same second
 				Integer nowFlow = this.flowTable_med.get(0);
 				this.flowTable_med.set(0, nowFlow.intValue()+1);
 			} else {//Need to offset the current data in order to update
