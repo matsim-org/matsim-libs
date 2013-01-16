@@ -478,6 +478,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	@Deprecated // switch is only there for backwards compatibility
 	public void setUsingOpportunityCostOfTimeInPtRouting(final boolean tmp) {
+		log.warn("config parameter " + USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING + " deprecated; remove from config file; " +
+				"will eventually be removed." ) ;
 		this.isUsingOpportunityCostOfTimeInPtRouting = tmp;
 	}
 
