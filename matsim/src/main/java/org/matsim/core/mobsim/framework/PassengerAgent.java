@@ -20,26 +20,12 @@
 
 package org.matsim.core.mobsim.framework;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
-public interface PassengerAgent extends NetworkAgent, Identifiable {
+/**
+ * (e.g. as passenger in private car.)
+ *
+ */
+public interface PassengerAgent extends NetworkAgent, VehicleUsingAgent, Identifiable {
 
-	/**
-	 * DriverAgent offers the same method. Is this a problem? 
-	 * @param veh
-	 */
-	public void setVehicle(final MobsimVehicle veh);
-	
-	/**
-	 * Design thoughts:<ul>
-	 * <li> MZ states (in his AdapterAgent) that the DriverAgent should not have this reference.  
-	 * I am, in fact, not so sure (any more); maybe it is not so bad to have this.  Clearly, symmetric
-	 * connectors would be better.  kai, nov'11
-	 * </ul>
-	 */
-	public MobsimVehicle getVehicle();
-	
-	public Id getPlannedVehicleId();
 }

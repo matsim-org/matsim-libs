@@ -22,13 +22,12 @@ package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 /**
  * @author nagel
  *
  */
-public interface DriverAgent extends NetworkAgent, Identifiable {
+public interface DriverAgent extends NetworkAgent, VehicleUsingAgent, Identifiable {
 
 	/**
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
@@ -36,26 +35,14 @@ public interface DriverAgent extends NetworkAgent, Identifiable {
 	public Id chooseNextLinkId();
 
 	/**
-	 * notifies the agent that it was moved over the node.  Design thoughts:<ul>
+	 * notifies the agent that it was moved over the node.  
+	 * <p/>
+	 * Design thoughts:<ul>
 	 * <li> I find it difficult to see how one should do without this.  Somehow the mobsim needs to tell the 
 	 * driver where she is. The mobsim could tell the vehicle, which tells the agent.  The DriverAgent would still 
 	 * need this method. kai, nov'11
 	 * </ul>
 	 */
 	public void notifyMoveOverNode(Id newLinkId);
-	
-	public void setVehicle( final MobsimVehicle veh ) ;
-	
-	/**
-	 * Design thoughts:<ul>
-	 * <li> MZ states (in his AdapterAgent) that the DriverAgent should not have this reference.  
-	 * I am, in fact, not so sure (any more); maybe it is not so bad to have this.  Clearly, symmetric
-	 * connectors would be better.  kai, nov'11
-	 * </ul>
-	 */
-	public MobsimVehicle getVehicle() ;
-	
-	public Id getPlannedVehicleId() ;
-	
 	
 }

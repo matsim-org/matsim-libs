@@ -23,19 +23,11 @@ package org.matsim.core.mobsim.framework;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
-/**Design decisions:<UL>
- * <li> In terms of design, the assumption is that the plan remains unchanged in the mobsim, at least from the
- * perspective of the iterations: plan = genotype, execution = phenotype.  Therefore, <i>already Christoph's implementation
- * violates the specification</i>.
- * <br/>
- * That is, we need to copy the plan, or at least copy it before modification ("getModifiablePlan").  This, however,
- * would immensely simplify the design, since we could, at this point, also shorten the plan to where the agent currently is,
- * meaning that all replanning algos should also work much better.
- * <br/>
- * Memory considerations could be addressed by lazily delaying this plans copying to the point where the modifiable
- * plan is needed.
- * <br/>
- * (The above may have been done in the meantime ...)
+/**Minimal interface for an agent that can do activities and legs.  For the legs, there is the minimal information to
+ * perform teleportation, but nothing else.
+ * </p>
+ * Design decisions:<UL>
+ * <li> Note that the plain mobsim agent (= this interface) does not know anything about plans.
  * </ul>
  *
  * @author dgrether
@@ -102,8 +94,11 @@ public interface MobsimAgent extends NetworkAgent, Identifiable {
 	/**
 	 * Convenience method for Leg.getMode(), in an attempt to get rid of getCurrentLeg().  If the agent is not on a leg, 
 	 * the behavior of this method is undefined (so don't rely on it).
-	 * 
-	 * Should be renamed to getLegMode(), in my opinion, as the mode of an agent can be anything else. mrieser/jan'12
+	 * <p/>
+	 * Comments:<ul>
+	 * <li>Should be renamed to getLegMode(), in my opinion, as the mode of an agent can be anything else. mrieser/jan'12
+	 * <li>I don't mind, but my current eclipse can't do the refactoring (https://bugs.eclipse.org/bugs/show_bug.cgi?id=293861). kai, jan'13
+	 * </ul>
 	 */
 	public String getMode() ;
 	
