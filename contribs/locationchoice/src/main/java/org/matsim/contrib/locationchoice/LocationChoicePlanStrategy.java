@@ -19,7 +19,7 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
 	
-	private static int locachoiceWrnCnt;
+//	private static int locachoiceWrnCnt;
 	
 	public LocationChoicePlanStrategy(Scenario scenario) {
 		String planSelector = scenario.getConfig().locationchoice().getPlanSelector();
@@ -34,15 +34,15 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 		}
 		delegate.addStrategyModule(new LocationChoice(scenario));
 		delegate.addStrategyModule(new ReRoute(scenario));
-		delegate.addStrategyModule(new TimeAllocationMutator(scenario.getConfig()));
-		if ( locachoiceWrnCnt < 1 ) {
-			locachoiceWrnCnt ++ ;
-			Logger.getLogger("dummy").warn("I don't think that using TimeAllocationMutator as last step of locationchoice" +
-					" (or of any strategy, for that matter) makes sense. --> please remove from code.   kai, oct'12") ;
-			if (scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals(VspExperimentalConfigGroup.ABORT) ) {
-				throw new RuntimeException("will not use locachoice followed by TimeMutation within VSP. Aborting ...") ;
-			}
-		}
+//		delegate.addStrategyModule(new TimeAllocationMutator(scenario.getConfig()));
+//		if ( locachoiceWrnCnt < 1 ) {
+//			locachoiceWrnCnt ++ ;
+//			Logger.getLogger("dummy").warn("I don't think that using TimeAllocationMutator as last step of locationchoice" +
+//					" (or of any strategy, for that matter) makes sense. --> please remove from code.   kai, oct'12") ;
+//			if (scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals(VspExperimentalConfigGroup.ABORT) ) {
+//				throw new RuntimeException("will not use locachoice followed by TimeMutation within VSP. Aborting ...") ;
+//			}
+//		}
 	}
 	
 	@Override
