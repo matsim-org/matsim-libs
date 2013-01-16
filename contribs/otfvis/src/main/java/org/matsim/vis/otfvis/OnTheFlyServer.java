@@ -295,6 +295,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 			return quad;
 		} else {
 			Config config = this.scenario.getConfig();
+			this.setShowNonMovingItems(config.otfVis().isDrawNonMovingItems());
 			String scenarioCRS = config.global().getCoordinateSystem();
 			int maxZoom = config.otfVis().getMaximumZoom();
 			if (config.otfVis().isMapOverlayMode()) {
@@ -339,8 +340,8 @@ public class OnTheFlyServer implements OTFLiveServer {
 	}
 
 	@Override
-	public void toggleShowParking() {
-		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
+	public void setShowNonMovingItems(boolean showParking) {
+		OTFLinkAgentsHandler.showParked = showParking;
 	}
 
 	@Override

@@ -56,7 +56,7 @@ public interface OTFServer {
 
 	public Collection<Double> getTimeSteps();
 
-	public void toggleShowParking();
+	public void setShowNonMovingItems(boolean showNonMovingItems);
 	
 	public OTFVisConfigGroup getOTFVisConfig();
 

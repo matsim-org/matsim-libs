@@ -52,6 +52,20 @@ import org.matsim.vis.otfvis.interfaces.OTFServer;
  */
 public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener, ItemListener {
 
+	private static final String SHOW_TRANSIT_FACILITIES = "show transit facilities";
+
+	private static final String SHOW_SCALE_BAR = "show scale bar";
+
+	private static final String SHOW_TIME_GL = "show time GL";
+
+	private static final String SAVE_JPG_FRAMES = "save jpg frames";
+
+	private static final String SHOW_OVERLAYS = "show overlays";
+
+	private static final String SHOW_LINK_IDS = "show link Ids";
+
+	private static final String SHOW_NON_MOVING_ITEMS = "show non-moving items";
+
 	private static final long serialVersionUID = 5778562849300898138L;
 
 	private final OTFServer server;
@@ -140,47 +154,47 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 			JCheckBox synchBox; 
 			if(server.isLive()) {
-				synchBox = new JCheckBox("show non-moving items");
-				synchBox.setSelected(visConfig.isShowParking());
+				synchBox = new JCheckBox(SHOW_NON_MOVING_ITEMS);
+				synchBox.setSelected(visConfig.isDrawNonMovingItems());
 				synchBox.addItemListener(this);
 				synchBox.setBounds(10, 20, 200, 31);
 				synchBox.setVisible(true);
 				panel.add(synchBox);
 			}
-			synchBox = new JCheckBox("show link Ids");
+			synchBox = new JCheckBox(SHOW_LINK_IDS);
 			synchBox.setSelected(visConfig.isDrawingLinkIds());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 40, 200, 31);
 			synchBox.setVisible(true);
 			panel.add(synchBox);
 			
-			synchBox = new JCheckBox("show overlays");
+			synchBox = new JCheckBox(SHOW_OVERLAYS);
 			synchBox.setSelected(visConfig.drawOverlays());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 60, 200, 31);
 			synchBox.setVisible(true);
 			panel.add(synchBox);
 
-			synchBox = new JCheckBox("show time GL");
+			synchBox = new JCheckBox(SHOW_TIME_GL);
 			synchBox.setSelected(visConfig.drawTime());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 80, 200, 31);
 			panel.add(synchBox);
 
-			synchBox = new JCheckBox("save jpg frames");
+			synchBox = new JCheckBox(SAVE_JPG_FRAMES);
 			synchBox.setSelected(visConfig.renderImages());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 100, 200, 31);
 			panel.add(synchBox);
 			
-			synchBox = new JCheckBox("show scale bar");
+			synchBox = new JCheckBox(SHOW_SCALE_BAR);
 			synchBox.setSelected(visConfig.drawScaleBar());
 			synchBox.addItemListener(this);
 			synchBox.setBounds(10, 140, 200, 31);
 			synchBox.setVisible(true);
 			panel.add(synchBox);
 			if (server.isLive()) {
-				synchBox = new JCheckBox("show transit facilities");
+				synchBox = new JCheckBox(SHOW_TRANSIT_FACILITIES);
 				synchBox.setSelected(visConfig.isDrawTransitFacilities());
 				synchBox.addItemListener(this);
 				synchBox.setBounds(10, 160, 200, 31);
@@ -323,30 +337,29 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	@Override
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
-		if (source.getText().equals("show non-moving items")) {
-			visConfig.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
-			visConfig.setShowParking(!visConfig.isShowParking());
+		if (source.getText().equals(SHOW_NON_MOVING_ITEMS)) {
+			visConfig.setDrawNonMovingItems(!visConfig.isDrawNonMovingItems());
 			if (host != null) {
-				server.toggleShowParking();
+				server.setShowNonMovingItems(visConfig.isDrawNonMovingItems());
 				host.clearCaches();
 				host.redrawDrawers();
 			}
-		} else if (source.getText().equals("show link Ids")) {
+		} else if (source.getText().equals(SHOW_LINK_IDS)) {
 			// toggle draw link Ids
 			visConfig.setDrawLinkIds(!visConfig.isDrawingLinkIds());
-		} else if (source.getText().equals("show overlays")) {
+		} else if (source.getText().equals(SHOW_OVERLAYS)) {
 			// toggle draw Overlays
 			visConfig.setDrawOverlays(!visConfig.drawOverlays());
-		} else if (source.getText().equals("save jpg frames")) {
+		} else if (source.getText().equals(SAVE_JPG_FRAMES)) {
 			// toggle save jpgs
 			visConfig.setRenderImages(!visConfig.renderImages());
-		} else if (source.getText().equals("show time GL")) {
+		} else if (source.getText().equals(SHOW_TIME_GL)) {
 			// toggle draw time in GL
 			visConfig.setDrawTime(!visConfig.drawTime());
-		} else if (source.getText().equals("show scale bar")) {
+		} else if (source.getText().equals(SHOW_SCALE_BAR)) {
 			// toggle draw Overlays
 			visConfig.setDrawScaleBar(!visConfig.drawScaleBar());
-		} else if (source.getText().equals("show transit facilities")) {
+		} else if (source.getText().equals(SHOW_TRANSIT_FACILITIES)) {
 			// toggle draw Overlays
 			visConfig.setDrawTransitFacilities(!visConfig.isDrawTransitFacilities());
 		} 

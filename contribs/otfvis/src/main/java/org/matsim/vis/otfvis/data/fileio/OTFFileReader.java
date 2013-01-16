@@ -246,8 +246,8 @@ public final class OTFFileReader implements OTFServer {
 	}
 
 	@Override
-	public void toggleShowParking() {
-		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
+	public void setShowNonMovingItems(boolean showNonMovingItems) {
+		OTFLinkAgentsHandler.showParked = showNonMovingItems;
 	}
 
 	@Override

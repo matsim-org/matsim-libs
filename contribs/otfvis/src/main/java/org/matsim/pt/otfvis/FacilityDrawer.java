@@ -186,7 +186,10 @@ public class FacilityDrawer {
 		}
 
 		private String buildText() {
-			return id + ": " + getnOfPeople();
+			if (OTFClientControl.getInstance().getOTFVisConfig().isDrawTransitFacilityIds()) 
+				return id + ": " + getnOfPeople();
+			else 
+				return Integer.toString(getnOfPeople());
 		}
 
 		private int getnOfPeople() {
