@@ -102,19 +102,38 @@ public class ShopsEnricher {
 		for (ShopLocation shop:this.shops.values()) {			
 			BZShop closestBZShop = (BZShop) bzQuadTree.get(shop.getCoord().getX(), shop.getCoord().getY());
 			if (((CoordImpl)closestBZShop.getCoord()).calcDistance(shop.getCoord()) < 150) {
-				if (closestBZShop.sizeMultiplyDefined()) {
-					log.info("Store " + shop.getId() + " multiply defined " + closestBZShop.getSize()[0] + " " + closestBZShop.getSize()[1] + " "
-							+ closestBZShop.getSize()[2] + " " + closestBZShop.getSize()[3] + " " + closestBZShop.getSize()[4] + " " + closestBZShop.getSize()[5]);
-					shop.setSize(-1);
-				}
-				else {
-					for (int is = closestBZShop.getSize().length-1; is >= 0; is--) {
-						if (closestBZShop.getSize()[is] == 1) {
-							shop.setSize(is);
-						}
+				if (closestBZShop.sizeMultiplyDefined()) {					
+					if (shop.getId() == new IdImpl(40051)) {
+						shop.setSize(4);
+					}
+					else if (shop.getId().compareTo(new IdImpl(40011)) == 0) {
+						shop.setSize(1);
+					}
+					else if (shop.getId().compareTo(new IdImpl(40014)) == 0) {
+						shop.setSize(3);
+					}
+					else if (shop.getId().compareTo(new IdImpl(100002)) == 0) {
+						shop.setSize(0);
+					}
+					else if (shop.getId().compareTo(new IdImpl(10002)) == 0) {
+						shop.setSize(4);
+					}
+					else if (shop.getId().compareTo(new IdImpl(100111)) == 0) {
+						shop.setSize(4);
+					}
+					else if (shop.getId().compareTo(new IdImpl(100165)) == 0) {
+						shop.setSize(0);
+					}
+					else {
+						log.info("Store " + shop.getId() + " multiply defined " + closestBZShop.getSize()[0] + " " + closestBZShop.getSize()[1] + " "
+								+ closestBZShop.getSize()[2] + " " + closestBZShop.getSize()[3] + " " + closestBZShop.getSize()[4] + " " + closestBZShop.getSize()[5]);
 					}
 				}
-				
+				for (int is = closestBZShop.getSize().length-1; is >= 0; is--) {
+					if (closestBZShop.getSize()[is] == 1) {
+						shop.setSize(is);
+					}
+				}				
 			}
 			else {
 				log.info(shop.getId() + ": no store close by!");
