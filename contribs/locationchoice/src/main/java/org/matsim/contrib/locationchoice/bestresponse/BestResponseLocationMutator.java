@@ -125,7 +125,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// yyyy the above is not great, but when I found it, it was passing integers all the way down to the method.  kai, jan'13
 
 		
-		ScoringFunctionAccumulator scoringFunction = (ScoringFunctionAccumulator) this.replanningContext.getScoringFunctionFactory().createNewScoringFunction(plan); 
+		ScoringFunctionAccumulator scoringFunction = 
+			(ScoringFunctionAccumulator) this.replanningContext.getScoringFunctionFactory().createNewScoringFunction(plan); 
 		// (scoringFunction inserted into getWeightedRandomChoice as well as into evaluateAndAdaptPlans.  Presumably, could as well
 		// insert factory (which is already in the replanning context), but this would need to be checked.  kai, jan'13
 		

@@ -41,12 +41,11 @@ public interface TransitTravelDisutility {
 	 */
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager);
 	
-	/*
+	/**
 	 * This is used for walking to and from the nearest transit stop from the start and end location,
 	 * as well as for the "direct" walk from start to finish without using a pt line at all.
 	 * It is not used for transfer links (these are handled by the transitTravelDisutility).
 	 */
-
 	double getTravelTime(Person person, Coord coord, Coord toCoord);
 
 	double getTravelDisutility(Person person, Coord coord, Coord toCoord);
