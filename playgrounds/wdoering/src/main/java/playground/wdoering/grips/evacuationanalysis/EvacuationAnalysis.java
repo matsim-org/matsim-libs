@@ -246,10 +246,6 @@ public class EvacuationAnalysis implements ActionListener{
 		this.firstLoad = true;
 		this.cellTransparency = .5f;
 		
-		//////////////////////////////////////////////////////////////////////////////
-		//basic frame settings
-		//////////////////////////////////////////////////////////////////////////////
-		
 		this.frame = new JFrame("Evacuation Analysis");
 		this.frame.setSize(960, 768);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -289,7 +285,7 @@ public class EvacuationAnalysis implements ActionListener{
 		this.blockPanel.add(controlPanel);
 		this.blockPanel.setPreferredSize(new Dimension(360,700));
 		this.blockPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		
+	
 		this.compositePanel = new JPanel();
 		this.compositePanel.setBounds(new Rectangle(0, 0, 800, 800));
 		this.compositePanel.setLayout(new BorderLayout(0, 0));
@@ -640,9 +636,14 @@ public class EvacuationAnalysis implements ActionListener{
 
 		if ((e.getActionCommand() == "changeIteration") && (!firstLoad)) 
 		{
+			System.out.println("(looking for \"" +iterationsList.getSelectedItem()+"\")");
 			File newFile = getEventPathFromName(""+iterationsList.getSelectedItem());
+			
 			if (newFile!=null)
+			{
 				currentEventFile = newFile;
+				System.out.println("current event file: " + newFile.getAbsoluteFile());
+			}
 			
 			if (!useCalculateButton)
 				runCalculation();
@@ -710,7 +711,8 @@ public class EvacuationAnalysis implements ActionListener{
 	{
 		for (File eventFile : eventFiles)
 		{
-			if (eventFile.getName().contains(selectedItem))
+//			System.out.println("file " + eventFile.getAbsolutePath() + " - " + eventFile.getName());
+			if (eventFile.getName().equals(selectedItem))
 				return eventFile;
 		}
 		return null;
@@ -766,7 +768,10 @@ public class EvacuationAnalysis implements ActionListener{
 				if (currentFile.isDirectory())
 					directoriesToScan.push(currentFile);
 				else
+				{
+//					System.out.println("file:" + currentFile.toString());
 					files.add(currentFile);
+				}
 			}
 			
 		}
