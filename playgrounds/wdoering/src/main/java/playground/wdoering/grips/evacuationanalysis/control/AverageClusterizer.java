@@ -26,17 +26,17 @@ public class AverageClusterizer implements Clusterizer {
 			}
 		});
 		
-		System.out.println();
-		System.out.println("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
-		System.out.println("clusters:");
-		for (Tuple<Id,Double>cluster : data)
-			System.out.println(cluster.getFirst() + ":" + cluster.getSecond());
-		System.out.println();
-		System.out.println("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
+//		System.out.println();
+//		System.out.println("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
+//		System.out.println("clusters:");
+//		for (Tuple<Id,Double>cluster : data)
+//			System.out.println(cluster.getFirst() + ":" + cluster.getSecond());
+//		System.out.println();
+//		System.out.println("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
 		
 		int m = (data.size()/n)>0?(data.size()/n):1; int i = 0;
 		
-		System.out.println("m:" + m + "|n:" + n + "|size:" + data.size());
+//		System.out.println("m:" + m + "|n:" + n + "|size:" + data.size());
 		
 		for (Tuple<Id,Double> element : data)
 		{

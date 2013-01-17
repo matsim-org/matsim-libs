@@ -81,8 +81,8 @@ public class UtilizationVisualizer {
 		this.data.updateClusters(Mode.UTILIZATION, clusters);
 		
 		
-		for (Tuple<Id,Double> cluster : clusters)
-			System.out.println("UTIL CL: " + cluster.getFirst() + ":" + cluster.getSecond());
+//		for (Tuple<Id,Double> cluster : clusters)
+//			System.out.println("UTIL CL: " + cluster.getFirst() + ":" + cluster.getSecond());
 		
 		//assign clusterized colors to all link ids 
 		for (Link link : links)

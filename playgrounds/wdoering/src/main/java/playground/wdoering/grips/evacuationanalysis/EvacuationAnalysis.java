@@ -136,7 +136,6 @@ public class EvacuationAnalysis implements ActionListener{
 	private MyMapViewer jMapViewer;
 	private JButton saveButton;
 	private JButton openBtn;
-	private JButton exportBtn;
 	private JPanel blockPanel;
 	private JPanel panelDescriptions;
 	private Scenario sc;
@@ -171,6 +170,8 @@ public class EvacuationAnalysis implements ActionListener{
 	private boolean useCalculateButton = false;
 	private GeotoolsTransformation ctInverse;
 	public enum Unit { TIME, PEOPLE };
+	
+	private int exportSize;
 
 	
 	
@@ -311,12 +312,7 @@ public class EvacuationAnalysis implements ActionListener{
 		this.calcButton.addActionListener(this);
 		this.calcButton.setPreferredSize(new Dimension(100,20));
 		this.calcButton.setSize(new Dimension(100,24));
-		
-		this.exportBtn = new JButton("export");
-		this.exportBtn.setEnabled(false);
-		this.exportBtn.addActionListener(this);
-		this.exportBtn.setPreferredSize(new Dimension(100,20));
-		this.exportBtn.setSize(new Dimension(100,24));
+
 		
 		JPanel iterationSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		iterationSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -383,7 +379,6 @@ public class EvacuationAnalysis implements ActionListener{
 		if (useCalculateButton)
 			calculateButtonPanel.add(calcButton);
 		
-		calculateButtonPanel.add(exportBtn);
 		calculateButtonPanel.setPreferredSize(new Dimension(220,40));
 		
 		JPanel transparencySliderPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -476,12 +471,81 @@ public class EvacuationAnalysis implements ActionListener{
 		 */
 		if (e.getActionCommand() == "Save")
 		{
-			//TODO: save Shape file and Graphs
+			if (eventHandler!=null)
+			{
+				
+				jMapViewer.disableForSaving(true);
+				jMapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				
+				final JFileChooser fc = new JFileChooser();
+				fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+				
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				
+				fc.setFileFilter(new FileFilter() {
+
+					@Override
+					public String getDescription() {
+						return "choose directory for the TIFF export";
+					}
+
+					@Override
+					public boolean accept(File f)
+					{
+						if (f.isDirectory())
+							return true;
+						else
+							return false;
+					}
+				});
+				
+				int returnVal = fc.showSaveDialog(this.frame);
+				
+				if (returnVal == JFileChooser.APPROVE_OPTION)
+				{
+					//open file
+					File directory = fc.getSelectedFile();
+				
+					Rect boundingBox = eventHandler.getData().getBoundingBox();
+					
+					Coord minValues = this.ctInverse.transform(new CoordImpl(boundingBox.minX, boundingBox.minY));
+					Coord maxValues = this.ctInverse.transform(new CoordImpl(boundingBox.maxX, boundingBox.maxY));
+					
+					double westmost = minValues.getX(); 
+					double soutmost = minValues.getY();
+					double eastmost = maxValues.getX();
+					double northmost = maxValues.getY();
+		
+					Envelope2D env = new Envelope2D(DefaultGeographicCRS.WGS84, westmost, soutmost, eastmost - westmost, northmost - soutmost);
+					
+					BufferedImage imgEvacuation = jMapViewer.getGridAsImage(Mode.EVACUATION, exportSize, exportSize);
+					BufferedImage imgClearing = jMapViewer.getGridAsImage(Mode.CLEARING, exportSize, exportSize);
+					BufferedImage imgUtilization = jMapViewer.getGridAsImage(Mode.UTILIZATION, exportSize, exportSize);
+					
+					String filePrefix = directory.toString()+ "/" + currentEventFile.getName()+ "_";
+					
+					try{
+						TiffExporter.writeGEOTiff(env, filePrefix+Mode.EVACUATION+".tiff", imgEvacuation);
+						TiffExporter.writeGEOTiff(env, filePrefix+Mode.CLEARING+".tiff", imgClearing);
+						TiffExporter.writeGEOTiff(env, filePrefix+Mode.UTILIZATION+".tiff", imgUtilization);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					finally
+					{
+						jMapViewer.disableForSaving(false);
+						jMapViewer.setCursor(Cursor.getDefaultCursor());
+					}
+				}
+				
+				jMapViewer.disableForSaving(false);
+				jMapViewer.setCursor(Cursor.getDefaultCursor());
+				
+				
+				
+			}			
 			
-//			this.sc.getConfig().network().setTimeVariantNetwork(true);
-//			String changeEventsFile = this.scPath + "/networkChangeEvents.xml";
-//			this.sc.getConfig().network().setChangeEventInputFile(changeEventsFile);
-//			new ConfigWriter(this.sc.getConfig()).write(this.configFile);
+			
 		}
 
 		/**
@@ -557,7 +621,6 @@ public class EvacuationAnalysis implements ActionListener{
 				this.openBtn.setEnabled(false);
 				this.saveButton.setEnabled(true);
 				this.calcButton.setEnabled(true);
-				this.exportBtn.setEnabled(true);
 				
 				this.ctInverse = new GeotoolsTransformation(this.getScenario().getConfig().global().getCoordinateSystem(),"EPSG:4326");
 				
@@ -574,39 +637,6 @@ public class EvacuationAnalysis implements ActionListener{
 			runCalculation();
 		}
 		
-		if (e.getActionCommand() == "export")
-		{
-			if (eventHandler!=null)
-			{
-				
-				Rect boundingBox = eventHandler.getData().getBoundingBox();
-				
-				Coord minValues = this.ctInverse.transform(new CoordImpl(boundingBox.minX, boundingBox.minY));
-				Coord maxValues = this.ctInverse.transform(new CoordImpl(boundingBox.maxX, boundingBox.maxY));
-				
-				double westmost = minValues.getX(); 
-				double soutmost = minValues.getY();
-				double eastmost = maxValues.getX();
-				double northmost = maxValues.getY();
-	
-				Envelope2D env = new Envelope2D(DefaultGeographicCRS.WGS84, westmost, soutmost, eastmost - westmost, northmost - soutmost);
-				
-				BufferedImage imgEvacuation = jMapViewer.getGridAsImage(Mode.EVACUATION, 800, 800);
-				BufferedImage imgClearing = jMapViewer.getGridAsImage(Mode.CLEARING, 800, 800);
-				BufferedImage imgUtilization = jMapViewer.getGridAsImage(Mode.UTILIZATION, 800, 800);
-				
-				try{
-					TiffExporter.writeGEOTiff(env, "C:/temp/export"+Mode.EVACUATION+".tiff", imgEvacuation);
-					TiffExporter.writeGEOTiff(env, "C:/temp/export"+Mode.CLEARING+".tiff", imgClearing);
-					TiffExporter.writeGEOTiff(env, "C:/temp/export"+Mode.UTILIZATION+".tiff", imgUtilization);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				
-			}
-			
-			
-		}
 
 		if ((e.getActionCommand() == "changeIteration") && (!firstLoad)) 
 		{

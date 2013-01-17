@@ -380,8 +380,6 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		//set visualization attributes
 		setVisualData(eventData);
 		
-		System.out.println("cellcount:" + cellCount);
-		
 		return eventData;
 	}
 	
@@ -389,13 +387,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	{
 		AverageClusterizer clusterizer = new AverageClusterizer();
 		
-		System.out.println(Mode.EVACUATION);
 		EvacuationTimeVisualizer eVis = new EvacuationTimeVisualizer(eventData, clusterizer, k, this.colorationMode, this.cellTransparency);
-		
-		System.out.println(Mode.CLEARING);
 		ClearingTimeVisualizer cVis = new ClearingTimeVisualizer(eventData, clusterizer, k, this.colorationMode, this.cellTransparency);
-		
-		System.out.println(Mode.UTILIZATION);
 		UtilizationVisualizer uVis = new UtilizationVisualizer(links, eventData, clusterizer, k, this.colorationMode, this.cellTransparency); 
 		
 		eventData.setEvacuationTimeVisData(eVis.getColoration());

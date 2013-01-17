@@ -97,13 +97,15 @@ public class TiffExporter {
 		try
 		{
 			writer.write(coverage, wps);
+			writer.dispose(); 
 		}
 		finally
 		{
-			try { writer.dispose(); } catch (Exception e) {}
+			try { writer.dispose(); } catch (Exception e) { e.printStackTrace(); return false; }
 		}
+		return true;
 		
-		return false;
+		
 	}
 	
 }

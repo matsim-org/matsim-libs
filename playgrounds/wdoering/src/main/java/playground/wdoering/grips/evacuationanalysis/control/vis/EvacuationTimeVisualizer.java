@@ -68,10 +68,7 @@ public class EvacuationTimeVisualizer {
 		
 		LinkedList<Double> clusterValues = new LinkedList<Double>();
 		for (Tuple<Id,Double> cluster : clusters)
-		{
 			clusterValues.add(cluster.getSecond());
-			System.out.println("evac clusters:" + cluster.getSecond());
-		}
 		
 		
 		for (Cell cell : cells)

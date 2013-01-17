@@ -134,6 +134,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private Cell selectedCell;
 	private Mode mode;
 
+	private boolean disableForSaving;
+
 
 
 	public MyMapViewer(EvacuationAnalysis evacAnalysis) {
@@ -212,22 +214,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e)
-	{
-
-		//if left mouse button was clicked
-		if (e.getButton() == MouseEvent.BUTTON1)
-		{
-
-		}
-
-
-	}
+	public void mouseClicked(MouseEvent e) {}
 
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		if (!this.editMode) {
+		if ((!this.editMode) && (!disableForSaving))
+		{
 			for (MouseListener m : this.m) {
 				m.mouseEntered(e);
 			}
@@ -238,7 +231,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		if (!this.editMode) {
+		if ((!this.editMode) && (!disableForSaving)) {
 			for (MouseListener m : this.m) {
 				m.mouseExited(e);
 			}
@@ -249,7 +242,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	public void mousePressed(MouseEvent e) {
 
 
-		if (!this.editMode) {
+		if ((!this.editMode)  && (!disableForSaving)) {
 			for (MouseListener m : this.m) {
 				m.mousePressed(e);
 			}
@@ -260,7 +253,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	@Override
 	public void mouseReleased(MouseEvent e) {
 
-		if (!this.editMode)
+		if ((!this.editMode)  && (!disableForSaving))
 		{
 			for (MouseListener m : this.m)
 			{
@@ -269,14 +262,14 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		}
 
 
-		if (e.getButton() == MouseEvent.BUTTON1)
+		if ((e.getButton() == MouseEvent.BUTTON1)  && (!disableForSaving))
 			repaint();
 
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (!this.editMode) {
+		if ((!this.editMode)  && (!disableForSaving)) {
 			for (MouseWheelListener m : this.mw) {
 				m.mouseWheelMoved(e);
 			}
@@ -285,7 +278,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (!this.editMode) {
+		if ((!this.editMode)  && (!disableForSaving)) {
 			for (KeyListener k : this.k) {
 				k.keyPressed(e);
 			}
@@ -295,7 +288,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if (!this.editMode) {
+		if ((!this.editMode)  && (!disableForSaving)) {
 			for (KeyListener k : this.k) {
 				k.keyReleased(e);
 			}
@@ -305,7 +298,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		if (!this.editMode) {
+		if ((!this.editMode) && (!disableForSaving)) {
 			for (KeyListener k : this.k) {
 				k.keyTyped(e);
 			}
@@ -315,7 +308,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	@Override
 	public void mouseDragged(MouseEvent arg0)
 	{
-		if (!this.editMode)
+		if ((!this.editMode) && (!disableForSaving))
 		{
 			for (MouseMotionListener m : this.mm)
 			{
@@ -331,7 +324,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	public void mouseMoved(MouseEvent arg0)
 	{
 
-		if (!this.editMode)
+		if ((!this.editMode) && (!disableForSaving))
 		{
 
 			this.currentMousePosition = new Point(arg0.getX(), arg0.getY());
@@ -348,12 +341,25 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	public void paint(Graphics g){
 		//paint map and links
 		super.paint(g);
+		
+		
 		{
 			Graphics2D g2D = (Graphics2D) g;     
 			g2D.setStroke(new BasicStroke(5F));
 			
 			//get viewport offset
 			Rectangle b = this.getViewportBounds();
+			
+			if (disableForSaving)
+			{
+				g.setColor(Color.darkGray);
+				g.fillRect(-5, -5, this.getWidth()+5, this.getHeight()+5);
+				g.setColor(Color.white);
+				Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 20);
+				g.setFont(font);
+				g.drawString("Saving, please wait...", this.getWidth()/3 -60, this.getHeight()/3);
+				return;
+			}
 			
 			
 			//draw area polygon
@@ -577,11 +583,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		
 		this.setCenterPosition(evacAnalysis.getNetworkCenter());
 
-//		this.updateUI();
-//		this.validate();
-		
-
-
 		// get viewport offset
 		Rectangle b = this.getViewportBounds();
 //		System.out.println("minx: " + minX + "|minY: " + minY);
@@ -635,12 +636,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		this.data = data;
 		this.cellTree = data.getCellTree();
 		this.gridSize = data.getCellSize();
-		
-		System.out.println("data bb: \t\t" + this.data.getBoundingBox().toString());
 		Rect mvbb = new Rect(minX,minY,maxX,maxY);
-		System.out.println("network link / mv bb: \t" + mvbb.toString());
-		
-		
 	}
 
 
@@ -662,6 +658,14 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	public void setColorationMode(ColorationMode mode)
 	{
 		this.colorationMode = mode; 
+		
+	}
+
+
+	public void disableForSaving(boolean disable)
+	{
+		this.disableForSaving = disable;
+		repaint();
 		
 	}
 	
