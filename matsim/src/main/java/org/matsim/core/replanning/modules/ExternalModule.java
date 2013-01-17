@@ -91,8 +91,8 @@ public class ExternalModule implements PlanStrategyModule {
 	protected String moduleId = "";
 	protected String outFileRoot = "";
 
-	private Integer iterationNumber = null;
 	private final Controler controler;
+	private int currentIteration = -1;
 
 
 	public ExternalModule(final String exePath, final String moduleId, final Controler controler, final Scenario scenario) {
@@ -105,6 +105,7 @@ public class ExternalModule implements PlanStrategyModule {
 
 	@Override
 	public void prepareReplanning(ReplanningContext replanningContext) {
+		this.currentIteration = replanningContext.getIteration();
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
 		PopulationImpl pop = (PopulationImpl) ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		pop.setIsStreaming(true);
@@ -185,7 +186,7 @@ public class ExternalModule implements PlanStrategyModule {
 		// Change scenario config according to given output- and input-filenames: events, plans, network
 		this.extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
 		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
-		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber() - 1, "events.txt"));
+		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, this.controler.getControlerIO().getIterationFilename(this.currentIteration - 1, "events.txt"));
 		String networkFilename = this.scenario.getConfig().findParam("network", "inputNetworkFile");
 		this.extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
 	}
@@ -199,7 +200,7 @@ public class ExternalModule implements PlanStrategyModule {
 		writeExternalExeConfig();
 
 		String cmd = this.exePath + " " + this.outFileRoot + this.moduleId + ExternalConfigFileName;
-		String logfilename = this.controler.getControlerIO().getIterationFilename(this.iterationNumber, this.moduleId + "stdout.log");
+		String logfilename = this.controler.getControlerIO().getIterationFilename(this.currentIteration, this.moduleId + "stdout.log");
 
 		return (ExeRunner.run(cmd, logfilename, 3600) == 0);
 	}
@@ -235,14 +236,6 @@ public class ExternalModule implements PlanStrategyModule {
 			// replace / append the new plan
 			((PersonImpl) person).exchangeSelectedPlan(newplan, false);
 		}
-	}
-
-	public Integer getIterationNumber() {
-		return iterationNumber;
-	}
-
-	public void setIterationNumber(Integer iterationNumber) {
-		this.iterationNumber = iterationNumber;
 	}
 
 	/**

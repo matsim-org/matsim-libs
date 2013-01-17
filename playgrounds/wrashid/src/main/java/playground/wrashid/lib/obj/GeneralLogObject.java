@@ -20,7 +20,6 @@
 
 package playground.wrashid.lib.obj;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -65,12 +64,12 @@ public class GeneralLogObject {
 		return arrayList;
 	}
 
-	public void writeFileAndCloseStream() {
+	public void writeFileAndCloseStream(int iteration) {
 		if (!fileClosed) {
 			ArrayList<String> outputList = new ArrayList<String>();
 
 			String outputFileName= controler.getControlerIO()
-			.getIterationFilename(controler.getIterationNumber(), this.outputFile);
+			.getIterationFilename(iteration, this.outputFile);
 			
 			try {
 				FileOutputStream fos = new FileOutputStream(outputFileName);

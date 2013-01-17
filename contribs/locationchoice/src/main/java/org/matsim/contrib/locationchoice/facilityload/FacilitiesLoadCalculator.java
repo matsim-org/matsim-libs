@@ -89,7 +89,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 		ActivityFacilities facilities = controler.getFacilities();
 
 		if (event.getIteration() % 10 == 0) {
-			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getControler().getIterationNumber()), event.getIteration(),
+			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),
 					this.eventsToFacilityLoad.getFacilityPenalties());
 		}
 	}

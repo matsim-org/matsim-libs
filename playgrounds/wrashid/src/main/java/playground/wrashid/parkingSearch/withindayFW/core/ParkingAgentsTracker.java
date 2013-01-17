@@ -23,7 +23,6 @@ package playground.wrashid.parkingSearch.withindayFW.core;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,15 +47,8 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -65,20 +57,15 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-
-import com.sun.org.apache.xml.internal.resolver.helpers.Debug;
 
 import playground.wrashid.lib.obj.HashMapHashSetConcat;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.obj.event.EventHandlerCodeSeparator;
-import playground.wrashid.parkingChoice.ParkingManager;
 import playground.wrashid.parkingSearch.withindayFW.analysis.ParkingAnalysisHandler;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureDurationOfLastParkingOfDay;
@@ -781,10 +768,10 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		log.info("parking capacity constraint violations:" + parkingOccupancy.getNumberOfMaximumParkingCapacitConstraintViolations());
 		
 		if (getParkingAnalysisHandler()!=null){
-			getParkingAnalysisHandler().updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure);
-			getParkingAnalysisHandler().processParkingWalkTimes(parkingWalkTimesLog);
-			getParkingAnalysisHandler().processParkingSearchTimes(parkingSearchTimesLog);
-			getParkingAnalysisHandler().processParkingCost(parkingCostLog);
+			getParkingAnalysisHandler().updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure, event.getIteration());
+			getParkingAnalysisHandler().processParkingWalkTimes(parkingWalkTimesLog, event.getIteration());
+			getParkingAnalysisHandler().processParkingSearchTimes(parkingSearchTimesLog, event.getIteration());
+			getParkingAnalysisHandler().processParkingCost(parkingCostLog, event.getIteration());
 			getParkingAnalysisHandler().printShareOfCarUsers();
 		}
 		

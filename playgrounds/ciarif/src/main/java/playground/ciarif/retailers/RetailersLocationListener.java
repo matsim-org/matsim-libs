@@ -132,21 +132,21 @@ public class RetailersLocationListener
         new ReRoutePersons().run(r.getMovedFacilities(), this.controler.getNetwork(), persons, this.pcrl, this.controler.getFacilities());
       }
     }
-    if ((this.controler.getIterationNumber().intValue() != 0) && (this.controler.getIterationNumber().intValue() % analysisFrequency == 0) && (this.controler.getIterationNumber().intValue() != modelIter) && (this.controler.getIterationNumber().intValue() != this.controler.getLastIteration()))
+    if ((event.getIteration() != 0) && (event.getIteration() % analysisFrequency == 0) && (event.getIteration() != modelIter) && (event.getIteration() != this.controler.getLastIteration()))
     {
     	log.info("Test1");
     	for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = localIterator.next();
 
-        this.rsw.write(r, this.controler.getIterationNumber().intValue(), this.cfc);
+        this.rsw.write(r, event.getIteration(), this.cfc);
       }
 
     }
 
-    if (this.controler.getIterationNumber().intValue() != this.controler.getLastIteration())
+    if (event.getIteration() != this.controler.getLastIteration())
       return;
     for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = localIterator.next();
 
-      this.rsw.write(r, this.controler.getIterationNumber().intValue(), this.cfc);
+      this.rsw.write(r, event.getIteration(), this.cfc);
       log.info("Test2");
     }
 

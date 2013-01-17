@@ -133,7 +133,6 @@ public final class StrategyManagerConfigLoader {
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			String exePath = settings.getExePath();
 			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controler, controler.getScenario());
-			em.setIterationNumber(controler.getIterationNumber());
 			strategy.addStrategyModule(em);
 			return strategy;
 		} else if (name.contains(".")) {

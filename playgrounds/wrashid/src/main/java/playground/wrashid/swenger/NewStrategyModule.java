@@ -34,7 +34,6 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 public class NewStrategyModule implements PlanStrategyModule {
 
@@ -113,12 +112,12 @@ public class NewStrategyModule implements PlanStrategyModule {
 	public void handlePlan(final Plan plan) {
 		
 		
-		if (controler.getIterationNumber() < firstStrategyChangeAtIteration){
-			lambdaParameter = controler.getIterationNumber() / firstStrategyChangeAtIteration;
+		if (this.replanningContext.getIteration() < firstStrategyChangeAtIteration){
+			lambdaParameter = this.replanningContext.getIteration() / firstStrategyChangeAtIteration;
 			probabilityOfRouting = routing0 * (1 - lambdaParameter) + routing1 * lambdaParameter;
 			probabilityOfTimeMutator = timeMutator0 * (1 - lambdaParameter) + timeMutator1 * lambdaParameter;
-		} else if (controler.getIterationNumber() < secondStrategyChangeAtIteration){
-			lambdaParameter = (controler.getIterationNumber() - firstStrategyChangeAtIteration) / (secondStrategyChangeAtIteration - firstStrategyChangeAtIteration);
+		} else if (this.replanningContext.getIteration() < secondStrategyChangeAtIteration){
+			lambdaParameter = (this.replanningContext.getIteration() - firstStrategyChangeAtIteration) / (secondStrategyChangeAtIteration - firstStrategyChangeAtIteration);
 			probabilityOfRouting = routing1	* (1 - lambdaParameter) + routing2 * lambdaParameter;
 			probabilityOfTimeMutator = timeMutator1	* (1 - lambdaParameter) + timeMutator2 * lambdaParameter;
 		} else {

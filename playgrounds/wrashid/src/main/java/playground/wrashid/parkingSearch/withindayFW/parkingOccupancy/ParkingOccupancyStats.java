@@ -27,7 +27,6 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
@@ -55,8 +54,8 @@ public class ParkingOccupancyStats {
 	}
 	
 	
-	public void writeOutParkingOccupanciesTxt(Controler controler, ParkingInfrastructure parkingInfrastructure) {
-		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+	public void writeOutParkingOccupanciesTxt(Controler controler, ParkingInfrastructure parkingInfrastructure, int iteration) {
+		String iterationFilename = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancy.txt");
 
 		ArrayList<String> list = new ArrayList<String>();
@@ -91,8 +90,8 @@ public class ParkingOccupancyStats {
 		GeneralLib.writeList(list, iterationFilename);
 	}
 	
-	public void writeOutParkingOccupancySumPng(Controler controler) {
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+	public void writeOutParkingOccupancySumPng(Controler controler, int iteration) {
+		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 		"parkingOccupancyAllParking.png");
 		
 		double matrix[][] = new double[96][1];

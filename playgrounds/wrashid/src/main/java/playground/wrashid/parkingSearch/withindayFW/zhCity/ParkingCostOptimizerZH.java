@@ -22,29 +22,22 @@ package playground.wrashid.parkingSearch.withindayFW.zhCity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.apache.commons.math.stat.descriptive.moment.Mean;
+import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
-import playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
-
-import org.apache.commons.math.stat.descriptive.moment.Mean;
-import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 
 public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
@@ -109,7 +102,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 		return twoHourParkingCost;
 	}
 
-	public void logParkingPriceStats(Controler controler) {
+	public void logParkingPriceStats(Controler controler, int iteration) {
 		// String iterationFilenameTxt =
 		// controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
 		// "parkingPrices.txt");
@@ -128,67 +121,67 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
 		morningArray = Collections.convertDoubleCollectionToArray(streetParkingPricesMorning);
 		afterNoonArray = Collections.convertDoubleCollectionToArray(streetParkingPricesAfternoon);
-		log.info("it-" + controler.getIterationNumber() + " average street parking price (morning/afternoon): "
+		log.info("it-" + iteration + " average street parking price (morning/afternoon): "
 				+ (new Mean()).evaluate(morningArray) + "/" + new Mean().evaluate(afterNoonArray));
-		log.info("it-" + controler.getIterationNumber() + " standardDeviation street parking price (morning/afternoon):"
+		log.info("it-" + iteration + " standardDeviation street parking price (morning/afternoon):"
 				+ (new StandardDeviation()).evaluate(morningArray) + "/" + new StandardDeviation().evaluate(afterNoonArray));
 
 		morningArray = Collections.convertDoubleCollectionToArray(garageParkingPricesMorning);
 		afterNoonArray = Collections.convertDoubleCollectionToArray(garageParkingPricesAfternoon);
-		log.info("it-" + controler.getIterationNumber() + " average garage parking price (morning/afternoon): "
+		log.info("it-" + iteration + " average garage parking price (morning/afternoon): "
 				+ (new Mean()).evaluate(morningArray) + "/" + new Mean().evaluate(afterNoonArray));
-		log.info("it-" + controler.getIterationNumber() + " standardDeviation garage parking price (morning/afternoon):"
+		log.info("it-" + iteration + " standardDeviation garage parking price (morning/afternoon):"
 				+ (new StandardDeviation()).evaluate(morningArray) + "/" + new StandardDeviation().evaluate(afterNoonArray));
 
-		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())) {
-			writeoutPrices(controler);
+		if (GlobalParkingSearchParams.writeDetailedOutput(iteration)) {
+			writeoutPrices(controler, iteration);
 		}
 
 	}
 
-	private void writeoutPrices(Controler controler) {
+	private void writeoutPrices(Controler controler, int iteration) {
 		DoubleValueHashMap<Id> inputValues = publicParkingPricePerHourInTheMorning;
 		String outputFileName = "publicParkingPricePerHourInTheMorning.txt";
-		outputParkingPrices(controler, inputValues, outputFileName);
+		outputParkingPrices(controler, iteration, inputValues, outputFileName);
 
 		inputValues = publicParkingPricePerHourInTheAfternoon;
 		outputFileName = "publicParkingPricePerHourInTheAfternoon.txt";
-		outputParkingPrices(controler, inputValues, outputFileName);
+		outputParkingPrices(controler, iteration, inputValues, outputFileName);
 		
-		printParkingPriceHistograms(controler);
+		printParkingPriceHistograms(controler, iteration);
 	}
 
-	private void printParkingPriceHistograms(Controler controler) {
+	private void printParkingPriceHistograms(Controler controler, int iteration) {
 		double[] values = Collections.convertDoubleCollectionToArray(filterParkingPrices(publicParkingPricePerHourInTheMorning,"stp"));
 		String timeOfDay="Morning";
 		String parkingType="street";
-		outputPriceHistorgram(controler, values, timeOfDay, parkingType);
+		outputPriceHistorgram(controler, iteration, values, timeOfDay, parkingType);
 		
 		values = Collections.convertDoubleCollectionToArray(filterParkingPrices(publicParkingPricePerHourInTheAfternoon,"stp"));
 		timeOfDay="Afternoon";
 		parkingType="street";
-		outputPriceHistorgram(controler, values, timeOfDay, parkingType);
+		outputPriceHistorgram(controler, iteration, values, timeOfDay, parkingType);
 		
 		values = Collections.convertDoubleCollectionToArray(filterParkingPrices(publicParkingPricePerHourInTheMorning,"gp"));
 		timeOfDay="Morning";
 		parkingType="garage";
-		outputPriceHistorgram(controler, values, timeOfDay, parkingType);
+		outputPriceHistorgram(controler, iteration, values, timeOfDay, parkingType);
 		
 		values = Collections.convertDoubleCollectionToArray(filterParkingPrices(publicParkingPricePerHourInTheAfternoon,"gp"));
 		timeOfDay="Afternoon";
 		parkingType="garage";
-		outputPriceHistorgram(controler, values, timeOfDay, parkingType);
+		outputPriceHistorgram(controler, iteration, values, timeOfDay, parkingType);
 	}
 
-	private void outputPriceHistorgram(Controler controler, double[] values, String timeOfDay, String parkingType) {
+	private void outputPriceHistorgram(Controler controler, int iteration, double[] values, String timeOfDay, String parkingType) {
 		String outputFileName = parkingType + "ParkingPricePerHourInThe" + timeOfDay + ".png";
 		
 		
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 				outputFileName);
 
 		GeneralLib.generateHistogram(fileName, values, 10,
-				"Histogram " + parkingType + " Pricing Price Per Hour In the " + timeOfDay + " - It." + controler.getIterationNumber(), "price [chf]",
+				"Histogram " + parkingType + " Pricing Price Per Hour In the " + timeOfDay + " - It." + iteration, "price [chf]",
 				"number of parkings");
 	}
 	
@@ -204,7 +197,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 		return result;
 	}
 
-	private void outputParkingPrices(Controler controler, DoubleValueHashMap<Id> inputValues, String outputFileName) {
+	private void outputParkingPrices(Controler controler, int iteration, DoubleValueHashMap<Id> inputValues, String outputFileName) {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add("parkingFacilityId\tprice");
 
@@ -217,7 +210,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 			list.add(stringBuffer.toString());
 		}
 
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), outputFileName);
+		String fileName = controler.getControlerIO().getIterationFilename(iteration, outputFileName);
 		GeneralLib.writeList(list, fileName);
 	}
 

@@ -3,9 +3,7 @@ package playground.pieter.mentalsim.controler.listeners;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Locale;
 
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -37,14 +35,13 @@ public class ExpensiveSimScoreWriter implements IterationEndsListener,
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		ArrayList<Integer> expensiveIters = MobSimSwitcher.getExpensiveIters();
 		int index = expensiveIters.size();
-		if (!MobSimSwitcher.expensiveIter || controler.getIterationNumber()==controler.getLastIteration()) {
+		if (!MobSimSwitcher.expensiveIter || event.getIteration()==controler.getLastIteration()) {
 			return;
 		}
 		double[][] history = controler.getScoreStats().getHistory();
-		int idx = controler.getIterationNumber()
-				- controler.getFirstIteration();
+		int idx = event.getIteration() - controler.getFirstIteration();
 		try {
-			out.write(controler.getIterationNumber() + "\t"
+			out.write(event.getIteration() + "\t"
 					+ history[INDEX_EXECUTED][idx] + "\t"
 					+ history[INDEX_WORST][idx] + "\t"
 					+ history[INDEX_AVERAGE][idx] + "\t"
@@ -65,7 +62,7 @@ public class ExpensiveSimScoreWriter implements IterationEndsListener,
 			iterations[i] = i + controler.getFirstIteration();
 		}
 		double[] values = new double[index];
-		double[] fullhist = new double[controler.getIterationNumber()
+		double[] fullhist = new double[event.getIteration()
 				- controler.getFirstIteration() + 1];
 		int[] series = { INDEX_WORST, INDEX_BEST, INDEX_AVERAGE, INDEX_EXECUTED };
 		String[] seriesNames = { "avg. worst score", "avg. best score",

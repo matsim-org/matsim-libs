@@ -100,10 +100,10 @@ public class MyControler1 extends Controler {
 	}
 
 	@Override
-	protected void runMobSim() {
+	protected void runMobSim(int iteration) {
 		ItsumoSim sim = new ItsumoSim(this.scenarioData, this.events);
 		sim.setControlerIO(this.getControlerIO());
-		sim.setIteration(this.getIterationNumber());
+		sim.setIteration(iteration);
 		sim.run();
 	}
 

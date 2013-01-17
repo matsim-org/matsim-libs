@@ -34,6 +34,7 @@ public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
 	private final Controler controler;
 	private final DepartureDelayAverageCalculator delay;
 	private StatisticsCollector statsCollector = null;
+	private int currentIteration = -1;
 
 	public JointTimeModeChooserModule(final Controler controler) {
 		super( controler.getConfig().global() );
@@ -62,6 +63,7 @@ public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
 	
 	@Override
 	public void beforePrepareReplanningHook( ReplanningContext replanningContext ) {
+		this.currentIteration = replanningContext.getIteration();
 		statsCollector = DUMP_STATS ?
 		new StatisticsCollector() :
 		null;
@@ -83,7 +85,7 @@ public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
 		if (statsCollector != null) {
 			statsCollector.dumpStatistics(
 					controler.getControlerIO().getIterationFilename(
-							controler.getIterationNumber(),
+							this.currentIteration,
 							getClass().getSimpleName()+"Stats.dat" ));
 		}
 	}

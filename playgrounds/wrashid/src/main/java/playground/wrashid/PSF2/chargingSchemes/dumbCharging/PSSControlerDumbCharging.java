@@ -40,7 +40,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -48,13 +47,8 @@ import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
 import playground.wrashid.PSF.PSS.EventReadControler;
 import playground.wrashid.PSF.PSS.PSSControler;
-import playground.wrashid.PSF.energy.AddEnergyScoreListener;
-import playground.wrashid.PSF.energy.AfterSimulationListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
-import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
-import playground.wrashid.PSF.lib.PSFGeneralLib;
-import playground.wrashid.PSF.parking.LogParkingTimes;
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.chargingSchemes.ActivityIntervalTracker_NonParallelizableHandler;
 import playground.wrashid.PSF2.chargingSchemes.ChargingAfterSimListener;
@@ -104,7 +98,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 		controler.addControlerListener(new ShutdownListener() {
 			public void notifyShutdown(ShutdownEvent event) {
-				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream();
+				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getControler().getLastIteration() + 1);
 			}
 		});
 	}
@@ -131,7 +125,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO()
-						.getIterationFilename(event.getControler().getIterationNumber(), "chargingLog.txt"));
+						.getIterationFilename(event.getIteration(), "chargingLog.txt"));
 				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO()
 						.getOutputFilename("chargingLog.txt"));
 
@@ -140,10 +134,10 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 				ChargingTimes.writeEnergyUsageStatisticsData(
 						event.getControler().getControlerIO()
-								.getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.txt"),
+								.getIterationFilename(event.getIteration(), "vehicleEnergyConsumption.txt"),
 						energyUsageStatistics);
 				ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(event.getControler().getControlerIO()
-						.getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.png"),
+						.getIterationFilename(event.getIteration(), "vehicleEnergyConsumption.png"),
 						energyUsageStatistics);
 			}
 		});
@@ -197,7 +191,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 		controler.addControlerListener(new AfterMobsimListener() {
 			public void notifyAfterMobsim(AfterMobsimEvent event) {
-				ParametersPSF2.getPSFIterationLog().writeFileAndCloseStream();
+				ParametersPSF2.getPSFIterationLog().writeFileAndCloseStream(event.getIteration());
 			}
 		});
 

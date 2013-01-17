@@ -112,15 +112,15 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 			}
 
 		}
-		writeWalkingDistanceStatisticsGraph(controler, parkingWalkDistances);
-		printWalkingDistanceHistogramm(controler, parkingWalkDistances);
+		writeWalkingDistanceStatisticsGraph(controler, event.getIteration(), parkingWalkDistances);
+		printWalkingDistanceHistogramm(controler, event.getIteration(), parkingWalkDistances);
 		
 		updateAverageValue(sumOfParkingWalkDistances);
 		
 		if (!ParkingChoiceLib.isTestCaseRun) {
-			writeOutParkingOccupancies(controler);
-			writeOutGraphParkingTypeOccupancies(controler);
-			writeOutGraphComparingSumOfSelectedParkingsToCounts(controler);
+			writeOutParkingOccupancies(controler, event.getIteration());
+			writeOutGraphParkingTypeOccupancies(controler, event.getIteration());
+			writeOutGraphComparingSumOfSelectedParkingsToCounts(controler, event.getIteration());
 		}
 
 		// eventsToScore.finish();
@@ -129,14 +129,14 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		parkingWalkDistancesInZHCity=new LinkedList<Double>();
 		scores=new DoubleValueHashMap<Id>();
 		
-		if (controler.getIterationNumber()==0 || controler.getIterationNumber()%10==0){
-			logParkingUsed(controler);
+		if (event.getIteration()==0 || event.getIteration()%10==0){
+			logParkingUsed(controler, event.getIteration());
 		}
 		
 	}
 
-	private void logParkingUsed(Controler controler) {
-		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+	private void logParkingUsed(Controler controler, int iteration) {
+		String iterationFilename = controler.getControlerIO().getIterationFilename(iteration,
 		"parkingLogInfo.txt");
 		
 		ArrayList<String> list=new ArrayList<String>();
@@ -193,10 +193,10 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		averageWalkingDistance = new Mean().evaluate(values);
 	}
 
-	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(Controler controler) {
-		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(Controler controler, int iteration) {
+		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancyCountsComparison.png");
-		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(iteration,
 		"parkingOccupancyCountsComparison.txt");
 		
 		HashMap<String, String> mappingOfParkingNameToParkingId = SingleDayGarageParkingsCount
@@ -246,10 +246,10 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		GeneralLib.writeMatrix(matrix, iterationFilenameTxt, txtFileHeader);
 	}
 
-	private void writeOutGraphParkingTypeOccupancies(Controler controler) {
-		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+	private void writeOutGraphParkingTypeOccupancies(Controler controler, int iteration) {
+		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancyByParkingTypes.png");
-		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(iteration,
 		"parkingOccupancyByParkingTypes.txt");
 
 		int numberOfColumns=4;
@@ -299,8 +299,8 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		GeneralLib.writeMatrix(matrix, iterationFilenameTxt, txtFileHeader);
 	}
 
-	private void writeOutParkingOccupancies(Controler controler) {
-		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+	private void writeOutParkingOccupancies(Controler controler, int iteration) {
+		String iterationFilename = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancy.txt");
 
 		ArrayList<String> list = new ArrayList<String>();
@@ -322,7 +322,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		GeneralLib.writeList(list, iterationFilename);
 	}
 
-	private void printWalkingDistanceHistogramm(Controler controler, HashMap<Id, Double> walkingDistance) {
+	private void printWalkingDistanceHistogramm(Controler controler, int iteration, HashMap<Id, Double> walkingDistance) {
 		double[] values = Collections.convertDoubleCollectionToArray(walkingDistance.values());
 
 		if (values.length == 0) {
@@ -330,18 +330,18 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 			values[0] = -1.0;
 		}
 
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 		"walkingDistanceHistogramm.png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
-				"Histogram Parking Walking Distance - It." + controler.getIterationNumber(), "distance", "number");
+				"Histogram Parking Walking Distance - It." + iteration, "distance", "number");
 		
-		writeOutWalkingDistanceHistogramToTxtFile(controler,values);
-		writeOutWalkingDistanceZHCity(controler);
+		writeOutWalkingDistanceHistogramToTxtFile(controler, iteration, values);
+		writeOutWalkingDistanceZHCity(controler, iteration);
 	}
 
-	private void writeOutWalkingDistanceZHCity(Controler controler) {
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+	private void writeOutWalkingDistanceZHCity(Controler controler, int iteration) {
+		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 		"walkingDistanceHistogrammZHCity.txt");
 		
 		double[] walkingDistances=new double[parkingWalkDistancesInZHCity.size()];
@@ -353,15 +353,15 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		GeneralLib.writeArrayToFile(walkingDistances, fileName, "parking walking distance [m]");
 	}
 
-	private void writeOutWalkingDistanceHistogramToTxtFile(Controler controler, double[] values) {
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+	private void writeOutWalkingDistanceHistogramToTxtFile(Controler controler, int iteration, double[] values) {
+		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 		"walkingDistanceHistogramm.txt");
 		
 		GeneralLib.writeArrayToFile(values, fileName, "parkingWalkingDistances [m]");
 	}
 
-	private void writeWalkingDistanceStatisticsGraph(Controler controler, HashMap<Id, Double> walkingDistance) {
-		parkingWalkingDistanceGraph.updateStatisticsForIteration(controler.getIterationNumber(), walkingDistance);
+	private void writeWalkingDistanceStatisticsGraph(Controler controler, int iteration, HashMap<Id, Double> walkingDistance) {
+		parkingWalkingDistanceGraph.updateStatisticsForIteration(iteration, walkingDistance);
 		String fileName = controler.getControlerIO().getOutputFilename("walkingDistanceOverIterations.png");
 		parkingWalkingDistanceGraph.writeGraphic(fileName);
 	}

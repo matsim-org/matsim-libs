@@ -63,14 +63,16 @@ public class DynusTMobsim implements Mobsim {
 	private final DynamicTravelTimeMatrix ttMatrix;
 	private final Network dynusTnet;
 	private final Controler controler;
+	private final int iteration;
 
 	public DynusTMobsim(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final Scenario sc, final EventsManager eventsManager,
-			final Network dynusTnet, final Controler controler) {
+			final Network dynusTnet, final Controler controler, final int iteration) {
 		this.dc = dc;
 		this.scenario = sc;
 		this.ttMatrix = ttMatrix;
 		this.dynusTnet = dynusTnet;
 		this.controler = controler;
+		this.iteration = iteration;
 	}
 
 	@Override
@@ -98,7 +100,7 @@ public class DynusTMobsim implements Mobsim {
 		exportDemand(mmCollector);
 		
 		log.info("write marginal sums");
-		exportMarginalSums(odm, this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "nachfrageRandsummen.txt"));
+		exportMarginalSums(odm, this.controler.getControlerIO().getIterationFilename(this.iteration, "nachfrageRandsummen.txt"));
 		
 		log.info("write demand for Dynus-T with factor " + this.dc.getDemandFactor());
 		DynusTDynamicODDemandWriter writer = new DynusTDynamicODDemandWriter(odm, this.dc.getZoneIdToIndexMapping());
@@ -130,10 +132,10 @@ public class DynusTMobsim implements Mobsim {
 		new VehicleTrajectoriesReader(multiHandler, this.dc.getZoneIdToIndexMapping()).readFile(vehTrajFilename);
 
 		this.dc.setTravelTimeCalculator(ttc);
-		linkStats.writeLinkVolumesToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkVolumes.txt"));
-		linkStats.writeLinkTravelTimesToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkTravelTimes.txt"));
-		linkStats.writeLinkTravelSpeedsToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkTravelSpeeds.txt"));
-		exportTravelTimes(hourlyTravelTimesMatrix, hourlyTtmCalc.getZoneIds(), this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_odTravelTimes.txt"));
+		linkStats.writeLinkVolumesToFile(this.controler.getControlerIO().getIterationFilename(this.iteration, "dynust_linkVolumes.txt"));
+		linkStats.writeLinkTravelTimesToFile(this.controler.getControlerIO().getIterationFilename(this.iteration, "dynust_linkTravelTimes.txt"));
+		linkStats.writeLinkTravelSpeedsToFile(this.controler.getControlerIO().getIterationFilename(this.iteration, "dynust_linkTravelSpeeds.txt"));
+		exportTravelTimes(hourlyTravelTimesMatrix, hourlyTtmCalc.getZoneIds(), this.controler.getControlerIO().getIterationFilename(this.iteration, "dynust_odTravelTimes.txt"));
 		extractVehTrajectories(vehTrajFilename);
 	}
 
@@ -217,7 +219,7 @@ public class DynusTMobsim implements Mobsim {
 				String mode = e.getKey();
 				DynamicODMatrix timeMatrices = e.getValue();
 				
-				String filename = this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "demand_" + mode + ".txt");
+				String filename = this.controler.getControlerIO().getIterationFilename(this.iteration, "demand_" + mode + ".txt");
 				BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 				
 				int binCount = timeMatrices.getNOfBins();
@@ -323,7 +325,7 @@ public class DynusTMobsim implements Mobsim {
 	private void extractVehTrajectories(final String vehTrajFilename) {
 		for (Tuple<Double, Double> t : this.dc.getVehTrajectoryExtracts()) {
 			String filename = "VehTrajectories_" + Time.writeTime(t.getFirst(), Time.TIMEFORMAT_HHMM, '_') + "-" + Time.writeTime(t.getSecond(), Time.TIMEFORMAT_HHMM, '_') + ".dat";
-			String outputFile = this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), filename);
+			String outputFile = this.controler.getControlerIO().getIterationFilename(this.iteration, filename);
 			Extractor.filterVehTrajectory(vehTrajFilename, t.getFirst() / 60.0, t.getSecond() / 60.0, outputFile); // convert times from seconds to minutes
 		}
 	}

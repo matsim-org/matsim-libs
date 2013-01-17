@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.events.ControlerEvent;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.V2G.BatteryStatistics;
@@ -88,12 +88,12 @@ public class OptimizedCharger {
 
 	}
 
-	public void outputOptimizationData(ControlerEvent event){
+	public void outputOptimizationData(AfterMobsimEvent event){
 		// write out charging events to file, if specified
 		// TODO: 'remove parameter main.chargingTimesOutputFilePath from config'
 		if (ParametersPSF.getMainChargingTimesOutputFilePath()!=null){
 			// write it to the iteration folder
-			ChargingTimes.writeChargingTimes(chargingTimes, event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "chargingLog.txt"));
+			ChargingTimes.writeChargingTimes(chargingTimes, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "chargingLog.txt"));
 
 			// also write it directly into the output folder, so that it can be used by the PSS
 			ChargingTimes.writeChargingTimes(chargingTimes, event.getControler().getControlerIO().getOutputFilename("chargingLog.txt"));
@@ -110,20 +110,20 @@ public class OptimizedCharger {
 			// TODO: remove the parameter ParametersPSF.getMainEnergyUsageStatistics() from the config file.
 
 			// write data into iterations folder
-			ChargingTimes.writeEnergyUsageStatisticsData(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.txt"), energyUsageStatistics);
+			ChargingTimes.writeEnergyUsageStatisticsData(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "vehicleEnergyConsumption.txt"), energyUsageStatistics);
 
-			ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.png"),energyUsageStatistics);
+			ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "vehicleEnergyConsumption.png"),energyUsageStatistics);
 
 
 
 			// TODO: the v2g power could be changed later.
 			double[][] gridConnectedPower=BatteryStatistics.getGridConnectedPower(parkingTimes,ParametersPSF.getDefaultChargingPowerAtParking());
-			BatteryStatistics.writeGridConnectedPower(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "gridConnectedVehiclePower.png"), gridConnectedPower);
-			BatteryStatistics.writeGridConnectedPowerData(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "gridConnectedVehiclePower.txt"), gridConnectedPower);
+			BatteryStatistics.writeGridConnectedPower(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "gridConnectedVehiclePower.png"), gridConnectedPower);
+			BatteryStatistics.writeGridConnectedPowerData(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "gridConnectedVehiclePower.txt"), gridConnectedPower);
 
 			double[][] gridConnectedEnergy=BatteryStatistics.getGridConnectedEnergy(chargingTimes, parkingTimes);
-			BatteryStatistics.writeGridConnectedEnergy(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "gridConnectedVehicleEnergy.png"), gridConnectedEnergy);
-			BatteryStatistics.writeGridConnectedEnergyData(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "gridConnectedVehicleEnergy.txt"), gridConnectedEnergy);
+			BatteryStatistics.writeGridConnectedEnergy(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "gridConnectedVehicleEnergy.png"), gridConnectedEnergy);
+			BatteryStatistics.writeGridConnectedEnergyData(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "gridConnectedVehicleEnergy.txt"), gridConnectedEnergy);
 		}
 
 		// output the price graphics

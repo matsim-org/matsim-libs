@@ -1,15 +1,28 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.ciarif.flexibletransports.controler.listeners;
 
-import java.util.List;
-import java.util.Map;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -17,18 +30,15 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import playground.ciarif.flexibletransports.config.FtConfigGroup;
-import playground.ciarif.flexibletransports.data.MyTransportMode;
+
 import playground.ciarif.flexibletransports.IO.CarSharingSummaryWriter;
 import playground.ciarif.flexibletransports.IO.PersonsSummaryWriter;
+import playground.ciarif.flexibletransports.config.FtConfigGroup;
+import playground.ciarif.flexibletransports.data.MyTransportMode;
 import playground.ciarif.flexibletransports.router.CarSharingStation;
-import playground.ciarif.flexibletransports.router.CarSharingStations;
 import playground.ciarif.flexibletransports.router.PlansCalcRouteFtInfo;
 
-public class CarSharingListener
-  implements IterationEndsListener
-{
-  private static final Logger log = Logger.getLogger(CarSharingListener.class);
+public class CarSharingListener implements IterationEndsListener {
   private Controler controler;
   //private CarSharingSummaryWriter csw = new CarSharingSummaryWriter("/data/matsim/ciarif/output/zurich_10pc/CarSharing/CarSharingSummary");
   //private PersonsSummaryWriter psw = new PersonsSummaryWriter("/data/matsim/ciarif/output/zurich_10pc/CarSharing/PersonsSummary");
@@ -48,7 +58,7 @@ public class CarSharingListener
   public void notifyIterationEnds(IterationEndsEvent event)
   {
     this.controler = event.getControler();
-    if (this.controler.getIterationNumber().intValue() != this.controler.getLastIteration())
+    if (event.getIteration() != this.controler.getLastIteration())
       return;
     Network network = this.controler.getNetwork();
     this.plansCalcRouteFtInfo.prepare(network);

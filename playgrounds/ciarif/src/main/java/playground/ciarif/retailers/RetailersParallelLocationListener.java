@@ -160,7 +160,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		
 		
 		Controler controler = event.getControler();
-		if (controler.getIterationNumber()%1==0 & controler.getIterationNumber()>0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
+		if (event.getIteration()%1==0 & event.getIteration()>0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
 			
 
 			
@@ -209,7 +209,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 				//TODO The check of moved facilities should happen here!!!!
 			}
 			
-			int iter = controler.getIterationNumber();
+			int iter = event.getIteration();
 			this.rs.write(this.retailers, iter);
 			
 			for (Person p : controler.getPopulation().getPersons().values()) {

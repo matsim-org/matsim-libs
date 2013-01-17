@@ -47,7 +47,7 @@ public class DynusTMobsimFactory implements MobsimFactory {
 
 	@Override
 	public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-		return new DynusTMobsim(this.dc, this.ttMatrix, sc, eventsManager, this.dynusTnet, this.controler);
+		return new DynusTMobsim(this.dc, this.ttMatrix, sc, eventsManager, this.dynusTnet, this.controler, this.controler.getIterationNumber());
 	}
 
 }

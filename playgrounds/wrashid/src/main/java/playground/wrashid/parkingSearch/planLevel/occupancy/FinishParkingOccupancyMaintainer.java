@@ -1,10 +1,28 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
@@ -28,24 +46,24 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		ParkingOccupancyAnalysis poaWriter = new ParkingOccupancyAnalysis(ParkingRoot.getParkingOccupancyMaintainer()
 				.getParkingOccupancyBins(), ParkingRoot.getParkingCapacity());
 		String fileName = event.getControler().getControlerIO()
-				.getIterationFilename(event.getControler().getIterationNumber(), "parkingOccupancyStatistics.txt");
+				.getIterationFilename(event.getIteration(), "parkingOccupancyStatistics.txt");
 		poaWriter.writeTxtFile(fileName);
 		fileName = event.getControler().getControlerIO()
-				.getIterationFilename(event.getControler().getIterationNumber(), "parkingOccupancyCoordinates.txt");
+				.getIterationFilename(event.getIteration(), "parkingOccupancyCoordinates.txt");
 		poaWriter.writeFakeKMLFile(fileName);
 		
-		writeOccupancyViolationStatisticsGrpah(poaWriter);
+		writeOccupancyViolationStatisticsGraph(event.getIteration(), poaWriter);
 
 		fileName = event.getControler().getControlerIO()
-				.getIterationFilename(event.getControler().getIterationNumber(), "parkingWalkingTimes.txt");
+				.getIterationFilename(event.getIteration(), "parkingWalkingTimes.txt");
 		new ParkingWalkingDistanceAnalysis(ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance())
 				.writeTxtFile(fileName);
 		fileName = event.getControler().getControlerIO()
-		.getIterationFilename(event.getControler().getIterationNumber(), "parkingLog.txt");
+		.getIterationFilename(event.getIteration(), "parkingLog.txt");
 		GeneralLib.writeList(ParkingRoot.getParkingLog(),fileName);
 		
-		writeWalkingDistanceStatisticsGraph();
-		generatePersonGroupsWalkingDistanceGraph();
+		writeWalkingDistanceStatisticsGraph(event.getIteration());
+		generatePersonGroupsWalkingDistanceGraph(event.getIteration());
 		updateparkingWalkingTimeOfPreviousIteration();
 		
 		//ParkingRoot.writeMapDebugTraceToCurrentIterationDirectory();
@@ -56,7 +74,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		
 	}
 	
-	private void generatePersonGroupsWalkingDistanceGraph() {
+	private void generatePersonGroupsWalkingDistanceGraph(int iteration) {
 		
 		PersonGroups personGroups = ParkingRoot.getPersonGroupsForStatistics();
 		
@@ -68,7 +86,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		HashMap<Id, Double> parkingRelatedWalkDistance = ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance();
 		
 		for (Id personId:parkingRelatedWalkDistance.keySet()){
-			int iterationNumber=GlobalRegistry.controler.getIterationNumber();
+			int iterationNumber=iteration;
 			String attribute=PersonGroupWalkingDistanceGraphGenerator.iterationWalkingDistanceSum+iterationNumber;
 			
 			Double sumOfWalkingDistance = (Double) personGroups.getAttributeValueForGroupToWhichThePersonBelongs(personId, attribute);
@@ -86,19 +104,17 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		PersonGroupWalkingDistanceGraphGenerator.generateGraphic(ParkingRoot.getPersonGroupsForStatistics(), GlobalRegistry.controler.getControlerIO().getOutputFilename("personGroupsWalkingDistance.png"));
 	}
 
-	private void writeOccupancyViolationStatisticsGrpah(
+	private void writeOccupancyViolationStatisticsGraph(int iteration, 
 			ParkingOccupancyAnalysis poaWriter) {
 		
-		Controler controler=GlobalRegistry.controler;
-		ParkingOccupancyAnalysis.updateStatisticsForIteration(controler.getIterationNumber(), poaWriter);
+		ParkingOccupancyAnalysis.updateStatisticsForIteration(iteration, poaWriter);
 		String fileName = GlobalRegistry.controler.getControlerIO().getOutputFilename("occupancyViolations.png");
 		ParkingOccupancyAnalysis.writeStatisticsGraph(fileName);
 		
 	}
 
-	private void writeWalkingDistanceStatisticsGraph(){
-		Controler controler=GlobalRegistry.controler;
-		ParkingRoot.getParkingWalkingDistanceGraph().updateStatisticsForIteration(controler.getIterationNumber(), ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance());
+	private void writeWalkingDistanceStatisticsGraph(int iteration){
+		ParkingRoot.getParkingWalkingDistanceGraph().updateStatisticsForIteration(iteration, ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance());
 		String fileName = GlobalRegistry.controler.getControlerIO().getOutputFilename("walkingDistance.png");
 		ParkingRoot.getParkingWalkingDistanceGraph().writeGraphic(fileName);
 	}

@@ -6,7 +6,6 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
 
-import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping;
@@ -47,8 +46,8 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		// this means, scaling in this case is not part of the simulation.
 		// but this would make it difficult.
 
-		// conclution: the scaling within the parking score should be done
-		// directly over the individual function paramters.
+		// conclusion: the scaling within the parking score should be done
+		// directly over the individual function parameters.
 		// the scaling between parking and the rest should be done again on an
 		// individual basis. That parameter can again
 		// be based on the whole situation of the person.
@@ -192,11 +191,11 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		// still get a chance to do that later.
 		// - pakrings, which have similar scores get selected at random!!! (e.g. within range of 10%)
 		
-		int iterationNumber=GlobalRegistry.controler.getIterationNumber();
-		int startingPhaseIterations=5;
-		if (iterationNumber<startingPhaseIterations){
+//		int iterationNumber=GlobalRegistry.controler.getIterationNumber();
+//		int startingPhaseIterations=5;
+//		if (iterationNumber<startingPhaseIterations){
 			//weightedScore=weightedScore*MatsimRandom.getRandom().nextDouble()*(1-(iterationNumber)/(startingPhaseIterations+1));
-		}
+//		}
 		
 		return weightedScore*penaltyScoreNorm;
 	}

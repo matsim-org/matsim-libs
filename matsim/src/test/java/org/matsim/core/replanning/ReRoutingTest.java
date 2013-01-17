@@ -66,6 +66,8 @@ public class ReRoutingTest extends MatsimTestCase {
 
 	static public class TestControler extends Controler {
 
+		boolean mobsimRan = false;
+		
 		public TestControler(final Scenario scenario) {
 			super(scenario);
 		}
@@ -86,12 +88,13 @@ public class ReRoutingTest extends MatsimTestCase {
 
 		@Override
 		protected void runMobSim() {
-			if (getIterationNumber() == 0) {
-				/* only run mobsim in iteration 0, afterwards we're no longer interested
+			if (!this.mobsimRan) {
+				/* only run mobsim once, afterwards we're no longer interested
 				 * in it as we have our plans-file to compare against to check the
 				 * replanning.
 				 */
 				super.runMobSim();
+				this.mobsimRan = true;
 			} else {
 				log.info("skipping mobsim, as it is not of interest in this iteration.");
 			}

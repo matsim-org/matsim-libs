@@ -31,15 +31,15 @@ public abstract class ParkingAnalysisHandler {
 
 	protected Controler controler;
 	
-	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure){
-		parkingOccupancy.writeOutParkingOccupanciesTxt(controler,parkingInfrastructure);
-		parkingOccupancy.writeOutParkingOccupancySumPng(controler);
+	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure, int iteration){
+		parkingOccupancy.writeOutParkingOccupanciesTxt(controler,parkingInfrastructure, iteration);
+		parkingOccupancy.writeOutParkingOccupancySumPng(controler, iteration);
 	}
 	
-	public abstract void processParkingWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog);
+	public abstract void processParkingWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog, int iteration);
 	
-	public abstract void processParkingSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog);
-	public abstract void processParkingCost(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog);
+	public abstract void processParkingSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog, int iteration);
+	public abstract void processParkingCost(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog, int iteration);
 
 	public abstract void printShareOfCarUsers(); 
 }

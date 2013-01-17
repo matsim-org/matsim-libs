@@ -23,9 +23,8 @@ package occupancy;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
-//import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-//import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
@@ -39,6 +38,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
+//import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+//import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
@@ -113,7 +114,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 		ActivityFacilities facilities = controler.getFacilities();
 
 		if (event.getIteration() % 10 == 0) {
-			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getControler().getIterationNumber()), event.getIteration(),
+			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),
 					facilityOccupancies);
 		}
 

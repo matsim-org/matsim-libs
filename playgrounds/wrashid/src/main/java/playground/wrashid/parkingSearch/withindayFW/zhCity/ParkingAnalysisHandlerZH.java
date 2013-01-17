@@ -22,7 +22,6 @@ package playground.wrashid.parkingSearch.withindayFW.zhCity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,14 +41,11 @@ import org.matsim.core.controler.Controler;
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 import playground.wrashid.parkingSearch.withindayFW.analysis.ParkingAnalysisHandler;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
-import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 
@@ -103,10 +99,10 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 	// TODO: remove parkingInfrasturcutre variable (use
 	// this.parkingInfrastructure instead)
 	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(ParkingOccupancyStats parkingOccupancy,
-			ParkingInfrastructure parkingInfrastructure) {
-		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+			ParkingInfrastructure parkingInfrastructure, int iteration) {
+		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancyCountsComparison.png");
-		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancyCountsComparison.txt");
 
 		HashMap<String, String> mappingOfParkingNameToParkingId = SingleDayGarageParkingsCount
@@ -165,10 +161,10 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		GeneralLib.writeMatrix(matrix, iterationFilenameTxt, txtFileHeader);
 	}
 
-	private void writeOutGraphParkingTypeOccupancies(ParkingOccupancyStats parkingOccupancy) {
-		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+	private void writeOutGraphParkingTypeOccupancies(ParkingOccupancyStats parkingOccupancy, int iteration) {
+		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancyByParkingTypes.png");
-		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancyByParkingTypes.txt");
 
 		int numberOfColumns = 4;
@@ -219,28 +215,28 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 	@Override
 	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy,
-			ParkingInfrastructure parkingInfrastructure) {
-		super.updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure);
-		writeOutGraphComparingSumOfSelectedParkingsToCounts(parkingOccupancy, parkingInfrastructure);
-		writeOutGraphParkingTypeOccupancies(parkingOccupancy);
+			ParkingInfrastructure parkingInfrastructure, int iteration) {
+		super.updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure, iteration);
+		writeOutGraphComparingSumOfSelectedParkingsToCounts(parkingOccupancy, parkingInfrastructure, iteration);
+		writeOutGraphParkingTypeOccupancies(parkingOccupancy, iteration);
 
-		logPeakUsageOfParkingTypes(parkingOccupancy, parkingInfrastructure);
+		logPeakUsageOfParkingTypes(parkingOccupancy, parkingInfrastructure, iteration);
 
 		if (GlobalParkingSearchParams.getScenarioId() == 2) {
 			ParkingCostOptimizerZH parkingCostCalculator = (ParkingCostOptimizerZH) this.parkingInfrastructure
 					.getParkingCostCalculator();
 
-			parkingCostCalculator.logParkingPriceStats(controler);
+			parkingCostCalculator.logParkingPriceStats(controler, iteration);
 			parkingCostCalculator.updatePrices(parkingOccupancy);
 		}
 
-		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())) {
-			writeUnusedParking(parkingOccupancy, parkingInfrastructure);
+		if (GlobalParkingSearchParams.writeDetailedOutput(iteration)) {
+			writeUnusedParking(parkingOccupancy, parkingInfrastructure, iteration);
 		}
 
 	}
 
-	private void writeUnusedParking(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure2) {
+	private void writeUnusedParking(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure2, int iteration) {
 		IntegerValueHashMap<Id> unusedCapacityStreetParking = new IntegerValueHashMap<Id>();
 		IntegerValueHashMap<Id> unusedCapacityGarageParking = new IntegerValueHashMap<Id>();
 		IntegerValueHashMap<Id> unusedCapacityPrivateParking = new IntegerValueHashMap<Id>();
@@ -266,18 +262,18 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 			}
 		}
 		
-		writeUnusedParkingHistogram("StreetParking", unusedCapacityStreetParking);
-		writeUnusedParkingHistogram("GarageParking", unusedCapacityGarageParking);
-		writeUnusedParkingHistogram("PrivateParking", unusedCapacityPrivateParking);
+		writeUnusedParkingHistogram("StreetParking", unusedCapacityStreetParking, iteration);
+		writeUnusedParkingHistogram("GarageParking", unusedCapacityGarageParking, iteration);
+		writeUnusedParkingHistogram("PrivateParking", unusedCapacityPrivateParking, iteration);
 	}
 
-	private void writeUnusedParkingHistogram(String parkingType, IntegerValueHashMap<Id> unusedParkingCapacity) {
+	private void writeUnusedParkingHistogram(String parkingType, IntegerValueHashMap<Id> unusedParkingCapacity, int iteration) {
 		double[] values = Collections.convertIntegerCollectionToDoubleArray(unusedParkingCapacity.values());
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 				"unusedParkingHistogramm"+ parkingType + ".png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
-				"Histogram "+ parkingType + " Unused Parking - It." + controler.getIterationNumber(), "number of unused Parking",
+				"Histogram "+ parkingType + " Unused Parking - It." + iteration, "number of unused Parking",
 				"number of parking facilities");
 		
 	}
@@ -288,7 +284,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 	// parking type is
 	// TODO: remove parkingInfrasturcutre variable (use
 	// this.parkingInfrastructure instead)
-	private void logPeakUsageOfParkingTypes(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure) {
+	private void logPeakUsageOfParkingTypes(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure, int iteration) {
 
 		int numberOfStreetParking = 0;
 		int numberOfGarageParking = 0;
@@ -339,7 +335,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 				numberOfPeakPrivateParking += peakUsageOfParking.get(parkingId);
 			}
 		}
-		log.info("iteration-" + controler.getIterationNumber());
+		log.info("iteration-" + iteration);
 		log.info("peak usage street parking:" + numberOfPeakStreetParking / 1.0 / numberOfStreetParking + " - ["
 				+ numberOfPeakStreetParking + "]");
 		log.info("peak usage garage parking:" + numberOfPeakGarageParking / 1.0 / numberOfGarageParking + " - ["
@@ -375,8 +371,8 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 	}
 
 	@Override
-	public void processParkingWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog) {
-		// TODO Auto-generated method stub
+	public void processParkingWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog, int iteration) {
+		
 		LinkedList<Double> streetParkingWalkLegTimes = new LinkedList<Double>();
 		LinkedList<Double> garageParkingWalkLegTimes = new LinkedList<Double>();
 
@@ -398,11 +394,11 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 		double[] values = Collections.convertDoubleCollectionToArray(streetParkingWalkLegTimes);
 
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 				"walkingDistanceHistogrammStp.png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
-				"Histogram Street Parking Walk Time - It." + controler.getIterationNumber(), "walk time [min]",
+				"Histogram Street Parking Walk Time - It." + iteration, "walk time [min]",
 				"number of walk legs");
 
 		//TODO: attention error can occur here, if you have totally strange scenario and values are empty
@@ -411,28 +407,28 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		
 		values = Collections.convertDoubleCollectionToArray(garageParkingWalkLegTimes);
 
-		fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		fileName = controler.getControlerIO().getIterationFilename(iteration,
 				"walkingDistanceHistogrammGp.png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
-				"Histogram Garage Parking Walk Time - It." + controler.getIterationNumber(), "walk time [min]",
+				"Histogram Garage Parking Walk Time - It." + iteration, "walk time [min]",
 				"number of walk legs");
 
-		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())) {
-			writeWalkTimes(parkingWalkTimesLog);
+		if (GlobalParkingSearchParams.writeDetailedOutput(iteration)) {
+			writeWalkTimes(parkingWalkTimesLog, iteration);
 		}
 	}
 
-	private void writeWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog) {
+	private void writeWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog, int iteration) {
 		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog = parkingWalkTimesLog;
 
 		String headerLine = "personId\tparkingFacilityId\tbothWayWalkTimeInMinutes";
 		String outputFileName = "walkTimes.txt";
 
-		writeParkingLog(inputLog, headerLine, outputFileName);
+		writeParkingLog(inputLog, headerLine, outputFileName, iteration);
 	}
 
-	private void writeParkingLog(LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog, String headerLine, String outputFileName) {
+	private void writeParkingLog(LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog, String headerLine, String outputFileName, int iteration) {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add(headerLine);
 
@@ -452,13 +448,13 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 			}
 		}
 
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), outputFileName);
+		String fileName = controler.getControlerIO().getIterationFilename(iteration, outputFileName);
 		GeneralLib.writeList(list, fileName);
 	}
 
 	@Override
-	public void processParkingSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog) {
-		// TODO Auto-generated method stub
+	public void processParkingSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog, int iteration) {
+
 		LinkedList<Double> streetParkingSearchTimes = new LinkedList<Double>();
 		LinkedList<Double> garageParkingSearchTimes = new LinkedList<Double>();
 
@@ -477,38 +473,37 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 		double[] values = Collections.convertDoubleCollectionToArray(streetParkingSearchTimes);
 
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 				"searchTimeHistogrammStp.png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
-				"Histogram Street Parking Search Time - It." + controler.getIterationNumber(), "search time [min]",
+				"Histogram Street Parking Search Time - It." + iteration, "search time [min]",
 				"number of parking searches");
 
 		values = Collections.convertDoubleCollectionToArray(garageParkingSearchTimes);
 
-		fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), "searchTimeHistogrammGp.png");
+		fileName = controler.getControlerIO().getIterationFilename(iteration, "searchTimeHistogrammGp.png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
-				"Histogram Garage Parking Search Time - It." + controler.getIterationNumber(), "search time [min]",
+				"Histogram Garage Parking Search Time - It." + iteration, "search time [min]",
 				"number of parking searches");
 
-		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())) {
-			writeSearchTimes(parkingSearchTimeLog);
+		if (GlobalParkingSearchParams.writeDetailedOutput(iteration)) {
+			writeSearchTimes(parkingSearchTimeLog, iteration);
 		}
 	}
 
-	private void writeSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog) {
+	private void writeSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog, int iteration) {
 		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog = parkingSearchTimeLog;
 
 		String headerLine = "personId\tparkingFacilityId\tsearchTimeInMinutes";
 		String outputFileName = "searchTimes.txt";
 
-		writeParkingLog(inputLog, headerLine, outputFileName);
+		writeParkingLog(inputLog, headerLine, outputFileName, iteration);
 	}
 
 	@Override
-	public void processParkingCost(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog) {
-		// TODO Auto-generated method stub
+	public void processParkingCost(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog, int iteration) {
 		LinkedList<Double> streetParkingCost = new LinkedList<Double>();
 		LinkedList<Double> garageParkingCost = new LinkedList<Double>();
 
@@ -527,34 +522,34 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 		double[] values = Collections.convertDoubleCollectionToArray(streetParkingCost);
 
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingCostHistogrammStp.png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
-				"Histogram Street Parking Cost - It." + controler.getIterationNumber(), "cost [chf]",
+				"Histogram Street Parking Cost - It." + iteration, "cost [chf]",
 				"number of parking operations");
 
 		values = Collections.convertDoubleCollectionToArray(garageParkingCost);
 
-		fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), "parkingCostHistogrammGp.png");
+		fileName = controler.getControlerIO().getIterationFilename(iteration, "parkingCostHistogrammGp.png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
-				"Histogram Garage Parking Cost - It." + controler.getIterationNumber(), "cost [chf]",
+				"Histogram Garage Parking Cost - It." + iteration, "cost [chf]",
 				"number of parking operations");
 
-		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())) {
-			writeParkingCostDetails(parkingCostLog);
+		if (GlobalParkingSearchParams.writeDetailedOutput(iteration)) {
+			writeParkingCostDetails(parkingCostLog, iteration);
 		}
 
 	}
 
-	private void writeParkingCostDetails(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog) {
+	private void writeParkingCostDetails(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog, int iteration) {
 		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog = parkingCostLog;
 
 		String headerLine = "personId\tparkingFacilityId\tcost[chf]";
 		String outputFileName = "parkingCostLog.txt";
 
-		writeParkingLog(inputLog, headerLine, outputFileName);
+		writeParkingLog(inputLog, headerLine, outputFileName, iteration);
 	}
 
 	@Override
