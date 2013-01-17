@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package test.java.playground.ssix;
+package playground.ssix;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import main.java.playgrounds.ssix.MyPersonDriverAgentImpl;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -74,6 +72,8 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import playgrounds.ssix.MyPersonDriverAgentImpl;
 
 public class DreieckStreckeSzenarioTest {
 
