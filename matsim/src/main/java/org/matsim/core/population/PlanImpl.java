@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
@@ -69,19 +68,23 @@ public class PlanImpl implements Plan {
 
 	private Customizable customizableDelegate;
 
+	@Deprecated // use methods of interface Person
 	public PlanImpl(final Person person) {
 		this.person = person;
 	}
 
+	@Deprecated // use methods of interface Person
 	public PlanImpl() {
 	}
 
+	@Deprecated // use methods of interface Person
 	public final ActivityImpl createAndAddActivity(final String type, final Coord coord) {
 		ActivityImpl a = new ActivityImpl(type, coord);
 		getPlanElements().add(a);
 		return a;
 	}
 
+	@Deprecated // use methods of interface Person
 	public final ActivityImpl createAndAddActivity(final String type) {
 		ActivityImpl a = new ActivityImpl(type);
 		getPlanElements().add(a);
@@ -89,6 +92,7 @@ public class PlanImpl implements Plan {
 	}
 
 
+	@Deprecated // use methods of interface Person
 	public final ActivityImpl createAndAddActivity(final String type, final Id linkId) {
 		ActivityImpl a = new ActivityImpl(type, linkId);
 		getPlanElements().add(a);
@@ -99,6 +103,7 @@ public class PlanImpl implements Plan {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // use methods of interface Plan
 	public LegImpl createAndAddLeg(final String mode) {
 		verifyCreateLeg();
 		LegImpl leg = new LegImpl(mode);

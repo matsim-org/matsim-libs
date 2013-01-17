@@ -26,6 +26,14 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
+/**
+ * Some comments:<ul>
+ * <li> When we developed the API, we were afraid of potentially inconsistent Coord, LinkId and FacilityId.
+ * As a result, one can set the Activity either from Coord or from LinkId, but not from both.  The FacilityId cannot be set at all
+ * (in the API).
+ * </ul>
+ *
+ */
 public class ActivityImpl implements Activity {
 
 	private double endTime = Time.UNDEFINED_TIME;

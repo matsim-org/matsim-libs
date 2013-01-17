@@ -73,6 +73,7 @@ public class PersonImpl implements Person {
 		return this.plans.add(plan);
 	}
 
+	@Deprecated // use methods of interface Person
 	public PlanImpl createAndAddPlan(final boolean selected) {
 		PlanImpl p = new PlanImpl(this);
 		this.addPlan(p);

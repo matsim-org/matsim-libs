@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 
@@ -37,9 +38,9 @@ public class ActivityOptionImpl implements ActivityOption {
 	private final ActivityFacilityImpl facility;
 	private Map<DayType, SortedSet<OpeningTime>> opentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
 
-	public ActivityOptionImpl(final String type, final ActivityFacilityImpl facility) {
+	public ActivityOptionImpl(final String type, final ActivityFacility facility) {
 		this.type = type;
-		this.facility = facility;
+		this.facility = (ActivityFacilityImpl) facility;
 		if (this.facility == null) { Gbl.errorMsg("facility=null not allowed!"); }
 	}
 
