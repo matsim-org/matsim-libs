@@ -27,6 +27,7 @@ import org.matsim.core.config.Module;
 
 public class LocationChoiceConfigGroup extends Module {
 
+	public static enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct }
 	public static final String GROUP_NAME = "locationchoice";
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
 	private static final String RESTR_FCN_EXP = "restraintFcnExp";
@@ -70,7 +71,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String radius = "null";
 	private String flexible_types = "null";
 		
-	private String algorithm = "null";
+	private Algotype algorithm ;
 	private String tt_approximationLevel = "0";
 	private String maxDistanceEpsilon = "-1.0";
 	private String planSelector = "SelectExpBeta";
@@ -128,7 +129,7 @@ public class LocationChoiceConfigGroup extends Module {
 			return getFlexibleTypes();
 		}
 		if (ALGO.equals(key)) {
-			return getAlgorithm();
+			throw new RuntimeException("getValue access disabled; used direct getter. kai, jan'13") ;
 		}
 		if (TT_APPROX_LEVEL.equals(key)) {
 			return getTravelTimeApproximationLevel();
@@ -236,13 +237,19 @@ public class LocationChoiceConfigGroup extends Module {
 				setFlexibleTypes(value);
 			}
 		} else if (ALGO.equals(key)) {
-			if (!(value.equals("localSearchRecursive") || value.equals("localSearchSingleAct") 
-					|| value.equals("random") || value.equals("bestResponse"))) {
-				log.warn("define algorithm: 'localSearchRecursive', 'localSearchSingleAct', 'random', 'bestResponse'. Set to default value 'random' now");
-			}
-			else {
-				setAlgorithm(value);
-			}
+//			if (!(value.equals("localSearchRecursive") || value.equals("localSearchSingleAct") 
+//					|| value.equals("random") || value.equals("bestResponse"))) {
+//			}
+//			else {
+				for ( Algotype algo : Algotype.values() ) {
+					if ( algo.toString().equalsIgnoreCase(value) ) {
+						setAlgorithm(algo) ; 
+						return ;
+					}
+				}
+				log.warn("define algorithm: 'localSearchRecursive', 'localSearchSingleAct', 'random', 'bestResponse'. Setting to default value 'random' now");
+				setAlgorithm(Algotype.random) ;
+//			}
 		} else if (TT_APPROX_LEVEL.equals(key)) {
 			if (!(value.equals("0") || value.equals("1") || value.equals("2"))) {
 				log.warn("set travel time approximation level to 0, 1 or 2. Set to default value '0' now (no approximation)");
@@ -358,7 +365,8 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, CENTER_NODE);
 		this.addParameterToMap(map, RADIUS);
 		this.addParameterToMap(map, FLEXIBLE_TYPES);
-		this.addParameterToMap(map, ALGO);
+//		this.addParameterToMap(map, ALGO);
+		map.put(ALGO, this.getAlgorithm().toString()  ) ;
 		this.addParameterToMap(map, TT_APPROX_LEVEL);
 		this.addParameterToMap(map, MAXDISTANCEEPSILON);
 		this.addParameterToMap(map, PLANSELECTOR);
@@ -431,10 +439,10 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setFlexibleTypes(final String flexibleTypes) {
 		this.flexible_types = flexibleTypes;
 	}
-	public String getAlgorithm() {
+	public Algotype getAlgorithm() {
 		return algorithm;
 	}
-	public void setAlgorithm(String algorithm) {
+	public void setAlgorithm(Algotype algorithm) {
 		this.algorithm = algorithm;
 	}
 	public String getTravelTimeApproximationLevel() {
