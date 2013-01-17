@@ -71,7 +71,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String radius = "null";
 	private String flexible_types = "null";
 		
-	private Algotype algorithm ;
+	private Algotype algorithm = Algotype.random ;
 	private String tt_approximationLevel = "0";
 	private String maxDistanceEpsilon = "-1.0";
 	private String planSelector = "SelectExpBeta";
