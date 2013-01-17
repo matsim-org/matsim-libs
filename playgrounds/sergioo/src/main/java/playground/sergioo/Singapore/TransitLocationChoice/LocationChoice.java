@@ -27,7 +27,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
@@ -42,7 +41,7 @@ import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -56,10 +55,10 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class LocationChoice extends AbstractMultithreadedModule {
 
-	private static final String RANDOM = "random";
-	private static final String BEST_RESPONSE = "bestResponse";
-	private static final String LOCAL_SEARCH_RECURSIVE = "localSearchRecursive";
-	private static final String LOCAL_SEARCH_SINGLE_ACT = "localSearchSingleAct";
+//	private static final String RANDOM = "random";
+//	private static final String BEST_RESPONSE = "bestResponse";
+//	private static final String LOCAL_SEARCH_RECURSIVE = "localSearchRecursive";
+//	private static final String LOCAL_SEARCH_SINGLE_ACT = "localSearchSingleAct";
 
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
@@ -92,8 +91,8 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());
 
 		//only compute oa for best response module
-		String algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
-		if (algorithm.equals(BEST_RESPONSE)) {
+		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+		if (algorithm.equals(Algotype.bestResponse)) {
 			this.createEpsilonScaleFactors();
 			this.createObjectAttributes(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
 			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues, this.scenario.getConfig().locationchoice());
@@ -189,9 +188,10 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	
 	@Override
 	protected void afterFinishReplanningHook() {
-		String algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
 		
-		if (algorithm.equals("localSearchRecursive") || algorithm.equals("localSearchSingleAct")) {
+//		if (algorithm.equals("localSearchRecursive") || algorithm.equals("localSearchSingleAct")) {
+		if ( algorithm.equals(Algotype.localSearchRecursive) || algorithm.equals(Algotype.localSearchSingleAct) ) {
 			int unsuccessfull = 0;
 			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
@@ -215,23 +215,32 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {		
 		// this is the way location choice should be configured ...
-		String algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
-		if (algorithm.equals(RANDOM)) {
+		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+		switch ( algorithm ) {
+		case random:
+//		if (algorithm.equals(RANDOM)) {
 			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-		} else if (algorithm.equals(BEST_RESPONSE)) {
+			break; 
+		case bestResponse:
+//		} else if (algorithm.equals(BEST_RESPONSE)) {
 			// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 			this.planAlgoInstances.add(new BestResponseLocationMutator(this.scenario,   
 					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
 					this.scaleEpsilon, this.actTypeConverter, this.sampler, this.getReplanningContext()));
-		} else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
+			break;
+		case localSearchRecursive:
+//			} else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
 			this.planAlgoInstances.add(new RecursiveLocationMutator(this.scenario, this.getReplanningContext().getTripRouterFactory().createTripRouter(),  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-		} else if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
+			break;
+	case localSearchSingleAct:
+//			} else if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
 			this.planAlgoInstances.add(new SingleActLocationMutator(this.scenario, this.quadTreesOfType, 
 					this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-		} else {
-			throw new RuntimeException("Location choice configuration error: Please specify a location choice algorithm.");
+			break;
+//	} else {
+//			throw new RuntimeException("Location choice configuration error: Please specify a location choice algorithm.");
 		}		
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}

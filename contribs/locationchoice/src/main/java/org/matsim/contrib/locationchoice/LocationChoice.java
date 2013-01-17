@@ -42,6 +42,7 @@ import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -55,12 +56,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class LocationChoice extends AbstractMultithreadedModule {
 
-	private static final String RANDOM = "random";
-	private static final String BEST_RESPONSE = "bestResponse";
-	private static final String LOCAL_SEARCH_RECURSIVE = "localSearchRecursive";
-	private static final String LOCAL_SEARCH_SINGLE_ACT = "localSearchSingleAct";
-
-
+//	private static final String RANDOM = "random";
+//	private static final String BEST_RESPONSE = "bestResponse";
+//	private static final String LOCAL_SEARCH_RECURSIVE = "localSearchRecursive";
+//	private static final String LOCAL_SEARCH_SINGLE_ACT = "localSearchSingleAct";
+	
 	/**
 	 * yyyy It is unclear to me why we need this as a collection and not just as a variable.  kai, dec'12
 	 */
@@ -95,10 +95,11 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());
 
 		//only compute oa for best response module
-		String algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
-		if (algorithm.equals(BEST_RESPONSE)) {
+		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+//		if (algorithm.equals(BEST_RESPONSE)) {
+		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(algorithm)) {
 			this.createEpsilonScaleFactors();
-			this.createObjectAttributes(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
+			this.createObjectAttributesAndReadOrCreateEpsilons(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
 			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues, this.scenario.getConfig().locationchoice());
 		}
 	}
@@ -115,7 +116,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.scaleEpsilon = this.defineFlexibleActivities.createScaleEpsilon();
 	}
 
-	private void createObjectAttributes(long seed) {
+	private void createObjectAttributesAndReadOrCreateEpsilons(long seed) {
 		this.personsMaxEpsUnscaled = new ObjectAttributes();
 
 
@@ -127,19 +128,21 @@ public class LocationChoice extends AbstractMultithreadedModule {
 				attributesReader.parse(maxEpsValues);
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
-				this.computeAttributes(seed);
+				this.computeEpsilons(seed);
 			}
 		}
 		else {
-			this.computeAttributes(seed);
+			this.computeEpsilons(seed);
 		}
 	}
 
-	private void computeAttributes(long seed) {
+	private void computeEpsilons(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
 				seed, (ScenarioImpl) this.scenario, this.scenario.getConfig(), 
 				this.scaleEpsilon, this.actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
+
 		computer.run();
+
 		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
@@ -165,19 +168,23 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 	@Override
 	protected void afterFinishReplanningHook() {
-		String algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
 
-		if (algorithm.equals(LOCAL_SEARCH_RECURSIVE) || algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
+//		if (algorithm.equals(LOCAL_SEARCH_RECURSIVE) || algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
+		if ( LocationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 
+				|| LocationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
 			int unsuccessfull = 0;
 			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
 				PlanAlgorithm plan_algo = planAlgo_it.next();
 
-				if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
+//				if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
+				if ( LocationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
 					unsuccessfull += ((SingleActLocationMutator)plan_algo).getNumberOfUnsuccessfull();
 					((SingleActLocationMutator)plan_algo).resetUnsuccsessfull();
 				}
-				else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
+//				else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
+				else if ( LocationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) ) {
 					unsuccessfull += ((RecursiveLocationMutator)plan_algo).getNumberOfUnsuccessfull();
 					((RecursiveLocationMutator)plan_algo).resetUnsuccsessfull();
 				}
@@ -190,11 +197,15 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {		
 		// this is the way location choice should be configured ...
-		String algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
-		if (algorithm.equals(RANDOM)) {
+		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+		switch ( algorithm ) {
+		case random:
+//		if (algorithm.equals(RANDOM)) {
 			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-		} else if (algorithm.equals(BEST_RESPONSE)) {
+			break ;
+		case bestResponse:
+//		} else if (algorithm.equals(BEST_RESPONSE)) {
 			// this one corresponds to the "frozen epsilon" paper(s)
 			
 			// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
@@ -207,15 +218,19 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			this.planAlgoInstances.add(new BestResponseLocationMutator(this.scenario,   
 					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
 					this.scaleEpsilon, this.actTypeConverter, this.sampler, this.getReplanningContext()));
-			
-		} else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
+			break ;
+		case localSearchRecursive:
+//		} else if (algorithm.equals(LOCAL_SEARCH_RECURSIVE)) {
 			this.planAlgoInstances.add(new RecursiveLocationMutator(this.scenario, this.getReplanningContext().getTripRouterFactory().createTripRouter(),  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-		} else if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
+			break ;
+		case localSearchSingleAct:
+//		} else if (algorithm.equals(LOCAL_SEARCH_SINGLE_ACT)) {
 			this.planAlgoInstances.add(new SingleActLocationMutator(this.scenario, this.quadTreesOfType, 
 					this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-		} else {
-			throw new RuntimeException("Location choice configuration error: Please specify a location choice algorithm.");
+			break ;
+//		} else {
+//			throw new RuntimeException("Location choice configuration error: Please specify a location choice algorithm.");
 		}		
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
