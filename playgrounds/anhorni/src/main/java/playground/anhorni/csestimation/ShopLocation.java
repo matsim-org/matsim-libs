@@ -73,7 +73,8 @@ public class ShopLocation extends Location {
 		return price;
 	}
 	public void setSize(int size) {
-		this.size = size;
+		// invert size by category
+		this.size = 6 - size;
 	}
 	public void setPrice(int price) {
 		this.price = price;

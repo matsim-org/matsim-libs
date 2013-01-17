@@ -60,12 +60,12 @@ public class ShopsEnricher {
 	}
 
 	/*
-	471901	Warenhäuser
-	471101	Verbrauchermärkte (> 2500 m2)
-	471102	Grosse Supermärkte (1000-2499 m2)
-	471103	Kleine Supermärkte (400-999 m2)
-	471104	Grosse Geschäfte (100-399 m2)
-	471105	Kleine Geschäfte (< 100 m2)
+	471901	0	Warenhäuser
+	471101	1	Verbrauchermärkte (> 2500 m2)
+	471102	2	Grosse Supermärkte (1000-2499 m2)
+	471103	3	Kleine Supermärkte (400-999 m2)
+	471104	4	Grosse Geschäfte (100-399 m2)
+	471105	5	Kleine Geschäfte (< 100 m2)
 	*/	
 	private void readBZ(String bzFile) throws Exception {
 		FileReader fr = new FileReader(bzFile);
