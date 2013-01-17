@@ -33,6 +33,7 @@ import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
 
 /**
  * Social force model according to: D. Helbing, I. Farkas, T. Vicsek,
@@ -65,6 +66,7 @@ public class SocialForceAgent implements Sim2DAgent {
 	private PhysicalSim2DSection currentPSec;
 	
 	private final Neighbors ncalc = new Neighbors();
+	private final Obstacles ocalc = new Obstacles();
 	private final DesiredDirection dd = new DesiredDirection();
 
 	private final float dT;
@@ -108,7 +110,7 @@ public class SocialForceAgent implements Sim2DAgent {
 		}
 		
 		List<Tuple<Float, Sim2DAgent>> neighbors = this.ncalc.computeNeighbors(this);
-		Segment[] obstacles = this.currentPSec.getObstacles();
+		List<Segment> obstacles = this.ocalc.computeObstacles(this);
 
 		
 		float[] e0 = this.dd.computeDesiredDirection(this);
@@ -280,6 +282,7 @@ public class SocialForceAgent implements Sim2DAgent {
 		} else {
 			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], 2*this.r, 192, 0, 64, 128);
 		}
+		this.ocalc.addDebugger(visDebugger);
 		
 	}
 

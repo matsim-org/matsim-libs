@@ -27,7 +27,7 @@ package playground.gregor.sim2d_v4.cgal;
  */
 public abstract class CGAL {
 
-	private static final float EPSILON = 0.0001f;
+	private static final float EPSILON = 0.001f;
 	
 	
 	/**

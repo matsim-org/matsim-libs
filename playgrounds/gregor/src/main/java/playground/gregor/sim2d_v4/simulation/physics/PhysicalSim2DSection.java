@@ -46,7 +46,7 @@ public class PhysicalSim2DSection {
 
 	private final Section sec;
 
-	Segment [] obstacles;
+	List<Segment> obstacles;
 	Segment [] openings;
 
 	Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
@@ -192,7 +192,7 @@ public class PhysicalSim2DSection {
 				obst.add(seg);
 			}
 		}
-		this.obstacles = obst.toArray(new Segment[0]);
+		this.obstacles = obst;
 		this.openings = open.toArray(new Segment[0]);
 
 		Map<Id, ? extends Link> links = this.sim2dsc.getMATSimScenario().getNetwork().getLinks();
@@ -218,7 +218,6 @@ public class PhysicalSim2DSection {
 			li.link = seg;
 			li.dx = dx;
 			li.dy = dy;
-
 			Segment fromOpening = getTouchingSegment(seg.x0,seg.y0, seg.x1,seg.y1,this.openings);
 			Segment toOpening = getTouchingSegment(seg.x1,seg.y1, seg.x0,seg.y0,this.openings);
 			li.fromOpening = fromOpening;
@@ -360,7 +359,7 @@ public class PhysicalSim2DSection {
 		this.neighbors.put(finishLine, psec);
 	}
 
-	public Segment [] getObstacles() {
+	public List<Segment> getObstacles() {
 		return this.obstacles;
 	}
 
