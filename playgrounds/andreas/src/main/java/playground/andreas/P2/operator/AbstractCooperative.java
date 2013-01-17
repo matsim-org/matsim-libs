@@ -55,6 +55,7 @@ public abstract class AbstractCooperative implements Cooperative{
 	private PFranchise franchise;
 	private final double costPerVehicleBuy;
 	protected final double costPerVehicleSell;
+	private final double costPerVehicleAndDay;
 	private final double minOperationTime;
 	
 	protected CoopState coopState;
@@ -68,6 +69,7 @@ public abstract class AbstractCooperative implements Cooperative{
 	protected double budget;
 	protected double score;
 	protected double scoreLastIteration;
+	protected int numberOfVehiclesInReserve;
 	
 	protected PRouteProvider routeProvider;
 	protected int currentIteration;
@@ -77,6 +79,7 @@ public abstract class AbstractCooperative implements Cooperative{
 		this.numberOfIterationsForProspecting = pConfig.getNumberOfIterationsForProspecting();
 		this.costPerVehicleBuy = pConfig.getPricePerVehicleBought();
 		this.costPerVehicleSell = pConfig.getPricePerVehicleSold();
+		this.costPerVehicleAndDay = pConfig.getCostPerVehicleAndDay();
 		this.minOperationTime = pConfig.getMinOperationTime();
 		this.franchise = franchise;
 	}
@@ -89,12 +92,14 @@ public abstract class AbstractCooperative implements Cooperative{
 		this.bestPlan = initialStrategy.run(this);
 		this.testPlan = null;
 		this.numberOfPlansTried = 0;
+		this.numberOfVehiclesInReserve = 0;
 	}
 
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
 		this.scoreLastIteration = this.score;
 		this.score = 0;
 		
+		// score all plans
 		for (PPlan plan : this.getAllPlans()) {
 			scorePlan(driverId2ScoreMap, plan);
 			this.score += plan.getScore();
@@ -102,6 +107,9 @@ public abstract class AbstractCooperative implements Cooperative{
 				route.setDescription(plan.toString(this.budget + this.score));
 			}
 		}
+		
+		// score all vehicles not associated with plans
+		score -= this.numberOfVehiclesInReserve * this.costPerVehicleAndDay;
 		
 		if (this.score > 0.0) {
 			this.coopState = CoopState.INBUSINESS;
@@ -185,6 +193,7 @@ public abstract class AbstractCooperative implements Cooperative{
 		for (PPlan plan : this.getAllPlans()) {
 			numberOfVehicles += plan.getNVehicles();
 		}
+		numberOfVehicles += this.numberOfVehiclesInReserve;
 		return numberOfVehicles;
 	}
 

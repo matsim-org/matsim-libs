@@ -36,10 +36,9 @@ import playground.andreas.P2.routeProvider.PRouteProvider;
 /**
  * This cooperative has multiple plans. Each is weighted by the number of vehicles associated with.
  * The number of vehicles depends on the score per vehicle and plan. In the end, each plan should have approximately the same score.
- * In contrast to {@link MultiPlanCooperative}, this cooperative accepts all plan as blueprint for replanning, again picking one is a weighted random draw.
+ * In contrast to {@link MultiPlanCooperative}, this cooperative accepts all plans as blueprints for replanning, again picking one is a weighted random draw.
  * Vehicle are shifted away from plans instantly, i.e. if a plan scored negative at least one vehicle is removed.
- * There is a car pool for vehicles currently not used. These vehicles are distributed to positive plans and new plans.
- * However, the car pool may increase over time, due to the careful nature of this coop. Cars which cannot used in a reasonable way are not put into service.
+ * Vehicles are distributed to positive plans and new plans.
  * 
  * @author aneumann
  *
@@ -50,7 +49,6 @@ public class CarefulMultiPlanCooperative extends AbstractCooperative{
 	
 	private final int tryouts = 10;
 	
-	private int numberOfVehiclesInReserve = 0;
 	private List<PPlan> plans;
 
 	public CarefulMultiPlanCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
@@ -96,13 +94,6 @@ public class CarefulMultiPlanCooperative extends AbstractCooperative{
 		return this.bestPlan;
 	}
 
-	@Override
-	public int getNumberOfVehiclesOwned() {
-		int numberOfVehicles = super.getNumberOfVehiclesOwned();
-		numberOfVehicles += this.numberOfVehiclesInReserve;
-		return numberOfVehicles;
-	}
-	
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
 		this.currentIteration = iteration;
 		
