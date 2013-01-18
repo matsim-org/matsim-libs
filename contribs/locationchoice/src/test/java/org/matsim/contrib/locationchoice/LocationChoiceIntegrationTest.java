@@ -1,5 +1,6 @@
 package org.matsim.contrib.locationchoice;
 
+import org.junit.Ignore;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,7 +39,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
-	public void testLocationChoiceJan2013() {
+	public void tesLocationChoiceJan2013() {
 		final Config config = localCreateConfig();
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
@@ -67,6 +68,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		for ( int ii=2 ; ii<nNodes+2 ; ii++ ) {
 			double tmp = Math.PI*(ii-1)/nNodes ;
 			Coord coord = new CoordImpl( scale*Math.sin(tmp),scale*Math.cos(tmp) ) ;
+
 			Node node = network.getFactory().createNode(new IdImpl(ii), coord ) ;
 			network.addNode(node) ;
 
