@@ -43,6 +43,8 @@ public class EstimationControler {
 	private TreeMap<Id, ShopLocation> shops;
 	private final static Logger log = Logger.getLogger(EstimationControler.class);
 	
+	private Population zhpopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+	
 	
 	public static void main(String[] args) {
 		EstimationControler c = new EstimationControler();
@@ -97,6 +99,10 @@ public class EstimationControler {
 						if (Integer.toString(start.getPlz()).startsWith("80") && Integer.toString(end.getPlz()).startsWith("80") && 
 								((CoordImpl) shop.getCoord()).calcDistance(act.getCoord()) < 200.0) {
 							person.addShoppingTrip(shoppingTrip);
+							
+							if (this.zhpopulation.getPersons().get(person.getId()) == null) {
+								this.zhpopulation.addPerson(person);
+							}
 						}
 					}
 				}
@@ -107,5 +113,9 @@ public class EstimationControler {
 	private void write(String outdir) {
 		Writer writer = new Writer();
 		writer.write(population, shops, outdir + "/persons.csv", outdir + "stores.csv");
+		
+		log.info("zh population size: " + this.zhpopulation.getPersons().size());
+		SurveyAnalyzer analyzer = new SurveyAnalyzer(this.zhpopulation, outdir);
+		analyzer.analyze();		
 	}	
 }
