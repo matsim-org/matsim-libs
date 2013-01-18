@@ -22,12 +22,12 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -99,7 +99,11 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 */
 	private final VehicleQ<QVehicle> vehQueue;
 
-	private final Map<QVehicle, Double> linkEnterTimeMap = new HashMap<QVehicle, Double>();
+	/**
+	 * This needs to be a ConcurrentHashMap because it can be accessed concurrently from
+	 * two different threads via addFromIntersection(...) and popFirstVehicle().
+	 */
+	private final Map<QVehicle, Double> linkEnterTimeMap = new ConcurrentHashMap<QVehicle, Double>();
 
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
