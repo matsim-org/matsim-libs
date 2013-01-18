@@ -42,11 +42,11 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculator(ttc));
 		LeastCostPathTree lcptDistance = new LeastCostPathTree(ttc, new TravelDistanceCalculator());
 	
-		assert(this.scenario.getNetwork() != null);
+		assert( this.scenario.getNetwork() != null );
 		
 		// get origin node
 		Node origin = this.scenario.getNetwork().getNodes().get(new IdImpl(1));
-		assert(origin != null);
+		assert( origin != null );
 		
 		// get destination node
 		Node destination = this.scenario.getNetwork().getNodes().get(new IdImpl(4));
@@ -55,12 +55,14 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		lcptTime.calculate(this.scenario.getNetwork(), origin, departureTime);
 		double arrivalTime = lcptTime.getTree().get( destination.getId() ).getTime();
 		double travelTime  = lcptTime.getTree().get( destination.getId() ).getCost(); // here cost = traveled time
-		printResults(arrivalTime, travelTime); // travel time = (50s+50s) = 100s
+		printResults(arrivalTime, travelTime); // travel time = cost = (50s+50s) = 100s
 		// check route (visited nodes should be 1,2,4)
 		List<Id> spTimeVisitedNodes = getVisitedNodes(lcptTime, destination, "Travel Time");
 		Assert.assertTrue( containsNode(spTimeVisitedNodes, this.scenario.createId("2")));
 		// check travel duration
 		Assert.assertTrue( travelTime == 100 );
+		// check travel time
+		Assert.assertTrue( arrivalTime - departureTime == 100 );
 		
 		lcptDistance.calculate(this.scenario.getNetwork(), origin, departureTime);
 		double arrivalTimeTD  = lcptDistance.getTree().get( destination.getId() ).getTime();
@@ -71,6 +73,8 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		Assert.assertTrue( containsNode(spDistenceVisitedNodes, this.scenario.createId("3")));
 		// check travel distance
 		Assert.assertTrue( travelDistance == 100 );
+		// check travel time
+		Assert.assertTrue( arrivalTimeTD - departureTime == 1000 );
 	}
 	
 	private void printResults(double tt, double tc){
@@ -101,7 +105,7 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 	}
 	
 	/**
-	 * true if given node id is part of the list of visted nodes
+	 * true if given node id is part of the list of visited nodes
 	 * @param list
 	 * @param nodeId
 	 * @return boolean
@@ -127,8 +131,8 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 	 */
 	private void createNetwork() {
 		/*
-		 * 
-		 *          (2) 
+		 * 			(2)
+		 *         /   \
 		 *        /     \
 		 *(10m/s)/       \(10m/s)
 		 *(500m)/	      \(500m)
