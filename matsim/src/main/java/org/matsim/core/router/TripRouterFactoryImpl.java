@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -61,17 +60,6 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 	private final PopulationFactory populationFactory;
 	private final TransitRouterFactory transitRouterFactory;
 	private final TransitSchedule transitSchedule;
-
-	public TripRouterFactoryImpl(final Controler controler) {
-		this(
-				controler.getScenario(),
-				controler.getTravelDisutilityFactory(),
-				controler.getLinkTravelTimes(),
-				controler.getLeastCostPathCalculatorFactory(),
-				controler.getScenario().getConfig().scenario().isUseTransit() ?
-					controler.getTransitRouterFactory() :
-					null);
-	}
 
 	public TripRouterFactoryImpl(
 			final Scenario scenario,

@@ -49,7 +49,13 @@ public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 			final HitchHikingSpots spots,
 			final SpotWeighter spotWeighter,
 			final HitchHikingConfigGroup config) {
-		super( controler );
+		super(controler.getScenario(),
+				controler.getTravelDisutilityFactory(),
+				controler.getLinkTravelTimes(),
+				controler.getLeastCostPathCalculatorFactory(),
+				controler.getScenario().getConfig().scenario().isUseTransit() ?
+					controler.getTransitRouterFactory() :
+					null);
 		this.controler = controler;
 		this.spotWeighter = spotWeighter;
 		this.spots = spots;

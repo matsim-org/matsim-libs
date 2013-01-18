@@ -591,7 +591,12 @@ public class Controler extends AbstractController {
 		}
 	
 		if ( getUseTripRouting() && tripRouterFactory == null ) {
-			tripRouterFactory = new TripRouterFactoryImpl( this );
+			tripRouterFactory = new TripRouterFactoryImpl(
+					getScenario(),
+					getTravelDisutilityFactory(),
+					getLinkTravelTimes(),
+					getLeastCostPathCalculatorFactory(),
+					getScenario().getConfig().scenario().isUseTransit() ? getTransitRouterFactory() : null);
 	
 			if ( config.multiModal().isMultiModalSimulationEnabled() ) {
 				tripRouterFactory = new MultimodalSimulationTripRouterFactory(
