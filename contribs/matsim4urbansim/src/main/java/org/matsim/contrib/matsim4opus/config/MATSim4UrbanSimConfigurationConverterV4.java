@@ -82,6 +82,9 @@ import org.matsim.contrib.matsim4opus.utils.io.Paths;
  * - switched matsim4urbansim config v2 parameters from v3 are out sourced into external matsim config
  * - introducing pseudo pt (configurable via external MATSim config)
  * - introducing new strategy module "changeSingeLegMode" (configurable via external MATSim config)
+ * 
+ * changes jan'13
+ * - added attributes for pt stop, travel times and distances input files 
  *
  */
 public class MATSim4UrbanSimConfigurationConverterV4 {
@@ -102,6 +105,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	// parameter names in matsim4urbansimParameter module
 	private static final String TIME_OF_DAY = "timeOfDay";								
 	private static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
+	private static final String PT_STOPS = "ptStops";
+	private static final String PT_TRAVEL_TIMES = "ptTravelTimes";
+	private static final String PT_TRAVEL_Distances = "ptTravelDistances";
 	private static final String BETA_BIKE_TRAVEL_TIME = "betaBikeTravelTime";
 	private static final String BETA_BIKE_TRAVEL_TIME_POWER2 = "betaBikeTravelTimePower2";
 	private static final String BETA_BIKE_LN_TRAVEL_TIME = "betaBikeLnTravelTime";
@@ -378,6 +384,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		}
 		
 		double timeOfDay						= 8 * 3600.;
+		String ptStops							= null;
+		String ptTravelTimes					= null;
+		String ptTravelDistances				= null;
 		if(matsim4UrbanSimModule != null){
 			try{
 				double tmp = Double.parseDouble( matsim4UrbanSimModule.getValue(TIME_OF_DAY) );
@@ -391,8 +400,30 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 				log.info("<param name=\"timeOfDay\" value=\"28800\" />");
 				log.info("</module>");
 			}
+			
+			ptStops = matsim4UrbanSimModule.getValue(PT_STOPS);
+			if( ptStops != null && Paths.pathExsits(ptStops))
+				log.info("Found pt stop input file: " + ptStops);
+			else{
+				ptStops = null;
+				log.warn("No pt stop input file found!!!");
+			}
+			
+			ptTravelTimes = matsim4UrbanSimModule.getValue(PT_TRAVEL_TIMES);
+			ptTravelDistances =  matsim4UrbanSimModule.getValue(PT_TRAVEL_Distances);
+			
+			if( ptTravelTimes != null && Paths.pathExsits(ptTravelTimes) && 
+				ptTravelDistances != null && Paths.pathExsits(ptTravelDistances)){
+				log.info("Found pt travel time input file: " + ptTravelTimes);
+				log.info("Found pt travel distance input file: " + ptTravelDistances);
+			}
+			else{
+				log.warn("Either no pt travel time or distance input file found! Both files needs to be set to use precomputed pt times and distances.");
+				ptTravelTimes = null;
+				ptTravelDistances = null;
+			}
 		}
-
+		
 		// set parameter in module 
 		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
 		module.setAgentPerformance(computeAgentPerformanceFeedback);
@@ -409,6 +440,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		module.setBoundingBoxRight(boundingBoxRight);
 		module.setBoundingBoxTop(boundingBoxTop);
 		module.setTimeOfDay(timeOfDay);
+		module.setPtStopsInputFile(ptStops);
+		module.setPtTravelTimesInputFile(ptTravelTimes);
+		module.setPtTravelDistancesInputFile(ptTravelDistances);
 		
 		// view results
 		log.info("MATSim4UrbanSimControler settings:");
@@ -425,6 +459,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
 		log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
 		log.info("Time of day: " + module.getTimeOfDay() );
+		log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
+		log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
+		log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
 	}
 	
 	private void initAccessibilityParameter(Matsim4UrbansimType matsim4UrbanSimParameter){

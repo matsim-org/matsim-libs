@@ -51,6 +51,12 @@ import org.apache.log4j.Logger;
  * - Other improvements:
  * 	For a better readability some functionality is out-sourced into helper classes
  * 
+ * improvements jan'13:
+ * 
+ * - The MATSim4URbanSim zone version now supports warm and hot start, i.e. it is possible to reuse a plans file from a previous MATSim run. 
+ *  The plans file will be merged with the current UrbanSim population. This means, persons that emigrated, moved into a new home, 
+ *  changed their employment status or got a new job are getting new plans.
+ * 
  */
 public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 

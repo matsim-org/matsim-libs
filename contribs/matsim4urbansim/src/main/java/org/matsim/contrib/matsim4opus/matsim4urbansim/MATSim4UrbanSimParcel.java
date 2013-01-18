@@ -28,14 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-
 import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
@@ -44,12 +36,21 @@ import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.router.MATSim4UrbanSimRouterFactoryImpl;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.BackupMATSimOutput;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -224,7 +225,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		// read UrbanSim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		
-		MATSim4UrbanSimControlerConfigModuleV3 m4uModule = getMATSim4UrbaSimControlerConfig();
+		MATSim4UrbanSimControlerConfigModuleV3 m4uModule = getMATSim4UrbanSimControlerConfig();
 		UrbanSimParameterConfigModuleV3 uspModule		 = getUrbanSimParameterConfig();
 		
 		
@@ -273,6 +274,20 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(true);	// sets, whether output Graphs are created
 		
+		PtMatrix ptMatrix = null;
+		if(getMATSim4UrbanSimControlerConfig().getPtStopsInputFile() != null){
+			log.info("An input files with pt stops is privided. Using MATSim4UrbanSim router ...");
+			// if ptStops etc are given in config
+			ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
+									controler.getScenario().getConfig().plansCalcRoute().getWalkSpeed(),
+									controler.getScenario().getConfig().plansCalcRoute().getPtSpeed(),
+									controler.getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactor(),
+									getMATSim4UrbanSimControlerConfig());	
+			controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
+		}
+		else
+			log.warn("No input file for pt stops given. Using MATSim default router ...");
+			
 		log.info("Adding controler listener ...");
 		addControlerListener(zones, parcels, controler);
 		addFurtherControlerListener(controler, parcels);
@@ -396,7 +411,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	void setControlerSettings(ScenarioImpl scenario, String[] args) {
 
 		AccessibilityParameterConfigModule moduleAccessibility = getAccessibilityParameterConfig();
-		MATSim4UrbanSimControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbaSimControlerConfig();
+		MATSim4UrbanSimControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbanSimControlerConfig();
 		
 		this.opportunitySampleRate 		= moduleAccessibility.getAccessibilityDestinationSamplingRate();
 
@@ -502,7 +517,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 * access to MATSim4UrbanSimControlerConfigModuleV3 and related parameter settings
 	 * @return MATSim4UrbanSimControlerConfigModuleV3
 	 */
-	MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig() {
+	MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbanSimControlerConfig() {
 		Module m = this.scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
 			return (MATSim4UrbanSimControlerConfigModuleV3) m;

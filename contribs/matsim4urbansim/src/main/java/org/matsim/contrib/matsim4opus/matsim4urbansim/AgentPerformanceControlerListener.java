@@ -3,6 +3,7 @@ package org.matsim.contrib.matsim4opus.matsim4urbansim;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -11,15 +12,14 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
+import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimPersonCSVWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
-
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
-import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimPersonCSVWriter;
 
 /**
  * implements agent-based performance feedback for UrbanSim population (time spent traveling, money spent traveling, etc.)
@@ -37,7 +37,7 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 		this.benchmark = benchmark;
 		// writing agent performances continuously into "persons.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
-		// data set table. THIS PRODUCES URBANSIM INPUT
+		// data set table. THIS PRODUCES INPUT FOR URBANSIM 
 		UrbanSimPersonCSVWriter.initUrbanSimPersonWriter();
 	}
 	
@@ -48,6 +48,11 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 	public void notifyShutdown(ShutdownEvent event) {
 		
 		int benchmarkID = this.benchmark.addMeasure("Agent performance controler");
+		
+		long carModeCounter = 0;
+		long ptModeCounter  = 0;
+		long bicycleModeCounter=0;
+		long walkModeCounter= 0;
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
@@ -90,28 +95,44 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 					else
 						isHomeActivity = false;
 				}
-				else if(pe instanceof Leg){
+				else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					//mode
+					// mode
 					mode = ((Leg) pe).getMode();
-					// if pe is a leg
-					Route route = leg.getRoute();
-					// tnicolai: or should we use route.getDistance ???
-					double distance = RouteUtils.calcDistance( (NetworkRoute)route ,network); 
-					if(isHomeActivity){
-						distance_home_work_meter = distance;
-						// to get minutes in time format mm:ss use TimeUtil.convertSeconds2Minutes(leg.getTravelTime()); 
-						// or see org.matsim.core.utils.misc.Time
-						duration_home_work_min   = leg.getTravelTime() / 60.;
+					
+					double distance = -1.;
+					if (mode.equalsIgnoreCase(TransportMode.car)) {
+						// if pe is a leg
+						Route route = leg.getRoute();
+						distance = RouteUtils.calcDistance(
+								(NetworkRoute) route, network);
 					}
-					else{
-						distance_work_home_meter = distance;
-						// to get minutes in time format mm:ss use TimeUtil.convertSeconds2Minutes(leg.getTravelTime()); 
+					if (isHomeActivity) {
+						distance_home_work_meter = distance;
+						// to get minutes in time format mm:ss use
+						// TimeUtil.convertSeconds2Minutes(leg.getTravelTime());
 						// or see org.matsim.core.utils.misc.Time
-						duration_work_home_min	 = leg.getTravelTime() / 60.;
+						duration_home_work_min = leg.getTravelTime() / 60.;
+					} else {
+						distance_work_home_meter = distance;
+						// to get minutes in time format mm:ss use
+						// TimeUtil.convertSeconds2Minutes(leg.getTravelTime());
+						// or see org.matsim.core.utils.misc.Time
+						duration_work_home_min = leg.getTravelTime() / 60.;
 					}
 				}
 			}
+			// update counter
+			if(mode.equalsIgnoreCase(TransportMode.car))
+				carModeCounter++;
+			else if(mode.equalsIgnoreCase(TransportMode.pt))
+				ptModeCounter++;
+			else if (mode.equalsIgnoreCase(TransportMode.bike))
+				bicycleModeCounter++;
+			else if (mode.equalsIgnoreCase(TransportMode.walk))
+				walkModeCounter++;
+			
+			// write current person dates into UrbanSim input table
 			write(duration_home_work_min, distance_home_work_meter,
 				  duration_work_home_min, distance_work_home_meter, 
 				  mode, p);
@@ -124,6 +145,13 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 		}
 		// close writer
 		UrbanSimPersonCSVWriter.close();
+		
+		log.info("Used transport modes ...");
+		log.info("Car " + carModeCounter);
+		log.info("Pt " + ptModeCounter);
+		log.info("Bicycle " + bicycleModeCounter);
+		log.info("Walk " + walkModeCounter);
+		
 		// print computation time 
 		if (this.benchmark != null && benchmarkID > 0) {
 			this.benchmark.stoppMeasurement(benchmarkID);

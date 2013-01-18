@@ -22,12 +22,21 @@
  */
 package org.matsim.contrib.matsim4opus.utils;
 
+import java.io.BufferedWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author thomas
@@ -78,5 +87,54 @@ public class CreateTestNetwork {
 		network.createAndAddLink(new IdImpl(12), node7, node4, 100, freespeed, capacity, numLanes);
 
 		return network;
+	}
+	
+	public static String createTestPtStationCSVFile(){
+		
+		/*
+		 * (2)(pt2)	(5)
+		 * 	|		 |
+		 * 	|		 |(pt3)
+		 * (1)------(4)------(7)
+		 * 	|		 |
+		 * 	|		 |
+		 * (3)(pt1) (6)
+		 */
+		
+		String location = TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptStops.csv";
+		BufferedWriter bw = IOUtils.getBufferedWriter(location);
+		
+		try{
+			bw.write("id,x,y" + InternalConstants.NEW_LINE); 	// header
+			bw.write("1,10,10" + InternalConstants.NEW_LINE);	// pt stop next to node (3)
+			bw.write("2,10, 190" + InternalConstants.NEW_LINE); // pt stop next to node (2)
+			bw.write("3,110,110" + InternalConstants.NEW_LINE); // pt stop next to node (4)
+			bw.flush();
+			bw.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return location;
+	}
+	
+	public static List<Coord> getTestFacilityLocations(){
+		
+		/*    B
+		 * (2)		(5)
+		 * 	|		 |
+		 * 	|		 |    C
+		 * (1)------(4)------(7)
+		 * 	|		 |           
+		 * 	|		 |
+		 * (3)		(6)
+		 *    A
+		 */   
+		
+		List<Coord> facilityList = new ArrayList<Coord>();
+		facilityList.add(new CoordImpl(10, -40));  // 50m to pt station 1
+		facilityList.add(new CoordImpl(10, 240));  // 50m to pt station 2
+		facilityList.add(new CoordImpl(160, 110)); // 50m to pt station 3
+		return facilityList;
 	}
 }

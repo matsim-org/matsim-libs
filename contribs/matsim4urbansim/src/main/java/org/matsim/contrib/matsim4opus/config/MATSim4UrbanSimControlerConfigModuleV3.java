@@ -59,6 +59,12 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
     
     private double timeOfDay;
     
+    private String ptStopsInputFile;
+    
+    private String ptTravelTimesInputFile;
+    
+    private String ptTravelDistancesInputFile;
+    
     private boolean isColdStart;
     
     private boolean isWarmStart;
@@ -184,6 +190,30 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
     
     public double getTimeOfDay(){
     	return this.timeOfDay;
+    }
+    
+    public void setPtStopsInputFile(String ptStops){
+    	this.ptStopsInputFile = ptStops;
+    }
+    
+    public String getPtStopsInputFile(){
+    	return this.ptStopsInputFile;
+    }
+    
+    public void setPtTravelTimesInputFile(String ptTravelTimes){
+    	this.ptTravelTimesInputFile = ptTravelTimes;
+    }
+    
+    public String getPtTravelTimesInputFile(){
+    	return this.ptTravelTimesInputFile;
+    }
+    
+    public void setPtTravelDistancesInputFile(String ptTravelDistances){
+    	this.ptTravelDistancesInputFile = ptTravelDistances;
+    }
+    
+    public String getPtTravelDistancesInputFile(){
+    	return this.ptTravelDistancesInputFile;
     }
 
     public boolean isColdStart(){
