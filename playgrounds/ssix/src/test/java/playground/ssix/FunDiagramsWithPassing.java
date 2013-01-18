@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import main.java.playgrounds.ssix.FundamentalDiagrams;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,8 +34,6 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
-
-import main.java.playgrounds.ssix.FundamentalDiagrams;
 
 /* A class supposed to go attached to the DreieckStreckeSzenario class (with passing).
  * It aims at analyzing the flow of events in order to detect:
@@ -73,7 +73,24 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	private double permanentAverageVelocity_truck;
 	//private double permanentAverageVelocity_med;
 	private double permanentAverageVelocity_fast;
-		
+	
+	private boolean endRegime;
+	
+	private double endDensity;
+	private double endDensity_truck;//partial density: number of truck drivers divided by the TOTAL network length.
+	//private double endDensity_med;
+	private double endDensity_fast;
+	
+	private double endFlow;
+	private double endFlow_truck;
+	//private double endFlow_med;
+	private double endFlow_fast;
+	
+	private double endAverageVelocity;
+	private double endAverageVelocity_truck;
+	//private double endAverageVelocity_med;
+	private double endAverageVelocity_fast;
+	
 	private Map<Id,Integer> personTour;
 	private Map<Id,Double> lastSeenOnStudiedLinkEnter;
 	
@@ -99,12 +116,16 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	public FunDiagramsWithPassing(Scenario sc){
 		this.scenario = sc;
 		this.permanentRegime = false;
+		this.endRegime = false;
 		this.personTour = new TreeMap<Id,Integer>();
 		this.lastSeenOnStudiedLinkEnter = new TreeMap<Id,Double>();
 		this.tourNumberSpeed = new TreeMap<Integer,Tuple<Integer,Double>>();
 		this.permanentDensity = 0.;
 		this.permanentFlow = 0.;
 		this.permanentAverageVelocity = 0.;
+		this.endDensity = 0.;
+		this.endFlow = 0.;
+		this.endAverageVelocity = 0.;
 		this.flowTable = new LinkedList<Integer>();
 		for (int i=0; i<3600; i++){
 			this.flowTable.add(0);
@@ -134,91 +155,112 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	}
 	
 	public void handleEvent(LinkEnterEvent event){
-		Id personId = event.getPersonId();
-		
-		//Disaggregated data updating methods
-		String transportMode = (String) scenario.getPopulation().getPersons().get(personId).getCustomAttributes().get("transportMode");
-		//System.out.println("transportMode: "+transportMode);
-		if (transportMode.equals("truck")){
-			handleEvent_truck(event);
-		/*
-		} else if (transportMode.equals("med")) {
-			handleEvent_med(event);
-		*/
-		} else if (transportMode.equals("fast")) {
-			handleEvent_fast(event);
-		} else {
-			while(true){
-				System.out.println("No transport mode acquired in event handling, must be something wrong!");
-			}
-		}
-		
-		//Still performing some aggregated data collecting
-		int tourNumber;
-		double nowTime = event.getTime();
-		double networkLength = DreieckStreckeSzenarioTest.length * 3;
-		
-		if (event.getLinkId().equals(studiedMeasuringPointLinkId)){	
+		if (!(endRegime)){//If data is already extracted for that number of agents on the track
+		//it is just necessary to let them go home and carry on with their lives instead of running around.
+			Id personId = event.getPersonId();
 			
-			//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
-			if (nowTime == this.flowTime.doubleValue()){//Still measuring the flow of the same second
-				Integer nowFlow = this.flowTable.get(0);
-				this.flowTable.set(0, nowFlow.intValue()+1);
-			} else {//Need to offset the current data in order to update
-				int timeDifference = (int) (nowTime-this.flowTime.doubleValue());
-				//log.info("timeDifference is: "+timeDifference);
-				if (timeDifference<3600){
-					for (int i=3599-timeDifference; i>=0; i--){
-						this.flowTable.set(i+timeDifference, this.flowTable.get(i).intValue());
+			//Disaggregated data updating methods
+			String transportMode = (String) scenario.getPopulation().getPersons().get(personId).getCustomAttributes().get("transportMode");
+			//System.out.println("transportMode: "+transportMode);
+			if (transportMode.equals("truck")){
+				handleEvent_truck(event);
+			/*
+			} else if (transportMode.equals("med")) {
+				handleEvent_med(event);
+			*/
+			} else if (transportMode.equals("fast")) {
+				handleEvent_fast(event);
+			} else {
+				while(true){
+					System.out.println("No transport mode acquired in event handling, must be something wrong!");
+				}
+			}
+			
+			//Still performing some aggregated data collecting
+			int tourNumber;
+			double nowTime = event.getTime();
+			double networkLength = DreieckStreckeSzenarioTest.length * 3;
+			
+			if (event.getLinkId().equals(studiedMeasuringPointLinkId)){	
+				
+				//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
+				if (nowTime == this.flowTime.doubleValue()){//Still measuring the flow of the same second
+					Integer nowFlow = this.flowTable.get(0);
+					this.flowTable.set(0, nowFlow.intValue()+1);
+				} else {//Need to offset the current data in order to update
+					int timeDifference = (int) (nowTime-this.flowTime.doubleValue());
+					//log.info("timeDifference is: "+timeDifference);
+					if (timeDifference<3600){
+						for (int i=3599-timeDifference; i>=0; i--){
+							this.flowTable.set(i+timeDifference, this.flowTable.get(i).intValue());
+						}
+						if (timeDifference > 1){
+							for (int i = 1; i<timeDifference; i++){
+								this.flowTable.set(i, 0);
+							}
+						}
+						this.flowTable.set(0, 1);
+					} else {
+						flowTableReset();
 					}
-					if (timeDifference > 1){
-						for (int i = 1; i<timeDifference; i++){
-							this.flowTable.set(i, 0);
+					this.flowTime = new Double(nowTime);
+				}
+				//Permanent Regime handling
+				if (permanentRegime){
+					tourNumber = this.personTour.get(personId);
+					
+					//System.out.println("Agent "+personId.toString()+" driving through.\n"+
+							//"Trying to update permanentGroupVariables from tourNumber "+tourNumber+".");
+					handlePermanentGroupDependentVariables(tourNumber);
+					
+					this.permanentFlow = getActualFlow();//veh/h
+					//Updating lastXFlows
+					for (int j=FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS-2; j>=0; j--){
+						this.lastXFlows.set(j+1, this.lastXFlows.get(j).doubleValue());
+					}
+					this.lastXFlows.set(0, this.permanentFlow);
+					
+					if (tourNumber >= (this.permanentRegimeTour+2)){//Let the simulation go another turn around to eventually fill data gaps
+						
+						int numberOfDrivingAgents = this.tourNumberSpeed.get(this.permanentRegimeTour).getFirst();
+						
+						this.permanentDensity = numberOfDrivingAgents/networkLength*1000;//veh/km
+					
+						this.permanentAverageVelocity = this.tourNumberSpeed.get(this.permanentRegimeTour).getSecond();//m/s
+	
+						if (almostEqualDoubles(this.lastXFlows.get(0),this.lastXFlows.get(FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS-1),0.02)){
+							log.info("Simulation successful.\n" +
+									"Densities: truck: "+this.permanentDensity_truck+/*" med: "+this.permanentDensity_med+*/" fast: "+this.permanentDensity_fast+" TOTAL: "+this.permanentDensity+"\n"+
+									"Flows: truck: "+this.permanentFlow_truck+/*" med: "+this.permanentFlow_med+*/" fast: "+this.permanentFlow_fast+" TOTAL: "+this.permanentFlow+"\n"+
+									"V: truck: "+this.permanentAverageVelocity_truck+/*" med: "+this.permanentAverageVelocity_med+*/" fast: "+this.permanentAverageVelocity_fast+" AVERAGE: "+this.permanentAverageVelocity+"\n");
+							
+							//Capturing data for writer extraction.
+							this.endRegime = true;
+							
+							this.endDensity = this.permanentDensity;
+							this.endDensity_truck = this.permanentDensity_truck;
+							//this.endDensity_med = this.permanentDensity_med;
+							this.endDensity_fast = this.permanentDensity_fast;
+							
+							this.endFlow
+ = this.permanentFlow;
+							this.endFlow_truck = this.permanentFlow_truck;
+							//this.endFlow_med = this.permanentFlow_med;
+							this.endFlow_fast = this.permanentFlow_fast;
+							
+							this.endAverageVelocity = this.permanentAverageVelocity;
+							this.endAverageVelocity_truck = this.permanentAverageVelocity_truck;
+							//this.endAverageVelocity_med = this.permanentAverageVelocity_med;
+							this.endAverageVelocity_fast = this.permanentAverageVelocity_fast;
+							
+							//TODO: set all goHome to true.
+							
+							
 						}
 					}
-					this.flowTable.set(0, 1);
-				} else {
-					flowTableReset();
-				}
-				this.flowTime = new Double(nowTime);
-			}
-			//Permanent Regime handling
-			if (permanentRegime){
-				tourNumber = this.personTour.get(personId);
-				
-				//System.out.println("Agent "+personId.toString()+" driving through.\n"+
-						//"Trying to update permanentGroupVariables from tourNumber "+tourNumber+".");
-				handlePermanentGroupDependentVariables(tourNumber);
-				
-				this.permanentFlow = getActualFlow();//veh/h
-				//Updating last5Flows
-				for (int j=FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS-2; j>=0; j--){
-					this.lastXFlows.set(j+1, this.lastXFlows.get(j).doubleValue());
-				}
-				this.lastXFlows.set(0, this.permanentFlow);
-				
-				if (tourNumber >= (this.permanentRegimeTour+2)){//Let the simulation go another turn around to eventually fill data gaps
-					
-					int numberOfDrivingAgents = this.tourNumberSpeed.get(this.permanentRegimeTour).getFirst();
-					
-					this.permanentDensity = numberOfDrivingAgents/networkLength*1000;//veh/km
-				
-					this.permanentAverageVelocity = this.tourNumberSpeed.get(this.permanentRegimeTour).getSecond();//m/s
-
-					if (almostEqualDoubles(this.lastXFlows.get(0),this.lastXFlows.get(FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS-1),0.02)){
-						log.info("Simulation successful.\n" +
-							 "Densities: truck: "+this.permanentDensity_truck+/*" med: "+this.permanentDensity_med+*/" fast: "+this.permanentDensity_fast+" TOTAL: "+this.permanentDensity+"\n"+
-							 "Flows: truck: "+this.permanentFlow_truck+/*" med: "+this.permanentFlow_med+*/" fast: "+this.permanentFlow_fast+" TOTAL: "+this.permanentFlow+"\n"+
-							 "V: truck: "+this.permanentAverageVelocity_truck+/*" med: "+this.permanentAverageVelocity_med+*/" fast: "+this.permanentAverageVelocity_fast+" AVERAGE: "+this.permanentAverageVelocity+"\n");
-						
-						//TODO: set all agents to abort and terminate simulation.
-						
-						
-					}
 				}
 			}
 		}
-		
 	}
 	
 	private void handleEvent_truck(LinkEnterEvent event){
@@ -405,7 +447,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 					//globally?
 					double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
 					double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
+					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed,
+ theOneBefore, 0.02))){
 						//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
 						if ((permanentRegime_truck) && (permanentRegime_med) && (permanentRegime_fast)){//just checking that the modes are effectively stable
 							if (!(permanentRegime)){
@@ -658,10 +701,18 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	}
 	
 	
-	private boolean almostEqualDoubles(double d1, double d2, double relativeMaximumAcceptedDeviance){
-		if (((d1-d2)/d2)<relativeMaximumAcceptedDeviance)
+	private boolean almostEqualDoubles(double d1, double d2, double MaximumAcceptedDeviance){
+		/*//Method 1: Relative accepted deviance:
+ not so good, with big flows it starts to detect stability too soon.
+		if (((d1-d2)/d2)< MaximumAcceptedDeviance)
 			return true;
 		return false;
+		//*/
+		//Method 2: Absolute accepted deviance
+		if (Math.abs(d1-d2)<1)
+			return true;
+		return false;
+		//*/
 	}
 	
 	
@@ -681,6 +732,18 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		this.permanentAverageVelocity_truck = 0.;
 		//this.permanentAverageVelocity_med = 0.;
 		this.permanentAverageVelocity = 0.;
+		
+		this.endDensity_truck = 0.;
+		//this.endDensity_med = 0.;
+		this.endDensity_fast = 0.;
+		
+		this.endFlow_truck = 0.;
+		//this.endFlow_med = 0.;
+		this.endFlow_fast = 0.;
+		
+		this.endAverageVelocity_truck = 0.;
+		//this.endAverageVelocity_med = 0.;
+		this.endAverageVelocity_fast = 0.;
 		
 		this.tourNumberSpeed_truck = new TreeMap<Integer,Tuple<Integer,Double>>();
 		//this.tourNumberSpeed_med = new TreeMap<Integer,Tuple<Integer,Double>>();
@@ -728,6 +791,18 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		this.flowTime_truck = new Double(0.);
 		//this.flowTime_med = new Double(0.);
 		this.flowTime_fast = new Double(0.);
+		
+		this.endDensity_truck = 0.;
+		//this.endDensity_med = 0.;
+		this.endDensity_fast = 0.;
+		
+		this.endFlow_truck = 0.;
+		//this.endFlow_med = 0.;
+		this.endFlow_fast = 0.;
+		
+		this.endAverageVelocity_truck = 0.;
+		//this.endAverageVelocity_med = 0.;
+		this.endAverageVelocity_fast = 0.;
 	}
 	
 	private void handlePermanentGroupDependentVariables(int tourNumber){
@@ -778,4 +853,63 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 			
 		}	
 	}
+
+	public boolean isEndRegime() {
+		return endRegime;
+	}
+	
+	public double getEndDensity() {
+		return endDensity;
+	}
+	
+	public double getEndDensity_truck() {
+		return endDensity_truck;
+	}
+
+/*
+	public double getEndDensity_med() {
+		return endDensity_med;
+	}
+*/
+	
+	public double getEndDensity_fast() {
+		return endDensity_fast;
+	}
+	
+	public double getEndFlow() {
+		return endFlow;
+	}
+	
+	public double getEndFlow_truck() {
+		return endFlow_truck;
+	}
+	
+	/*
+	public double getEndFlow_med() {
+		return endFlow_med;
+	}
+	*/
+	
+	public double getEndFlow_fast() {
+		return endFlow_fast;
+	}
+	
+	public double getEndAverageVelocity() {
+		return endAverageVelocity;
+	}
+	
+	public double getEndAverageVelocity_truck() {
+		return endAverageVelocity_truck;
+	}
+	
+	/*
+	public double getEndAverageVelocity_med() {
+		return endAverageVelocity_med;
+	}
+	*/
+	
+	public double getEndAverageVelocity_fast() {
+		return endAverageVelocity_fast;
+	}
+
 }

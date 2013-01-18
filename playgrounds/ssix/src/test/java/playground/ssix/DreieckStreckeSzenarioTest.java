@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import main.java.playgrounds.ssix.MyPersonDriverAgentImpl;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +42,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -72,8 +75,8 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import main.java.playgrounds.ssix.MyPersonDriverAgentImpl;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class DreieckStreckeSzenarioTest {
 
@@ -84,9 +87,11 @@ public class DreieckStreckeSzenarioTest {
 	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
 		
 		private MyPersonDriverAgentImpl delegate;
+		public boolean goHome;
 		
 		public MyRoundAndRoundAgent(Person p, Plan unmodifiablePlan, QSim qSim) {
-			delegate = new MyPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
+			this.delegate = new MyPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
+			this.goHome = false;//false at start, modified when all data is extracted.
 			}
 
 		public final void endActivityAndComputeNextState(double now) {
@@ -139,14 +144,24 @@ public class DreieckStreckeSzenarioTest {
 
 		@Override
 		public Id chooseNextLinkId() {
-			Id forcedLeftTurnLinkId = new IdImpl((long)(3*DreieckStreckeSzenarioTest.subdivisionFactor - 1));
-			if (!(delegate.getCurrentLinkId().equals(forcedLeftTurnLinkId))){
+			if (!(goHome)){
+				Id forcedLeftTurnLinkId = new IdImpl((long)(3*DreieckStreckeSzenarioTest.subdivisionFactor - 1));
+				if (!(delegate.getCurrentLinkId().equals(forcedLeftTurnLinkId))){
+					return delegate.chooseNextLinkId();
+				}
+				Id afterLeftTurnLinkId = new IdImpl((long)(0));
+				delegate.setCachedNextLinkId(afterLeftTurnLinkId);
+				delegate.setCurrentLinkIdIndex(0);
+				return afterLeftTurnLinkId;
+			}
+			Id forcedStraightForwardLinkId = new IdImpl((long)(DreieckStreckeSzenarioTest.subdivisionFactor - 1));
+			if (!(delegate.getCurrentLinkId().equals(forcedStraightForwardLinkId))){
 				return delegate.chooseNextLinkId();
 			}
-			Id afterLeftTurnLinkId = new IdImpl((long)(0));
-			delegate.setCachedNextLinkId(afterLeftTurnLinkId);
-			delegate.setCurrentLinkIdIndex(0);
-			return afterLeftTurnLinkId;
+			Id afterGoingStraightForwardLinkId = new IdImpl((long)(3*DreieckStreckeSzenarioTest.subdivisionFactor));
+			delegate.setCachedNextLinkId(afterGoingStraightForwardLinkId);
+			delegate.setCurrentLinkIdIndex(3*DreieckStreckeSzenarioTest.subdivisionFactor);//This does work quite well so far and allows to end simulation.
+			return afterGoingStraightForwardLinkId;
 		}
 
 		@Override
@@ -222,9 +237,11 @@ public class DreieckStreckeSzenarioTest {
 		DreieckStreckeSzenarioTest dreieck = new DreieckStreckeSzenarioTest(2600);
 		dreieck.fillNetworkData();
 		
+		dreieck.openFile();
 		for (long i=0; i<N_AGENTS; i++){
 			dreieck.run(i, "constantModalSplit");
 		}
+		dreieck.closeFile();
 	}
 	
 	public void run(long numberOfPeople, String mode){
@@ -244,7 +261,24 @@ public class DreieckStreckeSzenarioTest {
 		
 		runqsim(events);
 		
-		//TODO: writer.doSomething
+		//writer.doSomething
+		writer.format("%d\t\t", numberOfPeople);
+		
+		writer.format("%.2f\t", fundi3.getEndDensity());
+		writer.format("%.2f\t", fundi3.getEndDensity_truck());
+		//writer.format("%.2f\t", fundi3.getEndDensity_med());
+		writer.format("%.2f\t\t", fundi3.getEndDensity_fast());
+		
+		writer.format("%.2f\t", fundi3.getEndFlow());
+		writer.format("%.2f\t",
+ fundi3.getEndFlow_truck());
+		//writer.format("%.2f\t", fundi3.getEndFlow_med());
+		writer.format("%.2f\t\t", fundi3.getEndFlow_fast());
+		
+		writer.format("%.2f\t", fundi3.getEndAverageVelocity());
+		writer.format("%.2f\t", fundi3.getEndAverageVelocity_truck());
+		//writer.format("%.2f\t", fundi3.getEndAverageVelocity_med());
+		writer.format("%.2f\n", fundi3.getEndAverageVelocity_fast());
 	}
 
 	private void fillNetworkData(){
@@ -277,8 +311,7 @@ public class DreieckStreckeSzenarioTest {
 			network.addNode(node);
 		}
 		//nodes of the triangle left side
-		for (int i = 0;
- i<DreieckStreckeSzenarioTest.subdivisionFactor-1; i++){
+		for (int i = 0; i<DreieckStreckeSzenarioTest.subdivisionFactor-1; i++){
 			double x = DreieckStreckeSzenarioTest.length/2 - (DreieckStreckeSzenarioTest.length/(2*DreieckStreckeSzenarioTest.subdivisionFactor))*(i+1);
 			double y = Math.sqrt(3.)*x;
 			Coord coord = scenario.createCoord(x, y);
@@ -484,7 +517,8 @@ public class DreieckStreckeSzenarioTest {
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				TravelTimeCalculator travelTimes = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+				TravelTimeCalculator
+ travelTimes = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 				TravelDisutility travelCosts = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimes, scenario.getConfig().planCalcScore());
 				PlansCalcRoute plansCalcRoute = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), travelCosts, travelTimes, new DijkstraFactory(), ((PopulationFactoryImpl)(scenario.getPopulation().getFactory())).getModeRouteFactory());
 				return new PersonPrepareForSim(plansCalcRoute, (ScenarioImpl)scenario);
@@ -512,8 +546,7 @@ public class DreieckStreckeSzenarioTest {
         }*/
         
         QSim qSim = new QSim(sc, events);
-        ActivityEngine
- activityEngine = new ActivityEngine();
+        ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
