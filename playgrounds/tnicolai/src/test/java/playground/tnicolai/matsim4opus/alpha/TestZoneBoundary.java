@@ -60,7 +60,6 @@ public class TestZoneBoundary {
 		String swissMunicipalityZones = "/Users/thomas/Documents/SVN_Studies/tnicolai/ersa/data/zones/G1G08.shp";
 		String swissCountryZone = "/Users/thomas/Documents/SVN_Studies/tnicolai/ersa/data/zones/G1L08.shp";
 
-
 		try {
 //			Geometry swissExample1 = FeatureSHP.readFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
 //			Geometry swissExample2 = FeatureSHP.readFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
