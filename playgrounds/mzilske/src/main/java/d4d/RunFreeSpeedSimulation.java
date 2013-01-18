@@ -19,23 +19,24 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
-public class RunSimulation {
+public class RunFreeSpeedSimulation {
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.controler().setLastIteration(200);
+		config.controler().setLastIteration(0);
+		config.controler().setOutputDirectory("./freespeed-output");
 		config.controler().setMobsim("jdeqsim");
 		// config.controler().setMobsim("DoNothing");
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
 		config.controler().setWriteSnapshotsInterval(5);
-		config.getQSimConfigGroup().setStorageCapFactor(0.01);
-		config.getQSimConfigGroup().setFlowCapFactor(0.01);
-		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
-		config.getQSimConfigGroup().setNumberOfThreads(8);
-		config.getQSimConfigGroup().setEndTime(27*60*60);
+//		config.getQSimConfigGroup().setStorageCapFactor(100);
+//		config.getQSimConfigGroup().setFlowCapFactor(100);
+//		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+//		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
+//		config.getQSimConfigGroup().setNumberOfThreads(8);
+//		config.getQSimConfigGroup().setEndTime(27*60*60);
 		config.plansCalcRoute().setTeleportedModeSpeed("other", 5.0 / 3.6); // 5 km/h beeline
 		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
 		config.plansCalcRoute().setNetworkModes(Arrays.asList("car"));
@@ -49,32 +50,10 @@ public class RunSimulation {
 		config.planCalcScore().setConstantCar(0);
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		// config.planCalcScore().setWriteExperiencedPlans(true);
-		config.setParam("JDEQSim", "flowCapacityFactor", "0.01");
-		config.setParam("JDEQSim", "storageCapacityFactor", "0.01");
+		config.setParam("JDEQSim", "flowCapacityFactor", "100");
+		config.setParam("JDEQSim", "storageCapacityFactor", "100");
 		double endTime= 60*60*32;
 		config.setParam("JDEQSim", "endTime", Double.toString(endTime));
-		
-		config.setParam("changeLegMode", "modes", "car,other");
-		config.setParam("changeLegMode", "ignoreCarAvailability", "true");
-		
-		
-		StrategySettings changeExp = new StrategySettings(new IdImpl(1));
-		changeExp.setModuleName("ChangeExpBeta");
-		changeExp.setProbability(0.8);
-		StrategySettings reRoute = new StrategySettings(new IdImpl(2));
-		reRoute.setModuleName("ReRoute");
-		// reRoute.setModuleName("Duplicate");
-		reRoute.setProbability(0.1);
-		reRoute.setDisableAfter(180);
-		StrategySettings changeMode = new StrategySettings(new IdImpl(3));
-		changeMode.setModuleName("ChangeLegMode");
-		// changeMode.setModuleName("Duplicate");
-		changeMode.setProbability(0.1);
-		changeMode.setDisableAfter(180);
-		config.strategy().setMaxAgentPlanMemorySize(3);
-		config.strategy().addStrategySettings(changeExp);
-		config.strategy().addStrategySettings(reRoute);
-		config.strategy().addStrategySettings(changeMode);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
@@ -91,43 +70,7 @@ public class RunSimulation {
 		});
 		
 		Controler controler = new Controler(scenario);
-		controler.addPlanStrategyFactory("Duplicate", new DuplicatePlanStrategyFactory());
 		controler.setOverwriteFiles(true);
-		controler.addMobsimFactory("DoNothing", new MobsimFactory() {
-
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				return new Mobsim() {
-
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						
-					}
-					
-				};
-			}
-			
-		});
-		controler.setOverwriteFiles(true);
-		controler.addPlanStrategyFactory("Duplicate", new DuplicatePlanStrategyFactory());
-		controler.setOverwriteFiles(true);
-		controler.addMobsimFactory("DoNothing", new MobsimFactory() {
-
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				return new Mobsim() {
-
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						
-					}
-					
-				};
-			}
-			
-		});
 		controler.run();
 	}
 
