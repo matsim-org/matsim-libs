@@ -24,7 +24,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SpatialReferenceObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
@@ -257,7 +257,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		
 		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		// init least cost path tree computing shortest paths (according to travel times)
-		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculatorTest(ttc, scenario.getConfig().planCalcScore(), dummyCostFactor));
+		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculator(ttc));
 		
 		// setting depature time not important here but necessary for LeastCostPathTree
 		final double depatureTime = 8.*3600;
@@ -314,7 +314,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		
 		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		// init least cost path tree computing shortest paths (according to travel times)
-		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculatorTest(ttc, scenario.getConfig().planCalcScore(), dummyCostFactor));
+		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculator(ttc));
 		
 		// setting depature time not important here but necessary for LeastCostPathTree
 		final double depatureTime = 8.*3600;
