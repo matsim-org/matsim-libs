@@ -45,8 +45,7 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 	private final double maxTime = 30.0 * 3600.0;
 	
 	private final double timeSlotSize;
-	private int[] currentWeights = null;
-	private int[] tempWeights = null;
+	private int[] weights = null;
 	private BufferedWriter writer = null;
 	
 	public TimeProvider(PConfigGroup pConfig, String outputDir){
@@ -58,13 +57,12 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 			numberOfSlots = 1;
 			log.warn("Number of slots is increased to " + numberOfSlots);
 		}
-		this.currentWeights = new int[numberOfSlots];
-		this.tempWeights = new int[numberOfSlots];
+		this.weights = new int[numberOfSlots];
 		
 		this.writer = IOUtils.getBufferedWriter(outputDir + PConstants.statsOutputFolder + "timeSlots2weight.txt");
 		StringBuffer strB = new StringBuffer();
 		
-		for (int i = 0; i < currentWeights.length; i++) {
+		for (int i = 0; i < weights.length; i++) {
 			strB.append("; " + i * timeSlotSize);
 		}
 		
@@ -79,9 +77,8 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 	@Override
 	public void reset(int iteration) {
 		// New Iteration - write the old weights to file and set the new ones as current
-		this.writeToFile(this.writer, this.currentWeights, iteration);
-		this.currentWeights = this.tempWeights;
-		this.tempWeights = new int[this.currentWeights.length];
+		this.writeToFile(this.writer, this.weights, iteration);
+		this.weights = new int[this.weights.length];
 	}
 
 	@Override
@@ -100,14 +97,14 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 		int startSlot = TimeProvider.getSlotForTime(startTime, this.timeSlotSize);
 		int endSlot = TimeProvider.getSlotForTime(endTime, this.timeSlotSize);
 		
-		if (startSlot >= this.currentWeights.length) {
-			log.info("Resetting start slot from " + startSlot + " to " + (this.currentWeights.length - 1));
-			startSlot = this.currentWeights.length -1;
+		if (startSlot >= this.weights.length) {
+			log.info("Resetting start slot from " + startSlot + " to " + (this.weights.length - 1));
+			startSlot = this.weights.length -1;
 		}
 			
-		if (endSlot >= this.currentWeights.length) {
-			log.info("Resetting end slot from " + endSlot + " to " + (this.currentWeights.length - 1));
-			endSlot = this.currentWeights.length - 1;
+		if (endSlot >= this.weights.length) {
+			log.info("Resetting end slot from " + endSlot + " to " + (this.weights.length - 1));
+			endSlot = this.weights.length - 1;
 		}
 		
 		int numberOfValidSlots = endSlot - startSlot + 1;
@@ -115,7 +112,7 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 		// get total weight of all valid time slots
 		int totalWeight = 0;
 		for (int i = startSlot; i <= endSlot; i++) {
-			totalWeight += this.currentWeights[i];
+			totalWeight += this.weights[i];
 		}
 		
 		if (totalWeight == 0.0) {
@@ -131,7 +128,7 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 			double rnd = MatsimRandom.getRandom().nextDouble() * totalWeight;
 			double accumulatedWeight = 0.0;
 			for (int i = startSlot; i <= endSlot; i++) {
-				accumulatedWeight += this.currentWeights[i];
+				accumulatedWeight += this.weights[i];
 				if (accumulatedWeight >= rnd) {
 					return i * this.timeSlotSize;
 				}
@@ -161,8 +158,8 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 	
 	private void addOneToTimeSlot(double time) {
 		int timeSlot = getSlotForTime(time, this.timeSlotSize);
-		if(timeSlot < this.tempWeights.length) {
-			this.tempWeights[timeSlot]++;
+		if(timeSlot < this.weights.length) {
+			this.weights[timeSlot]++;
 		}
 	}
 

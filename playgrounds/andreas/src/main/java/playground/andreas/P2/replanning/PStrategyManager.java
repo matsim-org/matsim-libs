@@ -71,7 +71,6 @@ public class PStrategyManager {
 	private double totalWeights = 0.0;
 	
 	private String pIdentifier;
-	private TimeProvider timeProvider = null;
 	private ReduceTimeServed reduceTimeServed = null;
 	private ReduceStopsToBeServed reduceStopsToBeServed = null;
 
@@ -80,10 +79,7 @@ public class PStrategyManager {
 	}
 	
 	// TODO[an] always initialize TimeReduceDemand
-	public void init(PConfigGroup pConfig, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, String outputDir) {
-		this.timeProvider = new TimeProvider(pConfig, outputDir);
-		eventsManager.addHandler(this.timeProvider);
-		
+	public void init(PConfigGroup pConfig, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
 			String classname = settings.getModuleName();
 			double rate = settings.getProbability();
@@ -91,14 +87,14 @@ public class PStrategyManager {
 				log.info("The following strategy has a weight set to zero. Will drop it. " + classname);
 				continue;
 			}
-			PStrategy strategy = loadStrategy(classname, settings, eventsManager, stageContainerCreator, ticketMachine);
+			PStrategy strategy = loadStrategy(classname, settings, eventsManager, stageContainerCreator, ticketMachine, timeProvider);
 			this.addStrategy(strategy, rate, settings.getDisableInIteration());
 		}
 		
 		log.info("enabled with " + this.strategies.size()  + " strategies");
 	}
 
-	private PStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine) {
+	private PStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
 		this.eventsManager = eventsManager;
 		PStrategy strategy = null;
 		
@@ -172,11 +168,11 @@ public class PStrategyManager {
 			strategy = strat;
 		} else if (name.equals(WeightedStartTimeExtension.STRATEGY_NAME)) {
 			WeightedStartTimeExtension strat = new WeightedStartTimeExtension(settings.getParametersAsArrayList());
-			strat.setTimeProvider(this.timeProvider);
+			strat.setTimeProvider(timeProvider);
 			strategy = strat;
 		} else if (name.equals(WeightedEndTimeExtension.STRATEGY_NAME)) {
 			WeightedEndTimeExtension strat = new WeightedEndTimeExtension(settings.getParametersAsArrayList());
-			strat.setTimeProvider(this.timeProvider);
+			strat.setTimeProvider(timeProvider);
 			strategy = strat;
 		}
 		

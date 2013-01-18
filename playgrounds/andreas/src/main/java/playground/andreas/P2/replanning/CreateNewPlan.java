@@ -22,7 +22,6 @@ package playground.andreas.P2.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
@@ -39,6 +38,7 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 	private final static Logger log = Logger.getLogger(CreateNewPlan.class);
 	public static final String STRATEGY_NAME = "CreateNewPlan";
 	private final double timeSlotSize;
+	private TimeProvider timeProvider;
 
 	public CreateNewPlan(ArrayList<String> parameter) {
 		super(parameter);
@@ -50,22 +50,30 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 		this.timeSlotSize = Double.valueOf(parameter.get(0));
 	}
 	
+	public void setTimeProvider(TimeProvider timeProvider){
+		this.timeProvider = timeProvider;
+	}
+	
 	@Override
 	public PPlan run(Cooperative cooperative) {
 		PPlan newPlan;		
 		
 		do {
-			double startTime = MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime());
-			startTime = TimeProvider.getSlotForTime(startTime, this.timeSlotSize) * this.timeSlotSize;
+			// get a valid start time
+			double startTime = this.timeProvider.getRandomTimeInInterval(0 * 3600.0, 24 * 3600.0 - cooperative.getMinOperationTime());
+			double endTime = this.timeProvider.getRandomTimeInInterval(startTime + cooperative.getMinOperationTime(), 24 * 3600.0);
 			
-			double endTime = startTime + cooperative.getMinOperationTime() + MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime() - startTime);
-			endTime = TimeProvider.getSlotForTime(endTime, this.timeSlotSize) * this.timeSlotSize;
+//			double startTime = MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime());
+//			startTime = TimeProvider.getSlotForTime(startTime, this.timeSlotSize) * this.timeSlotSize;
+//			
+//			double endTime = startTime + cooperative.getMinOperationTime() + MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime() - startTime);
+//			endTime = TimeProvider.getSlotForTime(endTime, this.timeSlotSize) * this.timeSlotSize;
 			
 			if (startTime == endTime) {
 				endTime += this.timeSlotSize;
 			}
 			
-			if (startTime + cooperative.getMinOperationTime() > endTime) {
+			while (startTime + cooperative.getMinOperationTime() > endTime) {
 				endTime += this.timeSlotSize;
 			}
 			

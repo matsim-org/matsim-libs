@@ -51,7 +51,7 @@ public class OperatorInitializer {
 	private int counter;
 	
 	
-	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, Controler controler) {
+	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, Controler controler, TimeProvider timeProvider) {
 		this.pConfig = pConfig;
 		this.cooperativeFactory = new CooperativeFactory(this.pConfig, franchise);
 		this.routeProvider = PRouteProviderFactory.createRouteProvider(controler.getNetwork(), controler.getPopulation(), this.pConfig, pStopsOnly, controler.getControlerIO().getOutputPath(), controler.getEvents());
@@ -62,6 +62,7 @@ public class OperatorInitializer {
 			ArrayList<String> parameter = new ArrayList<String>();
 			parameter.add(Double.toString(pConfig.getTimeSlotSize()));
 			this.initialStrategy = new CreateNewPlan(parameter);
+			((CreateNewPlan) this.initialStrategy).setTimeProvider(timeProvider);
 		}
 	}
 	
