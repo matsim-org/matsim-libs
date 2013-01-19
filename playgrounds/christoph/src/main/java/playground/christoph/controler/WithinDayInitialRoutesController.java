@@ -140,6 +140,22 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 	protected void loadData() {
 		super.loadData();
 		
+//		/*
+//		 * Create dummy car routes, if routes are not already present. By doing so,
+//		 * PersonPrepareForSim does not pre-calculate routes which would be deleted
+//		 * anyway when the agents depart.
+//		 */
+//		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
+//		DummyRoutesCreator dummyRoutesCreator = new DummyRoutesCreator(routeFactory);		
+//		dummyRoutesCreator.run(this.getPopulation());
+	}
+	
+	@Override
+	protected void prepareForSim() {
+		
+		// TODO: adapt Code to create dummy routes in prepareForSim.
+		super.prepareForSim();
+		
 		/*
 		 * Create dummy car routes, if routes are not already present. By doing so,
 		 * PersonPrepareForSim does not pre-calculate routes which would be deleted
@@ -183,6 +199,9 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 			this.getWithinDayEngine().doInitialReplanning(false);
 			this.getWithinDayEngine().doDuringLegReplanning(false);
 			this.getWithinDayEngine().doDuringActivityReplanning(false);
+			
+			this.events.removeHandler(this.getTravelTimeCollector());
+			this.getFixedOrderSimulationListener().removeSimulationListener(this.getTravelTimeCollector());
 		}
 	}
 	
@@ -193,7 +212,7 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 * by the replanners.
 		 */
 		super.setUp();
-		
+
 		// initialize Identifiers and Replanners
 		this.initIdentifiers();
 		this.initReplanners();
@@ -232,14 +251,15 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();	
 //		travelTimes.put(TransportMode.car, this.getTravelTimeCalculator());	// TravelTimeCalculator?!
 		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
+//		travelTimes.put(TransportMode.car, new FreeSpeedTravelTimeCalculatorFactory().createTravelTime());
 		
 		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory disutilityFactory = this.getTravelDisutilityFactory();
-
+		
 		LeastCostPathCalculatorFactory factory = this.getLeastCostPathCalculatorFactory();
 	
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, disutilityFactory, travelTimes, factory, routeFactory);
-		
+
 		/*
 		 * During Leg Replanner
 		 */
@@ -272,11 +292,17 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 				PlanElement planElement = plan.getPlanElements().get(i);
 				if (planElement instanceof Leg) {
 					Leg leg = (Leg) planElement;
-					if (leg.getRoute() == null) {
-						Id startLinkId = ((Activity) plan.getPlanElements().get(i - 1)).getLinkId();
-						Id endLinkId = ((Activity) plan.getPlanElements().get(i + 1)).getLinkId();
-						leg.setRoute(routeFactory.createRoute(TransportMode.car, startLinkId, endLinkId));
-					}
+					
+					// if it is a car leg
+					if (leg.getMode().equals(TransportMode.car)) {
+						
+						// if its route is not valid, create a dummy route
+//						if (leg.getRoute() == null) {
+							Id startLinkId = ((Activity) plan.getPlanElements().get(i - 1)).getLinkId();
+							Id endLinkId = ((Activity) plan.getPlanElements().get(i + 1)).getLinkId();
+							leg.setRoute(routeFactory.createRoute(TransportMode.car, startLinkId, endLinkId));
+//						}
+					} 
 				}
 			}
 		}

@@ -37,7 +37,7 @@ public class InitialRoutesController {
 
 	private static final Logger log = Logger.getLogger(InitialRoutesController.class);
 	
-	private static boolean useWithinDayReplanning = false;
+	private static boolean useWithinDayReplanning = true;
 	private static double duringLegReroutingShare = 0.10;
 	private static boolean duringLegRerouting = true;
 	private static boolean initialLegRerouting = true;
