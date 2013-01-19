@@ -211,7 +211,10 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 
 		@Override
 		public Network getNetwork() {
-			return scenario.getNetwork();
+			if (this.scenario != null) { // super-Constructor calls some init Methods which might call this method
+				return scenario.getNetwork();
+			}
+			return null;
 		}
 
 		@Override
