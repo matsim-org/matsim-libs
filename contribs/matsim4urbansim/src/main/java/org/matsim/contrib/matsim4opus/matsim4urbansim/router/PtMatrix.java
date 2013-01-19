@@ -24,6 +24,9 @@ package org.matsim.contrib.matsim4opus.matsim4urbansim.router;
 
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -39,13 +42,12 @@ import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 
 /**
@@ -160,7 +162,7 @@ public class PtMatrix {
 	}
 	
 	/**
-	 * constructs an origin destination matrix for pt stops with travel times.
+	 * constructs tow origin destination matrices for pt stops, one for travel times and one for travel distances.
 	 * travel times are calculated based on travel distances on the network divided by the typical pt speed (normally 25kmh).
 	 * the travel distance is determined by the shortest route on the network to get from one stop to another stop.
 	 * 
@@ -219,23 +221,134 @@ public class PtMatrix {
 				travelDistanceOD.createEntry(originStop.getId(), destinationStop.getId(), distance);	
 			}
 		}
-		log.info("OD matrix with pt stop to pt stop travel times created.");
+		log.info("Done creating OD matrices with pt stop to pt stop travel times and distances.");
 		// log.info(euclidianDistanceCounter + " travel times are on Euclidian distances.");
 		// log.info(networkDistanceCounter + " travel times based on newtork distances.");
 	}
 	
+	/**
+	 * constructs tow origin destination matrices for pt stops, one for travel times and one for travel distances.
+	 * Travel times, distances and pt connections are given via input files.
+	 * A consistency check makes sure that only pt connections that are included in the QuadTree can be be added to the matrices.
+	 * The QuadTree contains the coordinates for each pt stop.
+	 * 
+	 * @param qTree
+	 * @param travelTimeOD
+	 * @param travelDistanceOD
+	 * @param ptTravelTimeInputFile
+	 * @param ptTravelDistanceInputFile
+	 */
 	private void initODMatrixFromFile(QuadTree<PtStop> qTree, Matrix travelTimeOD, Matrix travelDistanceOD, String ptTravelTimeInputFile, String ptTravelDistanceInputFile){
+		
+		// convert qtree into hasMap to query ptStops as origins and destinations
+		HashMap<Id, PtStop> ptStopHashMap = convertQuadTree2HashMap(qTree);
 		
 		BufferedReader brTravelTimes = IOUtils.getBufferedReader(ptTravelTimeInputFile);
 		BufferedReader brTravelDistances = IOUtils.getBufferedReader(ptTravelDistanceInputFile);
 		
-		// run through travel times file create tmp quadTree
+		log.warn("pt connections that contain one or two pt stops that are not included in QuadTree will be skipped!");
 		
-		// run through travel distances file create tmp quadTree
+		// run through travel times and distances files and create/fill od matrices
+		try{
+			log.info("Creating travel time OD matrix from VISUM pt stop 2 pt stop travel times file: " + ptTravelTimeInputFile);
+			fillODMatrix(travelTimeOD, ptStopHashMap, brTravelTimes, true);
+			log.info("Done creating travel time OD matrix ...");
+			
+			log.info("Creating travel distance OD matrix from VISUM pt stop 2 pt stop travel distance file: " + ptTravelDistanceInputFile);
+			fillODMatrix(travelDistanceOD, ptStopHashMap, brTravelDistances, false);
+			log.info("Done creating travel distance OD matrix ...");
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		log.info("Done creating OD matrices with pt stop to pt stop travel times and distances.");
+	}
+
+	/**
+	 * @param odMatrix
+	 * @param originPtStopIDX
+	 * @param destinationPtStopIDX
+	 * @param valueIDX
+	 * @param EMPTY_ENTRY
+	 * @param SEPARATOR
+	 * @param ptStopHashMap
+	 * @param br
+	 * @throws IOException
+	 */
+	private void fillODMatrix(Matrix odMatrix, HashMap<Id, PtStop> ptStopHashMap,
+			BufferedReader br, boolean isTravelTimes) throws IOException {
 		
-		// run through given qTree, add an entry to od matrix only if for a given origin and destination both dates are available.
+		int originPtStopIDX 		= 0;		// column index for origin pt stop id
+		int destinationPtStopIDX 	= 1;		// column index for destination pt stop id
+		int valueIDX 				= 2;		// column index for travel time or distance value
 		
+		final double EMPTY_ENTRY 	= 999999.;	// indicates that a value is not set (VISUM specific)
+		final String SEPARATOR 		= ";";		// 
 		
+		String line 				= null;		// line from input file
+		String parts[] 				= null;		// values accessible via array
+		
+		while ( (line = br.readLine()) != null ) {
+			
+			line = line.trim().replaceAll("\\s+", SEPARATOR);
+			parts = line.split(SEPARATOR);
+			
+			if(parts.length != 3){
+				log.warn("Could not parse line: " + line);
+				continue;
+			}
+			
+			try{
+				// trying to convert items into integers
+				Long originPtStopAsLong 	= Long.parseLong(parts[originPtStopIDX]);
+				Long destinationPtStopAsLong= Long.parseLong(parts[destinationPtStopIDX]);
+				double value 				= Double.parseDouble(parts[valueIDX]);
+				if(isTravelTimes)
+					value = value * 60.; 	// convert value from minutes into seconds
+				
+				if(value == EMPTY_ENTRY){
+					log.warn("No parameter set: " + line);
+					continue;
+				}
+				
+				// create Id's
+				Id originPtStopID 			= new IdImpl(originPtStopAsLong);
+				Id destinationPtStopID 		= new IdImpl(destinationPtStopAsLong);
+				
+				// check if a pt stop with the given id exists
+				if( ptStopHashMap.containsKey(originPtStopID) && 
+					ptStopHashMap.containsKey(destinationPtStopID)){
+					
+					// add to od matrix
+					odMatrix.createEntry(originPtStopID, destinationPtStopID, value);
+				}
+				else{
+					if(! ptStopHashMap.containsKey(originPtStopID))
+						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + originPtStopID);
+					if(! ptStopHashMap.containsKey(destinationPtStopID))
+						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + destinationPtStopID);
+					continue;
+				}
+			} catch(NumberFormatException nfe){
+				log.warn("Could not convert values into integer: " + line);
+				continue;
+			}
+		}
+	}
+	
+	//////////////////////////////////////
+	// helper method
+	//////////////////////////////////////
+	
+	private HashMap<Id, PtStop> convertQuadTree2HashMap(QuadTree<PtStop> qTree){
+		
+		Iterator<PtStop> ptStopIterator = qTree.values().iterator();
+		HashMap<Id, PtStop> ptStopHashMap = new HashMap<Id, PtMatrix.PtStop>();
+		
+		while(ptStopIterator.hasNext()){
+			PtStop ptStop = ptStopIterator.next();
+			ptStopHashMap.put(ptStop.getId(), ptStop);
+		}
+		return ptStopHashMap;
 	}
 	
 	//////////////////////////////////////
@@ -299,7 +412,15 @@ public class PtMatrix {
 		double walkTravelTimeFromFacility2FromPtStop = NetworkUtil.getEuclidianDistance(fromFacilityCoord, fromPtStop.getCoord()) / meterPerSecWalkSpeed;
 		double walkTravelTimeToPtStop2ToFacility = NetworkUtil.getEuclidianDistance(toPtStop.getCoord(), toFacilityCoord) / meterPerSecWalkSpeed;
 		
-		double ptTravelTime = originDestinationTravelTimeMatrix.getEntry(fromPtStop.getId(), toPtStop.getId()).getValue();
+		Entry entry = originDestinationTravelTimeMatrix.getEntry(fromPtStop.getId(), toPtStop.getId());
+		double ptTravelTime = Double.MAX_VALUE;
+		if(entry != null)
+			ptTravelTime = entry.getValue();
+		else{
+			log.warn("No entry found in od travel times matrix for pt stops: " + fromPtStop.getId() + " " + toPtStop.getId());
+			if(fromPtStop == toPtStop)
+				ptTravelTime = 0.;
+		}
 		
 		double totalTravelTime = walkTravelTimeFromFacility2FromPtStop + ptTravelTime + walkTravelTimeToPtStop2ToFacility;
 		return totalTravelTime;
@@ -331,10 +452,17 @@ public class PtMatrix {
 		double walkTravelDistanceFromFacility2FromPtStop = NetworkUtil.getEuclidianDistance(fromFacilityCoord, fromPtStop.getCoord());
 		double walkTravelDistanceToPtStop2ToFacility = NetworkUtil.getEuclidianDistance(toPtStop.getCoord(), toFacilityCoord);
 		
-		double ptTravelDistance = originDestinationTravelDistanceMatrix.getEntry(fromPtStop.getId(), toPtStop.getId()).getValue();
-		
+		Entry entry = originDestinationTravelDistanceMatrix.getEntry(fromPtStop.getId(), toPtStop.getId());
+		double ptTravelDistance = Double.MAX_VALUE;
+		if(entry != null)
+			ptTravelDistance = entry.getValue();
+		else{
+			log.warn("No entry found in od travel distances matrix for pt stops: " + fromPtStop.getId() + " " + toPtStop.getId());
+			if(fromPtStop == toPtStop)
+				ptTravelDistance = 0.;
+		}
+			
 		double totalTravelDistance = walkTravelDistanceFromFacility2FromPtStop + ptTravelDistance + walkTravelDistanceToPtStop2ToFacility;
-		
 		return totalTravelDistance;
 	}
 	
@@ -380,17 +508,17 @@ public class PtMatrix {
 		String ZurichNetwork  = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/data/network/ivtch-osm.xml";
 		
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(BrusselNetwork);
+		new MatsimNetworkReader(scenario).readFile(ZurichNetwork);
 		ScenarioUtils.loadScenario(scenario);
 		
 		Network network = scenario.getNetwork() ;
 		// TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		
 		MATSim4UrbanSimControlerConfigModuleV3 m4uccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		m4uccm.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/brussels_zone/data/transit_csvs_from_Dimitris_20121002/underground.csv"); 	// for Brussels
-		// m4uccm.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv");					  	// for Zurich
-		// m4uccm.setPtTravelTimesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT");						// for Zurich
-		// m4uccm.setPtTravelDistancesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRD");					// for Zurich
+		// m4uccm.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/brussels_zone/data/transit_csvs_from_Dimitris_20121002/underground.csv"); 	// for Brussels
+		m4uccm.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv");					  	// for Zurich
+		m4uccm.setPtTravelTimesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT");						// for Zurich
+		m4uccm.setPtTravelDistancesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRD");					// for Zurich
 
 		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, m4uccm);
 		

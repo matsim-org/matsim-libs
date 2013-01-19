@@ -52,16 +52,13 @@ public class PseudoPtRoutingModule implements RoutingModule{
 	//    - find the nearest transit stop to the coordinates of the next activity (via QuadTree)
 	//    - determine the time and generalized cost of the trip (walk + "matrix" entry + walk)
 	// 4) return that route as pseudo transit, i.e. such that matsim executes this as teleportation
-	
-	private final Controler controler;
-	
+
 	private PopulationFactoryImpl populationFactory;
 	private GenericRouteFactory genericRouteFactory;
 	private NetworkImpl network;
 	private PtMatrix ptMatrix;
 	
 	public PseudoPtRoutingModule(final Controler controler, PtMatrix ptMatrix){
-		this.controler = controler;
 		this.populationFactory = new PopulationFactoryImpl(controler.getScenario());
 		this.genericRouteFactory = new GenericRouteFactory();
 		this.network = (NetworkImpl) controler.getScenario().getNetwork();
