@@ -36,6 +36,8 @@ import playground.vsp.emissions.types.HbefaVehicleCategory;
 //TODO explain/change
 //import playground.vsp.emissions.types.HbefaColdEmissionFactorKey;
 
+//test for playground.vsp.emissions.types.HbefaColdEmissionFactorKey
+
 public class TestHbefaColdEmissionFactorKey {
 	
 	@Test

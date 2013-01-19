@@ -34,6 +34,7 @@ import playground.vsp.emissions.events.ColdEmissionEventImpl;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
 
+//test for playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler
 
 public class TestColdEmissionHandler {
 	

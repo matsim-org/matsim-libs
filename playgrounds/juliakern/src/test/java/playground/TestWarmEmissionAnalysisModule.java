@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*                                                   *
- * TestHbefaVehicleAttributesEmission.java                                 *
+ * TestEmission.java                                                       *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,38 +20,42 @@
 
 package playground;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
-import playground.julia.emission.types.*;
-//TODO entweder folgende Klasse benutzen oder Test umschreiben -> siehe unten
-//import playground.vsp.emissions.types.HbefaVehicleAttributes;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.testcases.MatsimTestUtils;
 
-//test for playground.vsp.emissions.types.HbefaVehicleAttributes
+import playground.vsp.analysis.modules.emissionsAnalyzer.*;
+import playground.vsp.emissions.WarmEmissionAnalysisModule;
+import playground.vsp.emissions.events.WarmEmissionEvent;
+import playground.vsp.emissions.events.WarmEmissionEventImpl;
+import playground.vsp.emissions.types.WarmPollutant;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
 
-public class TestHbefaVehicleAttributes {
+
+
+public class TestWarmEmissionAnalysisModule {
 	
+	//TODO copy from TestColdEmissionAnalysisModule
 	@Test
-	public final void testEquals(){
-		//default case
-		HbefaVehicleAttributes hva = new HbefaVehicleAttributes();
-		HbefaVehicleAttributes hva2 = new HbefaVehicleAttributes();
-		Assert.assertTrue(hva.equals(hva2));
-		//default constructor
-		hva.setHbefaEmConcept("average");
-		hva.setHbefaSizeClass("average");
-		hva.setHbefaTechnology("average");
-		Assert.assertTrue(hva.equals(hva2));
-		//test with content
-		//TODO die HbefaVehicleAttributes hat keinen schoenen Konstuktor.... sowas wie HbefaVehicleAttributes (String, String, String) waer schoen
-		//hab ich mal ergaenzt... uebernehmen?
-		hva.setHbefaEmConcept("hbefaEmConcept");
-		hva.setHbefaSizeClass("hbefaSizeClass");
-		hva.setHbefaTechnology("hbefaTechnology");
-		HbefaVehicleAttributes hva3 = new HbefaVehicleAttributes("hbefaTechnology", "hbefaSizeClass", "hbefaEmConcept");
-		Assert.assertTrue(hva3.equals(hva));
-		//TODO null constructor
-		HbefaVehicleAttributes hva4 = new HbefaVehicleAttributes("","","");
-		Assert.assertTrue(hva2.equals(hva4));
+	public final void testCalculateWarmEmissionsAndThrowEvent(){
+		
+		//setup? rather without inputfiles
+		/*(
+			Id coldEmissionEventLinkId,
+			Id personId,
+			Double startEngineTime,
+			Double parkingDuration,
+			Double accumulatedDistance,
+			String vehicleInformation)*/
+		
+		//WarmEmissionAnalysisModule weam = new ColdEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);
+		//TODO can i setup a analysismodule without inputfiles? ->ihab/benjamin
 		
 	}
 	
