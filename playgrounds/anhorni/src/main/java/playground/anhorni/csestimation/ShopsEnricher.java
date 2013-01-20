@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 
@@ -37,7 +38,7 @@ public class ShopsEnricher {
 	private TreeMap<Id, BZShop> bzShops;
 	private TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();
 	private final static Logger log = Logger.getLogger(ShopsEnricher.class);
-	CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
+	private CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
 	
 	public static void main(String[] args) {
 		ShopsEnricher enricher = new ShopsEnricher();
@@ -102,7 +103,11 @@ public class ShopsEnricher {
 		QuadTree<Location> bzQuadTree = Utils.buildLocationQuadTree(this.bzShops); 
 		for (ShopLocation shop:this.shops.values()) {			
 			BZShop closestBZShop = (BZShop) bzQuadTree.get(shop.getCoord().getX(), shop.getCoord().getY());
-			if (((CoordImpl)closestBZShop.getCoord()).calcDistance(shop.getCoord()) < 150) {
+			
+			Coord bzsCoord = this.trafo.transform(closestBZShop.getCoord());
+			Coord sCoord = this.trafo.transform(shop.getCoord());
+			
+			if (CoordUtils.calcDistance(bzsCoord, sCoord) < 150) {
 				if (closestBZShop.sizeMultiplyDefined()) {					
 					if (shop.getId() == new IdImpl(40051)) {
 						shop.setSize(4);

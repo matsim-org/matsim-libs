@@ -22,6 +22,7 @@ package playground.anhorni.csestimation;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -32,7 +33,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.anhorni.analysis.microcensus.planbased.MZ2Plans;
 import playground.anhorni.analysis.microcensus.planbased.MZActivityImpl;
@@ -43,6 +45,8 @@ public class MZControler {
 	private final static Logger log = Logger.getLogger(MZControler.class);	
 	private Population estimationPopulation0510 = 
 		((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+	
+	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 	
 	public static void main(String[] args) {
 		MZControler c = new MZControler();
@@ -97,9 +101,12 @@ public class MZControler {
 						MZActivityImpl end = (MZActivityImpl)plan.getPlanElements().get(actlegIndex + 2);
 						shoppingTrip.setEnd(end.getCoord());
 						
-						// TODO: check coord transformation!
-						if (Integer.toString(start.getPlz()).startsWith("80") && Integer.toString(end.getPlz()).startsWith("80") && 
-								((CoordImpl) shop.getCoord()).calcDistance(act.getCoord()) < 200.0) {
+						Coord sCoord = this.trafo.transform(shop.getCoord());
+						Coord aCoord = this.trafo.transform(act.getCoord());						
+						if (Integer.toString(start.getPlz()).startsWith("80") && 
+								Integer.toString(end.getPlz()).startsWith("80") && 
+								CoordUtils.calcDistance(sCoord, aCoord) < 200.0) {
+							
 							person.addShoppingTrip(shoppingTrip);
 							
 							if (this.estimationPopulation0510.getPersons().get(person.getId()) == null) {
