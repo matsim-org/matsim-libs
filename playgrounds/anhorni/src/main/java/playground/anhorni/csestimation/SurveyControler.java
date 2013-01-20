@@ -26,14 +26,14 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-public class Controler {
+public class SurveyControler {
 	public static ArrayList<String> modes = new ArrayList<String>(Arrays.asList("car", "pt", "bike", "walk", ""));
 	public static ArrayList<String> frequency = new ArrayList<String>(Arrays.asList("VeryOften", "Often", "OnceAWhile", "Seldom", "Never", "NULL", ""));	
 	private TreeMap<Id, EstimationPerson> population = new TreeMap<Id, EstimationPerson>();
-	private final static Logger log = Logger.getLogger(Controler.class);
+	private final static Logger log = Logger.getLogger(SurveyControler.class);
 	
 	public static void main(String[] args) {
-		Controler c = new Controler();
+		SurveyControler c = new SurveyControler();
 		String personFile = args[0];
 		String personShopsFile = args[1];
 		String addedShopsFile = args[2];

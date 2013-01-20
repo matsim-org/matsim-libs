@@ -20,6 +20,7 @@
 package playground.anhorni.csestimation;
 
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,21 +34,18 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-
 import playground.anhorni.analysis.microcensus.planbased.MZ2Plans;
 import playground.anhorni.analysis.microcensus.planbased.MZActivityImpl;
 import playground.anhorni.analysis.microcensus.planbased.MZPerson;
 
-public class EstimationControler {
-	private Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();	
+public class MZControler {	
 	private TreeMap<Id, ShopLocation> shops;
-	private final static Logger log = Logger.getLogger(EstimationControler.class);
-	
-	private Population zhpopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-	
+	private final static Logger log = Logger.getLogger(MZControler.class);	
+	private Population estimationPopulation0510 = 
+		((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 	
 	public static void main(String[] args) {
-		EstimationControler c = new EstimationControler();
+		MZControler c = new MZControler();
 		String mzIndir = args[0];
 		String universalChoiceSetFile = args[1];
 		String outdir = args[2];
@@ -55,6 +53,8 @@ public class EstimationControler {
 	}
 	
 	public void run(String universalChoiceSetFile, String mzIndir, String outdir) {
+		Population population = 
+			((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		Population popMZ;
 		MZ2Plans mzCreator = new MZ2Plans();
 		try {
@@ -62,7 +62,7 @@ public class EstimationControler {
 			
 			for (Person p : popMZ.getPersons().values()) {
 				MZPerson person = (MZPerson)p;
-				this.population.addPerson(new EstimationPerson(person));
+				population.addPerson(new EstimationPerson(person));
 			}
 			
 		} catch (Exception e) {
@@ -70,12 +70,13 @@ public class EstimationControler {
 		}
 		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
 		this.shops = ucsReader.readUniversalCS(universalChoiceSetFile);	
-		this.createShoppingTrips();
-		this.write(outdir);
+		this.createShoppingTrips(population);
+		this.write(outdir, population);
+		this.analyze(outdir, population);
 		log.info("finished .......................................");
 	}
 		
-	private void createShoppingTrips() {
+	private void createShoppingTrips(Population population) {
 		QuadTree<Location> shopQuadTree = Utils.buildLocationQuadTree(this.shops); 	// TODO: coord conversion
 		
 		for (Person p:population.getPersons().values()) {			
@@ -96,12 +97,13 @@ public class EstimationControler {
 						MZActivityImpl end = (MZActivityImpl)plan.getPlanElements().get(actlegIndex + 2);
 						shoppingTrip.setEnd(end.getCoord());
 						
+						// TODO: check coord transformation!
 						if (Integer.toString(start.getPlz()).startsWith("80") && Integer.toString(end.getPlz()).startsWith("80") && 
 								((CoordImpl) shop.getCoord()).calcDistance(act.getCoord()) < 200.0) {
 							person.addShoppingTrip(shoppingTrip);
 							
-							if (this.zhpopulation.getPersons().get(person.getId()) == null) {
-								this.zhpopulation.addPerson(person);
+							if (this.estimationPopulation0510.getPersons().get(person.getId()) == null) {
+								this.estimationPopulation0510.addPerson(person);
 							}
 						}
 					}
@@ -110,12 +112,14 @@ public class EstimationControler {
 		}
 	}
 	
-	private void write(String outdir) {
+	private void analyze(String outdir, Population population) {
+		log.info("zh population size: " + this.estimationPopulation0510.getPersons().size());
+		SurveyAnalyzer analyzer = new SurveyAnalyzer(this.estimationPopulation0510, outdir);
+		analyzer.analyze();	
+	}
+	
+	private void write(String outdir, Population population) {
 		Writer writer = new Writer();
 		writer.write(population, shops, outdir + "/persons.csv", outdir + "stores.csv");
-		
-		log.info("zh population size: " + this.zhpopulation.getPersons().size());
-		SurveyAnalyzer analyzer = new SurveyAnalyzer(this.zhpopulation, outdir);
-		analyzer.analyze();		
 	}	
 }

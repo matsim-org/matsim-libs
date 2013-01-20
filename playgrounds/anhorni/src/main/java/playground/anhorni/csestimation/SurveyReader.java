@@ -42,6 +42,8 @@ public class SurveyReader {
 				
 				person.setAge(Math.max(0, Integer.parseInt(entrs[1].trim())));
 				person.setSex(entrs[2].trim());
+				
+				person.setWeight(1.0);
 				// TODO: hh income -99 = AHV
 				if (!entrs[3].trim().equals("")) {
 					person.setHhIncome(Integer.parseInt(entrs[3].trim()));
@@ -58,10 +60,10 @@ public class SurveyReader {
 				hlocation.setCity(entrs[10].trim());
 				hlocation.setCoord(new CoordImpl(Double.parseDouble(entrs[11].trim()), Double.parseDouble(entrs[12].trim()))); // TODO: prüfen bei NULL
 				
-				person.setModesForShopping(Controler.modes.indexOf("car"), Controler.frequency.indexOf(entrs[13].trim().replaceAll("car", "")));
-				person.setModesForShopping(Controler.modes.indexOf("pt"), Controler.frequency.indexOf(entrs[14].trim().replaceAll("pt", "")));
-				person.setModesForShopping(Controler.modes.indexOf("bike"), Controler.frequency.indexOf(entrs[15].trim().substring(1)));
-				person.setModesForShopping(Controler.modes.indexOf("walk"), Controler.frequency.indexOf(entrs[16].trim().substring(1)));
+				person.setModesForShopping(SurveyControler.modes.indexOf("car"), SurveyControler.frequency.indexOf(entrs[13].trim().replaceAll("car", "")));
+				person.setModesForShopping(SurveyControler.modes.indexOf("pt"), SurveyControler.frequency.indexOf(entrs[14].trim().replaceAll("pt", "")));
+				person.setModesForShopping(SurveyControler.modes.indexOf("bike"), SurveyControler.frequency.indexOf(entrs[15].trim().substring(1)));
+				person.setModesForShopping(SurveyControler.modes.indexOf("walk"), SurveyControler.frequency.indexOf(entrs[16].trim().substring(1)));
 				
 				if (entrs[17].trim().equals("yes")) {
 					Location wlocation = new Location(new IdImpl(-2));
@@ -69,15 +71,15 @@ public class SurveyReader {
 					wlocation.setCity(entrs[21].trim());
 					wlocation.setCoord(new CoordImpl(Double.parseDouble(entrs[22].trim()), Double.parseDouble(entrs[23].trim())));
 				
-					if (entrs[25].trim().contains("car")) person.setModeForWorking(Controler.modes.indexOf("car"), true);
-					if (entrs[25].trim().contains("pt")) person.setModeForWorking(Controler.modes.indexOf("pt"), true);
-					if (entrs[25].trim().contains("bike")) person.setModeForWorking(Controler.modes.indexOf("bike"), true);
-					if (entrs[25].trim().contains("walk")) person.setModeForWorking(Controler.modes.indexOf("walk"), true);		
+					if (entrs[25].trim().contains("car")) person.setModeForWorking(SurveyControler.modes.indexOf("car"), true);
+					if (entrs[25].trim().contains("pt")) person.setModeForWorking(SurveyControler.modes.indexOf("pt"), true);
+					if (entrs[25].trim().contains("bike")) person.setModeForWorking(SurveyControler.modes.indexOf("bike"), true);
+					if (entrs[25].trim().contains("walk")) person.setModeForWorking(SurveyControler.modes.indexOf("walk"), true);		
 					
-					person.setAreaToShop(0, Controler.frequency.indexOf(entrs[26].trim().replaceAll("home", "")));
-					person.setAreaToShop(1, Controler.frequency.indexOf(entrs[27].trim().replaceAll("work", "")));
-					person.setAreaToShop(2, Controler.frequency.indexOf(entrs[28].trim().replaceAll("inter", "")));
-					person.setAreaToShop(3, Controler.frequency.indexOf(entrs[29].trim().replaceAll("other", "")));
+					person.setAreaToShop(0, SurveyControler.frequency.indexOf(entrs[26].trim().replaceAll("home", "")));
+					person.setAreaToShop(1, SurveyControler.frequency.indexOf(entrs[27].trim().replaceAll("work", "")));
+					person.setAreaToShop(2, SurveyControler.frequency.indexOf(entrs[28].trim().replaceAll("inter", "")));
+					person.setAreaToShop(3, SurveyControler.frequency.indexOf(entrs[29].trim().replaceAll("other", "")));
 				}				
 			}
 		} catch (IOException e) {

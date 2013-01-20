@@ -86,8 +86,7 @@ public class PlansCreateFromMZ {
 		try {
 			this.readPersonStrings(population2005, indir + "/2005Wegeinland.dat", "2005");
 			this.readPersonStrings(population2010, indir + "/2010Wegeinland.dat", "2010");
-			
-							
+										
 			this.readPersonAttributes(indir + "/2005Zielpersonen.dat", "2005", population2005);
 			this.readPersonAttributes(indir + "/2010Zielpersonen.dat", "2010", population2010);
 			
@@ -282,6 +281,8 @@ public class PlansCreateFromMZ {
 					person = new MZPerson(pid);
 					plans.addPerson(person);
 				}
+				
+				person.setWeight(weight);
 
 				// creating/getting plan
 				Plan plan = person.getSelectedPlan();
@@ -468,6 +469,8 @@ public class PlansCreateFromMZ {
 					person = new MZPerson(pid);
 					plans.addPerson(person);
 				}
+				
+				person.setWeight(weight);
 
 				// creating/getting plan
 				Plan plan = person.getSelectedPlan();
@@ -541,11 +544,20 @@ public class PlansCreateFromMZ {
 			int day = Integer.parseInt(entries[3].trim());
 			int age = Integer.parseInt(entries[4].trim());
 			int hh =  Integer.parseInt(year) * 1000000 + Integer.parseInt(entries[0].trim());
+			String sex = ""; // TODO: check if 1=m 2=f
+			int s = Integer.parseInt(entries[5].trim());
+			if (s == 2) {
+				sex = "f";
+			}
+			else if (s == 1) {
+				sex = "m";
+			}
 			MZPerson person = (MZPerson) population.getPersons().get(new IdImpl(id));
 			if (person != null) {
 				person.setAge(age);
 				person.setDay(day);
 				person.setHh(hh);
+				person.setSex(sex);
 			}
 		}
 	}
@@ -576,7 +588,7 @@ public class PlansCreateFromMZ {
 				log.info(person.getHh());
 				log.info(households.keySet().toString());
 			}			
-			person.setHhIncome(household.getSize());
+			person.setHhSize(household.getSize());
 			person.setHhIncome(household.getHhIncome());		
 		}		
 	}

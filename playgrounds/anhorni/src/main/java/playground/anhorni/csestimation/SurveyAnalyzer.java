@@ -7,7 +7,8 @@ import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
+
+import playground.anhorni.analysis.microcensus.planbased.MZPerson;
 
 public class SurveyAnalyzer {
 	private final static Logger log = Logger.getLogger(SurveyAnalyzer.class);	
@@ -29,20 +30,23 @@ public class SurveyAnalyzer {
 	
 	public void analyze() {
 		log.info("Analyzing " + this.population.size() + " persons");
-//		interval, maxVal
-		Bins ageBins = new Bins(10, 100, "age");
+		Bins ageBins = new Bins(10, 100, "age"); //	interval, maxVal
 		Bins incomeBins = new Bins(2000, 18000, "income");
+		int isWoman = 0;
 		
 		for (Person p:this.population.values()) {
-			if (((PersonImpl)p).getAge() > 0) {
-				ageBins.addVal(((PersonImpl)p).getAge(), 1.0);
-			}
-			
+			if (((MZPerson)p).getAge() > 0) {
+				ageBins.addVal(((MZPerson)p).getAge(), ((MZPerson)p).getWeight());
+			}			
 			if (((EstimationPerson)p).getHhIncome() > 0.0) {
-				incomeBins.addVal(((EstimationPerson)p).getHhIncome(), 1.0);
+				incomeBins.addVal(((EstimationPerson)p).getHhIncome(), ((MZPerson)p).getWeight());
 			}
+			if (((EstimationPerson)p).getSex().equals("f")) {
+				isWoman++;
+			}	
 		}
 		ageBins.plotBinnedDistribution(outdir, "age bins", " year");
 		incomeBins.plotBinnedDistribution(outdir, "income bins", " SFr.");
+		log.info("Share of women: " + (double)isWoman / (double)this.population.size());
 	}
 }

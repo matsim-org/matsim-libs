@@ -24,11 +24,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 
 public class MZPerson extends PersonImpl implements Person {	
-	private int hhIncome;
+	private double hhIncome;
 	private int day;
 	private int hh;
 	private int hhSize;
 	private int plz;
+	private double weight;
 	
 	public MZPerson(Id id) {
 		super(id);
@@ -39,10 +40,10 @@ public class MZPerson extends PersonImpl implements Person {
 	public void setId(Id id) {
 		this.id = id;
 	}
-	public int getHhIncome() {
+	public double getHhIncome() {
 		return hhIncome;
 	}
-	public void setHhIncome(int hhIncome) {
+	public void setHhIncome(double hhIncome) {
 		this.hhIncome = hhIncome;
 	}
 	public int getDay() {
@@ -68,5 +69,11 @@ public class MZPerson extends PersonImpl implements Person {
 	}
 	public void setPlz(int plz) {
 		this.plz = plz;
+	}
+	public double getWeight() {
+		return weight;
+	}
+	public void setWeight(double weight) {
+		this.weight = weight;
 	}
 }
