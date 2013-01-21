@@ -20,9 +20,13 @@
 
 package org.matsim.population.algorithms;
 
+import java.util.List;
 import java.util.Random;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
@@ -54,15 +58,18 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private void mutatePlan(final Plan plan) {
 
-		int max = plan.getPlanElements().size();
+		List<PlanElement> planElements = plan.getPlanElements();
+		int max = planElements.size();
 
 		double now = 0;
 
 		// apply mutation to all activities except the last home activity
-		for (int i = 0; i < max; i++ ) {
+		for (int i = 0; i < max; i++) {
 
-			if (i % 2 == 0) {
-				ActivityImpl act = (ActivityImpl)(plan.getPlanElements().get(i));
+			PlanElement pe = planElements.get(i);
+			
+			if (pe instanceof Activity) {
+				ActivityImpl act = (ActivityImpl) pe;
 
 				// handle first activity
 				if (i == 0) {
@@ -105,9 +112,9 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 				}
 
-			} else {
+			} else if (pe instanceof Leg) {
 
-				LegImpl leg = (LegImpl)(plan.getPlanElements().get(i));
+				LegImpl leg = (LegImpl) pe;
 
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
