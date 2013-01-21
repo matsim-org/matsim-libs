@@ -27,6 +27,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.TimeProvider;
 
 /**
  * 
@@ -73,10 +74,15 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 		}
 		
 		double newEndTime = Math.min(24 * 3600.0, cooperative.getBestPlan().getEndTime() + timeMutation);
-		newEndTime = Math.max(newEndTime, cooperative.getBestPlan().getStartTime() + cooperative.getMinOperationTime());
-		
+				
 		// cast time to time bin size
-		newEndTime = this.getTimeSlotForTime(newEndTime) * this.timeBinSize;
+		newEndTime = TimeProvider.getSlotForTime(newEndTime, this.timeBinSize) * this.timeBinSize;
+		
+		// increase to match min operation time
+		while (newEndTime < cooperative.getBestPlan().getStartTime() + cooperative.getMinOperationTime()) {
+			newEndTime += this.timeBinSize;
+		}
+		
 		newPlan.setEndTime(newEndTime);
 		
 		if(newPlan.getEndTime() <= newPlan.getStartTime()){
@@ -92,9 +98,5 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 	@Override
 	public String getName() {
 		return MaxRandomEndTimeAllocator.STRATEGY_NAME;
-	}
-	
-	private int getTimeSlotForTime(double time){
-		return ((int) time / this.timeBinSize);
 	}
 }
