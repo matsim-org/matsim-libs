@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.processing;
 
+import java.awt.Polygon;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
@@ -55,23 +56,64 @@ public class ShapeDrawer_V2 extends PApplet {
 		String munichShapeFileName = "/media/data/2_Workspaces/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/Landkreise_umMuenchen_Umrisse.shp";
 		
 		size(1000, 1000, P2D);
-//		background(255, 255, 255);
+//		background(0, 0, 0);
 		
-		Collection<SimpleFeature> networkShape = readShape(networkShapeFileName);
+//		Collection<SimpleFeature> networkShape = readShape(networkShapeFileName);
 		Collection<SimpleFeature> munichShape = readShape(munichShapeFileName);
 		
-		defineBoundingBox(networkShape);
+//		defineBoundingBox(networkShape);
+		defineBoundingBox(munichShape);
 		
-		network = getPShapes(networkShape);
+//		network = getPShapes(networkShape);
 		munich = getPShapes(munichShape);
 	}
 
 	@Override
 	public void draw(){
-		shape(network);
+		background(0, 0, 0);
+		
+//		shape(network);
 		shape(munich);
+		
+//		PShape testChild = munich.getChild(0);
+//		if(mousePressed){
+//			Polygon p = getPolygon(testChild); 
+//
+//			if(p.contains(mouseX, mouseY)){
+//				testChild.fill(150, 50, 50);
+//				testChild.noStroke();
+//			}
+//			shape(testChild);
+//		}
+//		testChild.noFill();
+
+		for(PShape childShape : munich.getChildren()){
+			if(mousePressed){
+				Polygon p = getPolygon(childShape); 
+
+				if(p.contains(mouseX, mouseY)){
+					childShape.fill(150, 50, 50);
+					childShape.noStroke();
+				}
+				shape(childShape);
+			}
+			childShape.noFill();
+		}
 	}
-	
+
+	private Polygon getPolygon(PShape shape) {
+		int vertexCount = shape.getVertexCount();
+		
+		int[] xCoords = new int[vertexCount];
+		int[] yCoords = new int[vertexCount];
+		
+		for(int i=0; i<vertexCount; i++){
+			xCoords[i] = (int) shape.getVertex(i).x;
+			yCoords[i] = (int) shape.getVertex(i).y;
+		}
+		return new Polygon(xCoords, yCoords, vertexCount);
+	}
+
 	private PShape getPShapes(Collection<SimpleFeature> featureCollection) {
 		PShape shapes = createShape(GROUP);
 		
