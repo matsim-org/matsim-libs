@@ -46,11 +46,17 @@ public class SurveyControler {
 		reader.readDumpedPersons(personFile);
 		log.info(this.population.size() + " persons created");
 		reader.readDumpedPersonShops(personShopsFile);	
+				
 		
-		SurveyCleaner cleaner = new SurveyCleaner();
-		cleaner.clean(this.population);
 		
 		SurveyAnalyzer analyzer = new SurveyAnalyzer(this.population, outdir);
+		SurveyCleaner cleaner = new SurveyCleaner();
+		cleaner.filter(population);
+		cleaner.cleanIncome(population);
+		analyzer.analyze();
+		
+		this.population = cleaner.clean(this.population);
+		analyzer = new SurveyAnalyzer(this.population, outdir);
 		analyzer.analyze();
 		log.info("finished .......................................");
 	}

@@ -41,8 +41,17 @@ public class SurveyReader {
 				this.population.put(userId, person);
 				
 				person.setAge(Math.max(0, Integer.parseInt(entrs[1].trim())));
-				person.setSex(entrs[2].trim());
 				
+				if (entrs[2].trim().equals("w")) {
+					person.setSex("f");
+				}
+				else if (entrs[2].trim().equals("m")) {
+					person.setSex("m");
+				}
+				else {
+					person.setSex("-99");
+				}
+
 				person.setWeight(1.0);
 				// TODO: hh income -99 = AHV
 				if (!entrs[3].trim().equals("")) {

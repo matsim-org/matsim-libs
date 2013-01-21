@@ -117,9 +117,12 @@ public class SurveyAnalyzer {
 			String gender = p.getSex();
 			if (gender.contains("f") || gender.contains("m")) {
 				totalGenderWeight += weight;
-			}
-			
-		}		
+			}		
+		}	
+		log.info("totalIncomeWeight: " + totalIncomeWeight);
+		log.info("totalAgeWeight: " + totalAgeWeight);
+		log.info("totalGenderWeight: " + totalGenderWeight);
+		
 		double genders[] = {0.0, 0.0};
 		double incomes[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		double ages[] = {0.0, 0.0, 0.0, 0.0};
@@ -213,5 +216,6 @@ public class SurveyAnalyzer {
 	
 	public void analyze() {
 		this.analyzeVariableBinSize();
+		log.info("=====================================");
 	}
 }
