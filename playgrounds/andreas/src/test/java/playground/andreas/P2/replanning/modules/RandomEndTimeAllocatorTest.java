@@ -29,6 +29,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.andreas.P2.PScenarioHelper;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.replanning.modules.deprecated.RandomEndTimeAllocator;
 
 public class RandomEndTimeAllocatorTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();

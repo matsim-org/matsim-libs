@@ -34,12 +34,12 @@ import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicl
 import playground.andreas.P2.replanning.modules.ConvexHullRouteExtension;
 import playground.andreas.P2.replanning.modules.MaxRandomEndTimeAllocator;
 import playground.andreas.P2.replanning.modules.MaxRandomStartTimeAllocator;
-import playground.andreas.P2.replanning.modules.RandomEndTimeAllocator;
 import playground.andreas.P2.replanning.modules.RandomRouteEndExtension;
 import playground.andreas.P2.replanning.modules.RandomRouteStartExtension;
-import playground.andreas.P2.replanning.modules.RandomStartTimeAllocator;
 import playground.andreas.P2.replanning.modules.RectangleHullRouteExtension;
 import playground.andreas.P2.replanning.modules.RouteEnvelopeExtension;
+import playground.andreas.P2.replanning.modules.deprecated.RandomEndTimeAllocator;
+import playground.andreas.P2.replanning.modules.deprecated.RandomStartTimeAllocator;
 
 /**
  * @author droeder
