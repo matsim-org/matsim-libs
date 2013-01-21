@@ -1,4 +1,4 @@
-package others.sergioo.AddressLocator;
+package others.sergioo.addressLocator2011;
 
 import java.io.BufferedReader;
 import java.io.IOException;

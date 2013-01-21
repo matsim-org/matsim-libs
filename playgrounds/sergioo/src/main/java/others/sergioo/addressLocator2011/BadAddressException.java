@@ -1,4 +1,4 @@
-package others.sergioo.AddressLocator;
+package others.sergioo.addressLocator2011;
 
 @SuppressWarnings("serial")
 public class BadAddressException extends Exception {
