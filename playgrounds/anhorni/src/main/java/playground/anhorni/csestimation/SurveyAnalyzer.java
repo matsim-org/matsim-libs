@@ -147,7 +147,7 @@ public class SurveyAnalyzer {
 			double income = p.getHhIncome();
 			if (income >= 0.0) {
 				if (income < 2000) {
-					incomes[0] += weight / totalIncomeWeight * 100.0;
+					incomes[0] += weight / totalIncomeWeight * 100.0;					
 				}
 				else if (income >= 2000 && income <= 4000) {
 					incomes[1] += weight / totalIncomeWeight * 100.0;
