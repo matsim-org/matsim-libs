@@ -66,7 +66,10 @@ public class MZControler {
 			
 			for (Person p : popMZ.getPersons().values()) {
 				MZPerson person = (MZPerson)p;
-				population.addPerson(new EstimationPerson(person));				
+				
+				if (person.getWeight() > 0.0 && person.getAge() > 0.0) {				
+					population.addPerson(new EstimationPerson(person));	
+				}
 			}
 			
 		} catch (Exception e) {
