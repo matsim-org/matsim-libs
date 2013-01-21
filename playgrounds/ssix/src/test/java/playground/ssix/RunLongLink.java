@@ -1,4 +1,4 @@
-package test.java.playground.ssix;
+package playground.ssix;
 
 //Just a modified copy of mzilske's version
 //so I can modify and add text in it in order to understand 

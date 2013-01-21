@@ -18,14 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package test.java.playground.ssix;
+package playground.ssix;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import main.java.playgrounds.ssix.FundamentalDiagrams;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,6 +32,8 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
+
+import playgrounds.ssix.FundamentalDiagrams;
 
 /* A class supposed to go attached to the DreieckStreckeSzenario class (with passing).
  * It aims at analyzing the flow of events in order to detect:
