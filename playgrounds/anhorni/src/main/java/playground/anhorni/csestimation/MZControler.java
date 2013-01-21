@@ -66,7 +66,7 @@ public class MZControler {
 			
 			for (Person p : popMZ.getPersons().values()) {
 				MZPerson person = (MZPerson)p;
-				population.addPerson(new EstimationPerson(person));
+				population.addPerson(new EstimationPerson(person));				
 			}
 			
 		} catch (Exception e) {
@@ -76,7 +76,7 @@ public class MZControler {
 		this.shops = ucsReader.readUniversalCS(universalChoiceSetFile);	
 		this.createShoppingTrips(population);
 		this.write(outdir, population);
-		this.analyze(outdir, population);
+		this.analyze(outdir);
 		log.info("finished .......................................");
 	}
 		
@@ -119,10 +119,10 @@ public class MZControler {
 		}
 	}
 	
-	private void analyze(String outdir, Population population) {
+	private void analyze(String outdir) {
 		log.info("zh population size: " + this.estimationPopulation0510.getPersons().size());
 		SurveyAnalyzer analyzer = new SurveyAnalyzer(this.estimationPopulation0510, outdir);
-		analyzer.analyze();	
+		analyzer.analyzeMZ();	
 	}
 	
 	private void write(String outdir, Population population) {

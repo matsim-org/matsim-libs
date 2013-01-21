@@ -61,6 +61,7 @@ public class EstimationPerson extends MZPerson {
 		super.setSelectedPlan(mzPerson.getSelectedPlan());
 		super.setLicence(mzPerson.getLicense());
 		super.setSex(mzPerson.getSex());
+		super.setWeight(mzPerson.getWeight());
 	}
 	
 	public void setHomeLocation(Location location) {

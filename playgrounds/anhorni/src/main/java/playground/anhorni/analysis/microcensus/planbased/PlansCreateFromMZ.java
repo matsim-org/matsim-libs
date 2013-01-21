@@ -544,7 +544,7 @@ public class PlansCreateFromMZ {
 			int day = Integer.parseInt(entries[3].trim());
 			int age = Integer.parseInt(entries[4].trim());
 			int hh =  Integer.parseInt(year) * 1000000 + Integer.parseInt(entries[0].trim());
-			String sex = ""; // TODO: check if 1=m 2=f
+			String sex = ""; // 1=m 2=f
 			int s = Integer.parseInt(entries[5].trim());
 			if (s == 2) {
 				sex = "f";
