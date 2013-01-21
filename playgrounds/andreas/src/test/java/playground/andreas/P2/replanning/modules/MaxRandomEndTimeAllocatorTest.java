@@ -38,7 +38,7 @@ public class MaxRandomEndTimeAllocatorTest {
 	@Test
     public final void testRun() {
 	
-		Cooperative coop = PScenarioHelper.createTestCooperative();
+		Cooperative coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
 		ArrayList<String> param = new ArrayList<String>();
 		param.add("0");
 		param.add("1");

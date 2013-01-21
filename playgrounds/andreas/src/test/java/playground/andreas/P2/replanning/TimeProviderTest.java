@@ -92,11 +92,11 @@ public class TimeProviderTest {
 			tP.handleEvent(new ActivityEndEvent(500.0 * i, id, id, id, "type"));
 		}
 		
-		Assert.assertEquals("Check time (cannot change due to missing reset call)", 12600.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Check time (cannot change due to missing reset call)", 18000.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Check time", 9900.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Check time", 18000.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
 
 		tP.reset(1);
-		Assert.assertEquals("Check time (will change)", 11700.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Check time (cannot change due to missing reset call)", 7200.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Check time", 10800.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Check time", 18000.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
 	}
 }

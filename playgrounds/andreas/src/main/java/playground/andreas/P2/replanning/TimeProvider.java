@@ -20,6 +20,7 @@
 package playground.andreas.P2.replanning;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -59,6 +60,7 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 		}
 		this.weights = new int[numberOfSlots];
 		
+		new File(outputDir + PConstants.statsOutputFolder).mkdir();
 		this.writer = IOUtils.getBufferedWriter(outputDir + PConstants.statsOutputFolder + "timeSlots2weight.txt");
 		StringBuffer strB = new StringBuffer();
 		
@@ -161,6 +163,10 @@ public class TimeProvider implements ActivityStartEventHandler, ActivityEndEvent
 		if(timeSlot < this.weights.length) {
 			this.weights[timeSlot]++;
 		}
+	}
+	
+	public double getTimeSlotSize(){
+		return this.timeSlotSize;
 	}
 
 	public static int getSlotForTime(double time, double timeSlotSize){

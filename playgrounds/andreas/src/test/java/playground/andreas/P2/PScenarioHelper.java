@@ -53,6 +53,7 @@ import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PStrategy;
+import playground.andreas.P2.replanning.TimeProvider;
 import playground.andreas.P2.routeProvider.ComplexCircleScheduleProvider;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.routeProvider.RandomStopProvider;
@@ -67,7 +68,7 @@ import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
  */
 public class PScenarioHelper {
 	
-	public static Cooperative createTestCooperative(){
+	public static Cooperative createTestCooperative(String testOutPutDir){
 		Scenario sC = PScenarioHelper.createTestNetwork();
 		
 		PConfigGroup pC = new PConfigGroup();
@@ -79,7 +80,10 @@ public class PScenarioHelper {
 		
 		ArrayList<String> parameter = new ArrayList<String>();
 		parameter.add("900");
-		coop.init(rP, new CreateNewPlan(parameter), 0, 0.0);
+		TimeProvider tP = new TimeProvider(pC, testOutPutDir);
+		CreateNewPlan strat = new CreateNewPlan(parameter);
+		strat.setTimeProvider(tP);
+		coop.init(rP, strat, 0, 0.0);
 		
 		return coop;
 	}

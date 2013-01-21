@@ -44,7 +44,7 @@ public class WeightedStartTimeExtensionTest {
 	@Test
     public final void testRun() {
 	
-		Cooperative coop = PScenarioHelper.createTestCooperative();
+		Cooperative coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
 		
 		new File(utils.getOutputDirectory() + PConstants.statsOutputFolder).mkdir();
 		
@@ -97,7 +97,7 @@ public class WeightedStartTimeExtensionTest {
 		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 18000.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare start time", 9000.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
 		
 		tP.reset(1);
 		testPlan = strat.run(coop);
@@ -106,6 +106,6 @@ public class WeightedStartTimeExtensionTest {
 		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 9000.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare start time", 18900.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
 	}
 }

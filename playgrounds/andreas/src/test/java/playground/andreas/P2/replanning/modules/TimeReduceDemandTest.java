@@ -45,7 +45,7 @@ public class TimeReduceDemandTest {
 		EventsFactory eF = new EventsFactory();
 		PConfigGroup pC = new PConfigGroup();
 		
-		Cooperative coop = PScenarioHelper.createTestCooperative();
+		Cooperative coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
 		ArrayList<String> param = new ArrayList<String>();
 		param.add("900");		
 		TimeReduceDemand strat = new TimeReduceDemand(param);

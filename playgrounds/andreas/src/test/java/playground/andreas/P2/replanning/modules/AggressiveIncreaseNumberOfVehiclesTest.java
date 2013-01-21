@@ -38,7 +38,7 @@ public class AggressiveIncreaseNumberOfVehiclesTest {
 	@Test
     public final void testRun() {
 	
-		Cooperative coop = PScenarioHelper.createTestCooperative();
+		Cooperative coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
 		AggressiveIncreaseNumberOfVehicles strat = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
 		PPlan testPlan = null;
 		
