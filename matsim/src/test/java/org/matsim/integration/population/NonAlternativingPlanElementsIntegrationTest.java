@@ -144,6 +144,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		plan.addActivity(home1);
 		plan.addLeg(leg1);
 		plan.addLeg(leg2);
+		plan.addLeg(leg3);
 		plan.addActivity(work);
 		plan.addActivity(shop);
 		plan.addLeg(leg4);
