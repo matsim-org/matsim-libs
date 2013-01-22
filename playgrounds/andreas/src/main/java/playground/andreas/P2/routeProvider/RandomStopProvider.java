@@ -171,14 +171,14 @@ public class RandomStopProvider {
 		if (this.stops2Weight == null) {
 			updateWeights();
 		}
-		double totalWeight = 0.0;
+		double totalWeightOfChoiceSet = 0.0;
 		for (TransitStopFacility stop : choiceSet) {
 			if (this.stops2Weight.get(stop) != null) {
-				totalWeight += this.stops2Weight.get(stop);
+				totalWeightOfChoiceSet += this.stops2Weight.get(stop);
 			}
 		}
 		
-		if (this.totalWeight == 0.0) {
+		if (totalWeightOfChoiceSet == 0.0) {
 			// old version
 			int i = 0;
 			double rndTreshold = MatsimRandom.getRandom().nextDouble() * choiceSet.size();
@@ -191,13 +191,13 @@ public class RandomStopProvider {
 			return null;
 		}
 
-		double accumulatedWeight = 0.0;
-		double rndTreshold = MatsimRandom.getRandom().nextDouble() * totalWeight;
+		double accumulatedWeightOfChoiceSet = 0.0;
+		double rndTreshold = MatsimRandom.getRandom().nextDouble() * totalWeightOfChoiceSet;
 		for (TransitStopFacility stop : choiceSet) {
 			if (this.stops2Weight.get(stop) != null) {
-				accumulatedWeight += this.stops2Weight.get(stop);
+				accumulatedWeightOfChoiceSet += this.stops2Weight.get(stop);
 			}
-			if (rndTreshold <= accumulatedWeight) {
+			if (rndTreshold <= accumulatedWeightOfChoiceSet) {
 				return stop;
 			}
 		}
