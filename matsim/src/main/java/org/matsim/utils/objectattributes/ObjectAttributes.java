@@ -22,6 +22,7 @@ package org.matsim.utils.objectattributes;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * A simple helper class to store arbitrary attributes (identified by Strings) for
@@ -36,6 +37,23 @@ import java.util.Map;
 public class ObjectAttributes {
 
 	/*package*/ Map<String, Map<String, Object>> attributes = new LinkedHashMap<String, Map<String, Object>>(1000);
+	
+	@Override
+	public String toString() {
+		StringBuilder stb = new StringBuilder() ;
+		for ( Entry<String, Map<String,Object>> entry : attributes.entrySet() ) {
+			String key = entry.getKey() ;
+			stb.append( "key=" + key ) ;
+			Map<String,Object> map = entry.getValue() ;
+			for ( Entry<String,Object> ee : map.entrySet() ) {
+				String subkey = ee.getKey();
+				stb.append("; subkey="+subkey ) ;
+				stb.append("; object="+ee.getValue().toString() ) ;
+			}
+			stb.append("\n") ;
+		}
+		return stb.toString() ;
+	}
 
 	public Object putAttribute(final String objectId, final String attribute, final Object value) {
 		Map<String, Object> attMap = this.attributes.get(objectId);
@@ -72,5 +90,6 @@ public class ObjectAttributes {
 	public void clear() {
 		this.attributes.clear();
 	}
+	
 
 }
