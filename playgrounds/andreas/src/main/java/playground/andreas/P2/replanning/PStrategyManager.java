@@ -29,6 +29,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConfigGroup.PStrategySettings;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.modules.ConvexHullRouteExtension;
+import playground.andreas.P2.replanning.modules.EndRouteExtension;
 import playground.andreas.P2.replanning.modules.MaxRandomEndTimeAllocator;
 import playground.andreas.P2.replanning.modules.MaxRandomStartTimeAllocator;
 import playground.andreas.P2.replanning.modules.RandomRouteEndExtension;
@@ -39,6 +40,7 @@ import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedRFare;
 import playground.andreas.P2.replanning.modules.ReduceTimeServed;
 import playground.andreas.P2.replanning.modules.ReduceTimeServedRFare;
 import playground.andreas.P2.replanning.modules.RouteEnvelopeExtension;
+import playground.andreas.P2.replanning.modules.SidewaysRouteExtension;
 import playground.andreas.P2.replanning.modules.TimeReduceDemand;
 import playground.andreas.P2.replanning.modules.WeightedEndTimeExtension;
 import playground.andreas.P2.replanning.modules.WeightedStartTimeExtension;
@@ -124,6 +126,10 @@ public class PStrategyManager {
 			strategy = new RandomRouteStartExtension(settings.getParametersAsArrayList());
 		} else if(name.equals(RouteEnvelopeExtension.STRATEGY_NAME)){
 			strategy = new RouteEnvelopeExtension(settings.getParametersAsArrayList());
+		} else if(name.equals(SidewaysRouteExtension.STRATEGY_NAME)){
+			strategy = new SidewaysRouteExtension(settings.getParametersAsArrayList());
+		} else if(name.equals(EndRouteExtension.STRATEGY_NAME)){
+			strategy = new EndRouteExtension(settings.getParametersAsArrayList());
 		} else if (name.equals(TimeReduceDemand.STRATEGY_NAME)) {
 			TimeReduceDemand strat = new TimeReduceDemand(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);
