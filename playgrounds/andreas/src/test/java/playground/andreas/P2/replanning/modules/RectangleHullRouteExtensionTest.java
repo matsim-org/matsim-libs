@@ -32,6 +32,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PStrategy;
+import playground.andreas.P2.replanning.modules.deprecated.RectangleHullRouteExtension;
 
 /**
  * @author droeder

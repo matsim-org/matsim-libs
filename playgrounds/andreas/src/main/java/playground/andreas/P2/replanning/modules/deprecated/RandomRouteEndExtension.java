@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.replanning.modules;
+package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +35,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.modules.EndRouteExtension;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -45,13 +46,12 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author droeder
  *
  * @deprecated Use {@linkplain EndRouteExtension} instead
- *
  */
-public class RandomRouteStartExtension extends AbstractPStrategyModule {
+public class RandomRouteEndExtension extends AbstractPStrategyModule {
 	
 	private static final Logger log = Logger
-	.getLogger(RandomRouteStartExtension.class);
-	public static final String STRATEGY_NAME = "RandomRouteStartExtension";
+	.getLogger(RandomRouteEndExtension.class);
+	public static final String STRATEGY_NAME = "RandomRouteEndExtension";
 	private double distanceFactor;
 	private QuadTree<TransitStopFacility> tree = null;
 	
@@ -61,7 +61,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	 *
 	 * @param parameter 
 	 */
-	public RandomRouteStartExtension(ArrayList<String> parameter) {
+	public RandomRouteEndExtension(ArrayList<String> parameter) {
 		super(parameter);
 		if(parameter.size() != 1){
 			log.error("only one parameter allowed. set the distancefactor to 0.5");
@@ -89,11 +89,11 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 		newPlan.setStartTime(oldPlan.getStartTime());
 		newPlan.setEndTime(oldPlan.getEndTime());
 		
-		List<TransitStopFacility> stopsToServe = createNewStopsToServe(cooperative, tree); 
+		ArrayList<TransitStopFacility> stopsToServe = createNewStopsToServe(cooperative, tree); 
 		if(stopsToServe == null){
 			return null;
 		}
-		newPlan.setStopsToBeServed((ArrayList<TransitStopFacility>) stopsToServe);
+		newPlan.setStopsToBeServed(stopsToServe);
 		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 		
@@ -108,6 +108,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	private ArrayList<TransitStopFacility> createNewStopsToServe(Cooperative cooperative, QuadTree<TransitStopFacility> tree) {
 		ArrayList<TransitStopFacility> stops2serve = new ArrayList<TransitStopFacility>();
 		stops2serve.addAll(cooperative.getBestPlan().getStopsToBeServed());
+		
 		// get already served stops in the correct order
 		List<TransitStopFacility> alreadyServed = new ArrayList<TransitStopFacility>(); 
 		for(TransitRoute r: cooperative.getBestPlan().getLine().getRoutes().values()){
@@ -118,23 +119,25 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 			break;
 		}
 		
-		/* find the stop within the greatest distance from the stops2beServed-list, assuming that this is the turning-point of the route  
+		/* find the stop within the greatest distance from the stops2beServed-list, assumin that this is the turning-point of the route  
 		 * use stops2serve and NOT alreadyServed, because alreadyServed might not be consistent or not necessary for the new route
 		 */
-		TransitStopFacility stopInGreatestDistance = findStopInGreatestDistance(stops2serve);
-		if(stopInGreatestDistance == null){
+		Integer indexStopInGreatestDistance = findStopInGreatestDistance(stops2serve);
+		if(indexStopInGreatestDistance == null){
 			// normally this should not happen, because there have to be at least 2 stops...
-			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + cooperative.getCurrentIteration() + ". can not find a second stop");
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ". can not find a second stop");
 			stops2serve = null;
 		}else{
 			//find candidate-stops which are within a specified area and not served already...
-			List<TransitStopFacility> candidates = findCandidates(alreadyServed, stopInGreatestDistance);
+			List<TransitStopFacility> candidates = findCandidates(alreadyServed, stops2serve.get(indexStopInGreatestDistance));
 			if(candidates.size() == 0){
 				// should only happen if the end of the route is at the periphery of the network
-				log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + cooperative.getCurrentIteration() + ". No unserved stop within the specified distance.");
+				log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+						cooperative.getCurrentIteration() + ". No unserved stop within the specified distance.");
 				stops2serve = null;
 			}else{
-				stops2serve = addCandidate(cooperative.getRouteProvider(), candidates, stops2serve);
+				stops2serve = addCandidate(cooperative.getRouteProvider(), candidates, stops2serve, indexStopInGreatestDistance);
 			}
 		}
 		return stops2serve;
@@ -144,7 +147,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	 * @param stops2serve
 	 * @return
 	 */
-	private TransitStopFacility findStopInGreatestDistance(List<TransitStopFacility> stops2serve) {
+	private Integer findStopInGreatestDistance(List<TransitStopFacility> stops2serve) {
 		TransitStopFacility first = stops2serve.get(0);
 		TransitStopFacility temp;
 		Integer index = null;
@@ -158,22 +161,13 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 				index = i;
 			}
 		}
-		/*
-		 * what may be NULL here? 
-		 * 
-		 * could be "index", but even if it is a circle-line and the stops2serve consists of the same stop twice,
-		 * index is set once, because 0 > Double.MIN_VALUE
-		 * 
-		 * is stops2serve.size() ==  1 possible? then index may be NULL
-		 */
 		if(index == null){
 			log.error("this should never happen, stops2Serve should consist of at least 2 stops...");
 //			for(TransitStopFacility f: stops2serve){
 //				log.error(f.getId().toString() + "\t" + f.getCoord().toString());
 //			}
-			return null;
 		}
-		return stops2serve.get(index);
+		return index;
 	}
 
 	/**
@@ -243,9 +237,9 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 		Coord first, base, direction, target1, target2, normal;
 		first = firstServed.getCoord();
 		base = stopInGreatestDistance.getCoord();
-		direction = CoordUtils.minus(first, base);
-		target1 = CoordUtils.plus(first, CoordUtils.scalarMult((1-this.distanceFactor), direction));
-		target2 = CoordUtils.plus(first, direction);
+		direction = CoordUtils.minus(base, first);
+		target1 = CoordUtils.plus(base, CoordUtils.scalarMult((1-this.distanceFactor), direction));
+		target2 = CoordUtils.plus(base, direction);
 
 		double length = CoordUtils.length(direction);
 		normal = CoordUtils.scalarMult(1/length, CoordUtils.rotateToRight(direction));
@@ -267,10 +261,10 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	 * @param indexStopInGreatestDistance 
 	 * @return
 	 */
-	private ArrayList<TransitStopFacility> addCandidate(PRouteProvider pRouteProvider, List<TransitStopFacility> candidates, ArrayList<TransitStopFacility> stops2serve) {
+	private ArrayList<TransitStopFacility> addCandidate(PRouteProvider pRouteProvider, List<TransitStopFacility> candidates, ArrayList<TransitStopFacility> stops2serve, Integer indexStopInGreatestDistance) {
 		//draw a random stop from the candidatesList
-//		TransitStopFacility temp = (TransitStopFacility) candidates.toArray()[(int)(MatsimRandom.getRandom().nextDouble() * candidates.size())];
-		TransitStopFacility temp = pRouteProvider.drawRandomStopFromList(candidates);
+		TransitStopFacility temp = null;
+		temp = pRouteProvider.drawRandomStopFromList(candidates);
 //		do{
 //			for(TransitStopFacility s: candidates){
 //				if(MatsimRandom.getRandom().nextDouble() < (1.0/candidates.size())){
@@ -279,8 +273,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 //				}
 //			}
 //		}while(temp == null);
-		//insert before the first stop
-		stops2serve.add(0, temp);
+		stops2serve.add(indexStopInGreatestDistance + 1, temp);
 		return stops2serve;
 	}
 
@@ -325,7 +318,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	 */
 	@Override
 	public String getName() {
-		return RandomRouteStartExtension.STRATEGY_NAME;
+		return RandomRouteEndExtension.STRATEGY_NAME;
 	}
 
 

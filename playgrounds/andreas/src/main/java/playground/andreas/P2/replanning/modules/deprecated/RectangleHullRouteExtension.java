@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,7 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.P2.replanning.modules;
+
+package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.replanning.modules.SidewaysRouteExtension;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -44,25 +46,28 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @deprecated Use {@linkplain SidewaysRouteExtension} instead
  *
  */
-public class RouteEnvelopeExtension extends AbstractPStrategyModule {
-	
+public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	
 	private static final Logger log = Logger
-			.getLogger(RouteEnvelopeExtension.class);
-	public static final String STRATEGY_NAME = "RouteEnvelopeExtension";
-	
-	private Double dist = Double.MIN_VALUE;
+			.getLogger(RectangleHullRouteExtension.class);
+	public static final String STRATEGY_NAME = "RectangleHullRouteExtension";
+	private double height;
 
 	/**
+	 * 
+	 * inserts a new stop 2 be served to the best plan of an cooperative.
+	 * This is done by spreading out a rectangle between the first stop2beServed and the furthest away stop from the stops2beServed 
+	 * list (assuming this is the turning-point of a route).
+	 * The width of the rectangle is naturally given by the distance of the to stops. The height has to be defined as parameter relative to the length.
+	 * 
 	 * @param parameter
 	 */
-	public RouteEnvelopeExtension(ArrayList<String> parameter) {
+	public RectangleHullRouteExtension(ArrayList<String> parameter) {
 		super(parameter);
 		if(parameter.size() != 1){
-			log.error("a parameter determining the distance for the enevelope has to be defined. Default == Double.MIN_VALUE");
-		}else{
-			this.dist = Double.parseDouble(parameter.get(0));
+			log.error("only exact one parameter allowed for this strategy...");
 		}
+		this.height = Double.parseDouble(parameter.get(0));
 	}
 
 	/* (non-Javadoc)
@@ -72,17 +77,17 @@ public class RouteEnvelopeExtension extends AbstractPStrategyModule {
 	public PPlan run(Cooperative cooperative) {
 		// get a List of served stop-facilities in the sequence they are served
 		List<TransitStopFacility> currentlyUsedStops = this.getUsedFacilities(cooperative);
-		// create envelope in the specified distance 
-		Geometry envelope = this.createEnvelope(currentlyUsedStops);
-		// find currently unused stops inside the convex-hull
-		List<TransitStopFacility> newEnvelopeInteriorStops = 
-			this.findNewEnvelopeInteriorStops(cooperative.getRouteProvider().getAllPStops(), currentlyUsedStops, envelope);
+		// create the rectangle
+		Geometry rectangle = this.createRectangle(cooperative.getBestPlan().getStopsToBeServed());
+		// find currently unused stops inside the rectangle
+		List<TransitStopFacility> newHullInteriorStops = 
+			this.findNewHullInteriorStops(cooperative.getRouteProvider().getAllPStops(), currentlyUsedStops, rectangle);
 		
 		// draw a random stop from the candidates-list
-		TransitStopFacility newStop = this.drawStop(cooperative.getRouteProvider(), newEnvelopeInteriorStops);
+		TransitStopFacility newStop = this.drawStop(cooperative.getRouteProvider(), newHullInteriorStops);
 		if(newStop == null){
-			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
-					cooperative.getCurrentIteration() + ". No unused stop in the envelope of the old route.");
+			log.error("can not create a new route for cooperative " + cooperative.getId() + " in iteration " + cooperative.getCurrentIteration() +
+					", because there is no unused stop in the convex hull of the old route.");
 			return null;
 		}else{
 			// create a new plan 
@@ -93,7 +98,7 @@ public class RouteEnvelopeExtension extends AbstractPStrategyModule {
 			newPlan.setEndTime(oldPlan.getEndTime());
 			//insert the new stop at the correct point (minimum average Distance from the subroute to the new Stop) in the sequence of stops 2 serve
 			ArrayList<TransitStopFacility> stopsToServe = createNewStopsToServe(cooperative, newStop); 
-			if(stopsToServe == null){
+			if(stopsToServe ==  null){
 				return null;
 			}
 			newPlan.setStopsToBeServed(stopsToServe);
@@ -103,7 +108,7 @@ public class RouteEnvelopeExtension extends AbstractPStrategyModule {
 			return newPlan;
 		}
 	}
-
+	
 
 	/**
 	 * @param cooperative
@@ -146,13 +151,14 @@ public class RouteEnvelopeExtension extends AbstractPStrategyModule {
 		
 		for(List<TransitStopFacility> subroute: subrouteFacilities){
 			temp = 0;
-			
 			for(TransitStopFacility t: subroute){
 				temp += CoordUtils.calcDistance(t.getCoord(), newStop.getCoord());
 			}
 			temp = temp/subroute.size();
 			dist.add(temp);
 		}
+		
+		
 		return dist;
 	}
 
@@ -203,60 +209,66 @@ public class RouteEnvelopeExtension extends AbstractPStrategyModule {
 	 * @param currentlyUsedStops
 	 * @return
 	 */
-	private Geometry createEnvelope(List<TransitStopFacility> currentlyUsedStops) {
-		Geometry[] objects = new Geometry[currentlyUsedStops.size() - 1];
-		GeometryFactory fac = new GeometryFactory();
-		
-		Coord one, two;
-		for(int i = 1; i < currentlyUsedStops.size(); i++){
-			one = currentlyUsedStops.get(i-1).getCoord();
-			two = currentlyUsedStops.get(i).getCoord();
-			// create a hull in the specified distance
-			objects[i-1] = fac.createMultiPoint(getHullForTwoCoords(one,two)).convexHull();
-		}
-		// merge geometries. we only need one...
-		return fac.createGeometryCollection(objects).buffer(0);
-	}
-
-	/**
-	 * @param one
-	 * @param two
-	 * @return
-	 */
-	private Coordinate[] getHullForTwoCoords(Coord one, Coord two) {
-		Coord first, second, direction, normal, unit;
-		first = one;
-		second = two;
+	private Geometry createRectangle(List<TransitStopFacility> currentlyUsedStops) {
+		Coord first, second, direction, normal;
+		first = currentlyUsedStops.get(0).getCoord();
+		second = findStopInGreatestDistance(currentlyUsedStops).getCoord();
 		direction = CoordUtils.minus(second, first);
-		unit = CoordUtils.scalarMult(1/CoordUtils.length(direction), direction);
-		first = CoordUtils.minus(first, CoordUtils.scalarMult(this.dist, unit));
-		second = CoordUtils.minus(second, CoordUtils.scalarMult(this.dist, unit));
 		normal = CoordUtils.scalarMult(1/CoordUtils.length(direction), CoordUtils.rotateToRight(direction));
+
+		double height = this.height/2*CoordUtils.length(direction);
 		
 		Coordinate[] c = new Coordinate[4];
-		c[0] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(this.dist, normal)));
-		c[1] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(-1*this.dist, normal)));
-		c[2] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(this.dist, normal)));
-		c[3] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(-1*this.dist, normal)));
-		return c;
+		c[0] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(height, normal)));
+		c[1] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(-1*height, normal)));
+		c[2] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(height, normal)));
+		c[3] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(-1*height, normal)));
+		
+		GeometryFactory f = new GeometryFactory();
+		return f.createMultiPoint(c).convexHull();
 	}
-
+	
+	/**
+	 * @param stops2serve
+	 * @return
+	 */
+	private TransitStopFacility findStopInGreatestDistance(List<TransitStopFacility> stops2serve) {
+		TransitStopFacility first = stops2serve.get(0);
+		TransitStopFacility temp;
+		Integer index = null;
+		double maxDist = -1., currentDist;
+		
+		for(int i = 1; i < stops2serve.size(); i++ ){
+			temp = stops2serve.get(i);
+			currentDist = CoordUtils.calcDistance(temp.getCoord(), first.getCoord());
+			if(currentDist > maxDist){
+				maxDist =  currentDist;
+				index = i;
+			}
+		}
+		return stops2serve.get(index);
+	}
+	
 	/**
 	 * returns stops within the convex hull, which are not part of the current route, but of its convex hull
 	 * 
 	 * @param stopsToBeServed
 	 * @param currentlyUsedStops
-	 * @param envelope
+	 * @param hull
 	 * @return
 	 */
-	private List<TransitStopFacility> findNewEnvelopeInteriorStops(Collection<TransitStopFacility> possibleStops, 
+	private List<TransitStopFacility> findNewHullInteriorStops(Collection<TransitStopFacility> possibleStops, 
 																List<TransitStopFacility> currentlyUsedStops, 
-																Geometry envelope) {
+																Geometry hull) {
 		List<TransitStopFacility> stopCandidates = new ArrayList<TransitStopFacility>();
 		
 		for(TransitStopFacility s: possibleStops){
+//				if(hull.contains(MGC.coord2Point(s.getCoord()))){
 			if(!currentlyUsedStops.contains(s)){
-				if(envelope.contains(MGC.coord2Point(s.getCoord()))){
+				// I replaced "contains" by "covers" since the exact interpretation seems to have changed 
+				// with the geotools upgrade. kai, jan'13
+				
+					if(hull.covers(MGC.coord2Point(s.getCoord()))){
 					stopCandidates.add(s);
 				}
 			}
@@ -273,7 +285,25 @@ public class RouteEnvelopeExtension extends AbstractPStrategyModule {
 		if(newHullInteriorStops.size() == 0){
 			return null;
 		}else{
-			// droeder old code
+//			TransitStopFacility newStop = null;
+//			Double rnd = null;
+//			if(newHullInteriorStops.size() > 1){
+//				do{
+//					//draw a random stop, if more than one stop is in the convex hull
+//					for(TransitStopFacility f : newHullInteriorStops){
+//						rnd = MatsimRandom.getRandom().nextDouble();
+//						if(rnd < 0.1){
+//							newStop = f;
+//							break;
+//						}
+//					}
+//					
+//				}while(newStop == null);
+//			}else{
+//				newStop = newHullInteriorStops.get(0);
+//			}
+			
+			// droeder code
 //			int rnd = (int)(MatsimRandom.getRandom().nextDouble() * (newHullInteriorStops.size() - 1));
 //			return newHullInteriorStops.get(rnd);
 			return pRouteProvider.drawRandomStopFromList(newHullInteriorStops);

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,48 +16,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.andreas.P2.replanning.modules;
+package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
-import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.replanning.modules.SidewaysRouteExtension;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author droeder
- * 
+ *
  * @deprecated Use {@linkplain SidewaysRouteExtension} instead
  *
  */
-public class ConvexHullRouteExtension extends AbstractPStrategyModule {
+public class RouteEnvelopeExtension extends AbstractPStrategyModule {
+	
 	
 	private static final Logger log = Logger
-			.getLogger(ConvexHullRouteExtension.class);
-	public static final String STRATEGY_NAME = "ConvexHullRouteExtension";
+			.getLogger(RouteEnvelopeExtension.class);
+	public static final String STRATEGY_NAME = "RouteEnvelopeExtension";
+	
+	private Double dist = Double.MIN_VALUE;
 
 	/**
 	 * @param parameter
 	 */
-	public ConvexHullRouteExtension(ArrayList<String> parameter) {
+	public RouteEnvelopeExtension(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() > 0){
-			log.error("no parameters allowed for this strategy...");
+		if(parameter.size() != 1){
+			log.error("a parameter determining the distance for the enevelope has to be defined. Default == Double.MIN_VALUE");
+		}else{
+			this.dist = Double.parseDouble(parameter.get(0));
 		}
 	}
 
@@ -68,18 +73,17 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 	public PPlan run(Cooperative cooperative) {
 		// get a List of served stop-facilities in the sequence they are served
 		List<TransitStopFacility> currentlyUsedStops = this.getUsedFacilities(cooperative);
-		// create the convex-hull (geotools-method) of all used stops 
-		Geometry hull = this.createConvexHull(currentlyUsedStops);
-		
+		// create envelope in the specified distance 
+		Geometry envelope = this.createEnvelope(currentlyUsedStops);
 		// find currently unused stops inside the convex-hull
-		List<TransitStopFacility> newHullInteriorStops = 
-			this.findNewHullInteriorStops(cooperative.getRouteProvider().getAllPStops(), currentlyUsedStops, hull);
+		List<TransitStopFacility> newEnvelopeInteriorStops = 
+			this.findNewEnvelopeInteriorStops(cooperative.getRouteProvider().getAllPStops(), currentlyUsedStops, envelope);
 		
 		// draw a random stop from the candidates-list
-		TransitStopFacility newStop = this.drawStop(cooperative.getRouteProvider(), newHullInteriorStops);
+		TransitStopFacility newStop = this.drawStop(cooperative.getRouteProvider(), newEnvelopeInteriorStops);
 		if(newStop == null){
 			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
-					cooperative.getCurrentIteration() + ", because there is no unused stop in the convex hull of the old route");
+					cooperative.getCurrentIteration() + ". No unused stop in the envelope of the old route.");
 			return null;
 		}else{
 			// create a new plan 
@@ -112,7 +116,7 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 		List<List<TransitStopFacility>> subrouteFacilities = this.findSubroutes(cooperative, newStop);
 		List<Double> avDist = calcAvDist(subrouteFacilities, newStop);
 		if(avDist.size() > cooperative.getBestPlan().getStopsToBeServed().size()){
-			log.warn("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
 					cooperative.getCurrentIteration() + ". more subroutes then expected were found.");
 			return null;
 		}
@@ -148,13 +152,8 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 				temp += CoordUtils.calcDistance(t.getCoord(), newStop.getCoord());
 			}
 			temp = temp/subroute.size();
-//			log.error("###");
-//			log.error(temp);
-//			System.out.println();
 			dist.add(temp);
 		}
-		
-		
 		return dist;
 	}
 
@@ -205,16 +204,42 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 	 * @param currentlyUsedStops
 	 * @return
 	 */
-	private Geometry createConvexHull(List<TransitStopFacility> currentlyUsedStops) {
-		Point[] points = new Point[currentlyUsedStops.size()];
-
-		int i = 0;
-		for(TransitStopFacility facility : currentlyUsedStops){
-			points[i] = MGC.coord2Point(facility.getCoord());
-			i++;
+	private Geometry createEnvelope(List<TransitStopFacility> currentlyUsedStops) {
+		Geometry[] objects = new Geometry[currentlyUsedStops.size() - 1];
+		GeometryFactory fac = new GeometryFactory();
+		
+		Coord one, two;
+		for(int i = 1; i < currentlyUsedStops.size(); i++){
+			one = currentlyUsedStops.get(i-1).getCoord();
+			two = currentlyUsedStops.get(i).getCoord();
+			// create a hull in the specified distance
+			objects[i-1] = fac.createMultiPoint(getHullForTwoCoords(one,two)).convexHull();
 		}
-		MultiPoint pointCloud = new MultiPoint(points, new GeometryFactory());
-		return pointCloud.convexHull();
+		// merge geometries. we only need one...
+		return fac.createGeometryCollection(objects).buffer(0);
+	}
+
+	/**
+	 * @param one
+	 * @param two
+	 * @return
+	 */
+	private Coordinate[] getHullForTwoCoords(Coord one, Coord two) {
+		Coord first, second, direction, normal, unit;
+		first = one;
+		second = two;
+		direction = CoordUtils.minus(second, first);
+		unit = CoordUtils.scalarMult(1/CoordUtils.length(direction), direction);
+		first = CoordUtils.minus(first, CoordUtils.scalarMult(this.dist, unit));
+		second = CoordUtils.minus(second, CoordUtils.scalarMult(this.dist, unit));
+		normal = CoordUtils.scalarMult(1/CoordUtils.length(direction), CoordUtils.rotateToRight(direction));
+		
+		Coordinate[] c = new Coordinate[4];
+		c[0] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(this.dist, normal)));
+		c[1] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(-1*this.dist, normal)));
+		c[2] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(this.dist, normal)));
+		c[3] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(-1*this.dist, normal)));
+		return c;
 	}
 
 	/**
@@ -222,17 +247,17 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 	 * 
 	 * @param stopsToBeServed
 	 * @param currentlyUsedStops
-	 * @param hull
+	 * @param envelope
 	 * @return
 	 */
-	private List<TransitStopFacility> findNewHullInteriorStops(Collection<TransitStopFacility> possibleStops, 
+	private List<TransitStopFacility> findNewEnvelopeInteriorStops(Collection<TransitStopFacility> possibleStops, 
 																List<TransitStopFacility> currentlyUsedStops, 
-																Geometry hull) {
+																Geometry envelope) {
 		List<TransitStopFacility> stopCandidates = new ArrayList<TransitStopFacility>();
 		
 		for(TransitStopFacility s: possibleStops){
 			if(!currentlyUsedStops.contains(s)){
-				if(hull.contains(MGC.coord2Point(s.getCoord()))){
+				if(envelope.contains(MGC.coord2Point(s.getCoord()))){
 					stopCandidates.add(s);
 				}
 			}
@@ -241,6 +266,7 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 	}
 	
 	/**
+	 * @param pRouteProvider 
 	 * @param newHullInteriorStops
 	 * @return
 	 */
@@ -248,23 +274,6 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 		if(newHullInteriorStops.size() == 0){
 			return null;
 		}else{
-//			TransitStopFacility newStop = null;
-//			Double rnd = null;
-//			if(newHullInteriorStops.size() > 1){
-//				do{
-//					//draw a random stop, if more than one stop is in the convex hull
-//					for(TransitStopFacility f : newHullInteriorStops){
-//						rnd = MatsimRandom.getRandom().nextDouble();
-//						if(rnd < 0.1){
-//							newStop = f;
-//							break;
-//						}
-//					}
-//					
-//				}while(newStop == null);
-//			}else{
-//				newStop = newHullInteriorStops.get(0);
-//			}
 			// droeder old code
 //			int rnd = (int)(MatsimRandom.getRandom().nextDouble() * (newHullInteriorStops.size() - 1));
 //			return newHullInteriorStops.get(rnd);

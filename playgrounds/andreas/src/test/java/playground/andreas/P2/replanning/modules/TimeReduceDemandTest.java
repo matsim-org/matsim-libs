@@ -33,7 +33,7 @@ import playground.andreas.P2.PScenarioHelper;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.modules.TimeReduceDemand;
+import playground.andreas.P2.replanning.modules.deprecated.TimeReduceDemand;
 
 
 public class TimeReduceDemandTest {

@@ -30,16 +30,16 @@ import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
-import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
-import playground.andreas.P2.replanning.modules.ConvexHullRouteExtension;
 import playground.andreas.P2.replanning.modules.MaxRandomEndTimeAllocator;
 import playground.andreas.P2.replanning.modules.MaxRandomStartTimeAllocator;
-import playground.andreas.P2.replanning.modules.RandomRouteEndExtension;
-import playground.andreas.P2.replanning.modules.RandomRouteStartExtension;
-import playground.andreas.P2.replanning.modules.RectangleHullRouteExtension;
-import playground.andreas.P2.replanning.modules.RouteEnvelopeExtension;
+import playground.andreas.P2.replanning.modules.deprecated.AggressiveIncreaseNumberOfVehicles;
+import playground.andreas.P2.replanning.modules.deprecated.ConvexHullRouteExtension;
 import playground.andreas.P2.replanning.modules.deprecated.RandomEndTimeAllocator;
+import playground.andreas.P2.replanning.modules.deprecated.RandomRouteEndExtension;
+import playground.andreas.P2.replanning.modules.deprecated.RandomRouteStartExtension;
 import playground.andreas.P2.replanning.modules.deprecated.RandomStartTimeAllocator;
+import playground.andreas.P2.replanning.modules.deprecated.RectangleHullRouteExtension;
+import playground.andreas.P2.replanning.modules.deprecated.RouteEnvelopeExtension;
 
 /**
  * @author droeder

@@ -28,7 +28,7 @@ import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
-import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
+import playground.andreas.P2.replanning.modules.deprecated.AggressiveIncreaseNumberOfVehicles;
 
 /**
  * Manages one paratransit line

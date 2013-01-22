@@ -17,56 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.replanning.modules;
+package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
-import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.modules.SidewaysRouteExtension;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author droeder
- *
+ * 
  * @deprecated Use {@linkplain SidewaysRouteExtension} instead
  *
  */
-public class RectangleHullRouteExtension extends AbstractPStrategyModule {
+public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 	
 	private static final Logger log = Logger
-			.getLogger(RectangleHullRouteExtension.class);
-	public static final String STRATEGY_NAME = "RectangleHullRouteExtension";
-	private double height;
+			.getLogger(ConvexHullRouteExtension.class);
+	public static final String STRATEGY_NAME = "ConvexHullRouteExtension";
 
 	/**
-	 * 
-	 * inserts a new stop 2 be served to the best plan of an cooperative.
-	 * This is done by spreading out a rectangle between the first stop2beServed and the furthest away stop from the stops2beServed 
-	 * list (assuming this is the turning-point of a route).
-	 * The width of the rectangle is naturally given by the distance of the to stops. The height has to be defined as parameter relative to the length.
-	 * 
 	 * @param parameter
 	 */
-	public RectangleHullRouteExtension(ArrayList<String> parameter) {
+	public ConvexHullRouteExtension(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 1){
-			log.error("only exact one parameter allowed for this strategy...");
+		if(parameter.size() > 0){
+			log.error("no parameters allowed for this strategy...");
 		}
-		this.height = Double.parseDouble(parameter.get(0));
 	}
 
 	/* (non-Javadoc)
@@ -76,17 +69,18 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	public PPlan run(Cooperative cooperative) {
 		// get a List of served stop-facilities in the sequence they are served
 		List<TransitStopFacility> currentlyUsedStops = this.getUsedFacilities(cooperative);
-		// create the rectangle
-		Geometry rectangle = this.createRectangle(cooperative.getBestPlan().getStopsToBeServed());
-		// find currently unused stops inside the rectangle
+		// create the convex-hull (geotools-method) of all used stops 
+		Geometry hull = this.createConvexHull(currentlyUsedStops);
+		
+		// find currently unused stops inside the convex-hull
 		List<TransitStopFacility> newHullInteriorStops = 
-			this.findNewHullInteriorStops(cooperative.getRouteProvider().getAllPStops(), currentlyUsedStops, rectangle);
+			this.findNewHullInteriorStops(cooperative.getRouteProvider().getAllPStops(), currentlyUsedStops, hull);
 		
 		// draw a random stop from the candidates-list
 		TransitStopFacility newStop = this.drawStop(cooperative.getRouteProvider(), newHullInteriorStops);
 		if(newStop == null){
-			log.error("can not create a new route for cooperative " + cooperative.getId() + " in iteration " + cooperative.getCurrentIteration() +
-					", because there is no unused stop in the convex hull of the old route.");
+			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+					cooperative.getCurrentIteration() + ", because there is no unused stop in the convex hull of the old route");
 			return null;
 		}else{
 			// create a new plan 
@@ -97,7 +91,7 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 			newPlan.setEndTime(oldPlan.getEndTime());
 			//insert the new stop at the correct point (minimum average Distance from the subroute to the new Stop) in the sequence of stops 2 serve
 			ArrayList<TransitStopFacility> stopsToServe = createNewStopsToServe(cooperative, newStop); 
-			if(stopsToServe ==  null){
+			if(stopsToServe == null){
 				return null;
 			}
 			newPlan.setStopsToBeServed(stopsToServe);
@@ -107,7 +101,7 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 			return newPlan;
 		}
 	}
-	
+
 
 	/**
 	 * @param cooperative
@@ -119,7 +113,7 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 		List<List<TransitStopFacility>> subrouteFacilities = this.findSubroutes(cooperative, newStop);
 		List<Double> avDist = calcAvDist(subrouteFacilities, newStop);
 		if(avDist.size() > cooperative.getBestPlan().getStopsToBeServed().size()){
-			log.info("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
+			log.warn("can not create a new plan for cooperative " + cooperative.getId() + " in iteration " + 
 					cooperative.getCurrentIteration() + ". more subroutes then expected were found.");
 			return null;
 		}
@@ -150,10 +144,14 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 		
 		for(List<TransitStopFacility> subroute: subrouteFacilities){
 			temp = 0;
+			
 			for(TransitStopFacility t: subroute){
 				temp += CoordUtils.calcDistance(t.getCoord(), newStop.getCoord());
 			}
 			temp = temp/subroute.size();
+//			log.error("###");
+//			log.error(temp);
+//			System.out.println();
 			dist.add(temp);
 		}
 		
@@ -208,46 +206,18 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	 * @param currentlyUsedStops
 	 * @return
 	 */
-	private Geometry createRectangle(List<TransitStopFacility> currentlyUsedStops) {
-		Coord first, second, direction, normal;
-		first = currentlyUsedStops.get(0).getCoord();
-		second = findStopInGreatestDistance(currentlyUsedStops).getCoord();
-		direction = CoordUtils.minus(second, first);
-		normal = CoordUtils.scalarMult(1/CoordUtils.length(direction), CoordUtils.rotateToRight(direction));
+	private Geometry createConvexHull(List<TransitStopFacility> currentlyUsedStops) {
+		Point[] points = new Point[currentlyUsedStops.size()];
 
-		double height = this.height/2*CoordUtils.length(direction);
-		
-		Coordinate[] c = new Coordinate[4];
-		c[0] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(height, normal)));
-		c[1] = MGC.coord2Coordinate(CoordUtils.plus(first, CoordUtils.scalarMult(-1*height, normal)));
-		c[2] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(height, normal)));
-		c[3] = MGC.coord2Coordinate(CoordUtils.plus(second, CoordUtils.scalarMult(-1*height, normal)));
-		
-		GeometryFactory f = new GeometryFactory();
-		return f.createMultiPoint(c).convexHull();
-	}
-	
-	/**
-	 * @param stops2serve
-	 * @return
-	 */
-	private TransitStopFacility findStopInGreatestDistance(List<TransitStopFacility> stops2serve) {
-		TransitStopFacility first = stops2serve.get(0);
-		TransitStopFacility temp;
-		Integer index = null;
-		double maxDist = -1., currentDist;
-		
-		for(int i = 1; i < stops2serve.size(); i++ ){
-			temp = stops2serve.get(i);
-			currentDist = CoordUtils.calcDistance(temp.getCoord(), first.getCoord());
-			if(currentDist > maxDist){
-				maxDist =  currentDist;
-				index = i;
-			}
+		int i = 0;
+		for(TransitStopFacility facility : currentlyUsedStops){
+			points[i] = MGC.coord2Point(facility.getCoord());
+			i++;
 		}
-		return stops2serve.get(index);
+		MultiPoint pointCloud = new MultiPoint(points, new GeometryFactory());
+		return pointCloud.convexHull();
 	}
-	
+
 	/**
 	 * returns stops within the convex hull, which are not part of the current route, but of its convex hull
 	 * 
@@ -262,12 +232,8 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 		List<TransitStopFacility> stopCandidates = new ArrayList<TransitStopFacility>();
 		
 		for(TransitStopFacility s: possibleStops){
-//				if(hull.contains(MGC.coord2Point(s.getCoord()))){
 			if(!currentlyUsedStops.contains(s)){
-				// I replaced "contains" by "covers" since the exact interpretation seems to have changed 
-				// with the geotools upgrade. kai, jan'13
-				
-					if(hull.covers(MGC.coord2Point(s.getCoord()))){
+				if(hull.contains(MGC.coord2Point(s.getCoord()))){
 					stopCandidates.add(s);
 				}
 			}
@@ -276,7 +242,6 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	}
 	
 	/**
-	 * @param pRouteProvider 
 	 * @param newHullInteriorStops
 	 * @return
 	 */
@@ -301,8 +266,7 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 //			}else{
 //				newStop = newHullInteriorStops.get(0);
 //			}
-			
-			// droeder code
+			// droeder old code
 //			int rnd = (int)(MatsimRandom.getRandom().nextDouble() * (newHullInteriorStops.size() - 1));
 //			return newHullInteriorStops.get(rnd);
 			return pRouteProvider.drawRandomStopFromList(newHullInteriorStops);

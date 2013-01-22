@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.replanning.modules;
+package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedRFare;
 
 /**
  * 
