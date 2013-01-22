@@ -20,7 +20,7 @@
 package playground.michalm.demand;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.*;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,6 +47,8 @@ public class DemandGenerator
 
     public void generate()
     {
+        Map<Id, Zone> zones = getZones();
+
         // activityPlaces - for random generation
         Distribution<Zone> sDistrib = new Distribution<Zone>();
         Distribution<Zone> wDistrib = new Distribution<Zone>();
@@ -149,7 +151,7 @@ public class DemandGenerator
                     act = createActivity(plan, "h", home);
                     act.setStartTime(20 * 3600 + timeShift);
                 }
-                
+
                 createAndInitPerson(plan);
             }
 
@@ -174,7 +176,7 @@ public class DemandGenerator
 
                 act = createActivity(plan, "h", home);
                 act.setStartTime(16 * 3600 + timeShift);
-                
+
                 createAndInitPerson(plan);
             }
         }

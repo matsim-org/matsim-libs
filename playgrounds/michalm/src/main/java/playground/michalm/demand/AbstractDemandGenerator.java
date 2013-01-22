@@ -51,17 +51,17 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 
-public class AbstractDemandGenerator
+public abstract class AbstractDemandGenerator
 {
     private static final Logger log = Logger.getLogger(AbstractDemandGenerator.class);
 
     protected Uniform uniform = new Uniform(new MersenneTwister());
 
-    private Scenario scenario;
-    private PopulationFactory pf;
+    private final Scenario scenario;
+    private final PopulationFactory pf;
 
-    Map<Id, Zone> zones;
-    List<Zone> fileOrderedZones;
+    private final Map<Id, Zone> zones;
+    private final List<Zone> fileOrderedZones;
 
 
     public AbstractDemandGenerator(String networkFileName, String zonesXMLFileName,
@@ -81,6 +81,12 @@ public class AbstractDemandGenerator
 
         ZoneShpReader shpReader = new ZoneShpReader(scenario, zones);
         shpReader.readZones(zonesShpFileName, idField);
+    }
+    
+    
+    public void resetRandomEngine(int seed)
+    {
+        uniform = new Uniform(new MersenneTwister(seed));
     }
 
 
@@ -115,7 +121,7 @@ public class AbstractDemandGenerator
         double minY = bounds.getMinY();
         double maxY = bounds.getMaxY();
 
-        Geometry geometry = (Geometry) ft.getDefaultGeometry();
+        Geometry geometry = (Geometry)ft.getDefaultGeometry();
         Point p = null;
         do {
             double x = uniform.nextDoubleFromTo(minX, maxX);
@@ -169,6 +175,18 @@ public class AbstractDemandGenerator
     PopulationFactory getPopulationFactory()
     {
         return scenario.getPopulation().getFactory();
+    }
+
+
+    public Map<Id, Zone> getZones()
+    {
+        return zones;
+    }
+
+
+    public List<Zone> getFileOrderedZones()
+    {
+        return fileOrderedZones;
     }
 
 

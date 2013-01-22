@@ -51,8 +51,11 @@ public class MielecDemandGenerator
         double[] taxiProbability = { 0, 0.07, 0.07, 0.07, 0.07, 0.07, 0 };
 
         ODDemandGenerator dg = new ODDemandGenerator(networkFileName, zonesXMLFileName,
-                zonesShpFileName, odMatrixFileName, idField, hours, flowCoeff, taxiProbability);
-        dg.generate();
+                zonesShpFileName, idField);
+
+        double[][] odMatrix = dg.readODMatrix(odMatrixFileName);
+
+        dg.generateMultiplePeriods(odMatrix, hours, flowCoeff, taxiProbability);
         dg.write(plansFileName);
         dg.writeTaxiCustomers(taxiFileName);
     }

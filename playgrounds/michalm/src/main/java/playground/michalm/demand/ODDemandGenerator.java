@@ -34,69 +34,54 @@ import playground.michalm.demand.Zone.Type;
 
 
 public class ODDemandGenerator
-    extends DemandGenerator
+    extends AbstractDemandGenerator
 {
     // private static final Logger log = Logger.getLogger(ODDemandGenerator.class);
-
-    private final int zoneCount;
-    private final double[][] odMatrix;
-
-    private final double[] hours; // time of simulation (i.e. 1.5 hours)
-    private final double[] flowCoeff; // artificial increase/decrease of the flow
-    private final double[] taxiProbability; // for internal flow (i.e. between internal zones: 0-8)
 
     private final List<Person> taxiCustomers = new ArrayList<Person>();
 
 
     public ODDemandGenerator(String networkFileName, String zonesXMLFileName,
-            String zonesShpFileName, String odMatrixFileName, String idField, double hours,
-            double flowCoeff, double taxiProbability)
-        throws IOException, SAXException, ParserConfigurationException
-    {
-        this(networkFileName, zonesXMLFileName, zonesShpFileName, odMatrixFileName, idField,
-                new double[] { hours }, new double[] { flowCoeff },
-                new double[] { taxiProbability });
-    }
-
-
-    public ODDemandGenerator(String networkFileName, String zonesXMLFileName,
-            String zonesShpFileName, String odMatrixFileName, String idField, double[] hours,
-            double[] flowCoeff, double[] taxiProbability)
+            String zonesShpFileName, String idField)
         throws IOException, SAXException, ParserConfigurationException
     {
         super(networkFileName, zonesXMLFileName, zonesShpFileName, idField);
-
-        this.hours = hours;
-        this.flowCoeff = flowCoeff;
-        this.taxiProbability = taxiProbability;
-
-        // read OD matrix
-        zoneCount = fileOrderedZones.size();
-        odMatrix = Array2DReader.getDoubleArray(new File(odMatrixFileName), zoneCount);
     }
 
 
-    @Override
-    public void generate()
+    public void generateMultiplePeriods(double[][] odMatrix, double[] hours, double[] flowCoeff,
+            double[] taxiProbability)
     {
         double startTime = 0;
         for (int i = 0; i < hours.length; i++) {
-            generateImpl(startTime, hours[i], flowCoeff[i], taxiProbability[i]);
+            generateSinglePeriod(odMatrix, hours[i], flowCoeff[i], taxiProbability[i], startTime);
             startTime += 3600 * hours[i];
         }
     }
 
 
-    private void generateImpl(double startTime, double hours, double flowCoeff,
-            double taxiProbability)
+    public void generateMultiplePeriods(double[][][] odMatrix, double[] taxiProbability)
+    {
+        double startTime = 0;
+        for (int i = 0; i < odMatrix.length; i++) {
+            generateSinglePeriod(odMatrix[i], 1, 1, taxiProbability[i], startTime);
+            startTime += 3600;
+        }
+    }
+
+
+    public void generateSinglePeriod(double[][] odMatrix, double hours, double flowCoeff,
+            double taxiProbability, double startTime)
     {
         PopulationFactory pf = getPopulationFactory();
+        List<Zone> zones = getFileOrderedZones();
+        int zoneCount = zones.size();
 
         for (int i = 0; i < zoneCount; i++) {
-            Zone oZone = fileOrderedZones.get(i);
+            Zone oZone = zones.get(i);
 
             for (int j = 0; j < zoneCount; j++) {
-                Zone dZone = fileOrderedZones.get(j);
+                Zone dZone = zones.get(j);
 
                 int odFlow = (int)Math.round(flowCoeff * odMatrix[i][j]);
 
@@ -121,18 +106,14 @@ public class ODDemandGenerator
 
                     if (isInternalFlow && taxiProbability > 0
                             && uniform.nextDoubleFromTo(0, 1) < taxiProbability) {
-                        // plan.addLeg(pf.createLeg(TaxiModeDepartureHandler.TAXI_MODE));
-
-                        plan.addLeg(pf.createLeg(TransportMode.car));
                         taxiCustomers.add(plan.getPerson());
                     }
-                    else {
-                        plan.addLeg(pf.createLeg(TransportMode.car));
-                    }
+
+                    plan.addLeg(pf.createLeg(TransportMode.car));
 
                     Coord dCoord = getRandomCoordInZone(dZone);
-                    Activity endAct = createActivity(plan, "dummy", dCoord);
-                    
+                    /*Activity endAct = */createActivity(plan, "dummy", dCoord);
+
                     createAndInitPerson(plan);
                 }
             }
@@ -168,6 +149,18 @@ public class ODDemandGenerator
         br.close();
         return taxiCustomerIds;
     }
+    
+    
+    public double[][] readODMatrix(String odMatrixFileName)
+    {
+        try {
+            return Array2DReader.getDoubleArray(new File(odMatrixFileName),
+                getFileOrderedZones().size());
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     public static void main(String[] args)
@@ -189,8 +182,12 @@ public class ODDemandGenerator
                 + "_pc.txt";
 
         ODDemandGenerator dg = new ODDemandGenerator(networkFileName, zonesXMLFileName,
-                zonesShpFileName, odMatrixFileName, idField, hours, flowCoeff, taxiProbability);
-        dg.generate();
+                zonesShpFileName, idField);
+
+        double[][] odMatrix = dg.readODMatrix(odMatrixFileName);
+
+        dg.generateMultiplePeriods(odMatrix, new double[] { hours }, new double[] { flowCoeff },
+                new double[] { taxiProbability });
         dg.write(plansFileName);
         dg.writeTaxiCustomers(taxiFileName);
     }
