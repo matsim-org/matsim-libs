@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.config.groups;
+package playground.meisterk.org.matsim.config;
 
 import java.util.Collections;
 import java.util.Set;

@@ -33,9 +33,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
 /**
  * Feasible mode chain analysis according to section 3.2 of

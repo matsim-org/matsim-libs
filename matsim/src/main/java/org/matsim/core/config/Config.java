@@ -40,7 +40,6 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -88,7 +87,6 @@ public class Config {
 	private MultiModalConfigGroup multiModal = null;
 	private NetworkConfigGroup network = null;
 	private ParallelEventHandlingConfigGroup parallelEventHandling = null ;
-	private PlanomatConfigGroup planomat = null;
 	private PlansCalcRouteConfigGroup plansCalcRoute = null;
 	private PlansConfigGroup plans = null;
 	private QSimConfigGroup qSimConfigGroup = null;
@@ -155,9 +153,6 @@ public class Config {
 		
 		this.parallelEventHandling = new ParallelEventHandlingConfigGroup() ;
 		this.modules.put(ParallelEventHandlingConfigGroup.GROUP_NAME, this.parallelEventHandling ) ;
-
-		this.planomat = new PlanomatConfigGroup();
-		this.modules.put(PlanomatConfigGroup.GROUP_NAME, this.planomat);
 
 		this.facilities = new FacilitiesConfigGroup();
 		this.modules.put(FacilitiesConfigGroup.GROUP_NAME, this.facilities);
@@ -452,10 +447,6 @@ public class Config {
 
 	public final LocationChoiceConfigGroup locationchoice() {
 		return this.locationchoice;
-	}
-
-	public final PlanomatConfigGroup planomat() {
-		return this.planomat;
 	}
 
 	public SignalSystemsConfigGroup signalSystems() {

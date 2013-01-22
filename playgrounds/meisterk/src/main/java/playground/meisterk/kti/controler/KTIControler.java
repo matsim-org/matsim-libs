@@ -40,6 +40,7 @@ import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
 import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
 /**
  * A special controler for the KTI-Project.
@@ -64,7 +65,7 @@ public class KTIControler extends Controler {
 
 		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
-		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
+		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), new PlanomatConfigGroup()));
 		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
 	}

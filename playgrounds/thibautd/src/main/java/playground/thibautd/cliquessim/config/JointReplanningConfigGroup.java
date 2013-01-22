@@ -26,9 +26,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
-import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
+
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup.SimLegInterpretation;
 
 /**
  * Gives access to all parameters needed for the joint plan optimisation.
@@ -37,6 +36,8 @@ import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLa
 public class JointReplanningConfigGroup extends Module {
 
 	private static final Logger log = Logger.getLogger(JointReplanningConfigGroup.class);
+	
+	public static enum TripStructureAnalysisLayerOption {facility,link}
 
 	public static final String GROUP_NAME = "JointReplanning";
 
@@ -625,11 +626,11 @@ public class JointReplanningConfigGroup extends Module {
 	public void setTripStructureAnalysisLayer(String value) {
 		if (value.equals("facility")) {
 			this.tripStructureAnalysisLayer =
-				PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility;
+				TripStructureAnalysisLayerOption.facility;
 		}
 		else if (value.equals("link")) {
 			this.tripStructureAnalysisLayer =
-				PlanomatConfigGroup.TripStructureAnalysisLayerOption.link;
+				TripStructureAnalysisLayerOption.link;
 		}
 		else {
 			throw new IllegalArgumentException("the tripStructureAnalysisLayer option"+

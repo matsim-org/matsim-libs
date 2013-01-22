@@ -23,8 +23,9 @@ package playground.meisterk.kti.router;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.routes.RouteFactory;
+
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
 public class KtiLinkNetworkRouteFactory implements RouteFactory {
 

@@ -34,8 +34,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -75,13 +73,14 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
 
+	public static enum TripStructureAnalysisLayerOption {facility,link}
+
 	public void testNetworkBased() {
 		Config config = loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
-		this.runDemo((NetworkImpl) network, config.planomat());
+		this.runDemo((NetworkImpl) network, TripStructureAnalysisLayerOption.link);
 	}
 	
 	public void testFacilitiesBased() {
@@ -89,12 +88,11 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility);
-		this.runDemo(facilities, config.planomat());
+		this.runDemo(facilities, TripStructureAnalysisLayerOption.facility);
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void runDemo(BasicLocations layer, PlanomatConfigGroup planomatConfigGroup) {
+	protected void runDemo(BasicLocations layer, TripStructureAnalysisLayerOption link) {
 		String UNDEFINED_UNDEFINED_UNDEFINED = Integer
 				.toString(PlanAnalyzeSubtours.UNDEFINED)
 				+ " "
@@ -102,31 +100,31 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 				+ " "
 				+ Integer.toString(PlanAnalyzeSubtours.UNDEFINED);
 		Integer NULL = null;	
-		doTest(layer, planomatConfigGroup, "1 2 1", "0 0", 1, map(0,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 20 1", "0 0 0", 1, map(0,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 1 2 1", "0 0 1 1", 2, map(0,NULL).map(1,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 1 3 1", "0 0 1 1", 2, map(0,NULL).map(1,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 2 1", "1 0 1", 2, map(0,1).map(1,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 2 2 2 2 2 2 1", "6 0 1 2 3 4 5 6", 7, map(0,6).map(1,6).map(2,6). map(3,6).map(4,6).map(5,6).map(6,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 3 2 1", "1 0 0 1", 2, map(0,1).map(1,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 3 4 3 2 1", "2 1 0 0 1 2", 3, map(0,1).map(1,2).map(2,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 14 2 14 2 1", "2 0 0 1 1 2", 3, map(0,2).map(1,2).map(2,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 14 14 2 14 2 1", "3 1 0 1 2 2 3", 4, map(0,1).map(1,3).map(2,3).map(3,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 3 4 3 2 5 4 5 1", "3 1 0 0 1 3 2 2 3", 4, map(0,1).map(1,3).map(2,3).map(3,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 3 2 3 2 1 2 1", "2 0 0 1 1 2 3 3", 4, map(0,2).map(1,2).map(2,NULL).map(3,NULL));
-		doTest(layer, planomatConfigGroup, "1 1 1 1 1 2 1", "0 1 2 3 4 4", 5, map(0,NULL).map(1,NULL).map(2,NULL).map(3,NULL).map(4,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 1 1", "0 0 1", 2, map(0,NULL).map(1,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 3 4", UNDEFINED_UNDEFINED_UNDEFINED, 0, Collections.EMPTY_MAP);
-		doTest(layer, planomatConfigGroup, "1 2 2 3 2 2 2 1 4 1", "4 0 1 1 2 3 4 5 5", 6, map(0,4).map(1,4).map(2,4).map(3,4).map(4,NULL).map(5,NULL));
-		doTest(layer, planomatConfigGroup, "1 2 3 4 3 1", "1 1 0 0 1", 2, map(0,1).map(1,NULL));
+		doTest(layer, link, "1 2 1", "0 0", 1, map(0,NULL));
+		doTest(layer, link, "1 2 20 1", "0 0 0", 1, map(0,NULL));
+		doTest(layer, link, "1 2 1 2 1", "0 0 1 1", 2, map(0,NULL).map(1,NULL));
+		doTest(layer, link, "1 2 1 3 1", "0 0 1 1", 2, map(0,NULL).map(1,NULL));
+		doTest(layer, link, "1 2 2 1", "1 0 1", 2, map(0,1).map(1,NULL));
+		doTest(layer, link, "1 2 2 2 2 2 2 2 1", "6 0 1 2 3 4 5 6", 7, map(0,6).map(1,6).map(2,6). map(3,6).map(4,6).map(5,6).map(6,NULL));
+		doTest(layer, link, "1 2 3 2 1", "1 0 0 1", 2, map(0,1).map(1,NULL));
+		doTest(layer, link, "1 2 3 4 3 2 1", "2 1 0 0 1 2", 3, map(0,1).map(1,2).map(2,NULL));
+		doTest(layer, link, "1 2 14 2 14 2 1", "2 0 0 1 1 2", 3, map(0,2).map(1,2).map(2,NULL));
+		doTest(layer, link, "1 2 14 14 2 14 2 1", "3 1 0 1 2 2 3", 4, map(0,1).map(1,3).map(2,3).map(3,NULL));
+		doTest(layer, link, "1 2 3 4 3 2 5 4 5 1", "3 1 0 0 1 3 2 2 3", 4, map(0,1).map(1,3).map(2,3).map(3,NULL));
+		doTest(layer, link, "1 2 3 2 3 2 1 2 1", "2 0 0 1 1 2 3 3", 4, map(0,2).map(1,2).map(2,NULL).map(3,NULL));
+		doTest(layer, link, "1 1 1 1 1 2 1", "0 1 2 3 4 4", 5, map(0,NULL).map(1,NULL).map(2,NULL).map(3,NULL).map(4,NULL));
+		doTest(layer, link, "1 2 1 1", "0 0 1", 2, map(0,NULL).map(1,NULL));
+		doTest(layer, link, "1 2 3 4", UNDEFINED_UNDEFINED_UNDEFINED, 0, Collections.EMPTY_MAP);
+		doTest(layer, link, "1 2 2 3 2 2 2 1 4 1", "4 0 1 1 2 3 4 5 5", 6, map(0,4).map(1,4).map(2,4).map(3,4).map(4,NULL).map(5,NULL));
+		doTest(layer, link, "1 2 3 4 3 1", "1 1 0 0 1", 2, map(0,1).map(1,NULL));
 		// doTest(layer, planomatConfigGroup, "1 2 3 4 2 5 3 6 1", " 2 0 0 0 1 1 2 2", 3, map(2,NULL).map(0,2).map(1,2));
-		doTest(layer, planomatConfigGroup, "1 2 3 4 2 5 3 6 1", "1 0 0 0 1 1 1 1", 2, map(1,NULL).map(0,1));
+		doTest(layer, link, "1 2 3 4 2 5 3 6 1", "1 0 0 0 1 1 1 1", 2, map(1,NULL).map(0,1));
 	}
 
-	private void doTest(BasicLocations layer, PlanomatConfigGroup planomatConfigGroup,
+	private void doTest(BasicLocations layer, TripStructureAnalysisLayerOption link,
 			String facString, String expectedSubtourIndexationString,
 			int expectedNumSubtoursForThis, Map<Integer, Integer> childToParent) {
-		boolean useFacilities = planomatConfigGroup.getTripStructureAnalysisLayer().equals( PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility );
+		boolean useFacilities = link.equals( TripStructureAnalysisLayerOption.facility );
 		PlanImpl plan = createPlan(layer, facString, useFacilities);
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours( plan , useFacilities);
 		StringBuilder builder = new StringBuilder();

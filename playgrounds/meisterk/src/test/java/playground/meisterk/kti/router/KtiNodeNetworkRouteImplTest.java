@@ -29,22 +29,20 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.AbstractNetworkRouteTest;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
+
 public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 
-	private Config config = null;
+	private PlanomatConfigGroup config = new PlanomatConfigGroup();
 
 	@Before
 	public void setUp() {
-		this.config = new Config();
-		this.config.addCoreModules();
 	}
 
 	@After
@@ -67,7 +65,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : expectedDistances.keySet()) {
 
-			this.config.planomat().setSimLegInterpretation(simLegInterpretation);
+			this.config.setSimLegInterpretation(simLegInterpretation);
 			NetworkRoute route = getNetworkRouteInstance(link1.getId(), link4.getId(), network);
 			route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("22 12 -23 3"), link4.getId());
 
@@ -85,7 +83,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : expectedDistances.keySet()) {
 
-			this.config.planomat().setSimLegInterpretation(simLegInterpretation);
+			this.config.setSimLegInterpretation(simLegInterpretation);
 			NetworkRoute route = getNetworkRouteInstance(link1.getId(), link1.getId(), network);
 			route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds(""), link1.getId());
 
@@ -102,7 +100,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 	@Override
 	protected NetworkRoute getNetworkRouteInstance(Id fromLinkId, Id toLinkId,
 			NetworkImpl network) {
-		return new KtiLinkNetworkRouteImpl(fromLinkId, toLinkId, network, this.config.planomat().getSimLegInterpretation());
+		return new KtiLinkNetworkRouteImpl(fromLinkId, toLinkId, network, this.config.getSimLegInterpretation());
 
 	}
 }

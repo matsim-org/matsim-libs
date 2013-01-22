@@ -21,7 +21,8 @@ package playground.ciarif.flexibletransports.config;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
+
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
 public class FtConfigGroup extends Module {
 	
@@ -162,7 +163,7 @@ public class FtConfigGroup extends Module {
 		}
 
 		if (!validParameterName) {
-			logger.warn("Unknown parameter name in module " + PlanomatConfigGroup.GROUP_NAME + ": \"" + param_name + "\". It is ignored.");
+			logger.warn("Unknown parameter name in module " + FtConfigGroup.GROUP_NAME + ": \"" + param_name + "\". It is ignored.");
 		}
 
 	}

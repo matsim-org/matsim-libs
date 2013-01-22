@@ -22,11 +22,12 @@ package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
+
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup.SimLegInterpretation;
 
 /**
  * Temporary solution to calculate the route distance as it is simulated in the JEDQSim.

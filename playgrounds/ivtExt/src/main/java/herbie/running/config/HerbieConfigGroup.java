@@ -22,7 +22,6 @@ package herbie.running.config;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 
 public class HerbieConfigGroup extends Module {
 
@@ -120,7 +119,7 @@ public class HerbieConfigGroup extends Module {
 		}
 		if (!validParameterName) {
 			logger.warn("Unknown parameter name in module " + 
-					PlanomatConfigGroup.GROUP_NAME + ": \"" + param_name + "\". It is ignored.");
+					HerbieConfigGroup.GROUP_NAME + ": \"" + param_name + "\". It is ignored.");
 		}
 	}	
 	public double getDistanceCostPtNoTravelCard() {

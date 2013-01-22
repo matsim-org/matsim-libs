@@ -48,6 +48,7 @@ import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
 import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
 public class KTIEnergyFlowsController extends EnergyFlowsController {
 
@@ -90,7 +91,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 			/*
 			 * Use KTI route factories.
 			 */
-			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
+			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), new PlanomatConfigGroup()));
 			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
 			

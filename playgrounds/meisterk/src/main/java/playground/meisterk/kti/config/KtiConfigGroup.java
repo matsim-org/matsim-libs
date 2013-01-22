@@ -22,7 +22,8 @@ package playground.meisterk.kti.config;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
+
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
 public class KtiConfigGroup extends Module {
 

@@ -42,6 +42,7 @@ import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
+import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
 public class CarSharingControler extends Controler
 {
@@ -62,7 +63,7 @@ public class CarSharingControler extends Controler
   // super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
    super.config.addModule(FtConfigGroup.GROUP_NAME, this.ftConfigGroup);
 
-    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.car, new KtiLinkNetworkRouteFactory(getNetwork(), super.getConfig().planomat()));
+    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.car, new KtiLinkNetworkRouteFactory(getNetwork(), new PlanomatConfigGroup()));
     ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
     //this.getNetwork().getFactory().setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
     ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
