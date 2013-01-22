@@ -40,7 +40,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
-	public void testLocationChoiceJan2013() {
+	public void tesLocationChoiceJan2013() {
 		final Config config = localCreateConfig();
 
 		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
@@ -123,7 +123,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 //		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
 		assertEquals( new IdImpl(0), newWork.getFacilityId() );
 	}
-	public void estLocationChoice() {
+	public void testLocationChoice() {
 		final Config config = localCreateConfig();
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
