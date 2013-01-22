@@ -38,13 +38,6 @@
 		<param name="writePlansInterval" value="50" />
 	</module>
 	
-	<module name="vspExperimental" >
-		<param name="isGeneratingBoardingDeniedEvent" value="true" />
-		<param name="vspDefaultsCheckingLevel" value="abort" />
-		<param name="isAbleToOverwritePtInteractionParams" value="true" />
-	</module>
-
-
 	<module name="qsim">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="05:00:00" />
