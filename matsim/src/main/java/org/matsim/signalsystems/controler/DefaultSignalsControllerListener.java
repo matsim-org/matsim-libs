@@ -35,7 +35,8 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 
 
 /**
- * SignalControllerListener implementation for the MATSim default, data driven signal model
+ * SignalControllerListener implementation for the MATSim default implementation for traffic light control, 
+ * i.e. a fixed-time traffic signal control that can be specified completely by xml input data.
  * @author dgrether
  *
  */
