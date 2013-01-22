@@ -289,7 +289,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			log.warn("No input file for pt stops given. Using MATSim default router ...");
 			
 		log.info("Adding controler listener ...");
-		addControlerListener(zones, parcels, controler);
+		addControlerListener(zones, parcels, controler, ptMatrix);
 		addFurtherControlerListener(controler, parcels);
 		log.info("Adding controler listener done!");
 	
@@ -304,13 +304,14 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 * @param parcels
 	 * @param controler
 	 */
-	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler) {
+	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler, PtMatrix ptMatrix) {
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
 			// creates zone2zone impedance matrix
 			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
 																					  parcels,
+																					  ptMatrix,
 																					  benchmark) );
 		if(computeAgentPerformance)
 			// creates a persons.csv output for UrbanSim
@@ -330,6 +331,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3( this,
 																						measuringPoints, 				
 																						zonesOrParcels,
+																						ptMatrix,
 																						benchmark,
 																						this.scenario));
 		}
@@ -339,6 +341,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid ptGrid;						// matrix for pt related accessibility measure. based on the boundary (above) and grid size
 			
 			ZoneLayer<Id>  measuringPoints;
 
@@ -346,18 +349,20 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
 																			   nwBoundaryBox.getBoundingBox());
 				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				bikeGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				carGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				bikeGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkGrid	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				ptGrid		= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			else{
 				Geometry boundary = GridUtils.getBoundary(shapeFile);
 				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
 																				   boundary);
 				freeSpeedGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				bikeGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				carGrid		= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				bikeGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				walkGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				ptGrid		= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 			}
 			
 			if(isParcelMode)
@@ -367,7 +372,9 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																							 freeSpeedGrid,
 																							 carGrid,
 																							 bikeGrid,
-																							 walkGrid, 
+																							 walkGrid,
+																							 ptGrid,
+																							 ptMatrix,
 																							 benchmark, 
 																							 this.scenario));
 			else
@@ -378,6 +385,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																							 carGrid,
 																							 bikeGrid,
 																							 walkGrid, 
+																							 ptGrid,
+																							 ptMatrix,
 																							 benchmark, 
 																							 this.scenario));
 		}

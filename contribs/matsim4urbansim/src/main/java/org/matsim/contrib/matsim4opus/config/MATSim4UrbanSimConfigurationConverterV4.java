@@ -117,6 +117,15 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	private static final String BETA_BIKE_TRAVEL_COST = "betaBikeTravelCost";
 	private static final String BETA_BIKE_TRAVEL_COST_POWER2 = "betaBikeTravelCostPower2";
 	private static final String BETA_BIKE_LN_TRAVEL_COST = "betaBikeLnTravelCost";
+	private static final String BETA_PT_TRAVEL_TIME = "betaPtTravelTime";
+	private static final String BETA_PT_TRAVEL_TIME_POWER2 = "betaPtTravelTimePower2";
+	private static final String BETA_PT_LN_TRAVEL_TIME = "betaPtLnTravelTime";
+	private static final String BETA_PT_TRAVEL_DISTANCE = "betaPtTravelDistance";
+	private static final String BETA_PT_TRAVEL_DISTANCE_POWER2 = "betaPtTravelDistancePower2";
+	private static final String BETA_PT_LN_TRAVEL_DISTANCE = "betaPtLnTravelDistance";
+	private static final String BETA_PT_TRAVEL_COST = "betaPtTravelCost";
+	private static final String BETA_PT_TRAVEL_COST_POWER2 = "betaPtTravelCostPower2";
+	private static final String BETA_PT_LN_TRAVEL_COST = "betaPtLnTravelCost";
 	
 	/**
 	 * constructor
@@ -476,7 +485,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		betaBikeTC, betaBikeTCPower, betaBikeLnTC,
 		betaWalkTT, betaWalkTTPower, betaWalkLnTT,	// walk
 		betaWalkTD, betaWalkTDPower, betaWalkLnTD,
-		betaWalkTC, betaWalkTCPower, betaWalkLnTC;
+		betaWalkTC, betaWalkTCPower, betaWalkLnTC,
+		betaPtTT, betaPtTTPower, betaPtLnTT,		// pt
+		betaPtTD, betaPtTDPower, betaPtLnTD,
+		betaPtTC, betaPtTCPower, betaPtLnTC;
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
 		
@@ -484,8 +496,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		// these parameter define if the beta or logit_scale parameter are taken from MATSim or the config file
 		boolean useMATSimLogitScaleParameter 	= matsim4UrbanSimParameter.getAccessibilityParameter().isUseLogitScaleParameterFromMATSim();
 		boolean useMATSimCarParameter			= matsim4UrbanSimParameter.getAccessibilityParameter().isUseCarParameterFromMATSim();
-		boolean useMATSimBikeParameter			= !useCustomMarginalUtilitiesBike(); // true if relevant settings in the external MATSim config is found
+		boolean useMATSimBikeParameter			= !useCustomMarginalUtilitiesBike(); // true if relevant settings in the external MATSim config are found
 		boolean useMATSimWalkParameter			= matsim4UrbanSimParameter.getAccessibilityParameter().isUseWalkParameterFromMATSim();
+		boolean useMATSimPtParameter			= !useCustomMarginalUtilitiesPt();	 // true if relevant settings in the external MATSim config are found
 		boolean useRawSum						= matsim4UrbanSimParameter.getAccessibilityParameter().isUseRawSumsWithoutLn();
 		
 		if(useMATSimLogitScaleParameter)
@@ -571,6 +584,30 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaWalkLnTC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelCost();
 		}
 		
+		if(useMATSimPtParameter){
+			// usually travelling_utils are negative
+			betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
+			betaPtTTPower	= 0.;
+			betaPtLnTT		= 0.;
+			betaPtTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtlOfDistanceBike(); // [utils/meter]
+			betaPtTDPower	= 0.;												
+			betaPtLnTD		= 0.;
+			betaPtTC		= 0.;// [utils/money], not available in MATSim
+			betaPtTCPower	= 0.;
+			betaPtLnTC		= 0.;
+		}
+		else{
+			betaPtTT		= getValueAsDouble(BETA_PT_TRAVEL_TIME);
+			betaPtTTPower	= getValueAsDouble(BETA_PT_TRAVEL_TIME_POWER2);
+			betaPtLnTT		= getValueAsDouble(BETA_PT_LN_TRAVEL_TIME);
+			betaPtTD		= getValueAsDouble(BETA_PT_TRAVEL_DISTANCE);
+			betaPtTDPower	= getValueAsDouble(BETA_PT_TRAVEL_DISTANCE_POWER2);
+			betaPtLnTD		= getValueAsDouble(BETA_PT_LN_TRAVEL_DISTANCE);
+			betaPtTC		= getValueAsDouble(BETA_PT_TRAVEL_COST);
+			betaPtTCPower	= getValueAsDouble(BETA_PT_TRAVEL_COST_POWER2);
+			betaPtLnTC		= getValueAsDouble(BETA_PT_LN_TRAVEL_COST);
+		}
+		
 		// set parameter in module 
 		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
 		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
@@ -607,6 +644,15 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		module.setBetaWalkTravelCost(betaWalkTC);
 		module.setBetaWalkTravelCostPower2(betaWalkTCPower);
 		module.setBetaWalkLnTravelCost(betaWalkLnTC);
+		module.setBetaPtTravelTime(betaPtTT);
+		module.setBetaPtTravelTimePower2(betaPtTTPower);
+		module.setBetaPtLnTravelTime(betaPtLnTT);
+		module.setBetaPtTravelDistance(betaPtTD);
+		module.setBetaPtTravelDistancePower2(betaPtTDPower);
+		module.setBetaPtLnTravelDistance(betaPtLnTD);
+		module.setBetaPtTravelCost(betaPtTC);
+		module.setBetaPtTravelCostPower2(betaPtTCPower);
+		module.setBetaPtLnTravelCost(betaPtLnTC);
 		
 		
 		// display results
@@ -966,6 +1012,26 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 					matsim4UrbanSimModule.getValue(BETA_BIKE_TRAVEL_COST) != null ||
 					matsim4UrbanSimModule.getValue(BETA_BIKE_TRAVEL_COST_POWER2) != null ||
 					matsim4UrbanSimModule.getValue(BETA_BIKE_LN_TRAVEL_COST) != null);
+		return false;
+	}
+	
+	/**
+	 * returns true if an external MATSim config contains the matsim4UrbanSimModule 
+	 * with at least one marginal utility for pt.
+	 * 
+	 * @return
+	 */
+	private boolean useCustomMarginalUtilitiesPt(){
+		if(matsim4UrbanSimModule != null)
+			return (matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_TIME) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_TIME_POWER2) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_LN_TRAVEL_TIME) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_DISTANCE) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_DISTANCE_POWER2) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_LN_TRAVEL_DISTANCE) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_COST) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_COST_POWER2) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_LN_TRAVEL_COST) != null);
 		return false;
 	}
 	

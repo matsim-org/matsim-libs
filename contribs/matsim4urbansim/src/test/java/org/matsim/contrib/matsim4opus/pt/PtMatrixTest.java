@@ -32,11 +32,6 @@ import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModul
 import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -74,8 +69,8 @@ public class PtMatrixTest extends MatsimTestCase{
 		for(int origin = 0; origin < facilityList.size(); origin++){
 			for(int destination = 0; destination < facilityList.size(); destination++){
 				
-				double travelTime = ptm.getTravelTime(facilityList.get( origin ), facilityList.get( destination ));
-				double travelDistance= ptm.getTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
+				double travelTime = ptm.getTotalTravelTime(facilityList.get( origin ), facilityList.get( destination ));
+				double travelDistance= ptm.getTotalTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
 				log.info("From: " + facilityList.get( origin ).getX()+":"+facilityList.get( origin ).getY() + ", To: " + facilityList.get( destination ).getX()+":"+facilityList.get( destination ).getY()  + ", TravelTime: " + travelTime + ", Travel Distance: " + travelDistance);
 				// tnicolai todo some assert statements
 			}

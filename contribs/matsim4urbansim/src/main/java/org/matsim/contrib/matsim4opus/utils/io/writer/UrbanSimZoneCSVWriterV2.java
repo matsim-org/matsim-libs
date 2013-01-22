@@ -37,7 +37,8 @@ public class UrbanSimZoneCSVWriterV2 {
 							  InternalConstants.ACCESSIBILITY_BY_FREESPEED + "," +
 							  InternalConstants.ACCESSIBILITY_BY_CAR + "," +
 							  InternalConstants.ACCESSIBILITY_BY_BIKE + "," +
-							  InternalConstants.ACCESSIBILITY_BY_WALK);
+							  InternalConstants.ACCESSIBILITY_BY_WALK + "," +
+							  InternalConstants.ACCESSIBILITY_BY_PT);
 			zoneWriter.newLine();
 			
 			log.info("... done!");
@@ -60,7 +61,8 @@ public class UrbanSimZoneCSVWriterV2 {
 							 double freeSpeedAccessibility,
 							 double carAccessibility, 
 							 double bikeAccessibility,
-							 double walkAccessibility){
+							 double walkAccessibility,
+							 double ptAccessibility){
 		
 		try{
 			assert(UrbanSimZoneCSVWriterV2.zoneWriter != null);
@@ -68,7 +70,8 @@ public class UrbanSimZoneCSVWriterV2 {
 							  freeSpeedAccessibility + "," + 
 							  carAccessibility + "," + 
 							  bikeAccessibility + "," +
-							  walkAccessibility );
+							  walkAccessibility + "," +
+							  ptAccessibility);
 			zoneWriter.newLine();
 		}
 		catch(Exception e){

@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeBasedTravelDisutility;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
@@ -63,6 +64,9 @@ import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
  * improvements / changes aug'12
  * - added calculation of free speed car and bike travel times
  * 
+ * improvements jan'13
+ * - added pt for accessibility calculation
+ * 
  * @author nagel
  * @author thomas
  *
@@ -75,6 +79,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	private ActivityFacilitiesImpl zones;
 	private ActivityFacilitiesImpl parcels;
 	private String travelDataPath;
+	private PtMatrix ptMatrix;		// this could be zero of no input files for pseudo pt are given ...
 	private Benchmark benchmark;
 
 	/**
@@ -82,12 +87,13 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	 * @param zones 
 	 * @param parcels
 	 */
-	public Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Benchmark benchmark) {
+	public Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, PtMatrix ptMatrix, Benchmark benchmark) {
 		assert(zones != null);
 		this.zones = zones;
 		assert(parcels != null);
 		this.parcels = parcels;
 		this.travelDataPath = InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME;
+		this.ptMatrix = ptMatrix;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
 	}
@@ -189,6 +195,14 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					if(walkTravelTime_min < 12.)
 						walkTravelTime_min = 12.;
 					
+					// pt travel times in minutes
+					double ptTravelTime_min = -1.;
+					if(this.ptMatrix != null){
+						ptTravelTime_min = this.ptMatrix.getTotalTravelTime(fromNode.getCoord(), toNode.getCoord()) / 60.;
+						if(ptTravelTime_min < 10.)
+							ptTravelTime_min = 10.;
+					}
+
 					// query trips in OD Matrix
 					double trips = 0.0;
 					Entry e = originDestinationMatrix.getEntry( originZoneID, destinationZoneID );
@@ -204,6 +218,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 										+ "," + congestedTravelTime_min 		//congested travel times
 										+ "," + bikeTravelTime_min				//bike travel times
 										+ "," + walkTravelTime_min				//walk travel times
+										+ "," + ptTravelTime_min				//pt travel times
 										+ "," + trips);							//vehicle trips
 					travelDataWriter.newLine();
 				}
@@ -246,7 +261,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
 		
 		// Travel Data Header
-		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,vehicle_free_speed_travel_time:f4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,bike_time_in_minutes:f4,walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
+		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,vehicle_free_speed_travel_time:f4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,bike_time_in_minutes:f4,walk_time_in_minutes:f4,pt_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
 		
 		Logger.getLogger(this.getClass()).error( "add new fields (this message is shown until all travel data attributes are updated)" );
 		travelDataWriter.newLine();

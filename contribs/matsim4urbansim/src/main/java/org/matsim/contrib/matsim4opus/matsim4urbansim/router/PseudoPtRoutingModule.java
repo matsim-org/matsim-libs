@@ -74,7 +74,7 @@ public class PseudoPtRoutingModule implements RoutingModule{
 		newLeg.setDepartureTime( departureTime );
 		// set travel time
 		// double travelTime = 10. * 60.; // for testing
-		double travelTime = this.ptMatrix.getTravelTime(fromFacility.getCoord(), toFacility.getCoord());
+		double travelTime = this.ptMatrix.getTotalTravelTime(fromFacility.getCoord(), toFacility.getCoord());
 		newLeg.setTravelTime( travelTime );
 		// set arrival time
 		newLeg.setArrivalTime( departureTime + travelTime );

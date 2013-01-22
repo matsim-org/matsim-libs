@@ -36,7 +36,8 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 										   InternalConstants.ACCESSIBILITY_BY_FREESPEED + "," +
 										   InternalConstants.ACCESSIBILITY_BY_CAR + "," +
 										   InternalConstants.ACCESSIBILITY_BY_BIKE + "," +
-										   InternalConstants.ACCESSIBILITY_BY_WALK);
+										   InternalConstants.ACCESSIBILITY_BY_WALK + "," +
+										   InternalConstants.ACCESSIBILITY_BY_PT);
 			accessibilityDataWriter.newLine();
 			
 			log.info("... done!");
@@ -63,7 +64,8 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 							 double freeSpeedAccessibility,
 							 double carAccessibility, 
 							 double bikeAccessibility,
-							 double walkAccessibility){
+							 double walkAccessibility,
+							 double ptAccessibility){
 		
 		try{
 			assert(AnalysisCellBasedAccessibilityCSVWriterV2.accessibilityDataWriter != null);
@@ -76,7 +78,8 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 										   freeSpeedAccessibility + "," +
 										   carAccessibility + "," +
 										   bikeAccessibility + "," + 
-										   walkAccessibility );
+										   walkAccessibility + "," +
+										   ptAccessibility);
 			accessibilityDataWriter.newLine();
 		}
 		catch(Exception e){

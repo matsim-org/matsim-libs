@@ -139,7 +139,7 @@ public class NetworkUtil {
 	
 	/**
 	 * this is just another implementation of getDistance2Node, its implemented to test whether a faster implementation
-	 * is possible. However, getDistance2Node is faster. Don't use this method
+	 * is possible. 
 	 * 
 	 * @param link
 	 * @param point
@@ -152,7 +152,7 @@ public class NetworkUtil {
 	
 	/**
 	 * this is just another implementation of getDistance2Node, its implemented to test whether a faster implementation
-	 * is possible. However, getDistance2Node is faster. Don't use this method
+	 * is possible. 
 	 * 
 	 * @param link
 	 * @param point

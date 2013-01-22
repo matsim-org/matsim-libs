@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -100,6 +101,9 @@ import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
  * changes sep'12
  * - renaming from CellBasedAccessibilityControlerListenerV3 into ParcelBasedAccessibilityControlerListenerV3
  * 
+ * improvements jan'13
+ * - added pt for accessibility calculation
+ * 
  * @author thomas
  * 
  */
@@ -119,6 +123,8 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
 													 SpatialGrid bikeGrid,										// table for bike travel times in accessibility computation
 													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
+													 SpatialGrid ptGrid,
+													 PtMatrix ptMatrix,
 													 Benchmark benchmark,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
 													 ScenarioImpl scenario){
 								
@@ -140,8 +146,11 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		this.bikeGrid = bikeGrid;
 		assert (walkGrid != null);
 		this.walkGrid = walkGrid;
+		assert (ptGrid != null);
+		this.ptGrid = ptGrid;
 		assert (benchmark != null);
 		this.benchmark = benchmark;
+		this.ptMatrix = ptMatrix;	// this could be zero of no input files for pseudo pt are given ...
 
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
@@ -182,6 +191,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 									 lcptFreeSpeedCarTravelTime,
 									 lcptCongestedCarTravelTime, 
 									 lcptTravelDistance, 
+									 ptMatrix,
 									 network,
 									 measuringPointIterator, 
 									 measuringPointsCell.getZones().size(),
@@ -233,11 +243,11 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 			Zone<Id> measurePoint, Coord coordFromZone,
 			Node fromNode, double freeSpeedAccessibility,
 			double carAccessibility, double bikeAccessibility,
-			double walkAccessibility) {
+			double walkAccessibility, double ptAccessibility) {
 		// writing accessibility values (stored in startZone object) in csv format ...
 		AnalysisCellBasedAccessibilityCSVWriterV2.write(measurePoint,
 				coordFromZone, fromNode, freeSpeedAccessibility,
-				carAccessibility, bikeAccessibility, walkAccessibility);
+				carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
 	}
 
 	// This needs to be executed only once at the end of the accessibility computation
@@ -261,7 +271,10 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		GridUtils.writeSpatialGridTable(walkGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
 				+ WALK_FILENAME + walkGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
-
+		// tnicolai: can be disabled for final release
+		GridUtils.writeSpatialGridTable(ptGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
+				+ PT_FILENAME + ptGrid.getResolution()
+				+ InternalConstants.FILE_TYPE_TXT);
 
 //		// tnicolai: disabled google earth outputs for final release 
 //		GridUtils.writeKMZFiles(measuringPointsCell,								// car results for google earth
@@ -306,6 +319,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		Interpolation carGridInterpolation = new Interpolation(carGrid, Interpolation.BILINEAR);
 		Interpolation bikeGridInterpolation= new Interpolation(bikeGrid, Interpolation.BILINEAR);
 		Interpolation walkGridInterpolation= new Interpolation(walkGrid, Interpolation.BILINEAR);
+		Interpolation ptGridInterpolation  = new Interpolation(ptGrid, Interpolation.BILINEAR);
 		
 		if(this.parcels != null){
 			
@@ -314,6 +328,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 			double carAccessibility = Double.NaN;
 			double bikeAccessibility= Double.NaN;
 			double walkAccessibility= Double.NaN;
+			double ptAccessibility  = Double.NaN;
 			
 			log.info(numberOfParcels + " parcels are now processing ...");
 			
@@ -332,10 +347,11 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 				
 				freeSpeedAccessibility = freeSpeedGridInterpolation.interpolate( parcel.getCoord() );
 				carAccessibility = carGridInterpolation.interpolate( parcel.getCoord() );
-				bikeAccessibility = bikeGridInterpolation.interpolate( parcel.getCoord() );
+				bikeAccessibility= bikeGridInterpolation.interpolate( parcel.getCoord() );
 				walkAccessibility= walkGridInterpolation.interpolate( parcel.getCoord() );
+				ptAccessibility  = ptGridInterpolation.interpolate( parcel.getCoord() );
 				
-				UrbanSimParcelCSVWriter.write(parcel.getId(), freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility);
+				UrbanSimParcelCSVWriter.write(parcel.getId(), freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
 			}
 			log.info("... done!");
 			UrbanSimParcelCSVWriter.close();

@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -43,6 +44,10 @@ import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
  * 
  * todo (sep'12):
  * - set external costs to opportunities within the same zone ...
+ * 
+ * improvements jan'13
+ * - added pt for accessibility calculation
+ * 
  * @author thomas
  *
  */
@@ -58,6 +63,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	public ZoneBasedAccessibilityControlerListenerV3(MATSim4UrbanSimInterface main,
 												   ZoneLayer<Id>  startZones, 
 												   ActivityFacilitiesImpl zones,
+												   PtMatrix ptMatrix,
 												   Benchmark benchmark,
 												   ScenarioImpl scenario){
 		
@@ -69,6 +75,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		this.measuringPointsZone = startZones;
 		assert(zones != null);
 		this.zones = zones;
+		this.ptMatrix = ptMatrix; // this could be zero of no input files for pseudo pt are given ...
 		assert(benchmark != null);
 		this.benchmark = benchmark;
 		assert(scenario != null);
@@ -113,7 +120,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			log.info(measuringPointsZone.getZones().size() + "  measurement points are now processing ...");
 			
 			accessibilityComputation(ttc, lcptFreeSpeedCarTravelTime,
-					lcptCongestedCarTravelTime, lcptTravelDistance, network,
+					lcptCongestedCarTravelTime, lcptTravelDistance, ptMatrix, network,
 					measuringPointIterator, measuringPointsZone.getZones().size(),
 					ZONE_BASED);
 			
@@ -145,13 +152,14 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			Zone<Id> measurePoint, Coord coordFromZone,
 			Node fromNode, double freeSpeedAccessibility,
 			double carAccessibility, double bikeAccessibility,
-			double walkAccessibility) {
+			double walkAccessibility, double ptAccessibility) {
 		// writing accessibility measures of current node in csv format (UrbanSim input)
 		UrbanSimZoneCSVWriterV2.write(measurePoint,
 									  freeSpeedAccessibility,
 									  carAccessibility,
 									  bikeAccessibility,
-									  walkAccessibility);
+									  walkAccessibility, 
+									  ptAccessibility);
 		// writing complete zones information for further analysis
 		AnalysisZoneCSVWriterV2.write(measurePoint,
 									coordFromZone, 
@@ -159,6 +167,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 									freeSpeedAccessibility,
 									carAccessibility,
 									bikeAccessibility,
-									walkAccessibility);
+									walkAccessibility,
+									ptAccessibility);
 	}
 }

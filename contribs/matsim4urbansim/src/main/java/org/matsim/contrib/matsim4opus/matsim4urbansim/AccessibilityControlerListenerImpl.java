@@ -25,6 +25,7 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Distances;
@@ -45,7 +46,10 @@ import com.vividsolutions.jts.geom.Point;
  *   
  * improvements nov'12
  * - bug fixed aggregatedOpportunities method for compound cost factors like time and distance    
- *   
+ * 
+ * improvements jan'13
+ * - added pt for accessibility calculation
+ *     
  * @author thomas
  *
  */
@@ -53,10 +57,11 @@ public class AccessibilityControlerListenerImpl{
 	
 	protected static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
 	
-	public static final String FREESEED_FILENAME = "freeSpeedAccessibility_cellsize_";
-	public static final String CAR_FILENAME = "carAccessibility_cellsize_";
-	public static final String BIKE_FILENAME = "bikeAccessibility_cellsize_";
-	public static final String WALK_FILENAME = "walkAccessibility_cellsize_";
+	public static final String FREESEED_FILENAME= "freeSpeedAccessibility_cellsize_";
+	public static final String CAR_FILENAME 	= "carAccessibility_cellsize_";
+	public static final String BIKE_FILENAME 	= "bikeAccessibility_cellsize_";
+	public static final String WALK_FILENAME 	= "walkAccessibility_cellsize_";
+	public static final String PT_FILENAME 		= "ptAccessibility_cellsize_";
 	
 	protected MATSim4UrbanSimInterface main = null;
 	
@@ -78,6 +83,10 @@ public class AccessibilityControlerListenerImpl{
 	protected SpatialGrid carGrid;
 	protected SpatialGrid bikeGrid;
 	protected SpatialGrid walkGrid;
+	protected SpatialGrid ptGrid;
+	
+	// storing pt matrix
+	protected PtMatrix ptMatrix;
 	
 	// accessibility parameter
 	protected boolean useRawSum	= false;
@@ -110,11 +119,21 @@ public class AccessibilityControlerListenerImpl{
 	protected double betaWalkTC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 	protected double betaWalkTCPower;
 	protected double betaWalkLnTC;
+	protected double betaPtTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
+	protected double betaPtTTPower;
+	protected double betaPtLnTT;
+	protected double betaPtTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
+	protected double betaPtTDPower;
+	protected double betaPtLnTD;
+	protected double betaPtTC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	protected double betaPtTCPower;
+	protected double betaPtLnTC;
 	
 	protected double VijCarTT, VijCarTTPower, VijCarLnTT, VijCarTD, VijCarTDPower, VijCarLnTD, VijCarTC, VijCarTCPower, VijCarLnTC,
 		   VijWalkTT, VijWalkTTPower, VijWalkLnTT, VijWalkTD, VijWalkTDPower, VijWalkLnTD, VijWalkTC, VijWalkTCPower, VijWalkLnTC,
 		   VijBikeTT, VijBikeTTPower, VijBikeLnTT, VijBikeTD, VijBikeTDPower, VijBikeLnTD, VijBikeTC, VijBikeTCPower, VijBikeLnTC,
-		   VijFreeTT, VijFreeTTPower, VijFreeLnTT, VijFreeTD, VijFreeTDPower, VijFreeLnTD, VijFreeTC, VijFreeTCPower, VijFreeLnTC;
+		   VijFreeTT, VijFreeTTPower, VijFreeLnTT, VijFreeTD, VijFreeTDPower, VijFreeLnTD, VijFreeTC, VijFreeTCPower, VijFreeLnTC,
+		   VijPtTT, VijPtTTPower, VijPtLnTT, VijPtTD, VijPtTDPower, VijPtLnTD, VijPtTC, VijPtTCPower, VijPtLnTC;
 	
 	protected double depatureTime;
 	protected double bikeSpeedMeterPerHour = -1;
@@ -166,6 +185,16 @@ public class AccessibilityControlerListenerImpl{
 		betaWalkTC		= moduleAPCM.getBetaWalkTravelCost();
 		betaWalkTCPower	= moduleAPCM.getBetaWalkTravelCostPower2();
 		betaWalkLnTC	= moduleAPCM.getBetaWalkLnTravelCost();
+		
+		betaPtTT		= moduleAPCM.getBetaPtTravelTime();
+		betaPtTTPower	= moduleAPCM.getBetaPtTravelTimePower2();
+		betaPtLnTT		= moduleAPCM.getBetaPtLnTravelTime();
+		betaPtTD		= moduleAPCM.getBetaPtTravelDistance();
+		betaPtTDPower	= moduleAPCM.getBetaPtTravelDistancePower2();
+		betaPtLnTD		= moduleAPCM.getBetaPtLnTravelDistance();
+		betaPtTC		= moduleAPCM.getBetaPtTravelCost();
+		betaPtTCPower	= moduleAPCM.getBetaPtTravelCostPower2();
+		betaPtLnTC		= moduleAPCM.getBetaPtLnTravelCost();
 		
 		depatureTime 	= 8.*3600;	
 		printParameterSettings();
@@ -312,6 +341,7 @@ public class AccessibilityControlerListenerImpl{
 											LeastCostPathTree lcptFreeSpeedCarTravelTime,
 											LeastCostPathTree lcptCongestedCarTravelTime,
 											LeastCostPathTree lcptTravelDistance, 
+											PtMatrix ptMatrix,
 											NetworkImpl network,
 											Iterator<Zone<Id>> measuringPointIterator,
 											int numberOfMeasuringPoints, 
@@ -390,7 +420,6 @@ public class AccessibilityControlerListenerImpl{
 				Link nearestLink = network.getNearestLinkExactly(coordFromZone);
 				
 				// captures the distance (as walk time) between a zone centroid and its nearest node
-				
 				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
 				
 				double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
@@ -424,7 +453,7 @@ public class AccessibilityControlerListenerImpl{
 					Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
 					
-					// tnicolai not needed anymore? since having the aggregated costs on the opportunity side
+					// tnicolai not needed anymore since having the aggregated costs on the opportunity side
 					// using number of aggregated opportunities as weight for log sum measure
 					// int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects(); 
 
@@ -440,6 +469,18 @@ public class AccessibilityControlerListenerImpl{
 					// walk travel times in hours
 					double walkTravelTime_h		= (travelDistance_meter / this.walkSpeedMeterPerHour) + road2NodeWalkTime_h;
 					
+					// travel times and distances for pseudo pt
+					double ptTravelTime_h		= Double.MAX_VALUE;	// travel time with pt
+					double ptTotalWalkTime_h	= Double.MAX_VALUE;	// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location
+					double ptTravelDistance_meter=Double.MAX_VALUE; // total travel distance including walking and pt distance from/to origin/destination location
+					double ptTotalWalkDistance_meter=Double.MAX_VALUE;// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location
+					if(ptMatrix != null){
+						ptTravelTime_h 			= ptMatrix.getPtTravelTime(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
+						ptTotalWalkTime_h		=ptMatrix.getTotalWalkTravelTime(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
+						
+						ptTotalWalkDistance_meter=ptMatrix.getTotalWalkTravelDistance(fromNode.getCoord(), destinationNode.getCoord());
+						ptTravelDistance_meter  = ptMatrix.getPtTravelDistance(fromNode.getCoord(), destinationNode.getCoord());
+					}
 					
 					sumDisutilityOfTravel(gcs, 
 							this.aggregatedOpportunities[i],
@@ -450,22 +491,28 @@ public class AccessibilityControlerListenerImpl{
 							freeSpeedTravelTime_h,
 							bikeTravelTime_h,
 							walkTravelTime_h, 
-							congestedCarTravelTime_h);
+							congestedCarTravelTime_h,
+							ptTravelTime_h,
+							ptTotalWalkTime_h,
+							ptTravelDistance_meter,
+							ptTotalWalkDistance_meter);
 				}
 				
 				// aggregated value
-				double freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility;
+				double freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility;
 				if(!useRawSum){ 	// get log sum
 					freeSpeedAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getFreeSpeedSum() );
 					carAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getCarSum() );
 					bikeAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getBikeSum() );
 					walkAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getWalkSum() );
+					ptAccessibility	 = inverseOfLogitScaleParameter * Math.log( gcs.getPtSum() );
 				}
 				else{ 				// get raw sum
 					freeSpeedAccessibility = inverseOfLogitScaleParameter * gcs.getFreeSpeedSum();
 					carAccessibility = inverseOfLogitScaleParameter * gcs.getCarSum();
 					bikeAccessibility= inverseOfLogitScaleParameter * gcs.getBikeSum();
 					walkAccessibility= inverseOfLogitScaleParameter * gcs.getWalkSum();
+					ptAccessibility  = inverseOfLogitScaleParameter * gcs.getPtSum();
 				}
 				
 				if(mode == PARCEL_BASED){ // only for cell-based accessibility computation
@@ -474,11 +521,12 @@ public class AccessibilityControlerListenerImpl{
 					carGrid.setValue(carAccessibility , measurePoint.getGeometry().getCentroid());
 					bikeGrid.setValue(bikeAccessibility , measurePoint.getGeometry().getCentroid());
 					walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
+					ptGrid.setValue(ptAccessibility, measurePoint.getGeometry().getCentroid());
 				}
 				
 				writeCSVData(measurePoint, coordFromZone, fromNode, 
 						freeSpeedAccessibility, carAccessibility,
-						bikeAccessibility, walkAccessibility);
+						bikeAccessibility, walkAccessibility, ptAccessibility);
 			}
 		}
 	}
@@ -522,7 +570,11 @@ public class AccessibilityControlerListenerImpl{
 									   double freeSpeedTravelTime_h,
 									   double bikeTravelTime_h,
 									   double walkTravelTime_h, 
-									   double congestedCarTravelTime_h) {
+									   double congestedCarTravelTime_h,
+									   double ptTravelTime_h,
+									   double ptTotalWalkTime_h,
+									   double ptTravelDistance_meter,
+									   double ptTotalWalkDistance_meter) {
 		
 		// for debugging free speed accessibility
 		VijFreeTT 	= getAsUtil(betaCarTT, freeSpeedTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
@@ -533,9 +585,9 @@ public class AccessibilityControlerListenerImpl{
 		VijFreeTDPower= getAsUtil(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
 		VijFreeLnTD = getAsUtil(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
 		
-		VijFreeTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
-		VijFreeTCPower= 0.;	// since MATSim doesn't gives monetary costs jet 
-		VijFreeLnTC = 0.;	// since MATSim doesn't gives monetary costs jet 
+		VijFreeTC 	= 0.;	// since MATSim doesn't gives monetary costs yet 
+		VijFreeTCPower= 0.;	// since MATSim doesn't gives monetary costs yet 
+		VijFreeLnTC = 0.;	// since MATSim doesn't gives monetary costs yet 
 		
 		double expFreeSpeedVij = Math.exp(logitScaleParameter *
 										 (VijFreeTT + VijFreeTTPower + VijFreeLnTT
@@ -554,9 +606,9 @@ public class AccessibilityControlerListenerImpl{
 		VijCarTDPower= getAsUtil(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
 		VijCarLnTD 	= getAsUtil(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
 		
-		VijCarTC 	= 0.; 	// since MATSim doesn't gives monetary costs jet 
-		VijCarTCPower= 0.;	// since MATSim doesn't gives monetary costs jet 
-		VijCarLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
+		VijCarTC 	= 0.; 	// since MATSim doesn't gives monetary costs yet 
+		VijCarTCPower= 0.;	// since MATSim doesn't gives monetary costs yet 
+		VijCarLnTC 	= 0.;	// since MATSim doesn't gives monetary costs yet 
 		
 		double expCongestedCarVij = Math.exp(logitScaleParameter *
 											(VijCarTT + VijCarTTPower + VijCarLnTT 
@@ -575,9 +627,9 @@ public class AccessibilityControlerListenerImpl{
 		VijBikeTDPower= getAsUtil(betaBikeTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
 		VijBikeLnTD = getAsUtil(betaBikeLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
 		
-		VijBikeTC 	= 0.; 	// since MATSim doesn't gives monetary costs jet 
-		VijBikeTCPower= 0.;	// since MATSim doesn't gives monetary costs jet 
-		VijBikeLnTC = 0.;	// since MATSim doesn't gives monetary costs jet 
+		VijBikeTC 	= 0.; 	// since MATSim doesn't gives monetary costs yet 
+		VijBikeTCPower= 0.;	// since MATSim doesn't gives monetary costs yet 
+		VijBikeLnTC = 0.;	// since MATSim doesn't gives monetary costs yet 
 		
 		double expBikeVij = Math.exp(logitScaleParameter *
 								    (VijBikeTT + VijBikeTTPower + VijBikeLnTT 
@@ -599,9 +651,9 @@ public class AccessibilityControlerListenerImpl{
 		VijWalkTDPower = getAsUtil(betaWalkTDPower, totalTravelDistance * totalTravelDistance, 0, 0);
 		VijWalkLnTD = getAsUtil(betaWalkLnTD, Math.log(totalTravelDistance), 0, 0);
 
-		VijWalkTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
-		VijWalkTCPower= 0.;	// since MATSim doesn't gives monetary costs jet 
-		VijWalkLnTC = 0.;	// since MATSim doesn't gives monetary costs jet 
+		VijWalkTC 	= 0.;	// since MATSim doesn't gives monetary costs yet 
+		VijWalkTCPower= 0.;	// since MATSim doesn't gives monetary costs yet 
+		VijWalkLnTC = 0.;	// since MATSim doesn't gives monetary costs yet 
 		
 		double expWalkVij = Math.exp(logitScaleParameter *
 									(VijWalkTT + VijWalkTTPower + VijWalkLnTT 
@@ -610,6 +662,26 @@ public class AccessibilityControlerListenerImpl{
 
 		// sum walk travel times (substitute for distances)
 		gcs.addWalkCost(expWalkVij * aggregatedOpportunities.getSumVjk());
+		
+		// for debugging pt accessibility
+		VijPtTT 	= getAsUtil(betaPtTT, ptTravelTime_h, betaWalkTT, (walkTravelTimePoint2Road_h + ptTotalWalkTime_h));
+		VijPtTTPower= getAsUtil(betaPtTTPower, ptTravelTime_h * ptTravelTime_h, betaWalkTTPower, (walkTravelTimePoint2Road_h + ptTotalWalkTime_h) * (walkTravelTimePoint2Road_h + ptTotalWalkTime_h));
+		VijPtLnTT	= getAsUtil(betaPtLnTT, Math.log(ptTravelTime_h), betaWalkLnTT, Math.log(walkTravelTimePoint2Road_h + ptTotalWalkTime_h));
+		
+		VijPtTD 	= getAsUtil(betaPtTD, ptTravelDistance_meter + distanceRoad2Node_meter, betaWalkTD, (distanceMeasuringPoint2Road_meter + ptTotalWalkDistance_meter)); 
+		VijPtTDPower= getAsUtil(betaPtTDPower, Math.pow(ptTravelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, (distanceMeasuringPoint2Road_meter + ptTotalWalkDistance_meter) * (distanceMeasuringPoint2Road_meter + ptTotalWalkDistance_meter));
+		VijPtLnTD 	= getAsUtil(betaPtLnTD, Math.log(ptTravelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter + ptTotalWalkDistance_meter));
+		
+		VijPtTC 	= 0.; 	// since MATSim doesn't gives monetary costs yet 
+		VijPtTCPower= 0.;	// since MATSim doesn't gives monetary costs yet 
+		VijPtLnTC 	= 0.;	// since MATSim doesn't gives monetary costs yet 
+		
+		double expPtVij = Math.exp(logitScaleParameter *
+								  (VijPtTT + VijPtTTPower + VijPtLnTT 
+								 + VijPtTD + VijPtTDPower + VijPtLnTD 
+								 + VijPtTC + VijPtTCPower + VijPtLnTC));
+		
+		gcs.addPtCost(expPtVij * aggregatedOpportunities.getSumVjk());
 	}
 	
 	/**
@@ -695,7 +767,7 @@ public class AccessibilityControlerListenerImpl{
 			Zone<Id> measurePoint, Coord coordFromZone,
 			Node fromNode, double freeSpeedAccessibility,
 			double carAccessibility, double bikeAccessibility,
-			double walkAccessibility) {
+			double walkAccessibility, double ptAccessibility) {
 		// this is just a stub and does nothing. 
 		// this needs to be implemented/overwritten by an inherited class
 	}
@@ -713,15 +785,17 @@ public class AccessibilityControlerListenerImpl{
 	public static class GeneralizedCostSum {
 		
 		private double sumFREESPEED = 0.;
-		private double sumCAR  = 0.;
-		private double sumBIKE = 0.;
-		private double sumWALK = 0.;
+		private double sumCAR  	= 0.;
+		private double sumBIKE 	= 0.;
+		private double sumWALK 	= 0.;
+		private double sumPt   	= 0.;
 		
 		public void reset() {
-			this.sumFREESPEED = 0.;
-			this.sumCAR		  = 0.;
-			this.sumBIKE	  = 0.;
-			this.sumWALK	  = 0.;
+			this.sumFREESPEED 	= 0.;
+			this.sumCAR		  	= 0.;
+			this.sumBIKE	  	= 0.;
+			this.sumWALK	  	= 0.;
+			this.sumPt		  	= 0.;
 		}
 		
 		public void addFreeSpeedCost(double cost){
@@ -740,6 +814,10 @@ public class AccessibilityControlerListenerImpl{
 			this.sumWALK += cost;
 		}
 		
+		public void addPtCost(double cost){
+			this.sumPt += cost;
+		}
+		
 		public double getFreeSpeedSum(){
 			return this.sumFREESPEED;
 		}
@@ -754,6 +832,10 @@ public class AccessibilityControlerListenerImpl{
 		
 		public double getWalkSum(){
 			return this.sumWALK;
+		}
+		
+		public double getPtSum(){
+			return this.sumPt;
 		}
 	}
 

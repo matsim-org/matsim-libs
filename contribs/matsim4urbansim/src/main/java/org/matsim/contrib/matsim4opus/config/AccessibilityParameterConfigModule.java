@@ -93,6 +93,25 @@ public class AccessibilityParameterConfigModule extends Module{
     
 	private double betaWalkLnTravelCost;
 	
+	private double betaPtTravelTime;
+    
+	private double betaPtTravelTimePower2;
+    
+	private double betaPtLnTravelTime;
+    
+	private double betaPtTravelDistance;
+    
+	private double betaPtTravelDistancePower2;
+    
+	private double betaPtLnTravelDistance;
+    
+	private double betaPtTravelCost;
+    
+	private double betaPtTravelCostPower2;
+    
+	private double betaPtLnTravelCost;
+	
+	
 	public AccessibilityParameterConfigModule(String name) {
 		super(name);
 	}
@@ -368,5 +387,77 @@ public class AccessibilityParameterConfigModule extends Module{
     public void setBetaWalkLnTravelCost(double value) {
         this.betaWalkLnTravelCost = value;
     }
+    
+    public double getBetaPtTravelTime() {
+        return betaPtTravelTime;
+    }
 
+    public void setBetaPtTravelTime(double value) {
+        this.betaPtTravelTime = value;
+    }
+
+    public double getBetaPtTravelTimePower2() {
+        return betaPtTravelTimePower2;
+    }
+
+    public void setBetaPtTravelTimePower2(double value) {
+        this.betaPtTravelTimePower2 = value;
+    }
+
+    public double getBetaPtLnTravelTime() {
+        return betaPtLnTravelTime;
+    }
+
+    public void setBetaPtLnTravelTime(double value) {
+        this.betaPtLnTravelTime = value;
+    }
+
+    public double getBetaPtTravelDistance() {
+        return betaPtTravelDistance;
+    }
+
+    public void setBetaPtTravelDistance(double value) {
+        this.betaPtTravelDistance = value;
+    }
+
+    public double getBetaPtTravelDistancePower2() {
+        return betaPtTravelDistancePower2;
+    }
+
+    public void setBetaPtTravelDistancePower2(double value) {
+        this.betaPtTravelDistancePower2 = value;
+    }
+
+    public double getBetaPtLnTravelDistance() {
+        return betaPtLnTravelDistance;
+    }
+
+    public void setBetaPtLnTravelDistance(double value) {
+        this.betaPtLnTravelDistance = value;
+    }
+
+    public double getBetaPtTravelCost() {
+        return betaPtTravelCost;
+    }
+
+    public void setBetaPtTravelCost(double value) {
+        this.betaPtTravelCost = value;
+    }
+
+    public double getBetaPtTravelCostPower2() {
+        return betaPtTravelCostPower2;
+    }
+
+    public void setBetaPtTravelCostPower2(double value) {
+        this.betaPtTravelCostPower2 = value;
+    }
+
+    public double getBetaPtLnTravelCost() {
+        return betaPtLnTravelCost;
+    }
+
+    public void setBetaPtLnTravelCost(double value) {
+        this.betaPtLnTravelCost = value;
+    }
+    
 }

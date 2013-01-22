@@ -24,6 +24,9 @@ import org.matsim.core.utils.misc.RouteUtils;
 /**
  * implements agent-based performance feedback for UrbanSim population (time spent traveling, money spent traveling, etc.)
  * 
+ * improvements jan'13
+ * - added pt for accessibility calculation
+ * 
  * @author thomas
  *
  */
