@@ -23,7 +23,11 @@ public class SurveyCleaner {
 	
 	public void filter(TreeMap<Id, EstimationPerson> population) { // stopped survey
 		population.remove(new IdImpl(1225));
-		population.remove(new IdImpl(1984));		
+		population.remove(new IdImpl(1984));	
+		
+		population.remove(new IdImpl(1897)); // Amriswil
+		population.remove(new IdImpl(1756)); // Niederglatt
+		population.remove(new IdImpl(1277)); //Küsnacht
 	}
 	
 	public void cleanIncome(TreeMap<Id, EstimationPerson> population) {

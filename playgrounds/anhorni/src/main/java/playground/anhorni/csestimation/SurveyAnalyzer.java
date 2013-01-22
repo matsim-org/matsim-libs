@@ -42,10 +42,34 @@ public class SurveyAnalyzer {
 	public void analyzeHomeSets(String cl) {
 		Bins awareness = new Bins(1, 11, cl + "_awareness");
 		Bins frequently = new Bins(1, 11, cl + "_frequently");
+		Bins distance10 = new Bins(250, 3000, cl + "_distance10");
+		Bins distance9 = new Bins(250, 3000, cl + "_distance9");
+		Bins distance8 = new Bins(250, 3000, cl + "_distance8");
+		
 		for (EstimationPerson p : this.population.values()) {
 			double awarenessShare = p.getHomeset().getAwarenessCnt();				
 			if (awarenessShare >= 0.0) {
 				awareness.addVal(awarenessShare, 1.0);
+				
+				int cnt = 0;
+				for (Double v : p.getHomeset().getShops().keySet()) {
+					cnt++;
+					if (cnt == 8) {
+						distance8.addVal(v, 1.0);
+					}
+					if (cnt == 9) {
+						distance9.addVal(v, 1.0);
+					}
+					if (cnt == 10) {
+						distance10.addVal(v, 1.0);
+					}
+					
+					if (v > 7000.0) {
+						log.info(p.getId() + " " + p.getHomeset().getShops().toString());
+					}
+					
+					
+				}					
 			}
 			double frequentlyShare = p.getHomeset().getFrequentlyVisitedCnt();
 			if (frequentlyShare >= 0.0)  {
@@ -54,8 +78,11 @@ public class SurveyAnalyzer {
 		}
 		awareness.plotBinnedDistribution(this.outdir, "", "");
 		frequently.plotBinnedDistribution(this.outdir, "", "");
+		distance10.plotBinnedDistribution(this.outdir, "distance10", "[m]");
+		distance9.plotBinnedDistribution(this.outdir, "distance9", "[m]");
+		distance8.plotBinnedDistribution(this.outdir, "distance8", "[m]");
 	}
-	
+		
 	private void analyzeVariableBinSizeMZ() {	
 		double totalGenderWeight = 0.0;
 		double totalAgeWeight = 0.0;
