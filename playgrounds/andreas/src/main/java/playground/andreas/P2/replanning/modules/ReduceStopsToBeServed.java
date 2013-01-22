@@ -51,6 +51,7 @@ import playground.andreas.P2.replanning.AbstractPStrategyModule;
  * 
  * @author aneumann
  *
+ * @deprecated Use {@linkplain ReduceStopsToBeServedRFare} instead
  */
 public class ReduceStopsToBeServed extends AbstractPStrategyModule implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	

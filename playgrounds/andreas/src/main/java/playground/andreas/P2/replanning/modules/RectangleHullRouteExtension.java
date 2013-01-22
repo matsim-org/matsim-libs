@@ -42,6 +42,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 /**
  * @author droeder
  *
+ * @deprecated Use {@linkplain SidewaysRouteExtension} instead
+ *
  */
 public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	

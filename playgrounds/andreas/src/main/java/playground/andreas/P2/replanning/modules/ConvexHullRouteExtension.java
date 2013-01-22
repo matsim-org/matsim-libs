@@ -41,6 +41,8 @@ import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author droeder
+ * 
+ * @deprecated Use {@linkplain SidewaysRouteExtension} instead
  *
  */
 public class ConvexHullRouteExtension extends AbstractPStrategyModule {

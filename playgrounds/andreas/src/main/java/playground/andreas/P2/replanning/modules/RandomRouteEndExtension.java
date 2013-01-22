@@ -44,6 +44,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 /**
  * @author droeder
  *
+ * @deprecated Use {@linkplain EndRouteExtension} instead
  */
 public class RandomRouteEndExtension extends AbstractPStrategyModule {
 	

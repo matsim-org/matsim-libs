@@ -47,6 +47,7 @@ import playground.andreas.P2.replanning.AbstractPStrategyModule;
  * 
  * @author aneumann
  *
+ * @deprecated Use {@linkplain ReduceTimeServedRFare} instead
  */
 public class ReduceTimeServed extends AbstractPStrategyModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	

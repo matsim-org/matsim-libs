@@ -32,6 +32,8 @@ import playground.andreas.P2.replanning.AbstractPStrategyModule;
  * 
  * Buys as much vehicles as possible.
  * 
+ * @deprecated
+ * 
  * @author aneumann
  *
  */
