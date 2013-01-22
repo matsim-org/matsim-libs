@@ -171,7 +171,7 @@ public class EvacuationAnalysis implements ActionListener{
 	private GeotoolsTransformation ctInverse;
 	public enum Unit { TIME, PEOPLE };
 	
-	private int exportSize;
+	private int exportSize = 1300;
 
 	
 	
@@ -503,9 +503,10 @@ public class EvacuationAnalysis implements ActionListener{
 					File directory = fc.getSelectedFile();
 				
 					Rect boundingBox = eventHandler.getData().getBoundingBox();
+					double gridSize = eventHandler.getData().getCellSize();
 					
-					Coord minValues = this.ctInverse.transform(new CoordImpl(boundingBox.minX, boundingBox.minY));
-					Coord maxValues = this.ctInverse.transform(new CoordImpl(boundingBox.maxX, boundingBox.maxY));
+					Coord minValues = this.ctInverse.transform(new CoordImpl(boundingBox.minX-gridSize/2, boundingBox.minY-gridSize/2));
+					Coord maxValues = this.ctInverse.transform(new CoordImpl(boundingBox.maxX+gridSize/2, boundingBox.maxY+gridSize/2));
 					
 					double westmost = minValues.getX(); 
 					double soutmost = minValues.getY();
@@ -518,7 +519,7 @@ public class EvacuationAnalysis implements ActionListener{
 					BufferedImage imgClearing = jMapViewer.getGridAsImage(Mode.CLEARING, exportSize, exportSize);
 					BufferedImage imgUtilization = jMapViewer.getGridAsImage(Mode.UTILIZATION, exportSize, exportSize);
 					
-					String filePrefix = directory.toString()+ "/" + currentEventFile.getName()+ "_";
+					String filePrefix = directory.toString()+ "/" + currentEventFile.getName()+ "_2_";
 					
 					try{
 						TiffExporter.writeGEOTiff(env, filePrefix+Mode.EVACUATION+".tiff", imgEvacuation);

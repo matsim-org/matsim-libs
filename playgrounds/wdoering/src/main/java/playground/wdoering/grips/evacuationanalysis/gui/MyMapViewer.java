@@ -400,7 +400,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				drawUtilization(g2D, b, this.getZoom());
 			
 			//draw the grid
-			drawGrid(mode, g2D, b, this.getZoom());
+			drawGrid(mode, g2D, b, this.getZoom(), true);
 
 
 
@@ -455,9 +455,10 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	/**
 	 * draw the grid
+	 * @param drawToolTip 
 	 * 
 	 */
-	private void drawGrid(Mode mode, Graphics2D g2D, Rectangle b, int zoom) {
+	private void drawGrid(Mode mode, Graphics2D g2D, Rectangle b, int zoom, boolean drawToolTip) {
 		if (!Double.isNaN(minX))
 		{
 			g2D.setColor(Color.BLACK);
@@ -527,10 +528,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				
 				//draw grid
 				g2D.setColor(ToolConfig.COLOR_GRID);
+				g2D.setStroke(new BasicStroke(2f));
 				g2D.drawRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
 				
 				
-				if (currentMousePosition!=null)
+				
+				if (drawToolTip && currentMousePosition!=null)
 				{
 					int mouseX = this.currentMousePosition.x;
 					int mouseY = this.currentMousePosition.y;
@@ -579,7 +582,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	
 	public BufferedImage getGridAsImage(Mode mode, int width, int height)
 	{
-			
+		
+		int zoom = 1;
 		
 		this.setCenterPosition(evacAnalysis.getNetworkCenter());
 
@@ -590,10 +594,10 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 //		System.exit(223);
 
 		Coord gridFromCoord = this.ctInverse.transform(new CoordImpl(minX-gridSize/2, minY-gridSize/2));
-		Point2D fromGridPoint = this.getTileFactory().geoToPixel(new GeoPosition(gridFromCoord.getY(),gridFromCoord.getX()), 2);
+		Point2D fromGridPoint = this.getTileFactory().geoToPixel(new GeoPosition(gridFromCoord.getY(),gridFromCoord.getX()), zoom);
 		
-		Coord gridToCoord = this.ctInverse.transform(new CoordImpl(maxX, maxY));
-		Point2D toGridPoint = this.getTileFactory().geoToPixel(new GeoPosition(gridToCoord.getY(),gridToCoord.getX()), 2);
+		Coord gridToCoord = this.ctInverse.transform(new CoordImpl(maxX+gridSize/2, maxY+gridSize/2));
+		Point2D toGridPoint = this.getTileFactory().geoToPixel(new GeoPosition(gridToCoord.getY(),gridToCoord.getX()), zoom);
 		
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice gs = ge.getDefaultScreenDevice();
@@ -603,8 +607,11 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		int maxX = (int)Math.max(fromGridPoint.getX(), toGridPoint.getX());
 		int minY = (int)Math.min(fromGridPoint.getY(), toGridPoint.getY());
 		int maxY = (int)Math.max(fromGridPoint.getY(), toGridPoint.getY());
+		
 
-		BufferedImage bImage = gc.createCompatibleImage(maxX-minX+8, maxY-minY+3, Transparency.TRANSLUCENT);
+		
+
+		BufferedImage bImage = gc.createCompatibleImage((int)(maxX-minX), (int)(maxY-minY), Transparency.TRANSLUCENT);
 		
 		Graphics IG = bImage.getGraphics();
 		Graphics2D IG2D = (Graphics2D) IG;
@@ -613,18 +620,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		IG2D.fillRect(0, 0, width, height);
 		
 		Rectangle gridRect = new Rectangle(minX,minY, 2215,250);
-//		
-//		System.out.println("c min x:\t" + fromGridPoint.getX() + "|y:\t" + fromGridPoint.getY());
-//		System.out.println("b.x\t:" + b.x  + "| b.y: " + b.y);
-//		System.out.println("gridRect x:\t" + gridRect.x + "|y:\t" + gridRect.y);
-////		
-//		
+
 
 		// draw utilization
 		if (mode.equals(Mode.UTILIZATION))
-			drawUtilization(IG2D, gridRect, 2);
+			drawUtilization(IG2D, gridRect, zoom);
 		else
-			drawGrid(mode, IG2D, gridRect, 2);
+			drawGrid(mode, IG2D, gridRect, zoom, false);
 
 		return bImage;
 	}
