@@ -109,6 +109,9 @@ public class PlanTimesAdapter {
 					double arrivalTime = departureTime + legTravelTime;
 //					previousLegPlanTmp.setArrivalTime(arrivalTime);
 					
+					// yyyy I think this is really more complicated than it should be since it could/should just copy the time structure of the 
+					// original plan and not think so much.  kai, jan'13
+					
 					// set new activity end time
 					Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
 					// yy Isn't this the same as "act"?  (The code originally was a bit different, but in the original code it was also not using the
