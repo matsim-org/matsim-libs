@@ -88,37 +88,22 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 
 	private void initLocal() {
-		this.defineFlexibleActivities(this.scenario.getConfig().locationchoice());
+		this.defineFlexibleActivities = new ActivitiesHandler(this.scenario.getConfig().locationchoice());
 		((NetworkImpl) this.scenario.getNetwork()).connect();
 
-		this.createActivityTypeConverter();
+		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
 		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());
 
-		//only compute oa for best response module
-		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
-//		if (algorithm.equals(BEST_RESPONSE)) {
-		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(algorithm)) {
-			this.createEpsilonScaleFactors();
+		//		if (algorithm.equals(BEST_RESPONSE)) {
+		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(this.scenario.getConfig().locationchoice().getAlgorithm())) {
+			this.scaleEpsilon = this.defineFlexibleActivities.createScaleEpsilon();
 			this.createObjectAttributesAndReadOrCreateEpsilons(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
 			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues, this.scenario.getConfig().locationchoice());
 		}
 	}
 
-	private void defineFlexibleActivities(LocationChoiceConfigGroup config) {
-		this.defineFlexibleActivities = new ActivitiesHandler(config);
-	}
-
-	private void createActivityTypeConverter() {
-		this.actTypeConverter = this.defineFlexibleActivities.getConverter(); 		
-	}
-
-	private void createEpsilonScaleFactors() {
-		this.scaleEpsilon = this.defineFlexibleActivities.createScaleEpsilon();
-	}
-
 	private void createObjectAttributesAndReadOrCreateEpsilons(long seed) {
 		this.personsMaxEpsUnscaled = new ObjectAttributes();
-
 
 		// check if object attributes files are available, other wise do preprocessing
 		String maxEpsValues = this.scenario.getConfig().locationchoice().getMaxEpsFile();
@@ -126,8 +111,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);
 			try {
 				attributesReader.parse(maxEpsValues);
-			} catch  (UncheckedIOException e) {
-				// reading was not successful
+			} catch  (UncheckedIOException e) {  // reading was not successful
 				this.computeEpsilons(seed);
 			}
 		}
@@ -146,6 +130,11 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
+		
+		System.err.println( "ff:\n" + this.facilitiesKValues.toString() ) ;
+		System.err.println( "pp:\n" + this.personsKValues.toString() ) ;
+		System.err.println( "max:\n" + this.personsMaxEpsUnscaled.toString() ) ;
+		
 	}
 
 
@@ -235,9 +224,10 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 
-	// for test cases:
-	/*package*/ final Network getNetwork() {
-		return this.scenario.getNetwork();
-	}
+//	// for test cases:
+//	/*package*/ final Network getNetwork() {
+//		return this.scenario.getNetwork();
+//	}
+	// does not seem to be used.  kai, apr'13
 
 }

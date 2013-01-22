@@ -85,19 +85,17 @@ public class PlanTimesAdapter {
 				if (planElementIndex == 0) {
 					scoringFunction.startActivity(0.0, act);
 					scoringFunction.endActivity(act.getEndTime(), act);
+					System.err.println("10 score: " + scoringFunction.getScore() ) ;
 					continue; 
 				}
 				else {
 					double legTravelTime = 0.0;
 					if (approximationLevel == ApproximationLevel.COMPLETE_ROUTING ) {
 						legTravelTime = computeTravelTimeFromCompleteRouting(plan.getPerson(),
-							plan.getPreviousActivity(plan.getPreviousLeg(act)), 
-							act);
-					}
-					else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
+							plan.getPreviousActivity(plan.getPreviousLeg(act)), act);
+					} else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
 						legTravelTime = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
-					}
-					else if (approximationLevel == ApproximationLevel.NO_ROUTING ) {
+					} else if (approximationLevel == ApproximationLevel.NO_ROUTING ) {
 						legTravelTime = approximateTravelTimeFromDistance(plan, actlegIndex, planElementIndex, act);
 					}
 					
@@ -127,7 +125,7 @@ public class PlanTimesAdapter {
 					{
 						if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
 							actTmp.setEndTime( act.getEndTime() ) ;
-						} else if ( act.getMaximumDuration() == Time.UNDEFINED_TIME) {
+						} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME) {
 							actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
 						}
 					} 
@@ -140,14 +138,25 @@ public class PlanTimesAdapter {
 					scoringFunction.startLeg(departureTime, previousLegPlanTmp);
 					scoringFunction.endLeg(arrivalTime);
 										
+					System.err.println("20 score: " + scoringFunction.getScore() ) ;
+
 					scoringFunction.startActivity(arrivalTime, actTmp);
+					System.err.println("arrivalTime: " + arrivalTime ) ;
 					if (planElementIndex < plan.getPlanElements().size() -1) {
-						// (last (home) activity does not finish act)
 						
-						scoringFunction.endActivity(arrivalTime + actDur, actTmp);
+						if ( actTmp.getEndTime() != Time.UNDEFINED_TIME ) {
+							scoringFunction.endActivity( actTmp.getEndTime(), actTmp ) ;
+							System.err.println( "actEndTime: " + actTmp.getEndTime() ) ;
+						} else if ( actTmp.getMaximumDuration() != Time.UNDEFINED_TIME ) {
+							scoringFunction.endActivity(arrivalTime + actDur, actTmp);
+							System.err.println( "arrivalTime: " + arrivalTime + " actDur: " + actDur ) ;
+						}
+						System.err.println("30 score: " + scoringFunction.getScore() ) ;
 					}
 					else {
+						// (last (home) activity does not end the activity:)
 						scoringFunction.finish();
+						System.err.println("40 score: " + scoringFunction.getScore() ) ;
 					}
 				}				
 			}

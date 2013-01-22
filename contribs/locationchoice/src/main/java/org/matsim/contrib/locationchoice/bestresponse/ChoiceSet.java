@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -48,12 +49,6 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 public class ChoiceSet {
 		
 	// *************************************
-	/**
-	 * Presumably some exponent that is used to re-weight scores.  Problem is that it does not work with negative scores.
-	 * Negative scores should not happen because then the activity should be dropped, but clearly the negativeness can
-	 * be a consequence of the approximations, which means that it needs to be handeled.  The way this is done
-	 * looks like a hack to me.  kai, jan'13
-	 */
 	private double exponent;
 	private int numberOfAlternatives;
 	
@@ -63,12 +58,40 @@ public class ChoiceSet {
 	private List<Id> notYetVisited = new Vector<Id>();
 	private final Network network;
 	private Config config;
+	
+	@Override
+	public String toString() {
+		StringBuilder stb = new StringBuilder() ;
+		stb.append("destinations:") ;
+		for ( Id id : destinations ) {
+			stb.append( " "+id ) ;
+		}
+		stb.append("\n") ;
+		stb.append("notYetVisited:" ) ;
+		for ( Id id : notYetVisited ) {
+			stb.append( " "+id ) ;
+		}
+		return stb.toString() ;
+	}
+	
+	private static int wrnCnt = 0 ;
 		
 	ChoiceSet(ApproximationLevel approximationLevel, Network network, Config config) {
 		this.approximationLevel = approximationLevel;
 		this.network = network;
 		this.config = config;
 		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
+		if ( wrnCnt < 1 ) {
+			wrnCnt++ ;
+			if ( this.exponent != 1. ) {
+				Logger.getLogger(this.getClass()).warn("Exponent is presumably some exponent that is used to re-weight scores. " +
+					" Problem is that it does not work with negative scores. " +
+					"Negative scores should not happen because then the activity should be dropped, " +
+					"but clearly the negativeness can be a consequence of the approximations, " +
+					"which means that it needs to be handeled.  " +
+					"The way this is done looks like a hack to me.  kai, jan'13" ) ;
+			}
+		}
 		this.numberOfAlternatives = Integer.parseInt(config.locationchoice().getProbChoiceSetSize());
 	}
 	
@@ -154,12 +177,12 @@ public class ChoiceSet {
 
 		leastCostPathCalculatorBackward.calcLeastCostTree(fromNode, -1.0);
 		// "-1.0" is ignored.  It is not clear to me why we first set the (approximated) start time separately, and then ignore the startTime.
-		// (The Dijkstra algo does not care of the start time is approximated or exact.)  kai, jan'13
+		// (The Dijkstra algo does not care if the start time is approximated or exact.)  kai, jan'13
 		
 		// ---
 		
 		// Handling duplicates. This was may the source for (small) random fluctuations
-		// which duplicates?  and how are they handled?  kai, jan'13
+		// yyyy which duplicates?  and how are they handled?  kai, jan'13
 		List<ScoredAlternative> list = new Vector<ScoredAlternative>();						
 		// if no epsilons are used!
 		double largestValue = -1.0 * Double.MAX_VALUE; // would prefer Double.NEGATIVE_INFINITY. kai, jan'13
@@ -178,7 +201,7 @@ public class ChoiceSet {
 					leastCostPathCalculatorForward, leastCostPathCalculatorBackward, router, this.approximationLevel);
 			
 			// not needed anymore
-			// why not?  kai, jan'13
+			// yyyy why not?  kai, jan'13
 			//scoringFunction.finish();
 			double score = scoringFunction.getScore();
 			scoringFunction.reset();

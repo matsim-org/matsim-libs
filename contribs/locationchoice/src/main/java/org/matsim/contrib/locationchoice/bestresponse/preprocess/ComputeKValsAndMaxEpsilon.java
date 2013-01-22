@@ -120,19 +120,22 @@ public class ComputeKValsAndMaxEpsilon {
 	public ObjectAttributes getFacilitiesKValues() {
 		return facilitiesKValues;
 	}
-	public void setFacilitiesKValues(ObjectAttributes facilitiesKValues) {
-		this.facilitiesKValues = facilitiesKValues;
-	}
+
+//	public void setPersonsMaxEpsUnscaled(ObjectAttributes personsMaxEpsUnscaled) {
+//	this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
+//}
+//	public void setFacilitiesKValues(ObjectAttributes facilitiesKValues) {
+//		this.facilitiesKValues = facilitiesKValues;
+//	}
+//	public void setPersonsKValues(ObjectAttributes personsKValues) {
+//		this.personsKValues = personsKValues;
+//	}
+	// never used, and IMO not meaningful (complex objects should not have setters for internal state). kai, jan'13
+	
 	public ObjectAttributes getPersonsKValues() {
 		return personsKValues;
 	}
-	public void setPersonsKValues(ObjectAttributes personsKValues) {
-		this.personsKValues = personsKValues;
-	}
 	public ObjectAttributes getPersonsMaxEpsUnscaled() {
 		return personsMaxEpsUnscaled;
-	}
-	public void setPersonsMaxEpsUnscaled(ObjectAttributes personsMaxEpsUnscaled) {
-		this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
 	}
 }

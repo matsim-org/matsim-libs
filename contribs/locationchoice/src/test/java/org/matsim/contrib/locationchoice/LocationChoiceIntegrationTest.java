@@ -1,6 +1,7 @@
 package org.matsim.contrib.locationchoice;
 
-import org.junit.Ignore;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,15 +40,19 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
-	public void tesLocationChoiceJan2013() {
+	public void testLocationChoiceJan2013() {
 		final Config config = localCreateConfig();
+
+		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
+		config.locationchoice().setEpsilonScaleFactors("100.0") ;
+		config.locationchoice().setProbChoiceExponent("1.") ;
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		// setup network
 		Network network = scenario.getNetwork();
 		
-		final double scale = 10000. ;
+		final double scale = 100. ;
 
 		Node node0 = network.getFactory().createNode(new IdImpl(0), new CoordImpl(-scale,0) ) ;
 		network.addNode(node0) ;
@@ -60,11 +65,12 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Link link1b = network.getFactory().createLink(new IdImpl("1b"), node1, node0 ) ;
 		network.addLink(link1b) ;
 
-		ActivityFacility facility1 = scenario.getActivityFacilities().createFacility(new IdImpl(1), new CoordImpl(0,0) ) ;
+		ActivityFacility facility1 = scenario.getActivityFacilities().createFacility(new IdImpl(1), new CoordImpl(scale,0) ) ;
 		// (this should be "createAndAdd". kai, jan'13)
 		facility1.getActivityOptions().put("initial-work", new ActivityOptionImpl("initial-work", facility1)) ;
 		
 		final int nNodes = 100 ;
+		Random random = new Random(4711) ;
 		for ( int ii=2 ; ii<nNodes+2 ; ii++ ) {
 			double tmp = Math.PI*(ii-1)/nNodes ;
 			Coord coord = new CoordImpl( scale*Math.sin(tmp),scale*Math.cos(tmp) ) ;
@@ -72,16 +78,17 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			Node node = network.getFactory().createNode(new IdImpl(ii), coord ) ;
 			network.addNode(node) ;
 
+			double rnd = random.nextDouble() ;
 			{
 				Link link = network.getFactory().createLink(new IdImpl(ii), node1, node) ;
-				link.setLength(scale) ;
+				link.setLength(rnd*scale) ;
 				link.setFreespeed(10.) ;
 				link.setCapacity(1.) ;
 				network.addLink(link) ;
 			}
 			{
 				Link link = network.getFactory().createLink(new IdImpl(ii+"b"), node, node1) ;
-				link.setLength(scale) ;
+				link.setLength(rnd*scale) ;
 				link.setFreespeed(10.) ;
 				link.setCapacity(1.) ;
 				network.addLink(link) ;
@@ -99,27 +106,24 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			@Override
 			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
-				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-				OTFClientLive.run(sc.getConfig(), server);
+//				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+//				OTFClientLive.run(sc.getConfig(), server);
 				return qSim ;
 			} 
 		} ) ;
 
 		controler.run();
 
-		// test that everything worked as expected
-		// The initial facility is *not* part of the choice set (its supported activity type is called "initial-work" for that reason)
-		// so that the test can notice that there is a difference. In my earlier attempt, the random facility chosen would always be the one 
-		// on which I already am, so the test was no good.
-		// Secondly, I need to give it two facilities to choose from, because a choice set of size 1 is treated specially
-		// (it is assumed that the one element is the one I'm already on, so nothing is done).
-		// I tricked it. :-)   michaz
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
+		System.err.println( " newPlan: " + newPlan ) ;
 		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
-		assertTrue(newWork.getFacilityId().equals(new IdImpl(2)) || newWork.getFacilityId().equals(new IdImpl(3)));
+		System.err.println( " newWork: " + newWork ) ;
+		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
+//		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
+		assertEquals( new IdImpl(0), newWork.getFacilityId() );
 	}
-	public void testLocationChoice() {
+	public void estLocationChoice() {
 		final Config config = localCreateConfig();
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);

@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -36,14 +37,26 @@ public class DestinationSampler {
 		this.samplePercent = Double.parseDouble(config.getDestinationSamplePercent());
 	}
 	
+	private static int wrnCnt = 0 ;
+	
 	// at the moment only working for powers of 10
 	public boolean sample(Id facilityId, Id personId) { 
 		if (Math.ceil(this.samplePercent) == 100) return true;
+		
+		if (wrnCnt < 1 ) {
+			wrnCnt++ ;
+			Logger.getLogger(this.getClass()).warn("I do not understand what is happening when samplePercent!=100.") ;
+			Logger.getLogger(this.getClass()).warn("E.g. samplePercent=10.  Then (int)(100./10.*rnd) = an integer number between 0 and 9.") ;
+			Logger.getLogger(this.getClass()).warn("That was for facilities; same will happen for persons.") ;
+			Logger.getLogger(this.getClass()).warn("Proba that they are equal is 1% (=0.1*0.1), and not 10% as it seems to pretend.") ;
+			Logger.getLogger(this.getClass()).warn("???? kai, jan'13") ;
+		}
 		
 		int facilityValue = (int)Math.floor(100.0 / samplePercent * 
 				(Double) this.facilitiesKValues.getAttribute(facilityId.toString(), "k"));
 		int personValue = (int)Math.floor(100.0 / samplePercent * 
 				(Double) this.personsKValues.getAttribute(personId.toString(), "k"));
 		return (facilityValue == personValue);
+		
 	}
 }
