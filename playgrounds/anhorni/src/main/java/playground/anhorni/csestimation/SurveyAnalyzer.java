@@ -40,8 +40,8 @@ public class SurveyAnalyzer {
 	}
 	
 	public void analyzeHomeSets(String cl) {
-		Bins awareness = new Bins(1, 10, cl + "_awareness");
-		Bins frequently = new Bins(1, 10, cl + "_frequently");
+		Bins awareness = new Bins(1, 11, cl + "_awareness");
+		Bins frequently = new Bins(1, 11, cl + "_frequently");
 		for (EstimationPerson p : this.population.values()) {
 			double awarenessShare = p.getHomeset().getAwarenessCnt();				
 			if (awarenessShare >= 0.0) {
