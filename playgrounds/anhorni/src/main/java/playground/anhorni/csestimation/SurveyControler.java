@@ -54,9 +54,7 @@ public class SurveyControler {
 		cleaner.clean(population);
 		analyzer.analyze();
 		
-		this.population = cleaner.removeNonAgeNonIncomePersons(this.population);
-		analyzer.setPopulation(this.population);
-		analyzer.analyze();
+		
 		
 		// create and analyze home sets
 		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
@@ -65,8 +63,15 @@ public class SurveyControler {
 		
 		for (EstimationPerson person : this.population.values()) {
 			person.createHomeSet(shopQuadTree);
-		}
-		analyzer.analyzeHomeSets();
+		}		
+		analyzer.analyzeHomeSets("uncleaned");
+		
+		this.population = cleaner.removeNonAgeNonIncomePersons(this.population);
+		analyzer.setPopulation(this.population);
+		analyzer.analyze();
+		
+		analyzer.analyzeHomeSets("cleaned");
+		
 		log.info("finished .......................................");
 	}
 }

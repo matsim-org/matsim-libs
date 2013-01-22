@@ -39,15 +39,15 @@ public class SurveyAnalyzer {
 		}
 	}
 	
-	public void analyzeHomeSets() {
-		Bins awareness = new Bins(0.1, 1.01, "awareness");
-		Bins frequently = new Bins(0.1, 1.01, "frequently");
+	public void analyzeHomeSets(String cl) {
+		Bins awareness = new Bins(1, 10, cl + "_awareness");
+		Bins frequently = new Bins(1, 10, cl + "_frequently");
 		for (EstimationPerson p : this.population.values()) {
-			double awarenessShare = p.getHomeset().getAwarenessShare();				
+			double awarenessShare = p.getHomeset().getAwarenessCnt();				
 			if (awarenessShare >= 0.0) {
 				awareness.addVal(awarenessShare, 1.0);
 			}
-			double frequentlyShare = p.getHomeset().getFrequentlyVisitedShare();
+			double frequentlyShare = p.getHomeset().getFrequentlyVisitedCnt();
 			if (frequentlyShare >= 0.0)  {
 				frequently.addVal(frequentlyShare, 1.0);
 			}

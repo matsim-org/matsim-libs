@@ -38,31 +38,31 @@ public class HomeSet {
 		}
 	}
 	
-	public double getAwarenessShare() {
-		double awareCnt = 0.0;
+	public int getAwarenessCnt() {
+		int awareCnt = 0;
 		for (ShopLocation shop:this.shops.values()) {			
 			if (person.getPersonLocations().getNullAwareOrnullVisitedStoresInQuerySet().contains(shop.getId())) {
 				log.info("Person " + person.getId() + " contains NULL awareness stores");
-				return -99.0;
+				return -99;
 			}
 			else if (person.getPersonLocations().getAwareStoresInQuerySet().contains(shop.getId())) {
 				awareCnt++;
 			}
 		}
-		return awareCnt / this.shops.size();
+		return awareCnt;
 	}
-	public double getFrequentlyVisitedShare() {
-		double frequentlyCnt = 0.0;
+	public int getFrequentlyVisitedCnt() {
+		int frequentlyCnt = 0;
 		for (ShopLocation shop:this.shops.values()) {			
 			if (person.getPersonLocations().getNullAwareOrnullVisitedStoresInQuerySet().contains(shop.getId())) {
 				log.info("Person " + person.getId() + " contains NULL frequently stores");
-				return -99.0;
+				return -99;
 			}
 			else if (person.getPersonLocations().getVisitedStoresInQuerySet().contains(shop.getId())) {
 				frequentlyCnt++;
 			}
 		}
-		return frequentlyCnt / this.shops.size();
+		return frequentlyCnt;
 	}	
 	public TreeMap<Id, ShopLocation> getShops() {
 		return shops;
