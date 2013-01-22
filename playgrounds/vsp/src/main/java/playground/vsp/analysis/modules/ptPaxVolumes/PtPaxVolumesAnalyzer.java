@@ -136,7 +136,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 		b.add("location", LineString.class);
 		b.add("line", String.class);
 		b.add("linkId", String.class);
-		b.add("paxTotal", String.class);
+		b.add("paxTotal", Double.class);
 		for (int i = 0; i < this.handler.getMaxInterval(); i++){
 			b.add("pax_" + String.valueOf(i), Double.class);
 		}
