@@ -46,6 +46,19 @@ public class HomeSet {
 		}
 	}
 	
+	public double getMaxDistanceAwareness() {
+		Coord hCoord = this.trafo.transform(person.getHomeLocation().getCoord());
+		double maxDistAware = 0.0;
+		for (ShopLocation shop:this.shops.values()) {	
+			if (person.getPersonLocations().getAwareStoresInQuerySet().contains(shop.getId())) {
+				Coord sCoord = this.trafo.transform(shop.getCoord());
+				double dist = CoordUtils.calcDistance(hCoord, sCoord);
+				maxDistAware = dist;
+			}
+		}
+		return maxDistAware;
+	}
+	
 	public int getAwarenessCnt() {
 		int awareCnt = 0;
 		for (ShopLocation shop:this.shops.values()) {			
