@@ -29,10 +29,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -205,11 +203,11 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			Id linkId = this.scenario.createId(atts.getValue(ATTR_ACT_LINK));
 			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), linkId);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-				coord = new CoordImpl(atts.getValue(ATTR_ACT_X), atts.getValue(ATTR_ACT_Y));
+				coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-			coord = new CoordImpl(atts.getValue(ATTR_ACT_X), atts.getValue(ATTR_ACT_Y));
+			coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
@@ -233,7 +231,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			if (this.currRoute instanceof GenericRoute) {
 				((GenericRoute) this.currRoute).setRouteDescription(startLinkId, this.routeDescription.trim(), endLinkId);
 			} else if (this.currRoute instanceof NetworkRoute) {
-				List<Id> linkIds = NetworkUtils.getLinkIds(this.routeDescription);
+				List<Id> linkIds = NetworkUtils.getLinkIds(this.routeDescription, this.scenario);
 				if (linkIds.size() > 0) {
 					linkIds.remove(0);
 				}
@@ -265,7 +263,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		this.currleg.setRoute(this.currRoute);
 
 		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
-			((NetworkRoute)this.currRoute).setVehicleId(new IdImpl(atts.getValue("vehicleRefId"))) ;
+			((NetworkRoute)this.currRoute).setVehicleId(this.scenario.createId(atts.getValue("vehicleRefId")));
 		}
 
 	}

@@ -252,7 +252,7 @@ public class AltPopulationReaderMatsimV5 implements PopulationReader {
 		Route currRoute;
 		if ("links".equals(routeType)) {
 			LinkNetworkRouteImpl linkNetworkRoute = new LinkNetworkRouteImpl(null, null);
-			List<Id> linkIds = NetworkUtils.getLinkIds(routeDescription);
+			List<Id> linkIds = NetworkUtils.getLinkIds(routeDescription, this.scenario);
 			Id startLinkId = linkIds.get(0);
 			Id endLinkId = linkIds.get(linkIds.size()-1);
 			if (linkIds.size() > 0) {

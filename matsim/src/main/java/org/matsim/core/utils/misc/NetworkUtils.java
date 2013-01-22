@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.basic.v01.IdImpl;
 
 /**
@@ -159,7 +160,10 @@ public class NetworkUtils {
 	 *
 	 * @param links
 	 * @return
+	 * 
+	 * @deprecated use the version which passes an {@link IdFactory}, otherwise you might end up wasting tons of memory
 	 */
+	@Deprecated
 	public static List<Id> getLinkIds(final String links) {
 		if (links == null) {
 			return new ArrayList<Id>(0);
@@ -173,6 +177,29 @@ public class NetworkUtils {
 
 		for (String id : parts) {
 			linkIdsList.add(new IdImpl(id));
+		}
+		return linkIdsList;
+	}
+
+	/**
+	 * Splits the given string at whitespace (one or more space, tab, newline) into single pieces, which are interpreted as ids.
+	 *
+	 * @param links
+	 * @return
+	 */
+	public static List<Id> getLinkIds(final String links, final IdFactory idFactory) {
+		if (links == null) {
+			return new ArrayList<Id>(0);
+		}
+		String trimmed = links.trim();
+		if (trimmed.length() == 0) {
+			return new ArrayList<Id>(0);
+		}
+		String[] parts = trimmed.split("[ \t\n]+");
+		final List<Id> linkIdsList = new ArrayList<Id>(parts.length);
+		
+		for (String id : parts) {
+			linkIdsList.add(idFactory.createId(id));
 		}
 		return linkIdsList;
 	}

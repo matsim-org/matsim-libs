@@ -85,7 +85,7 @@ public class PopulationWriterHandlerImplV5Test {
 		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));
 		Leg leg = pb.createLeg(TransportMode.car);
 		NetworkRoute route = new LinkNetworkRouteImpl(idFrom, idTo);
-		List<Id> routeLinkIds = NetworkUtils.getLinkIds(linkIds);
+		List<Id> routeLinkIds = NetworkUtils.getLinkIds(linkIds, scenario);
 		route.setLinkIds(idFrom, routeLinkIds, idTo);
 		leg.setRoute(route);
 		plan.addLeg(leg);

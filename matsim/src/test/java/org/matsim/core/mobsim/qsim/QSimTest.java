@@ -1093,7 +1093,7 @@ public class QSimTest {
 		a1.setEndTime(8*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), link5.getId());
-		route.setLinkIds(new IdImpl(startLinkId), NetworkUtils.getLinkIds(linkIds), new IdImpl(endLinkId));
+		route.setLinkIds(new IdImpl(startLinkId), NetworkUtils.getLinkIds(linkIds, f.scenario), new IdImpl(endLinkId));
 		leg.setRoute(route);
 		ActivityImpl a2 = plan.createAndAddActivity("w", link5.getId());
 		a2.setEndTime(9*3600);

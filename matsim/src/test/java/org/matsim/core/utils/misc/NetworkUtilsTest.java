@@ -144,7 +144,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetLinksID_StringNull() {
-		List<Id> linkIds = NetworkUtils.getLinkIds((String) null);
+		List<Id> linkIds = NetworkUtils.getLinkIds((String) null, null);
 		assertEquals(0, linkIds.size());
 	}
 
