@@ -147,7 +147,8 @@ public class ActivityImpl implements Activity {
 				"[coord=" + this.getCoord() + "]" +
 				"[linkId=" + this.linkId + "]" +
 				"[startTime=" + Time.writeTime(this.getStartTime()) + "]" +
-				"[endTime=" + Time.writeTime(this.getEndTime()) + "]";
+				"[endTime=" + Time.writeTime(this.getEndTime()) + "]" +
+				"[facilityId=" + this.facilityId + "]" ;
 	}
 
 	@Override
