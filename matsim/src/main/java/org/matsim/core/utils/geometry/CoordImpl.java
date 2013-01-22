@@ -97,7 +97,13 @@ public class CoordImpl implements Serializable, Coord {
 
 	@Override
 	public int hashCode() {
-		return (int)(this.x - this.y);
+		// Implementation based on chapter 3 of Joshua Bloch's "Effective Java"
+		long xbits = Double.doubleToLongBits(this.x);
+		long ybits = Double.doubleToLongBits(this.y);
+		int result = (int) (xbits ^ (xbits >>> 32));
+    result = 31 * result + (int) (ybits ^ (ybits >>> 32));
+    return result;
+//		return (int)(this.x - this.y);
 	}
 
 	@Override
