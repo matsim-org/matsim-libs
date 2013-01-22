@@ -72,8 +72,8 @@ public class EndRouteExtensionTest {
 		Assert.assertNotNull("Test plan should not be null", testPlan);
 		
 		Assert.assertEquals("Compare start stop", "p_2111", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_3343", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2333", testPlan.getStopsToBeServed().get(2).getId().toString());
+		Assert.assertEquals("Compare start stop", "p_2333", testPlan.getStopsToBeServed().get(1).getId().toString());
+		Assert.assertEquals("Compare end stop", "p_3343", testPlan.getStopsToBeServed().get(2).getId().toString());
 		
 		
 		parameter = new ArrayList<String>();
@@ -86,8 +86,8 @@ public class EndRouteExtensionTest {
 		
 		Assert.assertNotNull("Test plan should not be null", testPlan);
 		Assert.assertEquals("Compare start stop", "p_2111", testPlan.getStopsToBeServed().get(0).getId().toString());
-		Assert.assertEquals("Compare start stop", "p_3334", testPlan.getStopsToBeServed().get(1).getId().toString());
-		Assert.assertEquals("Compare end stop", "p_2333", testPlan.getStopsToBeServed().get(2).getId().toString());
+		Assert.assertEquals("Compare start stop", "p_2333", testPlan.getStopsToBeServed().get(1).getId().toString());
+		Assert.assertEquals("Compare end stop", "p_3334", testPlan.getStopsToBeServed().get(2).getId().toString());
 		
 		coop.getBestPlan().setStopsToBeServed(testPlan.getStopsToBeServed());
 		

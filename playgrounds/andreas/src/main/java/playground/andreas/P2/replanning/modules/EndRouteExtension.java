@@ -110,30 +110,17 @@ public class EndRouteExtension extends AbstractPStrategyModule {
 
 	private ArrayList<TransitStopFacility> addStopToExistingStops(TransitStopFacility baseStop, TransitStopFacility remoteStop, ArrayList<TransitStopFacility> currentStopsToBeServed, TransitStopFacility newStop) {
 		ArrayList<TransitStopFacility> newStopsToBeServed = new ArrayList<TransitStopFacility>(currentStopsToBeServed);
-		this.addNewStopBetweenTwoNearestExistingStop(newStopsToBeServed, newStop);
-		return newStopsToBeServed;
-	}
-
-
-	private void addNewStopBetweenTwoNearestExistingStop(ArrayList<TransitStopFacility> stops, TransitStopFacility stop) {
-		// find nearest stop
-		double smallestDistance = Double.MAX_VALUE;
-		TransitStopFacility stopWithSmallestDistance = stops.get(0);
-		TransitStopFacility stopWithSecondSmallestDistance = stops.get(0);
-		for (TransitStopFacility transitStopFacility : stops) {
-			double currentDistance = CoordUtils.calcDistance(stop.getCoord(), transitStopFacility.getCoord());
-			if (currentDistance < smallestDistance) {
-				smallestDistance = currentDistance;
-				stopWithSecondSmallestDistance = stopWithSmallestDistance;
-				stopWithSmallestDistance = transitStopFacility;
-			}
+		
+		// decide which stop is closer
+		if (CoordUtils.calcDistance(baseStop.getCoord(), newStop.getCoord()) < CoordUtils.calcDistance(remoteStop.getCoord(), newStop.getCoord())) {
+			// baseStop is closer - insert before baseStop
+			newStopsToBeServed.add(0, newStop);
+		} else {
+			// remote stop is closer or both have the same distance - add after remote stop
+			newStopsToBeServed.add(newStopsToBeServed.indexOf(remoteStop) + 1, newStop);
 		}
 		
-		// find index to insert
-		int index = Math.min(stops.indexOf(stopWithSecondSmallestDistance), stops.indexOf(stopWithSmallestDistance));
-		
-		// insert
-		stops.add(index + 1, stop);
+		return newStopsToBeServed;
 	}
 
 	private TransitStopFacility findStopWithLargestDistance(ArrayList<TransitStopFacility> stops) {
