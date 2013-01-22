@@ -1,4 +1,4 @@
-package playground.florian.GTFSConverter;
+package playground.mzilske.vbb;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,10 +22,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -40,12 +38,10 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleWriterV1;
 
 public class GtfsConverter {
 
@@ -90,36 +86,10 @@ public class GtfsConverter {
 		return scenario;
 	}
 
-	public void writeScenario() {
-		writeConfig();
-		writeNetwork();
-		writeTransitSchedule();
-		writeVehicles();
-	}
-
-	private void writeNetwork() {
-		new NetworkWriter(scenario.getNetwork()).write("./network.xml");
-		System.out.println("Wrote Network to " + new File("../../gtfsOutput/network.xml").getAbsolutePath());
-	}
-
-
-	private void writeConfig() {
-		ConfigWriter cw = new ConfigWriter(config);
-		cw.setPrettyPrint(true);
-		cw.write("../../gtfsOutput/config.xml");
-	}
-
-	private void writeTransitSchedule() {
-		System.out.println("Writing TransitSchedule.");
-		TransitScheduleWriter tsw = new TransitScheduleWriter(ts);
-		tsw.writeFile("../../gtfsOutput/transitSchedule.xml");
-	}
-
 	public void setDate(long date) {
 		this.date = date;
 	}
-
-
+	
 	public void setCreateShapedNetwork(boolean createShapedNetwork) {
 		if(((new File(filepath + "/shapes.txt")).exists()) && (createShapedNetwork)){
 			this.createShapedNetwork = createShapedNetwork;
@@ -447,7 +417,7 @@ public class GtfsConverter {
 				stops.add(routeStop);	
 			}else{
 				//finish old route
-				// stops = this.interpolateMissingDepartures(stops);
+				stops = this.interpolateMissingDepartures(stops);
 				TransitLine tl = ts.getTransitLines().get(routeToTripAssignments.get(currentTripId));
 				TransitRoute tr = ts.getFactory().createTransitRoute(this.matsimRouteIdToGtfsTripIdAssignments.get(currentTripId), tripRoute.get(currentTripId), stops, "pt");
 				tr.addDeparture(departure);
@@ -468,13 +438,18 @@ public class GtfsConverter {
 		// The last trip of the file was not added, so it needs to be added now
 		Id currentTripId = new IdImpl(currentTrip);
 		//finish old route
-		// stops = this.interpolateMissingDepartures(stops);
+		stops = this.interpolateMissingDepartures(stops);
 		TransitLine tl = ts.getTransitLines().get(routeToTripAssignments.get(currentTripId));
 		TransitRoute tr = ts.getFactory().createTransitRoute(this.matsimRouteIdToGtfsTripIdAssignments.get(currentTripId), tripRoute.get(currentTripId), stops, "pt");
 		tr.addDeparture(departure);
 		tl.addRoute(tr);
 	}
 
+	/**
+	 * Beats me how this works. michaz '13
+	 * @param stops
+	 * @return
+	 */
 	private List<TransitRouteStop> interpolateMissingDepartures(List<TransitRouteStop> stops) {
 		List<TransitRouteStop> result = new ArrayList<TransitRouteStop>();
 		List<TransitRouteStop> toBeInterpolated = new ArrayList<TransitRouteStop>();
@@ -521,6 +496,12 @@ public class GtfsConverter {
 		return result;
 	}
 
+	
+	/**
+	 * Problem: Will also generate stops, and links for stops, which are disconnected from the network because
+	 * they are not used by any line. These will have an invalid link reference. :(
+	 * @param stopsSource
+	 */
 	private void convertStops(GtfsSource stopsSource){
 		int stopIdIndex = stopsSource.getContentIndex("stop_id");
 		int stopNameIndex = stopsSource.getContentIndex("stop_name");
@@ -679,7 +660,7 @@ public class GtfsConverter {
 				if(!usedTripId.equals(entries[tripIdIndex])){
 					addLink = false;				
 				}
-				// for each stop should exist one dummyLink
+				// for each stop should exist one dummy node with a link in to it (dL2_) and a link back to the road (dL1_).
 				Id dummyId = new IdImpl("dN_" + toNodeId);
 				if(!(network.getNodes().containsKey(dummyId))){
 					NodeImpl n = new NodeImpl(dummyId);
@@ -779,11 +760,6 @@ public class GtfsConverter {
 		}
 	}
 
-
-	private void writeVehicles() {
-		VehicleWriterV1 vw = new VehicleWriterV1(scenario.getVehicles());
-		vw.writeFile("../../gtfsOutput/transitVehicles.xml");
-	}
 
 	private int getWeekday(long date) {
 		int year = (int)(date/10000);

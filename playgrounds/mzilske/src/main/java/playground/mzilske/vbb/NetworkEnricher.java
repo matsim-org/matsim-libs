@@ -1,4 +1,4 @@
-package playground.florian.GTFSConverter;
+package playground.mzilske.vbb;
 
 import java.util.ArrayList;
 import java.util.HashMap;

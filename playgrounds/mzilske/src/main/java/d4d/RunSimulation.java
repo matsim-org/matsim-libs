@@ -80,7 +80,7 @@ public class RunSimulation {
 		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
 		AltPopulationReaderMatsimV5 altPopulationReaderMatsimV5 = new AltPopulationReaderMatsimV5(scenario);
 		//	altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
-		altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
+		altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population-capital-only.xml");
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithm() {
 
 			@Override

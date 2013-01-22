@@ -1,4 +1,4 @@
-package playground.florian.gtfsTests;
+package playground.mzilske.vbb;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -17,8 +17,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 
-import playground.florian.GTFSConverter.GtfsConverter;
-
 public class GtfsTests extends MatsimTestCase {
 	
 	
@@ -27,12 +25,15 @@ public class GtfsTests extends MatsimTestCase {
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.convert();
-		gtfs.writeScenario();
 		ScenarioImpl scenario = (ScenarioImpl) gtfs.getScenario(); 
 		
 		// The Conversion is done, now read the checked scenario
-		Config checkedConfig = ConfigUtils.loadConfig(this.getPackageInputDirectory()+ "/checked/config.xml");
-		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(checkedConfig));
+		// Config checkedConfig = ConfigUtils.loadConfig(this.getPackageInputDirectory()+ "/checked/config.xml");
+		// ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(checkedConfig));
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseVehicles(true);
+		config.scenario().setUseTransit(true);
+		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network.xml");
 		new VehicleReaderV1(checkedScenario.getVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
 		new TransitScheduleReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/transitSchedule.xml");
@@ -49,8 +50,10 @@ public class GtfsTests extends MatsimTestCase {
 		ScenarioImpl scenario = (ScenarioImpl) gtfs.getScenario(); 
 		
 		// The Conversion is done, now read the checked scenario
-		Config checkedConfig = ConfigUtils.loadConfig(this.getPackageInputDirectory() + "/checked/config_shaped.xml");
-		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(checkedConfig));
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseVehicles(true);
+		config.scenario().setUseTransit(true);
+		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network_shaped.xml");
 		new VehicleReaderV1(checkedScenario.getVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
 		new TransitScheduleReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/transitSchedule_shaped.xml");
@@ -59,7 +62,6 @@ public class GtfsTests extends MatsimTestCase {
 	}
 	
 	private void compareResults(ScenarioImpl expected, ScenarioImpl actual){
-		this.compareConfigs(expected, actual);
 		this.compareNetworks(expected, actual);
 		this.compareTransitVehicles(expected, actual);
 		this.compareTransitSchedules(expected, actual);
@@ -105,13 +107,6 @@ public class GtfsTests extends MatsimTestCase {
 		Network n2 = sc2.getNetwork();
 		assertEquals(n1.getLinks().size(), n2.getLinks().size());
 		assertEquals(n1.getNodes().size(), n2.getNodes().size());
-	}
-
-	private void compareConfigs(ScenarioImpl sc1,ScenarioImpl sc2) {
-		Config c1 = sc1.getConfig();
-		Config c2 = sc2.getConfig();
-		assertEquals(c1.transit().getTransitModes(),c2.transit().getTransitModes());
-		assertEquals(c1.getQSimConfigGroup().getStartTime(),c2.getQSimConfigGroup().getStartTime());		
 	}
 
 }

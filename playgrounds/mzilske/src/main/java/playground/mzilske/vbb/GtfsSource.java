@@ -1,4 +1,4 @@
-package playground.florian.GTFSConverter;
+package playground.mzilske.vbb;
 
 import java.io.BufferedReader;
 import java.io.File;

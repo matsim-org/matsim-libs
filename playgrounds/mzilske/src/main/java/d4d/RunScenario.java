@@ -128,7 +128,7 @@ public class RunScenario {
 		readSampleWithOneRandomPointForEachSightingInNewCell(readAllSightings);
 
 
-		runStatistics();
+//		runStatistics();
 
 //				ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithmProvider() {
 //		
@@ -219,7 +219,8 @@ public class RunScenario {
 			((PopulationImpl) scenario.getPopulation()).getPersons().remove(person.getId());
 		}
 		
-		
+
+		runStatistics();
 		
 		return scenario;
 	}
@@ -525,8 +526,10 @@ public class RunScenario {
 		}
 		System.out.println(cityPopulation.getPersons().size());
 		new InitialStatistics("-capital-only").run(cityPopulation);
+		new PopulationWriter(cityPopulation, null).write("/Users/zilske/d4d/output/population-capital-only.xml");
 		System.out.println(nonCityPopulation.getPersons().size());
 		new InitialStatistics("-countryside-only").run(nonCityPopulation);
+		new PopulationWriter(nonCityPopulation, null).write("/Users/zilske/d4d/output/population-countryside-only.xml");
 	}
 
 
