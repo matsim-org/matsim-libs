@@ -148,21 +148,9 @@ public class PhysicalSim2DEnvironment {
 			for (PhysicalSim2DSection psec : this.psecs.values()) {
 				psec.debug(visDebugger);
 			}
-			long timel = System.currentTimeMillis();
-			long last = visDebugger.lastUpdate;
-			long diff = timel - last;
-			if (diff < this.sim2dsc.getSim2DConfig().getTimeStepSize()*1000) {
-				long wait = (long) (this.sim2dsc.getSim2DConfig().getTimeStepSize()*1000-diff);
-				try {
-					Thread.sleep(wait);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			visDebugger.setTime(time);
-			visDebugger.update();
-			visDebugger.lastUpdate = System.currentTimeMillis();
+
+			visDebugger.update(time);
+			
 
 		}
 

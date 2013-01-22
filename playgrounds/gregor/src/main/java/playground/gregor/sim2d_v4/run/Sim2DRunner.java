@@ -28,6 +28,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
@@ -70,8 +71,8 @@ public class Sim2DRunner implements IterationStartsListener{
 			runner.controller = controller;
 		}
 
-		controller.setCreateGraphs(false);
-
+//		controller.setCreateGraphs(false);
+		controller.setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 		controller.run();
 	}
 
@@ -93,7 +94,7 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if ((event.getIteration()) % 10 == 0) {
+		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 400) {
 			PhysicalSim2DEnvironment.DEBUG = true;
 			this.controller.setCreateGraphs(true);
 		} else {

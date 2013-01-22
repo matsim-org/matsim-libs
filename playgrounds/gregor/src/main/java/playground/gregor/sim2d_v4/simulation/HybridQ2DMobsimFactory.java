@@ -82,7 +82,8 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		qSim.addActivityHandler(activityEngine);
 		
 		Sim2DScenario sc2d = sc.getScenarioElement(Sim2DScenario.class);
-		Sim2DAgentBuilder aBuilder = new Sim2DAgentBuilder(sc2d.getSim2DConfig());
+		Sim2DAgentFactory aBuilder = new SocialForceSim2DAgentFactory(sc2d.getSim2DConfig());
+//		Sim2DAgentFactory aBuilder = new ORCAAgentFactory();
 		
 		HybridQSim2DNetworkFactory networkFactory = new HybridQSim2DNetworkFactory(e,sc, aBuilder);
 		

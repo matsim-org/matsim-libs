@@ -38,11 +38,11 @@ public class SimplePopulationGenerator {
 		Config c = ConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/input/config.xml");
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		
-		int nrAgents = 1000;
+		int nrAgents = 200;
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
-		for (int i = 0; i < nrAgents; i++) {
+		for (int i = 0; i < nrAgents/2; i++) {
 			Person pers = fac.createPerson(new IdImpl(i));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
@@ -52,6 +52,19 @@ public class SimplePopulationGenerator {
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
 			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_9_27062060"));
+			plan.addActivity(act1);
+			pop.addPerson(pers);
+		}
+		for (int i = nrAgents/2; i < nrAgents; i++) {
+			Person pers = fac.createPerson(new IdImpl(i));
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			Activity act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_9_27062060"));
+			act0.setEndTime(0);
+			plan.addActivity(act0);
+			Leg leg = fac.createLeg("car");
+			plan.addLeg(leg);
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_0_174673140"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}

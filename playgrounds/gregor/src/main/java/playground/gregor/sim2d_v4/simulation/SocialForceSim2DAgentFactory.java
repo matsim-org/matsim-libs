@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DAgent.java
+ * Sim2DAgentBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,46 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation.physics;
+package playground.gregor.sim2d_v4.simulation;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.SocialForceAgent;
 
-public interface Sim2DAgent {
+public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
 	
-	public abstract QVehicle getQVehicle();
+	private final Sim2DConfig conf;
 
-//	public void calcNeighbors(PhysicalSim2DSection physicalSim2DSection);
-//
-//	public void setObstacles(Segment[] obstacles);
+	public SocialForceSim2DAgentFactory(Sim2DConfig conf) {
+		this.conf = conf;
+	}
 
-	public abstract void updateVelocity();
-
-	public abstract void setPSec(PhysicalSim2DSection physicalSim2DSection);
-	
-	public abstract PhysicalSim2DSection getPSec();
-	
-	public abstract void move(float dx, float dy);
-
-	public abstract float[] getVelocity();
-
-	public abstract Id getCurrentLinkId();
-
-	public abstract float[] getPos();
-
-	public abstract Id chooseNextLinkId();
-
-	public abstract Id getId();
-
-	public abstract void notifyMoveOverNode(Id nextLinkId);
-
-	public abstract void debug(VisDebugger visDebugger);
-
-	public abstract float getRadius();
-
-	
-	
+	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
+		Sim2DAgent agent = new SocialForceAgent(veh, spawnX, spawnY,(float) this.conf.getTimeStepSize());
+		return agent;
+	}
 
 }

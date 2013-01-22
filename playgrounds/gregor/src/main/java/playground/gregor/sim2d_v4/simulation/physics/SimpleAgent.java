@@ -116,13 +116,18 @@ public class SimpleAgent implements Sim2DAgent {
 
 	@Override
 	public void debug(VisDebugger visDebugger) {
-		visDebugger.addCircle(this.getPos()[0], this.getPos()[1], .5f, 192, 0, 64, 128);
+		visDebugger.addCircle(this.getPos()[0], this.getPos()[1], .5f, 192, 0, 64, 128,0,true);
 		
 	}
 
 	@Override
 	public PhysicalSim2DSection getPSec() {
 		return this.currentPSec;
+	}
+
+	@Override
+	public float getRadius() {
+		return this.r;
 	}
 
 }

@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
-import playground.gregor.sim2d_v4.simulation.Sim2DAgentBuilder;
+import playground.gregor.sim2d_v4.simulation.Sim2DAgentFactory;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
@@ -59,9 +59,9 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 
 	private final List<DepartureBox> dBoxes = new ArrayList<DepartureBox>();
 
-	private final Sim2DAgentBuilder agentBuilder;
+	private final Sim2DAgentFactory agentBuilder;
 
-	QSim2DTransitionLink(Link link, QNetwork network, QNode toQueueNode, Sim2DEngine hybridEngine, QLinkImpl qLinkImpl, Sim2DEnvironment env, Sim2DAgentBuilder builder) {
+	QSim2DTransitionLink(Link link, QNetwork network, QNode toQueueNode, Sim2DEngine hybridEngine, QLinkImpl qLinkImpl, Sim2DEnvironment env, Sim2DAgentFactory builder) {
 		this.link = link;
 		this.qNetwork = network;
 		this.toQueueNode = toQueueNode;

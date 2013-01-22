@@ -44,7 +44,7 @@ public class VisDebugger extends PApplet {
 	private final JFrame fr;
 
 	public long lastUpdate = -1;
-	
+
 	public VisDebugger() {
 		this.fr = new JFrame();
 		this.fr.setSize(1000, 1000);
@@ -65,66 +65,71 @@ public class VisDebugger extends PApplet {
 	protected int my = 0;
 	protected int omy;
 	protected int omx;
-	
+
 	private boolean first = true;
 	private String time = "00:00.00.0";
 	private String iteration = "it: 0";
+	private final double dT = 0.04;
+	private double speedup = 1;
 	@Override
 	public void setup() {
 		addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
 			@Override
 			public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) { 
-				mouseWheel(evt.getWheelRotation());
+				if (evt.getModifiers() == java.awt.event.MouseWheelEvent.SHIFT_MASK) {
+					speedup(evt.getWheelRotation());
+				} else {
+					mouseWheel(evt.getWheelRotation());
+				}
 			}}); 
 		addMouseMotionListener(new MouseMotionListener() {
-			
+
 			@Override
 			public void mouseMoved(MouseEvent e) {
-//				System.out.println(e.getX() + " " + e.getY());
-				
+				//				System.out.println(e.getX() + " " + e.getY());
+
 			}
-			
+
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				VisDebugger.this.dragX = e.getX()-VisDebugger.this.mx;
 				VisDebugger.this.dragY = e.getY()-VisDebugger.this.my;
-//				System.out.println(VisDebugger.this.dragX + " " + VisDebugger.this.dragY);
-				
+				//				System.out.println(VisDebugger.this.dragX + " " + VisDebugger.this.dragY);
+
 			}
 		});
 		addMouseListener(new MouseListener() {
-			
+
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				VisDebugger.this.omx += VisDebugger.this.dragX; 
 				VisDebugger.this.dragX = 0;
 				VisDebugger.this.omy += VisDebugger.this.dragY; 
 				VisDebugger.this.dragY = 0;
-				System.out.println(VisDebugger.this.omx + " " + VisDebugger.this.omy);
 			}
-			
+
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 				VisDebugger.this.mx = arg0.getX();
 				VisDebugger.this.my = arg0.getY();
 			}
-			
+
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 		size(W,W);
@@ -133,16 +138,26 @@ public class VisDebugger extends PApplet {
 
 	void mouseWheel(int delta)
 	{
-		this.scale-=10*delta;
-
-
+		this.scale-=10.*delta;
+		this.scale = Math.max(10, this.scale);
+		this.scale = Math.min(700, this.scale);
 	}	
+
+	void speedup(int delta) {
+		this.speedup += delta/10.;
+		this.speedup = Math.max(0.1, this.speedup);
+		this.speedup = Math.min(10, this.speedup);
+//		System.out.println(this.speedup);
+	}
 
 	@Override
 	public void draw() {
 		stroke(255);
 		background(255);
 		fill(255);
+
+		//		  PGraphicsOpenGL pgl = (PGraphicsOpenGL) this.g; 
+		//		  GL gl = pgl.beginGL();
 
 		synchronized(this.elementsStatic) {
 			Iterator<Object> it = this.elementsStatic.iterator();
@@ -154,9 +169,12 @@ public class VisDebugger extends PApplet {
 					drawCircle((Circle) el);
 				} else if (el instanceof Polygon) {
 					drawPolygon((Polygon)el);
+				}else if (el instanceof Text) {
+					drawText((Text)el);
 				}
 			}
 		}
+		int agents = 0;
 		synchronized(this.elements) {
 			Iterator<Object> it = this.elements.iterator();
 			while (it.hasNext()) {
@@ -165,6 +183,7 @@ public class VisDebugger extends PApplet {
 					drawLine((Line) el);
 				} else if (el instanceof Circle) {
 					drawCircle((Circle) el);
+					agents++;
 				} else if (el instanceof Polygon) {
 					drawPolygon((Polygon)el);
 				} else if (el instanceof Text) {
@@ -174,9 +193,15 @@ public class VisDebugger extends PApplet {
 		}
 		drawTime();
 		drawIteration();
+		drawAgentsCount(agents);
+		drawSpeedup();
 	}
 
+
 	private void drawText(Text el) {
+		if (this.scale < el.minScale) {
+			return;
+		}
 		stroke(el.r,el.g,el.b,el.a);
 		fill(el.r,el.g,el.b,el.a);
 		text(el.text,scaleFlX(el.x),scaleFlY(el.y));
@@ -189,9 +214,9 @@ public class VisDebugger extends PApplet {
 		rect(0, 0, 105, 25);
 		fill(0);
 		text(strTime, 10, 18);
-		
+
 	}
-	
+
 	private void drawIteration() {
 		String iteration = setIteration(-1);
 		fill(128, 128);
@@ -199,10 +224,32 @@ public class VisDebugger extends PApplet {
 		rect(0, 26, 105, 25);
 		fill(0);
 		text(iteration, 10, 44);
-		
+
+	}
+	private void drawAgentsCount(int agents) {
+		fill(128,128);
+		stroke(0);
+		rect(0,52,105,25);
+		fill(0);
+		text("agents: " + agents,10,70);
+
+	}
+	
+	private void drawSpeedup() {
+		fill(128,128);
+		stroke(0);
+		rect(0,78,105,25);
+		fill(0);
+		int a = (int) this.speedup;
+		int b = (int) ((this.speedup - a) * 10);
+		text("accel.: " + a + "." + b,10,96);
 	}
 
+
 	private void drawPolygon(Polygon p) {
+		if (this.scale < p.minScale) {
+			return;
+		}
 		fill(p.r,p.g,p.b,p.a);
 		stroke(p.r,p.g,p.b,p.a);
 		beginShape();
@@ -212,28 +259,42 @@ public class VisDebugger extends PApplet {
 			vertex(x,y);
 		}
 		endShape();
-		
+
 	}
 
 	private void drawCircle(Circle c) {
-		fill(c.r,c.g,c.b,c.a);
+		if (this.scale < c.minScale) {
+			return;
+		}
+		if (c.fill) {
+			fill(c.r,c.g,c.b,c.a);
+		} else {
+			fill(c.r,c.g,c.b,0);
+		}
 		stroke(c.r,c.g,c.b,c.a);
 		ellipseMode(CENTER);
 		ellipse(scaleFlX(c.x),scaleFlY(c.y),scaleFl(c.rr),scaleFl(c.rr));
 	}
 
 	private void drawLine(Line l) {
-		stroke(l.r, l.g, l.b, l.a);
+		if (this.scale < (l.minScale-l.a)) {
+			return;
+		}
+		int a = l.a;
+		if (this.scale < l.minScale) {
+			a -= (int) (l.minScale-this.scale);
+		} 
+		stroke(l.r, l.g, l.b, a);
 		//		stroke(20);
 		strokeWeight(2);
 		line(scaleFlX(l.x0),scaleFlY(l.y0),scaleFlX(l.x1),scaleFlY(l.y1));
-		
+
 	}
 
 	private float scaleFl(float y1) {
 		return this.scale/10 * y1;
 	}
-	
+
 	private float scaleFlX(float y1) {
 		return this.scale/10 * y1 + this.dragX + this.omx;
 	}
@@ -241,7 +302,7 @@ public class VisDebugger extends PApplet {
 	private float scaleFlY(float y1) {
 		return 50-this.scale/10 * y1 + this.dragY + this.omy;
 	}
-	public void addLineStatic(float x0, float y0, float x1, float y1, int r, int g, int b, int a) {
+	public void addLineStatic(float x0, float y0, float x1, float y1, int r, int g, int b, int a, int minScale) {
 		Line l = new Line();
 		l.x0 = x0;
 		l.x1 = x1;
@@ -251,43 +312,12 @@ public class VisDebugger extends PApplet {
 		l.g = g;
 		l.b = b;
 		l.a = a;
-		StringBuffer buf = new StringBuffer();
-		buf.append("line");
-		buf.append(x0);
-		buf.append(' ');
-		buf.append(y0);
-		buf.append(' ');
-		buf.append(x1);
-		buf.append(' ');
-		buf.append(y1);
-		addElementStatic(l,buf.toString());
-
-	}
-	
-	public void addLine(float x0, float y0, float x1, float y1, int r, int g, int b, int a) {
-		Line l = new Line();
-		l.x0 = x0;
-		l.x1 = x1;
-		l.y0 = y0;
-		l.y1 = y1;
-		l.r = r;
-		l.g = g;
-		l.b = b;
-		l.a = a;
-		StringBuffer buf = new StringBuffer();
-		buf.append("line");
-		buf.append(x0);
-		buf.append(' ');
-		buf.append(y0);
-		buf.append(' ');
-		buf.append(x1);
-		buf.append(' ');
-		buf.append(y1);
-		addElement(l,buf.toString());
+		l.minScale = minScale;
+		addElementStatic(l);
 
 	}
 
-	public void addCircle(float x, float y, float rr, int r, int g, int b, int a) {
+	public void addCircleStatic(float x, float y, float rr, int r, int g, int b, int a, int minScale) {
 		Circle c = new Circle();
 		c.x = x;
 		c.y = y;
@@ -296,17 +326,50 @@ public class VisDebugger extends PApplet {
 		c.g = g;
 		c.b = b;
 		c.a = a;
-		StringBuffer buf = new StringBuffer();
-		buf.append("circle");
-		buf.append(x);
-		buf.append(' ');
-		buf.append(y);
-		buf.append(' ');
-		buf.append(rr);
-		addElement(c,buf.toString());
+		c.minScale = minScale;
+		addElementStatic(c);
 	}
 
-	public void addPolygon(float [] x, float [] y, int r, int g, int b, int a) {
+	public void addLine(float x0, float y0, float x1, float y1, int r, int g, int b, int a, int minScale) {
+		Line l = new Line();
+		l.x0 = x0;
+		l.x1 = x1;
+		l.y0 = y0;
+		l.y1 = y1;
+		l.r = r;
+		l.g = g;
+		l.b = b;
+		l.a = a;
+		l.minScale = minScale;
+		addElement(l);
+
+	}
+
+	public void addTextStatic(float x, float y, String string, int minScale) {
+		Text text = new Text();
+		text.x = x;
+		text.y = y;
+		text.text = string;
+		text.a = 255;
+		text.minScale = minScale;
+		addElementStatic(text);
+	}
+
+	public void addCircle(float x, float y, float rr, int r, int g, int b, int a, int minScale, boolean fill) {
+		Circle c = new Circle();
+		c.x = x;
+		c.y = y;
+		c.rr = rr;
+		c.r = r;
+		c.g = g;
+		c.b = b;
+		c.a = a;
+		c.minScale = minScale;
+		c.fill  = fill;
+		addElement(c);
+	}
+
+	public void addPolygon(float [] x, float [] y, int r, int g, int b, int a, int minScale) {
 		Polygon p = new Polygon();
 		p.x = x;
 		p.y = y;
@@ -314,69 +377,88 @@ public class VisDebugger extends PApplet {
 		p.g = g;
 		p.b = b;
 		p.a = a;
-		StringBuffer buf = new StringBuffer();
-		buf.append("polygon");
-		buf.append(x);
-		buf.append(' ');
-		buf.append(y);
-		buf.append(' ');
-		addElement(p,buf.toString());
+		p.minScale = minScale;
+		addElement(p);
 	}
-	
-	public void addText(float x, float y, String string) {
+
+	public void addText(float x, float y, String string, int minScale) {
 		Text text = new Text();
 		text.x = x;
 		text.y = y;
 		text.text = string;
 		text.a = 255;
-		addElement(text, string);
+		text.minScale = minScale;
+		addElement(text);
 	}
-	
-	private void addElement(Object o, String key) {
+
+	private void addElement(Object o) {
 		this.newElements.add(o);
 	}
-	private void addElementStatic(Object o, String key) {
+	private void addElementStatic(Object o) {
 		synchronized(this.elementsStatic){
 			this.elementsStatic.add(o);
 		}
 	}
 
-	public void update() {
+	public void update(double time) {
+		long timel = System.currentTimeMillis();
+		long last = this.lastUpdate;
+		long diff = timel - last;
+		if (diff < this.dT*1000/this.speedup) {
+			long wait = (long) (this.dT *1000/this.speedup-diff);
+			try {
+				Thread.sleep(wait);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		setTime(time);
 		synchronized(this.elements) {
-//			this.elements.clear();
+			//			this.elements.clear();
 			this.elements = Collections.synchronizedList(new ArrayList<Object>(this.newElements));
 			this.newElements.clear();
 		}
 		this.first = false;
+		this.lastUpdate = System.currentTimeMillis();
+	}
+	
+	public void addAll() {
+		synchronized(this.elements) {
+			//			this.elements.clear();
+			this.elements.addAll(this.newElements);
+			this.newElements.clear();
+		}
 	}
 
 	public boolean isFirst() {
 		return this.first;
 	}
 
-	
 
-	
+
+
 	private static final class Text {
 		float x,y;
 		String text;
-		int r,g,b,a;
+		int r,g,b,a, minScale = 0;
 	}
-	
+
 	private static final class Line {
 		float x0,x1,y0,y1;
-		int r,g,b,a;
+		int r,g,b,a, minScale = 0;
 	}
 
 	private static class Circle {
+		boolean fill = true;
 		float x,y,rr;
-		int r,g,b,a;
+		int r,g,b,a, minScale = 0;
 	}
-	
+
 	private static class Polygon {
 		float [] x;
 		float [] y;
-		int r,g,b,a;
+		int r,g,b,a, minScale = 0;
 	}
 
 	synchronized public String setTime(double time2) {
@@ -390,9 +472,9 @@ public class VisDebugger extends PApplet {
 			this.time = strTime;
 		}
 		return this.time;
-		
+
 	}
-	
+
 	synchronized public String setIteration(int it) {
 		if (it > 0) {
 			this.iteration = "iteration: " + it;

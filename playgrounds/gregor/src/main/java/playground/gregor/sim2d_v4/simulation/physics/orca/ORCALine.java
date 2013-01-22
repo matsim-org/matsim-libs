@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DAgentBuilder.java
+ * ORCALineTMP.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation;
+package playground.gregor.sim2d_v4.simulation.physics.orca;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import playground.gregor.sim2d_v4.debugger.VisDebugger;
 
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.SocialForceAgent;
 
-public class Sim2DAgentBuilder {
+public interface ORCALine {
+
+//	public abstract void gisDump();
+
+	public abstract boolean solutionSatisfyConstraint(float[] v);
+
+	public abstract float getPointX();
+
+	public abstract float getPointY();
 	
-	private final Sim2DConfig conf;
+	public abstract void setPointX(float x);
+	
+	public abstract void setPointY(float y);
 
-	public Sim2DAgentBuilder(Sim2DConfig conf) {
-		this.conf = conf;
-	}
+	public abstract float getDirectionX();
 
-	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
-//		Sim2DAgent agent = new SimpleAgent(veh,spawnX,spawnY);
-		Sim2DAgent agent = new SocialForceAgent(veh, spawnX, spawnY,(float) this.conf.getTimeStepSize());
-		return agent;
-	}
+	public abstract float getDirectionY();
+	
+	public abstract void debug(VisDebugger visDebugger, int r, int g, int b);
+
 
 }

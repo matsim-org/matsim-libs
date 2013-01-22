@@ -79,7 +79,9 @@
 		<dependency>
 			<groupId>processing</groupId>
 			<artifactId>core</artifactId>
-			<version>1.5.1</version>
+			<scope>system</scope>
+			<version>2.0.b7</version>
+			<systemPath>${basedir}/lib/processing-2.0b7/core.jar</systemPath>
 		</dependency>
 	</dependencies>
 </project>

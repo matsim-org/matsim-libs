@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DAgent.java
+ * ORCAAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,46 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation.physics;
+package playground.gregor.sim2d_v4.simulation;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
+import playground.gregor.sim2d_v4.simulation.physics.ORCAAgent;
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
-public interface Sim2DAgent {
-	
-	public abstract QVehicle getQVehicle();
+public class ORCAAgentFactory implements Sim2DAgentFactory {
 
-//	public void calcNeighbors(PhysicalSim2DSection physicalSim2DSection);
-//
-//	public void setObstacles(Segment[] obstacles);
-
-	public abstract void updateVelocity();
-
-	public abstract void setPSec(PhysicalSim2DSection physicalSim2DSection);
-	
-	public abstract PhysicalSim2DSection getPSec();
-	
-	public abstract void move(float dx, float dy);
-
-	public abstract float[] getVelocity();
-
-	public abstract Id getCurrentLinkId();
-
-	public abstract float[] getPos();
-
-	public abstract Id chooseNextLinkId();
-
-	public abstract Id getId();
-
-	public abstract void notifyMoveOverNode(Id nextLinkId);
-
-	public abstract void debug(VisDebugger visDebugger);
-
-	public abstract float getRadius();
-
-	
-	
+	@Override
+	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
+		return new ORCAAgent(veh, spawnX, spawnY);
+	}
 
 }

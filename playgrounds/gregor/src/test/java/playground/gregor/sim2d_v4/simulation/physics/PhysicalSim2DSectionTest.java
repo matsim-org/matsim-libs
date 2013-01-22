@@ -255,13 +255,18 @@ public class PhysicalSim2DSectionTest {
 
 		@Override
 		public void debug(VisDebugger visDebugger) {
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], .5f, 192, 0, 64, 128);
+			throw new RuntimeException("don't call this method!");
 
 		}
 
 		@Override
 		public PhysicalSim2DSection getPSec() {
 			return this.currentPSec;
+		}
+
+		@Override
+		public float getRadius() {
+			throw new RuntimeException("don't call this method!");
 		}
 
 

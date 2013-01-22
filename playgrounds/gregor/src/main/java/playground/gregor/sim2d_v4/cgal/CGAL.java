@@ -27,7 +27,7 @@ package playground.gregor.sim2d_v4.cgal;
  */
 public abstract class CGAL {
 
-	private static final float EPSILON = 0.001f;
+	private static final float EPSILON = 0.0001f;
 	
 	
 	/**
@@ -83,7 +83,7 @@ public abstract class CGAL {
 	}
 	
 	/**
-	 * calculates the coefficient r a vector has to be multiplied by to get the perpendicular projection on the line 
+	 * calculates the coefficient r by which a given vector has to be multiplied to get the perpendicular projection on the line 
 	 * defined by the vector for a given point
 	 * @param x x-coordinate of the point
 	 * @param y y-coordinate of the point
@@ -102,6 +102,38 @@ public abstract class CGAL {
 		
 		return r;
 		
+	}
+
+	/**
+	 * calculates the coefficient r by which a given normalized vector has to be multiplied to get the perpendicular projection on the line 
+	 * defined by the vector for a given point
+	 * @param x x-coordinate of the point
+	 * @param y y-coordinate of the point
+	 * @param v0x first x-coordinate of the vector
+	 * @param v0y first y-coordinate of the vector
+	 * @param vdx x-direction of the vector
+	 * @param vdy y-direction of the vector
+	 * @return the coefficient by which the vector has to be multiplied
+	 */
+	public static float normVectorCoefOfPerpendicularProjection(float x, float y, float v0x, float v0y, float vdx, float vdy) {
+		float numerator = (x-v0x) * vdx + (y - v0y) * vdy;
+		float denomenator  = vdx * vdx + vdy * vdy; //TODO in most sim2d cases this value can be precalculated [gl Jan'13] 
+		float r = numerator/denomenator;
+		
+		return r;
+		
+	}
+	
+	/**
+	 * dot product of two 2d vectors
+	 * @param x0 the x-coordinate of the first vector
+	 * @param y0 the y-coordinate of the first vector
+	 * @param x1 the x-coordinate of the second vector
+	 * @param y1 the y-coordinate of the second vector
+	 * @return the dot product
+	 */
+	public static float dot(float x0, float y0, float x1, float y1) {
+		return x0 * x1 + y0  * y1;
 	}
 	
 }
