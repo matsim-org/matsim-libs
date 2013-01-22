@@ -28,7 +28,7 @@ public class AgentPropertiesScoringFunctionFactory implements ScoringFunctionFac
 		return createNewScoringFunction(plan.getPerson().getId().toString());
 	}
 
-	public ScoringFunction createNewScoringFunction(String id)
+	private ScoringFunction createNewScoringFunction(String id)
 	{
 		final AgentProperties props = properties.get(id);
 		
