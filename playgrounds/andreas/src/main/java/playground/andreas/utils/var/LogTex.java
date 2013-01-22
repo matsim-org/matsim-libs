@@ -31,6 +31,7 @@ public class LogTex implements TabularFileHandler {
 	private int lastIteration = -1;
 	private int coopCounterInThatIteration = 1;
 	private String lastCoopName = "";
+	private int lastPaxSum = 0;
 
 	static interface LineSink {
 		void process(String line);
@@ -73,6 +74,7 @@ public class LogTex implements TabularFileHandler {
 						this.lastIteration = Integer.parseInt(row[0]);
 						this.coopCounterInThatIteration = 1;
 						this.lastCoopName = "";
+						this.lastPaxSum = 0;
 						sink.process("\\addlinespace[1.0em]");
 					}
 					
@@ -125,9 +127,12 @@ public class LogTex implements TabularFileHandler {
 					String trips = row[6];
 					strB.append(trips);
 					
+					this.lastPaxSum += Integer.parseInt(trips);
+					
 					strB.append(" & ");
 
 					double score = Double.parseDouble(row[7]);
+					score = score / Double.parseDouble(veh);
 					score = Math.round(score * 10.) / 10.;
 					DecimalFormat df = (DecimalFormat)DecimalFormat.getInstance(Locale.US);
 					df.applyPattern("#,###,##0.0");
@@ -143,6 +148,8 @@ public class LogTex implements TabularFileHandler {
 					strB.append(s);
 
 					strB.append(" \\tabularnewline");
+					
+					strB.append(" % pax sum " + this.lastPaxSum);
 					
 					sink.process(strB.toString());
 					
