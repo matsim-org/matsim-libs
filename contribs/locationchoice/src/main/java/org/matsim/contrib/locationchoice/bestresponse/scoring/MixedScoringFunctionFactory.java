@@ -99,6 +99,7 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.functio
 		this.facilitiesKValues = computer.getFacilitiesKValues();
 	}
 
+	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
