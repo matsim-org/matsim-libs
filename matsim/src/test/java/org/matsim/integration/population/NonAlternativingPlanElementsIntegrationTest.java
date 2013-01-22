@@ -66,7 +66,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	@Test
-	public void test_Controler_QueueSimulation_Timechoice() {
+	public void test_Controler_QueueSimulation_Timechoice_acts() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setMobsim("queueSimulation");
 		config.controler().setLastIteration(10);
@@ -76,7 +76,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 		
-		Plan plan = createNonAlternatingPlanForEquilNet(scenario);
+		Plan plan = createPlanWithConsecutiveActivitiesForEquilNet(scenario);
 		Person person = scenario.getPopulation().getFactory().createPerson(new IdImpl(1));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
@@ -89,8 +89,33 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
 
-	@Test @Ignore("Test does not yet work")
-	public void test_Controler_QSim_Routechoice() {
+	@Test
+	public void test_Controler_QueueSimulation_Timechoice_legs() {
+		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setMobsim("queueSimulation");
+		config.controler().setLastIteration(10);
+		config.strategy().addParam("Module_2", "TimeAllocationMutator");
+		config.strategy().addParam("ModuleProbability_2", "1.0");
+		
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
+		
+		Plan plan = createPlanWithConsecutiveLegsForEquilNet(scenario);
+		Person person = scenario.getPopulation().getFactory().createPerson(new IdImpl(1));
+		person.addPlan(plan);
+		scenario.getPopulation().addPerson(person);
+		
+		Controler controler = new Controler(scenario);
+		controler.setDumpDataAtEnd(false);
+		controler.setCreateGraphs(false);
+		controler.run();
+		
+		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
+	}
+
+	@Test
+	@Ignore( "This fails" )
+	public void test_Controler_QSim_Routechoice_acts() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setMobsim("qsim");
 		config.addQSimConfigGroup(new QSimConfigGroup());
@@ -103,7 +128,34 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		
 		addSimpleTransitServices(scenario);
 		
-		Plan plan = createNonAlternatingPlanForEquilNet(scenario);
+		Plan plan = createPlanWithConsecutiveActivitiesForEquilNet(scenario);
+		Person person = scenario.getPopulation().getFactory().createPerson(new IdImpl(1));
+		person.addPlan(plan);
+		scenario.getPopulation().addPerson(person);
+		
+		Controler controler = new Controler(scenario);
+		controler.setDumpDataAtEnd(false);
+		controler.setCreateGraphs(false);
+		controler.run();
+		
+		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
+	}
+
+	@Test
+	public void test_Controler_QSim_Routechoice_legs() {
+		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setMobsim("qsim");
+		config.addQSimConfigGroup(new QSimConfigGroup());
+		config.controler().setLastIteration(10);
+		config.strategy().addParam("Module_2", "ReRoute");
+		config.strategy().addParam("ModuleProbability_2", "1.0");
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
+		
+		addSimpleTransitServices(scenario);
+		
+		Plan plan = createPlanWithConsecutiveLegsForEquilNet(scenario);
 		Person person = scenario.getPopulation().getFactory().createPerson(new IdImpl(1));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
@@ -116,7 +168,8 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
 	
-	private Plan createNonAlternatingPlanForEquilNet(Scenario scenario) {
+	// TODO: make more complicated plans when testing subtour mode choice
+	private static Plan createPlanWithConsecutiveLegsForEquilNet(final Scenario scenario) {
 		PopulationFactory pf = scenario.getPopulation().getFactory();
 		
 		Plan plan = pf.createPlan();
@@ -124,20 +177,23 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		Activity home1 = pf.createActivityFromLinkId("h", new IdImpl(1));
 		((ActivityImpl) home1).setCoord(new CoordImpl(-17000, 500));
 		home1.setEndTime(7.0 * 3600);
+
 		Leg leg1 = pf.createLeg("transit_walk");
 		leg1.setRoute(new GenericRouteImpl(new IdImpl(1), new IdImpl(14)));
+
 		Leg leg2 = pf.createLeg("pt");
 		leg2.setRoute(new LinkNetworkRouteImpl(new IdImpl(14), new Id[] {new IdImpl(20)}, new IdImpl(21)));
+
 		Leg leg3 = pf.createLeg("transit_walk");
 		leg3.setRoute(new LinkNetworkRouteImpl(new IdImpl(14), new Id[0], new IdImpl(14)));
+
 		Activity work = pf.createActivityFromLinkId("w", new IdImpl(21));
 		work.setEndTime(17.0 * 3600);
 		((ActivityImpl) work).setCoord(new CoordImpl(5000, -8000));
-		Activity shop = pf.createActivityFromLinkId("w", new IdImpl(21));
-		shop.setEndTime(17.5 * 3600);
-		((ActivityImpl) shop).setCoord(new CoordImpl(5000, -8000));
+
 		Leg leg4 = pf.createLeg("car");
 		leg4.setRoute(new LinkNetworkRouteImpl(new IdImpl(21), new Id[] {new IdImpl(22), new IdImpl(23)}, new IdImpl(1)));
+
 		Activity home2 = pf.createActivityFromLinkId("h", new IdImpl(1));
 		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
 		
@@ -146,9 +202,54 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		plan.addLeg(leg2);
 		plan.addLeg(leg3);
 		plan.addActivity(work);
-		plan.addActivity(shop);
 		plan.addLeg(leg4);
 		plan.addActivity(home2);
+		
+		return plan;
+	}
+
+	private static Plan createPlanWithConsecutiveActivitiesForEquilNet(final Scenario scenario) {
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+		
+		Plan plan = pf.createPlan();
+		
+		Activity home1 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		((ActivityImpl) home1).setCoord(new CoordImpl(-17000, 500));
+		home1.setEndTime(7.0 * 3600);
+
+		Leg leg1 = pf.createLeg("walk");
+		leg1.setRoute(new GenericRouteImpl(new IdImpl(1), new IdImpl(14)));
+
+		Activity work = pf.createActivityFromLinkId("w", new IdImpl(21));
+		work.setEndTime(17.0 * 3600);
+		((ActivityImpl) work).setCoord(new CoordImpl(5000, -8000));
+
+		Activity shop = pf.createActivityFromLinkId("h", new IdImpl(21));
+		shop.setEndTime(17.5 * 3600);
+		((ActivityImpl) shop).setCoord(new CoordImpl(5000, -8000));
+
+		Leg leg2 = pf.createLeg("car");
+		leg2.setRoute(new LinkNetworkRouteImpl(new IdImpl(21), new Id[] {new IdImpl(22), new IdImpl(23)}, new IdImpl(1)));
+
+		Activity home2 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
+		home2.setEndTime(21 * 3600);
+
+		Activity home3 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
+		home2.setEndTime(22 * 3600);
+
+		Activity home4 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
+		
+		plan.addActivity(home1);
+		plan.addLeg(leg1);
+		plan.addActivity(work);
+		plan.addActivity(shop);
+		plan.addLeg(leg2);
+		plan.addActivity(home2);
+		plan.addActivity(home3);
+		plan.addActivity(home4);
 		
 		return plan;
 	}
