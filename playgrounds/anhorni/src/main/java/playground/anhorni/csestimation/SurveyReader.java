@@ -67,7 +67,7 @@ public class SurveyReader {
 				Location hlocation = new Location(new IdImpl(-1));
 				person.setHomeLocation(hlocation);
 				hlocation.setCity(entrs[10].trim());
-				hlocation.setCoord(new CoordImpl(Double.parseDouble(entrs[11].trim()), Double.parseDouble(entrs[12].trim()))); // TODO: prüfen bei NULL
+				hlocation.setCoord(new CoordImpl(Double.parseDouble(entrs[12].trim()), Double.parseDouble(entrs[11].trim()))); // TODO: prüfen bei NULL
 				
 				person.setModesForShopping(SurveyControler.modes.indexOf("car"), SurveyControler.frequency.indexOf(entrs[13].trim().replaceAll("car", "")));
 				person.setModesForShopping(SurveyControler.modes.indexOf("pt"), SurveyControler.frequency.indexOf(entrs[14].trim().replaceAll("pt", "")));
@@ -118,6 +118,7 @@ public class SurveyReader {
 				ShopLocation store = new ShopLocation(shopId);				
 				int aware = 0;
 				int visited = 0;
+				boolean nullStore = false;
 				
 				if (entrs[5].trim().equals("yes")) {
 					aware = 1;
@@ -127,6 +128,11 @@ public class SurveyReader {
 					aware = -1;
 					store.setVisitFrequency("never");
 				}
+				else if (entrs[5].trim().equals("NULL")) {
+					nullStore = true;
+				}
+				
+				
 				if (entrs[3].trim().equals("yes")) {
 					visited = 1;
 					store.setVisitFrequency(entrs[6].trim());
@@ -136,12 +142,20 @@ public class SurveyReader {
 					visited = -1;
 					store.setVisitFrequency(entrs[6].trim());
 				}
+				else if (entrs[3].trim().equals("NULL")) {
+					nullStore = true;
+				}				
 				if (person == null) {
 					log.error("person null for user " + userId);
 					System.exit(1);
 				}
 				else {
-					person.addStore(store, aware, visited);	
+					if (nullStore) {
+						person.addNullStore(store);
+					}
+					else {
+						person.addStore(store, aware, visited);	
+					}
 				}
 				if (prevId.compareTo(userId) != 0 && prevId.compareTo(new IdImpl(-99)) != 0) {
 					log.info("parsed user: " + prevId + " " + countAware + " aware stores " + countVisited + " visited stores");

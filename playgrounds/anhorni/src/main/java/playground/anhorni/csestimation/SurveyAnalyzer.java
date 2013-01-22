@@ -1,5 +1,6 @@
 package playground.anhorni.csestimation;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.TreeMap;
 
@@ -18,16 +19,42 @@ public class SurveyAnalyzer {
 	public SurveyAnalyzer(TreeMap<Id, EstimationPerson> population, String outdir) {
 		this.population = population;
 		this.outdir = outdir;
+		new File(this.outdir).mkdirs();
 	}
 	
 	public SurveyAnalyzer(Population population, String outdir) {
+		this.setPopulation(population);
+		this.outdir = outdir;
+	} 
+	
+	public void setPopulation(TreeMap<Id, EstimationPerson> population) {
+		this.population = population;
+	}
+		
+	public void setPopulation(Population population) {
 		this.population = new TreeMap<Id, EstimationPerson>();
 		for (Person p:population.getPersons().values()) {
 			EstimationPerson person = (EstimationPerson)p;
 			this.population.put(p.getId(), person);		
 		}
-		this.outdir = outdir;
-	} 
+	}
+	
+	public void analyzeHomeSets() {
+		Bins awareness = new Bins(0.1, 1.01, "awareness");
+		Bins frequently = new Bins(0.1, 1.01, "frequently");
+		for (EstimationPerson p : this.population.values()) {
+			double awarenessShare = p.getHomeset().getAwarenessShare();				
+			if (awarenessShare >= 0.0) {
+				awareness.addVal(awarenessShare, 1.0);
+			}
+			double frequentlyShare = p.getHomeset().getFrequentlyVisitedShare();
+			if (frequentlyShare >= 0.0)  {
+				frequently.addVal(frequentlyShare, 1.0);
+			}
+		}
+		awareness.plotBinnedDistribution(this.outdir, "", "");
+		frequently.plotBinnedDistribution(this.outdir, "", "");
+	}
 	
 	private void analyzeVariableBinSizeMZ() {	
 		double totalGenderWeight = 0.0;

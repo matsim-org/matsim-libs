@@ -52,5 +52,4 @@ public class UniversalChoiceSetReader {
 		}
 		return shops;
 	}
-
 }

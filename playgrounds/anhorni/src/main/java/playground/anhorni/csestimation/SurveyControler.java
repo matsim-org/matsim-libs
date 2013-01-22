@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.QuadTree;
 
 public class SurveyControler {
 	public static ArrayList<String> modes = new ArrayList<String>(Arrays.asList("car", "pt", "bike", "walk", ""));
@@ -37,11 +38,12 @@ public class SurveyControler {
 		String personFile = args[0];
 		String personShopsFile = args[1];
 		String addedShopsFile = args[2];
-		String outdir = args[3];
-		c.run(personFile, personShopsFile, addedShopsFile, outdir);
+		String shopsFile = args[3];
+		String outdir = args[4];	
+		c.run(personFile, personShopsFile, addedShopsFile, shopsFile, outdir);
 	}
 	
-	public void run(String personFile, String personShopsFile, String addedShopsFile, String outdir) {
+	public void run(String personFile, String personShopsFile, String addedShopsFile, String shopsFile, String outdir) {
 		SurveyReader reader = new SurveyReader(this.population);
 		reader.readDumpedPersons(personFile);
 		log.info(this.population.size() + " persons created");
@@ -53,8 +55,18 @@ public class SurveyControler {
 		analyzer.analyze();
 		
 		this.population = cleaner.removeNonAgeNonIncomePersons(this.population);
-		analyzer = new SurveyAnalyzer(this.population, outdir);
+		analyzer.setPopulation(this.population);
 		analyzer.analyze();
+		
+		// create and analyze home sets
+		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
+		TreeMap<Id, ShopLocation> ucs = ucsReader.readUniversalCS(shopsFile);
+		QuadTree<Location> shopQuadTree = Utils.buildLocationQuadTree(ucs);
+		
+		for (EstimationPerson person : this.population.values()) {
+			person.createHomeSet(shopQuadTree);
+		}
+		analyzer.analyzeHomeSets();
 		log.info("finished .......................................");
 	}
 }

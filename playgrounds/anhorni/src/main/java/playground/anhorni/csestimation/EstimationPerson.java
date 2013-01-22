@@ -25,6 +25,7 @@ import java.util.Vector;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.QuadTree;
 
 import playground.anhorni.analysis.microcensus.planbased.MZPerson;
 
@@ -40,6 +41,7 @@ public class EstimationPerson extends MZPerson {
 	
 	private PersonLocations locations = new PersonLocations();
 	private PersonModes modes = new PersonModes();
+	private HomeSet homeset;
 	
 	private List<ShoppingTrip> shoppingTrips = new Vector<ShoppingTrip>();
 	
@@ -72,7 +74,13 @@ public class EstimationPerson extends MZPerson {
 	}
 	public void addStore(ShopLocation store, int aware, int visited)  {
 		this.locations.addStore(store, aware, visited);
-	}	
+	}
+	public void addNullStore(ShopLocation store) {
+		this.locations.addNullStore(store);
+	}
+	public Location getHomeLocation() {
+		return this.locations.getHomeLocation();
+	}
 	public void setModeForWorking(int index, boolean value) {
 		this.modes.setModeForWorking(index, value);
 	}
@@ -123,5 +131,18 @@ public class EstimationPerson extends MZPerson {
 	}
 	public List<ShoppingTrip> getShoppingTrips() {
 		return this.shoppingTrips;
+	}
+	public HomeSet getHomeset() {
+		return homeset;
+	}
+	public void setHomeset(HomeSet homeset) {
+		this.homeset = homeset;
+	}
+	public void createHomeSet(QuadTree<Location> shopQuadTree) {
+		this.homeset = new HomeSet();
+		this.homeset.create(this, shopQuadTree);
+	}
+	public PersonLocations getPersonLocations() {
+		return this.locations;
 	}
 }
