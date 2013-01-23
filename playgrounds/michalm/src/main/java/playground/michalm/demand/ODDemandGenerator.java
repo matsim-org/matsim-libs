@@ -84,7 +84,7 @@ public class ODDemandGenerator
                 Zone dZone = zones.get(j);
 
                 double flow = hours * flowCoeff * odMatrix[i][j];//assumption: positive number!
-                boolean roundUp = uniform.nextDoubleFromTo(0, 1) > (flow - (int)flow); 
+                boolean roundUp = uniform.nextDoubleFromTo(0, 1) < (flow - (int)flow); 
                 
                 int trips = (int)flow + (roundUp ? 1 : 0);  
                 
