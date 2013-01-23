@@ -22,13 +22,14 @@ package playground.andreas.P2.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
 
 /**
  * 
- * Creates a completely new plan.
+ * Creates a new plan from scratch. New stops have a minimal distance of twice the grid size. 
  * 
  * @author aneumann
  *
@@ -38,16 +39,19 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 	private final static Logger log = Logger.getLogger(CreateNewPlan.class);
 	public static final String STRATEGY_NAME = "CreateNewPlan";
 	private final double timeSlotSize;
+	private final double minStopDistance;
 	private TimeProvider timeProvider;
 
 	public CreateNewPlan(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 1){
+		if(parameter.size() != 2){
 			log.error("Wrong number of parameters. Will ignore: " + parameter);
 			log.error("Parameter 1: Time slot size for new start and end times");
+			log.error("Parameter 2: Grid size in meter");
 		}
 		
-		this.timeSlotSize = Double.valueOf(parameter.get(0));
+		this.timeSlotSize = Double.parseDouble(parameter.get(0));
+		this.minStopDistance = 2 * Double.parseDouble(parameter.get(1));
 	}
 	
 	public void setTimeProvider(TimeProvider timeProvider){
@@ -86,7 +90,8 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 			
 			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
-			while(stop1.getId() == stop2.getId()){
+			
+			while (CoordUtils.calcDistance(stop1.getCoord(), stop2.getCoord()) < this.minStopDistance) {
 				stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			}
 			

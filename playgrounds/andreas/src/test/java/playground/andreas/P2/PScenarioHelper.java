@@ -80,6 +80,7 @@ public class PScenarioHelper {
 		
 		ArrayList<String> parameter = new ArrayList<String>();
 		parameter.add("900");
+		parameter.add("0.0");
 		TimeProvider tP = new TimeProvider(pC, testOutPutDir);
 		CreateNewPlan strat = new CreateNewPlan(parameter);
 		strat.setTimeProvider(tP);

@@ -61,6 +61,7 @@ public class OperatorInitializer {
 		} else {
 			ArrayList<String> parameter = new ArrayList<String>();
 			parameter.add(Double.toString(pConfig.getTimeSlotSize()));
+			parameter.add(Double.toString(pConfig.getGridSize()));
 			this.initialStrategy = new CreateNewPlan(parameter);
 			((CreateNewPlan) this.initialStrategy).setTimeProvider(timeProvider);
 		}
