@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.collections.IdentifiableArrayMap;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -70,8 +71,8 @@ public final class TransitRouterNetwork implements Network {
 		public final TransitRoute route;
 		public final TransitLine line;
 		final Id id;
-		final Map<Id, TransitRouterNetworkLink> ingoingLinks = new LinkedHashMap<Id, TransitRouterNetworkLink>();
-		final Map<Id, TransitRouterNetworkLink> outgoingLinks = new LinkedHashMap<Id, TransitRouterNetworkLink>();
+		final Map<Id, TransitRouterNetworkLink> ingoingLinks = new IdentifiableArrayMap<TransitRouterNetworkLink>();
+		final Map<Id, TransitRouterNetworkLink> outgoingLinks = new IdentifiableArrayMap<TransitRouterNetworkLink>();
 
 		public TransitRouterNetworkNode(final Id id, final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 			this.id = id;
