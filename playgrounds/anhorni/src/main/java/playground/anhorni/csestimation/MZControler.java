@@ -78,8 +78,13 @@ public class MZControler {
 		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
 		this.shops = ucsReader.readUniversalCS(universalChoiceSetFile);	
 		this.createShoppingTrips(population);
-		this.write(outdir, population);
+		
+		SurveyCleaner cleaner = new SurveyCleaner();
+		this.estimationPopulation0510 = cleaner.removeNonAgeNonIncomePersons(this.estimationPopulation0510);
+		
 		this.analyze(outdir);
+		this.write(outdir, this.estimationPopulation0510);
+		
 		log.info("finished .......................................");
 	}
 		

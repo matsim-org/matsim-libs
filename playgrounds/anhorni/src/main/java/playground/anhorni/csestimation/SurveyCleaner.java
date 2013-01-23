@@ -2,12 +2,29 @@ package playground.anhorni.csestimation;
 
 import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class SurveyCleaner {	
 	public void clean(TreeMap<Id, EstimationPerson> population) {
 		this.filter(population);
 		this.cleanIncome(population);
+	}
+	
+	public Population removeNonAgeNonIncomePersons(Population population) {
+		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		
+		for (Person p : population.getPersons().values()) {
+			EstimationPerson person = (EstimationPerson)p;
+			if (person.getAge() > 0.0 && person.getHhIncome() > 0.0) {
+				pop.addPerson(person);
+			}
+		}
+		return pop;
 	}
 	
 	public TreeMap<Id, EstimationPerson> removeNonAgeNonIncomePersons(TreeMap<Id, EstimationPerson> population) {
