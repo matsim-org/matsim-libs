@@ -83,19 +83,21 @@ public class ODDemandGenerator
             for (int j = 0; j < zoneCount; j++) {
                 Zone dZone = zones.get(j);
 
-                int odFlow = (int)Math.round(flowCoeff * odMatrix[i][j]);
-
-                if (odFlow == 0) {
+                double flow = hours * flowCoeff * odMatrix[i][j];//assumption: positive number!
+                boolean roundUp = uniform.nextDoubleFromTo(0, 1) > (flow - (int)flow); 
+                
+                int trips = (int)flow + (roundUp ? 1 : 0);  
+                
+                if (trips == 0) {
                     continue;
                 }
 
                 boolean isInternalFlow = oZone.getType() == Type.INTERNAL
                         && dZone.getType() == Type.INTERNAL;
 
-                int count = (int)Math.round(hours * odFlow);
-                double timeStep = 3600. / odFlow;
+                double timeStep = hours * 3600 / trips;
 
-                for (int k = 0; k < count; k++) {
+                for (int k = 0; k < trips; k++) {
                     Plan plan = createPlan();
 
                     Coord oCoord = getRandomCoordInZone(oZone);
