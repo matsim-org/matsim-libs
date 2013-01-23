@@ -43,6 +43,11 @@ public class SingleLineScenario
 {
 	public static ScenarioImpl buildScenario()
 	{
+		return buildScenario(300);
+	}
+	
+	public static ScenarioImpl buildScenario(int numAgents)
+	{
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
@@ -61,15 +66,19 @@ public class SingleLineScenario
 		NetworkFactory nw = net.getFactory();
 		
 		Node a = nw.createNode(scen.createId("NodeA"), scen.createCoord(100, 100));
-		Node b = nw.createNode(scen.createId("NodeB"), scen.createCoord(500100, 500100));
-		Node u = nw.createNode(scen.createId("NodeU"), scen.createCoord(95, 95));
-		Node v = nw.createNode(scen.createId("NodeV"), scen.createCoord(500105, 500105));
+		Node b = nw.createNode(scen.createId("NodeB"), scen.createCoord(5000, 5000));
+		Node u = nw.createNode(scen.createId("NodeU"), scen.createCoord(99, 99));
+		Node v = nw.createNode(scen.createId("NodeV"), scen.createCoord(5001, 5001));
 		Link ab = nw.createLink(scen.createId("LinkAB"),a,b);
 		Link ua = nw.createLink(scen.createId("LinkUA"),u,a);
 		Link bv = nw.createLink(scen.createId("LinkBV"),b,v);
 		Link ba = nw.createLink(scen.createId("LinkBA"),b,a);
 		Link au = nw.createLink(scen.createId("LinkAU"),a,u);
 		Link vb = nw.createLink(scen.createId("LinkVB"),v,b);
+		
+		ab.setLength(5000);
+		ba.setLength(5000);
+		
 		
 		net.addNode(a);
 		net.addNode(b);
@@ -136,7 +145,7 @@ public class SingleLineScenario
 			cap.setStandingRoom(20);
 			VehicleType type = vFac.createVehicleType(scen.createId("r1dep"+t+"type"));
 			type.setCapacity(cap);
-			type.setMaximumVelocity(50);
+			type.setMaximumVelocity(20);
 			scen.getVehicles().getVehicleTypes().put(type.getId(), type);
 			Vehicle veh = vFac.createVehicle(scen.createId("r1dep"+t+"veh"), type);
 			scen.getVehicles().getVehicles().put(veh.getId(), veh);
@@ -166,7 +175,7 @@ public class SingleLineScenario
 		homeEnd.setCoord(bv.getCoord());
 		
 		
-		for (int t=0; t < 300; t++)
+		for (int t=0; t < numAgents; t++)
 		{
 			Person p = popFac.createPerson(scen.createId("Agent"+t));
 			Plan plan = popFac.createPlan();

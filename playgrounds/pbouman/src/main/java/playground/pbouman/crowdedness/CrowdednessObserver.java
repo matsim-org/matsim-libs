@@ -22,6 +22,10 @@
  */
 package playground.pbouman.crowdedness;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,54 +36,151 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
+import playground.pbouman.crowdedness.rules.SeatAssignmentRule;
+
 /**
+ * The crowdedness observed used PersonEntersVehicleEvents and PersonLeveasVehiclEvents
+ * to keep track of the crowdedness of PT-Vehicles. It also tracks how long passengers
+ * are staying within a vehicle while it is moving. As soon as passengers enter or leave
+ * the vehicle, all passengers that were in the vehicle will be notified that they have
+ * been in a crowded vehicle for a certain amount of time. This is done by generating
+ * PersonCrowdednessEvents.
+ * 
  * @author nagel
- *
+ * @author pbouman
  */
 public class CrowdednessObserver implements
-		VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler,
-		PersonLeavesVehicleEventHandler {
+		VehicleDepartsAtFacilityEventHandler, 
+		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 	
 	private EventsManager ev;
 	private Scenario sc;
 	private Vehicles vehs;
+	private SeatAssignmentRule rule;
+	
+	private Map<Vehicle,SeatAdministration> personsInVehicles;
 
-	public CrowdednessObserver( Scenario sc, EventsManager ev ) {
+	private HashSet<Vehicle> pendingObservation;
+	private Map<Vehicle,Double> lastDeparture;
+	
+	public CrowdednessObserver( Scenario sc, EventsManager ev , SeatAssignmentRule rule) {
 		this.sc = sc ;
 		this.ev = ev ;
 		this.vehs = ((ScenarioImpl)this.sc).getVehicles() ;
+		this.rule = rule;
+		this.personsInVehicles = new HashMap<Vehicle,SeatAdministration>();
+		this.pendingObservation = new HashSet<Vehicle>();
+		this.lastDeparture = new HashMap<Vehicle,Double>();
 	}
-
+	
+	private Vehicle getVehicle(Id vehicleId)
+	{
+		return this.vehs.getVehicles().get(vehicleId);
+	}
+	
 	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		ev.processEvent(new PersonCrowdednessEvent(event.getTime()) ) ;
+	public void handleEvent(VehicleDepartsAtFacilityEvent event)
+	{
+		Vehicle v = getVehicle(event.getVehicleId());
+		
+		// If there is already a pending observation and we observe
+		// another departure, no one has left or entered the vehicle 
+		// in the meantime. This implies that no events were generated.
+		// We thus do not need to update the lastDeparture.
+		if (!pendingObservation.contains(v))
+		{
+			lastDeparture.put(v, event.getTime());
+			pendingObservation.add(v);
+		}
+	}
+	
+	private void pushEvents(Id vehicleId, double time)
+	{
+		Vehicle v = this.vehs.getVehicles().get(vehicleId);
+	
+		// Check whether there was a departure in the past. If so
+		if (pendingObservation.contains(v))
+		{
+			
+			// Get the administration
+			
+			SeatAdministration personsInVehicle = personsInVehicles.get(v);
+			
+			double seatCrwd = personsInVehicle.getSeatCrowdedness();
+			double standCrwd = personsInVehicle.getStandingCrowdedness();
+			double totalCrwd = personsInVehicle.getTotalCrowdedness();
+			
+			// Get the time difference between now and the last departure
+			// we have registered.
+			double duration = time - lastDeparture.get(v);
+			
+			// Now if any persons are in the vehicle
+			if (personsInVehicle != null)
+			{
+				for (Id person : personsInVehicle.getSittingSet())
+				{
+					// Send the people who are sitting an Event that tells them they have been sitting.
+					ev.processEvent(new PersonCrowdednessEvent(time, person, vehicleId, duration, true, seatCrwd, standCrwd, totalCrwd) );
+				}
+				for (Id person : personsInVehicle.getStandingSet())
+				{
+					// Send the people who are standing an Event that tells them they have been standing.
+					ev.processEvent(new PersonCrowdednessEvent(time, person, vehicleId, duration, false, seatCrwd, standCrwd, totalCrwd) );				
+				}
+			}
+			
+			pendingObservation.remove(v);
+		}
 	}
 
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
+		personsInVehicles.clear();
+		pendingObservation.clear();
+		lastDeparture.clear();
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		
+		
 		Id vehId = event.getVehicleId() ;
-		this.vehs.getVehicles().get(vehId) ;
-		// get size of vehicl etc.
-
+		Vehicle v = this.vehs.getVehicles().get(vehId) ;
+		Id person = event.getPersonId();
+		
+		// If any observations are pending, push PersonCrowdednessEvents before updating the seat administration.
+		pushEvents(vehId, event.getTime());
+		
+		SeatAdministration personsInVehicle = personsInVehicles.get(v);
+		if (personsInVehicle == null)
+		{
+			personsInVehicle = new SeatAdministration(v,rule);
+			personsInVehicles.put(v, personsInVehicle);
+		}
+		
+		personsInVehicle.addPerson(person);
 	}
 
 	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		// TODO Auto-generated method stub
-
+	public void handleEvent(PersonLeavesVehicleEvent event)
+	{
+		Id vehId = event.getVehicleId() ;
+		Vehicle v = this.vehs.getVehicles().get(vehId);
+		Id person = event.getPersonId();
+		
+		// If any observations are pending, push PersonCrowdednessEvents before updating the seat administration.
+		pushEvents(vehId, event.getTime());
+		
+		personsInVehicles.get(v).remove(person);
 	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
 	}
+
 
 }

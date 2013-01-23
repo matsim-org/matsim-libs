@@ -17,66 +17,150 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.pbouman.crowdedness;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
+ * The CrowdedScoringFunction adds disutilities for crowdedness in PT-vehicles
+ * on top the scores calculated by some other ScoringFunction.
+ * 
  * @author nagel
+ * @author pbouman
  *
  */
 public class CrowdedScoringFunction implements ScoringFunction {
 	
-	ScoringFunction delegate ;
-	private double score;
+	private final static double standingPenalty = 2 / 3600d;
+	private final static double totalCrowdednessPenalty = 1 / 3600d;
+	private final static double sittingCrowdednessPenalty = 0.5 / 3600d;
+	private final static double standingCrowdednessPenalty = 0.75 / 3600d;
 	
-	public void addMoney(double amount) {
-		delegate.addMoney(amount);
-	}
+	private ScoringFunction delegate ;
+	private double score;
 
-	public void agentStuck(double time) {
-		delegate.agentStuck(time);
-	}
 
-	public void finish() {
-		delegate.finish();
-	}
-
-	public double getScore() {
-		return this.score+ delegate.getScore();
-	}
-
-	public void handleActivity(Activity activity) {
-		delegate.handleActivity(activity);
-	}
-
-	public void handleLeg(Leg leg) {
-		delegate.handleLeg(leg);
-	}
-
-	public void reset() {
-		delegate.reset();
-		this.score = 0. ;
-	}
-
+	private EventsManager events;
+	
 	public CrowdedScoringFunction(ScoringFunction delegate) {
-//		delegate = new CharyparNagelScoringFunctionFactory(config, network).createNewScoringFunction(plan) ;
+
+		this.delegate = delegate;
 	}
+	
+	public CrowdedScoringFunction(ScoringFunction delegate, EventsManager events) {
+
+		this.delegate = delegate;
+		this.events = events;
+	}
+
 
 	@Override
 	public void handleEvent(Event event) {
 		if ( event instanceof PersonCrowdednessEvent ) {
-			//...
-			this.score += -1.0 ;
+			PersonCrowdednessEvent pce = (PersonCrowdednessEvent) event;
+			
+			double duration = pce.getDuration();
+			boolean isSitting = pce.isSitting();
+			double totalCrowdedness = pce.getTotalCrowdedness();
+			double seatCrowdedness = pce.getSeatCrowdedness();
+			double standingCrowdedness = pce.getStandCrowdedness();
+			
+			double penalty = 0;
+			
+			// We just multiply the penalty per second with the duration and the transformed crowdedness factor.
+			
+			// First we apply a penalty for the total crowdedness of the vehicle
+			penalty += duration * transform(totalCrowdedness) * totalCrowdednessPenalty;
+						
+			if (isSitting)
+			{
+				// If we are sitting, we add an additional penalty depending on the crowdedness of the seats.
+				penalty += duration * transform(seatCrowdedness) * sittingCrowdednessPenalty;
+			}
+			else
+			{
+				// If we are standing, we have a linear disutility for standing
+				// Also, we have a disutility for the crowdedness of the space we are standing in.
+				penalty += duration * standingPenalty;
+				penalty += duration * transform(standingCrowdedness) * standingCrowdednessPenalty;
+			}
+			
+			score -= penalty;
+			
+			if (events != null)
+			{
+				// If we have an EventManager, report the penalty calculated to it
+				events.processEvent(new CrowdedPenaltyEvent(pce.getTime(), pce.getPersonId(), penalty));
+			}
+			
+			//this.score += -1.0 ;
 			// unit of this is utils.  1 util is very approximately one Euro.
 		}
 
 	}
+
+
+	// This is just some transformation prevents the
+	// crowdedness from being a linear factor.
+	// However, it probably does not make a lot of sense.
+	private double transform(double crowdedness)
+	{
+		double result;
+		if (crowdedness < 0.5)
+		{
+			result = crowdedness * crowdedness;
+		}
+		else
+		{
+			result = 0.25 + Math.sqrt(crowdedness);
+		}		
+		return result;
+	}
+	
+	
+	@Override
+	public void addMoney(double amount) {
+		delegate.addMoney(amount);
+	}
+
+	@Override
+	public void agentStuck(double time) {
+		delegate.agentStuck(time);
+	}
+
+	@Override
+	public void finish() {
+		delegate.finish();
+	}
+
+	@Override
+	public double getScore() {
+		return this.score + delegate.getScore();
+	}
+
+	@Override
+	public void handleActivity(Activity activity) {
+		delegate.handleActivity(activity);
+	}
+
+	@Override
+	public void handleLeg(Leg leg) {
+		delegate.handleLeg(leg);
+		
+	}
+
+	
+	@Override
+	public void reset() {
+		delegate.reset();
+		this.score = 0. ;
+		
+	}
+
+	
 
 }
