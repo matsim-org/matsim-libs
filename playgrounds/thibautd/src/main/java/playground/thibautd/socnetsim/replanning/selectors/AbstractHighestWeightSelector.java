@@ -251,8 +251,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			personsStillToAllocate.size() > 1 ?
 			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
 			Collections.EMPTY_LIST;
-		final Set<Id> newAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
-		newAllocatedPersons.add( currentPerson.person.getId() );
 
 		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 
@@ -268,13 +266,13 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
-			Set<Id> actuallyAllocatedPersons = newAllocatedPersons;
-			JointPlan jointPlan = r.jointPlan ;
-			if (jointPlan != null) {
-				if ( contains( jointPlan , alreadyAllocatedPersons ) ) continue;
-				actuallyRemainingPersons = filter( remainingPersons , jointPlan );
+			Set<Id> actuallyAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
+			actuallyAllocatedPersons.add( currentPerson.person.getId() );
+			if (r.jointPlan != null) {
+				if ( contains( r.jointPlan , alreadyAllocatedPersons ) ) continue;
+				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 				actuallyAllocatedPersons = new HashSet<Id>( actuallyAllocatedPersons );
-				actuallyAllocatedPersons.addAll( jointPlan.getIndividualPlans().keySet() );
+				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
 			}
 
 			if ( actuallyRemainingPersons.size() > 0 ) {
