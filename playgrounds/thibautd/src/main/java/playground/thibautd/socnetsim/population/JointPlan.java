@@ -193,8 +193,8 @@ public class JointPlan implements Plan {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": plans="+getIndividualPlans()+
-			", isSelected="+this.isSelected();
+		return getClass().getSimpleName()+": plans="+getIndividualPlans();
+			//", isSelected="+this.isSelected();
 	}
 
 	public ScoresAggregator getScoresAggregator() {
