@@ -40,6 +40,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -107,7 +108,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 			final Controler controler) {
 		this( new PlanRouter(
 					controler.getTripRouterFactory().createTripRouter(),
-					controler.getScenario().getActivityFacilities() ),
+					((ScenarioImpl) controler.getScenario()).getActivityFacilities() ),
 				controler);
 	}
 

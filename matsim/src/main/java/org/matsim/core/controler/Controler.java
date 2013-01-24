@@ -990,7 +990,7 @@ public class Controler extends AbstractController {
 		return this.events;
 	}
 
-	public final ScenarioImpl getScenario() {
+	public final Scenario getScenario() {
 		return this.scenarioData;
 	}
 
