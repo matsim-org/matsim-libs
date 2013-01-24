@@ -187,7 +187,9 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 			color = bvg2ColoringScheme(agInfo);
 		} else if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equals( OTFVisConfigGroup.ColoringScheme.byId ) ) {
 			color = byIdColoringScheme(agInfo);
-		} else {
+		} else if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equals( OTFVisConfigGroup.ColoringScheme.gtfs ) ) {
+			color = gtfsColoringScheme(agInfo);
+		}  else {
 			color = standardColoringScheme(agInfo);
 		}
 		if (this.count % OGLAgentPointLayer.BUFFERSIZE == 0) {
@@ -288,6 +290,29 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 			} else if ( idstr.endsWith("_S")) {
 				return Color.GREEN;
 			} else if ( idstr.endsWith("_U")) {
+				return Color.BLUE;
+			} else {
+				return Color.ORANGE;
+			}
+		} else {
+			return Color.YELLOW;
+		}
+	}
+	
+	private Color gtfsColoringScheme(AgentSnapshotInfo agInfo) {
+		if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
+			return Color.DARK_GRAY;
+		} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
+			return Color.ORANGE;
+		} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
+			String idstr = agInfo.getId().toString();
+			if ( idstr.endsWith("bus") ) {
+				return Color.MAGENTA;
+			} else if ( idstr.endsWith("tram") ) {
+				return Color.RED;
+			} else if ( idstr.endsWith("rail")) {
+				return Color.GREEN;
+			} else if ( idstr.endsWith("subway")) {
 				return Color.BLUE;
 			} else {
 				return Color.ORANGE;

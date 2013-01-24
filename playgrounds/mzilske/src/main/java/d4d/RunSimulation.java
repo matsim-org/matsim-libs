@@ -30,13 +30,13 @@ public class RunSimulation {
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
 		config.controler().setWriteSnapshotsInterval(5);
-		config.getQSimConfigGroup().setStorageCapFactor(0.01);
-		config.getQSimConfigGroup().setFlowCapFactor(0.01);
-		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
-		config.getQSimConfigGroup().setNumberOfThreads(8);
-		config.getQSimConfigGroup().setEndTime(27*60*60);
-		config.plansCalcRoute().setTeleportedModeSpeed("other", 5.0 / 3.6); // 5 km/h beeline
+//		config.getQSimConfigGroup().setStorageCapFactor(0.01);
+//		config.getQSimConfigGroup().setFlowCapFactor(0.01);
+//		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+//		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
+//		config.getQSimConfigGroup().setNumberOfThreads(8);
+//		config.getQSimConfigGroup().setEndTime(27*60*60);
+		config.plansCalcRoute().setTeleportedModeSpeed("other", 20.0 / 3.6); // 5 km/h beeline
 		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
 		config.plansCalcRoute().setNetworkModes(Arrays.asList("car"));
 		config.controler().setWriteEventsInterval(10);
@@ -50,7 +50,7 @@ public class RunSimulation {
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		// config.planCalcScore().setWriteExperiencedPlans(true);
 		config.setParam("JDEQSim", "flowCapacityFactor", "0.01");
-		config.setParam("JDEQSim", "storageCapacityFactor", "0.01");
+		config.setParam("JDEQSim", "storageCapacityFactor", "0.05");
 		double endTime= 60*60*32;
 		config.setParam("JDEQSim", "endTime", Double.toString(endTime));
 		
@@ -80,7 +80,7 @@ public class RunSimulation {
 		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
 		AltPopulationReaderMatsimV5 altPopulationReaderMatsimV5 = new AltPopulationReaderMatsimV5(scenario);
 		//	altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
-		altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population-capital-only.xml");
+		altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithm() {
 
 			@Override

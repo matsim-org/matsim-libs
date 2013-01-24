@@ -21,11 +21,12 @@ public class GtfsTests extends MatsimTestCase {
 	
 	
 	public void testGtfsStandardConversion(){
-		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new IdentityTransformation());
+
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
+		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), scenario, new IdentityTransformation());
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.convert();
-		ScenarioImpl scenario = (ScenarioImpl) gtfs.getScenario(); 
 		
 		// The Conversion is done, now read the checked scenario
 		// Config checkedConfig = ConfigUtils.loadConfig(this.getPackageInputDirectory()+ "/checked/config.xml");
@@ -42,12 +43,13 @@ public class GtfsTests extends MatsimTestCase {
 	}
 	
 	public void testGtfsShapedConversion(){
-		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), new IdentityTransformation());
+
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
+		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), scenario, new IdentityTransformation());
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.setCreateShapedNetwork(true);
 		gtfs.convert();
-		ScenarioImpl scenario = (ScenarioImpl) gtfs.getScenario(); 
 		
 		// The Conversion is done, now read the checked scenario
 		Config config = ConfigUtils.createConfig();
