@@ -57,7 +57,7 @@ public class FilterPopulationBasedOnCliqueInfo {
 		String configFile = args[0];
 
 		JointControler controler = (JointControler) JointControlerUtils.createControler(configFile);
-		ScenarioImpl scenario = controler.getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) controler.getScenario();
 		Cliques cliques = JointControlerUtils.getCliques( scenario );
 		Population population = scenario.getPopulation();
 

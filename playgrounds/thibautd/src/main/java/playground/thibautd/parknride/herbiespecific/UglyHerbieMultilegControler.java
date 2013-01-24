@@ -32,6 +32,7 @@ import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.router.TransitRouterConfig;
 
@@ -95,7 +96,7 @@ public class UglyHerbieMultilegControler extends Controler {
 					new ParkAndRideScoringFunctionFactory(
 						herbieScoringFunctionFactory,
 						penaltyFactory,
-						getScenario().getActivityFacilities(),
+						((ScenarioImpl) getScenario()).getActivityFacilities(),
 						getNetwork()));
 				
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
