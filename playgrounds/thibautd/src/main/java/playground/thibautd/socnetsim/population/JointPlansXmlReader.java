@@ -61,9 +61,12 @@ public class JointPlansXmlReader extends AbstractParsePullXmlReader<JointPlans> 
 		final Counter counter = new Counter( "parsing joint plan # " );
 		final JointPlans jointPlans = new JointPlans();
 
-		while ( streamReader.next() != XMLStreamConstants.START_ELEMENT );
+		while ( streamReader.hasNext() && streamReader.next() != XMLStreamConstants.START_ELEMENT );
 		while (streamReader.hasNext()) {
-			if ( !streamReader.getLocalName().equals( JOINT_PLAN_TAG ) ) continue;
+			if ( !streamReader.getLocalName().equals( JOINT_PLAN_TAG ) ) {
+				while ( streamReader.hasNext() && streamReader.next() != XMLStreamConstants.START_ELEMENT );
+				continue;
+			}
 			counter.incCounter();
 			jointPlans.addJointPlan( parseJointPlan( streamReader , jointPlans.getFactory() ) );
 		}
@@ -78,7 +81,8 @@ public class JointPlansXmlReader extends AbstractParsePullXmlReader<JointPlans> 
 		final Map<Id, Plan> plans = new LinkedHashMap<Id, Plan>();
 
 		while ( streamReader.next() != XMLStreamConstants.START_ELEMENT );
-		while ( streamReader.getLocalName().equals( PLAN_TAG ) ) {
+		while ( streamReader.getEventType() != XMLStreamConstants.END_DOCUMENT &&
+				streamReader.getLocalName().equals( PLAN_TAG ) ) {
 			final Id id = new IdImpl(
 					streamReader.getAttributeValue(
 						null,
@@ -94,7 +98,7 @@ public class JointPlansXmlReader extends AbstractParsePullXmlReader<JointPlans> 
 			// use the ID from person on purpose to minimize memory consumption
 			plans.put( person.getId() , plan );
 
-			while ( streamReader.next() != XMLStreamConstants.START_ELEMENT );
+			while ( streamReader.hasNext() && streamReader.next() != XMLStreamConstants.START_ELEMENT );
 		}
 
 		return factory.createJointPlan( plans );
