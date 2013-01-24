@@ -36,7 +36,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
-import playground.thibautd.cliquessim.config.JointReplanningConfigGroup;
 import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripPossibilitiesConfigGroup;
@@ -180,9 +179,6 @@ public class JointControlerUtils {
 		// /////////////////////////////////////////////////////////////////////
 		// initialize the config before passing it to the controler
 		config.addCoreModules();
-		config.addModule(
-				JointReplanningConfigGroup.GROUP_NAME,
-				new JointReplanningConfigGroup());
 		config.addModule(
 				CliquesConfigGroup.GROUP_NAME,
 				new CliquesConfigGroup());

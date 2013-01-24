@@ -30,7 +30,7 @@ import org.matsim.core.config.Module;
  */
 public class CliquesConfigGroup extends Module {
 
-	private static final Logger log = Logger.getLogger(JointReplanningConfigGroup.class);
+	private static final Logger log = Logger.getLogger(CliquesConfigGroup.class);
 
 	public static final String GROUP_NAME = "Cliques";
 
