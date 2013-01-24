@@ -62,7 +62,7 @@ public class BkControlerIncome extends BkControler {
 		this.addInstallTravelCostCalculatorFactoryControlerListener();
 
 		this.scenarioData.getConfig().global().setNumberOfThreads(1);
-		this.personHouseholdMapping = new PersonHouseholdMapping(this.getScenario().getHouseholds());
+		this.personHouseholdMapping = new PersonHouseholdMapping(((ScenarioImpl) this.getScenario()).getHouseholds());
 		
 		/*		Setting the needed scoring function.
 		Remark: parameters must be set in several classes and independently for scoring and router!*/
@@ -75,7 +75,7 @@ public class BkControlerIncome extends BkControler {
 	private void installTravelCostCalculatorFactory() {
 		//returns null, if there is no road pricing
 		if (config.scenario().isUseRoadpricing()){
-			RoadPricingScheme roadPricingScheme = (RoadPricingScheme) ((ScenarioImpl) this.scenarioData).getScenarioElement(RoadPricingScheme.class);
+			RoadPricingScheme roadPricingScheme = this.scenarioData.getScenarioElement(RoadPricingScheme.class);
 			
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
