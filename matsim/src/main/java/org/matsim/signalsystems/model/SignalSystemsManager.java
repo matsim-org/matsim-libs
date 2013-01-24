@@ -32,28 +32,29 @@ import org.matsim.signalsystems.data.SignalsData;
  */
 public interface SignalSystemsManager {
 
+	public SignalsData getSignalsData();
+	
+	public void setSignalsData(SignalsData signalsData);
+
 	public EventsManager getEventsManager();
 	
 	public void setEventsManager(EventsManager events);
 	
-	public void requestControlUpdate(double time_sec);
-	
-	public AmberLogic getAmberLogic();
-	
 	public void addSignalSystem(SignalSystem system);
-	
+
 	public Map<Id, SignalSystem> getSignalSystems();
+	
+	public void resetModel(Integer iterationNumber);
+	
+	public void requestControlUpdate(double time_sec);
 
 	public void setAmberLogic(AmberLogic amberLogic);
 	
-	public void resetModel(Integer iterationNumber);
-
-	public SignalsData getSignalsData();
-	
-	public void setSignalsData(SignalsData signalsData);
+	public AmberLogic getAmberLogic();
 	
 	public IntergreensLogic getIntergreensLogic();
-	
+
 	public void setIntergreensLogic(IntergreensLogic logic);
 	
+
 }
