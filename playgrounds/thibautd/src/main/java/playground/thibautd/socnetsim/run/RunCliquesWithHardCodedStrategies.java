@@ -22,10 +22,13 @@ package playground.thibautd.socnetsim.run;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
+import playground.thibautd.analysis.listeners.FilteredScoreStats;
+import playground.thibautd.analysis.listeners.FilteredScoreStats.PersonFilter;
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
@@ -153,6 +156,21 @@ public class RunCliquesWithHardCodedStrategies {
 				new LegHistogramListenerWithoutControler(
 					controllerRegistry.getEvents(),
 					controller.getControlerIO() ));
+
+		controller.addControlerListener(
+				new FilteredScoreStats(
+					new PersonFilter() {
+						@Override
+						public boolean acceptPerson(final Person person) {
+							return true;
+						}
+						@Override
+						public String getName() {
+							return "All Agents";
+						}
+					},
+					controllerRegistry.getScenario().getPopulation(),
+					controller.getControlerIO().getOutputFilename( "scoresStatsAll" )));
 
 		controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
 
