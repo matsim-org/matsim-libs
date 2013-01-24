@@ -87,7 +87,6 @@ public class JointPlansTest {
 		JointPlan wrongInstance = 
 			new JointPlan(
 					jp1,
-					false,
 					new HomogeneousScoreAggregator());
 
 		boolean gotException = false;

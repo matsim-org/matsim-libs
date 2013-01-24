@@ -31,21 +31,16 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.scoring.ScoresAggregator;
 
 /**
  * class for handling synchronized plans.
  * It implements the plan interface to be compatible with the StrategyManager.
- *
- * FIXME: currently, the JointPlan is responsible for "inserting" itself at
- * the individual level. This is quite messy, and should be moved at an upper level.
  * @author thibautd
  */
 public class JointPlan implements Plan {
 	private final Map<Id,Plan> individualPlans = new LinkedHashMap<Id,Plan>();
-	private final boolean setAtIndividualLevel;
 
 	private ScoresAggregator aggregator;
 
@@ -60,43 +55,9 @@ public class JointPlan implements Plan {
 	 */
 	JointPlan(
 			final Map<Id, ? extends Plan> plans,
-			final boolean addAtIndividualLevel,
 			final ScoresAggregator aggregator) {
-		this.setAtIndividualLevel = addAtIndividualLevel;
-
-		if (addAtIndividualLevel) {
-			for (Plan plan : plans.values()) {
-				Person person = plan.getPerson();
-				if (!person.getPlans().contains( plan )) {
-					person.addPlan( plan );
-				}
-			}
-		}
 		this.individualPlans.putAll( plans );
 		this.aggregator = aggregator;
-	}
-
-	/**
-	 * makes a <u>shallow</u> copy of the plan.
-	 */
-	JointPlan(final JointPlan plan) {
-		this(
-				cloneIndividualPlans( plan ),
-				plan.setAtIndividualLevel,
-				plan.getScoresAggregator());
-		//this.setJointTripPossibilities( plan.getJointTripPossibilities() );
-	}
-
-	private static Map<Id, Plan> cloneIndividualPlans(final JointPlan plan) {
-		Map<Id , Plan> plans = new LinkedHashMap<Id, Plan>();
-
-		for (Map.Entry<Id, Plan> indiv : plan.getIndividualPlans().entrySet()) {
-			PlanImpl newPlan = new PlanImpl( indiv.getValue().getPerson() );
-			newPlan.copyFrom( indiv.getValue() );
-			plans.put( indiv.getKey() , newPlan );
-		}
-		
-		return plans;
 	}
 
 	/*
@@ -116,7 +77,6 @@ public class JointPlan implements Plan {
 		}
 		return Collections.unmodifiableList(output);
 	}
-
 
 	/**
 	 * Inherited from the interface, but unimplemented.
@@ -239,8 +199,8 @@ public class JointPlan implements Plan {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": plans="+getIndividualPlans()+", addAtIndividualLevel="+
-			setAtIndividualLevel+", isSelected="+this.isSelected();
+		return getClass().getSimpleName()+": plans="+getIndividualPlans()+
+			", isSelected="+this.isSelected();
 	}
 
 	public ScoresAggregator getScoresAggregator() {

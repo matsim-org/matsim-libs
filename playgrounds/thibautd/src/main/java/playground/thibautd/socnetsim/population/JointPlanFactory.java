@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.scoring.HomogeneousScoreAggregator;
 import playground.thibautd.socnetsim.scoring.ScoresAggregator;
@@ -63,14 +66,47 @@ public class JointPlanFactory implements MatsimFactory {
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel,
 			final ScoresAggregator aggregator) {
-		JointPlan jointPlan = new JointPlan( plans, addAtIndividualLevel , aggregator );
+		JointPlan jointPlan = new JointPlan( plans, aggregator );
+
+		if (addAtIndividualLevel) {
+			for (Plan plan : plans.values()) {
+				final Person person = plan.getPerson();
+				if (person == null) {
+					throw new NullPointerException(
+							"the person backpointed by the plan"+
+							" must not be null for the plan to be added" );
+				}
+				if ( !person.getPlans().contains( plan ) ) person.addPlan( plan );
+			}
+		}
+
 		return jointPlan;
 	}
 
 	public JointPlan copyJointPlan(
 			final JointPlan toCopy) {
-		JointPlan copy = new JointPlan( toCopy );
-		return copy;
+		return copyJointPlan( toCopy , true );
+	}
+
+	public JointPlan copyJointPlan(
+			final JointPlan toCopy,
+			final boolean addAtIndividualLevel) {
+		return createJointPlan(
+				cloneIndividualPlans( toCopy ),
+				addAtIndividualLevel,
+				toCopy.getScoresAggregator());
+	}
+
+	private static Map<Id, Plan> cloneIndividualPlans(final JointPlan plan) {
+		final Map<Id , Plan> plans = new LinkedHashMap<Id, Plan>();
+
+		for (Map.Entry<Id, Plan> indiv : plan.getIndividualPlans().entrySet()) {
+			final PlanImpl newPlan = new PlanImpl( indiv.getValue().getPerson() );
+			newPlan.copyFrom( indiv.getValue() );
+			plans.put( indiv.getKey() , newPlan );
+		}
+		
+		return plans;
 	}
 }
 
