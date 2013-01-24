@@ -23,8 +23,10 @@ package playground.wrashid.parkingSearch.withinday;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
@@ -48,6 +50,7 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingQSimFactory;
@@ -127,6 +130,14 @@ public class WithinDayParkingController extends WithinDayController implements S
 		legModeChecker.run(this.scenarioData.getPopulation());
 		
 		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,null,null);
+		
+		// init parking facility capacities
+				IntegerValueHashMap<Id> facilityCapacities = new IntegerValueHashMap<Id>();
+				parkingInfrastructure.setFacilityCapacities(facilityCapacities);
+				for (ActivityFacility parkingFacility : parkingInfrastructure.getParkingFacilities()) {
+					facilityCapacities.incrementBy(parkingFacility.getId(), 10);
+				}
+		
 		
 //		Set<Id> parkingFacilityIds = parkingInfrastructure.getFacilityCapacities().getKeySet();
 //		for (Id id : parkingFacilityIds) parkingInfrastructure.getFacilityCapacities().incrementBy(id, 1000);
