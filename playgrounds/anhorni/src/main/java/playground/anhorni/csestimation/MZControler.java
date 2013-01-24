@@ -99,7 +99,7 @@ public class MZControler {
 				actlegIndex++;
 				if (pe instanceof Activity) {
 					MZActivityImpl act = (MZActivityImpl)plan.getPlanElements().get(actlegIndex);
-					if (act.getType().startsWith("s")) {
+					if (act.getType().startsWith("sg")) {
 						ShopLocation shop = (ShopLocation) shopQuadTree.get(act.getCoord().getX(), act.getCoord().getY());	
 						ShoppingTrip shoppingTrip = new ShoppingTrip();
 						shoppingTrip.setShop(shop);
