@@ -139,8 +139,22 @@
  *   &lt;param name="tollLinksFile" value="path/to/your/roadpricing-file.xml" /&gt;
  * &lt;/module&gt; </pre>
  * 
- * As soon as road pricing is switched on in the scenario config module and the parameter <code>tollLinksFile</code> is set, the Controler will load the file and the required
- * classes to simulate the road pricing scenario.
+ * As soon as road pricing is switched on in the scenario config module and the parameter <code>tollLinksFile</code> is set, start MATSim using the following lines of code if you don't use area tolls: 
+ * <code>
+ * public static void main(String[] args) {
+ * 		Controler c = new Controler(args)
+ *		c.addControlerListener(new Roadpricing());
+ *		c.run();
+ * }
+ * </code>
+ * 
+ * If area tolls are used, start MATSim by calling
+ * <code>
+ * public static void main(String[] args) {
+ * 		AreaTollControler c = new AreaTollControler(args)
+ *		c.run();
+ * }
+ * </code>
  *
  * <h3><a name="no-controler">Use RoadPricing without the Controler</a></h3>
  * If you plan to use the provided road pricing functionality outside of the Controler, please

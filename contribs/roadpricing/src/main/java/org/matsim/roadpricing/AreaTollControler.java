@@ -12,6 +12,7 @@ public class AreaTollControler extends Controler {
 
 	public AreaTollControler(Config config) {
 		super(config);
+		this.addControlerListener(new RoadPricing());
 	}
 
 	@Override
