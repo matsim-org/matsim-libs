@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -119,7 +120,17 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 		}
 
 		if (isCurrentActivityDuringDay(personId, planElementIndex)) {
-			Activity previousAct = (Activity) executedPlan.getPlanElements().get(planElementIndex - 2);
+			
+			
+			PlanElement planElement = executedPlan.getPlanElements().get(planElementIndex - 2);
+			
+			if (!(planElement instanceof Activity)){
+				ExperimentalBasicWithindayAgent experimentalBasicWithindayAgent = this.agents.get(personId);
+				
+				System.out.println();
+			}
+			
+			Activity previousAct = (Activity) planElement;
 
 			if (previousAct.getType().equals("parking")) {
 				double activityStartTime = event.getTime();

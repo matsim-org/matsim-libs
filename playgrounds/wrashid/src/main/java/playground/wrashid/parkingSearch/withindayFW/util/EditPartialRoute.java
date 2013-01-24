@@ -283,6 +283,8 @@ public class EditPartialRoute {
 		newPlan.addActivity(fromActivity);
 		newPlan.addLeg(leg);
 		newPlan.addActivity(toActivity);
+		
+		
 		planAlgorithm.run(newPlan);
 
 		return (NetworkRoute) leg.getRoute();

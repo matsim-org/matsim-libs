@@ -71,7 +71,7 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 			DebugLib.traceAgent(withinDayAgent.getId(), 6);
 		}
 		
-		EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
+		//EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
 		
 		Plan plan = withinDayAgent.getSelectedPlan();
 
@@ -188,7 +188,7 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 					
 					// update car leg from parking activity
 					//editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1, routeAlgo);
-					editPartialRoute.replanFutureCarLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1);
+					editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1, routeAlgo);
 				}
 
 			// as we have found a parking on our way to the planned parking, we discard the rest
@@ -208,8 +208,8 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 //				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
 //						withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.time);
 
-				editPartialRoute.replanCurrentCarLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
-						withinDayAgent.getCurrentRouteLinkIdIndex(), this.time);
+				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
+						withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.time);
 						
 				
 				

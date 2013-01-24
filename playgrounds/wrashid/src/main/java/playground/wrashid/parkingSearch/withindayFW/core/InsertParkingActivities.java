@@ -188,10 +188,12 @@ public class InsertParkingActivities implements PlanAlgorithm {
 						editRoutes.replanFutureLegRoute(plan, i-1, routingAlgorithm);
 						//update car leg
 												
-						EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routingAlgorithm);
 												
-						//editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
-						editPartialRoute.replanFutureCarLegRoute(plan, i+1);
+						editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
+						
+						
+						//EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routingAlgorithm);
+						//editPartialRoute.replanFutureCarLegRoute(plan, i+1);
 					}
 					
 					break;
@@ -298,7 +300,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	
 	public static void updateNextParkingActivityIfNeededDuringDay(ParkingInfrastructure pi,
 			PlanBasedWithinDayAgent withinDayAgent, Scenario sc, PlanAlgorithm routeAlgo) {
-		EditPartialRoute editPartialRoute=new EditPartialRoute(sc, routeAlgo);
+		//EditPartialRoute editPartialRoute=new EditPartialRoute(sc, routeAlgo);
 		
 
 		EditRoutes editRoutes = new EditRoutes();

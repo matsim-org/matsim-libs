@@ -68,7 +68,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 
 		
-		EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
+		//EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
 		
 		Plan plan = withinDayAgent.getSelectedPlan();
 		
@@ -111,7 +111,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 			
 			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), secondWalkgLegIndex, routeAlgo);
 			
-			editPartialRoute.replanFutureCarLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex);
+			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex, routeAlgo);
 		}
 		
 		
@@ -121,7 +121,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		
 		Route preRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
 		//editRoutes.replanCurrentLegRoute(withinDayAgent.getSelectedPlan(), currentLegIndex, currentLinkIndex, routeAlgo, time);
-		editPartialRoute.replanCurrentCarLegRoute(plan, currentLegIndex, currentLinkIndex, time);
+		editRoutes.replanCurrentLegRoute(plan, currentLegIndex, currentLinkIndex, routeAlgo, time);
 		
 		
 		Route postRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute();

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
@@ -48,7 +49,7 @@ import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingQSimFactory;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW;
 
-public abstract class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener {
+public abstract class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener  {
 
 	protected static int currentScenarioId=2;
 	
@@ -148,9 +149,17 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		
+	}
+	
+	
+	protected void setUp(){
+		setUseTripRouting(false);
+		super.setUp();
+		
 		startUpBegin();
 		//TODO: clean this out! => nothing from test/zürich scenario should be here.
-		HashMap<String, HashSet<Id>> parkingTypes = initParkingTypes(event);
+		HashMap<String, HashSet<Id>> parkingTypes = initParkingTypes(this);
 		
 		// connect facilities to network
 		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
@@ -177,6 +186,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 
 		insertParkingActivities = new InsertParkingActivities(scenarioData, this.createRoutingAlgorithm(), parkingInfrastructure);
 
+		this.getWithinDayEngine().initializeReplanningModules(numReplanningThreads);
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
 		this.setMobsimFactory(mobsimFactory);
 
@@ -203,7 +213,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		
 	}
 
-	private HashMap<String, HashSet<Id>> initParkingTypes(StartupEvent event) {
+	private HashMap<String, HashSet<Id>> initParkingTypes(Controler controler) {
 		HashMap<String, HashSet<Id>> parkingTypes = new HashMap<String, HashSet<Id>>();
 
 		HashSet<Id> streetParking=new HashSet<Id>();
@@ -211,7 +221,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		parkingTypes.put("streetParking", streetParking);
 		parkingTypes.put("garageParking", garageParking);
 		
-		for (ActivityFacility facility : ((ScenarioImpl) event.getControler().getScenario()).getActivityFacilities()
+		for (ActivityFacility facility : ((ScenarioImpl) controler.getScenario()).getActivityFacilities()
 				.getFacilities().values()) {
 
 			// if the facility offers a parking activity
