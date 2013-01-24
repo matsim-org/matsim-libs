@@ -98,6 +98,7 @@ public class GroupPlanStrategyFactory {
 
 		strategy.addStrategyModule(
 				new JointPlanMergingModule(
+					registry.getJointPlans().getFactory(),
 					config.global().getNumberOfThreads(),
 					// merge everything
 					1.0 ) );
@@ -119,6 +120,7 @@ public class GroupPlanStrategyFactory {
 		// to make optimisation easier.
 		strategy.addStrategyModule(
 				new SplitJointPlansBasedOnJointTripsModule(
+					registry.getJointPlans().getFactory(),
 					config.global().getNumberOfThreads() ) );
 
 		strategy.addStrategyModule(

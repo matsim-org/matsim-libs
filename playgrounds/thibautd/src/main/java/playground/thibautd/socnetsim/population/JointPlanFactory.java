@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.internal.MatsimFactory;
 
 import playground.thibautd.socnetsim.scoring.HomogeneousScoreAggregator;
 import playground.thibautd.socnetsim.scoring.ScoresAggregator;
@@ -34,12 +35,8 @@ import playground.thibautd.socnetsim.scoring.ScoresAggregator;
  *
  * @author thibautd
  */
-public class JointPlanFactory {
-	private static final PlanLinks planLinks = new PlanLinks();
-
-	private JointPlanFactory() {}
-
-	public static JointPlan createJointPlan(
+public class JointPlanFactory implements MatsimFactory {
+	public JointPlan createJointPlan(
 			final Map<Id, ? extends Plan> plans) {
 		return createJointPlan( plans, true );
 	}
@@ -47,7 +44,7 @@ public class JointPlanFactory {
 	/**
 	 * equivalent to JointPlan(clique, plans, addAtIndividualLevel, true)
 	 */
-	public static JointPlan createJointPlan(
+	public JointPlan createJointPlan(
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel) {
 		return createJointPlan( plans, addAtIndividualLevel, new HomogeneousScoreAggregator());
@@ -62,24 +59,18 @@ public class JointPlanFactory {
 	 * @param addAtIndividualLevel if true, the plans are added to the Person's plans.
 	 * set to false for a temporary plan (in a replaning for example).
 	 */
-	public static JointPlan createJointPlan(
+	public JointPlan createJointPlan(
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel,
 			final ScoresAggregator aggregator) {
 		JointPlan jointPlan = new JointPlan( plans, addAtIndividualLevel , aggregator );
-		planLinks.addJointPlan( jointPlan );
 		return jointPlan;
 	}
 
-	public static JointPlan copyJointPlan(
+	public JointPlan copyJointPlan(
 			final JointPlan toCopy) {
 		JointPlan copy = new JointPlan( toCopy );
-		planLinks.addJointPlan( copy );
 		return copy;
-	}
-
-	public static PlanLinks getPlanLinks() {
-		return planLinks;
 	}
 }
 

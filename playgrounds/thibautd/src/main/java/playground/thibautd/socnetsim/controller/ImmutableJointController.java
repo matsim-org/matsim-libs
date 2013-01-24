@@ -90,6 +90,7 @@ public final class ImmutableJointController extends AbstractController {
 		final DumpJointDataAtEnd dumpDataAtEnd =
 			new DumpJointDataAtEnd(
 					registry.getScenario(),
+					registry.getJointPlans(),
 					controlerIO);
 		this.addControlerListener(dumpDataAtEnd);
 		
@@ -113,6 +114,7 @@ public final class ImmutableJointController extends AbstractController {
 		this.addCoreControlerListener(
 				 new JointPlansDumping(
 					registry.getScenario(),
+					registry.getJointPlans(),
 					registry.getScenario().getConfig().controler().getFirstIteration(), 
 					registry.getScenario().getConfig().controler().getWritePlansInterval(),
 					controlerIO ));

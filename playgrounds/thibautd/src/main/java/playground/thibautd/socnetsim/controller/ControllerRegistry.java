@@ -38,6 +38,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 
+import playground.thibautd.socnetsim.population.PlanLinks;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 
@@ -46,6 +47,7 @@ import playground.thibautd.socnetsim.router.JointTripRouterFactory;
  */
 public final class ControllerRegistry {
 	private final Scenario scenario;
+	private final PlanLinks jointPlans;
 	private final EventsManager events;
 	private final TravelTimeCalculator travelTime;
 	private final TravelDisutilityFactory travelDisutilityFactory;
@@ -57,8 +59,10 @@ public final class ControllerRegistry {
 
 	public ControllerRegistry(
 			final Scenario scenario,
+			final PlanLinks jointPlans,
 			final ScoringFunctionFactory scoringFunctionFactory) {
 		this.scenario = scenario;
+		this.jointPlans = jointPlans;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 
 		this.events = EventsUtils.createEventsManager( scenario.getConfig() );
@@ -120,6 +124,10 @@ public final class ControllerRegistry {
 
 	public Scenario getScenario() {
 		return scenario;
+	}
+	
+	public PlanLinks getJointPlans() {
+		return jointPlans;
 	}
 
 	public EventsManager getEvents() {

@@ -44,6 +44,7 @@ import playground.thibautd.socnetsim.population.JointPlanFactory;
  */
 public class GroupPlansTest {
 	private final List<GroupPlans> testPlans = new ArrayList<GroupPlans>();
+	private final JointPlanFactory factory = new JointPlanFactory();
 
 	@Before
 	public void initPlanWithoutJointPlan() {
@@ -70,7 +71,7 @@ public class GroupPlansTest {
 							new PersonImpl(
 								id ) ) );
 			}
-			plans.add( JointPlanFactory.createJointPlan( planMap ) );
+			plans.add( factory.createJointPlan( planMap ) );
 		}
 
 		testPlans.add( new GroupPlans( plans , Collections.EMPTY_LIST ) );
@@ -84,7 +85,7 @@ public class GroupPlansTest {
 	@Test
 	public void testCopyLooksValid() throws Exception {
 		for (GroupPlans plans : testPlans) {
-			GroupPlans copy = GroupPlans.copyPlans( plans );
+			GroupPlans copy = GroupPlans.copyPlans( factory , plans );
 
 			assertEquals(
 					"wrong number of individual plans in copy",
@@ -101,7 +102,7 @@ public class GroupPlansTest {
 	@Test
 	public void testCopyIsNotSame() throws Exception {
 		for (GroupPlans plans : testPlans) {
-			GroupPlans copy = GroupPlans.copyPlans( plans );
+			GroupPlans copy = GroupPlans.copyPlans( factory , plans );
 
 			assertNotSame(
 					"copy is the same instance",
@@ -121,10 +122,11 @@ public class GroupPlansTest {
 
 				JointPlan copyJointPlan = getCopy( copiedJointPlan , copy );
 				for (Plan copyIndivPlan : copyJointPlan.getIndividualPlans().values()) {
-					assertSame(
-							"wrong joint plan associated to individual plans in copy",
-							copyJointPlan,
-							JointPlanFactory.getPlanLinks().getJointPlan( copyIndivPlan ));
+					// not necessary anymore (factory does not automatically registers in a global container)
+					//assertSame(
+					//		"wrong joint plan associated to individual plans in copy",
+					//		copyJointPlan,
+					//		JointPlanFactory.getPlanLinks().getJointPlan( copyIndivPlan ));
 
 					assertFalse(
 							"individual plans were not copied when copying joint plan",

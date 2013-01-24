@@ -114,7 +114,7 @@ public class JointPlanUtilsTest {
 								Arrays.asList( driverLeg ),
 								passenger1.getId(),
 								passengerLeg))),
-					JointPlanFactory.createJointPlan( plans )));
+					new JointPlanFactory().createJointPlan( plans )));
 
 		// plan 2
 		// two passenger, two ODs
@@ -193,7 +193,7 @@ public class JointPlanUtilsTest {
 								Arrays.asList( driverLeg2 ),
 								passenger2.getId(),
 								passengerLeg2))),
-					JointPlanFactory.createJointPlan( plans )));
+					new JointPlanFactory().createJointPlan( plans )));
 
 		// plan 3
 		// two passenger, two ODs, two JT for one passenger
@@ -301,7 +301,7 @@ public class JointPlanUtilsTest {
 								Arrays.asList( driverLeg3 ),
 								passenger1.getId(),
 								passengerLeg3))),
-					JointPlanFactory.createJointPlan( plans )));
+					new JointPlanFactory().createJointPlan( plans )));
 
 		// plan 4
 		// two passengers, "midle trip"
@@ -387,7 +387,7 @@ public class JointPlanUtilsTest {
 								Arrays.asList( driverLeg2 ),
 								passenger2.getId(),
 								passengerLeg2))),
-					JointPlanFactory.createJointPlan( plans )));
+					new JointPlanFactory().createJointPlan( plans )));
 	}
 
 	@Test

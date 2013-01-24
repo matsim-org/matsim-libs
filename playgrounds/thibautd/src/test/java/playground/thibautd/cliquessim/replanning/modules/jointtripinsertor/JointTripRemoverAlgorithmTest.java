@@ -130,7 +130,7 @@ public class JointTripRemoverAlgorithmTest {
 
 		return new Fixture(
 				"one passenger",
-				JointPlanFactory.createJointPlan( plans ),
+				new JointPlanFactory().createJointPlan( plans ),
 				expectedAfterRemoval,
 				new JointTrip(
 					driver.getId(),
@@ -214,7 +214,7 @@ public class JointTripRemoverAlgorithmTest {
 
 		return new Fixture(
 				"two passengers full overlap",
-				JointPlanFactory.createJointPlan( plans ),
+				new JointPlanFactory().createJointPlan( plans ),
 				expectedAfterRemoval,
 				new JointTrip(
 					driver.getId(),
@@ -313,7 +313,7 @@ public class JointTripRemoverAlgorithmTest {
 
 		return new Fixture(
 				"two passengers intern overlap",
-				JointPlanFactory.createJointPlan( plans ),
+				new JointPlanFactory().createJointPlan( plans ),
 				expectedAfterRemoval,
 				new JointTrip(
 					driver.getId(),
@@ -412,7 +412,7 @@ public class JointTripRemoverAlgorithmTest {
 
 		return new Fixture(
 				"two passengers extern overlap",
-				JointPlanFactory.createJointPlan(plans),
+				new JointPlanFactory().createJointPlan(plans),
 				expectedAfterRemoval,
 				new JointTrip(
 					driver.getId(),

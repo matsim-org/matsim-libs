@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.population.PlanLinks;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
@@ -78,9 +79,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	// interface and abstract method
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
-	public final GroupPlans selectPlans(final ReplanningGroup group) {
+	public final GroupPlans selectPlans(
+			final PlanLinks jointPlans,
+			final ReplanningGroup group) {
 		if (log.isTraceEnabled()) log.trace( "handling group "+group );
-		Map<Id, PersonRecord> personRecords = getPersonRecords( group );
+		Map<Id, PersonRecord> personRecords = getPersonRecords( jointPlans , group );
 
 		GroupPlans allocation = selectPlans( personRecords );
 
@@ -110,7 +113,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return new GroupPlans( jointPlans , individualPlans );
 	}
 
-	private Map<Id, PersonRecord> getPersonRecords(final ReplanningGroup group) {
+	private Map<Id, PersonRecord> getPersonRecords(
+			final PlanLinks jointPlans,
+			final ReplanningGroup group) {
 		final Map<Id, PersonRecord> map = new LinkedHashMap<Id, PersonRecord>();
 
 		for (Person person : group.getPersons()) {
@@ -118,7 +123,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			for (Plan plan : person.getPlans()) {
 				plans.add( new PlanRecord(
 							plan,
-							JointPlanFactory.getPlanLinks().getJointPlan( plan ),
+							jointPlans.getJointPlan( plan ),
 							getWeight( plan )));
 			}
 			map.put(

@@ -38,17 +38,22 @@ import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.
  * @author thibautd
  */
 public class JointPlansXmlWriter extends MatsimXmlWriter {
-	private final Set<JointPlan> jointPlans = new HashSet<JointPlan>();
+	private final Set<JointPlan> jointPlansSet = new HashSet<JointPlan>();
 
-	public static void write( final Population population , final String file ) {
-		new JointPlansXmlWriter( population ).write( file );
+	public static void write(
+			final Population population,
+			final PlanLinks jointPlans,
+			final String file ) {
+		new JointPlansXmlWriter( population , jointPlans ).write( file );
 	}
 
-	private JointPlansXmlWriter(final Population population) {
+	private JointPlansXmlWriter(
+			final Population population,
+			final PlanLinks jointPlans) {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				final JointPlan jp = JointPlanFactory.getPlanLinks().getJointPlan( plan );
-				if (jp != null) jointPlans.add( jp );
+				final JointPlan jp = jointPlans.getJointPlan( plan );
+				if (jp != null) jointPlansSet.add( jp );
 			}
 		}
 	}
@@ -57,7 +62,7 @@ public class JointPlansXmlWriter extends MatsimXmlWriter {
 		final Counter counter = new Counter( "[JointPlansXmlWriter] dumped jointPlan # " );
 		openFile( file );
 		writeStartTag( ROOT_TAG , Collections.EMPTY_LIST );
-		for (JointPlan jp : jointPlans) {
+		for (JointPlan jp : jointPlansSet) {
 			counter.incCounter();
 			writeJointPlan( jp );
 		}

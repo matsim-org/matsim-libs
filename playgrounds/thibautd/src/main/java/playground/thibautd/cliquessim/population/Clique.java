@@ -239,7 +239,8 @@ public class Clique implements Person {
 	}
 
 	public Plan copySelectedPlan() {
-		JointPlan plan = JointPlanFactory.copyJointPlan(this.selectedPlan);
+		log.warn( "creating a joint plan without registering it! Check it is valid" );
+		JointPlan plan = new JointPlanFactory().copyJointPlan(this.selectedPlan);
 		//TODO: use this.addPlan (when implemented)
 		this.plans.add(plan);
 		this.setSelectedPlan(plan);
@@ -366,7 +367,8 @@ public class Clique implements Person {
 			this.plans.clear();
 
 			for (Map.Entry<String, Map<Id, PlanImpl>> entry : individualPlans.entrySet()) {
-				newJointPlan = JointPlanFactory.createJointPlan(
+				log.warn( "creating a joint plan without registering it! Check it is valid" );
+				newJointPlan = new JointPlanFactory().createJointPlan(
 						entry.getValue(),
 						true); //add at individual level
 				//TODO: use this.addPlan (when implemented)

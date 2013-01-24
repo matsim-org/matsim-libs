@@ -23,23 +23,28 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
+import playground.thibautd.socnetsim.population.PlanLinks;
+
 /**
  * @author thibautd
  */
 public class GroupReplanningListenner implements ReplanningListener {
 	private final Population population;
+	private final PlanLinks jointPlans;
 	private GroupStrategyManager strategyManager;
 
 	public GroupReplanningListenner(
 			final Population population,
+			final PlanLinks jointPlans,
 			final GroupStrategyManager strategyManager) {
 		this.population = population;
+		this.jointPlans = jointPlans;
 		this.strategyManager = strategyManager;
 	}
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-		strategyManager.run( population );
+		strategyManager.run( jointPlans , population );
 	}
 }
 

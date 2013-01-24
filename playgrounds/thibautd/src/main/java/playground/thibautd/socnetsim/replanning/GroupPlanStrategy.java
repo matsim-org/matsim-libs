@@ -28,6 +28,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.PlanLinks;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
@@ -48,15 +49,15 @@ public class GroupPlanStrategy {
 		strategyModules.add( module );
 	}
 
-	public void run(final Collection<ReplanningGroup> groups) {
+	public void run(
+			final PlanLinks jointPlans,
+			final Collection<ReplanningGroup> groups) {
 		List<GroupPlans> plansToHandle = new ArrayList<GroupPlans>();
 
 		Counter selectCounter = new Counter( "["+selector.getClass().getSimpleName()+"] selecting plan # " );
 		for (ReplanningGroup group : groups) {
-			// TODO: parallelize, as selection is quite heavy for groups, compared
-			// to individuals. Make sure that the results remain deterministic
 			selectCounter.incCounter();
-			GroupPlans plans = selector.selectPlans( group );
+			GroupPlans plans = selector.selectPlans( jointPlans , group );
 
 			if (plans == null) {
 				// this is a valid output from the selector,
@@ -66,8 +67,9 @@ public class GroupPlanStrategy {
 			}
 
 			if (strategyModules.size() > 0) {
-				plans = GroupPlans.copyPlans( plans );
+				plans = GroupPlans.copyPlans( jointPlans.getFactory() , plans );
 				plansToHandle.add( plans );
+				assert !jointPlansAreRegistered( plans , jointPlans );
 			}
 
 			select( plans );
@@ -77,6 +79,21 @@ public class GroupPlanStrategy {
 		for (GroupStrategyModule module : strategyModules) {
 			module.handlePlans( plansToHandle );
 		}
+
+		// the modules are allowed to modify joint structure:
+		// register joint plans afterhand only.
+		for (GroupPlans groupPlans : plansToHandle) {
+			jointPlans.addJointPlans( groupPlans.getJointPlans() );
+		}
+	}
+
+	private static boolean jointPlansAreRegistered(
+			final GroupPlans plans,
+			final PlanLinks jointPlans) {
+		for (JointPlan jp : plans.getJointPlans()) {
+			if (jointPlans.contains( jp )) return true;
+		}
+		return false;
 	}
 
 	private static void select(final GroupPlans plans) {

@@ -48,6 +48,7 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  */
 public class SplittingTest {
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
+	private final JointPlanFactory factory = new JointPlanFactory();
 
 	private static class Fixture {
 		final GroupPlans plan;
@@ -87,7 +88,7 @@ public class SplittingTest {
 		fixtures.add(
 				new Fixture(
 					new GroupPlans(
-						Collections.singleton( JointPlanFactory.createJointPlan( plans ) ),
+						Collections.singleton( factory.createJointPlan( plans ) ),
 						Collections.EMPTY_LIST),
 					0,
 					plans.size(),
@@ -113,7 +114,7 @@ public class SplittingTest {
 		fixtures.add(
 				new Fixture(
 					new GroupPlans(
-						Collections.singleton( JointPlanFactory.createJointPlan( plans ) ),
+						Collections.singleton( factory.createJointPlan( plans ) ),
 						Collections.EMPTY_LIST),
 					0,
 					plans.size(),
@@ -152,7 +153,7 @@ public class SplittingTest {
 		fixtures.add(
 				new Fixture(
 					new GroupPlans(
-						Collections.singleton( JointPlanFactory.createJointPlan( plans ) ),
+						Collections.singleton( factory.createJointPlan( plans ) ),
 						Collections.EMPTY_LIST),
 					1,
 					0,
@@ -208,7 +209,7 @@ public class SplittingTest {
 		fixtures.add(
 				new Fixture(
 					new GroupPlans(
-						Collections.singleton( JointPlanFactory.createJointPlan( plans ) ),
+						Collections.singleton( factory.createJointPlan( plans ) ),
 						Collections.EMPTY_LIST),
 					1,
 					0,
@@ -220,7 +221,9 @@ public class SplittingTest {
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
 	public void testNumberOfJointPlans() throws Exception {
-		SplitJointPlansBasedOnJointTripsAlgorithm algo = new SplitJointPlansBasedOnJointTripsAlgorithm();
+		SplitJointPlansBasedOnJointTripsAlgorithm algo =
+				new SplitJointPlansBasedOnJointTripsAlgorithm(
+						factory );
 		for (Fixture f : fixtures) {
 			algo.run( f.plan );
 			assertEquals(
@@ -232,7 +235,9 @@ public class SplittingTest {
 
 	@Test
 	public void testNumberOfIndividualPlans() throws Exception {
-		SplitJointPlansBasedOnJointTripsAlgorithm algo = new SplitJointPlansBasedOnJointTripsAlgorithm();
+		SplitJointPlansBasedOnJointTripsAlgorithm algo =
+				new SplitJointPlansBasedOnJointTripsAlgorithm(
+						factory );
 		for (Fixture f : fixtures) {
 			algo.run( f.plan );
 			assertEquals(

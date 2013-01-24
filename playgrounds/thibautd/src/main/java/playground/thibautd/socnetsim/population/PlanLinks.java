@@ -19,8 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
-import org.matsim.api.core.v01.population.Plan;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
  * Stores links between individual plans,
@@ -32,7 +36,10 @@ import org.matsim.api.core.v01.population.Plan;
  *
  * @author thibautd
  */
-public class PlanLinks {
+public class PlanLinks implements MatsimToplevelContainer {
+	private static final Logger log =
+		Logger.getLogger(PlanLinks.class);
+
 	// Note: using a WeakHashMap is much harder than expected:
 	// or you reference a Plan->JointPlan mapping, and the Plans
 	// are never finalized, as they are referenced by the JointPlan;
@@ -50,29 +57,63 @@ public class PlanLinks {
 	// If this comes in the way of somebody when trying to remove the
 	// "custom attributes", please drop me an e-mail, I'll search for another
 	// solution. td, 12.2012
-	private static final String ATT_NAME = "jointPlanReference";
+	private final String attName;
+
+	private static AtomicInteger instanceCount = new AtomicInteger( 0 );
+	private final JointPlanFactory factory = new JointPlanFactory();
 	
-	PlanLinks() {}
+	public PlanLinks() {
+		if (instanceCount.incrementAndGet() > 1) {
+			log.warn( "there are several instances of PlanLinks. Did you expect it?" );
+		}
+		attName = "jointPlanReference_" + instanceCount.toString();
+	}
 
 	public JointPlan getJointPlan(final Plan indivPlan) {
-		return (JointPlan) indivPlan.getCustomAttributes().get( ATT_NAME );
+		// XXX should be synchronized!
+		return (JointPlan) indivPlan.getCustomAttributes().get( attName );
 	}
 
 	public void removeJointPlan(final JointPlan jointPlan) {
-		for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
-			Object removed = indivPlan.getCustomAttributes().remove( ATT_NAME );
-			if (removed != jointPlan) throw new PlanLinkException( removed+" differs from "+indivPlan );
+		synchronized (jointPlan) {
+			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
+				Object removed = indivPlan.getCustomAttributes().remove( attName );
+				if (removed != jointPlan) throw new PlanLinkException( removed+" differs from "+indivPlan );
+			}
 		}
 	}
 
 	public void addJointPlan(final JointPlan jointPlan) {
-		for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
-			Object removed = indivPlan.getCustomAttributes().put( ATT_NAME , jointPlan );
-			if (removed != null && removed != jointPlan) {
-				throw new PlanLinkException( removed+" was associated to "+indivPlan+
-						" while trying to associate "+jointPlan );
+		synchronized (jointPlan) {
+			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
+				Object removed = indivPlan.getCustomAttributes().put( attName , jointPlan );
+				if (removed != null && removed != jointPlan) {
+					throw new PlanLinkException( removed+" was associated to "+indivPlan+
+							" while trying to associate "+jointPlan );
+				}
 			}
 		}
+	}
+	
+	public boolean contains( final JointPlan jointPlan) {
+		synchronized (jointPlan) {
+			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
+				Object removed = indivPlan.getCustomAttributes().get( attName );
+				if (removed != null && removed == jointPlan) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+	public void addJointPlans(final Iterable<JointPlan> jointPlans) {
+		for (JointPlan jp : jointPlans) addJointPlan( jp );
+	}
+
+	@Override
+	public JointPlanFactory getFactory() {
+		return factory;
 	}
 
 	public static class PlanLinkException extends RuntimeException {

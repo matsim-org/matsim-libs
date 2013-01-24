@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
+import playground.thibautd.socnetsim.population.PlanLinks;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
@@ -26,6 +27,6 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
  * @author thibautd
  */
 public interface GroupLevelPlanSelector {
-	public GroupPlans selectPlans(ReplanningGroup group);
+	public GroupPlans selectPlans(PlanLinks jointPlans , ReplanningGroup group);
 }
 

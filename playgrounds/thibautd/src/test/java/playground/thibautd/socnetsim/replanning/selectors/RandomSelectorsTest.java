@@ -41,6 +41,7 @@ import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.population.PlanLinks;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
@@ -53,10 +54,12 @@ public class RandomSelectorsTest {
 	}
 
 	private final List<ReplanningGroup> testGroups = new ArrayList<ReplanningGroup>();
+	private PlanLinks jointPlans = new PlanLinks();
 
 	@After
 	public void clear() {
 		testGroups.clear();
+		jointPlans = new PlanLinks();
 	}
 
 	@Before
@@ -158,9 +161,12 @@ public class RandomSelectorsTest {
 		plan.setScore( -5000d );
 		jp3.put( id , plan );
 
-		JointPlanFactory.createJointPlan( jp1 );
-		JointPlanFactory.createJointPlan( jp2 );
-		JointPlanFactory.createJointPlan( jp3 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp2 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp3 ) );
 	}
 
 	@Before
@@ -252,14 +258,22 @@ public class RandomSelectorsTest {
 		plan.setScore( 10d );
 		jp5.put( id , plan );
 
-		JointPlanFactory.createJointPlan( jp1 );
-		JointPlanFactory.createJointPlan( jp2 );
-		JointPlanFactory.createJointPlan( jp3 );
-		JointPlanFactory.createJointPlan( jp4 );
-		JointPlanFactory.createJointPlan( jp5 );
-		JointPlanFactory.createJointPlan( jp6 );
-		JointPlanFactory.createJointPlan( jp7 );
-		JointPlanFactory.createJointPlan( jp8 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp2 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp3 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp4 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp5 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp6 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp7 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp8 ) );
 	}
 
 	@Test
@@ -283,7 +297,7 @@ public class RandomSelectorsTest {
 				count.incCounter();
 				GroupLevelPlanSelector selector = factory.create( new Random( seed ) );
 
-				final GroupPlans selected = selector.selectPlans( group );
+				final GroupPlans selected = selector.selectPlans( jointPlans , group );
 				if (previous != null) {
 					assertEquals(
 							"different results with the same random seed",

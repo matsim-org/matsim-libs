@@ -273,7 +273,7 @@ public class IterativeActionTest {
 			passengerLeg1.setRoute( passengerRoute );
 		}
 
-		return JointPlanFactory.createJointPlan( individualPlans );
+		return new JointPlanFactory().createJointPlan( individualPlans );
 	}
 
 	private JointPlan createPlanWithoutJointTrips() {
@@ -306,7 +306,7 @@ public class IterativeActionTest {
 			act.setCoord( coord2 );
 		}
 
-		return JointPlanFactory.createJointPlan( individualPlans );
+		return new JointPlanFactory().createJointPlan( individualPlans );
 	}
 }
 

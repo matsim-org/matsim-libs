@@ -41,8 +41,8 @@ import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.
 /**
  * @author thibautd
  */
-public class JointPlansXmlReader extends AbstractParsePullXmlReader<List<JointPlan>> {
-	public static List<JointPlan> readJointPlans(
+public class JointPlansXmlReader extends AbstractParsePullXmlReader<PlanLinks> {
+	public static PlanLinks readJointPlans(
 			final Population population,
 			final String fileName) {
 		return new JointPlansXmlReader( population ).readFile( fileName );
@@ -55,24 +55,25 @@ public class JointPlansXmlReader extends AbstractParsePullXmlReader<List<JointPl
 	}
 
 	@Override
-	protected List<JointPlan> parse(
+	protected PlanLinks parse(
 			final XMLStreamReader streamReader)
 			throws XMLStreamException {
 		final Counter counter = new Counter( "parsing joint plan # " );
-		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
+		final PlanLinks jointPlans = new PlanLinks();
 
 		while ( streamReader.next() != XMLStreamConstants.START_ELEMENT );
 		while (streamReader.hasNext()) {
 			if ( !streamReader.getLocalName().equals( JOINT_PLAN_TAG ) ) continue;
 			counter.incCounter();
-			jointPlans.add( parseJointPlan( streamReader ) );
+			jointPlans.addJointPlan( parseJointPlan( streamReader , jointPlans.getFactory() ) );
 		}
 
 		return jointPlans;
 	}
 
 	private JointPlan parseJointPlan(
-			final XMLStreamReader streamReader)
+			final XMLStreamReader streamReader,
+			final JointPlanFactory factory)
 			throws XMLStreamException {
 		final Map<Id, Plan> plans = new LinkedHashMap<Id, Plan>();
 
@@ -96,7 +97,7 @@ public class JointPlansXmlReader extends AbstractParsePullXmlReader<List<JointPl
 			while ( streamReader.next() != XMLStreamConstants.START_ELEMENT );
 		}
 
-		return JointPlanFactory.createJointPlan( plans );
+		return factory.createJointPlan( plans );
 	}
 }
 

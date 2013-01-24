@@ -43,6 +43,7 @@ import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.population.PlanLinks;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
@@ -61,16 +62,19 @@ public class HighestWeightSelectorTest {
 		final ReplanningGroup group;
 		final GroupPlans expectedSelectedPlans;
 		final GroupPlans expectedSelectedPlansWhenBlocking;
+		final PlanLinks jointPlans;
 
 		public Fixture(
 				final String name,
 				final ReplanningGroup group,
 				final GroupPlans expectedPlans,
-				final GroupPlans expectedSelectedPlansWhenBlocking) {
+				final GroupPlans expectedSelectedPlansWhenBlocking,
+				final PlanLinks jointPlans) {
 			this.name = name;
 			this.group = group;
 			this.expectedSelectedPlans = expectedPlans;
 			this.expectedSelectedPlansWhenBlocking = expectedSelectedPlansWhenBlocking;
+			this.jointPlans = jointPlans;
 		}
 	}
 
@@ -101,6 +105,7 @@ public class HighestWeightSelectorTest {
 	// fixtures management
 	// /////////////////////////////////////////////////////////////////////////
 	public static Fixture createIndividualPlans() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		List<Plan> toBeSelected = new ArrayList<Plan>();
@@ -146,10 +151,12 @@ public class HighestWeightSelectorTest {
 				"all individual",
 				group,
 				exp,
-				exp);
+				exp,
+				jointPlans);
 	}
 
 	public static Fixture createFullyJointPlans() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
@@ -208,9 +215,12 @@ public class HighestWeightSelectorTest {
 		plan.setScore( -5000d );
 		jp3.put( id , plan );
 
-		JointPlanFactory.createJointPlan( jp1 );
-		JointPlan sel = JointPlanFactory.createJointPlan( jp2 );
-		JointPlanFactory.createJointPlan( jp3 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		JointPlan sel = jointPlans.getFactory().createJointPlan( jp2 );
+		jointPlans.addJointPlan( sel );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp3 ) );
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel ),
@@ -219,10 +229,12 @@ public class HighestWeightSelectorTest {
 				"fully joint",
 				group,
 				expected,
-				expected);
+				expected,
+				jointPlans);
 	}
 
 	public static Fixture createPartiallyJointPlansOneSelectedJp() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		List<Plan> toBeSelected = new ArrayList<Plan>();
@@ -280,9 +292,12 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 
-		JointPlanFactory.createJointPlan( jp1 );
-		JointPlan sel = JointPlanFactory.createJointPlan( jp2 );
-		JointPlanFactory.createJointPlan( jp3 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		JointPlan sel = jointPlans.getFactory().createJointPlan( jp2 );
+		jointPlans.addJointPlan( sel );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp3 ) );
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel ),
@@ -292,11 +307,13 @@ public class HighestWeightSelectorTest {
 				"partially joint, one selected joint plan",
 				group,
 				expected,
-				expected);
+				expected,
+				jointPlans);
 
 	}
 
 	public static Fixture createPartiallyJointPlansTwoSelectedJps() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
@@ -353,10 +370,14 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 
-		JointPlanFactory.createJointPlan( jp1 );
-		JointPlan sel1 = JointPlanFactory.createJointPlan( jp2 );
-		JointPlanFactory.createJointPlan( jp3 );
-		JointPlan sel2 = JointPlanFactory.createJointPlan( jp4 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		JointPlan sel1 = jointPlans.getFactory().createJointPlan( jp2 );
+		jointPlans.addJointPlan( sel1 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp3 ) );
+		JointPlan sel2 = jointPlans.getFactory().createJointPlan( jp4 );
+		jointPlans.addJointPlan( sel2 );
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel1 , sel2 ),
@@ -365,10 +386,12 @@ public class HighestWeightSelectorTest {
 				"partially joint, two selected joint plans",
 				group,
 				expected,
-				expected);
+				expected,
+				jointPlans);
 	}
 
 	public static Fixture createPartiallyJointPlansMessOfJointPlans() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
@@ -455,14 +478,22 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 10d );
 		jp5.put( id , plan );
 
-		JointPlanFactory.createJointPlan( jp1 );
-		JointPlanFactory.createJointPlan( jp2 );
-		JointPlanFactory.createJointPlan( jp3 );
-		JointPlanFactory.createJointPlan( jp4 );
-		JointPlan sel1 = JointPlanFactory.createJointPlan( jp5 );
-		JointPlan sel2 = JointPlanFactory.createJointPlan( jp6 );
-		JointPlanFactory.createJointPlan( jp7 );
-		JointPlanFactory.createJointPlan( jp8 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp2 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp3 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp4 ) );
+		JointPlan sel1 = jointPlans.getFactory().createJointPlan( jp5 );
+		jointPlans.addJointPlan( sel1 );
+		JointPlan sel2 = jointPlans.getFactory().createJointPlan( jp6 );
+		jointPlans.addJointPlan( sel2 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp7 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp8 ) );
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel1 , sel2 ),
@@ -471,10 +502,12 @@ public class HighestWeightSelectorTest {
 				"partially joint, multiple combinations",
 				group,
 				expected,
-				expected);
+				expected,
+				jointPlans);
 	}
 
 	public static Fixture createOneBigJointPlanDifferentNPlansPerAgent() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp = new HashMap<Id, Plan>();
@@ -513,7 +546,8 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -15000d );
 
-		JointPlan sel = JointPlanFactory.createJointPlan( jp );
+		JointPlan sel = jointPlans.getFactory().createJointPlan( jp );
+		jointPlans.addJointPlan( sel );
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel ),
@@ -523,10 +557,12 @@ public class HighestWeightSelectorTest {
 				"one big joint plan",
 				group,
 				expected,
-				null);
+				null,
+				jointPlans);
 	}
 
 	public static Fixture createPartiallyJointPlansNoSelectedJp() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		List<Plan> toBeSelected = new ArrayList<Plan>();
@@ -609,10 +645,14 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5d );
 
-		JointPlanFactory.createJointPlan( jp1 );
-		JointPlanFactory.createJointPlan( jp2 );
-		JointPlanFactory.createJointPlan( jp3 );
-		JointPlanFactory.createJointPlan( jp4 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp2 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp3 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp4 ) );
 
 		GroupPlans expected = new GroupPlans(
 					Collections.EMPTY_LIST,
@@ -622,10 +662,12 @@ public class HighestWeightSelectorTest {
 				"partially joint, no selected joint trips",
 				group,
 				expected,
-				expected);
+				expected,
+				jointPlans);
 	}
 
 	public static Fixture createOneBigJointPlanDifferentNPlansPerAgent2() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp = new HashMap<Id, Plan>();
@@ -664,7 +706,8 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -15000d );
 
-		JointPlan sel = JointPlanFactory.createJointPlan( jp );
+		JointPlan sel = jointPlans.getFactory().createJointPlan( jp );
+		jointPlans.addJointPlan( sel );
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel ),
@@ -674,10 +717,12 @@ public class HighestWeightSelectorTest {
 				"one big joint plan order 2",
 				group,
 				expected,
-				null);
+				null,
+				jointPlans);
 	}
 
 	public static Fixture createOneBigJointPlanDifferentNPlansPerAgentWithNullScores() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp = new HashMap<Id, Plan>();
@@ -718,7 +763,8 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( null );
 
-		JointPlan sel = JointPlanFactory.createJointPlan( jp );
+		JointPlan sel = jointPlans.getFactory().createJointPlan( jp );
+		jointPlans.addJointPlan( sel );
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel ),
@@ -728,10 +774,12 @@ public class HighestWeightSelectorTest {
 				"one big joint plan, null scores",
 				group,
 				expected,
-				null);
+				null,
+				jointPlans);
 	}
 
 	public static Fixture createPlanWithDifferentSolutionIfBlocked() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
@@ -789,9 +837,12 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -1295836d );
 
-		JointPlan sel = JointPlanFactory.createJointPlan( jp1 );
-		JointPlanFactory.createJointPlan( jp2 );
-		JointPlanFactory.createJointPlan( jp3 );
+		JointPlan sel = jointPlans.getFactory().createJointPlan( jp1 );
+		jointPlans.addJointPlan( sel );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp2 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp3 ) );
 
 		GroupPlans expected = new GroupPlans(
 					Collections.EMPTY_LIST,
@@ -804,10 +855,12 @@ public class HighestWeightSelectorTest {
 				"different plans if blocking",
 				group,
 				expected,
-				expectedBlock);
+				expectedBlock,
+				jointPlans);
 	}
 
 	public static Fixture createPlanWithNoSolutionIfBlocked() {
+		final PlanLinks jointPlans = new PlanLinks();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
@@ -853,8 +906,10 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 0d );
 		jp2.put( id , plan );
 
-		JointPlanFactory.createJointPlan( jp1 );
-		JointPlanFactory.createJointPlan( jp2 );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp2 ) );
 
 		GroupPlans expected = new GroupPlans(
 					Collections.EMPTY_LIST,
@@ -865,7 +920,8 @@ public class HighestWeightSelectorTest {
 				"no plans if blocking",
 				group,
 				expected,
-				expectedBlock);
+				expectedBlock,
+				jointPlans);
 	}
 
 	@Before
@@ -905,7 +961,7 @@ public class HighestWeightSelectorTest {
 			planCounts.put( p.getId() , p.getPlans().size() );
 		}
 
-		selector.selectPlans( fixture.group );
+		selector.selectPlans( fixture.jointPlans , fixture.group );
 
 		Assert.assertEquals(
 				"unexpected change in group size for fixture "+fixture.name,
@@ -924,7 +980,7 @@ public class HighestWeightSelectorTest {
 		HighestScoreSumSelector selector = new HighestScoreSumSelector( blocking , exploreAll );
 		GroupPlans selected = null;
 		try {
-			selected = selector.selectPlans( fixture.group );
+			selected = selector.selectPlans( fixture.jointPlans , fixture.group );
 		}
 		catch (Exception e) {
 			throw new RuntimeException( "exception thrown for instance <<"+fixture.name+">>", e );

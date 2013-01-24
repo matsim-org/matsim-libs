@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.replanning.modules;
 
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
 
 /**
@@ -32,17 +33,23 @@ import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
  */
 public class JointPlanMergingModule extends AbstractMultithreadedGroupStrategyModule {
 	private final double probAcceptance;
+	private final JointPlanFactory factory;
 
 	public JointPlanMergingModule(
+			final JointPlanFactory factory,
 			final int nThreads,
 			final double probAcceptance) {
 		super( nThreads );
+		this.factory = factory;
 		this.probAcceptance = probAcceptance;
 	}
 
 	@Override
 	public GroupPlansAlgorithm createAlgorithm() {
-		return new JointPlanMergingAlgorithm( probAcceptance , MatsimRandom.getLocalInstance() );
+		return new JointPlanMergingAlgorithm(
+				factory,
+				probAcceptance,
+				MatsimRandom.getLocalInstance() );
 	}
 }
 

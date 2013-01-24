@@ -39,12 +39,14 @@ import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.population.PlanLinks;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
  * @author thibautd
  */
 public class MergingTest {
+	private PlanLinks jointPlans = new PlanLinks();
 	private final List<GroupPlans> testPlans = new ArrayList<GroupPlans>();
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -53,6 +55,7 @@ public class MergingTest {
 	@After
 	public void clean() {
 		testPlans.clear();
+		jointPlans = new PlanLinks();
 	}
 
 	@Before
@@ -78,7 +81,7 @@ public class MergingTest {
 						id,
 						new PlanImpl( new PersonImpl( id ) ) );
 			}
-			plans.add( JointPlanFactory.createJointPlan( indivPlans ) );
+			plans.add( jointPlans.getFactory().createJointPlan( indivPlans ) );
 		}
 
 		testPlans.add( new GroupPlans( plans , Collections.EMPTY_LIST ) );
@@ -91,6 +94,7 @@ public class MergingTest {
 	public void testProbOne() throws Exception {
 		JointPlanMergingAlgorithm algo =
 			new JointPlanMergingAlgorithm(
+					jointPlans.getFactory(),
 					1d,
 					new Random( 12 ));
 
@@ -117,6 +121,7 @@ public class MergingTest {
 	public void testProbZero() throws Exception {
 		JointPlanMergingAlgorithm algo =
 			new JointPlanMergingAlgorithm(
+					jointPlans.getFactory(),
 					0d,
 					new Random( 12 ));
 

@@ -27,6 +27,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
+import playground.thibautd.socnetsim.population.PlanLinks;
 
 /**
  * @author thibautd
@@ -35,16 +36,19 @@ public class JointPlansDumping implements BeforeMobsimListener {
 	private static final Logger log =
 		Logger.getLogger(JointPlansDumping.class);
 
-	private Scenario sc ;
+	private Scenario sc;
+	private PlanLinks jointPlans;
 	private int writePlansInterval, firstIteration ;
 	private OutputDirectoryHierarchy controlerIO;
 
 	public JointPlansDumping(
 			final Scenario sc,
+			final PlanLinks jointPlans,
 			final int firstIteration,
 			final int writePlansInterval,
 			final OutputDirectoryHierarchy controlerIO ) {
 		this.sc = sc ;
+		this.jointPlans = jointPlans;
 		this.firstIteration = firstIteration ;
 		this.writePlansInterval = writePlansInterval ;
 		this.controlerIO = controlerIO ;
@@ -60,6 +64,7 @@ public class JointPlansDumping implements BeforeMobsimListener {
 		log.info("dumping joint plans...");
 		JointPlansXmlWriter.write(
 				sc.getPopulation(),
+				jointPlans,
 				controlerIO.getIterationFilename(
 					event.getIteration(),
 					"jointPlans.xml.gz" ));

@@ -46,14 +46,20 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  * @author thibautd
  */
 public class SplitJointPlansBasedOnJointTripsAlgorithm implements GroupPlansAlgorithm {
+	private final JointPlanFactory factory;
+
+	public SplitJointPlansBasedOnJointTripsAlgorithm(
+			final JointPlanFactory factory) {
+		this.factory = factory;
+	}
 
 	@Override
 	public void run(final GroupPlans plans) {
-		unregisterJointPlans( plans );
+		//unregisterJointPlans( plans );
 		splitPlans( plans );
 	}
 
-	private static void splitPlans(final GroupPlans plans) {
+	private void splitPlans(final GroupPlans plans) {
 		final List<JointPlan> newJointPlans = new ArrayList<JointPlan>();
 		final List<Plan> newIndividualPlans = new ArrayList<Plan>();
 		
@@ -68,7 +74,7 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GroupPlansAlgo
 		plans.getIndividualPlans().addAll( newIndividualPlans );
 	}
 
-	private static GroupPlans splitPlan(final JointPlan jp) {
+	private GroupPlans splitPlan(final JointPlan jp) {
 		final GroupPlans groupPlans = new GroupPlans();
 		final Map<Id, Plan> plansMap = new HashMap<Id, Plan>( jp.getIndividualPlans() );
 
@@ -81,7 +87,7 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GroupPlansAlgo
 
 			if ( jpMap.size() > 1 ) {
 				groupPlans.getJointPlans().add(
-						JointPlanFactory.createJointPlan( jpMap ) );
+						factory.createJointPlan( jpMap ) );
 			}
 			else {
 				groupPlans.getIndividualPlans().add(
@@ -128,10 +134,10 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GroupPlansAlgo
 		return Collections.EMPTY_LIST;
 	}
 
-	private static void unregisterJointPlans(final GroupPlans plans) {
-		for (JointPlan jp : plans.getJointPlans()) {
-			JointPlanFactory.getPlanLinks().removeJointPlan( jp );
-		}
-	}
+	//private static void unregisterJointPlans(final GroupPlans plans) {
+	//	for (JointPlan jp : plans.getJointPlans()) {
+	//		JointPlanFactory.getPlanLinks().removeJointPlan( jp );
+	//	}
+	//}
 }
 

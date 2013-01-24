@@ -36,6 +36,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.population.PlanLinks;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
@@ -77,13 +78,15 @@ public class GroupStrategyManager {
 		this.random = MatsimRandom.getLocalInstance();
 	}
 
-	public final void run(final Population population) {
+	public final void run(
+			final PlanLinks jointPlans,
+			final Population population) {
 		final Collection<ReplanningGroup> groups = groupIdentifier.identifyGroups( population );
 
 		Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
 			new LinkedHashMap<GroupPlanStrategy, List<ReplanningGroup>>();
 		for (ReplanningGroup g : groups) {
-			removeExtraPlans( g );
+			removeExtraPlans( jointPlans , g );
 
 			GroupPlanStrategy strategy = registry.chooseStrategy( random.nextDouble() );
 			List<ReplanningGroup> alloc = strategyAllocations.get( strategy );
@@ -101,14 +104,16 @@ public class GroupStrategyManager {
 			final GroupPlanStrategy strategy = e.getKey();
 			final List<ReplanningGroup> toHandle = e.getValue();
 			log.info( "passing "+toHandle.size()+" groups to strategy "+strategy );
-			strategy.run( toHandle );
+			strategy.run( jointPlans , toHandle );
 			log.info( "strategy "+strategy+" finished" );
 		}
 	}
 
-	private final void removeExtraPlans(final ReplanningGroup group) {
+	private final void removeExtraPlans(
+			final PlanLinks jointPlans,
+			final ReplanningGroup group) {
 		int c = 0;
-		while ( removeOneExtraPlan( group ) ) c++;
+		while ( removeOneExtraPlan( jointPlans , group ) ) c++;
 		if (c > 0) {
 			// in the clique setting, it is impossible.
 			// replace by a warning (or nothing) when there is a setting
@@ -117,7 +122,9 @@ public class GroupStrategyManager {
 		}
 	}
 
-	private final boolean removeOneExtraPlan(final ReplanningGroup group) {
+	private final boolean removeOneExtraPlan(
+			final PlanLinks jointPlans,
+			final ReplanningGroup group) {
 		if (log.isTraceEnabled()) log.trace( "removing plans for group "+group );
 		if (maxPlanPerAgent <= 0) return false;
 
@@ -130,7 +137,7 @@ public class GroupStrategyManager {
 			if (log.isTraceEnabled()) log.trace( "Too many plans for person "+person );
 
 			if (toRemove == null) {
-				toRemove = selectorForRemoval.selectPlans( group );
+				toRemove = selectorForRemoval.selectPlans( jointPlans , group );
 				if (log.isTraceEnabled()) log.trace( "plans to remove will be taken from "+toRemove );
 				if ( toRemove == null ) {
 					throw new RuntimeException(
@@ -139,7 +146,7 @@ public class GroupStrategyManager {
 				}
 			}
 
-			for (Plan plan : toRemove( person , toRemove )) {
+			for (Plan plan : toRemove( jointPlans , person , toRemove )) {
 				if (log.isTraceEnabled()) log.trace( "removing plan "+plan+" for person "+person );
 				final Person personToHandle = plan.getPerson();
 
@@ -165,10 +172,11 @@ public class GroupStrategyManager {
 	}
 
 	private static final Collection<Plan> toRemove(
+			final PlanLinks jointPlans,
 			final Person person,
 			final GroupPlans toRemove) {
 		for (Plan plan : person.getPlans()) {
-			JointPlan jp = JointPlanFactory.getPlanLinks().getJointPlan( plan );
+			JointPlan jp = jointPlans.getJointPlan( plan );
 
 			if (jp != null && toRemove.getJointPlans().contains( jp )) {
 				return jp.getIndividualPlans().values();

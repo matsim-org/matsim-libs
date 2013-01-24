@@ -81,12 +81,14 @@ public class GroupPlans {
 		return "{GroupPlans: jointPlans="+jointPlans+"; individualPlans="+individualPlans+"}";
 	}
 
-	public static GroupPlans copyPlans(final GroupPlans plans) {
+	public static GroupPlans copyPlans(
+			final JointPlanFactory jointPlanFactory,
+			final GroupPlans plans) {
 		List<JointPlan> jps = new ArrayList<JointPlan>();
 		List<Plan> ps = new ArrayList<Plan>();
 
 		for (JointPlan jp : plans.getJointPlans()) {
-			jps.add( JointPlanFactory.copyJointPlan( jp ) );
+			jps.add( jointPlanFactory.copyJointPlan( jp ) );
 		}
 
 		for (Plan p : plans.getIndividualPlans()) {

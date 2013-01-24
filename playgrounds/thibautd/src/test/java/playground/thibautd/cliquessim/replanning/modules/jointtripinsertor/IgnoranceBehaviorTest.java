@@ -117,7 +117,7 @@ public class IgnoranceBehaviorTest {
 			plan.createAndAddActivity( "second_act_p"+i , new IdImpl( "space" ) );
 		}
 
-		return JointPlanFactory.createJointPlan( individualPlans );
+		return new JointPlanFactory().createJointPlan( individualPlans );
 	}
 
 	private JointPlan createPlanWithJointTrips() {
@@ -160,7 +160,7 @@ public class IgnoranceBehaviorTest {
 			passengerLeg1.setRoute( passengerRoute );
 		}
 
-		return JointPlanFactory.createJointPlan( individualPlans );
+		return new JointPlanFactory().createJointPlan( individualPlans );
 	}
 }
 

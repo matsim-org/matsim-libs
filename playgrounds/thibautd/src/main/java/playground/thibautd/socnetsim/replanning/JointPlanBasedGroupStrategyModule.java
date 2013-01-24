@@ -43,6 +43,7 @@ public class JointPlanBasedGroupStrategyModule implements GroupStrategyModule {
 
 	private final boolean wrapIndividualPlansAndActOnThem;
 	private final PlanStrategyModule delegate;
+	private final JointPlanFactory jointPlanFactory = new JointPlanFactory();
 
 	public JointPlanBasedGroupStrategyModule(
 			final PlanStrategyModule module) {
@@ -79,9 +80,8 @@ public class JointPlanBasedGroupStrategyModule implements GroupStrategyModule {
 		for (Plan p : plans.getIndividualPlans()) {
 			Map<Id, Plan> fakeJointPlanMap = new HashMap<Id, Plan>();
 			fakeJointPlanMap.put( p.getPerson().getId() , p );
-			JointPlan jp = JointPlanFactory.createJointPlan( fakeJointPlanMap , false );
+			JointPlan jp = jointPlanFactory.createJointPlan( fakeJointPlanMap , false );
 			delegate.handlePlan( jp );
-			JointPlanFactory.getPlanLinks().removeJointPlan( jp );
 		}
 	}
 

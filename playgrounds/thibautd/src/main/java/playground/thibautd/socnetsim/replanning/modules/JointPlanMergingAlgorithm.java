@@ -37,17 +37,20 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 class JointPlanMergingAlgorithm implements GroupPlansAlgorithm {
 	private final double probAcceptance;
 	private final Random random;
+	private final JointPlanFactory factory;
 
 	public JointPlanMergingAlgorithm(
+			final JointPlanFactory factory,
 			final double probAcceptance,
 			final Random random) {
 		this.probAcceptance = probAcceptance;
 		this.random = random;
+		this.factory = factory;
 	}
 
 	@Override
 	public void run(final GroupPlans plans) {
-		unregisterJointPlans( plans );
+		//unregisterJointPlans( plans );
 		mergePlans( plans );
 	}
 
@@ -102,13 +105,13 @@ class JointPlanMergingAlgorithm implements GroupPlansAlgorithm {
 		return false;
 	}
 
-	private void unregisterJointPlans(final GroupPlans plans) {
-		for (JointPlan jp : plans.getJointPlans()) {
-			JointPlanFactory.getPlanLinks().removeJointPlan( jp );
-		}
-	}
+	//private void unregisterJointPlans(final GroupPlans plans) {
+	//	for (JointPlan jp : plans.getJointPlans()) {
+	//		JointPlanFactory.getPlanLinks().removeJointPlan( jp );
+	//	}
+	//}
 
-	private static class JointPlanBuilder {
+	private class JointPlanBuilder {
 		private final Map<Id, Plan> plans = new HashMap<Id, Plan>();
 
 		public void addJointPlan(final JointPlan jp) {
@@ -128,7 +131,7 @@ class JointPlanMergingAlgorithm implements GroupPlansAlgorithm {
 		}
 
 		public JointPlan build() {
-			return JointPlanFactory.createJointPlan( plans );
+			return factory.createJointPlan( plans );
 		}
 	}
 }
