@@ -42,7 +42,7 @@ public class TransitFares
 
 		if (useAgentSensitivities)
 		{
-			ScenarioImpl si = controler.getScenario();
+			ScenarioImpl si = (ScenarioImpl) controler.getScenario();
 			si.addScenarioElement(new AgentSensitivities(si));
 		}
 		

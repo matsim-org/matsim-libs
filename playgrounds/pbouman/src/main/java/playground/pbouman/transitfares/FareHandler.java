@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
@@ -211,7 +210,7 @@ public class FareHandler implements
 	public void notifyStartup(StartupEvent event)
 	{
 		event.getControler().getEvents().addHandler(this);
-		ScenarioImpl scenario = event.getControler().getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
 		policies = new FarePolicies(scenario);
 		scenario.addScenarioElement(policies);
 	}
