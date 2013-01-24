@@ -62,7 +62,7 @@ public class JointPlansXmlWriter extends MatsimXmlWriter {
 			writeJointPlan( jp );
 		}
 		counter.printCounter();
-		writeEndTag( JOINT_PLAN_TAG );
+		writeEndTag( ROOT_TAG );
 		close();
 	}
 
