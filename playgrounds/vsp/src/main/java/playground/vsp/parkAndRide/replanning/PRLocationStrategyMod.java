@@ -65,7 +65,7 @@ public class PRLocationStrategyMod implements PlanStrategyModule {
 	 * @param typicalDuration 
 	 */
 	public PRLocationStrategyMod(Controler controler, Map<Id, PRFacility> id2prFacility, double gravity, double typicalDuration) {
-		this.sc = controler.getScenario();
+		this.sc = (ScenarioImpl) controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.id2prFacility = id2prFacility;
 		this.gravity = gravity;

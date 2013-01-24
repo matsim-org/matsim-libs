@@ -71,7 +71,7 @@ public class PRAddStrategyMod implements PlanStrategyModule {
 	 * @param typicalDuration 
 	 */
 	public PRAddStrategyMod(Controler controler, Map<Id, PRFacility> id2prFacility, double gravity, double typicalDuration) {
-		this.sc = controler.getScenario();
+		this.sc = (ScenarioImpl) controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
 		this.id2prFacility = id2prFacility;

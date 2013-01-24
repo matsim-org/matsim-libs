@@ -52,7 +52,7 @@ public class TrafficStateControlerListener implements StartupListener, Iteration
 
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		ScenarioImpl scenario = event.getControler().getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
 		EventsManager events = event.getControler().getEvents();
 		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, scenario.getNetwork());
 		events.addHandler(this.volumes);
