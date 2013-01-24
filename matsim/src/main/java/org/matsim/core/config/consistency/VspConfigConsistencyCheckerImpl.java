@@ -132,12 +132,12 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		}
 		
 		if ( !config.locationchoice().getDestinationSamplePercent().equals("100.") ) {
-			problem = true ;
+//			problem = true ;
 			log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +
 					"DestinationSampler is resolved.  kai, jan'13") ;
 		}
 		if ( !config.locationchoice().getProbChoiceExponent().equals("1.") ) {
-			problem = true ;
+//			problem = true ;
 			log.error("vsp will not accept location choice prob choice exponents other than 1 until the corresponding warning in " +
 					"ChoiceSet is resolved.  kai, jan'13") ;
 		}
