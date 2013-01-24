@@ -20,7 +20,7 @@
 package playground.pbouman.crowdedness;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 import playground.pbouman.crowdedness.CrowdedScoringFunctionFactory;
 import playground.pbouman.crowdedness.CrowdednessObserver;
@@ -34,30 +34,26 @@ import playground.pbouman.scenarios.SingleLineScenario;
  *
  */
 
-public class RunSingleLineScenario extends Controler
+public class RunSingleLineScenario
 {
-	public RunSingleLineScenario(Scenario scenario) {
-		super(scenario);
-	}
 
 	public static void main(String [] args)
 	{
 		Scenario scenario = SingleLineScenario.buildScenario(20);
-		Controler controler = new RunSingleLineScenario(scenario);
+		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
 
+		controler.setScoringFunctionFactory(new CrowdedScoringFunctionFactory(
+			new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()),
+				controler.getEvents()
+		));
+		
 		//CrowdednessObserver observer = new CrowdednessObserver(scenario, controler.getEvents(), new StochasticRule());
 		CrowdednessObserver observer = new CrowdednessObserver(scenario, controler.getEvents(), new SimpleRule());
 		controler.getEvents().addHandler(observer);
 		
 		controler.run();
 	}
-	
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory()
-	{
-		return new CrowdedScoringFunctionFactory(super.loadScoringFunctionFactory(), this.getEvents());
-		
-	}
+
 
 }

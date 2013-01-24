@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.pbouman.crowdedness;
+package playground.pbouman.crowdedness.events;
 
 import java.util.Map;
 

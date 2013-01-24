@@ -25,6 +25,9 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scoring.ScoringFunction;
 
+import playground.pbouman.crowdedness.events.CrowdedPenaltyEvent;
+import playground.pbouman.crowdedness.events.PersonCrowdednessEvent;
+
 /**
  * The CrowdedScoringFunction adds disutilities for crowdedness in PT-vehicles
  * on top the scores calculated by some other ScoringFunction.

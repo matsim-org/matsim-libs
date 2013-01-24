@@ -43,6 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
+import playground.pbouman.crowdedness.events.PersonCrowdednessEvent;
 import playground.pbouman.crowdedness.rules.SeatAssignmentRule;
 
 /**
