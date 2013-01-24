@@ -35,10 +35,10 @@ import org.matsim.core.scoring.ScoringFunction;
  */
 public class CrowdedScoringFunction implements ScoringFunction {
 	
-	private final static double standingPenalty = 2 / 3600d;
-	private final static double totalCrowdednessPenalty = 1 / 3600d;
-	private final static double sittingCrowdednessPenalty = 0.5 / 3600d;
-	private final static double standingCrowdednessPenalty = 0.75 / 3600d;
+	private final static double standingPenalty = 16 / 3600d;
+	private final static double totalCrowdednessPenalty = 8 / 3600d;
+	private final static double sittingCrowdednessPenalty = 2 / 3600d;
+	private final static double standingCrowdednessPenalty = 6 / 3600d;
 	
 	private ScoringFunction delegate ;
 	private double score;
