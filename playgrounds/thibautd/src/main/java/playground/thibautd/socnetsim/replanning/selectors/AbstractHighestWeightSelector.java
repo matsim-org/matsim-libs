@@ -53,6 +53,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	private static final Logger log =
 		Logger.getLogger(AbstractHighestWeightSelector.class);
 
+	private static final double EPSILON = 1E-7;
 	private final boolean forbidBlockingCombinations;
 	private final boolean pruneUnplausiblePlans;
 	private final boolean exploreAll;
@@ -451,7 +452,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 							minimalWeightToObtain,
 							newMinimumWeightToObtain,
 							constructedString != null ?
-								constructedString.getWeight() :
+								constructedString.getWeight() - EPSILON :
 								Double.NEGATIVE_INFINITY));
 			}
 			else {
@@ -466,6 +467,12 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 
 			if (newString == null) continue;
+
+			assert newString.getWeight() <= r.cachedMaximumWeight :
+				"weight higher than estimated max: "+newString.getWeight()+" > "+r.cachedMaximumWeight;
+			assert newString.getWeight() >= r.cachedMinimumWeight :
+				"weight lower than estimated min: "+newString.getWeight()+" < "+r.cachedMinimumWeight;
+
 			if (constructedString == null ||
 					newString.getWeight() > constructedString.getWeight()) {
 				constructedString = newString;
@@ -515,7 +522,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			// moreover, returning here makes sure the branch has infinitely negative
 			// weight, even if plans in it have infinitely positive weights
 			if (max == Double.NEGATIVE_INFINITY) return Double.NEGATIVE_INFINITY;
-			score += max;
+			// avoid making the bound too tight, to avoid messing up with the rounding error
+			score += max + EPSILON;
 		}
 
 		return score;
@@ -585,7 +593,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			// moreover, returning here makes sure the branch has infinitely positive
 			// weight, even if plans in it have infinitely negative weights
 			if (min == Double.POSITIVE_INFINITY) return Double.POSITIVE_INFINITY;
-			score += min;
+			// avoid making the bound too tight, to avoid messing up with the rounding error
+			score += min - EPSILON;
 		}
 
 		return score;
