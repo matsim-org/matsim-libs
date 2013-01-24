@@ -655,7 +655,7 @@ public class Controler extends AbstractController {
 		} else if (this.config.simulation() != null && this.config.simulation().getExternalExe() != null ) {
 			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData, this.events);
 			simulation.setControlerIO(this.controlerIO);
-			simulation.setIterationNumber(this.getIterationNumber());
+			simulation.setIterationNumber(this.thisIteration);
 			return simulation;
 		} else if (this.config.controler().getMobsim() != null) {
 			String mobsim = this.config.controler().getMobsim();
@@ -691,7 +691,7 @@ public class Controler extends AbstractController {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
 			}
 
-			int itNumber = this.getIterationNumber();
+			int itNumber = this.thisIteration;
 			if (config.controler().getWriteSnapshotsInterval() != 0 && itNumber % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);
 				for (String snapshotFormat : this.config.controler().getSnapshotFormat()) {
