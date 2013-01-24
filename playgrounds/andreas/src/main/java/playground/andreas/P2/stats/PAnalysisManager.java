@@ -34,7 +34,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
@@ -50,13 +50,13 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.AverageTripDistanceMe
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageWaitingTimeSecondsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountCapacityMeterPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountDeparturesPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountDeparturesWithNoCapacityLeftPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountPassengerMeterPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountTransfersPerModeModeCombination;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerPtModeCombination;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehicleMeterPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountDeparturesWithNoCapacityLeftPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
@@ -109,7 +109,7 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 		
 		// register all analyzes
 		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
-			event.getControler().getEvents().addHandler((EventHandler) ana);
+			event.getControler().getEvents().addHandler(ana);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		// update pt mode for each line in schedule
 		updateLineId2ptModeMap(event.getControler().getScenario().getTransitSchedule());
-		updateVehicleTypes(event.getControler().getScenario().getVehicles());
+		updateVehicleTypes(((ScenarioImpl) event.getControler().getScenario()).getVehicles());
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -103,7 +104,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		this.statsManager.notifyStartup(event);
 		this.pBox.notifyStartup(event);
 		this.baseSchedule = event.getControler().getScenario().getTransitSchedule();
-		this.baseVehicles = event.getControler().getScenario().getVehicles();
+		this.baseVehicles = ((ScenarioImpl) event.getControler().getScenario()).getVehicles();
 		this.schedule = addPTransitScheduleToOriginalOne(this.baseSchedule, this.pBox.getpTransitSchedule());
 		((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
 		this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
@@ -135,7 +136,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 				ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return stuckFactory.getReRouteStuck(controler.createRoutingAlgorithm(), controler.getScenario(), agentsStuckHandler.getAgentsStuck());
+						return stuckFactory.getReRouteStuck(controler.createRoutingAlgorithm(), ((ScenarioImpl)controler.getScenario()), agentsStuckHandler.getAgentsStuck());
 					}
 				});
 			}
@@ -187,7 +188,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 	
 	private void dumpTransitScheduleAndVehicles(Controler controler, int iteration){
 		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(this.schedule);
-		VehicleWriterV1 writer2 = new VehicleWriterV1(controler.getScenario().getVehicles());
+		VehicleWriterV1 writer2 = new VehicleWriterV1(((ScenarioImpl) controler.getScenario()).getVehicles());
 		writer.write(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
 		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "vehicles.xml.gz"));
 	}
