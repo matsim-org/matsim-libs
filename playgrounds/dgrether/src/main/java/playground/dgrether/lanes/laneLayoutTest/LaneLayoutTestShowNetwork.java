@@ -48,6 +48,7 @@ public class LaneLayoutTestShowNetwork {
 		sc.getConfig().plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		sc.getConfig().otfVis().setDrawLinkIds(true);
+		sc.getConfig().otfVis().setDrawNonMovingItems(true);
 		sc.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);

@@ -54,7 +54,7 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		ScenarioImpl scenario = event.getControler().getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , event.getControler().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();

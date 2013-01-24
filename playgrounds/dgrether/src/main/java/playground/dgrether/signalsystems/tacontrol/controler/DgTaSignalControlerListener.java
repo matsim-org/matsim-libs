@@ -51,7 +51,7 @@ public class DgTaSignalControlerListener implements SignalsControllerListener , 
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		ScenarioImpl scenario = event.getControler().getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
 		
 		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
 		this.sensorManager.setLaneDefinitions(scenario.getScenarioElement(LaneDefinitions20.class));

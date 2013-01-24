@@ -56,7 +56,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		ScenarioImpl scenario = event.getControler().getScenario();
+		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
 		
 		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
 		if (scenario.getConfig().scenario().isUseLanes()){
