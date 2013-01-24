@@ -396,9 +396,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		PlanString constructedString = null;
 
 		for (PlanRecord r : records) {
-			if (constructedString != null &&
+			if (!exploreAll &&
+					constructedString != null &&
 					r.cachedMaximumWeight <= constructedString.getWeight()) {
-				assert !exploreAll;
 				if (log.isTraceEnabled()) {
 					log.trace( "maximum weight from now on: "+r.cachedMaximumWeight );
 					log.trace( "weight obtained: "+constructedString.getWeight() );
@@ -407,8 +407,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				break;
 			}
 
-			if (r.cachedMaximumWeight < minimalWeightToObtain) {
-				assert !exploreAll;
+			if (!exploreAll && r.cachedMaximumWeight < minimalWeightToObtain) {
 				if (log.isTraceEnabled()) {
 					log.trace( "maximum weight from now on: "+r.cachedMaximumWeight );
 					log.trace( "minimum weight to obtain: "+minimalWeightToObtain );
@@ -800,6 +799,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 				if (head.jointPlan == null &&
 						!plans.remove( head.plan )) {
+					assert !forbidden.getIndividualPlans().contains( head.plan ) : "planString contains duplicates";
 					return false;
 				}
 			}
