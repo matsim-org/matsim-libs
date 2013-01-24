@@ -159,6 +159,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		int nIndivPlans = 0;
 		//final Set<Set<Id>> jointPlansGroups = new HashSet<Set<Id>>();
 
+		// plans are sorted
 		while (plans.hasNext()) {
 			final PlanRecord plan = plans.next();
 
@@ -256,7 +257,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 
 		for (PlanRecord r : records) {
-			// skip impossible plans
+			// skip forbidden plans
 			if ( r.jointPlan == null &&
 					forbidenPlans.getIndividualPlans().contains( r.plan ) ) {
 				continue;
@@ -270,9 +271,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			Set<Id> actuallyAllocatedPersons = newAllocatedPersons;
 			JointPlan jointPlan = r.jointPlan ;
 			if (jointPlan != null) {
-				// normally, it is impossible that it is always the case if there
-				// is a valid plan: a branch were this would be the case would
-				// have a infinitely negative weight and not explored.
 				if ( contains( jointPlan , alreadyAllocatedPersons ) ) continue;
 				actuallyRemainingPersons = filter( remainingPersons , jointPlan );
 				actuallyAllocatedPersons = new HashSet<Id>( actuallyAllocatedPersons );
@@ -320,7 +318,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			"still to allocate: "+personsStillToAllocate+
 			 ", already allocated: "+alreadyAllocatedPersons;
 		if (log.isTraceEnabled()) {
-			log.trace( "looking ar person "+currentPerson.person.getId()+
+			log.trace( "looking at person "+currentPerson.person.getId()+
 					" with already selected "+alreadyAllocatedPersons );
 		}
 
