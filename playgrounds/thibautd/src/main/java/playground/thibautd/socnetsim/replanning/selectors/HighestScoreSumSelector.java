@@ -32,9 +32,15 @@ public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
 		super( blocking );
 	}
 
-
 	HighestScoreSumSelector(final boolean blocking , final boolean exploreAll) {
 		super( blocking , exploreAll );
+	}
+
+	HighestScoreSumSelector(
+			final boolean blocking,
+			final boolean exploreAll,
+			final boolean pruneUnplausiblePlans) {
+		super( blocking , exploreAll , pruneUnplausiblePlans );
 	}
 
 	@Override

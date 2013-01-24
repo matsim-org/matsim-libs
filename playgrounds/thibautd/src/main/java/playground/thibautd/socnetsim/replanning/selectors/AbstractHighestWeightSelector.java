@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
@@ -55,6 +54,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		Logger.getLogger(AbstractHighestWeightSelector.class);
 
 	private final boolean forbidBlockingCombinations;
+	private final boolean pruneUnplausiblePlans;
 	private final boolean exploreAll;
 
 	protected AbstractHighestWeightSelector() {
@@ -71,8 +71,16 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	protected AbstractHighestWeightSelector(
 			final boolean isForRemoval,
 			final boolean exploreAll) {
+		this( isForRemoval , exploreAll , true );
+	}
+
+	protected AbstractHighestWeightSelector(
+			final boolean isForRemoval,
+			final boolean exploreAll,
+			final boolean pruneUnplausiblePlans) {
 		this.forbidBlockingCombinations = isForRemoval;
 		this.exploreAll = exploreAll;
+		this.pruneUnplausiblePlans = pruneUnplausiblePlans;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -158,11 +166,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	 */
 	private void pruneUnplausiblePlans(
 			final PersonRecord personRecord) {
-		if (exploreAll) return;
+		if (!pruneUnplausiblePlans) return;
 		final Iterator<PlanRecord> plans = personRecord.plans.iterator();
 		final int maxIndivPlans = forbidBlockingCombinations ? 2 : 1;
 		int nIndivPlans = 0;
-		//final Set<Set<Id>> jointPlansGroups = new HashSet<Set<Id>>();
 
 		// plans are sorted
 		while (plans.hasNext()) {
@@ -172,10 +179,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				nIndivPlans++;
 				if (nIndivPlans > maxIndivPlans) plans.remove();
 			}
-			//else {
-			//	final Set<Id> group = plan.jointPlan.getIndividualPlans().keySet();
-			//	if (!jointPlansGroups.add( group )) plans.remove();
-			//}
 		}
 	}
 
