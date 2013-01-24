@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
@@ -51,11 +52,11 @@ public class ComputeKValsAndMaxEpsilon {
 	
 	private HashSet<String> flexibleTypes;
 	
-	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config, 
+	public ComputeKValsAndMaxEpsilon(long seed, Scenario scenario, Config config, 
 			ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes) {
 		rnd = new RandomFromVarDistr();
 		rnd.setSeed(seed);
-		this.scenario = scenario;
+		this.scenario = (ScenarioImpl) scenario;
 		this.config = config;
 		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;

@@ -34,7 +34,7 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 	private RandomLocationMutator initialize() {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
-		scenario = initializer.getControler().getScenario();
+		scenario = (ScenarioImpl) initializer.getControler().getScenario();
 		return new RandomLocationMutator(scenario, new Random(1111));
 	}
 
