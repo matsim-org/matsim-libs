@@ -44,7 +44,7 @@ public class ParkAndRideRemoveStrategy implements PlanStrategyModule {
 	private ScenarioImpl sc;
 	
 	public ParkAndRideRemoveStrategy(Controler controler) {
-		this.sc = controler.getScenario();
+		this.sc = (ScenarioImpl) controler.getScenario();
 	}
 
 	@Override

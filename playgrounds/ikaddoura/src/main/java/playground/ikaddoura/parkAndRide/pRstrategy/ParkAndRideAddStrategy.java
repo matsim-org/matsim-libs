@@ -60,7 +60,7 @@ public class ParkAndRideAddStrategy implements PlanStrategyModule {
 	private int gravity;
 	
 	public ParkAndRideAddStrategy(Controler controler, Map<Id, ParkAndRideFacility> id2prFacility, Map<Id, List<PrWeight>> personId2prWeights, int gravity) {
-		this.sc = controler.getScenario();
+		this.sc = (ScenarioImpl) controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
 		this.id2prFacility = id2prFacility;
