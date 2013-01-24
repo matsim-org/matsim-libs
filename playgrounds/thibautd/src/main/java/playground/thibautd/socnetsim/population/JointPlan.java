@@ -191,12 +191,6 @@ public class JointPlan implements Plan {
 		return output;
 	}
 
-	/**
-	 */
-	public String getType() {
-		return "jointPlan";
-	}
-
 	@Override
 	public String toString() {
 		return getClass().getSimpleName()+": plans="+getIndividualPlans()+
