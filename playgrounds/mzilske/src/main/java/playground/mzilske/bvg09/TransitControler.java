@@ -173,13 +173,13 @@ public class TransitControler extends Controler {
 				new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork(), event.getControler().getScenario()).readFile(this.config.getTransitScheduleFile());
 			}
 			if (this.config.getVehiclesFile() != null) {
-				new VehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(this.config.getVehiclesFile());
+				new VehicleReaderV1(((ScenarioImpl) event.getControler().getScenario()).getVehicles()).parse(this.config.getVehiclesFile());
 			}
 			ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
 					event.getControler().getScenario().getNetwork(), event
 							.getControler().getScenario()
 							.getTransitSchedule().getTransitLines().values(),
-					event.getControler().getScenario().getVehicles(),
+					((ScenarioImpl) event.getControler().getScenario()).getVehicles(),
 					event.getControler().getScenario().getConfig().planCalcScore());
 			reconstructingUmlaufBuilder.build();
 		}
