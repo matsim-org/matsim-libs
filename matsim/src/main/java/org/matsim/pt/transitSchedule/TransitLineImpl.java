@@ -67,4 +67,9 @@ public class TransitLineImpl implements TransitLine {
 		return null != this.transitRoutes.remove(route.getId());
 	}
 
+	@Override
+	public String toString() {
+		return "[TransitLineImpl: line=" + this.lineId.toString() + ", #routes=" + this.transitRoutes.size() + "]";
+	}
+	
 }

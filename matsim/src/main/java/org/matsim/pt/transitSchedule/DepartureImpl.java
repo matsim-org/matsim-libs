@@ -60,4 +60,9 @@ public class DepartureImpl implements Departure {
 		return this.vehicleId;
 	}
 
+	@Override
+	public String toString() {
+		return "[DepartureImpl: id=" + this.id + ", depTime=" + this.departureTime + "]";
+	}
+	
 }

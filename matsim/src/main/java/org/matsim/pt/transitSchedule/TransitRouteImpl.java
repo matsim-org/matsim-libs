@@ -148,4 +148,9 @@ public class TransitRouteImpl implements TransitRoute {
 		this.direction = direction;
 	}
 
+	@Override
+	public String toString() {
+		return "[TransitRouteImpl: route=" + this.lineRouteName + ", #departures=" + this.departures.size() + "]";
+	}
+	
 }
