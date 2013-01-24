@@ -19,23 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.xml.sax.SAXException;
 
-import playground.thibautd.analysis.listeners.CliqueScoreStats;
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
-import playground.thibautd.cliquessim.population.CliquesXmlReader;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
@@ -44,12 +37,14 @@ import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
+import playground.thibautd.socnetsim.replanning.selectors.AbstractHighestWeightSelector;
 
 /**
  * @author thibautd
  */
 public class RunCliquesWithHardCodedStrategies {
-	private static final boolean DO_TRACE = false;
+	private static final boolean DO_STRATEGY_TRACE = false;
+	private static final boolean DO_SELECT_TRACE = false;
 
 	public static class Weights {
 		public double reRoute = 0.1;
@@ -162,7 +157,8 @@ public class RunCliquesWithHardCodedStrategies {
 	}
 
 	public static void main(final String[] args) {
-		if (DO_TRACE) Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
+		if (DO_STRATEGY_TRACE) Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
+		if (DO_SELECT_TRACE) Logger.getLogger( AbstractHighestWeightSelector.class.getName() ).setLevel( Level.TRACE );
 		final String configFile = args[ 0 ];
 
 		// load "registry"
