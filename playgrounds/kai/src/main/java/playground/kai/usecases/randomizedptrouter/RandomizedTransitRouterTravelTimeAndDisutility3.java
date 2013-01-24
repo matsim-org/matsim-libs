@@ -215,6 +215,8 @@ public class RandomizedTransitRouterTravelTimeAndDisutility3  extends TransitRou
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.loadConfig(args[0]) ;
 
+		boolean doVisualization = true;
+
 		config.planCalcScore().setWriteExperiencedPlans(true) ;
 
 		config.otfVis().setDrawTransitFacilities(true) ; // this DOES work
@@ -245,6 +247,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility3  extends TransitRou
 			}
 		}) ;
 		
+		if (doVisualization){
 		ctrl.setMobsimFactory(new MobsimFactory(){
 
 			@Override
@@ -256,7 +259,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility3  extends TransitRou
 				
 				return qSim ;
 			}}) ;
-		
+		}
 		ctrl.run() ;
 		
 	}
