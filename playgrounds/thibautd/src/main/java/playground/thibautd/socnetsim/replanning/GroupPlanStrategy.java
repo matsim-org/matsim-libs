@@ -28,7 +28,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.PlanLinks;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
@@ -50,7 +50,7 @@ public class GroupPlanStrategy {
 	}
 
 	public void run(
-			final PlanLinks jointPlans,
+			final JointPlans jointPlans,
 			final Collection<ReplanningGroup> groups) {
 		List<GroupPlans> plansToHandle = new ArrayList<GroupPlans>();
 
@@ -89,7 +89,7 @@ public class GroupPlanStrategy {
 
 	private static boolean jointPlansAreRegistered(
 			final GroupPlans plans,
-			final PlanLinks jointPlans) {
+			final JointPlans jointPlans) {
 		for (JointPlan jp : plans.getJointPlans()) {
 			if (jointPlans.contains( jp )) return true;
 		}

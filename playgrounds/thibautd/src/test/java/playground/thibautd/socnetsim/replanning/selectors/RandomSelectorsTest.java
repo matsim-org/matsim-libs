@@ -41,7 +41,7 @@ import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.population.PlanLinks;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
@@ -54,12 +54,12 @@ public class RandomSelectorsTest {
 	}
 
 	private final List<ReplanningGroup> testGroups = new ArrayList<ReplanningGroup>();
-	private PlanLinks jointPlans = new PlanLinks();
+	private JointPlans jointPlans = new JointPlans();
 
 	@After
 	public void clear() {
 		testGroups.clear();
-		jointPlans = new PlanLinks();
+		jointPlans = new JointPlans();
 	}
 
 	@Before

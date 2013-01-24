@@ -23,19 +23,19 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
-import playground.thibautd.socnetsim.population.PlanLinks;
+import playground.thibautd.socnetsim.population.JointPlans;
 
 /**
  * @author thibautd
  */
 public class GroupReplanningListenner implements ReplanningListener {
 	private final Population population;
-	private final PlanLinks jointPlans;
+	private final JointPlans jointPlans;
 	private GroupStrategyManager strategyManager;
 
 	public GroupReplanningListenner(
 			final Population population,
-			final PlanLinks jointPlans,
+			final JointPlans jointPlans,
 			final GroupStrategyManager strategyManager) {
 		this.population = population;
 		this.jointPlans = jointPlans;

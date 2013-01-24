@@ -36,7 +36,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.population.PlanLinks;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
@@ -79,7 +79,7 @@ public class GroupStrategyManager {
 	}
 
 	public final void run(
-			final PlanLinks jointPlans,
+			final JointPlans jointPlans,
 			final Population population) {
 		final Collection<ReplanningGroup> groups = groupIdentifier.identifyGroups( population );
 
@@ -110,7 +110,7 @@ public class GroupStrategyManager {
 	}
 
 	private final void removeExtraPlans(
-			final PlanLinks jointPlans,
+			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		int c = 0;
 		while ( removeOneExtraPlan( jointPlans , group ) ) c++;
@@ -123,7 +123,7 @@ public class GroupStrategyManager {
 	}
 
 	private final boolean removeOneExtraPlan(
-			final PlanLinks jointPlans,
+			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		if (log.isTraceEnabled()) log.trace( "removing plans for group "+group );
 		if (maxPlanPerAgent <= 0) return false;
@@ -172,7 +172,7 @@ public class GroupStrategyManager {
 	}
 
 	private static final Collection<Plan> toRemove(
-			final PlanLinks jointPlans,
+			final JointPlans jointPlans,
 			final Person person,
 			final GroupPlans toRemove) {
 		for (Plan plan : person.getPlans()) {

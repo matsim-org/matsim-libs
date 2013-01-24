@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanLinksTest.java
+ * JointPlansTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -37,7 +37,7 @@ import playground.thibautd.socnetsim.scoring.HomogeneousScoreAggregator;
 /**
  * @author thibautd
  */
-public class PlanLinksTest {
+public class JointPlansTest {
 	@Test
 	public void testExceptionAdd() throws Exception {
 		Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
@@ -52,7 +52,7 @@ public class PlanLinksTest {
 		jp2.put( p1.getPerson().getId() , p1 );
 		jp2.put( p3.getPerson().getId() , p3 );
 
-		PlanLinks jointPlans = new PlanLinks();
+		JointPlans jointPlans = new JointPlans();
 		jointPlans.addJointPlan(
 				jointPlans.getFactory().createJointPlan( jp1 ) );
 		boolean gotException = false;
@@ -60,7 +60,7 @@ public class PlanLinksTest {
 			jointPlans.addJointPlan(
 				jointPlans.getFactory().createJointPlan( jp2 ) );
 		}
-		catch (PlanLinks.PlanLinkException e) {
+		catch (JointPlans.PlanLinkException e) {
 			gotException = true;
 		}
 
@@ -78,7 +78,7 @@ public class PlanLinksTest {
 		jp1.put( p1.getPerson().getId() , p1 );
 		jp1.put( p2.getPerson().getId() , p2 );
 
-		PlanLinks jointPlans = new PlanLinks();
+		JointPlans jointPlans = new JointPlans();
 		jointPlans.addJointPlan(
 			jointPlans.getFactory().createJointPlan( jp1 ) );
 
@@ -94,7 +94,7 @@ public class PlanLinksTest {
 		try {
 			jointPlans.removeJointPlan( wrongInstance );
 		}
-		catch (PlanLinks.PlanLinkException e) {
+		catch (JointPlans.PlanLinkException e) {
 			gotException = true;
 		}
 
@@ -159,7 +159,7 @@ public class PlanLinksTest {
 
 	//	gc();
 	//	Assert.assertEquals(
-	//			"PlanLinks did not forget",
+	//			"JointPlans did not forget",
 	//			null,
 	//			refToJp.get());
 	//}
@@ -180,7 +180,7 @@ public class PlanLinksTest {
 
 	//	gc();
 	//	Assert.assertNotNull(
-	//			"PlanLinks did forget while Plans are still referenced",
+	//			"JointPlans did forget while Plans are still referenced",
 	//			refToJp.get());
 	//}
 

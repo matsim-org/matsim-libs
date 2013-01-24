@@ -32,7 +32,7 @@ import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
-import playground.thibautd.socnetsim.population.PlanLinks;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
@@ -96,7 +96,7 @@ public class RunCliquesWithHardCodedStrategies {
 			new ControllerRegistry(
 					scenario,
 					// TODO: import
-					new PlanLinks(),
+					new JointPlans(),
 					new CharyparNagelScoringFunctionFactory(
 						config.planCalcScore(),
 						scenario.getNetwork()) );

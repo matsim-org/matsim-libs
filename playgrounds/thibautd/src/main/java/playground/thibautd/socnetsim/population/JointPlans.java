@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanLinks.java
+ * JointPlans.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -36,9 +36,9 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  *
  * @author thibautd
  */
-public class PlanLinks implements MatsimToplevelContainer {
+public class JointPlans implements MatsimToplevelContainer {
 	private static final Logger log =
-		Logger.getLogger(PlanLinks.class);
+		Logger.getLogger(JointPlans.class);
 
 	// Note: using a WeakHashMap is much harder than expected:
 	// or you reference a Plan->JointPlan mapping, and the Plans
@@ -62,9 +62,9 @@ public class PlanLinks implements MatsimToplevelContainer {
 	private static AtomicInteger instanceCount = new AtomicInteger( 0 );
 	private final JointPlanFactory factory = new JointPlanFactory();
 	
-	public PlanLinks() {
+	public JointPlans() {
 		if (instanceCount.incrementAndGet() > 1) {
-			log.warn( "there are several instances of PlanLinks. Did you expect it?" );
+			log.warn( "there are several instances of JointPlans. Did you expect it?" );
 		}
 		attName = "jointPlanReference_" + instanceCount.toString();
 	}

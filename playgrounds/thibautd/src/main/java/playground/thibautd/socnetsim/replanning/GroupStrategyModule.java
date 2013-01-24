@@ -23,7 +23,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 
-import playground.thibautd.socnetsim.population.PlanLinks;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
@@ -34,7 +34,7 @@ public interface GroupStrategyModule {
 	/**
 	 * Tells the module to handle the specified plans.
 	 * The joint plans referenced by the GroupPlans instance should
-	 * not be assumed as being known by any {@link PlanLinks} container.
+	 * not be assumed as being known by any {@link JointPlans} container.
 	 */
 	public void handlePlans(Collection<GroupPlans> groupPlans);
 }

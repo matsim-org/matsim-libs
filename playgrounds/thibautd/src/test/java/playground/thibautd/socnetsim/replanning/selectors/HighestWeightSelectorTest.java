@@ -43,7 +43,7 @@ import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.population.PlanLinks;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
@@ -62,14 +62,14 @@ public class HighestWeightSelectorTest {
 		final ReplanningGroup group;
 		final GroupPlans expectedSelectedPlans;
 		final GroupPlans expectedSelectedPlansWhenBlocking;
-		final PlanLinks jointPlans;
+		final JointPlans jointPlans;
 
 		public Fixture(
 				final String name,
 				final ReplanningGroup group,
 				final GroupPlans expectedPlans,
 				final GroupPlans expectedSelectedPlansWhenBlocking,
-				final PlanLinks jointPlans) {
+				final JointPlans jointPlans) {
 			this.name = name;
 			this.group = group;
 			this.expectedSelectedPlans = expectedPlans;
@@ -105,7 +105,7 @@ public class HighestWeightSelectorTest {
 	// fixtures management
 	// /////////////////////////////////////////////////////////////////////////
 	public static Fixture createIndividualPlans() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		List<Plan> toBeSelected = new ArrayList<Plan>();
@@ -156,7 +156,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createFullyJointPlans() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
@@ -234,7 +234,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createPartiallyJointPlansOneSelectedJp() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		List<Plan> toBeSelected = new ArrayList<Plan>();
@@ -313,7 +313,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createPartiallyJointPlansTwoSelectedJps() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
@@ -391,7 +391,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createPartiallyJointPlansMessOfJointPlans() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
@@ -507,7 +507,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createOneBigJointPlanDifferentNPlansPerAgent() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp = new HashMap<Id, Plan>();
@@ -562,7 +562,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createPartiallyJointPlansNoSelectedJp() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		List<Plan> toBeSelected = new ArrayList<Plan>();
@@ -667,7 +667,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createOneBigJointPlanDifferentNPlansPerAgent2() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp = new HashMap<Id, Plan>();
@@ -722,7 +722,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createOneBigJointPlanDifferentNPlansPerAgentWithNullScores() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp = new HashMap<Id, Plan>();
@@ -779,7 +779,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createPlanWithDifferentSolutionIfBlocked() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
@@ -860,7 +860,7 @@ public class HighestWeightSelectorTest {
 	}
 
 	public static Fixture createPlanWithNoSolutionIfBlocked() {
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();

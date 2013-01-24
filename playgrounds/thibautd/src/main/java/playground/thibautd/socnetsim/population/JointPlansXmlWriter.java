@@ -42,14 +42,14 @@ public class JointPlansXmlWriter extends MatsimXmlWriter {
 
 	public static void write(
 			final Population population,
-			final PlanLinks jointPlans,
+			final JointPlans jointPlans,
 			final String file ) {
 		new JointPlansXmlWriter( population , jointPlans ).write( file );
 	}
 
 	private JointPlansXmlWriter(
 			final Population population,
-			final PlanLinks jointPlans) {
+			final JointPlans jointPlans) {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				final JointPlan jp = jointPlans.getJointPlan( plan );

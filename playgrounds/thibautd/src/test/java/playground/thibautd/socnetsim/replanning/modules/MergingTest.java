@@ -39,14 +39,14 @@ import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.population.PlanLinks;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
  * @author thibautd
  */
 public class MergingTest {
-	private PlanLinks jointPlans = new PlanLinks();
+	private JointPlans jointPlans = new JointPlans();
 	private final List<GroupPlans> testPlans = new ArrayList<GroupPlans>();
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ public class MergingTest {
 	@After
 	public void clean() {
 		testPlans.clear();
-		jointPlans = new PlanLinks();
+		jointPlans = new JointPlans();
 	}
 
 	@Before

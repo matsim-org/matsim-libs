@@ -41,8 +41,8 @@ import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.
 /**
  * @author thibautd
  */
-public class JointPlansXmlReader extends AbstractParsePullXmlReader<PlanLinks> {
-	public static PlanLinks readJointPlans(
+public class JointPlansXmlReader extends AbstractParsePullXmlReader<JointPlans> {
+	public static JointPlans readJointPlans(
 			final Population population,
 			final String fileName) {
 		return new JointPlansXmlReader( population ).readFile( fileName );
@@ -55,11 +55,11 @@ public class JointPlansXmlReader extends AbstractParsePullXmlReader<PlanLinks> {
 	}
 
 	@Override
-	protected PlanLinks parse(
+	protected JointPlans parse(
 			final XMLStreamReader streamReader)
 			throws XMLStreamException {
 		final Counter counter = new Counter( "parsing joint plan # " );
-		final PlanLinks jointPlans = new PlanLinks();
+		final JointPlans jointPlans = new JointPlans();
 
 		while ( streamReader.next() != XMLStreamConstants.START_ELEMENT );
 		while (streamReader.hasNext()) {
