@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package air.run;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -28,7 +29,9 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
  * 
  */
 public class DgFlightControllerStucked {
-
+	
+	private static final Logger log = Logger.getLogger(DgFlightControllerStucked.class);
+	
 	public static void main(String[] args) {
 //		String[] args2 = {"/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph_one_line/air_config.xml"};
 		Controler controler = new Controler(args);
@@ -39,6 +42,7 @@ public class DgFlightControllerStucked {
 		controler.addControlerListener(lis);
 		if (flightConfig.doRerouteStuckedPersons()){
 			controler.addControlerListener(new FlightStuckedReplanning());
+			log.info("Switched on flight stucked replanning");
 		}
 		controler.run();
 
