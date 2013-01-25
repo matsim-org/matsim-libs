@@ -21,8 +21,10 @@ package playground.thibautd.socnetsim.run;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
@@ -33,6 +35,8 @@ import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControl
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
+import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
+import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -171,6 +175,18 @@ public class RunCliquesWithHardCodedStrategies {
 					},
 					controllerRegistry.getScenario().getPopulation(),
 					controller.getControlerIO().getOutputFilename( "scoresStatsAll" )));
+
+		controller.addControlerListener(
+				new JointPlanSizeStats(
+					controller.getControlerIO(),
+					controllerRegistry.getScenario(),
+					new AbstractPlanAnalyzerPerGroup.GroupIdentifier() {
+						final Id group = new IdImpl( "All" );
+						@Override
+						public Id getGroup(final Person person) {
+							return group;
+						}
+					}));
 
 		controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
 
