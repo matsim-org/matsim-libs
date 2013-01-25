@@ -29,13 +29,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
-import playground.thibautd.analysis.listeners.FilteredScoreStats;
-import playground.thibautd.analysis.listeners.FilteredScoreStats.PersonFilter;
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
+import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
@@ -162,21 +161,6 @@ public class RunCliquesWithHardCodedStrategies {
 					controllerRegistry.getEvents(),
 					controller.getControlerIO() ));
 
-		controller.addControlerListener(
-				new FilteredScoreStats(
-					new PersonFilter() {
-						@Override
-						public boolean acceptPerson(final Person person) {
-							return true;
-						}
-						@Override
-						public String getName() {
-							return "All Agents";
-						}
-					},
-					controllerRegistry.getScenario().getPopulation(),
-					controller.getControlerIO().getOutputFilename( "scoresStatsAll" )));
-
 		final AbstractPlanAnalyzerPerGroup.GroupIdentifier allAgentsIdentifier =
 					new AbstractPlanAnalyzerPerGroup.GroupIdentifier() {
 						final Id group = new IdImpl( "All" );
@@ -185,6 +169,12 @@ public class RunCliquesWithHardCodedStrategies {
 							return group;
 						}
 					};
+
+		controller.addControlerListener(
+				new FilteredScoreStats(
+					controller.getControlerIO(),
+					controllerRegistry.getScenario(),
+					allAgentsIdentifier));
 
 		controller.addControlerListener(
 				new JointPlanSizeStats(
