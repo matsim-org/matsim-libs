@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.analysis;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -34,6 +35,7 @@ import playground.thibautd.utils.ObjectPool;
  */
 public class CliquesSizeGroupIdentifier implements AbstractPlanAnalyzerPerGroup.GroupIdentifier {
 	private final Map<Id, Id> personIdToGroupId = new LinkedHashMap<Id, Id>();
+	private final Id fullGroupId = new IdImpl( "all" );
 
 	public CliquesSizeGroupIdentifier(final Collection<? extends Collection<Id>> groups) {
 		final ObjectPool<Id> idPool = new ObjectPool<Id>();
@@ -47,8 +49,10 @@ public class CliquesSizeGroupIdentifier implements AbstractPlanAnalyzerPerGroup.
 	}
 
 	@Override
-	public Id getGroup(final Person person) {
-		return personIdToGroupId.get( person.getId() );
+	public Iterable<Id> getGroups(final Person person) {
+		return Arrays.asList(
+				personIdToGroupId.get( person.getId() ),
+				fullGroupId);
 	}
 }
 

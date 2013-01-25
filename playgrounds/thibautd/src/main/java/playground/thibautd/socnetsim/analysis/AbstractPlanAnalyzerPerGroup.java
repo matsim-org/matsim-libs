@@ -52,9 +52,11 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 	/**
 	 * THe plan sizes are plotted per group: this class aims at saying which agent
 	 * pertains to each group (eg "agents in an household of 3 persons which have a car available")
+	 * <br>
+	 * An agent can pertain to any number of groups
 	 */
 	public static interface GroupIdentifier {
-		public Id getGroup(Person person);
+		public Iterable<Id> getGroups(Person person);
 	}
 
 	private final Scenario scenario;
@@ -94,12 +96,12 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			final History history =
-				historyPerGroup.getHistoryForGroup(
-						groupIdentifier.getGroup( person ) );
+			for (Id groupId : groupIdentifier.getGroups( person )) {
+				final History history = historyPerGroup.getHistoryForGroup( groupId );
 
-			history.notifyIteration( event.getIteration() );
-			fillStatsForPerson( history , person );
+				history.notifyIteration( event.getIteration() );
+				fillStatsForPerson( history , person );
+			}
 		}
 
 		for (Map.Entry<Id, History> entry : historyPerGroup.getEntries()) {
