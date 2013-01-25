@@ -47,7 +47,6 @@ import playground.thibautd.socnetsim.router.JointTripRouterFactory;
  */
 public final class ControllerRegistry {
 	private final Scenario scenario;
-	private final JointPlans jointPlans;
 	private final EventsManager events;
 	private final TravelTimeCalculator travelTime;
 	private final TravelDisutilityFactory travelDisutilityFactory;
@@ -62,7 +61,7 @@ public final class ControllerRegistry {
 			final JointPlans jointPlans,
 			final ScoringFunctionFactory scoringFunctionFactory) {
 		this.scenario = scenario;
-		this.jointPlans = jointPlans;
+		addJointPlansToScenario( scenario , jointPlans );
 		this.scoringFunctionFactory = scoringFunctionFactory;
 
 		this.events = EventsUtils.createEventsManager( scenario.getConfig() );
@@ -122,12 +121,20 @@ public final class ControllerRegistry {
 				null); // last arg: transit router factory.
 	}
 
+	private static void addJointPlansToScenario(
+			final Scenario scenario,
+			final JointPlans jointPlans) {
+		final JointPlans alreadyHere = scenario.getScenarioElement( JointPlans.class );
+		if (alreadyHere != null && alreadyHere != jointPlans) throw new IllegalArgumentException();
+		scenario.addScenarioElement( jointPlans );
+	}
+
 	public Scenario getScenario() {
 		return scenario;
 	}
 	
 	public JointPlans getJointPlans() {
-		return jointPlans;
+		return scenario.getScenarioElement( JointPlans.class );
 	}
 
 	public EventsManager getEvents() {
