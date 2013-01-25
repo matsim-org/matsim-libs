@@ -1,7 +1,6 @@
 package playground.dhosse.bachelorarbeit;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkSimplifier;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -11,7 +10,7 @@ public class Main {
 
 	public static void main(String args[]){
 		
-		String file1 = "./input/zurich.xml";
+		String file1 = "./input/network_bridge.xml";
 //		String file2 = "./input/network_bridge.xml";
 		
 		Config config = ConfigUtils.createConfig();
@@ -27,7 +26,7 @@ public class Main {
 //		NetworkSimplifier simp = new NetworkSimplifier();
 //		simp.run(sc.getNetwork());
 		NetworkInspector nI = new NetworkInspector(sc.getNetwork());
-		nI.checkNetworkAttributes(true, false);
+		nI.checkNetworkAttributes(true, true);
 		nI.isRoutable();
 
 //		Grid grid = new Grid();

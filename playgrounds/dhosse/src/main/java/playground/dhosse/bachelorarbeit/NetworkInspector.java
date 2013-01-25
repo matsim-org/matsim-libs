@@ -25,9 +25,12 @@ public class NetworkInspector {
 	
 	private DecimalFormat df = new DecimalFormat(",##0.00");
 	
+	private double[] linkCapacities;
+	
 	public NetworkInspector(final Network net){
 		
 		this.net = net;
+		this.linkCapacities = new double[5];
 		
 	}
 	
@@ -73,6 +76,17 @@ public class NetworkInspector {
 			int numberOfLanes = (int) link.getNumberOfLanes();
 			nLanes[numberOfLanes-1]++;
 			
+			if(link.getCapacity()<=500)
+				this.linkCapacities[0]++;
+			else if(link.getCapacity()<=1000&&link.getCapacity()>500)
+				this.linkCapacities[1]++;
+			else if(link.getCapacity()<=1500&&link.getCapacity()>1000)
+				this.linkCapacities[2]++;
+			else if(link.getCapacity()<=2000&&link.getCapacity()>1500)
+				this.linkCapacities[3]++;
+			else if(link.getCapacity()>2000)
+				this.linkCapacities[4]++;
+			
 			this.distances.put(link.getId(), distance);
 			
 			if(link.getLength()<7){
@@ -96,6 +110,8 @@ public class NetworkInspector {
 		createLaneStatisticsFiles(nLanes);
 		
 		createLinkLengthComparisonFile();
+		
+		createLinkCapacityFiles();
 		
 		logger.info("done.");
 
@@ -171,6 +187,24 @@ public class NetworkInspector {
 		System.out.println("total length of network: " + length + "m\n"
 				+ "geom. length of network: " + gLength + "m");
 	}
+	
+private void createLinkCapacityFiles() throws IOException{
+		
+		logger.info("writing capacities statistics file...");
+		
+		//kategorien: 500|1000|1500|2000|>...
+		String[] categories = new String[5];
+		categories[0]="<=500";
+		categories[1]="<=1000";
+		categories[2]="<=1500";
+		categories[3]="<=2000";
+		categories[4]=">2000";
+		
+		BarChart chart = new BarChart("Link capacities","capacity","number of objects",categories);
+		chart.addSeries("capacities", this.linkCapacities);
+		chart.saveAsPng("./test/linkCapacities.png", 800, 600);
+		
+	}
 
 	private void createNodeDegreesFiles(double[] inDegrees, double[] outDegrees) throws IOException {
 		
@@ -191,10 +225,4 @@ public class NetworkInspector {
 		chart.saveAsPng("./test/nodeDegrees.png", 800, 600);
 	}
 	
-//	private void createLinkCapacityFiles() throws IOException{
-//		File file = new File("./test/linkCapacities.txt");
-//		FileWriter writer = new FileWriter(file);
-//		writer.write("nObjects");
-//	}
-
 }
