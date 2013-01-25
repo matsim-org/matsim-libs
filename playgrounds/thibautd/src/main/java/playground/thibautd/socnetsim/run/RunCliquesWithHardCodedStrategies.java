@@ -37,6 +37,7 @@ import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
+import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -176,17 +177,26 @@ public class RunCliquesWithHardCodedStrategies {
 					controllerRegistry.getScenario().getPopulation(),
 					controller.getControlerIO().getOutputFilename( "scoresStatsAll" )));
 
-		controller.addControlerListener(
-				new JointPlanSizeStats(
-					controller.getControlerIO(),
-					controllerRegistry.getScenario(),
+		final AbstractPlanAnalyzerPerGroup.GroupIdentifier allAgentsIdentifier =
 					new AbstractPlanAnalyzerPerGroup.GroupIdentifier() {
 						final Id group = new IdImpl( "All" );
 						@Override
 						public Id getGroup(final Person person) {
 							return group;
 						}
-					}));
+					};
+
+		controller.addControlerListener(
+				new JointPlanSizeStats(
+					controller.getControlerIO(),
+					controllerRegistry.getScenario(),
+					allAgentsIdentifier));
+
+		controller.addControlerListener(
+				new JointTripsStats(
+					controller.getControlerIO(),
+					controllerRegistry.getScenario(),
+					allAgentsIdentifier));
 
 		controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
 
