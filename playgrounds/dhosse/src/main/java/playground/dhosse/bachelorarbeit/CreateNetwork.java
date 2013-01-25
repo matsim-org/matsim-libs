@@ -1,30 +1,38 @@
 package playground.dhosse.bachelorarbeit;
 
 import java.io.IOException;
+import java.util.Collection;
 
-import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.io.OsmNetworkReader;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geomgraph.NodeFactory;
 
 
 public class CreateNetwork {
 	
 	public static void main(String[] args) throws IOException {
+
+		Config config = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario(config);
+		Network net = sc.getNetwork();
 		
-		
-		
-		String input = "./input/berlin_detailnetz.shp";
 		ShapeFileReader reader = new ShapeFileReader();
-		reader.readFileAndInitialize(input);
+		Collection<SimpleFeature> features=reader.readFileAndInitialize("./input/detailnetz_berlin.shp");
+		
+		for(SimpleFeature feature : features){
+			NodeFactory nF = new NodeFactory();
+			
+//			nF.createNode(coord);
+//			LinkFactoryImpl linkF = new LinkFactoryImpl();
+//			linkF.createLink(id, from, to, net, feature.getAttribute("LAENGE"), freespeed, capacity, nOfLanes);
+		}
 		
 //	    String osm = "./input/berlin.osm";
 //	    Config config = ConfigUtils.createConfig();

@@ -1,6 +1,7 @@
 package playground.dhosse.bachelorarbeit;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.matsim4opus.utils.network.NetworkSimplifier;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -10,7 +11,7 @@ public class Main {
 
 	public static void main(String args[]){
 		
-		String file1 = "./input/brb.xml";
+		String file1 = "./input/zurich.xml";
 //		String file2 = "./input/network_bridge.xml";
 		
 		Config config = ConfigUtils.createConfig();
@@ -19,11 +20,15 @@ public class Main {
 		
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
 		nr.readFile(file1);
+
 //		MatsimNetworkReader nr2 = new MatsimNetworkReader(sc2);
 //		nr2.readFile(file2);
 		
+		NetworkSimplifier simp = new NetworkSimplifier();
+		simp.run(sc.getNetwork());
 		NetworkInspector nI = new NetworkInspector(sc.getNetwork());
-		nI.checkNetworkAttributes(true, true);
+		nI.checkNetworkAttributes(true, false);
+		nI.isRoutable();
 
 //		Grid grid = new Grid();
 //		grid.calculateTravelTime(sc.getNetwork());
