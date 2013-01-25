@@ -34,12 +34,14 @@ import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
+import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
@@ -140,10 +142,12 @@ public class RunCliquesWithHardCodedStrategies {
 				weights.logitSelection );
 
 		// create strategy manager
+		final FixedGroupsIdentifier cliques = 
+			FixedGroupsIdentifierFileParser.readCliquesFile(
+					cliquesConf.getInputFile() );
 		final GroupStrategyManager strategyManager =
 			new GroupStrategyManager( 
-					FixedGroupsIdentifierFileParser.readCliquesFile(
-							cliquesConf.getInputFile() ),
+					cliques,
 					strategyRegistry,
 					config.strategy().getMaxAgentPlanMemorySize());
 
@@ -161,32 +165,27 @@ public class RunCliquesWithHardCodedStrategies {
 					controllerRegistry.getEvents(),
 					controller.getControlerIO() ));
 
-		final AbstractPlanAnalyzerPerGroup.GroupIdentifier allAgentsIdentifier =
-					new AbstractPlanAnalyzerPerGroup.GroupIdentifier() {
-						final Id group = new IdImpl( "All" );
-						@Override
-						public Id getGroup(final Person person) {
-							return group;
-						}
-					};
+		CliquesSizeGroupIdentifier groupIdentifier =
+			new CliquesSizeGroupIdentifier(
+					cliques.getGroupInfo() );
 
 		controller.addControlerListener(
 				new FilteredScoreStats(
 					controller.getControlerIO(),
 					controllerRegistry.getScenario(),
-					allAgentsIdentifier));
+					groupIdentifier));
 
 		controller.addControlerListener(
 				new JointPlanSizeStats(
 					controller.getControlerIO(),
 					controllerRegistry.getScenario(),
-					allAgentsIdentifier));
+					groupIdentifier));
 
 		controller.addControlerListener(
 				new JointTripsStats(
 					controller.getControlerIO(),
 					controllerRegistry.getScenario(),
-					allAgentsIdentifier));
+					groupIdentifier));
 
 		controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
 

@@ -43,6 +43,10 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 		this.groupsInfo = groups;
 	}
 
+	public Collection<? extends Collection<Id>> getGroupInfo() {
+		return groupsInfo;
+	}
+
 	@Override
 	public Collection<ReplanningGroup> identifyGroups(final Population population) {
 		final List<ReplanningGroup> groups = new ArrayList<ReplanningGroup>();
