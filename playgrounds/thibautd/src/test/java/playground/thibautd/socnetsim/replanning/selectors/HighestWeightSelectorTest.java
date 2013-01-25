@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,7 +41,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
@@ -926,7 +924,7 @@ public class HighestWeightSelectorTest {
 
 	@Before
 	public void setupLogging() {
-		Logger.getRootLogger().setLevel( Level.TRACE );
+		//Logger.getRootLogger().setLevel( Level.TRACE );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
