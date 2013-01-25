@@ -24,8 +24,8 @@ public class Main {
 //		MatsimNetworkReader nr2 = new MatsimNetworkReader(sc2);
 //		nr2.readFile(file2);
 		
-		NetworkSimplifier simp = new NetworkSimplifier();
-		simp.run(sc.getNetwork());
+//		NetworkSimplifier simp = new NetworkSimplifier();
+//		simp.run(sc.getNetwork());
 		NetworkInspector nI = new NetworkInspector(sc.getNetwork());
 		nI.checkNetworkAttributes(true, false);
 		nI.isRoutable();
