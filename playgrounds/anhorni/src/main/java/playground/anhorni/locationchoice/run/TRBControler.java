@@ -23,10 +23,6 @@ import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.anhorni.locationchoice.analysis.PrintShopAndLeisureLocations;
 import playground.anhorni.locationchoice.analysis.TravelDistanceDistribution;
 import playground.anhorni.locationchoice.analysis.events.CalcLegDistancesListenerDetailed;
