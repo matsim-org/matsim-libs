@@ -67,7 +67,7 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 			blackListToUse = composite;
 		}
 
-		return new TripsToLegsAlgorithm( router , blackListToUse );
+		return new TripsToLegsAlgorithm( blackListToUse );
 	}
 }
 

@@ -23,9 +23,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
-
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 
 /**
  * Simplifies a plan to its structure, so that plan algorithms
@@ -35,25 +39,41 @@ import org.matsim.core.router.TripRouter;
  * @author thibautd
  */
 public class TripsToLegsAlgorithm implements PlanAlgorithm {
-	private final TripRouter router;
 	private final StageActivityTypes blackList;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	public TripsToLegsAlgorithm(final TripRouter router) {
-		this( router , router.getStageActivityTypes() );
+		this( router.getStageActivityTypes() );
 	}
 
+	
 	public TripsToLegsAlgorithm(
-			final TripRouter router,
 			final StageActivityTypes blackList) {
-		this.router = router;
+		this( blackList , new MainModeIdentifierImpl() );
+	}
+	
+	public TripsToLegsAlgorithm(
+			final StageActivityTypes blackList,
+			final MainModeIdentifier mainModeIdentifier) {
 		this.blackList = blackList;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		List<PlanElement> structure = router.tripsToLegs( plan , blackList );
-		plan.getPlanElements().clear();
-		plan.getPlanElements().addAll( structure );
+		final List<PlanElement> planElements = plan.getPlanElements();
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , blackList );
+		
+		for ( Trip trip : trips ) {
+			final List<PlanElement> fullTrip =
+				planElements.subList(
+						planElements.indexOf( trip.getOriginActivity() ) + 1,
+						planElements.indexOf( trip.getDestinationActivity() ));
+			final String mode = mainModeIdentifier.identifyMainMode( fullTrip );
+			fullTrip.clear();
+			fullTrip.add( new LegImpl( mode ) );
+			if ( fullTrip.size() != 1 ) throw new RuntimeException( fullTrip.toString() );
+		}
 	}
 }
 

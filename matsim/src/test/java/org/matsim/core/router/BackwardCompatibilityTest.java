@@ -42,6 +42,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -120,7 +121,8 @@ public class BackwardCompatibilityTest {
 	public void testTravelTime() {
 		for (Person person : controler.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
+				new TripsToLegsAlgorithm( tripRouter ).run( plan );
+				Iterator<PlanElement> iterator = plan.getPlanElements().iterator();
 
 				Activity origin = (Activity) iterator.next();
 
@@ -164,7 +166,8 @@ public class BackwardCompatibilityTest {
 	public void testMode() {
 		for (Person person : controler.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
+				new TripsToLegsAlgorithm( tripRouter ).run( plan );
+				Iterator<PlanElement> iterator = plan.getPlanElements().iterator();
 
 				Activity origin = (Activity) iterator.next();
 
