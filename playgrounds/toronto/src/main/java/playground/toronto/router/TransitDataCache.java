@@ -224,8 +224,8 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 						}
 					}
 				}
-				log.warn("No departures were recorded for line " + lineId + " route " + routeId + " at stop " 
-						+ key.getStopFacility().getId() + "! TransitDataCache is using scheduled departure times for this stop. This could cause problems!");
+				//log.warn("No departures were recorded for line " + lineId + " route " + routeId + " at stop " 
+						//+ key.getStopFacility().getId() + "! TransitDataCache is using scheduled departure times for this stop. This could cause problems!");
 				this.departures.put(key, this.defaultDepartures.get(key));
 			}
 		}
