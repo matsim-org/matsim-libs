@@ -47,13 +47,13 @@ public class CreateTestNetwork {
 	public static NetworkImpl createTestNetwork() {
 
 		/*
-		 * (2)		(5)
+		 * (2)		(5)------(8)
 		 * 	|		 |
 		 * 	|		 |
 		 * (1)------(4)------(7)
 		 * 	|		 |
 		 * 	|		 |
-		 * (3)		(6)
+		 * (3)		(6)------(9)
 		 */
 		double freespeed = 2.7;	// this is m/s and corresponds to 50km/h
 		double capacity = 500.;
@@ -71,6 +71,8 @@ public class CreateTestNetwork {
 		Node node5 = network.createAndAddNode(new IdImpl(5), scenario.createCoord(100, 200));
 		Node node6 = network.createAndAddNode(new IdImpl(6), scenario.createCoord(100, 0));
 		Node node7 = network.createAndAddNode(new IdImpl(7), scenario.createCoord(200, 100));
+		Node node8 = network.createAndAddNode(new IdImpl(8), scenario.createCoord(200, 200));
+		Node node9 = network.createAndAddNode(new IdImpl(9), scenario.createCoord(200, 0));
 
 		// add links (bi-directional)
 		network.createAndAddLink(new IdImpl(1), node1, node2, 100, freespeed, capacity, numLanes);
@@ -85,6 +87,10 @@ public class CreateTestNetwork {
 		network.createAndAddLink(new IdImpl(10), node6, node4, 100, freespeed, capacity, numLanes);
 		network.createAndAddLink(new IdImpl(11), node4, node7, 100, freespeed, capacity, numLanes);
 		network.createAndAddLink(new IdImpl(12), node7, node4, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(13), node5, node8, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(14), node8, node5, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(15), node6, node9, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(16), node9, node6, 100, freespeed, capacity, numLanes);
 
 		return network;
 	}
@@ -92,13 +98,13 @@ public class CreateTestNetwork {
 	public static String createTestPtStationCSVFile(){
 		
 		/*
-		 * (2)(pt2)	(5)
+		 * (2)	    (5)------(8)
+		 * 	|(pt2)   |   (pt3)
 		 * 	|		 |
-		 * 	|		 |(pt3)
 		 * (1)------(4)------(7)
 		 * 	|		 |
-		 * 	|		 |
-		 * (3)(pt1) (6)
+		 * 	|(pt1)   |   (pt4)
+		 * (3)      (6)------(9)
 		 */
 		
 		String location = TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptStops.csv";
@@ -108,7 +114,8 @@ public class CreateTestNetwork {
 			bw.write("id,x,y" + InternalConstants.NEW_LINE); 	// header
 			bw.write("1,10,10" + InternalConstants.NEW_LINE);	// pt stop next to node (3)
 			bw.write("2,10, 190" + InternalConstants.NEW_LINE); // pt stop next to node (2)
-			bw.write("3,110,110" + InternalConstants.NEW_LINE); // pt stop next to node (4)
+			bw.write("3,190,190" + InternalConstants.NEW_LINE); // pt stop next to node (8)
+			bw.write("4,190,10" + InternalConstants.NEW_LINE);  // pt stop next to node (9)
 			bw.flush();
 			bw.close();
 		}
@@ -120,21 +127,22 @@ public class CreateTestNetwork {
 	
 	public static List<Coord> getTestFacilityLocations(){
 		
-		/*    B
-		 * (2)		(5)
+		/*    B             C
+		 * (2)		(5)------(8)
 		 * 	|		 |
-		 * 	|		 |    C
+		 * 	|		 |    
 		 * (1)------(4)------(7)
 		 * 	|		 |           
 		 * 	|		 |
-		 * (3)		(6)
-		 *    A
+		 * (3)		(6)------(9)
+		 *    A             D
 		 */   
 		
 		List<Coord> facilityList = new ArrayList<Coord>();
 		facilityList.add(new CoordImpl(10, -40));  // 50m to pt station 1
 		facilityList.add(new CoordImpl(10, 240));  // 50m to pt station 2
-		facilityList.add(new CoordImpl(160, 110)); // 50m to pt station 3
+		facilityList.add(new CoordImpl(190, 240)); // 50m to pt station 3
+		facilityList.add(new CoordImpl(190, -40)); // 50m to pt station 4
 		return facilityList;
 	}
 }
