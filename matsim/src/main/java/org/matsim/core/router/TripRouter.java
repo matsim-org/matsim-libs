@@ -325,6 +325,11 @@ public class TripRouter {
 			}
 			if (pe == destination) {
 				indexOfDestination = currentIndex;
+				if ( indexOfOrigin < 0 ) {
+					throw new RuntimeException(
+							"destination "+destination+" found before origin "+
+							origin+" in "+plan );
+				}
 				break;
 			}
 			currentIndex++;
