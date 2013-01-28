@@ -299,6 +299,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		Leg leg2 = pFactory.createLeg(TransportMode.car);
 		plan.addLeg(leg2);
 
+		home = pFactory.createActivityFromLinkId("home", scenario.createId("1"));
 		plan.addActivity(home);
 
 		person.addPlan(plan);
