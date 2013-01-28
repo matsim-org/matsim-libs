@@ -206,11 +206,14 @@ public class JointTimeModeChooserSolution implements Solution {
 			}
 		}
 
-		//for (Tuple<Plan , List<PlanElement>> individualPlan : values.planStructures) {
-			//List<PlanElement> routed = planRouter.run( individualPlan.getFirst().getPerson() , individualPlan.getSecond() );
-			//planRouter.updatePlanElements( individualPlan.getFirst() , routed );
-			if (true) throw new RuntimeException( "TODO" );
-		//}
+		for (Tuple<Plan , List<PlanElement>> individualPlan : values.planStructures) {
+			List<PlanElement> routed = RoutingUtils.route(
+					planRouter,
+					individualPlan.getFirst().getPerson(),
+					individualPlan.getSecond() );
+			individualPlan.getFirst().getPlanElements().clear();
+			individualPlan.getFirst().getPlanElements().addAll( routed );
+		}
 
 		// make sure time are consistent (activities start at the arrival time, etc.)
 		enforceTimeConsistency( plan );
@@ -269,6 +272,7 @@ public class JointTimeModeChooserSolution implements Solution {
 			double lastNow = 0;
 			((Activity) planStructure.get( 0 )).setStartTime( Time.UNDEFINED_TIME );
 			((Activity) planStructure.get( planStructure.size() - 1 )).setEndTime( Time.UNDEFINED_TIME );
+			final Iterator<PlanElement> planIter = individualPlan.getPlanElements().iterator();
 			for (PlanElement pe : planStructure.subList(0 , planStructure.size() - 1)) {
 				now = updateNow( now , pe );
 
@@ -292,6 +296,30 @@ public class JointTimeModeChooserSolution implements Solution {
 						act.setEndTime( Time.UNDEFINED_TIME );
 						act.setMaximumDuration( 0 );
 					}
+				}
+				else if ( ((Leg) pe).getMode().equals( JointActingTypes.DRIVER ) ) {
+					PlanElement planLeg = planIter.next();
+					while ( !(planLeg instanceof Leg) ||
+							!((Leg) planLeg).getMode().equals( JointActingTypes.DRIVER ) ) {
+						planLeg = planIter.next();
+					}
+
+					final Leg l = ((Leg) planLeg);
+					// the cast is not necessary, but acts as a type check
+					final DriverRoute planRoute = (DriverRoute) l.getRoute();
+					((Leg) pe).setRoute( planRoute.clone() );
+				}
+				else if ( ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
+					PlanElement planLeg = planIter.next();
+					while ( !(planLeg instanceof Leg) ||
+							!((Leg) planLeg).getMode().equals( JointActingTypes.PASSENGER ) ) {
+						planLeg = planIter.next();
+					}
+
+					final Leg l = ((Leg) planLeg);
+					// the cast is not necessary, but acts as a type check
+					final PassengerRoute planRoute = (PassengerRoute) l.getRoute();
+					((Leg) pe).setRoute( planRoute.clone() );
 				}
 			}
 
@@ -433,6 +461,7 @@ public class JointTimeModeChooserSolution implements Solution {
 			final Id passenger) {
 		// FIXME: invalid if several joint trips with the same OD (the
 		// tt for the first driver trip will always be considered)
+		assert driver != null;
 		for (PlanElement pe : plan.getIndividualPlans().get( driver ).getPlanElements()) {
 			if (pe instanceof Leg) {
 				Route r = ((Leg) pe).getRoute();
