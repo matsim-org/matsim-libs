@@ -102,9 +102,9 @@ public class TimeModeChooserSolution implements Solution {
 			}
 		}
 
-		List<PlanElement> elements = planRouter.run( plan.getPerson() , values.planStructure );
 		plan.getPlanElements().clear();
-		plan.getPlanElements().addAll( elements );
+		plan.getPlanElements().addAll( values.planStructure );
+		planRouter.run( plan );
 
 		// make sure time are consistent (activities start at the arrival time, etc.)
 		enforceTimeConsistency( plan );

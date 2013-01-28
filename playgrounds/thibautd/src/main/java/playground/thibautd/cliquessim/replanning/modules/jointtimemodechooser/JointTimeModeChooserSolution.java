@@ -203,10 +203,11 @@ public class JointTimeModeChooserSolution implements Solution {
 			}
 		}
 
-		for (Tuple<Plan , List<PlanElement>> individualPlan : values.planStructures) {
-			List<PlanElement> routed = planRouter.run( individualPlan.getFirst().getPerson() , individualPlan.getSecond() );
-			planRouter.updatePlanElements( individualPlan.getFirst() , routed );
-		}
+		//for (Tuple<Plan , List<PlanElement>> individualPlan : values.planStructures) {
+			//List<PlanElement> routed = planRouter.run( individualPlan.getFirst().getPerson() , individualPlan.getSecond() );
+			//planRouter.updatePlanElements( individualPlan.getFirst() , routed );
+			if (true) throw new RuntimeException( "TODO" );
+		//}
 
 		// make sure time are consistent (activities start at the arrival time, etc.)
 		enforceTimeConsistency( plan );

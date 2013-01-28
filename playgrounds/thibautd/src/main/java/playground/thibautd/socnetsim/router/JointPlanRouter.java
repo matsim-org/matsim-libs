@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.router;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,9 +45,7 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
  * @author thibautd
  */
 public class JointPlanRouter extends PlanRouter {
-	private static final Logger log =
-		Logger.getLogger(JointPlanRouter.class);
-
+	
 	public JointPlanRouter(
 			final TripRouter routingHandler,
 			final ActivityFacilities facilities ) {
@@ -59,38 +58,27 @@ public class JointPlanRouter extends PlanRouter {
 	}
 
 	@Override
-	public void updatePlanElements(
-			final Plan plan,
-			final List<PlanElement> newPlanElements) {
-		try {
-			// "transmit" joint info before update
-			JointRouteIterator oldPlan = new JointRouteIterator( plan.getPlanElements() );
-			JointRouteIterator newPlan = new JointRouteIterator( newPlanElements ) ;
+	public void run( final Plan plan ) {
+		JointRouteIterator oldPlan = new JointRouteIterator( plan.getPlanElements() );
+		super.run( plan );
+		// "transmit" joint info before returning
+		JointRouteIterator newPlan = new JointRouteIterator( plan.getPlanElements() ) ;
 
-			Route oldRoute = oldPlan.nextJointRoute();
-			Route newRoute = newPlan.nextJointRoute();
+		Route oldRoute = oldPlan.nextJointRoute();
+		Route newRoute = newPlan.nextJointRoute();
 
-			while (oldRoute != null) {
-				if (oldRoute instanceof DriverRoute) {
-					((DriverRoute) newRoute).setPassengerIds(
-						((DriverRoute) oldRoute).getPassengersIds() );
-				}
-				else {
-					((PassengerRoute) newRoute).setDriverId(
-						((PassengerRoute) oldRoute).getDriverId() );
-				}
-
-				oldRoute = oldPlan.nextJointRoute();
-				newRoute = newPlan.nextJointRoute();
+		while (oldRoute != null) {
+			if (oldRoute instanceof DriverRoute) {
+				((DriverRoute) newRoute).setPassengerIds(
+					((DriverRoute) oldRoute).getPassengersIds() );
+			}
+			else {
+				((PassengerRoute) newRoute).setDriverId(
+					((PassengerRoute) oldRoute).getDriverId() );
 			}
 
-			super.updatePlanElements( plan , newPlanElements );
-		}
-		catch (Exception e) {
-			throwInformativeError(
-					plan.getPlanElements(),
-					newPlanElements,
-					e);
+			oldRoute = oldPlan.nextJointRoute();
+			newRoute = newPlan.nextJointRoute();
 		}
 	}
 
@@ -98,7 +86,7 @@ public class JointPlanRouter extends PlanRouter {
 		private final Iterator<PlanElement> pes;
 
 		public JointRouteIterator( final List<PlanElement> pes ) {
-			this.pes = pes.iterator();
+			this.pes = new ArrayList<PlanElement>( pes ).iterator();
 		}
 
 		public Route nextJointRoute() {
@@ -112,23 +100,5 @@ public class JointPlanRouter extends PlanRouter {
 			}
 			return null;
 		}
-	}
-
-	private static synchronized void throwInformativeError(
-			final List<PlanElement> toChange,
-			final List<PlanElement> changeInfo,
-			final Throwable e) {
-		log.error( " ################### ERROR ################ " );
-		log.error( " to update:" );
-		int i=0;
-		for (PlanElement pe : toChange) log.error( (++i)+": "+pe );
-		log.error( " with:" );
-		i=0;
-		for (PlanElement pe : changeInfo) log.error( (++i)+": "+pe );
-
-		throw new RuntimeException(
-				// "problem while updating "+toChange+" of size "+toChange.size()
-				//+" with "+changeInfo+" of size "+changeInfo.size(),
-				e);
 	}
 }

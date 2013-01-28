@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +32,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -48,9 +47,30 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private final TripRouter routingHandler;
 	private final ActivityFacilities facilities;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	/**
 	 * Initialises an instance.
+	 * @param routingHandler the {@link TripRouter} to use to route individual trips
+	 * @param facilities the {@link ActivityFacilities} to which activities are refering.
+	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
+	 * origin and destination activity.
+	 * @param mainModeIdentifier the object to use to identify routing mode
+	 */
+	public PlanRouter(
+			final TripRouter routingHandler,
+			final ActivityFacilities facilities,
+			final MainModeIdentifier mainModeIdentifier) {
+		this.routingHandler = routingHandler;
+		this.facilities = facilities;
+		this.mainModeIdentifier = mainModeIdentifier;
+	}
+
+	/**
+	 * Initialises an instance, using the default mode identification:
+	 * the mode of a trip is the mode of the first leg of this trip,
+	 * except if this leg has mode transit_walk, in which case the mode "pt"
+	 * is used.
 	 * @param routingHandler the {@link TripRouter} to use to route individual trips
 	 * @param facilities the {@link ActivityFacilities} to which activities are refering.
 	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
@@ -59,8 +79,9 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	public PlanRouter(
 			final TripRouter routingHandler,
 			final ActivityFacilities facilities ) {
-		this.routingHandler = routingHandler;
-		this.facilities = facilities;
+		this( routingHandler,
+				facilities,
+				new MainModeIdentifierImpl());
 	}
 
 	/**
@@ -82,16 +103,25 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		return routingHandler;
 	}
 
-	/**
-	 * Extracts the plan structure using {@link TripRouter#tripsToLegs(Plan)},
-	 * routes it using {@link #run(Person, List)}, and updates the plan so that
-	 * it references the routed sequence.
-	 */
 	@Override
 	public void run(final Plan plan) {
-		List<PlanElement> newSequence = routingHandler.tripsToLegs( plan );
-		newSequence = run( plan.getPerson() , newSequence );
-		updatePlanElements( plan , newSequence );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , routingHandler.getStageActivityTypes() );
+
+		for (Trip trip : trips) {
+			final List<? extends PlanElement> newTrip =
+				routingHandler.calcRoute(
+						mainModeIdentifier.identifyMainMode( trip.getTripElements() ),
+						toFacility( trip.getOriginActivity() ),
+						toFacility( trip.getDestinationActivity() ),
+						calcEndOfActivity( trip.getOriginActivity() , plan ),
+						plan.getPerson() );
+
+			TripRouter.insertTrip(
+					plan, 
+					trip.getOriginActivity(),
+					newTrip,
+					trip.getDestinationActivity());
+		}
 	}
 
 	@Override
@@ -99,78 +129,6 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			run( plan );
 		}
-	}
-
-	/**
-	 * The actual processing method of the {@link #run(Plan)} method.
-	 *
-	 * It routes the trips defined by the legs in the planStructure sequence,
-	 * and returns the full routed structure.
-	 * @param person the {@link Person} to route
-	 * @param planStructure the sequence of plan elements, where the trips are replaced
-	 * by legs. This can be obtained by the {@link TripRouter#tripsToLegs(Plan)}
-	 * and {@link TripRouter#tripsToLegs(List)} methods.
-	 *
-	 * @return the routed sequence of plan elements
-	 */
-	public List<PlanElement> run(
-			final Person person,
-			final List<PlanElement> planStructure) {
-		List<PlanElement> newPlanElements = new ArrayList<PlanElement>();
-
-		Facility destination = null;
-		Iterator<PlanElement> pes = planStructure.iterator();
-		Activity currentAct =  (Activity) pes.next();
-		Facility origin = toFacility( currentAct );
-		Leg legTrip = null;
-		List<? extends PlanElement> trip = null;
-
-		double now = 0;
-		newPlanElements.add( currentAct );
-		while (pes.hasNext()) {
-			// normally, strict act/leg alternance here (trips replaced by legs).
-			// If not, throw an exception with an informative debugging message.
-			try {
-				legTrip = (Leg) pes.next();
-			}
-			catch (ClassCastException e) {
-				throw new RuntimeException( "agent "+person.getId()+": unexpected leg/act alternance in structure "+planStructure );
-			}
-
-			now = updateNow( now , currentAct );
-			
-			try {
-				currentAct = (Activity) pes.next();
-			}
-			catch (ClassCastException e) {
-				throw new RuntimeException( "agent "+person.getId()+": unexpected leg/act alternance in structure "+planStructure );
-			}
-
-			destination = toFacility( currentAct );
-
-			try {
-				trip = routingHandler.calcRoute(
-							legTrip.getMode(),
-							origin,
-							destination,
-							now,
-							person);
-			}
-			catch (TripRouter.UnknownModeException e) {
-				throw new RuntimeException( "agent "+person.getId()+": unexpected mode in structure "+planStructure , e );
-			}
-
-			newPlanElements.addAll( trip );
-
-			for (PlanElement pe : trip) {
-				now = updateNow( now , pe );
-			}
-
-			newPlanElements.add( currentAct );
-			origin = destination;
-		}
-
-		return newPlanElements;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -183,17 +141,27 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			// use facilities only if the activity does not provides the required fields.
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
-		else {
-			return new ActivityWrapperFacility( act );
-		}
+		return new ActivityWrapperFacility( act );
 	}
 
-	protected void updatePlanElements(
-			final Plan plan,
-			final List<PlanElement> newPlanElements) {
-		List<PlanElement> pes = plan.getPlanElements();
-		pes.clear();
-		pes.addAll( newPlanElements );
+	private static double calcEndOfActivity(
+			final Activity activity,
+			final Plan plan) {
+		if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
+
+		// no sufficient information in the activity...
+		// do it the long way.
+		// XXX This is inefficient! Using a cache for each plan may be an option
+		// (knowing that plan elements are iterated in proper sequence,
+		// no need to re-examine the parts of the plan already known)
+		double now = 0;
+
+		for (PlanElement pe : plan.getPlanElements()) {
+			now = updateNow( now , pe );
+			if (pe == activity) return now;
+		}
+
+		throw new RuntimeException( "activity "+activity+" not found in "+plan.getPlanElements() );
 	}
 
 	private static double updateNow(
@@ -220,10 +188,8 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 				throw new RuntimeException("activity has neither end-time nor duration." + act);
 			}
 		}
-		else {
-			double tt = ((Leg) pe).getTravelTime();
-			return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
-		}
+		double tt = ((Leg) pe).getTravelTime();
+		return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
 	}	
 
 	private static class ActivityWrapperFacility implements Facility {
