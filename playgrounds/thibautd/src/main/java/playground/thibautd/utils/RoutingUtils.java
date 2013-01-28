@@ -21,20 +21,28 @@ package playground.thibautd.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 
 /**
+ * methods for easy adatpation of code in the time TripRouter
+ * provided tripsToLegs methods
  * @author thibautd
  */
 public class RoutingUtils {
 	private RoutingUtils() {}
+	private static PooledPlanFactory planFactory = new PooledPlanFactory();
 
 	public static List<PlanElement> tripsToLegs(
 			final Plan plan,
@@ -57,6 +65,90 @@ public class RoutingUtils {
 		}
 
 		return structure;
+	}
+
+	public static List<PlanElement> route(
+			final PlanRouter planRouter,
+			final Person person,
+			final List<PlanElement> structure) {
+		final InternalPlan plan = planFactory.getInstance();
+
+		plan.setPerson( person );
+		plan.setPlanElements( new ArrayList<PlanElement>( structure ) );
+
+		planRouter.run( plan );
+
+		return plan.getPlanElements();
+	}
+
+	private static class PooledPlanFactory {
+		public InternalPlan getInstance() {
+			return new InternalPlan();
+		}
+
+		//public void pool(final InternalPlan plan) {
+		//	plan.clear();
+		//	// TODO pool if cost of construction too high in TMC
+		//}
+	}
+
+	private static class InternalPlan implements Plan {
+		private Person person = null;
+		private List<PlanElement> elements = null;
+
+		//public void clear() {
+		//	person = null;
+		//	elements = null;
+		//}
+
+		@Override
+		public Person getPerson() {
+			return person;
+		}
+
+		@Override
+		public void setPerson(final Person person) {
+			this.person = person;
+		}
+
+		public void setPlanElements(final List<PlanElement> elements) {
+			this.elements = elements;
+		}
+
+		@Override
+		public List<PlanElement> getPlanElements() {
+			return elements;
+		}
+
+		@Override
+		public Map<String, Object> getCustomAttributes() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void addLeg(Leg leg) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void addActivity(Activity act) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isSelected() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setScore(Double score) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Double getScore() {
+			throw new UnsupportedOperationException();
+		}
 	}
 }
 
