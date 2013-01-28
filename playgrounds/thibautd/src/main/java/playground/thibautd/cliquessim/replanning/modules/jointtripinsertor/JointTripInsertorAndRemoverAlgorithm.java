@@ -31,12 +31,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.utils.RoutingUtils;
 
 /**
  * @author thibautd
@@ -102,7 +104,11 @@ public class JointTripInsertorAndRemoverAlgorithm implements PlanAlgorithm {
 		int countEgoists = 0;
 		for (Plan indivPlan : ((JointPlan) plan).getIndividualPlans().values()) {
 			if ( agentsToIgnore.contains( indivPlan.getPerson().getId() ) ) continue;
-			List<PlanElement> struct = tripRouter.tripsToLegs( indivPlan );
+			List<PlanElement> struct =
+					RoutingUtils.tripsToLegs(
+							indivPlan,
+							tripRouter.getStageActivityTypes(),
+							new MainModeIdentifierImpl());
 			// parse trips, and count "egoists" (non-driver non-passenger) and
 			// passengers. Some care is needed: joint trips are not identified as
 			// trips by the router!

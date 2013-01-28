@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -50,6 +52,7 @@ import playground.thibautd.socnetsim.router.JointPlanRouter;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 import playground.thibautd.tsplanoptimizer.framework.ValueImpl;
+import playground.thibautd.utils.RoutingUtils;
 
 /**
  * Similar to the individual version.
@@ -87,7 +90,7 @@ public class JointTimeModeChooserSolution implements Solution {
 			final TripRouter tripRouter) {
 		this(
 			plan,
-			extractValues( plan , tripRouter ),
+			extractValues( plan , tripRouter , new MainModeIdentifierImpl() ),
 			new JointPlanRouter( tripRouter ));
 	}
 
@@ -244,7 +247,8 @@ public class JointTimeModeChooserSolution implements Solution {
 	// /////////////////////////////////////////////////////////////////////////
 	private static Values extractValues(
 			final JointPlan plan,
-			final TripRouter tripRouter) {
+			final TripRouter tripRouter,
+			final MainModeIdentifier mainModeIdentifier) {
 		List<List<Value>> groupValues = new ArrayList<List<Value>>();
 		List<List<PlanElement>> groupCodedPlanElements = new ArrayList<List<PlanElement>>();
 		List<Tuple<Plan , List<PlanElement>>> planStructures = new ArrayList<Tuple<Plan , List<PlanElement>>>();
@@ -255,7 +259,11 @@ public class JointTimeModeChooserSolution implements Solution {
 
 			List<Value> values = new ArrayList<Value>();
 			List<PlanElement> codedPlanElements = new ArrayList<PlanElement>();
-			List<PlanElement> planStructure = tripRouter.tripsToLegs( individualPlan.getPlanElements() );
+			List<PlanElement> planStructure =
+					RoutingUtils.tripsToLegs(
+						individualPlan,
+						tripRouter.getStageActivityTypes(),
+						mainModeIdentifier);
 
 			double now = 0;
 			double lastNow = 0;

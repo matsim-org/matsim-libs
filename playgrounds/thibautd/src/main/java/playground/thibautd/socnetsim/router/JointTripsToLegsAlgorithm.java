@@ -27,10 +27,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.utils.RoutingUtils;
 
 /**
  * Similar to TripsToLegsAlgorithm, but remembers joint routes
@@ -46,7 +48,11 @@ public class JointTripsToLegsAlgorithm implements PlanAlgorithm {
 	@Override
 	public void run(final Plan plan) {
 		List<OrigLegDest> jointInfo = getJointInfo( plan );
-		List<PlanElement> structure = router.tripsToLegs( plan );
+		List<PlanElement> structure =
+				RoutingUtils.tripsToLegs(
+						plan,
+						router.getStageActivityTypes(),
+						new MainModeIdentifierImpl());
 		reinsertJointInfo( jointInfo , structure );
 		plan.getPlanElements().clear();
 		plan.getPlanElements().addAll( structure );

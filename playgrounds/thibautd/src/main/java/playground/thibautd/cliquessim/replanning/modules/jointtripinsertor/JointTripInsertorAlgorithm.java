@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -45,6 +47,7 @@ import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.utils.RoutingUtils;
 
 /**
  * An algorithm which creates joint trips from nothing,
@@ -57,6 +60,7 @@ public class JointTripInsertorAlgorithm implements PlanAlgorithm {
 	private final double betaDetour;
 	private final double scale;
 	private final Random random;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	public JointTripInsertorAlgorithm(
 			final Random random,
@@ -67,6 +71,7 @@ public class JointTripInsertorAlgorithm implements PlanAlgorithm {
 		betaDetour = config.getBetaDetour();
 		scale = config.getScale();
 		this.random = random;
+		this.mainModeIdentifier = new MainModeIdentifierImpl();
 	}
 
 	@Override
@@ -95,7 +100,11 @@ public class JointTripInsertorAlgorithm implements PlanAlgorithm {
 			if ( agentsToIgnore.contains( id ) ) continue;
 			Plan plan = entry.getValue();
 
-			Iterator<PlanElement> structure = router.tripsToLegs( plan ).iterator();
+			Iterator<PlanElement> structure =
+					RoutingUtils.tripsToLegs(
+							plan,
+							router.getStageActivityTypes(),
+							mainModeIdentifier).iterator();
 			double now = 0;
 			Activity origin = (Activity) structure.next();
 			now = TripRouter.calcEndOfPlanElement( now , origin );

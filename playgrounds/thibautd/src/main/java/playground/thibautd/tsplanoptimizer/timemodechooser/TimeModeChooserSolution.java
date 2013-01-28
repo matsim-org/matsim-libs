@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
@@ -37,6 +39,7 @@ import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 import playground.thibautd.tsplanoptimizer.framework.ValueImpl;
+import playground.thibautd.utils.RoutingUtils;
 
 /**
  * Represents a plan for which activity end times are optimised.
@@ -46,6 +49,7 @@ import playground.thibautd.tsplanoptimizer.framework.ValueImpl;
 public class TimeModeChooserSolution implements Solution {
 	private final Plan plan;
 	private final PlanRouter planRouter;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	// maintain two lists: the values, and the plan elements they are
 	// related to, in the same order. Compared to a map, this allows to
@@ -66,17 +70,20 @@ public class TimeModeChooserSolution implements Solution {
 			final TripRouter tripRouter) {
 		this(
 			plan,
-			extractValues( plan , tripRouter ),
-			new PlanRouter( tripRouter ));
+			extractValues( plan , tripRouter , new MainModeIdentifierImpl() ),
+			new PlanRouter( tripRouter ),
+			new MainModeIdentifierImpl());
 	}
 
 	private TimeModeChooserSolution(
 			final Plan plan,
 			final Values values,
-			final PlanRouter planRouter) {
+			final PlanRouter planRouter,
+			final MainModeIdentifier mainModeIdentifer) {
 		this.plan = plan;
 		this.values = values;
 		this.planRouter = planRouter;
+		this.mainModeIdentifier = mainModeIdentifer;
 	}
 
 	@Override
@@ -130,7 +137,8 @@ public class TimeModeChooserSolution implements Solution {
 					Collections.unmodifiableList( newValues ),
 					values.associatedPlanElements,
 					values.planStructure),
-				planRouter);
+				planRouter,
+				mainModeIdentifier);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -138,9 +146,14 @@ public class TimeModeChooserSolution implements Solution {
 	// /////////////////////////////////////////////////////////////////////////
 	private static Values extractValues(
 			final Plan plan,
-			final TripRouter tripRouter) {
+			final TripRouter tripRouter,
+			final MainModeIdentifier mainModeIdentifier) {
 		List<Value> values = new ArrayList<Value>();
-		List<PlanElement> planStructure = tripRouter.tripsToLegs( plan );
+		List<PlanElement> planStructure =
+				RoutingUtils.tripsToLegs(
+						plan,
+						tripRouter.getStageActivityTypes(),
+						mainModeIdentifier);
 		List<PlanElement> codedPlanElements = new ArrayList<PlanElement>();
 		
 		double now = 0;

@@ -84,7 +84,6 @@ public class TimeAllocationMutatorTest {
 
 		TripsToLegsAlgorithm trips2legs =
 			new TripsToLegsAlgorithm(
-					new TripRouter(),
 					new StageActivityTypesImpl(
 						Arrays.asList( PtConstants.TRANSIT_ACTIVITY_TYPE ) ));
 

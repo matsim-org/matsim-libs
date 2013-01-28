@@ -29,9 +29,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.thibautd.utils.RoutingUtils;
 
 
 /**
@@ -92,7 +95,11 @@ public class ParkAndRideUtils {
 			final TripRouter tripRouter,
 			final StageActivityTypes pnrTypes,
 			final Plan plan) {
-		List<PlanElement> planStructure = tripRouter.tripsToLegs( plan );
+		List<PlanElement> planStructure =
+				RoutingUtils.tripsToLegs(
+						plan,
+						tripRouter.getStageActivityTypes(),
+						new MainModeIdentifierImpl());
 
 		// then, remove park and ride trips, and mark them as pt
 		Iterator<PlanElement> iter = planStructure.iterator();

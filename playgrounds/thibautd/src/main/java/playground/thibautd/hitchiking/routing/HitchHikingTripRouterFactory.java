@@ -96,23 +96,27 @@ public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 	}
 
 	private static class HhTripRouter extends TripRouter {
-		@Override
-		protected String identifyMainMode( final List<PlanElement> trip ) {
-			for (PlanElement pe : trip) {
-				if (pe instanceof Leg) {
-					String mode = ((Leg) pe).getMode();
-
-					if ( mode.equals( HitchHikingConstants.DRIVER_MODE ) ) {
-						return HitchHikingConstants.DRIVER_MODE;
-					}
-					else if ( mode.equals( HitchHikingConstants.PASSENGER_MODE ) ) {
-						return HitchHikingConstants.PASSENGER_MODE;
-					}
-				}
-			}
-
-			return super.identifyMainMode( trip );
+		public HhTripRouter() {
+			throw new UnsupportedOperationException( "TODO: replace MainModeIdentifier in PlanRouter" );
 		}
+
+		//@Override
+		//protected String identifyMainMode( final List<PlanElement> trip ) {
+		//	for (PlanElement pe : trip) {
+		//		if (pe instanceof Leg) {
+		//			String mode = ((Leg) pe).getMode();
+
+		//			if ( mode.equals( HitchHikingConstants.DRIVER_MODE ) ) {
+		//				return HitchHikingConstants.DRIVER_MODE;
+		//			}
+		//			else if ( mode.equals( HitchHikingConstants.PASSENGER_MODE ) ) {
+		//				return HitchHikingConstants.PASSENGER_MODE;
+		//			}
+		//		}
+		//	}
+
+		//	return super.identifyMainMode( trip );
+		//}
 	}
 }
 
