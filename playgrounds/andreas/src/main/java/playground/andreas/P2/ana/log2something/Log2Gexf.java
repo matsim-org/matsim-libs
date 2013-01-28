@@ -46,7 +46,7 @@ public class Log2Gexf {
 		String inputFile = args[0];
 		String outputFile;
 		
-		outputFile = inputFile.replace(".txt", ".gexf");
+		outputFile = inputFile.replace(".txt", ".gexf.gz");
 		Log2Gexf.convertLog2Gexf(inputFile, outputFile);
 		
 		outputFile = inputFile.replace(".txt", ".tex");
