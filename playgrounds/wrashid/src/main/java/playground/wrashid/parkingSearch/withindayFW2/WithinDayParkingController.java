@@ -63,8 +63,8 @@ public class WithinDayParkingController extends WithinDayController implements S
 	 */
 	protected int numReplanningThreads = 8;
 
-	protected RandomSearchIdentifier randomSearchIdentifier;
-	protected RandomSearchReplannerFactory randomSearchReplannerFactory;
+	protected ParkingSearchIdentifier randomSearchIdentifier;
+	protected ParkingSearchReplannerFactory randomSearchReplannerFactory;
 
 	protected LegModeChecker legModeChecker;
 	protected ParkingAgentsTracker parkingAgentsTracker;
@@ -80,7 +80,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 
 	protected void initIdentifiers() {
 
-		this.randomSearchIdentifier = new RandomSearchIdentifier(parkingAgentsTracker, parkingInfrastructure); 
+		this.randomSearchIdentifier = new ParkingSearchIdentifier(parkingAgentsTracker, parkingInfrastructure); 
 		this.getFixedOrderSimulationListener().addSimulationListener(this.randomSearchIdentifier);
 	}
 	
@@ -108,7 +108,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, times, factory, routeFactory);
 	
-		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(), router, 1.0, this.scenarioData, parkingAgentsTracker);
+		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), router, 1.0, this.scenarioData, parkingAgentsTracker);
 		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
 	}

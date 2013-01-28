@@ -44,13 +44,13 @@ import org.matsim.withinday.utils.EditRoutes;
  * 
  * @author cdobler
  */
-public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
+public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 
 	private final Random random;
 	private final EditRoutes editRoutes;
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	
-	RandomSearchReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+	ParkingSearchReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
 			ParkingAgentsTracker parkingAgentsTracker) {
 		super(id, scenario, internalInterface);
 		this.parkingAgentsTracker = parkingAgentsTracker;

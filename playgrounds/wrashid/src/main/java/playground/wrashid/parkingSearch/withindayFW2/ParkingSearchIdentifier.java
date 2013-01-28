@@ -36,13 +36,13 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
-public class RandomSearchIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
+public class ParkingSearchIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
 	
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	private final ParkingInfrastructure parkingInfrastructure;
 	private final Map<Id, PlanBasedWithinDayAgent> agents;
 	
-	public RandomSearchIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure) {
+	public ParkingSearchIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
 		this.parkingInfrastructure = parkingInfrastructure;
 		

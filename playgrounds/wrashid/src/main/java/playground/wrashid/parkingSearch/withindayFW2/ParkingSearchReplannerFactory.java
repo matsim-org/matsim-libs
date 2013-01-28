@@ -25,12 +25,12 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
-public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFactory {
+public class ParkingSearchReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	
-	public RandomSearchReplannerFactory(WithinDayEngine replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
+	public ParkingSearchReplannerFactory(WithinDayEngine replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
 			double replanningProbability, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		
@@ -39,8 +39,8 @@ public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFac
 	}
 
 	@Override
-	public RandomSearchReplanner createReplanner() {
-		RandomSearchReplanner replanner = new RandomSearchReplanner(super.getId(), scenario, 
+	public ParkingSearchReplanner createReplanner() {
+		ParkingSearchReplanner replanner = new ParkingSearchReplanner(super.getId(), scenario, 
 				this.getReplanningManager().getInternalInterface(), parkingAgentsTracker);
 		super.initNewInstance(replanner);
 		return replanner;
