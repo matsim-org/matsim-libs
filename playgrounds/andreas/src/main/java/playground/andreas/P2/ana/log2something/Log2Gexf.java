@@ -34,7 +34,6 @@ public class Log2Gexf {
 
 	private static final Logger log = Logger.getLogger(Log2Gexf.class);
 	
-	
 	public static void convertLog2Gexf(String inputFile, String outputFile) {
 		ArrayList<LogElement> logElements = LogReader.readFile(inputFile);
 		ArrayList<PlanElement> planElements = LogElement2PlanElement.logElement2PlanElement(logElements);
@@ -43,10 +42,14 @@ public class Log2Gexf {
 	}
 	
 	public static void main(String[] args) {
-		String inputFile = "f:/bvg5_b285b.pCoopLogger.txt";
-		String outputFile = "f:/bvg5_b285b.pCoopLogger_output.gexf";
 		
+		String inputFile = args[0];
+		String outputFile;
+		
+		outputFile = inputFile.replace(".txt", ".gexf");
 		Log2Gexf.convertLog2Gexf(inputFile, outputFile);
+		
+		outputFile = inputFile.replace(".txt", ".tex");
+		Log2Tex.convertLog2Tex(inputFile, outputFile);
 	}
-	
 }

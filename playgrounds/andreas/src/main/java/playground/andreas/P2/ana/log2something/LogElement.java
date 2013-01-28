@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
  */
 public class LogElement {
 	
-	private static final Logger log = Logger.getLogger(LogTex.class);
+	private static final Logger log = Logger.getLogger(LogElement.class);
 
 	private int iteration;
 	private String coopId;
@@ -120,8 +120,4 @@ public class LogElement {
 	public void setStopsToBeServed(String[] stopsToBeServed) {
 		this.stopsToBeServed = stopsToBeServed;
 	}
-	
-	
-	
-	
 }
