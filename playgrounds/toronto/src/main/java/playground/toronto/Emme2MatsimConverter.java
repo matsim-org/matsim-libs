@@ -430,6 +430,8 @@ public class Emme2MatsimConverter {
 		
 		String line;
 		while((line = emmeReader.readLine()) != null){
+			if (line.startsWith("c")) continue;
+			
 			if(line.startsWith("t nodes")){
 				isReadingNodes = true;
 				isReadingLinks = false;
