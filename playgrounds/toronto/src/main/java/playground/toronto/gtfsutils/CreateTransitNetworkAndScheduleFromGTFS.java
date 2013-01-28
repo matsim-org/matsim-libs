@@ -143,8 +143,8 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 				Trip trip = tpEntry.getValue();
 				if (services.contains(trip.getService())){ //filter by specified service period
 					
-					ArrayList<TransitRouteStop> routeStops = new ArrayList<TransitRouteStop>();
-					ArrayList<Id> itinerary = new ArrayList<Id>();
+					ArrayList<TransitRouteStop> routeStops = new ArrayList<TransitRouteStop>(); //List of stops
+					ArrayList<Id> itinerary = new ArrayList<Id>(); //List of links
 					Id routeId = new IdImpl(tpEntry.getKey());
 					
 					//Prepare first stop in trip
@@ -236,7 +236,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 					int lastIndex = itinerary.size() - 1;
 					NetworkRoute netRoute = new LinkNetworkRouteImpl(itinerary.get(0), itinerary.get(lastIndex));
 					if (itinerary.size() > 2)
-						netRoute.setLinkIds(itinerary.get(0), itinerary.subList(1, lastIndex - 1), itinerary.get(lastIndex));
+						netRoute.setLinkIds(itinerary.get(0), itinerary.subList(1, lastIndex), itinerary.get(lastIndex));
 						
 					TransitRoute tRoute = schedFact.createTransitRoute(routeId, netRoute,routeStops,mode.toString());
 					tRoute.setDescription(trip.getName());
