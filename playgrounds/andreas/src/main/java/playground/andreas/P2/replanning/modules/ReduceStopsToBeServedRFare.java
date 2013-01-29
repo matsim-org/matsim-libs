@@ -148,7 +148,7 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		
 		// avoid using a stop twice in a row
 		for (TransitStopFacility stop : tempStopsToBeServed) {
-			if (stopsToBeServed.size() > 1) {
+			if (stopsToBeServed.size() > 0) {
 				if (stopsToBeServed.get(stopsToBeServed.size() - 1).getId() != stop.getId()) {
 					stopsToBeServed.add(stop);
 				}
