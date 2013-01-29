@@ -51,7 +51,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 
 	private static final Logger log = Logger.getLogger(DropOffAgentReplanner.class);
 	
-	private static final String activityType = "dropoff";
+	public static final String activityType = "dropoff";
 	
 	private final RouteFactory routeFactory;
 	

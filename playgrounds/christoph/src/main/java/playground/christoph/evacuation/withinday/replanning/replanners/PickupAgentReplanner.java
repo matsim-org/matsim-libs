@@ -51,7 +51,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 
 	private static final Logger log = Logger.getLogger(PickupAgentReplanner.class);
 	
-	private static final String activityType = "pickup";
+	public static final String activityType = "pickup";
 	
 	private final RouteFactory carRouteFactory;
 	private final RouteFactory rideRouteFactory;

@@ -45,7 +45,7 @@ import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
  */
 public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplanner {
 
-	private static final String activityType = "meetHousehold";
+	public static final String activityType = "meetHousehold";
 	
 	protected final DecisionDataProvider decisionDataProvider;
 	
