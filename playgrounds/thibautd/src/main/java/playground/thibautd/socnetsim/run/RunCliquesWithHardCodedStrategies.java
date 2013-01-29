@@ -19,18 +19,28 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
+import playground.thibautd.analysis.listeners.TripModeShares;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
@@ -40,6 +50,7 @@ import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
@@ -186,6 +197,38 @@ public class RunCliquesWithHardCodedStrategies {
 					controller.getControlerIO(),
 					controllerRegistry.getScenario(),
 					groupIdentifier));
+
+		final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
+		actTypesForAnalysis.addActivityTypes(
+				controllerRegistry.getTripRouterFactory().createTripRouter().getStageActivityTypes() );
+		actTypesForAnalysis.addActivityTypes(
+				new StageActivityTypesImpl(
+					Arrays.asList(
+						JointActingTypes.PICK_UP,
+						JointActingTypes.DROP_OFF ) ) );
+		controller.addControlerListener(
+				new TripModeShares(
+					controller.getControlerIO(),
+					controllerRegistry.getScenario(),
+					new MainModeIdentifier() {
+						private final MainModeIdentifier d = new MainModeIdentifierImpl();
+
+						@Override
+						public String identifyMainMode(
+								final List<PlanElement> tripElements) {
+							for (PlanElement pe : tripElements) {
+								if ( !(pe instanceof Leg) ) continue;
+								final String mode = ((Leg) pe).getMode();
+
+								if (mode.equals( JointActingTypes.DRIVER ) ||
+										mode.equals( JointActingTypes.PASSENGER ) ) {
+									return mode;
+								}
+							}
+							return d.identifyMainMode( tripElements );
+						}
+					},
+					actTypesForAnalysis));
 
 		controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
 
