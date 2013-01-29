@@ -91,15 +91,19 @@ public class MZControler {
 	private void createShoppingTrips(Population population) {
 		QuadTree<Location> shopQuadTree = Utils.buildLocationQuadTree(this.shops); 	// TODO: coord conversion
 		
+		int sgCnt = 0;
+		int sngCnt = 0;
+		
 		for (Person p:population.getPersons().values()) {			
 			EstimationPerson person = (EstimationPerson)p;
 			int actlegIndex = -1;
-			Plan plan = person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();			
 			for (PlanElement pe : plan.getPlanElements()) {
 				actlegIndex++;
 				if (pe instanceof Activity) {
 					MZActivityImpl act = (MZActivityImpl)plan.getPlanElements().get(actlegIndex);
 					if (act.getType().startsWith("sg")) {
+						sgCnt++;
 						ShopLocation shop = (ShopLocation) shopQuadTree.get(act.getCoord().getX(), act.getCoord().getY());	
 						ShoppingTrip shoppingTrip = new ShoppingTrip();
 						shoppingTrip.setShop(shop);
@@ -122,9 +126,13 @@ public class MZControler {
 							}
 						}
 					}
+					else if (act.getType().startsWith("sng")) {
+						sngCnt++;
+					}
 				}
 			}			
 		}
+		log.info("sg cnt: " + sgCnt + " sng cnt: " + sngCnt);
 	}
 	
 	private void analyze(String outdir) {
