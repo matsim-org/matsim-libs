@@ -129,6 +129,7 @@ class JointTimeModeChooserConfigBuilder {
 		tabuChecker.add( new JointInvalidValueChecker() );
 		tabuChecker.add( new ModeChainTabuList( nTabu ) );
 		tabuChecker.add( new NullMoveChecker() );
+		tabuChecker.add( new CarAvailabilityTabuChecker() );
 		configuration.setTabuChecker( tabuChecker );
 
 		if (outputDir != null) {
