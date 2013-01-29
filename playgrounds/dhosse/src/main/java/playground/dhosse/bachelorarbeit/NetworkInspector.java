@@ -5,19 +5,39 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
+import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.gis.Zone;
+import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
+import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.ParcelBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.ZoneBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
+import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
+import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.charts.BarChart;
 
 public class NetworkInspector {
 	
-	private final Network net;
+	private final Scenario scenario;
 	
 	private Map<Id,Double> distances = new HashMap<Id,Double>();
 	
@@ -25,23 +45,21 @@ public class NetworkInspector {
 	
 	private DecimalFormat df = new DecimalFormat(",##0.00");
 	
-	private double[] linkCapacities;
+	private double[] linkCapacities = new double[5];
 	
-	public NetworkInspector(final Network net){
+	public NetworkInspector(final Scenario sc){
 		
-		this.net = net;
-		this.linkCapacities = new double[5];
+		this.scenario = sc;
 		
 	}
 	
 	public void isRoutable(){
 		
-		logger.info("network contains " + this.net.getNodes().size() + " nodes and " +
-		this.net.getLinks().size() + " links");
+		logger.info("network contains " + this.scenario.getNetwork().getNodes().size() +
+				" nodes and " + this.scenario.getNetwork().getLinks().size() + " links");
 		
 		NetworkCleaner nc = new NetworkCleaner();
-		nc.run(this.net);
-		
+		nc.run(this.scenario.getNetwork());
 	}
 	
 	public void checkNetworkAttributes(boolean checkLinks, boolean checkNodes){
@@ -55,6 +73,66 @@ public class NetworkInspector {
 		if(checkNodes){
 				checkNodeAttributes();
 		}
+		
+	}
+	
+	public void accessibilityComputation(boolean parcelBased){
+		
+		AccessibilityControlerListenerImpl listener;
+		
+		MATSim4UrbanSimInterface main = new MATSim4UrbanSimInterface() {
+			
+			@Override
+			public boolean isParcelMode() {
+				return false;
+			}
+			
+			@Override
+			public ReadFromUrbanSimModel getReadFromUrbanSimModel() {
+				return null;
+			}
+			
+			@Override
+			public double getOpportunitySampleRate() {
+				return 0;
+			}
+		};
+		
+		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+		
+		bbox.setDefaultBoundaryBox(this.scenario.getNetwork());
+		
+		SpatialGrid grid = new SpatialGrid(bbox.getBoundingBox(), 100);
+		
+		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl();//create facility, aus matsim-bev., strukturdaten etc.
+		
+		//class schreiben: extends accessibilitycontrolerlistener, notifyshutdown overriden, aggregateOpportunities ersetzen, kein file, kein sample, for-schleife: über facilities iterieren
+		
+//		this.scenario.getConfig().addModule("module", new AccessibilityParameterConfigModule("module"));
+//		System.out.println(this.scenario.getConfig().getModule(AccessibilityParameterConfigModule.GROUP_NAME));
+//		MATSim4UrbanSimConfigurationConverterV4 connector = new MATSim4UrbanSimConfigurationConverterV4("./input/config.xml");
+		//solution: getter-methode rein, config-modul initialisieren, werte für betas reinsetzen (pt auslassen)/beta_x_tt:-12,rest:0
+
+		
+		
+		ScenarioImpl sc = (ScenarioImpl) this.scenario;
+		
+//		Benchmark benchmark = new Benchmark();
+		
+//		ZoneLayer<Id> startZones = new ZoneLayer<Id>(new Set<Zone<Id>>() {
+//		});
+
+		if(parcelBased){
+			listener = new ParcelBasedAccessibilityControlerListenerV3(main, null,
+					parcels, grid, grid, grid, grid, grid, null, null,
+					(ScenarioImpl) this.scenario);
+		} else{
+			ActivityFacilitiesImpl zones = new ActivityFacilitiesImpl();
+			
+			listener = new ZoneBasedAccessibilityControlerListenerV3(main, null,
+					zones, null, null, (ScenarioImpl) this.scenario);
+		}
+		
 	}
 	
 	public void checkLinkAttributes() throws IOException{
@@ -66,7 +144,7 @@ public class NetworkInspector {
 		
 		double[] nLanes = new double[6];
 		
-		for(Link link : net.getLinks().values()){
+		for(Link link : this.scenario.getNetwork().getLinks().values()){
 			double distance = 
 					Math.sqrt(Math.pow(link.getToNode().getCoord().getX() -
 							link.getFromNode().getCoord().getX(),2) +
@@ -125,7 +203,7 @@ public class NetworkInspector {
 		double[] inDegrees = new double[10];
 		double[] outDegrees = new double[10];
 		
-		for(Node node : net.getNodes().values()){
+		for(Node node : this.scenario.getNetwork().getNodes().values()){
 			inDegrees[node.getInLinks().size()-1]++;
 			outDegrees[node.getOutLinks().size()-1]++;
 		}
@@ -177,9 +255,10 @@ public class NetworkInspector {
 		writer.write("Id\tlength\tactualLength");
 		
 		for(Id id : this.distances.keySet()){
-			writer.write("\n"+id.toString()+"\t"+this.net.getLinks().get(id).getLength()+
+			writer.write("\n"+id.toString()+"\t"+
+					this.scenario.getNetwork().getLinks().get(id).getLength()+
 					"\t"+this.distances.get(id));
-			length += this.net.getLinks().get(id).getLength();
+			length += this.scenario.getNetwork().getLinks().get(id).getLength();
 			gLength += this.distances.get(id);
 		}
 		
