@@ -78,8 +78,6 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 			} else {
 				waitingTime =  event.getTime() - personId2AgentDepartureTime.get(personId);
 			}
-			System.out.println("WaitingTime "+ waitingTime);
-			// save waitingTime per person (for Scoring...)
 			if (personId2WaitingTime.get(personId) == null){
 				personId2WaitingTime.put(personId, waitingTime);
 			} else {
@@ -116,8 +114,6 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 			} else {
 				inVehicleTime = event.getTime() - personId2PersonEntersVehicleTime.get(personId);
 			}
-			System.out.println("InVehTime "+ inVehicleTime + "("+event.getTime() + " - " + personId2PersonEntersVehicleTime.get(personId)+")");
-
 			if (personId2InVehicleTime.get(personId) == null) {
 				personId2InVehicleTime.put(personId, inVehicleTime);
 			} else {

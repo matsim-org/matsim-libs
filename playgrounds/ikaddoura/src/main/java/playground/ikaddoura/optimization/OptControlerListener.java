@@ -38,12 +38,12 @@ import playground.ikaddoura.optimization.handler.PtLegHandler;
  *
  */
 
-public class PtControlerListener implements StartupListener {
+public class OptControlerListener implements StartupListener {
 
 	private final double fare;
 	private final PtLegHandler ptScoringHandler;
 
-	public PtControlerListener(double fare, PtLegHandler ptLegHandler){
+	public OptControlerListener(double fare, PtLegHandler ptLegHandler){
 		this.fare = fare;
 		this.ptScoringHandler = ptLegHandler;
 	}

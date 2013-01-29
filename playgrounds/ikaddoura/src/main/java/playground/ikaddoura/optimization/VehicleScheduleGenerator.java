@@ -200,7 +200,7 @@ public class VehicleScheduleGenerator {
 		
 		for (Id routeId : routeId2transitStopFacilities.keySet()){
 			double arrivalTime = 0;
-			double departureTime = 0;
+			double departureTime = arrivalTime + this.stopTime;
 			List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
 			List<TransitStopFacility> transitStopFacilities = routeId2transitStopFacilities.get(routeId);
 

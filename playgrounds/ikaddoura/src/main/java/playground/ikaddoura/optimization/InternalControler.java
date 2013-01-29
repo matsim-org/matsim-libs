@@ -103,7 +103,7 @@ public class InternalControler {
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.addControlerListener(new PtControlerListener(this.fare, this.ptScoringHandler));
+		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler));
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt + "/internalIterations");
