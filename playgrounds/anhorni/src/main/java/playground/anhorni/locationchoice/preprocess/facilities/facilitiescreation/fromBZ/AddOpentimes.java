@@ -20,7 +20,6 @@
 
 package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ;
 
-import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -37,7 +36,9 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
+import playground.anhorni.csestimation.Utils;
 
 /**
  * Assign every shop an opening time based on shopsOf2005 survey.
@@ -49,14 +50,16 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 	private final ScenarioImpl scenario;
 	private final ActivityFacilitiesImpl shopsOf2005;
-	private final String shopsOf2005Filename = "input/facilities/facilities_shopsOf2005.xml";
+	private String shopsOf2005Filename; // "input/facilities/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
+	private QuadTree<ActivityFacility> shopQuadTree;
 
-	public AddOpentimes(final ScenarioImpl scenario) {
+	public AddOpentimes(final ScenarioImpl scenario, String shopsOf2005Filename) {
 		super();
 		this.scenario = scenario;
 		this.shopsOf2005 = this.scenario.getActivityFacilities();
 		this.shopsOf2005.setName("shopsOf2005");
+		this.shopsOf2005Filename = shopsOf2005Filename;
 	}
 
 	public void init() {
@@ -64,6 +67,8 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.scenario);
 		facilities_reader.readFile(this.shopsOf2005Filename);
 		log.info("Reading shops Of 2005 xml file...done.");
+		
+		this.shopQuadTree = Utils.buildLocationQuadTreeFacilities(this.scenario.getActivityFacilities().getFacilitiesForActivityType("shop"));
 	}
 
 	@Override
@@ -73,12 +78,11 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		DayType[] weekDays = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri };
 		double startTime = -1.0;
 		double endTime = -1.0;
-
 		Map<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
 
-		// List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
-		List closestShops = null;
-		ActivityOptionImpl shopsOf2005ShopAct = (ActivityOptionImpl) ((ActivityFacilityImpl) closestShops.get(0)).getActivityOptions().get(FacilitiesProductionKTI.ACT_TYPE_SHOP);
+		ActivityFacilityImpl closestShop = (ActivityFacilityImpl) this.shopQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());		
+		
+		ActivityOptionImpl shopsOf2005ShopAct = (ActivityOptionImpl) closestShop.getActivityOptions().get(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpeningTimes();
 		} else {
@@ -246,5 +250,4 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 				}
 		}
 	}
-
 }

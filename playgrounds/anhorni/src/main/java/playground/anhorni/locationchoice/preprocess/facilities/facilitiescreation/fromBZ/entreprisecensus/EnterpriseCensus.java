@@ -49,8 +49,7 @@ public class EnterpriseCensus {
 	public static final int HOSPITALITY_NOGA_SECTION = 55;
 	public static final int CULTURE_NOGA_SECTION = 92;
 	
-	public enum ProductionSector {
-		
+	public enum ProductionSector {		
 		SECTOR2("B011001", "B014504", "B01EQTS2"),
 		SECTOR3("B015001", "B019304", "B01EQTS3");
 
@@ -78,7 +77,7 @@ public class EnterpriseCensus {
 		public String getFteItem() {
 			return fteItem;
 		}
-}
+	}
 	
 	private TreeMap<Integer, TreeMap<String, Double>> hectareAggregation = new TreeMap<Integer, TreeMap<String, Double>>();
 
@@ -127,8 +126,7 @@ public class EnterpriseCensus {
 		this.hectareAggregationItems.add(type);
 	}
 	
-	public final void addHectareAggregationInformation(String reli, String noga, double value) {
-		
+	public final void addHectareAggregationInformation(String reli, String noga, double value) {		
 		int reliInt = Integer.parseInt(reli);
 		TreeMap<String, Double> entries = null;
 		if (this.hectareAggregation.containsKey(reliInt)) {
@@ -170,10 +168,8 @@ public class EnterpriseCensus {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final double getHectareAggregationInformation(final Integer reli, final String noga) {
-		
-		double value = 0.0;
-		
+	public final double getHectareAggregationInformation(final Integer reli, final String noga) {	
+		double value = 0.0;	
 		if (this.hectareAggregation.containsKey(reli)) {
 			if (this.hectareAggregation.get(reli).containsKey(noga)) {
 				value = this.hectareAggregation.get(reli).get(noga).doubleValue();
@@ -221,7 +217,6 @@ public class EnterpriseCensus {
 		int numEntries = 0;
 		for (Integer reli : this.hectareAggregation.keySet()) {
 			for (String noga : this.hectareAggregation.get(reli).keySet()) {
-//				System.out.println(reli + ":" + noga + " -> " + this.hectareAggregation.get(reli).get(noga).toString());
 				numEntries++;
 			}
 		}		
@@ -232,7 +227,6 @@ public class EnterpriseCensus {
 		int numPresenceCodes = 0;
 		for (Integer reli : this.presenceCodes.keySet()) {
 			for (String noga : this.presenceCodes.get(reli)) {
-//				System.out.println(reli + " -> " + noga);
 				numPresenceCodes++;
 			}
 		}

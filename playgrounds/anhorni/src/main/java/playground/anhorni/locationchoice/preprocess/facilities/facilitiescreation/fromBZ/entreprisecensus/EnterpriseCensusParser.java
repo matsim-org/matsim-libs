@@ -30,14 +30,16 @@ import org.apache.log4j.Logger;
 
 public class EnterpriseCensusParser {
 
-	private String inputHectareAggregationFile = "input/facilities/BZ01_UNT.TXT";
-	private String presenceCodeFile = "input/facilities/BZ01_UNT_P_DSVIEW.TXT";
+	private String inputHectareAggregationFile; //  = "input/facilities/BZ01_UNT.TXT";
+	private String presenceCodeFile; // = "input/facilities/BZ01_UNT_P_DSVIEW.TXT";
 	private static Logger log = Logger.getLogger(EnterpriseCensusParser.class);
 
 	public EnterpriseCensusParser(EnterpriseCensus ec) {
 	}
 
-	public void parse(EnterpriseCensus ec) {
+	public void parse(EnterpriseCensus ec, String inputHectareAggregationFile, String presenceCodeFile) {
+		this.inputHectareAggregationFile = inputHectareAggregationFile;
+		this.presenceCodeFile = presenceCodeFile;
 		this.readPresenceCodes(ec);
 		this.readHectareAggregations(ec);
 	}

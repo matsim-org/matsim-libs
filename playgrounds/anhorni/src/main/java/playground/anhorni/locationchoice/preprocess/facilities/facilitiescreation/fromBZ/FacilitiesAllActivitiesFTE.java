@@ -1,7 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilitiesAllActivitiesFTE.java
- *                                                                         *
+ *                                                                          *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007 by the members listed in the COPYING,        *
@@ -42,12 +41,11 @@ import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreatio
 public class FacilitiesAllActivitiesFTE {
 
 	private static Logger log = Logger.getLogger(FacilitiesAllActivitiesFTE.class);
-
 	private final static String TEMPORARY_FACILITY_ID_SEPARATOR = "_";
-
 	private EnterpriseCensus myCensus;
 	private TreeMap<String, String> facilityActivities = new TreeMap<String, String>();
-
+	private String inputHectareAggregationFile;
+	private String presenceCodeFile;
 	private FacilitiesProductionKTI.KTIYear ktiYear;
 
 	public FacilitiesAllActivitiesFTE(KTIYear ktiYear2) {
@@ -55,36 +53,32 @@ public class FacilitiesAllActivitiesFTE {
 		this.ktiYear = ktiYear2;
 	}
 
-	public void run(ActivityFacilitiesImpl facilities) {
+	public void run(ActivityFacilitiesImpl facilities, String inputHectareAggregationFile, String presenceCodeFile) {
+		this.inputHectareAggregationFile = inputHectareAggregationFile;
+		this.presenceCodeFile = presenceCodeFile;
 		this.loadFacilityActivities();
 		this.createThem(facilities);
 	}
 
 	private void loadCensus() {
-
 		log.info("Reading enterprise census files into EnterpriseCensus object...");
 		this.myCensus = new EnterpriseCensus();
 
 		EnterpriseCensusParser myCensusParser = new EnterpriseCensusParser(this.myCensus);
 		try {
-			myCensusParser.parse(this.myCensus);
+			myCensusParser.parse(this.myCensus, this.inputHectareAggregationFile, this.presenceCodeFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		myCensus.printPresenceCodesReport();
 		myCensus.printHectareAggregationReport();
-
 		log.info("Reading enterprise census files into EnterpriseCensus object...done.");
 	}
 
 	private void createThem(ActivityFacilitiesImpl facilities) {
-
 		Random random = new Random(4711);
-
 		// see http://www.matsim.org/node/36 for the next step
 		random.nextInt();
-
 		TreeMap<String, Integer> tempFacilities = new TreeMap<String, Integer>();
 
 		// in the enterprise census there are 4 size classes of facilities
@@ -126,7 +120,6 @@ public class FacilitiesAllActivitiesFTE {
 		int additionalFTEs = Integer.MIN_VALUE;
 
 		int hectareCnt = 0, facilityCnt = 0;
-		int skip = 1;
 		int numFacilities, numFTEs, numSectorFTE = Integer.MAX_VALUE, sizeRange;
 		String X, Y, attributeId, tempFacilityId, activityId = null;
 		HashSet<String> presenceCodeItems = null;
@@ -137,9 +130,7 @@ public class FacilitiesAllActivitiesFTE {
 
 		System.out.println("  creating facilities... ");
 		Set<Integer> ecHectares = this.myCensus.getHectareAggregation().keySet();
-
 		Iterator<String> attributeIds_it = null;
-
 		for (Integer reli : ecHectares) {
 			X = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "X"));
 			Y = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "Y"));
@@ -163,9 +154,7 @@ public class FacilitiesAllActivitiesFTE {
 
 					// create temporary facilities, set minimum FTEs
 					for (int i=0; i < numFacilities; i++) {
-
 						tempFacilityId = this.createTemporaryFacilityID(facilityCnt++, attributeId);
-//						System.out.println("Creating temporary " + tempFacilityId + "...");
 						tempFacilities.put(tempFacilityId, minFTEs);
 						numSectorFTE -= minFTEs;
 						// the number of distributed FTEs should not exceed the number of available ones
@@ -173,9 +162,7 @@ public class FacilitiesAllActivitiesFTE {
 							log.info("numFTE exceeded.");
 						}
 					}
-
 				}
-
 				// distribute remaining FTEs to temporary facilities
 				Object[] tempFacilitiesIds = tempFacilities.keySet().toArray();
 				while (numSectorFTE > 0) {
@@ -199,15 +186,16 @@ public class FacilitiesAllActivitiesFTE {
 					}
 
 				}
-
 				// create singleton Facility objects from temporary ones
 				Iterator<String> tempFacilities_it = tempFacilities.keySet().iterator();
 				while (tempFacilities_it.hasNext()) {
 					tempFacilityId = tempFacilities_it.next();
 					attributeId = this.getAttributeIdFromTemporaryFacilityID(tempFacilityId);
-					f = facilities.createFacility(
-							new IdImpl(this.getNumberFromTemporaryFacilityID(tempFacilityId)),
-							new CoordImpl(X, Y));
+//					f = facilities.createFacility(
+//							new IdImpl(this.getNumberFromTemporaryFacilityID(tempFacilityId)),
+//							new CoordImpl(X, Y));
+					
+					f = facilities.createFacility(new IdImpl(tempFacilityId), new CoordImpl(X, Y));
 
 					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 						// create the work activity and its capacity according to all the computation done before
@@ -220,8 +208,6 @@ public class FacilitiesAllActivitiesFTE {
 							a = f.createActivityOption(activityId);
 						}
 					} else if (ktiYear.equals(KTIYear.KTI_YEAR_2008)) {
-
-						//						System.out.println("attributeId: " + attributeId);
 						// usually more than one presence code is available,
 						// or there are multiple facilities with the same presence code, clearly
 						// without marginal sums over the presence codes we cannot find out
@@ -256,20 +242,9 @@ public class FacilitiesAllActivitiesFTE {
 					}
 
 				}
-
 				tempFacilities.clear();
-
-//				System.out.println(
-//				"Remaining FTEs in sector " + new Integer(sector).toString() +
-//				" of hectare " + new Integer(hectareCnt).toString() +
-//				": " + new Integer(numSectorFTE).toString());
 			}
-
 			hectareCnt++;
-//			if ((hectareCnt % skip) == 0) {
-//			log.info("Processed " + hectareCnt + " hectares.");
-//			skip *= 2;
-//			}
 		}
 		log.info("Processed " + hectareCnt + " hectares.");
 		log.info("creating facilities...DONE.");
@@ -282,7 +257,6 @@ public class FacilitiesAllActivitiesFTE {
 
 
 	private String getNumberFromTemporaryFacilityID(final String temporaryFacilityId) {
-
 		return temporaryFacilityId.substring(
 				0,
 				temporaryFacilityId.indexOf(TEMPORARY_FACILITY_ID_SEPARATOR)
@@ -290,7 +264,6 @@ public class FacilitiesAllActivitiesFTE {
 
 	}
 	private String getAttributeIdFromTemporaryFacilityID(final String temporaryFacilityId) {
-
 		return temporaryFacilityId.substring(
 				temporaryFacilityId.indexOf(TEMPORARY_FACILITY_ID_SEPARATOR) + 1,
 				temporaryFacilityId.length()
@@ -299,9 +272,7 @@ public class FacilitiesAllActivitiesFTE {
 	}
 
 	private void loadFacilityActivities() {
-
 		if (this.ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
-
 			// shop
 			// "52: Detailhandel; Reparatur von Gebrauchsgütern"
 			this.facilityActivities.put("B015201", "shop");
@@ -330,45 +301,49 @@ public class FacilitiesAllActivitiesFTE {
 			this.facilityActivities.put("B019204", "leisure");
 
 		} else if (this.ktiYear.equals(KTIYear.KTI_YEAR_2008)) {
-
 			// education
 			for (String str : new String[]{"B018010A"}) {
 				this.facilityActivities.put(
 						str, 
-						FacilitiesProductionKTI.EDUCATION_KINDERGARTEN);
+						//FacilitiesProductionKTI.EDUCATION_KINDERGARTEN);
+						FacilitiesProductionKTI.ACT_TYPE_EDUCATION);
 			}
 
 			for (String str : new String[]{"B018010B"}) {
 				this.facilityActivities.put(
 						str, 
-						FacilitiesProductionKTI.EDUCATION_PRIMARY);
+						//FacilitiesProductionKTI.EDUCATION_PRIMARY);
+						FacilitiesProductionKTI.ACT_TYPE_EDUCATION);
 			}
 
 			for (String str : new String[]{"B018021A", "B018021B", "B018021C", "B018022A"}) {
 				this.facilityActivities.put(
 						str, 
-						FacilitiesProductionKTI.EDUCATION_SECONDARY);
+						//FacilitiesProductionKTI.EDUCATION_SECONDARY);
+						FacilitiesProductionKTI.ACT_TYPE_EDUCATION);
 			}
 
 			for (String str : new String[]{"B018030A", "B018030B", "B018030C", "B018030D"}) {
 				this.facilityActivities.put(
 						str, 
-						FacilitiesProductionKTI.EDUCATION_HIGHER);
+						//FacilitiesProductionKTI.EDUCATION_HIGHER);
+						FacilitiesProductionKTI.ACT_TYPE_EDUCATION);
 			}
 
 			for (String str : new String[]{"B018041A", "B018042A", "B018042B", "B018042C", "B018042D", "B018042E"}) {
 				this.facilityActivities.put(
 						str, 
-						FacilitiesProductionKTI.EDUCATION_OTHER);
+						//FacilitiesProductionKTI.EDUCATION_OTHER);
+						FacilitiesProductionKTI.ACT_TYPE_EDUCATION);
 			}
-
 			// shopping
 			for (String str : new String[]{"11A"}) {
 				this.facilityActivities.put(
 						EnterpriseCensus.EC01_PREFIX + 
 						EnterpriseCensus.SHOP_NOGA_SECTION + 
 						str, 
-						FacilitiesProductionKTI.SHOP_RETAIL_GT2500);
+						//FacilitiesProductionKTI.SHOP_RETAIL_GT2500);
+						FacilitiesProductionKTI.ACT_TYPE_SHOP);
 			}
 
 			for (String str : new String[]{"11B"}) {
@@ -376,7 +351,8 @@ public class FacilitiesAllActivitiesFTE {
 						EnterpriseCensus.EC01_PREFIX + 
 						EnterpriseCensus.SHOP_NOGA_SECTION + 
 						str, 
-						FacilitiesProductionKTI.SHOP_RETAIL_GET1000);
+						//FacilitiesProductionKTI.SHOP_RETAIL_GET1000);
+						FacilitiesProductionKTI.ACT_TYPE_SHOP);
 			}
 
 			for (String str : new String[]{"11C"}) {
@@ -384,7 +360,8 @@ public class FacilitiesAllActivitiesFTE {
 						EnterpriseCensus.EC01_PREFIX + 
 						EnterpriseCensus.SHOP_NOGA_SECTION + 
 						str, 
-						FacilitiesProductionKTI.SHOP_RETAIL_GET400);
+						//FacilitiesProductionKTI.SHOP_RETAIL_GET400);
+						FacilitiesProductionKTI.ACT_TYPE_SHOP);
 			}
 
 			for (String str : new String[]{"11D"}) {
@@ -392,7 +369,8 @@ public class FacilitiesAllActivitiesFTE {
 						EnterpriseCensus.EC01_PREFIX + 
 						EnterpriseCensus.SHOP_NOGA_SECTION + 
 						str, 
-						FacilitiesProductionKTI.SHOP_RETAIL_GET100);
+						//FacilitiesProductionKTI.SHOP_RETAIL_GET100);
+						FacilitiesProductionKTI.ACT_TYPE_SHOP);
 			}
 
 			for (String str : new String[]{"11E"}) {
@@ -400,7 +378,8 @@ public class FacilitiesAllActivitiesFTE {
 						EnterpriseCensus.EC01_PREFIX + 
 						EnterpriseCensus.SHOP_NOGA_SECTION + 
 						str, 
-						FacilitiesProductionKTI.SHOP_RETAIL_LT100);
+						//FacilitiesProductionKTI.SHOP_RETAIL_LT100);
+						FacilitiesProductionKTI.ACT_TYPE_SHOP);
 			}
 
 			for (String str : new String[]{
@@ -415,7 +394,8 @@ public class FacilitiesAllActivitiesFTE {
 						EnterpriseCensus.EC01_PREFIX + 
 						EnterpriseCensus.SHOP_NOGA_SECTION + 
 						str, 
-						FacilitiesProductionKTI.SHOP_OTHER);
+						//FacilitiesProductionKTI.SHOP_OTHER);
+						FacilitiesProductionKTI.ACT_TYPE_SHOP);
 			}
 
 			// leisure
@@ -424,22 +404,24 @@ public class FacilitiesAllActivitiesFTE {
 						EnterpriseCensus.EC01_PREFIX + 
 						EnterpriseCensus.HOSPITALITY_NOGA_SECTION + 
 						str, 
-						FacilitiesProductionKTI.LEISURE_GASTRO);
+						//FacilitiesProductionKTI.LEISURE_GASTRO);
+						FacilitiesProductionKTI.ACT_TYPE_LEISURE);
 			}
 
 			for (String str : new String[]{"11A","12A","21A","22A","23A","23B","23C"}) {
 				this.facilityActivities.put(
 						EnterpriseCensus.EC01_PREFIX +
 						EnterpriseCensus.HOSPITALITY_NOGA_SECTION + 
-						str, 
-//						FacilitiesProductionKTI.LEISURE_HOSPITALITY);	
-						FacilitiesProductionKTI.LEISURE_GASTRO);
+						str, 	
+						//FacilitiesProductionKTI.LEISURE_GASTRO);
+						FacilitiesProductionKTI.ACT_TYPE_LEISURE);
 			}
 
 			for (String str : new String[]{"B019261A", "B019262A", "B019262B"}) {
 				this.facilityActivities.put(
 						str, 
-						FacilitiesProductionKTI.LEISURE_SPORTS);
+						//FacilitiesProductionKTI.LEISURE_SPORTS);
+						FacilitiesProductionKTI.ACT_TYPE_LEISURE);
 			}
 
 			for (String str : new String[]{
@@ -452,7 +434,8 @@ public class FacilitiesAllActivitiesFTE {
 						EnterpriseCensus.EC01_PREFIX + 
 						EnterpriseCensus.CULTURE_NOGA_SECTION + 
 						str, 
-						FacilitiesProductionKTI.LEISURE_CULTURE);
+						//FacilitiesProductionKTI.LEISURE_CULTURE);
+						FacilitiesProductionKTI.ACT_TYPE_LEISURE);
 			}
 		}
 		for (String str : facilityActivities.keySet()) {

@@ -23,6 +23,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -55,5 +56,32 @@ public class Utils {
 		Gbl.printRoundTime();
 		log.info("Created tree with " + locQuadTree.size() + " locations");
 		return locQuadTree;
+	}
+	
+	public static QuadTree<ActivityFacility> buildLocationQuadTreeFacilities(TreeMap<Id, ? extends ActivityFacility> shops) {
+		Gbl.startMeasurement();
+		System.out.println("      building loc quad tree...");
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		for (ActivityFacility loc : shops.values()) {
+			if (loc.getCoord().getX() < minx) { minx = loc.getCoord().getX(); }
+			if (loc.getCoord().getY() < miny) { miny = loc.getCoord().getY(); }
+			if (loc.getCoord().getX() > maxx) { maxx = loc.getCoord().getX(); }
+			if (loc.getCoord().getY() > maxy) { maxy = loc.getCoord().getY(); }
+		}
+		minx -= 1.0;
+		miny -= 1.0;
+		maxx += 1.0;
+		maxy += 1.0;
+		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		QuadTree<ActivityFacility> facQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		for (ActivityFacility f : shops.values()) {
+			facQuadTree.put(f.getCoord().getX(), f.getCoord().getY(), f);
+		}
+		Gbl.printRoundTime();
+		log.info("Created tree with " + facQuadTree.size() + " locations");
+		return facQuadTree;
 	}
 }
