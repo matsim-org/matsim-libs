@@ -141,7 +141,18 @@ public class TransitRouterVariableImpl implements TransitRouter {
 				travelTime += ttime;
 				time += ttime;
 			}
-			else if(l.fromNode.route==null) {
+			else if(l.fromNode.route!=null) {
+				//inside link
+				leg = new LegImpl(TransportMode.pt);
+				ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(stop.getStopFacility(), l.fromNode.line, l.fromNode.route, l.fromNode.stop.getStopFacility());
+				leg.setRoute(ptRoute);
+				leg.setTravelTime(travelTime);
+				legs.add(leg);
+				travelTime = 0;
+				stop = l.fromNode.stop;
+				coord = l.fromNode.stop.getStopFacility().getCoord();
+			}
+			else if(l.toNode.route!=null) {
 				//wait link
 				leg = new LegImpl(TransportMode.transit_walk);
 				walkDistance = CoordUtils.calcDistance(coord, l.toNode.stop.getStopFacility().getCoord()); 
@@ -154,17 +165,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 				stop = l.toNode.stop;
 				time += walkWaitTime;
 			}
-			else if(l.toNode.route==null) {
-				//transfer link
-				leg = new LegImpl(TransportMode.pt);
-				ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(stop.getStopFacility(), l.fromNode.line, l.fromNode.route, l.fromNode.stop.getStopFacility());
-				leg.setRoute(ptRoute);
-				leg.setTravelTime(travelTime);
-				legs.add(leg);
-				travelTime = 0;
-				stop = l.fromNode.stop;
-				coord = l.fromNode.stop.getStopFacility().getCoord();
-			}
+			
 		}
 		leg = new LegImpl(TransportMode.transit_walk);
 		walkDistance = CoordUtils.calcDistance(coord, toCoord); 

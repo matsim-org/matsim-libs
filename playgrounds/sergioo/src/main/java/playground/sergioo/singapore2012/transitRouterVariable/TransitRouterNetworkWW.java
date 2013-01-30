@@ -21,9 +21,8 @@
 package playground.sergioo.singapore2012.transitRouterVariable;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,7 +35,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
@@ -44,7 +42,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Transit router network with travel, transfer, and waiting links
@@ -301,65 +298,61 @@ public final class TransitRouterNetworkWW implements Network {
 		final TransitRouterNetworkWW transitNetwork = new TransitRouterNetworkWW();
 		final Counter linkCounter = new Counter(" link #");
 		final Counter nodeCounter = new Counter(" node #");
+		int numTravelLinks = 0, numWaitingLinks = 0, numInsideLinks = 0, numTransferLinks = 0;
+		Map<Id, TransitRouterNetworkNode> stops = new HashMap<Id, TransitRouterNetworkNode>();
+		TransitRouterNetworkNode nodeSR, nodeS;
+		// build stop nodes
+		for (TransitLine line : schedule.getTransitLines().values())
+			for (TransitRoute route : line.getRoutes().values())
+				for (TransitRouteStop stop : route.getStops()) {
+					nodeS = stops.get(stop.getStopFacility().getId());
+					if(nodeS == null) {
+						nodeS = transitNetwork.createNode(stop, null, null);
+						nodeCounter.incCounter();
+						stops.put(stop.getStopFacility().getId(), nodeS);
+					}
+				}
+		transitNetwork.finishInit();
+		// build transfer links
+		log.info("add transfer links");
+		// connect all stops with walking links if they're located less than beelineWalkConnectionDistance from each other
+		for (TransitRouterNetworkNode node : transitNetwork.getNodes().values())
+			for (TransitRouterNetworkNode node2 : transitNetwork.getNearestNodes(node.stop.getStopFacility().getCoord(), maxBeelineWalkConnectionDistance))
+				if (node!=node2) {
+					transitNetwork.createLink(node, node2, null, null);
+					linkCounter.incCounter();
+					numTransferLinks++;
+				}
 		// build nodes and links connecting the nodes according to the transit routes
+		log.info("add travel, waiting and inside links");
 		for (TransitLine line : schedule.getTransitLines().values())
 			for (TransitRoute route : line.getRoutes().values()) {
 				TransitRouterNetworkNode prevNode = null;
 				for (TransitRouteStop stop : route.getStops()) {
-					TransitRouterNetworkNode node = transitNetwork.createNode(stop, route, line);
+					nodeS = stops.get(stop.getStopFacility().getId());
+					nodeSR = transitNetwork.createNode(stop, route, line);
 					nodeCounter.incCounter();
 					if (prevNode != null) {
-						transitNetwork.createLink(network, prevNode, node, route, line);
+						transitNetwork.createLink(network, prevNode, nodeSR, route, line);
 						linkCounter.incCounter();
+						numTravelLinks++;
 					}
-					prevNode = node;
+					prevNode = nodeSR;
+					transitNetwork.createLink(nodeS, nodeSR, null, null);
+					linkCounter.incCounter();
+					numWaitingLinks++;
+					transitNetwork.createLink(nodeSR, nodeS, null, null);
+					linkCounter.incCounter();
+					numInsideLinks++;
 				}
 			}
-		// build stop nodes and waiting links
-		log.info("add waiting links");
-		List<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>> toBeAdded = new LinkedList<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>>();
-		for(TransitStopFacility stopF:schedule.getFacilities().values()) {
-			TransitRouteStop stop = null;
-			SEARCH_ROUTE_STOP://For finding one route stop with the desired facility
-			for (TransitLine line : schedule.getTransitLines().values())
-				for (TransitRoute route : line.getRoutes().values())
-					for (TransitRouteStop stop2 : route.getStops())
-						if(stopF.getId().equals(stop2.getStopFacility().getId())) {
-							stop = stop2;
-							break SEARCH_ROUTE_STOP;
-						}
-			if(stop!=null) {
-				TransitRouterNetworkNode node = transitNetwork.createNode(stop, null, null);
-				nodeCounter.incCounter();
-				for(TransitRouterNetworkNode node2 : transitNetwork.getNodes().values())
-					if(node2.getLine()!=null && node2.stop.getStopFacility().getId().equals(stopF.getId())) {
-						toBeAdded.add(new Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>(node, node2));
-						linkCounter.incCounter();
-					}
-			}
-		}
-		log.info(toBeAdded.size() + " waiting links to be added.");
-		for (Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode> tuple : toBeAdded)
-			transitNetwork.createLink(tuple.getFirst(), tuple.getSecond(), null, null);
-		transitNetwork.finishInit();
-		// build transfer links
-		log.info("add transfer links");
-		toBeAdded = new LinkedList<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>>();
-		// connect all stops with walking links if they're located less than beelineWalkConnectionDistance from each other
-		for (TransitRouterNetworkNode node : transitNetwork.getNodes().values())
-			if (node.line!=null && node.getInLinks().size()>0) // only add links from this node to other nodes if agents actually can arrive here
-				for (TransitRouterNetworkNode node2 : transitNetwork.getNearestNodes(node.stop.getStopFacility().getCoord(), maxBeelineWalkConnectionDistance))
-					if (node2.line==null) { // only add links to other nodes when agents can depart there
-						toBeAdded.add(new Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>(node, node2));
-						linkCounter.incCounter();
-					}
-		log.info(toBeAdded.size() + " transfer links to be added.");
-		for (Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode> tuple : toBeAdded)
-			transitNetwork.createLink(tuple.getFirst(), tuple.getSecond(), null, null);
 		log.info("transit router network statistics:");
 		log.info(" # nodes: " + transitNetwork.getNodes().size());
 		log.info(" # links total:     " + transitNetwork.getLinks().size());
-		log.info(" # transfer links:  " + toBeAdded.size());
+		log.info(" # travel links:  " + numTravelLinks);
+		log.info(" # waiting links:  " + numWaitingLinks);
+		log.info(" # inside links:  " + numInsideLinks);
+		log.info(" # transfer links:  " + numTransferLinks);
 		return transitNetwork;
 	}
 	public TransitRouterNetworkLink createLink(final Network network, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {

@@ -27,10 +27,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
@@ -52,13 +54,13 @@ public class TransitRouterNetworkTravelTimeAndDisutilityVariableWW extends Trans
 	private final double timeSlot;
 	private final int numSlots;
 	
-	public TransitRouterNetworkTravelTimeAndDisutilityVariableWW(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, TravelTime travelTime, WaitTime waitTime) {
+	public TransitRouterNetworkTravelTimeAndDisutilityVariableWW(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, TravelTime travelTime, WaitTime waitTime, TravelTimeCalculatorConfigGroup tTConfigGroup, QSimConfigGroup qSimConfigGroup) {
 		super(config);
 		this.network = network;
 		this.travelTime = travelTime;
 		this.waitTime = waitTime;
-		this.timeSlot = ((TravelTimeCalculator)travelTime).getTimeSlice();
-		this.numSlots = ((TravelTimeCalculator)travelTime).getNumSlots();
+		timeSlot = tTConfigGroup.getTraveltimeBinSize();
+		numSlots = (int) ((qSimConfigGroup.getEndTime()-qSimConfigGroup.getStartTime())/timeSlot);
 		for(TransitRouterNetworkLink link:routerNetwork.getLinks().values())
 			if(link.route!=null)
 				linkTravelTimes.put(link.getId(), new double[numSlots]);
@@ -81,12 +83,12 @@ public class TransitRouterNetworkTravelTimeAndDisutilityVariableWW extends Trans
 			}
 			return linksTime;
 		}
-		else if(wrapped.fromNode.route==null)
-			//wait link
-			return waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time);
 		else if(wrapped.toNode.route==null)
 			//transfer link
 			return wrapped.getLength()/this.config.getBeelineWalkSpeed();
+		else if(wrapped.fromNode.route==null)
+			//wait link
+			return waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time);
 		else
 			throw new RuntimeException("Bad transit router link");
 	}
@@ -97,13 +99,13 @@ public class TransitRouterNetworkTravelTimeAndDisutilityVariableWW extends Trans
 		if (wrapped.route != null)
 			cost = - getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
 				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
-		else if (wrapped.fromNode.route==null)
-			// it's a wait link
-			cost = - getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfWaitingPt_utl_s();
 		else if(wrapped.toNode.route==null)
 			// it's a transfer link (walk)
-			cost = -getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
-			       - this.config.getUtilityOfLineSwitch_utl();
+			cost = -getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s();
+		else if (wrapped.fromNode.route==null)
+			// it's a wait link
+			cost = - getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
+					- this.config.getUtilityOfLineSwitch_utl();
 		else
 			throw new RuntimeException("Bad transit router link");
 		return cost;

@@ -45,7 +45,7 @@ public class TransitRouterVariableImplFactory implements TransitRouterFactory {
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		transitRouterNetworkTravelTimeCostVariable = new TransitRouterNetworkTravelTimeAndDisutilityVariableWW(config, controler.getNetwork(), routerNetwork, controler.getLinkTravelTimes(), waitTime);
+		transitRouterNetworkTravelTimeCostVariable = new TransitRouterNetworkTravelTimeAndDisutilityVariableWW(config, controler.getNetwork(), routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().getQSimConfigGroup());
 		controler.addControlerListener(transitRouterNetworkTravelTimeCostVariable);
 		return new TransitRouterVariableImpl(config, transitRouterNetworkTravelTimeCostVariable, routerNetwork, controler.getNetwork());
 	}
