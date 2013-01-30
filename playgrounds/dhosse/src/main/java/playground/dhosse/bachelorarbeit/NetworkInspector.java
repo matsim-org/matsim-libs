@@ -5,31 +5,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
-import org.matsim.contrib.matsim4opus.gis.Zone;
-import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.ParcelBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.ZoneBasedAccessibilityControlerListenerV3;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -102,37 +94,47 @@ public class NetworkInspector {
 		
 		bbox.setDefaultBoundaryBox(this.scenario.getNetwork());
 		
-		SpatialGrid grid = new SpatialGrid(bbox.getBoundingBox(), 100);
+		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
+		SpatialGrid carGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
+		SpatialGrid bikeGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
+		SpatialGrid walkGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
+		SpatialGrid ptGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
 		
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl();//create facility, aus matsim-bev., strukturdaten etc.
 		
-		//class schreiben: extends accessibilitycontrolerlistener, notifyshutdown overriden, aggregateOpportunities ersetzen, kein file, kein sample, for-schleife: über facilities iterieren
+		int i=0;
 		
-//		this.scenario.getConfig().addModule("module", new AccessibilityParameterConfigModule("module"));
-//		System.out.println(this.scenario.getConfig().getModule(AccessibilityParameterConfigModule.GROUP_NAME));
-//		MATSim4UrbanSimConfigurationConverterV4 connector = new MATSim4UrbanSimConfigurationConverterV4("./input/config.xml");
-		//solution: getter-methode rein, config-modul initialisieren, werte für betas reinsetzen (pt auslassen)/beta_x_tt:-12,rest:0
+		for(Person p : this.scenario.getPopulation().getPersons().values()){
+			PlanElement pe1 = p.getSelectedPlan().getPlanElements().get(0);
+			PlanElement pe2 = p.getSelectedPlan().getPlanElements().get(2);
+			if(pe1 instanceof Activity){
+				Id id = new IdImpl(i);
+				parcels.createFacility(id, ((Activity)pe1).getCoord());
+				i++;
+			}
+			if(pe2 instanceof Activity){
+				Id id = new IdImpl(i);
+				parcels.createFacility(id, ((Activity)pe2).getCoord());
+				i++;
+			}
+		}
+		
+		//class schreiben: extends accessibilitycontrolerlistener, notifyshutdown overriden,
+		//aggregateOpportunities ersetzen, kein file, kein sample, for-schleife: über facilities iterieren
 
-		
-		
 		ScenarioImpl sc = (ScenarioImpl) this.scenario;
 		
-//		Benchmark benchmark = new Benchmark();
-		
-//		ZoneLayer<Id> startZones = new ZoneLayer<Id>(new Set<Zone<Id>>() {
-//		});
-
 		if(parcelBased){
-			listener = new ParcelBasedAccessibilityControlerListenerV3(main, null,
-					parcels, grid, grid, grid, grid, grid, null, null,
-					(ScenarioImpl) this.scenario);
+			listener = new MyParcelBasedAccessibilityControlerListener(main, null,
+					parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid, ptGrid, null, null,
+					sc);
+			
 		} else{
 			ActivityFacilitiesImpl zones = new ActivityFacilitiesImpl();
 			
 			listener = new ZoneBasedAccessibilityControlerListenerV3(main, null,
-					zones, null, null, (ScenarioImpl) this.scenario);
+					zones, null, null, sc);
 		}
-		
 	}
 	
 	public void checkLinkAttributes() throws IOException{
