@@ -106,8 +106,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	private static final String TIME_OF_DAY = "timeOfDay";								
 	private static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
 	private static final String PT_STOPS = "ptStops";
+	private static final String PT_STOPS_SWITCH = "usePtStops";
 	private static final String PT_TRAVEL_TIMES = "ptTravelTimes";
-	private static final String PT_TRAVEL_Distances = "ptTravelDistances";
+	private static final String PT_TRAVEL_DISTANCES = "ptTravelDistances";
+	private static final String PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH = "useTravelTimesAndDistances";
 	private static final String BETA_BIKE_TRAVEL_TIME = "betaBikeTravelTime";
 	private static final String BETA_BIKE_TRAVEL_TIME_POWER2 = "betaBikeTravelTimePower2";
 	private static final String BETA_BIKE_LN_TRAVEL_TIME = "betaBikeLnTravelTime";
@@ -410,26 +412,39 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 				log.info("</module>");
 			}
 			
-			ptStops = matsim4UrbanSimModule.getValue(PT_STOPS);
-			if( ptStops != null && Paths.pathExsits(ptStops))
-				log.info("Found pt stop input file: " + ptStops);
-			else{
-				ptStops = null;
-				log.warn("No pt stop input file found!!!");
-			}
-			
-			ptTravelTimes = matsim4UrbanSimModule.getValue(PT_TRAVEL_TIMES);
-			ptTravelDistances =  matsim4UrbanSimModule.getValue(PT_TRAVEL_Distances);
-			
-			if( ptTravelTimes != null && Paths.pathExsits(ptTravelTimes) && 
-				ptTravelDistances != null && Paths.pathExsits(ptTravelDistances)){
-				log.info("Found pt travel time input file: " + ptTravelTimes);
-				log.info("Found pt travel distance input file: " + ptTravelDistances);
-			}
-			else{
-				log.warn("Either no pt travel time or distance input file found! Both files needs to be set to use precomputed pt times and distances.");
-				ptTravelTimes = null;
-				ptTravelDistances = null;
+			// check if pseudo pt should be used
+			if( matsim4UrbanSimModule.getValue( PT_STOPS_SWITCH ) != null && 
+				matsim4UrbanSimModule.getValue( PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE")){
+				
+				// check if pt stops input file is given and existing
+				ptStops = matsim4UrbanSimModule.getValue(PT_STOPS);
+				if( ptStops != null && Paths.pathExsits(ptStops))
+					log.info("Found pt stop input file: " + ptStops);
+				else{
+					log.error("The parameter 'usePtStop' is set TRUE, but no pt stop input file found!!!");
+					log.error("Given input file for 'ptStop' = " + ptStops);
+					System.exit(InternalConstants.FILE_NOT_FOUND);
+				}
+				
+				// check if input files for pt travel times and distances are set
+				if( matsim4UrbanSimModule.getValue( PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null &&
+					matsim4UrbanSimModule.getValue( PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase( "TRUE" )){
+					
+					ptTravelTimes = matsim4UrbanSimModule.getValue(PT_TRAVEL_TIMES);
+					ptTravelDistances =  matsim4UrbanSimModule.getValue(PT_TRAVEL_DISTANCES);
+					
+					if( ptTravelTimes != null && Paths.pathExsits(ptTravelTimes) && 
+						ptTravelDistances != null && Paths.pathExsits(ptTravelDistances)){
+						log.info("Found pt travel time input file: " + ptTravelTimes);
+						log.info("Found pt travel distance input file: " + ptTravelDistances);
+					}
+					else{
+						log.error("The parameter 'useTravelTimesAndDistances' is set TRUE but either no pt travel time or distance input file found! Both files needs to be set to use precomputed pt times and distances.");
+						log.error("Given input file for 'ptTravelTimes' = " + ptTravelTimes);
+						log.error("Given input file for 'ptTravelDistances' = " + ptTravelDistances);
+						System.exit(InternalConstants.FILE_NOT_FOUND);
+					}
+				}
 			}
 		}
 		

@@ -276,7 +276,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		
 		PtMatrix ptMatrix = null;
 		if(getMATSim4UrbanSimControlerConfig().getPtStopsInputFile() != null){
-			log.info("An input files with pt stops is privided. Using MATSim4UrbanSim router ...");
+			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
 			// if ptStops etc are given in config
 			ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
 									controler.getScenario().getConfig().plansCalcRoute().getWalkSpeed(),
@@ -285,8 +285,6 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 									getMATSim4UrbanSimControlerConfig());	
 			controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 		}
-		else
-			log.warn("No input file for pt stops given. Using MATSim default router ...");
 			
 		log.info("Adding controler listener ...");
 		addControlerListener(zones, parcels, controler, ptMatrix);

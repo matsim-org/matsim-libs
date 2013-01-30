@@ -185,6 +185,7 @@ public class InternalConstants {
 	public static final int UNMARSCHALLING_FAILED 			= 3;
 	public static final int NO_MATSIM_NETWORK 				= 4;
 	public static final int INCOMPLETE_PARAMETER_SETTINGS	= 5;
+	public static final int FILE_NOT_FOUND					= 6;
 	
 	/** MATSim 4 UrbanSim (urbansimParameter) parameter names **/
 	public static final String URBANSIM_PARAMETER = "urbansimParameter";
