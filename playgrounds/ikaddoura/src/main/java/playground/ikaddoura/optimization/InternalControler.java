@@ -74,10 +74,15 @@ public class InternalControler {
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
 
-	public InternalControler(Scenario scenario, String directoryExtIt, double fare, long randomSeed) {
+	private String scheduleFile;
+	private String vehiclesFile;
+
+	public InternalControler(Scenario scenario, String directoryExtIt, double fare, long randomSeed, String scheduleFile, String vehiclesFile) {
 		this.scenario = scenario;
 		this.directoryExtIt = directoryExtIt;
 		this.randomSeed = randomSeed;
+		this.scheduleFile = scheduleFile;
+		this.vehiclesFile = vehiclesFile;
 		this.fare = fare;
 		this.ptScoringHandler = new PtLegHandler();
 
@@ -96,9 +101,9 @@ public class InternalControler {
 			log.info("Random seed is not taken from configFile. Setting random seed to " + randomSeed);
 			scenario.getConfig().global().setRandomSeed(randomSeed);
 		}
-	
-		new TransitScheduleReaderV1(scenario).readFile(this.directoryExtIt + "/scheduleFile.xml");
-		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(this.directoryExtIt + "/vehiclesFile.xml");
+
+		new TransitScheduleReaderV1(scenario).readFile(this.scheduleFile);
+		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(this.vehiclesFile);
 
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);

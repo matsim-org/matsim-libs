@@ -48,62 +48,105 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vehicles.Vehicles;
+
 
 /**
  * @author Ihab
  *
  */
-public class VehicleScheduleGenerator {
-	private final static Logger log = Logger.getLogger(VehicleScheduleGenerator.class);
-	
+public class ScheduleGenerator {
+
+	private final static Logger log = Logger.getLogger(ScheduleGenerator.class);
+
 	private double stopTime;
 	private Network network;
-	private String scheduleFile;
-	private String vehicleFile;
 	private Id transitLineId;
 	private Id routeId1;
 	private Id routeId2;
-	private Id vehTypeId;
-	
-	private int numberOfBuses;
 	private double startTime;
 	private double endTime;
 	private double pausenzeit;
-	private int busSeats;
-	private int standingRoom;
-	private double length;
-	private double egressSeconds;
-	private double accessSeconds;
 	private double scheduleSpeed;
-	private DoorOperationMode doorOperationMode;
 	
-	private double headway;
-		
-	List<Id> vehicleIDs = new ArrayList<Id>();
+	private double umlaufzeit;
+
+	private List<Id> vehicleIDs = new ArrayList<Id>();
+	private Map<Id, TransitRoute> routeId2transitRoute;
 	
-	TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
+	private TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
 	private final TransitSchedule schedule = sf.createTransitSchedule();
 	
-	Vehicles veh = VehicleUtils.createVehiclesContainer();
-
-	public void createSchedule() throws IOException {
-		
+	public void createSchedule(int numberOfBuses) throws IOException {
+		createLineRoutesStops();
+		createVehicleIDs(numberOfBuses);
+		setDepartureIDs(routeId2transitRoute, numberOfBuses);
+	}
+	
+	// ************************************************************************************
+	
+	public void createLineRoutesStops() {
 		Map<Id,List<Id>> routeID2linkIDs = getIDs();
 		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(routeID2linkIDs);
 		Map<Id, NetworkRoute> routeId2networkRoute = getRouteId2NetworkRoute(routeID2linkIDs);
 		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(routeId2transitStopFacilities);
-		Map<Id, TransitRoute> routeId2transitRoute = getRouteId2TransitRoute(routeId2networkRoute, routeId2TransitRouteStops);
+		this.routeId2transitRoute = getRouteId2TransitRoute(routeId2networkRoute, routeId2TransitRouteStops);
 		setTransitLine(routeId2transitRoute);
-		setDepartureIDs(routeId2transitRoute);
 		
+		int lastStop = routeId2transitRoute.get(routeId1).getStops().size()-1;
+		double routeTravelTime = routeId2transitRoute.get(routeId1).getStops().get(lastStop).getArrivalOffset();
+		this.umlaufzeit = (routeTravelTime + this.pausenzeit) * 2.0;
+		log.info("RouteTravelTime: "+ Time.writeTime(routeTravelTime, Time.TIMEFORMAT_HHMMSS));
+		log.info("Umlaufzeit: "+ Time.writeTime(umlaufzeit, Time.TIMEFORMAT_HHMMSS));			
+	}
+	
+	public void setDepartureIDs(Map<Id, TransitRoute> routeId2transitRoute, int numberOfBuses) {	
+		
+		double headway = umlaufzeit / numberOfBuses;
+		log.info("Takt: "+ Time.writeTime(headway, Time.TIMEFORMAT_HHMMSS));
+			
+		int routeNr = 0;
+		for (Id routeId : routeId2transitRoute.keySet()){
+			double firstDepartureTime = 0.0;
+			if (routeNr == 1){
+				firstDepartureTime = this.startTime;
+				log.info(routeId.toString() + ": Route 0 --> First Departure Time: "+ Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
+			}
+			else if (routeNr == 0){
+				firstDepartureTime = this.startTime + umlaufzeit/2;
+				log.info(routeId.toString() + ": Route 1 --> First Departure Time: "+ Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
+	
+			}
+			int vehicleIndex = 0;
+			int depNr = 0;
+			for (double departureTime = firstDepartureTime; departureTime < this.endTime ; ){
+				Departure departure = sf.createDeparture(new IdImpl(depNr), departureTime);
+				departure.setVehicleId(vehicleIDs.get(vehicleIndex));
+				routeId2transitRoute.get(routeId).addDeparture(departure);
+				departureTime = departureTime + headway;
+				depNr++;
+				if (vehicleIndex == numberOfBuses - 1){
+					vehicleIndex = 0;
+				}
+				else {
+					vehicleIndex++;
+				}
+			}				
+			routeNr++;
+		}			
+	}
+			
+	public void createVehicleIDs(int numberOfBuses){
+		for (int vehicleNr=1 ; vehicleNr <= numberOfBuses ; vehicleNr++){
+			vehicleIDs.add(new IdImpl("bus_"+vehicleNr));
 		}
+	}
+	
+	public void writeScheduleFile(String scheduleFile) {
+		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(schedule);
+		scheduleWriter.write(scheduleFile);
+	}
+	
+	// ************************************************************************************
 		
 	private Map<Id,List<Id>> getIDs() {
 		List <Link> busLinks = new ArrayList<Link>();
@@ -111,10 +154,8 @@ public class VehicleScheduleGenerator {
 		List<Id> linkIDsRoute1 = new LinkedList<Id>();
 		List<Id> linkIDsRoute2 = new LinkedList<Id>();
 		
-		// take busLinks and put them in a Map
 		for (Link link : this.network.getLinks().values()){
 			if (link.getAllowedModes().contains("bus") && !link.getAllowedModes().contains("car")){
-//			if (link.getAllowedModes().contains("bus")){
 				busLinks.add(link);
 			}
 		}
@@ -240,57 +281,11 @@ public class VehicleScheduleGenerator {
 	
 	private void setTransitLine(Map<Id, TransitRoute> routeId2transitRoute) {
 		TransitLine transitLine = sf.createTransitLine(this.transitLineId);
-
-		if (this.numberOfBuses == 0) {
-			throw new RuntimeException("At least 1 Bus expected. Aborting...");
-		}
-		else {
-			schedule.addTransitLine(transitLine);
-		}
+		
+		schedule.addTransitLine(transitLine);
 		
 		transitLine.addRoute(routeId2transitRoute.get(this.routeId1));
 		transitLine.addRoute(routeId2transitRoute.get(this.routeId2));
-	}
-	
-	private void setDepartureIDs(Map<Id, TransitRoute> routeId2transitRoute) {	
-		
-		int lastStop = routeId2transitRoute.get(routeId1).getStops().size()-1;
-		double routeTravelTime = routeId2transitRoute.get(routeId1).getStops().get(lastStop).getArrivalOffset();
-		log.info("RouteTravelTime: "+ Time.writeTime(routeTravelTime, Time.TIMEFORMAT_HHMMSS));
-		double umlaufzeit = (routeTravelTime + this.pausenzeit) * 2.0;
-		log.info("Umlaufzeit: "+ Time.writeTime(umlaufzeit, Time.TIMEFORMAT_HHMMSS));
-		this.headway = umlaufzeit / this.numberOfBuses;
-		log.info("Takt: "+ Time.writeTime(this.headway, Time.TIMEFORMAT_HHMMSS));
-		
-		int routeNr = 0;
-		for (Id routeId : routeId2transitRoute.keySet()){
-			double firstDepartureTime = 0.0;
-			if (routeNr == 1){
-				firstDepartureTime = this.startTime;
-				log.info(routeId.toString() + ": Route 0 --> First Departure Time: "+ Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
-			}
-			else if (routeNr == 0){
-				firstDepartureTime = this.startTime + umlaufzeit/2;
-				log.info(routeId.toString() + ": Route 1 --> First Departure Time: "+ Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
-
-			}
-			int vehicleIndex = 0;
-			int depNr = 0;
-			for (double departureTime = firstDepartureTime; departureTime < this.endTime ; ){
-				Departure departure = sf.createDeparture(new IdImpl(depNr), departureTime);
-				departure.setVehicleId(vehicleIDs.get(vehicleIndex));
-				routeId2transitRoute.get(routeId).addDeparture(departure);
-				departureTime = departureTime + this.headway;
-				depNr++;
-				if (vehicleIndex == this.numberOfBuses - 1){
-					vehicleIndex = 0;
-				}
-				else {
-					vehicleIndex++;
-				}
-			}				
-		routeNr++;
-		}			
 	}
 	
 	private List<Id> turnArround(List<Id> myList) {
@@ -300,45 +295,7 @@ public class VehicleScheduleGenerator {
 		}
 		return turnedArroundList;
 	}
-
-	public void createVehicles() {
-		
-		VehicleType type = veh.getFactory().createVehicleType(this.vehTypeId);
-		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
-		cap.setSeats(this.busSeats);
-		cap.setStandingRoom(this.standingRoom);
-		type.setCapacity(cap);
-		type.setLength(length);
-		type.setAccessTime(accessSeconds);
-		type.setEgressTime(egressSeconds);
-		type.setDoorOperationMode(doorOperationMode);
-		
-		veh.getVehicleTypes().put(this.vehTypeId, type); 
-		
-		for (int vehicleNr=1 ; vehicleNr<=numberOfBuses ; vehicleNr++){
-			vehicleIDs.add(new IdImpl("bus_"+vehicleNr));
-		}
-
-		if (vehicleIDs.isEmpty()){
-			throw new RuntimeException("At least 1 Bus is expected. Aborting...");
-		} else {
-			for (Id vehicleId : vehicleIDs){
-				Vehicle vehicle = veh.getFactory().createVehicle(vehicleId, veh.getVehicleTypes().get(vehTypeId));
-				veh.getVehicles().put(vehicleId, vehicle);
-			}
-		}
-	}
 	
-	public void writeScheduleFile() {
-		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(schedule);
-		scheduleWriter.write(scheduleFile);
-	}
-	
-	public void writeVehicleFile() {
-		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(veh);
-		vehicleWriter.writeFile(vehicleFile);
-	}
-
 	private List<Id> getMiddleRouteLinkIDs(List<Id> linkIDsRoute) {
 		List<Id> routeLinkIDs = new ArrayList<Id>();
 		int nr = 0;
@@ -350,6 +307,8 @@ public class VehicleScheduleGenerator {
 		}
 		return routeLinkIDs;
 	}
+	
+	// ************************************************************************************
 
 	public void setStopTime(double stopTime) {
 		this.stopTime = stopTime;
@@ -357,18 +316,6 @@ public class VehicleScheduleGenerator {
 
 	public void setNetwork(Network network) {
 		this.network = network;
-	}
-
-	public void setVehicleFile(String vehicleFile) {
-		this.vehicleFile = vehicleFile;
-	}
-
-	public void setScheduleFile(String scheduleFile) {
-		this.scheduleFile = scheduleFile;
-	}
-	
-	public void setSeats(int seats) {
-		this.busSeats = seats;
 	}
 
 	public void setTransitLineId(Id transitLineId) {
@@ -383,36 +330,12 @@ public class VehicleScheduleGenerator {
 		this.routeId2 = routeId2;
 	}
 
-	public void setVehTypeId(Id vehTypeId) {
-		this.vehTypeId = vehTypeId;
-	}
-
-	public void setStandingRoom(int standingRoom) {
-		this.standingRoom = standingRoom;
-	}
-
-	public void setNumberOfBuses(int numberOfBuses) {
-		this.numberOfBuses = numberOfBuses;
-	}
-
 	public void setStartTime(double startTime) {
 		this.startTime = startTime;
 	}
 
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
-	}
-
-	public void setLength(double length) {
-		this.length = length;
-	}
-
-	public void setEgressSeconds(double egressSeconds) {
-		this.egressSeconds = egressSeconds;
-	}
-
-	public void setAccessSeconds(double accessSeconds) {
-		this.accessSeconds = accessSeconds;
 	}
 
 	public void setScheduleSpeed(double scheduleSpeed) {
@@ -423,11 +346,7 @@ public class VehicleScheduleGenerator {
 		this.pausenzeit = pausenzeit;
 	}
 
-	public void setDoorOperationMode(DoorOperationMode doorOperationMode) {
-		this.doorOperationMode = doorOperationMode;
-	}
-
-	public double getHeadway() {
-		return headway;
+	public double getUmlaufzeit() {
+		return umlaufzeit;
 	}
 }

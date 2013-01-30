@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
  * @author ihab and benjamin
  *
  */
-public class ExtItInformation {
+public class IterationInfo {
 	
 	private double fare;
 	private double capacity;

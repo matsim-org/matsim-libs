@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Time;
 
-import playground.ikaddoura.optimization.ExtItInformation;
+import playground.ikaddoura.optimization.IterationInfo;
 
 
 /**
@@ -22,7 +22,7 @@ import playground.ikaddoura.optimization.ExtItInformation;
 public class TextFileWriter {
 	private final static Logger log = Logger.getLogger(TextFileWriter.class);
 
-	public void writeExtItData(String directoryExtItParam, SortedMap<Integer, ExtItInformation> extIt2information) {
+	public void writeExtItData(String directoryExtItParam, SortedMap<Integer, IterationInfo> extIt2information) {
 		File file = new File(directoryExtItParam+"/extItData.csv");
 		   
 	    try {
@@ -68,7 +68,7 @@ public class TextFileWriter {
 	    } catch (IOException e) {}		
 	}
 	
-	public void writeMatrices(String directoryExtItParam, SortedMap<Integer, ExtItInformation> it2information) {
+	public void writeMatrices(String directoryExtItParam, SortedMap<Integer, IterationInfo> it2information) {
 		
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2welfare = new TreeMap<Integer, SortedMap<Double, Double>>();
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2profit = new TreeMap<Integer, SortedMap<Double, Double>>();
@@ -181,7 +181,7 @@ public class TextFileWriter {
 	    } catch (IOException e) {}		
 	}
 
-	public void writeWaitDataPerPerson(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
+	public void writeWaitDataPerPerson(String directoryExtItParam2Param1, SortedMap<Integer, IterationInfo> extIt2information, int extItParam1) {
 		
 		String path = directoryExtItParam2Param1 + "/Data/";
 		File directory = new File(path);

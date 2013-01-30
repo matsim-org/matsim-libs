@@ -25,11 +25,14 @@ package playground.ikaddoura.optimization;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -72,12 +75,14 @@ class ExternalControler {
 	
 	static String settingsFile;
 
-	private SortedMap<Integer, ExtItInformation> it2information = new TreeMap<Integer, ExtItInformation>();
+	private Map<Integer, Map<Integer, String>> numberOfbuses2capacity2vehiclesFile = new HashMap<Integer, Map<Integer, String>>();
+	private Map<Integer, String> numberOfbuses2scheduleFile = new HashMap<Integer, String>();
+	private SortedMap<Integer, IterationInfo> it2information = new TreeMap<Integer, IterationInfo>();
 	private TextFileWriter textWriter = new TextFileWriter();
-	
-	private double fare;
-	private int capacity;
-	private int numberOfBuses;
+	private Operator operator = new Operator();
+	private Users users = new Users();
+
+	private double umlaufzeit;
 
 	public static void main(final String[] args) throws IOException {
 		
@@ -125,103 +130,146 @@ class ExternalControler {
 	private void run() throws IOException {
 		
 		checkConsitency();
+		createInputFiles();
 		
-		Operator operator = new Operator();
-		Users users = new Users();
-
 		int iterationCounter = 0;
 		
-		this.numberOfBuses = startBusNumber;
-		for (int extItParam0 = 0; extItParam0 <= stepsBusNumber ; extItParam0++){
-			log.info("************* EXTERNAL ITERATION (0) " + extItParam0 + " BEGINS *************");
-			
-			this.fare = startFare;
-			for (int extItParam1 = 0; extItParam1 <= stepsFare ; extItParam1++){
-				log.info("************* EXTERNAL ITERATION (1) " + extItParam1 + " BEGINS *************");
-				
-				this.capacity = startCapacity;
-				for (int extItParam2 = 0; extItParam2 <= stepsCapacity ; extItParam2++){
-					log.info("************* EXTERNAL ITERATION (2) " + extItParam2 + " BEGINS *************");
-					log.info("number of buses: " + this.numberOfBuses + " // fare: " + this.fare + " // capacity: " + this.capacity);
-					
-					String directoryIt = outputPath + "/extITERS/" + iterationCounter + "_buses" + this.numberOfBuses + "_fare" + this.fare + "_capacity" + this.capacity;
-					File directory = new File(directoryIt);
-					directory.mkdirs();
-					
-					Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
-			
-					new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
-					new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
-						
-					VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, scenario.getNetwork(), directoryIt);
-					vsw.writeTransitVehiclesAndSchedule();
-					
-					InternalControler internalControler = new InternalControler(scenario, directoryIt, this.fare, randomSeed);
-					internalControler.run();
-					
-					deleteUnnecessaryInternalIterations(directoryIt+"/internalIterations/ITERS/", scenario); 
+		double fare;
+		int capacity;
+		int numberOfBuses;
 		
-					operator.setParametersForExtIteration(this.capacity);
-					users.setParametersForExtIteration(scenario);
-					
-					OperatorUserAnalysis analysis = new OperatorUserAnalysis(scenario, directoryIt, vsw.getHeadway());
-					analysis.readEvents();
-					
-					operator.calculateCosts(analysis);
-					users.calculateLogsum();
-						
-					ExtItInformation info = new ExtItInformation();
-					info.setFare(this.fare);
-					info.setCapacity(this.capacity);
-					info.setNumberOfBuses(this.numberOfBuses);
-					info.setHeadway(vsw.getHeadway());
-					info.setOperatorCosts(operator.getCosts());
-					info.setOperatorRevenue(analysis.getRevenue());
-					info.setUsersLogSum(users.getLogSum());
-					info.setNumberOfCarLegs(analysis.getSumOfCarLegs());
-					info.setNumberOfPtLegs(analysis.getSumOfPtLegs());
-					info.setNumberOfWalkLegs(analysis.getSumOfWalkLegs());
-					info.setNoValidPlanScore(users.getNoValidPlanScore());
-					
-					info.setWaitingTimes(analysis.getWaitHandler().getWaitingTimes());
-					info.setWaitingTimesNotMissed(analysis.getWaitHandler().getWaitingTimesNotMissed());
-					info.setWaitingTimesMissed(analysis.getWaitHandler().getWaitingTimesMissed());
-					info.setPersonId2waitingTimes(analysis.getWaitHandler().getPersonId2waitingTimes());
-					info.setNumberOfMissedVehicles(analysis.getWaitHandler().getNumberOfMissedVehicles());
-									
-					info.setAvgT0MinusTActPerPerson(analysis.getCongestionHandler().getAvgTActMinusT0PerPerson());
-					info.setT0MinusTActSum(analysis.getCongestionHandler().getTActMinusT0Sum());
-					info.setAvgT0MinusTActDivT0PerTrip(analysis.getCongestionHandler().getAvgT0minusTActDivT0PerCarTrip());
-					
-					this.it2information.put(iterationCounter, info);
-					
+		numberOfBuses = startBusNumber;
+		for (int busStep = 0; busStep <= stepsBusNumber ; busStep++){
+				
+			capacity = startCapacity;
+			for (int capacityStep = 0; capacityStep <= stepsCapacity ; capacityStep++){
+				
+				fare = startFare;
+				for (int fareStep = 0; fareStep <= stepsFare ; fareStep++){
+
+					log.info("*********************************************************");
+					log.info("number of buses: " + numberOfBuses + " // fare: " + fare + " // capacity: " + capacity);
+					runInternalIteration(iterationCounter, numberOfBuses, capacity, fare);
 					iterationCounter++;
-					this.textWriter.writeExtItData(outputPath, this.it2information);
-					this.textWriter.writeMatrices(outputPath, this.it2information);
 					
-					if (extItParam2 < stepsCapacity){
-						this.capacity = this.capacity + incrCapacity;
-					}
-					
-					log.info("************* EXTERNAL ITERATION (2) " + extItParam2 + " ENDS *************");
+					if (fareStep < stepsFare){
+						fare = fare + incrFare;
+					}	
 				}
 				
-				if (extItParam1 < stepsFare){
-					this.fare = this.fare + incrFare;
+				if (capacityStep < stepsCapacity){
+					capacity = capacity + incrCapacity;
 				}
-				
-				log.info("************* EXTERNAL ITERATION (1) " + extItParam1 + " ENDS *************");
 			}
 			
-			if (extItParam0 < stepsBusNumber){
-				this.numberOfBuses = this.numberOfBuses + incrBusNumber;
-			}
-			
-			log.info("************* EXTERNAL ITERATION (0) " + extItParam0 + " ENDS *************");
-					
+			if (busStep < stepsBusNumber){
+				numberOfBuses = numberOfBuses + incrBusNumber;
+			}					
 		}
 	}
 	
+	private void runInternalIteration(int iterationCounter, int numberOfBuses, int capacity, double fare) throws IOException {
+		
+		String directoryIt = outputPath + "/extITERS/" + iterationCounter + "_buses" + numberOfBuses + "_fare" + fare + "_capacity" + capacity;
+		File directory = new File(directoryIt);
+		directory.mkdirs();
+		
+		String scheduleFile = this.numberOfbuses2scheduleFile.get(numberOfBuses);
+		String vehiclesFile = this.numberOfbuses2capacity2vehiclesFile.get(numberOfBuses).get(capacity);
+		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
+		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		
+		InternalControler internalControler = new InternalControler(scenario, directoryIt, fare, randomSeed, scheduleFile, vehiclesFile);
+		internalControler.run();
+		
+		deleteUnnecessaryInternalIterations(directoryIt+"/internalIterations/ITERS/", scenario); 
+
+		operator.setParametersForExtIteration(capacity);
+		users.setParametersForExtIteration(scenario);
+		
+		OperatorUserAnalysis analysis = new OperatorUserAnalysis(scenario, directoryIt, this.umlaufzeit/numberOfBuses);
+		analysis.readEvents();
+		
+		operator.calculateCosts(analysis);
+		users.calculateLogsum();
+			
+		IterationInfo info = new IterationInfo();
+		info.setFare(fare);
+		info.setCapacity(capacity);
+		info.setNumberOfBuses(numberOfBuses);
+		info.setHeadway(this.umlaufzeit/numberOfBuses);
+		info.setOperatorCosts(operator.getCosts());
+		info.setOperatorRevenue(analysis.getRevenue());
+		info.setUsersLogSum(users.getLogSum());
+		info.setNumberOfCarLegs(analysis.getSumOfCarLegs());
+		info.setNumberOfPtLegs(analysis.getSumOfPtLegs());
+		info.setNumberOfWalkLegs(analysis.getSumOfWalkLegs());
+		info.setNoValidPlanScore(users.getNoValidPlanScore());
+		
+		info.setWaitingTimes(analysis.getWaitHandler().getWaitingTimes());
+		info.setWaitingTimesNotMissed(analysis.getWaitHandler().getWaitingTimesNotMissed());
+		info.setWaitingTimesMissed(analysis.getWaitHandler().getWaitingTimesMissed());
+		info.setPersonId2waitingTimes(analysis.getWaitHandler().getPersonId2waitingTimes());
+		info.setNumberOfMissedVehicles(analysis.getWaitHandler().getNumberOfMissedVehicles());
+						
+		info.setAvgT0MinusTActPerPerson(analysis.getCongestionHandler().getAvgTActMinusT0PerPerson());
+		info.setT0MinusTActSum(analysis.getCongestionHandler().getTActMinusT0Sum());
+		info.setAvgT0MinusTActDivT0PerTrip(analysis.getCongestionHandler().getAvgT0minusTActDivT0PerCarTrip());
+		
+		this.it2information.put(iterationCounter, info);
+		
+		iterationCounter++;
+		this.textWriter.writeExtItData(outputPath, this.it2information);
+		this.textWriter.writeMatrices(outputPath, this.it2information);
+	}
+
+	private void createInputFiles() throws IOException {
+
+		String dir = outputPath + "/generatedInputFiles/";
+		File directory = new File(dir);
+		directory.mkdirs();
+		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
+		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		
+		int numberOfBuses = startBusNumber;
+		for (int busStep = 0; busStep <= stepsBusNumber ; busStep++){
+			
+			log.info("Writing transitSchedule...");
+			String scheduleFile = dir + "transitSchedule_buses" + numberOfBuses + ".xml";
+			
+			ScheduleWriter sw = new ScheduleWriter(scenario.getNetwork());
+			sw.createSchedule(numberOfBuses, scheduleFile);
+			
+			int capacity = startCapacity;
+			for (int capacityStep = 0; capacityStep <= stepsCapacity ; capacityStep++){
+			
+				log.info("Writing transitVehicles...");
+				String vehiclesFile = dir + "transitVehicles_buses" + numberOfBuses + "_capacity" + capacity + ".xml";
+				VehicleWriter vw = new VehicleWriter();
+				vw.writeVehicles(numberOfBuses, capacityStep, vehiclesFile);
+				
+				if (this.numberOfbuses2capacity2vehiclesFile.containsKey(numberOfBuses)){
+					this.numberOfbuses2capacity2vehiclesFile.get(numberOfBuses).put(capacity, vehiclesFile);
+					
+				} else {
+					Map<Integer, String> capacity2vehiclesFile = new HashMap<Integer, String>();
+					capacity2vehiclesFile.put(capacity, vehiclesFile);
+					this.numberOfbuses2capacity2vehiclesFile.put(numberOfBuses, capacity2vehiclesFile);
+				}
+				capacity = capacity + incrCapacity;
+			}
+			
+			this.numberOfbuses2scheduleFile.put(numberOfBuses, scheduleFile);			
+			numberOfBuses = numberOfBuses + incrBusNumber;
+			
+			this.umlaufzeit = sw.getUmlaufzeit(); // TODO: get umlaufzeit from somewhere else!
+		}						
+	}
+
 	private void deleteUnnecessaryInternalIterations(String itersPath, Scenario scenario) {
 		
 		int firstIt = scenario.getConfig().controler().getFirstIteration();
