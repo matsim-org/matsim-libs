@@ -21,8 +21,9 @@ package playground.vsp.analysis.modules.ptAccessibility.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -49,95 +50,108 @@ public class PtAccessMapShapeWriter {
 
 	public static void writeAccessMap(Map<String, Map<String, MultiPolygon>> cluster2mode2area, int quadrantSegments, String outputFolder, String targetCoordinateSystem) {
 		// Sort distance clusters
-		ArrayList<Integer> distances = new ArrayList<Integer>();
+		ArrayList<Integer> distancesSmallestFirst = new ArrayList<Integer>();
 		for (String distanceString : cluster2mode2area.keySet()) {
-			distances.add(Integer.parseInt(distanceString));
+			distancesSmallestFirst.add(Integer.parseInt(distanceString));
 		}
-		Collections.sort(distances);
+		Collections.sort(distancesSmallestFirst);
 
-		ArrayList<Geometry> buffersSmallestFirst = new ArrayList<Geometry>();
+		HashMap<Integer, HashMap<String, Geometry>> distance2mode2buffer = new HashMap<Integer, HashMap<String, Geometry>>();
 		
 		// Calculate buffer for all Multipolygons
-		Geometry lastBuffer = null;
+		HashMap<String, Geometry> mode2buffer = null;
 		int lastDistance = 0;
 		
-		for (Integer distance : distances) {
-			if (lastBuffer == null) {
+		for (Integer distance : distancesSmallestFirst) {
+			if (mode2buffer == null) {
 				// it's the frist and smallest one
-				for (Geometry multipolygon : cluster2mode2area.get(distances.get(0).toString()).values()) {
-					lastBuffer = multipolygon.buffer(0.0, quadrantSegments);
+				mode2buffer = new HashMap<String, Geometry>();
+				for (Entry<String, MultiPolygon> multipolygonEntry : cluster2mode2area.get(distancesSmallestFirst.get(0).toString()).entrySet()) {
+					mode2buffer.put(multipolygonEntry.getKey(), multipolygonEntry.getValue().buffer(0.0, quadrantSegments));
 					lastDistance = distance.intValue();
 				}
 			} else {
-				lastBuffer = lastBuffer.buffer(distance.intValue() - lastDistance);
+				HashMap<String, Geometry> tempBuffers = new HashMap<String, Geometry>();
+				for (Entry<String, Geometry> bufferEntry : mode2buffer.entrySet()) {
+					tempBuffers.put(bufferEntry.getKey(), bufferEntry.getValue().buffer(distance.intValue() - lastDistance));
+				}
+				mode2buffer = tempBuffers;
 				lastDistance = distance.intValue();
 			}
 			
-			buffersSmallestFirst.add(lastBuffer);
+			distance2mode2buffer.put(distance, mode2buffer);
 		}
 		
-		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_buffer", distances, buffersSmallestFirst, targetCoordinateSystem);
+		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_buffer", distance2mode2buffer, targetCoordinateSystem);
 		
-		// resort
-		LinkedList<Geometry> buffersLargestFirst = new LinkedList<Geometry>();
-		for (int i = 0; i < buffersSmallestFirst.size(); i++) {
-			buffersLargestFirst.addFirst(buffersSmallestFirst.get(i));
+		
+		
+		// resort distances - largest first
+		ArrayList<Integer> distancesLargestFirst = new ArrayList<Integer>();
+		for (Integer distance : distancesSmallestFirst) {
+			distancesLargestFirst.add(0, distance);
 		}
+		
+
+		HashMap<Integer, HashMap<String, Geometry>> distance2mode2diffBuffer = new HashMap<Integer, HashMap<String, Geometry>>();
+		HashMap<String, Geometry> lastMode2Buffer = null;
+		Integer lastDist = null;
 		
 		// calculate Diff for all buffers
-		LinkedList<Geometry> diffBuffers = new LinkedList<Geometry>();
-		lastBuffer = null;
-		
-		for (Geometry buffer : buffersLargestFirst) {
-			if (lastBuffer == null) {
-				lastBuffer = buffer;
+		for (Integer distance : distancesLargestFirst) {
+			distance2mode2diffBuffer.put(distance, new HashMap<String, Geometry>());
+			
+			if (lastMode2Buffer == null) {
+				lastMode2Buffer = distance2mode2buffer.get(distance);
+				lastDist = distance;
 			} else {
 				// diff
-				Geometry diffBuffer = lastBuffer.difference(buffer);
-				diffBuffers.addFirst(diffBuffer);
-				lastBuffer = buffer;
+				for (String mode : distance2mode2buffer.get(distance).keySet()) {
+					Geometry diffBuffer = lastMode2Buffer.get(mode).difference(distance2mode2buffer.get(distance).get(mode));
+					distance2mode2diffBuffer.get(lastDist).put(mode, diffBuffer);
+				}
+				lastMode2Buffer = distance2mode2buffer.get(distance);
+				lastDist = distance;
 			}
 		}
+				
 		// add last (smallest) one as well
-		diffBuffers.addFirst(buffersLargestFirst.get(buffersLargestFirst.size() - 1));
-		
-		// repack
-		ArrayList<Geometry> buffersToWrite = new ArrayList<Geometry>();
-		for (Geometry geometry : diffBuffers) {
-			buffersToWrite.add(geometry);
+		for (Entry<String, Geometry> mode2BufferEntry : lastMode2Buffer.entrySet()) {
+			distance2mode2diffBuffer.get(lastDist).put(mode2BufferEntry.getKey(), mode2BufferEntry.getValue());
 		}
-		
-		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_diffBuffer", distances, buffersToWrite, targetCoordinateSystem);
+				
+		writeGeometries(outputFolder + PtStopMap.FILESUFFIX + "_diffBuffer", distance2mode2diffBuffer, targetCoordinateSystem);
 	}
 
-	private static void writeGeometries(String outputFolderAndFileName, ArrayList<Integer> distances, ArrayList<Geometry> geometries, String targetCoordinateSystem) {
+	private static void writeGeometries(String outputFolderAndFileName, HashMap<Integer, HashMap<String, Geometry>> distance2mode2buffer, String targetCoordinateSystem) {
 		// write all to file
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(MGC.getCRS(targetCoordinateSystem));
 		b.setName("name");
 		b.add("location", MultiPolygon.class);
-		b.add("name", String.class);
+		b.add("mode", String.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		
-		Collection<SimpleFeature> bufferFeatures = new ArrayList<SimpleFeature>();
+		Collection<SimpleFeature> bufferFeatures;
 		Object[] bufferFeatureAttribs;
 		
-		for (int i = 0; i < geometries.size(); i++) {
-			Geometry geometry = geometries.get(i);
-
+		for (Entry<Integer, HashMap<String, Geometry>> distance2mode2bufferEntry : distance2mode2buffer.entrySet()) {
 			bufferFeatures = new ArrayList<SimpleFeature>();
-			bufferFeatureAttribs = new Object[2];
-			bufferFeatureAttribs[0] = geometry;
-			String distance = distances.get(i).toString();
-			bufferFeatureAttribs[1] = distance;
-			try {
-				bufferFeatures.add(builder.buildFeature(null, bufferFeatureAttribs));
-			} catch (IllegalArgumentException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			HashMap<String, Geometry> mode2buffer = distance2mode2bufferEntry.getValue();
+			for (Entry<String, Geometry> mode2BufferEntry : mode2buffer.entrySet()) {
+				bufferFeatureAttribs = new Object[2];
+				bufferFeatureAttribs[0] = mode2BufferEntry.getValue();
+				bufferFeatureAttribs[1] = mode2BufferEntry.getKey();
+				try {
+					bufferFeatures.add(builder.buildFeature(null, bufferFeatureAttribs));
+				} catch (IllegalArgumentException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
+			
 			try{
-				ShapeFileWriter.writeGeometries(bufferFeatures, outputFolderAndFileName + "_" + distance + ".shp");
+				ShapeFileWriter.writeGeometries(bufferFeatures, outputFolderAndFileName + "_" + distance2mode2bufferEntry.getKey() + ".shp");
 			}catch(ServiceConfigurationError e){
 				e.printStackTrace();
 			}
