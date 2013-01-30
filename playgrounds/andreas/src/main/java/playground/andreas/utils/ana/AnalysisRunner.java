@@ -42,12 +42,14 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
 import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
@@ -76,7 +78,17 @@ public class AnalysisRunner {
 		int gridSize = Integer.valueOf(args[3]);
 		String shapeFile = args[4];
 		int quadrantSegments = Integer.parseInt(args[5]);
+		String fromCoordSystem = args[6];
 		
+		String targetCoordinateSystem = fromCoordSystem;
+		CoordinateTransformation coordTransformation = null;
+		
+		if (args.length == 8) {
+			// we want to transform
+			String toCoordSystem = args[7];
+			coordTransformation = TransformationFactory.getCoordinateTransformation(fromCoordSystem, toCoordSystem);
+			targetCoordinateSystem = toCoordSystem;
+		}
 		
 		String oldJavaIoTempDir = System.getProperty("java.io.tmpdir");
 		String newJavaIoTempDir = outputDir + "/" + runId + "/tmp";
@@ -87,7 +99,8 @@ public class AnalysisRunner {
 		sc.getConfig().scenario().setUseTransit(true);
 		
 //		String targetCoordinateSystem = TransformationFactory.WGS84_UTM35S; // Gauteng
-		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
+//		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
+//		String targetCoordinateSystem = TransformationFactory.WGS84;		// World Mercator
 		
 		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(outputDir + "/" + runId + "/", runId, true, true);
 		
@@ -95,6 +108,10 @@ public class AnalysisRunner {
 		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
 		new MatsimFacilitiesReader((ScenarioImpl) sc).readFile(dir.getOutputFilename("output_facilities.xml.gz"));
 		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(iteration, "plans.xml.gz"));
+		
+		BVGLines2PtModes bvgLines2PtModes = new BVGLines2PtModes();
+		bvgLines2PtModes.setPtModesForEachLine(sc.getTransitSchedule(), "para");
+		TagLinesInTransitSchedule.tagLinesInTransitSchedule(sc.getTransitSchedule(), bvgLines2PtModes.getLineId2ptModeMap());
 		
 		List<Integer> cluster = new ArrayList<Integer>(){{
 			add(100);
