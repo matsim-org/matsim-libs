@@ -92,13 +92,13 @@ class ExternalControler {
 		if (args.length == 0){
 			settingsFile = "/Users/Ihab/Desktop/input/settingsFile.csv";
 			configFile = "/Users/Ihab/Desktop/input/config.xml";
-			outputPath = "/Users/Ihab/Desktop/output";			
+			outputPath = "/Users/Ihab/Desktop/output2";			
 		} else {
 			settingsFile = args[0];
 			configFile = args[1];
 			outputPath = args[2];
 			
-			if (!args[3].isEmpty() && !args[4].isEmpty()){
+			if (args.length > 3) {
 				rndSeedsFile = args[3];		
 				rndSeedNr = Integer.parseInt(args[4]);
 				RndSeedsLoader rndSeedsLoader = new RndSeedsLoader(rndSeedsFile);
@@ -218,7 +218,7 @@ class ExternalControler {
 		InternalControler internalControler = new InternalControler(scenario, fare);
 		internalControler.run();
 		
-		deleteUnnecessaryInternalIterations(directoryIt+"/internalIterations/ITERS/", scenario); 
+		deleteUnnecessaryInternalIterations(scenario); 
 
 		operator.setParametersForExtIteration(capacity);
 		users.setParametersForExtIteration(scenario);
@@ -293,7 +293,7 @@ class ExternalControler {
 			String scheduleFile = dir + "transitSchedule_buses" + numberOfBuses + ".xml";
 			
 			ScheduleWriter sw = new ScheduleWriter(scenario.getNetwork());
-			sw.createSchedule(numberOfBuses, scheduleFile);
+			sw.writeSchedule(numberOfBuses, scheduleFile);
 			
 			int capacity = startCapacity;
 			for (int capacityStep = 0; capacityStep <= stepsCapacity ; capacityStep++){
@@ -301,7 +301,7 @@ class ExternalControler {
 				log.info("Writing transitVehicles...");
 				String vehiclesFile = dir + "transitVehicles_buses" + numberOfBuses + "_capacity" + capacity + ".xml";
 				VehicleWriter vw = new VehicleWriter();
-				vw.writeVehicles(numberOfBuses, capacityStep, vehiclesFile);
+				vw.writeVehicles(numberOfBuses, capacity, vehiclesFile);
 				
 				if (this.numberOfbuses2capacity2vehiclesFile.containsKey(numberOfBuses)){
 					this.numberOfbuses2capacity2vehiclesFile.get(numberOfBuses).put(capacity, vehiclesFile);
@@ -322,8 +322,8 @@ class ExternalControler {
 		
 	}
 
-	private void deleteUnnecessaryInternalIterations(String itersPath, Scenario scenario) {
-		
+	private void deleteUnnecessaryInternalIterations(Scenario scenario) {
+		String itersPath = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/";
 		int firstIt = scenario.getConfig().controler().getFirstIteration();
 		int lastIt = scenario.getConfig().controler().getLastIteration();
 		log.info("Deleting unnecessary internal iteration output files...");

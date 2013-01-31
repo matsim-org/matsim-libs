@@ -42,7 +42,7 @@ public class ScheduleWriter {
 		this.network = network;
 	}
 
-	public void createSchedule(int numberOfBuses, String outputFile) throws IOException {
+	public void writeSchedule(int numberOfBuses, String outputFile) throws IOException {
 		
 		ScheduleGenerator generator = new ScheduleGenerator();
 		generator.setStartTime(4.0 * 3600);		// [sec]
