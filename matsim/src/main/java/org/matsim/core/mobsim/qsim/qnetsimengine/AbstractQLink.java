@@ -101,24 +101,21 @@ abstract class AbstractQLink extends QLinkInternalI {
 		this.netElementActivator = network.simEngine;
 	}
 
-	abstract boolean doSimStep(double now);
-
 	abstract void activateLink();
 
-	abstract void addFromIntersection(final QVehicle veh);
-
-	abstract QNode getToNode();
-
+	@Override
 	/*package*/ final void addParkedVehicle(MobsimVehicle vehicle) {
 		QVehicle qveh = (QVehicle) vehicle; // cast ok: when it gets here, it needs to be a qvehicle to work.
 		this.parkedVehicles.put(qveh.getId(), qveh);
 		qveh.setCurrentLink(this.link);
 	}
 
+	@Override
 	/*package*/ final QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
+	@Override
 	/*package*/ QVehicle getParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
@@ -130,18 +127,22 @@ abstract class AbstractQLink extends QLinkInternalI {
 		this.activateLink();
 	}
 
+	@Override
 	/*package*/ void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
 		this.additionalAgentsOnLink.put(planAgent.getId(), planAgent);
 	}
 
+	@Override
 	/*package*/ MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
 		return this.additionalAgentsOnLink.remove(mobsimAgentId);
 	}
 
+	@Override
 	/*package*/ Collection<MobsimAgent> getAdditionalAgentsOnLink() {
 		return Collections.unmodifiableCollection( this.additionalAgentsOnLink.values());
 	}
 
+	@Override
 	void clearVehicles() {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
@@ -327,7 +328,8 @@ abstract class AbstractQLink extends QLinkInternalI {
 		return false;
 	}
 
-	QVehicle getVehicle(Id vehicleId) {
+	@Override
+	/*package*/ QVehicle getVehicle(Id vehicleId) {
 		QVehicle ret = this.parkedVehicles.get(vehicleId);
 		return ret;
 	}
