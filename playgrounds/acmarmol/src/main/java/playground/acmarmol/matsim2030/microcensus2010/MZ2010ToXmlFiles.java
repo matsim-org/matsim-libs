@@ -96,7 +96,7 @@ public class MZ2010ToXmlFiles {
 		String inputBase = args[0];
 		String outputBase = args[1];
 
-		String haushalteFile = inputBase+"haushalte5imp.dat";
+		String haushalteFile = inputBase+"haushalte.dat";
 		String haushaltspersonenFile = inputBase+"haushaltspersonen.dat";
 		String fahrzeugeFile = inputBase+"fahrzeuge.dat";
 		String zielpersonenFile = inputBase+"zielpersonen.dat";
@@ -124,10 +124,11 @@ public class MZ2010ToXmlFiles {
 		//population
 		Population population = scenario.getPopulation();
 		ObjectAttributes populationAttributes = new ObjectAttributes();
+		ObjectAttributes householdpersonsAttributes = new ObjectAttributes();
 		//households
 		Households households = scenario.getHouseholds();
 		ObjectAttributes householdAttributes = new ObjectAttributes();
-		//vehicles
+		//vehicless
 		Vehicles vehicles = scenario.getVehicles();
 		ObjectAttributes vehiclesAttributes = new ObjectAttributes();
 		ObjectAttributes wegeAttributes = new ObjectAttributes(); 
@@ -159,7 +160,7 @@ public class MZ2010ToXmlFiles {
 //////////////////////////////////////////////////////////////////////	
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing haushaltspersonenFile...");
-		new MZ2010HouseholdPersonParser(households,householdAttributes).parse(haushaltspersonenFile);
+		new MZ2010HouseholdPersonParser(households,householdAttributes, householdpersonsAttributes).parse(haushaltspersonenFile);
 		log.info("done. (parsing haushaltspersonenFile)");
 				
 		Gbl.printElapsedTime();
@@ -167,6 +168,7 @@ public class MZ2010ToXmlFiles {
 		log.info("writing intermediate files...");
 		new HouseholdsWriterV10(households).writeFile(outputBase+"/households.01.xml.gz");
 		households_axmlw.writeFile(outputBase+"/householdAttributes.01.xml.gz");
+		new ObjectAttributesXmlWriter(householdpersonsAttributes).writeFile(outputBase+"/householdpersonsAttributes.01.xml");
 		log.info("done. (writing)");
 		
 		Gbl.printElapsedTime();
@@ -296,7 +298,7 @@ public class MZ2010ToXmlFiles {
 //////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("removing persons with all plan outside switzerland...");
-		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwizerland(population, wegeAttributes , MZConstants.SWISS_CODE);
+		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwitzerland(population, wegeAttributes , MZConstants.SWISS_CODE);
 		if(out_pids.size()>0){
 		MZPopulationUtils.removePlans(population, out_pids);
 		System.out.println("      done.");
@@ -378,6 +380,18 @@ public class MZ2010ToXmlFiles {
 
 
 //////////////////////////////////////////////////////////////////////
+
+
+
+		System.out.println("-----------------------------------------------------------------------------------------------------------");
+		log.info("recoding activity types to HWELS...");
+		MZPopulationUtils.recodeActivityTypesHWELS(population);
+		new PopulationWriter(population, null).write(outputBase+"population.15.xml");
+		System.out.println("  done.");
+
+
+
+//////////////////////////////////////////////////////////////////////
 		
 		
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
@@ -386,6 +400,8 @@ public class MZ2010ToXmlFiles {
 		Gbl.printElapsedTime();
 		
 		MZPopulationUtils.classifyActivityChains(population);
+		
+		
 		
 
 	}//end main		

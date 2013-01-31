@@ -3,7 +3,10 @@ package playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -16,29 +19,32 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.households.Household;
 
-import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.ocupancyRate.Etappe;
-import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.ocupancyRate.EtappenLoader;
+import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.Etappe;
+import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.EtappenLoader;
+import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.weges.Wege;
+import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.weges.WegeLoader;
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
 import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.CoordConverter;
 
 public class TimeSeriesInfoExtractor {
 	
 	
-	private Population population;
-	private ObjectAttributes populationAttributes;
-	private ObjectAttributes householdAttributes;
-	private int year;
+	private Microcensus microcensus;
 	private int[] cohorts;
 	private String[] cohorts_strings;
 	private int[] age_groups;
@@ -46,25 +52,14 @@ public class TimeSeriesInfoExtractor {
 	final  Logger log = Logger.getLogger(TimeSeriesInfoExtractor.class);
 	private BufferedWriter out;
 	
-	public TimeSeriesInfoExtractor(String populationInputFile, String populationAttributesInputFile, String householdAttributesInputFile, int year, int[] cohorts, String[] cohorts_strings, int[] age_groups, String[] age_group_strings){
-		this.year = year;
+	public TimeSeriesInfoExtractor(Microcensus microcensus,int[] cohorts, String[] cohorts_strings, int[] age_groups, String[] age_group_strings){
+
+		this.microcensus = microcensus;
 		this.cohorts = cohorts;
 		this.cohorts_strings = cohorts_strings;
 		this.age_group_strings = age_group_strings;
 		this.age_groups = age_groups;
 		
-		Config config = ConfigUtils.createConfig();
-		config.setParam("plans", "inputPlansFile", populationInputFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		this.population = scenario.getPopulation();
-		this.populationAttributes = new ObjectAttributes();
-		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(populationAttributes);
-		reader.putAttributeConverter(CoordImpl.class, new CoordConverter());
-		reader.parse(populationAttributesInputFile);
-		this.householdAttributes = new ObjectAttributes();
-		ObjectAttributesXmlReader readerHH = new ObjectAttributesXmlReader(householdAttributes);
-		readerHH.putAttributeConverter(CoordImpl.class, new CoordConverter());
-		readerHH.parse(householdAttributesInputFile);
 	}
 	
 	
@@ -75,11 +70,11 @@ public class TimeSeriesInfoExtractor {
 		String outputBase = "C:/local/marmolea/output/Activity Chains Forecast/";
 		
 		
-		//final int[] COHORTS = {1990,1980,1970,1960,1950,1940,1930,1910,0};
-		//final String[] COHORTS_STRINGS =  {"1990-1999","1980-1989","1970-1979","1960-1969","1950-1959","1940-1949","1930-1939","1910-1929","<1910"};
+		final int[] COHORTS = {1990,1980,1970,1960,1950,1940,1930,1910,0};
+		final String[] COHORTS_STRINGS =  {"1990-1999","1980-1989","1970-1979","1960-1969","1950-1959","1940-1949","1930-1939","1910-1929","<1910"};
 				
-		final int[] COHORTS = {2000,1990,1980,1970,1960,1950,1940,1930,1920,1910,0};
-		final String[] COHORTS_STRINGS =  {">1999","1990-1999","1980-1989","1970-1979","1960-1969","1950-1959","1940-1949","1930-1939","1920-1929","1910-1919","<1910"};
+//		final int[] COHORTS = {2000,1990,1980,1970,1960,1950,1940,1930,1920,1910,0};
+//		final String[] COHORTS_STRINGS =  {">1999","1990-1999","1980-1989","1970-1979","1960-1969","1950-1959","1940-1949","1930-1939","1920-1929","1910-1919","<1910"};
 		
 		//5-year cohorts
 		//final int[] COHORTS = {1990,1985,1980,1975,1970,1965,1960,1955,1950,1945,1940,0};
@@ -90,30 +85,63 @@ public class TimeSeriesInfoExtractor {
 		final String[] AGE_GROUPS_STRINGS = {"18-24","25-44","45-64","65+"};
 		
 		String populationInputFile;
+		String householdInputFile;
 		String populationAttributesInputFile;
 		String householdAttributesInputFile;
+		Microcensus microcensus;
 		
-		populationInputFile = inputBase + "population.03.itnr.MZ2000.xml";
+		populationInputFile = inputBase + "population.05.MZ1989.xml";	
+		householdInputFile = inputBase + "households.04.MZ1989.xml";
+		populationAttributesInputFile = inputBase + "populationAttributes.04.MZ1989.xml";
+		householdAttributesInputFile = inputBase + "householdAttributes.04.MZ1989.xml";
+		microcensus = new Microcensus(populationInputFile,householdInputFile,populationAttributesInputFile,householdAttributesInputFile, 1989);
+		TimeSeriesInfoExtractor extractorMZ1989 = new TimeSeriesInfoExtractor(microcensus, COHORTS, COHORTS_STRINGS, AGE_GROUPS, AGE_GROUPS_STRINGS);	
+				
+		populationInputFile = inputBase + "population.04.MZ1994.xml";	
+		householdInputFile = inputBase + "households.04.MZ1994.xml";
+		populationAttributesInputFile = inputBase + "populationAttributes.04.MZ1994.xml";
+		householdAttributesInputFile = inputBase + "householdAttributes.04.MZ1994.xml";
+		microcensus = new Microcensus(populationInputFile,householdInputFile,populationAttributesInputFile,householdAttributesInputFile, 1994);
+		TimeSeriesInfoExtractor extractorMZ1994 = new TimeSeriesInfoExtractor(microcensus, COHORTS, COHORTS_STRINGS, AGE_GROUPS, AGE_GROUPS_STRINGS);	
+		
+		//---------------------------------------------------------
+//		populationInputFile = inputBase + "population.03.zid.MZ2000.xml";
+//		populationAttributesInputFile = inputBase + "populationAttributes.04.zid.MZ2000.xml";
+		
+		populationInputFile = inputBase + "population.09.MZ2000.xml";
 		populationAttributesInputFile = inputBase + "populationAttributes.04.itnr.MZ2000.xml";
+		
+		
+		householdInputFile = inputBase + "households.04.MZ2000.xml";
+				
 		//populationInputFile = inputBase + "population.03.MZ2000.xml";
 		//populationAttributesInputFile = inputBase + "populationAttributes.04.MZ2000.xml";
-		householdAttributesInputFile = inputBase + "householdAttributes.03.MZ2000.xml";
-		TimeSeriesInfoExtractor extractorMZ2000 = new TimeSeriesInfoExtractor(populationInputFile,populationAttributesInputFile,householdAttributesInputFile, 2000, COHORTS, COHORTS_STRINGS,  AGE_GROUPS, AGE_GROUPS_STRINGS);	
+		householdAttributesInputFile = inputBase + "householdAttributes.04.imputed.MZ2000.xml";
+		microcensus = new Microcensus(populationInputFile,householdInputFile,populationAttributesInputFile,householdAttributesInputFile, 2000);
+		TimeSeriesInfoExtractor extractorMZ2000 = new TimeSeriesInfoExtractor(microcensus, COHORTS, COHORTS_STRINGS, AGE_GROUPS, AGE_GROUPS_STRINGS);	
 		
-		populationInputFile = inputBase + "population.12.MZ2005.xml";	
+		
+		populationInputFile = inputBase + "population.12.MZ2005.xml";
+		householdInputFile = inputBase + "households.04.MZ2005.xml";
 		populationAttributesInputFile = inputBase + "populationAttributes.04.MZ2005.xml";
-		householdAttributesInputFile = inputBase + "householdAttributes.04.MZ2005.xml";
-		TimeSeriesInfoExtractor extractorMZ2005 = new TimeSeriesInfoExtractor(populationInputFile,populationAttributesInputFile, householdAttributesInputFile, 2005, COHORTS, COHORTS_STRINGS, AGE_GROUPS, AGE_GROUPS_STRINGS);	
-		
+		householdAttributesInputFile = inputBase + "householdAttributes.04.imputed.MZ2005.xml";
+		microcensus = new Microcensus(populationInputFile,householdInputFile,populationAttributesInputFile,householdAttributesInputFile, 2005);
+		TimeSeriesInfoExtractor extractorMZ2005= new TimeSeriesInfoExtractor(microcensus, COHORTS, COHORTS_STRINGS, AGE_GROUPS, AGE_GROUPS_STRINGS);	
+				
 		populationInputFile = inputBase + "population.12.MZ2010.xml";
+		householdInputFile = inputBase + "households.04.MZ2010.xml";
 		populationAttributesInputFile = inputBase + "populationAttributes.04.MZ2010.xml";
-		householdAttributesInputFile = inputBase + "householdAttributes.04.MZ2010.xml";
-		TimeSeriesInfoExtractor extractorMZ2010 = new TimeSeriesInfoExtractor(populationInputFile,populationAttributesInputFile,householdAttributesInputFile, 2010, COHORTS, COHORTS_STRINGS,  AGE_GROUPS, AGE_GROUPS_STRINGS);	
-
-		//extractorMZ2000.extractAndPrint(outputBase + "TimeSeriesInfoMZ2000.txt");
-		extractorMZ2005.extractAndPrint(outputBase + "TimeSeriesInfoMZ2005.txt");
+		householdAttributesInputFile = inputBase + "householdAttributes.04.imputed.MZ2010.xml";
+		microcensus = new Microcensus(populationInputFile,householdInputFile,populationAttributesInputFile,householdAttributesInputFile, 2010);
+		TimeSeriesInfoExtractor extractorMZ2010 = new TimeSeriesInfoExtractor(microcensus, COHORTS, COHORTS_STRINGS, AGE_GROUPS, AGE_GROUPS_STRINGS);	
+		
+//		extractorMZ1989.extractAndPrint(outputBase + "TimeSeriesInfoMZ1989.txt");
+//		extractorMZ1994.extractAndPrint(outputBase + "TimeSeriesInfoMZ1994.txt");
+//		extractorMZ2000.extractAndPrint(outputBase + "TimeSeriesInfoMZ2000.txt");
+//		extractorMZ2005.extractAndPrint(outputBase + "TimeSeriesInfoMZ2005.txt");
 		extractorMZ2010.extractAndPrint(outputBase + "TimeSeriesInfoMZ2010.txt");		
 		
+		 
 
 	}
 	
@@ -124,15 +152,20 @@ public class TimeSeriesInfoExtractor {
 		out = IOUtils.getBufferedWriter(outputFile);
 		
 		printTitle();
-//		filterPopulationOver18();
+		printPopulationSize("Total population size");
+		
+//		filterPopulationEmployed();
+//		filterPopulationWeekday();
+//		filterPopulationWithWorkActivity();
+		filterPopulationOver18();
 		ArrayList<Id>[] ids_cohort = getIdsByCohort();
 //		printTotalPersonsPerCohort(ids_cohort);
-//		printMeanAgePerCohort(ids_cohort);
-//		printDriverLicenseByCohortAndAge(ids_cohort);
+		printMeanAgePerCohort(ids_cohort);
+//		printDriverLicenseByCohortAndGender(ids_cohort);
 //		printDriverLicenseByCohortAndResidence(ids_cohort);
 //		printDriverLicenseByCohortAndResidenceBigCities(ids_cohort);
-//		printDriverLicenseByCohortAndSeasonTicket(ids_cohort);
-//		printDriverLicenseByCohortAndPW_GA(ids_cohort);
+		printDriverLicenseByCohortAndSeasonTicket(ids_cohort);
+		printDriverLicenseByCohortAndPW_GA(ids_cohort);
 //		printCarAvailabilityByCohort(ids_cohort);
 //		printAbonnementOwnership(ids_cohort);
 //		printHalbTaxOwnershipByCohort(ids_cohort);
@@ -163,16 +196,603 @@ public class TimeSeriesInfoExtractor {
 //		printDailyDistanceByCohortAndPWAvailability(ids_cohort);
 
 //		printHoursInAndOutOfHomeByCohort(ids_cohort);
-		printNumberOfJourneysByCohort(ids_cohort);		
-		printNumberOfActivitiesByCohort(ids_cohort);
-		printHoursInActivitiesByCohort(ids_cohort);
-		printHoursSpentbyActivity(ids_cohort);
+//		printOutOfHomeTripsActivitiesRatioByCohortAndGender(ids_cohort);
 		
+//		printNumberOfJourneysByCohort(ids_cohort);		
+//		printNumberOfActivitiesByCohort(ids_cohort);
+//		printNumberOfActivitiesByCohortAndGender(ids_cohort);
+//		printHoursInActivitiesByCohort(ids_cohort);
+//		printHoursSpentbyActivity(ids_cohort);
 		
+//		printLegDepartureTimes();
+//		printGoingToActivityHours(MZConstants.LEISURE);
+//		printReturningFromActivityHours(MZConstants.SHOPPING);
+		
+//		printIncomeMean();
+//		printDriverLicenseByCohortAndIncomeTercile(ids_cohort);
+//		printCarAvailabilityByCohortAndIncomeTercile(ids_cohort);
+//		printAbonnementOwnershipByCohortAndIncomeTercile(ids_cohort); //use MZ2000 with zid as id
+//		printAverageTripsByCohortAndIncomeTercile(ids_cohort);
+//		printDailyTripsDurationByCohortAndIncomeTercile(ids_cohort);
+//		printDailyDistancesByCohortAndIncomeTercile(ids_cohort);	
+		
+//		printIncomeTerciles();
+		
+//		printTripsOutOfHomeActivitesRatioByCohortAndAge(ids_cohort);
+//		printShareOfCarTripsByCohortAndGroup(ids_cohort);
 		
 		out.close();
 	
 	}
+	
+	
+	private void printTripsOutOfHomeActivitesRatioByCohortAndAge(ArrayList<Id>[] ids_cohort) throws Exception {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("TRIPS - OUT OF HOME ACTIVITIES RATIO BY COHORT AND GENDER"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort  \t M  \t F" ); 
+		out.newLine();
+		
+		
+		
+//		TreeMap<String, ArrayList<Wege>> all_weges= WegeLoader.loadData(microcensus.getYear());
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] groups = getGenderIdsForCohort(ids);
+			 
+			for(ArrayList<Id> group: groups){ 
+			
+			double total = 0;
+			double sum_weight=0;
+			for(Id id:group){
+				
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+//				total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_INLAND))*pw*hhw;
+				
+				double nr_trips = 0;
+				double ooh_activities = 0;	
+				
+				Person person = microcensus.getPopulation().getPersons().get(id);
+								
+				if(person.getSelectedPlan()==null)
+					continue;
+						
+					for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
+						
+						if(!(pe instanceof Activity)){
+							nr_trips++;
+							continue;
+						}
+							
+						
+						Activity activity = (Activity)pe;
+						if(!activity.getType().equals(MZConstants.HOME))
+							ooh_activities++;
+					}
+				
+						
+//				ArrayList<Wege> weges = all_weges.get(id.toString());
+//				if(weges!=null){
+//					nr_trips =weges.size();
+//				}
+					
+				if(nr_trips==0){
+					System.out.println("");
+				}
+				
+				System.out.println(ooh_activities/nr_trips);
+				
+				total += ooh_activities/nr_trips*pw;
+				sum_weight +=  pw*hhw;
+				
+			}
+						
+			out.write( "\t" + total/sum_weight);
+			
+			}
+			
+			out.newLine();
+		}
+		
+		
+	}
+	
+	private void printIncomeTerciles() throws IOException {
+		
+		double[] terciles = this.getIncomeTerciles();
+		
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("INCOME TERCILES"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Year: " + microcensus.getYear());
+		out.newLine();
+		out.write("First Tercile:  0<= income <=" + terciles[0]);
+		out.newLine();
+		out.write("Second Tercile:  " + terciles[0] + "< income <=" +terciles[1]);
+		out.newLine();
+		out.write("Third Tercile:  " + terciles[1] + "< income ");
+		out.newLine();
+		
+//		ArrayList<Id>[] terciles = getIncomeTercilesIdsForCohort(new ArrayList<Id>(microcensus.getPopulation().getPersons().keySet()));
+//		System.out.println(this.microcensus.getYear());
+//		System.out.println();
+//		System.out.println("\t\t" + this.microcensus.getPopulation().getPersons().size());
+//		System.out.println( "\t" + terciles[0].size());
+//		System.out.println("\t" +terciles[1].size());
+//		System.out.println("\t" +terciles[2].size());
+//		System.out.println("\t\t" +(terciles[0].size()+terciles[1].size()+terciles[2].size()));
+//		System.out.println();
+		
+	}
+
+
+	private void printShareOfCarTripsByCohortAndGroup(ArrayList<Id>[] ids_cohort) throws Exception {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("SHARE OF CAR TRIPS PER COHORT AND OTHER GROUP"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort  \tShare M  \tShare F" ); 
+		out.newLine();
+		
+		TreeMap<String, ArrayList<Wege>> all_weges= WegeLoader.loadData(microcensus.getYear());
+		TreeMap<String, ArrayList<Etappe>> etappes = EtappenLoader.loadData(this.microcensus.getYear());
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] groups = getIncomeTercilesIdsForCohort(ids);
+			//getIdsByResidenceBigCities(ids);
+			// getGenderIdsForCohort(ids);
+			 
+		 
+			for(ArrayList<Id> group: groups){ 
+			
+			double counter = 0;
+			double sum_weight=0;
+			for(Id id:group){
+				
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+				
+				
+				//WEGE
+//				ArrayList<Wege> weges = all_weges.get(id.toString());
+//				
+//				if(weges!=null){
+//					for(Wege wege:weges){
+//						
+//						if(wege.getMode().equals(MZConstants.CAR))
+//						counter+= pw*hhw;
+//						
+//						sum_weight +=  pw*hhw;
+//					}										
+//				}
+				
+				
+				//ETAPPEN
+				if(etappes.containsKey(id.toString())){
+					ArrayList<Etappe> etappen = etappes.get(id.toString());
+					
+					for(Etappe etappe: etappen){
+						
+						if(etappe.getMode().equals(MZConstants.CAR_FAHRER)||etappe.getMode().equals(MZConstants.CAR_MITFAHRER))
+							counter+= pw*hhw;
+						
+						sum_weight +=  pw*hhw;
+					}
+				}
+				
+				
+			}
+						
+			out.write( "\t" + counter/sum_weight*100);
+			
+			}
+			
+			out.newLine();
+		}
+		
+	}
+
+
+	private void printDriverLicenseByCohortAndIncomeTercile(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("DRIVING LICENSE PER COHORT AND INCOME TERCILES"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort  \t First Tercile  \t Second Tercile \t Third Tercile" ); 
+		out.newLine();
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] terciles = getIncomeTercilesIdsForCohort(ids);
+			 
+			for(ArrayList<Id> tercile: terciles){ 
+			
+			double counter = 0;
+			double sum_weight=0;
+			
+			
+			
+			for(Id id:tercile){
+				
+
+				
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+				
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES)){
+				
+					counter+=  pw*hhw;
+				}
+				sum_weight +=  pw*hhw;
+				
+			}
+						
+			out.write( "\t" + counter/sum_weight*100);
+			
+			}
+			
+			out.newLine();
+		}
+		
+		
+	}
+	
+	private ArrayList<Id>[] getIncomeTercilesIdsForCohort(ArrayList<Id> ids) {
+		
+		
+		double[] terciles = getIncomeTerciles();
+		
+		
+		ArrayList<Id>[] ids_terciles = new ArrayList[3];
+		ids_terciles[0] = new ArrayList<Id>();
+		ids_terciles[1] = new ArrayList<Id>();
+		ids_terciles[2] = new ArrayList<Id>();
+		
+		for(Id id:ids){
+			
+			String hhnr =	(String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER);
+			
+			if(((String) microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.HOUSEHOLD_INCOME_MIDDLE_OF_INTERVAL)).equals(MZConstants.UNSPECIFIED))
+				continue;
+			
+			double income = Double.parseDouble((String) microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.HOUSEHOLD_INCOME_MIDDLE_OF_INTERVAL));
+			
+//			if(income<0)
+//				continue;
+			
+			if(income<=terciles[0]){
+				ids_terciles[0].add(id);
+			}else if(income<=terciles[1]){
+				ids_terciles[1].add(id);
+			}else{
+				ids_terciles[2].add(id);
+			}
+			
+		}
+		
+		
+		return ids_terciles;
+
+	}
+
+
+	private double[]  getIncomeTerciles() {
+		
+		double[] terciles = new double[2];
+		TreeMap<Double, Double> incomes =  new TreeMap<Double, Double>();
+		
+		double total_weight = 0;
+		
+		for(Household household : microcensus.getHouseholds().getHouseholds().values()){
+			String income_string = (String) microcensus.getHouseholdAttributes().getAttribute(household.getId().toString(), MZConstants.HOUSEHOLD_INCOME_MIDDLE_OF_INTERVAL);
+			if(income_string.equals(MZConstants.UNSPECIFIED))
+				continue;
+			double income = Double.parseDouble(income_string);
+			double weight = Double.parseDouble((String) microcensus.getHouseholdAttributes().getAttribute(household.getId().toString(), MZConstants.HOUSEHOLD_WEIGHT));
+				if(incomes.get(income)==null)
+					incomes.put(income, 0.0);
+			
+				incomes.put(income, incomes.get(income)+ weight);
+				total_weight+=weight;
+		}
+		
+		double tercile_limit = total_weight/3;
+		double first_tercile_income = getPercentileWithLimit(incomes, tercile_limit);
+		double second_tercile_income = getPercentileWithLimit(incomes, 2*tercile_limit);
+		
+		terciles[0] = first_tercile_income;
+		terciles[1] = second_tercile_income;
+		
+		return terciles;
+		
+	}
+
+	private void  printIncomeMean() throws IOException {
+		
+		double total_weight = 0;
+		double total_income = 0;
+		double counter1 = 0;
+		double counter2 = 0;
+		
+		for(Household household : microcensus.getHouseholds().getHouseholds().values()){
+			
+			counter1++;
+
+			String income_string = (String) microcensus.getHouseholdAttributes().getAttribute(household.getId().toString(), MZConstants.HOUSEHOLD_INCOME_MIDDLE_OF_INTERVAL);
+			if(income_string.equals(MZConstants.UNSPECIFIED)){
+				counter2++;
+			}else{
+			double income = Double.parseDouble(income_string);
+			double weight = Double.parseDouble((String) microcensus.getHouseholdAttributes().getAttribute(household.getId().toString(), MZConstants.HOUSEHOLD_WEIGHT));
+			total_weight += weight;
+			total_income += income*weight;		
+			
+			}	
+		}
+		out.write( "Average household income: " + total_income/total_weight);
+		out.newLine();
+		out.write( "% of households considered: " +  (1-counter2/counter1)*100);
+	}
+	
+	
+	private double getPercentileWithLimit(TreeMap<Double, Double> incomes, Double limit){
+		
+		double percentile = 0;
+		double cum_sum=0;
+
+		for(Double j : incomes.keySet()){
+			cum_sum+= incomes.get(j);
+			
+			if(cum_sum>limit){
+				percentile = j;
+				break;
+			}
+		}
+		
+		return percentile;
+	}
+	
+	private void printLegDepartureTimes() throws IOException{
+		
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("LEG DEPARTURE TIMES"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		
+		Double[] distribution = new Double[24]; //time intervals of 1-hour
+		//Double[] distribution = new Double[6*24];
+		java.util.Arrays.fill(distribution, 0.0);
+		
+		int counter = 0;
+		
+		for(Person person:microcensus.getPopulation().getPersons().values()){
+			
+			double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.PERSON_WEIGHT));
+			Plan plan = person.getSelectedPlan();
+			
+			if(plan==null)
+				continue; //avoid persons without plan
+			
+			
+			for(PlanElement pe: plan.getPlanElements()){
+				
+				if(!(pe instanceof Leg))
+					continue;
+				
+				Leg leg = (Leg)pe;
+				double dep_t = leg.getDepartureTime();
+					
+					//1 hour intervals
+					int pos = (int) (dep_t/3600);
+					if(pos>23)
+						pos-=24;
+					
+					//10 min intervals
+//					int pos = (int) (dep_t/600);
+//					if(pos>23*6+5)
+//						pos-=24*6;
+
+				counter++;						
+				distribution[pos]+=pw;						
+							
+			}			
+		}	
+
+//		double sum=0.0;
+//		LinkedList<Double> mov_sum = new LinkedList<Double>();
+//		for(int j=0;j<=6;j++){
+//		mov_sum.addFirst(distribution[j]);
+//		sum+=distribution[j];
+//		}
+//		out.write( "\t" + sum);	
+//		
+//		for(int j=6; j<distribution.length;j++){
+//		
+//			sum +=  distribution[j] - mov_sum.pollLast();
+//			mov_sum.addFirst(distribution[j]);
+//			
+//			out.write( "\t" + sum);		
+//		}
+		
+		for(int j=0; j<distribution.length;j++){
+			
+			out.write( "\t" + distribution[j]);		
+		}
+		out.write( "\n\n Number of LEGS: " + counter);	
+	}
+
+	private void printReturningFromActivityHours(String activityType) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("RETURN FROM " + activityType); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		
+		//Double[] distribution = new Double[24]; //time intervals of 1-hour
+		Double[] distribution = new Double[6*24];
+		java.util.Arrays.fill(distribution, 0.0);
+		
+		for(Person person:microcensus.getPopulation().getPersons().values()){
+			
+			double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.PERSON_WEIGHT));
+			Plan plan = person.getSelectedPlan();
+			
+			if(plan==null)
+				continue; //avoid persons without plan
+			
+			PlanElement[] pe = plan.getPlanElements().toArray(new PlanElement[plan.getPlanElements().size()]);
+			
+			for(int i=2;i<pe.length-1;i+=2){
+				
+				ActivityImpl activity = (ActivityImpl) pe[i];
+				if(activity.getType().equals(activityType)){
+					
+					LegImpl leg = (LegImpl) pe[i+1];
+					double dep_t = leg.getDepartureTime();
+					
+					//1 hour intervals
+//					int pos = (int) (dep_t/3600);
+//					if(pos>23)
+//						pos-=24;
+					
+					//10 min intervals
+					int pos = (int) (dep_t/600);
+					if(pos>23*6+5)
+						pos-=24*6;
+					
+					distribution[pos]+=pw;						
+				}				
+			}			
+		}	
+
+//		double sum=0.0;
+//		LinkedList<Double> mov_sum = new LinkedList<Double>();
+//		for(int j=0;j<=6;j++){
+//		mov_sum.addFirst(distribution[j]);
+//		sum+=distribution[j];
+//		}
+//		out.write( "\t" + sum);	
+//		
+//		for(int j=6; j<distribution.length;j++){
+//		
+//			sum +=  distribution[j] - mov_sum.pollLast();
+//			mov_sum.addFirst(distribution[j]);
+//			
+//			out.write( "\t" + sum);		
+//		}
+		
+		for(int j=0; j<distribution.length;j++){
+			
+			out.write( "\t" + distribution[j]);		
+		}
+		
+	}
+
+
+	private void printGoingToActivityHours(String activityType) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("GOING " + activityType); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		int counter = 0;
+
+		Double[] distribution = new Double[24]; //time intervals of 1-hour
+		//Double[] distribution = new Double[6*24];
+		java.util.Arrays.fill(distribution, 0.0);
+		
+		for(Person person:microcensus.getPopulation().getPersons().values()){
+			
+			double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.PERSON_WEIGHT));
+			Plan plan = person.getSelectedPlan();
+			
+			if(plan==null)
+				continue; //avoid persons without plan
+			
+			PlanElement[] pe = plan.getPlanElements().toArray(new PlanElement[plan.getPlanElements().size()]);
+			
+			for(int i=2;i<pe.length;i+=2){
+				
+				ActivityImpl activity = (ActivityImpl) pe[i];
+				//if(activity.getType().equals(activityType)){
+					
+					LegImpl leg = (LegImpl) pe[i-1];
+					counter++;
+					double dep_t = leg.getDepartureTime();
+		
+					//1 hour intervals
+					int pos = (int) (dep_t/3600);
+					if(pos>23)
+						pos-=24;
+					
+					//10 min intervals
+//					int pos = (int) (dep_t/600);
+//					if(pos>23*6+5)
+//						pos-=24*6;
+					
+					distribution[pos]+=pw;					
+				//}				
+			}	
+			
+			
+		}	
+		
+//		double sum=0.0;
+//		LinkedList<Double> mov_sum = new LinkedList<Double>();
+//		for(int j=0;j<6;j++){
+//		mov_sum.addFirst(distribution[j]);
+//		sum+=distribution[j];
+//		}
+//		out.write( "\t" + sum);	
+//		
+//		for(int j=6; j<distribution.length;j++){
+//		
+//			sum +=  distribution[j] - mov_sum.pollLast();
+//			mov_sum.addFirst(distribution[j]);
+//			
+//			out.write( "\t" + sum);		
+//		}
+		
+		for(int j=0; j<distribution.length;j++){
+			
+			out.write( "\t" + distribution[j]);		
+		}
+		
+		System.out.println("TOTAL LEGS: " + counter);
+		
+	}
+
+	
 
 	private void printHoursSpentbyActivity(ArrayList<Id>[] ids_cohort) throws IOException {
 		out.write("------------------------------"); 
@@ -200,10 +820,10 @@ public class TimeSeriesInfoExtractor {
 //					continue
 //					;
 			
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				Plan plan = population.getPersons().get(id).getSelectedPlan();
+				Plan plan = microcensus.getPopulation().getPersons().get(id).getSelectedPlan();
 					
 				if(plan!=null){
 		
@@ -267,10 +887,10 @@ public class TimeSeriesInfoExtractor {
 			double total = 0;
 			for(Id id:ids){
 			
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				Plan plan = population.getPersons().get(id).getSelectedPlan();
+				Plan plan = microcensus.getPopulation().getPersons().get(id).getSelectedPlan();
 				
 				int counter=0;
 				if(plan!=null){
@@ -295,17 +915,88 @@ public class TimeSeriesInfoExtractor {
 				sum_weight +=  pw*hhw;
 				
 			}	
-			for(int j=0; j<number_activities.length;j++){
-				out.write( "\t" + number_activities[j]/sum_weight);		
-			}
+			//Per Activity Type
+//			for(int j=0; j<number_activities.length;j++){
+//				out.write( "\t" + number_activities[j]/sum_weight);		
+//			}
+//			out.newLine();
+			
+			//TOTALS
+			out.write( "\t" + total/sum_weight);		
 			out.newLine();
-			//out.write( "\t" + total/sum_weight);		
-			//out.newLine();
 		}
 			
 		
 	}
 
+	private void printNumberOfActivitiesByCohortAndGender(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("NUMBER OF ACTIVITIES "); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("\t M  \t F" ); 
+		out.newLine();
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] genders = getGenderIdsForCohort(ids);
+			 
+			for(ArrayList<Id> gender: genders){ 
+			
+			double sum_weight=0;
+			double total = 0;
+			double[] number_activities = new double[7];
+						
+				for(Id id:gender){
+					
+					double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+					
+					Plan plan = microcensus.getPopulation().getPersons().get(id).getSelectedPlan();
+					
+					int counter=0;
+					if(plan!=null){
+										
+				
+						for(PlanElement pe: plan.getPlanElements()){
+							if(!(pe instanceof Activity))
+								continue;
+							Activity activity = (Activity)pe;
+							
+							if(activity.getType().equals(MZConstants.HOME))
+								continue;
+							
+							//[0]=work , [1]=education, [2]=shopping, [3]=business, [4]=leisure, [5]=other, [6]=home
+							int indexType = this.getIndexByActivityType(activity.getType());
+							number_activities[indexType]+=  pw;
+							
+							counter++;
+						}
+					}
+				total += counter*pw*hhw;
+				sum_weight +=  pw*hhw;
+				
+			}	
+			
+//				for(int j=0; j<number_activities.length;j++){
+//					out.write( "\t" + number_activities[j]/sum_weight);		
+//				}
+//			out.newLine();
+			out.write( "\t" + total/sum_weight);		
+			
+		
+			}
+			out.newLine();
+		}
+		
+	}
 
 	private void printNumberOfJourneysByCohort(ArrayList<Id>[] ids_cohort) throws IOException {
 		out.write("------------------------------"); 
@@ -329,13 +1020,13 @@ public class TimeSeriesInfoExtractor {
 			double[] cum_sum = new double[7];
 			for(Id id:ids){
 			
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
 				//[0]=work , [1]=education, [2]=shopping, [3]=business, [4]=leisure, [5]=other, [6]=home
 				double[] activities = new double[7];
 				
-				Plan plan = population.getPersons().get(id).getSelectedPlan();
+				Plan plan = microcensus.getPopulation().getPersons().get(id).getSelectedPlan();
 				
 				int counter=0;
 				if(plan!=null){
@@ -369,12 +1060,11 @@ public class TimeSeriesInfoExtractor {
 				
 			}	
 			
-			for(int j=0; j<cum_sum.length;j++){
-				out.write( "\t" + cum_sum[j]/sum_weight);		
-			}
+//			for(int j=0; j<cum_sum.length;j++){
+//				out.write( "\t" + cum_sum[j]/sum_weight);		
+//			}
+			out.write( "\t TOTAL \t " + total/sum_weight);		
 			out.newLine();
-			//out.write( "\t" + total/sum_weight);		
-			//out.newLine();
 		}
 			
 	}
@@ -401,10 +1091,10 @@ public class TimeSeriesInfoExtractor {
 			double total = 0;
 			for(Id id:ids){
 			
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				Plan plan = population.getPersons().get(id).getSelectedPlan();
+				Plan plan = microcensus.getPopulation().getPersons().get(id).getSelectedPlan();
 				
 				double time_activities=0;
 				if(plan!=null){
@@ -446,8 +1136,6 @@ public class TimeSeriesInfoExtractor {
 		out.newLine();
 		out.write("------------------------------"); 
 		out.newLine();
-		out.write("Cohort   \t M \t F" ); 
-		out.newLine();
 		
 		
 		for(int i=cohorts_strings.length-1;i>=0;i--){
@@ -460,10 +1148,10 @@ public class TimeSeriesInfoExtractor {
 			double total = 0;
 			for(Id id:ids){
 			
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				Plan plan = population.getPersons().get(id).getSelectedPlan();
+				Plan plan = microcensus.getPopulation().getPersons().get(id).getSelectedPlan();
 				
 				double time_home=24*3600;
 				if(plan!=null){
@@ -498,6 +1186,54 @@ public class TimeSeriesInfoExtractor {
 		
 	}
 
+	private void printOutOfHomeTripsActivitiesRatioByCohortAndGender(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("DRIVING LICENSE PER COHORT AND GENDER"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort  \tShare M  \tShare F" ); 
+		out.newLine();
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] genders = getGenderIdsForCohort(ids);
+			 
+			for(ArrayList<Id> gender: genders){ 
+			
+			double counter = 0;
+			double sum_weight=0;
+			for(Id id:gender){
+				
+
+				
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+				
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES)){
+				
+					counter+=  pw*hhw;
+				}
+				sum_weight +=  pw*hhw;
+				
+			}
+						
+			out.write( "\t" + counter/sum_weight*100);
+			
+			}
+			
+			out.newLine();
+		}
+		
+		
+	}
+	
 
 	private void printOccupancyRateData() throws Exception  {
 		out.write("------------------------------"); 
@@ -507,7 +1243,7 @@ public class TimeSeriesInfoExtractor {
 		out.write("------------------------------"); 
 	
 		
-		TreeMap<String, ArrayList<Etappe>> etappes = EtappenLoader.loadData(this.year);
+		TreeMap<String, ArrayList<Etappe>> etappes = EtappenLoader.loadData(this.microcensus.getYear());
 		
 		//[0]=leisure
 		//[1]=other/services
@@ -522,7 +1258,7 @@ public class TimeSeriesInfoExtractor {
 		double[] passenger = new double[7];
 		double[] cumulative =new double[7];
 
- 			for(Person person:population.getPersons().values()){
+ 			for(Person person:microcensus.getPopulation().getPersons().values()){
 				
 				
 				if(etappes.containsKey(person.getId().toString())){
@@ -607,11 +1343,15 @@ public class TimeSeriesInfoExtractor {
 		
 		else if(type.contains(MZConstants.ACCOMPANYING_CHILDREN)
 				|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
+				|| type.contains(MZConstants.ACCOMPANYING)
 				|| type.contains(MZConstants.ERRANDS)
 				|| type.contains(MZConstants.OTHER)
 				|| type.contains(MZConstants.FOREIGN_PROPERTY)
 				|| type.contains(MZConstants.OVERNIGHT)
-				|| type.contains(MZConstants.PSEUDOETAPPE))
+				|| type.contains(MZConstants.PSEUDOETAPPE)
+				|| type.contains(MZConstants.CHANGE)
+				|| type.contains(MZConstants.NO_ANSWER))
+				
 			return 5;
 		else if(type.contains(MZConstants.HOME))
 			return 6;
@@ -701,10 +1441,10 @@ public class TimeSeriesInfoExtractor {
 			
 			for(Id id:ids){
 	
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				Person person = population.getPersons().get(id);
+				Person person = microcensus.getPopulation().getPersons().get(id);
 				
 				if(person.getSelectedPlan()!=null){
 						
@@ -796,21 +1536,21 @@ public class TimeSeriesInfoExtractor {
 			
 			for(Id id:ids){
 	
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA first class")).equals(MZConstants.YES)
-						 |((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA second class")).equals(MZConstants.YES) ){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA1)).equals(MZConstants.YES)
+						 |((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA2)).equals(MZConstants.YES) ){
 					
 						abonnement_groups[0] += pw*hhw;
-				}else if(((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Halbtax")).equals(MZConstants.YES)){
-					if(((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Verbund")).equals(MZConstants.YES) ){
+				}else if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES)){
+					if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_VERBUND)).equals(MZConstants.YES) ){
 						
 						abonnement_groups[2] += pw*hhw;	
 					}else{
 						abonnement_groups[1] += pw*hhw;
 					}
-				}else if(((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Verbund")).equals(MZConstants.YES) ){
+				}else if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_VERBUND)).equals(MZConstants.YES) ){
 						abonnement_groups[3] += pw*hhw;
 				}else{
 						abonnement_groups[4] += pw*hhw;
@@ -858,14 +1598,14 @@ public class TimeSeriesInfoExtractor {
 				
 
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "driving licence")).equals(MZConstants.YES)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES)){
 					
 					sum_weight +=  pw*hhw;
 					
-					if(((String)this.populationAttributes.getAttribute(id.toString(), "availability: car")).equals(MZConstants.ALWAYS)){
+					if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.CAR_AVAILABILITY)).equals(MZConstants.ALWAYS)){
 					
 						counter+=  pw*hhw;
 					}
@@ -912,10 +1652,10 @@ public class TimeSeriesInfoExtractor {
 				
 
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "driving licence")).equals(MZConstants.YES)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES)){
 				
 					counter+=  pw*hhw;
 				}
@@ -954,9 +1694,9 @@ public class TimeSeriesInfoExtractor {
 			
 			for(Id id: ids){
 				
-				Person person = population.getPersons().get(id);
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1; //Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				Person person = microcensus.getPopulation().getPersons().get(id);
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1; //Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				total = total + ((PersonImpl)person).getAge()*pw*hhw;
 				sum_weight +=  pw*hhw;
 		
@@ -971,7 +1711,7 @@ public class TimeSeriesInfoExtractor {
 
 
 	private void printTitle() throws IOException {
-		out.write("\t\t\t  Moblity tool ownership and use, MZ" +year);
+		out.write("\t\t\t  Moblity tool ownership and use, MZ" +this.microcensus.getYear());
 		out.newLine();
 		out.newLine();
 		
@@ -1029,9 +1769,9 @@ public class TimeSeriesInfoExtractor {
 					double total = 0;
 					for(Id id:group){
 						
-						double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-						double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
-						total = total + Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DURATION))*pw*hhw;
+						double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+						double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+						total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DURATION))*pw*hhw;
 						sum_weight +=  pw*hhw;
 											
 					}
@@ -1081,9 +1821,9 @@ public class TimeSeriesInfoExtractor {
 					double total = 0;
 					for(Id id:group){
 						
-						double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-						double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
-						total = total + Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DISTANCE))*pw*hhw;
+						double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+						double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+						total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DISTANCE))*pw*hhw;
 						sum_weight +=  pw*hhw;
 						
 						
@@ -1138,9 +1878,9 @@ public class TimeSeriesInfoExtractor {
 					double total = 0;
 					for(Id id:group){
 						
-						double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-						double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
-						total = total + Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_INLAND))*pw*hhw;
+						double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+						double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+						total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_INLAND))*pw*hhw;
 						sum_weight +=  pw*hhw;
 
 						
@@ -1182,9 +1922,9 @@ public class TimeSeriesInfoExtractor {
 			double total = 0;
 			for(Id id:gender){
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
-				total += Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DURATION))*pw*hhw;
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+				total += Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DURATION))*pw*hhw;
 				sum_weight +=  pw*hhw;
 				
 				
@@ -1199,6 +1939,60 @@ public class TimeSeriesInfoExtractor {
 		
 	}
 
+	
+	private void printDailyTripsDurationByCohortAndIncomeTercile(ArrayList<Id>[] ids_cohort) throws Exception {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("DAILY TRIPS DURATION BY COHORT AND INCOME TERCILES"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort  \t First Tercile  \t Second Tercile \t Third Tercile" ); 
+		out.newLine();
+		
+		
+		TreeMap<String, ArrayList<Wege>> all_weges= WegeLoader.loadData(microcensus.getYear());
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] terciles = getIncomeTercilesIdsForCohort(ids);
+			 
+			for(ArrayList<Id> tercile: terciles){ 
+			
+			double total = 0;
+			double sum_weight=0;
+			for(Id id:tercile){
+				
+				
+				
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+//				total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DURATION))*pw*hhw;
+				
+				ArrayList<Wege> weges = all_weges.get(id.toString());
+							
+				if(weges!=null){
+					for(Wege wege:weges){
+						total+= Double.parseDouble(wege.getDuration())*pw;
+					}										
+				}
+				sum_weight +=  pw*hhw;
+				
+			}
+						
+			out.write( "\t" + total/sum_weight);
+			
+			}
+			
+			out.newLine();
+		}
+		
+		
+	}
 
 	private void printDailyDistanceByCohort(ArrayList<Id>[] ids_cohort) throws IOException {
 		out.write("------------------------------"); 
@@ -1225,9 +2019,9 @@ public class TimeSeriesInfoExtractor {
 			double total = 0;
 			for(Id id:gender){
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
-				total = total + Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DISTANCE))*pw*hhw;
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+				total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DISTANCE))*pw*hhw;
 				sum_weight +=  pw*hhw;
 				
 			
@@ -1239,6 +2033,60 @@ public class TimeSeriesInfoExtractor {
 			
 			out.newLine();
 		}
+		
+	}
+	
+	private void printDailyDistancesByCohortAndIncomeTercile(ArrayList<Id>[] ids_cohort) throws Exception {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("DAILY DISTANCES BY COHORT AND INCOME TERCILES"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort  \t First Tercile  \t Second Tercile \t Third Tercile" ); 
+		out.newLine();
+		
+		
+		TreeMap<String, ArrayList<Wege>> all_weges= WegeLoader.loadData(microcensus.getYear());
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] terciles = getIncomeTercilesIdsForCohort(ids);
+			 
+			for(ArrayList<Id> tercile: terciles){ 
+			
+			double total = 0;
+			double sum_weight=0;
+			for(Id id:tercile){
+				
+				
+				
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+//				total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DISTANCE))*pw*hhw;
+				
+				ArrayList<Wege> weges = all_weges.get(id.toString());
+							
+				if(weges!=null){
+					for(Wege wege:weges){
+						total+= Double.parseDouble(wege.getDistance())*pw;
+					}										
+				}
+				sum_weight +=  pw*hhw;
+				
+			}
+						
+			out.write( "\t" + total/sum_weight);
+			
+			}
+			
+			out.newLine();
+		}
+		
 		
 	}
 
@@ -1268,9 +2116,9 @@ public class TimeSeriesInfoExtractor {
 			double total = 0;
 			for(Id id:gender){
 			
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
-				total = total + Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_INLAND))*pw*hhw;
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+				total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_INLAND))*pw*hhw;
 				sum_weight +=  pw*hhw;
 				
 			}	
@@ -1285,19 +2133,71 @@ public class TimeSeriesInfoExtractor {
 		
 	}
 	
+	private void printAverageTripsByCohortAndIncomeTercile(ArrayList<Id>[] ids_cohort) throws Exception {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("AVERAGE TRIPS INLAND BY COHORT AND INCOME TERCILES"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort  \t First Tercile  \t Second Tercile \t Third Tercile" ); 
+		out.newLine();
+		
+		
+		TreeMap<String, ArrayList<Wege>> all_weges= WegeLoader.loadData(microcensus.getYear());
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] terciles = getIncomeTercilesIdsForCohort(ids);
+			 
+			for(ArrayList<Id> tercile: terciles){ 
+			
+			double total = 0;
+			double sum_weight=0;
+			for(Id id:tercile){
+				
+				
+				
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+//				total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_INLAND))*pw*hhw;
+				
+				ArrayList<Wege> weges = all_weges.get(id.toString());
+				if(weges!=null){
+					total+=weges.size()*pw;
+				}
+				sum_weight +=  pw*hhw;
+				
+			}
+						
+			out.write( "\t" + total/sum_weight);
+			
+			}
+			
+			out.newLine();
+		}
+		
+		
+	}
+	
+	
 	private void printDailyDistanceByCohortAndPWAvailability(ArrayList<Id>[] ids_cohort) throws Exception {
 		out.write("------------------------------"); 
 		out.newLine();
-		out.write("AVERGAE DAILY DISTANCE"); 
+		out.write("AVERAGE DAILY DISTANCE"); 
 		out.newLine();
 		out.write("------------------------------"); 
 		out.newLine();
 		out.write("Cohort   \t ALWAYS \t BY ARRANGEMENT \t NEVER" ); 
 		out.newLine();
 		
-		if(year==2000){
+		if(this.microcensus.getYear()==2000){
 		
-			TreeMap<String, ArrayList<Etappe>> etappes = EtappenLoader.loadData(this.year);
+			TreeMap<String, ArrayList<Etappe>> etappes = EtappenLoader.loadData(this.microcensus.getYear());
 			
 			for(int i=cohorts_strings.length-1;i>=0;i--){
 				
@@ -1316,10 +2216,10 @@ public class TimeSeriesInfoExtractor {
 	
 					ArrayList<Etappe> etappen = etappes.get(id.toString());
 					
-					double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+					double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 					
-					Person person = population.getPersons().get(id);
+					Person person = microcensus.getPopulation().getPersons().get(id);
 					
 					double dist=0;
 					if(etappen!=null){ //avoid people without plan or undefined etappes
@@ -1355,9 +2255,9 @@ public class TimeSeriesInfoExtractor {
 				double total = 0;
 				for(Id id:group){
 	
-					double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
-					double dist= Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DISTANCE));
+					double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+					double dist= Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DISTANCE));
 				
 					total +=  dist*pw*hhw;
 					sum_weight +=  pw*hhw;
@@ -1382,8 +2282,8 @@ public class TimeSeriesInfoExtractor {
 		out.write("Cohort   \t ALWAYS \t BY ARRANGEMENT \t NEVER" ); 
 		out.newLine();
 		
-		if(year==2000){			
-			TreeMap<String, ArrayList<Etappe>> etappes = EtappenLoader.loadData(this.year);
+		if(this.microcensus.getYear()==2000){			
+			TreeMap<String, ArrayList<Etappe>> etappes = EtappenLoader.loadData(this.microcensus.getYear());
 			
 		
 			for(int i=cohorts_strings.length-1;i>=0;i--){
@@ -1402,8 +2302,8 @@ public class TimeSeriesInfoExtractor {
 	
 					ArrayList<Etappe> etappen = etappes.get(id.toString());
 					
-					double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+					double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 					
 					
 					int nr_wege=0;
@@ -1439,9 +2339,9 @@ public class TimeSeriesInfoExtractor {
 				double total = 0;
 				for(Id id:group){
 	
-					double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
-					double nr_wege= Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_INLAND));
+					double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+					double nr_wege= Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_INLAND));
 				
 					total +=  nr_wege*pw*hhw;
 					sum_weight +=  pw*hhw;
@@ -1482,10 +2382,10 @@ public class TimeSeriesInfoExtractor {
 			double sum_weight=0;
 			for(Id id:gender){
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Verbund")).equals(MZConstants.YES) ){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_VERBUND)).equals(MZConstants.YES) ){
 				
 					counter+=  pw*hhw;
 				}
@@ -1531,11 +2431,11 @@ public class TimeSeriesInfoExtractor {
 			
 			for(Id id:gender){
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA first class")).equals(MZConstants.YES)
-						 |((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA second class")).equals(MZConstants.YES) ){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA1)).equals(MZConstants.YES)
+						 |((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA2)).equals(MZConstants.YES) ){
 				
 					counter+=  pw*hhw;
 				}
@@ -1583,10 +2483,10 @@ public class TimeSeriesInfoExtractor {
 			for(Id id:gender){
 				
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Halbtax")).equals(MZConstants.YES)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES)){
 				
 					counter+=  pw*hhw;
 				}
@@ -1632,14 +2532,14 @@ public class TimeSeriesInfoExtractor {
 			for(Id id:gender){
 				
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Halbtax")).equals(MZConstants.YES)
-						|((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA first class")).equals(MZConstants.YES)	
-						|((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA second class")).equals(MZConstants.YES)
-						|((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Verbund")).equals(MZConstants.YES)
-						|((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Halbtax")).equals(MZConstants.YES)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES)
+						|((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA1)).equals(MZConstants.YES)	
+						|((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA2)).equals(MZConstants.YES)
+						|((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_VERBUND)).equals(MZConstants.YES)
+						|((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES)){
 				
 					counter+=  pw*hhw;
 				}
@@ -1658,6 +2558,58 @@ public class TimeSeriesInfoExtractor {
 		
 		
 	}
+	
+	private void printAbonnementOwnershipByCohortAndIncomeTercile(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("AT LEAST ONE ABONNEMENT OWNERSHIP BY COHORT AND INCOME TERCILES"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort  \t First Tercile  \t Second Tercile \t Third Tercile" ); 
+		out.newLine();
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] terciles = getIncomeTercilesIdsForCohort(ids);
+			 
+			for(ArrayList<Id> tercile: terciles){ 
+			
+			double counter = 0;
+			double sum_weight=0;
+			for(Id id:tercile){
+				
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+				
+						
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES)
+						|((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA1)).equals(MZConstants.YES)	
+						|((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA2)).equals(MZConstants.YES)
+						|((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_VERBUND)).equals(MZConstants.YES)
+						|((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES)){
+				
+					counter+=  pw*hhw;
+				}
+				sum_weight +=  pw*hhw;
+				
+			}
+						
+			out.write( "\t" + counter/sum_weight*100);
+			
+			}
+			
+			out.newLine();
+		}
+		
+		
+	}
+	
 	private void printCarAvailabilityByCohort(ArrayList<Id>[] ids_cohort) throws IOException {
 		out.write("------------------------------"); 
 		out.newLine();
@@ -1669,7 +2621,7 @@ public class TimeSeriesInfoExtractor {
 		out.newLine();
 		
 		
-		for(int i=0;i<cohorts_strings.length;i++){
+		for(int i=cohorts_strings.length-1;i>=0;i--){
 			
 			out.write(cohorts_strings[i]);
 			
@@ -1683,10 +2635,10 @@ public class TimeSeriesInfoExtractor {
 			double sum_weight=0;
 			for(Id id:gender){
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "availability: car")).equals(MZConstants.ALWAYS)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.CAR_AVAILABILITY)).equals(MZConstants.ALWAYS)){
 				
 					counter+=  pw*hhw;
 				}
@@ -1695,13 +2647,60 @@ public class TimeSeriesInfoExtractor {
 	
 			}
 				
-						
-			out.write("\t" + counter +"\t" +counter/sum_weight*100 );
+			out.write("\t" +counter/sum_weight*100 );
+			
+			//out.write("\t" + counter +"\t" +counter/sum_weight*100 );
 			
 			}
 			
 			out.newLine();
 		}
+		
+	}
+	
+	private void printCarAvailabilityByCohortAndIncomeTercile(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("CAR AVAILABILITY PER COHORT AND INCOME TERCILES"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort  \t First Tercile  \t Second Tercile \t Third Tercile" ); 
+		out.newLine();
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			 ArrayList<Id>[] terciles = getIncomeTercilesIdsForCohort(ids);
+			 
+			for(ArrayList<Id> tercile: terciles){ 
+			
+			double counter = 0;
+			double sum_weight=0;
+			for(Id id:tercile){
+				
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
+				
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.CAR_AVAILABILITY)).equals(MZConstants.ALWAYS)){
+				
+					counter+=  pw*hhw;
+				}
+				sum_weight +=  pw*hhw;
+				
+			}
+						
+			out.write( "\t" + counter/sum_weight*100);
+			
+			}
+			
+			out.newLine();
+		}
+		
 		
 	}
 	
@@ -1734,10 +2733,10 @@ public class TimeSeriesInfoExtractor {
 				
 
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "driving licence")).equals(MZConstants.YES)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES)){
 				
 					counter+=  pw*hhw;
 				}
@@ -1780,10 +2779,10 @@ public class TimeSeriesInfoExtractor {
 				
 
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "driving licence")).equals(MZConstants.YES)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES)){
 				
 					counter+=  pw*hhw;
 				}
@@ -1826,10 +2825,10 @@ public class TimeSeriesInfoExtractor {
 				
 
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "driving licence")).equals(MZConstants.YES)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES)){
 				
 					counter+=  pw*hhw;
 				}
@@ -1872,10 +2871,10 @@ public class TimeSeriesInfoExtractor {
 				
 
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "driving licence")).equals(MZConstants.YES)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES)){
 				
 					counter+=  pw*hhw;
 				}
@@ -1893,7 +2892,7 @@ public class TimeSeriesInfoExtractor {
 		
 	}
 
-	private void printDriverLicenseByCohortAndAge(ArrayList<Id>[] ids_cohort) throws IOException {
+	private void printDriverLicenseByCohortAndGender(ArrayList<Id>[] ids_cohort) throws IOException {
 		out.write("------------------------------"); 
 		out.newLine();
 		out.write("DRIVING LICENSE PER COHORT AND GENDER"); 
@@ -1920,10 +2919,10 @@ public class TimeSeriesInfoExtractor {
 				
 
 				
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
-				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 				
-				if(((String)this.populationAttributes.getAttribute(id.toString(), "driving licence")).equals(MZConstants.YES)){
+				if(((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES)){
 				
 					counter+=  pw*hhw;
 				}
@@ -1962,7 +2961,7 @@ public class TimeSeriesInfoExtractor {
 			ArrayList<Id> ids = ids_cohort[i];
 						
 			for(Id id:ids){
-				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
 				cum_sum[i]+=pw;
 				sum_weight +=pw;
 			}
@@ -1981,20 +2980,17 @@ public class TimeSeriesInfoExtractor {
 
 	public void filterPopulationOver18() throws IOException{
 		
-		out.write("Total population size: \t\t" + this.population.getPersons().size());
+		ArrayList<Id>[] genders = this.getGenderIdsForCohort(new ArrayList<Id>(microcensus.getPopulation().getPersons().keySet()));
+		out.write("Total male: \t" + genders[0].size() + "\t" + (float)genders[0].size()*100/microcensus.getPopulation().getPersons().size() );
 		out.newLine();
-		
-		ArrayList<Id>[] genders = this.getGenderIdsForCohort(new ArrayList(this.population.getPersons().keySet()));
-		out.write("Total male: \t" + genders[0].size() + "\t" + (float)genders[0].size()*100/population.getPersons().size() );
-		out.newLine();
-		out.write("Total female: \t" + genders[1].size() + "\t" + (float)genders[1].size()*100/population.getPersons().size() );
+		out.write("Total female: \t" + genders[1].size() + "\t" + (float)genders[1].size()*100/microcensus.getPopulation().getPersons().size() );
 		out.newLine();
 		out.newLine();
 		
 	
 		Set<Id> ids_to_remove = new HashSet<Id>();
 		
-		for(Person person: this.population.getPersons().values()){
+		for(Person person: microcensus.getPopulation().getPersons().values()){
 			
 			if(((PersonImpl)person).getAge() < 18){
 				ids_to_remove.add(person.getId());
@@ -2003,18 +2999,101 @@ public class TimeSeriesInfoExtractor {
 			
 		}
 		
-		population.getPersons().keySet().removeAll(ids_to_remove);
+		microcensus.getPopulation().getPersons().keySet().removeAll(ids_to_remove);
 		
-		out.write("Total population over 18: \t\t" + this.population.getPersons().size());
+		out.write("Total population over 18: \t\t" + microcensus.getPopulation().getPersons().size());
 		out.newLine();
-		genders = this.getGenderIdsForCohort(new ArrayList(this.population.getPersons().keySet()));
-		out.write("Total male: \t" + genders[0].size() + "\t" + (float)genders[0].size()*100/population.getPersons().size() );
+		genders = this.getGenderIdsForCohort(new ArrayList<Id>(microcensus.getPopulation().getPersons().keySet()));
+		out.write("Total male: \t" + genders[0].size() + "\t" + (float)genders[0].size()*100/microcensus.getPopulation().getPersons().size() );
 		out.newLine();
-		out.write("Total female: \t" + genders[1].size() + "\t" + (float)genders[1].size()*100/population.getPersons().size() );
+		out.write("Total female: \t" + genders[1].size() + "\t" + (float)genders[1].size()*100/microcensus.getPopulation().getPersons().size() );
 		out.newLine();
 		out.newLine();
 		
 		
+	}
+	
+	public void filterPopulationWeekday() throws IOException{
+		
+		
+		Set<Id> ids_to_remove = new HashSet<Id>();
+		
+		
+		
+		for(Person person: microcensus.getPopulation().getPersons().values()){
+			
+			String day = (String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.DAY_OF_WEEK);
+			
+			if(day.equals(MZConstants.SATURDAY) || day.equals(MZConstants.SUNDAY)){
+				ids_to_remove.add(person.getId());					
+			}
+			
+		}
+		
+		microcensus.getPopulation().getPersons().keySet().removeAll(ids_to_remove);
+		
+		out.write("Total weekday: \t\t" + microcensus.getPopulation().getPersons().size());
+		out.newLine();
+		
+		new PopulationWriter(microcensus.getPopulation(), null).write("C:/local/marmolea/output/Activity Chains Forecast/population_weekday_employed.xml");
+	}
+	
+	public void filterPopulationWithWorkActivity() throws IOException{
+		
+		
+		Set<Id> ids_to_remove = new HashSet<Id>();
+		
+		for(Person person: microcensus.getPopulation().getPersons().values()){
+			
+			Plan plan = person.getSelectedPlan();
+			
+			if(plan==null){
+				ids_to_remove.add(person.getId());
+				continue;
+			}
+			
+			boolean remove= true;
+			for(PlanElement pe : plan.getPlanElements()){
+				
+				if(!(pe instanceof Activity))
+					continue;
+				Activity activity = (Activity)pe;
+				
+				if(activity.getType().equals(MZConstants.WORK))
+					remove= false;
+				
+			}
+			
+			if(remove){
+				ids_to_remove.add(person.getId());					
+			}
+			
+		}
+		
+		microcensus.getPopulation().getPersons().keySet().removeAll(ids_to_remove);
+		
+		out.write("Total population with work activity: \t\t" + microcensus.getPopulation().getPersons().size());
+		out.newLine();
+	}
+	
+	
+	public void filterPopulationEmployed() throws IOException{
+		
+	
+		Set<Id> ids_to_remove = new HashSet<Id>();
+		
+		for(Person person: microcensus.getPopulation().getPersons().values()){
+			
+			if(!((PersonImpl)person).isEmployed()){
+				ids_to_remove.add(person.getId());					
+			}
+			
+		}
+		
+		microcensus.getPopulation().getPersons().keySet().removeAll(ids_to_remove);
+		
+		out.write("Total population employed: \t\t" + microcensus.getPopulation().getPersons().size());
+		out.newLine();
 	}
 	
 	private ArrayList<Id>[] getIdsByCohort() throws IOException {
@@ -2024,11 +3103,11 @@ public class TimeSeriesInfoExtractor {
 		
 		for(int i=0;i<this.cohorts.length;i++){
 			ids_cohort[i] = new ArrayList<Id>();
-			max_age[i] = this.year-this.cohorts[i];
+			max_age[i] = this.microcensus.getYear()-this.cohorts[i];
 		}
 		max_age[this.cohorts.length-1] = Integer.MAX_VALUE;
 				
-		for(Person person:population.getPersons().values()){
+		for(Person person:microcensus.getPopulation().getPersons().values()){
 			
 			for(int i=0;i<this.cohorts.length;i++){
 				if(((PersonImpl)person).getAge() <= max_age[i]){
@@ -2051,11 +3130,11 @@ public class TimeSeriesInfoExtractor {
 		
 		for(Id id:ids){
 			
-			if(((PersonImpl)population.getPersons().get(id)).getSex().equals("m")){
+			if(((PersonImpl)microcensus.getPopulation().getPersons().get(id)).getSex().equals("m")){
 				ids_gender[0].add(id);
-			}else if(((PersonImpl)population.getPersons().get(id)).getSex().equals("f")){
+			}else if(((PersonImpl)microcensus.getPopulation().getPersons().get(id)).getSex().equals("f")){
 				ids_gender[1].add(id);
-			}else{Gbl.errorMsg("This should neber happen!: Gender "+ ((PersonImpl)population.getPersons().get(id)).getSex() +" unknown!");}
+			}else{Gbl.errorMsg("This should neber happen!: Gender "+ ((PersonImpl)microcensus.getPopulation().getPersons().get(id)).getSex() +" unknown!");}
 			
 		}
 		
@@ -2073,12 +3152,12 @@ public class TimeSeriesInfoExtractor {
 		
 		for(Id id:ids){
 			
-			boolean hasAbonnement = (((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA first class")).equals(MZConstants.YES) 
-					| ((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA second class")).equals(MZConstants.YES)
-					| ((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Halbtax")).equals(MZConstants.YES)
-					| ((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Verbund")).equals(MZConstants.YES));
+			boolean hasAbonnement = (((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA1)).equals(MZConstants.YES) 
+					| ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA2)).equals(MZConstants.YES)
+					| ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES)
+					| ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_VERBUND)).equals(MZConstants.YES));
 			
-			boolean hasCarAvailable = ((String)this.populationAttributes.getAttribute(id.toString(), "availability: car")).equals(MZConstants.ALWAYS);
+			boolean hasCarAvailable = ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.CAR_AVAILABILITY)).equals(MZConstants.ALWAYS);
 					
 					
 			if(hasAbonnement & hasCarAvailable){
@@ -2108,7 +3187,7 @@ public class TimeSeriesInfoExtractor {
 		}
 		
 		
-		for(Person person:population.getPersons().values()){
+		for(Person person:microcensus.getPopulation().getPersons().values()){
 			
 			for(int i=0;i<this.cohorts.length;i++){
 				if(((PersonImpl)person).getAge() < this.age_groups[i]){
@@ -2130,9 +3209,9 @@ public class TimeSeriesInfoExtractor {
 			ids_PW[i] = new ArrayList<Id>();
 		}
 		
-				for(Person person:population.getPersons().values()){
+				for(Person person:microcensus.getPopulation().getPersons().values()){
 			
-				boolean hasCarAvailable = ((String)this.populationAttributes.getAttribute(person.getId().toString(), "availability: car")).equals(MZConstants.ALWAYS);
+				boolean hasCarAvailable = ((String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.CAR_AVAILABILITY)).equals(MZConstants.ALWAYS);
 				
 				if(hasCarAvailable){
 					ids_PW[0].add(person.getId());
@@ -2157,7 +3236,7 @@ public class TimeSeriesInfoExtractor {
 		
 			for(Id id:ids){
 					
-				String av = (String)this.populationAttributes.getAttribute(id.toString(), "availability: car");
+				String av = (String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.CAR_AVAILABILITY);
 				if(av.equals(MZConstants.ALWAYS)){
 					ids_PW[0].add(id);
 				}else if(av.equals(MZConstants.ARRANGEMENT)){
@@ -2184,14 +3263,14 @@ public class TimeSeriesInfoExtractor {
 		
 		int counter0 =0, counter1=0,counter2=0,counter3=0;
 		
-				for(Person person:population.getPersons().values()){
+				for(Person person:microcensus.getPopulation().getPersons().values()){
 			
-				boolean hasCarAvailable = ((String)this.populationAttributes.getAttribute(person.getId().toString(), "availability: car")).equals(MZConstants.ALWAYS);
+				boolean hasCarAvailable = ((String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.CAR_AVAILABILITY)).equals(MZConstants.ALWAYS);
 				
-				boolean hasSeasonTicket =  ((String)this.populationAttributes.getAttribute(person.getId().toString(), "abonnement: GA first class")).equals(MZConstants.YES) |
-										   ((String)this.populationAttributes.getAttribute(person.getId().toString(), "abonnement: GA second class")).equals(MZConstants.YES) |
-										   ((String)this.populationAttributes.getAttribute(person.getId().toString(), "abonnement: Verbund")).equals(MZConstants.YES)|
-										   ((String)this.populationAttributes.getAttribute(person.getId().toString(), "abonnement: Halbtax")).equals(MZConstants.YES);
+				boolean hasSeasonTicket =  ((String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.ABBO_GA1)).equals(MZConstants.YES) |
+										   ((String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.ABBO_GA2)).equals(MZConstants.YES) |
+										   ((String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.ABBO_VERBUND)).equals(MZConstants.YES)|
+										   ((String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES);
 				
 				if(hasCarAvailable & hasSeasonTicket){
 					ids_PW_Verbund[0].add(person.getId()); counter0++;
@@ -2224,12 +3303,12 @@ private ArrayList<Id>[] getIdsByResidence(ArrayList<Id> ids) throws IOException 
 	
 			for(Id id:ids){
 		
-			String hhnr =	(String)this.populationAttributes.getAttribute(id.toString(), "household number");
+			String hhnr =	(String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER);
 				
-			boolean zurich = ((String)this.householdAttributes.getAttribute(hhnr, "municipality")).equals("261");
-			boolean basel = ((String)this.householdAttributes.getAttribute(hhnr, "municipality")).equals("2701");
-			boolean bern = ((String)this.householdAttributes.getAttribute(hhnr, "municipality")).equals("351");
-			boolean geneva = ((String)this.householdAttributes.getAttribute(hhnr, "municipality")).equals("6621");
+			boolean zurich = ((String)this.microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.MUNICIPALITY)).equals("261");
+			boolean basel = ((String)this.microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.MUNICIPALITY)).equals("2701");
+			boolean bern = ((String)this.microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.MUNICIPALITY)).equals("351");
+			boolean geneva = ((String)this.microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.MUNICIPALITY)).equals("6621");
 			
 			if(zurich){
 				ids_residence[0].add(id); 
@@ -2261,12 +3340,12 @@ private ArrayList<Id>[] getIdsByResidenceBigCities(ArrayList<Id> ids) throws IOE
 	
 			for(Id id:ids){
 		
-			String hhnr =	(String)this.populationAttributes.getAttribute(id.toString(), "household number");
+			String hhnr =	(String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER);
 				
-			boolean zurich = ((String)this.householdAttributes.getAttribute(hhnr, "municipality")).equals("261");
-			boolean basel = ((String)this.householdAttributes.getAttribute(hhnr, "municipality")).equals("2701");
-			boolean bern = ((String)this.householdAttributes.getAttribute(hhnr, "municipality")).equals("351");
-			boolean geneva = ((String)this.householdAttributes.getAttribute(hhnr, "municipality")).equals("6621");
+			boolean zurich = ((String)this.microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.MUNICIPALITY)).equals("261");
+			boolean basel = ((String)this.microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.MUNICIPALITY)).equals("2701");
+			boolean bern = ((String)microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.MUNICIPALITY)).equals("351");
+			boolean geneva = ((String)microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.MUNICIPALITY)).equals("6621");
 			
 			if(zurich|basel|bern|geneva){
 				ids_residence[0].add(id); 
@@ -2293,10 +3372,10 @@ private ArrayList<Id>[] getIdsByGA_SeasonTicket(ArrayList<Id> ids) throws IOExce
 	
 			for(Id id:ids){
 		
-			boolean hasAbonnement = (((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA first class")).equals(MZConstants.YES) 
-						| ((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA second class")).equals(MZConstants.YES)
-						| ((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Halbtax")).equals(MZConstants.YES)
-						| ((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Verbund")).equals(MZConstants.YES));
+			boolean hasAbonnement = (((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA1)).equals(MZConstants.YES) 
+						| ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA2)).equals(MZConstants.YES)
+						| ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES)
+						| ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_VERBUND)).equals(MZConstants.YES));
 			
 			if(hasAbonnement){
 				ids_ticket[0].add(id); 
@@ -2323,12 +3402,12 @@ private ArrayList<Id>[] getIdsByPW_GA(ArrayList<Id> ids) throws IOException {
 	
 			for(Id id:ids){
 		
-			boolean hasCarAvailable = ((String)this.populationAttributes.getAttribute(id.toString(), "availability: car")).equals(MZConstants.ALWAYS);	
+			boolean hasCarAvailable = ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.CAR_AVAILABILITY)).equals(MZConstants.ALWAYS);	
 				
-			boolean hasAbonnement = (((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA first class")).equals(MZConstants.YES) 
-						| ((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: GA second class")).equals(MZConstants.YES)
-						| ((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Halbtax")).equals(MZConstants.YES)
-						| ((String)this.populationAttributes.getAttribute(id.toString(), "abonnement: Verbund")).equals(MZConstants.YES));
+			boolean hasAbonnement = (((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA1)).equals(MZConstants.YES) 
+						| ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_GA2)).equals(MZConstants.YES)
+						| ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_HT)).equals(MZConstants.YES)
+						| ((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.ABBO_VERBUND)).equals(MZConstants.YES));
 			
 			if(hasCarAvailable){
 				ids_ticket[0].add(id); 
@@ -2342,5 +3421,13 @@ private ArrayList<Id>[] getIdsByPW_GA(ArrayList<Id> ids) throws IOException {
 			
 	return ids_ticket;
 }
+
+
+	private void printPopulationSize(String comment) throws IOException{
+
+	out.write( comment + ": \t\t" + microcensus.getPopulation().getPersons().size());
+	out.newLine();
+
+	}
 
 }

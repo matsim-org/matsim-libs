@@ -17,23 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.acmarmol.matsim2030.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus1989;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.households.IncomeImpl;
-import org.matsim.households.Income.IncomePeriod;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
 
 /**
 * 
-* Parses the haushalte.dat file from MZ2010, creates matsim households, and
+* Parses the haushalte.dat file from MZ2005, creates matsim households, and
 * fills the households attributes with the microcensus information.
 * 
 * @see org.matsim.utils.objectattributes 
@@ -42,7 +39,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 * 
 */
 
-public class MZ2010HouseholdParser {
+public class MZ1989HouseholdParser {
 
 //////////////////////////////////////////////////////////////////////
 //member variables
@@ -57,7 +54,7 @@ public class MZ2010HouseholdParser {
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZ2010HouseholdParser(Households households, ObjectAttributes householdAttributes) {
+	public MZ1989HouseholdParser(Households households, ObjectAttributes householdAttributes) {
 	super();
 	this.households = households;
 	this.householdAttributes = householdAttributes;
@@ -81,31 +78,29 @@ public class MZ2010HouseholdParser {
 		String[] entries = curr_line.split("\t", -1);
 		
 		//household number
-		String hhnr = entries[0].trim();
+		String hhnr = entries[1].trim();
 		
 		//household weight 
-		String hh_weight = entries[1];
+		String hh_weight = entries[2];
 		householdAttributes.putAttribute(hhnr, MZConstants.HOUSEHOLD_WEIGHT, hh_weight);
 		
 		//household size
-		String size = entries[76].trim();
-		householdAttributes.putAttribute(hhnr, MZConstants.HOUSEHOLD_SIZE, size);
+		//String size = entries[76].trim();
+		//householdAttributes.putAttribute(hhnr, "size", size);
 		
 		//household income
-		String income = entries[98].trim();
-		householdAttributes.putAttribute(hhnr, MZConstants.HOUSEHOLD_INCOME, income);
-		householdAttributes.putAttribute(hhnr, MZConstants.HOUSEHOLD_INCOME_MIDDLE_OF_INTERVAL, getIncome(income));
-	
+		//String income = entries[98].trim();
+		//householdAttributes.putAttribute(hhnr, "income", income);
 		
 		
 		// location coordinate (round to 1/10 of hectare) - WGS84 (5,6) & CH1903 (7,8)
-		Coord location = new CoordImpl(entries[7].trim(),entries[8].trim());
+		//Coord location = new CoordImpl(entries[7].trim(),entries[8].trim());
 		//location.setX(Math.round(location.getX()/10.0)*10);
 		//location.setY(Math.round(location.getY()/10.0)*10);
-		householdAttributes.putAttribute(hhnr, MZConstants.COORD, location);
+		//householdAttributes.putAttribute(hhnr, "coord", location);
 		
 		//Kanton
-		String kanton =  entries[17].trim();
+		String kanton =  entries[4].trim();
 		if(kanton.equals("1")){kanton = MZConstants.ZURICH;}						else if(kanton.equals("2")){kanton = MZConstants.BERN;}
 		else if(kanton.equals("3")){kanton = MZConstants.LUZERN;}					else if(kanton.equals("4")){kanton = MZConstants.URI;}
 		else if(kanton.equals("5")){kanton = MZConstants.SCHWYZ;}					else if(kanton.equals("6")){kanton = MZConstants.OBWALDEN;}
@@ -120,50 +115,36 @@ public class MZ2010HouseholdParser {
 		else if(kanton.equals("23")){kanton = MZConstants.VALAIS;}				else if(kanton.equals("24")){kanton = MZConstants.NEUCHATEL;}
 		else if(kanton.equals("25")){kanton = MZConstants.GENEVE;}				else if(kanton.equals("26")){kanton = MZConstants.JURA;}
 		else if(kanton.equals("-97")){kanton = MZConstants.UNSPECIFIED;}		
-		householdAttributes.putAttribute(hhnr, MZConstants.CANTON, kanton);
+		householdAttributes.putAttribute(hhnr, "kanton", kanton);
 		
 		//municipality BFS number
-		String municipality =  entries[10].trim();
+		String municipality =  entries[3].trim();
 		householdAttributes.putAttribute(hhnr, MZConstants.MUNICIPALITY, municipality);
 		
-		
-		//municipality BFS number
-		String region =  entries[16].trim();
-		householdAttributes.putAttribute(hhnr, MZConstants.REGION, region);
-		
+	
 		//number of cars
-		String nr_cars = entries[77];
-		if(nr_cars.equals("-98")){nr_cars = MZConstants.NO_ANSWER;}
-		else if(nr_cars.equals("-97")){nr_cars = MZConstants.NOT_KNOWN;}
+		String nr_cars = entries[13];
+		if(nr_cars.equals("")){nr_cars = MZConstants.NO_ANSWER;}
 		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_CARS, nr_cars);
 		
 		//number of motorcycles
-		String nr_mcycles = entries[79];
-		if(nr_mcycles.equals("-98")){nr_mcycles = MZConstants.NO_ANSWER;}
-		else if(nr_mcycles.equals("-97")){nr_mcycles = MZConstants.NOT_KNOWN;}
+		String nr_mcycles = entries[14];
+		if(nr_mcycles.equals("")){nr_mcycles = MZConstants.NO_ANSWER;}
 		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_MOTORCYCLES, nr_mcycles);
 		
-		//number of small motorcycles
-		String nr_smcycles = entries[80];
-		if(nr_smcycles.equals("-98")){nr_smcycles = MZConstants.NO_ANSWER;}
-		else if(nr_smcycles.equals("-97")){nr_smcycles = MZConstants.NOT_KNOWN;}
-		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_SMALL_MOTORCYCLES, nr_smcycles);
-		
 		//number of mofa
-		String nr_mofas = entries[82];
-		if(nr_mofas.equals("-98")){nr_mofas = MZConstants.NO_ANSWER;}
-		else if(nr_mofas.equals("-97")){nr_mofas = MZConstants.NOT_KNOWN;}
+		String nr_mofas = entries[15];
+		if( nr_mofas.equals("")){nr_mofas = MZConstants.NO_ANSWER;}
 		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_MOFAS, nr_mofas);
 		
 		//number of bicycles
-		String nr_bikes = entries[83];
-		if(nr_bikes.equals("-98")){nr_bikes = MZConstants.NO_ANSWER;}
-		else if(nr_bikes.equals("-97")){nr_bikes = MZConstants.NOT_KNOWN;}
+		String nr_bikes = entries[16];
+		if(nr_bikes.equals("")){nr_bikes = MZConstants.NO_ANSWER;}
 		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_BICYCLES, nr_bikes);
 		
 		// creating matsim household
 		Household hh = households.getFactory().createHousehold(new IdImpl(hhnr));
-		hh.setIncome(new IncomeImpl(Double.parseDouble(income), IncomePeriod.month));
+		//hh.setIncome(new IncomeImpl(Double.parseDouble(income), IncomePeriod.month));
 		households.getHouseholds().put(hh.getId(), hh);
 		}
 		
@@ -176,32 +157,6 @@ public class MZ2010HouseholdParser {
 		System.out.println();
 		
 		
-	}
-	
-	
-	private String getIncome(String hh_income) {
-		
-		if(hh_income.equals("1")){
-			return "1000";
-		}else if(hh_income.equals("2")){
-			return "3000";
-		}else if(hh_income.equals("3")){
-			return "5000";
-		}else if(hh_income.equals("4")){
-			return "7000";
-		}else if(hh_income.equals("5")){
-			return "9000";
-		}else if(hh_income.equals("6")){
-			return "11000";
-		}else if(hh_income.equals("7")){
-			return "13000";
-		}else if(hh_income.equals("8")){
-			return "15000";
-		}else if(hh_income.equals("9")){
-			return "20000";
-		}else{
-			return MZConstants.UNSPECIFIED;
-		}
 	}
 	
 	

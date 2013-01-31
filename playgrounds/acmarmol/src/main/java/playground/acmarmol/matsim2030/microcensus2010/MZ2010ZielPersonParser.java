@@ -357,6 +357,31 @@ public class MZ2010ZielPersonParser {
 		else Gbl.errorMsg("This should never happen!  Gleis 7: " + gleis7+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.ABBO_GLEIS7, gleis7);
 		
+		//last education
+		String education = entries[180];
+		if(education.equals("1")){education = MZConstants.EDUCATION_NO_SCHOOL;}
+		else if(education.equals("2")){education = MZConstants.EDUCATION_NOT_FINISHED_MANDATORY_SCHOOL;}
+		else if(education.equals("3")){education = MZConstants.EDUCATION_MANDATORY_SCHOOL;}
+		else if(education.equals("4")){education = MZConstants.EDUCATION_ONE_YEAR_AUSBILDUNG;}
+		else if(education.equals("5")){education = MZConstants.EDUCATION_TWO_YEAR_BERUFLICHE_GRUNDBILDUNG;}
+		else if(education.equals("6")){education = MZConstants.EDUCATION_TWO_YEAR_VOLLZEITBERUFSLEHRE;}
+		else if(education.equals("7")){education = MZConstants.EDUCATION_TWO_THREE_YEARS_AUSBILDUNG;}
+		else if(education.equals("8")){education = MZConstants.EDUCATION_THREE_FOUR_YEARS_BERUFSLEHRE;}
+		else if(education.equals("9")){education = MZConstants.EDUCATION_THREE_FOUR_YEARS_VOLLZEITBERUFSLEHRE;}
+		else if(education.equals("10")){education = MZConstants.EDUCATION_LEHRKRÄFTE;}
+		else if(education.equals("11")){education = MZConstants.EDUCATION_MATURITÄTSCHULE;}
+		else if(education.equals("12")){education = MZConstants.EDUCATION_BERUFSLEHRE;}
+		else if(education.equals("13")){education = MZConstants.EDUCATION_HÖHERE_BERUFSAUSBILDUNG;}
+		else if(education.equals("14")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HÖHEREFACHSSCHULE_FACHHOSCHSCHULE;}
+		else if(education.equals("15")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HÖHEREFACHSSCHULE_FACHHOSCHSCHULE;}
+		else if(education.equals("16")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HÖHEREFACHSSCHULE_FACHHOSCHSCHULE;}
+		else if(education.equals("17")){education = MZConstants.EDUCATION_UNIVERSITÄT;}
+		else if(education.equals("-98") || education.equals(" ")){education = MZConstants.NO_ANSWER;}
+		else if(education.equals("-97")){education = MZConstants.NOT_KNOWN;}
+		else Gbl.errorMsg("Last education: " + education+ " doesn't exist");
+		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.LAST_EDUCATION, education);
+		
+		
 		
 		//creating matsim person
 		PersonImpl person = new PersonImpl(new IdImpl(hhnr.concat(zielpnr)));

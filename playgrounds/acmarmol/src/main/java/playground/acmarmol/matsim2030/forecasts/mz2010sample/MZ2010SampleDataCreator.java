@@ -30,8 +30,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.acmarmol.matsim2030.forecasts.Loader;
-import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.ocupancyRate.Etappe;
-import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.ocupancyRate.EtappenLoader;
+import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.Etappe;
+import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.EtappenLoader;
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
 import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.CoordConverter;
 import playground.acmarmol.utils.MyCollectionUtils;
@@ -239,7 +239,7 @@ public class MZ2010SampleDataCreator {
 			return 1;
 			
 		}else if(mode.equals(MZConstants.WALK)
-				|| mode.equals(MZConstants.BYCICLE)
+				|| mode.equals(MZConstants.BICYCLE)
 				|| mode.equals(MZConstants.CABLE_CAR)
 				|| mode.equals(MZConstants.SKATEBOARD)){
 			

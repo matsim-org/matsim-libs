@@ -22,10 +22,12 @@ package playground.acmarmol.matsim2030.microcensus2010;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 
@@ -45,6 +47,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -412,6 +415,10 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						teleportLeg.setArrivalTime(previousActivity.getEndTime());
 						teleportLeg.setTravelTime(0);
 						teleportLeg.setMode(MZConstants.ABROAD_TELEPORT);
+						GenericRouteImpl route = new GenericRouteImpl(null, null);
+						teleportLeg.setRoute(route);
+						route.setDistance(0);
+						route.setTravelTime(leg.getTravelTime());
 						
 						if(toAdd.get(pid) == null){ toAdd.put(pid, new ArrayList<Tuple<Integer,PlanElement>>());}	
 						toAdd.get(pid).add(new Tuple<Integer, PlanElement>(index+1, teleportLeg));
@@ -431,7 +438,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 				//1) all previous activities and legs are outside switzerland -> remove all
 				//2) there's a previous "airport" or "border" activity, thus the person left and entered switzerland on the same plan. 
 				//	2.1) if the coords of these two match (same airport or border pass) merge both activities and fix start and end times accordingly
-				//  2.2) if the coords don't match, create intermediate leg with mode "teleport" two keep consistency on plan.
+				//  2.2) if the coords don't match, create intermediate leg with mode "teleport" to keep consistency on plan.
 					
 						for (int j=index-1; cont && j>=0 ;j--) {
 							
@@ -452,6 +459,10 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 									teleportLeg.setDepartureTime(activity.getEndTime());
 									teleportLeg.setArrivalTime(previousActivity.getStartTime());
 									teleportLeg.setMode(MZConstants.ABROAD_TELEPORT);
+									GenericRouteImpl route = new GenericRouteImpl(null, null);
+									teleportLeg.setRoute(route);
+									route.setDistance(0);
+									route.setTravelTime(leg.getTravelTime());
 									if(toAdd.get(pid) == null){ toAdd.put(pid, new ArrayList<Tuple<Integer,PlanElement>>());}	
 									toAdd.get(pid).add(new Tuple<Integer, PlanElement>(index, teleportLeg));
 									delete = false; 
@@ -469,7 +480,6 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		
 			toRemove.put(pid, elementsToRemove);
 	}
-		
 
 //////////////////////////////////////////////////////////////////////
 	/**
@@ -603,7 +613,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	
 //////////////////////////////////////////////////////////////////////
 
-	public static Set<Id> identifyPlansOutOfSwizerland(final Population population, final ObjectAttributes wegeAttributes, String countryCode) {
+	public static Set<Id> identifyPlansOutOfSwitzerland(final Population population, final ObjectAttributes wegeAttributes, String countryCode) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person person : population.getPersons().values()) {	
 			Plan plan = person.getSelectedPlan();
@@ -772,6 +782,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						
 						else if(type.contains(MZConstants.ACCOMPANYING_CHILDREN)
 								|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
+								|| type.contains(MZConstants.ACCOMPANYING)
 								|| type.contains(MZConstants.ERRANDS)
 								|| type.contains(MZConstants.OTHER)
 								|| type.contains(MZConstants.FOREIGN_PROPERTY)
@@ -837,7 +848,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						} else if (mode.equals(MZConstants.WALK)) {
 							leg.setMode(TransportMode.walk);  //WALK
 
-						} else if (mode.equals(MZConstants.BYCICLE)
+						} else if (mode.equals(MZConstants.BICYCLE)
 								|| mode.equals(MZConstants.SKATEBOARD)
 								|| mode.equals(MZConstants.MOFA)) {
 							leg.setMode(TransportMode.bike);  //BICYCLE
@@ -933,6 +944,279 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 			log.info("All activities:\n" + s.toString());
 		}
 	}
+
+
+
+	public static void setMZ2000LegModesWithEtappenInfo(
+			Population population,
+			TreeMap<String, ArrayList<playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.Etappe>> etappes) {
+		
+		
+		for(Person person: population.getPersons().values()){
+			
+			Id id  = person.getId();
+			
+			Plan plan = person.getSelectedPlan();
+			
+			if(plan==null)
+				continue;
+			
+			ArrayList<playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.Etappe> etappen = etappes.get(id.toString());
+			int legCounter=0;
+			for(PlanElement pe : plan.getPlanElements()){
+				
+				if(!(pe instanceof Leg))
+					continue;
+				
+				legCounter++;
+				LegImpl leg = (LegImpl) pe;
+				int curr_mode = Integer.MAX_VALUE;
+				String mode = null;
+				
+				for(playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.Etappe etappe: etappen){
+					
+					if(etappe.getWegeNr()>legCounter)
+						break;
+					
+					if(etappe.getModeInteger()<curr_mode){
+						curr_mode = etappe.getModeInteger();
+						mode = etappe.getWegeEquivalentModeFromEtappeMode();
+						
+						}
+					
+				}
+				
+				leg.setMode(mode);			
+			}
+		}
+	}
 	
+//////////////////////////////////////////////////////////////////////
+	
+	public static void setHomeLocationsMZ2000FromHouseholdAdress(final Population population,
+			 final ObjectAttributes populationAttributes,
+			 final ObjectAttributes householdAttributes,
+			 final ObjectAttributes wegeAttributes) {
+		
+		HashMap<Id, ArrayList<Tuple<Integer, Integer>>> homes_info = new HashMap<Id,ArrayList<Tuple<Integer, Integer>>>();
+		int counter = 0;
+		
+
+			for (Person person : population.getPersons().values()) {	
+				String hhnr = (String) populationAttributes.getAttribute(person.getId().toString(), MZConstants.HOUSEHOLD_NUMBER);
+				String hh_address = (String) householdAttributes.getAttribute(hhnr, MZConstants.ADDRESS);
+				
+				Plan plan = person.getSelectedPlan();
+				
+				if(plan==null) //avoid persons without activities
+					continue;
+				
+					int legCounter = 0;
+					for (PlanElement pe : plan.getPlanElements()) {
+						if (pe instanceof Leg) {
+							
+							legCounter++;
+							String address_start = (String) wegeAttributes.getAttribute(person.getId().toString().concat("-").concat(String.valueOf(legCounter)),MZConstants.ADDRESS_START);
+							String adress_end = (String) wegeAttributes.getAttribute(person.getId().toString().concat("-").concat(String.valueOf(legCounter)),MZConstants.ADDRESS_END);
+							
+							if(!(address_start.equals(hh_address) || adress_end.equals(hh_address)))
+								continue;
+							
+							int pos=0;;
+							if(address_start.equals(hh_address))
+								pos=-1;
+							counter++;
+							if(homes_info.get(person.getId())==null)
+								homes_info.put(person.getId(), new ArrayList<Tuple<Integer, Integer>>());
+							homes_info.get(person.getId()).add(new Tuple<Integer, Integer>(legCounter, pos));
+						}
+					}
+					
+					
+				
+			}
+			
+		setHomeLocations(population, homes_info);
+			
+		System.out.println("      Number of activities set to work: " + counter);
+	}
+
+
+
+	private static void setHomeLocations(
+			Population population,
+			HashMap<Id, ArrayList<Tuple<Integer, Integer>>> homes_info) {
+		
+		   Iterator it = homes_info.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pairs = (Map.Entry)it.next();
+		        Id id = (Id) pairs.getKey();
+		        ArrayList<Tuple<Integer, Integer>> legs = (ArrayList<Tuple<Integer, Integer>>) pairs.getValue();
+		            
+		       	        
+		       Person person = population.getPersons().get(id);
+		       List<PlanElement> pes = person.getSelectedPlan().getPlanElements();
+		       PlanElement[] pesArray = pes.toArray(new PlanElement[pes.size()]);
+		       
+		       for(Tuple<Integer,Integer> leg:legs){
+		    	   
+		    	   ActivityImpl activity = (ActivityImpl) pesArray[2*(leg.getFirst()+leg.getSecond())]; 
+		    	   activity.setType(MZConstants.HOME); 
+		       }
+		        
+		       it.remove(); // avoids a ConcurrentModificationException
+		    }
+		
+		
+	}
+
+
+
+	public static void setHomeLocationsMZ2000AccordingToActivitySequence(
+			Population population) {
+		
+		for(Person person: population.getPersons().values()){
+			
+			Plan plan = person.getSelectedPlan();
+			
+			if(plan==null)
+				continue;
+			
+			String lastActivityType = null;
+			
+			for(PlanElement pe: plan.getPlanElements()){
+				
+				if (pe instanceof ActivityImpl) {
+					ActivityImpl act = (ActivityImpl) pe;
+					if(act.getType().equals(lastActivityType))
+						act.setType(MZConstants.HOME);
+						
+					lastActivityType = act.getType();					
+				}
+				
+				
+			}
+			
+			
+		}
+		
+		
+		
+	}
+
+
+	
+
+	public static void eliminateToursWithUndefinedWegeTimesMZ1989(
+			Population population) {
+		//removes only home-to-home tours
+		
+		for(Person person: population.getPersons().values()){
+			
+			if(person.getId().toString().equals("100071")){
+				System.out.println();
+			}
+			
+ 			Plan plan = person.getSelectedPlan();
+			
+			if(plan==null)
+				continue;
+			
+			boolean erase =false;
+			ArrayList<PlanElement> toRemove = new  ArrayList<PlanElement>();
+			ArrayList<PlanElement> tour = new  ArrayList<PlanElement>();
+			
+			
+			for(PlanElement pe: plan.getPlanElements()){
+				System.out.println(pe);
+				tour.add(pe);
+				if(pe instanceof ActivityImpl){
+					ActivityImpl act = (ActivityImpl) pe;
+					if(act.getType().equals(MZConstants.HOME)){
+						if(erase){
+							
+							
+							toRemove.addAll(tour);
+							erase= false;
+						}
+							
+						tour.clear();
+					}
+						
+				}
+				
+				if(!(pe instanceof Leg))
+					continue;
+				
+				Leg leg = (LegImpl) pe;
+				if(leg.getDepartureTime()< 0 || leg.getTravelTime()<0)
+					erase=true;			
+				
+			
+			}
+			if(erase)
+				toRemove.addAll(tour);
+		
+		plan.getPlanElements().removeAll(toRemove);	
+			
+		}
+		
+		
+	}
+
+//////////////////////////////////////////////////////////////////////	
+	
+public static void recodeActivityTypesHWELS(Population population){
+		
+		for(Person person: population.getPersons().values()){
+		
+			Plan plan = person.getSelectedPlan();
+			
+			if(plan!=null){
+				for(PlanElement pe: plan.getPlanElements()){
+					
+					if(pe instanceof Activity){
+						
+						ActivityImpl act = (ActivityImpl) pe;
+						String type = act.getType();
+						
+						if(type.contains(MZConstants.WORK)
+								||type.contains(MZConstants.BUSINESS)
+								||type.contains(MZConstants.DIENSTFAHRT))
+						{act.setType(MZConstants.WORK);}
+						
+						else if(type.contains(MZConstants.LEISURE)
+								||type.contains(MZConstants.ACCOMPANYING_CHILDREN)
+								|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
+								|| type.contains(MZConstants.ERRANDS)
+								|| type.contains(MZConstants.OTHER)
+								|| type.contains(MZConstants.FOREIGN_PROPERTY)
+								|| type.contains(MZConstants.OVERNIGHT)
+								|| type.contains(MZConstants.ACCOMPANYING)
+								|| type.contains(MZConstants.ERRANDS)
+								|| type.contains(MZConstants.OTHER)
+								|| type.contains(MZConstants.FOREIGN_PROPERTY)
+								|| type.contains(MZConstants.OVERNIGHT)
+								|| type.contains(MZConstants.PSEUDOETAPPE))
+						{act.setType(MZConstants.LEISURE);}
+						
+//						else if(type.contains(MZConstants.SHOPPING))
+//						{act.setType(MZConstants.SHOPPING);}
+//						
+//						else if(type.contains(MZConstants.EDUCATION))
+//						{act.setType(MZConstants.EDUCATION);}
+//						
+//						else if(type.contains(MZConstants.HOME))
+//						{act.setType(MZConstants.HOME);}
+						
+					}
+					
+					
+				}
+				
+			}
+		
+		}
+	}
 //////////////////////////////////////////////////////////////////////
 }

@@ -90,12 +90,14 @@ public class MZ2005HouseholdParser {
 		householdAttributes.putAttribute(hhnr, MZConstants.HOUSEHOLD_WEIGHT, hh_weight);
 		
 		//household size
-		//String size = entries[76].trim();
-		//householdAttributes.putAttribute(hhnr, "size", size);
+		String size = entries[88].trim();
+		householdAttributes.putAttribute(hhnr, MZConstants.HOUSEHOLD_SIZE, size);
 		
 		//household income
-		//String income = entries[98].trim();
-		//householdAttributes.putAttribute(hhnr, "income", income);
+		String income = entries[50].trim();
+		householdAttributes.putAttribute(hhnr, MZConstants.HOUSEHOLD_INCOME, income);
+		householdAttributes.putAttribute(hhnr, MZConstants.HOUSEHOLD_INCOME_MIDDLE_OF_INTERVAL, getIncome(income));
+
 		
 		
 		// location coordinate (round to 1/10 of hectare) - WGS84 (5,6) & CH1903 (7,8)
@@ -106,19 +108,19 @@ public class MZ2005HouseholdParser {
 		
 		//Kanton
 		String kanton =  entries[18].trim();
-		if(kanton.equals("1")){kanton = "zürich";}						else if(kanton.equals("2")){kanton = "bern";}
-		else if(kanton.equals("3")){kanton = "luzern";}					else if(kanton.equals("4")){kanton = "uri";}
-		else if(kanton.equals("5")){kanton = "schwyz";}					else if(kanton.equals("6")){kanton = "obwalden";}
-		else if(kanton.equals("7")){kanton = "nidwalden";}				else if(kanton.equals("8")){kanton = "glarus";}
-		else if(kanton.equals("9")){kanton = "zug";}					else if(kanton.equals("10")){kanton = "fribourg";}
-		else if(kanton.equals("11")){kanton = "solothurn";}				else if(kanton.equals("12")){kanton = "basel stadt";}
-		else if(kanton.equals("13")){kanton = "basel land";}			else if(kanton.equals("14")){kanton = "schaffhausen";}
-		else if(kanton.equals("15")){kanton = "appenzell ausserrhoden";}else if(kanton.equals("16")){kanton = "appenzell innerrhoden";}
-		else if(kanton.equals("17")){kanton = "st. gallen";}			else if(kanton.equals("18")){kanton = "graubünden";}
-		else if(kanton.equals("19")){kanton = "aargau";}				else if(kanton.equals("20")){kanton = "thurgau";}
-		else if(kanton.equals("21")){kanton = "ticino";}				else if(kanton.equals("22")){kanton = "vaud";}
-		else if(kanton.equals("23")){kanton = "valais";}				else if(kanton.equals("24")){kanton = "neuchâtel";}
-		else if(kanton.equals("25")){kanton = "genève";}				else if(kanton.equals("26")){kanton = "jura";}
+		if(kanton.equals("1")){kanton = MZConstants.ZURICH;}						else if(kanton.equals("2")){kanton = MZConstants.BERN;}
+		else if(kanton.equals("3")){kanton = MZConstants.LUZERN;}					else if(kanton.equals("4")){kanton = MZConstants.URI;}
+		else if(kanton.equals("5")){kanton = MZConstants.SCHWYZ;}					else if(kanton.equals("6")){kanton = MZConstants.OBWALDEN;}
+		else if(kanton.equals("7")){kanton = MZConstants.NIDWALDEN;}				else if(kanton.equals("8")){kanton = MZConstants.GLARUS;}
+		else if(kanton.equals("9")){kanton = MZConstants.ZUG;}					else if(kanton.equals("10")){kanton = MZConstants.FRIBOURG;}
+		else if(kanton.equals("11")){kanton = MZConstants.SOLOTHURN;}				else if(kanton.equals("12")){kanton = MZConstants.BASEL_STADT;}
+		else if(kanton.equals("13")){kanton = MZConstants.BASEL_LAND;}			else if(kanton.equals("14")){kanton = MZConstants.SCHAFFHAUSEN;}
+		else if(kanton.equals("15")){kanton = MZConstants.APPENZELL_AUSSERHODEN;}else if(kanton.equals("16")){kanton = MZConstants.APPENZELL_INNERHODEN;}
+		else if(kanton.equals("17")){kanton = MZConstants.ST_GALLEN;}			else if(kanton.equals("18")){kanton = MZConstants.GRAUBUNDEN;}
+		else if(kanton.equals("19")){kanton = MZConstants.AARGAU;}				else if(kanton.equals("20")){kanton = MZConstants.THURGAU;}
+		else if(kanton.equals("21")){kanton = MZConstants.TICINO;}				else if(kanton.equals("22")){kanton = MZConstants.VAUD;}
+		else if(kanton.equals("23")){kanton = MZConstants.VALAIS;}				else if(kanton.equals("24")){kanton = MZConstants.NEUCHATEL;}
+		else if(kanton.equals("25")){kanton = MZConstants.GENEVE;}				else if(kanton.equals("26")){kanton = MZConstants.JURA;}
 		else if(kanton.equals("-97")){kanton = MZConstants.UNSPECIFIED;}		
 		householdAttributes.putAttribute(hhnr, MZConstants.CANTON, kanton);
 		
@@ -154,11 +156,11 @@ public class MZ2005HouseholdParser {
 		String nr_bikes = entries[95];
 		if(nr_bikes.equals("-98")){nr_bikes = MZConstants.NO_ANSWER;}
 		else if(nr_bikes.equals("-97")){nr_bikes = MZConstants.NOT_KNOWN;}
-		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_BYCICLES, nr_bikes);
+		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_BICYCLES, nr_bikes);
 		
 		// creating matsim household
 		Household hh = households.getFactory().createHousehold(new IdImpl(hhnr));
-		//hh.setIncome(new IncomeImpl(Double.parseDouble(income), IncomePeriod.month));
+		hh.setIncome(new IncomeImpl(Double.parseDouble(income), IncomePeriod.month));
 		households.getHouseholds().put(hh.getId(), hh);
 		}
 		
@@ -171,6 +173,32 @@ public class MZ2005HouseholdParser {
 		System.out.println();
 		
 		
+	}
+	
+	
+	private String getIncome(String hh_income) {
+		
+		if(hh_income.equals("1")){
+			return "1000";
+		}else if(hh_income.equals("2")){
+			return "3000";
+		}else if(hh_income.equals("3")){
+			return "5000";
+		}else if(hh_income.equals("4")){
+			return "7000";
+		}else if(hh_income.equals("5")){
+			return "9000";
+		}else if(hh_income.equals("6")){
+			return "11000";
+		}else if(hh_income.equals("7")){
+			return "13000";
+		}else if(hh_income.equals("8")){
+			return "15000";
+		}else if(hh_income.equals("9")){
+			return "20000";
+		}else{
+			return MZConstants.UNSPECIFIED;
+		}
 	}
 	
 	

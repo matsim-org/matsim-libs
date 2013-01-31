@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.acmarmol.matsim2030.microcensus2000;
+package playground.acmarmol.matsim2030.microcensus1989;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
@@ -31,12 +31,12 @@ import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
 
 /**
 * 
-* Parses the haushaltepersonen.dat file from MZ2000,  and adds member ids to matsim households.
+* Parses the haushaltepersonen.dat file from MZ2010,  and adds member ids to matsim households.
 *
 * @author acmarmol
 * 
 */
-public class MZ2000HouseholdPersonParser {
+public class MZ1989HouseholdPersonParser {
 	
 //////////////////////////////////////////////////////////////////////
 //member variables
@@ -45,19 +45,17 @@ public class MZ2000HouseholdPersonParser {
 	private Households households;
 	private ObjectAttributes populationAttributes;
 	private Population population;
-	private ObjectAttributes householdpersonsAttributes;
 	
 
 //////////////////////////////////////////////////////////////////////
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZ2000HouseholdPersonParser(Households households,Population population, ObjectAttributes populationAttributes, ObjectAttributes householdpersonsAttributes) {
+	public MZ1989HouseholdPersonParser(Households households,Population population, ObjectAttributes populationAttributes) {
 	super();
 	this.households = households;
 	this.populationAttributes = populationAttributes;
 	this.population = population;
-	this.householdpersonsAttributes = householdpersonsAttributes;
 	}	
 
 
@@ -82,38 +80,15 @@ public class MZ2000HouseholdPersonParser {
 			//household person number (hpnr)
 			String hpnr = entries[1].trim();
 			
-
 			String zp = entries[8];
-			String zid = hhnr.concat(hpnr);
+			String zid = hhnr.concat(zp);
+			IdImpl hhid = new IdImpl(hhnr);
 			
-			//age
-			String age = entries[4].trim();
-			this.householdpersonsAttributes.putAttribute(zid, MZConstants.AGE, age);
 			
-			//gender
-			String gender = entries[5].trim();
-			if(gender.equals("1")){gender=MZConstants.MALE;}
-			else if(gender.equals("2")){gender=MZConstants.FEMALE;}
-			else{
-				Gbl.errorMsg("Unknown gender: "+ gender);
-			}
-			this.householdpersonsAttributes.putAttribute(zid, MZConstants.GENDER, gender);
-			
-			//car driving license
-			String driving_license = entries[9].trim();
-			if(driving_license.equals("1")){driving_license = MZConstants.YES;}
-			else{driving_license = MZConstants.NO;}
-			this.householdpersonsAttributes.putAttribute(zid, MZConstants.DRIVING_LICENCE, driving_license);
-			
-			//motorbike driving license
-			String mbike_license = entries[10].trim();
-			if(mbike_license.equals("1")){mbike_license = MZConstants.YES;}
-			else{mbike_license = MZConstants.NO;}
-			this.householdpersonsAttributes.putAttribute(zid, MZConstants.MOTORBIKE_DRIVING_LICENCE, mbike_license);
+		
 			
 			//filling person data into matsim households
-			
-			IdImpl hhid = new IdImpl(hhnr);
+
 			if(!this.households.getHouseholds().containsKey(hhid)){
 				Gbl.errorMsg("This should never happen!  Household hhnr: " + hhnr+ " doesn't exist");
 			}		

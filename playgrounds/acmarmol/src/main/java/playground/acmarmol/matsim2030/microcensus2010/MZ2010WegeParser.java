@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+s * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -34,6 +34,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -119,7 +120,7 @@ public class MZ2010WegeParser {
 			else if(mode.equals("11")){mode =  MZConstants.TAXI;}
 			else if(mode.equals("12")){mode =  MZConstants.MOTORCYCLE;}
 			else if(mode.equals("13")){mode =  MZConstants.MOFA;}
-			else if(mode.equals("14")){mode =  MZConstants.BYCICLE;}
+			else if(mode.equals("14")){mode =  MZConstants.BICYCLE;}
 			else if(mode.equals("15")){mode =  MZConstants.WALK;}
 			else if(mode.equals("16")){mode =  MZConstants.SKATEBOARD;}
 			else if(mode.equals("17")){mode =  MZConstants.OTHER;}
@@ -157,7 +158,7 @@ public class MZ2010WegeParser {
 			
 			//bee-line distance (km => m)
 			double distance = Double.parseDouble(entries[85].trim())*1000.0;
-			entries[21] = Double.toString(distance);
+//			entries[21] = Double.toString(distance);
 			
 			
 			

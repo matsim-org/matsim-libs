@@ -43,16 +43,17 @@ public class MZ2010HouseholdPersonParser {
 
 	private Households households;
 	private ObjectAttributes householdAttributes;
-	
+	private ObjectAttributes householdpersonsAttributes;
 
 //////////////////////////////////////////////////////////////////////
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZ2010HouseholdPersonParser(Households households, ObjectAttributes householdAttributes) {
+	public MZ2010HouseholdPersonParser(Households households, ObjectAttributes householdAttributes, ObjectAttributes householdpersonsAttributes) {
 	super();
 	this.households = households;
 	this.householdAttributes = householdAttributes;
+	this.householdpersonsAttributes = householdpersonsAttributes;
 	}	
 
 
@@ -78,6 +79,32 @@ public class MZ2010HouseholdPersonParser {
 			String hpnr = entries[2].trim();
 			
 			
+			//age
+			String age = entries[4].trim();
+			this.householdpersonsAttributes.putAttribute(hhnr.concat(hpnr), MZConstants.AGE, age);
+			
+			//gender
+			String gender = entries[5].trim();
+			if(gender.equals("1")){gender=MZConstants.MALE;}
+			else if(gender.equals("2")){gender=MZConstants.FEMALE;}
+			else{
+				Gbl.errorMsg("Unknown gender: "+ gender);
+			}
+			this.householdpersonsAttributes.putAttribute(hhnr.concat(hpnr), MZConstants.GENDER, gender);
+			
+			//car driving license
+			String driving_license = entries[6].trim();
+			if(driving_license.equals("1")){driving_license = MZConstants.YES;}
+			else{driving_license = MZConstants.NO;}
+			this.householdpersonsAttributes.putAttribute(hhnr.concat(hpnr), MZConstants.DRIVING_LICENCE, driving_license);
+			
+			//motorbike driving license
+			String mbike_license = entries[7].trim();
+			if(mbike_license.equals("1")){mbike_license = MZConstants.YES;}
+			else{mbike_license = MZConstants.NO;}
+			this.householdpersonsAttributes.putAttribute(hhnr.concat(hpnr), MZConstants.MOTORBIKE_DRIVING_LICENCE, mbike_license);
+					
+			
 			//filling person data into matsim households
 			IdImpl hhid = new IdImpl(hhnr);
 			if(!this.households.getHouseholds().containsKey(hhid)){
@@ -85,6 +112,8 @@ public class MZ2010HouseholdPersonParser {
 			}		
 			this.households.getHouseholds().get(hhid).getMemberIds().add(new IdImpl(hhnr.concat(hpnr)));  // id = hhnr + hpnr??
 		}
+		
+			
 		
 		
 		br.close();

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.acmarmol.matsim2030.microcensus2000;
+package playground.acmarmol.matsim2030.microcensus1994;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -49,16 +49,16 @@ import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters
 
 /**
 * 
-* MATSim-DB: creates population, vehicles and households and xml files from MicroCensus 2000 database
+* MATSim-DB: creates population, vehicles and households and xml files from MicroCensus 1994 database
 * 
 *
 * @author acmarmol
 * 
 */
 
-public class MZ2000ToXmlFiles {
+public class MZ1994ToXmlFiles {
 
-	private final static Logger log = Logger.getLogger(MZ2000ToXmlFiles.class);
+	private final static Logger log = Logger.getLogger(MZ1994ToXmlFiles.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// main
@@ -66,21 +66,21 @@ public class MZ2000ToXmlFiles {
 
 	public static void main(String[] args) throws Exception {
 		
-		System.out.println("MATSim-DB: creates population, vehicles and households and xml files from MicroCensus 2000 database \n");
+		System.out.println("MATSim-DB: creates population, vehicles and households and xml files from MicroCensus 1994 database \n");
 		
 		
 		// from local directory
 		//String inputBase = "P:/Daten/Mikrozensen Verkehr Schweiz/2010/3_DB_SPSS/dat files/";
-		String inputBase = "P:/Daten/Mikrozensen Verkehr Schweiz/Mz2000/spss/2000/dat_files/";
+		String inputBase = "P:/Daten/Mikrozensen Verkehr Schweiz/MZ'94/SPSS/dat_files/";
 				args = new String[] {
 				inputBase+"haushalte.dat",
 				inputBase+"haushaltspersonen.dat",
 				inputBase+"fahrzeuge.dat",
 				inputBase+"zielpersonen.dat",
-				inputBase+"wg.dat",
+				inputBase+"wege.dat",
 				inputBase+"ausgaenge.dat",
 				inputBase+"etappen.dat",
-				"C:/local/marmolea/output/MicroCensus2000/"
+				"C:/local/marmolea/output/MicroCensus1994/"
 				//"C:/local/marmolea/output/MicroCensus2010/"
 		};
 		
@@ -122,6 +122,7 @@ public class MZ2000ToXmlFiles {
 		Population population = scenario.getPopulation();
 		ObjectAttributes populationAttributes = new ObjectAttributes();
 		ObjectAttributes householdpersonsAttributes = new ObjectAttributes();
+		
 		//households
 		Households households = scenario.getHouseholds();
 		ObjectAttributes householdAttributes = new ObjectAttributes();
@@ -139,7 +140,7 @@ public class MZ2000ToXmlFiles {
 
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing haushalteFile...");
-		new MZ2000HouseholdParser(households,householdAttributes).parse(haushalteFile);
+		new MZ1994HouseholdParser(households,householdAttributes).parse(haushalteFile);
 		log.info("done. (parsing haushalteFile)");
 				
 		Gbl.printElapsedTime();
@@ -176,7 +177,7 @@ public class MZ2000ToXmlFiles {
 //////////////////////////////////////////////////////////////////////	
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing zielpersonenFile...");
-		new MZ2000ZielPersonParser(population,populationAttributes,households,householdAttributes).parse(zielpersonenFile);
+		new MZ1994ZielPersonParser(population,populationAttributes,households,householdAttributes).parse(zielpersonenFile);
 		log.info("done. (parsing zielpersonenFile)");
 				
 		Gbl.printElapsedTime();
@@ -197,7 +198,7 @@ public class MZ2000ToXmlFiles {
 ////////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing haushaltspersonenFile...");
-		new MZ2000HouseholdPersonParser(households,population, populationAttributes, householdpersonsAttributes).parse(haushaltspersonenFile);
+		new MZ1994HouseholdPersonParser(households,population, populationAttributes, householdpersonsAttributes).parse(haushaltspersonenFile);
 		log.info("done. (parsing haushaltspersonenFile)");
 		
 		Gbl.printElapsedTime();
@@ -208,14 +209,14 @@ public class MZ2000ToXmlFiles {
 		//households_axmlw.writeFile(outputBase+"/householdAttributes.01.xml.gz");
 		new ObjectAttributesXmlWriter(householdpersonsAttributes).writeFile(outputBase+"/householdpersonsAttributes.01.xml");
 		log.info("done. (writing)");
-
+		
 		Gbl.printElapsedTime();
 		
 	
 ////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing wegeFile...");
-		ArrayList<Set<Id>> pids = new MZ2000WegeParser(population, wegeAttributes).parse(wegeFile);
+		ArrayList<Set<Id>> pids = new MZ1994WegeParser(population, wegeAttributes).parse(wegeFile);
 		log.info("done. (parsing wegeFile)");
 		
 		Gbl.printElapsedTime();
@@ -235,18 +236,15 @@ public class MZ2000ToXmlFiles {
 		Gbl.printElapsedTime();
 //////////////////////////////////////////////////////////////////////
 		//no mode specification in wege file! need to get this data from etappen level
-		System.out.println("-----------------------------------------------------------------------------------------------------------");
-		log.info("parsing etappenFile...");		
-		TreeMap<String, ArrayList<playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.Etappe>> etappes = EtappenLoader.loadData(2000);
-		MZPopulationUtils.setMZ2000LegModesWithEtappenInfo(population, etappes);
-		new PopulationWriter(population, null).write(outputBase+"population.05.xml");
-		
-		
-		MZPopulationUtils.setHomeLocationsMZ2000FromHouseholdAdress(population, populationAttributes, householdAttributes, wegeAttributes);
-		new PopulationWriter(population, null).write(outputBase+"population.06.xml");
-		MZPopulationUtils.setHomeLocationsMZ2000AccordingToActivitySequence(population);	
-		new PopulationWriter(population, null).write(outputBase+"population.07.xml");
-		
+//		System.out.println("-----------------------------------------------------------------------------------------------------------");
+//		log.info("parsing etappenFile...");		
+//		TreeMap<String, ArrayList<playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.ocupancyRate.Etappe>> etappes = EtappenLoader.loadData(2000);
+//		MZPopulationUtils.setMZ2000LegModesWithEtappenInfo(population, etappes);
+//		new PopulationWriter(population, null).write(outputBase+"population.05.xml");
+//		
+//		
+//		MZPopulationUtils.setHomeLocationsMZ2000FromHouseholdAdress(population, populationAttributes, householdAttributes, wegeAttributes);
+//		new PopulationWriter(population, null).write(outputBase+"population.06.xml");
 //		new MZ2000EtappenParser(wegeAttributes).parse(etappenFile);
 //		wege_axmlw.writeFile(outputBase+"/wegeAttributes.01.xml.gz");
 //		log.info("done. (parsing wegeFile)");
@@ -306,19 +304,19 @@ public class MZ2000ToXmlFiles {
 //		
 //		
 //////////////////////////////////////////////////////////////////////
-		System.out.println("-----------------------------------------------------------------------------------------------------------");
-		log.info("removing persons with all plan outside switzerland...");
-		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwitzerland(population, wegeAttributes, "");
-		if(out_pids.size()>0){
-		MZPopulationUtils.removePlans(population, out_pids);
-		System.out.println("      done.");
-		System.out.println("      Total persons removed: " + out_pids.size());
-		System.out.println("      Remaining population size: " + population.getPersons().size()+" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
-		System.out.println("      Writing population without time  inconsistencies xml file \n");	
-		new PopulationWriter(population, null).write(outputBase+"population.09.xml");
-		System.out.println("  done.");
-		
-		}else{System.out.println("      NO PEOPLE WITH PLANS COMPLETELY OUT OF SWITZERLAND \n");}
+//		System.out.println("-----------------------------------------------------------------------------------------------------------");
+//		log.info("removing persons with all plan outside switzerland...");
+//		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwitzerland(population, wegeAttributes, "");
+//		if(out_pids.size()>0){
+//		MZPopulationUtils.removePlans(population, out_pids);
+//		System.out.println("      done.");
+//		System.out.println("      Total persons removed: " + out_pids.size());
+//		System.out.println("      Remaining population size: " + population.getPersons().size()+" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
+//		System.out.println("      Writing population without time  inconsistencies xml file \n");	
+//		new PopulationWriter(population, null).write(outputBase+"population.09.xml");
+//		System.out.println("  done.");
+//		
+//		}else{System.out.println("      NO PEOPLE WITH PLANS COMPLETELY OUT OF SWITZERLAND \n");}
 ////////////////////////////////////////////////////////////////////////
 ////		
 ////		
@@ -383,7 +381,7 @@ public class MZ2000ToXmlFiles {
 
 		Gbl.printElapsedTime();
 		
-		//MZPopulationUtils.classifyActivityChains(population);
+//		MZPopulationUtils.classifyActivityChains(population);
 		
 
 	}//end main		

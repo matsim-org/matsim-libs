@@ -39,6 +39,7 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.acmarmol.matsim2030.microcensus2010.Etappe;
 import playground.acmarmol.matsim2030.microcensus2010.MZ2010EtappenParser;
+import playground.acmarmol.matsim2030.microcensus2010.MZ2010HouseholdPersonParser;
 import playground.acmarmol.matsim2030.microcensus2010.MZPopulationUtils;
 import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.CoordConverter;
 import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.EtappeConverter;
@@ -130,6 +131,7 @@ public class MZ2005ToXmlFiles {
 		//population
 		Population population = scenario.getPopulation();
 		ObjectAttributes populationAttributes = new ObjectAttributes();
+		ObjectAttributes householdpersonsAttributes = new ObjectAttributes();
 		//households
 		Households households = scenario.getHouseholds();
 		ObjectAttributes householdAttributes = new ObjectAttributes();
@@ -163,21 +165,22 @@ public class MZ2005ToXmlFiles {
 		Gbl.printElapsedTime();
 		
 ////////////////////////////////////////////////////////////////////////	
-//		System.out.println("-----------------------------------------------------------------------------------------------------------");
-//		log.info("parsing haushaltspersonenFile...");
-//		new MZHouseholdPersonParser(households,householdAttributes).parse(haushaltspersonenFile);
-//		log.info("done. (parsing haushaltspersonenFile)");
-//				
-//		Gbl.printElapsedTime();
-//		
-//		log.info("writing intermediate files...");
-//		//new HouseholdsWriterV10(households).writeFile(outputBase+"/households.01.xml.gz");
-//		//households_axmlw.writeFile(outputBase+"/householdAttributes.01.xml.gz");
-//		log.info("done. (writing)");
-//		
-//		Gbl.printElapsedTime();
-//		
-////////////////////////////////////////////////////////////////////////
+		System.out.println("-----------------------------------------------------------------------------------------------------------");
+		log.info("parsing haushaltspersonenFile...");
+		new MZ2005HouseholdPersonParser(households,householdAttributes, householdpersonsAttributes).parse(haushaltspersonenFile);
+		log.info("done. (parsing haushaltspersonenFile)");
+				
+		Gbl.printElapsedTime();
+		
+		log.info("writing intermediate files...");
+		new HouseholdsWriterV10(households).writeFile(outputBase+"/households.01.xml.gz");
+		households_axmlw.writeFile(outputBase+"/householdAttributes.01.xml.gz");
+		new ObjectAttributesXmlWriter(householdpersonsAttributes).writeFile(outputBase+"/householdpersonsAttributes.01.xml");
+		log.info("done. (writing)");
+		
+		Gbl.printElapsedTime();
+		
+//////////////////////////////////////////////////////////////////////
 //		System.out.println("-----------------------------------------------------------------------------------------------------------");
 //		log.info("parsing fahrzeugeFile...");
 //		// next fill up the vehicles. For that you need to doublecheck consistency with the households (as given in the MZ database structure)
@@ -217,7 +220,8 @@ public class MZ2005ToXmlFiles {
 		
 		Gbl.printElapsedTime();
 		
-////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing wegeFile...");
 		ArrayList<Set<Id>> pids = new MZ2005WegeParser(population, wegeAttributes).parse(wegeFile);
@@ -302,7 +306,7 @@ public class MZ2005ToXmlFiles {
 ////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("removing persons with all plan outside switzerland...");
-		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwizerland(population, wegeAttributes, "Schweiz");
+		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwitzerland(population, wegeAttributes, "Schweiz");
 		if(out_pids.size()>0){
 		MZPopulationUtils.removePlans(population, out_pids);
 		System.out.println("      done.");

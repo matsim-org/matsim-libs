@@ -1,4 +1,4 @@
-package playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.ocupancyRate;
+package playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.etappenParsers;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -18,6 +18,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.Etappe;
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
 
 /**
@@ -77,7 +78,7 @@ public class MZ2010EtappenParser {
 				//etappe mode
 				String mode = entries[7].trim();
 				if(mode.equals("1")){mode =  MZConstants.WALK;}
-				else if(mode.equals("2")){mode =  MZConstants.BYCICLE;}
+				else if(mode.equals("2")){mode =  MZConstants.BICYCLE;}
 				else if(mode.equals("3")){mode =  MZConstants.MOFA;}
 				else if(mode.equals("4")){mode =  MZConstants.KLEINMOTORRAD;}
 				else if(mode.equals("5")){mode =  MZConstants.MOTORRAD_FAHRER;}

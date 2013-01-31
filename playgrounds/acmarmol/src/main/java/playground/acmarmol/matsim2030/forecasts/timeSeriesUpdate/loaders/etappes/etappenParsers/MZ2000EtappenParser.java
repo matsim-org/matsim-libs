@@ -1,4 +1,4 @@
-package playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.ocupancyRate;
+package playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.etappenParsers;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,6 +16,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.Etappe;
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
 
 /**
@@ -74,8 +75,27 @@ public class MZ2000EtappenParser {
 				
 				//etappe mode
 				String mode = entries[13].trim();
+				
+				int modeInt = 0; //save mode as integer to be able to use hierarchy
+				if(mode.equals("1")){modeInt = 15;}
+				else if(mode.equals("2")){modeInt = 14;}
+				else if(mode.equals("3")){modeInt = 13;}
+				else if(mode.equals("4") || mode.equals("5") || mode.equals("23")){modeInt = 12;}
+				else if(mode.equals("6") || mode.equals("7")){modeInt = 9;}
+				else if(mode.equals("8")){modeInt = 2;}
+				else if(mode.equals("9")){modeInt = 3;}
+				else if(mode.equals("10")){modeInt = 6;}
+				else if(mode.equals("11")){modeInt = 5;}
+				else if(mode.equals("12")){modeInt = 11;}
+				else if(mode.equals("13")){modeInt = 8;}
+				else if(mode.equals("14")){modeInt = 10;}
+				else if(mode.equals("15")){modeInt = 4;}
+				else if(mode.equals("16")){modeInt = 1;}
+				else if(mode.equals("17") || mode.equals("90") || mode.equals("99")){modeInt = 17;}
+				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+				
 				if(mode.equals("1")){mode =  MZConstants.WALK;}
-				else if(mode.equals("2")){mode =  MZConstants.BYCICLE;}
+				else if(mode.equals("2")){mode =  MZConstants.BICYCLE;}
 				else if(mode.equals("3")){mode =  MZConstants.MOFA;}
 				else if(mode.equals("23")){mode =  MZConstants.KLEINMOTORRAD;}
 				else if(mode.equals("4")){mode =  MZConstants.MOTORRAD_FAHRER;}
@@ -95,6 +115,8 @@ public class MZ2000EtappenParser {
 				else if(mode.equals("90")){mode =  MZConstants.OTHER;}
 				else if(mode.equals("99")){mode =  MZConstants.NO_ANSWER;}
 				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+				
+
 				
 				//total people in car
 				String total_people = entries[15].trim();
@@ -126,7 +148,7 @@ public class MZ2000EtappenParser {
 				//ausland etappe?  
 				String ausland = entries[34].trim();
 				if(ausland.equals("1")){
-					skip=true;
+					//skip=true;
 				}
 				
 				
@@ -141,6 +163,7 @@ public class MZ2000EtappenParser {
 					etappe.setDuration(duration);
 					etappe.setDistance(distance);
 					etappe.setWegeNr(wege_nr);
+					etappe.setModeInteger(modeInt);
 					
 					
 					

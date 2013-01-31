@@ -92,7 +92,7 @@ public class Etappe {
 		else if(modeInteger == 11){mode = MZConstants.TAXI;}
 		else if(modeInteger == 12){mode = MZConstants.MOTORCYCLE;}
 		else if(modeInteger == 13){mode = MZConstants.MOFA;}
-		else if(modeInteger == 14){mode = MZConstants.BYCICLE;}
+		else if(modeInteger == 14){mode = MZConstants.BICYCLE;}
 		else if(modeInteger == 15){mode = MZConstants.WALK;}
 		else if(modeInteger == 16){mode = MZConstants.SKATEBOARD;}
 		else if(modeInteger == 17){mode = MZConstants.OTHER;}

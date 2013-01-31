@@ -89,6 +89,20 @@ public abstract class MyCollectionUtils {
 		}
 		return str.toString();
 	}
+	
+	public static final String integerArrayToTabSeparatedString(final int[] values) {
+		boolean isFirst = true;
+		StringBuilder str = new StringBuilder();
+		for (int mode : values) {
+			if (!isFirst) {
+				str.append("\t");
+			}
+			str.append(mode);
+			isFirst = false;
+		}
+		return str.toString();
+	}
+	
 
 	public static final String[] stringToArray(final String values) {
 		Set<String> tmp = stringToSet(values);
