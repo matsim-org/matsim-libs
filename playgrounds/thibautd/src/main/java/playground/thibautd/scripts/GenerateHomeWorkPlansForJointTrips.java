@@ -26,20 +26,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
@@ -47,11 +47,9 @@ import playground.thibautd.householdsfromcensus.CliquesWriter;
 /**
  * @author thibautd
  */
-public class GenerateEquilPlansForJointTrips {
+public class GenerateHomeWorkPlansForJointTrips {
 	private static final Id HOME_LINK_ID = new IdImpl( 1 );
-	private static final Coord HOME_COORD = new CoordImpl( -25000 , 0 );
-	private static final Id WORK_LINK_ID = new IdImpl( 20 );
-	private static final Coord WORK_COORD = new CoordImpl( 10000 , 0 );
+	private static final Id WORK_LINK_ID = new IdImpl( 2 );
 
 	public static void main(final String[] args) {
 		final String outputCliquesFile = args[ 0 ];
@@ -71,7 +69,12 @@ public class GenerateEquilPlansForJointTrips {
 		while ( population.getPersons().size() < popSize ) {
 			counter.incCounter();
 			final int size = sizes.next();
-			Collection<Person> persons = createClique( random , ids , size );
+			Collection<Person> persons =
+				createClique(
+						population.getFactory(),
+						random,
+						ids,
+						size );
 			for (Person p : persons) population.addPerson( p );
 			cliques.addClique( persons );
 		}
@@ -82,6 +85,7 @@ public class GenerateEquilPlansForJointTrips {
 	}
 
 	private static Collection<Person> createClique(
+			final PopulationFactory factory,
 			final Random random,
 			final IdIterator ids,
 			final int size) {
@@ -92,21 +96,36 @@ public class GenerateEquilPlansForJointTrips {
 			final boolean isDriver = i % 2 == 0;
 			final String mode = isDriver ? TransportMode.car : TransportMode.pt;
 
-			// TODO: make times random and stupid
 			PersonImpl person = new PersonImpl( ids.next() );
 			if (!isDriver) person.setCarAvail( "never" );
 			persons.add( person );
-			PlanImpl plan = person.createAndAddPlan( true );
-			ActivityImpl act = plan.createAndAddActivity( "h" , HOME_LINK_ID );
-			act.setCoord( HOME_COORD );
+
+			assert person.getPlans().size() == 0;
+			Plan plan = factory.createPlan();
+			plan.setPerson( person );
+			person.addPlan( plan );
+			assert person.getPlans().size() == 1;
+			person.setSelectedPlan( plan );
+
+			Activity act = factory.createActivityFromLinkId( "h" , HOME_LINK_ID );
 			act.setEndTime( random.nextDouble() * 12 * 3600 );
-			plan.createAndAddLeg( mode );
-			act = plan.createAndAddActivity( "w" , WORK_LINK_ID );
-			act.setCoord( WORK_COORD );
+			plan.addActivity( act );
+
+			Leg leg = factory.createLeg( mode );
+			plan.addLeg( leg );
+
+
+			act = factory.createActivityFromLinkId( "w" , WORK_LINK_ID );
 			act.setEndTime( (1 + random.nextDouble()) * 12 * 3600 );
-			plan.createAndAddLeg( mode );
-			act = plan.createAndAddActivity( "h" , HOME_LINK_ID );
-			act.setCoord( HOME_COORD );
+			plan.addActivity( act );
+
+
+			leg = factory.createLeg( mode );
+			plan.addLeg( leg );
+
+
+			act = factory.createActivityFromLinkId( "h" , HOME_LINK_ID );
+			plan.addActivity( act );
 		}
 
 		return persons;
