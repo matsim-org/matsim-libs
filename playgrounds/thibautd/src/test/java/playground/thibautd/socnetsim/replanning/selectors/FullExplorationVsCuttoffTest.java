@@ -99,11 +99,13 @@ public class FullExplorationVsCuttoffTest {
 
 	@Test
 	public void testFullExplorationVsCuttoffNonBlocking() throws Exception {
+		log.info( "test: testFullExplorationVsCuttoffNonBlocking()" );
 		testFullExplorationVsCuttoff( false );
 	}
 
 	@Test
 	public void testFullExplorationVsCuttoffBlocking() throws Exception {
+		log.info( "test: testFullExplorationVsCuttoffBlocking()" );
 		testFullExplorationVsCuttoff( true );
 	}
 
@@ -156,11 +158,13 @@ public class FullExplorationVsCuttoffTest {
 
 	@Test
 	public void testPruningVsNoPruningBlocking() throws Exception {
+		log.info( "test: testPruningVsNoPruningBlocking()" );
 		testPruningVsNoPruning( true );
 	}
 
 	@Test
 	public void testPruningVsNoPruningNonBlocking() throws Exception {
+		log.info( "test: testPruningVsNoPruningNonBlocking()" );
 		testPruningVsNoPruning( false );
 	}
 
