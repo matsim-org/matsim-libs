@@ -22,38 +22,26 @@ package playground.thibautd.cliquessim.utils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripPossibilitiesConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripsMutatorConfigGroup;
-import playground.thibautd.cliquessim.population.Cliques;
-import playground.thibautd.cliquessim.population.CliquesXmlReader;
 import playground.thibautd.cliquessim.population.PopulationWithJointTripsReader;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLReader;
-import playground.thibautd.scoring.CarPoolingLegScoringFunction;
-import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
- * Helper class to create a fully configured {@link JointControler} from a config file,
- * or to only load the {@link Config} or the {@link ScenarioWithCliques}
  *
  * @author thibautd
  */
@@ -90,17 +78,7 @@ public class JointControlerUtils {
 		JointTripPossibilities poss = readPossibilities( config );
 		if (poss != null) scenario.addScenarioElement( poss );
 
-		try {
-			new CliquesXmlReader(scenario).parse();
-		} catch (Exception e) {
-			throw new RuntimeException("Problem while importing clique information", e);
-		}
-
 		return scenario;
-	}
-
-	public static Cliques getCliques(final Scenario sc) {
-		return sc.getScenarioElement( Cliques.class );
 	}
 
 	public static JointTripPossibilities getJointTripPossibilities(final Scenario sc) {
