@@ -20,9 +20,12 @@
 
 package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ;
 
+import java.util.Map;
+import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
@@ -31,11 +34,13 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -56,12 +61,12 @@ public class FacilitiesProductionKTI {
 	public enum KTIYear {KTI_YEAR_2007, KTI_YEAR_2008}
 
 	// work
-	public static final String ACT_TYPE_WORK = "work";
-	public static final String WORK_SECTOR2 = "work_sector2";
-	public static final String WORK_SECTOR3 = "work_sector3";
+	public static final String ACT_TYPE_WORK = "w";
+	public static final String WORK_SECTOR2 = "w"; // "work_sector2";
+	public static final String WORK_SECTOR3 = "w"; // "work_sector3";
 
 	// education
-	public static final String ACT_TYPE_EDUCATION = "education";
+	public static final String ACT_TYPE_EDUCATION = "e";
 
 	public static final String EDUCATION_KINDERGARTEN = ACT_TYPE_EDUCATION + "_kindergarten";
 	public static final String EDUCATION_PRIMARY = ACT_TYPE_EDUCATION + "_primary";
@@ -70,7 +75,7 @@ public class FacilitiesProductionKTI {
 	public static final String EDUCATION_OTHER = ACT_TYPE_EDUCATION + "_other";
 
 	// shopping
-	public static final String ACT_TYPE_SHOP = "shop";
+	public static final String ACT_TYPE_SHOP = "s";
 	public static final String SHOP_RETAIL_GT2500 = ACT_TYPE_SHOP + "_retail_gt2500sqm";
 	public static final String SHOP_RETAIL_GET1000 = ACT_TYPE_SHOP + "_retail_get1000sqm";
 	public static final String SHOP_RETAIL_GET400 = ACT_TYPE_SHOP + "_retail_get400sqm";
@@ -79,7 +84,7 @@ public class FacilitiesProductionKTI {
 	public static final String SHOP_OTHER = ACT_TYPE_SHOP + "_other";
 
 	// leisure
-	public static final String ACT_TYPE_LEISURE = "leisure";
+	public static final String ACT_TYPE_LEISURE = "l";
 	public static final String LEISURE_SPORTS = ACT_TYPE_LEISURE + "_sports";
 	public static final String LEISURE_CULTURE = ACT_TYPE_LEISURE + "_culture";
 	public static final String LEISURE_GASTRO = ACT_TYPE_LEISURE + "_gastro";
@@ -89,6 +94,9 @@ public class FacilitiesProductionKTI {
 	private ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 	
 	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
+	
+	private Coord center = new CoordImpl(682756, 248732); // Letten
+	private double radius = 5000.0;
 	
 	/**
 	 * @param 
@@ -154,15 +162,24 @@ public class FacilitiesProductionKTI {
 		int sizeCnt = 0;
 		int priceCnt = 0;
 		
-		for (ActivityFacility f : this.facilities.getFacilitiesForActivityType("shop").values()) {
+		for (ActivityFacility f : this.facilities.getFacilitiesForActivityType("s").values()) {
 			ShopLocation shop = (ShopLocation) zhShopsQuadTree.get(
 					trafo.transform(f.getCoord()).getX(), trafo.transform(f.getCoord()).getY());			
 			if (CoordUtils.calcDistance(f.getCoord(), trafoback.transform(shop.getCoord())) < 150.0 &&
 					this.isFood(f)) {
 				facilitiesAttributes.putAttribute(f.getId().toString(), "price", 1.0 * shop.getPrice());
-				((ActivityFacilityImpl)f).createActivityOption("sg");
-				f.getActivityOptions().get("sg").addOpeningTime(f.getActivityOptions().get("shop").getOpeningTimes(DayType.wed).first());
 				
+				double dist = CoordUtils.calcDistance(f.getCoord(), center);
+					if (dist < radius) {
+						((ActivityFacilityImpl)f).createActivityOption("sg");
+				
+						// copy opening times
+						ActivityOptionImpl optionNew = (ActivityOptionImpl) f.getActivityOptions().get("sg");
+				
+						Map<DayType, SortedSet<OpeningTime>> ot = (Map<DayType, SortedSet<OpeningTime>>) 
+								((ActivityOptionImpl)f.getActivityOptions().get("s")).getOpeningTimes();
+						optionNew.setOpeningTimes(ot);	
+					}
 				if (shop.getPrice() > 0) priceCnt++;
 				
 			}

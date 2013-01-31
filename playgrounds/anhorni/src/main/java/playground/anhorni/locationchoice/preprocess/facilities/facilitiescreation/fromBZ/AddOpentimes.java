@@ -66,23 +66,20 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		log.info("Reading shops Of 2005 xml file... ");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.scenario);
 		facilities_reader.readFile(this.shopsOf2005Filename);
-		log.info("Reading shops Of 2005 xml file...done.");
-		
-		this.shopQuadTree = Utils.buildLocationQuadTreeFacilities(this.scenario.getActivityFacilities().getFacilitiesForActivityType("shop"));
+		log.info("Reading shops Of 2005 xml file...done.");		
+		this.shopQuadTree = Utils.buildLocationQuadTreeFacilities(
+				this.scenario.getActivityFacilities().getFacilitiesForActivityType("shop"));
 	}
 
 	@Override
 	public void run(final ActivityFacility facility) {
-
 		DayType[] days = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri, DayType.sat, DayType.sun };
 		DayType[] weekDays = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri };
 		double startTime = -1.0;
 		double endTime = -1.0;
 		Map<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
-
 		ActivityFacilityImpl closestShop = (ActivityFacilityImpl) this.shopQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());		
-		
-		ActivityOptionImpl shopsOf2005ShopAct = (ActivityOptionImpl) closestShop.getActivityOptions().get(FacilitiesProductionKTI.ACT_TYPE_SHOP);
+		ActivityOptionImpl shopsOf2005ShopAct = (ActivityOptionImpl) closestShop.getActivityOptions().get("shop");
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpeningTimes();
 		} else {
@@ -137,8 +134,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 				// if presence code, work and one other imputed activity are present
 			case 3:
 				for (String activityType : activities.keySet()) {
-					if (
-							Pattern.matches(FacilitiesProductionKTI.ACT_TYPE_SHOP + ".*", activityType)) {
+					if (Pattern.matches(FacilitiesProductionKTI.ACT_TYPE_SHOP + ".*", activityType)) {
 						((ActivityOptionImpl) activities.get(activityType)).setOpeningTimes(closestShopOpentimes);
 						((ActivityOptionImpl) activities.get(FacilitiesProductionKTI.WORK_SECTOR3)).setOpeningTimes(closestShopOpentimes);
 					} else if (
@@ -159,8 +155,9 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 									17.0 * 3600));
 						}
 					} else if (
-							Pattern.matches(FacilitiesProductionKTI.EDUCATION_SECONDARY, activityType) ||
-							Pattern.matches(FacilitiesProductionKTI.EDUCATION_OTHER, activityType)) {
+							Pattern.matches("e", activityType)) {
+							//Pattern.matches(FacilitiesProductionKTI.EDUCATION_SECONDARY, activityType) ||
+							//Pattern.matches(FacilitiesProductionKTI.EDUCATION_OTHER, activityType)) {
 						for (DayType day : weekDays) {
 							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
@@ -193,7 +190,8 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 								12.0 * 3600));
 
 					} else if (
-							Pattern.matches(FacilitiesProductionKTI.LEISURE_SPORTS, activityType)) {
+							Pattern.matches("l", activityType)) {
+							//Pattern.matches(FacilitiesProductionKTI.LEISURE_SPORTS, activityType)) {
 						for (DayType day : days) {
 							if (
 									day.equals(DayType.mon) ||
