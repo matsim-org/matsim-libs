@@ -286,7 +286,7 @@ public class AgentsInEvacuationAreaPostProcessing {
 	 */
 	private static class DummyController extends Controler {
 
-		private final OutputDirectoryHierarchy controlerIO;
+//		private final OutputDirectoryHierarchy controlerIO;
 		
 		public DummyController(Scenario scenario) {
 			super(scenario);
@@ -296,16 +296,20 @@ public class AgentsInEvacuationAreaPostProcessing {
 				outputPath = outputPath.substring(0, outputPath.length() - 1);
 			}
 			if (this.scenarioData.getConfig().controler().getRunId() != null) {
-				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
+//				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
+				this.setupOutputDirectory(outputPath, this.scenarioData.getConfig().controler().getRunId(), true) ;
 			} else {
-				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
+//				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
+				this.setupOutputDirectory(outputPath, null, true) ;
 			}
+			// yy I don't think that this if confidition is necessary. kai, apr'13
+			
 		}
 		
-		@Override
-		public OutputDirectoryHierarchy getControlerIO() {
-			return this.controlerIO;
-		}
+//		@Override
+//		public OutputDirectoryHierarchy getControlerIO() {
+//			return this.controlerIO;
+//		}
 		
 		@Override
 		public void run() {

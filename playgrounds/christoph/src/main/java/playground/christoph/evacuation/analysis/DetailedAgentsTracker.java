@@ -888,7 +888,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	 */
 	private static class DummyController extends Controler {
 
-		private final OutputDirectoryHierarchy controlerIO;
+//		private final OutputDirectoryHierarchy controlerIO;
 		
 		public DummyController(Scenario scenario, String outputPath) {
 			super(scenario);
@@ -899,16 +899,18 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				outputPath = outputPath.substring(0, outputPath.length() - 1);
 			}
 			if (this.scenarioData.getConfig().controler().getRunId() != null) {
-				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
+//				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
+				this.setupOutputDirectory(outputPath, this.scenarioData.getConfig().controler().getRunId(), true) ;
 			} else {
-				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
+//				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
+				this.setupOutputDirectory(outputPath, null, true) ;
 			}
 		}
 		
-		@Override
-		public OutputDirectoryHierarchy getControlerIO() {
-			return this.controlerIO;
-		}
+//		@Override
+//		public OutputDirectoryHierarchy getControlerIO() {
+//			return this.controlerIO;
+//		}
 		
 		@Override
 		public void run() {

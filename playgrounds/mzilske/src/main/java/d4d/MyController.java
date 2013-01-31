@@ -89,14 +89,14 @@ public class MyController extends AbstractController {
 		
 		// optional: score stats
 				this.scoreStats = new ScoreStats(this.scenario.getPopulation(),
-						this.controlerIO.getOutputFilename("scorestats"), true);
+						this.getControlerIO().getOutputFilename("scorestats"), true);
 				this.addControlerListener(this.scoreStats);
 		
 		final PlansDumping plansDumping = new PlansDumping( this.scenario, this.config.controler().getFirstIteration(), 
-				1, stopwatch, controlerIO );
+				1, stopwatch, getControlerIO() );
 		this.addCoreControlerListener(plansDumping);
 		
-		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
+		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
 
 		
 		final StrategyManager strategyManager = createStrategyManager() ;
@@ -108,7 +108,7 @@ public class MyController extends AbstractController {
 		
 		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) eventsManager,
 				5, this.config.controler().getEventsFileFormats(),
-				controlerIO );
+				getControlerIO() );
 
 		this.addCoreControlerListener(eventsHandling);
 		
@@ -178,7 +178,7 @@ public class MyController extends AbstractController {
 //			}
 //			
 //		};
-		final PlansScoring plansScoring = new PlansScoring( scenario, eventsManager, controlerIO, scoringFunctionFactory );
+		final PlansScoring plansScoring = new PlansScoring( scenario, eventsManager, getControlerIO(), scoringFunctionFactory );
 		return plansScoring;
 	}
 

@@ -35,7 +35,7 @@ public abstract class AbstractController {
 	
 	private static Logger log = Logger.getLogger(AbstractController.class);
 
-	protected OutputDirectoryHierarchy controlerIO;
+	private OutputDirectoryHierarchy controlerIO;
 
 	/**
 	 * This was  public in the design that I found. kai, jul'12
@@ -97,8 +97,8 @@ public abstract class AbstractController {
 	}
 
 	protected final void setupOutputDirectory(final String outputDirectory, String runId, final boolean overwriteFiles) {
-		this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be before logging
-		OutputDirectoryLogging.initLogging(this.controlerIO); // logging needs to be early
+		this.setControlerIO(new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles)); // output dir needs to be before logging
+		OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
 	}
 
 	protected final void run(Config config) {
@@ -149,7 +149,7 @@ public abstract class AbstractController {
 			log.info(marker + "ITERATION " + iteration + " BEGINS");
 			this.stopwatch.setCurrentIteration(iteration);
 			this.stopwatch.beginOperation("iteration");
-			this.controlerIO.createIterationDirectory(iteration);
+			this.getControlerIO().createIterationDirectory(iteration);
 			resetRandomNumbers(rndSeed, iteration);
 
 			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
@@ -170,7 +170,7 @@ public abstract class AbstractController {
 			log.info(marker + "ITERATION " + iteration + " fires iteration end event");
 			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
 			this.stopwatch.endOperation("iteration");
-			this.stopwatch.write(this.controlerIO.getOutputFilename("stopwatch.txt"));
+			this.stopwatch.write(this.getControlerIO().getOutputFilename("stopwatch.txt"));
 			log.info(marker + "ITERATION " + iteration + " ENDS");
 			log.info(divider);
 		}
@@ -214,6 +214,21 @@ public abstract class AbstractController {
 
 	protected final void addCoreControlerListener( ControlerListener l ) {
 		this.controlerListenerManager.addCoreControlerListener(l) ;
+	}
+
+
+	private final void setControlerIO(OutputDirectoryHierarchy controlerIO) {
+		// yy this is a leftover from a refactoring that could be removed completely
+		
+		this.controlerIO = controlerIO;
+	}
+
+
+	/**
+	 * yyyy Christoph Dobler overrides this method at some point. --???  
+	 */
+	public final OutputDirectoryHierarchy getControlerIO() {
+		return controlerIO;
 	}
 	
 	

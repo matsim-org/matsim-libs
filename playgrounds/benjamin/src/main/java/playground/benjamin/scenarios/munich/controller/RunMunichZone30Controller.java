@@ -137,7 +137,7 @@ public class RunMunichZone30Controller extends AbstractController {
 	@Override
 	protected void loadCoreListeners() {
 
-		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenario, controlerIO);
+		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenario, getControlerIO());
 		this.addControlerListener(dumpDataAtEnd);
 		
 		final PlansScoring plansScoring = buildPlansScoring();
@@ -147,19 +147,19 @@ public class RunMunichZone30Controller extends AbstractController {
 		this.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
 
 		final PlansDumping plansDumping = new PlansDumping( this.scenario, this.config.controler().getFirstIteration(), 
-				this.config.controler().getWritePlansInterval(), stopwatch, controlerIO );
+				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
 		this.addCoreControlerListener(plansDumping);
 
-		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
+		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
 		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) eventsManager,
 				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
-				controlerIO );
+				getControlerIO() );
 		this.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
 	}
 	private PlansScoring buildPlansScoring() {
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
-		final PlansScoring plansScoring = new PlansScoring( this.scenario, this.eventsManager, controlerIO, scoringFunctionFactory );
+		final PlansScoring plansScoring = new PlansScoring( this.scenario, this.eventsManager, getControlerIO(), scoringFunctionFactory );
 		return plansScoring;
 	}
 
@@ -254,7 +254,7 @@ public class RunMunichZone30Controller extends AbstractController {
 			SnapshotWriterManager manager = new SnapshotWriterManager(config);
 			SnapshotWriterFactory snapshotWriterFactory = new OTFFileWriterFactory() ;
 			String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-			String fileName = controlerIO.getIterationFilename(iteration, baseFileName);
+			String fileName = getControlerIO().getIterationFilename(iteration, baseFileName);
 			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenario);
 			manager.addSnapshotWriter(snapshotWriter);
 			// === end ===

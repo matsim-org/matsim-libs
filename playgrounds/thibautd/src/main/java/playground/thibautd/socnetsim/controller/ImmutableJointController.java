@@ -91,13 +91,13 @@ public final class ImmutableJointController extends AbstractController {
 			new DumpJointDataAtEnd(
 					registry.getScenario(),
 					registry.getJointPlans(),
-					controlerIO);
+					getControlerIO());
 		this.addControlerListener(dumpDataAtEnd);
 		
 		this.addControlerListener( new PlansScoring(
 					registry.getScenario(),
 					registry.getEvents(),
-					controlerIO,
+					getControlerIO(),
 					registry.getScoringFunctionFactory()) );
 
 		if (replanner == null) throw new NullPointerException();
@@ -109,7 +109,7 @@ public final class ImmutableJointController extends AbstractController {
 					registry.getScenario().getConfig().controler().getFirstIteration(), 
 					registry.getScenario().getConfig().controler().getWritePlansInterval(),
 					stopwatch,
-					controlerIO ));
+					getControlerIO() ));
 
 		this.addCoreControlerListener(
 				 new JointPlansDumping(
@@ -117,19 +117,19 @@ public final class ImmutableJointController extends AbstractController {
 					registry.getJointPlans(),
 					registry.getScenario().getConfig().controler().getFirstIteration(), 
 					registry.getScenario().getConfig().controler().getWritePlansInterval(),
-					controlerIO ));
+					getControlerIO() ));
 
 		this.addCoreControlerListener(
 				new LegTimesListener(
 					registry.getLegTimes(),
-					controlerIO));
+					getControlerIO()));
 		
 		this.addCoreControlerListener(
 				new EventsHandling(
 						(EventsManagerImpl) registry.getEvents(),
 						registry.getScenario().getConfig().controler().getWriteEventsInterval(),
 						registry.getScenario().getConfig().controler().getEventsFileFormats(),
-						controlerIO ));
+						getControlerIO() ));
 	}
 
 	@Override
@@ -165,9 +165,10 @@ public final class ImmutableJointController extends AbstractController {
 		return registry;
 	}
 
-	public OutputDirectoryHierarchy getControlerIO() {
-		return super.controlerIO;
-	}
+//	public OutputDirectoryHierarchy getControlerIO() {
+//		return super.controlerIO;
+//	}
+	// I don't think you need this (?).  kai, apr'13
 
 	private static class PreparePersonAlgorithm extends AbstractPersonAlgorithm {
 		private final AbstractPersonAlgorithm prepareForSim;

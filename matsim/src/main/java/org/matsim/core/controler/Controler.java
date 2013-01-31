@@ -406,7 +406,7 @@ public class Controler extends AbstractController {
 		 */
 	
 		if (this.dumpDataAtEnd) {
-			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData, controlerIO));
+			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData, getControlerIO()));
 		}
 	
 	
@@ -415,13 +415,13 @@ public class Controler extends AbstractController {
 		}
 	
 		// the default handling of plans
-		this.plansScoring = new PlansScoring( this.scenarioData, this.events, controlerIO, this.scoringFunctionFactory );
+		this.plansScoring = new PlansScoring( this.scenarioData, this.events, getControlerIO(), this.scoringFunctionFactory );
 		this.addCoreControlerListener(this.plansScoring);
 
 		this.strategyManager = loadStrategyManager();
 		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.config.controler().getWritePlansInterval(),
-				this.stopwatch, this.controlerIO ));
+				this.stopwatch, this.getControlerIO() ));
 	
 	
 		/*
@@ -436,7 +436,7 @@ public class Controler extends AbstractController {
 	
 		this.legTimes = new CalcLegTimes();
 		this.events.addHandler(this.legTimes);
-		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
+		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
 	
 		this.addCoreControlerListener(new EventsHandling(this.events, this.getConfig().controler().getWriteEventsInterval(),
 				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
@@ -475,12 +475,12 @@ public class Controler extends AbstractController {
 	
 		// optional: score stats
 		this.scoreStats = new ScoreStats(this.population,
-				this.controlerIO.getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
+				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
 		this.addControlerListener(this.scoreStats);
 	
 		// optional: travel distance stats
 		this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
-				this.controlerIO .getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
+				this.getControlerIO() .getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
 		this.addControlerListener(this.travelDistanceStats);
 	
 		// load counts, if requested
@@ -673,7 +673,7 @@ public class Controler extends AbstractController {
 			return simulation;
 		} else if (this.config.simulation() != null && this.config.simulation().getExternalExe() != null ) {
 			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData, this.events);
-			simulation.setControlerIO(this.controlerIO);
+			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.thisIteration);
 			return simulation;
 		} else if (this.config.controler().getMobsim() != null) {
@@ -716,7 +716,7 @@ public class Controler extends AbstractController {
 				for (String snapshotFormat : this.config.controler().getSnapshotFormat()) {
 					SnapshotWriterFactory snapshotWriterFactory = this.snapshotWriterRegister.getInstance(snapshotFormat);
 					String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-					String fileName = this.controlerIO.getIterationFilename(itNumber, baseFileName);
+					String fileName = this.getControlerIO().getIterationFilename(itNumber, baseFileName);
 					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
 					manager.addSnapshotWriter(snapshotWriter);
 				}
@@ -1081,12 +1081,13 @@ public class Controler extends AbstractController {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 	}
 
-	/**
-	 * yyyy Christoph Dobler overrides this method at some point. --???  
-	 */
-	public OutputDirectoryHierarchy getControlerIO() {
-		return this.controlerIO;
-	}
+//	/**
+//	 * yyyy Christoph Dobler overrides this method at some point. --???  
+//	 */
+//	public OutputDirectoryHierarchy getControlerIO() {
+//		return this.controlerIO;
+//	}
+	// now in AbstractController
 
 	/**
 	 * @return The result of this function is not reliable. It is the iteration number, but it is only set  

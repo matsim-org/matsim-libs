@@ -118,7 +118,7 @@ public class KnSimplifiedController extends AbstractController {
 	@Override
 	protected void loadCoreListeners() {
 
-		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenario, controlerIO);
+		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenario, getControlerIO());
 		this.addControlerListener(dumpDataAtEnd);
 		
 		final PlansScoring plansScoring = createPlansScoring();
@@ -128,14 +128,14 @@ public class KnSimplifiedController extends AbstractController {
 		this.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
 
 		final PlansDumping plansDumping = new PlansDumping( this.scenario, this.config.controler().getFirstIteration(), 
-				this.config.controler().getWritePlansInterval(), stopwatch, controlerIO );
+				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
 		this.addCoreControlerListener(plansDumping);
 
-		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
+		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
 		
 		final EventsHandling eventsHandling = new EventsHandling(events,
 				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
-				controlerIO );
+				getControlerIO() );
 		this.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
 	}
@@ -179,7 +179,7 @@ public class KnSimplifiedController extends AbstractController {
 	}
 	
 	private PlansScoring createPlansScoring() {
-		return SimplifiedControlerUtils.createPlansScoringDefault( this.scenario, this.events, this.controlerIO );
+		return SimplifiedControlerUtils.createPlansScoringDefault( this.scenario, this.events, this.getControlerIO() );
 	}
 
 	private ModularPlanRouter createRoutingAlgorithm() {
@@ -188,7 +188,7 @@ public class KnSimplifiedController extends AbstractController {
 
 	@Override
 	protected void runMobSim(int iteration) {
-		SimplifiedControlerUtils.runMobsimDefault(scenario, events, iteration, controlerIO );
+		SimplifiedControlerUtils.runMobsimDefault(scenario, events, iteration, getControlerIO() );
 	}
 	
 	@Override
