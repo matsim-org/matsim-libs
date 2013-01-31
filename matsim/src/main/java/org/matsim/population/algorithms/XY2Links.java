@@ -104,7 +104,16 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 				}
 
 				// If the linkId is still null get nearest link from the network
-				Link link = this.network.getNearestLinkExactly(act.getCoord());
+//				Link link = this.network.getNearestLinkExactly(act.getCoord());
+				Link link = this.network.getNearestLink(act.getCoord());
+				// getNearestLinkExactly not necessarily better than getNearestLink.  E.g.
+				// n--n-----------------------------n
+				// A home location slightly to the right of the middle node will take:
+				// * the left link with getNearestLink
+				// * the right link with getNearestLinkExactly
+				// kai/dominik, jan'13
+				
+				
 				if (null == link) {
 					throw new RuntimeException("For person id="+plan.getPerson().getId()+": getNearestLink returned Null! act="+act);
 				}
