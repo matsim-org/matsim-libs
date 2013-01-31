@@ -45,7 +45,6 @@ import playground.thibautd.cliquessim.population.CliquesXmlReader;
 import playground.thibautd.cliquessim.population.PopulationWithJointTripsReader;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLReader;
-import playground.thibautd.cliquessim.run.JointControler;
 import playground.thibautd.scoring.CarPoolingLegScoringFunction;
 import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
 import playground.thibautd.socnetsim.population.DriverRoute;
@@ -60,25 +59,6 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
  */
 public class JointControlerUtils {
 	private JointControlerUtils() {}
-
-	/**
-	 * Creates a {@link JointControler} instance from a configFile.
-	 * Some of the loading methods are workarounds, and may not work with all
-	 * scenarios. Particularly, "special" settings as households, transit, vehicles,
-	 * lanes or signal systems are not handled.
-	 *
-	 * @return a JointControler instance, ready for running.
-	 */
-	public static Controler createControler(final String configFile) {
-		Config config = createConfig(configFile);
-
-		Scenario scenario = createScenario(config);
-
-		Controler controler = new JointControler(scenario);
-		setScoringFunction(controler);
-
-		return controler;
-	}
 
 	/**
 	 * binds to createScenario(createConfig(configFile));
@@ -197,39 +177,6 @@ public class JointControlerUtils {
 
 		//read the config file
 		if (configFile != null) ConfigUtils.loadConfig(config, configFile);
-	}
-
-	/**
-	 * In case facilities are defined, sets the scoring function factory to
-	 * {@link KtiLikeActivitiesScoringFunctionFactory}
-	 */
-	private static void setScoringFunction(final Controler controler) {
-		ActivityFacilities facilities = controler.getFacilities();
-		int nFacilities = facilities.getFacilities().size();
-
-		if (nFacilities > 0) {
-			Config config = controler.getConfig();
-			PlanCalcScoreConfigGroup planCalcScoreConfigGroup = 
-				config.planCalcScore();
-
-			// TODO: choose from some config group?
-			ScoringFunctionFactory factory =
-				// new CharyparNagelOpenTimesScoringFunctionFactory(
-				new KtiLikeActivitiesScoringFunctionFactory(
-						planCalcScoreConfigGroup,
-						controler.getScenario());
-				//new HerbieBasedScoringFunctionFactory(
-				//		config,
-				//		controler.getScenario());
-			controler.setScoringFunctionFactory(factory);
-			controler.addControlerListener( CarPoolingLegScoringFunction.getInformationLogger() );
-		}
-		else {
-			controler.setScoringFunctionFactory(
-					new CharyparNagelScoringFunctionFactory(
-						controler.getConfig().planCalcScore(),
-						controler.getScenario().getNetwork()) );
-		}
 	}
 }
 
