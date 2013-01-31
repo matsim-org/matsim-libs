@@ -147,6 +147,9 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
  * @author mrieser
  */
 public class Controler extends AbstractController {
+	// yyyy Design thoughts:
+	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
+	// not sufficient, people should use AbstractController.  kai, jan'13
 
 	public static final String DIRECTORY_ITERS = "ITERS";
 	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
@@ -316,6 +319,8 @@ public class Controler extends AbstractController {
 	 * Starts the iterations.
 	 */
 	public void run() {
+		// yyyy cannot make this final since it is overridden about 6 times. kai, jan'13
+
 		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.config.controler().getRunId(), this.overwriteFiles);
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			setupMultiModalSimulation();
@@ -368,6 +373,8 @@ public class Controler extends AbstractController {
 	 * Loads the Scenario if it was not given in the constructor.
 	 */
 	protected void loadData() {
+		// yyyy cannot make this final since it is overridden about 16 times. kai, jan'13
+
 		if (!this.scenarioLoaded) {
 			ScenarioUtils.loadScenario(this.scenarioData);
 			this.network = this.scenarioData.getNetwork();
@@ -385,7 +392,8 @@ public class Controler extends AbstractController {
 	 */
 	@Override
 	protected void loadCoreListeners() {
-	
+		// yyyy cannot make this final since it is overridden about 4 times. kai, jan'13
+
 		/*
 		 * The order how the listeners are added is very important! As
 		 * dependencies between different listeners exist or listeners may read
@@ -447,6 +455,8 @@ public class Controler extends AbstractController {
 	 * @return The ScoringFunctionFactory to be used for plans-scoring.
 	 */
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		// yyyy cannot make this final since it is overridden about 10 times. kai, jan'13
+		
 		return new CharyparNagelScoringFunctionFactory(
 				this.config.planCalcScore(), this.getNetwork());
 	}
@@ -458,6 +468,8 @@ public class Controler extends AbstractController {
 	 * are added must not affect the correctness of the code.
 	 */
 	protected void loadControlerListeners() {
+		// yyyy cannot make this method final since is is overridden about 13 times.  kai, jan'13
+
 		// optional: LegHistogram
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
 	
@@ -502,7 +514,8 @@ public class Controler extends AbstractController {
 
 	@Override
 	protected void prepareForSim() {
-
+		// yyyy cannot make this final since it is overridden at 2 locations.  kai, jan'13
+		
 		setUp();
 		
 		// make sure all routes are calculated.
@@ -527,6 +540,8 @@ public class Controler extends AbstractController {
 	 * </ul>
 	 */
 	protected void setUp() {
+		// yyyy cannot make this final since it is overridden at about 25 locations.  kai, jan'13
+		
 		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 	
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
@@ -626,28 +641,32 @@ public class Controler extends AbstractController {
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
 	protected StrategyManager loadStrategyManager() {
+		// yyyy cannot make this final: overridden at about 40 locations.  kai, jan'2013
 		StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(this, manager, this.planStrategyFactoryRegister);
 		return manager;
 	}
 
 	@Override
-	protected boolean continueIterations(int it) {
+	protected final boolean continueIterations(int it) {
 		return terminationCriterion.continueIterations(it);
 	}
 	
 	@Override
 	protected void runMobSim(int iteration) {
+		// yyyy cannot make this final: overridden at 1 location.  kai, jan'13
 		this.thisIteration = iteration;
 		runMobSim();
 	}
 
 	protected void runMobSim() {
+		// yyyy cannot make this final: overridden at about 15 locations.  kai, jan'13
 		Mobsim sim = getNewMobsim();
 		sim.run();
 	}
 
-	/* package */Mobsim getNewMobsim() {
+	/* package */ Mobsim getNewMobsim() {
+		// overridden once for a test case (not so bad since it is package protected). kai, jan'13
 		if (this.thisMobsimFactory != null) {
 			Mobsim simulation = this.thisMobsimFactory.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
@@ -811,11 +830,11 @@ public class Controler extends AbstractController {
 		return this.strategyManager;
 	}
 
-	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
+	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
 		return this.leastCostPathCalculatorFactory;
 	}
 
-	public void setLeastCostPathCalculatorFactory(
+	public final void setLeastCostPathCalculatorFactory(
 			final LeastCostPathCalculatorFactory factory) {
 		this.leastCostPathCalculatorFactory = factory;
 	}
@@ -832,6 +851,8 @@ public class Controler extends AbstractController {
 	 *         single thread, use multiple instances for multiple threads!
 	 */
 	public PlanAlgorithm createRoutingAlgorithm() {
+		// yyyy can't make this final: overridden at about 20 locations.  kai, jan'13
+		
 		return useTripRouting ?
 			new PlanRouter(
 				getTripRouterFactory().createTripRouter(),
@@ -944,21 +965,22 @@ public class Controler extends AbstractController {
 	}
 
 	public TripRouterFactory getTripRouterFactory() {
+		// yyyy cannot make this final: thiautd is overriding this at one location.  kai, jan'13
 		if ( !useTripRouting ) {
 			throw new IllegalStateException( "cannot get the trip router: useTripRouting is false" );
 		}
 		return tripRouterFactory;
 	}
 
-	public void setTripRouterFactory(final TripRouterFactory factory) {
+	public final void setTripRouterFactory(final TripRouterFactory factory) {
 		tripRouterFactory = factory;
 	}
 
-	public void setUseTripRouting(final boolean useTripRouting) {
+	public final void setUseTripRouting(final boolean useTripRouting) {
 		this.useTripRouting = useTripRouting;
 	}
 
-	public boolean getUseTripRouting() {
+	public final boolean getUseTripRouting() {
 		return useTripRouting;
 	}
 
@@ -1012,22 +1034,22 @@ public class Controler extends AbstractController {
 		return this.linkStats;
 	}
 
-	public CalcLegTimes getLegTimes() {
+	public final CalcLegTimes getLegTimes() {
 		return this.legTimes;
 	}
 
-	public VolumesAnalyzer getVolumes() {
+	public final VolumesAnalyzer getVolumes() {
 		return this.volumes;
 	}
 
 	/**
 	 * @return Returns the scoreStats.
 	 */
-	public ScoreStats getScoreStats() {
+	public final ScoreStats getScoreStats() {
 		return this.scoreStats;
 	}
 
-	public List<MobsimListener> getMobsimListeners() {
+	public final List<MobsimListener> getMobsimListeners() {
 		return this.simulationListeners;
 	}
 
@@ -1036,29 +1058,32 @@ public class Controler extends AbstractController {
 	 * This method exposes something which is definitely private to the Controler,
 	 * bypassing all the interfaces.
 	 */
-	public PlansScoring getPlansScoring() {
+	public final PlansScoring getPlansScoring() {
 		return this.plansScoring;
 	}
 
 	@Deprecated
-	public TravelTimeCalculatorFactory getTravelTimeCalculatorFactory() {
+	public final TravelTimeCalculatorFactory getTravelTimeCalculatorFactory() {
 		return this.travelTimeCalculatorFactory;
 	}
 
-	public void setTravelTimeCalculatorFactory(
+	public final void setTravelTimeCalculatorFactory(
 			final TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
 		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
 	}
 
-	public TravelDisutilityFactory getTravelDisutilityFactory() {
+	public final TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.travelCostCalculatorFactory;
 	}
 
-	public void setTravelDisutilityFactory(
+	public final void setTravelDisutilityFactory(
 			final TravelDisutilityFactory travelCostCalculatorFactory) {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 	}
 
+	/**
+	 * yyyy Christoph Dobler overrides this method at some point. --???  
+	 */
 	public OutputDirectoryHierarchy getControlerIO() {
 		return this.controlerIO;
 	}
@@ -1069,20 +1094,20 @@ public class Controler extends AbstractController {
 	 * If you need the iteration number, just be an EventHandler or an IterationStartsListener and you will be told.
 	 */
 	@Deprecated
-	public Integer getIterationNumber() {
+	public final Integer getIterationNumber() {
 		log.warn("Controler.getIterationNumber() is deprecated and wrong. If you need the iteration number, just be an EventHandler or an IterationStartsListener and you will be told.");
 		return this.thisIteration;
 	}
 	
-	public void setTerminationCriterion(TerminationCriterion terminationCriterion) {
+	public final void setTerminationCriterion(TerminationCriterion terminationCriterion) {
 		this.terminationCriterion = terminationCriterion;
 	}
 
-	public MobsimFactory getMobsimFactory() {
+	public final MobsimFactory getMobsimFactory() {
 		return this.thisMobsimFactory;
 	}
 
-	public void setMobsimFactory(final MobsimFactory mobsimFactory) {
+	public final void setMobsimFactory(final MobsimFactory mobsimFactory) {
 		this.thisMobsimFactory = mobsimFactory;
 	}
 
@@ -1094,37 +1119,37 @@ public class Controler extends AbstractController {
 	 *
 	 * @see ControlerConfigGroup#getMobsim()
 	 */
-	public void addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
+	public final void addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
 		this.mobsimFactoryRegister.register(mobsimName, mobsimFactory);
 	}
 
-	public void addSnapshotWriterFactory(final String snapshotWriterName, final SnapshotWriterFactory snapshotWriterFactory) {
+	public final void addSnapshotWriterFactory(final String snapshotWriterName, final SnapshotWriterFactory snapshotWriterFactory) {
 		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);
 	}
 	
-	public void addPlanStrategyFactory(final String planStrategyFactoryName, final PlanStrategyFactory planStrategyFactory) {
+	public final void addPlanStrategyFactory(final String planStrategyFactoryName, final PlanStrategyFactory planStrategyFactory) {
 		this.planStrategyFactoryRegister.register(planStrategyFactoryName, planStrategyFactory);
 	}
 
-	public SignalsControllerListenerFactory getSignalsControllerListenerFactory() {
+	public final SignalsControllerListenerFactory getSignalsControllerListenerFactory() {
 		return this.signalsFactory;
 	}
 
-	public void setSignalsControllerListenerFactory(
+	public final void setSignalsControllerListenerFactory(
 			final SignalsControllerListenerFactory signalsFactory) {
 		this.signalsFactory = signalsFactory;
 	}
 
-	public TransitRouterFactory getTransitRouterFactory() {
+	public final TransitRouterFactory getTransitRouterFactory() {
 		return this.transitRouterFactory;
 	}
 
-	public void setTransitRouterFactory(
+	public final void setTransitRouterFactory(
 			final TransitRouterFactory transitRouterFactory) {
 		this.transitRouterFactory = transitRouterFactory;
 	}
 
-	public Map<String, TravelTime> getMultiModalTravelTimes() {
+	public final Map<String, TravelTime> getMultiModalTravelTimes() {
 		return this.multiModalTravelTimes;
 	}
 
