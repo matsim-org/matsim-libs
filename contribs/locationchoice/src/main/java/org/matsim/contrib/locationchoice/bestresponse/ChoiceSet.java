@@ -134,7 +134,11 @@ public class ChoiceSet {
 		
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
+
 		Random random = new Random(replanningContext.getIteration() * 102830259L);
+		// yyyyyy the same seed for every agent????? kai, jan'13
+
+		// yyyyyy what is this supposed to do??? kai, jan'13
 		for (int i = 0; i < 10; i++) {
 			random.nextDouble();
 		}
@@ -146,6 +150,8 @@ public class ChoiceSet {
 	        	id = entry.getValue();
 	        }
 	    }
+		// yyyyyy looks to me like: "the last facility with a double value larger than the random number is returned.  If this returns null,
+		// then the first entry in the choice set is returned."  But why???  And why the same randomScore for all agents???  kai, jan'13
 		return id;
 	}
 	

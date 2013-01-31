@@ -85,7 +85,7 @@ public class PlanTimesAdapter {
 				if (planElementIndex == 0) {
 					scoringFunction.startActivity(0.0, act);
 					scoringFunction.endActivity(act.getEndTime(), act);
-					System.err.println("10 score: " + scoringFunction.getScore() ) ;
+//					System.err.println("10 score: " + scoringFunction.getScore() ) ;
 					continue; 
 				}
 				else {
@@ -141,25 +141,25 @@ public class PlanTimesAdapter {
 					scoringFunction.startLeg(departureTime, previousLegPlanTmp);
 					scoringFunction.endLeg(arrivalTime);
 										
-					System.err.println("20 score: " + scoringFunction.getScore() ) ;
+//					System.err.println("20 score: " + scoringFunction.getScore() ) ;
 
 					scoringFunction.startActivity(arrivalTime, actTmp);
-					System.err.println("arrivalTime: " + arrivalTime ) ;
+//					System.err.println("arrivalTime: " + arrivalTime ) ;
 					if (planElementIndex < plan.getPlanElements().size() -1) {
 						
 						if ( actTmp.getEndTime() != Time.UNDEFINED_TIME ) {
 							scoringFunction.endActivity( actTmp.getEndTime(), actTmp ) ;
-							System.err.println( "actEndTime: " + actTmp.getEndTime() ) ;
+//							System.err.println( "actEndTime: " + actTmp.getEndTime() ) ;
 						} else if ( actTmp.getMaximumDuration() != Time.UNDEFINED_TIME ) {
 							scoringFunction.endActivity(arrivalTime + actDur, actTmp);
-							System.err.println( "arrivalTime: " + arrivalTime + " actDur: " + actDur ) ;
+//							System.err.println( "arrivalTime: " + arrivalTime + " actDur: " + actDur ) ;
 						}
-						System.err.println("30 score: " + scoringFunction.getScore() ) ;
+//						System.err.println("30 score: " + scoringFunction.getScore() ) ;
 					}
 					else {
 						// (last (home) activity does not end the activity:)
 						scoringFunction.finish();
-						System.err.println("40 score: " + scoringFunction.getScore() ) ;
+//						System.err.println("40 score: " + scoringFunction.getScore() ) ;
 					}
 				}				
 			}

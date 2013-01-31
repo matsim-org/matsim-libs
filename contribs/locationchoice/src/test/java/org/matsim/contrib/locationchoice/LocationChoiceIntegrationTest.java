@@ -40,19 +40,24 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
-	public void tesLocationChoiceJan2013() {
+	public void testLocationChoiceJan2013() {
 		final Config config = localCreateConfig();
 
 		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
 		config.locationchoice().setEpsilonScaleFactors("100.0") ;
 		config.locationchoice().setProbChoiceExponent("1.") ;
+		
+		config.otfVis().setEffectiveLaneWidth(1.) ;
+		config.otfVis().setLinkWidth((float)1.) ;
+		config.otfVis().setShowTeleportedAgents(true) ;
+		config.otfVis().setDrawNonMovingItems(true) ;
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		// setup network
 		Network network = scenario.getNetwork();
 		
-		final double scale = 100. ;
+		final double scale = 1000. ;
 
 		Node node0 = network.getFactory().createNode(new IdImpl(0), new CoordImpl(-scale,0) ) ;
 		network.addNode(node0) ;
@@ -98,7 +103,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			facility.getActivityOptions().put("work", new ActivityOptionImpl("work", facility)) ;
 		}
 		
-		Person person = localCreatePopWOnePerson(scenario, link1, facility1);
+		Person person = localCreatePopWOnePerson(scenario, link1, facility1, 8.*60*60+5*60);
 
 		Controler controler = new Controler(scenario);
 		
@@ -121,7 +126,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		System.err.println( " newWork: " + newWork ) ;
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
 //		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
-		assertEquals( new IdImpl(0), newWork.getFacilityId() );
+		assertEquals( new IdImpl(55), newWork.getFacilityId() );
 	}
 	public void testLocationChoice() {
 		final Config config = localCreateConfig();
@@ -140,7 +145,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		ActivityFacilityImpl facility3 = scenario.getActivityFacilities().createFacility(new IdImpl(3), new CoordImpl(0, 300));
 		facility3.getActivityOptions().put("work", new ActivityOptionImpl("work", facility3));
 		
-		Person person = localCreatePopWOnePerson(scenario, link, facility1);
+		Person person = localCreatePopWOnePerson(scenario, link, facility1, 17.*60.*60.);
 
 		Controler controler = new Controler(scenario);
 
@@ -161,8 +166,9 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 	/** 
 	 * setup population with one person
+	 * @param workActEndTime TODO
 	 */
-	private static Person localCreatePopWOnePerson(ScenarioImpl scenario, Link link, ActivityFacility facility1) {
+	private static Person localCreatePopWOnePerson(ScenarioImpl scenario, Link link, ActivityFacility facility1, double workActEndTime) {
 
 		Population population = scenario.getPopulation();
 
@@ -181,7 +187,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		plan.addLeg(population.getFactory().createLeg(TransportMode.car)) ;
 		{
 			Activity act = population.getFactory().createActivityFromCoord("work", scenario.getActivityFacilities().getLocation(facility1.getId()).getCoord() ) ;
-			act.setEndTime(17*60*60);
+			act.setEndTime(workActEndTime);
 			((ActivityImpl)act).setFacilityId(facility1.getId());
 			plan.addActivity(act) ;
 		}

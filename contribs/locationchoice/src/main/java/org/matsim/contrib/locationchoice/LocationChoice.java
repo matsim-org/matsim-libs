@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.locationchoice;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -27,7 +28,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
@@ -68,8 +68,12 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private ObjectAttributes personsMaxEpsUnscaled;
-	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
-	private ObjectAttributes personsKValues = new ObjectAttributes();
+//	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
+//	private ObjectAttributes personsKValues = new ObjectAttributes();
+	
+	private static int facKVals = 0 ;
+	private static int persKVals = 1 ;
+	private static int maxEpsUnsc = 2 ;
 
 	private ScaleEpsilon scaleEpsilon;
 	private ActivitiesHandler defineFlexibleActivities;
@@ -97,43 +101,67 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		//		if (algorithm.equals(BEST_RESPONSE)) {
 		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(this.scenario.getConfig().locationchoice().getAlgorithm())) {
 			this.scaleEpsilon = this.defineFlexibleActivities.createScaleEpsilon();
-			this.createObjectAttributesAndReadOrCreateEpsilons(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
-			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues, this.scenario.getConfig().locationchoice());
+			List<ObjectAttributes> epsilons = this.createObjectAttributesAndReadOrCreateEpsilons(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
+//			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues, this.scenario.getConfig().locationchoice());
+			this.sampler = new DestinationSampler(epsilons.get(persKVals), epsilons.get(facKVals), this.scenario.getConfig().locationchoice());
+			this.personsMaxEpsUnscaled = epsilons.get(maxEpsUnsc) ;
 		}
 	}
 
-	private void createObjectAttributesAndReadOrCreateEpsilons(long seed) {
-		this.personsMaxEpsUnscaled = new ObjectAttributes();
+	private List<ObjectAttributes> createObjectAttributesAndReadOrCreateEpsilons(long seed) {
+//		List<ObjectAttributes> epsilons = 
+		
+//		this.personsMaxEpsUnscaled = new ObjectAttributes();
 
 		// check if object attributes files are available, other wise do preprocessing
 		String maxEpsValues = this.scenario.getConfig().locationchoice().getMaxEpsFile();
+
 		if (!maxEpsValues.equals("null")) {
-			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);
-			try {
-				attributesReader.parse(maxEpsValues);
-			} catch  (UncheckedIOException e) {  // reading was not successful
-				this.computeEpsilons(seed);
-			}
+//			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);
+//			try {
+//				attributesReader.parse(maxEpsValues);
+//			} catch  (UncheckedIOException e) {  // reading was not successful
+//				this.computeEpsilons(seed);
+//			}
+			throw new RuntimeException("yyyyyy I cannot see how the reading from file obtains the person and facility values.  " +
+			"Since I cannot see this, I am also not able to modify the code accordingly.  kai, jan'13" ) ;
 		}
 		else {
-			this.computeEpsilons(seed);
+			return this.computeEpsilons(seed);
 		}
 	}
 
-	private void computeEpsilons(long seed) {
+	private List<ObjectAttributes> computeEpsilons(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
 				seed, (ScenarioImpl) this.scenario, this.scenario.getConfig(), 
 				this.scaleEpsilon, this.actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
 
 		computer.run();
-
-		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
-		this.personsKValues = computer.getPersonsKValues();
-		this.facilitiesKValues = computer.getFacilitiesKValues();
 		
-		System.err.println( "ff:\n" + this.facilitiesKValues.toString() ) ;
-		System.err.println( "pp:\n" + this.personsKValues.toString() ) ;
-		System.err.println( "max:\n" + this.personsMaxEpsUnscaled.toString() ) ;
+		List<ObjectAttributes> epsilons = new ArrayList<ObjectAttributes>(3) ;
+		for ( int ii=0 ; ii<3 ; ii++ ) {
+			if ( ii==persKVals ) {
+				epsilons.add( computer.getPersonsKValues() ) ;
+			} else if ( ii==facKVals ) {
+				epsilons.add( computer.getFacilitiesKValues() ) ;
+			} else if ( ii==maxEpsUnsc ) {
+				epsilons.add( computer.getPersonsMaxEpsUnscaled() ) ;
+			}
+		}
+		
+
+//		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
+//		this.personsKValues = computer.getPersonsKValues();
+//		this.facilitiesKValues = computer.getFacilitiesKValues();
+		
+//		System.err.println( "ff:\n" + this.facilitiesKValues.toString() ) ;
+//		System.err.println( "pp:\n" + this.personsKValues.toString() ) ;
+//		System.err.println( "max:\n" + this.personsMaxEpsUnscaled.toString() ) ;
+		System.err.println( "ff:\n" + epsilons.get(facKVals).toString() ) ;
+		System.err.println( "pp:\n" + epsilons.get(persKVals).toString() ) ;
+		System.err.println( "max:\n" + epsilons.get(maxEpsUnsc).toString() ) ;
+		
+		return epsilons ;
 		
 	}
 
