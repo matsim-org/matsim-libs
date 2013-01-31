@@ -245,6 +245,7 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 
 	public static void main(String[] args) {
 //		String configFile = "/home/dgrether/data/work/repos/shared-svn/projects/andreas-graf/Szenarien/SimplifiedRandomizedPT/config_adapt_rpt_dg.xml";
+		String configFile = "/Users/nagel/shared-svn/projects/andreas-graf/Szenarien/SimplifiedRandomizedPT/config_adapt_rpt_dg1.xml";
 		boolean doVisualization = true;
 		final Config config = ConfigUtils.loadConfig(args[0]) ;
 //		final Config config = ConfigUtils.loadConfig(configFile) ;
