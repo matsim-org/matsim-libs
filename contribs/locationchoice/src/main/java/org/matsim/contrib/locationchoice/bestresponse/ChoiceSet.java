@@ -49,7 +49,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 public class ChoiceSet {
 		
 	// *************************************
-	private double exponent;
+//	private double exponent;
 	private int numberOfAlternatives;
 	
 	private ApproximationLevel approximationLevel;	
@@ -74,24 +74,24 @@ public class ChoiceSet {
 		return stb.toString() ;
 	}
 	
-	private static int wrnCnt = 0 ;
+//	private static int wrnCnt = 0 ;
 		
 	ChoiceSet(ApproximationLevel approximationLevel, Network network, Config config) {
 		this.approximationLevel = approximationLevel;
 		this.network = network;
 		this.config = config;
-		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
-		if ( wrnCnt < 1 ) {
-			wrnCnt++ ;
-			if ( this.exponent != 1. ) {
-				Logger.getLogger(this.getClass()).warn("Exponent is presumably some exponent that is used to re-weight scores. " +
-					" Problem is that it does not work with negative scores. " +
-					"Negative scores should not happen because then the activity should be dropped, " +
-					"but clearly the negativeness can be a consequence of the approximations, " +
-					"which means that it needs to be handeled.  " +
-					"The way this is done looks like a hack to me.  kai, jan'13" ) ;
-			}
-		}
+//		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
+//		if ( wrnCnt < 1 ) {
+//			wrnCnt++ ;
+//			if ( this.exponent != 1. ) {
+//				Logger.getLogger(this.getClass()).warn("Exponent is presumably some exponent that is used to re-weight scores. " +
+//					" Problem is that it does not work with negative scores. " +
+//					"Negative scores should not happen because then the activity should be dropped, " +
+//					"but clearly the negativeness can be a consequence of the approximations, " +
+//					"which means that it needs to be handeled.  " +
+//					"The way this is done looks like a hack to me.  kai, jan'13" ) ;
+//			}
+//		}
 		this.numberOfAlternatives = Integer.parseInt(config.locationchoice().getProbChoiceSetSize());
 	}
 	
@@ -220,8 +220,8 @@ public class ChoiceSet {
 		}	
 		// find the sum of the scores to normalize scores
 		Collections.sort(list);
-		double totalScore = this.getTotalScore(list, (largestValue < 0.0));
-		TreeMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list, totalScore, (largestValue < 0.0));
+		double totalScore = this.getTotalScore(list);
+		TreeMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list, totalScore);
 				
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
@@ -235,40 +235,37 @@ public class ChoiceSet {
 		}
 	}
 	
-	private double getTotalScore(List<ScoredAlternative> list, boolean largestValueIsNegative) {
+	private double getTotalScore(List<ScoredAlternative> list) {
 		int n = 0;
 		double totalScore = 0.0;
 		for (ScoredAlternative sa : list) {
 			if (n >= numberOfAlternatives) break;			
-			double score = Math.pow(sa.getScore(), exponent);
-			if (largestValueIsNegative) {
-				// if we only have negative values -> change sign of score // see my comment at the declaration of this.exponent.  kai, jan'13
-				score *= -1.0;
-			}
-			if (score > 0.0) {
-				totalScore += score;
-			}
+//			if (largestValueIsNegative) {
+//				// if we only have negative values -> change sign of score // see my comment at the declaration of this.exponent.  kai, jan'13
+//				score *= -1.0;
+//			}
+//			if (score > 0.0) {
+				totalScore += sa.getScore();
+//			}
 			n++;
 		}
 		return totalScore;
 	}
 	
-	private TreeMap<Double,Id> generateReducedChoiceSet(List<ScoredAlternative> list, double totalScore, boolean largestValueIsNegative) {
+	private TreeMap<Double,Id> generateReducedChoiceSet(List<ScoredAlternative> list, double totalScore) {
 		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
 		int n = 0;
 		double sumScore = 0.0;
 		for (ScoredAlternative sa : list) {
 			if (n >= numberOfAlternatives) break;
-			double score = Math.pow(sa.getScore(), exponent);
-			
-			if (largestValueIsNegative) {
-				// if we only have negative values -> change sign of score // see my comment at the declaration of this.exponent.  kai, jan'13
-				score *= -1.0;
-			}			
-			if (score > 0.0) {
-				sumScore += (score / totalScore);				
+//			if (largestValueIsNegative) {
+//				// if we only have negative values -> change sign of score // see my comment at the declaration of this.exponent.  kai, jan'13
+//				score *= -1.0;
+//			}			
+//			if (score > 0.0) {
+				sumScore += (sa.getScore() / totalScore);				
 				mapNormalized.put(sumScore , sa.getAlternativeId());
-			}
+//			}
 			n++;	
 		}
 		return mapNormalized;
