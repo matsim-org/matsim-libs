@@ -24,17 +24,20 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
@@ -43,7 +46,6 @@ import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.analysis.listeners.TripModeShares;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
-import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
@@ -103,6 +105,18 @@ public class RunCliquesWithHardCodedStrategies {
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 		JointControlerUtils.tuneScenario( scenario );
 		ScenarioUtils.loadScenario( scenario );
+
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				for (Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE )) {
+					if (act.getCoord() != null) continue;
+					if (act.getLinkId() == null) throw new NullPointerException();
+					((ActivityImpl) act).setCoord(
+						scenario.getNetwork().getLinks().get( act.getLinkId() ).getCoord() );
+				}
+			}
+		}
+
 		return scenario;
 	}
 
