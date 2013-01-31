@@ -247,7 +247,8 @@ public class LangeStreckeSzenario {
 	
 	private Activity createWork(){
 		Id workLinkId = new IdImpl(numberOfLinks+1);
-		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("work", workLinkId);
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("work",
+ workLinkId);
 		return activity;
 	}
 	

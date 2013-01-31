@@ -273,7 +273,8 @@ public class DreieckStreckeSzenario {
 			Node from = network.getNodes().get(idFrom);
 			Node to = network.getNodes().get(idTo);
 			
-			Link link = this.scenario.getNetwork().getFactory().createLink(idFrom, from, to);
+			Link
+ link = this.scenario.getNetwork().getFactory().createLink(idFrom, from, to);
 			link.setCapacity(this.networkCapacity);
 			link.setFreespeed(50./3.6);
 			link.setLength(calculateLength(from,to));
