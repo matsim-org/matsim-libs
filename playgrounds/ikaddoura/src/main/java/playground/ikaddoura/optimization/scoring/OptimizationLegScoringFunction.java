@@ -82,10 +82,10 @@ public class OptimizationLegScoringFunction extends CharyparNagelLegScoring {
 
 		if (TransportMode.car.equals(leg.getMode())) {
 			
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
-				System.out.println("MarginalUtilityOfDistanceCar: " + this.params.marginalUtilityOfDistanceCar_m);
-				throw new RuntimeException("Marginal utility of distance car is deprecated and should not be used. Aborting...");
-			}
+//			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
+//				System.out.println("MarginalUtilityOfDistanceCar: " + this.params.marginalUtilityOfDistanceCar_m);
+//				throw new RuntimeException("Marginal utility of distance car is deprecated and should not be used. Aborting...");
+//			}
 			
 			Route route = leg.getRoute();
 			double dist = getDistance(route);

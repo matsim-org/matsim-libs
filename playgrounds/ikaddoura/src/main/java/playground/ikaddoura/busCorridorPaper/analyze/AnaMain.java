@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class AnaMain {
 
-	private String outputFolder = "/Users/Ihab/Desktop/B_NTC_anaOutputRndSeedRuns_preliminary/";
+	private String outputFolder = "/Users/Ihab/Desktop/B_NTC_anaOutputRndSeedRuns/";
 	private String runFolder = "/Users/Ihab/ils4/kaddoura/welfareBusCorridor_opt3/output/FINAL_OUTPUT/B_NTC/";
 
 //	private String outputFolder = "/Users/Ihab/Desktop/A_TC_anaOutputRndSeedRuns/";
@@ -68,7 +68,10 @@ public class AnaMain {
 		dataWriter.writeData("AvgT0minusTActDivByT0perCarTrip");
 		dataWriter.writeData("OperatorProfit");
 		dataWriter.writeData("UserBenefits");
-		
+		dataWriter.writeData("AvgWaitingTimeAll");
+		dataWriter.writeData("AvgWaitingTimeMissedBus");
+		dataWriter.writeData("AvgWaitingTimeNoMissedBus");
+
 		MatrixWriter matrixWriter = new MatrixWriter(outputFolder, runNr2itNr2ana);
 		matrixWriter.writeAvgMatrix("Welfare");
 		matrixWriter.writeAvgMatrix("PtTrips");
@@ -77,6 +80,9 @@ public class AnaMain {
 		matrixWriter.writeAvgMatrix("AvgT0minusTActDivByT0perCarTrip");
 		matrixWriter.writeAvgMatrix("OperatorProfit");
 		matrixWriter.writeAvgMatrix("UserBenefits");
+		matrixWriter.writeAvgMatrix("AvgWaitingTimeAll");
+		matrixWriter.writeAvgMatrix("AvgWaitingTimeMissedBus");
+		matrixWriter.writeAvgMatrix("AvgWaitingTimeNoMissedBus");
 		
 		matrixWriter.writeGlobalMaximumMatrix("Welfare");
 		matrixWriter.writeGlobalMaximumMatrix("OperatorProfit");

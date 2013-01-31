@@ -24,7 +24,6 @@
 package playground.ikaddoura.optimization.handler;
 
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -42,11 +41,6 @@ public class CalculateFareForBusTripHandler implements PersonEntersVehicleEventH
 		this.events = events;
 		this.fare = fare;
 	}
-
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-	}
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
@@ -60,5 +54,10 @@ public class CalculateFareForBusTripHandler implements PersonEntersVehicleEventH
 	// this method needs to be extended when differentiated fares apply.
 	private double calculateFare() {
 		return this.fare;
+	}
+
+	@Override
+	public void reset(int iteration) {
+		
 	}
 }

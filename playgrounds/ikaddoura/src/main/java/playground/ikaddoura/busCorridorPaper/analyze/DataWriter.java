@@ -87,6 +87,12 @@ public class DataWriter extends BasicWriter{
     				data = super.getRunNr2itNr2ana().get(runNr).get(iteration).getNumberOfMissedBusTrips();
     			} else if (type.equalsIgnoreCase("AvgT0minusTActDivByT0perCarTrip")) {
     				data = super.getRunNr2itNr2ana().get(runNr).get(iteration).getAvgT0MinusTActDivByT0perTrip();
+    			} else if (type.equalsIgnoreCase("AvgWaitingTimeAll")) {
+    				data = super.getRunNr2itNr2ana().get(runNr).get(iteration).getAvgWaitingTimeAll();
+    			} else if (type.equalsIgnoreCase("AvgWaitingTimeMissedBus")) {
+    				data = super.getRunNr2itNr2ana().get(runNr).get(iteration).getAvgWaitingTimeMissing();
+    			} else if (type.equalsIgnoreCase("AvgWaitingTimeNoMissedBus")) {
+    				data = super.getRunNr2itNr2ana().get(runNr).get(iteration).getAvgWaitingTimeNotMissing();
     			} else {
     				log.warn(type + "unknown.");
     			}

@@ -85,8 +85,6 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 				personId2WaitingTime.put(personId, waitingTimeSum);
 			}
 						
-		} else {
-			// no person enters a bus
 		}
 	}
 

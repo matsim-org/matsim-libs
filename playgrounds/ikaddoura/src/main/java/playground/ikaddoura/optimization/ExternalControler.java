@@ -32,10 +32,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.optimization.analysis.Operator;
@@ -64,19 +62,23 @@ class ExternalControler {
 	static int incrBusNumber;
 	static double incrFare;
 	static int incrCapacity;
+	static int incrDemand;
 
 	static int startBusNumber;
 	static double startFare;
 	static int startCapacity;
+	static int startDemand;
 	
 	static int stepsBusNumber;
 	static int stepsCapacity;
 	static int stepsFare;
+	static int stepsDemand;
 	
 	static String settingsFile;
 
 	private Map<Integer, Map<Integer, String>> numberOfbuses2capacity2vehiclesFile = new HashMap<Integer, Map<Integer, String>>();
 	private Map<Integer, String> numberOfbuses2scheduleFile = new HashMap<Integer, String>();
+	private Map<Integer, String> demand2populationFile = new HashMap<Integer, String>();
 	private SortedMap<Integer, IterationInfo> it2information = new TreeMap<Integer, IterationInfo>();
 	private TextFileWriter textWriter = new TextFileWriter();
 	private Operator operator = new Operator();
@@ -112,14 +114,17 @@ class ExternalControler {
 		incrBusNumber = settings.getIncrBusNumber();
 		incrFare = settings.getIncrFare();
 		incrCapacity = settings.getIncrCapacity();
+		incrDemand = settings.getIncrDemand();
 		
 		startBusNumber = settings.getStartBusNumber();
 		startFare = settings.getStartFare();
 		startCapacity = settings.getStartCapacity();
+		startDemand = settings.getStartDemand();
 
 		stepsBusNumber = settings.getStepsBusNumber();
 		stepsFare = settings.getStepsFare();
 		stepsCapacity = settings.getStepsCapacity();
+		stepsDemand = settings.getStepsDemand();
 		
 		log.info("Setting parameters... Done.");
 		
@@ -137,51 +142,80 @@ class ExternalControler {
 		double fare;
 		int capacity;
 		int numberOfBuses;
+		int demand;
 		
-		numberOfBuses = startBusNumber;
-		for (int busStep = 0; busStep <= stepsBusNumber ; busStep++){
-				
-			capacity = startCapacity;
-			for (int capacityStep = 0; capacityStep <= stepsCapacity ; capacityStep++){
-				
-				fare = startFare;
-				for (int fareStep = 0; fareStep <= stepsFare ; fareStep++){
-
-					log.info("*********************************************************");
-					log.info("number of buses: " + numberOfBuses + " // fare: " + fare + " // capacity: " + capacity);
-					runInternalIteration(iterationCounter, numberOfBuses, capacity, fare);
-					iterationCounter++;
+		demand = startDemand;
+		for (int demandStep = 0; demandStep <= stepsDemand ; demandStep++){
+			numberOfBuses = startBusNumber;
+			for (int busStep = 0; busStep <= stepsBusNumber ; busStep++){
 					
-					if (fareStep < stepsFare){
-						fare = fare + incrFare;
-					}	
+				capacity = startCapacity;
+				for (int capacityStep = 0; capacityStep <= stepsCapacity ; capacityStep++){
+					
+					fare = startFare;
+					for (int fareStep = 0; fareStep <= stepsFare ; fareStep++){
+
+						log.info("*********************************************************");
+						log.info("demand: " + demand + " // number of buses: " + numberOfBuses + " // fare: " + fare + " // capacity: " + capacity);
+						runInternalIteration(iterationCounter, demand, numberOfBuses, capacity, fare);
+						iterationCounter++;
+						
+						if (fareStep < stepsFare){
+							fare = fare + incrFare;
+						}	
+					}
+					
+					if (capacityStep < stepsCapacity){
+						capacity = capacity + incrCapacity;
+					}
 				}
 				
-				if (capacityStep < stepsCapacity){
-					capacity = capacity + incrCapacity;
-				}
+				if (busStep < stepsBusNumber){
+					numberOfBuses = numberOfBuses + incrBusNumber;
+				}					
 			}
 			
-			if (busStep < stepsBusNumber){
-				numberOfBuses = numberOfBuses + incrBusNumber;
-			}					
+			if (demandStep < stepsDemand){
+				demand = demand + incrDemand;
+			}
 		}
 	}
 	
-	private void runInternalIteration(int iterationCounter, int numberOfBuses, int capacity, double fare) throws IOException {
-		
-		String directoryIt = outputPath + "/extITERS/" + iterationCounter + "_buses" + numberOfBuses + "_fare" + fare + "_capacity" + capacity;
+	private void runInternalIteration(int iterationCounter, int demand, int numberOfBuses, int capacity, double fare) throws IOException {
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
+
+		String directoryIt = outputPath + "/extITERS/" + iterationCounter + "_demand" + demand + "_buses" + numberOfBuses + "_fare" + fare + "_capacity" + capacity;
 		File directory = new File(directoryIt);
 		directory.mkdirs();
+		scenario.getConfig().controler().setOutputDirectory(directoryIt);
 		
 		String scheduleFile = this.numberOfbuses2scheduleFile.get(numberOfBuses);
 		String vehiclesFile = this.numberOfbuses2capacity2vehiclesFile.get(numberOfBuses).get(capacity);
 		
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
-		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		if (this.demand2populationFile.isEmpty()) {
+			String populationFile = scenario.getConfig().plans().getInputFile();
+			if (populationFile==null){
+				throw new RuntimeException("Missing populationFile in config.");
+			} else {
+				log.info("PopulationFile from config: " + scenario.getConfig().plans().getInputFile());
+			}
+		} else {
+			String populationFile = this.demand2populationFile.get(demand);
+			scenario.getConfig().plans().setInputFile(populationFile);
+		}
 		
-		InternalControler internalControler = new InternalControler(scenario, directoryIt, fare, randomSeed, scheduleFile, vehiclesFile);
+		scenario.getConfig().transit().setTransitScheduleFile(scheduleFile);
+		scenario.getConfig().transit().setVehiclesFile(vehiclesFile);
+		
+		if (randomSeed==0) {
+			log.info("Random seed is taken from configFile. Random seed: " + scenario.getConfig().global().getRandomSeed());
+		} else {
+			log.info("Random seed is not taken from configFile. Setting random seed to " + randomSeed);
+			scenario.getConfig().global().setRandomSeed(randomSeed);
+		}
+		
+		InternalControler internalControler = new InternalControler(scenario, fare);
 		internalControler.run();
 		
 		deleteUnnecessaryInternalIterations(directoryIt+"/internalIterations/ITERS/", scenario); 
@@ -189,7 +223,7 @@ class ExternalControler {
 		operator.setParametersForExtIteration(capacity);
 		users.setParametersForExtIteration(scenario);
 		
-		OperatorUserAnalysis analysis = new OperatorUserAnalysis(scenario, directoryIt, this.umlaufzeit/numberOfBuses);
+		OperatorUserAnalysis analysis = new OperatorUserAnalysis(scenario, this.umlaufzeit/numberOfBuses);
 		analysis.readEvents();
 		
 		operator.calculateCosts(analysis);
@@ -233,7 +267,24 @@ class ExternalControler {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
-		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		
+		if (startDemand == 0 && incrDemand == 0 && stepsDemand == 0){
+			log.info("No populationFile written. Expecting populationFile in config.");
+		} else {
+			int demand = startDemand;
+			for (int demandStep = 0; demandStep <= stepsDemand; demandStep++){
+			
+				log.info("Writing population...");
+				String populationFile = dir + "population" + demand + ".xml";
+				PopulationGenerator pG = new PopulationGenerator(scenario);
+				pG.writePopulation(demand, populationFile);
+		
+				this.demand2populationFile.put(demand, populationFile);
+				demand = demand + incrDemand;
+			}
+		}
+		
+		
 		
 		int numberOfBuses = startBusNumber;
 		for (int busStep = 0; busStep <= stepsBusNumber ; busStep++){
@@ -267,7 +318,8 @@ class ExternalControler {
 			numberOfBuses = numberOfBuses + incrBusNumber;
 			
 			this.umlaufzeit = sw.getUmlaufzeit(); // TODO: get umlaufzeit from somewhere else!
-		}						
+		}	
+		
 	}
 
 	private void deleteUnnecessaryInternalIterations(String itersPath, Scenario scenario) {
@@ -310,6 +362,11 @@ class ExternalControler {
 			incrCapacity = 0;
 			stepsCapacity = 0;
 			log.info("Constant capacity");
+		}
+		if (incrDemand==0 || stepsDemand==0){
+			incrDemand = 0;
+			stepsDemand = 0;
+			log.info("Constant demand");
 		}
 	}
 }

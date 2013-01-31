@@ -334,6 +334,12 @@ public class MatrixWriter extends BasicWriter{
 			    				data = extItAna.getNumberOfMissedBusTrips();
 			    			} else if (type.equalsIgnoreCase("AvgT0minusTActDivByT0perCarTrip")) {
 			    				data = extItAna.getAvgT0MinusTActDivByT0perTrip();
+			    			} else if (type.equalsIgnoreCase("AvgWaitingTimeAll")) {
+			    				data = extItAna.getAvgWaitingTimeAll();
+			    			} else if (type.equalsIgnoreCase("AvgWaitingTimeMissedBus")) {
+			    				data = extItAna.getAvgWaitingTimeMissing();
+			    			} else if (type.equalsIgnoreCase("AvgWaitingTimeNoMissedBus")) {
+			    				data = extItAna.getAvgWaitingTimeNotMissing();
 			    			} else {
 			    				log.warn(type + "unknown.");
 			    			}

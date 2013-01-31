@@ -66,6 +66,9 @@ public class OptSettingsReader {
 	                		                	
 	            		} else if (parts[0].equals("startCapacity")){
 	                		this.optSettings.setStartCapacity(Integer.parseInt(parts[1]));
+	                		
+	            		} else if (parts[0].equals("startDemand")){
+	                		this.optSettings.setStartDemand(Integer.parseInt(parts[1]));
 	            			
 	            		} else if (parts[0].equals("incrBusNumber")){
 	                		this.optSettings.setIncrBusNumber(Integer.parseInt(parts[1]));
@@ -76,6 +79,9 @@ public class OptSettingsReader {
 	                	} else if (parts[0].equals("incrCapacity")){
 	                		this.optSettings.setIncrCapacity(Integer.parseInt(parts[1]));
 	                		
+	                	} else if (parts[0].equals("incrDemand")){
+	                		this.optSettings.setIncrDemand(Integer.parseInt(parts[1]));
+	                		
 	                	} else if (parts[0].equals("stepsBusNumber")){
 		                	this.optSettings.setStepsBusNumber(Integer.parseInt(parts[1]));
 		                		
@@ -84,6 +90,9 @@ public class OptSettingsReader {
 	                		
 	                	} else if (parts[0].equals("stepsCapacity")){
 	                		this.optSettings.setStepsCapacity(Integer.parseInt(parts[1]));
+	                	
+	                	} else if (parts[0].equals("stepsDemand")){
+	                		this.optSettings.setStepsDemand(Integer.parseInt(parts[1]));
 	                		
 	            		} else {
 	            			throw new RuntimeException(parts[0] +" is an unknown parameter in the optimization settings file. Aborting...");

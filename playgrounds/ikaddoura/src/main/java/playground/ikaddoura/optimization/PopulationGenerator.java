@@ -18,10 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.optimization.prepare;
+package playground.ikaddoura.optimization;
 
-
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -38,44 +36,25 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 
-public class CreatePopulation implements Runnable {
+public class PopulationGenerator {
 
-	static String networkFile = "/Users/Ihab/Desktop/input/network.xml";
-	static String outputPath = "/Users/Ihab/Desktop/input/populationFiles/";
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 	private Scenario scenario;
 	private Population population;
 
-	public static void main(String[] args) {
-		CreatePopulation population = new CreatePopulation();
-		population.run();
+	public PopulationGenerator(Scenario scenario) {
+		this.scenario = scenario;
+		this.population = scenario.getPopulation();
 	}
 
-	public void run(){
+	public void writePopulation(int demand, String populationFile) {
 		
-		File directory = new File(outputPath);
-		directory.mkdirs();
+		fillZoneData();
+		generatePopulation(demand);
 		
-		int demand = 5000;
-		for (int n = 0; n<=9; n++){
-			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			this.population = this.scenario.getPopulation();
-			Config config = this.scenario.getConfig();
-			config.network().setInputFile(networkFile);
-			ScenarioUtils.loadScenario(this.scenario);
-			
-			fillZoneData();
-			generatePopulation(demand);
-			
-			PopulationWriter populationWriter = new PopulationWriter(this.population, scenario.getNetwork());
-			populationWriter.write(outputPath + "population_" + demand + ".xml");
-			demand = demand + 5000;
-		}
-
+		PopulationWriter populationWriter = new PopulationWriter(population, scenario.getNetwork());
+		populationWriter.write(populationFile);
 	}
 
 	private void fillZoneData() {

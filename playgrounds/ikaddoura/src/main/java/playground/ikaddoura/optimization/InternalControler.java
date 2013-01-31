@@ -28,8 +28,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -47,8 +48,6 @@ public class InternalControler {
 	private PtLegHandler ptScoringHandler;
 	
 	private final Scenario scenario;
-	private final String directoryExtIt;
-	private final long randomSeed;
 	private final double fare;
 	
 	private final double MARGINAL_UTILITY_OF_MONEY = 0.062;
@@ -74,15 +73,8 @@ public class InternalControler {
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
 
-	private String scheduleFile;
-	private String vehiclesFile;
-
-	public InternalControler(Scenario scenario, String directoryExtIt, double fare, long randomSeed, String scheduleFile, String vehiclesFile) {
+	public InternalControler(Scenario scenario, double fare) {
 		this.scenario = scenario;
-		this.directoryExtIt = directoryExtIt;
-		this.randomSeed = randomSeed;
-		this.scheduleFile = scheduleFile;
-		this.vehiclesFile = vehiclesFile;
 		this.fare = fare;
 		this.ptScoringHandler = new PtLegHandler();
 
@@ -94,16 +86,11 @@ public class InternalControler {
 	}
 	
 	public void run() {
-		
-		if (randomSeed==0) {
-			log.info("Random seed is taken from configFile. Random seed: " + scenario.getConfig().global().getRandomSeed());
-		} else {
-			log.info("Random seed is not taken from configFile. Setting random seed to " + randomSeed);
-			scenario.getConfig().global().setRandomSeed(randomSeed);
-		}
 
-		new TransitScheduleReaderV1(scenario).readFile(this.scheduleFile);
-		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(this.vehiclesFile);
+		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		new TransitScheduleReaderV1(scenario).readFile(this.scenario.getConfig().transit().getTransitScheduleFile());
+		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(this.scenario.getConfig().transit().getVehiclesFile());
 
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
@@ -111,7 +98,6 @@ public class InternalControler {
 		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler));
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
-		controlerConfGroup.setOutputDirectory(this.directoryExtIt + "/internalIterations");
 		if (controlerConfGroup.getLastIteration() == 0) {
 			controlerConfGroup.setWriteEventsInterval(1);
 			controlerConfGroup.setWritePlansInterval(1);
@@ -143,11 +129,6 @@ public class InternalControler {
 		
 		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(planCalcScoreConfigGroup, scenario.getNetwork(), ptScoringHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE, TRAVEL_PT_ACCESS, TRAVEL_PT_EGRESS);
 		controler.setScoringFunctionFactory(scoringfactory);
-
-		// just for information so that schedule and vehicles appear in the output_config:
-		TransitConfigGroup transit = controler.getConfig().transit();
-		transit.setTransitScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
-		transit.setVehiclesFile(this.directoryExtIt+"/vehiclesFile.xml");
 		
 		controler.setCreateGraphs(false);
 		controler.run();		

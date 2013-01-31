@@ -56,9 +56,9 @@ public class OperatorUserAnalysis {
 	private final Network network;
 	private final Double headway;
 	
-	public OperatorUserAnalysis(Scenario scenario, String directoryExtIt, Double headway) {
+	public OperatorUserAnalysis(Scenario scenario, Double headway) {
 		int lastInternalIteration = scenario.getConfig().controler().getLastIteration();
-		this.lastEventFile = directoryExtIt + "/internalIterations/ITERS/it." + lastInternalIteration + "/" + lastInternalIteration + ".events.xml.gz";
+		this.lastEventFile = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + lastInternalIteration + "/" + lastInternalIteration + ".events.xml.gz";
 		this.network = scenario.getNetwork();
 		this.headway = headway;
 	}

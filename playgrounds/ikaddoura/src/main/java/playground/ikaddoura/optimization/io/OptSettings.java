@@ -32,13 +32,15 @@ public class OptSettings {
 	private int incrBusNumber;
 	private double incrFare;
 	private int incrCapacity;
+	private int incrDemand;
 	private int startBusNumber;
 	private double startFare;
 	private int startCapacity;
-	private long randomSeed;
+	private int startDemand;
 	private int stepsBusNumber;
 	private int stepsFare;
 	private int stepsCapacity;
+	private int stepsDemand;
 
 	public int getIncrBusNumber() {
 		return incrBusNumber;
@@ -76,12 +78,6 @@ public class OptSettings {
 	public void setStartCapacity(int startCapacity) {
 		this.startCapacity = startCapacity;
 	}
-	public long getRandomSeed() {
-		return randomSeed;
-	}
-	public void setRandomSeed(long l) {
-		this.randomSeed = l;
-	}
 	public int getStepsBusNumber() {
 		return stepsBusNumber;
 	}
@@ -99,6 +95,24 @@ public class OptSettings {
 	}
 	public void setStepsCapacity(int stepsCapacity) {
 		this.stepsCapacity = stepsCapacity;
+	}
+	public int getIncrDemand() {
+		return incrDemand;
+	}
+	public void setIncrDemand(int incrDemand) {
+		this.incrDemand = incrDemand;
+	}
+	public int getStartDemand() {
+		return startDemand;
+	}
+	public void setStartDemand(int startDemand) {
+		this.startDemand = startDemand;
+	}
+	public int getStepsDemand() {
+		return stepsDemand;
+	}
+	public void setStepsDemand(int stepsDemand) {
+		this.stepsDemand = stepsDemand;
 	}
 
 }

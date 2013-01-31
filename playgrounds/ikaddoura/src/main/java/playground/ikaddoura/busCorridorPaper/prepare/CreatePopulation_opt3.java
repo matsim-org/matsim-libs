@@ -87,7 +87,7 @@ public class CreatePopulation_opt3 implements Runnable {
 			double homeEndTimeRnd = calculateNormallyDistributedTime(8.0*3600.0, 3600.0);
 
 			if (i <= ((double)quantity / 2.0)){
-				Person person = this.population.getFactory().createPerson(createId("person_WorkWhitePt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
+				Person person = this.population.getFactory().createPerson(createId("person_WorkPt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
 				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
@@ -100,7 +100,7 @@ public class CreatePopulation_opt3 implements Runnable {
 			}
 			
 			if (i > ((double)quantity / 2.0)){
-				Person person = this.population.getFactory().createPerson(createId("person_WorkWhiteCar_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
+				Person person = this.population.getFactory().createPerson(createId("person_WorkCar_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
 				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
