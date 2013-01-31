@@ -30,6 +30,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 /**
  * @author nagel
@@ -131,15 +132,28 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			log.warn("</module>");
 		}
 		
-		if ( !config.locationchoice().getDestinationSamplePercent().equals("100.") ) {
-//			problem = true ;
-			log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +
-					"DestinationSampler is resolved.  kai, jan'13") ;
+		boolean usingLocationChoice = false ;
+		for ( StrategySettings settings : config.strategy().getStrategySettings() ) {
+			if ( StrategyManagerConfigLoader.LOCATION_CHOICE.equals(settings.getModuleName())) {
+				usingLocationChoice = true ;
+			}
 		}
-		if ( !config.locationchoice().getProbChoiceExponent().equals("1.") ) {
-//			problem = true ;
-			log.error("vsp will not accept location choice prob choice exponents other than 1 until the corresponding warning in " +
-					"ChoiceSet is resolved.  kai, jan'13") ;
+		
+		if ( usingLocationChoice ) {
+			if ( !config.locationchoice().getDestinationSamplePercent().equals("100.") ) {
+				//			problem = true ;
+				log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +
+				"DestinationSampler is resolved.  kai, jan'13") ;
+			}
+//			if ( !config.locationchoice().getProbChoiceExponent().equals("1.") ) {
+//				//			problem = true ;
+//				log.error("vsp will not accept location choice prob choice exponents other than 1 until the corresponding warning in " +
+//				"ChoiceSet is resolved.  kai, jan'13") ;
+//			}
+			if ( !Boolean.parseBoolean( config.vspExperimental().getValue( VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice) ) ) {
+				// problem = true ;
+				log.error("vsp will not accept location choice without including opportunity cost of time into the approximation. kai,jan'13") ;
+			}
 		}
 		
 		if ( problem && config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel)

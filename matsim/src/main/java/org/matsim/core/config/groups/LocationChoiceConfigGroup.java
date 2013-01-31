@@ -80,7 +80,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String epsilonDistribution = "gumbel";
 	private String epsilonScaleFactors = "null";
 	private String probChoiceSetSize = "10";
-	private String probChoiceExponent ="3";
+//	private String probChoiceExponent ="3";
 	
 	private String pkValuesFile = "null";
 	private String fkValuesFile = "null";
@@ -152,9 +152,9 @@ public class LocationChoiceConfigGroup extends Module {
 		if (PROBCHOICESETSIZE.equals(key)) {
 			return getProbChoiceSetSize();
 		}
-		if (PROBCHOICEEXP.equals(key)) {
-			return getProbChoiceExponent();
-		}
+//		if (PROBCHOICEEXP.equals(key)) {
+//			return getProbChoiceExponent();
+//		}
 		if (PKVALS_FILE.equals(key)) {
 			return getpkValuesFile();
 		}
@@ -295,12 +295,13 @@ public class LocationChoiceConfigGroup extends Module {
 				setProbChoiceSetSize(value);
 			}
 		} else if (PROBCHOICEEXP.equals(key)) {
-			if (value.length() == 0) {
-				log.warn("define weight (exponent) for weighting scores in candiate set. Set to default value '3' now");
-			}
-			else {
-				setProbChoiceExponent(value);
-			}
+			log.error("location choice key " + PROBCHOICEEXP + " is no longer used.  Please remove.  This will be enforced more strictly in the future.  kai, jan'13") ;
+//			if (value.length() == 0) {
+//				log.warn("define weight (exponent) for weighting scores in candiate set. Set to default value '3' now");
+//			}
+//			else {
+//				setProbChoiceExponent(value);
+//			}
 		} else if (PKVALS_FILE.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define a persons k values file if available. Set to default value 'null' now");
@@ -374,7 +375,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, EPSDISTR);
 		this.addParameterToMap(map, SCALE_EPS);
 		this.addParameterToMap(map, PROBCHOICESETSIZE);
-		this.addParameterToMap(map, PROBCHOICEEXP);
+//		this.addParameterToMap(map, PROBCHOICEEXP);
 		this.addParameterToMap(map, PKVALS_FILE);
 		this.addParameterToMap(map, FKVALS_FILE);
 		this.addParameterToMap(map, MAXEPS_FILE);		
@@ -487,12 +488,12 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setProbChoiceSetSize(String probChoiceSetSize) {
 		this.probChoiceSetSize = probChoiceSetSize;
 	}
-	public String getProbChoiceExponent() {
-		return probChoiceExponent;
-	}
-	public void setProbChoiceExponent(String probChoiceExponent) {
-		this.probChoiceExponent = probChoiceExponent;
-	}
+//	public String getProbChoiceExponent() {
+//		return probChoiceExponent;
+//	}
+//	public void setProbChoiceExponent(String probChoiceExponent) {
+//		this.probChoiceExponent = probChoiceExponent;
+//	}
 	public String getpkValuesFile() {
 		return pkValuesFile;
 	}

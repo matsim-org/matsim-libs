@@ -49,6 +49,8 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  */
 public final class StrategyManagerConfigLoader {
 
+	public static final String LOCATION_CHOICE = "LocationChoice";
+
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
 	private static int externalCounter = 0;
@@ -125,7 +127,7 @@ public final class StrategyManagerConfigLoader {
 
 	private static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		// Special cases, scheduled to go away.
-		if (name.equals("LocationChoice")) {
+		if (name.equals(LOCATION_CHOICE)) {
 			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
 			return strategy;
 		} else if (name.equals("ExternalModule")) {
