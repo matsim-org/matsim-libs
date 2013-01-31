@@ -230,7 +230,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return false;
 	}
 
-	private static boolean isBlocking(
+	private boolean isBlocking(
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans groupPlan) {
 		return !searchForCombinationsWithoutForbiddenPlans(
@@ -240,7 +240,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				Collections.EMPTY_SET);
 	}
 
-	private static boolean searchForCombinationsWithoutForbiddenPlans(
+	private boolean searchForCombinationsWithoutForbiddenPlans(
 			final GroupPlans forbidenPlans,
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate,
@@ -255,6 +255,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 
+		final KnownBranches knownBranches = new KnownBranches( pruneSimilarBranches );
 		for (PlanRecord r : records) {
 			// skip forbidden plans
 			if ( r.jointPlan == null &&
@@ -266,6 +267,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				continue;
 			}
 
+			final Set<Id> cotravelers = r.jointPlan == null ? null : r.jointPlan.getIndividualPlans().keySet();
+			if ( knownBranches.isExplored( cotravelers ) ) continue;
+
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			Set<Id> actuallyAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
 			actuallyAllocatedPersons.add( currentPerson.person.getId() );
@@ -276,13 +280,16 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
 			}
 
-			if ( actuallyRemainingPersons.size() > 0 ) {
+			if ( !actuallyRemainingPersons.isEmpty() ) {
 				final boolean found = searchForCombinationsWithoutForbiddenPlans(
 						forbidenPlans,
 						allPersonsRecord,
 						actuallyRemainingPersons,
 						actuallyAllocatedPersons);
 				if (found) return true;
+				// if we are here, it is impossible to find allowed plans with the remaining
+				// agents. No need to re-explore.
+				knownBranches.tagAsExplored( cotravelers );
 			}
 			else {
 				return true;
