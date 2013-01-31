@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -126,14 +127,32 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		final Map<Id, PersonRecord> map = new LinkedHashMap<Id, PersonRecord>();
+		final Map<Plan, Double> weights = new HashMap<Plan, Double>();
+
+		for (Person person : group.getPersons()) {
+			for (Plan plan : person.getPlans()) {
+				weights.put( plan , getWeight( plan ) );
+			}
+		}
 
 		for (Person person : group.getPersons()) {
 			final LinkedList<PlanRecord> plans = new LinkedList<PlanRecord>();
 			for (Plan plan : person.getPlans()) {
+				double w = weights.get( plan );
+				final JointPlan jp = jointPlans.getJointPlan( plan );
+
+				if (jp != null) {
+					for (Plan p : jp.getIndividualPlans().values()) {
+						if (p == plan) continue;
+						w += weights.get( p );
+					}
+					w /= jp.getIndividualPlans().size();
+				}
+				
 				plans.add( new PlanRecord(
 							plan,
-							jointPlans.getJointPlan( plan ),
-							getWeight( plan )));
+							jp,
+							w));
 			}
 			map.put(
 					person.getId(),
@@ -149,7 +168,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 								final PlanRecord o1,
 								final PlanRecord o2) {
 							// sort in DECREASING order
-							return -Double.compare( o1.weight , o2.weight );
+							return -Double.compare( o1.avgJointPlanWeight , o2.avgJointPlanWeight );
 						}
 					});
 			pruneUnplausiblePlans( personRecord );
@@ -373,6 +392,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		// is better than the maximum possible in remaining plans
 		// or worst than the worst possible at a higher level
 		PlanString constructedString = null;
+		// the plans got after this step only depend on the agents still to
+		// allocate. We can stop at the first found solution.
+		final KnownBranches knownBranches = new KnownBranches( exploreAll );
 
 		for (PlanRecord r : records) {
 			if (!exploreAll &&
@@ -412,6 +434,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
 			}
 
+			if ( knownBranches.isExplored( actuallyAllocatedPersons ) ) continue;
 			PlanString newString;
 			if ( actuallyRemainingPersons.size() > 0 ) {
 				newString = buildPlanString(
@@ -425,6 +448,12 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 							constructedString != null ?
 								constructedString.getWeight() - EPSILON :
 								Double.NEGATIVE_INFINITY));
+				// if we found something, it is the best given the joint structure
+				// (plans are sorted by avg joint plan weight): do not search more
+				// for this particular structure.
+				// If we did not found something, trying again with the same structure
+				// will not change anything.
+				knownBranches.tagAsExplored( actuallyAllocatedPersons );
 			}
 			else {
 				newString = new PlanString( r , tail );
@@ -467,7 +496,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			// This list contains the agent to be selected.
 			final Collection<Id> personsSelected,
 			final List<PersonRecord> remainingPersons) {
-		double score = planToSelect.weight;
+		double score = planToSelect.avgJointPlanWeight;
 
 		// if the plan to select is a joint plan,
 		// we know exactly what plan to get the score from.
@@ -502,7 +531,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		// case in jp: plan is fully determined
 		if (jointPlanToSelect != null) {
 			final Plan plan = jointPlanToSelect.getIndividualPlan( record.person.getId() );
-			if (plan != null) return record.getRecord( plan ).weight;
+			if (plan != null) return record.getRecord( plan ).avgJointPlanWeight;
 		}
 
 		final Collection<Id> idsInJpToSelect =
@@ -514,12 +543,12 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
 
-			if (plan.jointPlan == null) return plan.weight;
+			if (plan.jointPlan == null) return plan.avgJointPlanWeight;
 
 			// skip this plan if its participants already have a plan
 			if (contains( plan.jointPlan , personsSelected )) continue;
 			if (contains( plan.jointPlan , idsInJpToSelect )) continue;
-			return plan.weight;
+			return plan.avgJointPlanWeight;
 		}
 
 		// this combination is impossible
@@ -583,7 +612,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				final PlanString tail) {
 			this.planRecord = head;
 			this.tail = tail;
-			this.weight = head.weight + (tail == null ? 0 : tail.getWeight());
+			this.weight = head.avgJointPlanWeight + (tail == null ? 0 : tail.getWeight());
 		}
 
 		public double getWeight() {
@@ -613,7 +642,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 								final PlanRecord o1,
 								final PlanRecord o2) {
 							// sort in DECREASING order
-							return -Double.compare( o1.weight , o2.weight );
+							return -Double.compare( o1.avgJointPlanWeight , o2.avgJointPlanWeight );
 						}
 					});
 		}
@@ -638,7 +667,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		 * if any.
 		 */
 		final JointPlan jointPlan;
-		final double weight;
+		final double avgJointPlanWeight;
 		double cachedMaximumWeight = Double.NaN;
 
 		public PlanRecord(
@@ -647,14 +676,14 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				final double weight) {
 			this.plan = plan;
 			this.jointPlan = jointPlan;
-			this.weight = weight;
+			this.avgJointPlanWeight = weight;
 		}
 
 		@Override
 		public String toString() {
 			return "{PlanRecord: "+plan.getPerson().getId()+":"+plan.getScore()+
 				" linkedWith:"+(jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())+
-				" weight="+weight+"}";
+				" weight="+avgJointPlanWeight+"}";
 		}
 	}
 
@@ -702,6 +731,23 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 
 			return true;
+		}
+	}
+
+	private static class KnownBranches {
+		private final boolean exploreAll;
+		private final List<Set<Id>> branches = new ArrayList<Set<Id>>();
+
+		public KnownBranches(final boolean exploreAll) {
+			this.exploreAll = exploreAll;
+		}
+
+		public void tagAsExplored(final Set<Id> branch) {
+			if (!exploreAll) branches.add( branch );
+		}
+
+		public boolean isExplored(final Set<Id> branch) {
+			return !exploreAll && branches.contains( branch );
 		}
 	}
 }
