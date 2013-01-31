@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
@@ -38,7 +39,7 @@ public class Main {
 
 	public static void main(String args[]){
 		
-		String file1 = "./input/config.xml";
+		String file1 = "C:/Users/Daniel/Dropbox/bsc/input/config.xml";
 //		String file2 = "./input/network_bridge.xml";
 		
 //		Config config = ConfigUtils.createConfig();
@@ -108,15 +109,6 @@ public class Main {
 			zones.add(zone);
 		}
 		
-//		ShapeFileReader reader = new ShapeFileReader();
-//		Collection<SimpleFeature> features = reader.readFileAndInitialize("input/shp/dlm_kreis.shp");
-//		
-//		for(SimpleFeature feature : features){
-//			Geometry geometry = (Geometry) feature.getDefaultGeometry();
-//			Zone<Id> zone = new Zone<Id>(geometry);
-//			zones.add(zone);
-//		}
-
 		ZoneLayer<Id> startZones = new ZoneLayer<Id>(zones);
 		
 		ctrl.addControlerListener(new MyParcelBasedAccessibilityControlerListener(main, startZones,
@@ -133,7 +125,7 @@ public class Main {
 //		MatsimNetworkReader nr2 = new MatsimNetworkReader(sc2);
 //		nr2.readFile(file2);
 		
-//		NetworkInspector nI = new NetworkInspector(sc);
+//		NetworkInspector nI = new NetworkInspector(scenario);
 //		nI.checkNetworkAttributes(true, true);
 //		nI.isRoutable();
 

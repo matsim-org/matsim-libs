@@ -37,7 +37,9 @@ public class NetworkInspector {
 	
 	private DecimalFormat df = new DecimalFormat(",##0.00");
 	
-	private double[] linkCapacities = new double[5];
+	private double[] linkCapacities = new double[7];
+	
+	private String outputFolder = "C:/Users/Daniel/Dropbox/bsc";
 	
 	public NetworkInspector(final Scenario sc){
 		
@@ -68,79 +70,10 @@ public class NetworkInspector {
 		
 	}
 	
-	public void accessibilityComputation(boolean parcelBased){
-		
-		AccessibilityControlerListenerImpl listener;
-		
-		MATSim4UrbanSimInterface main = new MATSim4UrbanSimInterface() {
-			
-			@Override
-			public boolean isParcelMode() {
-				return false;
-			}
-			
-			@Override
-			public ReadFromUrbanSimModel getReadFromUrbanSimModel() {
-				return null;
-			}
-			
-			@Override
-			public double getOpportunitySampleRate() {
-				return 0;
-			}
-		};
-		
-		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-		
-		bbox.setDefaultBoundaryBox(this.scenario.getNetwork());
-		
-		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
-		SpatialGrid carGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
-		SpatialGrid bikeGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
-		SpatialGrid walkGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
-		SpatialGrid ptGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
-		
-		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl();//create facility, aus matsim-bev., strukturdaten etc.
-		
-		int i=0;
-		
-		for(Person p : this.scenario.getPopulation().getPersons().values()){
-			PlanElement pe1 = p.getSelectedPlan().getPlanElements().get(0);
-			PlanElement pe2 = p.getSelectedPlan().getPlanElements().get(2);
-			if(pe1 instanceof Activity){
-				Id id = new IdImpl(i);
-				parcels.createFacility(id, ((Activity)pe1).getCoord());
-				i++;
-			}
-			if(pe2 instanceof Activity){
-				Id id = new IdImpl(i);
-				parcels.createFacility(id, ((Activity)pe2).getCoord());
-				i++;
-			}
-		}
-		
-		//class schreiben: extends accessibilitycontrolerlistener, notifyshutdown overriden,
-		//aggregateOpportunities ersetzen, kein file, kein sample, for-schleife: über facilities iterieren
-
-		ScenarioImpl sc = (ScenarioImpl) this.scenario;
-		
-		if(parcelBased){
-			listener = new MyParcelBasedAccessibilityControlerListener(main, null,
-					parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid, ptGrid, null, null,
-					sc);
-			
-		} else{
-			ActivityFacilitiesImpl zones = new ActivityFacilitiesImpl();
-			
-			listener = new ZoneBasedAccessibilityControlerListenerV3(main, null,
-					zones, null, null, sc);
-		}
-	}
-	
 	public void checkLinkAttributes() throws IOException{
 		logger.info("checking link attributes...");
 		
-		File file = new File("./test/lengthBelowStats.txt");
+		File file = new File(this.outputFolder+"/test/lengthBelowStats.txt");
 		FileWriter writer = new FileWriter(file);
 		int writerIndex = 0;
 		
@@ -156,16 +89,20 @@ public class NetworkInspector {
 			int numberOfLanes = (int) link.getNumberOfLanes();
 			nLanes[numberOfLanes-1]++;
 			
-			if(link.getCapacity()<=500)
+			if(link.getCapacity()<=125)//kapazitäten nach ras-q
 				this.linkCapacities[0]++;
-			else if(link.getCapacity()<=1000&&link.getCapacity()>500)
+			else if(link.getCapacity()<=625&&link.getCapacity()>125)
 				this.linkCapacities[1]++;
-			else if(link.getCapacity()<=1500&&link.getCapacity()>1000)
+			else if(link.getCapacity()<=830&&link.getCapacity()>625)
 				this.linkCapacities[2]++;
-			else if(link.getCapacity()<=2000&&link.getCapacity()>1500)
+			else if(link.getCapacity()<=1250&&link.getCapacity()>830)
 				this.linkCapacities[3]++;
-			else if(link.getCapacity()>2000)
+			else if(link.getCapacity()<=2500&&link.getCapacity()>1250)
 				this.linkCapacities[4]++;
+			else if(link.getCapacity()<=3000&&link.getCapacity()>2500)
+				this.linkCapacities[5]++;
+			else if(link.getCapacity()>4000)
+				this.linkCapacities[6]++;
 			
 			this.distances.put(link.getId(), distance);
 			
@@ -228,7 +165,7 @@ public class NetworkInspector {
 		
 		logger.info("writing lane statistics file...");
 		
-		File file = new File("./test/laneStatistics.txt");
+		File file = new File(this.outputFolder+"/test/laneStatistics.txt");
 		FileWriter writer = new FileWriter(file);
 		writer.write("Degree");
 		for(int i=0;i<values.length;i++){
@@ -242,7 +179,7 @@ public class NetworkInspector {
 		
 		BarChart chart = new BarChart("Number of lanes", "number of lanes", "number of objects");
 		chart.addSeries("nlanes", values);
-		chart.saveAsPng("./test/laneStatistics.png", 800, 600);
+		chart.saveAsPng(this.outputFolder+"/test/laneStatistics.png", 800, 600);
 	}
 
 	private void createLinkLengthComparisonFile() throws IOException {
@@ -252,7 +189,7 @@ public class NetworkInspector {
 		double length = 0;
 		double gLength = 0;
 
-		File file = new File("./test/linkLengthComparison.txt");
+		File file = new File(this.outputFolder+"/test/linkLengthComparison.txt");
 		FileWriter writer = new FileWriter(file);
 		writer.write("Id\tlength\tactualLength");
 		
@@ -274,16 +211,18 @@ private void createLinkCapacityFiles() throws IOException{
 		logger.info("writing capacities statistics file...");
 		
 		//kategorien: 500|1000|1500|2000|>...
-		String[] categories = new String[5];
-		categories[0]="<=500";
-		categories[1]="<=1000";
-		categories[2]="<=1500";
-		categories[3]="<=2000";
-		categories[4]=">2000";
+		String[] categories = new String[7];
+		categories[0]="<=125";
+		categories[1]="<=625";
+		categories[2]="<=830";
+		categories[3]="<=1250";
+		categories[4]="<=2500";
+		categories[5]="<=3000";
+		categories[6]=">4000";
 		
 		BarChart chart = new BarChart("Link capacities","capacity","number of objects",categories);
 		chart.addSeries("capacities", this.linkCapacities);
-		chart.saveAsPng("./test/linkCapacities.png", 800, 600);
+		chart.saveAsPng(this.outputFolder+"/test/linkCapacities.png", 800, 600);
 		
 	}
 
@@ -291,7 +230,7 @@ private void createLinkCapacityFiles() throws IOException{
 		
 		logger.info("writing node degrees files");
 		
-		File file = new File("./test/nodeDegrees.txt");
+		File file = new File(this.outputFolder+"/test/nodeDegrees.txt");
 		FileWriter writer = new FileWriter(file);
 		writer.write("in/out\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\nnobjects");
 		
@@ -303,7 +242,7 @@ private void createLinkCapacityFiles() throws IOException{
 		BarChart chart = new BarChart("Node degrees", "degree", "number of objects");
 		chart.addSeries("in-degrees", inDegrees);
 		chart.addSeries("out-degrees", outDegrees);
-		chart.saveAsPng("./test/nodeDegrees.png", 800, 600);
+		chart.saveAsPng(this.outputFolder+"/test/nodeDegrees.png", 800, 600);
 	}
 	
 }

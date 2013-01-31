@@ -59,6 +59,7 @@ public class MyParcelBasedAccessibilityControlerListener extends
 		ParcelBasedAccessibilityControlerListenerV3 {
 	
 	private static final Logger log = Logger.getLogger(MyParcelBasedAccessibilityControlerListener.class);
+	private static InternalConstants internalConstants = new InternalConstants();
 
 	public MyParcelBasedAccessibilityControlerListener(
 			MATSim4UrbanSimInterface main, ZoneLayer<Id> startZones,
@@ -68,9 +69,10 @@ public class MyParcelBasedAccessibilityControlerListener extends
 			ScenarioImpl scenario) {
 		super(main, startZones, parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
 				ptGrid, ptMatrix, benchmark, scenario);
+		internalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
 	}
 	
-	protected AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, /*final double jobSample,*/ final NetworkImpl network, final boolean isParcelMode){
+	protected AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, /*final double jobSample,*/ final NetworkImpl network/*, final boolean isParcelMode*/){
 		
 		// readJobs creates a hash map of job with key = job id
 		// this hash map includes jobs according to job sample size
@@ -150,7 +152,7 @@ public class MyParcelBasedAccessibilityControlerListener extends
 		Controler controler = event.getControler();
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		
-		this.aggregatedOpportunities = this.aggregatedOpportunities(this.parcels, /*this.main.getOpportunitySampleRate(),*/ network, this.main.isParcelMode());
+		this.aggregatedOpportunities = this.aggregatedOpportunities(this.parcels, /*this.main.getOpportunitySampleRate(),*/ network/*, this.main.isParcelMode()*/);
 		
 //		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
 		
@@ -201,7 +203,7 @@ public class MyParcelBasedAccessibilityControlerListener extends
 			
 			AnalysisCellBasedAccessibilityCSVWriterV2.close(); 
 			writePlottingData();						// plotting data for visual analysis via R
-			writeInterpolatedParcelAccessibilities();	// UrbanSim input file with interpolated accessibilities on parcel level
+//			writeInterpolatedParcelAccessibilities();	// UrbanSim input file with interpolated accessibilities on parcel level
 		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -209,80 +211,81 @@ public class MyParcelBasedAccessibilityControlerListener extends
 			e.printStackTrace();
 		}
 	}
+	
+	private void writePlottingData() throws IOException{
 		
-		private void writePlottingData() throws IOException{
-			
-			log.info("Writing plotting files ...");
-			// tnicolai: can be disabled for final release
-			GridUtils.writeSpatialGridTable(freeSpeedGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// freespeed results for plotting in R
-					+ FREESEED_FILENAME + freeSpeedGrid.getResolution()
-					+ InternalConstants.FILE_TYPE_TXT);
-			// tnicolai: can be disabled for final release
-			GridUtils.writeSpatialGridTable(carGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
-					+ CAR_FILENAME + carGrid.getResolution()
-					+ InternalConstants.FILE_TYPE_TXT);
-			// tnicolai: can be disabled for final release
-			GridUtils.writeSpatialGridTable(bikeGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
-					+ BIKE_FILENAME + bikeGrid.getResolution()
-					+ InternalConstants.FILE_TYPE_TXT);
-			// tnicolai: can be disabled for final release
-			GridUtils.writeSpatialGridTable(walkGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
-					+ WALK_FILENAME + walkGrid.getResolution()
-					+ InternalConstants.FILE_TYPE_TXT);
-			// tnicolai: can be disabled for final release
-			GridUtils.writeSpatialGridTable(ptGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
-					+ PT_FILENAME + ptGrid.getResolution()
-					+ InternalConstants.FILE_TYPE_TXT);
+		log.info("Writing plotting files ...");
+		// tnicolai: can be disabled for final release
+		
+		GridUtils.writeSpatialGridTable(freeSpeedGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// freespeed results for plotting in R
+				+ FREESEED_FILENAME + freeSpeedGrid.getResolution()
+				+ InternalConstants.FILE_TYPE_TXT);
+		// tnicolai: can be disabled for final release
+		GridUtils.writeSpatialGridTable(carGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
+				+ CAR_FILENAME + carGrid.getResolution()
+				+ InternalConstants.FILE_TYPE_TXT);
+		// tnicolai: can be disabled for final release
+		GridUtils.writeSpatialGridTable(bikeGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
+				+ BIKE_FILENAME + bikeGrid.getResolution()
+				+ InternalConstants.FILE_TYPE_TXT);
+		// tnicolai: can be disabled for final release
+		GridUtils.writeSpatialGridTable(walkGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
+				+ WALK_FILENAME + walkGrid.getResolution()
+				+ InternalConstants.FILE_TYPE_TXT);
+		// tnicolai: can be disabled for final release
+//		GridUtils.writeSpatialGridTable(ptGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
+//				+ PT_FILENAME + ptGrid.getResolution()
+//				+ InternalConstants.FILE_TYPE_TXT);
 
-			log.info("Writing plotting files done!");
-		}
+		log.info("Writing plotting files done!");
+	}
+	
+	private void writeInterpolatedParcelAccessibilities() {
+		// from here accessibility feedback for each parcel
+		UrbanSimParcelCSVWriter.initUrbanSimZoneWriter();
 		
-		private void writeInterpolatedParcelAccessibilities() {
-			// from here accessibility feedback for each parcel
-			UrbanSimParcelCSVWriter.initUrbanSimZoneWriter();
+		Interpolation freeSpeedGridInterpolation = new Interpolation(freeSpeedGrid, Interpolation.BILINEAR);
+		Interpolation carGridInterpolation = new Interpolation(carGrid, Interpolation.BILINEAR);
+		Interpolation bikeGridInterpolation= new Interpolation(bikeGrid, Interpolation.BILINEAR);
+		Interpolation walkGridInterpolation= new Interpolation(walkGrid, Interpolation.BILINEAR);
+		Interpolation ptGridInterpolation  = new Interpolation(ptGrid, Interpolation.BILINEAR);
+		
+		if(this.parcels != null){
 			
-			Interpolation freeSpeedGridInterpolation = new Interpolation(freeSpeedGrid, Interpolation.BILINEAR);
-			Interpolation carGridInterpolation = new Interpolation(carGrid, Interpolation.BILINEAR);
-			Interpolation bikeGridInterpolation= new Interpolation(bikeGrid, Interpolation.BILINEAR);
-			Interpolation walkGridInterpolation= new Interpolation(walkGrid, Interpolation.BILINEAR);
-			Interpolation ptGridInterpolation  = new Interpolation(ptGrid, Interpolation.BILINEAR);
+			int numberOfParcels = this.parcels.getFacilities().size();
+			double freeSpeedAccessibility = Double.NaN;
+			double carAccessibility = Double.NaN;
+			double bikeAccessibility= Double.NaN;
+			double walkAccessibility= Double.NaN;
+			double ptAccessibility  = Double.NaN;
 			
-			if(this.parcels != null){
+			log.info(numberOfParcels + " parcels are now processing ...");
+			
+			Iterator<ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
+			ProgressBar bar = new ProgressBar( numberOfParcels );
+			
+			while(parcelIterator.hasNext()){
 				
-				int numberOfParcels = this.parcels.getFacilities().size();
-				double freeSpeedAccessibility = Double.NaN;
-				double carAccessibility = Double.NaN;
-				double bikeAccessibility= Double.NaN;
-				double walkAccessibility= Double.NaN;
-				double ptAccessibility  = Double.NaN;
+				bar.update();
 				
-				log.info(numberOfParcels + " parcels are now processing ...");
+				ActivityFacility parcel = parcelIterator.next();
 				
-				Iterator<ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
-				ProgressBar bar = new ProgressBar( numberOfParcels );
+				// for testing
+				// double car = carGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
+				// double walk= walkGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
 				
-				while(parcelIterator.hasNext()){
-					
-					bar.update();
-					
-					ActivityFacility parcel = parcelIterator.next();
-					
-					// for testing
-					// double car = carGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
-					// double walk= walkGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
-					
-					freeSpeedAccessibility = freeSpeedGridInterpolation.interpolate( parcel.getCoord() );
-					carAccessibility = carGridInterpolation.interpolate( parcel.getCoord() );
-					bikeAccessibility= bikeGridInterpolation.interpolate( parcel.getCoord() );
-					walkAccessibility= walkGridInterpolation.interpolate( parcel.getCoord() );
-					ptAccessibility  = ptGridInterpolation.interpolate( parcel.getCoord() );
-					
-					UrbanSimParcelCSVWriter.write(parcel.getId(), freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
-				}
-				log.info("... done!");
-				UrbanSimParcelCSVWriter.close();
+				freeSpeedAccessibility = freeSpeedGridInterpolation.interpolate( parcel.getCoord() );
+				carAccessibility = carGridInterpolation.interpolate( parcel.getCoord() );
+				bikeAccessibility= bikeGridInterpolation.interpolate( parcel.getCoord() );
+				walkAccessibility= walkGridInterpolation.interpolate( parcel.getCoord() );
+				ptAccessibility  = ptGridInterpolation.interpolate( parcel.getCoord() );
+				
+				UrbanSimParcelCSVWriter.write(parcel.getId(), freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
 			}
+			log.info("... done!");
+			UrbanSimParcelCSVWriter.close();
 		}
+	}
 		
 		@Override
 		protected void initAccessibilityParameter(ScenarioImpl scenario){
@@ -320,11 +323,11 @@ public class MyParcelBasedAccessibilityControlerListener extends
 			moduleAPCM.setBetaWalkTravelDistancePower2(0);
 			moduleAPCM.setBetaWalkTravelTimePower2(0);
 			
-			moduleAPCM.setAccessibilityDestinationSamplingRate(0);
-			moduleAPCM.setLogitScaleParameter(0);
+			moduleAPCM.setAccessibilityDestinationSamplingRate(1);
+			moduleAPCM.setLogitScaleParameter(1);
 			moduleAPCM.setUseBikeParameterFromMATSim(true);
 			moduleAPCM.setUseCarParameterFromMATSim(true);
-			moduleAPCM.setUseLogitScaleParameterFromMATSim(false);
+			moduleAPCM.setUseLogitScaleParameterFromMATSim(true);
 			moduleAPCM.setUseRawSumsWithoutLn(true);
 			moduleAPCM.setUseWalkParameterFromMATSim(true);
 			
@@ -558,17 +561,18 @@ public class MyParcelBasedAccessibilityControlerListener extends
 					}
 
 					if(mode == PARCEL_BASED){ // only for cell-based accessibility computation
-						// assign log sums to current starZone object and spatial grid
+//						 assign log sums to current starZone object and spatial grid
 						freeSpeedGrid.setValue(freeSpeedAccessibility, measurePoint.getGeometry().getCentroid());
 						carGrid.setValue(carAccessibility , measurePoint.getGeometry().getCentroid());
 						bikeGrid.setValue(bikeAccessibility , measurePoint.getGeometry().getCentroid());
 						walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
 						ptGrid.setValue(ptAccessibility, measurePoint.getGeometry().getCentroid());
+//						log.info(freeSpeedGrid.getValue(measurePoint.getGeometry().getCentroid()));
 					}
 
-					writeCSVData(measurePoint, coordFromZone, fromNode, 
-							freeSpeedAccessibility, carAccessibility,
-							bikeAccessibility, walkAccessibility, ptAccessibility);
+//					writeCSVData(measurePoint, coordFromZone, fromNode, 
+//							freeSpeedAccessibility, carAccessibility,
+//							bikeAccessibility, walkAccessibility, ptAccessibility);
 				}
 			}
 		}
