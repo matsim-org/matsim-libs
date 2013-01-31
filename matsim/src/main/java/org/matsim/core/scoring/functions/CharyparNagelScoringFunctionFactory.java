@@ -40,18 +40,24 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final CharyparNagelScoringParameters params;
+//	private final CharyparNagelScoringParameters params;
 	protected Network network;
+	private final PlanCalcScoreConfigGroup config;
 
 	public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
-		this.params = new CharyparNagelScoringParameters(config);
+
+		//		this.params = new CharyparNagelScoringParameters(config);
+		this.config = config ;
+		// (constructor of factory should not "do" anything.  In this case, config may not yet contain the
+		// "pt interaction" activity type when this constructor is called.  kai, jan'13)
+		
 		this.network = network;
 	}
 
-	public CharyparNagelScoringFunctionFactory(CharyparNagelScoringParameters params, Network network) {
-		this.params = params;
-		this.network = network;
-	}
+//	public CharyparNagelScoringFunctionFactory(CharyparNagelScoringParameters params, Network network) {
+//		this.params = params;
+//		this.network = network;
+//	}
 
 
 	/**
@@ -75,6 +81,7 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 	 */
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(this.config) ;
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
@@ -83,7 +90,12 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 		return scoringFunctionAccumulator;
 	}
 
+	@Deprecated
 	public CharyparNagelScoringParameters getParams() {
-		return params;
+		// yyyy This is not helpful.  If factories should not do anything before "create" is called, then it is not clear
+		// in which state this is at which point in time.  (For example, the "pt interaction" activity may have already been added,
+		//	 or not.not kai, jan'13
+//		return params;
+		return new CharyparNagelScoringParameters(config) ;
 	}
 }

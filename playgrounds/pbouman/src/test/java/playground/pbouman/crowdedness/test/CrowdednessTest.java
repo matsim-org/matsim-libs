@@ -49,7 +49,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -95,13 +95,20 @@ public class CrowdednessTest
 		final ScenarioImpl scen = generateScenario();
 		scen.getConfig().controler().setLastIteration(0);
 				
-		Controler c = new Controler(scen)
-		{
-			@Override protected ScoringFunctionFactory loadScoringFunctionFactory()
-			{
-				return new CrowdedScoringFunctionFactory(super.loadScoringFunctionFactory(), getEvents());
-			}
-		};
+		Controler c = new Controler(scen) ;
+//		{
+//			@Override protected ScoringFunctionFactory loadScoringFunctionFactory()
+//			{
+//				return new CrowdedScoringFunctionFactory(super.loadScoringFunctionFactory(), getEvents());
+//			}
+//		};
+		
+		c.setScoringFunctionFactory(
+				new CrowdedScoringFunctionFactory( 
+						new CharyparNagelScoringFunctionFactory(c.getConfig().planCalcScore(), c.getNetwork()), c.getEvents()
+						)
+				) ;
+
 	
 		c.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
 		
