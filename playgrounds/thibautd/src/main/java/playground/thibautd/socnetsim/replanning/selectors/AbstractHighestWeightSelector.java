@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +55,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 	private static final double EPSILON = 1E-7;
 	private final boolean forbidBlockingCombinations;
-	private final boolean pruneUnplausiblePlans;
+	private final boolean pruneSimilarBranches;
 	private final boolean exploreAll;
 
 	protected AbstractHighestWeightSelector() {
@@ -79,10 +78,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	protected AbstractHighestWeightSelector(
 			final boolean isForRemoval,
 			final boolean exploreAll,
-			final boolean pruneUnplausiblePlans) {
+			final boolean pruneSimilarBranches) {
 		this.forbidBlockingCombinations = isForRemoval;
 		this.exploreAll = exploreAll;
-		this.pruneUnplausiblePlans = pruneUnplausiblePlans;
+		this.pruneSimilarBranches = pruneSimilarBranches;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -171,35 +170,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 							return -Double.compare( o1.avgJointPlanWeight , o2.avgJointPlanWeight );
 						}
 					});
-			pruneUnplausiblePlans( personRecord );
 		}
 
 		return map;
-	}
-
-	/**
-	 * removes all plans that will not be selected for sure,
-	 * by keeping only the best joint plan for each agent combination.
-	 * It assumes the plans sorted.
-	 * It increases DRAMATICALLY the performance (several hundreds times faster),
-	 * probably both due to reduced problem sized and tighter lower bounds
-	 */
-	private void pruneUnplausiblePlans(
-			final PersonRecord personRecord) {
-		if (!pruneUnplausiblePlans) return;
-		final Iterator<PlanRecord> plans = personRecord.plans.iterator();
-		final int maxIndivPlans = forbidBlockingCombinations ? 2 : 1;
-		int nIndivPlans = 0;
-
-		// plans are sorted
-		while (plans.hasNext()) {
-			final PlanRecord plan = plans.next();
-
-			if (plan.jointPlan == null) {
-				nIndivPlans++;
-				if (nIndivPlans > maxIndivPlans) plans.remove();
-			}
-		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -394,7 +367,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		PlanString constructedString = null;
 		// the plans got after this step only depend on the agents still to
 		// allocate. We can stop at the first found solution.
-		final KnownBranches knownBranches = new KnownBranches( exploreAll );
+		final KnownBranches knownBranches = new KnownBranches( pruneSimilarBranches );
 
 		for (PlanRecord r : records) {
 			if (!exploreAll &&
@@ -417,6 +390,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				break;
 			}
 
+			final Set<Id> cotravelers = r.jointPlan == null ? null : r.jointPlan.getIndividualPlans().keySet();
+			if ( knownBranches.isExplored( cotravelers ) ) continue;
+
 			PlanString tail = str;
 			// TODO: find a better way to filter persons (should be
 			// possible in PlanString), ie without having to create new collections
@@ -434,9 +410,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
 			}
 
-			if ( knownBranches.isExplored( actuallyAllocatedPersons ) ) continue;
 			PlanString newString;
-			if ( actuallyRemainingPersons.size() > 0 ) {
+			if ( !actuallyRemainingPersons.isEmpty() ) {
 				newString = buildPlanString(
 						forbidenCombinations,
 						allPersonsRecord,
@@ -453,7 +428,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				// for this particular structure.
 				// If we did not found something, trying again with the same structure
 				// will not change anything.
-				knownBranches.tagAsExplored( actuallyAllocatedPersons );
+				knownBranches.tagAsExplored( cotravelers );
 			}
 			else {
 				newString = new PlanString( r , tail );
@@ -735,19 +710,19 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	}
 
 	private static class KnownBranches {
-		private final boolean exploreAll;
+		private final boolean prune;
 		private final List<Set<Id>> branches = new ArrayList<Set<Id>>();
 
-		public KnownBranches(final boolean exploreAll) {
-			this.exploreAll = exploreAll;
+		public KnownBranches(final boolean prune) {
+			this.prune = prune;
 		}
 
 		public void tagAsExplored(final Set<Id> branch) {
-			if (!exploreAll) branches.add( branch );
+			if (prune) branches.add( branch );
 		}
 
 		public boolean isExplored(final Set<Id> branch) {
-			return !exploreAll && branches.contains( branch );
+			return prune && branches.contains( branch );
 		}
 	}
 }
