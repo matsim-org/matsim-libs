@@ -27,13 +27,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripsMutatorConfigGroup;
-import playground.thibautd.cliquessim.population.PopulationWithJointTripsReader;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;
@@ -62,15 +60,7 @@ public class JointControlerUtils {
 	public static Scenario createScenario(final Config config) {
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		tuneScenario( scenario );
-
-		//(new ScenarioLoaderImpl(scenario)).loadScenario();
-		// ScenarioUtils.loadScenario(scenario);
-		// Cannot load full joint information when using default loader: load manually.
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadNetwork();
-		loader.loadActivityFacilities();
-		// TODO: adapt to new state
-		(new PopulationWithJointTripsReader(scenario)).readFile(config.plans().getInputFile());
+		ScenarioUtils.loadScenario( scenario );
 
 		return scenario;
 	}
