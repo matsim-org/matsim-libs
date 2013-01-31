@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import playgrounds.ssix.FundamentalDiagrams;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,8 +34,6 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
-
-import playgrounds.ssix.FundamentalDiagrams;
 
 /* A class supposed to go attached to the DreieckStreckeSzenario class (with passing).
  * It aims at analyzing the flow of events in order to detect:
@@ -243,6 +243,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 							this.endDensity_fast = this.permanentDensity_fast;
 							
 							this.endFlow
+
  = this.permanentFlow;
 							this.endFlow_truck = this.permanentFlow_truck;
 							//this.endFlow_med = this.permanentFlow_med;
@@ -253,7 +254,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 							//this.endAverageVelocity_med = this.permanentAverageVelocity_med;
 							this.endAverageVelocity_fast = this.permanentAverageVelocity_fast;
 							
-							//TODO: set all goHome to true.
+							//TODO: set all goHome to true. Resolved in setting an endTime to the qSim, resulting in an abrupt abort after endTime seconds.
 							
 							
 						}
@@ -447,7 +448,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 					//globally?
 					double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
 					double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed,
+					if
+ ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed,
  theOneBefore, 0.02))){
 						//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
 						if ((permanentRegime_truck) && (permanentRegime_med) && (permanentRegime_fast)){//just checking that the modes are effectively stable
@@ -701,7 +703,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	}
 	
 	
-	private boolean almostEqualDoubles(double d1, double d2, double MaximumAcceptedDeviance){
+	private boolean almostEqualDoubles(double
+ d1, double d2, double MaximumAcceptedDeviance){
 		/*//Method 1: Relative accepted deviance:
  not so good, with big flows it starts to detect stability too soon.
 		if (((d1-d2)/d2)< MaximumAcceptedDeviance)

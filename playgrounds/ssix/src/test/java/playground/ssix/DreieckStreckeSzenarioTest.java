@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import playgrounds.ssix.MyPersonDriverAgentImpl;
+
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +43,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -72,8 +76,8 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import playgrounds.ssix.MyPersonDriverAgentImpl;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class DreieckStreckeSzenarioTest {
 
@@ -221,7 +225,9 @@ public class DreieckStreckeSzenarioTest {
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
 		config.getQSimConfigGroup().setMainModes(Arrays.asList("fast"/*,"med"*/,"truck"));
-		config.getQSimConfigGroup().setStuckTime(100*3600.);
+		config.getQSimConfigGroup().setStuckTime(100*3600.);//allows to overcome maximal density regime
+		config.getQSimConfigGroup().setEndTime(10*3600);//allows to set agents to abort after getting the wanted data.
+									//TODO: is for actual network configurations correct, needs dependency on bigger network length 
 		
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
 		// this may lead to abort during execution.  In such cases, please fix the configuration.  if necessary, talk
@@ -260,6 +266,7 @@ public class DreieckStreckeSzenarioTest {
 		
 		//writer.doSomething
 		writer.format("%d\t\t", numberOfPeople);
+		System.out.println("Writing down data for "+numberOfPeople+" people.");
 		
 		writer.format("%.2f\t", fundi3.getEndDensity());
 		writer.format("%.2f\t", fundi3.getEndDensity_truck());
@@ -267,8 +274,7 @@ public class DreieckStreckeSzenarioTest {
 		writer.format("%.2f\t\t", fundi3.getEndDensity_fast());
 		
 		writer.format("%.2f\t", fundi3.getEndFlow());
-		writer.format("%.2f\t",
- fundi3.getEndFlow_truck());
+		writer.format("%.2f\t", fundi3.getEndFlow_truck());
 		//writer.format("%.2f\t", fundi3.getEndFlow_med());
 		writer.format("%.2f\t\t", fundi3.getEndFlow_fast());
 		
@@ -507,7 +513,8 @@ public class DreieckStreckeSzenarioTest {
 	private void prepareForSim() {
 		// make sure all routes are calculated.
 		//Calculating routes this way will make them direct. On the contrary we want the drivers to go all the way around
-		// 	-> All routes are now implemented in the createPopulation method while creating legs
+		// 	-> All routes
+ are now implemented in the createPopulation method while creating legs
 		
 		
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), scenario.getConfig().global().getNumberOfThreads(),

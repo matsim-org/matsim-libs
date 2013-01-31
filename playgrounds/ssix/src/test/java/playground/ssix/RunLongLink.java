@@ -268,7 +268,8 @@ public class RunLongLink {
 		qSim.addQueueSimulationListeners(queueSimulationFeature);
 		server.setSimulation(qSim);
 
-		if (config.scenario().isUseTransit()) {
+		if
+ (config.scenario().isUseTransit()) {
 
 			Network network = scenario.getNetwork();
 			TransitSchedule transitSchedule = ((ScenarioImpl) scenario).getTransitSchedule();
