@@ -32,11 +32,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
 import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
-import playground.thibautd.cliquessim.config.JointTripPossibilitiesConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripsMutatorConfigGroup;
 import playground.thibautd.cliquessim.population.PopulationWithJointTripsReader;
-import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities;
-import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLReader;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;
@@ -75,28 +72,7 @@ public class JointControlerUtils {
 		// TODO: adapt to new state
 		(new PopulationWithJointTripsReader(scenario)).readFile(config.plans().getInputFile());
 
-		JointTripPossibilities poss = readPossibilities( config );
-		if (poss != null) scenario.addScenarioElement( poss );
-
 		return scenario;
-	}
-
-	public static JointTripPossibilities getJointTripPossibilities(final Scenario sc) {
-		return sc.getScenarioElement( JointTripPossibilities.class );
-	}
-
-	private static JointTripPossibilities readPossibilities(final Config config) {
-		JointTripPossibilitiesConfigGroup group = (JointTripPossibilitiesConfigGroup)
-			 config.getModule( JointTripPossibilitiesConfigGroup.GROUP_NAME );
-		String file = group != null ? group.getPossibilitiesFile() : null;
-
-		if (file != null) {
-			JointTripPossibilitiesXMLReader reader = new JointTripPossibilitiesXMLReader();
-			reader.parse( file );
-			return reader.getJointTripPossibilities();
-		}
-
-		return null;
 	}
 
 	public static void tuneScenario(final Scenario sc) {
@@ -146,9 +122,6 @@ public class JointControlerUtils {
 		config.addModule(
 				JointTimeModeChooserConfigGroup.GROUP_NAME,
 				new JointTimeModeChooserConfigGroup());
-		config.addModule(
-				JointTripPossibilitiesConfigGroup.GROUP_NAME,
-				new JointTripPossibilitiesConfigGroup());
 		config.addModule(
 				JointTripInsertorConfigGroup.GROUP_NAME,
 				new JointTripInsertorConfigGroup());
