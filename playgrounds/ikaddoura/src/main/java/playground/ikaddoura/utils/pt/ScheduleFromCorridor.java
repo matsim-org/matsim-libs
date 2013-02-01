@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BusCorridorScheduleVehiclesGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,9 +22,6 @@
  */
 package playground.ikaddoura.utils.pt;
 
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,15 +30,17 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
-import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -50,115 +48,72 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-
 /**
- * @author Ihab
+ * Creates a schedule without departures from a corridor network (one transit line, two transit routes (one for each direction), a transit stop on the toNode of each link).
+ * 
+ * @author ikaddoura
  *
  */
-public class ScheduleGenerator {
+public class ScheduleFromCorridor {
+		
+	private final static Logger log = Logger.getLogger(ScheduleFromCorridor.class);
 
-	private final static Logger log = Logger.getLogger(ScheduleGenerator.class);
-
-	private double stopTime;
-	private Network network;
-	private Id transitLineId;
-	private Id routeId1;
-	private Id routeId2;
-	private double startTime;
-	private double endTime;
-	private double pausenzeit;
-	private double scheduleSpeed;
+	// standard IDs
+	private Id transitLineId = new IdImpl("transitLine");
+	private Id routeId1 = new IdImpl("route_1");
+	private Id routeId2 = new IdImpl("route_2");
 	
-	private double umlaufzeit_sec;
-
-	private List<Id> vehicleIDs = new ArrayList<Id>();
+	private double routeTravelTime;
 	private Map<Id, TransitRoute> routeId2transitRoute;
 	
 	private TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
-	private final TransitSchedule schedule = sf.createTransitSchedule();
-	
-	// ************************************************************************************
-	
-	public void createLineRoutesStops() {
-		Map<Id,List<Id>> routeID2linkIDs = getIDs();
-		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(routeID2linkIDs);
+	private final TransitSchedule transitSchedule = sf.createTransitSchedule();
+
+	public TransitSchedule getTransitSchedule() {
+		return this.transitSchedule;
+	}
+
+	/**
+	 * Creates the transit schedule without departures. Creates a transit line for a simple corridor network. The linkMarker sequence has to match to the network link IDs,
+	 * indicating on which link a transit stop has to be added. The schedule speed and scheduled stop time are used for calculating arrival and departure offsets
+	 * based on the length of the corridor links.
+	 *
+	 */
+	public void createTransitSchedule(String networkFile, String linkMarker, String transitRouteMode, boolean isBlocking, boolean awaitDeparture, double scheduleSpeed_m_sec, double stopTime_sec) {
+		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario).readFile(networkFile);
+		Network network = scenario.getNetwork();
+		
+		Map<Id,List<Id>> routeID2linkIDs = getIDs(network, linkMarker);
+		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(network, routeID2linkIDs, isBlocking);
 		Map<Id, NetworkRoute> routeId2networkRoute = getRouteId2NetworkRoute(routeID2linkIDs);
-		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(routeId2transitStopFacilities);
-		this.routeId2transitRoute = getRouteId2TransitRoute(routeId2networkRoute, routeId2TransitRouteStops);
+		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(stopTime_sec, scheduleSpeed_m_sec, awaitDeparture, network, routeId2transitStopFacilities);
+
+		setRouteId2TransitRoute(transitRouteMode, routeId2networkRoute, routeId2TransitRouteStops);
 		setTransitLine(routeId2transitRoute);
-		
+				
 		int lastStop = routeId2transitRoute.get(routeId1).getStops().size()-1;
-		double routeTravelTime = routeId2transitRoute.get(routeId1).getStops().get(lastStop).getArrivalOffset();
-		this.umlaufzeit_sec = Math.round((routeTravelTime + this.pausenzeit) * 2.0);
+		this.routeTravelTime = routeId2transitRoute.get(routeId1).getStops().get(lastStop).getArrivalOffset();
 		log.info("RouteTravelTime: "+ Time.writeTime(routeTravelTime, Time.TIMEFORMAT_HHMMSS));
-		log.info("Umlaufzeit: "+ Time.writeTime(umlaufzeit_sec, Time.TIMEFORMAT_HHMMSS));			
-	}
-	
-	public void setDepartureIDs(double headway, int numberOfBuses) {	
 		
-		log.info("Takt: "+ Time.writeTime(headway, Time.TIMEFORMAT_HHMMSS));
-		log.info("Required number of public vehicles: " + numberOfBuses);
-			
-		int routeNr = 0;
-		for (Id routeId : routeId2transitRoute.keySet()){
-			double firstDepartureTime = 0.0;
-			if (routeNr == 1){
-				firstDepartureTime = this.startTime;
-				log.info(routeId.toString() + ": first departure: "+ Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
-			}
-			else if (routeNr == 0){
-				firstDepartureTime = this.startTime + umlaufzeit_sec/2;
-				log.info(routeId.toString() + ": first departure: "+ Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
-	
-			}
-			int vehicleIndex = 0;
-			int depNr = 0;
-			for (double departureTime = firstDepartureTime; departureTime < this.endTime ; ){
-				Departure departure = this.sf.createDeparture(new IdImpl(depNr), departureTime);
-				departure.setVehicleId(this.vehicleIDs.get(vehicleIndex));
-				this.routeId2transitRoute.get(routeId).addDeparture(departure);
-				departureTime = departureTime + headway;
-				depNr++;
-				if (vehicleIndex == numberOfBuses - 1){
-					vehicleIndex = 0;
-				}
-				else {
-					vehicleIndex++;
-				}
-			}				
-			routeNr++;
-		}			
+//		this.umlaufzeit_sec = Math.round((routeTravelTime + this.pausenzeit) * 2.0);
+//		log.info("Umlaufzeit: "+ Time.writeTime(umlaufzeit_sec, Time.TIMEFORMAT_HHMMSS));
 	}
-			
-	public void createVehicleIDs(int numberOfBuses){
-		for (int vehicleNr=1 ; vehicleNr <= numberOfBuses ; vehicleNr++){
-			this.vehicleIDs.add(new IdImpl("bus_"+vehicleNr));
-		}
-	}
-	
-	public void writeScheduleFile(String outputDir, String scheduleFile) {
-		File directory = new File(outputDir);
-		directory.mkdirs();
-		
-		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(this.schedule);
-		scheduleWriter.write(outputDir + scheduleFile);
-	}
-	
-	// ************************************************************************************
-		
-	private Map<Id,List<Id>> getIDs() {
+
+	private Map<Id,List<Id>> getIDs(Network network, String linkMarker) {
 		List <Link> busLinks = new ArrayList<Link>();
 		Map<Id, List<Id>> routeID2linkIDs = new HashMap<Id, List<Id>>();
 		List<Id> linkIDsRoute1 = new LinkedList<Id>();
 		List<Id> linkIDsRoute2 = new LinkedList<Id>();
 		
-		for (Link link : this.network.getLinks().values()){
-			if (link.getAllowedModes().contains("bus") && !link.getAllowedModes().contains("car")){
+		for (Link link : network.getLinks().values()){
+			if (link.getAllowedModes().contains(linkMarker)){
 				busLinks.add(link);
 			}
 		}
 		
-		if (busLinks.isEmpty()) throw new RuntimeException("No bus links found. Link IDs have to contain [bus] in order to create the schedule. Aborting...");
+		if (busLinks.isEmpty()) throw new RuntimeException("No marked links found. Link IDs have to contain [" + linkMarker + "] in order to create the transit stops. Aborting...");
 		
 		// one direction
 		int fromNodeIdRoute1 = 0;
@@ -169,9 +124,6 @@ public class ScheduleGenerator {
 			for (Link link : busLinks){
 				if (Integer.parseInt(link.getFromNode().getId().toString()) == fromNodeIdRoute1 && Integer.parseInt(link.getToNode().getId().toString()) == toNodeIdRoute1){			
 					linkIDsRoute1.add(link.getId());
-				}
-				else {
-					// nothing
 				}
 			}
 		}
@@ -185,9 +137,6 @@ public class ScheduleGenerator {
 				if (Integer.parseInt(link.getFromNode().getId().toString())==fromNodeIdRoute2 && Integer.parseInt(link.getToNode().getId().toString())==toNodeIdRoute2){			
 					linkIDsRoute2.add(link.getId());
 				}
-				else {
-					// nothing
-				}
 			}
 		}
 
@@ -200,22 +149,22 @@ public class ScheduleGenerator {
 		return routeID2linkIDs;
 	}
 
-	private Map<Id,List<TransitStopFacility>> getStopLinkIDs(Map<Id, List<Id>> routeID2linkIDs) {
+	private Map<Id,List<TransitStopFacility>> getStopLinkIDs(Network network, Map<Id, List<Id>> routeID2linkIDs, boolean isBlocking) {
 		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = new HashMap<Id, List<TransitStopFacility>>();
 			
 		for (Id routeID : routeID2linkIDs.keySet()){
 			List<TransitStopFacility> stopFacilitiesRoute = new ArrayList<TransitStopFacility>();
 
 			for (Id linkID : routeID2linkIDs.get(routeID)){				
-				if (schedule.getFacilities().containsKey(linkID)){
-					TransitStopFacility transitStopFacility = schedule.getFacilities().get(linkID);
+				if (transitSchedule.getFacilities().containsKey(linkID)){
+					TransitStopFacility transitStopFacility = transitSchedule.getFacilities().get(linkID);
 					stopFacilitiesRoute.add(transitStopFacility);
 				}
 				else {
-					TransitStopFacility transitStopFacility = sf.createTransitStopFacility(linkID, this.network.getLinks().get(linkID).getToNode().getCoord(), false);
+					TransitStopFacility transitStopFacility = sf.createTransitStopFacility(linkID, network.getLinks().get(linkID).getToNode().getCoord(), isBlocking);
 					transitStopFacility.setLinkId(linkID);
 					stopFacilitiesRoute.add(transitStopFacility);
-					schedule.addStopFacility(transitStopFacility);
+					transitSchedule.addStopFacility(transitStopFacility);
 				}
 			}	
 			routeId2transitStopFacilities.put(routeID, stopFacilitiesRoute);
@@ -233,13 +182,13 @@ public class ScheduleGenerator {
 		return routeId2NetworkRoute;
 	}
 
-	private Map<Id, List<TransitRouteStop>> getRouteId2TransitRouteStops(Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities) {
+	private Map<Id, List<TransitRouteStop>> getRouteId2TransitRouteStops(double stopTime, double scheduleSpeed_m_sec, boolean awaitDeparture, Network network, Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities) {
 
 		Map<Id, List<TransitRouteStop>> routeId2transitRouteStops = new HashMap<Id, List<TransitRouteStop>>();
 		
 		for (Id routeId : routeId2transitStopFacilities.keySet()){
 			double arrivalTime = 0;
-			double departureTime = arrivalTime + this.stopTime;
+			double departureTime = arrivalTime + stopTime;
 			List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
 			List<TransitStopFacility> transitStopFacilities = routeId2transitStopFacilities.get(routeId);
 
@@ -248,17 +197,22 @@ public class ScheduleGenerator {
 			for (TransitStopFacility transitStopFacility : transitStopFacilities){
 				
 				TransitRouteStop transitRouteStop = sf.createTransitRouteStop(transitStopFacility, arrivalTime, departureTime);
-				transitRouteStop.setAwaitDepartureTime(true);
+				transitRouteStop.setAwaitDepartureTime(awaitDeparture);
 				transitRouteStops.add(transitRouteStop);
 				
 				if (ii==transitStopFacilities.size()-1){
 				} else {
-					travelTimeBus = this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.scheduleSpeed;
+
 //					travelTimeBus = this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed();
+
+					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / scheduleSpeed_m_sec;
+					if (scheduleSpeed_m_sec > network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed()){
+						log.warn("The free speed of a network link is less than the scheduled speed. This will cause schedule delays.");
+					}
 				}
 				
 				arrivalTime = departureTime + travelTimeBus;
-				departureTime = arrivalTime + this.stopTime;	
+				departureTime = arrivalTime + stopTime;	
 				ii++;
 			}
 		routeId2transitRouteStops.put(routeId, transitRouteStops);
@@ -267,23 +221,21 @@ public class ScheduleGenerator {
 	}
 
 	
-	private Map<Id, TransitRoute> getRouteId2TransitRoute(Map<Id, NetworkRoute> routeId2networkRoute, Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops) {
+	private void setRouteId2TransitRoute(String transitRouteMode, Map<Id, NetworkRoute> routeId2networkRoute, Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops) {
 		
-		Map<Id, TransitRoute> routeId2transitRoute = new HashMap<Id, TransitRoute>();			
+		this.routeId2transitRoute = new HashMap<Id, TransitRoute>();			
 		for (Id routeId : routeId2networkRoute.keySet()){
-			TransitRoute transitRoute = sf.createTransitRoute(routeId, routeId2networkRoute.get(routeId), routeId2TransitRouteStops.get(routeId), "bus");
+			TransitRoute transitRoute = sf.createTransitRoute(routeId, routeId2networkRoute.get(routeId), routeId2TransitRouteStops.get(routeId), transitRouteMode);
 			routeId2transitRoute.put(routeId, transitRoute);
 		}
-		return routeId2transitRoute;
 	}
 	
 	private void setTransitLine(Map<Id, TransitRoute> routeId2transitRoute) {
+		
 		TransitLine transitLine = sf.createTransitLine(this.transitLineId);
-		
-		schedule.addTransitLine(transitLine);
-		
 		transitLine.addRoute(routeId2transitRoute.get(this.routeId1));
 		transitLine.addRoute(routeId2transitRoute.get(this.routeId2));
+		transitSchedule.addTransitLine(transitLine);
 	}
 	
 	private List<Id> turnArround(List<Id> myList) {
@@ -305,16 +257,6 @@ public class ScheduleGenerator {
 		}
 		return routeLinkIDs;
 	}
-	
-	// ************************************************************************************
-
-	public void setStopTime(double stopTime) {
-		this.stopTime = stopTime;
-	}
-
-	public void setNetwork(Network network) {
-		this.network = network;
-	}
 
 	public void setTransitLineId(Id transitLineId) {
 		this.transitLineId = transitLineId;
@@ -328,23 +270,4 @@ public class ScheduleGenerator {
 		this.routeId2 = routeId2;
 	}
 
-	public void setStartTime(double startTime) {
-		this.startTime = startTime;
-	}
-
-	public void setEndTime(double endTime) {
-		this.endTime = endTime;
-	}
-
-	public void setScheduleSpeed(double scheduleSpeed) {
-		this.scheduleSpeed = scheduleSpeed;
-	}
-
-	public void setPausenzeit(double pausenzeit) {
-		this.pausenzeit = pausenzeit;
-	}
-
-	public double getUmlaufzeit_sec() {
-		return umlaufzeit_sec;
-	}
 }

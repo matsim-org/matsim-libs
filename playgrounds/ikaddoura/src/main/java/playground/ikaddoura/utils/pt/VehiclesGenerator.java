@@ -29,13 +29,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
 /**
@@ -44,61 +45,52 @@ import org.matsim.vehicles.Vehicles;
  */
 public class VehiclesGenerator {
 	private final static Logger log = Logger.getLogger(VehiclesGenerator.class);
-
-	private Id vehTypeId;
-	private double egressSeconds;
-	private double accessSeconds;
-	private DoorOperationMode doorOperationMode;
-	private List<Id> vehicleIDs = new ArrayList<Id>();	
+	
 	private Vehicles veh = VehicleUtils.createVehiclesContainer();
 
-	public void createVehicles(int numberOfBuses, int busSeats, int standingRoom, double length) {
+	public void createVehicles(TransitSchedule schedule, List<Id> lineIDs, int busSeats, int standingRoom, double length, Id vehTypeId, double egressSeconds, double accessSeconds, DoorOperationMode doorOperationMode) {
 		
-		VehicleType type = veh.getFactory().createVehicleType(this.vehTypeId);
-		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
-		cap.setSeats(busSeats);
-		cap.setStandingRoom(standingRoom);
-		type.setCapacity(cap);
-		type.setLength(length);
-		type.setAccessTime(accessSeconds);
-		type.setEgressTime(egressSeconds);
-		type.setDoorOperationMode(doorOperationMode);
+		for (Id transitLineId : lineIDs){
+			log.info("Creating transit vehicles for transit line " + transitLineId);
+			List<Id> vehicleIDs = new ArrayList<Id>();
+			
+			for (TransitRoute transitRoute : schedule.getTransitLines().get(transitLineId).getRoutes().values()){
+				
+				for (Departure dep : transitRoute.getDepartures().values()){
+					
+					if (vehicleIDs.contains(dep.getVehicleId())){
+						// vehicle Id already in list
+					} else {
+						vehicleIDs.add(dep.getVehicleId());
+					}
+				}
+			}
 		
-		veh.getVehicleTypes().put(this.vehTypeId, type); 
-		
-		for (int vehicleNr=1 ; vehicleNr <= numberOfBuses ; vehicleNr++){
-			vehicleIDs.add(new IdImpl("bus_"+vehicleNr));
-		}
-
-		if (vehicleIDs.isEmpty()){
-			throw new RuntimeException("At least 1 Bus is expected. Aborting...");
-		} else {
-			for (Id vehicleId : vehicleIDs){
-				Vehicle vehicle = veh.getFactory().createVehicle(vehicleId, veh.getVehicleTypes().get(vehTypeId));
-				veh.getVehicles().put(vehicleId, vehicle);
+			VehicleType type = veh.getFactory().createVehicleType(vehTypeId);
+			VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+			cap.setSeats(busSeats);
+			cap.setStandingRoom(standingRoom);
+			type.setCapacity(cap);
+			type.setLength(length);
+			type.setAccessTime(accessSeconds);
+			type.setEgressTime(egressSeconds);
+			type.setDoorOperationMode(doorOperationMode);
+			
+			veh.getVehicleTypes().put(vehTypeId, type); 
+			
+			if (vehicleIDs.isEmpty()){
+				throw new RuntimeException("At least 1 Bus is expected. Aborting...");
+			} else {
+				for (Id vehicleId : vehicleIDs){
+					Vehicle vehicle = veh.getFactory().createVehicle(vehicleId, veh.getVehicleTypes().get(vehTypeId));
+					veh.getVehicles().put(vehicleId, vehicle);
+				}
 			}
 		}
 	}
-	
-	public void writeVehicleFile(String vehicleFile) {
-		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(veh);
-		vehicleWriter.writeFile(vehicleFile);
-	}
 
-	public void setVehTypeId(Id vehTypeId) {
-		this.vehTypeId = vehTypeId;
-	}
-
-	public void setEgressSeconds(double egressSeconds) {
-		this.egressSeconds = egressSeconds;
-	}
-
-	public void setAccessSeconds(double accessSeconds) {
-		this.accessSeconds = accessSeconds;
-	}
-
-	public void setDoorOperationMode(DoorOperationMode doorOperationMode) {
-		this.doorOperationMode = doorOperationMode;
+	public Vehicles getVehicles() {
+		return this.veh;
 	}
 	
 }
