@@ -38,8 +38,9 @@
 			<artifactId>wfs-v_1_1_0-schema</artifactId>
 			<version>1.0.3</version>
 		</dependency>
-		<dependency> <!-- xerces import needed since org.jvnet.ogc imports an older version and so ``overwrites'' the actual version needed by matsim
-		so please don't remove this gl(nov. 2012) -->
+		<dependency> <!-- xerces import needed since org.jvnet.ogc imports an older version and 
+				so ``overwrites'' the actual version needed by matsim so please don't remove 
+				this gl(nov. 2012) -->
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<version>2.7.1</version>

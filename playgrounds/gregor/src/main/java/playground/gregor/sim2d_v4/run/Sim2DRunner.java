@@ -21,6 +21,7 @@
 package playground.gregor.sim2d_v4.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -29,18 +30,20 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
+import playground.gregor.sim2d_v4.debugger.QSimDrawer;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 
 public class Sim2DRunner implements IterationStartsListener{
 
-	private final VisDebugger visDebugger = new VisDebugger();
+	private VisDebugger visDebugger = null;
 	private Controler controller;
+	private QSimDrawer qSimDrawer;
+	private HybridQ2DMobsimFactory factory;
 
 	public static void main(String [] args) {
 		if (args.length != 3) {
@@ -52,11 +55,24 @@ public class Sim2DRunner implements IterationStartsListener{
 		Sim2DConfig sim2dc = Sim2DConfigUtils.loadConfig(sim2DConf);
 		Sim2DScenario sim2dsc = Sim2DScenarioUtils.loadSim2DScenario(sim2dc);
 		Config c = ConfigUtils.loadConfig(qsimConf);
+		
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		sc.addScenarioElement(sim2dsc);
 		sim2dsc.connect(sc);
 
-
+		//offsets needed to convert to floats later in program
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = minX;
+		for (Node n : sc.getNetwork().getNodes().values()) {
+			if (n.getCoord().getX() < minX) {
+				minX = n.getCoord().getX(); 
+			}
+			if (n.getCoord().getY() < minY) {
+				minY = n.getCoord().getY(); 
+			}
+		}
+		sim2dc.setOffsets(minX, minY);
+		
 		Controler controller = new Controler(sc);
 
 		controller.setOverwriteFiles(true);
@@ -66,9 +82,16 @@ public class Sim2DRunner implements IterationStartsListener{
 
 		if (args[2].equals("true")) {
 			Sim2DRunner runner = new Sim2DRunner();
-			PhysicalSim2DEnvironment.visDebugger = runner.visDebugger;
+			runner.visDebugger = new VisDebugger(sim2dc.getTimeStepSize());
+//			runner.visDebugger.setTransformationStuff(minX, minY);
 			controller.addControlerListener(runner);
 			runner.controller = controller;
+			runner.factory = factory;
+			runner.qSimDrawer = new QSimDrawer(sc);
+//			runner.visDebugger.addAdditionalDrawer(runner.qSimDrawer);
+			
+//			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 9);
+//			runner.visDebugger.setFrameSaver(fs);
 		}
 
 //		controller.setCreateGraphs(false);
@@ -94,11 +117,13 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 400) {
-			PhysicalSim2DEnvironment.DEBUG = true;
+		if ((event.getIteration()) % 2 == 0 || event.getIteration() > 50) {
+			this.factory.debug(this.visDebugger);
+			this.controller.getEvents().addHandler(this.qSimDrawer);
 			this.controller.setCreateGraphs(true);
 		} else {
-			PhysicalSim2DEnvironment.DEBUG = false;
+			this.factory.debug(null);
+			this.controller.getEvents().removeHandler(this.qSimDrawer);
 			this.controller.setCreateGraphs(false);
 		}
 		this.visDebugger.setIteration(event.getIteration());

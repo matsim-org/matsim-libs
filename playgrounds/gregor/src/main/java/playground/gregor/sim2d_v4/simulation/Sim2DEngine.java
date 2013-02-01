@@ -34,6 +34,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
+import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -60,6 +61,8 @@ public class Sim2DEngine implements MobsimEngine {
 
 	private final Map<Id,Sim2DQTransitionLink> lowResLinks = new HashMap<Id,Sim2DQTransitionLink>();
 
+	private VisDebugger debugger;
+
 	public Sim2DEngine(QSim sim) {
 		this.scenario = sim.getScenario();
 
@@ -84,6 +87,14 @@ public class Sim2DEngine implements MobsimEngine {
 		while (sim2DTime < time + this.qSimStepSize) {
 			for (PhysicalSim2DEnvironment  env : this.penvs.values()) { //element order undefined when iterating over a HashSet. will certainly cause problems with checksum tests
 				env.doSimStep(sim2DTime);
+				
+				if (this.debugger != null) {
+					env.debug(this.debugger);
+				}
+			}
+			
+			if (this.debugger != null) {
+				this.debugger.update(sim2DTime);
 			}
 			sim2DTime += this.sim2DStepSize;
 		}
@@ -127,5 +138,8 @@ public class Sim2DEngine implements MobsimEngine {
 		this.lowResLinks.put(lowResLink.getLink().getId(),lowResLink);
 	}
 
+	public void debug(VisDebugger debugger) {
+		this.debugger = debugger;
+	}
 
 }

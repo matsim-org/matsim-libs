@@ -128,7 +128,7 @@ public class PhysicalSim2DSection {
 							loResLink.addFromIntersection(veh);
 							this.penv.getEventsManager().processEvent(new LinkLeaveEvent(time, agent.getId(), currentLinkId, agent.getQVehicle().getId()));
 							agent.notifyMoveOverNode(nextLinkId);
-							this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
+//							this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
 						} else {
 							dx = 0;
 							dy = 0;
@@ -318,10 +318,10 @@ public class PhysicalSim2DSection {
 	public void debug(VisDebugger visDebugger) {
 		if (visDebugger.isFirst()) {
 			for (Segment seg : this.obstacles) {
-				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 0, 0, 128,90);
+				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 222, 222, 222, 128,0);
 			}
 			for (Segment seg : this.openings) {
-				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128,150);
+				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128,40);
 			}
 			for (Id key : this.linkInfos.keySet()) {
 				Link l = this.sim2dsc.getMATSimScenario().getNetwork().getLinks().get(key);
@@ -329,13 +329,13 @@ public class PhysicalSim2DSection {
 				float x1 = (float) (l.getToNode().getCoord().getX() - this.offsetX);
 				float y0 = (float) (l.getFromNode().getCoord().getY() - this.offsetY);
 				float y1 = (float) (l.getToNode().getCoord().getY() - this.offsetY);
-				visDebugger.addLineStatic(x0, y0, x1, y1, 0, 0, 0, 255,450);
+				visDebugger.addLineStatic(x0, y0, x1, y1,192, 192, 192, 255,255);
 				float dx = x1-x0 + MatsimRandom.getRandom().nextFloat()-.5f;
 				float dy = y1-y0 + MatsimRandom.getRandom().nextFloat()-.5f;;
 				float length = (float) Math.sqrt(dx*dx+dy*dy);
 				dx /=length;
 				dy /=length;
-				visDebugger.addTextStatic((x1+x0)/2+dy/2, (y1+y0)/2-dx/2, key.toString(),600);
+				visDebugger.addTextStatic((x1+x0)/2+dy/2, (y1+y0)/2-dx/2, key.toString(),99);
 
 			}
 
@@ -350,8 +350,8 @@ public class PhysicalSim2DSection {
 				x[i] = (float) (c.x - this.offsetX);
 				y[i] = (float) (c.y - this.offsetY);
 			}
-			visDebugger.addPolygon(x, y,32, 255, 64, 32,150);
-			visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId(),600);
+			visDebugger.addPolygon(x, y,32, 255, 64, 64,5);
+			visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId(),99);
 		}
 		for (Sim2DAgent agent : this.agents) {
 			agent.debug(visDebugger);

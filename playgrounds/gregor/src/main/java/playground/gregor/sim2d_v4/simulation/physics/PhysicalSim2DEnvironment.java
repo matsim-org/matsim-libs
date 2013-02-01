@@ -59,9 +59,9 @@ public class PhysicalSim2DEnvironment {
 
 	private final double offsetY;
 
-	//DEBUG
-	public static boolean DEBUG = false;
-	public static  VisDebugger visDebugger;
+//	//DEBUG
+//	public static boolean DEBUG = false;
+//	public static  VisDebugger visDebugger;
 //	static {
 //		if (DEBUG) {
 //			visDebugger = new VisDebugger();
@@ -76,8 +76,8 @@ public class PhysicalSim2DEnvironment {
 
 	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc, EventsManager eventsManager) {
 		this.env = env;
-		this.offsetX = env.getEnvelope().getMinX();
-		this.offsetY = env.getEnvelope().getMinY();
+		this.offsetX = sim2dsc.getSim2DConfig().getOffsetX();
+		this.offsetY = sim2dsc.getSim2DConfig().getOffsetY();
 		this.sim2dsc = sim2dsc;
 		this.eventsManager = eventsManager;
 		init();
@@ -121,10 +121,10 @@ public class PhysicalSim2DEnvironment {
 			psec.moveAgents(time);
 		}
 
-		//DEBUG
-		if (DEBUG) {
-			debug(time);
-		}
+//		//DEBUG
+//		if (DEBUG) {
+//			debug(time);
+//		}
 	}
 	//		}
 	//		log.info("sim step done.");
@@ -136,23 +136,20 @@ public class PhysicalSim2DEnvironment {
 	//			precompute relevant exit of new section (needed to recognize that an agent leaves a section) (may be a list of sections to traverse calculated at the beginning would be helpful)
 	//			unregister agent in current section (it.remove());
 	//			register agent in next section (.add(agent) only if sections are not multi-threaded)
-	private void debug(double time) {
-		boolean hasAgent = false;
-		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			if (psec.getNumberOfAllAgents() > 0) {
-				hasAgent = true;
-				break;
-			}
-		}
-		if (hasAgent){
+	public void debug(VisDebugger visDebugger) {
+//		visDebugger.setTransformationStuff(this.offsetX, this.offsetY);
+//		boolean hasAgent = false;
+//		for (PhysicalSim2DSection psec : this.psecs.values()) {
+//			if (psec.getNumberOfAllAgents() > 0) {
+//				hasAgent = true;
+//				break;
+//			}
+//		}
+//		if (hasAgent){
 			for (PhysicalSim2DSection psec : this.psecs.values()) {
 				psec.debug(visDebugger);
 			}
-
-			visDebugger.update(time);
-			
-
-		}
+//		}
 
 	}
 
@@ -210,6 +207,7 @@ public class PhysicalSim2DEnvironment {
 		
 		bottomX += gap/2 * dx/DEP_BOX_WIDTH;
 		bottomY += gap/2 * dy/DEP_BOX_WIDTH;
+		
 		
 		GeometryFactory geofac = new GeometryFactory();
 		for (int i = 0; i < nrOfBoxes; i++) {

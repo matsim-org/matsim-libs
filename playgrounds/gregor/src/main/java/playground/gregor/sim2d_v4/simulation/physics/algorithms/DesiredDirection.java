@@ -63,7 +63,7 @@ public class DesiredDirection {
 			dist = -dist;
 		}
 		
-		float exp = Math.exp(dist/(li.width/2));
+		float exp = Math.exp(dist/(li.width));
 		float w0 = 1 - 1/exp;
 		float w1 = 1 - w0;
 		

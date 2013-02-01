@@ -30,10 +30,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.OverlayLayout;
 
 import org.matsim.core.utils.misc.Time;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 
 public class VisDebugger extends PApplet {
 
@@ -45,32 +48,59 @@ public class VisDebugger extends PApplet {
 
 	public long lastUpdate = -1;
 
-	public VisDebugger() {
-		this.fr = new JFrame();
-		this.fr.setSize(1000, 1000);
-		this.fr.add(this,BorderLayout.CENTER);
-		this.init();
-		this.fr.setVisible(true);
-	}
 
-	private static final int W = 1000;
 
-	private float scale = 50;
+
+
+
+	//	private static final int W = 1000;
+
+	private float scale = 2;
 	private List<Object> elements = Collections.synchronizedList(new ArrayList<Object>());
 	private final List<Object> elementsStatic = Collections.synchronizedList(new ArrayList<Object>());
 	private final List<Object> newElements = new ArrayList<Object>();
 	protected int dragX = 0;
 	protected int dragY = 0;
-	protected int mx = 0;
+	protected int mx =0;
 	protected int my = 0;
-	protected int omy;
-	protected int omx;
+	protected int omx= 0;
+	protected int omy= 0;
 
 	private boolean first = true;
 	private String time = "00:00.00.0";
 	private String iteration = "it: 0";
-	private final double dT = 0.04;
+	private final double dT;
 	private double speedup = 1;
+
+	private int bgXShift;
+	private int bgYShift;
+
+
+
+	private PTileFactory pTileFac = null;
+	private final List<VisDebuggerAdditionalDrawer> additionalDrawers = new ArrayList<VisDebuggerAdditionalDrawer>();
+
+	private FrameSaver fs = null;
+	private int it = 0;
+
+	public VisDebugger(double dT) {
+		this.dT = dT;
+		this.fr = new JFrame();
+		this.fr.setSize(1024, 768);
+
+		JPanel compositePanel = new JPanel();
+		compositePanel.setLayout(new OverlayLayout(compositePanel));
+
+		this.fr.add(compositePanel,BorderLayout.CENTER);
+
+		compositePanel.add(this);
+		compositePanel.setEnabled(true);
+		compositePanel.setVisible(true);
+		this.init();
+		this.fr.setVisible(true);
+	}
+
+
 	@Override
 	public void setup() {
 		addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
@@ -94,6 +124,7 @@ public class VisDebugger extends PApplet {
 			public void mouseDragged(MouseEvent e) {
 				VisDebugger.this.dragX = e.getX()-VisDebugger.this.mx;
 				VisDebugger.this.dragY = e.getY()-VisDebugger.this.my;
+				VisDebugger.this.computeBGShift();
 				//				System.out.println(VisDebugger.this.dragX + " " + VisDebugger.this.dragY);
 
 			}
@@ -106,6 +137,8 @@ public class VisDebugger extends PApplet {
 				VisDebugger.this.dragX = 0;
 				VisDebugger.this.omy += VisDebugger.this.dragY; 
 				VisDebugger.this.dragY = 0;
+				VisDebugger.this.computeBGShift();
+
 			}
 
 			@Override
@@ -132,32 +165,50 @@ public class VisDebugger extends PApplet {
 
 			}
 		});
-		size(W,W);
+		size(1024,768);
 		background(0);
+
 	}
 
 	void mouseWheel(int delta)
 	{
-		this.scale-=10.*delta;
-		this.scale = Math.max(10, this.scale);
-		this.scale = Math.min(700, this.scale);
+
+		float x1 = deScaleX(getWidth()/2);
+		float y1 = deScaleY(getHeight()/2);
+		this.scale-= delta;
+		this.scale = Math.max(1, this.scale);
+		this.scale = Math.min(100, this.scale);
+		float x2 = deScaleX(getWidth()/2);
+		float y2 = deScaleY(getHeight()/2);
+		float xShift = -(x1-x2)*this.scale;
+		float yShift = (y1-y2)*this.scale;
+		this.omx += xShift;
+		this.omy += yShift;
+		computeBGShift();
+
 	}	
 
 	void speedup(int delta) {
 		this.speedup += delta/10.;
-		this.speedup = Math.max(0.1, this.speedup);
-		this.speedup = Math.min(10, this.speedup);
-//		System.out.println(this.speedup);
+		this.speedup = Math.max(0.05, this.speedup);
+		this.speedup = Math.min(100, this.speedup);
+		//		System.out.println(this.speedup);
+	}
+
+	private void computeBGShift(){
+		this.bgYShift = (this.dragY+this.omy)/(256);
+		this.bgXShift = (-(VisDebugger.this.dragX +VisDebugger.this.omx))/(256);
+//		System.out.println("scale:" + this.scale + " omx:" + this.omx + " omy:" + this.omy + " width:" + getWidth() + " height:" + getHeight());
 	}
 
 	@Override
 	public void draw() {
+
 		stroke(255);
-		background(255);
+		background(0,16,64,255);
 		fill(255);
 
-		//		  PGraphicsOpenGL pgl = (PGraphicsOpenGL) this.g; 
-		//		  GL gl = pgl.beginGL();
+		drawBG();
 
 		synchronized(this.elementsStatic) {
 			Iterator<Object> it = this.elementsStatic.iterator();
@@ -191,14 +242,65 @@ public class VisDebugger extends PApplet {
 				}
 			}
 		}
+		for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
+			d.draw(this);
+		}
+		strokeWeight(2);
 		drawTime();
 		drawIteration();
 		drawAgentsCount(agents);
 		drawSpeedup();
+
+		if (this.fs != null) {
+			this.fs.saveFrame(this,this.it + "_" + this.time);
+		}
 	}
 
 
-	private void drawText(Text el) {
+	private void drawBG() {
+		if (this.pTileFac == null) {
+			return;
+		}
+		//		System.out.println("xshift:" + this.bgXShift + " yshift:" + this.bgYShift + " scale:" + this.scale);
+		int xidx = this.bgXShift-1;
+		int yidx = this.bgYShift-1;
+		int xTiles = getWidth()/256;
+		int yTiles = getHeight()/256;
+		for (int  y = 0; y <= yTiles+2; y++) {
+			for (int x = 0; x <= xTiles+2; x++) {
+				//				int logscale = (int)(log(this.scale)/log(2));
+				//				System.out.println(logscale);
+				PImage img = this.pTileFac.getTile(xidx, yidx, (int)(this.scale+.5f));
+
+				float xx =  xidx * 256/this.scale;
+				//				float yy =  yidx * 256/this.scale;
+
+				//				float xx1 = (xidx+1) * 256/this.scale;
+				float yy1 = (yidx+1) * 256/this.scale;
+
+				//				PImage img = loadPImage(xx, yy, xx1, yy1);
+				if (img != null) {
+					image(img,scaleFlX(xx),scaleFlY(yy1),256,256);
+				}
+
+
+
+				//				System.out.print(xx +"," + yy + "\t");
+				xidx++;
+			}
+			//			System.out.println();
+			yidx++;
+			xidx -= xTiles+3;
+		}
+
+	}
+
+
+	public void addAdditionalDrawer(VisDebuggerAdditionalDrawer drawer) {
+		this.additionalDrawers .add(drawer);
+	}
+
+	void drawText(Text el) {
 		if (this.scale < el.minScale) {
 			return;
 		}
@@ -209,37 +311,37 @@ public class VisDebugger extends PApplet {
 
 	private void drawTime() {
 		String strTime = setTime(-1);
-		fill(128, 128);
+		fill(64, 192);
 		stroke(0);
 		rect(0, 0, 105, 25);
-		fill(0);
+		fill(192,192,192,255);
 		text(strTime, 10, 18);
 
 	}
 
 	private void drawIteration() {
 		String iteration = setIteration(-1);
-		fill(128, 128);
+		fill(64, 192);
 		stroke(0);
 		rect(0, 26, 105, 25);
-		fill(0);
+		fill(192,192,192,255);
 		text(iteration, 10, 44);
 
 	}
 	private void drawAgentsCount(int agents) {
-		fill(128,128);
+		fill(64, 192);
 		stroke(0);
 		rect(0,52,105,25);
-		fill(0);
+		fill(192,192,192,255);
 		text("agents: " + agents,10,70);
 
 	}
-	
+
 	private void drawSpeedup() {
-		fill(128,128);
+		fill(64, 192);
 		stroke(0);
 		rect(0,78,105,25);
-		fill(0);
+		fill(192,192,192,255);
 		int a = (int) this.speedup;
 		int b = (int) ((this.speedup - a) * 10);
 		text("accel.: " + a + "." + b,10,96);
@@ -272,7 +374,7 @@ public class VisDebugger extends PApplet {
 			fill(c.r,c.g,c.b,0);
 		}
 		stroke(c.r,c.g,c.b,c.a);
-		ellipseMode(CENTER);
+		ellipseMode(RADIUS);
 		ellipse(scaleFlX(c.x),scaleFlY(c.y),scaleFl(c.rr),scaleFl(c.rr));
 	}
 
@@ -291,17 +393,46 @@ public class VisDebugger extends PApplet {
 
 	}
 
+	void drawWeightedLine(WeightedLine l) {
+		if (this.scale < (l.minScale-l.a)) {
+			return;
+		}
+		int a = l.a;
+		if (this.scale < l.minScale) {
+			a -= (int) (l.minScale-this.scale);
+		} 
+		strokeCap(SQUARE);
+		stroke(l.r, l.g, l.b, a);
+		//		stroke(20);
+		final float w = scaleFl(l.weight);
+		if (w < 0) {
+			return;
+		}
+		strokeWeight(w);
+		line(scaleFlX(l.x0),scaleFlY(l.y0),scaleFlX(l.x1),scaleFlY(l.y1));
+
+	}
+
 	private float scaleFl(float y1) {
-		return this.scale/10 * y1;
+		return this.scale * y1;
 	}
 
 	private float scaleFlX(float y1) {
-		return this.scale/10 * y1 + this.dragX + this.omx;
+		return this.scale * y1 + this.dragX + this.omx;
+	}
+
+	private float deScaleX(float x) {
+		return (x -this.dragX - this.omx)/this.scale;
 	}
 
 	private float scaleFlY(float y1) {
-		return 50-this.scale/10 * y1 + this.dragY + this.omy;
+		return this.getHeight() - this.scale* y1 + this.dragY + this.omy;
 	}
+
+	private float deScaleY(float y) {
+		return (this.getHeight()/2 + this.dragY + this.omy)/this.scale;
+	}
+
 	public void addLineStatic(float x0, float y0, float x1, float y1, int r, int g, int b, int a, int minScale) {
 		Line l = new Line();
 		l.x0 = x0;
@@ -401,7 +532,12 @@ public class VisDebugger extends PApplet {
 	}
 
 	public void update(double time) {
+
+		if (this.fs != null) {
+			this.fs.await();
+		}
 		long timel = System.currentTimeMillis();
+
 		long last = this.lastUpdate;
 		long diff = timel - last;
 		if (diff < this.dT*1000/this.speedup) {
@@ -422,7 +558,7 @@ public class VisDebugger extends PApplet {
 		this.first = false;
 		this.lastUpdate = System.currentTimeMillis();
 	}
-	
+
 	public void addAll() {
 		synchronized(this.elements) {
 			//			this.elements.clear();
@@ -438,15 +574,22 @@ public class VisDebugger extends PApplet {
 
 
 
-	private static final class Text {
+	static final class Text {
 		float x,y;
 		String text;
-		int r,g,b,a, minScale = 0;
+		int r = 222, g = 222, b = 222, a = 222; 
+		int minScale = 0;
 	}
 
 	private static final class Line {
 		float x0,x1,y0,y1;
 		int r,g,b,a, minScale = 0;
+	}
+
+	static final class WeightedLine {
+		float x0, y0, x1, y1, weight = 1, count = 0;
+		int r,g,b,a, minScale = 0;
+		public int cap;
 	}
 
 	private static class Circle {
@@ -478,8 +621,26 @@ public class VisDebugger extends PApplet {
 	synchronized public String setIteration(int it) {
 		if (it > 0) {
 			this.iteration = "iteration: " + it;
+			this.speedup = 1;
+			this.it  = it;
 		}
 		return this.iteration;
+	}
+
+	public void setTransformationStuff(double x, double y) {
+		if (this.pTileFac != null) {
+			return;
+		}
+		//		this.offsetX = x;
+		//		this.offsetY = y;
+		//		TileFactory tf = PTileFactory.getWMSTileFactory("http://localhost:8080/geoserver/wms?service=WMS&", "ch","EPSG:3395",x,y);
+		this.pTileFac = new PTileFactory(this,"EPSG:3395",x,y);
+	}
+
+
+	public void setFrameSaver(FrameSaver fs) {
+		this.fs = fs;
+		
 	}
 
 

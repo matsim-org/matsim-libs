@@ -72,7 +72,7 @@ public class SocialForceAgent implements Sim2DAgent {
 	private final float dT;
 	
 	private final float [] oldPos = {0,0};
-	private int notMoved = 0;
+	private final int notMoved = 0;
 	private final float notMovedThreshold = 0.01f*0.01f;
 	private final int maxNotMoved = 10;
 
@@ -93,21 +93,21 @@ public class SocialForceAgent implements Sim2DAgent {
 	@Override
 	public void updateVelocity() {
 		
-		//experimental
-		float mvX = this.oldPos[0] - this.pos[0];
-		float mvY = this.oldPos[1] - this.pos[1];
-		this.oldPos[0] = this.pos[0];
-		this.oldPos[1] = this.pos[1];
-		float sqrMvd = mvX*mvX + mvY*mvY;
-		if (sqrMvd < this.notMovedThreshold) {
-			this.notMoved++;
-			if (this.notMoved >= this.maxNotMoved) {
-				this.notMoved = 0;
-				this.v[0] = MatsimRandom.getRandom().nextFloat()-.5f;
-				this.v[1] = MatsimRandom.getRandom().nextFloat()-.5f;
-				return;
-			}
-		}
+//		//experimental
+//		float mvX = this.oldPos[0] - this.pos[0];
+//		float mvY = this.oldPos[1] - this.pos[1];
+//		this.oldPos[0] = this.pos[0];
+//		this.oldPos[1] = this.pos[1];
+//		float sqrMvd = mvX*mvX + mvY*mvY;
+//		if (sqrMvd < this.notMovedThreshold) {
+//			this.notMoved++;
+//			if (this.notMoved >= this.maxNotMoved) {
+//				this.notMoved = 0;
+//				this.v[0] = MatsimRandom.getRandom().nextFloat()-.5f;
+//				this.v[1] = MatsimRandom.getRandom().nextFloat()-.5f;
+//				return;
+//			}
+//		}
 		
 		List<Tuple<Float, Sim2DAgent>> neighbors = this.ncalc.computeNeighbors(this);
 		List<Segment> obstacles = this.ocalc.computeObstacles(this);
@@ -126,7 +126,7 @@ public class SocialForceAgent implements Sim2DAgent {
 		
 	
 		for (Tuple<Float, Sim2DAgent> t : neighbors) {
-			SocialForceAgent neighbor = (SocialForceAgent) t.getSecond();
+			Sim2DAgent neighbor = t.getSecond();
 			float[] nPos = neighbor.getPos();
 			float nx = this.pos[0] - nPos[0];
 			float ny = this.pos[1] - nPos[1];
@@ -137,7 +137,7 @@ public class SocialForceAgent implements Sim2DAgent {
 			nx /= dist;
 			ny /= dist;
 			
-			float r = this.r + neighbor.r;
+			float r = this.r + neighbor.getRadius();
 			
 			float exp = playground.gregor.sim2d_v4.math.Math.exp((r-dist)/this.B);
 			
@@ -278,9 +278,9 @@ public class SocialForceAgent implements Sim2DAgent {
 	@Override
 	public void debug(VisDebugger visDebugger) {
 		if (getId().toString().contains("g")) {
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], 2*this.r, 0, 192, 64, 128,0,true);
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 0, 192, 64, 128,0,true);
 		} else if (getId().toString().contains("r")) {
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], 2*this.r, 192, 0, 64, 128,0,true);
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 192, 0, 64, 128,0,true);
 		} else {
 			int nr = this.hashCode()%3*255;
 			int r,g,b;
@@ -297,7 +297,7 @@ public class SocialForceAgent implements Sim2DAgent {
 				g=0;
 				b=nr;
 			}
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], 2*this.r, r, g, b, 222,0,true);
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, r, g, b, 222,0,true);
 //			visDebugger.addText(this.getPos()[0],this.getPos()[1], this.getId().toString(), 0);
 		}
 		this.ocalc.addDebugger(visDebugger);

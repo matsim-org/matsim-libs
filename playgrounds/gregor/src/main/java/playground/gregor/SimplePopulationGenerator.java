@@ -38,35 +38,39 @@ public class SimplePopulationGenerator {
 		Config c = ConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/input/config.xml");
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		
-		int nrAgents = 200;
+		int nrAgents = 2000;
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
+		double t = 120;
 		for (int i = 0; i < nrAgents/2; i++) {
-			Person pers = fac.createPerson(new IdImpl(i));
+			Person pers = fac.createPerson(new IdImpl("r"+i));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_0_174673140"));
-			act0.setEndTime(0);
+			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
 			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_9_27062060"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
+//			t += .5;
 		}
+		t =0;
 		for (int i = nrAgents/2; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl(i));
+			Person pers = fac.createPerson(new IdImpl("g"+i));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_9_27062060"));
-			act0.setEndTime(0);
+			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
 			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_0_174673140"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
+//			t += .5;
 		}
 		new PopulationWriter(pop, sc.getNetwork()).write(c.plans().getInputFile());
 

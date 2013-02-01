@@ -28,8 +28,8 @@ package playground.gregor.sim2d_v4.cgal;
 public abstract class CGAL {
 
 	private static final float EPSILON = 0.0001f;
-	
-	
+
+
 	/**
 	 * tests whether coordinate x0,y0 is located left of the infinite vector that runs from x1,y1  to x2,y2
 	 * @param x0 the x-coordinate to test
@@ -46,7 +46,7 @@ public abstract class CGAL {
 		return (x2 - x1)*(y0 - y1) - (x0 - x1) * (y2 - y1);
 	}
 
-	
+
 	/**
 	 * tests whether coordinate x0,y0 is located on the infinite vector defined by coordinates x1,y1 and x2,y2
 	 * @param x0 the x-coordinate to test
@@ -61,7 +61,7 @@ public abstract class CGAL {
 		float left = isLeftOfLine(x0,y0,x1,y1,x2,y2);
 		return left*left < EPSILON;
 	}
-	
+
 	/**
 	 * calculates the signed distance of a point to a line (given by a vector)
 	 * a negative value indicates that the point is on the left side of the defining vector 
@@ -76,12 +76,12 @@ public abstract class CGAL {
 	 * @return signed distance
 	 */
 	public static float signDistPointLine(float px, float py, float lx0, float ly0, float dxl, float dyl) {
-//		float r = (px - lx0) * dxl + (py - ly0) * dyl;
+		//		float r = (px - lx0) * dxl + (py - ly0) * dyl;
 		float s = ((ly0 - py) * dxl - (lx0 - px) * dyl);
-		
+
 		return s;
 	}
-	
+
 	/**
 	 * calculates the coefficient r by which a given vector has to be multiplied to get the perpendicular projection on the line 
 	 * defined by the vector for a given point
@@ -99,9 +99,9 @@ public abstract class CGAL {
 		float numerator = (x-v0x) * vdx + (y - v0y) * vdy;
 		float denomenator  = vdx * vdx + vdy * vdy; //TODO in most sim2d cases this value can be precalculated [gl Jan'13] 
 		float r = numerator/denomenator;
-		
+
 		return r;
-		
+
 	}
 
 	/**
@@ -119,11 +119,11 @@ public abstract class CGAL {
 		float numerator = (x-v0x) * vdx + (y - v0y) * vdy;
 		float denomenator  = vdx * vdx + vdy * vdy; //TODO in most sim2d cases this value can be precalculated [gl Jan'13] 
 		float r = numerator/denomenator;
-		
+
 		return r;
-		
+
 	}
-	
+
 	/**
 	 * dot product of two 2d vectors
 	 * @param x0 the x-coordinate of the first vector
@@ -135,5 +135,19 @@ public abstract class CGAL {
 	public static float dot(float x0, float y0, float x1, float y1) {
 		return x0 * x1 + y0  * y1;
 	}
-	
+
+	/**
+	 * determinate of 2x2 square matrix    
+	 * @param x0
+	 * @param x1
+	 * @param y0
+	 * @param y1
+	 * @return determinante
+	 */
+	public static float det(float x0, float x1,
+			float y0, float y1) {
+
+		return x0*y1 - y0 * x1;
+	}
+
 }

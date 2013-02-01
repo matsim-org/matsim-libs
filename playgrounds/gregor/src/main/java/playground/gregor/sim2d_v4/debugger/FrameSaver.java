@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DAgentBuilder.java
+ * FrameSaver.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,26 +18,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation;
+package playground.gregor.sim2d_v4.debugger;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.SocialForceAgent;
+import processing.core.PApplet;
 
-public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
+public class FrameSaver {
 	
-	private final Sim2DConfig conf;
+	private final CyclicBarrier barrier = new CyclicBarrier(2);
+	private final String path;
+	private final String extension;
+	private final int frameSkip;
+	private int skiped;
 
-	public SocialForceSim2DAgentFactory(Sim2DConfig conf) {
-		this.conf = conf;
+	public FrameSaver(String path, String extension, int frameSkip) {
+		this.path = path;
+		this.extension = extension;
+		this.frameSkip = frameSkip;
+		this.skiped = frameSkip;
 	}
-
-	@Override
-	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
-		Sim2DAgent agent = new SocialForceAgent(veh, spawnX, spawnY,(float) this.conf.getTimeStepSize());
-		return agent;
+	
+	public void saveFrame(PApplet p, String identifier) {
+		if (this.skiped != this.frameSkip) {
+			this.skiped++;
+			this.await();
+			return;
+		}
+		this.skiped = 0;
+		StringBuffer bf = new StringBuffer();
+		bf.append(this.path);
+		bf.append("/");
+		bf.append(identifier);
+		bf.append(".");
+		bf.append(this.extension);
+		p.saveFrame(bf.toString());
+		this.await();
+	}
+	
+	public void await() {
+		try {
+			this.barrier.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DAgentBuilder.java
+ * VisDebuggerAdditionalDrawer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,26 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation;
+package playground.gregor.sim2d_v4.debugger;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+public interface VisDebuggerAdditionalDrawer {
 
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.SocialForceAgent;
-
-public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
-	
-	private final Sim2DConfig conf;
-
-	public SocialForceSim2DAgentFactory(Sim2DConfig conf) {
-		this.conf = conf;
-	}
-
-	@Override
-	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
-		Sim2DAgent agent = new SocialForceAgent(veh, spawnX, spawnY,(float) this.conf.getTimeStepSize());
-		return agent;
-	}
-
+	public void draw(VisDebugger p);
 }

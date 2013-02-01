@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSim2DNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
+import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
 public class HybridQ2DMobsimFactory implements MobsimFactory {
@@ -42,6 +43,8 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 	private final static Logger log = Logger.getLogger(HybridQ2DMobsimFactory.class);
 	
 	Sim2DEngine sim2DEngine = null;
+
+	private VisDebugger debugger;
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -74,6 +77,10 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(teleportationEngine);
 		
 		Sim2DEngine e = new Sim2DEngine(qSim);
+		
+		//DEBUG
+		e.debug(this.debugger);
+		
 		this.sim2DEngine = e;
 		qSim.addMobsimEngine(e);
 		
@@ -100,5 +107,10 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 
 	public Sim2DEngine getSim2DEngine() {
 		return this.sim2DEngine;
+	}
+
+	public void debug(VisDebugger visDebugger) {
+		this.debugger = visDebugger;
+		
 	}
 }

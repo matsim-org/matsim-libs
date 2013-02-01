@@ -180,6 +180,8 @@ public class PhysicalSim2DSectionTest {
 
 		this.e = new Envelope(-4,6,0,8);
 		env.setEnvelope(this.e);
+		
+		conf.setOffsets(-4, 0);
 
 		sc.connect(msc);
 
