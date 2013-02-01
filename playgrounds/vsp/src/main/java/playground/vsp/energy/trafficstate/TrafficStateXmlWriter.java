@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.vsp.energy.trafficstate;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -30,6 +28,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
@@ -66,7 +65,7 @@ public class TrafficStateXmlWriter {
 		XMLOutputFactory xof =  XMLOutputFactory.newInstance();
 		XMLStreamWriter xtw = null;
 		try {
-			xtw = new IndentingXMLStreamWriter(xof.createXMLStreamWriter(new FileWriter(filename)));
+			xtw = new IndentingXMLStreamWriter(xof.createXMLStreamWriter(IOUtils.getOutputStream(filename)));
 			xtw.writeStartDocument("utf-8","1.0");
 //			
 			xtw.writeStartElement("traffic_state");
@@ -103,10 +102,7 @@ public class TrafficStateXmlWriter {
 			xtw.close();
 		} catch (XMLStreamException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-
 	
 	}
 	

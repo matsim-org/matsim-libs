@@ -66,7 +66,7 @@ public class TrafficStateControlerListener implements StartupListener, Iteration
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		TrafficState ts = this.calculateTrafficState();
-		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "traffic_state.xml");
+		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "traffic_state.xml.gz");
 		new TrafficStateXmlWriter(ts).writeFile(filename);
 	}
 
