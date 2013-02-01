@@ -38,8 +38,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 
 /**
+ * Generates or modifies transit departures.
+ * 
  * @author ikaddoura
- *
  */
 public class DeparturesGenerator {
 	private final static Logger log = Logger.getLogger(DeparturesGenerator.class);
@@ -47,6 +48,10 @@ public class DeparturesGenerator {
 	private TransitSchedule transitSchedule;
 	private TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
 	
+	/**
+	 * Creates and adds departures for each given transit line of a given schedule.
+	 * 
+	 */
 	public void addDepartures(TransitSchedule schedule, List<Id> lineIDs, double headway_sec, double startTime, double endTime, double pausenzeit) {
 		this.transitSchedule = schedule;
 		

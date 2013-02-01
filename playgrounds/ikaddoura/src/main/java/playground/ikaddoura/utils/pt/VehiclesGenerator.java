@@ -40,6 +40,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 /**
+ * Generates transit vehicles for each given transit line of a given schedule.
  * @author Ihab
  *
  */
@@ -47,7 +48,10 @@ public class VehiclesGenerator {
 	private final static Logger log = Logger.getLogger(VehiclesGenerator.class);
 	
 	private Vehicles veh = VehicleUtils.createVehiclesContainer();
-
+	
+	/**
+	 * Generates transit vehicles for each given transit line of a given schedule.
+	 */
 	public void createVehicles(TransitSchedule schedule, List<Id> lineIDs, int busSeats, int standingRoom, double length, Id vehTypeId, double egressSeconds, double accessSeconds, DoorOperationMode doorOperationMode) {
 		
 		for (Id transitLineId : lineIDs){
