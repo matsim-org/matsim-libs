@@ -58,6 +58,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	private boolean permanentRegime_fast;
 	
 	private int permanentRegimeTour;
+	private int cachedPermanentRegimeTour;
 	
 	private double permanentDensity;
 	private double permanentDensity_truck;//partial density: number of truck drivers divided by the TOTAL network length.
@@ -172,7 +173,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				handleEvent_fast(event);
 			} else {
 				while(true){
-					System.out.println("No transport mode acquired in event handling, must be something wrong!");
+					log.warn("No transport mode acquired in event handling, must be something wrong!");
 				}
 			}
 			
@@ -205,6 +206,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 					}
 					this.flowTime = new Double(nowTime);
 				}
+				
 				//Permanent Regime handling
 				if (permanentRegime){
 					tourNumber = this.personTour.get(personId);
@@ -221,6 +223,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 					this.lastXFlows.set(0, this.permanentFlow);
 					
 					if (tourNumber >= (this.permanentRegimeTour+2)){//Let the simulation go another turn around to eventually fill data gaps
+						//TODO: this is not enough. Need to wait until the slowest mode has reached and totally completed tour permanentRegimeTour.
+						//
 						
 						int numberOfDrivingAgents = this.tourNumberSpeed.get(this.permanentRegimeTour).getFirst();
 						
@@ -228,7 +232,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 					
 						this.permanentAverageVelocity = this.tourNumberSpeed.get(this.permanentRegimeTour).getSecond();//m/s
 	
-						if (almostEqualDoubles(this.lastXFlows.get(0),this.lastXFlows.get(FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS-1),0.02)){
+						if (almostAbsoluteEqualDoubles(this.lastXFlows.get(0),this.lastXFlows.get(FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS-1),1.)){
 							log.info("Simulation successful.\n" +
 									"Densities: truck: "+this.permanentDensity_truck+/*" med: "+this.permanentDensity_med+*/" fast: "+this.permanentDensity_fast+" TOTAL: "+this.permanentDensity+"\n"+
 									"Flows: truck: "+this.permanentFlow_truck+/*" med: "+this.permanentFlow_med+*/" fast: "+this.permanentFlow_fast+" TOTAL: "+this.permanentFlow+"\n"+
@@ -242,9 +246,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 							//this.endDensity_med = this.permanentDensity_med;
 							this.endDensity_fast = this.permanentDensity_fast;
 							
-							this.endFlow
-
- = this.permanentFlow;
+							this.endFlow = this.permanentFlow;
 							this.endFlow_truck = this.permanentFlow_truck;
 							//this.endFlow_med = this.permanentFlow_med;
 							this.endFlow_fast = this.permanentFlow_fast;
@@ -269,6 +271,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		int tourNumber;
 		double nowTime = event.getTime();
 		double networkLength = DreieckStreckeSzenarioTest.length * 3;
+		int checkingForAgents_fast = this.tourNumberSpeed_fast.size();
 		
 		if (event.getLinkId().equals(studiedMeasuringPointLinkId)){
 			if (this.personTour.containsKey(personId)){
@@ -282,9 +285,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				double sn = NumberSpeed.getSecond(); double sn_truck = NumberSpeed_truck.getSecond();//average speed for n people
 				//encountered a few calculatory problems here for still mysterious reasons, 
 				//hence the normally very unnecessary detailed programming
-				double
-  first = n*sn/(n+1); double first_truck = n_truck*sn_truck/(n_truck+1);
-				double second = speed/(n+1); double second_truck = speed/(n_truck+1);
+				double first = n*sn/(n+1);   	double first_truck = n_truck*sn_truck/(n_truck+1);
+				double second = speed/(n+1); 	double second_truck = speed/(n_truck+1);
 				Tuple<Integer,Double> newNumberSpeed = new Tuple<Integer,Double>(n+1,first + second/*average speed with n+1 people*/);
 				Tuple<Integer,Double> newNumberSpeed_truck = new Tuple<Integer,Double>(n_truck+1,first_truck + second_truck/*truck average speed with n+1 people*/);
 				this.tourNumberSpeed.put(tourNumber, newNumberSpeed);
@@ -296,42 +298,79 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 					//Checking for empty modes
 					/*
 					if (!(this.permanentRegime_med)){
-						int checkingForAgents_med = this.tourNumberSpeed_med.size();
+						//int checkingForAgents_med = this.tourNumberSpeed_med.size();
 						if (checkingForAgents_med == 0){
 							this.permanentRegime_med = true;//no agents driving, so this variable should always be true
-							System.out.println("Med permanent regime attained because of empty mode.");
+							log.info("Med permanent regime attained because of empty mode.");
 						}
 					}
 					*/
 					if (!(this.permanentRegime_fast)){
-						int checkingForAgents_fast = this.tourNumberSpeed_fast.size();
 						if (checkingForAgents_fast == 0){
 							this.permanentRegime_fast = true;//no agents driving, so this variable should always be true
-							System.out.println("Fast permanent regime attained because of empty mode.");
+							this.cachedPermanentRegimeTour = 0;//lowest value possible for initialization so it will not be considered.
+							log.info("Fast permanent regime attained because of empty mode.");
 						}
 					}
 					
 					//Permanent in the mode?
-					double previousLapSpeed_truck = this.tourNumberSpeed_truck.get(tourNumber-1).getSecond();
-					double theOneBefore_truck = this.tourNumberSpeed_truck.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed_truck, 0.02)) && (almostEqualDoubles(previousLapSpeed_truck, theOneBefore_truck, 0.02))){
-						if (!(permanentRegime_truck)){
-							//this.permanentRegimeTour=tourNumber; eventually detect the permanent regime as soon as ONE of the modes has reached it?
+					if (!(permanentRegime_truck)){
+						double previousLapSpeed_truck = this.tourNumberSpeed_truck.get(tourNumber-1).getSecond();
+						double theOneBefore_truck = this.tourNumberSpeed_truck.get(tourNumber-2).getSecond();
+						if ((almostRelativeEqualDoubles(speed, previousLapSpeed_truck, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed_truck, theOneBefore_truck, 0.02))){
 							this.permanentRegime_truck=true;
-							System.out.println("Truck permanent regime attained.");
+							log.info("Truck permanent regime attained.");
+							
+							if (permanentRegime_fast){
+								if (tourNumber>cachedPermanentRegimeTour){
+									this.permanentRegimeTour = tourNumber;
+								} else {
+									this.permanentRegimeTour = this.cachedPermanentRegimeTour;
+									this.cachedPermanentRegimeTour = tourNumber;//so that I remember the two tourNumbers in any situation.
+								}
+							} else {
+								this.cachedPermanentRegimeTour = tourNumber;
+							}
 						}
 					}
 					//globally?
-					double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
-					double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
-						//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
-						if ((permanentRegime_truck) /*&& (permanentRegime_med) */&& (permanentRegime_fast)){//just checking that the modes are effectively stable
-							if (!(permanentRegime)){
-								this.permanentRegimeTour=tourNumber;
-								this.permanentRegime=true;
-							}
-						}	
+					if (!(permanentRegime)){
+						double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
+						double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
+						boolean closeSpeeds = false;
+						boolean stableModes = false;
+						boolean completedPRT = false;
+						int n_truck_prt;
+						int n_fast_prt;
+						
+						if ((almostRelativeEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
+							//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
+							closeSpeeds = true;
+						}
+						if ((permanentRegime_truck) /*&&(permanentRegime_med)*/ && (permanentRegime_fast)){  //just checking that the modes are effectively stable
+							stableModes = true;
+						}
+						try {
+							n_truck_prt = tourNumberSpeed_truck.get(permanentRegimeTour).getFirst();
+						} catch (NullPointerException e) {
+							n_truck_prt = 0;//means the NumberSpeed_truck for this tour hasn't been created => the mode needs to run around a little more
+						}
+						try {
+							n_fast_prt = tourNumberSpeed_fast.get(permanentRegimeTour).getFirst();
+						} catch (NullPointerException e) {
+							n_fast_prt = 0;//means the NumberSpeed_fast for this tour hasn't been created => the mode needs to run around a little more
+						}
+						if ( (n_truck_prt+n_fast_prt) == this.scenario.getPopulation().getPersons().size()){
+						//if 
+						//TODO:make sure tourNumberSpeed_mode.get(PRT).getFirst() equals numberOfPeople for each mode (everyone has driven the PRT tour)
+						//then 
+							completedPRT = true;
+						//
+						}
+						if ((closeSpeeds) && (stableModes) && (completedPRT)){
+							this.permanentRegime=true;
+							log.info("Global permanent regime attained.");
+						}
 					}
 				}
 				
@@ -393,6 +432,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		int tourNumber;
 		double nowTime = event.getTime();
 		double networkLength = DreieckStreckeSzenarioTest.length * 3;
+		int checkingForAgents_truck = this.tourNumberSpeed_truck.size();
+		int checkingForAgents_fast = this.tourNumberSpeed_fast.size();
 		
 		if (event.getLinkId().equals(studiedMeasuringPointLinkId)){
 			if (this.personTour.containsKey(personId)){
@@ -417,18 +458,17 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				//Checking for permanentRegime, in the mode and globally
 				if (tourNumber>2){
 					//Checking for empty modes
+					//TODO: Update this part for 3 modes with the use of cachedPermanentRegimeTour?
 					if (!(this.permanentRegime_truck)){
-						int checkingForAgents_truck = this.tourNumberSpeed_truck.size();
 						if (checkingForAgents_truck == 0){
 							this.permanentRegime_truck = true;//no agents driving, so this variable should always be true
-							System.out.println("Truck permanent regime attained because of empty mode.");
+							log.info("Truck permanent regime attained because of empty mode.");
 						}
 					}
 					if (!(this.permanentRegime_fast)){
-						int checkingForAgents_fast = this.tourNumberSpeed_fast.size();
 						if (checkingForAgents_fast == 0){
 							this.permanentRegime_fast = true;//no agents driving, so this variable should always be true
-							System.out.println("Fast permanent regime attained because of empty mode.");
+							log.info("Fast permanent regime attained because of empty mode.");
 						}
 					}
 					
@@ -438,24 +478,23 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 					//System.out.println("previous_med: "+previousLapSpeed_med);
 					double theOneBefore_med = this.tourNumberSpeed_med.get(tourNumber-2).getSecond();
 					//System.out.println("before_med: "+theOneBefore_med);
-					if ((almostEqualDoubles(speed, previousLapSpeed_med, 0.02)) && (almostEqualDoubles(previousLapSpeed_med, theOneBefore_med, 0.02))){
+					if ((almostRelativeEqualDoubles(speed, previousLapSpeed_med, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed_med, theOneBefore_med, 0.02))){
 						if (!(permanentRegime_med)){
 							//this.permanentRegimeTour=tourNumber; eventually detect the permanent regime as soon as ONE of the modes has reached it?
 							this.permanentRegime_med=true;
-							System.out.println("Med permanent regime attained.");
+							log.info("Med permanent regime attained.");
 						}
 					}
 					//globally?
 					double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
 					double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
-					if
- ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed,
- theOneBefore, 0.02))){
+					if ((almostRelativeEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
 						//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
 						if ((permanentRegime_truck) && (permanentRegime_med) && (permanentRegime_fast)){//just checking that the modes are effectively stable
 							if (!(permanentRegime)){
-								this.permanentRegimeTour=tourNumber;
 								this.permanentRegime=true;
+								if (checkingForAgents_fast != 0)
+									this.permanentRegimeTour=tourNumber;//this must be done only in the fastest mode
 							}
 						}	
 					}
@@ -542,13 +581,14 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				
 				
 				//Checking for permanentRegime, in the mode and globally
-				if (tourNumber>2){
+				if (tourNumber>2){//>=3 because I want to compare actual speed with *2* previous speeds
 					//Checking for empty modes
 					if (!(this.permanentRegime_truck)){
 						int checkingForAgents_truck = this.tourNumberSpeed_truck.size();
 						if (checkingForAgents_truck == 0){
 							this.permanentRegime_truck = true;//no agents driving, so this variable should always be true
-							System.out.println("Truck permanent regime attained because of empty mode.");
+							this.cachedPermanentRegimeTour = 0;//lowest value possible for initialization so it will not be considered.
+							log.info("Truck permanent regime attained because of empty mode.");
 						}
 					}
 					/*
@@ -556,36 +596,73 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 						int checkingForAgents_med = this.tourNumberSpeed_med.size();
 						if (checkingForAgents_med == 0){
 							this.permanentRegime_med = true;//no agents driving, so this variable should always be true
-							System.out.println("Med permanent regime attained because of empty mode.");
+							log.info("Med permanent regime attained because of empty mode.");
 						}
 					}
 					*/
 					
 					//Permanent in the mode?
-					//System.out.println("speed_fast: "+speed);
-					double previousLapSpeed_fast = this.tourNumberSpeed_fast.get(tourNumber-1).getSecond();
-					//System.out.println("previous_fast: "+previousLapSpeed_fast);
-					double theOneBefore_fast = this.tourNumberSpeed_fast.get(tourNumber-2).getSecond();
-					//System.out.println("before_fast: "+theOneBefore_fast);
-					if ((almostEqualDoubles(speed, previousLapSpeed_fast, 0.05)) && (almostEqualDoubles(previousLapSpeed_fast, theOneBefore_fast, 0.05))){
-						if (!(permanentRegime_fast)){
-							//this.permanentRegimeTour=tourNumber; eventually detect the permanent regime as soon as ONE of the modes has reached it?
+					if (!(permanentRegime_fast)){
+						//System.out.println("speed_fast: "+speed);
+						double previousLapSpeed_fast = this.tourNumberSpeed_fast.get(tourNumber-1).getSecond();
+						//System.out.println("previous_fast: "+previousLapSpeed_fast);
+						double theOneBefore_fast = this.tourNumberSpeed_fast.get(tourNumber-2).getSecond();
+						//System.out.println("before_fast: "+theOneBefore_fast);
+						if ((almostRelativeEqualDoubles(speed, previousLapSpeed_fast, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed_fast, theOneBefore_fast, 0.02))){
 							this.permanentRegime_fast=true;
-							System.out.println("Fast permanent regime attained.");
+							log.info("Fast permanent regime attained.");
+							
+							if (permanentRegime_truck){
+								if (tourNumber>cachedPermanentRegimeTour){//taking the highest tourNumber to ensure permanent data collecting
+									this.permanentRegimeTour = tourNumber;
+								} else {
+									this.permanentRegimeTour = this.cachedPermanentRegimeTour;
+									this.cachedPermanentRegimeTour = tourNumber;//so that I remember the two tourNumbers in any situation.
+								}
+							} else {
+								this.cachedPermanentRegimeTour = tourNumber;
+							}
 						}
 					}
+					
 					//globally?
-					double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
-					double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
-						//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
-						if ((permanentRegime_truck) /*&& (permanentRegime_med)*/ && (permanentRegime_fast)){//just checking that the modes are effectively stable
-							if (!(permanentRegime)){
-								this.permanentRegimeTour=tourNumber;
-								this.permanentRegime=true;
-							}
-						}	
-					}
+					if (!(permanentRegime)){
+						double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
+						double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
+						boolean closeSpeeds = false;
+						boolean stableModes = false;
+						boolean completedPRT = false;
+						int n_truck_prt;
+						int n_fast_prt;
+						
+						if ((almostRelativeEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
+							//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
+							closeSpeeds = true;
+						}
+						if ((permanentRegime_truck) /*&&(permanentRegime_med)*/ && (permanentRegime_fast)){  //just checking that the modes are effectively stable
+							stableModes = true;
+						}
+						try {
+							n_truck_prt = tourNumberSpeed_truck.get(permanentRegimeTour).getFirst();
+						} catch (NullPointerException e) {
+							n_truck_prt = 0;//means the NumberSpeed_truck for this tour hasn't been created => the mode needs to run around a little more
+						}
+						try {
+							n_fast_prt = tourNumberSpeed_fast.get(permanentRegimeTour).getFirst();
+						} catch (NullPointerException e) {
+							n_fast_prt = 0;//means the NumberSpeed_fast for this tour hasn't been created => the mode needs to run around a little more
+						}
+						if ( (n_truck_prt+n_fast_prt) == this.scenario.getPopulation().getPersons().size()){
+						//make sure tourNumberSpeed_mode.get(PRT).getFirst() equals numberOfPeople for each mode (everyone has driven the PRT tour)
+						//TODO:make sure that works...
+							completedPRT = true;
+						//
+						}
+						if ((closeSpeeds) && (stableModes) && (completedPRT)){
+							this.permanentRegime=true;
+							log.info("Global permanent regime attained.");
+						}
+					}	
 				}
 				
 				//Updating aggregated data sources
@@ -703,21 +780,19 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	}
 	
 	
-	private boolean almostEqualDoubles(double
- d1, double d2, double MaximumAcceptedDeviance){
-		/*//Method 1: Relative accepted deviance:
- not so good, with big flows it starts to detect stability too soon.
+	private boolean almostRelativeEqualDoubles(double d1, double d2, double MaximumAcceptedDeviance){
+		//	not so good, with big flows it starts to detect stability too soon.
 		if (((d1-d2)/d2)< MaximumAcceptedDeviance)
 			return true;
 		return false;
-		//*/
-		//Method 2: Absolute accepted deviance
-		if (Math.abs(d1-d2)<1)
-			return true;
-		return false;
-		//*/
+		
 	}
 	
+	private boolean almostAbsoluteEqualDoubles(double d1, double d2, double MaximumAcceptedDeviance){
+		if (Math.abs(d1-d2)<MaximumAcceptedDeviance)
+			return true;
+		return false;
+	}
 	
 	private void initializeGroupDependentVariables(){
 		this.permanentRegime_truck = false;
@@ -816,6 +891,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		this.permanentFlow_fast = getActualFlow_fast();				
 		
 		if (tourNumber >= (this.permanentRegimeTour+3)){//Let the simulation go another turn around to eventually fill data gaps
+			//TODO: this is not enough. Need to wait until the slowest mode has reached and totally completed tour permanentRegimeTour.
+			
 			int N_truck = 0; /*int N_med = 0;*/ int N_fast = 0;
 			
 			if (this.tourNumberSpeed_truck.size() != 0){
