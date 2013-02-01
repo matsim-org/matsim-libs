@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -35,7 +34,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -46,7 +44,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author thibautd
  */
-public class TripRouter {
+public final class TripRouter {
 	private final Map<String, RoutingModule> routingModules =
 		new HashMap<String , RoutingModule>();
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
@@ -96,88 +94,6 @@ public class TripRouter {
 	// /////////////////////////////////////////////////////////////////////////
 	// Handling methods
 	// /////////////////////////////////////////////////////////////////////////
-	///**
-	// * Creates a list of plan elements reproducing the plan,
-	// * except that multi-legs trips are replaced by one single leg,
-	// * with mode set to the main mode of the trip.
-	// * The argument plan is not modified.
-	// * All references in the return list, except the newly created "dummy"
-	// * legs, point towards the plan's instances.
-	// *
-	// * @param plan the plan to analyse
-	// * @return the simplified sequence of plan elements
-	// */
-	//public List<PlanElement> tripsToLegs(final Plan plan) {
-	//	return tripsToLegs( plan.getPlanElements() );
-	//}
-
-	///**
-	// * Actual processing method used by {@link #tripsToLegs(Plan)}. Allows
-	// * to analyse any sequence of plan elements, even outside of a plan container.
-	// * @param plan the sequence of {@link PlanElement} to analyse.
-	// * @return the simplified sequence of plan elements
-	// */
-	//public List<PlanElement> tripsToLegs(final List<PlanElement> plan) {
-	//	return tripsToLegs( plan , checker );
-	//}
-
-	///**
-	// * The same as {@link #tripsToLeg(Plan)}, but allowing to use
-	// * a specific {@link StageActivityTypes} instance.
-	// * @param plan the plan to analyse
-	// * @param checker the checker to use
-	// * @return the plan structure. See {@link #tripsToLeg(Plan)} for details.
-	// */
-	//public List<PlanElement> tripsToLegs(final Plan plan, final StageActivityTypes checker) {
-	//	return tripsToLegs( plan.getPlanElements() , checker );
-	//}
-
-	///**
-	// * The same as {@link #tripsToLeg(List)}, but allowing to use
-	// * a specific {@link StageActivityTypes} instance.
-	// * @param plan the plan to analyse
-	// * @param checker the checker to use
-	// * @return the plan structure. See {@link #tripsToLeg(Plan)} for details.
-	// */
-	//public List<PlanElement> tripsToLegs(final List<PlanElement> plan, final StageActivityTypes checker) {
-	//	List<PlanElement> simplifiedPlan = new ArrayList<PlanElement>();
-	//	List<PlanElement> currentTrip = new ArrayList<PlanElement>();
-
-	//	for (PlanElement currentElement : plan) {
-	//		if (currentElement instanceof Activity) {
-	//			Activity act = (Activity) currentElement;
-
-	//			if (checker.isStageActivity( act.getType() )) {
-	//				currentTrip.add( act );
-	//			}
-	//			else {
-	//				// "transmitting" the instance for mono-legs trips
-	//				// sounds like a good idea, but it's not: it forces to skip
-	//				// main mode identification...
-	//				//if (currentTrip.size() == 1) {
-	//				//	simplifiedPlan.addAll( currentTrip );
-	//				//}
-	//				// else if (currentTrip.size() > 1) {
-	//				if (currentTrip.size() > 0) {
-	//					Leg newLeg = new LegImpl( identifyMainMode( currentTrip ) );
-
-	//					simplifiedPlan.add( newLeg );
-	//				}
-	//				currentTrip.clear();
-	//				simplifiedPlan.add( act );
-	//			}
-	//		}
-	//		else if (currentElement instanceof Leg) {
-	//			currentTrip.add( currentElement );
-	//		}
-	//		else {
-	//			throw new RuntimeException( "unknown PlanElement implementation "+currentElement.getClass() );
-	//		}
-	//	}
-
-	//	return simplifiedPlan;
-	//}
-
 	/**
 	 * Routes a trip between the given O/D pair, with the given main mode.
 	 *
@@ -209,19 +125,6 @@ public class TripRouter {
 
 		throw new UnknownModeException( "unregistered main mode "+mainMode+": does not pertain to "+routingModules.keySet() );
 	}
-
-	///**
-	// * This is the method responsible for identifying the "main mode"
-	// * of the trip, that is, the mode to which is attached the routing module to use.
-	// * This default implementation considers a trip always starts by a leg, and
-	// * the main mode is the mode of the first leg.
-	// * <br>
-	// * Override to change that.
-	// */
-	//protected String identifyMainMode(final List<PlanElement> trip) {
-	//	String mode = ((Leg) trip.get( 0 )).getMode();
-	//	return mode.equals( TransportMode.transit_walk ) ? TransportMode.pt : mode;
-	//}
 
 	public static class UnknownModeException extends RuntimeException {
 		private UnknownModeException(

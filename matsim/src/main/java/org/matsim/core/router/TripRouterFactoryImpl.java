@@ -107,21 +107,9 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 		this.transitSchedule = transitSchedule;
 	}
 
-
-
-	/**
-	 * Hook provided to change the {@link TripRouter}
-	 * implementation whithout changing the configuration.
-	 *
-	 * @return a new unconfigured instance
-	 */
-	protected TripRouter instanciateTripRouter() {
-		return new TripRouter();
-	}
-
 	@Override
 	public TripRouter createTripRouter() {
-		TripRouter tripRouter = instanciateTripRouter();
+		TripRouter tripRouter = new TripRouter();
 
 		PlansCalcRouteConfigGroup routeConfigGroup = config.plansCalcRoute();
 		TravelDisutility travelCost =

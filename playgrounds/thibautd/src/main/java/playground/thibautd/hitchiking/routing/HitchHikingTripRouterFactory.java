@@ -63,12 +63,9 @@ public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 	}
 
 	@Override
-	protected TripRouter instanciateTripRouter() {
-		return new HhTripRouter();
-	};
-
-	@Override
 	public TripRouter createTripRouter() {
+		if (true) 
+			throw new UnsupportedOperationException( "TODO: replace MainModeIdentifier in PlanRouter" );
 		TripRouter instance = super.createTripRouter();
 
 		instance.setRoutingModule(
@@ -95,11 +92,6 @@ public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 		return instance;
 	}
 
-	private static class HhTripRouter extends TripRouter {
-		public HhTripRouter() {
-			throw new UnsupportedOperationException( "TODO: replace MainModeIdentifier in PlanRouter" );
-		}
-
 		//@Override
 		//protected String identifyMainMode( final List<PlanElement> trip ) {
 		//	for (PlanElement pe : trip) {
@@ -117,6 +109,5 @@ public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 
 		//	return super.identifyMainMode( trip );
 		//}
-	}
 }
 
