@@ -75,18 +75,25 @@ public class ScheduleVehcileWriter {
 	
 	
 	public static void main(String[] args) {
+
 		
 		ScheduleVehcileWriter svw = new ScheduleVehcileWriter();
-		svw.setHeadway_sec(3600.);
+		
+		svw.setOutputDirectory("/Users/Ihab/Desktop/scheduleVehicleWriter/output/");
 		svw.setNetworkFile("/Users/Ihab/Desktop/scheduleVehicleWriter/input/network.xml");
+		svw.setScheduleFile("transitSchedule.xml");
+		svw.setVehiclesFile("transitVehicles.xml");
+		svw.setHeadway_sec(3600.);
+		svw.setBusSeats(61);
+		svw.setStandingRoom(0);
+		svw.setLength(10);
+		
 		svw.setStopTime_sec(15);
 		svw.setScheduleSpeed_m_sec(8.3333333);
 		svw.setAwaitDeparture(true);
 		svw.setBlocking(false);
 		svw.setTransitRouteMode("bus");
 		svw.setLinkIdMarker("bus");
-		svw.setOutputDirectory("/Users/Ihab/Desktop/scheduleVehicleWriter/output/");
-		svw.setScheduleFile("transitSchedule.xml");
 		svw.setPausenzeit(600);
 		svw.setStartTime(4 * 3600);
 		svw.setEndTime(24 * 3600);
@@ -95,14 +102,11 @@ public class ScheduleVehcileWriter {
 //		int busSeats = (int) (capacity * 1.) + 1; // plus one seat because a seat for the driver is expected
 //		int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 		
-		svw.setVehiclesFile("transitVehicles.xml");
-		svw.setBusSeats(61);
-		svw.setStandingRoom(0);
-		svw.setLength(10);
 		svw.setVehTypeId(new IdImpl("bus"));
 		svw.setAccessSeconds(2);
 		svw.setEgressSeconds(1.5);
 		svw.setDoorOperationMode(DoorOperationMode.parallel);
+		
 		svw.run();
 	}
 
