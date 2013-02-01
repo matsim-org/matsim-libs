@@ -47,7 +47,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private final TripRouter routingHandler;
 	private final ActivityFacilities facilities;
-	private final MainModeIdentifier mainModeIdentifier;
 
 	/**
 	 * Initialises an instance.
@@ -55,33 +54,12 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 * @param facilities the {@link ActivityFacilities} to which activities are refering.
 	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
 	 * origin and destination activity.
-	 * @param mainModeIdentifier the object to use to identify routing mode
 	 */
 	public PlanRouter(
 			final TripRouter routingHandler,
-			final ActivityFacilities facilities,
-			final MainModeIdentifier mainModeIdentifier) {
+			final ActivityFacilities facilities) {
 		this.routingHandler = routingHandler;
 		this.facilities = facilities;
-		this.mainModeIdentifier = mainModeIdentifier;
-	}
-
-	/**
-	 * Initialises an instance, using the default mode identification:
-	 * the mode of a trip is the mode of the first leg of this trip,
-	 * except if this leg has mode transit_walk, in which case the mode "pt"
-	 * is used.
-	 * @param routingHandler the {@link TripRouter} to use to route individual trips
-	 * @param facilities the {@link ActivityFacilities} to which activities are refering.
-	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
-	 * origin and destination activity.
-	 */
-	public PlanRouter(
-			final TripRouter routingHandler,
-			final ActivityFacilities facilities ) {
-		this( routingHandler,
-				facilities,
-				new MainModeIdentifierImpl());
 	}
 
 	/**
@@ -110,7 +88,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		for (Trip trip : trips) {
 			final List<? extends PlanElement> newTrip =
 				routingHandler.calcRoute(
-						mainModeIdentifier.identifyMainMode( trip.getTripElements() ),
+						routingHandler.getMainModeIdentifier().identifyMainMode( trip.getTripElements() ),
 						toFacility( trip.getOriginActivity() ),
 						toFacility( trip.getDestinationActivity() ),
 						calcEndOfActivity( trip.getOriginActivity() , plan ),

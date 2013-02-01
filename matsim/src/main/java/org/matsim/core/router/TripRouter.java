@@ -49,6 +49,8 @@ public final class TripRouter {
 		new HashMap<String , RoutingModule>();
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
 
+	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
 	// /////////////////////////////////////////////////////////////////////////
@@ -89,6 +91,24 @@ public final class TripRouter {
 	 */
 	public StageActivityTypes getStageActivityTypes() {
 		return checker;
+	}
+
+	/**
+	 * Sets the {@link MainModeIdentifier} instance returned by this trip router.
+	 * Note that it is not used internally: it is just provided here because it is useful
+	 * mainly for users of this class.
+	 *
+	 * @param newIdentifier the instance to register
+	 * @return the previous registered instance
+	 */
+	public MainModeIdentifier setMainModeIdentifier(final MainModeIdentifier newIdentifier) {
+		final MainModeIdentifier old = this.mainModeIdentifier;
+		this.mainModeIdentifier = newIdentifier;
+		return old;
+	}
+
+	public MainModeIdentifier getMainModeIdentifier() {
+		return mainModeIdentifier;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
