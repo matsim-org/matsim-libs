@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import playground.christoph.controler.WithinDayInitialRoutesController;
 
@@ -96,6 +97,11 @@ public class InitialRoutesController {
 		} else {
 			controler = new Controler(scenario);			
 		}
+		/*
+		 * Use a scoring function which uses opening times from the facilities.
+		 */
+		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
+				
 		controler.run();
 	}
 }
