@@ -20,6 +20,7 @@
 package org.matsim.contrib.locationchoice.bestresponse;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -150,29 +151,22 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					double y = (actPre.getCoord().getY() + actPost.getCoord().getY()) / 2.0;
 					Coord center = new CoordImpl(x,y);
 
-					ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario.getNetwork(),
-							this.scenario.getConfig());
-					this.createChoiceSetFromCircle(
-							center, maxRadius, this.actTypeConverter.convertType(((ActivityImpl)actToMove).getType()), cs,
-							plan.getPerson().getId());
+					ChoiceSet cs = createChoiceSetFromCircle2(plan,
+							travelTimeApproximationLevel, actToMove, maxRadius,
+							center);
 					
 					System.err.println("ChoiceSet cs:\n" + cs.toString() ) ;
 
 					// **************************************************
 					// maybe repeat this a couple of times
+					// yy why? kai, feb'13
 
 					this.setLocation((ActivityImpl)actToMove, 
 							cs.getWeightedRandomChoice(actlegIndex, actPre.getCoord(),
 									actPost.getCoord(), this.facilities, scoringFunction, 
 									plan, replanningContext));	
 					
-					System.err.println("the acts of the tentative plan look as:" ) ;
-					for ( PlanElement pe2 : plan.getPlanElements() ) {
-						if ( pe2 instanceof Activity ) {
-							Activity act = (Activity) pe2 ;
-							System.err.println( act.toString() ) ;
-						}
-					}
+					printTentativePlanToConsole(plan);
 
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
 					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
@@ -185,23 +179,39 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		}		
 	}
 
+	private ChoiceSet createChoiceSetFromCircle2(Plan plan,
+			ApproximationLevel travelTimeApproximationLevel,
+			final Activity actToMove, double maxRadius, Coord center) {
+
+		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario.getNetwork(), this.scenario.getConfig());
+
+		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
+		Collection<ActivityFacility> list = this.quadTreesOfType.get(convertedType).get( center.getX(), center.getY(), maxRadius );
+		
+		for (ActivityFacility facility : list) {
+			if (this.sampler.sample(facility.getId(), plan.getPerson().getId())) { 
+				cs.addDestination(facility.getId());
+			}
+		}
+		return cs;
+	}
+
+	private static void printTentativePlanToConsole(Plan plan) {
+		System.err.println("the acts of the tentative plan look as:" ) ;
+		for ( PlanElement pe2 : plan.getPlanElements() ) {
+			if ( pe2 instanceof Activity ) {
+				Activity act = (Activity) pe2 ;
+				System.err.println( act.toString() ) ;
+			}
+		}
+	}
+
 	private void setLocation(ActivityImpl act, Id facilityId) {
 		act.setFacilityId(facilityId);
 		act.setLinkId(((NetworkImpl) this.scenario.getNetwork()).getNearestLink(this.facilities.getFacilities().get(facilityId).getCoord()).getId());
 		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 	}
 	
-	private final void createChoiceSetFromCircle(Coord center, double radius, String type, ChoiceSet cs, Id personId) {
-		ArrayList<ActivityFacility> list = 
-				(ArrayList<ActivityFacility>) super.quadTreesOfType.get(type).get(center.getX(), center.getY(), radius);
-
-		for (ActivityFacility facility : list) {
-			if (this.sampler.sample(facility.getId(), personId)) { 
-				cs.addDestination(facility.getId());
-			}
-		}
-	}
-
 	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlanSoFar, ChoiceSet cs, ScoringFunctionAccumulator scoringFunction) {		
 		double score = this.computeScoreAndAdaptPlan(plan, cs, scoringFunction);	
 		System.err.println("expected score of new plan is: " + score ) ;
