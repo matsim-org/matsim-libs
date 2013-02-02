@@ -36,7 +36,7 @@ public class ActTypeConverter {
 		else return actType;
 	}
 	
-	public String convert2FullType(String type) {
+	public static String convert2FullType(String type) {
 		String fullType = "tta";
 		if (type.startsWith("h")) {
 			fullType = "home";

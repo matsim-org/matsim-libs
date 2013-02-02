@@ -108,7 +108,7 @@ public class AdaptZHScenario {
 		trees.put("leisure", this.builFacQuadTree("leisure", this.scenario.getActivityFacilities().getFacilitiesForActivityType("l")));
 		trees.put("tta", this.builFacQuadTree("tta", this.scenario.getActivityFacilities().getFacilitiesForActivityType("tta")));
 		
-		ActTypeConverter actTypeConverter = new ActTypeConverter(false);
+//		ActTypeConverter actTypeConverter = new ActTypeConverter(false);
 		
 		int counter = 0;
 		int nextMsg = 1;
@@ -147,7 +147,7 @@ public class AdaptZHScenario {
 					}
 					else {
 						((ActivityImpl)pe).setFacilityId(
-								trees.get(actTypeConverter.convert2FullType(act.getType())).get(act.getCoord().getX(), act.getCoord().getY())
+								trees.get(ActTypeConverter.convert2FullType(act.getType())).get(act.getCoord().getX(), act.getCoord().getY())
 								.getId());
 					}
 				}

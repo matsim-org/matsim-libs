@@ -285,14 +285,14 @@ public class CreateNewZHScenario {
 	
 	private void convertFromV1toV2(Scenario inScenario) {
 		
-		ActTypeConverter actTypeConverter = new ActTypeConverter(false);
+//		ActTypeConverter actTypeConverter = new ActTypeConverter(false);
 		
 		for (Person p : inScenario.getPopulation().getPersons().values()){
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
 						ActivityImpl act = (ActivityImpl)pe;
-						String v2Type = actTypeConverter.convert2FullType(act.getType());
+						String v2Type = ActTypeConverter.convert2FullType(act.getType());
 						double duration = 12.0 * 3600.0;
 						if (!act.getType().equals("tta")) {
 							duration = Double.parseDouble(act.getType().substring(1)) * 3600.0;
