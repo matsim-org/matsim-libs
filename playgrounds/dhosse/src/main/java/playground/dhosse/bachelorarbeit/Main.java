@@ -86,12 +86,12 @@ public class Main {
 			PlanElement pe2 = p.getSelectedPlan().getPlanElements().get(2);
 			if(pe1 instanceof Activity){
 				Id id = new IdImpl(i);
-				parcels.createFacility(id, ((Activity)pe1).getCoord());
+				parcels.createAndAddFacility(id, ((Activity)pe1).getCoord());
 				i++;
 			}
 			if(pe2 instanceof Activity){
 				Id id = new IdImpl(i);
-				parcels.createFacility(id, ((Activity)pe2).getCoord());
+				parcels.createAndAddFacility(id, ((Activity)pe2).getCoord());
 				i++;
 			}
 		}
