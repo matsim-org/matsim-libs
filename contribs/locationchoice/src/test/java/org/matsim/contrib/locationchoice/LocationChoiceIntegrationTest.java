@@ -32,6 +32,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
+import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -57,65 +62,12 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
-	public void testLocationChoiceFeb2013NegativeScores() {
-		final Config config = localCreateConfig();
-
-		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
-		config.locationchoice().setEpsilonScaleFactors("100.0") ;
-//		config.locationchoice().setProbChoiceExponent("1.") ;
-		
-		config.otfVis().setEffectiveLaneWidth(1.) ;
-		config.otfVis().setLinkWidth((float)1.) ;
-		config.otfVis().setShowTeleportedAgents(true) ;
-		config.otfVis().setDrawNonMovingItems(true) ;
-
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-
-		final double scale = 100000. ;
-		final double speed = 1. ;
-
-		createExampleNetwork(scenario, scale, speed);
-		
-		Link ll1 = scenario.getNetwork().getLinks().get(new IdImpl(1)) ;
-		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
-		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
-
-		Controler controler = new Controler(scenario);
-		
-		controler.setMobsimFactory(new MobsimFactory() {
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
-//				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-//				OTFClientLive.run(sc.getConfig(), server);
-				return qSim ;
-			} 
-		} ) ;
-
-		controler.run();
-
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
-		Plan newPlan = person.getSelectedPlan();
-		System.err.println( " newPlan: " + newPlan ) ;
-		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
-		System.err.println( " newWork: " + newWork ) ;
-		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
-//		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
-//		assertEquals( new IdImpl(55), newWork.getFacilityId() );
-		System.err.println("shouldn't this change anyways??") ;
-	}
-
 	public void testLocationChoiceJan2013() {
 		final Config config = localCreateConfig();
 
 		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
 		config.locationchoice().setEpsilonScaleFactors("100.0") ;
-//		config.locationchoice().setProbChoiceExponent("1.") ;
-		
-		config.otfVis().setEffectiveLaneWidth(1.) ;
-		config.otfVis().setLinkWidth((float)1.) ;
-		config.otfVis().setShowTeleportedAgents(true) ;
-		config.otfVis().setDrawNonMovingItems(true) ;
+		config.locationchoice().setRandomSeed("4711") ;
 
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
@@ -123,19 +75,38 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		final double speed = 10. ;
 
 		createExampleNetwork(scenario, scale, speed);
-		
+
 		Link ll1 = scenario.getNetwork().getLinks().get(new IdImpl(1)) ;
 		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
 		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
 
+		FacilityPenalties facPenalties = scenario.getScenarioElement(FacilityPenalties.class);
+		if (facPenalties == null) {
+			facPenalties = new FacilityPenalties();
+			scenario.addScenarioElement( facPenalties );
+		}
+
 		Controler controler = new Controler(scenario);
-		
+		controler.setOverwriteFiles(true) ;
+
+		// set scoring function
+		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(config.locationchoice());
+		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
+		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
+
+		MixedScoringFunctionFactory scoringFunctionFactory =
+			new MixedScoringFunctionFactory(config, controler, scaleEpsilon, actTypeConverter, defineFlexibleActivities.getFlexibleTypes() );
+		scoringFunctionFactory.setUsingFacilityOpeningTimes(false) ;
+
+		controler.setScoringFunctionFactory(scoringFunctionFactory);
+
+		// this is here only to switch on otfvis if needed:
 		controler.setMobsimFactory(new MobsimFactory() {
 			@Override
 			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
-//				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-//				OTFClientLive.run(sc.getConfig(), server);
+				//				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+				//				OTFClientLive.run(sc.getConfig(), server);
 				return qSim ;
 			} 
 		} ) ;
@@ -148,13 +119,77 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
 		System.err.println( " newWork: " + newWork ) ;
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
-//		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
-		assertEquals( new IdImpl(55), newWork.getFacilityId() );
+		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
+		assertEquals( new IdImpl(27), newWork.getFacilityId() );
+	}
+
+	public void testLocationChoiceFeb2013NegativeScores() {
+		// config:
+		final Config config = localCreateConfig();
+
+		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
+		config.locationchoice().setEpsilonScaleFactors("100.0") ;
+
+		// scenario:
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+
+		final double scale = 100000. ;
+		final double speed = 1. ;
+
+		createExampleNetwork(scenario, scale, speed);
+
+		Link ll1 = scenario.getNetwork().getLinks().get(new IdImpl(1)) ;
+		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
+		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
+
+		FacilityPenalties facPenalties = scenario.getScenarioElement(FacilityPenalties.class);
+		if (facPenalties == null) {
+			facPenalties = new FacilityPenalties();
+			scenario.addScenarioElement( facPenalties );
+		}
+
+		// controler:
+		Controler controler = new Controler(scenario);
+		controler.setOverwriteFiles(true) ;
+
+		// set scoring function
+		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(config.locationchoice());
+		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
+		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
+
+		MixedScoringFunctionFactory scoringFunctionFactory =
+			new MixedScoringFunctionFactory(config, controler, scaleEpsilon, actTypeConverter, defineFlexibleActivities.getFlexibleTypes() );
+		scoringFunctionFactory.setUsingFacilityOpeningTimes(false) ;
+
+		controler.setScoringFunctionFactory(scoringFunctionFactory);
+
+		// this is here only to switch on otfvis if needed:
+		controler.setMobsimFactory(new MobsimFactory() {
+			@Override
+			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
+				//				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+				//				OTFClientLive.run(sc.getConfig(), server);
+				return qSim ;
+			} 
+		} ) ;
+
+		controler.run();
+
+		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		Plan newPlan = person.getSelectedPlan();
+		System.err.println( " newPlan: " + newPlan ) ;
+		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
+		System.err.println( " newWork: " + newWork ) ;
+		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
+		//		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
+		//		assertEquals( new IdImpl(55), newWork.getFacilityId() );
+		System.err.println("shouldn't this change anyways??") ;
 	}
 
 	private void createExampleNetwork(final ScenarioImpl scenario, final double scale, final double speed) {
 		Network network = scenario.getNetwork() ;
-		
+
 		Node node0 = network.getFactory().createNode(new IdImpl(0), new CoordImpl(-scale,0) ) ;
 		network.addNode(node0) ;
 
@@ -190,14 +225,16 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 				link.setCapacity(1.) ;
 				network.addLink(link) ;
 			}
-			
+
 			ActivityFacility facility = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(ii), coord ) ;
 			facility.getActivityOptions().put("work", new ActivityOptionImpl("work", facility)) ;
 		}
-		
+
 		// create one additional facility for the initial activity:
 		ActivityFacilityImpl facility1 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(1), new CoordImpl(scale,0) );
-		facility1.getActivityOptions().put("initial-work", new ActivityOptionImpl("initial-work", facility1)) ;
+		facility1.getActivityOptions().put("work", new ActivityOptionImpl("work", facility1)) ;
+		// (as soon as you set a scoring function that looks if activity types match opportunities at facilities, you can only use
+		// an activity type that indeed is at the facility)
 	}
 	public void testLocationChoice() {
 		final Config config = localCreateConfig();
@@ -215,7 +252,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		facility2.getActivityOptions().put("work", new ActivityOptionImpl("work", facility2));
 		ActivityFacilityImpl facility3 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(3), new CoordImpl(0, 300));
 		facility3.getActivityOptions().put("work", new ActivityOptionImpl("work", facility3));
-		
+
 		Person person = localCreatePopWOnePerson(scenario, link, facility1, 17.*60.*60.);
 
 		Controler controler = new Controler(scenario);
@@ -248,7 +285,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		PlanImpl plan = (PlanImpl) population.getFactory().createPlan() ;
 		person.addPlan(plan) ;
-		
+
 		{
 			Activity act = population.getFactory().createActivityFromCoord("home", new CoordImpl(0,0)) ;
 			//		act.setLinkId(link.getId());
@@ -264,8 +301,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		}
 		plan.createAndAddLeg(TransportMode.car);
 		{
-//		act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
-//		act.setLinkId(link.getId());
+			//		act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
+			//		act.setLinkId(link.getId());
 			Activity act = population.getFactory().createActivityFromCoord("home", new CoordImpl(0,0)) ;
 			plan.addActivity(act) ;
 		}
@@ -276,7 +313,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 	private Config localCreateConfig() {
 		// setup config
 		final Config config = loadConfig(null);
-		
+
 		config.global().setNumberOfThreads(0);
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);
@@ -294,11 +331,16 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		ActivityParams work = new ActivityParams("work");
 		work.setTypicalDuration(12*60*60);
 		config.planCalcScore().addActivityParams(work);
-		
+
 		final StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
 		strategySettings.setModuleName("LocationChoice");
 		strategySettings.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings);
+		
+		config.otfVis().setEffectiveLaneWidth(1.) ;
+		config.otfVis().setLinkWidth((float)1.) ;
+		config.otfVis().setShowTeleportedAgents(true) ;
+		config.otfVis().setDrawNonMovingItems(true) ;
 
 		return config;
 	}

@@ -30,6 +30,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -98,16 +99,40 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.functio
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
 	}
+	
+	private boolean usingFacilityOpeningTimes = true ;
+	public void setUsingFacilityOpeningTimes( boolean val ) {
+		usingFacilityOpeningTimes = val ;
+	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		MixedActivityScoringFunction scoringFunction = new MixedActivityScoringFunction((PlanImpl)plan, super.getParams(), 
-				this.controler.getFacilities(), this.controler.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(), this.controler.getConfig(),
-				this.facilitiesKValues, this.personsKValues, this.scaleEpsilon);
-		
+		CharyparNagelActivityScoring scoringFunction ;
+		if ( usingFacilityOpeningTimes ) {
+			scoringFunction = new MixedActivityScoringFunction(
+					(PlanImpl)plan, 
+					super.getParams(), 
+					this.controler.getFacilities(), 
+					this.controler.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(), 
+					this.controler.getConfig(),
+					this.facilitiesKValues, 
+					this.personsKValues, 
+					this.scaleEpsilon);
+		} else {
+			scoringFunction = new MixedActivityWOFacilitiesScoringFunction(
+					(PlanImpl)plan, 
+					super.getParams(), 
+					this.controler.getFacilities(), 
+					this.controler.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(), 
+					this.controler.getConfig(),
+					this.facilitiesKValues, 
+					this.personsKValues, 
+					this.scaleEpsilon);
+		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
+		
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(super.getParams(), controler.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;
