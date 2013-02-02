@@ -31,7 +31,7 @@ public class ActTypeConverter {
 	
 	public String convertType(String actType) {
 		if (this.isV1) {
-			return this.convert2MinimalType(actType);
+			return convert2MinimalType(actType);
 		}
 		else return actType;
 	}
@@ -56,7 +56,7 @@ public class ActTypeConverter {
 		return fullType;
 	}
 	
-	public String convert2MinimalType(String type) {
+	public static String convert2MinimalType(String type) {
 		String minimalType = "tta";
 		if (type.startsWith("h")) {
 			minimalType = "h";

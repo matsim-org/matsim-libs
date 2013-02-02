@@ -125,7 +125,7 @@ public class FacilitiesAdderAndModifier {
 					}
 					else {
 						((ActivityImpl)pe).setFacilityId(
-								trees.get(new ActTypeConverter(true).convert2MinimalType(act.getType())).get(act.getCoord().getX(), act.getCoord().getY())
+								trees.get(ActTypeConverter.convert2MinimalType(act.getType())).get(act.getCoord().getX(), act.getCoord().getY())
 								.getId());
 					}
 				}
