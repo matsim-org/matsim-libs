@@ -55,7 +55,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		this.facilities = new ActivityFacilitiesImpl();
 
 		Coord defaultCoord = new CoordImpl(0.0, 0.0);
-		ActivityFacilityImpl testFacility = ((ActivityFacilitiesImpl) facilities).createFacility(new IdImpl(0), defaultCoord);
+		ActivityFacilityImpl testFacility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(new IdImpl(0), defaultCoord);
 
 		ActivityOptionImpl noWedAndWkDay = testFacility.createActivityOption(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);
 		noWedAndWkDay.addOpeningTime(new OpeningTimeImpl(DayType.fri, 8.0 * 3600, 16.0 * 3600));

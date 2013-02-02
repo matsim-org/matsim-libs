@@ -237,7 +237,7 @@ public class BuildingsZHCreator {
 			BuildingData building = entry.getValue();
 			
 			Coord coord = scenario.createCoord(building.x, building.y);
-			ActivityFacilityImpl facility = ((ScenarioImpl) scenario).getActivityFacilities().createFacility(id, coord);
+			ActivityFacilityImpl facility = ((ScenarioImpl) scenario).getActivityFacilities().createAndAddFacility(id, coord);
 
 			int capacity = building.getApartmentCapacity();
 			if (capacity > 0) {

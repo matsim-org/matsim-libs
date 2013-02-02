@@ -299,31 +299,31 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		ActivityFacilityImpl facility = null;
 		ActivityFacilitiesImpl facilities = ((ScenarioImpl) sc).getActivityFacilities();
 		
-		facility = facilities.createFacility(sc.createId("f1"), sc.getNetwork().getLinks().get(sc.createId("l1")).getCoord());
+		facility = facilities.createAndAddFacility(sc.createId("f1"), sc.getNetwork().getLinks().get(sc.createId("l1")).getCoord());
 		facility.createActivityOption("parking");
 		
-		facility = facilities.createFacility(sc.createId("f2"), sc.getNetwork().getLinks().get(sc.createId("l2")).getCoord());
+		facility = facilities.createAndAddFacility(sc.createId("f2"), sc.getNetwork().getLinks().get(sc.createId("l2")).getCoord());
 		facility.createActivityOption("home");
 		
-		facility = facilities.createFacility(sc.createId("f3"), sc.getNetwork().getLinks().get(sc.createId("l3")).getCoord());
+		facility = facilities.createAndAddFacility(sc.createId("f3"), sc.getNetwork().getLinks().get(sc.createId("l3")).getCoord());
 		facility.createActivityOption("parking");
 		
-		facility = facilities.createFacility(sc.createId("f4"), sc.getNetwork().getLinks().get(sc.createId("l4")).getCoord());
+		facility = facilities.createAndAddFacility(sc.createId("f4"), sc.getNetwork().getLinks().get(sc.createId("l4")).getCoord());
 		facility.createActivityOption("work");
 		
-		facility = facilities.createFacility(sc.createId("f5"), sc.getNetwork().getLinks().get(sc.createId("l5")).getCoord());
+		facility = facilities.createAndAddFacility(sc.createId("f5"), sc.getNetwork().getLinks().get(sc.createId("l5")).getCoord());
 		facility.createActivityOption("shopping");
 		
-		facility = facilities.createFacility(sc.createId("f6"), sc.getNetwork().getLinks().get(sc.createId("l6")).getCoord());
+		facility = facilities.createAndAddFacility(sc.createId("f6"), sc.getNetwork().getLinks().get(sc.createId("l6")).getCoord());
 		facility.createActivityOption("parking");
 		
-		facility = facilities.createFacility(sc.createId("f7"), sc.getNetwork().getLinks().get(sc.createId("l7")).getCoord());
+		facility = facilities.createAndAddFacility(sc.createId("f7"), sc.getNetwork().getLinks().get(sc.createId("l7")).getCoord());
 		facility.createActivityOption("parking");
 		
-		facility = facilities.createFacility(sc.createId("f8"), sc.getNetwork().getLinks().get(sc.createId("l8")).getCoord());
+		facility = facilities.createAndAddFacility(sc.createId("f8"), sc.getNetwork().getLinks().get(sc.createId("l8")).getCoord());
 		facility.createActivityOption("parking");
 		
-		facility = facilities.createFacility(sc.createId("f9"), sc.getNetwork().getLinks().get(sc.createId("l9")).getCoord());
+		facility = facilities.createAndAddFacility(sc.createId("f9"), sc.getNetwork().getLinks().get(sc.createId("l9")).getCoord());
 		facility.createActivityOption("parking");		
 	}
 

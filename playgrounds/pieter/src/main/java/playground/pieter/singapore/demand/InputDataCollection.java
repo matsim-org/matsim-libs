@@ -481,7 +481,7 @@ public class InputDataCollection implements Serializable {
 						rs.getDouble("latitude"));
 				ActivityFacilityImpl facility = scenario
 						.getActivityFacilities()
-						.createFacility(
+						.createAndAddFacility(
 								new IdImpl(new String("leisure_" + counter)),
 								TransformationFactory
 										.getCoordinateTransformation(
@@ -499,7 +499,7 @@ public class InputDataCollection implements Serializable {
 
 			while (rs.next()) {
 				ActivityFacilityImpl facility = scenario
-						.getActivityFacilities().createFacility(
+						.getActivityFacilities().createAndAddFacility(
 								new IdImpl(new String("home_"
 										+ rs.getInt("id_res_facility"))),
 								new CoordImpl(rs.getDouble("x_utm48n"), rs

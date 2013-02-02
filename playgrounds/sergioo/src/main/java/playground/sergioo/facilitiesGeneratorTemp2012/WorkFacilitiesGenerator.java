@@ -235,7 +235,7 @@ public class WorkFacilitiesGenerator {
 			int f=0;
 			while(facilityI.hasNext()) {
 				Entry<Integer, Tuple<String, Coord>> facilityE = facilityI.next();
-				ActivityFacilityImpl facility = facilities.createFacility(new IdImpl(facilityE.getKey()), coordinateTransformation.transform(facilityE.getValue().getSecond()));
+				ActivityFacilityImpl facility = facilities.createAndAddFacility(new IdImpl(facilityE.getKey()), coordinateTransformation.transform(facilityE.getValue().getSecond()));
 				ResultSet resultOccupations = dataBaseAuxiliar.executeQuery("SELECT occupation,quantity FROM Activity_types,Activity_types_X_Place_types,Place_types_X_RealEstate_place_types,RealEstate_place_types WHERE Activity_types.id=activity_type_id AND Activity_types_X_Place_types.place_type_id=Place_types_X_RealEstate_place_types.place_type_id AND realestate_place_type_id=RealEstate_place_types.id AND name='"+facilityE.getValue().getFirst()+"'");
 				Map<String,Integer> occupations = new HashMap<String, Integer>();
 				int totalQuantity=0;
@@ -567,7 +567,7 @@ public class WorkFacilitiesGenerator {
 			ActivityFacilityImpl facility;
 			if(!postCodes.containsKey(resultFacilities.getString(5))) {
 				if(!centers.containsKey(center)) {
-					facility = ((ActivityFacilitiesImpl) facilities).createFacility(new IdImpl(resultFacilities.getString(1)), coordinateTransformation.transform(center));
+					facility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(new IdImpl(resultFacilities.getString(1)), coordinateTransformation.transform(center));
 					postCodes.put(resultFacilities.getString(5),facility.getId());
 					centers.put(center,facility.getId());
 				}

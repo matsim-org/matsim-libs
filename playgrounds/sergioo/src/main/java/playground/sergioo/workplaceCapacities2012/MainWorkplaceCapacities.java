@@ -993,7 +993,7 @@ public class MainWorkplaceCapacities {
 			System.out.println("Matrix written!");
 		}
 		Matrix3DImpl matrix = (Matrix3DImpl)capacities;
-		ActivityFacilityImpl fac = new ActivityFacilitiesImpl().createFacility(new IdImpl("dummy"), new CoordImpl(0,0));
+		ActivityFacilityImpl fac = new ActivityFacilitiesImpl().createAndAddFacility(new IdImpl("dummy"), new CoordImpl(0,0));
 		for(int o=0; o<matrix.getDimension(1); o++) {
 			double[] center = new double[]{0, 0};
 			for(PointPerson pointPerson:clusters.get(o).getPoints())
@@ -1071,7 +1071,7 @@ public class MainWorkplaceCapacities {
 			modeShareZone.difference += getMaxCapacity(mPArea)-capacity;
 		}
 		System.out.println("Zones done!");
-		ActivityFacilityImpl fac = new ActivityFacilitiesImpl().createFacility(new IdImpl("dummy"), new CoordImpl(0,0));
+		ActivityFacilityImpl fac = new ActivityFacilitiesImpl().createAndAddFacility(new IdImpl("dummy"), new CoordImpl(0,0));
 		for(int c=0; c<matrixCapacities[0].length; c++) {
 			double[] center = new double[]{0, 0};
 			for(PointPerson pointPerson:clusters.get(c).getPoints())
@@ -1128,7 +1128,7 @@ public class MainWorkplaceCapacities {
 			Id id = new IdImpl((int)(buildingsR.getFloat(5)));
 			if(facilities.getFacilities().get(id)!=null)
 				continue;
-			ActivityFacilityImpl building = facilities.createFacility(id, new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
+			ActivityFacilityImpl building = facilities.createAndAddFacility(id, new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
 			building.setLinkId(((NetworkImpl)network).getNearestLinkExactly(building.getCoord()).getId());
 			building.setDesc(buildingsR.getString(6)+":"+mPArea.getType().replaceAll("&", "AND"));
 			double proportion = buildingsR.getDouble(4);

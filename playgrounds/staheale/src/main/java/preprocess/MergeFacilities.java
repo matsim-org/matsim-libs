@@ -87,7 +87,7 @@ public class MergeFacilities {
 
 		for (ActivityFacility f : ActHomeFacilities.values()) {
 
-			ActivityFacilityImpl a = workFacilities.createFacility(f.getId(), f.getCoord());
+			ActivityFacilityImpl a = workFacilities.createAndAddFacility(f.getId(), f.getCoord());
 			a.createActivityOption("home");
 			//        a.getActivityOptions().get("home").addOpeningTime(new OpeningTimeImpl(
 			//				DayType.wk,

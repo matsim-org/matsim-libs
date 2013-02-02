@@ -101,7 +101,7 @@ public class NewDemandWithFacilities4Zrh {
 			Coord coord = act.getCoord();
 			ActivityFacilityImpl af = afMap.get(coord);
 			if (af == null) {
-				af = afs.createFacility(new IdImpl(facCnt++), coord);
+				af = afs.createAndAddFacility(new IdImpl(facCnt++), coord);
 				afMap.put(coord, af);
 			}
 			act.setFacilityId(af.getId());

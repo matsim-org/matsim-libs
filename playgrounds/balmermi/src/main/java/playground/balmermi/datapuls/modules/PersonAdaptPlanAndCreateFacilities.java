@@ -124,7 +124,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					CoordImpl c = new CoordImpl(x,y);
 					ActivityFacilityImpl af = facs.get(x,y);
 					if (af == null) {
-						af = activityFacilities.createFacility(new IdImpl(id),c);
+						af = activityFacilities.createAndAddFacility(new IdImpl(id),c);
 						id++;
 						ActivityOptionImpl ao = af.createActivityOption(a.getType());
 						ao.setCapacity(1.0);
@@ -140,7 +140,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 						}
 					}
 					else {
-						af = activityFacilities.createFacility(new IdImpl(id),c);
+						af = activityFacilities.createAndAddFacility(new IdImpl(id),c);
 						id++;
 						ActivityOptionImpl ao = af.createActivityOption(a.getType());
 						ao.setCapacity(1.0);

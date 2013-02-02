@@ -84,7 +84,7 @@ public class Shp2Facilities {
 			
 			Id id = new IdImpl( cnt ) ; cnt++ ;
 			
-			ActivityFacilityImpl facility = facilities.createFacility(id, coord ) ;
+			ActivityFacilityImpl facility = facilities.createAndAddFacility(id, coord ) ;
 			
 			facility.createActivityOption( (String) feature.getAttribute("LU_CODE") ) ;
 			facility.createActivityOption( (String) feature.getAttribute("LU_DESCRIP") ) ;

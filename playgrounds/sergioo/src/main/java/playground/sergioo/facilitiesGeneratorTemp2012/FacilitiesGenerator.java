@@ -95,7 +95,7 @@ public class FacilitiesGenerator {
 			boolean newFacility = false;
 			if(!postCodes.containsKey(resultFacilities.getString(5))) {
 				if(!centers.containsKey(center)) {
-					facility = facilities.createFacility(new IdImpl(resultFacilities.getString(1)), coordinateTransformation.transform(center));
+					facility = facilities.createAndAddFacility(new IdImpl(resultFacilities.getString(1)), coordinateTransformation.transform(center));
 					newFacility = true;
 				}
 				else {

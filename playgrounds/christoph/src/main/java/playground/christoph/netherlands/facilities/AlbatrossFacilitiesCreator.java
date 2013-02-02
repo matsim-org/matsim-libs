@@ -128,7 +128,7 @@ public class AlbatrossFacilitiesCreator {
 				
 				Coord coord = new CoordImpl(centerX + unitVectorX, centerY + unitVectorY);
 				
-				ActivityFacilityImpl facility = activityFacilities.createFacility(linkId, coord);
+				ActivityFacilityImpl facility = activityFacilities.createAndAddFacility(linkId, coord);
 				facility.setLinkId(((LinkImpl)link).getId());
 				
 				createAndAddActivityOptions(facility);

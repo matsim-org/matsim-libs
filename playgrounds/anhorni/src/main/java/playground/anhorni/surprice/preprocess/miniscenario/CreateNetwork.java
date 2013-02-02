@@ -126,7 +126,7 @@ public class CreateNetwork {
 	
 	private void addFacility(Link l, int facilityId) {				
 		IdImpl id = new IdImpl(Integer.toString(facilityId));
-		this.scenario.getActivityFacilities().createFacility(id, l.getCoord());
+		this.scenario.getActivityFacilities().createAndAddFacility(id, l.getCoord());
 		ActivityFacilityImpl facility = (ActivityFacilityImpl)(this.scenario.getActivityFacilities().getFacilities().get(id));
 		facility.createActivityOption("home");
 		facility.createActivityOption("work");

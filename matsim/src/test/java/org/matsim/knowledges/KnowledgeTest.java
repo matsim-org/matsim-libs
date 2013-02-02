@@ -126,13 +126,13 @@ public class KnowledgeTest extends MatsimTestCase {
 		
 		log.info("  creating test facilities...");
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		ActivityFacilityImpl f1 = facilities.createFacility(new IdImpl(1),new CoordImpl(1,1));
+		ActivityFacilityImpl f1 = facilities.createAndAddFacility(new IdImpl(1),new CoordImpl(1,1));
 		f1.createActivityOption(H);
 		f1.createActivityOption(W);
 		f1.createActivityOption(E);
 		f1.createActivityOption(S);
 		f1.createActivityOption(L);
-		ActivityFacilityImpl f2 = facilities.createFacility(new IdImpl(2),new CoordImpl(2,2));
+		ActivityFacilityImpl f2 = facilities.createAndAddFacility(new IdImpl(2),new CoordImpl(2,2));
 		f2.createActivityOption(H);
 		f2.createActivityOption(W);
 		log.info("  done.");

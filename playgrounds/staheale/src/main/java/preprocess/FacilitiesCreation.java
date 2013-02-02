@@ -215,7 +215,7 @@ public class FacilitiesCreation {
 				while (tempFacilities_it.hasNext()) {
 					tempFacilityId = tempFacilities_it.next();
 					attributeId = this.getAttributeIdFromTemporaryFacilityID(tempFacilityId);
-					f = facilities.createFacility(
+					f = facilities.createAndAddFacility(
 							new IdImpl(this.getNumberFromTemporaryFacilityID(tempFacilityId)),
 							new CoordImpl(X, Y));
 

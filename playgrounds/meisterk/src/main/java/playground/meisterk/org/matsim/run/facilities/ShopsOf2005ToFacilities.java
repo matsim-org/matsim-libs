@@ -703,7 +703,7 @@ public class ShopsOf2005ToFacilities {
 						System.out.println("There it is: " + name);
 						System.out.flush();
 					}
-					/*ActivityFacility newFacility =*/ facilities.createFacility(new IdImpl(name), ch1903Coordinates);
+					/*ActivityFacility newFacility =*/ facilities.createAndAddFacility(new IdImpl(name), ch1903Coordinates);
 				}
 			}
 

@@ -85,7 +85,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startFacility(final Attributes atts) {
-		this.currfacility = this.scenario.getActivityFacilities().createFacility(this.scenario.createId(atts.getValue("id")), 
+		this.currfacility = this.scenario.getActivityFacilities().createAndAddFacility(this.scenario.createId(atts.getValue("id")), 
 				this.scenario.createCoord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))));
 		this.currfacility.setDesc(atts.getValue("desc"));
 	}

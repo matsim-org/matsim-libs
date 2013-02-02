@@ -37,7 +37,7 @@ public class GenerateParkingFacilities {
 					
 					// add facility only, if it does not already exist
 					if (!facilities.getFacilities().containsKey(facilityId)){
-						ActivityFacilityImpl facility = facilities.createFacility(facilityId, act.getCoord());
+						ActivityFacilityImpl facility = facilities.createAndAddFacility(facilityId, act.getCoord());
 						facility.createActivityOption(act.getType());
 						facility.createActivityOption("parkingArrival");
 						facility.createActivityOption("parkingDeparture");

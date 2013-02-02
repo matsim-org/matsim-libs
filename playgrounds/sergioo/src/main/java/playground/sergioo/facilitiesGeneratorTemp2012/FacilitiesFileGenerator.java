@@ -71,7 +71,7 @@ public class FacilitiesFileGenerator {
 		timesResult.close();
 		ResultSet facilitiesResult = dataBaseFacilities.executeQuery("SELECT external_id,x,y,id FROM Facilities");
 		while(facilitiesResult.next()) {
-			ActivityFacility facility = facilities.createFacility(new IdImpl(facilitiesResult.getInt(1)), new CoordImpl(facilitiesResult.getDouble(2), facilitiesResult.getDouble(3)));
+			ActivityFacility facility = facilities.createAndAddFacility(new IdImpl(facilitiesResult.getInt(1)), new CoordImpl(facilitiesResult.getDouble(2), facilitiesResult.getDouble(3)));
 			int facilityId=facilitiesResult.getInt(4);
 			for(Tuple<String,Double> optionData:activityOptions.get(facilitiesResult.getInt(4))) {
 				ActivityOption option = ((ActivityFacilityImpl)facility).createActivityOption(optionData.getFirst());

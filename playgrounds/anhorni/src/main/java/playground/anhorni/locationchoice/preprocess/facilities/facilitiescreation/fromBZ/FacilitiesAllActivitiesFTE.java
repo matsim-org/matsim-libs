@@ -195,7 +195,7 @@ public class FacilitiesAllActivitiesFTE {
 //							new IdImpl(this.getNumberFromTemporaryFacilityID(tempFacilityId)),
 //							new CoordImpl(X, Y));
 					
-					f = facilities.createFacility(new IdImpl(tempFacilityId), new CoordImpl(X, Y));
+					f = facilities.createAndAddFacility(new IdImpl(tempFacilityId), new CoordImpl(X, Y));
 
 					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 						// create the work activity and its capacity according to all the computation done before

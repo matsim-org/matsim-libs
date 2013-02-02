@@ -76,7 +76,7 @@ public class CreateFacilities {
 						Double.parseDouble(parts[index_yCoord]));
 				
 				ActivityFacilityImpl facility = 
-					(ActivityFacilityImpl)((ScenarioImpl)this.scenario).getActivityFacilities().createFacility(new IdImpl(cnt), coord);
+					(ActivityFacilityImpl)((ScenarioImpl)this.scenario).getActivityFacilities().createAndAddFacility(new IdImpl(cnt), coord);
 				
 				String types [] = parts[index_types].split(",");
  				for (int i = 0; i < types.length; i++) {
@@ -106,7 +106,7 @@ public class CreateFacilities {
 				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
 						Double.parseDouble(parts[index_yHomeCoord]));
 				
-				ActivityFacility facility = ((ScenarioImpl)this.scenario).getActivityFacilities().createFacility(new IdImpl(startIndex + cnt), homeCoord);
+				ActivityFacility facility = ((ScenarioImpl)this.scenario).getActivityFacilities().createAndAddFacility(new IdImpl(startIndex + cnt), homeCoord);
 				addActivityOption(facility, "home");
 				cnt++;
 			}

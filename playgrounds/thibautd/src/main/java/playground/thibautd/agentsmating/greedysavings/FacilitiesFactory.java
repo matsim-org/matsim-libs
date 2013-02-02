@@ -108,7 +108,7 @@ public class FacilitiesFactory {
 		Id facilityId = this.idFactory.createId();
 
 		ActivityFacilityImpl facility =
-			this.facilities.createFacility(
+			this.facilities.createAndAddFacility(
 					facilityId,
 					this.network.getLinks().get(linkId).getCoord());
 

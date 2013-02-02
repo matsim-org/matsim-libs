@@ -85,7 +85,7 @@ public class PrepareEvacuationScenario {
 			 * Create and add the pickup and drop off facility and add activity option ("pickup", "dropoff")
 			 */
 			String idString = link.getId().toString() + pickupDropOffSuffix;
-			ActivityFacility pickupDropOffFacility = ((ActivityFacilitiesImpl) facilities).createFacility(scenario.createId(idString), link.getCoord());
+			ActivityFacility pickupDropOffFacility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(scenario.createId(idString), link.getCoord());
 			((ActivityFacilityImpl) pickupDropOffFacility).setLinkId(((LinkImpl)link).getId());
 			
 			ActivityOption activityOption;

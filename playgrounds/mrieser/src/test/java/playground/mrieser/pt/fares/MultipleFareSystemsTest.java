@@ -34,12 +34,12 @@ public class MultipleFareSystemsTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl stop1 = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
-		final ActivityFacilityImpl stop2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
-		final ActivityFacilityImpl stop3 = facilities.createFacility(new IdImpl(3), new CoordImpl(1100, 1200));
-		final ActivityFacilityImpl stop4 = facilities.createFacility(new IdImpl(4), new CoordImpl(2100, 1200));
-		final ActivityFacilityImpl stop5 = facilities.createFacility(new IdImpl(5), new CoordImpl(100, 1200));
-		final ActivityFacilityImpl stop6 = facilities.createFacility(new IdImpl(6), new CoordImpl(2100, 2200));
+		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(new IdImpl(1), new CoordImpl(100, 200));
+		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(new IdImpl(2), new CoordImpl(2100, 200));
+		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(new IdImpl(3), new CoordImpl(1100, 1200));
+		final ActivityFacilityImpl stop4 = facilities.createAndAddFacility(new IdImpl(4), new CoordImpl(2100, 1200));
+		final ActivityFacilityImpl stop5 = facilities.createAndAddFacility(new IdImpl(5), new CoordImpl(100, 1200));
+		final ActivityFacilityImpl stop6 = facilities.createAndAddFacility(new IdImpl(6), new CoordImpl(2100, 2200));
 
 		// first TableLookupFares, connecting Stops 1-3
 		final Map<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double> fares1 = new HashMap<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double>();

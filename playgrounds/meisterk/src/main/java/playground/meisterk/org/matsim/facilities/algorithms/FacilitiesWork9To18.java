@@ -80,7 +80,7 @@ public class FacilitiesWork9To18 {
 			Y = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "Y"));
 
 			for (int i=0; i<B01S2; i++) {
-				f = facilities.createFacility(new IdImpl(facilityCnt++), new CoordImpl(X, Y));
+				f = facilities.createAndAddFacility(new IdImpl(facilityCnt++), new CoordImpl(X, Y));
 				a = f.createActivityOption("work");
 
 				// equally distribute jobs among facilities
@@ -94,7 +94,7 @@ public class FacilitiesWork9To18 {
 			}
 
 			for (int i=0; i<B01S3; i++) {
-				f = facilities.createFacility(new IdImpl(facilityCnt++), new CoordImpl(X, Y));
+				f = facilities.createAndAddFacility(new IdImpl(facilityCnt++), new CoordImpl(X, Y));
 				a = f.createActivityOption("work");
 
 				// equally distribute jobs among facilities

@@ -102,7 +102,7 @@ public class SimpleMasterAreas {
 			Id id = new IdImpl((int)(buildingsR.getFloat(5)));
 			if(facilities.getFacilities().get(id)!=null)
 				continue;
-			ActivityFacilityImpl building = facilities.createFacility(id, new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
+			ActivityFacilityImpl building = facilities.createAndAddFacility(id, new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
 			building.setDesc(buildingsR.getString(6)+":"+mPArea.getType().replaceAll("&", "AND"));
 			double capacity = buildingsR.getDouble(7)*mPAreasPlotRatio.get(areaId)/workerAreas.get(mPArea.getType());
 			if(capacity>0) {

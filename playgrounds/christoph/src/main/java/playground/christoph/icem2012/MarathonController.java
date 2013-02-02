@@ -538,14 +538,14 @@ public class MarathonController extends WithinDayController implements StartupLi
 		Link endLink = scenarioData.getNetwork().getLinks().get(endLinkId);
 		
 		Id preRunFacilityId = scenarioData.createId("preRunFacility");
-		ActivityFacility preRunFacility = (scenarioData).getActivityFacilities().createFacility(preRunFacilityId, startLink.getCoord());
+		ActivityFacility preRunFacility = (scenarioData).getActivityFacilities().createAndAddFacility(preRunFacilityId, startLink.getCoord());
 		((ActivityFacilityImpl) preRunFacility).setLinkId(startLinkId);
 		ActivityOption activityOption = ((ActivityFacilityImpl) preRunFacility).createActivityOption("preRun");
 		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 		activityOption.setCapacity(Double.MAX_VALUE);
 				
 		Id postRunFacilityId = scenarioData.createId("postRunFacility");
-		ActivityFacility postRunFacility = (scenarioData).getActivityFacilities().createFacility(postRunFacilityId, endLink.getCoord());
+		ActivityFacility postRunFacility = (scenarioData).getActivityFacilities().createAndAddFacility(postRunFacilityId, endLink.getCoord());
 		((ActivityFacilityImpl) postRunFacility).setLinkId(startLinkId);
 		activityOption = ((ActivityFacilityImpl) preRunFacility).createActivityOption("postRun");
 		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
@@ -641,7 +641,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		 * Create and add the rescue facility and an activity option ("rescue")
 		 */
 		Id rescueFacilityId = scenarioData.createId("rescueFacility");
-		ActivityFacility rescueFacility = (scenarioData).getActivityFacilities().createFacility(rescueFacilityId, rescueLink.getCoord());
+		ActivityFacility rescueFacility = (scenarioData).getActivityFacilities().createAndAddFacility(rescueFacilityId, rescueLink.getCoord());
 		((ActivityFacilityImpl) rescueFacility).setLinkId(rescueLink.getId());
 		
 		ActivityOption activityOption = ((ActivityFacilityImpl) rescueFacility).createActivityOption("rescue");
@@ -654,7 +654,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		for (Node node :exitNodes) {
 			for (Link inLink : node.getInLinks().values()) {
 				rescueFacilityId = scenarioData.createId("rescueFacility" + inLink.getId().toString());
-				rescueFacility = (scenarioData).getActivityFacilities().createFacility(rescueFacilityId, inLink.getCoord());
+				rescueFacility = (scenarioData).getActivityFacilities().createAndAddFacility(rescueFacilityId, inLink.getCoord());
 				((ActivityFacilityImpl) rescueFacility).setLinkId(rescueLink.getId());
 				
 				activityOption = ((ActivityFacilityImpl) rescueFacility).createActivityOption("rescue");
@@ -674,7 +674,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 			
 			Link link = this.scenarioData.getNetwork().getLinks().get(affectedLinkId);
 			Id facilityId = scenarioData.createId("switchWalkModeFacility" + affectedLinkId.toString());
-			ActivityFacility facility = (scenarioData).getActivityFacilities().createFacility(facilityId, link.getToNode().getCoord());
+			ActivityFacility facility = (scenarioData).getActivityFacilities().createAndAddFacility(facilityId, link.getToNode().getCoord());
 			((ActivityFacilityImpl) facility).setLinkId(link.getId());
 			
 			activityOption = ((ActivityFacilityImpl) facility).createActivityOption("switchWalkMode");

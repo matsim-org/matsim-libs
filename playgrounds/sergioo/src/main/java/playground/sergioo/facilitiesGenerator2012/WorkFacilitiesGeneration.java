@@ -191,7 +191,7 @@ public class WorkFacilitiesGeneration {
 				Id areaId =  new IdImpl(buildingsR.getString(1));
 				ActivityFacilityImpl mPArea = (ActivityFacilityImpl) mPAreas.get(areaId);
 				MPAreaData mPAreaData = dataMPAreas.get(areaId);
-				ActivityFacilityImpl building = facilities.createFacility(new IdImpl(buildingsR.getString(3)), coordinateTransformation.transform(new CoordImpl(buildingsR.getDouble(4), buildingsR.getDouble(5))));
+				ActivityFacilityImpl building = facilities.createAndAddFacility(new IdImpl(buildingsR.getString(3)), coordinateTransformation.transform(new CoordImpl(buildingsR.getDouble(4), buildingsR.getDouble(5))));
 				building.setDesc(mPAreaData.getType());
 				double proportion = buildingsR.getDouble(2);
 				for(ActivityOption activityOptionArea:mPArea.getActivityOptions().values()) {

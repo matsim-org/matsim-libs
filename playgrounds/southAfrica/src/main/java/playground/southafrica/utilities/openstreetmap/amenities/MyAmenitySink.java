@@ -123,7 +123,7 @@ public class MyAmenitySink implements Sink {
 				Id newId = new IdImpl(node.getId());
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
-					af = facilities.createFacility(newId, coord);					
+					af = facilities.createAndAddFacility(newId, coord);					
 					af.setDesc(name);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
@@ -145,7 +145,7 @@ public class MyAmenitySink implements Sink {
 				Id newId = new IdImpl(node.getId());
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
-					af = facilities.createFacility(newId, coord);					
+					af = facilities.createAndAddFacility(newId, coord);					
 					af.setDesc(name);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
@@ -181,7 +181,7 @@ public class MyAmenitySink implements Sink {
 				Id newId = new IdImpl(way.getId());
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
-					af = facilities.createFacility(newId, coord);					
+					af = facilities.createAndAddFacility(newId, coord);					
 					af.setDesc(name);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
@@ -203,7 +203,7 @@ public class MyAmenitySink implements Sink {
 				Id newId = new IdImpl(way.getId());
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
-					af = facilities.createFacility(newId, coord);					
+					af = facilities.createAndAddFacility(newId, coord);					
 					af.setDesc(name);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
@@ -238,7 +238,7 @@ public class MyAmenitySink implements Sink {
 				Id newId = new IdImpl(relation.getId());
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
-					af = facilities.createFacility(newId, coord);					
+					af = facilities.createAndAddFacility(newId, coord);					
 					af.setDesc(name);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
@@ -260,7 +260,7 @@ public class MyAmenitySink implements Sink {
 				Id newId = new IdImpl(relation.getId());
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
-					af = facilities.createFacility(newId, coord);					
+					af = facilities.createAndAddFacility(newId, coord);					
 					af.setDesc(name);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);

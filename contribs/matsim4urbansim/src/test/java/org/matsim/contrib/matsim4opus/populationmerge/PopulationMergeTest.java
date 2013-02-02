@@ -168,8 +168,8 @@ public class PopulationMergeTest extends MatsimTestCase{
 	private ActivityFacilitiesImpl createZones() {
 		// create dummy zone facilities
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
-		zones.createFacility(new IdImpl(1), new CoordImpl(0., 0.));
-		zones.createFacility(new IdImpl(2), new CoordImpl(200., 100.));
+		zones.createAndAddFacility(new IdImpl(1), new CoordImpl(0., 0.));
+		zones.createAndAddFacility(new IdImpl(2), new CoordImpl(200., 100.));
 		return zones;
 	}
 	

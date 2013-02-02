@@ -116,7 +116,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				ActivityFacilityImpl f = (ActivityFacilityImpl) facilities.getFacilities().get(f_id);
 				if (f == null) {
 					// create new home facility id
-					f = facilities.createFacility(f_id,coord);
+					f = facilities.createAndAddFacility(f_id,coord);
 					ActivityOptionImpl act = f.createActivityOption(CAtts.ACT_HOME);
 					act.setCapacity((double) 1);
 

@@ -30,8 +30,8 @@ public final class BeelineDistanceBasedFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_DifferentCostsPerKilometer() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl fromStop = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
-		final ActivityFacilityImpl toStop = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
+		final ActivityFacilityImpl fromStop = facilities.createAndAddFacility(new IdImpl(1), new CoordImpl(100, 200));
+		final ActivityFacilityImpl toStop = facilities.createAndAddFacility(new IdImpl(2), new CoordImpl(2100, 200));
 
 		assertEquals(2.0, new BeelineDistanceBasedFares(1.0).getSingleTripCost(fromStop, toStop), EPSILON);
 		assertEquals(1.0, new BeelineDistanceBasedFares(0.5).getSingleTripCost(fromStop, toStop), EPSILON);
@@ -40,7 +40,7 @@ public final class BeelineDistanceBasedFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_SameFromAsTo() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl fromStop = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
+		final ActivityFacilityImpl fromStop = facilities.createAndAddFacility(new IdImpl(1), new CoordImpl(100, 200));
 
 		assertEquals(0.0, new BeelineDistanceBasedFares(1.0).getSingleTripCost(fromStop, fromStop), EPSILON);
 	}

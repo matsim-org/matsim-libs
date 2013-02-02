@@ -261,9 +261,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private void initFacilities() {
 		facilities = new ActivityFacilitiesImpl();
-		ActivityFacilityImpl fac = facilities.createFacility( new IdImpl( "h" ) , new CoordImpl( 0 , 0 ) );
+		ActivityFacilityImpl fac = facilities.createAndAddFacility( new IdImpl( "h" ) , new CoordImpl( 0 , 0 ) );
 		fac.createActivityOption( "h" ).addOpeningTime( new OpeningTimeImpl( DayType.wk , 0 , 24 * 3600 ) );
-		fac = facilities.createFacility( new IdImpl( "w" ) , new CoordImpl( 0 , 0 ) );
+		fac = facilities.createAndAddFacility( new IdImpl( "w" ) , new CoordImpl( 0 , 0 ) );
 		fac.createActivityOption( "w" ).addOpeningTime( new OpeningTimeImpl( DayType.wk , 7 , 20 * 3600 ) );
 	}
 

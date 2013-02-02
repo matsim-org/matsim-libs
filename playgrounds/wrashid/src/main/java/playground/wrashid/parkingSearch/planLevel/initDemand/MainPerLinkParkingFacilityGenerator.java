@@ -63,7 +63,7 @@ public class MainPerLinkParkingFacilityGenerator {
 			// don't do this change - will be done later probably
 			int parkingCapacity = (int) Math.round(Math.ceil(link.getLength() / 2.0 / 5.0/100.0/2));
 			totalNumberOfParkingsAdded+=parkingCapacity;
-			ActivityFacilityImpl activityFacility = activityFacilities.createFacility(new IdImpl(parkPlatzId), link.getCoord());
+			ActivityFacilityImpl activityFacility = activityFacilities.createAndAddFacility(new IdImpl(parkPlatzId), link.getCoord());
 			activityFacility.createActivityOption("parking").setCapacity((double) parkingCapacity);
 			parkPlatzId++;
 		}

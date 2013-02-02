@@ -99,7 +99,7 @@ public class MyShoppingSink implements Sink {
 					}else{
 						/* Shopping mall identified. Now get the centroid of all members. */ 
 						Coord coord = getRelationCentroid(relationMap.get(r).getEntity());
-						ActivityFacilityImpl mall = facilities.createFacility(new IdImpl(relation.getId()), coord);
+						ActivityFacilityImpl mall = facilities.createAndAddFacility(new IdImpl(relation.getId()), coord);
 						mall.setDesc(name);
 						/* Shopping */
 						ActivityOptionImpl shopping = mall.createActivityOption("s");

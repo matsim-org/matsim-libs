@@ -145,7 +145,7 @@ public class FacilitiesProductionKTI {
 	private void combineFacilities(ScenarioImpl scenario) {
 		for (ActivityFacility f : scenario.getActivityFacilities().getFacilities().values()) {
 			if (f.getActivityOptions().containsKey("home")) {
-				this.facilities.createFacility(f.getId(), f.getCoord());
+				this.facilities.createAndAddFacility(f.getId(), f.getCoord());
 				ActivityFacilityImpl facility = (ActivityFacilityImpl)this.facilities.getFacilities().get(f.getId());	
 				ActivityOptionImpl ao = new ActivityOptionImpl("h", f);
 				ao.addOpeningTime(new OpeningTimeImpl(DayType.wk, 0.0 * 3600, 24.0 * 3600));

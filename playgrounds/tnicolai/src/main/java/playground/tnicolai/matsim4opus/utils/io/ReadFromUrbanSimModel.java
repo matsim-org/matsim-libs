@@ -128,7 +128,7 @@ public class ReadFromUrbanSimModel {
 				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
-				ActivityFacilityImpl facility = zones.createFacility(zone_ID,coord);
+				ActivityFacilityImpl facility = zones.createAndAddFacility(zone_ID,coord);
 				facility.setDesc( InternalConstants.FACILITY_DESCRIPTION ) ;
 
 				// set custom attributes, these are needed to compute zone2zone trips
@@ -194,7 +194,7 @@ public class ReadFromUrbanSimModel {
 				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
-				ActivityFacilityImpl facility = parcels.createFacility(parcel_ID,coord);
+				ActivityFacilityImpl facility = parcels.createAndAddFacility(parcel_ID,coord);
 				facility.setDesc( InternalConstants.FACILITY_DESCRIPTION ) ;
 				
 				// get zone ID
@@ -257,7 +257,7 @@ public class ReadFromUrbanSimModel {
 			pz = entry.getValue();
 			// compute the average center of a zone
 			coord = new CoordImpl( pz.sumXCoordinate/pz.count , pz.sumYCoordinate/pz.count );
-			zones.createFacility(zone_ID, coord);
+			zones.createAndAddFacility(zone_ID, coord);
 		}
 		log.info( "Done with constructing urbansim zones. Constucted " + zones.getFacilities().size() + " zones.");
 	}

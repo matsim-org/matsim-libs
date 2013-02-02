@@ -75,7 +75,7 @@ public class ReadFromUrbansimParcelModel {
 
 				Coord coord = new CoordImpl( parts[idxFromKey.get("x_coord_sp")],parts[idxFromKey.get("y_coord_sp")] ) ;
 
-				ActivityFacilityImpl facility = parcels.createFacility(parcelId,coord) ;
+				ActivityFacilityImpl facility = parcels.createAndAddFacility(parcelId,coord) ;
 				facility.setDesc("urbansim location") ;
 
 				// Can't add info (in this case zone ID) to facilities, so put into separate data structure:
@@ -129,7 +129,7 @@ public class ReadFromUrbansimParcelModel {
 			Id zoneId = entry.getKey();
 			PseudoZone pz = entry.getValue() ;
 			Coord coord = new CoordImpl( pz.sumx/pz.cnt , pz.sumy/pz.cnt ) ;
-			zones.createFacility(zoneId, coord) ;
+			zones.createAndAddFacility(zoneId, coord) ;
 		}
 
 	}

@@ -159,7 +159,7 @@ public class AddSecureFacilitiesToNetwork {
 			 * Create and add the rescue facility and add activity option ("rescue")
 			 */
 			String idString = "secureFacility" + link.getId();
-			ActivityFacility secureFacility = ((ScenarioImpl)scenario).getActivityFacilities().createFacility(scenario.createId(idString), link.getCoord());
+			ActivityFacility secureFacility = ((ScenarioImpl)scenario).getActivityFacilities().createAndAddFacility(scenario.createId(idString), link.getCoord());
 			((ActivityFacilityImpl)secureFacility).setLinkId(((LinkImpl)link).getId());
 			
 			ActivityOption activityOption = ((ActivityFacilityImpl)secureFacility).createActivityOption("rescue");

@@ -244,7 +244,7 @@ public class IatbrPlanBuilder {
 				Coord closestBuilding = spot5QT.get(firstActivity.getCoord().getX(), firstActivity.getCoord().getY());
 				if(!facilityIdMap.containsKey(closestBuilding)){
 					Id newFacility = new IdImpl("spot_" + spotId++);
-					home = activityFacilities.createFacility(newFacility, closestBuilding);
+					home = activityFacilities.createAndAddFacility(newFacility, closestBuilding);
 					home.createActivityOption("h");
 					/* This should not be necessary, but is inconsistent with other containers. */
 					/* TODO Follow up with MATSim developers. */
@@ -285,7 +285,7 @@ public class IatbrPlanBuilder {
 									Coord closestBuildingCoord = spot5QT.get(act.getCoord().getX(), act.getCoord().getY());
 									if(!facilityIdMap.containsKey(closestBuildingCoord)){
 										Id newFacility = new IdImpl("spot_" + spotId++);
-										ActivityFacilityImpl afi = activityFacilities.createFacility(newFacility, closestBuildingCoord);
+										ActivityFacilityImpl afi = activityFacilities.createAndAddFacility(newFacility, closestBuildingCoord);
 										afi.createActivityOption("w");
 										facilityIdMap.put(closestBuildingCoord, newFacility);
 										work = afi;
@@ -342,7 +342,7 @@ public class IatbrPlanBuilder {
 		
 		for(Id id : sc.getActivityFacilities().getFacilities().keySet()){
 			ActivityFacilityImpl af = (ActivityFacilityImpl) sc.getActivityFacilities().getFacilities().get(id);
-			ActivityFacilityImpl afNew = activityFacilities.createFacility(new IdImpl("sacsc_" + id.toString()), af.getCoord());
+			ActivityFacilityImpl afNew = activityFacilities.createAndAddFacility(new IdImpl("sacsc_" + id.toString()), af.getCoord());
 			afNew.getActivityOptions().putAll(af.getActivityOptions());
 			sacscQT.put(afNew.getCoord().getX(), afNew.getCoord().getY(), afNew);
 			shoppingQT.put(afNew.getCoord().getX(), afNew.getCoord().getY(), afNew);
@@ -368,7 +368,7 @@ public class IatbrPlanBuilder {
 				Coord closestBuildingCoord = spot5QT.get(af.getCoord().getX(), af.getCoord().getY());
 				ActivityFacilityImpl afNew;
 				if(!facilityIdMap.containsKey(closestBuildingCoord)){
-					afNew = activityFacilities.createFacility(new IdImpl("osm_" + id.toString()), closestBuildingCoord);
+					afNew = activityFacilities.createAndAddFacility(new IdImpl("osm_" + id.toString()), closestBuildingCoord);
 					afNew.getActivityOptions().putAll(af.getActivityOptions());
 					facilityIdMap.put(closestBuildingCoord, afNew.getId());
 				} else{

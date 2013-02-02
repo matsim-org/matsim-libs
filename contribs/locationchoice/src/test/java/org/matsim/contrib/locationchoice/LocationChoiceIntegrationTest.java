@@ -67,7 +67,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Link link1b = network.getFactory().createLink(new IdImpl("1b"), node1, node0 ) ;
 		network.addLink(link1b) ;
 
-		ActivityFacility facility1 = scenario.getActivityFacilities().createFacility(new IdImpl(1), new CoordImpl(scale,0) ) ;
+		ActivityFacility facility1 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(1), new CoordImpl(scale,0) ) ;
 		// (this should be "createAndAdd". kai, jan'13)
 		facility1.getActivityOptions().put("initial-work", new ActivityOptionImpl("initial-work", facility1)) ;
 		
@@ -96,7 +96,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 				network.addLink(link) ;
 			}
 			
-			ActivityFacility facility = scenario.getActivityFacilities().createFacility(new IdImpl(ii), coord ) ;
+			ActivityFacility facility = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(ii), coord ) ;
 			facility.getActivityOptions().put("work", new ActivityOptionImpl("work", facility)) ;
 		}
 		
@@ -135,11 +135,11 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
-		ActivityFacilityImpl facility1 = scenario.getActivityFacilities().createFacility(new IdImpl(1), new CoordImpl(0, 500));
+		ActivityFacilityImpl facility1 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(1), new CoordImpl(0, 500));
 		facility1.getActivityOptions().put("initial-work", new ActivityOptionImpl("initial-work", facility1));
-		ActivityFacilityImpl facility2 = scenario.getActivityFacilities().createFacility(new IdImpl(2), new CoordImpl(0, 400));
+		ActivityFacilityImpl facility2 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(2), new CoordImpl(0, 400));
 		facility2.getActivityOptions().put("work", new ActivityOptionImpl("work", facility2));
-		ActivityFacilityImpl facility3 = scenario.getActivityFacilities().createFacility(new IdImpl(3), new CoordImpl(0, 300));
+		ActivityFacilityImpl facility3 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(3), new CoordImpl(0, 300));
 		facility3.getActivityOptions().put("work", new ActivityOptionImpl("work", facility3));
 		
 		Person person = localCreatePopWOnePerson(scenario, link, facility1, 17.*60.*60.);

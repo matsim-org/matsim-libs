@@ -60,7 +60,7 @@ public class EducationalFacilitiesGenerator {
 					else
 						coord = allPostalCodes.get(postalCode);
 					if(coord!=null)
-						facility = facilities.createFacility(new IdImpl(postalCode), coordinateTransformation.transform(coord));
+						facility = facilities.createAndAddFacility(new IdImpl(postalCode), coordinateTransformation.transform(coord));
 					else
 						System.out.println(educationalFacilitiesResult.getInt(6));
 				}

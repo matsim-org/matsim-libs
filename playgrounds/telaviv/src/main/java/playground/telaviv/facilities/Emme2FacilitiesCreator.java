@@ -144,7 +144,7 @@ public class Emme2FacilitiesCreator {
 			
 			Coord coord = new CoordImpl(centerX + unitVectorX, centerY + unitVectorY);
 			
-			ActivityFacilityImpl facility = activityFacilities.createFacility(id, coord);
+			ActivityFacilityImpl facility = activityFacilities.createAndAddFacility(id, coord);
 			facility.setLinkId(((LinkImpl)link).getId());
 			
 			createAndAddActivityOptions(facility);
@@ -208,7 +208,7 @@ public class Emme2FacilitiesCreator {
 				
 				Coord coord = new CoordImpl(centerX + unitVectorX, centerY + unitVectorY);
 				
-				facility = activityFacilities.createFacility(externalLink.getId(), coord);
+				facility = activityFacilities.createAndAddFacility(externalLink.getId(), coord);
 				((ActivityFacilityImpl) facility).setLinkId(((LinkImpl)externalLink).getId());
 				
 				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("tta");

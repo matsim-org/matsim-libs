@@ -66,7 +66,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ActivityFacilityImpl createFacility(final Id id, final Coord center) {
+	public final ActivityFacilityImpl createAndAddFacility(final Id id, final Coord center) {
 		if (facilities.containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}

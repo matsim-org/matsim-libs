@@ -34,7 +34,7 @@ public class HomeFacilitiesGenerator {
 			if(homeFacilitiesResult.getDouble(2)!=0) {
 				ActivityFacility facility = facilities.getFacilities().get(new IdImpl(homeFacilitiesResult.getInt(1)));
 				if(facility == null)
-					 facility = facilities.createFacility(new IdImpl(homeFacilitiesResult.getInt(1)), new CoordImpl(homeFacilitiesResult.getDouble(3),homeFacilitiesResult.getDouble(4)));
+					 facility = facilities.createAndAddFacility(new IdImpl(homeFacilitiesResult.getInt(1)), new CoordImpl(homeFacilitiesResult.getDouble(3),homeFacilitiesResult.getDouble(4)));
 				ActivityOption option = facility.getActivityOptions().get("home");
 				double capacity = 0;
 				if(option==null)

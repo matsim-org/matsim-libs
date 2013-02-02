@@ -231,7 +231,7 @@ public class AddExitLinksToNetwork {
 		/*
 		 * Create and add the rescue facility and an activity option ("rescue")
 		 */
-		ActivityFacility rescueFacility = ((ScenarioImpl)scenario).getActivityFacilities().createFacility(scenario.createId("rescueFacility"), rescueLink.getCoord());
+		ActivityFacility rescueFacility = ((ScenarioImpl)scenario).getActivityFacilities().createAndAddFacility(scenario.createId("rescueFacility"), rescueLink.getCoord());
 		((ActivityFacilityImpl)rescueFacility).setLinkId(((LinkImpl)rescueLink).getId());
 		
 		ActivityOption activityOption = ((ActivityFacilityImpl)rescueFacility).createActivityOption("rescue");

@@ -84,7 +84,7 @@ public class LegModeCheckerTest extends MatsimTestCase {
 				
 				ActivityFacilityImpl facility = (ActivityFacilityImpl) facilities.getFacilities().get(activity.getLinkId());
 				if (facility == null) {
-					facility = facilities.createFacility(activity.getLinkId(), activity.getCoord());
+					facility = facilities.createAndAddFacility(activity.getLinkId(), activity.getCoord());
 				}
 				ActivityOption activityOption = facility.getActivityOptions().get(activity.getType());
 				if (activityOption == null) {

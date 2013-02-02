@@ -86,7 +86,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 				int idx_y = idxFromKey.get("relative_y:i4") ;
 				Coord coord = new CoordImpl( parts[idx_x], parts[idx_y] ) ;
 
-				ActivityFacilityImpl facility = facilities.createFacility(id,coord) ;
+				ActivityFacilityImpl facility = facilities.createAndAddFacility(id,coord) ;
 				facility.setDesc("urbansim location") ;
 
 				line = reader.readLine() ;

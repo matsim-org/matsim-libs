@@ -46,7 +46,7 @@ public class FacilityFromActivity {
 						throw new NullPointerException("Activity has no coordinate.");
 					
 					Id id = new IdImpl(String.format("tmp.%1$s.%2$s.%3$s", person.getId().toString(), k, i));
-					ActivityFacilityImpl facility = facilities.createFacility(id, act.getCoord());
+					ActivityFacilityImpl facility = facilities.createAndAddFacility(id, act.getCoord());
 					((ActivityImpl)act).setFacilityId(facility.getId());
 				}
 				k++;

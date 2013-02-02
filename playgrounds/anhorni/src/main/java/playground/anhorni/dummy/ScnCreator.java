@@ -160,7 +160,7 @@ public class ScnCreator {
 			Coord newCoord = new CoordImpl(xNew, yNew);
 			
 			ActivityFacilityImpl newFacility = (ActivityFacilityImpl)
-			((ScenarioImpl)this.newScenario).getActivityFacilities().createFacility(facility.getId(), newCoord);
+			((ScenarioImpl)this.newScenario).getActivityFacilities().createAndAddFacility(facility.getId(), newCoord);
 			
 			for (ActivityOption actOption : facility.getActivityOptions().values()) {
 				newFacility.createActivityOption(actOption.getType());
