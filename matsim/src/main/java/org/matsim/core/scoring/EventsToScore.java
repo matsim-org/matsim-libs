@@ -59,6 +59,7 @@ import org.matsim.core.events.handler.TravelledEventHandler;
  *
  * @author mrieser, michaz
  */
+@Deprecated // seems that EventsToScore2 works well, so this one should be removed.  kai, feb'13
 public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
 AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkLeaveEventHandler,
 LinkEnterEventHandler, TravelledEventHandler {

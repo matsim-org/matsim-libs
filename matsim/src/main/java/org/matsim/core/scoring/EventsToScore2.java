@@ -84,7 +84,7 @@ public class EventsToScore2 implements BasicEventHandler {
 		this.scenario = scenario;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
-		initHandlers(scenario, scoringFunctionFactory, learningRate);
+		initHandlers(scoringFunctionFactory);
 		
 		String str = this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.scoreMSAStartsAtIteration) ;
 		if ( str.equals("null") ) {
@@ -94,8 +94,7 @@ public class EventsToScore2 implements BasicEventHandler {
 		}
 	}
 
-	private void initHandlers(final Scenario scenario,
-			final ScoringFunctionFactory factory, final double learningRate) {
+	private void initHandlers(final ScoringFunctionFactory factory) {
 		this.eventsToActivities = new EventsToActivities();
 		this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(scenario, factory);
 		this.eventsToActivities.setActivityHandler(this.scoringFunctionsForPopulation);
@@ -227,7 +226,7 @@ public class EventsToScore2 implements BasicEventHandler {
 	public void reset(final int iteration) {
 		this.eventsToActivities.reset(iteration);
 		this.eventsToLegs.reset(iteration);
-		initHandlers(scenario, scoringFunctionFactory, learningRate);
+		initHandlers(scoringFunctionFactory);
 		finished = false;
 		this.iteration = iteration ;
 		// ("reset" is called just before the mobsim starts, so it probably has the correct iteration number for our purposes) 
