@@ -214,6 +214,9 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			this.planAlgoInstances.add(new BestResponseLocationMutator(this.scenario,   
 					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
 					this.scaleEpsilon, this.actTypeConverter, this.sampler, this.getReplanningContext()));
+			// yyyy the k-values are carried into that class only via the sampler.  However, the sampler does not return them.  Thus there
+			// needs to be another channel to get them in there.  Presumably via the scoring function, but I don't think that it will
+			// do that without further measures somewhere else.  kai, feb'13
 			break ;
 		case localSearchRecursive:
 			this.planAlgoInstances.add(new RecursiveLocationMutator(this.scenario, this.getReplanningContext().getTripRouterFactory().createTripRouter(),  

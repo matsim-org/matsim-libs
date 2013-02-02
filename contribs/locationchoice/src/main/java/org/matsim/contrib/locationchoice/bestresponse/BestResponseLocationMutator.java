@@ -56,18 +56,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private final ScaleEpsilon scaleEpsilon;
 	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
-//	private final ScoringFunctionFactory scoringFunctionFactory;
-//	private final TravelTime travelTime;
-//	private final TravelDisutility travelCost;
-//	private final TripRouter tripRouter;
-//	private final int iteration;
 	private ReplanningContext replanningContext;
 
-	/* TODO: Use Singleton pattern or encapsulating object for the many constructor objects
-	 * Similar to Scenario object. 
-	 * ReplanningContext would already do some of this.  kai, jan'13
-	 * Did that.  kai, jan'13
-	 */
 	public BestResponseLocationMutator(final Scenario scenario,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
