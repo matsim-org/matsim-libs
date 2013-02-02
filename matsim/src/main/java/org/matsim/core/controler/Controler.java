@@ -964,8 +964,7 @@ public class Controler extends AbstractController {
 		return plansCalcRoute;
 	}
 
-	public TripRouterFactory getTripRouterFactory() {
-		// yyyy cannot make this final: thiautd is overriding this at one location.  kai, jan'13
+	public final TripRouterFactory getTripRouterFactory() {
 		if ( !useTripRouting ) {
 			throw new IllegalStateException( "cannot get the trip router: useTripRouting is false" );
 		}
