@@ -28,11 +28,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * @author dgrether, mrieser
@@ -40,6 +42,7 @@ import org.matsim.core.population.routes.RouteFactory;
 public class PopulationFactoryImpl implements PopulationFactory {
 
 	private final ModeRouteFactory routeFactory;
+	private ScenarioImpl scenario;
 
 	public PopulationFactoryImpl(final Scenario scenario) {
 		this.routeFactory = new ModeRouteFactory();
@@ -56,6 +59,8 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		for (String transportMode : scenario.getConfig().plansCalcRoute().getNetworkModes()) {
 			this.routeFactory.setRouteFactory(transportMode, factory);
 		}
+
+		this.scenario = (ScenarioImpl) scenario ;
 	}
 
 	@Override
@@ -75,9 +80,12 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		return act;
 	}
 
-	public Activity createActivityFromFacilityId(final String actType, final Id facilityId) {
+	public Activity createActivityFromFacilityIdAndSetCoordAndLinkId(final String actType, final Id facilityId) {
 		ActivityImpl act = new ActivityImpl(actType);
 		act.setFacilityId(facilityId);
+		final ActivityFacility activityFacility = this.scenario.getActivityFacilities().getFacilities().get( facilityId);
+		act.setCoord( activityFacility.getCoord() ) ;
+		act.setLinkId( activityFacility.getLinkId() ) ;
 		return act;
 	}
 
