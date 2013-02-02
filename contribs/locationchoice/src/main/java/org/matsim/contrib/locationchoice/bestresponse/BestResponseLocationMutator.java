@@ -151,9 +151,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					double y = (actPre.getCoord().getY() + actPost.getCoord().getY()) / 2.0;
 					Coord center = new CoordImpl(x,y);
 
-					ChoiceSet cs = createChoiceSetFromCircle2(plan,
-							travelTimeApproximationLevel, actToMove, maxRadius,
-							center);
+					ChoiceSet cs = createChoiceSetFromCircle(plan, travelTimeApproximationLevel, actToMove, maxRadius, center);
 					
 					System.err.println("ChoiceSet cs:\n" + cs.toString() ) ;
 
@@ -161,15 +159,15 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					// maybe repeat this a couple of times
 					// yy why? kai, feb'13
 
-					this.setLocation((ActivityImpl)actToMove, 
-							cs.getWeightedRandomChoice(actlegIndex, actPre.getCoord(),
-									actPost.getCoord(), this.facilities, scoringFunction, 
-									plan, replanningContext));	
+					final Id choice = cs.getWeightedRandomChoice(actlegIndex, this.facilities, scoringFunction, plan, replanningContext);
+
+					this.setLocation(actToMove, choice);	
 					
 					printTentativePlanToConsole(plan);
 
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
 					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
+
 					// yyyy if I understand this correctly, this means that, if the location change is accepted, all subsequent locachoice 
 					// optimization attempts will be run with that new location.  kai, jan'13
 					
@@ -179,11 +177,11 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		}		
 	}
 
-	private ChoiceSet createChoiceSetFromCircle2(Plan plan,
+	private ChoiceSet createChoiceSetFromCircle(Plan plan,
 			ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
-		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario.getNetwork(), this.scenario.getConfig());
+		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
 		Collection<ActivityFacility> list = this.quadTreesOfType.get(convertedType).get( center.getX(), center.getY(), maxRadius );
@@ -206,7 +204,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		}
 	}
 
-	private void setLocation(ActivityImpl act, Id facilityId) {
+	private void setLocation(Activity act2, Id facilityId) {
+		ActivityImpl act = (ActivityImpl) act2 ;
 		act.setFacilityId(facilityId);
 		act.setLinkId(((NetworkImpl) this.scenario.getNetwork()).getNearestLink(this.facilities.getFacilities().get(facilityId).getCoord()).getId());
 		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());

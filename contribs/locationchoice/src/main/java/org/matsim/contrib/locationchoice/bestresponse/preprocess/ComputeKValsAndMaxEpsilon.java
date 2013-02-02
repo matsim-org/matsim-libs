@@ -52,12 +52,12 @@ public class ComputeKValsAndMaxEpsilon {
 	
 	private HashSet<String> flexibleTypes;
 	
-	public ComputeKValsAndMaxEpsilon(long seed, Scenario scenario, Config config, 
-			ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes) {
+	public ComputeKValsAndMaxEpsilon(long seed, Scenario scenario, ScaleEpsilon scaleEpsilon, 
+			ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes) {
 		rnd = new RandomFromVarDistr();
 		rnd.setSeed(seed);
 		this.scenario = (ScenarioImpl) scenario;
-		this.config = config;
+		this.config = this.scenario.getConfig() ;
 		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;
 		this.flexibleTypes = flexibleTypes;

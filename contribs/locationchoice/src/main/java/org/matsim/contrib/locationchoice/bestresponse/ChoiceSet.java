@@ -26,9 +26,8 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -58,6 +58,8 @@ public class ChoiceSet {
 	private List<Id> notYetVisited = new Vector<Id>();
 	private final Network network;
 	private Config config;
+
+	private PopulationFactoryImpl pFactory;
 	
 	@Override
 	public String toString() {
@@ -76,10 +78,12 @@ public class ChoiceSet {
 	
 //	private static int wrnCnt = 0 ;
 		
-	ChoiceSet(ApproximationLevel approximationLevel, Network network, Config config) {
+	ChoiceSet(ApproximationLevel approximationLevel, Scenario scenario) {
 		this.approximationLevel = approximationLevel;
-		this.network = network;
-		this.config = config;
+		this.network = scenario.getNetwork() ;
+		this.config = scenario.getConfig() ;
+		this.pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory() ;
+		
 //		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
 //		if ( wrnCnt < 1 ) {
 //			wrnCnt++ ;
@@ -126,11 +130,10 @@ public class ChoiceSet {
 		Collections.shuffle(this.notYetVisited, rnd);
 	}
 	
-	public Id getWeightedRandomChoice(int actlegIndex, Coord coordPre,
-			Coord coordPost, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction, 
-			Plan plan, ReplanningContext replanningContext) {
+	public Id getWeightedRandomChoice(int actlegIndex, ActivityFacilities facilities,
+			ScoringFunctionAccumulator scoringFunction, Plan plan, ReplanningContext replanningContext) {
 				
-		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, facilities, scoringFunction, plan, replanningContext);
+		TreeMap<Double, Id> map = this.createReducedChoiceSetWithScores(actlegIndex, facilities, scoringFunction, plan, replanningContext);
 		
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
@@ -152,10 +155,11 @@ public class ChoiceSet {
 	    }
 		// yyyyyy looks to me like: "the last facility with a double value larger than the random number is returned.  If this returns null,
 		// then the first entry in the choice set is returned."  But why???  And why the same randomScore for all agents???  kai, jan'13
+
 		return id;
 	}
 	
-	private TreeMap<Double,Id> createChoiceSet(int actlegIndex, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
+	private TreeMap<Double,Id> createReducedChoiceSetWithScores(int actlegIndex, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
 			Plan plan, ReplanningContext replanningContext) {
 		TravelTime travelTime = replanningContext.getTravelTimeCalculator() ; 
 		TravelDisutility travelCost = replanningContext.getTravelCostCalculator() ;
@@ -209,6 +213,7 @@ public class ChoiceSet {
 			// not needed anymore
 			// yyyy why not?  kai, jan'13
 			//scoringFunction.finish();
+			
 			double score = scoringFunction.getScore();
 			scoringFunction.reset();
 									
@@ -218,10 +223,8 @@ public class ChoiceSet {
 			}
 			list.add(new ScoredAlternative(score, destinationId));
 		}	
-		// find the sum of the scores to normalize scores
-		Collections.sort(list);
-		double totalScore = this.getTotalScore(list);
-		TreeMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list, totalScore);
+
+		TreeMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list);
 				
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
@@ -229,6 +232,7 @@ public class ChoiceSet {
 			return mapCorrected;
 		}
 		else  {	
+			// yyyyyy how is this supposed to happen at all?  kai, jan'13
 			TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
 			mapTmp.put(1.1, facilityIdWithLargestScore);
 			return mapTmp;
@@ -252,7 +256,11 @@ public class ChoiceSet {
 		return totalScore;
 	}
 	
-	private TreeMap<Double,Id> generateReducedChoiceSet(List<ScoredAlternative> list, double totalScore) {
+	private TreeMap<Double,Id> generateReducedChoiceSet(List<ScoredAlternative> list) {
+		// find the sum of the scores to normalize scores
+		Collections.sort(list);
+		double totalScore = this.getTotalScore(list);
+		
 		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
 		int n = 0;
 		double sumScore = 0.0;

@@ -54,11 +54,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class LocationChoice extends AbstractMultithreadedModule {
 
-//	private static final String RANDOM = "random";
-//	private static final String BEST_RESPONSE = "bestResponse";
-//	private static final String LOCAL_SEARCH_RECURSIVE = "localSearchRecursive";
-//	private static final String LOCAL_SEARCH_SINGLE_ACT = "localSearchSingleAct";
-	
 	/**
 	 * yyyy It is unclear to me why we need this as a collection and not just as a variable.  kai, dec'12
 	 */
@@ -96,19 +91,16 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
 		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());
 
-		//		if (algorithm.equals(BEST_RESPONSE)) {
 		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(this.scenario.getConfig().locationchoice().getAlgorithm())) {
 			this.scaleEpsilon = this.defineFlexibleActivities.createScaleEpsilon();
-			List<ObjectAttributes> epsilons = this.createObjectAttributesAndReadOrCreateEpsilons(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
+			List<ObjectAttributes> epsilons = this.readOrCreateEpsilons(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
 //			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues, this.scenario.getConfig().locationchoice());
 			this.sampler = new DestinationSampler(epsilons.get(persKVals), epsilons.get(facKVals), this.scenario.getConfig().locationchoice());
 			this.personsMaxEpsUnscaled = epsilons.get(maxEpsUnsc) ;
 		}
 	}
 
-	private List<ObjectAttributes> createObjectAttributesAndReadOrCreateEpsilons(long seed) {
-//		List<ObjectAttributes> epsilons = 
-		
+	private List<ObjectAttributes> readOrCreateEpsilons(long seed) {
 //		this.personsMaxEpsUnscaled = new ObjectAttributes();
 
 		// check if object attributes files are available, other wise do preprocessing
@@ -131,11 +123,13 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 	private List<ObjectAttributes> computeEpsilons(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, (ScenarioImpl) this.scenario, this.scenario.getConfig(), 
-				this.scaleEpsilon, this.actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
+				seed, this.scenario, this.scaleEpsilon, 
+				this.actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
 
 		computer.run();
 		
+		// the reason for the following somewhat strange construct is that I want to _return_ the result, rather than
+		// having it as a side effect. kai, feb'13
 		List<ObjectAttributes> epsilons = new ArrayList<ObjectAttributes>(3) ;
 		for ( int ii=0 ; ii<3 ; ii++ ) {
 			if ( ii==persKVals ) {
@@ -177,12 +171,12 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 
 	@Override
-	protected void beforeFinishReplanningHook() {
+	protected final void beforeFinishReplanningHook() {
 		Gbl.printMemoryUsage() ;
 	}
 
 	@Override
-	protected void afterFinishReplanningHook() {
+	protected final void afterFinishReplanningHook() {
 		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
 
 		if ( LocationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 

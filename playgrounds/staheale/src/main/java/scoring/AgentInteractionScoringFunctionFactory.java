@@ -122,7 +122,7 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 
 	private void computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, this.controler.getScenario(), this.config2, this.scaleEpsilon, this.actTypeConverter, this.flexibleTypes);
+				seed, this.controler.getScenario(), this.scaleEpsilon, this.actTypeConverter, this.flexibleTypes);
 		computer.assignKValues();
 
 		this.personsKValues = computer.getPersonsKValues();
