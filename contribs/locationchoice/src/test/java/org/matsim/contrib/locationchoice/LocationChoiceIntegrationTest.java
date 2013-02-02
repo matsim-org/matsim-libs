@@ -37,6 +37,54 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
+	public void testLocationChoiceFeb2013NegativeScores() {
+		final Config config = localCreateConfig();
+
+		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
+		config.locationchoice().setEpsilonScaleFactors("100.0") ;
+//		config.locationchoice().setProbChoiceExponent("1.") ;
+		
+		config.otfVis().setEffectiveLaneWidth(1.) ;
+		config.otfVis().setLinkWidth((float)1.) ;
+		config.otfVis().setShowTeleportedAgents(true) ;
+		config.otfVis().setDrawNonMovingItems(true) ;
+
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+
+		final double scale = 100000. ;
+		final double speed = 1. ;
+
+		createExampleNetwork(scenario, scale, speed);
+		
+		Link ll1 = scenario.getNetwork().getLinks().get(new IdImpl(1)) ;
+		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
+		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
+
+		Controler controler = new Controler(scenario);
+		
+		controler.setMobsimFactory(new MobsimFactory() {
+			@Override
+			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
+//				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+//				OTFClientLive.run(sc.getConfig(), server);
+				return qSim ;
+			} 
+		} ) ;
+
+		controler.run();
+
+		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		Plan newPlan = person.getSelectedPlan();
+		System.err.println( " newPlan: " + newPlan ) ;
+		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
+		System.err.println( " newWork: " + newWork ) ;
+		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
+//		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
+//		assertEquals( new IdImpl(55), newWork.getFacilityId() );
+		System.err.println("shouldn't this change anyways??") ;
+	}
+
 	public void testLocationChoiceJan2013() {
 		final Config config = localCreateConfig();
 
@@ -51,56 +99,14 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
-		// setup network
-		Network network = scenario.getNetwork();
-		
 		final double scale = 1000. ;
+		final double speed = 10. ;
 
-		Node node0 = network.getFactory().createNode(new IdImpl(0), new CoordImpl(-scale,0) ) ;
-		network.addNode(node0) ;
-
-		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(10,0) ) ;
-		network.addNode(node1) ;
-
-		Link link1 = network.getFactory().createLink(new IdImpl(1), node0, node1 ) ;
-		network.addLink(link1) ;
-		Link link1b = network.getFactory().createLink(new IdImpl("1b"), node1, node0 ) ;
-		network.addLink(link1b) ;
-
-		ActivityFacility facility1 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(1), new CoordImpl(scale,0) ) ;
-		// (this should be "createAndAdd". kai, jan'13)
-		facility1.getActivityOptions().put("initial-work", new ActivityOptionImpl("initial-work", facility1)) ;
+		createExampleNetwork(scenario, scale, speed);
 		
-		final int nNodes = 100 ;
-		Random random = new Random(4711) ;
-		for ( int ii=2 ; ii<nNodes+2 ; ii++ ) {
-			double tmp = Math.PI*(ii-1)/nNodes ;
-			Coord coord = new CoordImpl( scale*Math.sin(tmp),scale*Math.cos(tmp) ) ;
-
-			Node node = network.getFactory().createNode(new IdImpl(ii), coord ) ;
-			network.addNode(node) ;
-
-			double rnd = random.nextDouble() ;
-			{
-				Link link = network.getFactory().createLink(new IdImpl(ii), node1, node) ;
-				link.setLength(rnd*scale) ;
-				link.setFreespeed(10.) ;
-				link.setCapacity(1.) ;
-				network.addLink(link) ;
-			}
-			{
-				Link link = network.getFactory().createLink(new IdImpl(ii+"b"), node, node1) ;
-				link.setLength(rnd*scale) ;
-				link.setFreespeed(10.) ;
-				link.setCapacity(1.) ;
-				network.addLink(link) ;
-			}
-			
-			ActivityFacility facility = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(ii), coord ) ;
-			facility.getActivityOptions().put("work", new ActivityOptionImpl("work", facility)) ;
-		}
-		
-		Person person = localCreatePopWOnePerson(scenario, link1, facility1, 8.*60*60+5*60);
+		Link ll1 = scenario.getNetwork().getLinks().get(new IdImpl(1)) ;
+		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
+		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
 
 		Controler controler = new Controler(scenario);
 		
@@ -124,6 +130,54 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
 //		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
 		assertEquals( new IdImpl(55), newWork.getFacilityId() );
+	}
+
+	private void createExampleNetwork(final ScenarioImpl scenario, final double scale, final double speed) {
+		Network network = scenario.getNetwork() ;
+		
+		Node node0 = network.getFactory().createNode(new IdImpl(0), new CoordImpl(-scale,0) ) ;
+		network.addNode(node0) ;
+
+		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(10,0) ) ;
+		network.addNode(node1) ;
+
+		Link link1 = network.getFactory().createLink(new IdImpl(1), node0, node1 );
+		network.addLink(link1) ;
+		Link link1b = network.getFactory().createLink(new IdImpl("1b"), node1, node0 ) ;
+		network.addLink(link1b) ;
+
+		final int nNodes = 100 ;
+		Random random = new Random(4711) ;
+		for ( int ii=2 ; ii<nNodes+2 ; ii++ ) {
+			double tmp = Math.PI*(ii-1)/nNodes ;
+			Coord coord = new CoordImpl( scale*Math.sin(tmp),scale*Math.cos(tmp) ) ;
+
+			Node node = network.getFactory().createNode(new IdImpl(ii), coord ) ;
+			network.addNode(node) ;
+
+			double rnd = random.nextDouble() ;
+			{
+				Link link = network.getFactory().createLink(new IdImpl(ii), node1, node) ;
+				link.setLength(rnd*scale) ;
+				link.setFreespeed(speed) ;
+				link.setCapacity(1.) ;
+				network.addLink(link) ;
+			}
+			{
+				Link link = network.getFactory().createLink(new IdImpl(ii+"b"), node, node1) ;
+				link.setLength(rnd*scale) ;
+				link.setFreespeed(speed) ;
+				link.setCapacity(1.) ;
+				network.addLink(link) ;
+			}
+			
+			ActivityFacility facility = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(ii), coord ) ;
+			facility.getActivityOptions().put("work", new ActivityOptionImpl("work", facility)) ;
+		}
+		
+		// create one additional facility for the initial activity:
+		ActivityFacilityImpl facility1 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(1), new CoordImpl(scale,0) );
+		facility1.getActivityOptions().put("initial-work", new ActivityOptionImpl("initial-work", facility1)) ;
 	}
 	public void testLocationChoice() {
 		final Config config = localCreateConfig();

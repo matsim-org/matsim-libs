@@ -60,6 +60,8 @@ public class ChoiceSet {
 	private Config config;
 
 	private PopulationFactoryImpl pFactory;
+
+	private Scenario scenario;
 	
 	@Override
 	public String toString() {
@@ -83,6 +85,7 @@ public class ChoiceSet {
 		this.network = scenario.getNetwork() ;
 		this.config = scenario.getConfig() ;
 		this.pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory() ;
+		this.scenario = scenario ;
 		
 //		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
 //		if ( wrnCnt < 1 ) {
@@ -283,7 +286,8 @@ public class ChoiceSet {
 			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, TripRouter router, 
 			ApproximationLevel approximationLevelTmp  ) {
 		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp , leastCostPathCalculatorForward, leastCostPathCalculatorBackward, 
-				this.network, router, this.config);
-		adapter.adaptAndScoreTimes(plan, actlegIndex, planTmp, scoringFunction);
+				router, this.scenario);
+		adapter.adaptTimesAndScorePlan(plan, actlegIndex, planTmp, scoringFunction);
+//		adapter.scorePlan(planTmp, actlegIndex, scoringFunction) ;
 	}
 }
