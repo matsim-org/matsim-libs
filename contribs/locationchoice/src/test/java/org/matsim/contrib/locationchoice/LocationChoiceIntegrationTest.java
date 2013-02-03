@@ -37,6 +37,7 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -55,10 +56,14 @@ import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
@@ -97,17 +102,17 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		scoringFunctionFactory.setUsingFacilityOpeningTimes(false) ;
 
 		controler.setScoringFunctionFactory(scoringFunctionFactory);
+		
+		// set locachoice strategy:
+		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
+			@Override
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
+				return new LocationChoicePlanStrategy(scenario2) ;
+			}
+		});
 
 		// this is here only to switch on otfvis if needed:
-		controler.setMobsimFactory(new MobsimFactory() {
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
-				//				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-				//				OTFClientLive.run(sc.getConfig(), server);
-				return qSim ;
-			} 
-		} ) ;
+//		controler.setMobsimFactory(new FactoryForMobsimWithOTFVis() ) ;
 
 		// run:
 		controler.run();
@@ -162,16 +167,16 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		controler.setScoringFunctionFactory(scoringFunctionFactory);
 
-		// this is here only to switch on otfvis if needed:
-		controler.setMobsimFactory(new MobsimFactory() {
+		// set locachoice strategy:
+		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
-				//				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-				//				OTFClientLive.run(sc.getConfig(), server);
-				return qSim ;
-			} 
-		} ) ;
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
+				return new LocationChoicePlanStrategy(scenario2) ;
+			}
+		});
+
+		// this is here only to switch on otfvis if needed:
+//		controler.setMobsimFactory(new FactoryForMobsimWithOTFVis() ) ;
 
 		controler.run();
 
@@ -256,6 +261,16 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		Controler controler = new Controler(scenario);
 
+		// set locachoice strategy:
+		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
+			@Override
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
+				return new LocationChoicePlanStrategy(scenario2) ;
+			}
+		});
+		// (this is now only necessary since the config for all three tests sets MyLocationChoice instead of LocationChoice. Probably
+		// should pull the best response test away from the other (old) test.  kai, feb'13
+		
 		controler.run();
 
 		// test that everything worked as expected
@@ -332,7 +347,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		config.planCalcScore().addActivityParams(work);
 
 		final StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
-		strategySettings.setModuleName("LocationChoice");
+		strategySettings.setModuleName("MyLocationChoice");
 		strategySettings.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 		
@@ -343,5 +358,15 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		return config;
 	}
+	
+	class FactoryForMobsimWithOTFVis implements MobsimFactory {
+		@Override
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+			QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+			OTFClientLive.run(sc.getConfig(), server);
+			return qSim ;
+		} 
+	} 
 
 }

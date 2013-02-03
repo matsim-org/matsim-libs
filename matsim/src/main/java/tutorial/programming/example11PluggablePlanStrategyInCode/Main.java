@@ -37,7 +37,6 @@ class Main {
 		}
 		
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
-		
 		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
 		stratSets.setModuleName("doSomethingSpecial");
 		stratSets.setProbability(0.1);
