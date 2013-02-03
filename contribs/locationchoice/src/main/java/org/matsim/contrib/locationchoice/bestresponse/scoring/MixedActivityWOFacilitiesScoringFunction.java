@@ -19,14 +19,11 @@
 
 package org.matsim.contrib.locationchoice.bestresponse.scoring;
 
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
@@ -44,8 +41,8 @@ public class MixedActivityWOFacilitiesScoringFunction extends CharyparNagelActiv
 	private Plan plan ;
 	
 	public MixedActivityWOFacilitiesScoringFunction(Plan plan, CharyparNagelScoringParameters params, 
-			final ActivityFacilities facilities, final TreeMap<Id, FacilityPenalty> facilityPenalties,
-			Config config, ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues,ScaleEpsilon scaleEpsilon) {
+			final ActivityFacilities facilities, Config config,
+			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues, ScaleEpsilon scaleEpsilon) {
 		//super(plan, params, facilityPenalties, facilities);
 		super(params);
 		this.facilities = facilities;

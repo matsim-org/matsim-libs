@@ -125,9 +125,8 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.functio
 					(PlanImpl)plan, 
 					super.getParams(), 
 					this.controler.getFacilities(), 
-					this.controler.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(), 
-					this.controler.getConfig(),
-					this.facilitiesKValues, 
+					this.controler.getConfig(), 
+					this.facilitiesKValues,
 					this.personsKValues, 
 					this.scaleEpsilon);
 		}

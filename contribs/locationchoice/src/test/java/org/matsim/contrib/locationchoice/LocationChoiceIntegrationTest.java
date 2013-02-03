@@ -63,29 +63,27 @@ import org.matsim.testcases.MatsimTestCase;
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 	public void testLocationChoiceJan2013() {
+		//	CONFIG:
 		final Config config = localCreateConfig();
 
 		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
 		config.locationchoice().setEpsilonScaleFactors("100.0") ;
 		config.locationchoice().setRandomSeed("4711") ;
 
+		// SCENARIO:
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		final double scale = 1000. ;
 		final double speed = 10. ;
-
 		createExampleNetwork(scenario, scale, speed);
 
 		Link ll1 = scenario.getNetwork().getLinks().get(new IdImpl(1)) ;
 		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
 		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
 
-		FacilityPenalties facPenalties = scenario.getScenarioElement(FacilityPenalties.class);
-		if (facPenalties == null) {
-			facPenalties = new FacilityPenalties();
-			scenario.addScenarioElement( facPenalties );
-		}
-
+		// (FacilityPenalties not necessary when facility opening times are not used (see below))
+		
+		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true) ;
 
@@ -111,6 +109,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			} 
 		} ) ;
 
+		// run:
 		controler.run();
 
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
