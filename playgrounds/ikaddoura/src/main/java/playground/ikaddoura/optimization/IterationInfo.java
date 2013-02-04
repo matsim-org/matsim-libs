@@ -36,6 +36,7 @@ public class IterationInfo {
 	private double capacity;
 	private double numberOfBuses;
 	private double headway;
+	private double totalDemand;
 	
 	private double operatorCosts;
 	private double operatorRevenue;
@@ -275,6 +276,14 @@ public class IterationInfo {
 
 	public void setAvgT0MinusTActDivT0PerTrip(double avgT0MinusTActDivT0PerTrip) {
 		this.avgT0MinusTActDivT0PerTrip = avgT0MinusTActDivT0PerTrip;
+	}
+
+	public void setTotalDemand(double demand) {
+		this.totalDemand = demand;
+	}
+
+	public double getTotalDemand() {
+		return totalDemand;
 	}
 		
 }

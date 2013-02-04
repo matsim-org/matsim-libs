@@ -245,6 +245,7 @@ class ExternalControler {
 		info.setCapacity(capacity);
 		info.setNumberOfBuses(analysis.getNumberOfBusesFromEvents());
 		info.setHeadway(headway);
+		info.setTotalDemand(demand);
 		info.setOperatorCosts(operator.getCosts());
 		info.setOperatorRevenue(analysis.getRevenue());
 		info.setUsersLogSum(users.getLogSum());

@@ -130,7 +130,7 @@ public class InternalControler {
 		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(planCalcScoreConfigGroup, scenario.getNetwork(), ptScoringHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE, TRAVEL_PT_ACCESS, TRAVEL_PT_EGRESS);
 		controler.setScoringFunctionFactory(scoringfactory);
 		
-		controler.setCreateGraphs(false);
+//		controler.setCreateGraphs(false);
 		controler.run();		
 	}
 
