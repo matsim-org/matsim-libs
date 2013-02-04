@@ -49,7 +49,7 @@ public class DeparturesGenerator {
 	private TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
 	
 	/**
-	 * Creates and adds departures for each given transit line of a given schedule.
+	 * Creates departures for each given transit line of a given schedule according to the given headway, the start and end time of service and the slack time.
 	 * 
 	 */
 	public void addDepartures(TransitSchedule schedule, List<Id> lineIDs, double headway_sec, double startTime, double endTime, double pausenzeit) {
@@ -67,20 +67,34 @@ public class DeparturesGenerator {
 				routeId2transitRoute.put(transitRoute.getId(), transitRoute);
 			}
 			
-			// modify departures of all transit routes of that line.
-
-			// assuming one cycle to consist of two routes TODO: RuntimeException if more/less than two routes for one line!
-			// assuming the two routes to be equal! TODO: RuntimeException if two routes have a different routeTravelTime!
+			if (routeId2transitRoute.size() > 2) {
+				throw new RuntimeException("A transit line consists of more than two transit routes. So far it is expected that a transit line consists of two identical" +
+						" transit routes (one for each direction). Can't garantee correct calculation of departure times. Aborting...");
+			}
 			
+			if (routeId2transitRoute.size() < 2) {
+				throw new RuntimeException("A transit line consists of less than two transit routes. So far it is expected that a transit line consists of two identical" +
+						" transit routes (one for each direction). Can't garantee correct calculation of departure times. Aborting...");
+			}
+						
 			List<Id> routeIDs = new ArrayList<Id>();
 			routeIDs.addAll(routeId2transitRoute.keySet());
 			
-			int lastStop = routeId2transitRoute.get(routeIDs.get(0)).getStops().size()-1;
-			double routeTravelTime = routeId2transitRoute.get(routeIDs.get(0)).getStops().get(lastStop).getArrivalOffset();
-			double umlaufzeit_sec = Math.round((routeTravelTime + pausenzeit) * 2.0);
+			int lastStop0 = routeId2transitRoute.get(routeIDs.get(0)).getStops().size()-1;
+			double routeTravelTime0 = routeId2transitRoute.get(routeIDs.get(0)).getStops().get(lastStop0).getArrivalOffset();
+			
+			int lastStop1 = routeId2transitRoute.get(routeIDs.get(1)).getStops().size()-1;
+			double routeTravelTime1 = routeId2transitRoute.get(routeIDs.get(1)).getStops().get(lastStop1).getArrivalOffset();
+			
+			if (routeTravelTime0 != routeTravelTime1) {
+				throw new RuntimeException("The transit routes have different travel times. So far it is expected that a transit line consists of two identical" +
+						" transit routes (one for each direction). Can't garantee correct calculation of departure times.  ");
+			}
+			
+			double umlaufzeit_sec = Math.round((routeTravelTime0 + pausenzeit) * 2.0);
 			int numberOfBuses = (int) Math.ceil(umlaufzeit_sec / headway_sec);
 			
-			log.info("RouteTravelTime: "+ Time.writeTime(routeTravelTime, Time.TIMEFORMAT_HHMMSS));
+			log.info("RouteTravelTime: "+ Time.writeTime(routeTravelTime0, Time.TIMEFORMAT_HHMMSS));
 			log.info("Umlaufzeit: "+ Time.writeTime(umlaufzeit_sec, Time.TIMEFORMAT_HHMMSS));
 			log.info("Takt: "+ Time.writeTime(headway_sec, Time.TIMEFORMAT_HHMMSS));
 			log.info("Required number of public vehicles: " + numberOfBuses);
