@@ -318,10 +318,10 @@ public class PhysicalSim2DSection {
 	public void debug(VisDebugger visDebugger) {
 		if (visDebugger.isFirst()) {
 			for (Segment seg : this.obstacles) {
-				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 222, 222, 222, 128,0);
+				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 18, 34, 34, 128,0);
 			}
 			for (Segment seg : this.openings) {
-				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128,40);
+				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128,128);
 			}
 			for (Id key : this.linkInfos.keySet()) {
 				Link l = this.sim2dsc.getMATSimScenario().getNetwork().getLinks().get(key);
@@ -329,7 +329,7 @@ public class PhysicalSim2DSection {
 				float x1 = (float) (l.getToNode().getCoord().getX() - this.offsetX);
 				float y0 = (float) (l.getFromNode().getCoord().getY() - this.offsetY);
 				float y1 = (float) (l.getToNode().getCoord().getY() - this.offsetY);
-				visDebugger.addLineStatic(x0, y0, x1, y1,192, 192, 192, 255,255);
+				visDebugger.addLineStatic(x0, y0, x1, y1,0, 0, 0, 255,240);
 				float dx = x1-x0 + MatsimRandom.getRandom().nextFloat()-.5f;
 				float dy = y1-y0 + MatsimRandom.getRandom().nextFloat()-.5f;;
 				float length = (float) Math.sqrt(dx*dx+dy*dy);

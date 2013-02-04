@@ -116,7 +116,29 @@ public class SimpleAgent implements Sim2DAgent {
 
 	@Override
 	public void debug(VisDebugger visDebugger) {
-		visDebugger.addCircle(this.getPos()[0], this.getPos()[1], .5f, 192, 0, 64, 128,0,true);
+		if (getId().toString().contains("g")) {
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 0, 192, 64, 128,0,true);
+		} else if (getId().toString().contains("r")) {
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 192, 0, 64, 128,0,true);
+		} else {
+			int nr = this.hashCode()%3*255;
+			int r,g,b;
+			if (nr > 2*255) {
+				r= nr-2*255;
+				g =0;
+				b=64;
+			} else if (nr > 255) {
+				r=0;
+				g=nr-255;
+				b=64;
+			} else {
+				r=64;
+				g=0;
+				b=nr;
+			}
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, r, g, b, 222,0,true);
+//			visDebugger.addText(this.getPos()[0],this.getPos()[1], this.getId().toString(), 0);
+		}
 		
 	}
 

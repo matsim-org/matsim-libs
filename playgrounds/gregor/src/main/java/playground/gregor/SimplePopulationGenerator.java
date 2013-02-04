@@ -38,7 +38,7 @@ public class SimplePopulationGenerator {
 		Config c = ConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/input/config.xml");
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		
-		int nrAgents = 2000;
+		int nrAgents = 20000;
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QSimDrawer.java
+ * QSimFibonacciPulser.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -41,12 +41,14 @@ import playground.gregor.sim2d_v4.debugger.VisDebugger.Text;
 import playground.gregor.sim2d_v4.debugger.VisDebugger.WeightedLine;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
-public class QSimDrawer implements VisDebuggerAdditionalDrawer, LinkEnterEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler{
+public class QSimFibonacciPulser implements VisDebuggerAdditionalDrawer, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler{
 
+	private final int [] intensities = {1,1,3,5,8,13,21,34};//, 34, 21,13,8,5,3,1,1};
+	//	private final int [] intensities = {8,13,21};
 	List<LinkInfo> links = new ArrayList<LinkInfo>();
 	Map<Id,LinkInfo> map = new HashMap<Id,LinkInfo>();
 
-	public QSimDrawer(Scenario sc) {
+	public QSimFibonacciPulser(Scenario sc) {
 		double offsetX = sc.getScenarioElement(Sim2DScenario.class).getSim2DConfig().getOffsetX();
 		double offsetY = sc.getScenarioElement(Sim2DScenario.class).getSim2DConfig().getOffsetY();
 		for (Link l : sc.getNetwork().getLinks().values()) {
@@ -60,41 +62,38 @@ public class QSimDrawer implements VisDebuggerAdditionalDrawer, LinkEnterEventHa
 			double dx = l.getToNode().getCoord().getX() - l.getFromNode().getCoord().getX();
 			double dy = l.getToNode().getCoord().getY() - l.getFromNode().getCoord().getY();
 			double length = Math.sqrt(dx*dx + dy*dy);
-			dx /= 2*length;
-			dy /= 2*length;
-			dx *= .71/4;
-			dy *= .71/4;
+			dx /= length;
+			dy /= length;
 			LinkInfo info = new LinkInfo();
-			info.lines = new WeightedLine[lanes+1];
-			info.cap = (int) (l.getLength()*lanes);
-			for (int i = 0; i <= lanes; i++) {
-				WeightedLine line = new WeightedLine();
-//				int c1 = MatsimRandom.getRandom().nextInt(lanes);
-//				int c1 = MatsimRandom.getRandom().nextInt(lanes);
-				final double ii = i+5;
-				line.x0 = (float) (l.getFromNode().getCoord().getX() - offsetX + ii*dy);
-				line.y0 = (float) (l.getFromNode().getCoord().getY() - offsetY - ii*dx);
-				line.x1 = (float) (l.getToNode().getCoord().getX() - offsetX + ii*dy);
-				line.y1 = (float) (l.getToNode().getCoord().getY() - offsetY - ii*dx);
-				line.r = 255;
-				line.a = 32;
-				line.weight = i/4.f+1;
-				info.lines[i] = line;
-				if (i == 0) {
-					line.r = 255;
-					line.g = 255;
-					line.b = 255;
-					line.a = 255;
-					line.weight = 1;
-				}
-			}
+			info.cap = (int) (l.getLength()*lanes)/2;
+			WeightedLine line = new WeightedLine();
+			double ii = width/2;
+			line.x0 = (float) (l.getFromNode().getCoord().getX() - offsetX );
+			line.y0 = (float) (l.getFromNode().getCoord().getY() - offsetY );
+			line.x1 = (float) (l.getToNode().getCoord().getX() - offsetX );
+			line.y1 = (float) (l.getToNode().getCoord().getY() - offsetY );
+			line.r = 255;
+			line.a = 128;
+			line.weight = 1;
+			info.w = line;
+			info.width = width;
+
+			info.x0 = line.x0;
+			info.x1 = line.x1;
+			info.y1 = line.y1;
+			info.y0 = line.y0;
+			info.dx = dy;
+			info.dy = -dx;
+
+
 			Text t = new Text();
-			t.x = (float) (l.getCoord().getX() - offsetX + 4*lanes*dy);
-			t.y = (float) (l.getCoord().getY() - offsetY - 4*lanes*dx);
+			t.x = (float) (l.getCoord().getX() - offsetX + 1.5*width*dy);
+			t.y = (float) (l.getCoord().getY() - offsetY - 1.5*width*dx);
 			info.t = t;
 			t.minScale = 8;
-			t.r = t.g = t.b = 222;
+			t.r = t.g = t.b = 0;
 			t.text = "0";
+
 			this.links.add(info);
 			this.map.put(l.getId(), info);
 		}
@@ -105,26 +104,95 @@ public class QSimDrawer implements VisDebuggerAdditionalDrawer, LinkEnterEventHa
 	public void draw(VisDebugger p) {
 		for (LinkInfo l : this.links) {
 			synchronized (l) {
-				final WeightedLine ll = l.lines[0];
+				final WeightedLine ll = l.w;
+				ll.r=0;
+				ll.g=0;
+				ll.b=0;
+				ll.a=255;
+				ll.x0 = (float) (l.x0+l.dx*l.width/2);
+				ll.x1 = (float) (l.x1+l.dx*l.width/2);
+				ll.y0 = (float) (l.y0+l.dy*l.width/2);
+				ll.y1 = (float) (l.y1+l.dy*l.width/2);
+				ll.weight = (float) l.width;
 				p.drawWeightedLine(ll);
 				if (l.onLink == 0) {
 					continue;
 				}
-				int r = l.onLinkR > 0 ? 255 : 0;
-				int g = l.onLinkG > 0 ? 255 : 0;
-				final int length = l.lines.length;
-				int draw = length * l.onLink/l.cap+2;
-				for (int i = 1; i < draw && i < length; i++) {
-					final WeightedLine lll = l.lines[i];
-					lll.r = r;
-					lll.g = g;
-					p.drawWeightedLine(lll);
+				ll.a  = 255;
+				if (l.onLinkG > l.onLinkR) {
+					l.w.g = 255;
+					l.w.r = 0;
+					l.w.b = 0;
+				} else {
+					l.w.g = 0;
+					l.w.r = 255;
+					l.w.b = 0;
 				}
+				ll.weight = (float) ((this.intensities[(int) l.count])*l.width/34);
+				//				for (int i = 0; i < 5; i++) {
+
+				ll.x0 = (float) (l.x0+l.dx*ll.weight);
+				ll.x1 = (float) (l.x1+l.dx*ll.weight);
+				ll.y0 = (float) (l.y0+l.dy*ll.weight);
+				ll.y1 = (float) (l.y1+l.dy*ll.weight);
+				p.drawWeightedLine(ll);
+				//					ll.weight /=2;
 				p.drawText(l.t);
+				//				}
+				l.count += l.incr ;
+				if (l.count >= l.from+l.range) {
+					l.incr = -l.incr;
+					l.count += l.incr;
+				} else if (l.count < l.from) {
+					l.incr = -l.incr;
+					l.count += l.incr;
+				}
 			}
 		}
 
 	}
+
+
+	private static final class LinkInfo {
+		public double dy;
+		public double dx;
+		public float y0;
+		public float y1;
+		public float x1;
+		public float x0;
+		public int cap;
+		public double incr = 0.1;
+		public double width;
+		//		public double incr;
+		public int from=0; //0-5
+		public final int range = 4;
+		WeightedLine w;
+		double count = this.from;
+		public int onLink;
+		public int onLinkG;
+		public int onLinkR;
+		Text t;
+		public void revise() {
+			double load = this.onLink/this.cap;
+			int from;
+			if (load >= 0.75) {
+				from = 3;
+			} else if (load >= .5) {
+				from =2;
+			} else if (load >= .25) {
+				from = 1;
+			} else {
+				from = 0;
+			}
+			if (from != this.from) {
+				this.from = from;
+				this.count = from;
+				this.incr = 0.1;
+			}
+
+		}
+	}
+
 
 
 
@@ -138,7 +206,7 @@ public class QSimDrawer implements VisDebuggerAdditionalDrawer, LinkEnterEventHa
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		 LinkInfo info = this.map.get(event.getLinkId());
+		LinkInfo info = this.map.get(event.getLinkId());
 		if (info == null) {
 			return;
 		}
@@ -149,6 +217,7 @@ public class QSimDrawer implements VisDebuggerAdditionalDrawer, LinkEnterEventHa
 			} else {
 				info.onLinkR--;
 			}
+			info.revise();
 			info.t.text = Integer.toString(info.onLink);
 		}
 
@@ -168,6 +237,7 @@ public class QSimDrawer implements VisDebuggerAdditionalDrawer, LinkEnterEventHa
 			} else {
 				info.onLinkR ++;
 			}
+			info.revise();
 			info.t.text = Integer.toString(info.onLink);
 		}		
 	}
@@ -186,22 +256,14 @@ public class QSimDrawer implements VisDebuggerAdditionalDrawer, LinkEnterEventHa
 			} else {
 				info.onLinkR ++;
 			}
+			info.revise();
 			info.t.text = Integer.toString(info.onLink);
 		}		
 	}
 
-	private static final class LinkInfo {
-		public int onLinkR = 0;
-		public int onLinkG = 0;
-		WeightedLine [] lines;
-		Text t;
-		int onLink;
-		int cap;
-	}
-
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		 LinkInfo info = this.map.get(event.getLinkId());
+		LinkInfo info = this.map.get(event.getLinkId());
 		if (info == null) {
 			return;
 		}
@@ -212,7 +274,10 @@ public class QSimDrawer implements VisDebuggerAdditionalDrawer, LinkEnterEventHa
 			} else {
 				info.onLinkR--;
 			}
+			info.revise();
 			info.t.text = Integer.toString(info.onLink);
 		}
 	}
+
+
 }

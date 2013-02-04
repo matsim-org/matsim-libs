@@ -205,11 +205,15 @@ public class VisDebugger extends PApplet {
 	public void draw() {
 
 		stroke(255);
-		background(0,16,64,255);
+		background(255,237,187,255);
 		fill(255);
 
 		drawBG();
 
+		for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
+			d.draw(this);
+		}
+		
 		synchronized(this.elementsStatic) {
 			Iterator<Object> it = this.elementsStatic.iterator();
 			while (it.hasNext()) {
@@ -242,9 +246,7 @@ public class VisDebugger extends PApplet {
 				}
 			}
 		}
-		for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
-			d.draw(this);
-		}
+
 		strokeWeight(2);
 		drawTime();
 		drawIteration();
@@ -641,6 +643,11 @@ public class VisDebugger extends PApplet {
 	public void setFrameSaver(FrameSaver fs) {
 		this.fs = fs;
 		
+	}
+
+
+	public float getScale() {
+		return this.scale;
 	}
 
 

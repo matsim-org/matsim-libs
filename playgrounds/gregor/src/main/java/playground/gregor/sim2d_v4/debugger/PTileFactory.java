@@ -209,7 +209,7 @@ public class PTileFactory {
 			System.out.println("stop!!!");
 		}
 
-		String url = "http://localhost:8080/geoserver/wms?service=WMS&version=1.1.0&request=GetMap&layers=ch&styles=&bbox=" +
+		String url = "http://localhost:8080/geoserver/wms?service=WMS&version=1.1.0&request=GetMap&layers=ch_day&styles=&bbox=" +
 				dest.x +
 				"," +
 				dest.y +
