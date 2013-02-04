@@ -55,6 +55,10 @@ public class DeparturesGenerator {
 	public void addDepartures(TransitSchedule schedule, List<Id> lineIDs, double headway_sec, double startTime, double endTime, double pausenzeit) {
 		this.transitSchedule = schedule;
 		
+		if (headway_sec < 1){
+			throw new RuntimeException("Headway is less than 1 sec. Aborting...");
+		}
+		
 		for (Id transitLineId : lineIDs){
 			log.info("Transit line Id: " + transitLineId);
 			Map<Id, TransitRoute> routeId2transitRoute = new HashMap<Id, TransitRoute>();

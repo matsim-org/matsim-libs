@@ -27,14 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
@@ -51,10 +46,10 @@ public class ScheduleVehcileWriter {
 	private String scheduleFile;
 
 	private String networkFile;
-	private String linkIdMarker = "bus";
-	private String transitRouteMode = "bus";
-	private boolean isBlocking = false;
-	private boolean awaitDeparture = true;
+	private String linkIdMarker;
+	private String transitRouteMode;
+	private boolean isBlocking;
+	private boolean awaitDeparture;
 	private double stopTime_sec;
 	private double scheduleSpeed_m_sec;
 	
@@ -110,17 +105,13 @@ public class ScheduleVehcileWriter {
 		svw.run();
 	}
 
-	private void setVehiclesFile(String vehiclesFile) {
-		this.vehicleFile = vehiclesFile;
-	}
-
 	private void run() {
 		
 		File directory = new File(this.outputDirectory);
 		directory.mkdirs();
 
-		ScheduleFromCorridor sfn = new ScheduleFromCorridor();
-		sfn.createTransitSchedule(this.networkFile, this.linkIdMarker, this.transitRouteMode, this.isBlocking, this.awaitDeparture, this.scheduleSpeed_m_sec, this.stopTime_sec);
+		ScheduleFromCorridor sfn = new ScheduleFromCorridor(this.networkFile);
+		sfn.createTransitSchedule(this.linkIdMarker, this.transitRouteMode, this.isBlocking, this.awaitDeparture, this.scheduleSpeed_m_sec, this.stopTime_sec);
 		this.schedule = sfn.getTransitSchedule();
 
 		List<Id> lineIDs = new ArrayList<Id>();
@@ -224,6 +215,10 @@ public class ScheduleVehcileWriter {
 
 	public void setDoorOperationMode(DoorOperationMode doorOperationMode) {
 		this.doorOperationMode = doorOperationMode;
+	}
+	
+	public void setVehiclesFile(String vehiclesFile) {
+		this.vehicleFile = vehiclesFile;
 	}
 	
 }

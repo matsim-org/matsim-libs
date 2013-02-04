@@ -58,8 +58,8 @@ public class OptSettingsReader {
 	            while((line = br.readLine()) != null) {
 	                	String[] parts = line.split(";");
 	                	
-	                	if (parts[0].equals("startBusNumber")){
-	                		this.optSettings.setStartBusNumber(Integer.parseInt(parts[1]));
+	                	if (parts[0].equals("startHeadway")){
+	                		this.optSettings.setStartHeadway(Double.parseDouble(parts[1]));
 	                	
 	                	} else if (parts[0].equals("startFare")){
 	                		this.optSettings.setStartFare(Double.parseDouble(parts[1]));
@@ -70,8 +70,8 @@ public class OptSettingsReader {
 	            		} else if (parts[0].equals("startDemand")){
 	                		this.optSettings.setStartDemand(Integer.parseInt(parts[1]));
 	            			
-	            		} else if (parts[0].equals("incrBusNumber")){
-	                		this.optSettings.setIncrBusNumber(Integer.parseInt(parts[1]));
+	            		} else if (parts[0].equals("incrHeadway")){
+	                		this.optSettings.setIncrHeadway(Double.parseDouble(parts[1]));
 	                		
 	                	} else if (parts[0].equals("incrFare")){
 	                		this.optSettings.setIncrFare(Double.parseDouble(parts[1]));
@@ -82,8 +82,8 @@ public class OptSettingsReader {
 	                	} else if (parts[0].equals("incrDemand")){
 	                		this.optSettings.setIncrDemand(Integer.parseInt(parts[1]));
 	                		
-	                	} else if (parts[0].equals("stepsBusNumber")){
-		                	this.optSettings.setStepsBusNumber(Integer.parseInt(parts[1]));
+	                	} else if (parts[0].equals("stepsHeadway")){
+		                	this.optSettings.setStepsHeadway(Integer.parseInt(parts[1]));
 		                		
 	                	} else if (parts[0].equals("stepsFare")){
 	                		this.optSettings.setStepsFare(Integer.parseInt(parts[1]));

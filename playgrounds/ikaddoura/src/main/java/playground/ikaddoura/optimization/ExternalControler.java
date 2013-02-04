@@ -25,16 +25,25 @@ package playground.ikaddoura.optimization;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 import playground.ikaddoura.optimization.analysis.Operator;
 import playground.ikaddoura.optimization.analysis.OperatorUserAnalysis;
@@ -43,6 +52,9 @@ import playground.ikaddoura.optimization.io.OptSettings;
 import playground.ikaddoura.optimization.io.OptSettingsReader;
 import playground.ikaddoura.optimization.io.RndSeedsLoader;
 import playground.ikaddoura.optimization.io.TextFileWriter;
+import playground.ikaddoura.utils.pt.DeparturesGenerator;
+import playground.ikaddoura.utils.pt.ScheduleFromCorridor;
+import playground.ikaddoura.utils.pt.VehiclesGenerator;
 
 /**
  * @author benjamin and Ihab
@@ -59,32 +71,30 @@ class ExternalControler {
 	static int rndSeedNr;
 	static long randomSeed;
 	
-	static int incrBusNumber;
+	static double incrHeadway;
 	static double incrFare;
 	static int incrCapacity;
 	static int incrDemand;
 
-	static int startBusNumber;
+	static double startHeadway;
 	static double startFare;
 	static int startCapacity;
 	static int startDemand;
 	
-	static int stepsBusNumber;
+	static int stepsHeadway;
 	static int stepsCapacity;
 	static int stepsFare;
 	static int stepsDemand;
 	
 	static String settingsFile;
 
-	private Map<Integer, Map<Integer, String>> numberOfbuses2capacity2vehiclesFile = new HashMap<Integer, Map<Integer, String>>();
-	private Map<Integer, String> numberOfbuses2scheduleFile = new HashMap<Integer, String>();
+	private Map<Double, Map<Integer, String>> headway2capacity2vehiclesFile = new HashMap<Double, Map<Integer, String>>();
+	private Map<Double, String> headway2scheduleFile = new HashMap<Double, String>();
 	private Map<Integer, String> demand2populationFile = new HashMap<Integer, String>();
 	private SortedMap<Integer, IterationInfo> it2information = new TreeMap<Integer, IterationInfo>();
 	private TextFileWriter textWriter = new TextFileWriter();
 	private Operator operator = new Operator();
 	private Users users = new Users();
-
-	private double umlaufzeit;
 
 	public static void main(final String[] args) throws IOException {
 		
@@ -92,7 +102,7 @@ class ExternalControler {
 		if (args.length == 0){
 			settingsFile = "/Users/Ihab/Desktop/input/settingsFile.csv";
 			configFile = "/Users/Ihab/Desktop/input/config.xml";
-			outputPath = "/Users/Ihab/Desktop/output2";			
+			outputPath = "/Users/Ihab/Desktop/output";			
 		} else {
 			settingsFile = args[0];
 			configFile = args[1];
@@ -111,17 +121,17 @@ class ExternalControler {
 		OptSettingsReader settingsReader = new OptSettingsReader(settingsFile);
 		OptSettings settings = settingsReader.getOptSettings();
 		
-		incrBusNumber = settings.getIncrBusNumber();
+		incrHeadway = settings.getIncrHeadway();
 		incrFare = settings.getIncrFare();
 		incrCapacity = settings.getIncrCapacity();
 		incrDemand = settings.getIncrDemand();
 		
-		startBusNumber = settings.getStartBusNumber();
+		startHeadway = settings.getStartHeadway();
 		startFare = settings.getStartFare();
 		startCapacity = settings.getStartCapacity();
 		startDemand = settings.getStartDemand();
 
-		stepsBusNumber = settings.getStepsBusNumber();
+		stepsHeadway = settings.getStepsHeadway();
 		stepsFare = settings.getStepsFare();
 		stepsCapacity = settings.getStepsCapacity();
 		stepsDemand = settings.getStepsDemand();
@@ -141,13 +151,14 @@ class ExternalControler {
 		
 		double fare;
 		int capacity;
-		int numberOfBuses;
+		double headway;
 		int demand;
 		
 		demand = startDemand;
 		for (int demandStep = 0; demandStep <= stepsDemand ; demandStep++){
-			numberOfBuses = startBusNumber;
-			for (int busStep = 0; busStep <= stepsBusNumber ; busStep++){
+			
+			headway = startHeadway;
+			for (int busStep = 0; busStep <= stepsHeadway ; busStep++){
 					
 				capacity = startCapacity;
 				for (int capacityStep = 0; capacityStep <= stepsCapacity ; capacityStep++){
@@ -156,8 +167,8 @@ class ExternalControler {
 					for (int fareStep = 0; fareStep <= stepsFare ; fareStep++){
 
 						log.info("*********************************************************");
-						log.info("demand: " + demand + " // number of buses: " + numberOfBuses + " // fare: " + fare + " // capacity: " + capacity);
-						runInternalIteration(iterationCounter, demand, numberOfBuses, capacity, fare);
+						log.info("demand: " + demand + " // headway: " + headway + " // fare: " + fare + " // capacity: " + capacity);
+						runInternalIteration(iterationCounter, demand, headway, capacity, fare);
 						iterationCounter++;
 						
 						if (fareStep < stepsFare){
@@ -170,8 +181,8 @@ class ExternalControler {
 					}
 				}
 				
-				if (busStep < stepsBusNumber){
-					numberOfBuses = numberOfBuses + incrBusNumber;
+				if (busStep < stepsHeadway){
+					headway = headway + incrHeadway;
 				}					
 			}
 			
@@ -181,17 +192,17 @@ class ExternalControler {
 		}
 	}
 	
-	private void runInternalIteration(int iterationCounter, int demand, int numberOfBuses, int capacity, double fare) throws IOException {
+	private void runInternalIteration(int iterationCounter, int demand, double headway, int capacity, double fare) throws IOException {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
 
-		String directoryIt = outputPath + "/extITERS/" + iterationCounter + "_demand" + demand + "_buses" + numberOfBuses + "_fare" + fare + "_capacity" + capacity;
+		String directoryIt = outputPath + "/extITERS/" + iterationCounter + "_demand" + demand + "_headway" + headway + "_fare" + fare + "_capacity" + capacity;
 		File directory = new File(directoryIt);
 		directory.mkdirs();
 		scenario.getConfig().controler().setOutputDirectory(directoryIt);
 		
-		String scheduleFile = this.numberOfbuses2scheduleFile.get(numberOfBuses);
-		String vehiclesFile = this.numberOfbuses2capacity2vehiclesFile.get(numberOfBuses).get(capacity);
+		String scheduleFile = this.headway2scheduleFile.get(headway);
+		String vehiclesFile = this.headway2capacity2vehiclesFile.get(headway).get(capacity);
 		
 		if (this.demand2populationFile.isEmpty()) {
 			String populationFile = scenario.getConfig().plans().getInputFile();
@@ -223,7 +234,7 @@ class ExternalControler {
 		operator.setParametersForExtIteration(capacity);
 		users.setParametersForExtIteration(scenario);
 		
-		OperatorUserAnalysis analysis = new OperatorUserAnalysis(scenario, this.umlaufzeit/numberOfBuses);
+		OperatorUserAnalysis analysis = new OperatorUserAnalysis(scenario, headway);
 		analysis.readEvents();
 		
 		operator.calculateCosts(analysis);
@@ -232,8 +243,8 @@ class ExternalControler {
 		IterationInfo info = new IterationInfo();
 		info.setFare(fare);
 		info.setCapacity(capacity);
-		info.setNumberOfBuses(numberOfBuses);
-		info.setHeadway(this.umlaufzeit/numberOfBuses);
+		info.setNumberOfBuses(analysis.getNumberOfBusesFromEvents());
+		info.setHeadway(headway);
 		info.setOperatorCosts(operator.getCosts());
 		info.setOperatorRevenue(analysis.getRevenue());
 		info.setUsersLogSum(users.getLogSum());
@@ -284,40 +295,57 @@ class ExternalControler {
 			}
 		}
 		
-		
-		
-		int numberOfBuses = startBusNumber;
-		for (int busStep = 0; busStep <= stepsBusNumber ; busStep++){
+		double headway = startHeadway;
+		for (int headwayStep = 0; headwayStep <= stepsHeadway ; headwayStep++){
 			
 			log.info("Writing transitSchedule...");
-			String scheduleFile = dir + "transitSchedule_buses" + numberOfBuses + ".xml";
+			TransitSchedule schedule;
+			String scheduleFile = dir + "transitSchedule_headway" + headway + ".xml";
 			
-			ScheduleWriter sw = new ScheduleWriter(scenario.getNetwork());
-			sw.writeSchedule(numberOfBuses, scheduleFile);
+			ScheduleFromCorridor sfn = new ScheduleFromCorridor(scenario.getNetwork());
+			sfn.createTransitSchedule("bus", "bus", false, true, 8.3333333, 15);
+			schedule = sfn.getTransitSchedule();
+			
+			List<Id> lineIDs = new ArrayList<Id>();
+			lineIDs.addAll(schedule.getTransitLines().keySet());
+			
+			DeparturesGenerator dg = new DeparturesGenerator();
+			dg.addDepartures(schedule, lineIDs, headway, 4. * 3600., 24. * 3600., 600.);
+			
+			TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(schedule);
+			scheduleWriter.write(scheduleFile);
 			
 			int capacity = startCapacity;
 			for (int capacityStep = 0; capacityStep <= stepsCapacity ; capacityStep++){
 			
 				log.info("Writing transitVehicles...");
-				String vehiclesFile = dir + "transitVehicles_buses" + numberOfBuses + "_capacity" + capacity + ".xml";
-				VehicleWriter vw = new VehicleWriter();
-				vw.writeVehicles(numberOfBuses, capacity, vehiclesFile);
+				Vehicles vehicles;
+				String vehiclesFile = dir + "transitVehicles_headway" + headway + "_capacity" + capacity + ".xml";
 				
-				if (this.numberOfbuses2capacity2vehiclesFile.containsKey(numberOfBuses)){
-					this.numberOfbuses2capacity2vehiclesFile.get(numberOfBuses).put(capacity, vehiclesFile);
+				double length = (0.1184 * capacity + 5.2152) + 2.;	// see linear regression analysis in "BusCostsEstimations.xls", + 2m distance (before/behind)
+				int busSeats = (int) (capacity * 1.) + 1; // plus one seat because a seat for the driver is expected
+				int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
+				
+				VehiclesGenerator vg = new VehiclesGenerator();
+				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 1.5, 2., DoorOperationMode.parallel);
+				vehicles = vg.getVehicles();
+				
+				VehicleWriterV1 vehicleWriter = new VehicleWriterV1(vehicles);
+				vehicleWriter.writeFile(vehiclesFile);
+				
+				if (this.headway2capacity2vehiclesFile.containsKey(headway)){
+					this.headway2capacity2vehiclesFile.get(headway).put(capacity, vehiclesFile);
 					
 				} else {
 					Map<Integer, String> capacity2vehiclesFile = new HashMap<Integer, String>();
 					capacity2vehiclesFile.put(capacity, vehiclesFile);
-					this.numberOfbuses2capacity2vehiclesFile.put(numberOfBuses, capacity2vehiclesFile);
+					this.headway2capacity2vehiclesFile.put(headway, capacity2vehiclesFile);
 				}
 				capacity = capacity + incrCapacity;
 			}
 			
-			this.numberOfbuses2scheduleFile.put(numberOfBuses, scheduleFile);			
-			numberOfBuses = numberOfBuses + incrBusNumber;
-			
-			this.umlaufzeit = sw.getUmlaufzeit(); // TODO: get umlaufzeit from somewhere else!
+			this.headway2scheduleFile.put(headway, scheduleFile);			
+			headway = headway + incrHeadway;
 		}	
 		
 	}
@@ -348,9 +376,9 @@ class ExternalControler {
 
 	private void checkConsitency() {
 		
-		if (incrBusNumber==0 || stepsBusNumber==0){
-			incrBusNumber = 0;
-			stepsBusNumber = 0;
+		if (incrHeadway==0 || stepsHeadway==0){
+			incrHeadway = 0;
+			stepsHeadway = 0;
 			log.info("Constant headway");
 		}
 		if (incrFare==0 || stepsFare==0){

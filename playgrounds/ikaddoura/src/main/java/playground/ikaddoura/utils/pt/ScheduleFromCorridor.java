@@ -65,10 +65,21 @@ public class ScheduleFromCorridor {
 	
 	private double routeTravelTime;
 	private Map<Id, TransitRoute> routeId2transitRoute;
+	private Network network;
 	
 	private TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
 	private final TransitSchedule transitSchedule = sf.createTransitSchedule();
 
+	public ScheduleFromCorridor(String networkFile) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario).readFile(networkFile);
+		this.network = scenario.getNetwork();
+	}
+
+	public ScheduleFromCorridor(Network network) {
+		this.network = network;
+	}
+	
 	public TransitSchedule getTransitSchedule() {
 		return this.transitSchedule;
 	}
@@ -79,26 +90,19 @@ public class ScheduleFromCorridor {
 	 * based on the length of the corridor links.
 	 *
 	 */
-	public void createTransitSchedule(String networkFile, String linkMarker, String transitRouteMode, boolean isBlocking, boolean awaitDeparture, double scheduleSpeed_m_sec, double stopTime_sec) {
-		
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
-		Network network = scenario.getNetwork();
-		
-		Map<Id,List<Id>> routeID2linkIDs = getIDs(network, linkMarker);
-		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(network, routeID2linkIDs, isBlocking);
+	public void createTransitSchedule(String linkMarker, String transitRouteMode, boolean isBlocking, boolean awaitDeparture, double scheduleSpeed_m_sec, double stopTime_sec) {
+				
+		Map<Id,List<Id>> routeID2linkIDs = getIDs(this.network, linkMarker);
+		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(this.network, routeID2linkIDs, isBlocking);
 		Map<Id, NetworkRoute> routeId2networkRoute = getRouteId2NetworkRoute(routeID2linkIDs);
 		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(stopTime_sec, scheduleSpeed_m_sec, awaitDeparture, network, routeId2transitStopFacilities);
 
 		setRouteId2TransitRoute(transitRouteMode, routeId2networkRoute, routeId2TransitRouteStops);
-		setTransitLine(routeId2transitRoute);
+		setTransitLine(this.routeId2transitRoute);
 				
-		int lastStop = routeId2transitRoute.get(routeId1).getStops().size()-1;
-		this.routeTravelTime = routeId2transitRoute.get(routeId1).getStops().get(lastStop).getArrivalOffset();
+		int lastStop = this.routeId2transitRoute.get(routeId1).getStops().size()-1;
+		this.routeTravelTime = this.routeId2transitRoute.get(routeId1).getStops().get(lastStop).getArrivalOffset();
 		log.info("RouteTravelTime: "+ Time.writeTime(routeTravelTime, Time.TIMEFORMAT_HHMMSS));
-		
-//		this.umlaufzeit_sec = Math.round((routeTravelTime + this.pausenzeit) * 2.0);
-//		log.info("Umlaufzeit: "+ Time.writeTime(umlaufzeit_sec, Time.TIMEFORMAT_HHMMSS));
 	}
 
 	private Map<Id,List<Id>> getIDs(Network network, String linkMarker) {

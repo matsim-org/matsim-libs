@@ -27,12 +27,13 @@ public class TextFileWriter {
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION;NumberOfBuses;Headway (hh:mm:ss);Fare (AUD);Capacity (Pers/Veh);OperatorCosts (AUD);OperatorRevenue (AUD);OperatorProfit (AUD);UsersLogSum (AUD);Welfare (AUD);CarLegs;PtLegs;WalkLegs;AvgWaitingTimeAll (sec);AvgWaitingTimeNotMissing (sec);AvgWaitingTimeMissing (sec);NumberOfMissedBusTrips;NumberOfNotMissedBusTrips;MissedBusses;t0MinusTActSum (sec);avgT0MinusTActPerPerson (sec);avgT0MinusTActDivT0perTrip;NumberOfAgentsNoValidPlan";
+	    String zeile1 = "ITERATION;Headway (sec);NumberOfBuses;Headway (hh:mm:ss);Fare (AUD);Capacity (Pers/Veh);OperatorCosts (AUD);OperatorRevenue (AUD);OperatorProfit (AUD);UsersLogSum (AUD);Welfare (AUD);CarLegs;PtLegs;WalkLegs;AvgWaitingTimeAll (sec);AvgWaitingTimeNotMissing (sec);AvgWaitingTimeMissing (sec);NumberOfMissedBusTrips;NumberOfNotMissedBusTrips;MissedBusses;t0MinusTActSum (sec);avgT0MinusTActPerPerson (sec);avgT0MinusTActDivT0perTrip;NumberOfAgentsNoValidPlan";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
 	    for (Integer iteration : extIt2information.keySet()){
 	    	double numberOfBuses = extIt2information.get(iteration).getNumberOfBuses();
+	    	double headway_sec = extIt2information.get(iteration).getHeadway();
 	    	String headway = Time.writeTime(extIt2information.get(iteration).getHeadway(), Time.TIMEFORMAT_HHMMSS);
 	    	double costs = extIt2information.get(iteration).getOperatorCosts();
 	    	double revenue = extIt2information.get(iteration).getOperatorRevenue();
@@ -55,7 +56,7 @@ public class TextFileWriter {
 	    	double avgT0MinusTActDivT0perTrip = extIt2information.get(iteration).getAvgT0MinusTActDivT0PerTrip();
 	    	double numberOfAgentsNoValidPlan = extIt2information.get(iteration).getNoValidPlanScore();
 	    	
-	    	String zeile = iteration+ ";"+numberOfBuses+";"+headway+";"+fare+";"+capacity+";"+costs+ ";"+revenue+";"+operatorProfit+";"+userScoreSum+";"+totalScore+";"+carLegs+";"+ptLegs+";"+walkLegs+";"+avgWaitTimeAll+";" +avgWaitTimeNotMissing+";"+avgWaitTimeMissing+";"+waitingTimeMoreThanHeadway+";"+waitingTimeLessThanHeadway+";"+missedBusses+ ";" +t0MinustActSum+ ";" +avgT0MinustActPerPerson+ ";" +avgT0MinusTActDivT0perTrip+ ";" +numberOfAgentsNoValidPlan;
+	    	String zeile = iteration+ ";"+headway_sec+";"+numberOfBuses+";"+headway+";"+fare+";"+capacity+";"+costs+ ";"+revenue+";"+operatorProfit+";"+userScoreSum+";"+totalScore+";"+carLegs+";"+ptLegs+";"+walkLegs+";"+avgWaitTimeAll+";" +avgWaitTimeNotMissing+";"+avgWaitTimeMissing+";"+waitingTimeMoreThanHeadway+";"+waitingTimeLessThanHeadway+";"+missedBusses+ ";" +t0MinustActSum+ ";" +avgT0MinustActPerPerson+ ";" +avgT0MinusTActDivT0perTrip+ ";" +numberOfAgentsNoValidPlan;
 	
 	    	bw.write(zeile);
 	        bw.newLine();

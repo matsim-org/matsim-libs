@@ -29,24 +29,24 @@ package playground.ikaddoura.optimization.io;
  */
 public class OptSettings {
 	
-	private int incrBusNumber;
+	private double incrHeadway;
 	private double incrFare;
 	private int incrCapacity;
 	private int incrDemand;
-	private int startBusNumber;
+	private double startHeadway;
 	private double startFare;
 	private int startCapacity;
 	private int startDemand;
-	private int stepsBusNumber;
+	private int stepsHeadway;
 	private int stepsFare;
 	private int stepsCapacity;
 	private int stepsDemand;
 
-	public int getIncrBusNumber() {
-		return incrBusNumber;
+	public double getIncrHeadway() {
+		return incrHeadway;
 	}
-	public void setIncrBusNumber(int incrBusNumber) {
-		this.incrBusNumber = incrBusNumber;
+	public void setIncrHeadway(double incrHeadway) {
+		this.incrHeadway = incrHeadway;
 	}
 	public double getIncrFare() {
 		return incrFare;
@@ -60,11 +60,11 @@ public class OptSettings {
 	public void setIncrCapacity(int incrCapacity) {
 		this.incrCapacity = incrCapacity;
 	}
-	public int getStartBusNumber() {
-		return startBusNumber;
+	public double getStartHeadway() {
+		return startHeadway;
 	}
-	public void setStartBusNumber(int startBusNumber) {
-		this.startBusNumber = startBusNumber;
+	public void setStartHeadway(double startHeadway) {
+		this.startHeadway = startHeadway;
 	}
 	public double getStartFare() {
 		return startFare;
@@ -78,11 +78,11 @@ public class OptSettings {
 	public void setStartCapacity(int startCapacity) {
 		this.startCapacity = startCapacity;
 	}
-	public int getStepsBusNumber() {
-		return stepsBusNumber;
+	public int getStepsHeadway() {
+		return stepsHeadway;
 	}
-	public void setStepsBusNumber(int stepsBusNumber) {
-		this.stepsBusNumber = stepsBusNumber;
+	public void setStepsHeadway(int stepsHeadway) {
+		this.stepsHeadway = stepsHeadway;
 	}
 	public int getStepsFare() {
 		return stepsFare;
