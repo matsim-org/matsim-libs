@@ -254,7 +254,11 @@ public class ScenarioImpl implements Scenario {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getScenarioElement(java.lang.Class<? extends T> klass) {
-		return (T) this.elements.get(klass);
+		final Object maybeScenarioElement = this.elements.get(klass);
+		if (maybeScenarioElement == null) {
+			log.warn("the scenario element " + klass.toString() + " is not defined.  This may crash later ..." ) ;
+		}
+		return (T) maybeScenarioElement;
 	}
 
 }
