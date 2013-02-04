@@ -37,8 +37,20 @@
   			<enabled>false</enabled>
   		</snapshots>
   	</repository>
+		<repository>
+			<id>geotools</id>
+			<name>Geotools repository</name>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
   </repositories>
   <dependencies>
+  		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-epsg-hsql</artifactId>
+			<version>2.7.3</version>
+			<scope>runtime</scope>
+		</dependency>
+  
   	<dependency>
       <groupId>trove</groupId>
       <artifactId>trove</artifactId>
@@ -67,6 +79,6 @@
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
       <version>3.1-beta1</version>
-    </dependency>    
+    </dependency>
   </dependencies>
 </project>
