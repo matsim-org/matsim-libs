@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
@@ -60,6 +62,11 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -86,24 +93,27 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
 		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
 
-		// (FacilityPenalties not necessary when facility opening times are not used (see below))
+//		// (FacilityPenalties not necessary when facility opening times are not used)
+		
+		final LocationChoiceBestResponseContext lcContext = new LocationChoiceBestResponseContext(scenario) ;
 		
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true) ;
 
-		// set scoring function
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(config.locationchoice());
-		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
-		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
+		// set scoring function factory:
+		controler.setScoringFunctionFactory( new ScoringFunctionFactory(){
+			@Override
+			public ScoringFunction createNewScoringFunction(Plan plan) {		
+				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+				scoringFunctionAccumulator.addScoringFunction(new MixedActivityWOFacilitiesScoringFunction(plan, lcContext ) );
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), scenario.getNetwork()));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(lcContext.getParams()));
+				return scoringFunctionAccumulator;
+			}
+		}) ;
 
-		MixedScoringFunctionFactory scoringFunctionFactory =
-			new MixedScoringFunctionFactory(config, controler, scaleEpsilon, actTypeConverter, defineFlexibleActivities.getFlexibleTypes() );
-		scoringFunctionFactory.setUsingFacilityOpeningTimes(false) ;
-
-		controler.setScoringFunctionFactory(scoringFunctionFactory);
-		
-		// set locachoice strategy:
+		// add locachoice strategy factory:
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {

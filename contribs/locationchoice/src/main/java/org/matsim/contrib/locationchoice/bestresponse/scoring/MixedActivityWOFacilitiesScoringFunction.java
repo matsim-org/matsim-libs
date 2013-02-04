@@ -24,10 +24,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -52,6 +54,16 @@ public class MixedActivityWOFacilitiesScoringFunction extends CharyparNagelActiv
 		this.plan = plan ;
 	}
 	
+	public MixedActivityWOFacilitiesScoringFunction(Plan plan2, LocationChoiceBestResponseContext lcContext) {
+		this( plan2, 
+				lcContext.getParams(), 
+				((ScenarioImpl)lcContext.getScenario()).getActivityFacilities(), 
+				lcContext.getScenario().getConfig(),
+				lcContext.getFacilitiesKValues(), 
+				lcContext.getPersonsKValues(), 
+				lcContext.getScaleEpsilon() ) ;
+	}
+
 	@Override
 	public void finish() {		
 		

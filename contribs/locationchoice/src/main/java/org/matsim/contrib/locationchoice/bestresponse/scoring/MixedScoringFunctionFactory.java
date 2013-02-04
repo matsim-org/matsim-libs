@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice.bestresponse.scoring;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
@@ -59,6 +60,11 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.functio
 		this.createObjectAttributes(Long.parseLong(config.locationchoice().getRandomSeed()));
 	}
 	
+	public MixedScoringFunctionFactory(Config config2, Controler controler2,
+			LocationChoiceBestResponseContext lcContext) {
+		this( config2, controler2, lcContext.getScaleEpsilon(), lcContext.getConverter(), lcContext.getFlexibleTypes() ) ;
+	}
+
 	private void createObjectAttributes(long seed) {
 		this.facilitiesKValues = new ObjectAttributes();
 		this.personsKValues = new ObjectAttributes();
