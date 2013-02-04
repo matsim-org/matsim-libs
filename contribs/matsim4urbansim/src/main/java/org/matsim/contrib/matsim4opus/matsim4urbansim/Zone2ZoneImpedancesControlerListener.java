@@ -66,6 +66,7 @@ import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
  * 
  * improvements jan'13
  * - added pt for accessibility calculation
+ * - added vehicle travel distance output
  * 
  * @author nagel
  * @author thomas
@@ -114,7 +115,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		Scenario sc = controler.getScenario();
 		
 		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
-		double bikeSpeedMeterPerMinute = 250.; // corresponds to 15 km/h 
+		double bikeSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getBikeSpeed() * 60.; // corresponds to 15 km/h 
 
 		// init least cost path tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getLinkTravelTimes();
@@ -219,6 +220,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 										+ "," + bikeTravelTime_min				//bike travel times
 										+ "," + walkTravelTime_min				//walk travel times
 										+ "," + ptTravelTime_min				//pt travel times
+										+ "," + travelDistance_meter			//network distance
 										+ "," + trips);							//vehicle trips
 					travelDataWriter.newLine();
 				}
@@ -261,9 +263,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
 		
 		// Travel Data Header
-		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,vehicle_free_speed_travel_time:f4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,bike_time_in_minutes:f4,walk_time_in_minutes:f4,pt_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
-		
-		Logger.getLogger(this.getClass()).error( "add new fields (this message is shown until all travel data attributes are updated)" );
+		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,vehicle_free_speed_travel_time:f4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,bike_time_in_minutes:f4,walk_time_in_minutes:f4,pt_time_in_minutes:f4,vehicle_travel_distance_in_meter:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
+		// Logger.getLogger(this.getClass()).warn( "add new fields (this message is shown until all travel data attributes are updated)" );
 		travelDataWriter.newLine();
 		return travelDataWriter;
 	}
