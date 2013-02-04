@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SamplerI.java
+ * DefaultEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.sna.snowball.sim;
+package playground.johannes.studies.smallworld;
 
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.snowball.SampledGraphProjection;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
 
 /**
  * @author illenberger
  *
  */
-public interface Sampler<G extends Graph, V extends Vertex, E extends Edge> {
+public class DefaultEstimator implements PiEstimator {
 
-	public int getIteration();
+	@Override
+	public void update(SampledGraph graph) {
+	}
 
-	public int getNumSampledVertices();
+	@Override
+	public double probability(SampledVertex vertex) {
+		return 1;
+	}
 
-	public SampledGraphProjection<G, V, E> getSampledGraph();
+	@Override
+	public double probability(SampledVertex vertex, int iteration) {
+		return 1;
+	}
+
 }

@@ -36,7 +36,7 @@ import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
 import playground.johannes.sna.snowball.sim.IterationSampleAnalyzer;
-import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
 
@@ -51,7 +51,7 @@ public class RandomSampler {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		SparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/data/graphs/cond-mat-2005-gc.graphml");
 		
-		Sampler<SparseGraph, SparseVertex, SparseEdge> sampler = new Sampler<SparseGraph, SparseVertex, SparseEdge>();
+		SnowballSampler<SparseGraph, SparseVertex, SparseEdge> sampler = new SnowballSampler<SparseGraph, SparseVertex, SparseEdge>();
 		
 		sampler.setSeedGenerator(new RandomPartition<SparseVertex>(0.2));
 		

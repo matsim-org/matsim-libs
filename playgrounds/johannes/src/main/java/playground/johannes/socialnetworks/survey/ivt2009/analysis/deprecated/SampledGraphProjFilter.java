@@ -22,7 +22,6 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
@@ -30,6 +29,7 @@ import playground.johannes.sna.graph.analysis.VertexFilter;
 import playground.johannes.sna.snowball.SampledGraphProjection;
 import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
@@ -55,7 +55,7 @@ public class SampledGraphProjFilter<G extends Graph, V extends Vertex, E extends
 	
 	@Override
 	public SampledGraphProjection<G, V, E> apply(SampledGraphProjection<G, V, E> graph) {
-		Sampler<G, V, E> sampler = new Sampler<G, V, E>();
+		SnowballSampler<G, V, E> sampler = new SnowballSampler<G, V, E>();
 		sampler.setResponseGenerator(new ResponseFilter(graph));
 		sampler.setSeedGenerator(new SeedFilter(graph));
 		sampler.setListener(new Listener());

@@ -65,14 +65,17 @@ public class IntervalSampleAnalyzer extends SampleAnalyzer {
 	public boolean afterSampling(Sampler<?, ?, ?> sampler, SampledVertexDecorator<?> vertex) {
 		int n = sampler.getNumSampledVertices();
 		if (n > prevN) {
-			if (n < 1000) {
+			if (n < 200) {
+				if(n % 10 == 0)
+					dump(sampler);
+			} else if (n < 1000) {
 				if (n % 100 == 0)
 					dump(sampler);
 			} else if (n < 10000) {
 				if (n % 1000 == 0)
 					dump(sampler);
 			} else {
-				if (n % 10000 == 0)
+				if (n % 5000 == 0)
 					dump(sampler);
 			}
 		}

@@ -51,7 +51,7 @@ import playground.johannes.sna.snowball.sim.FinalSampleAnalyzer;
 import playground.johannes.sna.snowball.sim.IntervalSampleAnalyzer;
 import playground.johannes.sna.snowball.sim.IterationSampleAnalyzer;
 import playground.johannes.sna.snowball.sim.LogIntervalSampleAnalyzer;
-import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.SamplerListenerComposite;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.IterationTask;
@@ -152,7 +152,7 @@ public class SnowballSim {
 		/*
 		 * Init and run sampler.
 		 */
-		Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>(randomSeed);
+		SnowballSampler<Graph, Vertex, Edge> sampler = new SnowballSampler<Graph, Vertex, Edge>(randomSeed);
 		sampler.setSeedGenerator(seedGenerator);
 		sampler.setResponseGenerator(reponseGenerator);
 		sampler.setListener(listeners);

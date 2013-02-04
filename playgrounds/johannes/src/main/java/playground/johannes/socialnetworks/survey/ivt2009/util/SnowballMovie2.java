@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.opengis.kml._2.FolderType;
-
-
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.VertexDecorator;
 import playground.johannes.sna.graph.analysis.VertexFilter;
@@ -40,6 +38,7 @@ import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import playground.johannes.sna.snowball.SampledGraphProjection;
 import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.sna.snowball.sim.SamplerListenerComposite;
@@ -102,8 +101,8 @@ public class SnowballMovie2 {
 		/*
 		 * Prepare sampler
 		 */
-		Sampler<SocialSampledGraphProjection<?, ?, ?>, SocialSampledVertexDecorator<?>, SocialSampledEdgeDecorator<?>> sampler =
-			new Sampler<SocialSampledGraphProjection<?,?,?>, SocialSampledVertexDecorator<?>, SocialSampledEdgeDecorator<?>>();
+		SnowballSampler<SocialSampledGraphProjection<?, ?, ?>, SocialSampledVertexDecorator<?>, SocialSampledEdgeDecorator<?>> sampler =
+			new SnowballSampler<SocialSampledGraphProjection<?,?,?>, SocialSampledVertexDecorator<?>, SocialSampledEdgeDecorator<?>>();
 		sampler.setSeedGenerator(seedGenerator);
 		final TimeTagger timeTagger = new TimeTagger();
 		SamplerListenerComposite composite = new SamplerListenerComposite();

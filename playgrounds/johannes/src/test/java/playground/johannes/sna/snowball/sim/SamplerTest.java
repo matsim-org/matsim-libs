@@ -39,7 +39,7 @@ import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
-import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.util.TXTWriter;
 
 /**
@@ -59,7 +59,7 @@ public class SamplerTest extends TestCase {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(TestCaseUtils.getPackageInputDirecoty(getClass()) + "test.graphml.gz");
 
-		Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
+		SnowballSampler<Graph, Vertex, Edge> sampler = new SnowballSampler<Graph, Vertex, Edge>();
 		sampler.setSeedGenerator(new FixedSizeRandomPartition<Vertex>(1, 1));
 		sampler.run(graph);
 

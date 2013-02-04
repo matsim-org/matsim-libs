@@ -23,7 +23,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.GraphBuilder;
@@ -40,6 +39,7 @@ import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
@@ -101,7 +101,7 @@ public class NSensitivity {
 				
 				double k_mean = 0;
 				for (int i = 0; i < ENSEMBLE_SIZE; i++) {
-					Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
+					SnowballSampler<Graph, Vertex, Edge> sampler = new SnowballSampler<Graph, Vertex, Edge>();
 					sampler.setSeedGenerator(seedGen);
 					sampler.setListener(listener);
 					sampler.run(graph);

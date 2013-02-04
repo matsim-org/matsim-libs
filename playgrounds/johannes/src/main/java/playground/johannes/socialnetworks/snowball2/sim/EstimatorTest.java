@@ -58,6 +58,7 @@ import playground.johannes.sna.snowball.SampledEdgeDecorator;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
@@ -633,7 +634,7 @@ public class EstimatorTest implements SamplerListener {
 		
 		EstimatorTest counter = new EstimatorTest(graph);
 		for(int i = 0; i < nSims; i++) {
-			Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
+			SnowballSampler<Graph, Vertex, Edge> sampler = new SnowballSampler<Graph, Vertex, Edge>();
 			sampler.setSeedGenerator(new FixedSizeRandomPartition<Vertex>(seeds, (long) (Math.random() * nSims)));
 			sampler.setResponseGenerator(new RandomPartition<Vertex>(proba, (long) (Math.random() * nSims)));
 			counter.reset(graph, estimtype);

@@ -26,11 +26,6 @@
   </build>
   <repositories>
   	<repository>
-  		<id>geotools</id>
-  		<name>Geotools repository</name>
-  		<url>http://maven.geotools.fr/repository</url>
-  	</repository>
-  	<repository>
   		<id>geogoogle</id>
   		<name>geogoogle repo</name>
   		<url>http://www.cs.drexel.edu/~zl25/maven2/repo</url>

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -38,9 +39,10 @@ import playground.johannes.sna.graph.analysis.RandomPartition;
 import playground.johannes.sna.graph.analysis.VertexFilter;
 import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
-import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
-import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.IntervalSampleAnalyzer;
+import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.sna.snowball.sim.SamplerListenerComposite;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.util.MultiThreading;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.IterationTask;
@@ -90,8 +92,8 @@ public class ConnectionSim {
 		/*
 		 * Init estimators.
 		 */
-		PiEstimator estimator = new SimplePiEstimator(graph.getVertices().size());
-		Map<String, AnalyzerTask> analyzers = loadAnalyzers(graph, estimator);
+		PiEstimator estimator = new DefaultEstimator();
+		Map<String, AnalyzerTask> analyzers = loadAnalyzers(graph);
 		List<PiEstimator> estimators = new ArrayList<PiEstimator>(1);
 		estimators.add(estimator);
 		/*
@@ -101,7 +103,13 @@ public class ConnectionSim {
 		/*
 		 * Init sample analyzers.
 		 */
-		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, estimators, output);
+		String type = config.getParam(MODULENAME, "sampler");
+		int dummySeeds = numSeeds;
+		SamplerListener listener;
+		if("egocentric".equals(type))
+			listener = new IntervalSampleAnalyzer(analyzers, estimators, output);
+		else
+			listener = new ConnectionSampleAnalyzer(dummySeeds, analyzers, estimators, output);
 		/*
 		 * Init sampler listener.
 		 */
@@ -109,16 +117,23 @@ public class ConnectionSim {
 		/*
 		 * Add analyzers to listener.
 		 */
-		listeners.addComponent(connectionAnalyzer);
+		listeners.addComponent(listener);
 		/*
 		 * Init and run sampler.
 		 */
-		Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>(randomSeed);
-		sampler.setSeedGenerator(seedGenerator);
-		sampler.setResponseGenerator(reponseGenerator);
-		sampler.setListener(listeners);
-		
-		sampler.run(graph);
+		if ("snowball".equals(type)) {
+			SnowballSampler<Graph, Vertex, Edge> sampler = new SnowballSampler<Graph, Vertex, Edge>(randomSeed);
+			sampler.setSeedGenerator(seedGenerator);
+			sampler.setResponseGenerator(reponseGenerator);
+			sampler.setListener(listeners);
+			sampler.run(graph);
+		} else if("egocentric".equals(type)) {
+			EgoCentricSampler<Graph, Vertex, Edge> sampler = new EgoCentricSampler<Graph, Vertex, Edge>();
+			sampler.setListiner(listeners);
+			sampler.run(graph, responseRate, numSeeds, new Random(randomSeed));
+		} else {
+			new RuntimeException("Unknown sampling design.");
+		}
 	}
 
 	public static Config loadConfig(String file) {
@@ -134,7 +149,7 @@ public class ConnectionSim {
 		return reader.readGraph(file);
 	}
 	
-	private static Map<String, AnalyzerTask> loadAnalyzers(Graph graph, PiEstimator estimator) {
+	private static Map<String, AnalyzerTask> loadAnalyzers(Graph graph) {
 		Map<String, AnalyzerTask> analyzers = new HashMap<String, AnalyzerTask>();
 		AnalyzerTaskComposite composite = new AnalyzerTaskComposite();
 		composite.addTask(new GraphSizeTask());

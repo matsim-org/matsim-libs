@@ -24,8 +24,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -40,6 +40,7 @@ import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.studies.snowball.SnowballSim;
@@ -83,7 +84,7 @@ public class NEstimTest {
 		for(int i = 0; i < nBurnin; i++) {
 			pObsListener.reset();
 			
-			Sampler<Graph, Vertex, Edge> sampler = newSampler(graph, seeds, proba, random);
+			SnowballSampler<Graph, Vertex, Edge> sampler = newSampler(graph, seeds, proba, random);
 			sampler.setListener(pObsListener);
 			sampler.run(graph);
 			
@@ -107,7 +108,7 @@ public class NEstimTest {
 		for(int i = 0; i < nSims; i++) {
 			nEstimListener.reset(graph.getVertices().size());
 			
-			Sampler<Graph, Vertex, Edge> sampler = newSampler(graph, seeds, proba, random);
+			SnowballSampler<Graph, Vertex, Edge> sampler = newSampler(graph, seeds, proba, random);
 			sampler.setListener(nEstimListener);
 			sampler.run(graph);
 			
@@ -151,8 +152,8 @@ public class NEstimTest {
 		logger.info("Done.");
 	}
 	
-	private static Sampler<Graph, Vertex, Edge> newSampler(Graph graph, int seeds, double proba, Random random) {
-		Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>();
+	private static SnowballSampler<Graph, Vertex, Edge> newSampler(Graph graph, int seeds, double proba, Random random) {
+		SnowballSampler<Graph, Vertex, Edge> sampler = new SnowballSampler<Graph, Vertex, Edge>();
 		sampler.setSeedGenerator(new FixedSizeRandomPartition<Vertex>(seeds, random.nextLong()));
 		sampler.setResponseGenerator(new RandomPartition<Vertex>(proba, random.nextLong()));
 		

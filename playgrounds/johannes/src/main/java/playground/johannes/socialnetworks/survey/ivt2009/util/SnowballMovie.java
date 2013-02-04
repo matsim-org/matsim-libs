@@ -36,7 +36,7 @@ import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.sna.graph.spatial.io.KMLPartitions;
 import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
-import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLTimeSpan;
 import playground.johannes.socialnetworks.snowball2.spatial.io.TimeTagger2;
 
@@ -58,7 +58,7 @@ public class SnowballMovie {
 		/*
 		 * Run sampler
 		 */
-		Sampler<SpatialGraph, SpatialVertex, SpatialEdge> sampler = new Sampler<SpatialGraph, SpatialVertex, SpatialEdge>();
+		SnowballSampler<SpatialGraph, SpatialVertex, SpatialEdge> sampler = new SnowballSampler<SpatialGraph, SpatialVertex, SpatialEdge>();
 		sampler.setResponseGenerator(new RandomPartition(1, 0));
 		sampler.setSeedGenerator(new FixedSizeRandomPartition(10, 0));
 //		final IterationTimeTagger tagger = new IterationTimeTagger();

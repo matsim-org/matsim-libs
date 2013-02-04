@@ -40,6 +40,7 @@ import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.sna.snowball.analysis.EstimatedDegree;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
@@ -83,7 +84,7 @@ public class SnowballSample {
 		Set<SimpleFeature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
 		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
 		
-		Sampler<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> sampler = new Sampler<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>();
+		SnowballSampler<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> sampler = new SnowballSampler<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>();
 		
 		sampler.setBuilder(new SpatialSampledGraphProjectionBuilder<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>());
 		sampler.setSeedGenerator(new SeedGenerator(geometry));

@@ -33,6 +33,7 @@ import playground.johannes.sna.graph.analysis.RandomPartition;
 import playground.johannes.sna.graph.analysis.VertexFilter;
 import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.sim.SnowballSampler;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.studies.mcmc.KeyMatrix;
@@ -75,7 +76,7 @@ public class GrowthSim {
 					VertexFilter<Vertex> seedGenerator = new FixedSizeRandomPartition<Vertex>(seed, randomSeed);
 					VertexFilter<Vertex> reponseGenerator = new RandomPartition<Vertex>(alpha / 100.0, randomSeed);
 
-					Sampler<Graph, Vertex, Edge> sampler = new Sampler<Graph, Vertex, Edge>(randomSeed);
+					SnowballSampler<Graph, Vertex, Edge> sampler = new SnowballSampler<Graph, Vertex, Edge>(randomSeed);
 					sampler.setSeedGenerator(seedGenerator);
 					sampler.setResponseGenerator(reponseGenerator);
 					sampler.setListener(new Listener());
