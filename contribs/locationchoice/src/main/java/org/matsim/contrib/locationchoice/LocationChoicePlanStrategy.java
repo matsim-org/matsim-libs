@@ -3,6 +3,7 @@ package org.matsim.contrib.locationchoice;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.replanning.PlanStrategy;
@@ -22,6 +23,10 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 //	private static int locachoiceWrnCnt;
 	
 	public LocationChoicePlanStrategy(Scenario scenario) {
+		if ( LocationChoiceConfigGroup.Algotype.bestResponse==scenario.getConfig().locationchoice().getAlgorithm() ) {
+			throw new RuntimeException("best response location choice not supported as part of LocationChoicePlanStrategy. " +
+					"Use BestReplyLocationChoicePlanStrategy instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13") ;
+		}
 		String planSelector = scenario.getConfig().locationchoice().getPlanSelector();
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector());
@@ -34,15 +39,6 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 		}
 		delegate.addStrategyModule(new LocationChoice(scenario));
 		delegate.addStrategyModule(new ReRoute(scenario));
-//		delegate.addStrategyModule(new TimeAllocationMutator(scenario.getConfig()));
-//		if ( locachoiceWrnCnt < 1 ) {
-//			locachoiceWrnCnt ++ ;
-//			Logger.getLogger("dummy").warn("I don't think that using TimeAllocationMutator as last step of locationchoice" +
-//					" (or of any strategy, for that matter) makes sense. --> please remove from code.   kai, oct'12") ;
-//			if (scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals(VspExperimentalConfigGroup.ABORT) ) {
-//				throw new RuntimeException("will not use locachoice followed by TimeMutation within VSP. Aborting ...") ;
-//			}
-//		}
 	}
 	
 	@Override

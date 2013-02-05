@@ -118,7 +118,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
-				return new LocationChoicePlanStrategy(scenario2) ;
+				return new BestReplyLocationChoicePlanStrategy(lcContext) ;
 			}
 		});
 		
@@ -163,7 +163,9 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			scenario.addScenarioElement( facPenalties );
 		}
 
-		// controler:
+		final LocationChoiceBestResponseContext lcContext = new LocationChoiceBestResponseContext(scenario) ;
+		
+		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true) ;
 
@@ -182,7 +184,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
-				return new LocationChoicePlanStrategy(scenario2) ;
+				return new BestReplyLocationChoicePlanStrategy(lcContext) ;
 			}
 		});
 

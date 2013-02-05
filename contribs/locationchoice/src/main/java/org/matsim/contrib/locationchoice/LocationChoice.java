@@ -80,6 +80,11 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 	public LocationChoice(Scenario scenario) {
 		super(scenario.getConfig().global());
+		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(scenario.getConfig().locationchoice().getAlgorithm()) ) {
+			throw new RuntimeException("best response location choice not supported as part of LocationChoice. " +
+					"Use BestReplyLocationChoice instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13") ;
+			// yyyyyy the best reply code pieces can be removed from this here.  kai, feb'13
+		}
 		this.scenario = scenario;
 		initLocal();
 	}
