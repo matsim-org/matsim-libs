@@ -121,7 +121,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 				return new LocationChoicePlanStrategy(scenario2) ;
 			}
 		});
-
+		
 		// this is here only to switch on otfvis if needed:
 //		controler.setMobsimFactory(new FactoryForMobsimWithOTFVis() ) ;
 

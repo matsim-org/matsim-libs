@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -42,6 +43,11 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -80,12 +86,33 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	private final boolean writeAnalysisFile;
 	private final CadytsPtPlanChanger cadytsPtPlanChanger;
 	private final Set<Id> calibratedLines;
-
+	private PtPlanToPlanStepBasedOnEvents ptStep ;
 	public static final String CADYTS_CORRECTION = "cadytsCorrection";
+	
+	public static enum Mode { asPlanStrategy, inScoringFunction } ;
+	private Mode mode = Mode.asPlanStrategy ;
 
 	public CadytsPtPlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTOR, needed for reflection-based instantiation
 		this( controler.getScenario(), controler.getEvents());
 		controler.addControlerListener(this);
+
+//		switch ( mode ) { 
+//		case asPlanStrategy:
+//			// see below
+//			break ;
+//		case inScoringFunction:
+//			controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
+//				@Override
+//				public ScoringFunction createNewScoringFunction(Plan plan) {
+//					ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+//					scoringFunctionAccumulator.addScoringFunction(new CadytsPtScoring(plan,ptStep,calibrator) );
+//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), controler.getScenario().getNetwork()));
+//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(lcContext.getParams()));
+//					return scoringFunctionAccumulator;
+//				}}) ;
+//		}
+		// starting point to also make this working by modifying the scores.  Not yet working.  kai, feb'2013
+			
 	}
 
 	/**
@@ -106,7 +133,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer, this.countsScaleFactor);
 
 		// this collects events and generates cadyts plans from it
-		PtPlanToPlanStepBasedOnEvents ptStep = new PtPlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedLines());
+		this.ptStep = new PtPlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedLines());
 		events.addHandler(ptStep);
 
 		String occupancyCountsFilename = config.ptCounts().getOccupancyCountsFileName();
@@ -115,10 +142,18 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		// build the calibrator. This is a static method, and in consequence has no side effects
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.occupCounts /*, cadytsConfig.getTimeBinSize()*/);
 		
-		// finally, we create the PlanStrategy, with the cadyts-based plan selector:
 		this.cadytsPtPlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
-		this.delegate = new PlanStrategyImpl(this.cadytsPtPlanChanger);
-
+		// (this is up here to satisfy the compiler re the final variable)
+		
+		switch ( mode ) { 
+		case asPlanStrategy:
+			// finally, we create the PlanStrategy, with the cadyts-based plan selector:
+			this.delegate = new PlanStrategyImpl(this.cadytsPtPlanChanger);
+			break ;
+		case inScoringFunction:
+			throw new RuntimeException("wrong constructor for this execution path. aborting ...") ;
+		}
+			
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 

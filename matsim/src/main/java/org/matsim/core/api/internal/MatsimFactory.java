@@ -22,6 +22,13 @@ package org.matsim.core.api.internal;
 
 /**
  * marker interface
+ * <p/>
+ * Design comments:<ul>
+ * <li>For the time being, factories should try to have as little state as possible.  Optimally, they have no state at all, i.e. everything
+ * is done in the "create" method.
+ * <li> (The above statement does not apply to anonymous implementations of factory interfaces ... since they can be considered ad-hoc
+ * scripts where the sequence of actions is, in fact, determined by the script.)
+ * </ul>
  * 
  * @author nagel
  *
