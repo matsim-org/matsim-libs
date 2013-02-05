@@ -114,6 +114,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		}) ;
 
 		// add locachoice strategy factory:
+		// yyyyyy choice context still needs to be inserted into this here!!! kai, feb'13
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
