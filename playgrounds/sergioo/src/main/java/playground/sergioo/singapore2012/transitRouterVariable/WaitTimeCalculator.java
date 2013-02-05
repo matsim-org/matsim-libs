@@ -21,8 +21,8 @@
 package playground.sergioo.singapore2012.transitRouterVariable;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -57,10 +57,10 @@ public class WaitTimeCalculator implements WaitTime, AgentDepartureEventHandler,
 
 	//Attributes
 	private final double timeSlot;
-	private final Map<String, WaitTimeData> waitTimes = new HashMap<String, WaitTimeData>();
-	private final Map<String, double[]> cacheScheduledWaitTimes = new HashMap<String, double[]>();
-	private final Map<Id, Double> agentsWaitingData = new HashMap<Id, Double>();
-	private final Map<Id, Integer> agentsCurrentLeg = new HashMap<Id, Integer>();
+	private final Map<String, WaitTimeData> waitTimes = new ConcurrentHashMap<String, WaitTimeData>();
+	private final Map<String, double[]> cacheScheduledWaitTimes = new ConcurrentHashMap<String, double[]>();
+	private final Map<Id, Double> agentsWaitingData = new ConcurrentHashMap<Id, Double>();
+	private final Map<Id, Integer> agentsCurrentLeg = new ConcurrentHashMap<Id, Integer>();
 	private final Population population;
 
 	//Constructors
@@ -152,26 +152,26 @@ public class WaitTimeCalculator implements WaitTime, AgentDepartureEventHandler,
 		}
 	}
 	
-//	@Override
-//	public void handleEvent(AdditionalTeleportationDepartureEvent event) {
-//		Double startWaitingTime = agentsWaitingData.get(event.getAgentId());
-//		if(startWaitingTime!=null) {
-//			int legs = 0, currentLeg = agentsCurrentLeg.get(event.getAgentId());
-//			PLAN_ELEMENTS:
-//			for(PlanElement planElement:population.getPersons().get(event.getAgentId()).getSelectedPlan().getPlanElements())
-//				if(planElement instanceof Leg) {
-//					if(currentLeg==legs) {
-//						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-//						String key = "("+leg[2]+")["+leg[3]+"]"+leg[1];
-//						waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
-//						agentsWaitingData.remove(event.getAgentId());
-//						break PLAN_ELEMENTS;
-//					}
-//					else
-//						legs++;
-//				}
-//		}
-//	}
+	/*@Override
+	public void handleEvent(AdditionalTeleportationDepartureEvent event) {
+		Double startWaitingTime = agentsWaitingData.get(event.getAgentId());
+		if(startWaitingTime!=null) {
+			int legs = 0, currentLeg = agentsCurrentLeg.get(event.getAgentId());
+			PLAN_ELEMENTS:
+			for(PlanElement planElement:population.getPersons().get(event.getAgentId()).getSelectedPlan().getPlanElements())
+				if(planElement instanceof Leg) {
+					if(currentLeg==legs) {
+						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
+						String key = "("+leg[2]+")["+leg[3]+"]"+leg[1];
+						waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+						agentsWaitingData.remove(event.getAgentId());
+						break PLAN_ELEMENTS;
+					}
+					else
+						legs++;
+				}
+		}
+	}*/
 	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
