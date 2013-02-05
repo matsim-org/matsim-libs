@@ -26,4 +26,3 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  */
 public interface GroupPlansAlgorithm extends GenericPlanAlgorithm<GroupPlans> {
 }
-

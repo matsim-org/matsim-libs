@@ -23,7 +23,6 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**

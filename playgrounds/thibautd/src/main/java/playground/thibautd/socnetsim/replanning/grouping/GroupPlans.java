@@ -44,7 +44,9 @@ public class GroupPlans {
 	private final Collection<Plan> individualPlans;
 
 	public GroupPlans() {
-		this( Collections.EMPTY_LIST , Collections.EMPTY_LIST );
+		this(
+				Collections.<JointPlan>emptyList(),
+				Collections.<Plan>emptyList() );
 	}
 
 	public GroupPlans(

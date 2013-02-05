@@ -61,7 +61,9 @@ public class JointPlansXmlWriter extends MatsimXmlWriter {
 	private void write(final String file) {
 		final Counter counter = new Counter( "[JointPlansXmlWriter] dumped jointPlan # " );
 		openFile( file );
-		writeStartTag( ROOT_TAG , Collections.EMPTY_LIST );
+		writeStartTag(
+				ROOT_TAG,
+				Collections.<Tuple<String, String>>emptyList() );
 		for (JointPlan jp : jointPlansSet) {
 			counter.incCounter();
 			writeJointPlan( jp );
@@ -80,7 +82,9 @@ public class JointPlansXmlWriter extends MatsimXmlWriter {
 	}
 
 	private void startJointPlan() {
-		writeStartTag( JOINT_PLAN_TAG , Collections.EMPTY_LIST );
+		writeStartTag(
+				JOINT_PLAN_TAG,
+				Collections.<Tuple<String, String>>emptyList() );
 	}
 
 	private void writeIndividualPlan(final Plan plan) {

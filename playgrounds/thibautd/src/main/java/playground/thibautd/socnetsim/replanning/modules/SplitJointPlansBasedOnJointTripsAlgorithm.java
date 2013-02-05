@@ -131,7 +131,7 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GroupPlansAlgo
 			return Collections.singleton( r.getDriverId() );
 		}
 
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	//private static void unregisterJointPlans(final GroupPlans plans) {

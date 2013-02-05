@@ -190,7 +190,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				forbiden,
 				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
-				Collections.EMPTY_SET,
+				Collections.<Id>emptySet(),
 				null,
 				Double.NEGATIVE_INFINITY);
 
@@ -237,7 +237,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				groupPlan,
 				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
-				Collections.EMPTY_SET);
+				Collections.<Id> emptySet());
 	}
 
 	private boolean searchForCombinationsWithoutForbiddenPlans(
@@ -251,7 +251,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		final List<PersonRecord> remainingPersons =
 			personsStillToAllocate.size() > 1 ?
 			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
-			Collections.EMPTY_LIST;
+			Collections.<PersonRecord> emptyList();
 
 		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 
@@ -332,7 +332,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		final List<PersonRecord> remainingPersons =
 			personsStillToAllocate.size() > 1 ?
 			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
-			Collections.EMPTY_LIST;
+			Collections.<PersonRecord> emptyList();
 		final Set<Id> newAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
 		newAllocatedPersons.add( currentPerson.person.getId() );
 
@@ -518,7 +518,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		final Collection<Id> idsInJpToSelect =
 			jointPlanToSelect == null ?
-			Collections.EMPTY_SET :
+			Collections.<Id> emptySet() :
 			jointPlanToSelect.getIndividualPlans().keySet();
 
 		for (PlanRecord plan : record.plans) {
