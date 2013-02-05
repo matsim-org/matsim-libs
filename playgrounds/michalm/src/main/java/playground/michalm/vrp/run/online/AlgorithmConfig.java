@@ -167,19 +167,19 @@ public class AlgorithmConfig
     public static final AlgorithmConfig[] ALL = {//
     NOS_STRAIGHT_LINE,//
             NOS_TRAVEL_DISTANCE,//
-            NOS_FREE_FLOW,//
+            // NOS_FREE_FLOW,//
             NOS_24_H,//
             NOS_15_MIN,//
-            OTS_REQ_FREE_FLOW,//
+            // OTS_REQ_FREE_FLOW,//
             OTS_REQ_24_H,//
             OTS_REQ_15_MIN,//
-            OTS_DRV_FREE_FLOW,//
+            // OTS_DRV_FREE_FLOW,//
             OTS_DRV_24_H,//
             OTS_DRV_15_MIN,//
-            RES_REQ_FREE_FLOW,//
+            // RES_REQ_FREE_FLOW,//
             RES_REQ_24_H,//
             RES_REQ_15_MIN,//
-            RES_DRV_FREE_FLOW,//
+            // RES_DRV_FREE_FLOW,//
             RES_DRV_24_H,//
             RES_DRV_15_MIN //
     };

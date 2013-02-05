@@ -25,6 +25,7 @@ import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.matsim.core.gbl.MatsimRandom;
 
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
 
 
 public class MultipleSingleIterOnlineDvrpLauncher
@@ -45,16 +46,24 @@ public class MultipleSingleIterOnlineDvrpLauncher
     }
 
 
-    public void run(int configIdx, int runs)
+    public void run(int configIdx, int runs, PrintWriter pw)
         throws IOException
     {
         launcher.algorithmConfig = AlgorithmConfig.ALL[configIdx];
 
-        SummaryStatistics travelTime = new SummaryStatistics();
-        SummaryStatistics travelTimeOccupied = new SummaryStatistics();
-        SummaryStatistics travelTimeIdle = new SummaryStatistics();
-        SummaryStatistics waitTime = new SummaryStatistics();
-        SummaryStatistics totalTime = new SummaryStatistics();
+        // taxiPickupDriveTime
+        // taxiDeliveryDriveTime
+        // taxiServiceTime
+        // taxiWaitTime
+        // taxiOverTime
+        // passengerWaitTime
+
+        SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
+        SummaryStatistics taxiDeliveryDriveTime = new SummaryStatistics();
+        SummaryStatistics taxiServiceTime = new SummaryStatistics();
+        SummaryStatistics taxiWaitTime = new SummaryStatistics();
+        SummaryStatistics taxiOverTime = new SummaryStatistics();
+        SummaryStatistics passengerWaitTime = new SummaryStatistics();
 
         for (int i = 0; i < runs; i++) {
             MatsimRandom.reset(RANDOM_SEEDS[i]);
@@ -62,31 +71,46 @@ public class MultipleSingleIterOnlineDvrpLauncher
             TaxiEvaluation evaluation = (TaxiEvaluation)new TaxiEvaluator()
                     .evaluateVrp(launcher.data.getVrpData());
 
-            travelTime.addValue(evaluation.getTravelCost());
-            travelTimeOccupied.addValue(evaluation.getTravelCostWithPassenger());
-            travelTimeIdle.addValue(evaluation.getTravelCostWithoutPassenger());
-            waitTime.addValue(evaluation.getReqTimeViolations());
-            totalTime.addValue(evaluation.getValue());
+            taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());
+            taxiDeliveryDriveTime.addValue(evaluation.getTaxiDeliveryDriveTime());
+            taxiServiceTime.addValue(evaluation.getTaxiServiceTime());
+            taxiWaitTime.addValue(evaluation.getTaxiWaitTime());
+            taxiOverTime.addValue(evaluation.getTaxiOverTime());
+            passengerWaitTime.addValue(evaluation.getPassengerWaitTime());
         }
 
-        PrintWriter pw = new PrintWriter(launcher.dirName + "stats_" + configIdx + "_" + runs
-                + ".out");
-        pw.println("---\tTOTAL-TT\tOCC-TT\tIDLE-TT\tWAIT-T\tTOTAL-T");
+        pw.println(configIdx + "\t" + TaxiEvaluation.HEADER);
 
-        pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n", travelTime.getMean(),
-                travelTimeOccupied.getMean(), travelTimeIdle.getMean(), waitTime.getMean(),
-                totalTime.getMean());
-        pw.printf("Min\t%d\t%d\t%d\t%d\t%d\n", (int)travelTime.getMin(),
-                (int)travelTimeOccupied.getMin(), (int)travelTimeIdle.getMin(),
-                (int)waitTime.getMin(), (int)totalTime.getMin());
-        pw.printf("Max\t%d\t%d\t%d\t%d\t%d\n", (int)travelTime.getMax(),
-                (int)travelTimeOccupied.getMax(), (int)travelTimeIdle.getMax(),
-                (int)waitTime.getMax(), (int)totalTime.getMax());
-        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n", travelTime.getStandardDeviation(),
-                travelTimeOccupied.getStandardDeviation(), travelTimeIdle.getStandardDeviation(),
-                waitTime.getStandardDeviation(), totalTime.getStandardDeviation());
+        pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+                taxiPickupDriveTime.getMean(),//
+                taxiDeliveryDriveTime.getMean(),//
+                taxiServiceTime.getMean(),//
+                taxiWaitTime.getMean(),//
+                taxiOverTime.getMean(),//
+                passengerWaitTime.getMean());
+        pw.printf("Min\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+                (int)taxiPickupDriveTime.getMin(),//
+                (int)taxiDeliveryDriveTime.getMin(),//
+                (int)taxiServiceTime.getMin(),//
+                (int)taxiWaitTime.getMin(),//
+                (int)taxiOverTime.getMin(),//
+                (int)passengerWaitTime.getMin());
+        pw.printf("Max\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+                (int)taxiPickupDriveTime.getMax(),//
+                (int)taxiDeliveryDriveTime.getMax(),//
+                (int)taxiServiceTime.getMax(),//
+                (int)taxiWaitTime.getMax(),//
+                (int)taxiOverTime.getMax(),//
+                (int)passengerWaitTime.getMax());
+        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
+                taxiPickupDriveTime.getStandardDeviation(),//
+                taxiDeliveryDriveTime.getStandardDeviation(),//
+                taxiServiceTime.getStandardDeviation(),//
+                taxiWaitTime.getStandardDeviation(),//
+                taxiOverTime.getStandardDeviation(),//
+                passengerWaitTime.getStandardDeviation());
 
-        pw.close();
+        pw.println();
     }
 
 
@@ -118,13 +142,17 @@ public class MultipleSingleIterOnlineDvrpLauncher
         MultipleSingleIterOnlineDvrpLauncher multiLauncher = new MultipleSingleIterOnlineDvrpLauncher(
                 paramFile);
 
+        PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats.out");
+
         if (configIdx == -1) {
             for (int i = 0; i < AlgorithmConfig.ALL.length; i++) {
-                multiLauncher.run(i, runs);
+                multiLauncher.run(i, runs, pw);
             }
         }
         else {
-            multiLauncher.run(configIdx, runs);
+            multiLauncher.run(configIdx, runs, pw);
         }
+        
+        pw.close();
     }
 }

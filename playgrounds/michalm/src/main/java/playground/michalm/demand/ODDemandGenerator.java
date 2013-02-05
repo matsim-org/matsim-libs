@@ -106,17 +106,17 @@ public class ODDemandGenerator
                     startAct.setEndTime((int) (startTime + k * timeStep + uniform.nextDoubleFromTo(
                             0, timeStep)));
 
+                    plan.addLeg(pf.createLeg(TransportMode.car));
+
+                    Coord dCoord = getRandomCoordInZone(dZone);
+                    createActivity(plan, "dummy", dCoord);
+
+                    createAndInitPerson(plan);
+
                     if (isInternalFlow && taxiProbability > 0
                             && uniform.nextDoubleFromTo(0, 1) < taxiProbability) {
                         taxiCustomers.add(plan.getPerson());
                     }
-
-                    plan.addLeg(pf.createLeg(TransportMode.car));
-
-                    Coord dCoord = getRandomCoordInZone(dZone);
-                    /*Activity endAct = */createActivity(plan, "dummy", dCoord);
-
-                    createAndInitPerson(plan);
                 }
             }
         }

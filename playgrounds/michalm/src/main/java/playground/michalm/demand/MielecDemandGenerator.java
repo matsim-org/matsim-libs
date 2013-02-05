@@ -26,6 +26,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import pl.poznan.put.util.array2d.Array2DUtils;
+
 
 public class MielecDemandGenerator
 {
@@ -46,16 +48,31 @@ public class MielecDemandGenerator
         // double flowCoeff = 1;
         // double taxiProbability = 0;
 
-        double[] hours = { 1, 1, 1, 1, 1, 1, 1 };
+        double hours = 1;
         double[] flowCoeff = { 0.2, 0.2, 0.4, 0.8, 0.4, 0.2, 0.2 };
-        double[] taxiProbability = { 0, 0.07, 0.07, 0.07, 0.07, 0.07, 0 };
+        double taxiProbability = 0.07;
 
         ODDemandGenerator dg = new ODDemandGenerator(networkFileName, zonesXMLFileName,
                 zonesShpFileName, idField);
 
         double[][] odMatrix = dg.readODMatrix(odMatrixFileName);
+        double[][] odMatrixTransposed = Array2DUtils.transponse(odMatrix);
 
-        dg.generateMultiplePeriods(odMatrix, hours, flowCoeff, taxiProbability);
+        double startTime = 0;
+        
+        //morning peak
+        for (int i = 0; i < flowCoeff.length; i++) {
+            dg.generateSinglePeriod(odMatrix, hours, flowCoeff[i], taxiProbability, startTime);
+            startTime += 3600 * hours;
+        }
+        
+        //symmetric evening peak
+        for (int i = 0; i < flowCoeff.length; i++) {
+            dg.generateSinglePeriod(odMatrixTransposed, hours, flowCoeff[i], taxiProbability,
+                    startTime);
+            startTime += 3600 * hours;
+        }
+
         dg.write(plansFileName);
         dg.writeTaxiCustomers(taxiFileName);
     }
