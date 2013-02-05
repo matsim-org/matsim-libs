@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointPlanAlgorithm.java
+ * GenericStrategyModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.replanning;
+package playground.thibautd.socnetsim.replanning;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
-import playground.thibautd.socnetsim.population.JointPlan;
+import java.util.Collection;
 
 /**
- * Simple abstract class to extend to provide PlanAlgorithms for
- * cliques.
- *
  * @author thibautd
  */
-public abstract class JointPlanAlgorithm implements PlanAlgorithm {
-
-	/**
-	 * Checks if the plan is a joint plan, and passes it to run( JointPlan ).
-	 *
-	 * @throws IllegalArgumentException if the argument is not a {@link JointPlan}
-	 */
-	@Override
-	public final void run(final Plan plan) {
-		if (plan instanceof JointPlan) {
-			run((JointPlan) plan);
-		} else {
-			throw new IllegalArgumentException(getClass().getSimpleName()+"launched with"+
-					"a non-joint plan");
-		}
-	}
-
-	/**
-	 * executes the algorithm.
-	 *
-	 * @param plan
-	 */
-	public abstract void run(final JointPlan plan);
-
+public interface GenericStrategyModule<T> {
+	public void handlePlans( Collection<T> toHandle );
 }
 

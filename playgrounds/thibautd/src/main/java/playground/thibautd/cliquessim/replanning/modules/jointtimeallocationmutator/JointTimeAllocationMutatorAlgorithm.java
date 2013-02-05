@@ -33,12 +33,13 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 
 /**
  * Executes a time allocation mutator on each individual plan.
  * @author thibautd
  */
-public class JointTimeAllocationMutatorAlgorithm implements PlanAlgorithm {
+public class JointTimeAllocationMutatorAlgorithm implements GenericPlanAlgorithm<JointPlan> {
 	private final PlanAlgorithm individualMutator;
 	private final Random random;
 
@@ -62,8 +63,8 @@ public class JointTimeAllocationMutatorAlgorithm implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(final Plan plan) {
-		List<Plan> plans = new ArrayList<Plan>( ((JointPlan) plan).getIndividualPlans().values() );
+	public void run(final JointPlan plan) {
+		List<Plan> plans = new ArrayList<Plan>( plan.getIndividualPlans().values() );
 		Plan individualPlanToMutate = plans.get( random.nextInt( plans.size() ) );
 		individualMutator.run( individualPlanToMutate );
 	}

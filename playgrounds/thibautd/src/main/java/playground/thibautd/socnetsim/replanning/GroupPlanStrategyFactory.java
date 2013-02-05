@@ -32,6 +32,8 @@ import playground.thibautd.cliquessim.replanning.modules.jointtimeallocationmuta
 import playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser.JointTimeModeChooserAlgorithm;
 import playground.thibautd.cliquessim.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.SplitJointPlansBasedOnJointTripsModule;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
@@ -105,9 +107,9 @@ public class GroupPlanStrategyFactory {
 
 		strategy.addStrategyModule(
 				new JointPlanBasedGroupStrategyModule(
-					new AbstractMultithreadedModule( config.global() ) {
+					new AbstractMultithreadedGenericStrategyModule<JointPlan>( config.global() ) {
 						@Override
-						public PlanAlgorithm getPlanAlgoInstance() {
+						public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
 							return new JointTripInsertorAndRemoverAlgorithm(
 								config,
 								registry.getTripRouterFactory().createTripRouter(),
@@ -136,10 +138,10 @@ public class GroupPlanStrategyFactory {
 
 			strategy.addStrategyModule(
 					new JointPlanBasedGroupStrategyModule(
-						new AbstractMultithreadedModule(
+						new AbstractMultithreadedGenericStrategyModule<JointPlan>(
 								registry.getScenario().getConfig().global() ) {
 							@Override
-							public PlanAlgorithm getPlanAlgoInstance() {
+							public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
 								return new JointTimeModeChooserAlgorithm(
 									MatsimRandom.getLocalInstance(),
 									null,

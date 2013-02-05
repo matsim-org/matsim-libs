@@ -33,17 +33,16 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.utils.RoutingUtils;
 
 /**
  * @author thibautd
  */
-public class JointTripInsertorAndRemoverAlgorithm implements PlanAlgorithm {
+public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan> {
 	private static final Logger log =
 		Logger.getLogger(JointTripInsertorAndRemoverAlgorithm.class);
 
@@ -76,18 +75,18 @@ public class JointTripInsertorAndRemoverAlgorithm implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(final Plan plan) {
+	public void run(final JointPlan plan) {
 		if (log.isTraceEnabled()) log.trace( "handling plan "+plan );
 		final List<Id> agentsToIgnore = new ArrayList<Id>();
 		ActedUponInformation actedUpon = null;
 
 		do {
 			if ( random.nextDouble() < getProbRemoval( plan , agentsToIgnore )) {
-				actedUpon = remover.run( (JointPlan) plan , agentsToIgnore );
+				actedUpon = remover.run( plan , agentsToIgnore );
 				if (log.isTraceEnabled()) log.trace( "removal: "+actedUpon );
 			}
 			else {
-				actedUpon = insertor.run( (JointPlan) plan , agentsToIgnore );
+				actedUpon = insertor.run( plan , agentsToIgnore );
 				if (log.isTraceEnabled()) log.trace( "insertion: "+actedUpon );
 			}
 
@@ -98,11 +97,11 @@ public class JointTripInsertorAndRemoverAlgorithm implements PlanAlgorithm {
 	}
 
 	private double getProbRemoval(
-			final Plan plan,
+			final JointPlan plan,
 			final Collection<Id> agentsToIgnore) {
 		int countPassengers = 0;
 		int countEgoists = 0;
-		for (Plan indivPlan : ((JointPlan) plan).getIndividualPlans().values()) {
+		for (Plan indivPlan : plan.getIndividualPlans().values()) {
 			if ( agentsToIgnore.contains( indivPlan.getPerson().getId() ) ) continue;
 			List<PlanElement> struct =
 					RoutingUtils.tripsToLegs(

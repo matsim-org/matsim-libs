@@ -47,7 +47,7 @@ public class CarAvailabilityTabuChecker implements TabuChecker {
 			final Solution solution,
 			final Move move) {
 		final Solution resultingSol = move.apply( solution );
-		final JointPlan resultingJointPlan = (JointPlan) resultingSol.getRepresentedPlan();
+		final JointPlan resultingJointPlan = ((JointTimeModeChooserSolution) resultingSol).getRepresentedJointPlan();
 
 		for (Plan plan : resultingJointPlan.getIndividualPlans().values()) {
 			final PersonImpl person = (PersonImpl) plan.getPerson();

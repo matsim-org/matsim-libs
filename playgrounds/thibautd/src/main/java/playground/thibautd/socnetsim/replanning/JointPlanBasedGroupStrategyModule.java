@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -38,21 +40,18 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  * @author thibautd
  */
 public class JointPlanBasedGroupStrategyModule implements GroupStrategyModule {
-	private static final Logger log =
-		Logger.getLogger(JointPlanBasedGroupStrategyModule.class);
-
 	private final boolean wrapIndividualPlansAndActOnThem;
-	private final PlanStrategyModule delegate;
+	private final GenericStrategyModule<JointPlan> delegate;
 	private final JointPlanFactory jointPlanFactory = new JointPlanFactory();
 
 	public JointPlanBasedGroupStrategyModule(
-			final PlanStrategyModule module) {
+			final GenericStrategyModule<JointPlan> module) {
 		this( true , module );
 	}
 
 	public JointPlanBasedGroupStrategyModule(
 			final boolean wrapIndividualPlansAndActOnThem,
-			final PlanStrategyModule module) {
+			final GenericStrategyModule<JointPlan> module) {
 		this.wrapIndividualPlansAndActOnThem = wrapIndividualPlansAndActOnThem;
 		this.delegate = module;
 	}
@@ -60,29 +59,22 @@ public class JointPlanBasedGroupStrategyModule implements GroupStrategyModule {
 	@Override
 	public void handlePlans(
 			final Collection<GroupPlans> groupPlans) {
-		delegate.prepareReplanning(null);
-
-		log.info( "handling "+groupPlans.size()+" groups" );
-		for (GroupPlans plans : groupPlans) {
-			handlePlans( plans );
+		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
+		
+		for (GroupPlans groupPlan : groupPlans) {
+			jointPlans.addAll( groupPlan.getJointPlans() );
+	
+			if (!wrapIndividualPlansAndActOnThem) return;
+	
+			for (Plan p : groupPlan.getIndividualPlans()) {
+				Map<Id, Plan> fakeJointPlanMap = new HashMap<Id, Plan>();
+				fakeJointPlanMap.put( p.getPerson().getId() , p );
+				JointPlan jp = jointPlanFactory.createJointPlan( fakeJointPlanMap , false );
+				jointPlans.add( jp );
+			}
 		}
-
-		delegate.finishReplanning();
-	}
-
-	private void handlePlans( final GroupPlans plans ) {
-		for (JointPlan jp : plans.getJointPlans()) {
-			delegate.handlePlan( jp );
-		}
-
-		if (!wrapIndividualPlansAndActOnThem) return;
-
-		for (Plan p : plans.getIndividualPlans()) {
-			Map<Id, Plan> fakeJointPlanMap = new HashMap<Id, Plan>();
-			fakeJointPlanMap.put( p.getPerson().getId() , p );
-			JointPlan jp = jointPlanFactory.createJointPlan( fakeJointPlanMap , false );
-			delegate.handlePlan( jp );
-		}
+		
+		delegate.handlePlans( jointPlans );
 	}
 
 	@Override

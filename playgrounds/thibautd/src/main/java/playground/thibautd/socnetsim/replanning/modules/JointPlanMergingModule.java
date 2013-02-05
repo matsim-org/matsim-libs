@@ -22,7 +22,9 @@ package playground.thibautd.socnetsim.replanning.modules;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
  * "widens" joint plans randomly. To use before
@@ -31,7 +33,7 @@ import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
  * Hence, if the group is not a clique, this may result in meaningless groupings.
  * @author thibautd
  */
-public class JointPlanMergingModule extends AbstractMultithreadedGroupStrategyModule {
+public class JointPlanMergingModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
 	private final double probAcceptance;
 	private final JointPlanFactory factory;
 
@@ -45,7 +47,7 @@ public class JointPlanMergingModule extends AbstractMultithreadedGroupStrategyMo
 	}
 
 	@Override
-	public GroupPlansAlgorithm createAlgorithm() {
+	public GenericPlanAlgorithm<GroupPlans> createAlgorithm() {
 		return new JointPlanMergingAlgorithm(
 				factory,
 				probAcceptance,

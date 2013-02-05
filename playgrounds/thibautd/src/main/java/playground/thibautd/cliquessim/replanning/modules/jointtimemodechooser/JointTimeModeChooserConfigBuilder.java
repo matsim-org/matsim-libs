@@ -46,7 +46,6 @@ class JointTimeModeChooserConfigBuilder {
 	private static final int N_ITER = 1000;
 	private static final List<Integer> RESTRICTED_STEPS = Arrays.asList( 60 , 300 , 1500 );
 
-	private final JointPlan plan;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final String outputDir;
 	private final JointTimeModeChooserConfigGroup config;
@@ -60,20 +59,17 @@ class JointTimeModeChooserConfigBuilder {
 	 */
 	public JointTimeModeChooserConfigBuilder(
 			final Random random,
-			final JointPlan plan,
 			final JointTimeModeChooserConfigGroup config,
 			final ScoringFunctionFactory scoringFunctionFactory) {
-		this( random , plan , config , scoringFunctionFactory , null );
+		this( random , config , scoringFunctionFactory , null );
 	}
 
 	public JointTimeModeChooserConfigBuilder(
 			final Random random,
-			final JointPlan plan,
 			final JointTimeModeChooserConfigGroup config,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final String analysisOutputDir) {
 		this.random = random;
-		this.plan = plan;
 		this.config = config;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.outputDir = analysisOutputDir;
@@ -83,8 +79,6 @@ class JointTimeModeChooserConfigBuilder {
 			final boolean penalizeUnsynchro,
 			final Solution initialSolution,
 			final TabuSearchConfiguration configuration) {
-		int cliqueSize = plan.getIndividualPlans().size();
-
 		// different parameters depending on whether we optimise
 		// with or without synchro, as mode is not optimised when
 		// synchro (thus structure of the tabu list is different),
@@ -133,12 +127,12 @@ class JointTimeModeChooserConfigBuilder {
 		configuration.setTabuChecker( tabuChecker );
 
 		if (outputDir != null) {
-			configuration.addListener(
-					new EvolutionPlotter(
-						"score evolution, clique "+plan.getPerson().getId()+", "+cliqueSize+" members",
-						outputDir+"/"+plan.getPerson().getId()+
-						(penalizeUnsynchro ? "-synchro-" : "-preSynchro-") +
-						"fitness.png" ) );
+//			configuration.addListener(
+//					new EvolutionPlotter(
+//						"score evolution, clique "+plan.getPerson().getId()+", "+cliqueSize+" members",
+//						outputDir+"/"+plan.getPerson().getId()+
+//						(penalizeUnsynchro ? "-synchro-" : "-preSynchro-") +
+//						"fitness.png" ) );
 		}
 	}
 }

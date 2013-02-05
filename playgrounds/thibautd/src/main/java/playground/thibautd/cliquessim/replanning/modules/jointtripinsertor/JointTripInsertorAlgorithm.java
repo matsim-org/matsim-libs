@@ -47,6 +47,7 @@ import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.utils.RoutingUtils;
 
 /**
@@ -54,7 +55,7 @@ import playground.thibautd.utils.RoutingUtils;
  * by grouping a car trip with a non-chain-based-mode trip.
  * @author thibautd
  */
-public class JointTripInsertorAlgorithm implements PlanAlgorithm {
+public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPlan> {
 	private final TripRouter router;
 	private final List<String> chainBasedModes;
 	private final double betaDetour;
@@ -75,8 +76,8 @@ public class JointTripInsertorAlgorithm implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(final Plan plan) {
-		run( (JointPlan) plan , Collections.EMPTY_LIST );
+	public void run(final JointPlan plan) {
+		run( plan , Collections.EMPTY_LIST );
 	}
 
 	public ActedUponInformation run(

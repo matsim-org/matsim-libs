@@ -24,7 +24,6 @@ import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.run
 import java.util.Random;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.TripRouterFactory;
@@ -32,10 +31,10 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
@@ -43,7 +42,7 @@ import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.
 /**
  * @author thibautd
  */
-public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
+public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<JointPlan> {
 	private final StatisticsCollector statsCollector;
 	private final Random random;
 
@@ -90,12 +89,10 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(final Plan plan) {
-		JointPlan jointPlan = (JointPlan) plan;
-
+	public void run(final JointPlan jointPlan) {
 		TripRouterFactory estimatorRouterFactory =
 			getAndTuneTripRouterFactory(
-					plan,
+					jointPlan,
 					delay,
 					scenario,
 					travelTimeCalculator,
@@ -111,7 +108,6 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 		JointTimeModeChooserConfigBuilder builder =
 			new JointTimeModeChooserConfigBuilder(
 					random,
-					jointPlan,
 					config,
 					scoringFunctionFactory,
 					null); // XXX: no debug plots anymore.
@@ -120,7 +116,7 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 		// first run without synchro
 		TabuSearchConfiguration configuration = new TabuSearchConfiguration();
 		Solution initialSolution = new JointTimeModeChooserSolution(
-						(JointPlan) plan,
+						jointPlan,
 						estimatorRouterFactory.createTripRouter());
 		builder.buildConfiguration(
 				false,
@@ -141,20 +137,20 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 		// two goals here:
 		// 1- the side effect: getRepresentedPlan sets the plan to the represented state
 		// 2- the obvious check
-		if (bestSolution.getRepresentedPlan() != plan) {
+		if (((JointTimeModeChooserSolution) bestSolution).getRepresentedJointPlan() != jointPlan) {
 			throw new RuntimeException( "the returned plan is not the input plan" );
 		}
 	}
 
 	private static TripRouterFactory getAndTuneTripRouterFactory(
-			final Plan plan,
+			final JointPlan plan,
 			final DepartureDelayAverageCalculator delay,
 			final Scenario scenario,
 			final TravelTime travelTimeCalculator,
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final TripRouterFactory tripRouterFactory) {
 		return new EstimatorTripRouterFactory(
-				plan,
+				plan.getIndividualPlans().values().iterator().next(),
 				scenario.getPopulation().getFactory(),
 				scenario.getNetwork(),
 				travelTimeCalculator,

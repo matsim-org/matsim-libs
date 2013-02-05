@@ -181,6 +181,10 @@ public class JointTimeModeChooserSolution implements Solution {
 
 	@Override
 	public Plan getRepresentedPlan() {
+		throw new UnsupportedOperationException( "use getRepresentedJointPlan()" );
+	}
+
+	public JointPlan getRepresentedJointPlan() {
 		//log.warn( "TODO: synchronisation! (do it in a joint router?)" );
 		Iterator<List<Value>> individualValues = values.values.iterator();
 		Iterator<List<PlanElement>> individualElements =  values.associatedPlanElements.iterator();
@@ -402,7 +406,7 @@ public class JointTimeModeChooserSolution implements Solution {
 			for (PlanElement pe : planElements) {
 				if (pe instanceof Activity) {
 					if ( now == Time.UNDEFINED_TIME ) {
-						throw new RuntimeException( "got an undefined start time for plan element "+pe+" in plan "+planToActOn.getPlanElements() );
+						throw new RuntimeException( "got an undefined start time for plan element "+pe+" in plan "+planToActOn );
 					}
 					Activity act = (Activity) pe;
 					// System.out.println( "now="+Time.writeTime( now ) );

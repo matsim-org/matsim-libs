@@ -23,11 +23,15 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
+
 /**
  * Module returning instances of {@link JointReRouteAlgo}
  * @author thibautd
  */
-public class JointReRouteModule extends AbstractMultithreadedModule {
+public class JointReRouteModule extends AbstractMultithreadedGenericStrategyModule<JointPlan> {
 
 	private final Controler controler;
 
@@ -37,7 +41,7 @@ public class JointReRouteModule extends AbstractMultithreadedModule {
 	}
 
 	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
+	public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
 		return new JointReRouteAlgo(controler);
 	}
 }

@@ -77,7 +77,7 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 
 	@Override
 	public double computeFitnessValue(final Solution solution) {
-		JointPlan plan = (JointPlan) solution.getRepresentedPlan();
+		JointPlan plan = ((JointTimeModeChooserSolution) solution).getRepresentedJointPlan();
 
 		if (DEBUG) log.debug( "start scoring" );
 

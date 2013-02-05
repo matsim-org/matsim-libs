@@ -21,11 +21,12 @@ package playground.thibautd.socnetsim.replanning.modules;
 
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
  * @author thibautd
  */
-public class SplitJointPlansBasedOnJointTripsModule extends AbstractMultithreadedGroupStrategyModule {
+public class SplitJointPlansBasedOnJointTripsModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
 	private final JointPlanFactory factory;
 
 	public SplitJointPlansBasedOnJointTripsModule(

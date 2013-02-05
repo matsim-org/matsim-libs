@@ -87,12 +87,14 @@ public class IterativeActionTest {
 
 		int d = 0;
 		int p = 0;
-		for (PlanElement pe : jointPlan.getPlanElements()) {
-			if ( !(pe instanceof Leg) ) continue;
-			final Leg l = (Leg) pe;
-			final String mode = l.getMode();
-			if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
-			if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+		for (Plan individualPlan : jointPlan.getIndividualPlans().values()) {
+			for (PlanElement pe : individualPlan.getPlanElements()) {
+				if ( !(pe instanceof Leg) ) continue;
+				final Leg l = (Leg) pe;
+				final String mode = l.getMode();
+				if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
+				if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+			}
 		}
 
 		final String finalPlanDescr = jointPlan.toString();
@@ -127,12 +129,14 @@ public class IterativeActionTest {
 
 		int d = 0;
 		int p = 0;
-		for (PlanElement pe : jointPlan.getPlanElements()) {
-			if ( !(pe instanceof Leg) ) continue;
-			final Leg l = (Leg) pe;
-			final String mode = l.getMode();
-			if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
-			if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+		for (Plan individualPlan : jointPlan.getIndividualPlans().values()) {
+			for (PlanElement pe : individualPlan.getPlanElements()) {
+				if ( !(pe instanceof Leg) ) continue;
+				final Leg l = (Leg) pe;
+				final String mode = l.getMode();
+				if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
+				if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+			}
 		}
 
 		final String finalPlanDescr = jointPlan.toString();
@@ -167,12 +171,14 @@ public class IterativeActionTest {
 
 		int d = 0;
 		int p = 0;
-		for (PlanElement pe : jointPlan.getPlanElements()) {
-			if ( !(pe instanceof Leg) ) continue;
-			final Leg l = (Leg) pe;
-			final String mode = l.getMode();
-			if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
-			if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+		for (Plan individualPlan : jointPlan.getIndividualPlans().values()) {
+			for (PlanElement pe : individualPlan.getPlanElements()) {
+				if ( !(pe instanceof Leg) ) continue;
+				final Leg l = (Leg) pe;
+				final String mode = l.getMode();
+				if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
+				if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+			}
 		}
 
 		final String finalPlanDescr = jointPlan.toString();
@@ -207,12 +213,14 @@ public class IterativeActionTest {
 
 		int d = 0;
 		int p = 0;
-		for (PlanElement pe : jointPlan.getPlanElements()) {
-			if ( !(pe instanceof Leg) ) continue;
-			final Leg l = (Leg) pe;
-			final String mode = l.getMode();
-			if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
-			if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+		for (Plan individualPlan : jointPlan.getIndividualPlans().values()) {
+			for (PlanElement pe : individualPlan.getPlanElements()) {
+				if ( !(pe instanceof Leg) ) continue;
+				final Leg l = (Leg) pe;
+				final String mode = l.getMode();
+				if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
+				if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+			}
 		}
 
 		final String finalPlanDescr = jointPlan.toString();

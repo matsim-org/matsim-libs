@@ -89,17 +89,21 @@ class JointPlanMergingAlgorithm implements GroupPlansAlgorithm {
 		}
 	}
 
+	private boolean add( final List<JointPlanBuilder> builders , final JointPlan jp ) {
+		for (JointPlanBuilder builder : builders) {
+			if (random.nextDouble() > probAcceptance) continue;
+
+			builder.addJointPlan( jp );
+			return true;
+		}
+		return false;
+	}
+	
 	private boolean add( final List<JointPlanBuilder> builders , final Plan p ) {
 		for (JointPlanBuilder builder : builders) {
 			if (random.nextDouble() > probAcceptance) continue;
 
-			if (p instanceof JointPlan) {
-				builder.addJointPlan( (JointPlan) p );
-			}
-			else {
-				builder.addIndividualPlan( p );
-			}
-
+			builder.addIndividualPlan( p );
 			return true;
 		}
 		return false;

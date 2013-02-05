@@ -29,35 +29,34 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
-import playground.thibautd.socnetsim.replanning.GroupStrategyModule;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 
 /**
  * @author thibautd
  */
-public abstract class AbstractMultithreadedGroupStrategyModule implements GroupStrategyModule {
-	static final private Logger log = Logger.getLogger(AbstractMultithreadedGroupStrategyModule.class);
+public abstract class AbstractMultithreadedGenericStrategyModule<T> implements GenericStrategyModule<T> {
+	static final private Logger log = Logger.getLogger(AbstractMultithreadedGenericStrategyModule.class);
 	private final int numOfThreads;
 	private final String name;
 
-	public AbstractMultithreadedGroupStrategyModule(GlobalConfigGroup globalConfigGroup) {
+	public AbstractMultithreadedGenericStrategyModule(GlobalConfigGroup globalConfigGroup) {
 		this( globalConfigGroup.getNumberOfThreads() );
 	}
 
-	public AbstractMultithreadedGroupStrategyModule(final int numOfThreads) {
-		this.name = getClass().getSimpleName();
+	public AbstractMultithreadedGenericStrategyModule(final int numOfThreads) {
+		this.name = getName();
 		this.numOfThreads = numOfThreads;
 	}
 
 	@Override
-	public void handlePlans(final Collection<GroupPlans> groupPlans) {
+	public void handlePlans(final Collection<T> groupPlans) {
 		log.info( "running "+name+" on "+groupPlans.size()+" groups" );
-		final PlanRunnable[] runnables = getPlanRunnables( groupPlans );
+		final List<PlanRunnable<T>> runnables = getPlanRunnables( groupPlans );
 		final ExceptionHandler exceptionHandler = new ExceptionHandler();
 
 		List<Thread> threads = new ArrayList<Thread>( numOfThreads );
-		for (PlanRunnable runnable : runnables) {
+		for (PlanRunnable<T> runnable : runnables) {
 			final Thread t = new Thread( runnable , name+"_"+threads.size());
 			t.setUncaughtExceptionHandler( exceptionHandler );
 			threads.add( t );
@@ -78,37 +77,40 @@ public abstract class AbstractMultithreadedGroupStrategyModule implements GroupS
 		}
 	}
 
-	private PlanRunnable[] getPlanRunnables(Collection<GroupPlans> groupPlans) {
-		final PlanRunnable[] runnables = new PlanRunnable[ numOfThreads ];
+	private List<PlanRunnable<T>> getPlanRunnables(Collection<T> groupPlans) {
+		final List<PlanRunnable<T>> runnables = new ArrayList<PlanRunnable<T>>();
 
 		final Counter counter = new Counter( "["+name+"] handled plan # " );
-		for (int i=0; i < runnables.length; i++) {
-			runnables[ i ] = new PlanRunnable( counter );
+		for (int i=0; i < numOfThreads; i++) {
+			runnables.add( new PlanRunnable<T>( counter , createAlgorithm() ) );
 		}
 
 		int count = 0;
-		for (GroupPlans p : groupPlans) {
-			runnables[ count % numOfThreads ].groupPlans.add( p );
+		for (T p : groupPlans) {
+			runnables.get( count % numOfThreads ).groupPlans.add( p );
 			count++;
 		}
 
 		return runnables;
 	}
 
-	public abstract GroupPlansAlgorithm createAlgorithm();
+	public abstract GenericPlanAlgorithm<T> createAlgorithm();
 
-	private class PlanRunnable implements Runnable {
-		final List<GroupPlans> groupPlans = new ArrayList<GroupPlans>();
-		final GroupPlansAlgorithm algo = createAlgorithm();
+	private static class PlanRunnable<T> implements Runnable {
+		final List<T> groupPlans = new ArrayList<T>();
+		final GenericPlanAlgorithm<T> algo;
 		final Counter counter;
 
-		public PlanRunnable(final Counter counter) {
+		public PlanRunnable(
+				final Counter counter,
+				final GenericPlanAlgorithm<T> algo) {
 			this.counter = counter;
+			this.algo = algo;
 		}
 
 		@Override
 		public void run() {
-			for (GroupPlans p : groupPlans) {
+			for (T p : groupPlans) {
 				algo.run( p );
 				counter.incCounter();
 			}
@@ -128,12 +130,21 @@ public abstract class AbstractMultithreadedGroupStrategyModule implements GroupS
 
 	@Override
 	public String toString() {
-		if (name.length() == 0) {
+		return getName();
+	}
+
+	/**
+	 * It is possible to override this method, which is used in log messages.
+	 * It is called once, at construction.
+	 */
+	protected String getName() {
+		final String tmpName = getClass().getSimpleName();
+		if (tmpName.length() == 0) {
 			// anonymous class
 			return createAlgorithm().getClass().getSimpleName();
 		}
 
-		return name;
+		return tmpName;
 	}
 }
 

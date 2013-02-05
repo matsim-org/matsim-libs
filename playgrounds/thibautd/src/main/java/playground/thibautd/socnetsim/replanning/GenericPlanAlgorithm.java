@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointTripInsertorModule.java
+ * GenericPlanAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.replanning.modules.jointtripinsertor;
-
-import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
+package playground.thibautd.socnetsim.replanning;
 
 /**
  * @author thibautd
  */
-public class JointTripInsertorAndRemoverModule extends AbstractMultithreadedModule {
-	private final Controler controler;
-
-	public JointTripInsertorAndRemoverModule(final Controler controler) {
-		super( controler.getConfig().global() );
-		this.controler = controler;
-	}
-
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return new JointTripInsertorAndRemoverAlgorithm(
-				controler.getConfig(),
-				controler.getTripRouterFactory().createTripRouter(),
-				MatsimRandom.getLocalInstance());
-	}
+public interface GenericPlanAlgorithm<T> {
+	public void run( T plan );
 }
 

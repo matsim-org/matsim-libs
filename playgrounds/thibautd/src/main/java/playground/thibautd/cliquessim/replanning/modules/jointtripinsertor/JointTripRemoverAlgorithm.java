@@ -46,11 +46,12 @@ import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTrip;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 
 /**
  * @author thibautd
  */
-public class JointTripRemoverAlgorithm implements PlanAlgorithm {
+public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan> {
 	private static final Logger log =
 		Logger.getLogger(JointTripRemoverAlgorithm.class);
 
@@ -61,9 +62,8 @@ public class JointTripRemoverAlgorithm implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(final Plan plan) {
-		if (plan instanceof JointPlan) run( (JointPlan) plan , Collections.EMPTY_LIST );
-		else throw new IllegalArgumentException( getClass().getSimpleName()+" can only operate on joint plans!" );
+	public void run(final JointPlan plan) {
+		run( plan , Collections.EMPTY_LIST );
 	}
 
 	public ActedUponInformation run( final JointPlan plan , final Collection<Id> agentsToIgnore ) {

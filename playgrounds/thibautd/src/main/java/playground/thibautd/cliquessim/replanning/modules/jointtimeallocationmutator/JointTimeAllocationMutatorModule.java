@@ -26,10 +26,14 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
+
 /**
  * @author thibautd
  */
-public class JointTimeAllocationMutatorModule extends AbstractMultithreadedModule {
+public class JointTimeAllocationMutatorModule extends AbstractMultithreadedGenericStrategyModule<JointPlan> {
 	private final TripRouterFactory tripRouterFactory;
 	private final double mutationRange;
 
@@ -46,7 +50,7 @@ public class JointTimeAllocationMutatorModule extends AbstractMultithreadedModul
 	}
 
 	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
+	public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
 		return new JointTimeAllocationMutatorAlgorithm(
 				MatsimRandom.getLocalInstance(),
 				tripRouterFactory.createTripRouter().getStageActivityTypes(),

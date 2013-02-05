@@ -39,13 +39,14 @@ import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector
  */
 public class GroupPlanStrategy {
 	private final GroupLevelPlanSelector selector;
-	private final List<GroupStrategyModule> strategyModules = new ArrayList<GroupStrategyModule>();
+	private final List<GenericStrategyModule<GroupPlans>> strategyModules =
+			new ArrayList<GenericStrategyModule<GroupPlans>>();
 
 	public GroupPlanStrategy(final GroupLevelPlanSelector selector) {
 		this.selector = selector;
 	}
 
-	public void addStrategyModule(final GroupStrategyModule module) {
+	public void addStrategyModule(final GenericStrategyModule<GroupPlans> module) {
 		strategyModules.add( module );
 	}
 
@@ -76,7 +77,7 @@ public class GroupPlanStrategy {
 		}
 		selectCounter.printCounter();
 
-		for (GroupStrategyModule module : strategyModules) {
+		for (GenericStrategyModule<GroupPlans> module : strategyModules) {
 			module.handlePlans( plansToHandle );
 		}
 

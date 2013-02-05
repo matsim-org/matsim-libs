@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.cliquessim.replanning.JointPlanAlgorithm;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 
 /**
  * Similar to the {@link org.matsim.core.replanning.modules.ReRoute} algorithm, on all plans of a joint plan.
@@ -35,7 +35,7 @@ import playground.thibautd.socnetsim.population.JointPlan;
  *
  * @author thibautd
  */
-public class JointReRouteAlgo extends JointPlanAlgorithm {
+public class JointReRouteAlgo implements GenericPlanAlgorithm<JointPlan> {
 
 	private final PlanAlgorithm routingAlgo;
 
