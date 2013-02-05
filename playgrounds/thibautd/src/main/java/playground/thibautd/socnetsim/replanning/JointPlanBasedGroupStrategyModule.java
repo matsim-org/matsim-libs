@@ -38,7 +38,7 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  * Delegates to a {@link PlanStrategyModule} which handles JointPlans.
  * @author thibautd
  */
-public class JointPlanBasedGroupStrategyModule implements GroupStrategyModule {
+public class JointPlanBasedGroupStrategyModule implements GenericStrategyModule<GroupPlans> {
 	private final boolean wrapIndividualPlansAndActOnThem;
 	private final GenericStrategyModule<JointPlan> delegate;
 	private final JointPlanFactory jointPlanFactory = new JointPlanFactory();

@@ -33,6 +33,7 @@ import playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser.Jo
 import playground.thibautd.cliquessim.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.SplitJointPlansBasedOnJointTripsModule;
@@ -184,7 +185,7 @@ public class GroupPlanStrategyFactory {
 	// /////////////////////////////////////////////////////////////////////////
 	// standard modules
 	// /////////////////////////////////////////////////////////////////////////
-	public static GroupStrategyModule createTripsToLegsModule(
+	public static GenericStrategyModule<GroupPlans> createTripsToLegsModule(
 			final Config config,
 			final TripRouterFactory tripRouterFactory) {
 		return new IndividualBasedGroupStrategyModule(
@@ -196,7 +197,7 @@ public class GroupPlanStrategyFactory {
 				});
 	}
 
-	public static GroupStrategyModule createReRouteModule(
+	public static GenericStrategyModule<GroupPlans> createReRouteModule(
 			final Config config,
 			final TripRouterFactory tripRouterFactory) {
 		return new IndividualBasedGroupStrategyModule(

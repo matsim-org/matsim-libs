@@ -36,7 +36,7 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
-import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
@@ -45,7 +45,7 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  * etc.)
  * @author thibautd
  */
-public class SplitJointPlansBasedOnJointTripsAlgorithm implements GroupPlansAlgorithm {
+public class SplitJointPlansBasedOnJointTripsAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 	private final JointPlanFactory factory;
 
 	public SplitJointPlansBasedOnJointTripsAlgorithm(

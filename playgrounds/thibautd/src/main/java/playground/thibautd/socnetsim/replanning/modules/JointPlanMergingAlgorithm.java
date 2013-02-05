@@ -31,10 +31,10 @@ import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
-class JointPlanMergingAlgorithm implements GroupPlansAlgorithm {
+class JointPlanMergingAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 	private final double probAcceptance;
 	private final Random random;
 	private final JointPlanFactory factory;

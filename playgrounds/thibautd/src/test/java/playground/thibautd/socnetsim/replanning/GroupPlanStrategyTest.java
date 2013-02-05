@@ -187,7 +187,7 @@ public class GroupPlanStrategyTest {
 		return group;
 	}
 
-	private Person createPerson(
+	private static Person createPerson(
 			final int count,
 			final boolean joint,
 			final Map<Id, Plan> jointPlan) {
@@ -201,7 +201,7 @@ public class GroupPlanStrategyTest {
 		return person;
 	}
 
-	private static class JointStructureInvertingModule implements GroupStrategyModule {
+	private static class JointStructureInvertingModule implements GenericStrategyModule<GroupPlans> {
 		private final JointPlanFactory factory;
 
 		public JointStructureInvertingModule(final JointPlanFactory factory) {

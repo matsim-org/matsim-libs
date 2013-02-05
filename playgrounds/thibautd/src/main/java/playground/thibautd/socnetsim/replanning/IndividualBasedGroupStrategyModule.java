@@ -33,7 +33,7 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  * Delegates action on individual plans to a {@link PlanStrategyModule}
  * @author thibautd
  */
-public class IndividualBasedGroupStrategyModule implements GroupStrategyModule {
+public class IndividualBasedGroupStrategyModule implements GenericStrategyModule<GroupPlans> {
 	private static final Logger log =
 		Logger.getLogger(IndividualBasedGroupStrategyModule.class);
 

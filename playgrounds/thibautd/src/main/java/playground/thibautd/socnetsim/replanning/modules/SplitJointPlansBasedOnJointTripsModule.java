@@ -20,7 +20,7 @@
 package playground.thibautd.socnetsim.replanning.modules;
 
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.replanning.GroupPlansAlgorithm;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
@@ -37,7 +37,7 @@ public class SplitJointPlansBasedOnJointTripsModule extends AbstractMultithreade
 	}
 
 	@Override
-	public GroupPlansAlgorithm createAlgorithm() {
+	public GenericPlanAlgorithm<GroupPlans> createAlgorithm() {
 		return new SplitJointPlansBasedOnJointTripsAlgorithm(
 				factory);
 	}
