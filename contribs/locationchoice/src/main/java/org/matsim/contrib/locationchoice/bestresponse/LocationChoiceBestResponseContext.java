@@ -43,6 +43,7 @@ public class LocationChoiceBestResponseContext {
 	private final Scenario scenario;
 	private ObjectAttributes personsKValues;
 	private ObjectAttributes facilitiesKValues;
+	private ObjectAttributes personsMaxEpsUnscaled;
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
@@ -73,10 +74,12 @@ public class LocationChoiceBestResponseContext {
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
 				this.computeAttributes(seed);
+				return ; // ??
 			}
 		}
 		else {
 			this.computeAttributes(seed);
+			return ; // ??
 		}
 		String fkValues = this.scenario.getConfig().locationchoice().getfkValuesFile();
 		if (!fkValues.equals("null")) {
@@ -86,10 +89,27 @@ public class LocationChoiceBestResponseContext {
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
 				this.computeAttributes(seed);
+				return ; // ??
 			}
 		}
 		else {
 			this.computeAttributes(seed);
+			return ; // ??
+		}
+		String maxEpsValues = this.scenario.getConfig().locationchoice().getMaxEpsFile();
+
+		if (!maxEpsValues.equals("null")) {
+			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);
+			try {
+				attributesReader.parse(maxEpsValues);
+			} catch  (UncheckedIOException e) {  // reading was not successful
+				this.computeAttributes(seed);
+				return ; // ??
+			}
+		}
+		else {
+			this.computeAttributes(seed);
+			return ; // ??
 		}
 	}
 	
@@ -100,6 +120,7 @@ public class LocationChoiceBestResponseContext {
 				
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
+		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled() ;
 	}
 
 	
