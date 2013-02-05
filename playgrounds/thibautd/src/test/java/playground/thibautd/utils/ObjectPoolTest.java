@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 

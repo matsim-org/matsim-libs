@@ -101,7 +101,7 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 				Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacilityId()+"!");
 			}
 			if (!prim_acts.contains(a)) {
-				k.addActivityOption((ActivityOptionImpl) a, false);
+				k.addActivityOption(a, false);
 			}
 		}
 	}

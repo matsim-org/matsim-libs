@@ -19,20 +19,18 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.grouping;
 
-import java.io.File;
+import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
-import static org.junit.Assert.*;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;

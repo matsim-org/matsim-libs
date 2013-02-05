@@ -20,14 +20,13 @@
 package playground.thibautd.socnetsim.controller.listeners;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
 
 /**
  * @author thibautd

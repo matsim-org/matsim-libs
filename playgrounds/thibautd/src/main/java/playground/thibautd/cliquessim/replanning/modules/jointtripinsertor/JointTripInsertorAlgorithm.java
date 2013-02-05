@@ -36,11 +36,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.DriverRoute;

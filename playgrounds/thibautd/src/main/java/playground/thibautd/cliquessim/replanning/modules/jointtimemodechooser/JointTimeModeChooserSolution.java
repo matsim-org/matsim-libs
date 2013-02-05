@@ -112,7 +112,7 @@ public class JointTimeModeChooserSolution implements Solution {
 		List<Integer> indices = new ArrayList<Integer>();
 
 		int index = -1;
-		for (List planValues : values.values) {
+		for (List<Value> planValues : values.values) {
 			index += planValues.size();
 			indices.add( index );
 		}

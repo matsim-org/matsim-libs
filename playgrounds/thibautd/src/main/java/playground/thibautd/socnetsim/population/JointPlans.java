@@ -22,7 +22,6 @@ package playground.thibautd.socnetsim.population;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 

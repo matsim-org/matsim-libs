@@ -20,7 +20,6 @@
 package playground.thibautd.utils;
 
 import java.lang.ref.WeakReference;
-
 import java.util.Map;
 import java.util.WeakHashMap;
 

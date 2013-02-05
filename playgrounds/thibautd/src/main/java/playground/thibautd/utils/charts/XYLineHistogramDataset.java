@@ -41,7 +41,7 @@ public class XYLineHistogramDataset extends AbstractIntervalXYDataset {
 
 	private final double binWidth;
 
-	private final List<Comparable> keys = new ArrayList<Comparable>();
+	private final List<Comparable<?>> keys = new ArrayList<Comparable<?>>();
 	private final List<List<Double>> yValues = new ArrayList<List<Double>>();
 	private final List<Double> xStartValues = new ArrayList<Double>();
 	private final List<List<Double>> rawXValues = new ArrayList<List<Double>>();
@@ -60,7 +60,7 @@ public class XYLineHistogramDataset extends AbstractIntervalXYDataset {
 	 * @param seriesKey the series identifier
 	 * @param xValues the x values of the elements to count.
 	 */
-	public void addSeries(final Comparable seriesKey, final List<Double> xValues) {
+	public void addSeries(final Comparable<?> seriesKey, final List<Double> xValues) {
 		this.keys.add(seriesKey);
 
 		List<Double> list = new ArrayList<Double>(xValues);
@@ -78,7 +78,7 @@ public class XYLineHistogramDataset extends AbstractIntervalXYDataset {
 				currentCount++;
 			}
 			else {
-				newSeries.add(((double) currentCount) / totalCount);
+				newSeries.add((currentCount) / totalCount);
 
 				currentUpperBound += binWidth;
 				while (xValue >= currentUpperBound) {
@@ -117,7 +117,7 @@ public class XYLineHistogramDataset extends AbstractIntervalXYDataset {
 
 		if (cumulative) {
 			value = ((item + 1) / 2);
-			value /= (double) this.rawXValues.get(series).size();
+			value /= this.rawXValues.get(series).size();
 		}
 		else {
 			value = this.yValues.get(series).get(index);
@@ -129,7 +129,7 @@ public class XYLineHistogramDataset extends AbstractIntervalXYDataset {
 	@Override
 	public Number getX(final int series, final int item) {
 		if (cumulative) return this.rawXValues.get(series).get(item / 2);
-		boolean even = ((double) item) % 2d == 0;
+		boolean even = (item) % 2d == 0;
 		//return this.xStartValues.get(series) + ( (item + 1) / 2 ) * binWidth;
 		return even ? getStartX(series, item / 2) : getEndX(series, item / 2);
 	}
@@ -140,7 +140,7 @@ public class XYLineHistogramDataset extends AbstractIntervalXYDataset {
 	}
 
 	@Override
-	public Comparable getSeriesKey(final int series) {
+	public Comparable<?> getSeriesKey(final int series) {
 		return this.keys.get(series);
 	}
 

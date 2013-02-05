@@ -199,7 +199,7 @@ public class PlotCliqueSizeDistribution {
 		}
 
 		@Override
-		public Comparable getSeriesKey(final int series) {
+		public Comparable<? extends Object> getSeriesKey(final int series) {
 			return seriesNames.get(series);
 		}
 	}

@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
+import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.JOINT_PLAN_TAG;
+import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.PERSON_ATT;
+import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.PLAN_NR_ATT;
+import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.PLAN_TAG;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,7 +39,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.utils.AbstractParsePullXmlReader;
-import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.*;
 
 /**
  * @author thibautd

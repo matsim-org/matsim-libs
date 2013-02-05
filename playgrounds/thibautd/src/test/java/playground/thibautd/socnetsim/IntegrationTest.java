@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
-import static org.junit.Assert.*;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;

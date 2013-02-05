@@ -224,13 +224,13 @@ class StdDevDataset extends AbstractIntervalXYDataset {
 
 	private final List< Tuple<Double, Element> > elements =
 		 	new ArrayList< Tuple<Double, Element> >();
-	private final Comparable key;
+	private final Comparable<? extends Object> key;
 
 	public StdDevDataset()  {
 		this( "standard deviation" );
 	}
 
-	public StdDevDataset( final Comparable seriesKey ) {
+	public StdDevDataset( final Comparable<? extends Object> seriesKey ) {
 		this.key = seriesKey;
 	}
 	// /////////////////////////////////////////////////////////////////////////
@@ -287,7 +287,7 @@ class StdDevDataset extends AbstractIntervalXYDataset {
 	}
 
 	@Override
-	public Comparable getSeriesKey(final int series) {
+	public Comparable<? extends Object> getSeriesKey(final int series) {
 		return key;
 	}
 

@@ -70,7 +70,7 @@ public class ReflectiveModule extends Module {
 
 	private Map<String, Method> getStringGetters() {
 		Map<String, Method> gs = new HashMap<String, Method>();
-		Class c = getClass();
+		Class<? extends ReflectiveModule> c = getClass();
 
 		Method[] allMethods = c.getDeclaredMethods();
 
@@ -87,7 +87,7 @@ public class ReflectiveModule extends Module {
 
 	private Map<String, Method> getGetters() {
 		Map<String, Method> gs = new HashMap<String, Method>();
-		Class c = getClass();
+		Class<? extends ReflectiveModule> c = getClass();
 
 		Method[] allMethods = c.getDeclaredMethods();
 
@@ -103,7 +103,7 @@ public class ReflectiveModule extends Module {
 
 	private Map<String, Method> getSetters() {
 		Map<String, Method> ss = new HashMap<String, Method>();
-		Class c = getClass();
+		Class<? extends ReflectiveModule> c = getClass();
 
 		Method[] allMethods = c.getDeclaredMethods();
 
@@ -120,7 +120,7 @@ public class ReflectiveModule extends Module {
 
 	private Map<String, Field> getFields() {
 		Map<String, Field> fs = new HashMap<String, Field>();
-		Class c = getClass();
+		Class<? extends ReflectiveModule> c = getClass();
 
 		for (Field f : c.getDeclaredFields()) {
 			if ( !Modifier.isStatic( f.getModifiers() ) ) {

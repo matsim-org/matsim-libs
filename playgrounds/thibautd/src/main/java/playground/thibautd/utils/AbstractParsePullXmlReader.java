@@ -27,8 +27,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.thibautd.utils.AbstractParsePullXmlReader;
-
 /**
  * @author thibautd
  */

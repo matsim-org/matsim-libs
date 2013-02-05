@@ -380,12 +380,12 @@ class ConditionValidator implements TwofoldTripValidator {
 	}
 
 	@Override
-	public Comparable getFirstCriterion() {
+	public Label getFirstCriterion() {
 		return new Label(condition.getDistance(), "", "m");
 	}
 
 	@Override
-	public Comparable getSecondCriterion() {
+	public Label getSecondCriterion() {
 		return new Label(condition.getTime()/60d, "", "min");
 	}
 
@@ -404,7 +404,7 @@ class ConditionValidator implements TwofoldTripValidator {
 		return condition.hashCode();
 	}
 
-	private static class Label implements Comparable {
+	static class Label implements Comparable<Label> {
 		private final double value;
 		private final String prefix;
 		private final String suffix;
@@ -423,9 +423,9 @@ class ConditionValidator implements TwofoldTripValidator {
 		 * compares string representation.
 		 */
 		@Override
-		public int compareTo(final Object o) {
-			if ( ((Label) o).prefix.equals(prefix) && ((Label) o).suffix.equals(suffix) ) {
-				return Double.compare(value, ((Label) o).value);
+		public int compareTo(final Label o) {
+			if ( o.prefix.equals(prefix) && o.suffix.equals(suffix) ) {
+				return Double.compare(value, o.value);
 			}
 			return toString().compareTo(o.toString());
 		}

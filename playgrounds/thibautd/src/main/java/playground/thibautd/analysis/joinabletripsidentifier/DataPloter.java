@@ -48,6 +48,7 @@ import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
+import playground.thibautd.analysis.joinabletripsidentifier.ConditionValidator.Label;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
 import playground.thibautd.utils.charts.BoxAndWhiskersChart;
@@ -472,8 +473,8 @@ public class DataPloter {
 	 * (as for example distance and time difference) to proceed to filtering
 	 */
 	public interface TwofoldTripValidator extends DriverTripValidator {
-		public Comparable getFirstCriterion();
-		public Comparable getSecondCriterion();
+		public Label getFirstCriterion();
+		public Label getSecondCriterion();
 	}
 
 	private static class ConditionComparator implements Comparator<TwofoldTripValidator> {

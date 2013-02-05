@@ -90,7 +90,7 @@ public class Aggregator {
 			    // @param toIndex high endpoint (exclusive) of the subList.
 				
 				filteredVolumes.addAll(volumesTemp.subList(
-						numberOfElements2RemovePerSide, (int)Math.round(numberOfElements - numberOfElements2RemovePerSide)));	
+						numberOfElements2RemovePerSide, Math.round(numberOfElements - numberOfElements2RemovePerSide)));	
 								
 				volumes.get(hour).clear();
 				volumes.get(hour).addAll(filteredVolumes);

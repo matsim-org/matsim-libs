@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTravelStructure;
 import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTrip;

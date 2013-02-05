@@ -20,14 +20,13 @@
 package playground.thibautd.analysis.listeners;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.analysis.LegHistogram;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * Produces histograms without requiring a Controler

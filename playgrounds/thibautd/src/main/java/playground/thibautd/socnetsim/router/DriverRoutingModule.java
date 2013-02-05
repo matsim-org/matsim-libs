@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.router;
 import java.util.Collections;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -72,7 +73,7 @@ public class DriverRoutingModule implements RoutingModule {
 		NetworkRoute netRoute = (NetworkRoute) carLeg.getRoute();
 
 		Leg leg = popFactory.createLeg( mode );
-		DriverRoute dRoute = new DriverRoute( netRoute , Collections.EMPTY_SET );
+		DriverRoute dRoute = new DriverRoute( netRoute , Collections.<Id>emptyList() );
 		leg.setRoute( dRoute );
 		leg.setDepartureTime( departureTime );
 		leg.setTravelTime( dRoute.getTravelTime() );

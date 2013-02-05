@@ -21,12 +21,11 @@ package playground.thibautd.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.List;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;

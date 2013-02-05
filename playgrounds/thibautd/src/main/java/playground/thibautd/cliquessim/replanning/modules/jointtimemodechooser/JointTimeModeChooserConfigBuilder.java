@@ -26,10 +26,8 @@ import java.util.Random;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
-import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;
 import playground.thibautd.tsplanoptimizer.framework.CompositeTabuChecker;
-import playground.thibautd.tsplanoptimizer.framework.EvolutionPlotter;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;
 import playground.thibautd.tsplanoptimizer.framework.NullMoveChecker;

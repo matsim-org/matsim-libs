@@ -20,8 +20,6 @@
 package playground.thibautd.cliquessim.replanning.modules.reroute;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;

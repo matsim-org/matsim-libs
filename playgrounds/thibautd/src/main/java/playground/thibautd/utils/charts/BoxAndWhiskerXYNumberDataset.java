@@ -94,17 +94,16 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 		if (items.size() > series) {
 		  return items.get(series);
 		}
-		else {
-			List<Tuple<Number, BoxAndWhiskerItem>> list = null;
+		
+		List<Tuple<Number, BoxAndWhiskerItem>> list = null;
 
-			for (int i=items.size(); i <= series; i++) {
-				list = new ArrayList<Tuple<Number, BoxAndWhiskerItem>>();
-				items.add(list);
-				seriesKeys.add("series "+i);
-			}
-
-			return list;
+		for (int i=items.size(); i <= series; i++) {
+			list = new ArrayList<Tuple<Number, BoxAndWhiskerItem>>();
+			items.add(list);
+			seriesKeys.add("series "+i);
 		}
+
+		return list;
 	}
 
 	/**
@@ -188,7 +187,7 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	}
 
 	@Override
-	public List getOutliers(final int series, final int item) {
+	public List<?> getOutliers(final int series, final int item) {
 		return this.items.get(series).get(item).getSecond().getOutliers();
 	}
 
@@ -211,7 +210,7 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	 * @return the index of the series
 	 */
 	@Override
-	public Comparable getSeriesKey(final int series) {
+	public Comparable<? extends Object> getSeriesKey(final int series) {
 		return series;
 	}
 }

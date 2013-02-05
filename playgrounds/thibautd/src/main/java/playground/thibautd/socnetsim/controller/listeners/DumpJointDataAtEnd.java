@@ -20,13 +20,13 @@
 package playground.thibautd.socnetsim.controller.listeners;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
 
 /**
  * @author thibautd

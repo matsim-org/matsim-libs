@@ -68,8 +68,8 @@ public class TwoCategoriesBoxAndWhiskerChart extends ChartUtil {
 	// /////////////////////////////////////////////////////////////////////////
 	public void addItem(
 			final List<? extends Number> itemData,
-			final Comparable rowKey,
-			final Comparable columnKey) {
+			final Comparable<?> rowKey,
+			final Comparable<?> columnKey) {
 		dataset.add( itemData , rowKey , columnKey );
 
 		if (plotStdDev) {

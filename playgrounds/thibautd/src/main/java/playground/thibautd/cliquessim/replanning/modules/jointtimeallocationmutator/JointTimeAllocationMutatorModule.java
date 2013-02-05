@@ -22,9 +22,7 @@ package playground.thibautd.cliquessim.replanning.modules.jointtimeallocationmut
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;

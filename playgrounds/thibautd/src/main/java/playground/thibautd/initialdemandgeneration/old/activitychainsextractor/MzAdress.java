@@ -33,7 +33,7 @@ class MzAdress {
 		log.info( "number of created full adresses: "+nCreatedFullAdresses );
 		log.info( "=> proportion of adresses only consisting in ZIP Code: "+
 				(100 * ( ((double) nCreatedAdresses - (double) nCreatedFullAdresses)
-						 / (double) nCreatedAdresses ))+
+						 / nCreatedAdresses ))+
 				"%");
 	}
 
