@@ -64,6 +64,7 @@ public class MultipleSingleIterOnlineDvrpLauncher
         SummaryStatistics taxiWaitTime = new SummaryStatistics();
         SummaryStatistics taxiOverTime = new SummaryStatistics();
         SummaryStatistics passengerWaitTime = new SummaryStatistics();
+        SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
 
         for (int i = 0; i < runs; i++) {
             MatsimRandom.reset(RANDOM_SEEDS[i]);
@@ -77,38 +78,45 @@ public class MultipleSingleIterOnlineDvrpLauncher
             taxiWaitTime.addValue(evaluation.getTaxiWaitTime());
             taxiOverTime.addValue(evaluation.getTaxiOverTime());
             passengerWaitTime.addValue(evaluation.getPassengerWaitTime());
+            maxPassengerWaitTime.addValue(evaluation.getMaxPassengerWaitTime());
         }
 
         pw.println(configIdx + "\t" + TaxiEvaluation.HEADER);
 
-        pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 taxiPickupDriveTime.getMean(),//
                 taxiDeliveryDriveTime.getMean(),//
                 taxiServiceTime.getMean(),//
                 taxiWaitTime.getMean(),//
                 taxiOverTime.getMean(),//
-                passengerWaitTime.getMean());
-        pw.printf("Min\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+                passengerWaitTime.getMean(),//
+                maxPassengerWaitTime.getMean());
+        pw.printf("Min\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
                 (int)taxiPickupDriveTime.getMin(),//
                 (int)taxiDeliveryDriveTime.getMin(),//
                 (int)taxiServiceTime.getMin(),//
                 (int)taxiWaitTime.getMin(),//
                 (int)taxiOverTime.getMin(),//
+                (int)passengerWaitTime.getMin(),//
                 (int)passengerWaitTime.getMin());
-        pw.printf("Max\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+        pw.printf("Max\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
                 (int)taxiPickupDriveTime.getMax(),//
                 (int)taxiDeliveryDriveTime.getMax(),//
                 (int)taxiServiceTime.getMax(),//
                 (int)taxiWaitTime.getMax(),//
                 (int)taxiOverTime.getMax(),//
+                (int)passengerWaitTime.getMax(),//
                 (int)passengerWaitTime.getMax());
-        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
+        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
                 taxiPickupDriveTime.getStandardDeviation(),//
                 taxiDeliveryDriveTime.getStandardDeviation(),//
                 taxiServiceTime.getStandardDeviation(),//
                 taxiWaitTime.getStandardDeviation(),//
                 taxiOverTime.getStandardDeviation(),//
+                passengerWaitTime.getStandardDeviation(),//
                 passengerWaitTime.getStandardDeviation());
+
+        // the endTime of the simulation??? --- time of last served request
 
         pw.println();
     }
@@ -152,7 +160,7 @@ public class MultipleSingleIterOnlineDvrpLauncher
         else {
             multiLauncher.run(configIdx, runs, pw);
         }
-        
+
         pw.close();
     }
 }

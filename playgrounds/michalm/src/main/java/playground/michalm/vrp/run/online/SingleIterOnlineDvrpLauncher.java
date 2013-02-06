@@ -40,7 +40,6 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import org.matsim.vis.otfvis.gui.OTFQueryControl;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
@@ -54,6 +53,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.util.gis.Schedules2GIS;
+import playground.michalm.vrp.RunningVehicleRegister;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.*;
@@ -85,7 +85,7 @@ public class SingleIterOnlineDvrpLauncher
     TaxiOptimizerFactory optimizerFactory;
 
     boolean otfVis;
-    public static OTFQueryControl queryControl;
+    //public static OTFQueryControl queryControl;
 
     boolean wal;
 
@@ -280,7 +280,9 @@ public class SingleIterOnlineDvrpLauncher
         }
     }
 
-
+    //just for debugging
+    private RunningVehicleRegister rvr;
+    
     void runSim()
     {
         if (scenario.getConfig().getQSimConfigGroup() == null) {
@@ -293,6 +295,9 @@ public class SingleIterOnlineDvrpLauncher
         EventsManager events = EventsUtils.createEventsManager();
         EventWriter writer = new EventWriterXML(dirName + "events.xml.gz");
         events.addHandler(writer);
+        
+        rvr = new RunningVehicleRegister();
+        events.addHandler(rvr);
         
         QSim qSim = new QSim(scenario, events);
         ActivityEngine activityEngine = new ActivityEngine();

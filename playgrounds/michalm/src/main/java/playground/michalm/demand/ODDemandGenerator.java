@@ -26,6 +26,7 @@ import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.xml.sax.SAXException;
 
@@ -100,16 +101,16 @@ public class ODDemandGenerator
                 for (int k = 0; k < trips; k++) {
                     Plan plan = createPlan();
 
-                    Coord oCoord = getRandomCoordInZone(oZone);
-                    Activity startAct = createActivity(plan, "dummy", oCoord);
+                    Link oLink = getRandomLinkInZone(oZone);
+                    Activity startAct = createActivity(plan, "dummy", oLink);
 
                     startAct.setEndTime((int) (startTime + k * timeStep + uniform.nextDoubleFromTo(
                             0, timeStep)));
 
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
-                    Coord dCoord = getRandomCoordInZone(dZone);
-                    createActivity(plan, "dummy", dCoord);
+                    Link dLink = getRandomLinkInZone(dZone, oLink.getId());
+                    createActivity(plan, "dummy", dLink);
 
                     createAndInitPerson(plan);
 

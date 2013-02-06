@@ -34,7 +34,7 @@ public class MielecDemandGenerator
     public static void main(String[] args)
         throws ConfigurationException, IOException, SAXException, ParserConfigurationException
     {
-        String dirName = "D:\\PP-rad\\taxi\\mielec-morning-variable\\";
+        String dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
         String networkFileName = dirName + "network.xml";
         String zonesXMLFileName = dirName + "zones.xml";
         String zonesShpFileName = dirName + "GIS\\zones_with_no_zone.SHP";

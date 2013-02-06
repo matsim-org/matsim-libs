@@ -26,6 +26,7 @@ import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.xml.sax.SAXException;
 
@@ -70,19 +71,19 @@ public class DemandGenerator
 
                 int timeShift = uniform.nextIntFromTo(-3600, 3600);
 
-                Coord home = getRandomCoordInZone(z);
+                Link home = getRandomLinkInZone(z);
                 Activity act = createActivity(plan, "h", home);
                 act.setEndTime(8 * 3600 + timeShift);
 
                 plan.addLeg(pf.createLeg(TransportMode.car));
 
-                act = createActivity(plan, "s", getRandomCoordInZone(sDistrib.draw()));
+                act = createActivity(plan, "s", getRandomLinkInZone(sDistrib.draw()));
                 act.setStartTime(9 * 3600 + timeShift);
                 act.setEndTime(15 * 3600 + timeShift);
 
                 plan.addLeg(pf.createLeg(TransportMode.car));
 
-                act = createActivity(plan, "l", getRandomCoordInZone(lDistrib.draw()));
+                act = createActivity(plan, "l", getRandomLinkInZone(lDistrib.draw()));
                 act.setStartTime(16 * 3600 + timeShift);
                 act.setEndTime(18 * 3600 + timeShift);
 
@@ -102,25 +103,25 @@ public class DemandGenerator
                 int timeShift = uniform.nextIntFromTo(-3600, 7200);
 
                 if (uniform.nextDouble() > 0.5) {// 50%
-                    Coord home = getRandomCoordInZone(z);
+                    Link home = getRandomLinkInZone(z);
                     Activity act = createActivity(plan, "h", home);
                     act.setEndTime(7 * 3600 + timeShift);
 
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
-                    act = createActivity(plan, "w", getRandomCoordInZone(wDistrib.draw()));
+                    act = createActivity(plan, "w", getRandomLinkInZone(wDistrib.draw()));
                     act.setStartTime(8 * 3600 + timeShift);
                     act.setEndTime(12 * 3600 + timeShift);
 
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
-                    act = createActivity(plan, "l", getRandomCoordInZone(lDistrib.draw()));
+                    act = createActivity(plan, "l", getRandomLinkInZone(lDistrib.draw()));
                     act.setStartTime(13 * 3600 + timeShift);
                     act.setEndTime(14 * 3600 + timeShift);
 
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
-                    act = createActivity(plan, "w", getRandomCoordInZone(wDistrib.draw()));
+                    act = createActivity(plan, "w", getRandomLinkInZone(wDistrib.draw()));
                     act.setStartTime(15 * 3600 + timeShift);
                     act.setEndTime(18 * 3600 + timeShift);
 
@@ -130,13 +131,13 @@ public class DemandGenerator
                     act.setStartTime(19 * 3600 + timeShift);
                 }
                 else {
-                    Coord home = getRandomCoordInZone(z);
+                    Link home = getRandomLinkInZone(z);
                     Activity act = createActivity(plan, "h", home);
                     act.setEndTime(8 * 3600 + timeShift);
 
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
-                    act = createActivity(plan, "w", getRandomCoordInZone(wDistrib.draw()));
+                    act = createActivity(plan, "w", getRandomLinkInZone(wDistrib.draw()));
                     act.setStartTime(9 * 3600 + timeShift);
                     act.setEndTime(17 * 3600 + timeShift);
 
@@ -162,13 +163,13 @@ public class DemandGenerator
 
                 int timeShift = uniform.nextIntFromTo(-3600, 3600);
 
-                Coord home = getRandomCoordInZone(z);
+                Link home = getRandomLinkInZone(z);
                 Activity act = createActivity(plan, "h", home);
                 act.setEndTime(11 * 3600 + timeShift);
 
                 plan.addLeg(pf.createLeg(TransportMode.car));
 
-                act = createActivity(plan, "l", getRandomCoordInZone(lDistrib.draw()));
+                act = createActivity(plan, "l", getRandomLinkInZone(lDistrib.draw()));
                 act.setStartTime(12 * 3600 + timeShift);
                 act.setEndTime(15 * 3600 + timeShift);
 
