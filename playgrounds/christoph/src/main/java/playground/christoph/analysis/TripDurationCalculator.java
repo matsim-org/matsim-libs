@@ -109,7 +109,7 @@ public class TripDurationCalculator implements AgentDepartureEventHandler, Agent
 		double travelTime = event.getTime() - departureTime;
 		String mode = event.getLegMode();
 		List<Double> modeTravelTimes = legTravelTimes.get(mode);
-		modeTravelTimes.add(travelTime);
+		if (modeTravelTimes != null) modeTravelTimes.add(travelTime);
 	}
 
 	@Override
