@@ -432,8 +432,12 @@ public class PtMatrix {
 		PtStop fromPtStop = this.qTree.get(fromFacilityCoord.getX(), fromFacilityCoord.getY());
 		PtStop toPtStop   = this.qTree.get(toFacilityCoord.getX(), toFacilityCoord.getY());
 		
-		if(fromPtStop == toPtStop)
-			return 0.;
+		// tnicolai feb'13: This leads to the following behavior:
+		// if the origin and destination location are very far away (on the opposite site of the city) from the ptStops 
+		// it is likely that the origin and destination ptStop will be the same. This leeds to ptTravelTimes = 0 and walkingTimes = 0.
+		// At least the walking times should indicate that it is not feasible to use pt
+		//if(fromPtStop == toPtStop)
+		//	return 0.;
 		
 		double walkTravelTimeFromFacility2FromPtStop = NetworkUtil.getEuclidianDistance(fromFacilityCoord, fromPtStop.getCoord()) / meterPerSecWalkSpeed;
 		double walkTravelTimeToPtStop2ToFacility = NetworkUtil.getEuclidianDistance(toPtStop.getCoord(), toFacilityCoord) / meterPerSecWalkSpeed;
