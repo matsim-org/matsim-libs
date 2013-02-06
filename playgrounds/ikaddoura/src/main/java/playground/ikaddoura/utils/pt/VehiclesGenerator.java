@@ -52,7 +52,16 @@ public class VehiclesGenerator {
 	/**
 	 * Generates transit vehicles for each given transit line of a given schedule.
 	 */
-	public void createVehicles(TransitSchedule schedule, List<Id> lineIDs, int busSeats, int standingRoom, double length, Id vehTypeId, double egressSeconds, double accessSeconds, DoorOperationMode doorOperationMode) {
+	public void createVehicles(TransitSchedule schedule, List<Id> lineIDs, int busSeats, int standingRoom, double length, Id vehTypeId, double egressSeconds, double accessSeconds, DoorOperationMode doorOperationMode, double pcu, double maxVelocity) {
+		
+		if (pcu==0.){
+			log.info("Passenger car equivalents (pcu) is 0.0. Calculating a pcu value based on the given vehicle length of " + length + " meters.");
+			log.info("Assumptions: 1 pcu = 7.5 meters (default); Adding 3 meters on top of the vehicle length (1.5m before and behind the vehicle)");
+			pcu = (length + 3) / 7.5;
+			log.info("Calculated pcu: " + pcu);
+		} else {
+			log.warn("Ignoring vehicle length. Using pcu instead.");
+		}
 		
 		for (Id transitLineId : lineIDs){
 			log.info("Creating transit vehicles for transit line " + transitLineId);
@@ -79,6 +88,9 @@ public class VehiclesGenerator {
 			type.setAccessTime(accessSeconds);
 			type.setEgressTime(egressSeconds);
 			type.setDoorOperationMode(doorOperationMode);
+			
+			type.setMaximumVelocity(maxVelocity);
+			type.setPcuEquivalents(pcu);
 			
 			veh.getVehicleTypes().put(vehTypeId, type); 
 			

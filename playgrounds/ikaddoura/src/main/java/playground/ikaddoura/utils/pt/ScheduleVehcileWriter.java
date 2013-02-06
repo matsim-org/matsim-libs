@@ -46,7 +46,6 @@ public class ScheduleVehcileWriter {
 	private String scheduleFile;
 
 	private String networkFile;
-	private String linkIdMarker;
 	private String transitRouteMode;
 	private boolean isBlocking;
 	private boolean awaitDeparture;
@@ -67,33 +66,35 @@ public class ScheduleVehcileWriter {
 	private double egressSeconds;
 	private double accessSeconds;
 	private DoorOperationMode doorOperationMode;
-	
+	private double pcu;
+	private double maxVelocity;
 	
 	public static void main(String[] args) {
 
 		
 		ScheduleVehcileWriter svw = new ScheduleVehcileWriter();
 		
-		svw.setOutputDirectory("/Users/Ihab/Desktop/scheduleVehicleWriter/output/");
-		svw.setNetworkFile("/Users/Ihab/Desktop/scheduleVehicleWriter/input/network.xml");
+		svw.setOutputDirectory("/Users/Ihab/Desktop/");
+		svw.setNetworkFile("/Users/Ihab/Desktop/network_mixed.xml");
 		svw.setScheduleFile("transitSchedule.xml");
 		svw.setVehiclesFile("transitVehicles.xml");
 		svw.setHeadway_sec(3600.);
 		svw.setBusSeats(61);
 		svw.setStandingRoom(0);
-		svw.setLength(10);
+		svw.setLength(15);
+		svw.setMaxVelocity(8.34); // default: Double.POSITIVE_INFINITY
+		svw.setPcu(2.5); // if 0 the pcu are calculated: pcu = (length+3m) / 7.5m
 		
 		svw.setStopTime_sec(15);
 		svw.setScheduleSpeed_m_sec(8.3333333);
 		svw.setAwaitDeparture(true);
 		svw.setBlocking(false);
 		svw.setTransitRouteMode("bus");
-		svw.setLinkIdMarker("bus");
 		svw.setPausenzeit(600);
 		svw.setStartTime(4 * 3600);
 		svw.setEndTime(24 * 3600);
 		
-//		double length = (0.1184 * capacity + 5.2152) + 2.;	// see linear regression analysis in "BusCostsEstimations.xls", + 2m distance (before/behind)
+//		double length = (0.1184 * capacity + 5.2152);	// see linear regression analysis in "BusCostsEstimations.xls"
 //		int busSeats = (int) (capacity * 1.) + 1; // plus one seat because a seat for the driver is expected
 //		int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 		
@@ -111,7 +112,7 @@ public class ScheduleVehcileWriter {
 		directory.mkdirs();
 
 		ScheduleFromCorridor sfn = new ScheduleFromCorridor(this.networkFile);
-		sfn.createTransitSchedule(this.linkIdMarker, this.transitRouteMode, this.isBlocking, this.awaitDeparture, this.scheduleSpeed_m_sec, this.stopTime_sec);
+		sfn.createTransitSchedule(this.transitRouteMode, this.isBlocking, this.awaitDeparture, this.scheduleSpeed_m_sec, this.stopTime_sec);
 		this.schedule = sfn.getTransitSchedule();
 
 		List<Id> lineIDs = new ArrayList<Id>();
@@ -125,7 +126,7 @@ public class ScheduleVehcileWriter {
 		
 		// create Vehicles for each line
 		VehiclesGenerator vg = new VehiclesGenerator();
-		vg.createVehicles(this.schedule, lineIDs, this.busSeats, this.standingRoom, this.length, this.vehTypeId, this.egressSeconds, this.accessSeconds, this.doorOperationMode);
+		vg.createVehicles(this.schedule, lineIDs, this.busSeats, this.standingRoom, this.length, this.vehTypeId, this.egressSeconds, this.accessSeconds, this.doorOperationMode, this.pcu, this.maxVelocity);
 		this.vehicles = vg.getVehicles();
 		
 		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(this.vehicles);
@@ -167,10 +168,6 @@ public class ScheduleVehcileWriter {
 	
 	public void setScheduleSpeed_m_sec(double scheduleSpeed_m_sec) {
 		this.scheduleSpeed_m_sec = scheduleSpeed_m_sec;
-	}
-	
-	public void setLinkIdMarker(String linkIdMarker) {
-		this.linkIdMarker = linkIdMarker;
 	}
 
 	public void setTransitRouteMode(String transitRouteMode) {
@@ -220,5 +217,13 @@ public class ScheduleVehcileWriter {
 	public void setVehiclesFile(String vehiclesFile) {
 		this.vehicleFile = vehiclesFile;
 	}
-	
+
+	public void setPcu(double pcu) {
+		this.pcu = pcu;
+	}
+
+	public void setMaxVelocity(double maxVelocity) {
+		this.maxVelocity = maxVelocity;
+	}
+		
 }

@@ -50,8 +50,10 @@ import playground.ikaddoura.optimization.analysis.OperatorUserAnalysis;
 import playground.ikaddoura.optimization.analysis.Users;
 import playground.ikaddoura.optimization.io.OptSettings;
 import playground.ikaddoura.optimization.io.OptSettingsReader;
+import playground.ikaddoura.optimization.io.PopFilePathsLoader;
 import playground.ikaddoura.optimization.io.RndSeedsLoader;
 import playground.ikaddoura.optimization.io.TextFileWriter;
+import playground.ikaddoura.utils.prepare.PopulationWorkOtherGenerator;
 import playground.ikaddoura.utils.pt.DeparturesGenerator;
 import playground.ikaddoura.utils.pt.ScheduleFromCorridor;
 import playground.ikaddoura.utils.pt.VehiclesGenerator;
@@ -67,9 +69,12 @@ class ExternalControler {
 	
 	static String configFile;
 	static String outputPath;
-	static String rndSeedsFile;
-	static int rndSeedNr;
+	
+	static boolean useRandomSeedsFile;
+	static boolean usePopulationPathsFile;
+
 	static long randomSeed;
+	static String populationFile;
 	
 	static double incrHeadway;
 	static double incrFare;
@@ -102,20 +107,12 @@ class ExternalControler {
 		if (args.length == 0){
 			settingsFile = "/Users/Ihab/Desktop/input/settingsFile.csv";
 			configFile = "/Users/Ihab/Desktop/input/config.xml";
-			outputPath = "/Users/Ihab/Desktop/output";			
+			outputPath = "/Users/Ihab/Desktop/output";
+			
 		} else {
 			settingsFile = args[0];
 			configFile = args[1];
 			outputPath = args[2];
-			
-			if (args.length > 3) {
-				rndSeedsFile = args[3];		
-				rndSeedNr = Integer.parseInt(args[4]);
-				RndSeedsLoader rndSeedsLoader = new RndSeedsLoader(rndSeedsFile);
-				log.info("Looking up randomSeed #" + rndSeedNr + " from file " + rndSeedsFile + "...");
-				randomSeed = rndSeedsLoader.getRandomSeed(rndSeedNr);
-				log.info("Looking up randomSeed #" + rndSeedNr + " from file " + rndSeedsFile + "... Done. RandomSeed: " + randomSeed);
-			}
 		}
 				
 		OptSettingsReader settingsReader = new OptSettingsReader(settingsFile);
@@ -135,6 +132,31 @@ class ExternalControler {
 		stepsFare = settings.getStepsFare();
 		stepsCapacity = settings.getStepsCapacity();
 		stepsDemand = settings.getStepsDemand();
+		
+		useRandomSeedsFile = settings.isUseRandomSeedsFile();
+		usePopulationPathsFile = settings.isUsePopulationPathsFile();
+		
+		if (useRandomSeedsFile){
+			String randomSeedsFile = settings.getRandomSeedsFile();
+			int rndSeedNr = Integer.parseInt(args[3]);
+			RndSeedsLoader rndSeedsLoader = new RndSeedsLoader(randomSeedsFile);
+			log.info("Looking up randomSeed #" + rndSeedNr + " from file " + randomSeedsFile + "...");
+			randomSeed = rndSeedsLoader.getRandomSeed(rndSeedNr);
+			log.info("Looking up randomSeed #" + rndSeedNr + " from file " + randomSeedsFile + "... Done. RandomSeed: " + randomSeed);
+		} else {
+			log.info("Random seed will be set via config.");
+		}
+		
+		if (usePopulationPathsFile){
+			String populationPathsFile = settings.getPopulationPathsFile();
+			int popFilePathNr = Integer.parseInt(args[4]);
+			PopFilePathsLoader popFilePathsLoader = new PopFilePathsLoader(populationPathsFile);
+			log.info("Looking up population file path #" + popFilePathNr + " from file " + populationPathsFile + "...");
+			populationFile = popFilePathsLoader.getPopulationFile(popFilePathNr);
+			log.info("Looking up randomSeed #" + popFilePathNr + " from file " + populationPathsFile + "... Done. RandomSeed: " + populationFile);
+		} else {
+			log.info("Population file will be set via config.");
+		}
 		
 		log.info("Setting parameters... Done.");
 		
@@ -166,9 +188,16 @@ class ExternalControler {
 					fare = startFare;
 					for (int fareStep = 0; fareStep <= stepsFare ; fareStep++){
 
-						log.info("*********************************************************");
-						log.info("demand: " + demand + " // headway: " + headway + " // fare: " + fare + " // capacity: " + capacity);
+						log.info("################################################");
+						log.info("         BEGIN OF EXTERNAL ITERATION " + iterationCounter);
+						log.info("################################################");
+						
 						runInternalIteration(iterationCounter, demand, headway, capacity, fare);
+						
+						log.info("################################################");
+						log.info("           END OF EXTERNAL ITERATION " + iterationCounter);
+						log.info("################################################");
+						
 						iterationCounter++;
 						
 						if (fareStep < stepsFare){
@@ -196,7 +225,9 @@ class ExternalControler {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
 
-		String directoryIt = outputPath + "/extITERS/" + iterationCounter + "_demand" + demand + "_headway" + headway + "_fare" + fare + "_capacity" + capacity;
+//		String directoryIt = outputPath + "/extITERS/" + iterationCounter + "_demand" + demand + "_headway" + headway + "_fare" + fare + "_capacity" + capacity;
+		String directoryIt = outputPath + "/extITERS/" + iterationCounter;
+
 		File directory = new File(directoryIt);
 		directory.mkdirs();
 		scenario.getConfig().controler().setOutputDirectory(directoryIt);
@@ -281,14 +312,18 @@ class ExternalControler {
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		
 		if (startDemand == 0 && incrDemand == 0 && stepsDemand == 0){
-			log.info("No populationFile written. Expecting populationFile in config.");
+			if (usePopulationPathsFile){
+				log.info("Population paths file enabled. Expecting population file paths.");
+			} else {
+				log.info("Population paths file disabled. Expecting population file in config.");
+			}
 		} else {
 			int demand = startDemand;
 			for (int demandStep = 0; demandStep <= stepsDemand; demandStep++){
 			
 				log.info("Writing population...");
 				String populationFile = dir + "population" + demand + ".xml";
-				PopulationGenerator pG = new PopulationGenerator(scenario);
+				PopulationWorkOtherGenerator pG = new PopulationWorkOtherGenerator(scenario);
 				pG.writePopulation(demand, populationFile);
 		
 				this.demand2populationFile.put(demand, populationFile);
@@ -304,7 +339,7 @@ class ExternalControler {
 			String scheduleFile = dir + "transitSchedule_headway" + headway + ".xml";
 			
 			ScheduleFromCorridor sfn = new ScheduleFromCorridor(scenario.getNetwork());
-			sfn.createTransitSchedule("bus", "bus", false, true, 8.3333333, 15);
+			sfn.createTransitSchedule("bus", false, true, 8.3333333, 15);
 			schedule = sfn.getTransitSchedule();
 			
 			List<Id> lineIDs = new ArrayList<Id>();
@@ -323,12 +358,12 @@ class ExternalControler {
 				Vehicles vehicles;
 				String vehiclesFile = dir + "transitVehicles_headway" + headway + "_capacity" + capacity + ".xml";
 				
-				double length = (0.1184 * capacity + 5.2152) + 2.;	// see linear regression analysis in "BusCostsEstimations.xls", + 2m distance (before/behind)
+				double length = (0.1184 * capacity + 5.2152);	// see linear regression analysis in "BusCostsEstimations.xls"
 				int busSeats = (int) (capacity * 1.) + 1; // plus one seat because a seat for the driver is expected
 				int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 				
 				VehiclesGenerator vg = new VehiclesGenerator();
-				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 1.5, 2., DoorOperationMode.parallel);
+				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 1.5, 2., DoorOperationMode.parallel, 0.0, Double.POSITIVE_INFINITY);
 				vehicles = vg.getVehicles();
 				
 				VehicleWriterV1 vehicleWriter = new VehicleWriterV1(vehicles);
@@ -377,25 +412,28 @@ class ExternalControler {
 
 	private void checkConsitency() {
 		
+		if (usePopulationPathsFile){
+			incrDemand = 0;
+			stepsDemand = 0;
+			startDemand = 0;
+			log.info("Demand variation disabled.");
+		}
+		
 		if (incrHeadway==0 || stepsHeadway==0){
 			incrHeadway = 0;
 			stepsHeadway = 0;
-			log.info("Constant headway");
 		}
 		if (incrFare==0 || stepsFare==0){
 			incrFare = 0;
 			stepsFare = 0;
-			log.info("Constant fare");
 		}
 		if (incrCapacity==0 || stepsCapacity==0){
 			incrCapacity = 0;
 			stepsCapacity = 0;
-			log.info("Constant capacity");
 		}
 		if (incrDemand==0 || stepsDemand==0){
 			incrDemand = 0;
 			stepsDemand = 0;
-			log.info("Constant demand");
 		}
 	}
 }

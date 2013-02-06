@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.optimization;
+package playground.ikaddoura.utils.prepare;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,13 +37,13 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 
-public class PopulationGenerator {
+public class PopulationWorkOtherGenerator {
 
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 	private Scenario scenario;
 	private Population population;
 
-	public PopulationGenerator(Scenario scenario) {
+	public PopulationWorkOtherGenerator(Scenario scenario) {
 		this.scenario = scenario;
 		this.population = scenario.getPopulation();
 	}

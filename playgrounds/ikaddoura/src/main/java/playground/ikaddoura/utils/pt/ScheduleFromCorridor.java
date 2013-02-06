@@ -85,14 +85,14 @@ public class ScheduleFromCorridor {
 	}
 
 	/**
-	 * Creates the transit schedule without departures. Creates a transit line for a simple corridor network. The linkMarker sequence has to match to the network link IDs,
-	 * indicating on which link a transit stop has to be added. The schedule speed and scheduled stop time are used for calculating arrival and departure offsets
+	 * Creates the transit schedule without departures. Creates a transit line for a simple corridor network.
+	 * The transitRouteMode indicates on which link a transit stop has to be added. The schedule speed and scheduled stop time are used for calculating arrival and departure offsets
 	 * based on the length of the corridor links.
 	 *
 	 */
-	public void createTransitSchedule(String linkMarker, String transitRouteMode, boolean isBlocking, boolean awaitDeparture, double scheduleSpeed_m_sec, double stopTime_sec) {
+	public void createTransitSchedule(String transitRouteMode, boolean isBlocking, boolean awaitDeparture, double scheduleSpeed_m_sec, double stopTime_sec) {
 				
-		Map<Id,List<Id>> routeID2linkIDs = getIDs(this.network, linkMarker);
+		Map<Id,List<Id>> routeID2linkIDs = getIDs(this.network, transitRouteMode);
 		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(this.network, routeID2linkIDs, isBlocking);
 		Map<Id, NetworkRoute> routeId2networkRoute = getRouteId2NetworkRoute(routeID2linkIDs);
 		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(stopTime_sec, scheduleSpeed_m_sec, awaitDeparture, network, routeId2transitStopFacilities);
@@ -105,19 +105,19 @@ public class ScheduleFromCorridor {
 		log.info("RouteTravelTime: "+ Time.writeTime(routeTravelTime, Time.TIMEFORMAT_HHMMSS));
 	}
 
-	private Map<Id,List<Id>> getIDs(Network network, String linkMarker) {
+	private Map<Id,List<Id>> getIDs(Network network, String transitRouteMode) {
 		List <Link> busLinks = new ArrayList<Link>();
 		Map<Id, List<Id>> routeID2linkIDs = new HashMap<Id, List<Id>>();
 		List<Id> linkIDsRoute1 = new LinkedList<Id>();
 		List<Id> linkIDsRoute2 = new LinkedList<Id>();
 		
 		for (Link link : network.getLinks().values()){
-			if (link.getAllowedModes().contains(linkMarker)){
+			if (link.getAllowedModes().contains(transitRouteMode)){
 				busLinks.add(link);
 			}
 		}
 		
-		if (busLinks.isEmpty()) throw new RuntimeException("No marked links found. Link IDs have to contain [" + linkMarker + "] in order to create the transit stops. Aborting...");
+		if (busLinks.isEmpty()) throw new RuntimeException("No links found. Allowed link modes have to contain [" + transitRouteMode + "] in order to create the transit stops. Aborting...");
 		
 		// one direction
 		int fromNodeIdRoute1 = 0;

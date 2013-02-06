@@ -41,6 +41,10 @@ public class OptSettings {
 	private int stepsFare;
 	private int stepsCapacity;
 	private int stepsDemand;
+	private boolean useRandomSeedsFile;
+	private String randomSeedsFile;
+	private boolean usePopulationPathsFile;
+	private String populationPathsFile;
 
 	public double getIncrHeadway() {
 		return incrHeadway;
@@ -114,5 +118,28 @@ public class OptSettings {
 	public void setStepsDemand(int stepsDemand) {
 		this.stepsDemand = stepsDemand;
 	}
-
+	public boolean isUseRandomSeedsFile() {
+		return useRandomSeedsFile;
+	}
+	public void setUseRandomSeedsFile(boolean useRandomSeedsFile) {
+		this.useRandomSeedsFile = useRandomSeedsFile;
+	}
+	public String getRandomSeedsFile() {
+		return randomSeedsFile;
+	}
+	public void setRandomSeedsFile(String randomSeedsFile) {
+		this.randomSeedsFile = randomSeedsFile;
+	}
+	public boolean isUsePopulationPathsFile() {
+		return usePopulationPathsFile;
+	}
+	public void setUsePopulationPathsFile(boolean usePopulationPathsFile) {
+		this.usePopulationPathsFile = usePopulationPathsFile;
+	}
+	public String getPopulationPathsFile() {
+		return populationPathsFile;
+	}
+	public void setPopulationPathsFile(String populationPathsFile) {
+		this.populationPathsFile = populationPathsFile;
+	}
 }

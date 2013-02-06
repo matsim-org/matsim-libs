@@ -94,6 +94,18 @@ public class OptSettingsReader {
 	                	} else if (parts[0].equals("stepsDemand")){
 	                		this.optSettings.setStepsDemand(Integer.parseInt(parts[1]));
 	                		
+	                	} else if (parts[0].equals("useRandomSeedsFile")){
+	                		this.optSettings.setUseRandomSeedsFile(Boolean.parseBoolean(parts[1]));
+	                		
+	                	} else if (parts[0].equals("usePopulationPathsFile")){
+	                		this.optSettings.setUsePopulationPathsFile(Boolean.parseBoolean(parts[1]));
+	                	
+	                	} else if (parts[0].equals("randomSeedsFile")){
+	                		this.optSettings.setRandomSeedsFile(parts[1]);
+	                	
+	                	} else if (parts[0].equals("populationPathsFile")){
+	                		this.optSettings.setPopulationPathsFile(parts[1]);
+	                		
 	            		} else {
 	            			throw new RuntimeException(parts[0] +" is an unknown parameter in the optimization settings file. Aborting...");
 	            		}

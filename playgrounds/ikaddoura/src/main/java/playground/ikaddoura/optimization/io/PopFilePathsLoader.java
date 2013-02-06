@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -32,34 +32,33 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-
 /**
  * @author ikaddoura
  *
  */
-public class RndSeedsLoader {
-	
-	private static final Logger log = Logger.getLogger(RndSeedsLoader.class);
-	private String rndSeedsFile;
-	private Map<Integer, Integer> runNr2rndSeed = new HashMap<Integer, Integer>();
+public class PopFilePathsLoader {
 
-	public RndSeedsLoader(String rndSeedsFile) {
-		this.rndSeedsFile = rndSeedsFile;
-		log.info("RndSeedsFile set to " + this.rndSeedsFile);
+	private static final Logger log = Logger.getLogger(PopFilePathsLoader.class);
+	private String popPathsFile;
+	private Map<Integer, String> runNr2popPathsFile = new HashMap<Integer, String>();
+
+	public PopFilePathsLoader(String popPathsFile) {
+		this.popPathsFile = popPathsFile;
+		log.info("Population paths file set to " + this.popPathsFile);
 		
 		loadRndSeeds();
 	}
 
 	private void loadRndSeeds() {
-		log.info("Loading rndSeeds from file...");
+		log.info("Loading population paths from file...");
 		
 		 BufferedReader br = null;
 	        try {
-	            br = new BufferedReader(new FileReader(new File(this.rndSeedsFile)));
+	            br = new BufferedReader(new FileReader(new File(this.popPathsFile)));
 	            int runNr = 1;
 	            String line = null;
 	            while((line = br.readLine()) != null) {
-	            	this.runNr2rndSeed.put(runNr, Integer.parseInt(line));
+	            	this.runNr2popPathsFile.put(runNr, line);
 	            	runNr++;
 	            }
 	        } catch(FileNotFoundException e) {
@@ -75,11 +74,10 @@ public class RndSeedsLoader {
 	                }
 	            }
 	        }
-	        log.info("Loading rndSeeds from file... Done.");
+	        log.info("Loading population paths from file... Done.");
 	}
 
-	public long getRandomSeed(int rndSeedNr) {
-		return this.runNr2rndSeed.get(rndSeedNr);
+	public String getPopulationFile(int nr) {
+		return this.runNr2popPathsFile.get(nr);
 	}
-
 }
