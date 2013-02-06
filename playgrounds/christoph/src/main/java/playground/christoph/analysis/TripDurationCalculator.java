@@ -169,7 +169,7 @@ public class TripDurationCalculator implements AgentDepartureEventHandler, Agent
 			int index = event.getIteration() - this.minIteration;
 
 			// create chart when data of more than one iteration is available.
-			XYLineChart chart = new XYLineChart("Average Leg Travel Times Statistics", "iteration", "score");
+			XYLineChart chart = new XYLineChart("Average Leg Travel Times Statistics", "iteration", "time");
 			
 			double[] iterations = new double[index + 1];
 			for (int i = 0; i <= index; i++) {
