@@ -61,6 +61,39 @@ public class PopGenerator {
 		PopGenerator.createPopS2(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_2.xml.gz");
 		PopGenerator.createPopS3(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_3.xml.gz");
 		PopGenerator.createPopS4(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_4.xml.gz");
+		
+		networkFilename = outputDir + "network_cross.xml";
+		nPersonsPerHour = 1000;
+		PopGenerator.createPopCross(networkFilename, nPersonsPerHour, outputDir + "pop_cross.xml.gz");
+	}
+
+	private static void createPopCross(String networkFilename, int nPersonsPerHour, String outFilename) {
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(sc).readFile(networkFilename);
+		Population pop = sc.getPopulation();
+		
+		MatsimRandom.reset(4711);
+		Random rnd = MatsimRandom.getLocalInstance();
+		
+		Coord nodeACoord = sc.getNetwork().getNodes().get(new IdImpl("A")).getCoord();
+		Coord nodeBCoord = sc.getNetwork().getNodes().get(new IdImpl("B")).getCoord();
+		
+		// create trips from node A to node B and trips from node A to node B, 6-10
+		createPersons(rnd, pop, nPersonsPerHour, nodeACoord, nodeBCoord, 6, 10);
+		createPersons(rnd, pop, nPersonsPerHour, nodeBCoord, nodeACoord, 6, 10);
+		
+		Coord nodeCCoord = sc.getNetwork().getNodes().get(new IdImpl("C")).getCoord();
+		Coord nodeDCoord = sc.getNetwork().getNodes().get(new IdImpl("D")).getCoord();
+		
+		// create trips from node C to node D and trips from node C to node D, 6-10
+		createPersons(rnd, pop, nPersonsPerHour, nodeCCoord, nodeDCoord, 6, 10);
+		createPersons(rnd, pop, nPersonsPerHour, nodeDCoord, nodeCCoord, 6, 10);
+		
+		// create trips from node A to node C and trips from node C to node A, 6-10
+		createPersons(rnd, pop, nPersonsPerHour / 10, nodeACoord, nodeCCoord, 6, 10);
+		createPersons(rnd, pop, nPersonsPerHour / 10, nodeCCoord, nodeACoord, 6, 10);
+						
+		new PopulationWriter(pop, null).write(outFilename);		
 	}
 
 	private static void createPopT1(String networkFilename, int nPersonsPerHour, String outFilename) {
