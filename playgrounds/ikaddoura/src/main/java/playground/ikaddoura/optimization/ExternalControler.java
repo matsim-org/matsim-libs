@@ -153,7 +153,7 @@ class ExternalControler {
 			PopFilePathsLoader popFilePathsLoader = new PopFilePathsLoader(populationPathsFile);
 			log.info("Looking up population file path #" + popFilePathNr + " from file " + populationPathsFile + "...");
 			populationFile = popFilePathsLoader.getPopulationFile(popFilePathNr);
-			log.info("Looking up randomSeed #" + popFilePathNr + " from file " + populationPathsFile + "... Done. RandomSeed: " + populationFile);
+			log.info("Looking up population file path #" + popFilePathNr + " from file " + populationPathsFile + "... Done. Population file: " + populationFile);
 		} else {
 			log.info("Population file will be set via config.");
 		}
@@ -235,16 +235,20 @@ class ExternalControler {
 		String scheduleFile = this.headway2scheduleFile.get(headway);
 		String vehiclesFile = this.headway2capacity2vehiclesFile.get(headway).get(capacity);
 		
-		if (this.demand2populationFile.isEmpty()) {
-			String populationFile = scenario.getConfig().plans().getInputFile();
-			if (populationFile==null){
-				throw new RuntimeException("Missing populationFile in config.");
-			} else {
-				log.info("PopulationFile from config: " + scenario.getConfig().plans().getInputFile());
-			}
-		} else {
-			String populationFile = this.demand2populationFile.get(demand);
+		if (usePopulationPathsFile) {
 			scenario.getConfig().plans().setInputFile(populationFile);
+		} else {
+			if (this.demand2populationFile.isEmpty()) {
+				String populationFile = scenario.getConfig().plans().getInputFile();
+				if (populationFile==null){
+					throw new RuntimeException("Missing populationFile in config.");
+				} else {
+					log.info("PopulationFile from config: " + scenario.getConfig().plans().getInputFile());
+				}
+			} else {
+				String populationFile = this.demand2populationFile.get(demand);
+				scenario.getConfig().plans().setInputFile(populationFile);
+			}
 		}
 		
 		scenario.getConfig().transit().setTransitScheduleFile(scheduleFile);
