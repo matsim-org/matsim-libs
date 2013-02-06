@@ -46,20 +46,6 @@ public class NetworkInspector {
 		nc.run(this.scenario.getNetwork());
 	}
 	
-	public void checkNetworkAttributes(boolean checkLinks, boolean checkNodes){
-		if(checkLinks){
-			try {
-				checkLinkAttributes();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		if(checkNodes){
-				checkNodeAttributes();
-		}
-		
-	}
-	
 	public void checkLinkAttributes() throws IOException{
 		logger.info("checking link attributes...");
 		

@@ -70,10 +70,10 @@ public class Main {
 		bbox.setDefaultBoundaryBox(scenario.getNetwork());
 		
 		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 200);
-		SpatialGrid carGrid = new SpatialGrid(freeSpeedGrid);
-		SpatialGrid bikeGrid = new SpatialGrid(freeSpeedGrid);
-		SpatialGrid walkGrid = new SpatialGrid(freeSpeedGrid);
-		SpatialGrid ptGrid = new SpatialGrid(freeSpeedGrid);
+//		SpatialGrid carGrid = new SpatialGrid(freeSpeedGrid);
+//		SpatialGrid bikeGrid = new SpatialGrid(freeSpeedGrid);
+//		SpatialGrid walkGrid = new SpatialGrid(freeSpeedGrid);
+//		SpatialGrid ptGrid = new SpatialGrid(freeSpeedGrid);
 		
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl();//create facility, aus matsim-bev., strukturdaten etc.
 		
@@ -109,10 +109,10 @@ public class Main {
 		
 		ZoneLayer<Id> startZones = new ZoneLayer<Id>(zones);
 		
-		ctrl.addControlerListener(new MyParcelBasedAccessibilityControlerListener(main, startZones,
-				parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid, ptGrid, null, null,
-				sc));
-		ctrl.run();
+//		ctrl.addControlerListener(new MyParcelBasedAccessibilityControlerListener(main, startZones,
+//				parcels, freeSpeedGrid, /*carGrid, bikeGrid, walkGrid, ptGrid,*/ null, null,
+//				sc));
+//		ctrl.run();
 		
 //		Scenario sc = ScenarioUtils.createScenario(config);
 //		Scenario sc2 = ScenarioUtils.createScenario(config);
@@ -131,6 +131,24 @@ public class Main {
 //		grid.calculateTravelTime(sc.getNetwork());
 //		grid.gridComparison(1000, sc.getNetwork(), sc2.getNetwork());
 //		grid.generateSHPExport(file1,file2);
+		
+
+		//TODO: methode isRoutable nochmal umschreiben (s.u.), unterscheidung bei node degree 1: einbahnstraße oder sackgasse?, dimension des untersuchungsgebiets ausgeben lassen
+		//TODO: wenn sackgasse: sackgasse, weil se aus dem untersuchungsgebiet rausführt oder "echte" sackgasse
+		//TODO: eigenen!!! controlerListener schreiben, ohne vererbung und pipapo,accessibility berechnung soll auch OHNE simulation, OHNE population möglich sein
+		//TODO: WAS MACHT DER PARCELBASEDACCESSIBILITYCONTROLERLISTENER GENAU???
+		
+//		NetworkInspector nI = new NetworkInspector(scenario);
+//		if(nI.isRoutable()) {
+			// print "Ist routbar."
+//		} else {
+			//print "Ist nicht routbar."
+//		}
+		
+		// Analysemethoden dürfen das Netz nicht verändern.
+		
+		
+		
 		
 	}
 
