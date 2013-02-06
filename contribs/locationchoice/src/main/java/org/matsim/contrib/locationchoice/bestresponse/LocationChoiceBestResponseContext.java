@@ -43,7 +43,7 @@ public class LocationChoiceBestResponseContext {
 	private final Scenario scenario;
 	private ObjectAttributes personsKValues;
 	private ObjectAttributes facilitiesKValues;
-	private ObjectAttributes personsMaxEpsUnscaled;
+//	private ObjectAttributes personsMaxEpsUnscaled;
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
@@ -65,7 +65,7 @@ public class LocationChoiceBestResponseContext {
 	private void createObjectAttributes(long seed) {
 		this.facilitiesKValues = new ObjectAttributes();
 		this.personsKValues = new ObjectAttributes();
-		this.personsMaxEpsUnscaled = new ObjectAttributes() ;
+//		this.personsMaxEpsUnscaled = new ObjectAttributes() ;
 		
 		String pkValues = this.scenario.getConfig().locationchoice().getpkValuesFile();
 		if (!pkValues.equals("null")) {
@@ -75,12 +75,12 @@ public class LocationChoiceBestResponseContext {
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
 				this.computeAttributes(seed);
-				return ; // ??
+//				return ; // ??
 			}
 		}
 		else {
 			this.computeAttributes(seed);
-			return ; // ??
+//			return ; // ??
 		}
 		String fkValues = this.scenario.getConfig().locationchoice().getfkValuesFile();
 		if (!fkValues.equals("null")) {
@@ -90,35 +90,35 @@ public class LocationChoiceBestResponseContext {
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
 				this.computeAttributes(seed);
-				return ; // ??
+//				return ; // ??
 			}
 		}
 		else {
 			this.computeAttributes(seed);
-			return ; // ??
+//			return ; // ??
 		}
-		String maxEpsValues = this.scenario.getConfig().locationchoice().getMaxEpsFile();
-
-		if (!maxEpsValues.equals("null")) {
-			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);
-			try {
-				attributesReader.parse(maxEpsValues);
-			} catch  (UncheckedIOException e) {  // reading was not successful
-				this.computeAttributes(seed);
-				return ; // ??
-			}
-		}
-		else {
-			this.computeAttributes(seed);
-			return ; // ??
-		}
+//		String maxEpsValues = this.scenario.getConfig().locationchoice().getMaxEpsFile();
+//
+//		if (!maxEpsValues.equals("null")) {
+//			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);
+//			try {
+//				attributesReader.parse(maxEpsValues);
+//			} catch  (UncheckedIOException e) {  // reading was not successful
+//				this.computeAttributes(seed);
+//				return ; // ??
+//			}
+//		}
+//		else {
+//			this.computeAttributes(seed);
+//			return ; // ??
+//		}
 	}
 	
 	private void computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
 				seed, scenario, this.scaleEpsilon, this.actTypeConverter, this.flexibleTypes);
 		computer.assignKValues();
-		computer.run(); // for maxEpsUnscaled
+//		computer.run(); // for maxEpsUnscaled
 				
 		this.personsKValues = computer.getPersonsKValues();
 //		System.out.println( "personKValues:\n" + this.personsKValues.toString() ) ;
@@ -126,7 +126,7 @@ public class LocationChoiceBestResponseContext {
 		this.facilitiesKValues = computer.getFacilitiesKValues();
 //		System.out.println( "facilityKValues:\n" + this.facilitiesKValues.toString() ) ;
 
-		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled() ;
+//		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled() ;
 //		System.out.println( "personMaxEpsUnscaled:\n" + this.personsMaxEpsUnscaled.toString() ) ;
 
 	}
@@ -160,9 +160,9 @@ public class LocationChoiceBestResponseContext {
 		return params;
 	}
 
-	public ObjectAttributes getPersonsMaxEpsUnscaled() {
-		return personsMaxEpsUnscaled;
-	}
+//	public ObjectAttributes getPersonsMaxEpsUnscaled() {
+//		return personsMaxEpsUnscaled;
+//	}
 
 
 }

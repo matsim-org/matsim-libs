@@ -38,6 +38,7 @@ import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.SingleActLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -94,15 +95,20 @@ public class BestReplyLocationChoice extends AbstractMultithreadedModule {
 	}
 
 	private void initLocal() {
-		this.flexibleTypes = this.lcContext.getFlexibleTypes() ;
+		ActivitiesHandler handler = new ActivitiesHandler(this.scenario.getConfig().locationchoice()) ;
+		
+		this.flexibleTypes = handler.getFlexibleTypes() ;
+//		this.flexibleTypes = this.lcContext.getFlexibleTypes() ;
 		
 		((NetworkImpl) this.scenario.getNetwork()).connect(); // ???
 
-		this.actTypeConverter = this.lcContext.getConverter() ;
+		this.actTypeConverter = handler.getConverter() ;
+//		this.actTypeConverter = this.lcContext.getConverter() ;
 		
 		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());
 
-		this.scaleEpsilon = this.lcContext.getScaleEpsilon() ;
+		this.scaleEpsilon = handler.createScaleEpsilon() ;
+//		this.scaleEpsilon = this.lcContext.getScaleEpsilon() ;
 
 		List<ObjectAttributes> epsilons = this.readOrCreateEpsilons(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
 		this.sampler = new DestinationSampler(epsilons.get(persKVals), epsilons.get(facKVals), this.scenario.getConfig().locationchoice());
