@@ -269,6 +269,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				this.cols.put((byte) color.getBlue());
 				this.cols.put((byte) 128);
 			}
+			this.vert.position(0);
+			this.cols.position(0);
 		}
 
 
@@ -281,8 +283,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
 			GL2 gl = OTFGLAbstractDrawable.getGl();
-			rewindGLBuffers();
-			prepare(gl);
+			if (vert != null) {
+				drawPlanPoly(gl);
+			}
 			createActivityTextsIfNecessary(drawer);
 			OGLAgentPointLayer layer = drawer.getCurrentSceneGraph().getAgentPointLayer();
 			Point2D.Double pos = tryToFindAgentPosition(layer);
@@ -301,7 +304,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			return pos;
 		}
 
-		private void prepare(GL2 gl) {
+		private void drawPlanPoly(GL2 gl) {
 			Color color = Color.ORANGE;
 			gl.glColor4d(color.getRed() / 255., color.getGreen() / 255., color
 					.getBlue() / 255., .5);
@@ -320,11 +323,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 		private void unPrepare(GL2 gl) {
 			gl.glDisable(GL2.GL_BLEND);
-		}
-
-		private void rewindGLBuffers() {
-			vert.position(0);
-			cols.position(0);
 		}
 
 		private float getLineWidth() {
