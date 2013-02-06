@@ -2,15 +2,12 @@ package playground.dhosse.bachelorarbeit;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
@@ -21,14 +18,12 @@ import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.ParcelBasedAccessibilityControlerListenerV3;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl.GeneralizedCostSum;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.Distances;
 import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
 import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
@@ -40,16 +35,12 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.LeastCostPathTree;
-
-import com.vividsolutions.jts.geom.Point;
 
 public class MyParcelBasedAccessibilityControlerListener extends
 		ParcelBasedAccessibilityControlerListenerV3 {
 	
 	private static final Logger log = Logger.getLogger(MyParcelBasedAccessibilityControlerListener.class);
-	private static InternalConstants internalConstants = new InternalConstants();
 
 	public MyParcelBasedAccessibilityControlerListener(
 			MATSim4UrbanSimInterface main, ZoneLayer<Id> startZones,
@@ -59,7 +50,6 @@ public class MyParcelBasedAccessibilityControlerListener extends
 			ScenarioImpl scenario) {
 		super(main, startZones, parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
 				ptGrid, ptMatrix, benchmark, scenario);
-		internalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
 	}
 	
 	protected AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, /*final double jobSample,*/ final NetworkImpl network/*, final boolean isParcelMode*/){
@@ -259,10 +249,6 @@ public class MyParcelBasedAccessibilityControlerListener extends
 				bar.update();
 				
 				ActivityFacility parcel = parcelIterator.next();
-				
-				// for testing
-				// double car = carGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
-				// double walk= walkGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
 				
 				freeSpeedAccessibility = freeSpeedGridInterpolation.interpolate( parcel.getCoord() );
 				carAccessibility = carGridInterpolation.interpolate( parcel.getCoord() );

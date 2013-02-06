@@ -12,19 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
-import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.ZoneBasedAccessibilityControlerListenerV3;
-import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.charts.BarChart;
 
 public class NetworkInspector {
@@ -38,6 +26,8 @@ public class NetworkInspector {
 	private DecimalFormat df = new DecimalFormat(",##0.00");
 	
 	private double[] linkCapacities = new double[7];
+	
+	private double[] nLanes = new double[6];
 	
 	private String outputFolder = "C:/Users/Daniel/Dropbox/bsc";
 	
@@ -77,8 +67,6 @@ public class NetworkInspector {
 		FileWriter writer = new FileWriter(file);
 		int writerIndex = 0;
 		
-		double[] nLanes = new double[6];
-		
 		for(Link link : this.scenario.getNetwork().getLinks().values()){
 			double distance = 
 					Math.sqrt(Math.pow(link.getToNode().getCoord().getX() -
@@ -87,7 +75,7 @@ public class NetworkInspector {
 							link.getFromNode().getCoord().getY(), 2));
 			
 			int numberOfLanes = (int) link.getNumberOfLanes();
-			nLanes[numberOfLanes-1]++;
+			this.nLanes[numberOfLanes-1]++;
 			
 			if(link.getCapacity()<=125)//kapazitäten nach ras-q
 				this.linkCapacities[0]++;
@@ -124,7 +112,7 @@ public class NetworkInspector {
 	
 		logger.info("writing link statistics files...");
 		
-		createLaneStatisticsFiles(nLanes);
+		createLaneStatisticsFiles();
 		
 		createLinkLengthComparisonFile();
 		
@@ -161,24 +149,24 @@ public class NetworkInspector {
 		
 	}
 	
-	private void createLaneStatisticsFiles(double[] values) throws IOException {
+	private void createLaneStatisticsFiles() throws IOException {
 		
 		logger.info("writing lane statistics file...");
 		
 		File file = new File(this.outputFolder+"/test/laneStatistics.txt");
 		FileWriter writer = new FileWriter(file);
 		writer.write("Degree");
-		for(int i=0;i<values.length;i++){
+		for(int i=0;i<this.nLanes.length;i++){
 			writer.write("\t"+ (i+1));
 		}
 		writer.write("\nnObjects");
-		for(int j=0;j<values.length;j++){
-			writer.write("\t"+values[j]);
+		for(int j=0;j<this.nLanes.length;j++){
+			writer.write("\t"+this.nLanes[j]);
 		}
 		writer.close();
 		
 		BarChart chart = new BarChart("Number of lanes", "number of lanes", "number of objects");
-		chart.addSeries("nlanes", values);
+		chart.addSeries("nlanes", this.nLanes);
 		chart.saveAsPng(this.outputFolder+"/test/laneStatistics.png", 800, 600);
 	}
 
@@ -202,8 +190,8 @@ public class NetworkInspector {
 		}
 		
 		writer.close();
-		System.out.println("total length of network: " + length + "m\n"
-				+ "geom. length of network: " + gLength + "m");
+		System.out.println("total length of network links: " + length + "m\n"
+				+ "geom. length of network links: " + gLength + "m");
 	}
 	
 private void createLinkCapacityFiles() throws IOException{
