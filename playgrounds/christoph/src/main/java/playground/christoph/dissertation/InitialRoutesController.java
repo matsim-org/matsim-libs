@@ -20,8 +20,12 @@
 
 package playground.christoph.dissertation;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -29,19 +33,23 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
+import playground.christoph.analysis.TripDurationCalculator;
 import playground.christoph.controler.WithinDayInitialRoutesController;
 
 public class InitialRoutesController {
 
 	private static final Logger log = Logger.getLogger(InitialRoutesController.class);
-	
+		
 	private static boolean useWithinDayReplanning = true;
 	private static double duringLegReroutingShare = 0.10;
 	private static boolean duringLegRerouting = true;
 	private static boolean initialLegRerouting = true;
+	private static boolean useFacilityOpenTimes = true;
 	
 	public static void main (String[] args) {
 		
@@ -67,6 +75,10 @@ public class InitialRoutesController {
 				i++;
 				useWithinDayReplanning = Boolean.parseBoolean(args[i]);
 				log.info("use within-day replanning: " + useWithinDayReplanning);
+			} else if (args[i].equalsIgnoreCase("-useOpenTimesFromFacilities")) {
+				i++;
+				useFacilityOpenTimes = Boolean.parseBoolean(args[i]);
+				log.info("use open times from facilities: " + useFacilityOpenTimes);
 			} else log.warn("Unknown Parameter: " + args[i]);
 		}
 		
@@ -97,11 +109,40 @@ public class InitialRoutesController {
 		} else {
 			controler = new Controler(scenario);			
 		}
+		
 		/*
 		 * Use a scoring function which uses opening times from the facilities.
 		 */
-		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
+		if (useFacilityOpenTimes) {
+			controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));			
+		}
 				
+		controler.addControlerListener(new StartupListener() {
+			
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				/*
+				 * Create average travel time statistics.
+				 */
+				String fileName = "tripDurations";
+				String outputFileName = event.getControler().getControlerIO().getOutputFilename(fileName);
+				Set<String> modes = new HashSet<String>();
+				modes.add(TransportMode.bike);
+				modes.add(TransportMode.car);
+				modes.add(TransportMode.pt);
+				modes.add(TransportMode.ride);
+				modes.add(TransportMode.walk);
+				
+				// create TripDurationCalculator and register it as ControlerListener and EventsHandler
+				TripDurationCalculator tripDurationCalculator = new TripDurationCalculator(outputFileName, modes, true);
+				event.getControler().addControlerListener(tripDurationCalculator);
+				event.getControler().getEvents().addHandler(tripDurationCalculator);
+				
+				// TripDurationCalculator is a StartupEventListener, therefore pass event over to it.
+				tripDurationCalculator.notifyStartup(event);
+			}
+		});
+		
 		controler.run();
 	}
 }
