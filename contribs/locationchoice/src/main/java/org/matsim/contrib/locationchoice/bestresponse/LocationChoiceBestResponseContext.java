@@ -65,6 +65,7 @@ public class LocationChoiceBestResponseContext {
 	private void createObjectAttributes(long seed) {
 		this.facilitiesKValues = new ObjectAttributes();
 		this.personsKValues = new ObjectAttributes();
+		this.personsMaxEpsUnscaled = new ObjectAttributes() ;
 		
 		String pkValues = this.scenario.getConfig().locationchoice().getpkValuesFile();
 		if (!pkValues.equals("null")) {
@@ -117,10 +118,17 @@ public class LocationChoiceBestResponseContext {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
 				seed, scenario, this.scaleEpsilon, this.actTypeConverter, this.flexibleTypes);
 		computer.assignKValues();
+		computer.run(); // for maxEpsUnscaled
 				
 		this.personsKValues = computer.getPersonsKValues();
+//		System.out.println( "personKValues:\n" + this.personsKValues.toString() ) ;
+		
 		this.facilitiesKValues = computer.getFacilitiesKValues();
+//		System.out.println( "facilityKValues:\n" + this.facilitiesKValues.toString() ) ;
+
 		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled() ;
+//		System.out.println( "personMaxEpsUnscaled:\n" + this.personsMaxEpsUnscaled.toString() ) ;
+
 	}
 
 	
@@ -150,6 +158,10 @@ public class LocationChoiceBestResponseContext {
 
 	public CharyparNagelScoringParameters getParams() {
 		return params;
+	}
+
+	public ObjectAttributes getPersonsMaxEpsUnscaled() {
+		return personsMaxEpsUnscaled;
 	}
 
 
