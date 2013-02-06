@@ -42,14 +42,14 @@ public class Log2Gexf {
 	}
 	
 	public static void main(String[] args) {
-		
-		String inputFile = args[0];
-		String outputFile;
-		
-		outputFile = inputFile.replace(".txt", ".gexf.gz");
-		Log2Gexf.convertLog2Gexf(inputFile, outputFile);
-		
-		outputFile = inputFile.replace(".txt", ".tex");
-		Log2Tex.convertLog2Tex(inputFile, outputFile);
+		for (String inputFile : args) {
+			String outputFile;
+			
+			outputFile = inputFile.replace(".txt", ".gexf.gz");
+			Log2Gexf.convertLog2Gexf(inputFile, outputFile);
+			
+			outputFile = inputFile.replace(".txt", ".tex");
+			Log2Tex.convertLog2Tex(inputFile, outputFile);
+		}
 	}
 }
