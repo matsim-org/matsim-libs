@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.PassengerRoute;
@@ -43,23 +44,24 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
  *
  * @author thibautd
  */
-public class JointPlanRouter extends PlanRouter {
+public class JointPlanRouter implements PlanAlgorithm {
+	private final PlanRouter delegate;
 	
 	public JointPlanRouter(
 			final TripRouter routingHandler,
 			final ActivityFacilities facilities ) {
-		super( routingHandler , facilities );
+		delegate = new PlanRouter( routingHandler , facilities );
 	}
 
 	public JointPlanRouter(
 			final TripRouter routingHandler) {
-		super( routingHandler );
+		delegate = new PlanRouter( routingHandler );
 	}
 
 	@Override
 	public void run( final Plan plan ) {
 		JointRouteIterator oldPlan = new JointRouteIterator( plan.getPlanElements() );
-		super.run( plan );
+		delegate.run( plan );
 		// "transmit" joint info before returning
 		JointRouteIterator newPlan = new JointRouteIterator( plan.getPlanElements() ) ;
 
@@ -79,6 +81,10 @@ public class JointPlanRouter extends PlanRouter {
 			oldRoute = oldPlan.nextJointRoute();
 			newRoute = newPlan.nextJointRoute();
 		}
+	}
+
+	public TripRouter getTripRouter() {
+		return delegate.getTripRouter();
 	}
 
 	private static class JointRouteIterator {

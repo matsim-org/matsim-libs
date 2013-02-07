@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * methods for easy adatpation of code in the time TripRouter
@@ -68,7 +68,7 @@ public class RoutingUtils {
 	}
 
 	public static List<PlanElement> route(
-			final PlanRouter planRouter,
+			final PlanAlgorithm planRouter,
 			final Person person,
 			final List<PlanElement> structure) {
 		final InternalPlan plan = planFactory.getInstance();
