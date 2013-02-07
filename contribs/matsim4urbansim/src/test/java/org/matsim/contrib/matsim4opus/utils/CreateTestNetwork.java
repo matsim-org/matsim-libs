@@ -125,6 +125,38 @@ public class CreateTestNetwork {
 		return location;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public static String createTestPtTravelTimesAndDistancesCSVFile(){
+		
+		// set dummy travel times or distances to all possible pairs of pt stops
+		
+		String location = TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptTravelInfo.csv";
+		BufferedWriter bw = IOUtils.getBufferedWriter(location);
+		
+		try{
+			for (int origin = 1; origin <= 4; origin++){
+				for (int destination = 1; destination <= 4; destination++){
+					if (origin == destination)
+						// set a travel time/distance of 0s or 0m between same origin and destination pt stops
+						bw.write(origin + " " + destination + " 0" + InternalConstants.NEW_LINE);
+					else
+						// set a dummy travel time/distance of 100s or 100m between different origin and destination pt stops
+						bw.write(origin + " " + destination + " 100" + InternalConstants.NEW_LINE); 
+				}
+			}
+			bw.flush();
+			bw.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return location;
+	}
+	
+	
 	public static List<Coord> getTestFacilityLocations(){
 		
 		/*    B             C

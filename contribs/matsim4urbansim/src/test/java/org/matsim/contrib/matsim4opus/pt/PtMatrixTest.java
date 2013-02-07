@@ -45,10 +45,11 @@ public class PtMatrixTest extends MatsimTestCase{
 	
 	private static final Logger log = Logger.getLogger(PtMatrixTest.class);
 	
+	// test the pt matrix if only the pt stops are known
 	@Test
-	public void testPtMatrix(){
+	public void testPtMatrixStops(){
 
-		log.info("Start testing");
+		log.info("Start testing the pt matrix with information about the pt stops.");
 		
 		long start = System.currentTimeMillis();
 		
@@ -87,8 +88,8 @@ public class PtMatrixTest extends MatsimTestCase{
 				// test travel time and distance for same origins and destinations
 				if(origin == destination){
 					
-					Assert.assertTrue(totalTravelTime == 0.);
-					Assert.assertTrue(totalTravelDistance == 0.);
+					Assert.assertTrue(totalTravelTime == 100.);
+					Assert.assertTrue(totalTravelDistance == 100.);
 				}
 				
 				// test travel time and distance for neighboring origins and destinations
@@ -122,6 +123,76 @@ public class PtMatrixTest extends MatsimTestCase{
 					// test lower bounds for pt travel distance and time
 					Assert.assertTrue(ptTravelDistance >= 180.);
 					Assert.assertTrue(ptTravelTime >= (180./defaultPtSpeed)*beelineDistanceFactor);
+				}
+			}
+		}
+		
+		// cleaning up
+		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		log.info("Creating pt matrix took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
+	}
+	
+	// tests the pt matrix if pt stops and travel times and distances are known
+	@Test
+	public void testPtMatrixTimesDistances(){
+
+		log.info("Start testing the pt matrix with information about the pt stops, pt travel times and distances.");
+		
+		long start = System.currentTimeMillis();
+		
+		// some default values
+		double defaultWalkSpeed = 1.; // in m/s
+		double defaultPtSpeed 	= 10.; // in m/s
+		double beelineDistanceFactor = 2.; // a multiplier for the pt travel distance
+
+		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
+		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile();	// creates a dummy csv file with pt stops fitting into the dummy network
+		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();	// creates a dummy csv file with pt travel times fitting into the dummy network
+		String distancesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();	// creates a dummy csv file with pt travel distances fitting into the dummy network
+		
+		MATSim4UrbanSimControlerConfigModuleV3 m4uccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
+		m4uccm.setPtStopsInputFile(stopsLocation);								// this is to be compatible with real code
+		m4uccm.setPtTravelTimesInputFile(timesLocation);						// this is to be compatible with real code
+		m4uccm.setPtTravelDistancesInputFile(distancesLocation);				// this is to be compatible with real code
+
+		// call and init the pt matrix
+		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, m4uccm);
+
+		// test the matrix
+		List<Coord> facilityList = CreateTestNetwork.getTestFacilityLocations();
+		
+		for(int origin = 0; origin < facilityList.size(); origin++){
+			for(int destination = 0; destination < facilityList.size(); destination++){
+				
+				// calculate travel times
+				double totalTravelTime = ptm.getTotalTravelTime(facilityList.get( origin ), facilityList.get( destination ));
+				double walkTravelTime = ptm.getTotalWalkTravelTime(facilityList.get( origin ), facilityList.get( destination ));
+				double ptTravelTime = ptm.getPtTravelTime(facilityList.get( origin ), facilityList.get( destination ));
+				
+				// calculate travel distances
+				double totalTravelDistance= ptm.getTotalTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
+				double walkTravelDistance = ptm.getTotalWalkTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
+				double ptTravelDistance = ptm.getPtTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
+				
+				log.info("From: " + facilityList.get( origin ).getX()+":"+facilityList.get( origin ).getY() + ", To: " + facilityList.get( destination ).getX()+":"+facilityList.get( destination ).getY()  + ", TravelTime: " + totalTravelTime + ", Travel Distance: " + totalTravelDistance);
+				
+				// test travel time and distance for same origins and destinations
+				if(origin == destination){
+					
+					Assert.assertTrue(totalTravelTime == 100./defaultWalkSpeed);
+					Assert.assertTrue(totalTravelDistance == 100.);
+				}
+				
+				// test travel time and distance for different origins and destinations
+				else {
+					
+					// test total walk travel distance and time (in this setting the total walk distance is 100m)
+					Assert.assertTrue(walkTravelDistance == 100.);
+					Assert.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
+					
+					// test pt travel distance and time (in this setting the pt travel distance is 100 m and the pt travel time is 100 min)
+					Assert.assertTrue(ptTravelDistance == 100.);
+					Assert.assertTrue(ptTravelTime == 100. * 60); // bitte dahinter schreiben warum * 60
 				}
 			}
 		}
