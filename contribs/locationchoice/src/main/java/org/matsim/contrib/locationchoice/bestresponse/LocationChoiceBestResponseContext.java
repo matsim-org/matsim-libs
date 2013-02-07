@@ -26,10 +26,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.BestReplyLocationChoice;
 import org.matsim.contrib.locationchoice.BestReplyLocationChoice.AttrType;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
+import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeMaxEpsilons;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
@@ -50,6 +52,7 @@ public class LocationChoiceBestResponseContext {
 	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
 	private CharyparNagelScoringParameters params;
+	private static final Logger log = Logger.getLogger(LocationChoiceBestResponseContext.class);
 
 	public LocationChoiceBestResponseContext(Scenario scenario) {
 		this.scenario = scenario;
@@ -73,6 +76,9 @@ public class LocationChoiceBestResponseContext {
 		String fkValuesFileName = this.scenario.getConfig().locationchoice().getfkValuesFile();
 		String maxEpsValuesFileName = this.scenario.getConfig().locationchoice().getMaxEpsFile();
 		if (!pkValuesFileName.equals("null") && !fkValuesFileName.equals("null") && !maxEpsValuesFileName.equals("null")) {
+			
+			log.info("reading kvals and maxEpsilons from files:\n"+ pkValuesFileName + "\n" + fkValuesFileName + "\n" + maxEpsValuesFileName);
+			
 			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(attrs.get(AttrType.persKVals.ordinal()));
 			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(attrs.get(AttrType.facKVals.ordinal()));
 			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(attrs.get(AttrType.maxEpsUnsc.ordinal()));
@@ -87,6 +93,7 @@ public class LocationChoiceBestResponseContext {
 			}
 		}
 		else {
+			log.info("Generating kVals and computing maxEpsilons");
 			attrs = this.computeAttributes(seed);
 			return ;
 		}
