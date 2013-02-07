@@ -37,8 +37,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.cliquessim.config.CliquesConfigGroup;
-import playground.thibautd.cliquessim.utils.JointControlerUtils;
+import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
+import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**
  * @author thibautd
@@ -50,7 +50,7 @@ public class FixedGroupsTest {
 	@Test
 	public void testIterationOrderIsDeterministic() throws Exception {
 		final String configFile = new File( utils.getPackageInputDirectory() ).getParentFile().getParentFile()+"/config.xml";
-		final Config config = JointControlerUtils.createConfig( configFile );
+		final Config config = JointScenarioUtils.createConfig( configFile );
 
 		Collection<ReplanningGroup> previous = null;
 

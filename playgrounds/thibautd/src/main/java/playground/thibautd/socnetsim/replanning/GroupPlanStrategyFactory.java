@@ -28,9 +28,9 @@ import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 
-import playground.thibautd.cliquessim.replanning.modules.jointtimeallocationmutator.JointTimeAllocationMutatorModule;
-import playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser.JointTimeModeChooserAlgorithm;
-import playground.thibautd.cliquessim.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
+import playground.thibautd.socnetsim.cliques.replanning.modules.jointtimeallocationmutator.JointTimeAllocationMutatorModule;
+import playground.thibautd.socnetsim.cliques.replanning.modules.jointtimemodechooser.JointTimeModeChooserAlgorithm;
+import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;

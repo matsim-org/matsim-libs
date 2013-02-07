@@ -44,12 +44,11 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.analysis.listeners.TripModeShares;
-import playground.thibautd.cliquessim.config.CliquesConfigGroup;
-import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.analysis.JointTripsStats;
+import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -61,6 +60,7 @@ import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.selectors.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**
  * @author thibautd
@@ -98,12 +98,12 @@ public class RunCliquesWithHardCodedStrategies {
 	}
 
 	public static Scenario createScenario(final String configFile) {
-		final Config config = JointControlerUtils.createConfig( configFile );
+		final Config config = JointScenarioUtils.createConfig( configFile );
 		// do not load joint plans (it fails with v5, and contrary to the "cliquessim"
 		// setting, it is not useful if reading plans without joint trips.
 		// XXX reading plans with joint trips will fail!
 		final Scenario scenario = ScenarioUtils.createScenario( config );
-		JointControlerUtils.tuneScenario( scenario );
+		JointScenarioUtils.tuneScenario( scenario );
 		ScenarioUtils.loadScenario( scenario );
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {

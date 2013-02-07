@@ -34,9 +34,9 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 
-import playground.thibautd.cliquessim.run.ImportedJointRoutesChecker;
 import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
+import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 
 /**
  * A simple controler for the process with joint plans.
