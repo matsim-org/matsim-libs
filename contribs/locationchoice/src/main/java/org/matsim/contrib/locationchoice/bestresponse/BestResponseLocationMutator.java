@@ -232,14 +232,9 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	 */
 	private double convertEpsilonIntoDistance(Person person, String type) {
 		double maxEpsilon = 0.0;
-		double scale = 1.0;
-
-		this.scaleEpsilon.getEpsilonFactor(type);
-		// yyyyyy what is the above line of code doing?  kai, jan'13
-		
+		double scale = this.scaleEpsilon.getEpsilonFactor(type);		
 		maxEpsilon = (Double) this.personsMaxEpsUnscaled.getAttribute(person.getId().toString(), type);
-
-		maxEpsilon *= scale;
+		maxEpsilon *= scale; // apply the scale factors given in the config file
 
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
