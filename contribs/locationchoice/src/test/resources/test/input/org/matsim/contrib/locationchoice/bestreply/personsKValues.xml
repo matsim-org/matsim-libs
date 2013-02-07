@@ -3,7 +3,7 @@
 
 <objectAttributes>
 	<object id="1">
-		<attribute name="k" class="java.lang.Double">0.31489140844497254</attribute>
+		<attribute name="k" class="java.lang.Double">0.01489140844497254</attribute>
 	</object>
 	<object id="2">
 		<attribute name="k" class="java.lang.Double">0.9950867648392226</attribute>

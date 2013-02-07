@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeMaxEpsilons;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -27,6 +28,8 @@ public class BestReplyTest extends MatsimTestCase {
 	public void testSampler() {
 		DestinationSampler sampler = new DestinationSampler(
 				context.getPersonsKValues(), context.getFacilitiesKValues(), scenario.getConfig().locationchoice());
+		assertTrue(sampler.sample(new IdImpl(1), new IdImpl(1)));
+		assertTrue(!sampler.sample(new IdImpl(1), new IdImpl(2)));
 	}
 	
 	public void init() {
