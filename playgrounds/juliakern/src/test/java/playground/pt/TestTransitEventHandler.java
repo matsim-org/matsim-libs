@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.jfree.util.Log;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -67,7 +68,7 @@ public class TestTransitEventHandler {
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
 	private PtDriverIdHandler ptDriverHandler= new PtDriverIdHandler();
 	@Rule public MatsimTestUtils utils= new MatsimTestUtils();
-	@Test //@Ignore
+	@Test @Ignore
 	public final void testHandleEventAgentArrival(){
 	
 		String netFilename = utils.getInputDirectory() + "network.xml"; //stimmt
@@ -78,7 +79,7 @@ public class TestTransitEventHandler {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = sc.getConfig();
 		
-		config.network().setInputFile(netFilename);
+		//config.network().setInputFile(netFilename);
 		NetworkImpl network = (NetworkImpl) sc.getNetwork();
 		Node node1 = network.createAndAddNode(sc.createId("1"), sc.createCoord(-20000.0,     0.0));
 		Node node2 = network.createAndAddNode(sc.createId("2"), sc.createCoord(-17500.0,     0.0));
@@ -133,11 +134,11 @@ public class TestTransitEventHandler {
 		ptList.add("normal");
 		ptList.add("different links"); //ptList.add("different persons"); ptList.add("different persons2");
 		for(String id: ptList ){
-			if(ptDriverIdAnalyzer.isPtDriver(new IdImpl(id))==false)System.out.println(id+ "is not ");
 			Assert.assertTrue("public transport", ptDriverIdAnalyzer.isPtDriver(new IdImpl(id)));
 		}
 		
 		Assert.assertEquals("total duration should be"+exp, exp, teh.getVehicleHours(), MatsimTestUtils.EPSILON);
+		Log.info("done");
 	}
 
 	private void createArrivalEvents(LinkedList<AgentArrivalEvent> arrivalEvents) {
