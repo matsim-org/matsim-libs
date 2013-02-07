@@ -73,7 +73,7 @@ public class ChoiceProba {
 		ptPlanAnalyzer = new PtPlanAnalyzer(net, schedule);
 		
 		//create StopNumberPerPassenger object for analysis of stop per line 
-		stopNumberPerPassenger = new StopNumberPerPassenger(net, schedule, line);
+		//stopNumberPerPassenger = new StopNumberPerPassenger(net, schedule, line); //only if one wants stop-use analysis
 	
 	}
 
@@ -81,11 +81,11 @@ public class ChoiceProba {
 		//these are just variables for output
 		final String NR= "\n";
 		final String TB= "\t";
-		final String s = "s";
+		final String s = "yes";
 		final String empty = "";
 		StringBuffer sBuff = new StringBuffer();
 		
-		sBuff.append("AGENT" + TB + "trWalkTime_s" + TB + "InVehTravTime_s" + TB + "tInVehDist_m" + TB + "transfers" + TB + "MATSIM SCORE"+	TB + "PROBA" + TB + "CADYTS SCORE" + TB + "CADYTS PROBA" + TB + "DIF_.25" + TB + "POST PROBAB" + /*TB + "MATSIM SELECTED" + TB + "CADYTS SELECTED" + */ TB + "M44_STOPS\n");
+		sBuff.append("AGENT" + TB + "trWalkTime_s" + TB + "InVehTravTime_s" + TB + "tInVehDist_m" + TB + "transfers" + TB + "MATSIM SCORE"+	TB + "MATSim_PROBA" + TB + "MATSim_SELECTED" + TB +  "CADYTS SCORE" + TB + "CADYTS PROBA" + TB +  "CADYTS_SELECTED" + TB + "DIF_.25" + TB + "POST PROBAB" + TB + "M44_STOPS\n");
 		
 		for (Person matsimPerson: popWithMatsimScores.getPersons().values()){
 			//get Matsims-ExpBeta selection probabilities (a priory)
@@ -114,10 +114,10 @@ public class ChoiceProba {
 				plan_postProbab_Map.put(i, postProbab);
 			}
 
-			//calculate how many stops of the given line used the person
-			stopNumberPerPassenger.get_persId_stopNumRecList_Map().clear();
-			stopNumberPerPassenger.run(cadytsPerson);
-			List<StopNumRecord> stopNumRecordList = stopNumberPerPassenger.get_persId_stopNumRecList_Map().entrySet().iterator().next().getValue();
+			//calculate how many stops of the given line used the person. //only if one wants stop-use analysis
+			//stopNumberPerPassenger.get_persId_stopNumRecList_Map().clear();
+			//stopNumberPerPassenger.run(cadytsPerson);
+			//List<StopNumRecord> stopNumRecordList = stopNumberPerPassenger.get_persId_stopNumRecList_Map().entrySet().iterator().next().getValue();
 					
 			boolean diffCadytsProbabilities = false;
 			StringBuffer sBuffPersonAnalysis = new StringBuffer();
@@ -132,20 +132,20 @@ public class ChoiceProba {
 				//pt analysis to find out trWalkTime, inVehTravTime, InVehDist, Transfers_num values
 				PtPlanAnalysisValues v = ptPlanAnalyzer.run(matsimPlan);  //matsim and cadyts plans trip values should be the same. The only diffs. should be score and selected plan
 				
-				//further analysis
-				String matsimSelected = matsimPlan.isSelected()? s : empty ;
-				int stops = stopNumRecordList.get(i).getStopsNum();
-				String cadytsSelected = stopNumRecordList.get(i).isSelected()? s : empty ;
-				 
+				//only if one wants stop-use analysis
+				//int stops = stopNumRecordList.get(i).getStopsNum();
 				
-				sBuffPersonAnalysis.append(i + TB + v.getTransitWalkTime_secs() + TB + v.getInVehTravTime_secs() + TB + v.getInVehDist_mts() + TB + v.getTransfers_num() + TB + matsimPlan.getScore() + TB + matsimProbab + TB + cadytsPlan.getScore() + TB + cadytsProbab + TB + TB + postProbab + /* TB + matsimSelected + TB + cadytsSelected +*/ TB + stops + NR);
+				String matsimSelected = matsimPlan.isSelected()? s : empty ;
+				String cadytsSelected = cadytsPlan.isSelected()? s : empty ;
+				
+				sBuffPersonAnalysis.append(i + TB + v.getTransitWalkTime_secs() + TB + v.trTravelTime_secs() + TB + v.getInVehDist_mts() + TB + v.getTransfers_num() + TB + matsimPlan.getScore() + TB + matsimProbab + TB + matsimSelected + TB + cadytsPlan.getScore() + TB + cadytsProbab + TB + cadytsSelected + TB + TB + postProbab + /* TB + matsimSelected + TB + cadytsSelected +*/  /* TB + stops +*/ NR);
 			
 				//find persons with proba very different from 0.25 for each plan
 				diffCadytsProbabilities = (0.25 - Math.abs(cadytsProbab))> 0.02 || diffCadytsProbabilities ;
 			}
 	
 			//store values in string buffer for output
-			sBuff.append(matsimPerson.getId() + TB + TB + TB + TB + TB + TB + TB + TB + TB + diffCadytsProbabilities + NR + sBuffPersonAnalysis);
+			sBuff.append(matsimPerson.getId() + TB + TB + TB + TB + TB + TB + TB + TB + TB + TB +  TB + diffCadytsProbabilities + NR + sBuffPersonAnalysis);
 
 		}
 		
@@ -159,7 +159,7 @@ public class ChoiceProba {
 	
 	
 	/**
-	 * Calculates selection probabilities according to ExpBetaPlanChanger and code
+	 * Calculates selection probabilities with a ExpBetaPlanSelector instance
 	 */
 	protected Map<Plan, Double> getPlansSelectionProbabilities(final Person person) {
 		Map<Plan, Double> plan_proba_Map = new LinkedHashMap<Plan, Double>(person.getPlans().size());
@@ -218,12 +218,28 @@ public class ChoiceProba {
 	}
 	
 	public static void main(String[] args) {
-		String strPlansWithMatsimScores = "../../input/sep/tasteRouting/500.plans.xml"; // input sep routing almost the same 10x autom timeMutated. Differences: here are matsim scores and choice probab used  
-		String strPlansWithCadytsCorrection = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.plans.xml";
-		String outputFile = "../../input/sep/tasteRouting/choiceProbabilities.xls";
-		String scheduleFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
-		String netFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String strLineId = "B-M44";
+		String strPlansWithMatsimScores ; // input sep routing almost the same 10x autom timeMutated. Differences: here are matsim scores and choice probab used  
+		String strPlansWithCadytsCorrection;
+		String outputFile ;
+		String scheduleFile ;
+		String netFile ;
+		String strLineId ;
+		
+		if (args.length>0){
+			strPlansWithMatsimScores = args[0];   
+			strPlansWithCadytsCorrection =args[1];
+			outputFile =args[2];
+			scheduleFile =args[3];
+			netFile =args[4];
+			strLineId =args[5];			
+		}else{
+			strPlansWithMatsimScores = "../../input/choiceM44/500.plansMatsim.xml.gz";										//"../../input/newDemand/ptLinecountsScenario/OutputPlansfromCluster/500.plansMATSIM.xml.gz"; // input sep routing almost the same 10x autom timeMutated. Differences: here are matsim scores and choice probab used  
+			strPlansWithCadytsCorrection = "../../input/choiceM44/poponlyM44.xml.gzWithUtilCorrections.xml.gz";  	//"../../input/newDemand/ptLinecountsScenario/OutputPlansfromCluster/500.plansCadyts.xml.gz";
+			outputFile = "../../input/choiceM44/m44choiceProbabilities.xls"; //"../../input/newDemand/ptLinecountsScenario/choiceProbabilities.xls";
+			scheduleFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
+			netFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			strLineId = "B-M44";
+		}
 		
 		//load data
 		DataLoader dataLoader = new DataLoader();

@@ -41,37 +41,40 @@ import playground.mmoyo.io.PopSecReader;
 import playground.mmoyo.io.TextFileWriter;
 import playground.mmoyo.utils.DataLoader;
 
-
-public class SingularValueDecomposition implements PersonAlgorithm{
+public class MySVDcalculator implements PersonAlgorithm{
 	PtPlanAnalyzer planAnalizer;
 	private StringBuffer sBuff = new StringBuffer("IdAgent\tBetawalk\tBetainvehTime\tBetaDistance\tBetaTransfer");
 	final String TB = "\t";
 	final String NL = "\n";
 	
-	public SingularValueDecomposition(final Network net, final TransitSchedule schedule){
+	public MySVDcalculator(final Network net, final TransitSchedule schedule){
 		planAnalizer = new PtPlanAnalyzer(net, schedule);
 	}
 	
-	@Override
-	public void run(final Person person) {
-		//objective: to create this matrices
-		//						A						X			B
+	public SVDvalues getSVDvalues(final Person person, double [] utilCorrection) {
+		//objective: to create these matrices
+		//						A						X			b
 		//         walk time dist chng     	betas		UtlCorr 	
 		//plan1 ┌ w1   t1   d1   c1 ¬  	┌ ßw¬   	┌λ1¬ 
 		//plan2 | w2   t2 	  d2  	c2  |  	| ßt  |   	| λ2 |
 		//plan3 | w3   t3	  d3 	c3  |  	| ßd  |	| λ3 |
 		//plan4 └ w4   t4	  d4   c4 ┘		└ ßc ┘	└λ4 ┘
-
+		
+		if (utilCorrection.length != person.getPlans().size()){
+			throw new RuntimeException(" Number of plans utility corrections is not the same as the number of agent plans");
+		}
+		
+		//up to now it is hard coded to 4 beta values in matrix X: trWalkTime_sec, trTravelTime_sec, InVehDist_mts, transfers_num  
 		double[][] arrayA = new double [person.getPlans().size()][4]; 
-		double[] arrayB = new double [4];
+		double[] arrayB = new double [utilCorrection.length];
 		int i = 0;
 		for (Plan plan: person.getPlans()){
 			PtPlanAnalysisValues v = planAnalizer.run(plan);
 			arrayA[i][0] = v.getTransitWalkTime_secs();  //[row][col] 
-			arrayA[i][1] = v.getInVehTravTime_secs();
+			arrayA[i][1] = v.trTravelTime_secs();
 			arrayA[i][2] = v.getInVehDist_mts();
 			arrayA[i][3] = v.getTransfers_num();
-			arrayB[i]= plan.getScore();
+			arrayB[i]= utilCorrection[i];
 			i++;
 		}
 
@@ -81,9 +84,19 @@ public class SingularValueDecomposition implements PersonAlgorithm{
 		RealVector utlCorrections = new ArrayRealVector(arrayB, false); //"constants" matrix
 		RealVector solution = svd.solve(utlCorrections);
 		
-		sBuff.append(NL + person.getId() + TB + solution.getEntry(0) + TB + solution.getEntry(1) + TB + solution.getEntry(2) + TB + solution.getEntry(3));
+		return new SVDvalues (person.getId(), solution.getEntry(0), solution.getEntry(1), solution.getEntry(2), solution.getEntry(3));
 	}
 	
+	@Override
+	public void run(final Person person) {   //it assumes that the score is the utility correction!
+		double[] scores = new double[person.getPlans().size()];
+		for (int i=0; i<person.getPlans().size() ; i++ ){
+			scores[i] = person.getPlans().get(i).getScore();
+		}
+		SVDvalues svdValues = this.getSVDvalues(person, scores );
+		sBuff.append(NL + svdValues.getIdAgent() + TB + svdValues.getWeight_trWalkTime() + TB + svdValues.getWeight_trTime() + TB + svdValues.getWeight_trDistance() + TB + svdValues.getWeight_changes());
+	}
+
 	private void writeSolution(final String outFile){
 		new TextFileWriter().write(sBuff.toString(), outFile, false);
 	}
@@ -109,13 +122,12 @@ public class SingularValueDecomposition implements PersonAlgorithm{
 		
 		final Network net = scn.getNetwork();
 		final TransitSchedule schedule = dataLoader.readTransitSchedule(schdFilePath);
-		SingularValueDecomposition solver = new SingularValueDecomposition(net, schedule);
+		MySVDcalculator solver = new MySVDcalculator(net, schedule);
 		new PopSecReader(scn, solver).readFile(popFilePath);
 		
 		//write solutions file
 		File file = new File(popFilePath);
 		solver.writeSolution(file.getPath() + "SVDSolutions.xls");
-		
 	}
 
 }
