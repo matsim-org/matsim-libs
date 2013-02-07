@@ -69,9 +69,9 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GenericPlanAlg
 			newIndividualPlans.addAll( splitted.getIndividualPlans() );
 		}
 
-		plans.getJointPlans().clear();
-		plans.getJointPlans().addAll( newJointPlans );
-		plans.getIndividualPlans().addAll( newIndividualPlans );
+		plans.clearJointPlans();
+		plans.addJointPlans( newJointPlans );
+		plans.addIndividualPlans( newIndividualPlans );
 	}
 
 	private GroupPlans splitPlan(final JointPlan jp) {
@@ -86,11 +86,11 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GenericPlanAlg
 			findDependentPlans( plan , jpMap , plansMap );
 
 			if ( jpMap.size() > 1 ) {
-				groupPlans.getJointPlans().add(
+				groupPlans.addJointPlan(
 						factory.createJointPlan( jpMap ) );
 			}
 			else {
-				groupPlans.getIndividualPlans().add(
+				groupPlans.addIndividualPlan(
 						jpMap.values().iterator().next() );
 			}
 		}

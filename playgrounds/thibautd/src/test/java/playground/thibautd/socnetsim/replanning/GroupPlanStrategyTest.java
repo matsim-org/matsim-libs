@@ -227,11 +227,9 @@ public class GroupPlanStrategyTest {
 				newJointPlan.put( p.getPerson().getId() , p );
 			}
 
-			plans.getJointPlans().clear();
-			plans.getJointPlans().add( factory.createJointPlan( newJointPlan ) );
-
-			plans.getIndividualPlans().clear();
-			plans.getIndividualPlans().addAll( newIndividualPlans );
+			plans.clear();
+			plans.addJointPlan( factory.createJointPlan( newJointPlan ) );
+			plans.addIndividualPlans( newIndividualPlans );
 		}
 	}
 }

@@ -40,8 +40,10 @@ import playground.thibautd.socnetsim.population.JointPlanFactory;
  * @author thibautd
  */
 public class GroupPlans {
-	private final Collection<JointPlan> jointPlans;
-	private final Collection<Plan> individualPlans;
+	private final List<JointPlan> jointPlans;
+	private final Collection<JointPlan> unmodifiableJointPlans;
+	private final List<Plan> individualPlans;
+	private final Collection<Plan> unmodifiablePlans;
 
 	public GroupPlans() {
 		this(
@@ -53,15 +55,46 @@ public class GroupPlans {
 			final Collection<JointPlan> jointPlans,
 			final Collection<Plan> individualPlans) {
 		this.jointPlans = new ArrayList<JointPlan>(jointPlans);
+		this.unmodifiableJointPlans = Collections.unmodifiableList( this.jointPlans );
 		this.individualPlans = new ArrayList<Plan>(individualPlans);
+		this.unmodifiablePlans = Collections.unmodifiableList( this.individualPlans );
 	}
 
 	public Collection<JointPlan> getJointPlans() {
-		return jointPlans;
+		return this.unmodifiableJointPlans;
 	}
 
 	public Collection<Plan> getIndividualPlans() {
-		return individualPlans;
+		return this.unmodifiablePlans;
+	}
+
+	public void addJointPlan(final JointPlan jp) {
+		jointPlans.add( jp );
+	}
+
+	public void addJointPlans(final Collection<JointPlan> jps) {
+		jointPlans.addAll( jps );
+	}
+
+	public void addIndividualPlan(final Plan p) {
+		individualPlans.add( p );
+	}
+
+	public void addIndividualPlans(final Collection<Plan> ps) {
+		individualPlans.addAll( ps );
+	}
+
+	public void clear() {
+		jointPlans.clear();
+		individualPlans.clear();
+	}
+
+	public void clearJointPlans() {
+		jointPlans.clear();
+	}
+
+	public void clearIndividualPlans() {
+		individualPlans.clear();
 	}
 
 	@Override

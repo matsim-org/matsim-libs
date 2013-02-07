@@ -76,15 +76,14 @@ class JointPlanMergingAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 		}
 
 		// update
-		plans.getIndividualPlans().clear();
-		plans.getJointPlans().clear();
+		plans.clear();
 
 		for (JointPlanBuilder builder : builders) {
 			if (builder.isJoint()) {
-				plans.getJointPlans().add( builder.build() );
+				plans.addJointPlan( builder.build() );
 			}
 			else {
-				plans.getIndividualPlans().add( builder.getIndividualPlan() );
+				plans.addIndividualPlan( builder.getIndividualPlan() );
 			}
 		}
 	}
