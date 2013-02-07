@@ -48,7 +48,6 @@ import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.thibautd.analysis.joinabletripsidentifier.ConditionValidator.Label;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
 import playground.thibautd.utils.charts.BoxAndWhiskersChart;
