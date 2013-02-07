@@ -89,13 +89,11 @@ public class LocationChoiceBestResponseContext {
 				log.error("unsuccessful reading kvals and maxEpsilons from files!\nThe values are now computed" +
 				" and following files are not considered!:\n" + pkValuesFileName + "\n" + fkValuesFileName + "\n" + maxEpsValuesFileName);
 				attrs = this.computeAttributes(seed);
-				return ; // ?? 
 			}
 		}
 		else {
 			log.info("Generating kVals and computing maxEpsilons");
 			attrs = this.computeAttributes(seed);
-			return ;
 		}
 	}
 	
