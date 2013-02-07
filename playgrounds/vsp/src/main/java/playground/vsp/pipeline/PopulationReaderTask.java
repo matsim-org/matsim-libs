@@ -1,19 +1,16 @@
-package d4d;
+package playground.vsp.pipeline;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
-import playground.vsp.pipeline.PersonSink;
-import playground.vsp.pipeline.PersonSource;
-
-
-public class PopulationReaderV5Task implements PersonSource, Runnable {
+public class PopulationReaderTask implements PersonSource, Runnable {
 
 	private PersonSink sink;
 	
@@ -21,7 +18,7 @@ public class PopulationReaderV5Task implements PersonSource, Runnable {
 
 	private Network network;
 	
-	public PopulationReaderV5Task(String filename, Network network) {
+	public PopulationReaderTask(String filename, Network network) {
 		super();
 		this.filename = filename;
 		this.network = network;
@@ -46,7 +43,7 @@ public class PopulationReaderV5Task implements PersonSource, Runnable {
 			}
 			
 		});
-		new AltPopulationReaderMatsimV5(scenario).readFile(filename);
+		new MatsimPopulationReader(scenario).readFile(filename);
 		sink.complete();
 	}
 
