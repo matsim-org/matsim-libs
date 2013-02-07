@@ -19,6 +19,7 @@
 
 package playground.andreas.P2.hook;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -41,6 +42,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 /**
+ * 
+ * Own implementation of boarding behavior. Note, that this behavior may be (more) inconstistent with the transit router as the default implementation.
+ * 
  * @author aneumann
  */
 public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
@@ -75,7 +79,28 @@ public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriver
 		
 		if(containsId(stopsToCome, route.getEgressStopId())){
 			if (route.getRouteId().toString().equalsIgnoreCase(transitRoute.getId().toString())) {
-				// it's the route planned - just board
+				LinkedList<TransitRouteStop> tempStopsToCome = new LinkedList<TransitRouteStop>(stopsToCome);
+				tempStopsToCome.removeLast();
+				boolean egressStopFound = false;
+				for (TransitRouteStop stop : tempStopsToCome) {
+					if (route.getEgressStopId().equals(stop.getStopFacility().getId())) {
+						egressStopFound = true;
+					} else if (route.getAccessStopId().equals(stop.getStopFacility().getId())) {
+						// route is looping - decide whether to board now or later
+						if (egressStopFound) {
+							// egress stop found - so the agent will be able to reach its destination before the vehicle returns to this stop
+							// boarding now should be faster
+							return true;
+						} else {
+							// egress stop not found - the vehicle will return before reaching the agent's destination
+							// boarding now or the next the vehicle passes by will not change the arrival time
+							// although people tend to board the first vehicle arriving, lines looping may impose extra costs, e.g. increased ticket costs due to more kilometer or hours traveled
+							// thus, board as late as possible
+							return false;
+						}
+					}
+				}
+				// nothing wrong, e.g. not looping and it's the route planned - just board
 				return true;
 			}
 			
