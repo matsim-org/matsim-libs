@@ -3,17 +3,17 @@ package d4d;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -25,7 +25,7 @@ public class RunFreeSpeedSimulation {
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory("./freespeed-output");
+		config.controler().setOutputDirectory("./freespeed-random-output");
 		config.controler().setMobsim("jdeqsim");
 		// config.controler().setMobsim("DoNothing");
 		config.global().setCoordinateSystem("EPSG:3395");
@@ -65,6 +65,26 @@ public class RunFreeSpeedSimulation {
 			@Override
 			public void run(Person person) {
 				PlanUtils.insertLinkIdsIntoGenericRoutes(person.getSelectedPlan());
+			}
+
+		});
+		
+		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithm() {
+
+			@Override
+			public void run(Person person) {
+				Plan plan = person.getSelectedPlan();
+				for (int i = 0; i < plan.getPlanElements().size()-2; i++) {
+					PlanElement pe = plan.getPlanElements().get(i);
+					if (pe instanceof Activity) {
+						Activity activity = (Activity) pe;
+						Leg leg = (Leg) plan.getPlanElements().get(i+1);
+						Activity nextActivity = (Activity) plan.getPlanElements().get(i+2);
+						double earliest = activity.getEndTime();
+						double latest = nextActivity.getEndTime() - leg.getTravelTime();
+						activity.setEndTime(earliest + MatsimRandom.getRandom().nextDouble() * (latest - earliest));
+					}
+				}
 			}
 
 		});

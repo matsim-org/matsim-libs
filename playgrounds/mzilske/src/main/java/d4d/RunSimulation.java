@@ -3,7 +3,11 @@ package d4d;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -12,6 +16,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -24,8 +29,9 @@ public class RunSimulation {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.controler().setLastIteration(200);
+		config.controler().setLastIteration(150);
 		config.controler().setMobsim("jdeqsim");
+		config.controler().setOutputDirectory("./random-output30kmh");
 		// config.controler().setMobsim("DoNothing");
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
@@ -36,7 +42,7 @@ public class RunSimulation {
 //		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
 //		config.getQSimConfigGroup().setNumberOfThreads(8);
 //		config.getQSimConfigGroup().setEndTime(27*60*60);
-		config.plansCalcRoute().setTeleportedModeSpeed("other", 20.0 / 3.6); // 5 km/h beeline
+		config.plansCalcRoute().setTeleportedModeSpeed("other", 30.0 / 3.6); //  km/h beeline
 		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
 		config.plansCalcRoute().setNetworkModes(Arrays.asList("car"));
 		config.controler().setWriteEventsInterval(10);
@@ -65,12 +71,12 @@ public class RunSimulation {
 		reRoute.setModuleName("ReRoute");
 		// reRoute.setModuleName("Duplicate");
 		reRoute.setProbability(0.1);
-		reRoute.setDisableAfter(180);
+		reRoute.setDisableAfter(130);
 		StrategySettings changeMode = new StrategySettings(new IdImpl(3));
 		changeMode.setModuleName("ChangeLegMode");
 		// changeMode.setModuleName("Duplicate");
 		changeMode.setProbability(0.1);
-		changeMode.setDisableAfter(180);
+		changeMode.setDisableAfter(130);
 		config.strategy().setMaxAgentPlanMemorySize(3);
 		config.strategy().addStrategySettings(changeExp);
 		config.strategy().addStrategySettings(reRoute);
@@ -86,6 +92,26 @@ public class RunSimulation {
 			@Override
 			public void run(Person person) {
 				PlanUtils.insertLinkIdsIntoGenericRoutes(person.getSelectedPlan());
+			}
+
+		});
+		
+		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithm() {
+
+			@Override
+			public void run(Person person) {
+				Plan plan = person.getSelectedPlan();
+				for (int i = 0; i < plan.getPlanElements().size()-2; i++) {
+					PlanElement pe = plan.getPlanElements().get(i);
+					if (pe instanceof Activity) {
+						Activity activity = (Activity) pe;
+						Leg leg = (Leg) plan.getPlanElements().get(i+1);
+						Activity nextActivity = (Activity) plan.getPlanElements().get(i+2);
+						double earliest = activity.getEndTime();
+						double latest = nextActivity.getEndTime() - leg.getTravelTime();
+						activity.setEndTime(earliest + MatsimRandom.getRandom().nextDouble() * (latest - earliest));
+					}
+				}
 			}
 
 		});

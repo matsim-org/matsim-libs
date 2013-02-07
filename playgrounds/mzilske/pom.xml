@@ -20,6 +20,11 @@
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
 		<repository>
+			<id>opengeo</id>
+			<name>Opengeo repository</name>
+			<url>dav:http://repo.opengeo.org</url>
+		</repository>
+		<repository>
 			<id>google-api-services</id>
 			<url>http://mavenrepo.google-api-java-client.googlecode.com/hg</url>
 		</repository>
@@ -98,6 +103,12 @@
 			<artifactId>osmosis-tagtransform-plugin</artifactId>
 			<version>0.1-20090508</version>
 		</dependency>
+		<dependency>
+			<groupId>org.opentripplanner</groupId>
+			<artifactId>opentripplanner-routing</artifactId>
+			<version>0.9.2-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
