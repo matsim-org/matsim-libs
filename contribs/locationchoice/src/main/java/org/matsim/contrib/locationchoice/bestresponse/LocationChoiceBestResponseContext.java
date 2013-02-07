@@ -22,9 +22,13 @@
  */
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.BestReplyLocationChoice;
+import org.matsim.contrib.locationchoice.BestReplyLocationChoice.AttrType;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
@@ -41,9 +45,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 public class LocationChoiceBestResponseContext {
 	
 	private final Scenario scenario;
-	private ObjectAttributes personsKValues;
-	private ObjectAttributes facilitiesKValues;
-//	private ObjectAttributes personsMaxEpsUnscaled;
+	private List<ObjectAttributes> attrs = new ArrayList<ObjectAttributes>() ; // would better be a Map
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
@@ -59,89 +61,80 @@ public class LocationChoiceBestResponseContext {
 		this.actTypeConverter = defineFlexibleActivities.getConverter() ;
 		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes() ;
 		
-		this.createObjectAttributes(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed())) ;
+		this.readOrCreateObjectAttributes(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed())) ;
 	}
 	
-	private void createObjectAttributes(long seed) {
-		this.facilitiesKValues = new ObjectAttributes();
-		this.personsKValues = new ObjectAttributes();
-//		this.personsMaxEpsUnscaled = new ObjectAttributes() ;
+	private void readOrCreateObjectAttributes(long seed) {
+		for ( int ii = 0 ; ii <= 2 ; ii++ ) {
+			attrs.add( new ObjectAttributes() );
+		}
 		
-		String pkValues = this.scenario.getConfig().locationchoice().getpkValuesFile();
-		if (!pkValues.equals("null")) {
-			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsKValues);
+		String pkValuesFileName = this.scenario.getConfig().locationchoice().getpkValuesFile();
+		String fkValuesFileName = this.scenario.getConfig().locationchoice().getfkValuesFile();
+		String maxEpsValuesFileName = this.scenario.getConfig().locationchoice().getMaxEpsFile();
+		if (!pkValuesFileName.equals("null") && !fkValuesFileName.equals("null") && !maxEpsValuesFileName.equals("null")) {
+			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(attrs.get(AttrType.persKVals.ordinal()));
+			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(attrs.get(AttrType.facKVals.ordinal()));
+			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(attrs.get(AttrType.maxEpsUnsc.ordinal()));
 			try {
-				attributesReader.parse(pkValues);
+				persKValuesReader.parse(pkValuesFileName);
+				facKValuesReader.parse(fkValuesFileName);
+				maxEpsReader.parse(maxEpsValuesFileName);
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
-				this.computeAttributes(seed);
-//				return ; // ??
+				attrs = this.computeAttributes(seed);
+				return ; // ?? 
 			}
 		}
 		else {
-			this.computeAttributes(seed);
-//			return ; // ??
+			attrs = this.computeAttributes(seed);
+			return ;
 		}
-		String fkValues = this.scenario.getConfig().locationchoice().getfkValuesFile();
-		if (!fkValues.equals("null")) {
-			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.facilitiesKValues);
-			try {
-				attributesReader.parse(fkValues);
-			} catch  (UncheckedIOException e) {
-				// reading was not successful
-				this.computeAttributes(seed);
-//				return ; // ??
-			}
-		}
-		else {
-			this.computeAttributes(seed);
-//			return ; // ??
-		}
-//		String maxEpsValues = this.scenario.getConfig().locationchoice().getMaxEpsFile();
-//
-//		if (!maxEpsValues.equals("null")) {
-//			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);
-//			try {
-//				attributesReader.parse(maxEpsValues);
-//			} catch  (UncheckedIOException e) {  // reading was not successful
-//				this.computeAttributes(seed);
-//				return ; // ??
-//			}
-//		}
-//		else {
-//			this.computeAttributes(seed);
-//			return ; // ??
-//		}
 	}
 	
-	private void computeAttributes(long seed) {
+	private List<ObjectAttributes> computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, scenario, this.scaleEpsilon, this.actTypeConverter, this.flexibleTypes);
-		computer.assignKValues();
-//		computer.run(); // for maxEpsUnscaled
-				
-		this.personsKValues = computer.getPersonsKValues();
-//		System.out.println( "personKValues:\n" + this.personsKValues.toString() ) ;
+				seed, this.scenario, this.scaleEpsilon, 
+				this.actTypeConverter, this.flexibleTypes);
+
+		computer.run();
 		
-		this.facilitiesKValues = computer.getFacilitiesKValues();
-//		System.out.println( "facilityKValues:\n" + this.facilitiesKValues.toString() ) ;
-
-//		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled() ;
-//		System.out.println( "personMaxEpsUnscaled:\n" + this.personsMaxEpsUnscaled.toString() ) ;
-
+		// the reason for the following somewhat strange construct is that I want to _return_ the result, rather than
+		// having it as a side effect. kai, feb'13
+		// (this would now be better as a map)
+		List<ObjectAttributes> attributes = new ArrayList<ObjectAttributes>(3) ;
+		for ( AttrType type : AttrType.values() ) {
+			switch ( type ) {
+			case facKVals:
+				attributes.add( computer.getFacilitiesKValues() ) ;
+				break;
+			case maxEpsUnsc:
+				attributes.add( computer.getPersonsMaxEpsUnscaled() ) ;
+				break;
+			case persKVals:
+				attributes.add( computer.getPersonsKValues() ) ;
+				break;
+			}
+		}
+		
+		for ( AttrType type : AttrType.values() ) {
+			System.err.println( type.toString() + "\n" + attributes.get(type.ordinal()) ) ;
+		}
+		
+		return attributes ;
+		
 	}
-
 	
 	public Scenario getScenario() {
 		return scenario;
 	}
 
 	public ObjectAttributes getPersonsKValues() {
-		return personsKValues;
+		return attrs.get(BestReplyLocationChoice.AttrType.persKVals.ordinal()) ;
 	}
 
 	public ObjectAttributes getFacilitiesKValues() {
-		return facilitiesKValues;
+		return attrs.get(BestReplyLocationChoice.AttrType.facKVals.ordinal()) ;
 	}
 
 	public ScaleEpsilon getScaleEpsilon() {
@@ -160,9 +153,13 @@ public class LocationChoiceBestResponseContext {
 		return params;
 	}
 
-//	public ObjectAttributes getPersonsMaxEpsUnscaled() {
-//		return personsMaxEpsUnscaled;
-//	}
+	public ObjectAttributes getPersonsMaxEpsUnscaled() {
+		return attrs.get(BestReplyLocationChoice.AttrType.maxEpsUnsc.ordinal()) ;
+	}
+	
+	public List<ObjectAttributes> getAttributes() {
+		return attrs ;
+	}
 
 
 }

@@ -93,8 +93,6 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
 		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
 
-//		// (FacilityPenalties not necessary when facility opening times are not used)
-		
 		final LocationChoiceBestResponseContext lcContext = new LocationChoiceBestResponseContext(scenario) ;
 		
 		// CONTROL(L)ER:
@@ -114,7 +112,6 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		}) ;
 
 		// add locachoice strategy factory:
-		// yyyyyy choice context still needs to be inserted into this here!!! kai, feb'13
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
