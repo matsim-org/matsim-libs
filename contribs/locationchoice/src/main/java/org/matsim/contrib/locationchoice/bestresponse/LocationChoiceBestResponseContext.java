@@ -75,10 +75,7 @@ public class LocationChoiceBestResponseContext {
 		String pkValuesFileName = this.scenario.getConfig().locationchoice().getpkValuesFile();
 		String fkValuesFileName = this.scenario.getConfig().locationchoice().getfkValuesFile();
 		String maxEpsValuesFileName = this.scenario.getConfig().locationchoice().getMaxEpsFile();
-		if (!pkValuesFileName.equals("null") && !fkValuesFileName.equals("null") && !maxEpsValuesFileName.equals("null")) {
-			
-			log.info("reading kvals and maxEpsilons from files:\n"+ pkValuesFileName + "\n" + fkValuesFileName + "\n" + maxEpsValuesFileName);
-			
+		if (!pkValuesFileName.equals("null") && !fkValuesFileName.equals("null") && !maxEpsValuesFileName.equals("null")) {			
 			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(attrs.get(AttrType.persKVals.ordinal()));
 			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(attrs.get(AttrType.facKVals.ordinal()));
 			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(attrs.get(AttrType.maxEpsUnsc.ordinal()));
@@ -86,8 +83,11 @@ public class LocationChoiceBestResponseContext {
 				persKValuesReader.parse(pkValuesFileName);
 				facKValuesReader.parse(fkValuesFileName);
 				maxEpsReader.parse(maxEpsValuesFileName);
+				log.info("reading kvals and maxEpsilons from files:\n"+ pkValuesFileName + "\n" + fkValuesFileName + "\n" + maxEpsValuesFileName);
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
+				log.error("unsuccessful reading kvals and maxEpsilons from files!\nThe values are now computed" +
+				" and following files are not considered!:\n" + pkValuesFileName + "\n" + fkValuesFileName + "\n" + maxEpsValuesFileName);
 				attrs = this.computeAttributes(seed);
 				return ; // ?? 
 			}
