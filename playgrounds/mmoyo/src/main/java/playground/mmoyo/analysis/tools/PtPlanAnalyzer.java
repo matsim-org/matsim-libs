@@ -61,7 +61,7 @@ public class PtPlanAnalyzer {
 		double walkDistance = 0.0;
 		double transitWalkTime_secs = 0.0;
 		double inVehDist_mts = 0.0;
-		double inVehTravTime_secs = 0.0;
+		double trTravelTime_secs = 0.0;
 		boolean currentlyPtMode= false;
 		
 		for (PlanElement pe : plan.getPlanElements()){
@@ -90,11 +90,11 @@ public class PtPlanAnalyzer {
 				//get transit walk distances
 				if (leg.getMode().equals(TransportMode.transit_walk)){
 					walkDistance +=  CoordUtils.calcDistance(lastAct.getCoord() , nextAct.getCoord());
-					transitWalkTime_secs += leg.getTravelTime(); 
+					transitWalkTime_secs += leg.getTravelTime();
 				} 
 				
 				//get in pt vehicle distance and time
-				else if (leg.getMode().equals(TransportMode.pt)){							
+				else if (leg.getMode().equals(TransportMode.pt)){	
 					if (!currentlyPtMode){
 						ptLegs_num++;
 						currentlyPtMode=true;
@@ -107,7 +107,7 @@ public class PtPlanAnalyzer {
 							
 							ExpTransRouteUtils ptRouteUtill = new ExpTransRouteUtils(network, schedule, expRoute);
 							inVehDist_mts += ptRouteUtill.getExpRouteDistance();
-							inVehTravTime_secs +=  leg.getTravelTime();
+							trTravelTime_secs +=  leg.getTravelTime();
 							ptTrips_num++;
 						}
 					}	
@@ -121,7 +121,7 @@ public class PtPlanAnalyzer {
 		PtPlanAnalysisValues values= new PtPlanAnalysisValues();
 		values.setAgentId(plan.getPerson().getId());
 		values.setTransitWalkTime_secs(transitWalkTime_secs);
-		values.setInVehTravTime_secs(inVehTravTime_secs);
+		values.setTrTravelTime_secs(trTravelTime_secs);
 		values.setInVehDist_mts(inVehDist_mts);
 		values.setPtLegs_num(ptLegs_num);
 		values.setPtTrips_num(ptTrips_num);
@@ -132,7 +132,7 @@ public class PtPlanAnalyzer {
 	public class PtPlanAnalysisValues{
 		private Id agentId;
 		private double transitWalkTime_secs;
-		private double inVehTravTime_secs;
+		private double trTravelTime_secs;
 		private double inVehDist_mts;
 		private int ptLegs_num;
 		private int ptTrips_num;
@@ -141,6 +141,7 @@ public class PtPlanAnalyzer {
 		public Id getAgentId() {
 			return agentId;
 		}
+		
 		private void setAgentId(Id agentId) {
 			this.agentId = agentId;
 		}
@@ -150,11 +151,11 @@ public class PtPlanAnalyzer {
 		private void setTransitWalkTime_secs(double transitWalkTime_secs) {
 			this.transitWalkTime_secs = transitWalkTime_secs;
 		}
-		public double getInVehTravTime_secs() {
-			return inVehTravTime_secs;
+		public double trTravelTime_secs() {
+			return trTravelTime_secs;
 		}
-		protected void setInVehTravTime_secs(double inVehTravTime_secs) {
-			this.inVehTravTime_secs = inVehTravTime_secs;
+		protected void setTrTravelTime_secs(double trTravelTime_secs) {
+			this.trTravelTime_secs = trTravelTime_secs;
 		}
 		public double getInVehDist_mts() {
 			return inVehDist_mts;

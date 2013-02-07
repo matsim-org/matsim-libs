@@ -67,7 +67,7 @@ public class PtPlansAnalyzer implements PersonAlgorithm{
 		PtPlanAnalysisValues v = ptPlanAnalyzer.run(plan);
 		Person person = plan.getPerson();
 		int planIdx = person.getPlans().indexOf(plan);
-		sBuff.append(person.getId() + TB +  planIdx + TB + plan.isSelected() + TB + v.getTransitWalkTime_secs() + TB +  v.getInVehTravTime_secs() + TB + v.getInVehDist_mts() + TB + v.getTransfers_num() + TB + v.getPtLegs_num() + TB + v.getPtTrips_num() + NR); //Store values in string buffer		
+		sBuff.append(person.getId() + TB +  planIdx + TB + plan.isSelected() + TB + v.getTransitWalkTime_secs() + TB +  v.trTravelTime_secs() + TB + v.getInVehDist_mts() + TB + v.getTransfers_num() + TB + v.getPtLegs_num() + TB + v.getPtTrips_num() + NR); //Store values in string buffer		
 	}
 
 	private void writeAnalysis(final String outFile){
