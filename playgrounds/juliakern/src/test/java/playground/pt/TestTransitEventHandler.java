@@ -67,7 +67,7 @@ public class TestTransitEventHandler {
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
 	private PtDriverIdHandler ptDriverHandler= new PtDriverIdHandler();
 	@Rule public MatsimTestUtils utils= new MatsimTestUtils();
-	@Test @Ignore
+	@Test //@Ignore
 	public final void testHandleEventAgentArrival(){
 	
 		String netFilename = utils.getInputDirectory() + "network.xml"; //stimmt
