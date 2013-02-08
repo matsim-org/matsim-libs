@@ -137,32 +137,37 @@ public class JointQSimFactory implements MobsimFactory {
 			source.insertAgentsIntoMobsim();
 
 			VehicleType type = VehicleUtils.getDefaultVehicleType();
-			popLoop:
 			for (Person p : population.getPersons().values()) {
-				Id homeLink = null;
-				// now, add a vehicle at each location where a driver leg starts,
-				// if it is not after another vehicular move (otherwise,
-				// problems appear if driver as no individual vehicular leg)
-				for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-					if (homeLink == null) {
-						homeLink = ((Activity) pe).getLinkId();
-					}
-					if (pe instanceof Leg) {
-						String mode = ((Leg) pe).getMode();
+				parkVehiclesForAgent( p , type );
+			}
+		}
 
-						if (mainModes.contains( mode )) {
-							// if the plan is valid, the vehicle will get moved
-							// to the pick ups
-							continue popLoop;
-						}
-						else if ( mode.equals( JointActingTypes.DRIVER ) ) {
-							qsim.createAndParkVehicleOnLink(
-									VehicleUtils.getFactory().createVehicle(
-										p.getId(),
-										type),
-									homeLink);
-						}
-					}
+		private void parkVehiclesForAgent(
+				final Person p,
+				final VehicleType type) {
+			Id homeLink = null;
+			// now, add a vehicle at each location where a driver leg starts,
+			// if it is not after another vehicular move (otherwise,
+			// problems appear if driver as no individual vehicular leg)
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
+				if (homeLink == null) {
+					homeLink = ((Activity) pe).getLinkId();
+				}
+
+				if ( !(pe instanceof Leg) ) continue;
+				final String mode = ((Leg) pe).getMode();
+
+				// if the plan is valid, the vehicle will get moved
+				// to the pick ups
+				if ( mainModes.contains( mode ) ) return;
+
+				if ( mode.equals( JointActingTypes.DRIVER ) ) {
+					qsim.createAndParkVehicleOnLink(
+							VehicleUtils.getFactory().createVehicle(
+								p.getId(),
+								type),
+							homeLink);
+					return;
 				}
 			}
 		}
