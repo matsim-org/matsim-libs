@@ -38,6 +38,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -204,6 +205,7 @@ public class AccessEgressDemo {
 		events.addHandler(diagram);
 
 		final QSim sim = (QSim) new QSimFactory().createMobsim(this.scenario, events);
+		sim.getTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);
 		OTFClientLive.run(this.scenario.getConfig(), server);
