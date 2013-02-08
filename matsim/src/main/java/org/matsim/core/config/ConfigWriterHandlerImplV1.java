@@ -78,11 +78,19 @@ import org.matsim.core.utils.io.UncheckedIOException;
 			out.write(" name=\"" + module.getName() + "\" >");
 			out.write(this.newline);
 			
+			boolean lastHadComment = false;
+			
 			for (Map.Entry<String, String> entry : params.entrySet()) {
 				if (comments.get(entry.getKey()) != null) {
 					out.write(this.newline);
 					out.write( "\t\t<!-- " + comments.get(entry.getKey()) + " -->");
 					out.write(this.newline);
+					lastHadComment = true;
+				} else {
+					if (lastHadComment) {
+						out.write(this.newline);
+					}
+					lastHadComment = false;
 				}
 				out.write("\t\t<param name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
 				out.write(this.newline);
