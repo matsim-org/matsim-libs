@@ -297,9 +297,6 @@ public class ControlerConfigGroup extends Module {
 		this.snapshotFormat = Collections.unmodifiableSet(new HashSet<String>(snapshotFormat));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotFormat()
-	 */
 	public Collection<String> getSnapshotFormat() {
 		return this.snapshotFormat;
 	}
