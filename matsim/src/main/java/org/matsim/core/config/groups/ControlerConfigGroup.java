@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.core.config.Module;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
 public class ControlerConfigGroup extends Module {
@@ -223,7 +224,10 @@ public class ControlerConfigGroup extends Module {
 			mobsimTypes.append(mtype.toString());
 			mobsimTypes.append(' ');
 		}
-		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + mobsimTypes);
+		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + mobsimTypes + IOUtils.NATIVE_NEWLINE +
+				"Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim." + IOUtils.NATIVE_NEWLINE +
+				"For 'qsim', add a module 'qsim' to the config." + IOUtils.NATIVE_NEWLINE +
+				"For 'queueSimulation', add a module 'simulation' to the config.");
 		
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.");
 		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
