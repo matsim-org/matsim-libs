@@ -29,11 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import playgrounds.ssix.FundamentalDiagrams;
-import playgrounds.ssix.MyPersonDriverAgentImpl;
-
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +41,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -78,8 +73,8 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import playgrounds.ssix.MyPersonDriverAgentImpl;
 
 public class DreieckStreckeSzenarioTest {
 
@@ -208,7 +203,7 @@ public class DreieckStreckeSzenarioTest {
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
 	public static double length = 200.;//in m, length of one the triangle sides.
 	
-	private static long N_AGENTS = 89;
+	private static long NUMBER_OF_AGENTS = 89;
 	
 	private static double FREESPEED = 90.;//in km/h
 	private static double P_TRUCK = 0.5;//no need to worry much about those, are normalized when choosing effective transport mode
@@ -243,8 +238,9 @@ public class DreieckStreckeSzenarioTest {
 		DreieckStreckeSzenarioTest dreieck = new DreieckStreckeSzenarioTest(2600);
 		dreieck.fillNetworkData();
 		
-		dreieck.openFile();
-		for (long i=0; i<N_AGENTS; i++){
+		String dir = "./output/data.txt";
+		dreieck.openFile(dir);
+		for (long i=0; i<NUMBER_OF_AGENTS+1; i++){
 			dreieck.run(i, "constantModalSplit");
 		}
 		dreieck.closeFile();
@@ -258,10 +254,7 @@ public class DreieckStreckeSzenarioTest {
 		//createWantedPopulation(1,0,2,2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		/*
-		FunDiagramsDreieck fundi2 = new FunDiagramsDreieck(this.scenario);
-		events.addHandler(fundi2)
-		*/
+		
 		FunDiagramsWithPassing fundi3 = new FunDiagramsWithPassing(this.scenario);
 		events.addHandler(fundi3);
 		
@@ -285,6 +278,7 @@ public class DreieckStreckeSzenarioTest {
 		writer.format("%.2f\t", fundi3.getEndAverageVelocity_truck());
 		//writer.format("%.2f\t", fundi3.getEndAverageVelocity_med());
 		writer.format("%.2f\n", fundi3.getEndAverageVelocity_fast());
+		log.info("Done!");
 	}
 
 	private void fillNetworkData(){
@@ -384,6 +378,8 @@ public class DreieckStreckeSzenarioTest {
 		}
 		
 		//TODO: other experimentations still need implementing.
+		//Idea1/1bis: Only one mode, see that you get back on the expected Q fundamental diagrams Simon/Esser/Nagel
+		//Idea2: constant truck density, fast from 0 to max // constant fast density, truck from 0 to max.
 	}
 	
 	private void createRandomPopulation(long numberOfPeople, int sekundenFrequenz){
@@ -506,9 +502,10 @@ public class DreieckStreckeSzenarioTest {
 
 		//prepareForSim();//-obsolete
 		
+		//TODO: Visualizer doesn't work anymore for quite obscure reasons.
 		//OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, (QSim)qSim);
-		
 		//OTFClientLive.run(scenario.getConfig(), server);
+		
 		qSim.run();
 	}
 	
@@ -641,12 +638,14 @@ public class DreieckStreckeSzenarioTest {
 		return activity;
 	}
 	
-	private void openFile() {
+	private void openFile(String dir) {
 		try {
-			writer = new PrintStream("./output/data.txt");
+			writer = new PrintStream(dir);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		writer.format("%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\n",	
+				      "n",  "k", "k_t","k_f", "rho","rho_t","rho_f","v","v_t","v_f");
 	}
 	
 	private void closeFile() {

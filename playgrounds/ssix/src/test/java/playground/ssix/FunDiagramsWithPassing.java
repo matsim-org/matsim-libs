@@ -528,8 +528,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 			
 			
 			//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
-			if (nowTime == this.flowTime_med.doubleValue()){//Still measuring
- the flow of the same second
+			if (nowTime == this.flowTime_med.doubleValue()){//Still measuring the flow of the same second
 				Integer nowFlow = this.flowTable_med.get(0);
 				this.flowTable_med.set(0, nowFlow.intValue()+1);
 			} else {//Need to offset the current data in order to update
