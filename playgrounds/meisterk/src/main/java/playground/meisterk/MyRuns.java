@@ -58,6 +58,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.run.XY2Links;
 
 import playground.meisterk.PersonAnalyseTimesByActivityType.Activities;

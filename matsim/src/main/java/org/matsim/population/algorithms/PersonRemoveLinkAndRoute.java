@@ -18,15 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk;
+package org.matsim.population.algorithms;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
