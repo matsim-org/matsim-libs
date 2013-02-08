@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
-import org.apache.commons.collections.list.NodeCachingLinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,7 +35,7 @@ public abstract class NodeClusteringAlgorithm {
 	private Network network;
 	private String algorithmName;
 	private TreeMap<Integer, ArrayList> pointersToClusterLevels = null;
-
+	protected HashSet<Integer> tabuList = new HashSet<Integer>();
 	public LinkedHashMap<Id, ClusterLink> getLinks() {
 		return links;
 	}
@@ -47,6 +46,8 @@ public abstract class NodeClusteringAlgorithm {
 		this.internalFlowMethodParameterTypes = argTypes;
 		this.internalFlowMethod = getLinkGetMethodWithArgTypes(linkMethodName,
 				argTypes);
+		NodeCluster.linkMethod = internalFlowMethod;
+		NodeCluster.args = args;
 		this.internalFlowMethodParameters = args;
 		if (argTypes != null || args != null)
 			logger.info("Using args " + internalFlowMethodParameters.toString());
@@ -338,6 +339,7 @@ public abstract class NodeClusteringAlgorithm {
 		// System.out.println("Clustercombos: " + clusterCheck.size());
 		return clusterCheck;
 	}
+	
 
 	public int getClusterSteps() {
 		return clusterSteps;

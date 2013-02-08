@@ -20,6 +20,8 @@ import org.matsim.api.core.v01.network.Link;
  * 
  */
 public class NodeCluster {
+	public static Method linkMethod;
+	public static Object[] args;
 	private NodeClusteringAlgorithm algo;
 	private int clusterStepFormed;
 	private int clusterStepParented;
@@ -36,7 +38,7 @@ public class NodeCluster {
 	private boolean isLeaf = false;
 	private double deltaFlow;
 	private double inFlowSum;
-	private double outFlowSum;
+	private double outFlowSum = Double.NaN;
 	private HashSet<NodeCluster> outBoundClusters;
 	private LinkedHashMap<Id, ClusterLink> newInterlinks;
 	private static long invocations = 0;
@@ -101,6 +103,29 @@ public class NodeCluster {
 		setInvocations(getInvocations() + 1);
 	}
 
+	public int getOutLinkSize(){
+		
+		return getOutLinksTemp().size();
+		
+	}
+	public LinkedHashMap<Id,ClusterLink> getOutLinksTemp(){
+		LinkedHashMap<Id, ClusterLink> ols = new LinkedHashMap<Id, ClusterLink>();
+		if(this.isLeaf()){
+			return (LinkedHashMap<Id, ClusterLink>) this.getOutLinks();
+		}else{
+			
+			NodeCluster nc1 = this.getChild1();
+			NodeCluster nc2 = this.getChild2();
+			ols.putAll(nc1.getOutLinks());
+			ols.putAll(nc2.getOutLinks());
+			for (ClusterLink l : newInterlinks.values()) {
+				ols.remove(l.getId());
+			}
+		}
+		
+		return ols;
+		
+	}
 	public void freezeCluster() {
 
 		inLinks = new LinkedHashMap<Id, ClusterLink>();
@@ -397,8 +422,28 @@ public class NodeCluster {
 	}
 
 	public double getOutFlowSum() {
-		// TODO Auto-generated method stub
-		return this.outFlowSum;
+		if(!Double.isNaN(this.outFlowSum))
+			return this.outFlowSum;
+		else
+		{
+			double result = 0;
+			for (ClusterLink l : this.getOutLinksTemp().values()) {
+				try {
+					result += (Double) linkMethod.invoke(l, args);
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			return result;
+			
+		}
 	}
 
 	public String toString() {

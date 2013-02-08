@@ -16,20 +16,20 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-public class IntraMaxNCA extends NodeClusteringAlgorithm {
-	public static String ALGORITHMNAME = "IntraMAX";
+public class IntraMinNCA extends NodeClusteringAlgorithm {
+	public static String ALGORITHMNAME = "IntraMIN";
 	public static int NUMTHREADS=4;
-	public IntraMaxNCA(Network network, String linkMethodName,
+	public IntraMinNCA(Network network, String linkMethodName,
 			String[] argTypes, Object[] args){
 		super(ALGORITHMNAME,network,linkMethodName,argTypes,args);
 	}
-	public IntraMaxNCA(Network network){
+	public IntraMinNCA(Network network){
 		super(ALGORITHMNAME, network);
 	}
 	@Override
 	protected NodeCluster findSingleInLinkClusters(
 			TreeMap<Integer, NodeCluster> clusters) {
-		double maxFlow = 0;
+		double minFlow = Double.POSITIVE_INFINITY;
 		NodeCluster outCluster = null;
 		for (int i : clusters.keySet()) {
 			NodeCluster nc = clusters.get(i);
@@ -39,8 +39,8 @@ public class IntraMaxNCA extends NodeClusteringAlgorithm {
 					newCluster = new NodeCluster(cl.getFromCluster(), nc,
 							internalFlowMethod, internalFlowMethodParameters,
 							clusterSteps, cl.getFromCluster().getId());
-					if (newCluster.getDeltaFlow() > maxFlow) {
-						maxFlow = newCluster.getDeltaFlow();
+					if (newCluster.getDeltaFlow() < minFlow) {
+						minFlow = newCluster.getDeltaFlow();
 						outCluster = newCluster;
 					}
 				}
@@ -53,7 +53,7 @@ public class IntraMaxNCA extends NodeClusteringAlgorithm {
 	protected NodeCluster findNextCluster(
 			TreeMap<Integer, NodeCluster> currentNodeClusters, int clusterStep) {
 		NodeCluster bestCluster = null;
-		double bestValue = 0;
+		double minValue = Double.POSITIVE_INFINITY;
 		HashSet<ClusterCombo> viableClusterCombos = getViableClusterCombos(currentNodeClusters);
 		for (ClusterCombo cc : viableClusterCombos) {
 			String[] ccs = cc.getComboId().split("z");
@@ -67,8 +67,8 @@ public class IntraMaxNCA extends NodeClusteringAlgorithm {
 					- nc.getChild1().getInternalFlow()
 					- nc.getChild2().getInternalFlow();
 
-			if (flowChange > bestValue) {
-				bestValue = flowChange;
+			if (flowChange < minValue) {
+				minValue = flowChange;
 				bestCluster = nc;
 			}
 
@@ -85,21 +85,21 @@ public class IntraMaxNCA extends NodeClusteringAlgorithm {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String fileName = "f:/TEMP/siouxfalls.txt";
+		String fileName = "f:/TEMP/singaporemindeltaspeedtimeslength.txt";
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
 		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario);
 		// nwr.readFile(args[0]);
-//		 nwr.readFile("F:/TEMP/smallnet.xml");
-		nwr.readFile("f:/matsimWorkspace/matsim/examples/siouxfalls/network-wo-dummy-node.xml");
-//		 nwr.readFile("data/singaporev1/network/planningNetwork_CLEAN.xml");
-		IntraMaxNCA nca = new IntraMaxNCA(scenario.getNetwork(),
-				"getCapacityTimesSpeed", null, null);
+//		 nwr.readFile("F:/TEMP/network.xml");
+//		nwr.readFile("f:/matsimWorkspace/matsim/examples/siouxfalls/network-wo-dummy-node.xml");
+		 nwr.readFile("data/singaporev1/network/planningNetwork_CLEAN.xml");
+		IntraMinNCA nca = new IntraMinNCA(scenario.getNetwork(),
+				"getCapacityTimesLength", null, null);
 		// ncr.run("getCapacity", new String[] { "java.lang.Double" },
 		// new Object[] { new Double(3600) });
 		nca.run();
 		new ClusterWriter().writeClusters(fileName,nca);
-		IntraMaxNCA nca2 = new IntraMaxNCA(scenario.getNetwork());
+		IntraMinNCA nca2 = new IntraMinNCA(scenario.getNetwork());
 		
 		new ClusterReader().readClusters(fileName, scenario.getNetwork(), nca2);
 		for(int i=0; i<=nca.getClusterSteps();i++){
