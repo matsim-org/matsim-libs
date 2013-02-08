@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.data.network;
+package playground.michalm.vrp.data.network.shortestpath;
 
-import java.io.IOException;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.*;
 
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.util.lang.TimeDiscretizer;
+import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 
 
-public class MatsimVrpGraphCreator
+public class MatsimArcFactories
 {
-    public static MatsimVrpGraph create(Network network, ArcFactory arcFactory,
-            boolean fixedSizeVrpGraph)
-        throws IOException
+    public static ArcFactory createArcFactory(Network network, TravelTime ttimeCalc,
+            TravelDisutility tcostCalc, TimeDiscretizer timeDiscretizer, boolean preciseArc)
     {
-        MatsimVrpGraph graph;
+        LeastCostPathCalculator router = new Dijkstra(network, tcostCalc, ttimeCalc);
+        ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
+                ttimeCalc, tcostCalc);
 
-        if (fixedSizeVrpGraph) {
-            int vertexCount = network.getLinks().size();
-            graph = new FixedSizeMatsimVrpGraph(vertexCount);
-            ((FixedSizeVrpGraph)graph).initArcs(arcFactory);
-        }
-        else {
-            graph = new GrowingMatsimVrpGraph(arcFactory);
-        }
-
-        // build vertices for all links...
-        MatsimVertexBuilder vertexBuilder = MatsimVertexImpl.createFromLinkIdBuilder(network);
-
-        for (Id id : network.getLinks().keySet()) {
-            graph.addVertex(vertexBuilder.setLinkId(id).build());
-        }
-
-        return graph;
+        return preciseArc
+                ? //
+                new PreciseMatsimArc.PreciseMatsimArcFactory(shortestPathCalculator)
+                : new SparseDiscreteMatsimArc.SparseDiscreteMatsimArcFactory(
+                        shortestPathCalculator, timeDiscretizer);
     }
+
 }

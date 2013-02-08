@@ -46,7 +46,7 @@ public class MultipleSingleIterOnlineDvrpLauncher
     }
 
 
-    public void run(int configIdx, int runs, PrintWriter pw)
+    public void run(int configIdx, int runs, PrintWriter pw, PrintWriter pw2)
         throws IOException
     {
         launcher.algorithmConfig = AlgorithmConfig.ALL[configIdx];
@@ -65,6 +65,23 @@ public class MultipleSingleIterOnlineDvrpLauncher
         SummaryStatistics taxiOverTime = new SummaryStatistics();
         SummaryStatistics passengerWaitTime = new SummaryStatistics();
         SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
+
+        switch (configIdx) {
+            case 0:
+            case 1:
+            case 3:
+            case 4:
+            case 9:
+            case 10:
+            case 15:
+            case 16:
+                // run as many times as requested
+                break;
+
+            default:
+                // do not run
+                runs = 0;
+        }
 
         for (int i = 0; i < runs; i++) {
             MatsimRandom.reset(RANDOM_SEEDS[i]);
@@ -119,6 +136,38 @@ public class MultipleSingleIterOnlineDvrpLauncher
         // the endTime of the simulation??? --- time of last served request
 
         pw.println();
+
+        if (runs > 0) {
+            pw2.println(configIdx + " ==============================");
+
+            pw2.println("pickupDelayStats");
+            pw2.println(TaxiOptimizer.pickupDelayStats);
+            pw2.println("pickupSpeedUpStats");
+            pw2.println(TaxiOptimizer.pickupSpeedupStats);
+            pw2.println("deliveryDelayStats");
+            pw2.println(TaxiOptimizer.deliveryDelayStats);
+            pw2.println("deliverySpeedUpStats");
+            pw2.println(TaxiOptimizer.deliverySpeedupStats);
+            pw2.println("waitDelayStats");
+            pw2.println(TaxiOptimizer.waitDelayStats);
+            pw2.println("waitSpeedUpStats");
+            pw2.println(TaxiOptimizer.waitSpeedupStats);
+            pw2.println("serveDelayStats");
+            pw2.println(TaxiOptimizer.serveDelayStats);
+            pw2.println("serveSpeedUpStats");
+            pw2.println(TaxiOptimizer.serveSpeedupStats);
+
+            pw2.println();
+
+            TaxiOptimizer.pickupDelayStats.clear();
+            TaxiOptimizer.pickupSpeedupStats.clear();
+            TaxiOptimizer.deliveryDelayStats.clear();
+            TaxiOptimizer.deliverySpeedupStats.clear();
+            TaxiOptimizer.waitDelayStats.clear();
+            TaxiOptimizer.waitSpeedupStats.clear();
+            TaxiOptimizer.serveDelayStats.clear();
+            TaxiOptimizer.serveSpeedupStats.clear();
+        }
     }
 
 
@@ -151,16 +200,18 @@ public class MultipleSingleIterOnlineDvrpLauncher
                 paramFile);
 
         PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats.out");
+        PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates.out");
 
         if (configIdx == -1) {
             for (int i = 0; i < AlgorithmConfig.ALL.length; i++) {
-                multiLauncher.run(i, runs, pw);
+                multiLauncher.run(i, runs, pw, pw2);
             }
         }
         else {
-            multiLauncher.run(configIdx, runs, pw);
+            multiLauncher.run(configIdx, runs, pw, pw2);
         }
 
         pw.close();
+        pw2.close();
     }
 }

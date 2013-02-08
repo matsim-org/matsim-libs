@@ -19,6 +19,7 @@
 
 package playground.michalm.vrp.data.network.shortestpath;
 
+import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.*;
 
 
@@ -42,4 +43,26 @@ public class PreciseMatsimArc
         return shortestPathCalculator.calculateShortestPath(fromVertex.getLink(),
                 toVertex.getLink(), departTime);
     }
+
+
+    public static class PreciseMatsimArcFactory
+        implements ArcFactory
+    {
+        private final ShortestPathCalculator shortestPathCalculator;
+
+
+        public PreciseMatsimArcFactory(ShortestPathCalculator shortestPathCalculator)
+        {
+            this.shortestPathCalculator = shortestPathCalculator;
+        }
+
+
+        @Override
+        public Arc createArc(Vertex fromVertex, Vertex toVertex)
+        {
+            return new PreciseMatsimArc((MatsimVertex)fromVertex, (MatsimVertex)toVertex,
+                    shortestPathCalculator);
+        }
+    }
+
 }

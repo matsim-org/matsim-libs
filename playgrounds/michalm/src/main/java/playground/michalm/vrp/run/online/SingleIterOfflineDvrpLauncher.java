@@ -24,12 +24,12 @@ import java.util.*;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -41,17 +41,17 @@ import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.simulator.DeterministicSimulator;
 import pl.poznan.put.vrp.dynamic.simulator.customer.CustomerAction;
 import playground.michalm.util.gis.Schedules2GIS;
-import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
-import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
 import playground.michalm.vrp.driver.VrpSchedulePlan;
 import playground.michalm.vrp.run.online.AlgorithmConfig.AlgorithmType;
 import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
@@ -181,9 +181,11 @@ public class SingleIterOfflineDvrpLauncher
     private void initMatsimVrpData()
         throws IOException
     {
+        Network network = scenario.getNetwork();
         TimeDiscretizer timeDiscretizer = TimeDiscretizer.TD_24H_BY_15MIN;
-        MatsimVrpGraph graph = MatsimVrpGraphCreator.create(scenario, ttimeCalc, tcostCalc,
-                timeDiscretizer, true);
+        ArcFactory arcFactory = MatsimArcFactories.createArcFactory(network, ttimeCalc, tcostCalc,
+                timeDiscretizer, false);
+        MatsimVrpGraph graph = MatsimVrpGraphCreator.create(network, arcFactory, true);
 
         VrpData vrpData = new VrpData();
         vrpData.setVrpGraph(graph);
@@ -191,7 +193,7 @@ public class SingleIterOfflineDvrpLauncher
         vrpData.setRequests(new ArrayList<Request>());
         new DepotReader(scenario, vrpData).readFile(depotsFileName);
         handleTaxiModeDepartures();// creates Requests
-        
+
         data = new MatsimVrpData(vrpData, scenario);
     }
 

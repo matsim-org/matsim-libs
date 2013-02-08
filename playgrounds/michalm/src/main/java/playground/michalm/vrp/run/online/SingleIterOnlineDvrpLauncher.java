@@ -24,13 +24,13 @@ import java.util.*;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.*;
@@ -48,6 +48,7 @@ import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
+import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
@@ -58,6 +59,7 @@ import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.*;
+import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
@@ -85,7 +87,7 @@ public class SingleIterOnlineDvrpLauncher
     TaxiOptimizerFactory optimizerFactory;
 
     boolean otfVis;
-    //public static OTFQueryControl queryControl;
+    // public static OTFQueryControl queryControl;
 
     boolean wal;
 
@@ -206,7 +208,8 @@ public class SingleIterOnlineDvrpLauncher
 
             case EVENTS_15_MIN:
             case EVENTS_24_H:
-                ttimeCalc = TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName, scenario);
+                ttimeCalc = TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
+                        scenario);
                 break;
 
             default:
@@ -226,9 +229,11 @@ public class SingleIterOnlineDvrpLauncher
                 throw new IllegalArgumentException();
         }
 
+        Network network = scenario.getNetwork();
         TimeDiscretizer timeDiscretizer = new TimeDiscretizer(travelTimeBinSize, numSlots);
-        MatsimVrpGraph graph = MatsimVrpGraphCreator.create(scenario, ttimeCalc, tcostCalc,
+        ArcFactory arcFactory = MatsimArcFactories.createArcFactory(network, ttimeCalc, tcostCalc,
                 timeDiscretizer, false);
+        MatsimVrpGraph graph = MatsimVrpGraphCreator.create(network, arcFactory, false);
 
         VrpData vrpData = new VrpData();
         vrpData.setVrpGraph(graph);
@@ -280,9 +285,11 @@ public class SingleIterOnlineDvrpLauncher
         }
     }
 
-    //just for debugging
+
+    // just for debugging
     private RunningVehicleRegister rvr;
-    
+
+
     void runSim()
     {
         if (scenario.getConfig().getQSimConfigGroup() == null) {
@@ -293,12 +300,12 @@ public class SingleIterOnlineDvrpLauncher
         }
 
         EventsManager events = EventsUtils.createEventsManager();
-        EventWriter writer = new EventWriterXML(dirName + "events.xml.gz");
-        events.addHandler(writer);
-        
+        // EventWriter writer = new EventWriterXML(dirName + "events.xml.gz");
+        // events.addHandler(writer);
+
         rvr = new RunningVehicleRegister();
         events.addHandler(rvr);
-        
+
         QSim qSim = new QSim(scenario, events);
         ActivityEngine activityEngine = new ActivityEngine();
         qSim.addMobsimEngine(activityEngine);
@@ -344,9 +351,9 @@ public class SingleIterOnlineDvrpLauncher
         // events.addHandler(runningVehicleRegister = new RunningVehicleRegister());
 
         qSim.run();
-        
+
         events.finishProcessing();
-        writer.closeFile();
+        // writer.closeFile();
     }
 
 
