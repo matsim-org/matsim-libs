@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -38,8 +39,7 @@ import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
@@ -61,7 +61,7 @@ public class BvgControler extends Controler {
 		super(config);
 	}
 
-	public BvgControler(final ScenarioImpl scenario) {
+	public BvgControler(final Scenario scenario) {
 		super(scenario);
 	}
 
@@ -131,8 +131,7 @@ public class BvgControler extends Controler {
 		config.planCalcScore().addActivityParams(transitActivityParams);
 
 		// reading the scenario (based on the config):
-		ScenarioLoaderImpl scLoader = new ScenarioLoaderImpl(config) ;
-		ScenarioImpl sc = (ScenarioImpl) scLoader.loadScenario() ;
+		Scenario sc = ScenarioUtils.loadScenario(config);
 
 //		TransitRouterConfig routerConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		BvgControler c = new BvgControler(sc);
