@@ -27,6 +27,6 @@ import java.util.Collection;
  */
 public interface VisData {
 
-	public Collection<AgentSnapshotInfo> getVehiclePositions(final Collection<AgentSnapshotInfo> positions);
+	public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(final Collection<AgentSnapshotInfo> positions);
 
 }

@@ -109,7 +109,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 			MobsimAgent agent = agents.get(personId);
 			VisLink visLink = internalInterface.getMobsim().getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
-			visLink.getVisData().getVehiclePositions(positions);
+			visLink.getVisData().getAgentSnapshotInfo(positions);
 			for (AgentSnapshotInfo position : positions) {
 				if (position.getId().equals(personId)) {
 					snapshots.add(position);
@@ -141,7 +141,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 				Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 				MobsimAgent agent = agents.get(personId);
 				VisLink visLink = internalInterface.getMobsim().getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
-				visLink.getVisData().getVehiclePositions(positions);
+				visLink.getVisData().getAgentSnapshotInfo(positions);
 				for (AgentSnapshotInfo position : positions) {
 					if (position.getId().equals(personId)) {
 						snapshots.add(position);
@@ -193,7 +193,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 	}
 
 	@Override
-	public Collection<AgentSnapshotInfo> getVehiclePositions(Collection<AgentSnapshotInfo> snapshotList) {
+	public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> snapshotList) {
 		snapshotList.addAll(this.snapshots);
 		return snapshotList;
 	}

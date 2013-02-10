@@ -68,7 +68,7 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine,
 	}
 
 	@Override
-	public Collection<AgentSnapshotInfo> getVehiclePositions(
+	public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(
 			Collection<AgentSnapshotInfo> snapshotList) {
 		snapshotList.addAll(this.snapshots);
 		return snapshotList;
@@ -97,7 +97,7 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine,
 				Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 				MobsimAgent agent = agents.get(personId);
 				VisLink visLink = internalInterface.getMobsim().getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
-				visLink.getVisData().getVehiclePositions(positions);
+				visLink.getVisData().getAgentSnapshotInfo(positions);
 				for (AgentSnapshotInfo position : positions) {
 					if (position.getId().equals(personId)) {
 						snapshots.add(position);

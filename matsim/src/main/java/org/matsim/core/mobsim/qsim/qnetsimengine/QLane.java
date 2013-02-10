@@ -791,7 +791,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		}
 		
 		@Override
-		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo( final Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLane.this.qLink.network.simEngine.getAgentSnapshotInfoBuilder();
 			
 			double numberOfVehiclesDriving = QLane.this.buffer.size() + QLane.this.vehQueue.size();

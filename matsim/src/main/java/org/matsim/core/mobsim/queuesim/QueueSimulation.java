@@ -449,7 +449,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		return new VisData() {
 
 			@Override
-			public Collection<AgentSnapshotInfo> getVehiclePositions(Collection<AgentSnapshotInfo> positions) {
+			public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
 				return Collections.emptyList();
 			}
 			

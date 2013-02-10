@@ -449,12 +449,12 @@ public class QLinkLanesImpl extends AbstractQLink {
 		}
 		
 		@Override
-		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo( final Collection<AgentSnapshotInfo> positions) {
 
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
-				lane.visdata.getVehiclePositions(positions);
+				lane.visdata.getAgentSnapshotInfo(positions);
 			}
 			int cnt2 = 10;
 			// treat vehicles from waiting list:

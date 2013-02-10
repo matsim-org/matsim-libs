@@ -92,7 +92,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 		if (!this.snapshotWriters.isEmpty()) {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 			for (VisLink link : visMobsim.getVisNetwork().getVisLinks().values()) {
-				link.getVisData().getVehiclePositions(positions);
+				link.getVisData().getAgentSnapshotInfo(positions);
 			}
 			for (SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);

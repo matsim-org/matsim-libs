@@ -60,7 +60,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-			src.getVehiclePositions(positions);
+			src.getAgentSnapshotInfo(positions);
 			out.putInt(positions.size());
 			for (AgentSnapshotInfo pos : positions) {
 				writeAgent(pos, out);

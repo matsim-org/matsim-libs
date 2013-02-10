@@ -811,7 +811,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 
 		@Override
-		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo( final Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			double numberOfVehiclesDriving = QLinkImpl.this.buffer.size() + QLinkImpl.this.vehQueue.size();

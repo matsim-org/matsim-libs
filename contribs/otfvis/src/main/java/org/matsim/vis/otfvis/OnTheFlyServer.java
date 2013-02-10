@@ -171,7 +171,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private final VisData visData = new VisData() {
 
 		@Override
-		public Collection<AgentSnapshotInfo> getVehiclePositions(Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
 			return snapshots.values();
 		}
 

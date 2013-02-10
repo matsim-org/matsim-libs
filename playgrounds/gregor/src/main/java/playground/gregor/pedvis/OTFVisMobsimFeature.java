@@ -66,7 +66,7 @@ AgentArrivalEventHandler {
 		this.walk2dWriter.setSrc(new VisData() {
 
 			@Override
-			public Collection<AgentSnapshotInfo> getVehiclePositions(
+			public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(
 					Collection<AgentSnapshotInfo> positions) {
 				return visData.values();
 			}
