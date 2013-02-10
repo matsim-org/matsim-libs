@@ -168,9 +168,6 @@ public class Controler extends AbstractController {
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	@Deprecated
-	private Integer thisIteration = null;
-
 	protected final Config config;
 	protected ScenarioImpl scenarioData = null;
 
@@ -653,9 +650,8 @@ public class Controler extends AbstractController {
 	}
 	
 	@Override
-	protected void runMobSim(int iteration) {
-		// yyyy cannot make this final: overridden at 1 location.  kai, jan'13
-		this.thisIteration = iteration;
+	protected final void runMobSim(int iteration) {
+		this.thisIteration = iteration; // yyyy this should not be necessary any more. kai, feb'13
 		runMobSim();
 	}
 
@@ -683,7 +679,8 @@ public class Controler extends AbstractController {
 			enrichSimulation(simulation);
 			return simulation;
 		} else {
-			log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
+			log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). " +
+					"Now trying to detect which mobsim to use from other parameters...");
 			MobsimFactory mobsimFactory;
 			if (config.getModule(QSimConfigGroup.GROUP_NAME) != null) {
 				mobsimFactory = new QSimFactory();

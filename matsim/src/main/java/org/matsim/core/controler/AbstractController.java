@@ -59,6 +59,9 @@ public abstract class AbstractController {
 			log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
 		}
 	};
+
+	@Deprecated
+	/*package*/ Integer thisIteration = null;
 	
 
 	protected AbstractController() {
@@ -143,11 +146,16 @@ public abstract class AbstractController {
 		String marker = "### ";
 
 		for (int iteration = firstIteration; continueIterations(iteration) ; iteration++ ) {
+			
+			// setting the other iteration counter to the same value:
+			this.thisIteration = iteration ;
+			// (this other iteration counter may have its own ++ !?!?)
+
 			this.stopwatch.setCurrentIteration(iteration) ;
 
 			log.info(divider);
 			log.info(marker + "ITERATION " + iteration + " BEGINS");
-			this.stopwatch.setCurrentIteration(iteration);
+//			this.stopwatch.setCurrentIteration(iteration);
 			this.stopwatch.beginOperation("iteration");
 			this.getControlerIO().createIterationDirectory(iteration);
 			resetRandomNumbers(rndSeed, iteration);

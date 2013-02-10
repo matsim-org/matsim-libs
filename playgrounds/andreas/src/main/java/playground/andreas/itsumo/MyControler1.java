@@ -28,8 +28,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -97,14 +101,6 @@ public class MyControler1 extends Controler {
 		}
 
 		return quant;
-	}
-
-	@Override
-	protected void runMobSim(int iteration) {
-		ItsumoSim sim = new ItsumoSim(this.scenarioData, this.events);
-		sim.setControlerIO(this.getControlerIO());
-		sim.setIteration(iteration);
-		sim.run();
 	}
 
 	/*package*/ static void loadPopulation(final Scenario scenario) {
@@ -334,6 +330,15 @@ public class MyControler1 extends Controler {
 			e1.printStackTrace();
 		}
 	}
+	
+//	@Override
+//	protected void runMobSim(int iteration) {
+//		ItsumoSim sim = new ItsumoSim(this.scenarioData, this.events);
+//		sim.setControlerIO(this.getControlerIO());
+//		sim.setIteration(iteration);
+//		sim.run();
+//	}
+	// see below. kai, feb'13
 
 	public static void main(final String[] args) {
 
@@ -343,13 +348,27 @@ public class MyControler1 extends Controler {
 		} else {
 			sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
 		}
-		Scenario scenario = sl.getScenario();
+		final Scenario scenario = sl.getScenario();
 
 		loadNetwork(scenario);
 		loadPopulation(scenario);
 
 		final MyControler1 controler = new MyControler1(scenario);
 		controler.setOverwriteFiles(true);
+		
+		final OutputDirectoryHierarchy controlerIO = controler.getControlerIO() ;
+		
+		controler.setMobsimFactory(new MobsimFactory(){
+			@Override
+			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+				ItsumoSim sim = new ItsumoSim(sc, eventsManager);
+				sim.setControlerIO(controlerIO);
+				sim.setIteration(-1); // not directly available; if truly necessary, something else needs to be done (e.g. events handler). kai, feb'13
+				throw new RuntimeException("inserted this factory instead of overriding runMobSim above.  not tested, this aborting ...") ;
+//				return sim ;
+			}
+		}) ;
+		
 		controler.run();
 
 		controler.makeVis();

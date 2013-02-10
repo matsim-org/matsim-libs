@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
@@ -92,7 +93,7 @@ public class ControlerMobsimIntegrationTest {
 	public void testRunMobsim_jdeqsim() {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
-		cfg.controler().setMobsim("jdeqsim");
+		cfg.controler().setMobsim(MobsimType.JDEQSim.toString());
 		cfg.controler().setWritePlansInterval(0);
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
