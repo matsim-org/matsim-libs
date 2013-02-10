@@ -3,8 +3,9 @@ package playground.dhosse.bachelorarbeit;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,8 +13,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.charts.BarChart;
+import org.opengis.geometry.BoundingBox;
 
 public class NetworkInspector {
 	
@@ -21,13 +24,24 @@ public class NetworkInspector {
 	
 	private Map<Id,Double> distances = new HashMap<Id,Double>();
 	
-	private Logger logger = Logger.getLogger(NetworkInspector.class);
+	private List<Link> lengthBelowStorageCapacity = new ArrayList<Link>();
 	
-	private DecimalFormat df = new DecimalFormat(",##0.00");
+	private List<Node> deadEnds = new ArrayList<Node>();
+	private List<Node> exitRoads = new ArrayList<Node>();
+	
+	private Logger logger = Logger.getLogger(NetworkInspector.class);
 	
 	private double[] linkCapacities = new double[7];
 	
 	private double[] nLanes = new double[6];
+	
+	private double[] inDegrees = new double[10];
+	private double[] outDegrees = new double[10];
+	
+	private double[] lengths = new double[9];
+	
+	private double totalLength = 0;
+	private double totalGLength = 0;
 	
 	private String outputFolder = "C:/Users/Daniel/Dropbox/bsc";
 	
@@ -37,20 +51,22 @@ public class NetworkInspector {
 		
 	}
 	
-	public void isRoutable(){
+	public boolean isRoutable(){
 		
 		logger.info("network contains " + this.scenario.getNetwork().getNodes().size() +
 				" nodes and " + this.scenario.getNetwork().getLinks().size() + " links");
 		
-		NetworkCleaner nc = new NetworkCleaner();
-		nc.run(this.scenario.getNetwork());
+//		NetworkCleaner nc = new NetworkCleaner();
+//		nc.run(this.scenario.getNetwork());
+		
+		return false;
+		
 	}
 	
-	public void checkLinkAttributes() throws IOException{
+	public void checkLinkAttributes() {
+		
 		logger.info("checking link attributes...");
 		
-		File file = new File(this.outputFolder+"/test/lengthBelowStats.txt");
-		FileWriter writer = new FileWriter(file);
 		int writerIndex = 0;
 		
 		for(Link link : this.scenario.getNetwork().getLinks().values()){
@@ -78,50 +94,111 @@ public class NetworkInspector {
 			else if(link.getCapacity()>4000)
 				this.linkCapacities[6]++;
 			
+			if(link.getLength()<7)
+				this.lengths[0]++;
+			else if(link.getLength()<15&&link.getLength()>=7)
+				this.lengths[1]++;
+			else if(link.getLength()<50&&link.getLength()>=15)
+				this.lengths[2]++;
+			else if(link.getLength()<100&&link.getLength()>=50)
+				this.lengths[3]++;
+			else if(link.getLength()>=100&&link.getLength()<150)
+				this.lengths[4]++;
+			else if(link.getLength()>=150&&link.getLength()<200)
+				this.lengths[5]++;
+			else if(link.getLength()>=200&&link.getLength()<300)
+				this.lengths[6]++;
+			else if(link.getLength()>=300&&link.getLength()<500)
+				this.lengths[7]++;
+			else if(link.getLength()>=500)
+				this.lengths[8]++;
+			
 			this.distances.put(link.getId(), distance);
 			
+			this.totalLength += link.getLength();
+			this.totalGLength += distance;
+			
 			if(link.getLength()<7){
-				writer.write("length of link " + link.getId() + " below" +
-						" min storage capacity for one vehicle (" + df.format(link.getLength()) +
-						" m instead of 7 m)\n");
+				this.lengthBelowStorageCapacity.add(link);
 				writerIndex++;
 			}
 		}
-		writer.close();
+		
 		
 		logger.info("done.");
 		
-		if(writerIndex>0){
-			logger.warn(writerIndex + " warnings about storage capacity. written to file " + file.getName());
-//		System.out.println("nlinks: "+net.getLinks().size());
-	}
-	
 		logger.info("writing link statistics files...");
 		
-		createLaneStatisticsFiles();
+		File file = new File(this.outputFolder+"/test/lengthBelowStorageCapacity.txt");
+		FileWriter writer;
+		try {
+			
+			writer = new FileWriter(file);
+			for(Link link : this.lengthBelowStorageCapacity){
+				writer.write("length of link " + link.getId() + " below min length for storage capacity of one vehicle (" +
+						link.getLength() + "m instead of 7 m)\n");
+			}
+			writer.close();
+			
+			createLaneStatisticsFiles();
+			
+			createLinkLengthComparisonFile();
+			
+			createLinkCapacityFiles();
+			
+			createLinkLengthFiles();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		createLinkLengthComparisonFile();
+		if(writerIndex>0)
+			logger.warn(writerIndex + " warnings about storage capacity. written to file " + file.getName());
 		
-		createLinkCapacityFiles();
-		
+		logger.info("total length of network: " + this.totalLength + "m, total geom. length: " + this.totalGLength + "m");
+	
 		logger.info("done.");
 
-//		System.out.println("nnodes: "+net.getNodes().size());
 	}
 	
 	public void checkNodeAttributes() {
 		
 		logger.info("checking node attributes...");
 		
-		double[] inDegrees = new double[10];
-		double[] outDegrees = new double[10];
+		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+		bbox.setDefaultBoundaryBox(this.scenario.getNetwork());
+		
+		NetworkBoundaryBox bbox2 = new NetworkBoundaryBox();
+		double factor = 0.95;
+		bbox2.setCustomBoundaryBox(bbox.getXMin()*factor, bbox.getYMin()*factor, bbox.getXMax()*factor, bbox.getYMax()*factor);
 		
 		for(Node node : this.scenario.getNetwork().getNodes().values()){
+			
 			inDegrees[node.getInLinks().size()-1]++;
 			outDegrees[node.getOutLinks().size()-1]++;
+			
+			if(node.getInLinks().size()==1&&node.getOutLinks().size()==1){
+				
+				Link inLink = node.getInLinks().values().iterator().next();
+				Link outLink = node.getOutLinks().values().iterator().next();
+				
+				if(inLink.getFromNode().equals(outLink.getToNode())){
+					
+					if(node.getCoord().getX()<=bbox2.getXMax()&&node.getCoord().getX()>=bbox2.getXMin()&&
+							node.getCoord().getY()<=bbox2.getYMax()&&node.getCoord().getY()>=bbox.getYMin())
+						this.deadEnds.add(node);
+					else
+						this.exitRoads.add(node);
+					
+				}
+				
+			}
+			
 		}
 		
 		logger.info("done.");
+		
+		logger.warn(this.deadEnds.size() + " dead ends and " + this.exitRoads.size() + " exit roads found.");
 		
 		logger.info("writing node statistics files...");
 		
@@ -135,13 +212,44 @@ public class NetworkInspector {
 		
 	}
 	
+	private void createLinkLengthFiles() throws IOException {
+		
+		logger.info("writing length statistics file...");
+		
+		File file = new File(this.outputFolder+"/test/lengthStatistics.txt");
+		FileWriter writer = new FileWriter(file);
+		
+		writer.write("\t\t<7\t<15\t<50\t<100\t<150\t<200\t<300\t<500\t>500\nnObjects");
+		
+		for(int j=0;j<this.lengths.length;j++){
+			writer.write("\t"+this.lengths[j]);
+		}
+		writer.close();
+		
+		String[] categories = new String[9];
+		categories[0]="< 7";
+		categories[1]="< 15";
+		categories[2]="< 50";
+		categories[3]="< 100";
+		categories[4]="< 150";
+		categories[5]="< 200";
+		categories[6]="< 300";
+		categories[7]="< 500";
+		categories[8]="> 500";
+		
+		BarChart chart = new BarChart("Link lengths", "length [m]", "number of objects",categories);
+		chart.addSeries("link lengths", this.lengths);
+		chart.saveAsPng(this.outputFolder+"/test/lengthStatistics.png", 800, 600);
+		
+	}
+	
 	private void createLaneStatisticsFiles() throws IOException {
 		
 		logger.info("writing lane statistics file...");
 		
 		File file = new File(this.outputFolder+"/test/laneStatistics.txt");
 		FileWriter writer = new FileWriter(file);
-		writer.write("Degree");
+		writer.write("NLanes");
 		for(int i=0;i<this.nLanes.length;i++){
 			writer.write("\t"+ (i+1));
 		}
@@ -158,26 +266,20 @@ public class NetworkInspector {
 
 	private void createLinkLengthComparisonFile() throws IOException {
 		
-		logger.info("writing length statistics file...");
-		
-		double length = 0;
-		double gLength = 0;
+		logger.info("writing length comparison file...");
 
 		File file = new File(this.outputFolder+"/test/linkLengthComparison.txt");
 		FileWriter writer = new FileWriter(file);
-		writer.write("Id\tlength\tactualLength");
+		writer.write("Id\tlength\tgeometric Length");
 		
 		for(Id id : this.distances.keySet()){
 			writer.write("\n"+id.toString()+"\t"+
 					this.scenario.getNetwork().getLinks().get(id).getLength()+
 					"\t"+this.distances.get(id));
-			length += this.scenario.getNetwork().getLinks().get(id).getLength();
-			gLength += this.distances.get(id);
 		}
 		
 		writer.close();
-		System.out.println("total length of network links: " + length + "m\n"
-				+ "geom. length of network links: " + gLength + "m");
+
 	}
 	
 private void createLinkCapacityFiles() throws IOException{
@@ -207,6 +309,8 @@ private void createLinkCapacityFiles() throws IOException{
 		File file = new File(this.outputFolder+"/test/nodeDegrees.txt");
 		FileWriter writer = new FileWriter(file);
 		writer.write("in/out\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\nnobjects");
+		
+		//dead ends, exit roads
 		
 		for(int i=0;i<inDegrees.length;i++){
 			writer.write("\t"+inDegrees[i]+"/"+outDegrees[i]);

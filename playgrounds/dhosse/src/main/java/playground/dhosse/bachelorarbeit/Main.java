@@ -19,8 +19,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -34,17 +34,21 @@ public class Main {
 	
 	public static void main(String args[]) {
 		
-		String file1 = "C:/Users/Daniel/Dropbox/bsc/input/config.xml";
+//		String file1 = "C:/Users/Daniel/Dropbox/bsc/input/config.xml";
 		
-//		Config config = ConfigUtils.createConfig();
-//		Scenario scenario = ScenarioUtils.createScenario(config);
-//		Network network = scenario.getNetwork();
+		String file1 = "C:/Users/Daniel/Dropbox/bsc/input/switzerland.xml";
 		
-		Config config = ConfigUtils.loadConfig(file1);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		Controler ctrl = new Controler(config);
-		ctrl.setOverwriteFiles(true);
+		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
+		nr.readFile(file1);
+
+//		Config config = ConfigUtils.loadConfig(file1);
+//		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+//		Controler ctrl = new Controler(config);
+//		ctrl.setOverwriteFiles(true);
 		
 		InternalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
 		
@@ -109,29 +113,14 @@ public class Main {
 		
 		ZoneLayer<Id> startZones = new ZoneLayer<Id>(zones);
 		
+		NetworkInspector ni = new NetworkInspector(scenario);
+		ni.checkLinkAttributes();
+		ni.checkNodeAttributes();
+		
 //		ctrl.addControlerListener(new MyParcelBasedAccessibilityControlerListener(main, startZones,
 //				parcels, freeSpeedGrid, /*carGrid, bikeGrid, walkGrid, ptGrid,*/ null, null,
 //				sc));
 //		ctrl.run();
-		
-//		Scenario sc = ScenarioUtils.createScenario(config);
-//		Scenario sc2 = ScenarioUtils.createScenario(config);
-		
-//		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
-//		nr.readFile(file1);
-
-//		MatsimNetworkReader nr2 = new MatsimNetworkReader(sc2);
-//		nr2.readFile(file2);
-		
-//		NetworkInspector nI = new NetworkInspector(scenario);
-//		nI.checkNetworkAttributes(true, true);
-//		nI.isRoutable();
-
-//		Grid grid = new Grid();
-//		grid.calculateTravelTime(sc.getNetwork());
-//		grid.gridComparison(1000, sc.getNetwork(), sc2.getNetwork());
-//		grid.generateSHPExport(file1,file2);
-		
 
 		//TODO: methode isRoutable nochmal umschreiben (s.u.), unterscheidung bei node degree 1: einbahnstraße oder sackgasse?, dimension des untersuchungsgebiets ausgeben lassen
 		//TODO: wenn sackgasse: sackgasse, weil se aus dem untersuchungsgebiet rausführt oder "echte" sackgasse
