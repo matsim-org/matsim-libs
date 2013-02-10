@@ -36,10 +36,10 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  */
 interface AgentSnapshotInfoBuilder {
 
-	void positionVehiclesFromTransitStop(Collection<AgentSnapshotInfo> positions, Link link,
+	int positionVehiclesFromTransitStop(Collection<AgentSnapshotInfo> positions, Link link,
 			Queue<QVehicle> transitVehicleStopQueue, int cnt2);
 
-	void positionVehiclesFromWaitingList(Collection<AgentSnapshotInfo> positions, Link link,
+	int positionVehiclesFromWaitingList(Collection<AgentSnapshotInfo> positions, Link link,
 			int cnt2, Queue<QVehicle> waitingList);
 
 	int positionAgentsInActivities(Collection<AgentSnapshotInfo> positions, Link link,

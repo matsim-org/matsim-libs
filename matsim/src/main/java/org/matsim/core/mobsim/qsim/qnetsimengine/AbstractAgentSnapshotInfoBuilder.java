@@ -64,12 +64,13 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	 * @param waitingList
 	 * @param transitQueueLaneFeature
 	 */
-	public void positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
+	public int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
 			Collection<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
 			boolean first = true;
 			for (MobsimAgent passenger : peopleInVehicle) {
+				cnt2++ ;
 				AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
 				if (passenger.getId().toString().startsWith("pt")) {
 					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
@@ -84,6 +85,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 				first = false;
 			}
 		}
+		return cnt2 ;
 	}
 
 	public int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
@@ -102,7 +104,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	 * Put the transit vehicles from the transit stop list in positions.
 	 * @param transitVehicleStopQueue 
 	 */
-	public void positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
+	public int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
 				List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
@@ -124,10 +126,12 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 					positions.add(passengerPosition);
 					cnt2-- ;
 				}
+				cnt2 += peopleInVehicle.size() ; // setting it correctly for the next output
 
 			}
 
 		}
+		return cnt2 ;
 	}
 
 	public void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 

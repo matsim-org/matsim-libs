@@ -828,13 +828,13 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			// initialize a bit away from the lane
 
 			// treat vehicles from transit stops
-			snapshotInfoBuilder.positionVehiclesFromTransitStop(positions, link, transitVehicleStopQueue, cnt2 );
+			cnt2 = snapshotInfoBuilder.positionVehiclesFromTransitStop(positions, link, transitVehicleStopQueue, cnt2 );
 
 			// treat vehicles from waiting list:
-			snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.link, cnt2,
+			cnt2 = snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.link, cnt2,
 					QLinkImpl.this.waitingList);
 
-			snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.link,
+			cnt2 = snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.link,
 					QLinkImpl.this.getAdditionalAgentsOnLink(), cnt2);
 
 			// return:
