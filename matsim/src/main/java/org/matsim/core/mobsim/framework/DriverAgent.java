@@ -21,13 +21,17 @@
 package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 
 /**
+ * Design comments:<ul>
+ * <li>DriverAgent extending PassengerAgent feels a bit odd.  However, in the code there are quite a few snippets that treat the 
+ * driver as a passenger, thus having the interface in the same way seems to make sense.  kai, feb'13
+ * </ul>
+ * 
  * @author nagel
  *
  */
-public interface DriverAgent extends NetworkAgent, VehicleUsingAgent, Identifiable {
+public interface DriverAgent extends PassengerAgent {
 
 	/**
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
