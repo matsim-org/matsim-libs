@@ -52,7 +52,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
 
 	/*package*/ static final String MOBSIM = "mobsim";
-	public enum MobsimType {queueSimulation, qsim, jdeqsim, multimodalQSim } ;
+	public enum MobsimType {queueSimulation, qsim, JDEQSim, multimodalQSim } ;
 	
 	public static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 

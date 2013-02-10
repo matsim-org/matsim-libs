@@ -12,7 +12,7 @@ public class MobsimRegistrar {
 	public MobsimRegistrar() {
 		register.register(MobsimType.qsim.toString(), new QSimFactory());
 		register.register(MobsimType.queueSimulation.toString(), new QueueSimulationFactory());
-		register.register(MobsimType.jdeqsim.toString(), new JDEQSimulationFactory());
+		register.register(MobsimType.JDEQSim.toString(), new JDEQSimulationFactory());
 	}
 	
 	public MobsimFactoryRegister getFactoryRegister() {
