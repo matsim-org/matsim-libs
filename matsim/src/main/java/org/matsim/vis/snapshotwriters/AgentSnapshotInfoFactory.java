@@ -57,7 +57,7 @@ public class AgentSnapshotInfoFactory {
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;
 		double euklidean;
-		if (link instanceof LinkImpl){ //as for LinkImpl instances the euklidean distance is already computed we can safe computing time but have a cast instead
+		if (link instanceof LinkImpl){ //as for LinkImpl instances the Euklidean distance is already computed we can save computing time
 			euklidean = ((LinkImpl)link).getEuklideanDistance();
 		}
 		else {
@@ -98,8 +98,10 @@ public class AgentSnapshotInfoFactory {
 		} else { // i.e. DX==0
 			if (dy > 0) {
 				theta = PI_HALF;
-			} else {
+			} else if ( dy < 0 ) {
 				theta = -PI_HALF;
+			} else { // i.e. DX==0 && DY==0
+				theta = 0.833*Math.PI ; // some default direction towards north north east 
 			}
 		}
 		if (theta < 0.0) theta += TWO_PI;
@@ -107,7 +109,10 @@ public class AgentSnapshotInfoFactory {
 		// "correction" is needed because link lengths are usually different (usually longer) than the Euklidean distances.
 		// For the visualization, however, the vehicles are distributed in a straight line between the end points.
 		// Since the simulation, on the other hand, reports odometer distances, this needs to be corrected.  kai, apr'10
+		//
 		// The same correction can be used for the orthogonal offsets.  kai, aug'10
+		// That did not work so well in some cases.  Since the link width also seems to be plotted without that correction, let's
+		// try to also do the "distance from link" without correction.   kai, feb'13
 		double correction = 0. ;
 		if ( lengthOfCurve != 0 ){
 			correction = euclideanLength / lengthOfCurve;
@@ -119,11 +124,11 @@ public class AgentSnapshotInfoFactory {
 
 		info.setEasting( startCoord.getX() 
 				+ (Math.cos(theta) * distanceOnVector * correction)
-				+ (Math.sin(theta) * lanePosition * correction) ) ;
+				+ (Math.sin(theta) * lanePosition ) ) ;
 		
 		info.setNorthing( startCoord.getY() 
 				+ Math.sin(theta) * distanceOnVector  * correction 
-				- Math.cos(theta) * lanePosition  * correction );
+				- Math.cos(theta) * lanePosition  );
 		
 		info.setAzimuth( theta / TWO_PI * 360. ) ;
 	}

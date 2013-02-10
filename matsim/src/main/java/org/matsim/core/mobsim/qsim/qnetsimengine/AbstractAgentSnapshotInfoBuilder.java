@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -67,9 +68,9 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	public int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
-			Collection<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
+			Collection<PassengerAgent> peopleInVehicle = getPeopleInVehicle(veh);
 			boolean first = true;
-			for (MobsimAgent passenger : peopleInVehicle) {
+			for (PassengerAgent passenger : peopleInVehicle) {
 				cnt2++ ;
 				AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
 				if (passenger.getId().toString().startsWith("pt")) {
@@ -90,14 +91,13 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 
 	public int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 			Collection<MobsimAgent> agentsInActivities,  int cnt2) {
-		int c = cnt2;
 		for (MobsimAgent pa : agentsInActivities) {
-			AgentSnapshotInfo agInfo = snapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), c) ;
+			AgentSnapshotInfo agInfo = snapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), cnt2) ;
 			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
 			positions.add(agInfo) ;
-			c++ ;
+			cnt2++ ;
 		}
-		return c;
+		return cnt2;
 	}
 
 	/**
@@ -107,11 +107,11 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	public int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
-				List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
+				List<PassengerAgent> peopleInVehicle = getPeopleInVehicle(veh);
 				boolean last = false ;
 				cnt2 += peopleInVehicle.size() ;
-				for ( ListIterator<MobsimAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
-					MobsimAgent passenger = it.previous();
+				for ( ListIterator<PassengerAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
+					PassengerAgent passenger = it.previous();
 					if ( !it.hasPrevious() ) {
 						last = true ;
 					}
@@ -203,16 +203,18 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	 * @param transitQueueLaneFeature
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
-	protected List<MobsimAgent> getPeopleInVehicle(QVehicle vehicle) {
-		ArrayList<MobsimAgent> people = new ArrayList<MobsimAgent>();
+	protected List<PassengerAgent> getPeopleInVehicle(QVehicle vehicle) {
+		ArrayList<PassengerAgent> people = new ArrayList<PassengerAgent>();
 		people.add(vehicle.getDriver());
-		if (vehicle instanceof TransitVehicle) {
-			for (PassengerAgent passenger : ((TransitVehicle) vehicle).getPassengers()) {
-				people.add((MobsimAgent) passenger);
-			}
+//		if (vehicle instanceof TransitVehicle) {
+//			for (PassengerAgent passenger : ((TransitVehicle) vehicle).getPassengers()) {
+//				people.add((MobsimAgent) passenger);
+//			}
+//		}
+		for ( PassengerAgent passenger : vehicle.getPassengers() ) {
+			people.add(passenger) ;
 		}
 		return people;
 	}
 
-	
 }
