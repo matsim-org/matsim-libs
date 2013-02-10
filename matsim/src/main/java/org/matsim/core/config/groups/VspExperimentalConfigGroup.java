@@ -33,28 +33,28 @@ interface ConfigKey {}
  */
 public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
-		public static enum VspExperimentalConfigKey implements ConfigKey {
-//			activityDurationInterpretation,
-			vspDefaultsCheckingLevel,
-			logitScaleParamForPlansRemoval,
-			scoreMSAStartsAtIteration,
-			isGeneratingBoardingDeniedEvent,
-			isAbleToOverwritePtInteractionParams,
-			isUsingOpportunityCostOfTimeForLocationChoice
+	public static enum VspExperimentalConfigKey implements ConfigKey {
+		//			activityDurationInterpretation,
+		vspDefaultsCheckingLevel,
+		logitScaleParamForPlansRemoval,
+		scoreMSAStartsAtIteration,
+		isGeneratingBoardingDeniedEvent,
+		isAbleToOverwritePtInteractionParams,
+		isUsingOpportunityCostOfTimeForLocationChoice
+	}
+
+	private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
+
+	public void addParam( final ConfigKey key, final String value ) {
+		String retVal = this.typedParam.put( key,value );
+		if ( retVal != null ) {
+			Logger.getLogger(this.getClass()).info(key + ": replacing >" + retVal + "< (old) with >" + value + "< (new)") ;
 		}
-	
-		private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
-	
-		public void addParam( final ConfigKey key, final String value ) {
-			String retVal = this.typedParam.put( key,value );
-			if ( retVal != null ) {
-				Logger.getLogger(this.getClass()).info(key + ": replacing >" + retVal + "< (old) with >" + value + "< (new)") ;
-			}
-		}
-	
-		public String getValue( final ConfigKey key ) {
-			return this.typedParam.get(key) ;
-		}
+	}
+
+	public String getValue( final ConfigKey key ) {
+		return this.typedParam.get(key) ;
+	}
 
 	// === testing area end ===
 
@@ -71,7 +71,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Deprecated
 	private static final String USE_ACTIVITY_DURATIONS = "useActivityDurations";
 	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
-	
+
 	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly } 
 
 	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.minOfDurationAndEndTime ;
@@ -99,13 +99,13 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	// ---
 
-//	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
+	//	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
 
 	public static final String IGNORE = "ignore" ;
 	public static final String WARN = "warn" ;
 	public static final String ABORT = "abort" ;
 
-//	private String vspDefaultsCheckingLevel = IGNORE ;
+	//	private String vspDefaultsCheckingLevel = IGNORE ;
 
 	// ---
 
@@ -144,7 +144,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
-		
+
 		// the following somewhat curious syntax is so that both the compiler and the runtime system notice if an entry
 		// is missing
 		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
@@ -178,11 +178,11 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
 			switch(key) {
 			case logitScaleParamForPlansRemoval:
-//				map.put(key.toString(), "comment") ;
+				//				map.put(key.toString(), "comment") ;
 				break;
 			case scoreMSAStartsAtIteration:
 				map.put(key.toString(), "first iteration of MSA score averaging. The matsim theory department " +
-						"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
+				"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
 				break;
 			case vspDefaultsCheckingLevel:
 				break;
@@ -191,11 +191,11 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			case isAbleToOverwritePtInteractionParams:
 				map.put(key.toString(), "(do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the " +
 						"parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, " +
-						"set the following to true.") ;
+				"set the following to true.") ;
 				break;
 			case isUsingOpportunityCostOfTimeForLocationChoice:
 				map.put(key.toString(), "if an approximation of the opportunity cost of time is included into the radius calculation for location choice." +
-						"`true' will be faster, but it is an approximation.  Default is `true'; `false' is available for backwards compatibility.") ;
+				"`true' will be faster, but it is an approximation.  Default is `true'; `false' is available for backwards compatibility.") ;
 				break;
 			}
 		}
@@ -228,16 +228,16 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				"When violating VSP defaults, this results in " +
 		"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
-//		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION
-//				+ " instead) Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
-		
+		//		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION
+		//				+ " instead) Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
+
 		StringBuilder str = new StringBuilder() ;
 		for ( ActivityDurationInterpretation itp : ActivityDurationInterpretation.values() ) {
 			str.append( " " + itp.toString() ) ;
 		}
 		map.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
 				+ ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +
-						"(simpler) version of the TimeAllocationMutator.") ;
+		"(simpler) version of the TimeAllocationMutator.") ;
 
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
 		"activityStartTime. default=false") ;
@@ -247,17 +247,17 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(MODES_FOR_SUBTOURMODECHOICE, "(do not use) set the traffic mode option for subTourModeChoice by Yu");
 		map.put(CHAIN_BASED_MODES, "(do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. \"car,bike\", \"car\"");
 
-//		map.put(OFFSET_WALK, "(deprecated, use corresponding option in planCalcScore) " +
-//		"set offset for mode \"walk\" in leg scoring function");
+		//		map.put(OFFSET_WALK, "(deprecated, use corresponding option in planCalcScore) " +
+		//		"set offset for mode \"walk\" in leg scoring function");
 
-//		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
+		//		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
 		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
 				"indicates if, for routing, the opportunity cost of time should be added to the mode-specific marginal " +
 				"utilities of time.\n\t\t" +
 				"Default is true; false is possible only for backwards compatibility.\n\t\t" +
 				"This is only a suggestion since there is (by matsim design) no way to enforce that mental modules " +
 		"obey this." ) ;
-		
+
 		return map;
 	}
 
@@ -265,7 +265,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Deprecated
 	public String getValue(final String key) {
 		throw new RuntimeException(" use direct getter or getValue( ...Key key) (depending on which one is implemented for " +
-				"your variable); aborting ... " ) ;
+		"your variable); aborting ... " ) ;
 	}
 
 	@Override
@@ -278,7 +278,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			// the above feels really odd.  Problem is that we can convert keys to strings, but not the other way round.
 			// alternative might be some lookup table.  kai, oct'12
 		}
-		
+
 		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
 			//			this.setUseActivityDurations(Boolean.parseBoolean(value));
 			if ( Boolean.parseBoolean(value) ) {
@@ -294,7 +294,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			setRemovingUnneccessaryPlanAttributes(Boolean.parseBoolean(value)) ;
 		} else if ( "coloring".equalsIgnoreCase(key) ) {
 			throw new RuntimeException("coloring in vspExperimentalConfigGroup is no longer allowed; use the corresponding " +
-					"config option in the otfvis config group (or do not use at all).  jul'12") ;
+			"config option in the otfvis config group (or do not use at all).  jul'12") ;
 		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key)) {
 			setInputMZ05File(value);
 		} else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key)) {
@@ -306,10 +306,10 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		} else if ("offsetWalk".equalsIgnoreCase(key)) {
 			throw new RuntimeException( "offsetWalk in vspExperimentalConfigGroup is no longer; use the (alternative-specific) " +
 			"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
-//		} else if ( VspExperimentalConfigKey.vspDefaultsCheckingLevel.toString().equals(key) ) {
-//			this.addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, value) ;
-//		} else if ( VspExperimentalConfigKey.logitScaleParamForPlansRemoval.toString().equals(key) ) {
-//			this.addParam( VspExperimentalConfigKey.logitScaleParamForPlansRemoval, value) ;
+			//		} else if ( VspExperimentalConfigKey.vspDefaultsCheckingLevel.toString().equals(key) ) {
+			//			this.addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, value) ;
+			//		} else if ( VspExperimentalConfigKey.logitScaleParamForPlansRemoval.toString().equals(key) ) {
+			//			this.addParam( VspExperimentalConfigKey.logitScaleParamForPlansRemoval, value) ;
 		} else if ( EMISSION_ROADTYPE_MAPPING_FILE.equals(key)){
 			this.setEmissionRoadTypeMappingFile(value);
 		} else if ( EMISSION_VEHICLE_FILE.equals(key)){
@@ -367,7 +367,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put( WRITING_OUTPUT_EVENTS, Boolean.toString(this.isWritingOutputEvents()) ) ;
 
 		map.put( MATSIM_GLOBAL_TIME_FORMAT, this.getMatsimGlobalTimeFormat() );
-		
+
 		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
 			map.put( key.toString(), this.getValue(key) ) ;
 		}
@@ -375,34 +375,34 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		return map;
 	}
 
-//	@Override
-//	protected void checkConsistency() throws RuntimeException {
-//		log.info( "entering checkVspDefaults ...") ;
-//
-//		// begin vsp default definitions
-//		final boolean usingOpportunityCostOfTimeInPtRoutingDefault = true ;
-//		// end vsp default definitions
-//
-//		boolean problem = false ;
-//		if ( this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.WARN )
-//				|| this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
-//
-//			if ( this.isUsingOpportunityCostOfTimeInPtRouting() != usingOpportunityCostOfTimeInPtRoutingDefault ) {
-//				log.warn( "violating VSP defaults; "+USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING + "  should be set to: " +
-//						usingOpportunityCostOfTimeInPtRoutingDefault + " in module: " + GROUP_NAME) ;
-//				problem = true ;
-//			}
-//
-//		}
-//
-//		if ( this.getVspDefaultsCheckingLevel().equals(VspExperimentalConfigGroup.ABORT) && problem ) {
-//			String str = "violating VSP defaults and vspDefaultsCheckingLevel set to `abort', thus aborting ..." ;
-//			log.fatal( str ) ;
-//			throw new RuntimeException( str ) ;
-//		}
-//
-//		log.info( "leaving checkVspDefaults ...") ;
-//	}
+	//	@Override
+	//	protected void checkConsistency() throws RuntimeException {
+	//		log.info( "entering checkVspDefaults ...") ;
+	//
+	//		// begin vsp default definitions
+	//		final boolean usingOpportunityCostOfTimeInPtRoutingDefault = true ;
+	//		// end vsp default definitions
+	//
+	//		boolean problem = false ;
+	//		if ( this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.WARN )
+	//				|| this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
+	//
+	//			if ( this.isUsingOpportunityCostOfTimeInPtRouting() != usingOpportunityCostOfTimeInPtRoutingDefault ) {
+	//				log.warn( "violating VSP defaults; "+USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING + "  should be set to: " +
+	//						usingOpportunityCostOfTimeInPtRoutingDefault + " in module: " + GROUP_NAME) ;
+	//				problem = true ;
+	//			}
+	//
+	//		}
+	//
+	//		if ( this.getVspDefaultsCheckingLevel().equals(VspExperimentalConfigGroup.ABORT) && problem ) {
+	//			String str = "violating VSP defaults and vspDefaultsCheckingLevel set to `abort', thus aborting ..." ;
+	//			log.fatal( str ) ;
+	//			throw new RuntimeException( str ) ;
+	//		}
+	//
+	//		log.info( "leaving checkVspDefaults ...") ;
+	//	}
 
 	public String getInputMZ05File() {
 		return this.inputMZ05File;
@@ -438,7 +438,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			 * I don't think this is the correct place for consistency checks but this bug is so hard to find that the user should be warned in any case. dg 08-2012
 			 */
 			log.warn("You are using " + activityDurationInterpretation + " as activityDurationInterpretation. " +
-					"This is not working in conjunction with the pt module as pt interaction activities then will never end!");
+			"This is not working in conjunction with the pt module as pt interaction activities then will never end!");
 			log.warn("ActivityDurationInterpreation " + activityDurationInterpretation + " is deprecated; use " 
 					+ ActivityDurationInterpretation.minOfDurationAndEndTime + " instead. kai, jan'13") ;
 		}
@@ -461,17 +461,17 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Deprecated // switch is only there for backwards compatibility
 	public void setUsingOpportunityCostOfTimeInPtRouting(final boolean tmp) {
 		log.warn("config parameter " + USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING + " deprecated; remove from config file; " +
-				"will eventually be removed." ) ;
+		"will eventually be removed." ) ;
 		this.isUsingOpportunityCostOfTimeInPtRouting = tmp;
 	}
 
-//	public void setVspDefaultsCheckingLevel(final String vspDefaultsCheckingLevel) {
-//		this.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, vspDefaultsCheckingLevel) ;
-//	}
+	//	public void setVspDefaultsCheckingLevel(final String vspDefaultsCheckingLevel) {
+	//		this.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, vspDefaultsCheckingLevel) ;
+	//	}
 
-//	public String getVspDefaultsCheckingLevel() {
-//		return this.getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel ) ;
-//	}
+	//	public String getVspDefaultsCheckingLevel() {
+	//		return this.getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel ) ;
+	//	}
 
 	public void setEmissionRoadTypeMappingFile(String roadTypeMappingFile) {
 		this.emissionRoadTypeMappingFile = roadTypeMappingFile;
