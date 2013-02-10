@@ -93,6 +93,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
 		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
 
+		// joint context (based on scenario):
 		final LocationChoiceBestResponseContext lcContext = new LocationChoiceBestResponseContext(scenario) ;
 		
 		// CONTROL(L)ER:
@@ -116,6 +117,9 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
 				return new BestReplyLocationChoicePlanStrategy(lcContext) ;
+				// yy MZ argues that this is not so great since the factory now has context that goes beyond Scenario and EventsManager.
+				// As an alternative, one could add the context to Scenario as scenario element.  I find the present version easier to read, and
+				// as long as the factories remain anonymous classes, this is most probably ok. kai, feb'13
 			}
 		});
 		
