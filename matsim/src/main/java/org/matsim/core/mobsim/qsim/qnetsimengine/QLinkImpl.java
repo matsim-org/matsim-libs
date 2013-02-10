@@ -148,6 +148,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	private boolean thisTimeStepGreen = true;
 	private double congestedDensity_veh_m;
 	private int nHolesMax;
+	private final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -174,6 +175,9 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 		this.calculateCapacities();
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
+		
+		this.insertingWaitingVehiclesBeforeDrivingVehicles = 
+			network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 	}
 
 	/* 
@@ -244,11 +248,17 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	boolean doSimStep(double now) {
 		updateBufferCapacity();
 
-		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
+		if ( this.insertingWaitingVehiclesBeforeDrivingVehicles ) {
+			moveWaitToBuffer(now);
+			moveLaneToBuffer(now);
+		} else {
+			moveLaneToBuffer(now);
+			moveWaitToBuffer(now);
+		}
+		// moveLaneToBuffer moves vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
 		// if this is the original lane.
-		moveLaneToBuffer(now);
-		// move vehicles from waitingQueue into buffer if possible
-		moveWaitToBuffer(now);
+		
+		// moveWaitToBuffer moves waiting (i.e. just departed) vehicles into the buffer.
 
 		this.active = this.isActive();
 		return active;

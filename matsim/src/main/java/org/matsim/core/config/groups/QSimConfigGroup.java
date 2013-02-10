@@ -87,6 +87,10 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	
 	private static final String MAIN_MODE = "mainMode" ;
 	private Collection<String> mainModes = Arrays.asList(TransportMode.car) ;
+	
+	// ---
+	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles" ;
+	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false ;
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -96,6 +100,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	public final void addParam(final String key, final String value) {
 		if (START_TIME.equals(key)) {
 			setStartTime(Time.parseTime(value));
+		} else if ( INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES.equals(key) ) {
+			setInsertingWaitingVehiclesBeforeDrivingVehicles(Boolean.parseBoolean(value)) ;
 		} else if (END_TIME.equals(key)) {
 			setEndTime(Time.parseTime(value));
 		} else if (TIME_STEP_SIZE.equals(key)) {
@@ -158,6 +164,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
 		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainMode()))) ;
+		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, String.valueOf( isInsertingWaitingVehiclesBeforeDrivingVehicles() ) ) ;
 		return map;
 	}
 
@@ -185,6 +192,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(MAIN_MODE, "Defines which mode should be the qsim `main' (=congested) mode. Technically, this is the mode that " +
 				"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
 				"factor, and storage capacity factor need to be set with diligence.  Needs to be a vehicular mode to make sense.") ;
+		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, 
+				"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false") ; 
 		return map ;
 	}
 	/* direct access */
@@ -329,6 +338,14 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	public Collection<String> getMainMode() {
 		return mainModes;
+	}
+
+	public boolean isInsertingWaitingVehiclesBeforeDrivingVehicles() {
+		return this.insertingWaitingVehiclesBeforeDrivingVehicles  ;
+	}
+
+	public void setInsertingWaitingVehiclesBeforeDrivingVehicles(boolean val) {
+		this.insertingWaitingVehiclesBeforeDrivingVehicles = val;
 	}
 	
 }
