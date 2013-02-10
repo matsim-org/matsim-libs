@@ -47,10 +47,11 @@ public class PositionInfoTest extends MatsimTestCase {
 		// place the vehicle at one quarter of the link
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		AgentSnapshotInfo posInfo = new AgentSnapshotInfoFactory(linkWidthCalculator).createAgentSnapshotInfo(new IdImpl(1), link1, 250, 0);
-		assertEquals(265.0, posInfo.getEasting(), epsilon);
-		assertEquals(235.0, posInfo.getNorthing(), epsilon);
+		assertEquals(260.60660171779824, posInfo.getEasting(), epsilon);
+		assertEquals(239.3933982822018, posInfo.getNorthing(), epsilon);
 		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08
 		// These numbers changed again when I mad the orthogonal offset adaptive.  kai, aug/10
+		// Made the orthogonal offsets non-adaptive again.  kai, feb'13
 	}
 
 	/**
@@ -69,10 +70,11 @@ public class PositionInfoTest extends MatsimTestCase {
 		// place the vehicle at one quarter of the link
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		AgentSnapshotInfo posInfo = new AgentSnapshotInfoFactory(linkWidthCalculator).createAgentSnapshotInfo(new IdImpl(1), link1, 500, 0);
-		assertEquals(257.5, posInfo.getEasting(), epsilon);
-		assertEquals(242.5, posInfo.getNorthing(), epsilon);
+		assertEquals(260.60660171779824, posInfo.getEasting(), epsilon);
+		assertEquals(239.3933982822018, posInfo.getNorthing(), epsilon);
 		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08
 		// These numbers changed again when I mad the orthogonal offset adaptive.  kai, aug/10
+		// Made the orthogonal offsets non-adaptive again.  kai, feb'13
 	}
 
 }
