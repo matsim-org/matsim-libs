@@ -13,7 +13,7 @@ public class Prefecture {
 	}
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(int id) {
@@ -21,7 +21,7 @@ public class Prefecture {
 	}
 
 	public double getLongitude() {
-		return longitude;
+		return this.longitude;
 	}
 
 	public void setLongitude(double longitude) {
@@ -29,7 +29,7 @@ public class Prefecture {
 	}
 
 	public double getLatitude() {
-		return latitude;
+		return this.latitude;
 	}
 
 	public void setLatitude(double latitude) {

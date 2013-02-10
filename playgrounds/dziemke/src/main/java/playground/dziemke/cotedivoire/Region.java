@@ -20,7 +20,7 @@ public class Region {
 	}
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(int id) {
@@ -28,7 +28,7 @@ public class Region {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -36,7 +36,7 @@ public class Region {
 	}
 	
 	public Geometry getGeometry() {
-		return geometry;
+		return this.geometry;
 	}
 
 	public void setGeometry(Geometry geometry) {
@@ -44,7 +44,7 @@ public class Region {
 	}
 	
 	public List <Prefecture> getPrefecture() {
-		return subprefectures;
+		return this.subprefectures;
 	}
 
 	public void setPrefectures(List <Prefecture> subprefectures) {
