@@ -69,7 +69,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 	 */
 	private void checkMobsimSelection(final Config config) {
 		if ( config.getModule("JDEQSim")!=null && config.controler().getMobsim() != null ) {
-			if ( !config.controler().getMobsim().equalsIgnoreCase(MobsimType.JDEQSim.toString()) ) {
+			if ( !config.controler().getMobsim().equalsIgnoreCase(MobsimType.jdeqsim.toString()) ) {
 				throw new RuntimeException( "config module for JDEQSim defined but other mobsim selected in controler config" +
 						" module; aborting since there is no way to fix this AND remain backwards compatible.\n" +
 						" Either select jdeqsim in the controler config OR remove the jdeqsim config module.") ;
@@ -106,18 +106,18 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 					config.removeModule(mType.toString());
 				}
 			}
-		} else if ( config.controler().getMobsim().equalsIgnoreCase( MobsimType.JDEQSim.toString() ) ) {
-			if ( config.getModule(MobsimType.JDEQSim.toString()) == null ) {
+		} else if ( config.controler().getMobsim().equalsIgnoreCase( MobsimType.jdeqsim.toString() ) ) {
+			if ( config.getModule(MobsimType.jdeqsim.toString()) == null ) {
 				log.warn("JDEQSim does not seem to have a typed (= preconfigured) config group; " +
 				"thus cannot load it; thus cannot print configuration options into logfile.  kai, mar'12") ;
 				for ( MobsimType mType : MobsimType.values() ) {
-					if ( mType != MobsimType.JDEQSim ) {
+					if ( mType != MobsimType.jdeqsim ) {
 						checkForConfigModulesOfUnselectedMobsims(config, mType);
 					}
 				}
 			}
 			for ( MobsimType mType : MobsimType.values() ) {
-				if ( mType != MobsimType.JDEQSim ) {
+				if ( mType != MobsimType.jdeqsim ) {
 					config.removeModule(mType.toString());
 				}
 			}
