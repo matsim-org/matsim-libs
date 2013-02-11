@@ -11,20 +11,8 @@ public class ShoppingTrip {
 	private int startPLZ;
 	private int endPLZ;
 	
-	public Coord getStart() {
-		return startCoord;
-	}
-	public Coord getEnd() {
-		return endCoord;
-	}
 	public ShopLocation getShop() {
 		return shop;
-	}
-	public void setStart(Coord start) {
-		this.startCoord = start;
-	}
-	public void setEnd(Coord end) {
-		this.endCoord = end;
 	}
 	public void setShop(ShopLocation shop) {
 		this.shop = shop;

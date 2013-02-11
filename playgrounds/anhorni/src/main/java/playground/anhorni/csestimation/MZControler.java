@@ -39,6 +39,8 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import playground.anhorni.analysis.microcensus.planbased.MZ2Plans;
 import playground.anhorni.analysis.microcensus.planbased.MZActivityImpl;
 import playground.anhorni.analysis.microcensus.planbased.MZPerson;
+import playground.anhorni.csestimation.biogeme.ChoiceSetWriter;
+import playground.anhorni.csestimation.biogeme.ModFileWriter;
 
 public class MZControler {	
 	private TreeMap<Id, ShopLocation> shops;
@@ -53,10 +55,11 @@ public class MZControler {
 		String mzIndir = args[0];
 		String universalChoiceSetFile = args[1];
 		String outdir = args[2];
-		c.run(universalChoiceSetFile, mzIndir, outdir);
+		String bzFile = args[3];
+		c.run(universalChoiceSetFile, mzIndir, outdir, bzFile);
 	}
 	
-	public void run(String universalChoiceSetFile, String mzIndir, String outdir) {
+	public void run(String universalChoiceSetFile, String mzIndir, String outdir, String bzFile) {
 		Population population = 
 			((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		Population popMZ;
@@ -85,6 +88,12 @@ public class MZControler {
 		this.analyze(outdir);
 		this.write(outdir, this.estimationPopulation0510);
 		
+		ChoiceSetWriter writer = new ChoiceSetWriter(this.shops, this.estimationPopulation0510);
+		writer.write(outdir, bzFile);
+		
+		ModFileWriter modWriter = new ModFileWriter();
+		modWriter.writeModFile(outdir + "mod0.mod");
+		
 		log.info("finished .......................................");
 	}
 		
@@ -109,9 +118,9 @@ public class MZControler {
 						shoppingTrip.setShop(shop);
 						MZActivityImpl start = (MZActivityImpl)plan.getPlanElements().get(actlegIndex - 2);
 						
-						shoppingTrip.setStart(start.getCoord());						
+						shoppingTrip.setStartCoord(start.getCoord());						
 						MZActivityImpl end = (MZActivityImpl)plan.getPlanElements().get(actlegIndex + 2);
-						shoppingTrip.setEnd(end.getCoord());
+						shoppingTrip.setEndCoord(end.getCoord());
 						
 						Coord sCoord = this.trafo.transform(shop.getCoord());
 						Coord aCoord = this.trafo.transform(act.getCoord());						

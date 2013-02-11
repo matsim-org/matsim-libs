@@ -32,8 +32,8 @@ public class Writer {
 					bufferedWriter.write(person.getAge() + ",");
 					bufferedWriter.write(person.getHhIncome() + ",");				
 					bufferedWriter.write(st.getShop().getId() + ","); // choice
-					Coord coordStartTrafo = this.trafo.transform(st.getStart());	
-					Coord coordEndTrafo = this.trafo.transform(st.getEnd());
+					Coord coordStartTrafo = this.trafo.transform(st.getStartCoord());	
+					Coord coordEndTrafo = this.trafo.transform(st.getEndCoord());
 					bufferedWriter.write(coordStartTrafo.getX() + "," + coordStartTrafo.getY() + ",");
 					bufferedWriter.write(coordEndTrafo.getX() + "," + coordEndTrafo.getY() + ",");
 					bufferedWriter.write("\n");

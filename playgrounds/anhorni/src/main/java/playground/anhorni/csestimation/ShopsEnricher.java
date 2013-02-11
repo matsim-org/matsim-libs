@@ -59,6 +59,19 @@ public class ShopsEnricher {
 		writer.writeShops(this.shops, outShopsFile);
 		log.info("Enriching finished ------------------------------------------");
 	}
+	
+	public void enrich(TreeMap<Id, ShopLocation> ucs, String bzFile) {
+		this.shops = ucs;
+		try {
+			log.info("reading: " + bzFile);
+			this.readBZ(bzFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		this.assignSize();
+		this.assignPrice();
+		log.info("Enriching finished ------------------------------------------");
+	}
 
 	/*
 	471901	0	Warenhäuser
