@@ -25,7 +25,7 @@ public class RunFreeSpeedSimulation {
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory("./freespeed-random-output");
+		config.controler().setOutputDirectory("./freespeed-output");
 		config.controler().setMobsim("jdeqsim");
 		// config.controler().setMobsim("DoNothing");
 		config.global().setCoordinateSystem("EPSG:3395");
@@ -59,7 +59,7 @@ public class RunFreeSpeedSimulation {
 		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
 		AltPopulationReaderMatsimV5 altPopulationReaderMatsimV5 = new AltPopulationReaderMatsimV5(scenario);
 		//	altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
-		altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
+		altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population-capital-only.xml");
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithm() {
 
 			@Override
@@ -69,25 +69,25 @@ public class RunFreeSpeedSimulation {
 
 		});
 		
-		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithm() {
-
-			@Override
-			public void run(Person person) {
-				Plan plan = person.getSelectedPlan();
-				for (int i = 0; i < plan.getPlanElements().size()-2; i++) {
-					PlanElement pe = plan.getPlanElements().get(i);
-					if (pe instanceof Activity) {
-						Activity activity = (Activity) pe;
-						Leg leg = (Leg) plan.getPlanElements().get(i+1);
-						Activity nextActivity = (Activity) plan.getPlanElements().get(i+2);
-						double earliest = activity.getEndTime();
-						double latest = nextActivity.getEndTime() - leg.getTravelTime();
-						activity.setEndTime(earliest + MatsimRandom.getRandom().nextDouble() * (latest - earliest));
-					}
-				}
-			}
-
-		});
+//		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithm() {
+//
+//			@Override
+//			public void run(Person person) {
+//				Plan plan = person.getSelectedPlan();
+//				for (int i = 0; i < plan.getPlanElements().size()-2; i++) {
+//					PlanElement pe = plan.getPlanElements().get(i);
+//					if (pe instanceof Activity) {
+//						Activity activity = (Activity) pe;
+//						Leg leg = (Leg) plan.getPlanElements().get(i+1);
+//						Activity nextActivity = (Activity) plan.getPlanElements().get(i+2);
+//						double earliest = activity.getEndTime();
+//						double latest = nextActivity.getEndTime() - leg.getTravelTime();
+//						activity.setEndTime(earliest + MatsimRandom.getRandom().nextDouble() * (latest - earliest));
+//					}
+//				}
+//			}
+//
+//		});
 		
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
