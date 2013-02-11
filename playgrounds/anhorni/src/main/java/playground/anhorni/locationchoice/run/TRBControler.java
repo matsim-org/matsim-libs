@@ -44,21 +44,23 @@ public class TRBControler extends Controler {
 	public static void main(String[] args) {
 		new TRBControler(args).run();
 	}
+	
+	 protected void setUp() {
+	      super.setUp();
+	      
+	      TRBScoringFunctionFactory trbScoringFunctionFactory =
+	  			new TRBScoringFunctionFactory(this.config.planCalcScore(), this);
+	  		this.setScoringFunctionFactory(trbScoringFunctionFactory);
 
-	@Override
-	public void run() {
-		TRBScoringFunctionFactory trbScoringFunctionFactory =
-			new TRBScoringFunctionFactory(this.config.planCalcScore(), this);
-		this.setScoringFunctionFactory(trbScoringFunctionFactory);
-
-		this.addControlerListener(new FacilitiesLoadCalculator(this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties()));
-		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
-		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes.txt", false));
-		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes_wayThere.txt", true));
-		this.addControlerListener(new CalcLegDistancesListenerDetailed("CalcLegDistances_wayThere.txt"));
-		this.addControlerListener(new CalculatePlanTravelStats(true));
-		this.addControlerListener(new PrintShopAndLeisureLocations());
-		this.addControlerListener(new TravelDistanceDistribution());
-		super.run();
-	}
+	  		this.addControlerListener(new FacilitiesLoadCalculator(this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties()));
+	  		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
+	  		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes.txt", false));
+	  		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes_wayThere.txt", true));
+	  		this.addControlerListener(new CalcLegDistancesListenerDetailed("CalcLegDistances_wayThere.txt"));
+	  		this.addControlerListener(new CalculatePlanTravelStats(true));
+	  		this.addControlerListener(new PrintShopAndLeisureLocations());
+	  		this.addControlerListener(new TravelDistanceDistribution());
+	  		super.run();
+	      
+	 }
 }

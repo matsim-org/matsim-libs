@@ -55,16 +55,13 @@ public class SingleRunControler extends Controler {
     	SingleRunControler controler = new SingleRunControler(args);
     	controler.run();
     }
-    
-    public void run() {
-    	super.setOverwriteFiles(true);
-    	if (this.day > -1) super.addControlerListener(new ShoppingCalculator(this.personAttributes, this.tempVar, this.day));
-    	super.run();
-    }
-    
+        
     @Override
     protected void setUp() {
       super.setUp();
+      super.setOverwriteFiles(true);
+      
+      if (this.day > -1) super.addControlerListener(new ShoppingCalculator(this.personAttributes, this.tempVar, this.day));
       
       ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.config.locationchoice());
 	  ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
