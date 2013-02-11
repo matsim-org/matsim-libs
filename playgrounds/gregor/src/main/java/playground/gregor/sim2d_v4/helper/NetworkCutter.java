@@ -20,8 +20,13 @@
 
 package playground.gregor.sim2d_v4.helper;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -62,8 +67,28 @@ public class NetworkCutter {
 
 	/*package*/ void run(Sim2DScenario sc) {
 		for (Sim2DEnvironment env : sc.getSim2DEnvironments()) {
+			makeOneWay(env);
 			processLinks(env);
 			mapLinks(env);
+		}
+	}
+
+	private void makeOneWay(Sim2DEnvironment env) {
+		Network net = env.getEnvironmentNetwork();
+		List<Link> rm = new ArrayList<Link>();
+		Iterator<? extends Link> it = net.getLinks().values().iterator();
+		Map<Id,Id> handled = new HashMap<Id,Id>();
+		while(it.hasNext()) {
+			Link l = it.next();
+			Id tmp = handled.get(l.getToNode().getId());
+			if (tmp != null && tmp.equals(l.getFromNode().getId())) {
+				rm.add(l);
+				continue;
+			}
+			handled.put(l.getFromNode().getId(), l.getToNode().getId());
+		}
+		for (Link l : rm) {
+			net.removeLink(l.getId());
 		}
 	}
 
@@ -118,20 +143,20 @@ public class NetworkCutter {
 			Intersect intersection = getFirstIntersection(l,qt);
 			if (intersection != null) {
 				net.removeLink(l.getId());
-				Link rev = null;
-				for (Link tmp : l.getToNode().getOutLinks().values()) {
-					if (tmp.getToNode().equals(l.getFromNode())) {
-						rev = tmp;
-						break;
-					}
-				}
-				net.removeLink(rev.getId());
-				rm.add(rev);
+//				Link rev = null;
+//				for (Link tmp : l.getToNode().getOutLinks().values()) {
+//					if (tmp.getToNode().equals(l.getFromNode())) {
+//						rev = tmp;
+//						break;
+//					}
+//				}
+//				net.removeLink(rev.getId());
+//				rm.add(rev);
 				
 				Id id0 = new IdImpl(l.getId()+"a");
 				Id id1 = new IdImpl(l.getId()+"b");
-				Id id0r = new IdImpl(rev.getId()+"a");
-				Id id1r = new IdImpl(rev.getId()+"b");
+//				Id id0r = new IdImpl(rev.getId()+"a");
+//				Id id1r = new IdImpl(rev.getId()+"b");
 				Coordinate c = new Coordinate();
 				Algorithms.computeLineIntersection(MGC.coord2Coordinate(l.getFromNode().getCoord()), MGC.coord2Coordinate(l.getToNode().getCoord()), intersection.sec.getPolygon().getCoordinates()[intersection.edge], intersection.sec.getPolygon().getCoordinates()[intersection.edge+1], c);
 				double len0 = c.distance(MGC.coord2Coordinate(l.getFromNode().getCoord()));
@@ -151,22 +176,22 @@ public class NetworkCutter {
 				l1.setNumberOfLanes(l.getNumberOfLanes());
 				l1.setLength(len1);
 				
-				Link l0r = fac.createLink(id0r, n, l.getFromNode());
-				Link l1r = fac.createLink(id1r, l.getToNode(),n);
-				l0r.setFreespeed(l.getFreespeed());
-				l0r.setCapacity(l.getCapacity());
-				l0r.setNumberOfLanes(l.getNumberOfLanes());
-				l0r.setLength(len0);
-				l1r.setFreespeed(l.getFreespeed());
-				l1r.setCapacity(l.getCapacity());
-				l1r.setNumberOfLanes(l.getNumberOfLanes());
-				l1r.setLength(len1);
+//				Link l0r = fac.createLink(id0r, n, l.getFromNode());
+//				Link l1r = fac.createLink(id1r, l.getToNode(),n);
+//				l0r.setFreespeed(l.getFreespeed());
+//				l0r.setCapacity(l.getCapacity());
+//				l0r.setNumberOfLanes(l.getNumberOfLanes());
+//				l0r.setLength(len0);
+//				l1r.setFreespeed(l.getFreespeed());
+//				l1r.setCapacity(l.getCapacity());
+//				l1r.setNumberOfLanes(l.getNumberOfLanes());
+//				l1r.setLength(len1);
 				
 				
 				net.addLink(l0);
 				net.addLink(l1);
-				net.addLink(l0r);
-				net.addLink(l1r);
+//				net.addLink(l0r);
+//				net.addLink(l1r);
 				open.add(l0);
 				open.add(l1);
 			}
@@ -244,7 +269,7 @@ public class NetworkCutter {
 	}
 	
 	public static void main(String [] args) {
-		Sim2DConfig conf = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/input/s2d_config.xml");
+		Sim2DConfig conf = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d2/input/s2d_config.xml");
 		Sim2DScenario sc = Sim2DScenarioUtils.loadSim2DScenario(conf);
 		new NetworkCutter().run(sc);
 		

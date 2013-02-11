@@ -273,7 +273,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		double capacity = net.getCapacityPeriod() * fc;
 
 		double cellSize = ((NetworkImpl)net).getEffectiveCellSize();
-		double nofLanes = mw * MAX_DENSITY * cellSize;
+		double nofLanes = mw * MAX_DENSITY * cellSize/2;
 
 		String IdSuffix = way.getId().toString();
 		for (int i = 0; i < way.getNodeRefs().size()-1; i++) {
@@ -408,9 +408,9 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 //		String inputDir = "/Users/laemmel/devel/gr90_sim2d_v4/input";
 //		String outputDir = "/Users/laemmel/devel/gr90_sim2d_v4/output";
 		
-		String osmFile = "/Users/laemmel/devel/burgdorf2d/osm/map.osm";
-		String inputDir = "/Users/laemmel/devel/burgdorf2d/input";
-		String outputDir = "/Users/laemmel/devel/burgdorf2d/output";
+		String osmFile = "/Users/laemmel/devel/burgdorf2d2/raw_input_stage3/map.osm";
+		String inputDir = "/Users/laemmel/devel/burgdorf2d2/input";
+		String outputDir = "/Users/laemmel/devel/burgdorf2d2/output";
 		
 		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);
