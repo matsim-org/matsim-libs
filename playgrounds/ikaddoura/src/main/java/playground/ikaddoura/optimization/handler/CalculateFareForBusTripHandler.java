@@ -45,14 +45,14 @@ public class CalculateFareForBusTripHandler implements PersonEntersVehicleEventH
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (event.getPersonId().toString().contains("person") && event.getVehicleId().toString().contains("bus")){
-			double fareForTrip = calculateFare();
+			double fareForTrip = calculateFare(event);
 			AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), fareForTrip);
 			this.events.processEvent(moneyEvent);
 		}
 	}
 
 	// this method needs to be extended when differentiated fares apply.
-	private double calculateFare() {
+	private double calculateFare(PersonEntersVehicleEvent event) {
 		return this.fare;
 	}
 

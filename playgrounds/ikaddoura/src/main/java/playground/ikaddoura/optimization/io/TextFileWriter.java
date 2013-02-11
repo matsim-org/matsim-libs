@@ -27,6 +27,9 @@ public class TextFileWriter {
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+	    String zeile0 = directoryExtItParam;
+	    bw.write(zeile0);
+	    bw.newLine();
 	    String zeile1 = "ITERATION;Headway (sec);NumberOfBuses;Headway (hh:mm:ss);Fare (AUD);Capacity (Pers/Veh);TotalDemand;OperatorCosts (AUD);OperatorRevenue (AUD);OperatorProfit (AUD);UsersLogSum (AUD);Welfare (AUD);CarLegs;PtLegs;WalkLegs;AvgWaitingTimeAll (sec);AvgWaitingTimeNotMissing (sec);AvgWaitingTimeMissing (sec);NumberOfMissedBusTrips;NumberOfNotMissedBusTrips;MissedBusses;t0MinusTActSum (sec);avgT0MinusTActPerPerson (sec);avgT0MinusTActDivT0perTrip;NumberOfAgentsNoValidPlan";
 	    bw.write(zeile1);
 	    bw.newLine();
