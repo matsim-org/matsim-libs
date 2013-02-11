@@ -46,10 +46,10 @@ import playground.gregor.sim2d_v4.simulation.physics.orca.ORCASolver;
  *
  */
 public class ORCAAgent implements Sim2DAgent {
-	
-	
+
+
 	private final float r = (float) (MatsimRandom.getRandom().nextDouble()*.1 + .25); //radius
-	private final float tau = 2f;
+	private final float tau = .5f;
 	private final float v0 = 1.34f; //desired velocity
 
 	private PhysicalSim2DSection psec;
@@ -57,20 +57,20 @@ public class ORCAAgent implements Sim2DAgent {
 	private final float[] v = {0,0};
 	private final QVehicle veh;
 	private final MobsimDriverAgent driver;
-	
+
 	private final Neighbors ncalc = new Neighbors();
 	private final Obstacles obst = new Obstacles();
 	private final DesiredDirection dd = new DesiredDirection();
 	private final ORCASolver solver = new ORCASolver();
-//	private VisDebugger debugger;
-	private VisDebugger debugger;
-	
+	//	private VisDebugger debugger;
+	private final VisDebugger debugger = null;
+
 	public ORCAAgent(QVehicle veh, float spawnX, float spawnY) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
 		this.driver = veh.getDriver();
-		this.ncalc.setRangeAndMaxNrOfNeighbors(5, 8);
+		this.ncalc.setRangeAndMaxNrOfNeighbors(5, 5);
 	}
 
 	@Override
@@ -80,46 +80,77 @@ public class ORCAAgent implements Sim2DAgent {
 
 	@Override
 	public void updateVelocity() {
-		
+
 		List<ORCALine> constr = new ArrayList<ORCALine>();
-		
-		for (Tuple<Float, Sim2DAgent> neighbor : this.ncalc.computeNeighbors(this)) {
-			ORCALine ol = new ORCALineAgent(this, neighbor, this.tau);
-			constr.add(ol);
-		}
-		
 		for (Segment seg : this.psec.getObstacles()) {
 			ORCALineEnvironment ol = new ORCALineEnvironment(this, seg, this.tau);
 			constr.add(ol);
 
 		}
-		
+
+//		if (!(this.psec instanceof DepartureBox)) {
+//			LinkInfo li = this.psec.getLinkInfo(getCurrentLinkId());
+//			for (Segment seg : this.psec.getOpenings()) {
+//				if (!seg.equals(li.finishLine)){
+//					ORCALineEnvironment ol = new ORCALineEnvironment(this, seg, this.tau);
+//					constr.add(ol);
+//				}
+//			}
+//		}
+		for (Tuple<Float, Sim2DAgent> neighbor : this.ncalc.computeNeighbors(this)) {
+//			if (this.debugger != null && ( getId().toString().equals("r876"))){//&& neighbor.getSecond().getId().toString().equals("r5")) {
+//				ORCALine ol = new ORCALineAgent(this, neighbor, this.tau,this.debugger);
+//				constr.add(ol);				
+//			} else {
+			ORCALine ol = new ORCALineAgent(this, neighbor, this.tau);
+			constr.add(ol);
+//			}
+//			if (this.getId().toString().equals("r996") && this.debugger != null){
+//				((ORCALineAgent)ol).debugSetOffset(this.pos[0], this.pos[1]);
+//				ol.debug(this.debugger, 0, 0, 0);
+//			}
+		}
+
+		//		Collections.reverse(constr);
+
+
+
 
 		final float[] dir = this.dd.computeDesiredDirection(this);
 		dir[0] *= this.v0;
 		dir[1] *= this.v0;
 
-		if (this.debugger != null) {
-			this.solver.addDebugger(this.debugger);
-		}
-		this.solver.run(constr, dir, this.v0*2);
+		
+		this.solver.run(constr, dir, this.v0);
+		
+		
+
+//		if (this.debugger != null && getId().toString().equals("r876") ){
+//			this.debugger.addLine(this.pos[0], this.pos[1], this.pos[0]+this.v[0], this.pos[1]+this.v[1], 255, 0, 0, 255, 0);
+//			System.out.println("debug!");
+//		}
 		
 		this.v[0] = dir[0];
 		this.v[1] = dir[1];
+
+//		if (this.debugger != null &&  getId().toString().equals("r876")){
+//			this.debugger.addLine(this.pos[0], this.pos[1], this.pos[0]+this.v[0], this.pos[1]+this.v[1], 0, 255, 0, 255, 0);
+//			this.debugger.addAll();
+//			System.out.println("debug!");
+//		}
 
 	}
 
 	@Override
 	public void setPSec(PhysicalSim2DSection physicalSim2DSection) {
 		this.psec = physicalSim2DSection;
-
 	}
 
 	@Override
 	public PhysicalSim2DSection getPSec() {
 		return this.psec;
 	}
-	
+
 	@Override
 	public float getRadius() {
 		return this.r;
@@ -164,8 +195,40 @@ public class ORCAAgent implements Sim2DAgent {
 
 	@Override
 	public void debug(VisDebugger visDebugger) {
-		visDebugger.addCircle(this.getPos()[0], this.getPos()[1], 2*this.r, 0, 192, 64, 128,0,true);
-		this.debugger = visDebugger;
+		if (getId().toString().contains("g")) {
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 0, 192, 64, 128,0,true);
+		} else if (getId().toString().contains("r")) {
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 192, 0, 64, 128,0,true);
+		} else {
+			int nr = this.hashCode()%3*255;
+			int r,g,b;
+			if (nr > 2*255) {
+				r= nr-2*255;
+				g =0;
+				b=64;
+			} else if (nr > 255) {
+				r=0;
+				g=nr-255;
+				b=64;
+			} else {
+				r=64;
+				g=0;
+				b=nr;
+			}
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, r, g, b, 222,0,true);
+		}
+		visDebugger.addText(this.getPos()[0], this.getPos()[1], this.driver.getId()+"", 50);
+//		this.debugger = visDebugger;
+	}
+
+	@Override
+	public float getXLocation() {
+		return this.pos[0];
+	}
+
+	@Override
+	public float getYLocation() {
+		return this.pos[0];
 	}
 
 }

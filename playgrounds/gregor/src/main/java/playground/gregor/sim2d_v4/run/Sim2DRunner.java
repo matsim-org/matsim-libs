@@ -30,7 +30,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
-import playground.gregor.sim2d_v4.debugger.QSimDrawer;
+import playground.gregor.sim2d_v4.debugger.QSimFibonacciPulser;
+import playground.gregor.sim2d_v4.debugger.ScaleBarDrawer;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
@@ -42,7 +43,7 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	private VisDebugger visDebugger = null;
 	private Controler controller;
-	private QSimDrawer qSimDrawer;
+	private QSimFibonacciPulser qSimDrawer;
 	private HybridQ2DMobsimFactory factory;
 
 	public static void main(String [] args) {
@@ -87,9 +88,11 @@ public class Sim2DRunner implements IterationStartsListener{
 			controller.addControlerListener(runner);
 			runner.controller = controller;
 			runner.factory = factory;
-			runner.qSimDrawer = new QSimDrawer(sc);
-//			runner.visDebugger.addAdditionalDrawer(runner.qSimDrawer);
+			runner.qSimDrawer = new QSimFibonacciPulser(sc);
 			
+			runner.visDebugger.addAdditionalDrawer(runner.qSimDrawer);
+//			runner.visDebugger.addAdditionalDrawer();
+			runner.visDebugger.addAdditionalDrawer(new ScaleBarDrawer());
 //			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 9);
 //			runner.visDebugger.setFrameSaver(fs);
 		}
@@ -117,7 +120,7 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if ((event.getIteration()) % 2 == 0 || event.getIteration() > 50) {
+		if ((event.getIteration()+1) % 2 == 0 || event.getIteration() > 50) {
 			this.factory.debug(this.visDebugger);
 			this.controller.getEvents().addHandler(this.qSimDrawer);
 			this.controller.setCreateGraphs(true);

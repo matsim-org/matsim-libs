@@ -197,7 +197,7 @@ public class PhysicalSim2DEnvironment {
 		
 		int flowCapNrOfBoxes = (int) Math.ceil(flowCap/maxBoxCap);
 		
-		nrOfBoxes = Math.min(flowCapNrOfBoxes, nrOfBoxes);
+		nrOfBoxes = Math.max(flowCapNrOfBoxes, nrOfBoxes);
 		
 		double gap = width - (nrOfBoxes * DEP_BOX_WIDTH);
 		

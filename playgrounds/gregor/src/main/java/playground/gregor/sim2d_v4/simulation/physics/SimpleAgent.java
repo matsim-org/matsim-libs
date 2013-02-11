@@ -152,4 +152,14 @@ public class SimpleAgent implements Sim2DAgent {
 		return this.r;
 	}
 
+	@Override
+	public float getXLocation() {
+		return this.pos[0];
+	}
+
+	@Override
+	public float getYLocation() {
+		return this.pos[1];
+	}
+
 }

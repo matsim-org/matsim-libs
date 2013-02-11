@@ -23,9 +23,10 @@ package playground.gregor.sim2d_v4.simulation.physics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
+import playground.gregor.sim2d_v4.cgal.TwoDObject;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 
-public interface Sim2DAgent {
+public interface Sim2DAgent extends TwoDObject{
 	
 	public abstract QVehicle getQVehicle();
 

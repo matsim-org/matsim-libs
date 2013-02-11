@@ -37,11 +37,13 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.TwoDTree;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 public class PhysicalSim2DSection {
 
@@ -66,6 +68,8 @@ public class PhysicalSim2DSection {
 	protected final PhysicalSim2DEnvironment penv;
 
 	private final Map<Segment,PhysicalSim2DSection> neighbors = new HashMap<Segment,PhysicalSim2DSection>();
+	
+	private final TwoDTree<Sim2DAgent> agentTwoDTree;
 
 	public PhysicalSim2DSection(Section sec, Sim2DScenario sim2dsc, double offsetX, double offsetY, PhysicalSim2DEnvironment penv) {
 		this.sec = sec;
@@ -74,6 +78,8 @@ public class PhysicalSim2DSection {
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
 		this.penv = penv;
+		Envelope e = this.sec.getPolygon().getEnvelopeInternal();
+		this.agentTwoDTree = new TwoDTree<Sim2DAgent>(new Envelope(e.getMinX()-offsetX,e.getMaxX()-offsetX,e.getMinY()-offsetY,e.getMaxY()-offsetY));
 		init();
 	}
 
@@ -100,6 +106,8 @@ public class PhysicalSim2DSection {
 
 
 	public void moveAgents(double time) {
+		this.agentTwoDTree.clear();
+		
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
@@ -148,7 +156,11 @@ public class PhysicalSim2DSection {
 			}
 			//			this.penv.getEventsManager().processEvent(new XYVxVyEventImpl(agent.getId(),agent.getPos()[0],agent.getPos()[1],agent.getVelocity()[0],agent.getVelocity()[1],time));
 			agent.move(dx, dy);
+			this.agentTwoDTree.insert(agent);
 		}
+
+		
+		
 	}
 
 	private void updateAgent(Sim2DAgent agent) {
@@ -307,9 +319,22 @@ public class PhysicalSim2DSection {
 	}
 
 	public List<Sim2DAgent> getAgents() {
+		
 		return this.agents;
 	}
+	
+	public List<Sim2DAgent> getAgents(Envelope e) {
+		return this.agentTwoDTree.get(e);
+	}
 
+	//HACK remove this
+	public void updatedTwoDTree() {
+		this.agentTwoDTree.clear();
+		for (Sim2DAgent a: this.agents) {
+			this.agentTwoDTree.insert(a);
+		}
+	}
+	
 	public Segment [] getOpenings() {
 		return this.openings;
 

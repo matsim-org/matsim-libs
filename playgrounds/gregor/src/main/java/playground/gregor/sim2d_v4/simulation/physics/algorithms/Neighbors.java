@@ -31,9 +31,13 @@ import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public class Neighbors {
 
+	
 	private float sqRange = 10;
+	private float range = (float) Math.sqrt(this.sqRange);
 	private int nrNeighbors = 3;
 	
 	
@@ -46,8 +50,12 @@ public class Neighbors {
 		
 		float currentMaxSqRange = this.sqRange;
 		
+		
+		float twoDTreeRange = this.range;
+		Envelope e = new Envelope(agent.getPos()[0]-twoDTreeRange,agent.getPos()[0]+twoDTreeRange,agent.getPos()[1]-twoDTreeRange,agent.getPos()[1]+twoDTreeRange);
+		List<Sim2DAgent> agents = psec.getAgents(e);
 		//agents from same section visible by definition
-		for (Sim2DAgent b : psec.getAgents()) {
+		for (Sim2DAgent b : agents) {
 			if (b == agent) {
 				continue;
 			}
@@ -91,8 +99,12 @@ public class Neighbors {
 			if (qSec == null) {
 				continue;
 			}
+			
+			twoDTreeRange = this.range;
+			e = new Envelope(agent.getPos()[0]-twoDTreeRange,agent.getPos()[0]+twoDTreeRange,agent.getPos()[1]-twoDTreeRange,agent.getPos()[1]+twoDTreeRange);
+			agents = qSec.getAgents(e);
 			//agents from neighboring sections need to check visibility
-			for (Sim2DAgent b : qSec.getAgents()) {
+			for (Sim2DAgent b : agents) {
 				float[] bPos = b.getPos();
 				if (!visible(aPos,bPos,opening)) {
 					continue;
@@ -142,6 +154,7 @@ public class Neighbors {
 
 	public void setRangeAndMaxNrOfNeighbors(float range, int nrNeighbors) {
 		this.sqRange = range*range;
+		this.range = range;
 		this.nrNeighbors = nrNeighbors;
 	}
 }

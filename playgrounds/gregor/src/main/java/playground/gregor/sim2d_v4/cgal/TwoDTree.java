@@ -70,11 +70,11 @@ public class TwoDTree<T extends TwoDObject> {
 	}
 
 	public void clear() {
-		this.root = null;
+		this.root = new TwoDNode<T>(this.root.getEnvelope(),0);
 	}
 
 	private static class TwoDNode<T extends TwoDObject> {
-		private final static int cacheSize = 128; 
+		private final static int cacheSize = 16; 
 
 		private final int depth;
 		private final Envelope envelope;
@@ -184,13 +184,12 @@ public class TwoDTree<T extends TwoDObject> {
 				}
 			}
 
-			//DEBUG
-			if (this.cache.size() > 0) {
-				System.out.println("YES!!!");
-			}
-
 			this.internalNode = true;
 
+		}
+		
+		public Envelope getEnvelope() {
+			return this.envelope;
 		}
 
 	}
