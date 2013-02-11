@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -250,6 +251,9 @@ class ExternalControler {
 			}
 		}
 		
+		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		demand = scenario.getPopulation().getPersons().size();
+		
 		scenario.getConfig().transit().setTransitScheduleFile(scheduleFile);
 		scenario.getConfig().transit().setVehiclesFile(vehiclesFile);
 		
@@ -300,9 +304,11 @@ class ExternalControler {
 		
 		this.it2information.put(iterationCounter, info);
 		
-		iterationCounter++;
 		this.textWriter.writeExtItData(outputPath, this.it2information);
+		this.textWriter.writeFareData(outputPath, analysis.getFareData());
 		this.textWriter.writeMatrices(outputPath, this.it2information);
+		
+		iterationCounter++;
 	}
 
 	private void createInputFiles() throws IOException {

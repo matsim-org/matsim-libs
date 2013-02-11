@@ -56,8 +56,12 @@ public class ConstantFareHandler implements PersonEntersVehicleEventHandler, Tra
 		Id vehId = event.getVehicleId();
 		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){
 			double fareForTrip = calculateFare(event);
-			AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), fareForTrip);
-			this.events.processEvent(moneyEvent);
+			if (fareForTrip == 0.){
+				// not processing zero money events
+			} else {
+				AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), fareForTrip);
+				this.events.processEvent(moneyEvent);
+			}
 		}
 	}
 

@@ -26,6 +26,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.ikaddoura.optimization.analysis.FareData;
+
 /**
  * @author ihab and benjamin
  *
@@ -40,6 +42,8 @@ public class IterationInfo {
 	
 	private double operatorCosts;
 	private double operatorRevenue;
+	
+	private List<FareData> fareDataList = new ArrayList<FareData>();
 	
 	private double usersLogSum;
 	private double numberOfCarLegs;
@@ -284,6 +288,14 @@ public class IterationInfo {
 
 	public double getTotalDemand() {
 		return totalDemand;
+	}
+
+	public List<FareData> getFareDataList() {
+		return fareDataList;
+	}
+
+	public void setFareDataList(List<FareData> fareDataList) {
+		this.fareDataList = fareDataList;
 	}
 		
 }

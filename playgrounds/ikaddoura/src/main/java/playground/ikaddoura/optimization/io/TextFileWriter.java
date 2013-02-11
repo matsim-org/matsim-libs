@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Time;
 
 import playground.ikaddoura.optimization.IterationInfo;
+import playground.ikaddoura.optimization.analysis.FareData;
 
 
 /**
@@ -226,6 +227,32 @@ public class TextFileWriter {
 		 } catch (IOException e) {}	
 		
 	}
+
+	public void writeFareData(String directoryExtItParam, List<FareData> list) {
+		File file = new File(directoryExtItParam + "/time2fareData.csv");
+		   
+	    try {
+	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+	    String zeile0 = directoryExtItParam;
+	    bw.write(zeile0);
+	    bw.newLine();
+	    String zeile1 = "Time;Amount(AUD)";
+	    bw.write(zeile1);
+	    bw.newLine();
 	
+	    for (FareData fareData : list){
+	    	
+	    	String zeile = fareData.getTime() + ";" + fareData.getAmount();
+	
+	    	bw.write(zeile);
+	        bw.newLine();
+	    }
+	
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
+	}
 	
 }

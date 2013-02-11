@@ -24,12 +24,10 @@
 package playground.ikaddoura.optimization;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -88,7 +86,6 @@ public class InternalControler {
 	public void run() {
 
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
-		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		new TransitScheduleReaderV1(scenario).readFile(this.scenario.getConfig().transit().getTransitScheduleFile());
 		new VehicleReaderV1((scenario).getVehicles()).readFile(this.scenario.getConfig().transit().getVehiclesFile());
 

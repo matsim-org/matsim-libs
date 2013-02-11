@@ -23,13 +23,13 @@
  */
 package playground.ikaddoura.optimization.analysis;
 
-//import org.apache.log4j.Logger;
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.ikaddoura.optimization.handler.CarCongestionHandlerAdvanced;
 import playground.ikaddoura.optimization.handler.DepartureArrivalEventHandler;
@@ -43,14 +43,13 @@ import playground.ikaddoura.optimization.handler.WaitingTimeHandler;
  *
  */
 public class OperatorUserAnalysis {
-//	private final static Logger log = Logger.getLogger(OperatorUserAnalysis.class);
 
-	DepartureArrivalEventHandler departureHandler;
-	MoneyEventHandler moneyHandler;
-	TransitEventHandler transitHandler;
-	LinksEventHandler linksHandler;
-	WaitingTimeHandler waitHandler;
-	CarCongestionHandlerAdvanced congestionHandler;
+	private DepartureArrivalEventHandler departureHandler;
+	private MoneyEventHandler moneyHandler;
+	private TransitEventHandler transitHandler;
+	private LinksEventHandler linksHandler;
+	private WaitingTimeHandler waitHandler;
+	private CarCongestionHandlerAdvanced congestionHandler;
 	
 	private final String lastEventFile;
 	private final Network network;
@@ -117,6 +116,10 @@ public class OperatorUserAnalysis {
 
 	public CarCongestionHandlerAdvanced getCongestionHandler() {
 		return congestionHandler;
+	}
+	
+	public List<FareData> getFareData() {
+		return this.moneyHandler.getfareDataList();
 	}
 	
 }

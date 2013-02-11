@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MoneyEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,49 +20,29 @@
 /**
  * 
  */
-package playground.ikaddoura.optimization.handler;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-
-import playground.ikaddoura.optimization.analysis.FareData;
+package playground.ikaddoura.optimization.analysis;
 
 /**
- * @author Ihab
+ * Simply collects the information when which amount had to be paid while boarding and alighting.
+ * 
+ * @author ikaddoura
  *
  */
-public class MoneyEventHandler implements AgentMoneyEventHandler {
-
-	private double revenues;
-	private List<FareData> fareDataList = new ArrayList<FareData>();
+public class FareData {
 	
-	@Override
-	public void reset(int iteration) {
-		this.revenues = 0;
-		this.fareDataList.clear();
-	}
-
-	@Override
-	public void handleEvent(AgentMoneyEvent event) {
-		this.revenues = this.revenues + (-1 * event.getAmount());
-		FareData fareData = new FareData();
-		fareData.setAmount(-1 * event.getAmount());
-		fareData.setTime(event.getTime());
-		this.fareDataList.add(fareData);
-	}
-
-	/**
-	 * @return the revenues
-	 */
-	public double getRevenues() {
-		return revenues;
-	}
-
-	public List<FareData> getfareDataList() {
-		return fareDataList;
-	}
+	private double time;
+	private double amount;
 	
+	public double getTime() {
+		return time;
+	}
+	public void setTime(double time) {
+		this.time = time;
+	}
+	public double getAmount() {
+		return amount;
+	}
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
 }
