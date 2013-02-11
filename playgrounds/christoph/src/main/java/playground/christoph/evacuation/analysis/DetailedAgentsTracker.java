@@ -189,16 +189,16 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		String evacuationConfigFile;
 		String outputPath;
 
-		configFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac/evac.1.output_config.xml.gz";
-		evacuationConfigFile = "../../matsim/mysimulations/census2000V2/config_evacuation.xml";
-		outputPath = "../../matsim/mysimulations/census2000V2/output_10pct_evac/";
+//		configFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac/evac.1.output_config.xml.gz";
+//		evacuationConfigFile = "../../matsim/mysimulations/census2000V2/config_evacuation.xml";
+//		outputPath = "../../matsim/mysimulations/census2000V2/output_10pct_evac/";
 
-//		if (args.length != 3) return;
-//		else {
-//			configFile = args[0];
-//			evacuationConfigFile = args[1];
-//			outputPath = args[2];
-//		}
+		if (args.length != 3) return;
+		else {
+			configFile = args[0];
+			evacuationConfigFile = args[1];
+			outputPath = args[2];
+		}
 
 		new DetailedAgentsTracker(configFile, evacuationConfigFile, outputPath);
 	}

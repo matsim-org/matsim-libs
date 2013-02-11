@@ -33,7 +33,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -257,8 +256,6 @@ public class AgentsReturnHomePostProcessing {
 	 * @author cdobler
 	 */
 	private static class DummyController extends Controler {
-
-//		private final OutputDirectoryHierarchy controlerIO;
 		
 		public DummyController(Scenario scenario, String outputPath) {
 			super(scenario);
@@ -275,16 +272,6 @@ public class AgentsReturnHomePostProcessing {
 //				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
 				this.setupOutputDirectory(outputPath, null, true) ;
 			}
-		}
-		
-//		@Override
-//		public OutputDirectoryHierarchy getControlerIO() {
-//			return this.controlerIO;
-//		}
-		
-		@Override
-		public void run() {
-			// don't do anything here
 		}
 	}
 }
