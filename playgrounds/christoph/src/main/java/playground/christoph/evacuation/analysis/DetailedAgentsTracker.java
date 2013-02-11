@@ -20,11 +20,15 @@
 
 package playground.christoph.evacuation.analysis;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -57,12 +61,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -78,6 +80,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -112,43 +115,61 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 
 	static final Logger log = Logger.getLogger(DetailedAgentsTracker.class);
 	
-	private final Set<Id> A;
-	private final Set<Id> A1;
-	private final Set<Id> A11;
-	private final Set<Id> A12;
-	private final Set<Id> A2;
-	private final Set<Id> A21;
-	private final Set<Id> A22;
+	public static final String newLine = "\n";
+	public static final String delimiter = "\t";
 	
-	private final Set<Id> B;
-	private final Set<Id> B1;
-	private final Set<Id> B11;
-	private final Set<Id> B111;
-	private final Set<Id> B112;
-	private final Set<Id> B113;
-	private final Set<Id> B12;
-	private final Set<Id> B2;
+	private final Set<Id> A = new HashSet<Id>();
+	private final Set<Id> A1 = new HashSet<Id>();
+	private final Set<Id> A11 = new HashSet<Id>();
+	private final Set<Id> A12 = new HashSet<Id>();
+	private final Set<Id> A2 = new HashSet<Id>();
+	private final Set<Id> A21 = new HashSet<Id>();
+	private final Set<Id> A22 = new HashSet<Id>();
 	
-	private final Set<Id> C;
-	private final Set<Id> C1;
-	private final Set<Id> C11;
-	private final Set<Id> C111;
-	private final Set<Id> C112;
-	private final Set<Id> C113;
-	private final Set<Id> C12;
-	private final Set<Id> C2;
+	private final Set<Id> B = new HashSet<Id>();
+	private final Set<Id> B1 = new HashSet<Id>();
+	private final Set<Id> B11 = new HashSet<Id>();
+	private final Set<Id> B111 = new HashSet<Id>();
+	private final Set<Id> B112 = new HashSet<Id>();
+	private final Set<Id> B113 = new HashSet<Id>();
+	private final Set<Id> B12 = new HashSet<Id>();
+	private final Set<Id> B2 = new HashSet<Id>();
 	
-	private final Set<Id> informedAgents;
-	private final Set<Id> enrouteDrivers;	
-	private final Map<Id, Id> vehiclePositions;
+	private final Set<Id> C = new HashSet<Id>();
+	private final Set<Id> C1 = new HashSet<Id>();
+	private final Set<Id> C11 = new HashSet<Id>();
+	private final Set<Id> C111 = new HashSet<Id>();
+	private final Set<Id> C112 = new HashSet<Id>();
+	private final Set<Id> C113 = new HashSet<Id>();
+	private final Set<Id> C12 = new HashSet<Id>();
+	private final Set<Id> C2 = new HashSet<Id>();
+	
+	private final Map<String, Integer> evacuationModesA11 = new TreeMap<String, Integer>();
+	private final Map<String, Integer> evacuationModesA21 = new TreeMap<String, Integer>();
+	
+	private final Map<String, Integer> evacuationModesB111Home = new TreeMap<String, Integer>();
+	private final Map<String, Integer> evacuationModesB111Evacuate = new TreeMap<String, Integer>();
+	private final Map<String, Integer> evacuationModesB112 = new TreeMap<String, Integer>();
+	private final Map<String, Integer> evacuationModesB12 = new TreeMap<String, Integer>();
+	private final Map<String, Integer> evacuationModesB2 = new TreeMap<String, Integer>();
+	
+	private final Map<String, Integer> evacuationModesC111Home = new TreeMap<String, Integer>();
+	private final Map<String, Integer> evacuationModesC111Evacuate = new TreeMap<String, Integer>();
+	private final Map<String, Integer> evacuationModesC112 = new TreeMap<String, Integer>();
+	private final Map<String, Integer> evacuationModesC12 = new TreeMap<String, Integer>();
+	private final Map<String, Integer> evacuationModesC2 = new TreeMap<String, Integer>();
+	
+	private final Set<Id> informedAgents = new HashSet<Id>();
+	private final Set<Id> enrouteDrivers = new HashSet<Id>();
+	private final Map<Id, Id> vehiclePositions = new HashMap<Id, Id>();
 	
 	/*
 	 * List of all activities and legs an agent performs after being informed. If the agent
 	 * currently performs an activity/leg when being informed, the activity/leg is also included.
 	 */
-	private final Map<Id, List<Activity>> agentActivities;
-	private final Map<Id, List<Leg>> agentLegs;
-		
+	private final Map<Id, List<Activity>> agentActivities = new HashMap<Id, List<Activity>>();
+	private final Map<Id, List<Leg>> agentLegs = new HashMap<Id, List<Leg>>();
+	
 	private final CoordAnalyzer coordAnalyzer;
 	private final HouseholdsTracker householdsTracker;
 	private final DecisionDataProvider decisionDataProvider;
@@ -156,49 +177,33 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	private final Config config;
 	private final Scenario scenario;
 	private final EventsManager eventsManager;
-		
+	
+	private final List<String> headers = new ArrayList<String>();
+	private final List<String> values = new ArrayList<String>();
+	
+	private final String outputCountsFile = "evacuationDecisionCounts.txt";
+	private final String outputModesFile = "evacuationDecisionModes.txt";
+	
 	public static void main(String[] args) {
-		String configFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac/evac.1.output_config.xml.gz";
-		String evacuationConfigFile = "../../matsim/mysimulations/census2000V2/config_evacuation.xml";
-		String outputPath = "../../matsim/mysimulations/census2000V2/output_10pct_evac/";
+		String configFile;
+		String evacuationConfigFile;
+		String outputPath;
+
+		configFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac/evac.1.output_config.xml.gz";
+		evacuationConfigFile = "../../matsim/mysimulations/census2000V2/config_evacuation.xml";
+		outputPath = "../../matsim/mysimulations/census2000V2/output_10pct_evac/";
+
+//		if (args.length != 3) return;
+//		else {
+//			configFile = args[0];
+//			evacuationConfigFile = args[1];
+//			outputPath = args[2];
+//		}
 
 		new DetailedAgentsTracker(configFile, evacuationConfigFile, outputPath);
 	}
 	
 	public DetailedAgentsTracker(String configFile, String evacuationConfigFile, String outputPath) {
-		
-		A = new HashSet<Id>();
-		A1 = new HashSet<Id>();
-		A11 = new HashSet<Id>();
-		A12 = new HashSet<Id>();
-		A2 = new HashSet<Id>();
-		A21 = new HashSet<Id>();
-		A22 = new HashSet<Id>();
-		
-		B = new HashSet<Id>();
-		B1 = new HashSet<Id>();
-		B11 = new HashSet<Id>();
-		B111 = new HashSet<Id>();
-		B112 = new HashSet<Id>();
-		B113 = new HashSet<Id>();
-		B12 = new HashSet<Id>();
-		B2 = new HashSet<Id>();
-		
-		C = new HashSet<Id>();
-		C1 = new HashSet<Id>();
-		C11 = new HashSet<Id>();
-		C111 = new HashSet<Id>();
-		C112 = new HashSet<Id>();
-		C113 = new HashSet<Id>();
-		C12 = new HashSet<Id>();
-		C2 = new HashSet<Id>();
-		
-		informedAgents = new HashSet<Id>();
-		enrouteDrivers = new HashSet<Id>();
-		vehiclePositions = new HashMap<Id, Id>();
-		agentActivities = new HashMap<Id, List<Activity>>();
-		agentLegs = new HashMap<Id, List<Leg>>();
-		
 		
 		config = ConfigUtils.loadConfig(configFile);
 		
@@ -225,19 +230,37 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		new PrepareEvacuationScenario().prepareScenario(scenario);
 		
 		/*
-		 * Create two DummyControllers which provide OutputDirectoryHierarchy that point
-		 * to the analyzed run's output directory.
+		 * Create two OutputDirectoryHierarchies that point to the analyzed run's output directory.
 		 * Since we do not want to overwrite existing results we add an additional prefix
 		 * to the re-created outputs.
 		 */
-		DummyController dummyInputController = new DummyController(scenario, outputPath);
+//		DummyController dummyInputController = new DummyController(scenario, outputPath);
+		OutputDirectoryHierarchy dummyInputDirectoryHierarchy;
+		if (outputPath == null) outputPath = scenario.getConfig().controler().getOutputDirectory();
+		if (outputPath.endsWith("/")) {
+			outputPath = outputPath.substring(0, outputPath.length() - 1);
+		}
+		if (scenario.getConfig().controler().getRunId() != null) {
+			dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, scenario.getConfig().controler().getRunId(), true);
+		} else {
+			dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, null, true);
+		}
 		
 		// add another string to the runId to not overwrite old files
 		String runId = scenario.getConfig().controler().getRunId();
 		scenario.getConfig().controler().setRunId(runId + ".postprocessed");
-		DummyController dummyOutputController = new DummyController(scenario, outputPath);
+//		DummyController dummyOutputController = new DummyController(scenario, outputPath);
+		OutputDirectoryHierarchy dummyOutputDirectoryHierarchy;
+		if (outputPath == null) outputPath = scenario.getConfig().controler().getOutputDirectory();
+		if (outputPath.endsWith("/")) {
+			outputPath = outputPath.substring(0, outputPath.length() - 1);
+		}
+		if (scenario.getConfig().controler().getRunId() != null) {
+			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, scenario.getConfig().controler().getRunId(), true);
+		} else {
+			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, null, true);
+		}
 		
-		List<ControlerListener> controlerListeners = new ArrayList<ControlerListener>();
 		List<MobsimListener> mobsimListeners = new ArrayList<MobsimListener>();
 		
 		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
@@ -263,19 +286,19 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		decisionDataGrabber.notifyMobsimInitialized(null);
 		
 		// read people in panic from file
-		String panicFile = dummyInputController.getControlerIO().getIterationFilename(0, PanicModel.panicModelFile);
+		String panicFile = dummyInputDirectoryHierarchy.getIterationFilename(0, PanicModel.panicModelFile);
 		PanicModel panicModel = new PanicModel(decisionDataProvider, EvacuationConfig.panicShare);
 		panicModel.readDecisionsFromFile(panicFile);
 		panicModel.printStatistics();
 		
 		// read pickup behavior from file
-		String pickupFile = dummyInputController.getControlerIO().getIterationFilename(0, PickupModel.pickupModelFile);
+		String pickupFile = dummyInputDirectoryHierarchy.getIterationFilename(0, PickupModel.pickupModelFile);
 		PickupModel pickupModel = new PickupModel(decisionDataProvider);
 		pickupModel.readDecisionsFromFile(pickupFile);
 		pickupModel.printStatistics();
 		
 		// read evacuation decisions from file
-		String evacuationDecisionFile = dummyInputController.getControlerIO().getIterationFilename(0, EvacuationDecisionModel.evacuationDecisionModelFile);
+		String evacuationDecisionFile = dummyInputDirectoryHierarchy.getIterationFilename(0, EvacuationDecisionModel.evacuationDecisionModelFile);
 		EvacuationDecisionModel evacuationDecisionModel = new EvacuationDecisionModel(scenario, MatsimRandom.getLocalInstance(), decisionDataProvider);
 		evacuationDecisionModel.readDecisionsFromFile(evacuationDecisionFile);
 		evacuationDecisionModel.printStatistics();
@@ -326,26 +349,22 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			}
 		}
 
-		String eventsFile = dummyInputController.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML);
+		String eventsFile = dummyInputDirectoryHierarchy.getIterationFilename(0, Controler.FILENAME_EVENTS_XML);
 		new EventsReaderXMLv1(eventsManager).parse(eventsFile);
-		
-		//IterationEndsListener
-		IterationEndsEvent iterationEndsEvent = new IterationEndsEvent(dummyOutputController, 0);
-		for(ControlerListener controlerListener : controlerListeners) {
-			if (controlerListener instanceof IterationEndsListener) {
-				((IterationEndsListener) controlerListener).notifyIterationEnds(iterationEndsEvent);
-			}
-		}
 
 		/*
-		 * Create results
+		 * Create results.
 		 */
 		analyzeA();
 		analyzeB();
 		analyzeC();
 		
-//		dummyInputController.shutdown(false);
-//		dummyOutputController.shutdown(false);
+		/*
+		 * Write results to files.
+		 */
+		String countsFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputCountsFile);
+		String modesFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputModesFile);
+		writeResultsToFiles(countsFileName, modesFileName);
 	}
 
 	private void analyzeA() {
@@ -353,7 +372,6 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		 * Split A into agents who's home facility is affected and is not affected.
 		 * Then, split A1 and A2 into agents who stay at home and who stay not at home.
 		 */
-		Map<String, Integer> evacuationModes = new TreeMap<String, Integer>();
 		for (Id personId : A) {
 			AgentPosition agentPosition = householdsTracker.getAgentPosition(personId);
 			Position position = agentPosition.getPositionType();
@@ -376,9 +394,9 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						Set<String> modes = new TreeSet<String>();
 						for (Leg leg : legs) modes.add(leg.getMode());
 						String modesString = CollectionUtils.setToString(modes);
-						Integer count = evacuationModes.get(modesString);
-						if (count == null) evacuationModes.put(modesString, 1);
-						else evacuationModes.put(modesString, count + 1);
+						Integer count = evacuationModesA11.get(modesString);
+						if (count == null) evacuationModesA11.put(modesString, 1);
+						else evacuationModesA11.put(modesString, count + 1);
 					}
 				} else {
 					A11.add(personId);
@@ -387,9 +405,9 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					Set<String> modes = new TreeSet<String>();
 					for (Leg leg : legs) modes.add(leg.getMode());
 					String modesString = CollectionUtils.setToString(modes);
-					Integer count = evacuationModes.get(modesString);
-					if (count == null) evacuationModes.put(modesString, 1);
-					else evacuationModes.put(modesString, count + 1);
+					Integer count = evacuationModesA11.get(modesString);
+					if (count == null) evacuationModesA11.put(modesString, 1);
+					else evacuationModesA11.put(modesString, count + 1);
 					
 					log.warn("Agent is not in a facility when simulation ends: " + personId);
 				}
@@ -409,9 +427,9 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						Set<String> modes = new TreeSet<String>();
 						for (Leg leg : legs) modes.add(leg.getMode());
 						String modesString = CollectionUtils.setToString(modes);
-						Integer count = evacuationModes.get(modesString);
-						if (count == null) evacuationModes.put(modesString, 1);
-						else evacuationModes.put(modesString, count + 1);
+						Integer count = evacuationModesA21.get(modesString);
+						if (count == null) evacuationModesA21.put(modesString, 1);
+						else evacuationModesA21.put(modesString, count + 1);
 					}
 				} else {
 					A21.add(personId);
@@ -420,36 +438,49 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					Set<String> modes = new TreeSet<String>();
 					for (Leg leg : legs) modes.add(leg.getMode());
 					String modesString = CollectionUtils.setToString(modes);
-					Integer count = evacuationModes.get(modesString);
-					if (count == null) evacuationModes.put(modesString, 1);
-					else evacuationModes.put(modesString, count + 1);
+					Integer count = evacuationModesA21.get(modesString);
+					if (count == null) evacuationModesA21.put(modesString, 1);
+					else evacuationModesA21.put(modesString, count + 1);
 					
 					log.warn("Agent is not in a facility when simulation ends: " + personId);
 				}
 			}
 		}
 		log.info("\tA\t" + "total at home:\t" + A.size());
+		headers.add("A");
+		values.add(String.valueOf(A.size()));
 		
 		log.info("\tA1\t" + "at home, home affected:\t" + A1.size());
 		log.info("\tA11\t" + "at home, home affected, evacuate:\t" + A11.size());
 		log.info("\tA12\t" + "at home, home affected, stay there:\t" + A12.size());
+		headers.add("A1");
+		headers.add("A11");
+		headers.add("A12");
+		values.add(String.valueOf(A1.size()));
+		values.add(String.valueOf(A11.size()));
+		values.add(String.valueOf(A12.size()));
 
 		log.info("\tA2\t" + "at home, home not affected:\t" + A2.size());		
 		log.info("\tA21\t" + "at home, home not affected, evacuate:\t" + A21.size());
 		log.info("\tA22\t" + "at home, home not affected, stay there:\t" + A22.size());
-				
-		for (String modes : evacuationModes.keySet()) {
-			log.info("\tA11\t" + "mode(s):\t" + modes + "\tcount:\t" + evacuationModes.get(modes));			
+		headers.add("A2");
+		headers.add("A21");
+		headers.add("A22");
+		values.add(String.valueOf(A2.size()));
+		values.add(String.valueOf(A21.size()));
+		values.add(String.valueOf(A22.size()));
+		
+		for (String modes : evacuationModesA11.keySet()) {
+			log.info("\tA11\t" + "mode(s):\t" + modes + "\tcount:\t" + evacuationModesA11.get(modes));			
 		}
+		for (String modes : evacuationModesA21.keySet()) {
+			log.info("\tA21\t" + "mode(s):\t" + modes + "\tcount:\t" + evacuationModesA21.get(modes));			
+		}
+
 	}
 	
 	private void analyzeB() {
 		
-		Map<String, Integer> evacuationModesB111Home = new TreeMap<String, Integer>();
-		Map<String, Integer> evacuationModesB111Evacuate = new TreeMap<String, Integer>();
-		Map<String, Integer> evacuationModesB112 = new TreeMap<String, Integer>();
-		Map<String, Integer> evacuationModesB12 = new TreeMap<String, Integer>();
-		Map<String, Integer> evacuationModesB2 = new TreeMap<String, Integer>();
 		for (Id personId : B) {
 			AgentPosition agentPosition = householdsTracker.getAgentPosition(personId);
 			Position position = agentPosition.getPositionType();
@@ -568,13 +599,31 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			}
 		}
 		log.info("\tB\t" + "total in evacuation area and not at home:\t" + B.size());
+		headers.add("B");
+		values.add(String.valueOf(B.size()));
+		
 		log.info("\tB1\t" + "in evacuation area and not at home, home affected:\t" + B1.size());
 		log.info("\tB11\t" + "in evacuation area and not at home, home affected, return home:\t" + B11.size());
 		log.info("\tB111\t" + "in evacuation area and not at home, home affected, return home, then evacuate:\t" + B111.size());
 		log.info("\tB112\t" + "in evacuation area and not at home, home affected, return home and stay there:\t" + B112.size());
 		log.info("\tB113\t" + "in evacuation area and not at home, home affected, still en-route (i.e. stuck/undefined):\t" + B113.size());
 		log.info("\tB12\t" + "in evacuation area and not at home, home affected, evacuate immediately:\t" + B12.size());
+		headers.add("B1");
+		headers.add("B11");
+		headers.add("B111");
+		headers.add("B112");
+		headers.add("B113");
+		headers.add("B12");
+		values.add(String.valueOf(B1.size()));
+		values.add(String.valueOf(B11.size()));
+		values.add(String.valueOf(B111.size()));
+		values.add(String.valueOf(B112.size()));
+		values.add(String.valueOf(B113.size()));
+		values.add(String.valueOf(B12.size()));
+		
 		log.info("\tB2\t" + "in evacuation area and not at home, home not affected:\t" + B2.size());
+		headers.add("B2");
+		values.add(String.valueOf(B2.size()));
 		
 		for (String modes : evacuationModesB111Home.keySet()) {
 			log.info("\tB111 (return home)\t" + "mode(s):\t" + modes + "\tcount:\t" + evacuationModesB111Home.get(modes));			
@@ -595,11 +644,6 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 
 	private void analyzeC() {
 		
-		Map<String, Integer> evacuationModesC111Home = new TreeMap<String, Integer>();
-		Map<String, Integer> evacuationModesC111Evacuate = new TreeMap<String, Integer>();
-		Map<String, Integer> evacuationModesC112 = new TreeMap<String, Integer>();
-		Map<String, Integer> evacuationModesC12 = new TreeMap<String, Integer>();
-		Map<String, Integer> evacuationModesC2 = new TreeMap<String, Integer>();
 		for (Id personId : C) {
 			AgentPosition agentPosition = householdsTracker.getAgentPosition(personId);
 			Position position = agentPosition.getPositionType();
@@ -718,13 +762,32 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			}
 		}
 		log.info("\tC\t" + "total outside evacuation area and not at home:\t" + C.size());
+		headers.add("C");
+		values.add(String.valueOf(C.size()));
+		
 		log.info("\tC1\t" + "outside evacuation area and not at home, home affected:\t" + C1.size());
 		log.info("\tC11\t" + "outside evacuation area and not at home, home affected, return home:\t" + C11.size());
 		log.info("\tC111\t" + "outside evacuation area and not at home, home affected, return home, then evacuate:\t" + C111.size());
 		log.info("\tC112\t" + "outside evacuation area and not at home, home affected, return home and stay there:\t" + C112.size());
 		log.info("\tC113\t" + "outside evacuation area and not at home, home affected, still en-route (i.e. stuck/undefined):\t" + C113.size());
-		log.info("\tC2\t" + "outside evacuation area and not at home, home not affected:\t" + C2.size());
+		log.info("\tC12\t" + "outside evacuation area and not at home, home affected, evacuate immediately:\t" + C12.size());
+		headers.add("C1");
+		headers.add("C11");
+		headers.add("C111");
+		headers.add("C112");
+		headers.add("C113");
+		headers.add("C12");
+		values.add(String.valueOf(C1.size()));
+		values.add(String.valueOf(C11.size()));
+		values.add(String.valueOf(C111.size()));
+		values.add(String.valueOf(C112.size()));
+		values.add(String.valueOf(C113.size()));
+		values.add(String.valueOf(C12.size()));
 		
+		log.info("\tC2\t" + "outside evacuation area and not at home, home not affected:\t" + C2.size());
+		headers.add("C2");
+		values.add(String.valueOf(C2.size()));
+
 		for (String modes : evacuationModesC111Home.keySet()) {
 			log.info("\tC111 (return home)\t" + "mode(s):\t" + modes + "\tcount:\t" + evacuationModesC111Home.get(modes));			
 		}
@@ -739,6 +802,102 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		}
 		for (String modes : evacuationModesC2.keySet()) {
 			log.info("\tC2\t" + "mode(s):\t" + modes + "\tcount:\t" + evacuationModesC2.get(modes));			
+		}
+	}
+	
+	private void writeResultsToFiles(String countsFileName, String modesFileName) {
+		
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(countsFileName);
+			
+			for (int i = 0; i < headers.size(); i++) {
+				String header = headers.get(i);
+				writer.write(header);
+				if (i < headers.size() - 1) writer.write(delimiter);
+				else writer.write(newLine);
+			}
+			
+			for (int i = 0; i < values.size(); i++) {
+				String value = values.get(i);
+				writer.write(value);
+				if (i < values.size() - 1) writer.write(delimiter);
+				else writer.write(newLine);
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+		
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(modesFileName);
+						
+			Set<String> modes = new TreeSet<String>();
+			modes.add(TransportMode.bike);
+			modes.add(TransportMode.car);
+			modes.add(TransportMode.ride);
+			modes.add(TransportMode.pt);
+			modes.add(TransportMode.walk);
+			modes.add(OldPassengerDepartureHandler.passengerTransportMode);
+			modes.add(OldPassengerDepartureHandler.passengerTransportMode + "," + TransportMode.walk);
+						
+			List<String> modeHeaders = new ArrayList<String>();
+			List<String> modeValues = new ArrayList<String>();
+			
+			Map<String, Map<String, Integer>> maps = new LinkedHashMap<String, Map<String, Integer>>();
+			maps.put("A11", evacuationModesA11);
+			maps.put("A21", evacuationModesA21);
+			
+			maps.put("B111Home", evacuationModesB111Home);
+			maps.put("B111Evacuate", evacuationModesB111Evacuate);
+			maps.put("B112", evacuationModesB112);
+			maps.put("B12", evacuationModesB12);
+			maps.put("B2", evacuationModesB2);
+			
+			maps.put("C111Home", evacuationModesC111Home);
+			maps.put("C111Evacuate", evacuationModesC111Evacuate);
+			maps.put("C112", evacuationModesC112);
+			maps.put("C12", evacuationModesC12);
+			maps.put("C2", evacuationModesC2);
+			
+			
+			for (Entry<String, Map<String, Integer>> entry : maps.entrySet()) {
+				
+				String string = entry.getKey();
+				Map<String, Integer> map =  entry.getValue();
+				
+				Set<String> occurringModes = map.keySet();
+				for (String mode : occurringModes) {
+					if (!modes.contains(mode)) {
+						throw new RuntimeException("Mode " + mode + " was found but was not expected!");
+					}
+				}
+				
+				for (String mode : modes) {
+					Integer count = map.get(mode);
+					if (count == null) count = 0;
+					modeHeaders.add(string + "_" + mode);
+					modeValues.add(String.valueOf(count));
+				}
+			}
+			
+			for (int i = 0; i < modeHeaders.size(); i++) {
+				String header = modeHeaders.get(i);
+				writer.write(header);
+				if (i < modeHeaders.size() - 1) writer.write(delimiter);
+				else writer.write(newLine);
+			}
+			
+			for (int i = 0; i < modeValues.size(); i++) {
+				String value = modeValues.get(i);
+				writer.write(value);
+				if (i < modeValues.size() - 1) writer.write(delimiter);
+				else writer.write(newLine);
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
 		}
 	}
 	
@@ -877,44 +1036,6 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		else {
 			Activity activity = activities.get(activities.size() - 1);
 			activity.setEndTime(event.getTime());			
-		}
-	}
-	
-	/**
-	 * Create a dummy controller that provides a ControlerIO object but that
-	 * does not run.
-	 * 
-	 * @author cdobler
-	 */
-	private static class DummyController extends Controler {
-
-//		private final OutputDirectoryHierarchy controlerIO;
-		
-		public DummyController(Scenario scenario, String outputPath) {
-			super(scenario);
-			
-			if (outputPath == null) outputPath = this.scenarioData.getConfig().controler().getOutputDirectory();
-			
-			if (outputPath.endsWith("/")) {
-				outputPath = outputPath.substring(0, outputPath.length() - 1);
-			}
-			if (this.scenarioData.getConfig().controler().getRunId() != null) {
-//				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
-				this.setupOutputDirectory(outputPath, this.scenarioData.getConfig().controler().getRunId(), true) ;
-			} else {
-//				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
-				this.setupOutputDirectory(outputPath, null, true) ;
-			}
-		}
-		
-//		@Override
-//		public OutputDirectoryHierarchy getControlerIO() {
-//			return this.controlerIO;
-//		}
-		
-		@Override
-		public void run() {
-			// don't do anything here
 		}
 	}
 	
