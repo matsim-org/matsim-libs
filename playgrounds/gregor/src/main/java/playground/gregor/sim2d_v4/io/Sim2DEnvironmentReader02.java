@@ -153,7 +153,7 @@ public class Sim2DEnvironmentReader02  extends MatsimJaxbXmlParser{
 			this.env.setCRS(this.targetSRS);
 		} else {
 			try {
-				CoordinateReferenceSystem crs = CRS.decode("EPSG:3395", true);
+				CoordinateReferenceSystem crs = CRS.decode(boxSRS, true);
 //				System.out.println(crs.getName());
 				this.env.setCRS(crs);
 			} catch (NoSuchAuthorityCodeException e1) {
