@@ -62,6 +62,9 @@ public class PtSubModeControlerOld extends Controler {
 			((PopulationFactoryImpl)super.getScenario().getPopulation().getFactory()).
 							setRouteFactory(modes, new ExperimentalTransitRouteFactory());
 		}
+
+		throw new RuntimeException("overriding of the run() method is no longer possible.  if this is needed, " +
+		"please talk to me for alternatives.  There is also no test for this execution path, otherwise I might have tried fixing it myself. Thanks, kai, feb'13") ;
 	}
 	
 	/**
@@ -83,20 +86,23 @@ public class PtSubModeControlerOld extends Controler {
 			((PopulationFactoryImpl)super.getScenario().getPopulation().getFactory()).
 							setRouteFactory(modes, new ExperimentalTransitRouteFactory());
 		}
+		
+		throw new RuntimeException("overriding of the run() method is no longer possible.  if this is needed, " +
+		"please talk to me for alternatives.  There is also no test for this execution path, otherwise I might have tried fixing it myself. Thanks, kai, feb'13") ;
 	}
 	
-	@Override
-	public void run(){
-		if(!(super.getTransitRouterFactory() instanceof PtSubModeRouterFactoryOld)){
-			throw new IllegalArgumentException("TransitRouterFactory needs to be instance of PtSubModeDependRouterFactory..."); 
-		}
-		if(!(super.getMobsimFactory() instanceof TransitSubModeQSimFactory)){
-			throw new IllegalArgumentException("QSIMFactory needs to be instance of TransitSubModeQsimFactory...");
-		}
-		// need to add the PtSubmodeDependRouterFactory as last to controlerlistener, so it is explicitly called last, after all changes in schedule are done...
-		super.addControlerListener((PtSubModeRouterFactoryOld)super.getTransitRouterFactory());
-		super.run();
-	}
+//	@Override
+//	public void run(){
+//		if(!(super.getTransitRouterFactory() instanceof PtSubModeRouterFactoryOld)){
+//			throw new IllegalArgumentException("TransitRouterFactory needs to be instance of PtSubModeDependRouterFactory..."); 
+//		}
+//		if(!(super.getMobsimFactory() instanceof TransitSubModeQSimFactory)){
+//			throw new IllegalArgumentException("QSIMFactory needs to be instance of TransitSubModeQsimFactory...");
+//		}
+//		// need to add the PtSubmodeDependRouterFactory as last to controlerlistener, so it is explicitly called last, after all changes in schedule are done...
+//		super.addControlerListener((PtSubModeRouterFactoryOld)super.getTransitRouterFactory());
+//		super.run();
+//	}
 
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(){

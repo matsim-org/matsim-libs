@@ -49,7 +49,10 @@ public class PtSubModeControler extends Controler {
 		//necessary for departure-handling
 		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
 		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this));
-	}
+
+		throw new RuntimeException("overriding of the run() method is no longer possible.  if this is needed, " +
+		"please talk to me for alternatives.  There is also no test for this execution path, otherwise I might have tried fixing it myself. Thanks, kai, feb'13") ;
+}
 	
 	/**
 	 * This class is a extension of the original MATSim-Controler. It will only work with an enabled pt-simulation.
@@ -64,19 +67,21 @@ public class PtSubModeControler extends Controler {
 		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
 		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this));
 
+		throw new RuntimeException("overriding of the run() method is no longer possible.  if this is needed, " +
+		"please talk to me for alternatives.  There is also no test for this execution path, otherwise I might have tried fixing it myself. Thanks, kai, feb'13") ;
 	}
 	
-	@Override
-	public void run(){
-		if(!(super.getTripRouterFactory() instanceof PtSubModeTripRouterFactory)){
-			throw new IllegalArgumentException("TripRouterFactory needs to be instance of PtSubModeTripRouterFactory..."); 
-		}
-		if(!(super.getMobsimFactory() instanceof TransitSubModeQSimFactory)){
-			throw new IllegalArgumentException("QSIMFactory needs to be instance of TransitSubModeQsimFactory...");
-		}
-		// need to add the PtSubmodeDependRouterFactory as last to controlerlistener, so it is explicitly called last, after all changes in schedule are done...
-		super.addControlerListener((PtSubModeRouterFactory)super.getTransitRouterFactory());
-		super.run();
-	}
+//	@Override
+//	public void run(){
+//		if(!(super.getTripRouterFactory() instanceof PtSubModeTripRouterFactory)){
+//			throw new IllegalArgumentException("TripRouterFactory needs to be instance of PtSubModeTripRouterFactory..."); 
+//		}
+//		if(!(super.getMobsimFactory() instanceof TransitSubModeQSimFactory)){
+//			throw new IllegalArgumentException("QSIMFactory needs to be instance of TransitSubModeQsimFactory...");
+//		}
+//		// need to add the PtSubmodeDependRouterFactory as last to controlerlistener, so it is explicitly called last, after all changes in schedule are done...
+//		super.addControlerListener((PtSubModeRouterFactory)super.getTransitRouterFactory());
+//		super.run();
+//	}
 	
 }
