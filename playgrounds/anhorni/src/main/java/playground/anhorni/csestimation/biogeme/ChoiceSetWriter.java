@@ -44,7 +44,7 @@ public class ChoiceSetWriter {
 	private TreeMap<Id, ShopLocation> universalCS;
 	private Population population;
 	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
-	private DecimalFormat formatter = new DecimalFormat("0.00");
+	private DecimalFormat formatter = new DecimalFormat("0.000");
 	
 	public ChoiceSetWriter(TreeMap<Id, ShopLocation> universalCS, Population population) {
 		this.universalCS = universalCS;
@@ -83,8 +83,11 @@ public class ChoiceSetWriter {
 				
 				for (ShoppingTrip st:person.getShoppingTrips()) {	
 					double id_WP = person.getWeight();
-					int choice = this.getIndex(st.getShop().getId());					
-					String attributes = person.getAge() + "\t" + person.getSex() + "\t" + person.getHhIncome() + "\t" + person.getHhSize();
+					int choice = this.getIndex(st.getShop().getId());	
+					int sex = 0;
+					if (person.getSex().equals("f")) sex = 1;
+					
+					String attributes = person.getAge() + "\t" + sex + "\t" + person.getHhIncome() + "\t" + person.getHhSize();
 					String alternatives = "";								
 					for (ShopLocation shop:this.universalCS.values()) {
 						Coord start = this.trafo.transform(st.getStartCoord());
@@ -101,7 +104,7 @@ public class ChoiceSetWriter {
 									CoordUtils.calcDistance(s, end) -
 									CoordUtils.calcDistance(start, end);
 						}					
-						alternatives += shop.getId() + "\t1\t" + formatter.format(additionalDistance) + "\t" + shop.getSize() + "\t" + shop.getPrice() + "\t";
+						alternatives += shop.getId() + "\t1\t" + formatter.format(additionalDistance / 1000.0) + "\t" + shop.getSize() + "\t" + shop.getPrice() + "\t";
 					}			
 					out.write(person.getId() + "\t" + id_WP + "\t" + choice + "\t" + attributes + "\t" + alternatives);
 					out.newLine();
