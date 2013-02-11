@@ -157,10 +157,6 @@ public class JointQSimFactory implements MobsimFactory {
 				if ( !(pe instanceof Leg) ) continue;
 				final String mode = ((Leg) pe).getMode();
 
-				// if the plan is valid, the vehicle will get moved
-				// to the pick ups
-				if ( mainModes.contains( mode ) ) return;
-
 				if ( mode.equals( JointActingTypes.DRIVER ) ) {
 					qsim.createAndParkVehicleOnLink(
 							VehicleUtils.getFactory().createVehicle(
@@ -169,6 +165,10 @@ public class JointQSimFactory implements MobsimFactory {
 							homeLink);
 					return;
 				}
+
+				// if the plan is valid, the vehicle will get moved
+				// to the pick ups
+				if ( mainModes.contains( mode ) ) return;
 			}
 		}
 	}
