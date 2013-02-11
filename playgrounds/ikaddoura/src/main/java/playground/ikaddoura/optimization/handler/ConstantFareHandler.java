@@ -23,28 +23,38 @@
  */
 package playground.ikaddoura.optimization.handler;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class CalculateFareForBusTripHandler implements PersonEntersVehicleEventHandler {
+public class ConstantFareHandler implements PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler {
 
 	private final EventsManager events;
 	private final double fare;
+	private final List<Id> ptDriverIDs = new ArrayList<Id>();
+	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
 
-	public CalculateFareForBusTripHandler(EventsManager events, double fare) {
+	public ConstantFareHandler(EventsManager events, double fare) {
 		this.events = events;
 		this.fare = fare;
 	}
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (event.getPersonId().toString().contains("person") && event.getVehicleId().toString().contains("bus")){
+		Id personId = event.getPersonId();
+		Id vehId = event.getVehicleId();
+		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){
 			double fareForTrip = calculateFare(event);
 			AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), fareForTrip);
 			this.events.processEvent(moneyEvent);
@@ -58,6 +68,19 @@ public class CalculateFareForBusTripHandler implements PersonEntersVehicleEventH
 
 	@Override
 	public void reset(int iteration) {
+		this.ptDriverIDs.clear();
+		this.ptVehicleIDs.clear();
+	}
+
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
 		
+		if (!this.ptDriverIDs.contains(event.getDriverId())){
+			this.ptDriverIDs.add(event.getDriverId());
+		}
+		
+		if (!this.ptVehicleIDs.contains(event.getVehicleId())){
+			this.ptVehicleIDs.add(event.getVehicleId());
+		}
 	}
 }

@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -105,9 +106,9 @@ class ExternalControler {
 		
 		log.info("Setting parameters...");
 		if (args.length == 0){
-			settingsFile = "/Users/Ihab/Desktop/input/settingsFile.csv";
-			configFile = "/Users/Ihab/Desktop/input/config.xml";
-			outputPath = "/Users/Ihab/Desktop/output";
+			settingsFile = "/Users/Ihab/Desktop/testScenario_input/settingsFile.csv";
+			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
+			outputPath = "/Users/Ihab/Desktop/testScenario_output";
 			
 		} else {
 			settingsFile = args[0];
@@ -188,15 +189,14 @@ class ExternalControler {
 					fare = startFare;
 					for (int fareStep = 0; fareStep <= stepsFare ; fareStep++){
 
-						log.info("################################################");
-						log.info("         BEGIN OF EXTERNAL ITERATION " + iterationCounter);
-						log.info("################################################");
+						log.info("###################################################");
+						log.info("### EXTERNAL ITERATION " + iterationCounter + " BEGINS");
+						log.info("headway [sec]: " + headway + " // capacity [pax/veh]: " + capacity + " // fare [AUD]: " + fare);
 						
 						runInternalIteration(iterationCounter, demand, headway, capacity, fare);
 						
-						log.info("################################################");
-						log.info("           END OF EXTERNAL ITERATION " + iterationCounter);
-						log.info("################################################");
+						log.info("### EXTERNAL ITERATION " + iterationCounter + " ENDS");
+						log.info("###################################################");
 						
 						iterationCounter++;
 						
@@ -223,9 +223,8 @@ class ExternalControler {
 	
 	private void runInternalIteration(int iterationCounter, int demand, double headway, int capacity, double fare) throws IOException {
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
 
-//		String directoryIt = outputPath + "/extITERS/" + iterationCounter + "_demand" + demand + "_headway" + headway + "_fare" + fare + "_capacity" + capacity;
 		String directoryIt = outputPath + "/extITERS/" + iterationCounter;
 
 		File directory = new File(directoryIt);
@@ -343,14 +342,14 @@ class ExternalControler {
 			String scheduleFile = dir + "transitSchedule_headway" + headway + ".xml";
 			
 			ScheduleFromCorridor sfn = new ScheduleFromCorridor(scenario.getNetwork());
-			sfn.createTransitSchedule("bus", false, true, 8.3333333, 15);
+			sfn.createTransitSchedule("bus", false, true, 8.3333333, 0);
 			schedule = sfn.getTransitSchedule();
 			
 			List<Id> lineIDs = new ArrayList<Id>();
 			lineIDs.addAll(schedule.getTransitLines().keySet());
 			
 			DeparturesGenerator dg = new DeparturesGenerator();
-			dg.addDepartures(schedule, lineIDs, headway, 4. * 3600., 24. * 3600., 600.);
+			dg.addDepartures(schedule, lineIDs, headway, 4. * 3600., 24. * 3600., 1200.);
 			
 			TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(schedule);
 			scheduleWriter.write(scheduleFile);
@@ -367,7 +366,7 @@ class ExternalControler {
 				int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 				
 				VehiclesGenerator vg = new VehiclesGenerator();
-				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 1.5, 2., DoorOperationMode.parallel, 0.0, Double.POSITIVE_INFINITY);
+				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 1.5, 2., DoorOperationMode.parallel, 2.5, Double.POSITIVE_INFINITY);
 				vehicles = vg.getVehicles();
 				
 				VehicleWriterV1 vehicleWriter = new VehicleWriterV1(vehicles);

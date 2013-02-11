@@ -47,7 +47,7 @@ public class InternalControler {
 
 	private PtLegHandler ptScoringHandler;
 	
-	private final Scenario scenario;
+	private final ScenarioImpl scenario;
 	private final double fare;
 	
 	private final double MARGINAL_UTILITY_OF_MONEY = 0.062;
@@ -73,7 +73,7 @@ public class InternalControler {
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
 
-	public InternalControler(Scenario scenario, double fare) {
+	public InternalControler(ScenarioImpl scenario, double fare) {
 		this.scenario = scenario;
 		this.fare = fare;
 		this.ptScoringHandler = new PtLegHandler();
@@ -90,12 +90,12 @@ public class InternalControler {
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		new TransitScheduleReaderV1(scenario).readFile(this.scenario.getConfig().transit().getTransitScheduleFile());
-		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(this.scenario.getConfig().transit().getVehiclesFile());
+		new VehicleReaderV1((scenario).getVehicles()).readFile(this.scenario.getConfig().transit().getVehiclesFile());
 
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler));
+		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler, this.scenario));
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		if (controlerConfGroup.getLastIteration() == 0) {

@@ -61,6 +61,7 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 		personId2AgentDepartureTime.clear();
 		personId2InVehicleTime.clear();
 		ptDriverIDs.clear();
+		ptVehicleIDs.clear();
 	}
 	
 	@Override

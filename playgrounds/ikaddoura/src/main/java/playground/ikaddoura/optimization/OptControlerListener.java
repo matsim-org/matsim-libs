@@ -29,8 +29,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.optimization.handler.CalculateFareForBusTripHandler;
+import playground.ikaddoura.optimization.handler.ConstantFareHandler;
+import playground.ikaddoura.optimization.handler.MarginalCostFareHandler;
 import playground.ikaddoura.optimization.handler.PtLegHandler;
 
 /**
@@ -42,10 +44,12 @@ public class OptControlerListener implements StartupListener {
 
 	private final double fare;
 	private final PtLegHandler ptScoringHandler;
+	private final ScenarioImpl scenario;
 
-	public OptControlerListener(double fare, PtLegHandler ptLegHandler){
+	public OptControlerListener(double fare, PtLegHandler ptLegHandler, ScenarioImpl scenario){
 		this.fare = fare;
 		this.ptScoringHandler = ptLegHandler;
+		this.scenario = scenario;
 	}
 	
 	@Override
@@ -53,8 +57,11 @@ public class OptControlerListener implements StartupListener {
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 		
-		CalculateFareForBusTripHandler fareCalculator = new CalculateFareForBusTripHandler(eventsManager, this.fare);
+		ConstantFareHandler fareCalculator = new ConstantFareHandler(eventsManager, this.fare);
+		MarginalCostFareHandler mcFareCalculator = new MarginalCostFareHandler(eventsManager, scenario);
+
 		event.getControler().getEvents().addHandler(fareCalculator);
+		event.getControler().getEvents().addHandler(mcFareCalculator);
 		
 		event.getControler().getEvents().addHandler(ptScoringHandler);
 	}

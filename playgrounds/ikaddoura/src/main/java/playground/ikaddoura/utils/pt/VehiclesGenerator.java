@@ -50,7 +50,9 @@ public class VehiclesGenerator {
 	private Vehicles veh = VehicleUtils.createVehiclesContainer();
 	
 	/**
-	 * Generates transit vehicles for each given transit line of a given schedule.
+	 * Generates transit vehicles for each given transit line of a given schedule. If pcu is 0.0 the pcu value is calculated based on the given length.
+	 * If the pcu value is not 0.0 the length is ignored and has no effect.
+	 * 
 	 */
 	public void createVehicles(TransitSchedule schedule, List<Id> lineIDs, int busSeats, int standingRoom, double length, Id vehTypeId, double egressSeconds, double accessSeconds, DoorOperationMode doorOperationMode, double pcu, double maxVelocity) {
 		
