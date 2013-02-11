@@ -61,7 +61,7 @@ import playground.ikaddoura.utils.pt.ScheduleFromCorridor;
 import playground.ikaddoura.utils.pt.VehiclesGenerator;
 
 /**
- * @author benjamin and Ihab
+ * @author Ihab
  *
  */
 

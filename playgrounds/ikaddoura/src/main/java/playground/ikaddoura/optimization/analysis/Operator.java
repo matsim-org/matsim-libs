@@ -40,6 +40,14 @@ public class Operator {
 	private double costs;
 
 	public void calculateCosts(OperatorUserAnalysis analysis) {
+		
+		if (capacity > 120) {
+			log.warn("Capacity is unrealistic high. Expects a value below 120 pax/veh." +
+					" Can't garantee right calculation of operator costs per vehicle day and operator costs per vehicle-km." +
+					" Setting capacity for cost calculations to 120 pax/veh.");
+			
+			this.capacity = 120;
+		}
 		double costsPerVehicleDay = 1.6064 * this.capacity + 22.622; // see linear regression analysis in "BusCostsEstimations.xls"
 		double costsPerVehicleKm = 0.006 * this.capacity + 0.513;    // see linear regression analysis in "BusCostsEstimations.xls"
 		
