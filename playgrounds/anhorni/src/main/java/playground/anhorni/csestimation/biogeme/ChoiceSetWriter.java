@@ -70,7 +70,7 @@ public class ChoiceSetWriter {
 		
 	private void write(String outdir) {
 				
-		String outfile = outdir + "cs.txt";			
+		String outfile = outdir + "sample.dat";			
 		String header = this.getHeader();
 	
 		try {								

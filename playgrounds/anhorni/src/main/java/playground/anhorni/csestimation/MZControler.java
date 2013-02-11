@@ -92,7 +92,7 @@ public class MZControler {
 		writer.write(outdir, bzFile);
 		
 		ModFileWriter modWriter = new ModFileWriter();
-		modWriter.writeModFile(outdir + "mod0.mod");
+		modWriter.writeModFile(outdir + "default.mod");
 		
 		log.info("finished .......................................");
 	}
