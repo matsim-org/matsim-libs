@@ -65,7 +65,7 @@ public class QSimFibonacciPulser implements VisDebuggerAdditionalDrawer, AgentDe
 			dx /= length;
 			dy /= length;
 			LinkInfo info = new LinkInfo();
-			info.cap = (int) (l.getLength()*lanes)/2;
+			info.cap = (int) (l.getLength()*lanes/0.26);
 			WeightedLine line = new WeightedLine();
 			double ii = width/2;
 			line.x0 = (float) (l.getFromNode().getCoord().getX() - offsetX );
@@ -128,6 +128,9 @@ public class QSimFibonacciPulser implements VisDebuggerAdditionalDrawer, AgentDe
 					l.w.r = 255;
 					l.w.b = 0;
 				}
+				ll.a = 192;
+				p.drawWeightedLine(ll);
+				ll.a = 255;
 				ll.weight = (float) ((this.intensities[(int) l.count])*l.width/34);
 				//				for (int i = 0; i < 5; i++) {
 

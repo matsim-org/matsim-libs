@@ -70,7 +70,7 @@ public class VisDebugger extends PApplet {
 	private String time = "00:00.00.0";
 	private String iteration = "it: 0";
 	private final double dT;
-	private double speedup = 1;
+	private double speedup = 10;
 
 	private int bgXShift;
 	private int bgYShift;
@@ -579,7 +579,7 @@ public class VisDebugger extends PApplet {
 	static final class Text {
 		float x,y;
 		String text;
-		int r = 222, g = 222, b = 222, a = 222; 
+		int r = 192, g = 192, b = 192, a = 222; 
 		int minScale = 0;
 	}
 
@@ -623,7 +623,7 @@ public class VisDebugger extends PApplet {
 	synchronized public String setIteration(int it) {
 		if (it > 0) {
 			this.iteration = "iteration: " + it;
-			this.speedup = 1;
+//			this.speedup = 1;
 			this.it  = it;
 		}
 		return this.iteration;
