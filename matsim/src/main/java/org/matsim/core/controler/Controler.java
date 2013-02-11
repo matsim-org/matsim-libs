@@ -316,8 +316,6 @@ public class Controler extends AbstractController {
 	 * Starts the iterations.
 	 */
 	public final void run() {
-		// yyyy cannot make this final since it is overridden about 6 times. kai, jan'13
-
 		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.config.controler().getRunId(), this.overwriteFiles);
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			setupMultiModalSimulation();
