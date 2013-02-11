@@ -14,7 +14,7 @@ public class Events2Score {
 	
 	public static void main(String[] args) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		Scenario scenario = ScenarioUtils.createScenario(RunSimulation.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(RunSimulation.createConfig("", 1.0));
 		scenario.getConfig().planCalcScore().setWriteExperiencedPlans(true);
 		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
 		new MatsimPopulationReader(scenario).readFile("/Users/zilske/matsim-without-history/playgrounds/trunk/mzilske/output2freespeed/output_plans.xml.gz");
