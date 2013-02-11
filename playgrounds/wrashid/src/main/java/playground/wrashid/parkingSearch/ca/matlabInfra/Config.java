@@ -31,8 +31,8 @@ public class Config {
 
 	private static double radiusInMetersOfStudyArea = 1000;
 	private static Coord studyAreaCenter = ParkingHerbieControler.getCoordinatesQuaiBridgeZH();
-	private static String baseFolder = "H:/data/experiments/TRBAug2011/runs/ktiRun22/output/";
-	private static String outputFolder= "H:/data/experiments/matlabExprVoresung/2011/29-Nov/";
+	private static String baseFolder = "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/";
+	private static String outputFolder= "H:/data/experiments/matlabExprVoresung/2013-feb/";
 	
 	private static NetworkImpl network=null;
 	

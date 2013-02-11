@@ -89,13 +89,13 @@ class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandle
 		Id personId = event.getPersonId();
 		if (event.getLegMode().equalsIgnoreCase("car") && Config.isInsideStudyArea(event.getLinkId())) {
 			if (!agentsInStudyArea.containsKey(personId)) {
-				DebugLib.stopSystemAndReportInconsistency("there is some conceptual problem in the prog...");
+				agentsInStudyArea.put(personId, new Agent(personId, event.getTime()));
+				//DebugLib.stopSystemAndReportInconsistency("there is some conceptual problem in the prog...");
 			}
-
+			
 			Agent agent = agentsInStudyArea.get(personId);
 			agent.routeTo = agent.tmpRoute.getNodeString(network);
 			agent.actStartTime = event.getTime();
-
 		}
 		agentLastArrivalTime.put(personId, event.getTime());
 	}
