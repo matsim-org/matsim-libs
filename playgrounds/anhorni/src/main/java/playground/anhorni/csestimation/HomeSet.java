@@ -6,7 +6,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;

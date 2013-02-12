@@ -30,7 +30,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 
 public class ShopsEnricher {
@@ -38,28 +38,7 @@ public class ShopsEnricher {
 	private TreeMap<Id, BZShop> bzShops;
 	private TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();
 	private final static Logger log = Logger.getLogger(ShopsEnricher.class);
-	private CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
-	
-	public static void main(String[] args) {
-		ShopsEnricher enricher = new ShopsEnricher();
-		enricher.enrich(args[0], args[1], args[2]);
-	}
-	
-	public void enrich(String ucsFile, String bzFile, String outShopsFile) {
-		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
-		this.shops = ucsReader.readUniversalCS(ucsFile);	
-		try {
-			this.readBZ(bzFile);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		this.assignSize();
-		this.assignPrice();
-		Writer writer = new Writer();
-		writer.writeShops(this.shops, outShopsFile);
-		log.info("Enriching finished ------------------------------------------");
-	}
-	
+		
 	public void enrich(TreeMap<Id, ShopLocation> ucs, String bzFile) {
 		this.shops = ucs;
 		try {
@@ -104,7 +83,7 @@ public class ShopsEnricher {
 				Id id = new IdImpl(Integer.parseInt(entries[0].trim()));
 				BZShop bzShop = new BZShop(id);
 				Coord coord = new CoordImpl(x, y);
-				bzShop.setCoord(this.trafo.transform(coord)); // transform Swiss -> WGS84				
+				bzShop.setCoord(coord);			
 				bzShop.setSize(size);
 				bzShops.put(id, bzShop);
 			}
@@ -116,11 +95,8 @@ public class ShopsEnricher {
 		QuadTree<Location> bzQuadTree = Utils.buildLocationQuadTree(this.bzShops); 
 		for (ShopLocation shop:this.shops.values()) {			
 			BZShop closestBZShop = (BZShop) bzQuadTree.get(shop.getCoord().getX(), shop.getCoord().getY());
-			
-			Coord bzsCoord = this.trafo.transform(closestBZShop.getCoord());
-			Coord sCoord = this.trafo.transform(shop.getCoord());
-			
-			if (CoordUtils.calcDistance(bzsCoord, sCoord) < 150) {
+						
+			if (CoordUtils.calcDistance(closestBZShop.getCoord(), shop.getCoord()) < 200) {
 				if (closestBZShop.sizeMultiplyDefined()) {					
 					if (shop.getId() == new IdImpl(40051)) {
 						shop.setSize(4);
@@ -155,7 +131,13 @@ public class ShopsEnricher {
 				}				
 			}
 			else {
-				log.info(shop.getId() + ": no store close by!");
+				if (Integer.parseInt(shop.getId().toString()) > 100000) {
+					shop.setSize(5);
+				}
+				else {			
+					log.info(shop.getId() + ": no store close by!");
+					shop.setSize(4);
+				}
 			}
 		}
 	}

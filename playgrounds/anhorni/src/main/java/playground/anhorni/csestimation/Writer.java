@@ -9,15 +9,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 public class Writer {
-	
-	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
-	
-	public void write(Population population, TreeMap<Id, ShopLocation> shops, String personsFile, String shopsFile) {
+		
+	public void write(Population population, TreeMap<Id, ShopLocation> shops, String personsFile, String shopsFile, String bzFile) {
 		this.writePersons(population, shops, personsFile);
-		this.writeShops(shops, shopsFile);
+		this.writeShops(shops, shopsFile, bzFile);
 	}
 	
 	private void writePersons(Population population, TreeMap<Id, ShopLocation> shops, String personsFile) {
@@ -32,8 +29,8 @@ public class Writer {
 					bufferedWriter.write(person.getAge() + ",");
 					bufferedWriter.write(person.getHhIncome() + ",");				
 					bufferedWriter.write(st.getShop().getId() + ","); // choice
-					Coord coordStartTrafo = this.trafo.transform(st.getStartCoord());	
-					Coord coordEndTrafo = this.trafo.transform(st.getEndCoord());
+					Coord coordStartTrafo = st.getStartCoord();	
+					Coord coordEndTrafo = st.getEndCoord();
 					bufferedWriter.write(coordStartTrafo.getX() + "," + coordStartTrafo.getY() + ",");
 					bufferedWriter.write(coordEndTrafo.getX() + "," + coordEndTrafo.getY() + ",");
 					bufferedWriter.write("\n");
@@ -47,12 +44,16 @@ public class Writer {
 		}
 	}
 	
-	public void writeShops(TreeMap<Id, ShopLocation> shops, String shopsFile) {
+	public void writeShops(TreeMap<Id, ShopLocation> shops, String shopsFile, String bzFile) {
+		
+		ShopsEnricher enricher = new ShopsEnricher();
+		enricher.enrich(shops, bzFile);
+		
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(shopsFile)); 			
 			for (ShopLocation shop:shops.values()) {
 				bufferedWriter.write(shop.getId() + ",");
-				Coord coordtrafo = this.trafo.transform(shop.getCoord());
+				Coord coordtrafo = shop.getCoord();
 				bufferedWriter.write(coordtrafo.getX() + "," + coordtrafo.getY() + ",");
 				bufferedWriter.write(shop.getSize() + ",");
 				bufferedWriter.write(shop.getPrice() + "\n");

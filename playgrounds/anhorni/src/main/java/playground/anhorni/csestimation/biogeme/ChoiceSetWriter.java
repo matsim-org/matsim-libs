@@ -32,22 +32,19 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import playground.anhorni.csestimation.EstimationPerson;
 import playground.anhorni.csestimation.ShopLocation;
 import playground.anhorni.csestimation.ShoppingTrip;
-import playground.anhorni.csestimation.ShopsEnricher;
 
 public class ChoiceSetWriter {
 
 	private final static Logger log = Logger.getLogger(ChoiceSetWriter.class);
 	private TreeMap<Id, ShopLocation> universalCS;
 	private Population population;
-	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 	private DecimalFormat formatter = new DecimalFormat("0.000");
 	Random random = new Random(37835409);
-	private double sampleRate = 0.2;
+	private double sampleRate = 1.01;
 	
 	public ChoiceSetWriter(TreeMap<Id, ShopLocation> universalCS, Population population) {
 		this.universalCS = universalCS;
@@ -55,8 +52,8 @@ public class ChoiceSetWriter {
 	}
 		
 	public void write(String outdir, String bzFile)  {	 		
-		ShopsEnricher enricher = new ShopsEnricher();
-		enricher.enrich(this.universalCS, bzFile);
+	//	ShopsEnricher enricher = new ShopsEnricher();
+	//	enricher.enrich(this.universalCS, bzFile);
 		this.write(outdir);		
 	}
 	
@@ -93,9 +90,9 @@ public class ChoiceSetWriter {
 					String attributes = person.getAge() + "\t" + sex + "\t" + person.getHhIncome() + "\t" + person.getHhSize();
 					String alternatives = "";								
 					for (ShopLocation shop:this.universalCS.values()) {
-						Coord start = this.trafo.transform(st.getStartCoord());
-						Coord end = this.trafo.transform(st.getEndCoord());
-						Coord s = this.trafo.transform(shop.getCoord());
+						Coord start = st.getStartCoord();
+						Coord end = st.getEndCoord();
+						Coord s = shop.getCoord();
 											
 						double additionalDistance = 0.0;					
 						// shopping round trip

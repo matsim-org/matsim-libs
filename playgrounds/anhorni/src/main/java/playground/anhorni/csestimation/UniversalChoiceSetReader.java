@@ -27,8 +27,11 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 public class UniversalChoiceSetReader {
+	
+	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 	
 	public TreeMap<Id, ShopLocation> readUniversalCS(String file) {
 		TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();
@@ -42,9 +45,9 @@ public class UniversalChoiceSetReader {
 				
 				Id id = new IdImpl(Integer.parseInt(entrs[0].trim()));
 				ShopLocation shop = new ShopLocation(id);
-				// lat -> 1 | lan -> 0
+				// lat -> 1 | lon -> 0
 				CoordImpl coord = new CoordImpl(Double.parseDouble(entrs[5]), Double.parseDouble(entrs[4]));
-				shop.setCoord(coord);
+				shop.setCoord(this.trafo.transform(coord));
 				shops.put(id, shop);				
 			}
 		} catch (IOException e) {
