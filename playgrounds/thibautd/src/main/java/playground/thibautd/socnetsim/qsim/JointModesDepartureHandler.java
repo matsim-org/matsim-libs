@@ -25,11 +25,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.VehicleUsingAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
@@ -40,18 +44,22 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
 /**
  * @author thibautd
  */
-public class JointModesDepartureHandler implements DepartureHandler {
+public class JointModesDepartureHandler implements DepartureHandler , MobsimEngine {
 	private final QNetsimEngine netsimEngine;
 	private final PassengersWaitingPerDriver passengersWaitingPerDriver = new PassengersWaitingPerDriver();
 	// map driverId -> driver info
 	private final Map<Id , WaitingDriver> waitingDrivers =
 		new LinkedHashMap<Id , WaitingDriver>();
+	private InternalInterface internalInterface = null;
 
 	public JointModesDepartureHandler(
 			final QNetsimEngine netsimEngine) {
 		this.netsimEngine = netsimEngine;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// departure handler
+	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public boolean handleDeparture(
 			final double now,
@@ -91,22 +99,32 @@ public class JointModesDepartureHandler implements DepartureHandler {
 		if ( presentPassengers.containsAll( passengerIds ) ) {
 			// all passengers are or already in the car,
 			// or waiting. Board waiting passengers and depart.
+			final EventsManager events = internalInterface.getMobsim().getEventsManager();
 			for (Id passengerId : passengerIds) {
 				final PassengerAgent passenger = passengersWaiting.remove( passengerId );
-				// TODO: throw event?
-				if ( agent != null ) vehicle.addPassenger( passenger );
+				if ( agent != null ) {
+					events.processEvent(
+							events.getFactory().createPersonEntersVehicleEvent(
+								now,
+								passengerId,
+								vehicleId ));
+					vehicle.addPassenger( passenger );
+				}
 			}
 			assert vehicle.getPassengers().size() == passengerIds.size() : vehicle.getPassengers()+" != "+passengerIds;
 
 			final boolean handled =
 				netsimEngine.getDepartureHandler().handleDeparture(
 						now,
-						agent,
+						new PassengerUnboardingDriverAgentWrapper(
+							(MobsimDriverAgent) agent,
+							internalInterface),
 						linkId );
 
 			if ( !handled ) {
 				throw new RuntimeException( "failed to handle departure. Check the main modes?" );
 			}
+
 			waitingDrivers.remove( driverId );
 		}
 		else {
@@ -165,6 +183,32 @@ public class JointModesDepartureHandler implements DepartureHandler {
 		return route.getDriverId();
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// engine
+	// /////////////////////////////////////////////////////////////////////////
+	@Override
+	public void doSimStep(final double time) {
+		// do nothing
+	}
+
+	@Override
+	public void onPrepareSim() {
+		// do nothing
+	}
+
+	@Override
+	public void afterSim() {
+		// do nothing
+	}
+
+	@Override
+	public void setInternalInterface(final InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// nested classes
+	// /////////////////////////////////////////////////////////////////////////
 	private final class WaitingDriver {
 		public final MobsimAgent driverAgent;
 		public final Id linkId;
@@ -209,5 +253,124 @@ public class JointModesDepartureHandler implements DepartureHandler {
 			return ps;
 		}
 	}
+
+	// XXX: quite dirty, but I didn't found a cleaner way to handle passenger arrivals
+	private static class PassengerUnboardingDriverAgentWrapper implements MobsimDriverAgent {
+		private final MobsimDriverAgent delegate;
+		private final InternalInterface internalInterface;
+
+		public PassengerUnboardingDriverAgentWrapper(
+				final MobsimDriverAgent delegate,
+				final InternalInterface internalInterface) {
+			this.delegate = delegate;
+			this.internalInterface = internalInterface;
+		}
+
+		@Override
+		public Id getId() {
+			return delegate.getId();
+		}
+
+		@Override
+		public void setVehicle(final MobsimVehicle veh) {
+			delegate.setVehicle(veh);
+		}
+
+		@Override
+		public Id getCurrentLinkId() {
+			return delegate.getCurrentLinkId();
+		}
+
+		@Override
+		public MobsimVehicle getVehicle() {
+			return delegate.getVehicle();
+		}
+
+		@Override
+		public Id getDestinationLinkId() {
+			return delegate.getDestinationLinkId();
+		}
+
+		@Override
+		public Id chooseNextLinkId() {
+			return delegate.chooseNextLinkId();
+		}
+
+		@Override
+		public void notifyMoveOverNode(final Id newLinkId) {
+			delegate.notifyMoveOverNode(newLinkId);
+		}
+
+		@Override
+		public State getState() {
+			return delegate.getState();
+		}
+
+		@Override
+		public Id getPlannedVehicleId() {
+			return delegate.getPlannedVehicleId();
+		}
+
+		@Override
+		public double getActivityEndTime() {
+			return delegate.getActivityEndTime();
+		}
+
+		@Override
+		public void endActivityAndComputeNextState(final double now) {
+			delegate.endActivityAndComputeNextState(now);
+		}
+
+		@Override
+		public void endLegAndComputeNextState(final double now) {
+			if ( !delegate.getMode().equals( JointActingTypes.DRIVER ) ) {
+				throw new IllegalStateException( delegate.getMode() );
+			}
+
+			final MobsimVehicle vehicle = delegate.getVehicle();
+			final Id linkId = delegate.getCurrentLinkId();
+			final Collection<PassengerAgent> passengersToUnboard = new ArrayList<PassengerAgent>();
+			for ( PassengerAgent p : vehicle.getPassengers() ) {
+				if ( p.getDestinationLinkId().equals( linkId ) ) {
+					passengersToUnboard.add( p );
+				}
+			}
+
+			final EventsManager events = internalInterface.getMobsim().getEventsManager();
+			for (PassengerAgent p : passengersToUnboard) {
+				vehicle.removePassenger( p );
+				((MobsimAgent) p).endLegAndComputeNextState( now );
+				events.processEvent(
+						events.getFactory().createPersonLeavesVehicleEvent(
+							now,
+							p.getId(),
+							vehicle.getId()));
+				internalInterface.arrangeNextAgentState( (MobsimAgent) p );
+			}
+
+			delegate.endLegAndComputeNextState( now );
+		}
+
+		@Override
+		public void abort(final double now) {
+			delegate.abort(now);
+		}
+
+		@Override
+		public Double getExpectedTravelTime() {
+			return delegate.getExpectedTravelTime();
+		}
+
+		@Override
+		public String getMode() {
+			return delegate.getMode();
+		}
+
+		@Override
+		public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
+			delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
+		}
+	}
+
 }
 
