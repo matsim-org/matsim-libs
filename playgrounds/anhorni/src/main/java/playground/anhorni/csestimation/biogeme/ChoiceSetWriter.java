@@ -121,25 +121,17 @@ public class ChoiceSetWriter {
 						avgCSSize += shop.getSize();
 						cntCS++;
 						
-						int avail = 0;
+						int avail = 1;
 						if (st.getShop().getId().compareTo(shop.getId()) == 0) {
-							out0.write(person.getId() + "\t" + shop.getId() + "\t" + additionalDistance + "\t" + shop.getSize() + "\t" + shop.getPrice());
-							avail = 1;							
+							out0.write(person.getId() + "\t" + shop.getId() + "\t" + additionalDistance + "\t" + shop.getSize() + "\t" + shop.getPrice());							
 							avgCODist += additionalDistance;
 							avgCOSize += shop.getSize();
 							avgCOPrice += shop.getPrice();
 							cntCO++;
 							sizeCS++;
-						}	
-						if (CoordUtils.calcDistance(st.getShop().getCoord(), shop.getCoord()) < 1000.0) {
-							if (random.nextFloat() < this.sampleRate) {
-								avail = 1;
-								sizeCS++;
-							}
-						}						
+						}							
 						alternatives += this.getIndex(shop.getId()) + "\t" + avail + "\t" + formatter.format(additionalDistance / 1000.0) + "\t" + shop.getSize() + "\t" + shop.getPrice() + "\t";
 					}
-					log.info("CS size: " + sizeCS);
 					out.write(person.getId() + "\t" + id_WP + "\t" + choice + "\t" + attributes + "\t" + alternatives);
 					out.newLine();
 					out0.newLine();
