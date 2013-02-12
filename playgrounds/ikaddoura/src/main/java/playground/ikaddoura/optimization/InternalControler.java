@@ -44,6 +44,7 @@ public class InternalControler {
 	private final static Logger log = Logger.getLogger(InternalControler.class);
 
 	private PtLegHandler ptScoringHandler;
+	private boolean marginalCostPricing;
 	
 	private final ScenarioImpl scenario;
 	private final double fare;
@@ -71,10 +72,11 @@ public class InternalControler {
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
 
-	public InternalControler(ScenarioImpl scenario, double fare) {
+	public InternalControler(ScenarioImpl scenario, double fare, boolean marginalCostPricing) {
 		this.scenario = scenario;
 		this.fare = fare;
 		this.ptScoringHandler = new PtLegHandler();
+		this.marginalCostPricing = marginalCostPricing;
 
 		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt();
 		log.info("Pt constant set to " + this.CONSTANT_PT);
@@ -92,7 +94,7 @@ public class InternalControler {
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler, this.scenario));
+		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler, this.scenario, this.marginalCostPricing));
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		if (controlerConfGroup.getLastIteration() == 0) {
@@ -127,7 +129,7 @@ public class InternalControler {
 		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(planCalcScoreConfigGroup, scenario.getNetwork(), ptScoringHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE, TRAVEL_PT_ACCESS, TRAVEL_PT_EGRESS);
 		controler.setScoringFunctionFactory(scoringfactory);
 		
-//		controler.setCreateGraphs(false);
+		controler.setCreateGraphs(false);
 		controler.run();		
 	}
 

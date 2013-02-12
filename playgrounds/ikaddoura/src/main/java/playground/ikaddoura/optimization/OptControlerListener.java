@@ -45,11 +45,13 @@ public class OptControlerListener implements StartupListener {
 	private final double fare;
 	private final PtLegHandler ptScoringHandler;
 	private final ScenarioImpl scenario;
+	private boolean marginalCostPricing;
 
-	public OptControlerListener(double fare, PtLegHandler ptLegHandler, ScenarioImpl scenario){
+	public OptControlerListener(double fare, PtLegHandler ptLegHandler, ScenarioImpl scenario, boolean marginalCostPricing){
 		this.fare = fare;
 		this.ptScoringHandler = ptLegHandler;
 		this.scenario = scenario;
+		this.marginalCostPricing = marginalCostPricing;
 	}
 	
 	@Override
@@ -58,10 +60,12 @@ public class OptControlerListener implements StartupListener {
 		EventsManager eventsManager = event.getControler().getEvents();
 		
 		ConstantFareHandler fareCalculator = new ConstantFareHandler(eventsManager, this.fare);
-		MarginalCostFareHandler mcFareCalculator = new MarginalCostFareHandler(eventsManager, scenario);
-
 		event.getControler().getEvents().addHandler(fareCalculator);
-		event.getControler().getEvents().addHandler(mcFareCalculator);
+
+		if (this.marginalCostPricing) {
+			MarginalCostFareHandler mcFareCalculator = new MarginalCostFareHandler(eventsManager, scenario);
+			event.getControler().getEvents().addHandler(mcFareCalculator);
+		}
 		
 		event.getControler().getEvents().addHandler(ptScoringHandler);
 	}

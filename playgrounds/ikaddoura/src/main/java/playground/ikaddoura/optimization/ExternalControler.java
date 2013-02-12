@@ -69,11 +69,13 @@ class ExternalControler {
 	
 	private final static Logger log = Logger.getLogger(ExternalControler.class);
 	
+	static String settingsFile;
 	static String configFile;
 	static String outputPath;
 	
 	static boolean useRandomSeedsFile;
 	static boolean usePopulationPathsFile;
+	static boolean marginalCostPricing;
 
 	static long randomSeed;
 	static String populationFile;
@@ -93,8 +95,6 @@ class ExternalControler {
 	static int stepsFare;
 	static int stepsDemand;
 	
-	static String settingsFile;
-
 	private Map<Double, Map<Integer, String>> headway2capacity2vehiclesFile = new HashMap<Double, Map<Integer, String>>();
 	private Map<Double, String> headway2scheduleFile = new HashMap<Double, String>();
 	private Map<Integer, String> demand2populationFile = new HashMap<Integer, String>();
@@ -109,7 +109,7 @@ class ExternalControler {
 		if (args.length == 0){
 			settingsFile = "/Users/Ihab/Desktop/testScenario_input/settingsFile.csv";
 			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-			outputPath = "/Users/Ihab/Desktop/testScenario_output_final";
+			outputPath = "/Users/Ihab/Desktop/testScenario_output";
 			
 		} else {
 			settingsFile = args[0];
@@ -137,6 +137,7 @@ class ExternalControler {
 		
 		useRandomSeedsFile = settings.isUseRandomSeedsFile();
 		usePopulationPathsFile = settings.isUsePopulationPathsFile();
+		marginalCostPricing = settings.isMarginalCostPricing();
 		
 		if (useRandomSeedsFile){
 			String randomSeedsFile = settings.getRandomSeedsFile();
@@ -158,6 +159,10 @@ class ExternalControler {
 			log.info("Looking up population file path #" + popFilePathNr + " from file " + populationPathsFile + "... Done. Population file: " + populationFile);
 		} else {
 			log.info("Population file will be set via config.");
+		}
+		
+		if (marginalCostPricing){
+			log.info("Marginal cost pricing is enabled.");
 		}
 		
 		log.info("Setting parameters... Done.");
@@ -193,8 +198,8 @@ class ExternalControler {
 						log.info("###################################################");
 						log.info("### EXTERNAL ITERATION " + iterationCounter + " BEGINS");
 						log.info("headway [sec]: " + headway + " // capacity [pax/veh]: " + capacity + " // fare [AUD]: " + fare);
-						
-						runInternalIteration(iterationCounter, demand, headway, capacity, fare);
+					
+						runInternalIteration(iterationCounter, demand, headway, capacity, fare, marginalCostPricing);
 						
 						log.info("### EXTERNAL ITERATION " + iterationCounter + " ENDS");
 						log.info("###################################################");
@@ -222,7 +227,7 @@ class ExternalControler {
 		}
 	}
 	
-	private void runInternalIteration(int iterationCounter, int demand, double headway, int capacity, double fare) throws IOException {
+	private void runInternalIteration(int iterationCounter, int demand, double headway, int capacity, double fare, boolean marginalCostPricing) throws IOException {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
 
@@ -264,7 +269,7 @@ class ExternalControler {
 			scenario.getConfig().global().setRandomSeed(randomSeed);
 		}
 		
-		InternalControler internalControler = new InternalControler(scenario, fare);
+		InternalControler internalControler = new InternalControler(scenario, fare, marginalCostPricing);
 		internalControler.run();
 		
 		deleteUnnecessaryInternalIterations(scenario); 

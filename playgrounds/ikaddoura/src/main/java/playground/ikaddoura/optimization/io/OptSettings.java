@@ -29,22 +29,23 @@ package playground.ikaddoura.optimization.io;
  */
 public class OptSettings {
 	
-	private double incrHeadway;
-	private double incrFare;
-	private int incrCapacity;
-	private int incrDemand;
-	private double startHeadway;
-	private double startFare;
-	private int startCapacity;
-	private int startDemand;
-	private int stepsHeadway;
-	private int stepsFare;
-	private int stepsCapacity;
-	private int stepsDemand;
-	private boolean useRandomSeedsFile;
-	private String randomSeedsFile;
-	private boolean usePopulationPathsFile;
-	private String populationPathsFile;
+	private double incrHeadway = 0.;
+	private double incrFare = 0.;
+	private int incrCapacity = 0;
+	private int incrDemand = 0;
+	private double startHeadway = 600;
+	private double startFare = 0.;
+	private int startCapacity = 100;
+	private int startDemand = 0;
+	private int stepsHeadway = 0;
+	private int stepsFare = 0;
+	private int stepsCapacity = 0;
+	private int stepsDemand = 0;
+	private boolean useRandomSeedsFile = false;
+	private String randomSeedsFile = null;
+	private boolean usePopulationPathsFile = false;
+	private String populationPathsFile = null;
+	private boolean marginalCostPricing = false;
 
 	public double getIncrHeadway() {
 		return incrHeadway;
@@ -141,5 +142,11 @@ public class OptSettings {
 	}
 	public void setPopulationPathsFile(String populationPathsFile) {
 		this.populationPathsFile = populationPathsFile;
+	}
+	public boolean isMarginalCostPricing() {
+		return marginalCostPricing;
+	}
+	public void setMarginalCostPricing(boolean marginalCostPricing) {
+		this.marginalCostPricing = marginalCostPricing;
 	}
 }
