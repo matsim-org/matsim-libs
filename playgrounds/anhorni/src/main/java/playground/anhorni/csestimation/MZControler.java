@@ -121,7 +121,7 @@ public class MZControler {
 					
 						if (Integer.toString(start.getPlz()).startsWith("80") && 
 								Integer.toString(end.getPlz()).startsWith("80") && 
-								CoordUtils.calcDistance(shop.getCoord(), act.getCoord()) < 200.0) {
+								CoordUtils.calcDistance(shop.getCoord(), act.getCoord()) < 200.0) { // close to a Zurich shop
 							
 							person.addShoppingTrip(shoppingTrip);
 							

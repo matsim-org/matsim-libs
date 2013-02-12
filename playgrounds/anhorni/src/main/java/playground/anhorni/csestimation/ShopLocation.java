@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 public class ShopLocation extends Location {	 
 	private int prevLoc = -99;
 	private int nextLoc = -99;
+	private int plz;
 	
 	private String visitFrequency;
 	private int [] reasonsForVisit = new int[7];
@@ -78,5 +79,11 @@ public class ShopLocation extends Location {
 	}
 	public void setPrice(int price) {
 		this.price = price;
+	}
+	public int getPlz() {
+		return plz;
+	}
+	public void setPlz(int plz) {
+		this.plz = plz;
 	}
 }
