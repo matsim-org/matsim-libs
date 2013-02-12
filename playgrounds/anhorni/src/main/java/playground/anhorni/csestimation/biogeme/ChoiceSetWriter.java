@@ -44,7 +44,7 @@ public class ChoiceSetWriter {
 	private Population population;
 	private DecimalFormat formatter = new DecimalFormat("0.000");
 	Random random = new Random(37835409);
-	private double sampleRate = 1.01;
+	private double sampleRate = 0.5;
 	
 	public ChoiceSetWriter(TreeMap<Id, ShopLocation> universalCS, Population population) {
 		this.universalCS = universalCS;
@@ -60,10 +60,10 @@ public class ChoiceSetWriter {
 	private int getIndex(Id id) {
 		int cnt = 0;
 		for (Id idcs : this.universalCS.keySet()) {
-			cnt++;
 			if (idcs.compareTo(id) == 0) {
 				return cnt;
 			}
+			cnt++;
 		}
 		return -99;
 	}
@@ -99,7 +99,8 @@ public class ChoiceSetWriter {
 					if (person.getSex().equals("f")) sex = 1;
 					
 					String attributes = person.getAge() + "\t" + sex + "\t" + person.getHhIncome() + "\t" + person.getHhSize();
-					String alternatives = "";								
+					String alternatives = "";	
+					int sizeCS = 0;
 					for (ShopLocation shop:this.universalCS.values()) {
 						Coord start = st.getStartCoord();
 						Coord end = st.getEndCoord();
@@ -114,8 +115,7 @@ public class ChoiceSetWriter {
 							additionalDistance = CoordUtils.calcDistance(start, s) +
 									CoordUtils.calcDistance(s, end) -
 									CoordUtils.calcDistance(start, end);
-						}
-						
+						}						
 						avgCSDist += additionalDistance;
 						avgCSPrice += shop.getPrice();
 						avgCSSize += shop.getSize();
@@ -124,18 +124,22 @@ public class ChoiceSetWriter {
 						int avail = 0;
 						if (st.getShop().getId().compareTo(shop.getId()) == 0) {
 							out0.write(person.getId() + "\t" + shop.getId() + "\t" + additionalDistance + "\t" + shop.getSize() + "\t" + shop.getPrice());
-							avail = 1;
-							
+							avail = 1;							
 							avgCODist += additionalDistance;
 							avgCOSize += shop.getSize();
 							avgCOPrice += shop.getPrice();
 							cntCO++;
+							sizeCS++;
 						}	
-						if (random.nextFloat() < this.sampleRate) {
-							avail = 1;
-						}
-						alternatives += shop.getId() + "\t" + avail + "\t" + formatter.format(additionalDistance / 1000.0) + "\t" + shop.getSize() + "\t" + shop.getPrice() + "\t";
-					}			
+						if (CoordUtils.calcDistance(st.getShop().getCoord(), shop.getCoord()) < 1000.0) {
+							if (random.nextFloat() < this.sampleRate) {
+								avail = 1;
+								sizeCS++;
+							}
+						}						
+						alternatives += this.getIndex(shop.getId()) + "\t" + avail + "\t" + formatter.format(additionalDistance / 1000.0) + "\t" + shop.getSize() + "\t" + shop.getPrice() + "\t";
+					}
+					log.info("CS size: " + sizeCS);
 					out.write(person.getId() + "\t" + id_WP + "\t" + choice + "\t" + attributes + "\t" + alternatives);
 					out.newLine();
 					out0.newLine();
