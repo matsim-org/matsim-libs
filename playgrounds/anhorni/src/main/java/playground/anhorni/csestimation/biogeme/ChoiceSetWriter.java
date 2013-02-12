@@ -69,15 +69,26 @@ public class ChoiceSetWriter {
 	}
 		
 	private void write(String outdir) {
-				
 		String outfile = outdir + "sample.dat";			
 		String header = this.getHeader();
+		
+		double avgCSDist = 0.0;
+		double avgCSPrice = 0.0;
+		double avgCSSize = 0.0;
+		
+		double avgCODist = 0.0;
+		double avgCOSize = 0.0;
+		double avgCOPrice = 0.0;
 	
 		try {								
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(header);
 			out.newLine();	
-						
+			
+			final BufferedWriter out0 = IOUtils.getBufferedWriter(outdir + "summary.dat");
+			
+			int cntCS = 0;
+			int cntCO = 0;
 			for (Person p:this.population.getPersons().values()) {
 				EstimationPerson person = (EstimationPerson)p;
 				
@@ -103,21 +114,45 @@ public class ChoiceSetWriter {
 							additionalDistance = CoordUtils.calcDistance(start, s) +
 									CoordUtils.calcDistance(s, end) -
 									CoordUtils.calcDistance(start, end);
-						}	
+						}
+						
+						avgCSDist += additionalDistance;
+						avgCSPrice += shop.getPrice();
+						avgCSSize += shop.getSize();
+						cntCS++;
+						
 						int avail = 0;
-						if (random.nextFloat() < this.sampleRate || st.getShop().getId().compareTo(shop.getId()) == 0) {
+						if (st.getShop().getId().compareTo(shop.getId()) == 0) {
+							out0.write(person.getId() + "\t" + shop.getId() + "\t" + additionalDistance + "\t" + shop.getSize() + "\t" + shop.getPrice());
 							avail = 1;
-						}				
+							
+							avgCODist += additionalDistance;
+							avgCOSize += shop.getSize();
+							avgCOPrice += shop.getPrice();
+							cntCO++;
+						}	
+						if (random.nextFloat() < this.sampleRate) {
+							avail = 1;
+						}
 						alternatives += shop.getId() + "\t" + avail + "\t" + formatter.format(additionalDistance / 1000.0) + "\t" + shop.getSize() + "\t" + shop.getPrice() + "\t";
 					}			
 					out.write(person.getId() + "\t" + id_WP + "\t" + choice + "\t" + attributes + "\t" + alternatives);
 					out.newLine();
+					out0.newLine();
 				}
-				out.flush();
 			}
-			out.flush();			
+			out.newLine();
+			out0.write("--------------------------------------------\n");
+			out0.write("Choice: \t\t" + formatter.format(avgCODist /cntCO) + "\t" + formatter.format(avgCOSize / cntCO) + "\t" + formatter.format(avgCOPrice /cntCO));
+			out0.newLine();
+			out0.write("Choice set: \t\t" + formatter.format(avgCSDist /cntCS) + "\t" + formatter.format(avgCSSize / cntCS) + "\t" + formatter.format(avgCSPrice /cntCS));
 			out.flush();
+			out.flush();			
 			out.close();
+			
+			out0.flush();
+			out0.close();
+			
 			log.info("cs file writen to: " + outfile);
 						
 		} catch (final IOException e) {

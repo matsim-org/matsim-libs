@@ -37,7 +37,7 @@ public class MZ2Plans {
 		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 
 		log.info("  running plans modules... ");
-		new PlansCreateFromMZ(1, 7).run(population, indir);
+		new PlansCreateFromMZ(1, 5).run(population, indir);
 
 		log.info("  writing plans xml file... ");
 		new PopulationWriter(population, NetworkImpl.createNetwork()).write(outdir + "plansMOSO.xml.gz");
