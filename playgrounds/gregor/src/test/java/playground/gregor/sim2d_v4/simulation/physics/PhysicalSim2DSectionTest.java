@@ -93,6 +93,10 @@ public class PhysicalSim2DSectionTest {
 		this.psec2.getAgents().add(a4);
 		a4.setPSec(this.psec2);
 		
+		this.psec0.updatedTwoDTree();
+		this.psec1.updatedTwoDTree();
+		this.psec2.updatedTwoDTree();
+		
 		Neighbors ncalc = new Neighbors();
 		ncalc.setRangeAndMaxNrOfNeighbors(10, 3);
 		List<Tuple<Float, Sim2DAgent>> neighbors = ncalc.computeNeighbors(agentInQuestion);
@@ -269,6 +273,16 @@ public class PhysicalSim2DSectionTest {
 		@Override
 		public float getRadius() {
 			throw new RuntimeException("don't call this method!");
+		}
+
+		@Override
+		public float getXLocation() {
+			return this.pos[0];
+		}
+
+		@Override
+		public float getYLocation() {
+			return this.pos[1];
 		}
 
 
