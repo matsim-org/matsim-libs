@@ -10,6 +10,7 @@ public class ShoppingTrip {
 	private ShopLocation shop;
 	private int startPLZ;
 	private int endPLZ;
+	private String mode;
 	
 	public ShopLocation getShop() {
 		return shop;
@@ -40,5 +41,11 @@ public class ShoppingTrip {
 	}
 	public void setEndPLZ(int endPLZ) {
 		this.endPLZ = endPLZ;
+	}
+	public String getMode() {
+		return mode;
+	}
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 }

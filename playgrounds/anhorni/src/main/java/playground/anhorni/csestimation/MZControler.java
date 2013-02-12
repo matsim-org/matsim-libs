@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -112,6 +113,8 @@ public class MZControler {
 						ShopLocation shop = (ShopLocation) shopQuadTree.get(act.getCoord().getX(), act.getCoord().getY());	
 						ShoppingTrip shoppingTrip = new ShoppingTrip();
 						shoppingTrip.setShop(shop);
+						LegImpl leg = (LegImpl)plan.getPlanElements().get(actlegIndex - 1);
+						shoppingTrip.setMode(leg.getMode());
 						MZActivityImpl start = (MZActivityImpl)plan.getPlanElements().get(actlegIndex - 2);
 						
 						shoppingTrip.setStartCoord(start.getCoord());						
