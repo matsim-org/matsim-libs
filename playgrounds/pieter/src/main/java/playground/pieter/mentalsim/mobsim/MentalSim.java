@@ -60,7 +60,7 @@ public class MentalSim implements Mobsim {
 	private Future<?>[] futures;
 
 	private final ExecutorService executor;
-	private TravelTimeCalculator travelTimeCalculator;
+	private TravelTime travelTimeCalculator;
 	private boolean linkEvents = false;
 	private MentalSimControler controler;
 
@@ -83,7 +83,7 @@ public class MentalSim implements Mobsim {
 	public MentalSim(Scenario sc2, EventsManager eventsManager,
 			TravelTime ttcalc, MentalSimControler c) {
 		this(sc2, eventsManager);
-		this.travelTimeCalculator = (TravelTimeCalculator) ttcalc;
+		this.travelTimeCalculator = ttcalc;
 		this.controler = c;
 	}
 
@@ -120,7 +120,7 @@ public class MentalSim implements Mobsim {
 		 */
 		for (int i = 0; i < segments.length; i++) {
 			threads[i]
-					.init(segments[i], network, travelTimeCalculator.getLinkTravelTimes(), eventManager);
+					.init(segments[i], network, travelTimeCalculator, eventManager);
 			futures[i] = executor.submit(threads[i]);
 		}
 		/*
