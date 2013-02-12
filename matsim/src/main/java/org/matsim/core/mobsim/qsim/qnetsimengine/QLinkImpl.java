@@ -148,7 +148,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	private boolean thisTimeStepGreen = true;
 	private double congestedDensity_veh_m;
 	private int nHolesMax;
-	private final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -176,8 +175,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.calculateCapacities();
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
 		
-		this.insertingWaitingVehiclesBeforeDrivingVehicles = 
-			network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 	}
 
 	/* 

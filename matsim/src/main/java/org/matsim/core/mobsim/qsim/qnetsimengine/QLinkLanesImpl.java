@@ -266,20 +266,32 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	boolean doSimStep(double now) {
-		boolean activeLane = false;
-		boolean otherLaneActive = false;
 		boolean activeWaitBuffer = false;
-		for (QLane lane : this.queueLanes){
-			if (lane.moveLane(now)){
-				otherLaneActive = true;
-			}
-			if (lane.isActive()){
-				activeLane = true;
-			}
+		boolean lanesActive = false;
+		if (this.insertingWaitingVehiclesBeforeDrivingVehicles){
+			this.moveWaitToBuffer(now);
+			lanesActive = this.moveLanes(now);
+		}
+		else {
+			lanesActive = this.moveLanes(now);
+			this.moveWaitToBuffer(now);
 		}
 		activeWaitBuffer = this.moveWaitToBuffer(now);
-		this.active = activeLane || otherLaneActive || activeWaitBuffer || (!this.waitingList.isEmpty());
+		this.active = lanesActive || activeWaitBuffer || (!this.waitingList.isEmpty());
 		return this.active;
+	}
+
+	private boolean moveLanes(double now){
+		boolean lanesActive = false;
+		for (QLane lane : this.queueLanes){
+			if (lane.moveLane(now)){
+				lanesActive = true;
+			}
+			if (lane.isActive()){
+				lanesActive = true;
+			}
+	}
+		return lanesActive;
 	}
 
 	/**

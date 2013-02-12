@@ -40,8 +40,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -95,10 +95,15 @@ abstract class AbstractQLink extends QLinkInternalI {
 
 	/*package*/ NetElementActivator netElementActivator;
 
+	/*package*/ final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
+
+	
 	AbstractQLink(Link link, QNetwork network) {
 		this.link = link ;
 		this.network = network;
 		this.netElementActivator = network.simEngine;
+		this.insertingWaitingVehiclesBeforeDrivingVehicles = 
+				network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 	}
 
 	abstract void activateLink();
