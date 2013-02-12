@@ -41,12 +41,16 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -139,6 +143,47 @@ public class JointTravelingSimulationTest {
 					"unexpected number of agents arriving at destination",
 					sc.getPopulation().getPersons().size(),
 					atDestCount.get());
+		}
+	}
+
+	@Test
+	public void testNumberOfEnterLeaveVehicle() throws Exception {
+		final Random random = new Random( 1234 );
+
+		for (int i=0; i < 50; i++) {
+			log.info( "random test scenario "+i );
+			final Scenario sc = createTestScenario( false , random );
+			final EventsManager events = EventsUtils.createEventsManager();
+
+			final AtomicInteger enterCount = new AtomicInteger( 0 );
+			final AtomicInteger leaveCount = new AtomicInteger( 0 );
+			events.addHandler( new PersonEntersVehicleEventHandler() {
+				@Override
+				public void reset(int iteration) {}
+
+				@Override
+				public void handleEvent(final PersonEntersVehicleEvent event) {
+					enterCount.incrementAndGet();
+				}
+			});
+
+			events.addHandler( new PersonLeavesVehicleEventHandler() {
+				@Override
+				public void reset(int iteration) {}
+
+				@Override
+				public void handleEvent(final PersonLeavesVehicleEvent event) {
+					leaveCount.incrementAndGet();
+				}
+			});
+
+			final JointQSimFactory factory = new JointQSimFactory( );
+			factory.createMobsim( sc , events ).run();
+
+			assertEquals(
+					"not as many leave events as enter events",
+					enterCount.get(),
+					leaveCount.get());
 		}
 	}
 
