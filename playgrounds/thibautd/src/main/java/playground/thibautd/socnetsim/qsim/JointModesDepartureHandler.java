@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.VehicleUsingAgent;
@@ -116,9 +115,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			final boolean handled =
 				netsimEngine.getDepartureHandler().handleDeparture(
 						now,
-						new PassengerUnboardingDriverAgentWrapper(
-							(MobsimDriverAgent) agent,
-							internalInterface),
+						agent,
 						linkId );
 
 			if ( !handled ) {
@@ -232,7 +229,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 
 			if ( ps == null ) {
 				ps = new PassengersWaitingForDriver();
-				map.put( linkId , ps );
+				map.put( driverId , ps );
 			}
 
 			return ps.getPassengersWaitingAtLink( linkId );
@@ -253,124 +250,5 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			return ps;
 		}
 	}
-
-	// XXX: quite dirty, but I didn't found a cleaner way to handle passenger arrivals
-	private static class PassengerUnboardingDriverAgentWrapper implements MobsimDriverAgent {
-		private final MobsimDriverAgent delegate;
-		private final InternalInterface internalInterface;
-
-		public PassengerUnboardingDriverAgentWrapper(
-				final MobsimDriverAgent delegate,
-				final InternalInterface internalInterface) {
-			this.delegate = delegate;
-			this.internalInterface = internalInterface;
-		}
-
-		@Override
-		public Id getId() {
-			return delegate.getId();
-		}
-
-		@Override
-		public void setVehicle(final MobsimVehicle veh) {
-			delegate.setVehicle(veh);
-		}
-
-		@Override
-		public Id getCurrentLinkId() {
-			return delegate.getCurrentLinkId();
-		}
-
-		@Override
-		public MobsimVehicle getVehicle() {
-			return delegate.getVehicle();
-		}
-
-		@Override
-		public Id getDestinationLinkId() {
-			return delegate.getDestinationLinkId();
-		}
-
-		@Override
-		public Id chooseNextLinkId() {
-			return delegate.chooseNextLinkId();
-		}
-
-		@Override
-		public void notifyMoveOverNode(final Id newLinkId) {
-			delegate.notifyMoveOverNode(newLinkId);
-		}
-
-		@Override
-		public State getState() {
-			return delegate.getState();
-		}
-
-		@Override
-		public Id getPlannedVehicleId() {
-			return delegate.getPlannedVehicleId();
-		}
-
-		@Override
-		public double getActivityEndTime() {
-			return delegate.getActivityEndTime();
-		}
-
-		@Override
-		public void endActivityAndComputeNextState(final double now) {
-			delegate.endActivityAndComputeNextState(now);
-		}
-
-		@Override
-		public void endLegAndComputeNextState(final double now) {
-			if ( !delegate.getMode().equals( JointActingTypes.DRIVER ) ) {
-				throw new IllegalStateException( delegate.getMode() );
-			}
-
-			final MobsimVehicle vehicle = delegate.getVehicle();
-			final Id linkId = delegate.getCurrentLinkId();
-			final Collection<PassengerAgent> passengersToUnboard = new ArrayList<PassengerAgent>();
-			for ( PassengerAgent p : vehicle.getPassengers() ) {
-				if ( p.getDestinationLinkId().equals( linkId ) ) {
-					passengersToUnboard.add( p );
-				}
-			}
-
-			final EventsManager events = internalInterface.getMobsim().getEventsManager();
-			for (PassengerAgent p : passengersToUnboard) {
-				vehicle.removePassenger( p );
-				((MobsimAgent) p).endLegAndComputeNextState( now );
-				events.processEvent(
-						events.getFactory().createPersonLeavesVehicleEvent(
-							now,
-							p.getId(),
-							vehicle.getId()));
-				internalInterface.arrangeNextAgentState( (MobsimAgent) p );
-			}
-
-			delegate.endLegAndComputeNextState( now );
-		}
-
-		@Override
-		public void abort(final double now) {
-			delegate.abort(now);
-		}
-
-		@Override
-		public Double getExpectedTravelTime() {
-			return delegate.getExpectedTravelTime();
-		}
-
-		@Override
-		public String getMode() {
-			return delegate.getMode();
-		}
-
-		@Override
-		public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
-			delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
-		}
-	}
-
 }
 
