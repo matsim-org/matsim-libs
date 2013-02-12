@@ -22,6 +22,7 @@ package playground.anhorni.csestimation.biogeme;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -45,6 +46,8 @@ public class ChoiceSetWriter {
 	private Population population;
 	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 	private DecimalFormat formatter = new DecimalFormat("0.000");
+	Random random = new Random(37835409);
+	private double sampleRate = 0.2;
 	
 	public ChoiceSetWriter(TreeMap<Id, ShopLocation> universalCS, Population population) {
 		this.universalCS = universalCS;
@@ -103,8 +106,12 @@ public class ChoiceSetWriter {
 							additionalDistance = CoordUtils.calcDistance(start, s) +
 									CoordUtils.calcDistance(s, end) -
 									CoordUtils.calcDistance(start, end);
-						}					
-						alternatives += shop.getId() + "\t1\t" + formatter.format(additionalDistance / 1000.0) + "\t" + shop.getSize() + "\t" + shop.getPrice() + "\t";
+						}	
+						int avail = 0;
+						if (random.nextFloat() < this.sampleRate || st.getShop().getId().compareTo(shop.getId()) == 0) {
+							avail = 1;
+						}				
+						alternatives += shop.getId() + "\t" + avail + "\t" + formatter.format(additionalDistance / 1000.0) + "\t" + shop.getSize() + "\t" + shop.getPrice() + "\t";
 					}			
 					out.write(person.getId() + "\t" + id_WP + "\t" + choice + "\t" + attributes + "\t" + alternatives);
 					out.newLine();
