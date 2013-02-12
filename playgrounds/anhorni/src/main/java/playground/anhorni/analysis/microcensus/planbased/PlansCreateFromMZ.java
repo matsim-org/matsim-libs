@@ -69,8 +69,6 @@ public class PlansCreateFromMZ {
 
 	private final static Logger log = Logger.getLogger(PlansCreateFromMZ.class);
 	
-	private CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
-	
 	public PlansCreateFromMZ(final int dow_min, final int dow_max) {
 		super();
 		this.dow_min = dow_min;
@@ -185,7 +183,6 @@ public class PlansCreateFromMZ {
 				entries[4] = Integer.toString(departure);
 
 				Coord from = new CoordImpl(entries[9].trim(),entries[10].trim());
-				from = this.trafo.transform(from);
 				entries[9] = Double.toString(from.getX());
 				entries[10] = Double.toString(from.getY());
 				int fromPLZ = -99;
@@ -193,7 +190,6 @@ public class PlansCreateFromMZ {
 					fromPLZ = Integer.parseInt(entries[12].trim());
 				}
 				Coord to = new CoordImpl(entries[15].trim(),entries[16].trim());
-				to = this.trafo.transform(to);
 				entries[15] = Double.toString(to.getX());
 				entries[16] = Double.toString(to.getY());
 				int toPLZ = -99;
@@ -373,9 +369,9 @@ public class PlansCreateFromMZ {
 				int departure = Integer.parseInt(entries[4].trim())*60;
 				entries[4] = Integer.toString(departure);
 
-				Coord from = new CoordImpl(entries[12].trim(), entries[13].trim());
-				entries[12] = Double.toString(from.getX());
-				entries[13] = Double.toString(from.getY());
+				Coord from = new CoordImpl(entries[14].trim(), entries[15].trim());
+				entries[14] = Double.toString(from.getX());
+				entries[15] = Double.toString(from.getY());
 				int fromPLZ = -99;
 				if (!entries[17].trim().isEmpty()) {
 					fromPLZ = Integer.parseInt(entries[17].trim());
