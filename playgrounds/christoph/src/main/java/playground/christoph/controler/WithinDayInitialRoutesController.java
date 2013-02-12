@@ -20,19 +20,21 @@
 
 package playground.christoph.controler;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -42,11 +44,15 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegStartedIdentifierFactory;
@@ -77,6 +83,7 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 	private DuringLegIdentifier legStartedIdentifier;
 	
 	private TransportModeFilterFactory carLegAgentsFilterFactory;
+	private WithinDayInitialRoutesTripRouterFactory tripRouterFactory;
 	
 	private double duringLegReroutingShare = 0.10;
 	
@@ -135,37 +142,7 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		// register this as a Controller Listener
 		super.addControlerListener(this);
 	}
-	
-	@Override
-	protected void loadData() {
-		super.loadData();
 		
-//		/*
-//		 * Create dummy car routes, if routes are not already present. By doing so,
-//		 * PersonPrepareForSim does not pre-calculate routes which would be deleted
-//		 * anyway when the agents depart.
-//		 */
-//		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
-//		DummyRoutesCreator dummyRoutesCreator = new DummyRoutesCreator(routeFactory);		
-//		dummyRoutesCreator.run(this.getPopulation());
-	}
-	
-	@Override
-	protected void prepareForSim() {
-		
-		// TODO: adapt Code to create dummy routes in prepareForSim.
-		super.prepareForSim();
-		
-		/*
-		 * Create dummy car routes, if routes are not already present. By doing so,
-		 * PersonPrepareForSim does not pre-calculate routes which would be deleted
-		 * anyway when the agents depart.
-		 */
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
-		DummyRoutesCreator dummyRoutesCreator = new DummyRoutesCreator(routeFactory);		
-		dummyRoutesCreator.run(this.getPopulation());
-	}
-	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 				
@@ -193,6 +170,11 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		
 		/*
+		 * Disable dummy routes creation.
+		 */
+		this.tripRouterFactory.setReplaceDummyModes(false);
+		
+		/*
 		 * Disable Within-Day Replanning after first Iteration.
 		 */
 		if (event.getIteration() > 0) {
@@ -212,7 +194,18 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 * by the replanners.
 		 */
 		super.setUp();
-
+		
+		/*
+		 * Replace TripRouterFactory with WithinDayInitialRoutesTripRouterFactory which creates only
+		 * dummy routes for within-day replanned modes.
+		 */
+		PopulationFactory populationFactory = this.getPopulation().getFactory();
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
+		Set<String> dummyModes = CollectionUtils.stringToSet(TransportMode.car);
+		tripRouterFactory = new WithinDayInitialRoutesTripRouterFactory(this.getTripRouterFactory(), dummyModes,
+				populationFactory, routeFactory);
+		this.setTripRouterFactory(tripRouterFactory);
+		
 		// initialize Identifiers and Replanners
 		this.initIdentifiers();
 		this.initReplanners();
@@ -251,7 +244,6 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();	
 //		travelTimes.put(TransportMode.car, this.getTravelTimeCalculator());	// TravelTimeCalculator?!
 		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
-//		travelTimes.put(TransportMode.car, new FreeSpeedTravelTimeCalculatorFactory().createTravelTime());
 		
 		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory disutilityFactory = this.getTravelDisutilityFactory();
@@ -278,41 +270,72 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		}
 	}
 	
-	private static class DummyRoutesCreator extends AbstractPersonAlgorithm implements PlanAlgorithm {
+	private static class WithinDayInitialRoutesTripRouterFactory implements TripRouterFactory {
 
+		private final TripRouterFactory tripRouterFactory;
+		private final Set<String> dummyModes;
+		private final PopulationFactory populationFactory;
 		private final ModeRouteFactory routeFactory;
 		
-		public DummyRoutesCreator(ModeRouteFactory routeFactory) {
+		private boolean replaceDummyModes = true;
+		
+		public WithinDayInitialRoutesTripRouterFactory(TripRouterFactory tripRouterFactory, Set<String> dummyModes, 
+				PopulationFactory populationFactory, ModeRouteFactory routeFactory) {
+			this.tripRouterFactory = tripRouterFactory;
+			this.dummyModes = dummyModes;
+			this.populationFactory = populationFactory;
+			this.routeFactory = routeFactory;
+		}
+		
+		public void setReplaceDummyModes(boolean replace) {
+			this.replaceDummyModes = replace;
+		}
+		
+		@Override
+		public TripRouter createTripRouter() {
+			TripRouter tripRouter = tripRouterFactory.createTripRouter();
+
+			if (replaceDummyModes) {
+				// replace routing modules for dummy modes
+				for (String mode : dummyModes) {
+					RoutingModule routingModule = new WithinDayInitialRoutesRoutingModule(mode, populationFactory, routeFactory);
+					tripRouter.setRoutingModule(mode, routingModule);
+				}				
+			}
+			
+			return tripRouter;
+		}
+	}
+	
+	private static class WithinDayInitialRoutesRoutingModule implements RoutingModule {
+
+		private final String mode;
+		private final PopulationFactory populationFactory;
+		private final ModeRouteFactory routeFactory;
+		
+		public WithinDayInitialRoutesRoutingModule(String mode, PopulationFactory populationFactory, ModeRouteFactory routeFactory) {
+			this.mode = mode;
+			this.populationFactory = populationFactory;
 			this.routeFactory = routeFactory;
 		}
 		
 		@Override
-		public void run(Plan plan) {
-			for (int i = 0; i < plan.getPlanElements().size(); i++) {
-				PlanElement planElement = plan.getPlanElements().get(i);
-				if (planElement instanceof Leg) {
-					Leg leg = (Leg) planElement;
-					
-					// if it is a car leg
-					if (leg.getMode().equals(TransportMode.car)) {
-						
-						// if its route is not valid, create a dummy route
-//						if (leg.getRoute() == null) {
-							Id startLinkId = ((Activity) plan.getPlanElements().get(i - 1)).getLinkId();
-							Id endLinkId = ((Activity) plan.getPlanElements().get(i + 1)).getLinkId();
-							leg.setRoute(routeFactory.createRoute(TransportMode.car, startLinkId, endLinkId));
-//						}
-					} 
-				}
-			}
+		public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
+			
+			Leg newLeg = this.populationFactory.createLeg(mode);
+			newLeg.setDepartureTime(departureTime);
+			newLeg.setTravelTime(0.0);	// we do not know the travel time
+			
+			Route route = this.routeFactory.createRoute(mode, fromFacility.getLinkId(), toFacility.getLinkId());
+			newLeg.setRoute(route);
+
+			return Arrays.asList(newLeg);
 		}
 
 		@Override
-		public void run(Person person) {
-			for (Plan plan : person.getPlans()) {
-				this.run(plan);
-			}
+		public StageActivityTypes getStageActivityTypes() {
+			return EmptyStageActivityTypes.INSTANCE;
 		}
+		
 	}
-	
 }
