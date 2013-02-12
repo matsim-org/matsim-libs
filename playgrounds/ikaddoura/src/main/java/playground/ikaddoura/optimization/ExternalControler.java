@@ -109,7 +109,7 @@ class ExternalControler {
 		if (args.length == 0){
 			settingsFile = "/Users/Ihab/Desktop/testScenario_input/settingsFile.csv";
 			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-			outputPath = "/Users/Ihab/Desktop/testScenario_output";
+			outputPath = "/Users/Ihab/Desktop/testScenario_output_final";
 			
 		} else {
 			settingsFile = args[0];

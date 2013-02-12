@@ -37,11 +37,14 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -52,7 +55,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
  * @author Ihab
  *
  */
-public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
+public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 	private final static Logger log = Logger.getLogger(MarginalCostFareHandler.class);
 
 	private final EventsManager events;
@@ -63,7 +66,8 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 	private final ScenarioImpl scenario;
 	private final double vtts_inVehicle;
 	private final double vtts_waiting;
-	private final Map<Id, Id> vehicleId2currentStopId = new HashMap<Id, Id>();
+	private final Map<Id, Id> vehicleId2stopIdLastArrival = new HashMap<Id, Id>();
+	private final Map<Id, Id> vehicleId2stopIdLastDeparture = new HashMap<Id, Id>();
 	private final Map<Id, Id> vehicleId2lineId = new HashMap<Id, Id>();
 	private final Map<Id, Id> vehicleId2routeId = new HashMap<Id, Id>();
 
@@ -84,7 +88,7 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 		this.ptDriverIDs.clear();
 		this.ptVehicleIDs.clear();
 		this.stopId2waitingPassengers.clear();
-		this.vehicleId2currentStopId.clear();
+		this.vehicleId2stopIdLastArrival.clear();
 		this.vehicleId2routeId.clear();
 		this.vehicleId2lineId.clear();
 	}
@@ -100,6 +104,10 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 			this.ptVehicleIDs.add(event.getVehicleId());
 		}
 		
+		// reset the positions at the beginning of each cycle
+		this.vehicleId2stopIdLastArrival.remove(event.getVehicleId());
+		this.vehicleId2stopIdLastDeparture.remove(event.getVehicleId());
+		
 		this.vehicleId2routeId.put(event.getVehicleId(), event.getTransitRouteId());
 		this.vehicleId2lineId.put(event.getVehicleId(), event.getTransitLineId());
 		
@@ -112,8 +120,8 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 				
 		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){
 									
-			Id stopId = this.vehicleId2currentStopId.get(vehId);
-//			System.out.println("Bus " + vehId + " is currently at stop " + stopId);
+			Id stopId = this.vehicleId2stopIdLastArrival.get(vehId);
+//			System.out.println("**** ENTERING ***** Bus " + vehId + " is currently at stop " + stopId);
 
 			// update number of passengers waiting at stops before calculating fare
 			if (this.stopId2waitingPassengers.containsKey(stopId)){
@@ -141,11 +149,17 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		Id personId = event.getPersonId();
 		Id vehId = event.getVehicleId();
+		
+		if (ptDriverIDs.contains(personId)){
+			// a pt driver leaves the bus means the end of a transit route is reached and the vehicle is not in the system. Therefore resetting the vehicle position.
+			this.vehicleId2stopIdLastDeparture.remove(vehId);
+			this.vehicleId2stopIdLastArrival.remove(vehId);
+		}
 				
 		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){
 						
-			Id stopId = this.vehicleId2currentStopId.get(vehId);
-//			System.out.println("Bus " + vehId + " is currently at stop " + stopId);
+			Id stopId = this.vehicleId2stopIdLastArrival.get(vehId);
+//			System.out.println("**** LEAVING ***** Bus " + vehId + " is currently at stop " + stopId);
 			
 			// update number of passengers in vehicle before calculating fare
 			if (this.vehId2passengers.containsKey(vehId)){
@@ -205,9 +219,88 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 
 	private double calculateDelaysWaiting(Id vehId, Id stopId, double transferTime_sec) {
 		
-		// get all stops ahead and the current stopId
-		boolean stopIsAhead = false;
+		// get all possible relevant stopIds beginning with the current stopId
+		List<Id> relevantStopIDsFromHere = getRelevantStopIDsFromHere(vehId, stopId);
+
+		// get last relevant stopId
+		Id lastRelevantStopId = getLastRelevantStopId(vehId, relevantStopIDsFromHere);
+		
+		// get all relevant stopIds
+		List<Id> relevantStopIDs = getAllRelevantStopIDs(relevantStopIDsFromHere, lastRelevantStopId);
+		
+//		System.out.println("All transit stops between this bus and the next bus (including the current stop): " + relevantStopIDs);
+		
+		// sum up the number of waiting passengers at these stops
+		int numberOfPassengersWaitingInRelevantArea = 0;
+		for (Id id : relevantStopIDs){
+			if (this.stopId2waitingPassengers.containsKey(id)){
+//				System.out.println("StopID: " + id + " --> waiting agents: " + this.stopId2waitingPassengers.get(id));
+				numberOfPassengersWaitingInRelevantArea = numberOfPassengersWaitingInRelevantArea + this.stopId2waitingPassengers.get(id);
+			} else {
+				// no one waiting at this stop
+			}
+		}
+		
+//		System.out.println("Number of agents waiting at these stops: " + numberOfPassengersWaitingInRelevantArea);
+		
+		double delaysWaiting_sec = numberOfPassengersWaitingInRelevantArea * transferTime_sec;
+		return delaysWaiting_sec / 3600.;
+	}
+	
+
+	private List<Id> getAllRelevantStopIDs(List<Id> relevantStopIDsFromHere, Id lastRelevantStopId) {
 		List<Id> relevantStopIDs = new ArrayList<Id>();
+
+		boolean isRelevant = true;
+		for (Id id : relevantStopIDsFromHere){
+			if (isRelevant){
+				relevantStopIDs.add(id);
+			}
+			if (id.equals(lastRelevantStopId)){
+				isRelevant = false;
+			}
+		}
+		return relevantStopIDs;
+	}
+
+	private Id getLastRelevantStopId(Id vehId, List<Id> relevantStopIDsFromHere) {
+		
+		Id lastRelevantStopId = null;
+		int lowestIndex = Integer.MAX_VALUE;
+
+		// get last departure stop Id for each vehicle
+		for (Id vehicleId : this.vehicleId2stopIdLastDeparture.keySet()){
+			if (!vehicleId.equals(vehId)){
+				// not the vehicle that is currently delayed
+//				System.out.println("Checking if vehicle " + vehicleId + " is the next vehicle ahead...");
+				Id transitStopId = vehicleId2stopIdLastDeparture.get(vehicleId);
+				
+				for (Id id : relevantStopIDsFromHere){
+					if (id.equals(transitStopId)){
+//						System.out.println("This vehicle is at a stop along the route. (StopId: " + id + ") Proceeding...");
+						int stopIndex = relevantStopIDsFromHere.indexOf(id);
+//						System.out.println("StopId index in list: " + stopIndex);
+						if (stopIndex < lowestIndex){							
+							lowestIndex = stopIndex;
+							lastRelevantStopId = id;
+						}
+					} else {
+//						System.out.println("StopId " + id + " is behind the currently delayed bus and therefore not relevant.");
+					}
+				}
+			}
+		}
+		if (lastRelevantStopId == null){
+			// That means there is no bus between the currently delayed one and the end of the route, thus all stops are relevant.
+			lastRelevantStopId = relevantStopIDsFromHere.get(relevantStopIDsFromHere.size() - 1); // last stop
+		}
+//		System.out.println("Last Relevant StopID: " + lastRelevantStopId);
+		return lastRelevantStopId;
+	}
+
+	private List<Id> getRelevantStopIDsFromHere(Id vehId, Id stopId) {
+		boolean stopIsAhead = false;
+		List<Id> relevantStopIDsFromHere = new ArrayList<Id>();
 		TransitRoute transitRoute = this.scenario.getTransitSchedule().getTransitLines().get(this.vehicleId2lineId.get(vehId)).getRoutes().get(this.vehicleId2routeId.get(vehId));
 		for (TransitRouteStop stop : transitRoute.getStops()){
 			
@@ -216,28 +309,12 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 			}
 			
 			if (stopIsAhead){
-				relevantStopIDs.add(stop.getStopFacility().getId());
+				relevantStopIDsFromHere.add(stop.getStopFacility().getId());
 			}
 		}
-//		System.out.println("Relevant transit stops (this one plus all transit stops ahead): " + relevantStopIDs);
-		
-		// sum up the number of waiting passengers at these stops
-		int numberOfPassengersWaitingAhead = 0;
-		for (Id id : relevantStopIDs){
-			if (this.stopId2waitingPassengers.containsKey(id)){
-//				System.out.println("StopID: " + id + " --> waiting agents: " + this.stopId2waitingPassengers.get(id));
-				numberOfPassengersWaitingAhead = numberOfPassengersWaitingAhead + this.stopId2waitingPassengers.get(id);
-			} else {
-				// no one waiting at this stop
-			}
-		}
-		
-//		System.out.println("Agents waiting at this transit stop and all transit stops ahead: " + numberOfPassengersWaitingAhead);
-		
-		double delaysWaiting_sec = numberOfPassengersWaitingAhead * transferTime_sec;
-		return delaysWaiting_sec / 3600.;
+		return relevantStopIDsFromHere;
 	}
-	
+
 	@Override
 	public void handleEvent(AgentWaitingForPtEvent event) {
 		if (this.stopId2waitingPassengers.containsKey(event.getWaitingAtStopId())){
@@ -250,11 +327,21 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.vehicleId2currentStopId.put(event.getVehicleId(), event.getFacilityId());
+		this.vehicleId2stopIdLastArrival.put(event.getVehicleId(), event.getFacilityId());
 	
 		if (event.getDelay() > 1200.) {
 			log.warn("Bus is more than 1200 seconds behind the schedule. More than the number of agents waiting along this transit route will be affected by delays.");
-			log.warn("Can't garantee right marginal cost calculation, e.g. increase the pausenzeit...");
+			log.warn("Can't garantee right marginal cost calculation.");
+		}
+	}
+
+	@Override
+	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+		this.vehicleId2stopIdLastDeparture.put(event.getVehicleId(), event.getFacilityId());
+		
+		if (event.getDelay() > 1200.) {
+			log.warn("Bus is more than 1200 seconds behind the schedule. More than the number of agents waiting along this transit route will be affected by delays.");
+			log.warn("Can't garantee right marginal cost calculation.");
 		}
 	}
 
