@@ -59,31 +59,25 @@ public class JointQSimFactory implements MobsimFactory {
 	public Mobsim createMobsim(
 			final Scenario sc,
 			final EventsManager eventsManager) {
-        QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+        final QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
 
-		// never use multi-thread, as the current implementation makes strong
-		// assumptions of the order in which function calls are made
-		QNetsimEngineFactory netsimEngFactory;
-		netsimEngFactory = new DefaultQSimEngineFactory();
-
 		// default initialisation
-		QSim qSim = new QSim(sc, eventsManager );
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim.addMobsimEngine(teleportationEngine);
+		final QSim qSim = new QSim( sc , eventsManager );
 
-		// set specific engine
-		//JointTripsEngine jointEngine = new JointTripsEngine( qSim );
-		//qSim.addDepartureHandler( jointEngine );
-		//qSim.addMobsimEngine( jointEngine );
+		final ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine( activityEngine );
+		qSim.addActivityHandler( activityEngine );
+
+		final QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
+		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine( qSim );
+		qSim.addMobsimEngine( netsimEngine );
+		qSim.addDepartureHandler( new JointModesDepartureHandler( netsimEngine ) );
+
+		final TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim.addMobsimEngine( teleportationEngine );
 
 		// create agent factory
         AgentFactory agentFactory;
@@ -100,7 +94,7 @@ public class JointQSimFactory implements MobsimFactory {
             agentFactory = new DefaultAgentFactory(qSim);
         }
         
-        AgentSource agentSource =
+        final AgentSource agentSource =
 			new DriverAwarePopulationAgentSource(
 					sc.getPopulation(),
 					agentFactory,
