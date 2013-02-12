@@ -28,12 +28,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -74,7 +70,7 @@ public class JointQSimFactory implements MobsimFactory {
 		netsimEngFactory = new DefaultQSimEngineFactory();
 
 		// default initialisation
-		QSim qSim = new QSim(sc, new DriverArtifactsSwallower( eventsManager ));
+		QSim qSim = new QSim(sc, eventsManager );
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
@@ -85,9 +81,9 @@ public class JointQSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(teleportationEngine);
 
 		// set specific engine
-		JointTripsEngine jointEngine = new JointTripsEngine( qSim );
-		qSim.addDepartureHandler( jointEngine );
-		qSim.addMobsimEngine( jointEngine );
+		//JointTripsEngine jointEngine = new JointTripsEngine( qSim );
+		//qSim.addDepartureHandler( jointEngine );
+		//qSim.addMobsimEngine( jointEngine );
 
 		// create agent factory
         AgentFactory agentFactory;
@@ -107,7 +103,7 @@ public class JointQSimFactory implements MobsimFactory {
         AgentSource agentSource =
 			new DriverAwarePopulationAgentSource(
 					sc.getPopulation(),
-					new JointTravelerAgentFactory( agentFactory ),
+					agentFactory,
 					qSim);
         qSim.addAgentSource(agentSource);
         return qSim;
@@ -170,79 +166,6 @@ public class JointQSimFactory implements MobsimFactory {
 				// to the pick ups
 				if ( mainModes.contains( mode ) ) return;
 			}
-		}
-	}
-
-	private static class DriverArtifactsSwallower implements EventsManager {
-		private final EventsManager delegate;
-
-		public DriverArtifactsSwallower(final EventsManager m) {
-			delegate = m;
-		}
-
-		@Override
-		public EventsFactory getFactory() {
-			return delegate.getFactory();
-		}
-
-		@Override
-		public void processEvent(final Event event) {
-			if (event instanceof AgentDepartureEvent &&
-					((AgentDepartureEvent) event).getLegMode().equals( JointTripsEngine.DRIVER_SIM_MODE )) {
-				// gloup! Swallow the event, as otherwise the events stream is inconsistent.
-				return;
-			}
-			delegate.processEvent(event);
-		}
-
-		@Override
-		public void addHandler(final EventHandler handler) {
-			delegate.addHandler(handler);
-		}
-
-		@Override
-		public void removeHandler(final EventHandler handler) {
-			delegate.removeHandler(handler);
-		}
-
-		@Override
-		public void resetCounter() {
-			delegate.resetCounter();
-		}
-
-		@Override
-		public void resetHandlers(int iteration) {
-			delegate.resetHandlers(iteration);
-		}
-
-		@Override
-		public void clearHandlers() {
-			delegate.clearHandlers();
-		}
-
-		@Override
-		public void printEventsCount() {
-			delegate.printEventsCount();
-		}
-
-		@Override
-		public void printEventHandlers() {
-			delegate.printEventHandlers();
-		}
-
-		@Override
-		public void initProcessing() {
-			delegate.initProcessing();
-		}
-
-		@Override
-		public void afterSimStep(double time) {
-			delegate.afterSimStep(time);
-		}
-
-		@Override
-		public void finishProcessing() {
-			delegate.finishProcessing();
 		}
 	}
 }
