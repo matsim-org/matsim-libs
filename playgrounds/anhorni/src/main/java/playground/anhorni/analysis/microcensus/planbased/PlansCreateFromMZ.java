@@ -377,9 +377,9 @@ public class PlansCreateFromMZ {
 					fromPLZ = Integer.parseInt(entries[17].trim());
 				}
 
-				Coord to = new CoordImpl(entries[19].trim(), entries[20].trim());
-				entries[19] = Double.toString(to.getX());
-				entries[20] = Double.toString(to.getY());
+				Coord to = new CoordImpl(entries[21].trim(), entries[22].trim());
+				entries[21] = Double.toString(to.getX());
+				entries[22] = Double.toString(to.getY());
 				int toPLZ = -99;
 				if (!entries[24].trim().isEmpty()) {
 					toPLZ = Integer.parseInt(entries[24].trim());

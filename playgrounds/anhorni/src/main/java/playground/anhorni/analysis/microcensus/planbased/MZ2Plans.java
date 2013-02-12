@@ -40,7 +40,7 @@ public class MZ2Plans {
 		new PlansCreateFromMZ(1, 5).run(population, indir);
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(population, NetworkImpl.createNetwork()).write(outdir + "plansMOSO.xml.gz");
+		new PopulationWriter(population, NetworkImpl.createNetwork()).write(outdir + "plansMOFR.xml.gz");
 
 		
 //		log.info("-------------------------------------------------------------");
