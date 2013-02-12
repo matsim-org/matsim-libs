@@ -160,7 +160,7 @@ public class ModFileWriter {
 			
 			out.write(intermediateBlock);
 			for (int j = 0; j < numberOfAlternatives; j++) {
-				String line = j + "\t" + "B_Price_Income * ( 1 + B_hhIncome *  hhIncome / hhSize ) * SH" + j + "_Price ";				
+				String line = j + "\t" + "B_Price_Income * ( 1 + B_hhIncome * ( hhIncome / hhSize )) * SH" + j + "_Price ";				
 				out.write(line);
 				out.newLine();
 				out.flush();
