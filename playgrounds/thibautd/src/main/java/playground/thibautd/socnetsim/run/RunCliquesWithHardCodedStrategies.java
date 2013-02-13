@@ -98,7 +98,7 @@ public class RunCliquesWithHardCodedStrategies {
 
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig( configFile );
-		final Scenario scenario = JointScenarioUtils.createScenario( config );
+		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -123,8 +123,7 @@ public class RunCliquesWithHardCodedStrategies {
 		final ControllerRegistry controllerRegistry =
 			new ControllerRegistry(
 					scenario,
-					// TODO: import
-					new JointPlans(),
+					scenario.getScenarioElement( JointPlans.class ),
 					new CharyparNagelScoringFunctionFactory(
 						config.planCalcScore(),
 						scenario.getNetwork()) );

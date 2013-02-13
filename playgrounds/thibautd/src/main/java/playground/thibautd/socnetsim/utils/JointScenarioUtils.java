@@ -35,6 +35,9 @@ import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup
 import playground.thibautd.socnetsim.cliques.config.JointTripsMutatorConfigGroup;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.population.JointPlansConfigGroup;
+import playground.thibautd.socnetsim.population.JointPlansXmlReader;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
@@ -88,6 +91,18 @@ public class JointScenarioUtils {
 		final Scenario scenario = createScenario( config );
 		ScenarioUtils.loadScenario( scenario );
 
+		final JointPlansConfigGroup jpConfig = (JointPlansConfigGroup)
+			config.getModule( JointPlansConfigGroup.GROUP_NAME );
+		if ( jpConfig.getFileName() != null) {
+			final JointPlans jps = JointPlansXmlReader.readJointPlans(
+					scenario.getPopulation(),
+					jpConfig.getFileName() );
+			scenario.addScenarioElement( jps );
+		}
+		else {
+			scenario.addScenarioElement( new JointPlans() );
+		}
+
 		return scenario;
 	}
 
@@ -119,6 +134,9 @@ public class JointScenarioUtils {
 		config.addModule(
 				JointTripInsertorConfigGroup.GROUP_NAME,
 				new JointTripInsertorConfigGroup());
+		config.addModule(
+				JointPlansConfigGroup.GROUP_NAME,
+				new JointPlansConfigGroup());
 
 		//read the config file
 		if (configFile != null) ConfigUtils.loadConfig(config, configFile);
