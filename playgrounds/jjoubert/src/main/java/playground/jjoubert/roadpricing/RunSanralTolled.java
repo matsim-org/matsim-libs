@@ -43,7 +43,7 @@ public class RunSanralTolled {
 		log.info("------------------------------------------------------");
 		log.info(" " + configFilename);
 				
-		Controler c = new SanralControler(configFilename);
+		SanralControler c = new SanralControler(configFilename);
 		c.run();
 	}
 

@@ -100,7 +100,7 @@ public abstract class AbstractController {
 	}
 
 	protected final void setupOutputDirectory(final String outputDirectory, String runId, final boolean overwriteFiles) {
-		this.setControlerIO(new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles)); // output dir needs to be before logging
+		this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be before logging
 		OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
 	}
 
@@ -225,16 +225,6 @@ public abstract class AbstractController {
 	}
 
 
-	private final void setControlerIO(OutputDirectoryHierarchy controlerIO) {
-		// yy this is a leftover from a refactoring that could be removed completely
-		
-		this.controlerIO = controlerIO;
-	}
-
-
-	/**
-	 * yyyy Christoph Dobler overrides this method at some point. --???  
-	 */
 	public final OutputDirectoryHierarchy getControlerIO() {
 		return controlerIO;
 	}

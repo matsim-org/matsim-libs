@@ -386,7 +386,7 @@ public class Controler extends AbstractController {
 	 * overwriting this method!
 	 */
 	@Override
-	protected void loadCoreListeners() {
+	protected final void loadCoreListeners() {
 		// yyyy cannot make this final since it is overridden about 4 times. kai, jan'13
 
 		/*
@@ -649,7 +649,7 @@ public class Controler extends AbstractController {
 	
 	@Override
 	protected final void runMobSim(int iteration) {
-		this.thisIteration = iteration; // yyyy this should not be necessary any more. kai, feb'13
+		this.thisIteration = iteration; // yyyy this line should not be necessary any more. kai, feb'13
 		runMobSim();
 	}
 

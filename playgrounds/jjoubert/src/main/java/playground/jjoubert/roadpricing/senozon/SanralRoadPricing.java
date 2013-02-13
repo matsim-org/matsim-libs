@@ -109,7 +109,10 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		// evaluate the final tolls paid by the agents and add them to their scores
-		this.tollCalc.sendUtilityEvents(Time.MIDNIGHT, event.getControler().getEvents());
+		this.tollCalc.sendUtilityEvents(
+				Time.MIDNIGHT, 
+				event.getControler().getEvents()
+				);
 	}
 
 	@Override

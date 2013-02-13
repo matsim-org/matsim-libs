@@ -22,21 +22,44 @@ package playground.jjoubert.roadpricing.senozon;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 
+/**
+ * I wanted to make loadCoreListeners final and thus retrofitted this class so that the one test which covers it
+ * still works.  A starting point for a better design is, in my view, in GautengControler.  kai, feb'13
+ *
+ */
 public class SanralControler extends Controler {
 
 	public SanralControler(String configFileName) {
 		super(configFileName);
+		this.addCoreControlerListener(new SanralRoadPricing());
+		// adding it as core listener will _always_ call it before the regular listeners
 	}
 
 	public SanralControler(Config config) {
 		super(config);
+		this.addCoreControlerListener(new SanralRoadPricing());
+		// adding it as core listener will _always_ call it before the regular listeners
 	}
 
-	@Override
-	protected void loadCoreListeners() {
-		super.loadCoreListeners();
-		// add custom road pricing listener after all others, so it will be loaded first!
-		this.addControlerListener(new SanralRoadPricing());
-	}
 
+	// the following is what was there:
+	
+//	@Override
+//	protected void loadCoreListeners() {
+//		super.loadCoreListeners();
+//		// add custom road pricing listener after all others, so it will be loaded first!
+//		this.addControlerListener(new SanralRoadPricing());
+//	}
+	
+	// for information: the calling sequence in AbstractController is as follows
+
+//	protected final void run(Config config) {
+//		loadCoreListeners(); // --> calls loadControlerListeners() 
+//		this.controlerListenerManager.fireControlerStartupEvent();
+//		checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
+//		prepareForSim();
+//		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
+//		shutdown(false);
+//	}
+	
 }
