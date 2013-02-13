@@ -36,7 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.socnetsim.run.RunCliquesWithHardCodedStrategies;
-import playground.thibautd.socnetsim.run.RunCliquesWithHardCodedStrategies.Weights;
+import playground.thibautd.socnetsim.run.RunCliquesWithHardCodedStrategies.WeightsConfigGroup;
 
 /**
  * Tests that the results are deterministic, by running several runs in numerous settings.
@@ -50,7 +50,7 @@ public class IntegrationTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final class SimulationParameters {
-		public Weights weights = new Weights();
+		public WeightsConfigGroup weights = new WeightsConfigGroup();
 		public int nIterations = 10;
 		public int nThreads = 4;
 		public int agentsMemorySize = 3;
@@ -79,14 +79,14 @@ public class IntegrationTest {
 	@Test
 	public void testDeterminismNoJointTrips() throws Exception {
 		SimulationParameters params = new SimulationParameters();
-		params.weights.jointTripMutation = 0;
+		params.weights.setJointTripMutationWeight( 0 );
 		testDeterminism( params );
 	}
 
 	@Test
 	public void testDeterminismNoLogit() throws Exception {
 		SimulationParameters params = new SimulationParameters();
-		params.weights.logitSelection = 0;
+		params.weights.setLogitSelectionWeight( 0 );
 		testDeterminism( params );
 	}
 
@@ -102,7 +102,7 @@ public class IntegrationTest {
 	public void testDeterminismJointTrips() throws Exception {
 		SimulationParameters params = new SimulationParameters();
 		params.weights.setAllToZero();
-		params.weights.jointTripMutation = 1;
+		params.weights.setJointTripMutationWeight( 1 );
 		testDeterminism( params );
 	}
 
@@ -110,8 +110,8 @@ public class IntegrationTest {
 	public void testDeterminismNonOptJointTrips() throws Exception {
 		SimulationParameters params = new SimulationParameters();
 		params.weights.setAllToZero();
-		params.weights.jointTripMutation = 1;
-		params.weights.jtmOptimizes = false;
+		params.weights.setJointTripMutationWeight( 1 );
+		params.weights.setJtmOptimizes( false );
 		testDeterminism( params );
 	}
 
@@ -120,7 +120,7 @@ public class IntegrationTest {
 		SimulationParameters params = new SimulationParameters();
 		params.agentsMemorySize = 0;
 		params.weights.setAllToZero();
-		params.weights.timeMutator = 1;
+		params.weights.setTimeMutationWeight( 1 );
 		testDeterminism( params );
 	}
 
@@ -129,7 +129,7 @@ public class IntegrationTest {
 		SimulationParameters params = new SimulationParameters();
 		params.agentsMemorySize = 0;
 		params.weights.setAllToZero();
-		params.weights.modeMutation = 1;
+		params.weights.setModeMutationWeight( 1 );
 		testDeterminism( params );
 	}
 
@@ -138,7 +138,7 @@ public class IntegrationTest {
 		SimulationParameters params = new SimulationParameters();
 		params.agentsMemorySize = 0;
 		params.weights.setAllToZero();
-		params.weights.reRoute = 1;
+		params.weights.setReRouteWeight( 1 );
 		testDeterminism( params );
 	}
 
@@ -146,7 +146,7 @@ public class IntegrationTest {
 	public void testDeterminismReRouteRemoval() throws Exception {
 		SimulationParameters params = new SimulationParameters();
 		params.weights.setAllToZero();
-		params.weights.reRoute = 1;
+		params.weights.setReRouteWeight( 1 );
 		testDeterminism( params );
 	}
 
@@ -154,8 +154,8 @@ public class IntegrationTest {
 	public void testDeterminismReRouteLogit() throws Exception {
 		SimulationParameters params = new SimulationParameters();
 		params.weights.setAllToZero();
-		params.weights.reRoute = 1;
-		params.weights.logitSelection = 1;
+		params.weights.setReRouteWeight( 1 );
+		params.weights.setLogitSelectionWeight( 1 );
 		testDeterminism( params );
 	}
 
@@ -187,7 +187,13 @@ public class IntegrationTest {
 			sc.getConfig().controler().setLastIteration( params.nIterations );
 			sc.getConfig().global().setNumberOfThreads( params.nThreads );
 
-			RunCliquesWithHardCodedStrategies.runScenario( sc , params.weights );
+			// this is dirty, but we want to replace it with the test-specific one.
+			// if the map becomes immutable, find another, cleaner, way to do so. td feb 13
+			sc.getConfig().getModules().put( WeightsConfigGroup.GROUP_NAME , params.weights );
+			assert sc.getConfig().getModule( WeightsConfigGroup.GROUP_NAME ) == params.weights;
+
+			// run without producing analysis output (much faster)
+			RunCliquesWithHardCodedStrategies.runScenario( sc , false );
 
 			final byte[] newSha1 = calcSha1( utils.getOutputDirectory()+"/output_plans.xml.gz" );
 			if ( sha1 != null ) {

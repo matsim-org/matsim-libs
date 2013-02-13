@@ -130,7 +130,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		for (Person person : group.getPersons()) {
 			for (Plan plan : person.getPlans()) {
-				weights.put( plan , getWeight( plan ) );
+				final double w = getWeight( plan );
+				if ( Double.isNaN( w ) ) throw new IllegalArgumentException( "NaN weights are not allowed" );
+				weights.put( plan , w );
 			}
 		}
 
@@ -451,7 +453,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			if (newString == null) continue;
 
 			assert newString.getWeight() <= r.cachedMaximumWeight :
-				"weight higher than estimated max: "+newString.getWeight()+" > "+r.cachedMaximumWeight;
+				getClass()+" weight higher than estimated max: "+newString.getWeight()+" > "+r.cachedMaximumWeight;
 
 			if (constructedString == null ||
 					newString.getWeight() > constructedString.getWeight()) {

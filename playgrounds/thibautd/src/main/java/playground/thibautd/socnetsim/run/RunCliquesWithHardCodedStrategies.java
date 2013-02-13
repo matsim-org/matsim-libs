@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -36,7 +35,6 @@ import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
@@ -61,6 +59,7 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFi
 import playground.thibautd.socnetsim.replanning.selectors.AbstractHighestWeightSelector;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+import playground.thibautd.utils.ReflectiveModule;
 
 /**
  * @author thibautd
@@ -69,13 +68,88 @@ public class RunCliquesWithHardCodedStrategies {
 	private static final boolean DO_STRATEGY_TRACE = false;
 	private static final boolean DO_SELECT_TRACE = false;
 
-	public static class Weights {
-		public double reRoute = 0.1;
-		public double timeMutator = 0.1;
-		public double jointTripMutation = 0.1;
-		public double modeMutation = 0.1;
-		public double logitSelection = 0.6;
-		public boolean jtmOptimizes = false;
+	public static class WeightsConfigGroup extends ReflectiveModule {
+		public final static String GROUP_NAME = "groupReplanningWeights";
+		private double reRoute = 0.1;
+		private double timeMutator = 0.1;
+		private double jointTripMutation = 0.1;
+		private double modeMutation = 0.1;
+		private double logitSelection = 0.6;
+		private boolean jtmOptimizes = false;
+
+		public WeightsConfigGroup() {
+			super( GROUP_NAME );
+		}
+
+		@StringGetter( "reRoute" )
+		public double getReRouteWeight() {
+			return reRoute;
+		}
+
+		@StringSetter( "reRoute" )
+		public void setReRouteWeight(final String s) {
+			this.reRoute = Double.parseDouble( s );
+		}
+
+		public void setReRouteWeight(final double v) {
+			this.reRoute = v;
+		}
+
+		@StringGetter( "timeMutator" )
+		public double getTimeMutationWeight() {
+			return timeMutator;
+		}
+
+		@StringSetter( "timeMutator" )
+		public void setTimeMutationWeight(final String s) {
+			this.timeMutator = Double.parseDouble( s );
+		}
+
+		public void setTimeMutationWeight(final double v) {
+			this.timeMutator = v;
+		}
+
+		@StringGetter( "jointTripMutation" )
+		public double getJointTripMutationWeight() {
+			return jointTripMutation;
+		}
+
+		@StringSetter( "jointTripMutation" )
+		public void setJointTripMutationWeight(final String s) {
+			this.jointTripMutation = Double.parseDouble( s );
+		}
+
+		public void setJointTripMutationWeight(final double v) {
+			this.jointTripMutation = v;
+		}
+
+		@StringGetter( "modeMutation" )
+		public double getModeMutationWeight() {
+			return modeMutation;
+		}
+
+		@StringSetter( "modeMutation" )
+		public void setModeMutationWeight(final String s) {
+			this.modeMutation = Double.parseDouble( s );
+		}
+
+		public void setModeMutationWeight(final double v) {
+			this.modeMutation = v;
+		}
+
+		@StringGetter( "logitSelection" )
+		public double getLogitSelectionWeight() {
+			return logitSelection;
+		}
+
+		@StringSetter( "logitSelection" )
+		public void setLogitSelectionWeight(final String s) {
+			this.logitSelection = Double.parseDouble( s );
+		}
+
+		public void setLogitSelectionWeight(final double v) {
+			this.logitSelection = v;
+		}
 
 		public void setAllToZero() {
 			reRoute = 0;
@@ -85,20 +159,24 @@ public class RunCliquesWithHardCodedStrategies {
 			logitSelection = 0;
 		}
 
-		@Override
-		public String toString() {
-			return "{Weights: reRoute="+reRoute+
-				", timeMutator="+timeMutator+
-				", jointTripMutation="+jointTripMutation+
-				(jtmOptimizes ? "with" : "without")+" optimization"+
-				", modeMutation="+modeMutation+
-				", logitSelection="+logitSelection+
-				"}";
+		@StringGetter( "jtmOptimizes" )
+		public boolean getJtmOptimizes() {
+			return jtmOptimizes;
+		}
+
+		@StringSetter( "jtmOptimizes" )
+		public void setJtmOptimizes(final String s) {
+			this.jtmOptimizes = Boolean.parseBoolean( s );
+		}
+
+		public void setJtmOptimizes(final boolean v) {
+			this.jtmOptimizes = v;
 		}
 	}
 
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.loadConfig( configFile );
+		config.addModule( WeightsConfigGroup.GROUP_NAME , new WeightsConfigGroup() );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -115,10 +193,10 @@ public class RunCliquesWithHardCodedStrategies {
 		return scenario;
 	}
 
-	public static void runScenario(
-			final Scenario scenario,
-			final Weights weights) {
+	public static void runScenario( final Scenario scenario, final boolean produceAnalysis ) {
 		final Config config = scenario.getConfig();
+		final WeightsConfigGroup weights = (WeightsConfigGroup)
+			config.getModule( WeightsConfigGroup.GROUP_NAME );
 		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
 					config.getModule( CliquesConfigGroup.GROUP_NAME );
 		final ControllerRegistry controllerRegistry =
@@ -183,66 +261,64 @@ public class RunCliquesWithHardCodedStrategies {
 						controllerRegistry.getJointPlans(),
 						strategyManager));
 
-		controller.addControlerListener(
-				new LegHistogramListenerWithoutControler(
-					controllerRegistry.getEvents(),
-					controller.getControlerIO() ));
+		if (produceAnalysis) {
+			controller.addControlerListener(
+					new LegHistogramListenerWithoutControler(
+						controllerRegistry.getEvents(),
+						controller.getControlerIO() ));
 
-		CliquesSizeGroupIdentifier groupIdentifier =
-			new CliquesSizeGroupIdentifier(
-					cliques.getGroupInfo() );
+			CliquesSizeGroupIdentifier groupIdentifier =
+				new CliquesSizeGroupIdentifier(
+						cliques.getGroupInfo() );
 
-		controller.addControlerListener(
-				new FilteredScoreStats(
-					controller.getControlerIO(),
-					controllerRegistry.getScenario(),
-					groupIdentifier));
+			controller.addControlerListener(
+					new FilteredScoreStats(
+						controller.getControlerIO(),
+						controllerRegistry.getScenario(),
+						groupIdentifier));
 
-		controller.addControlerListener(
-				new JointPlanSizeStats(
-					controller.getControlerIO(),
-					controllerRegistry.getScenario(),
-					groupIdentifier));
+			controller.addControlerListener(
+					new JointPlanSizeStats(
+						controller.getControlerIO(),
+						controllerRegistry.getScenario(),
+						groupIdentifier));
 
-		controller.addControlerListener(
-				new JointTripsStats(
-					controller.getControlerIO(),
-					controllerRegistry.getScenario(),
-					groupIdentifier));
+			controller.addControlerListener(
+					new JointTripsStats(
+						controller.getControlerIO(),
+						controllerRegistry.getScenario(),
+						groupIdentifier));
 
-		final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
-		actTypesForAnalysis.addActivityTypes(
-				controllerRegistry.getTripRouterFactory().createTripRouter().getStageActivityTypes() );
-		actTypesForAnalysis.addActivityTypes(
-				new StageActivityTypesImpl(
-					Arrays.asList(
-						JointActingTypes.PICK_UP,
-						JointActingTypes.DROP_OFF ) ) );
-		controller.addControlerListener(
-				new TripModeShares(
-					controller.getControlerIO(),
-					controllerRegistry.getScenario(),
-					new MainModeIdentifier() {
-						private final MainModeIdentifier d = new MainModeIdentifierImpl();
+			final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
+			actTypesForAnalysis.addActivityTypes(
+					controllerRegistry.getTripRouterFactory().createTripRouter().getStageActivityTypes() );
+			actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
+			controller.addControlerListener(
+					new TripModeShares(
+						controller.getControlerIO(),
+						controllerRegistry.getScenario(),
+						new MainModeIdentifier() {
+							private final MainModeIdentifier d = new MainModeIdentifierImpl();
 
-						@Override
-						public String identifyMainMode(
-								final List<PlanElement> tripElements) {
-							for (PlanElement pe : tripElements) {
-								if ( !(pe instanceof Leg) ) continue;
-								final String mode = ((Leg) pe).getMode();
+							@Override
+							public String identifyMainMode(
+									final List<PlanElement> tripElements) {
+								for (PlanElement pe : tripElements) {
+									if ( !(pe instanceof Leg) ) continue;
+									final String mode = ((Leg) pe).getMode();
 
-								if (mode.equals( JointActingTypes.DRIVER ) ||
-										mode.equals( JointActingTypes.PASSENGER ) ) {
-									return mode;
+									if (mode.equals( JointActingTypes.DRIVER ) ||
+											mode.equals( JointActingTypes.PASSENGER ) ) {
+										return mode;
+									}
 								}
+								return d.identifyMainMode( tripElements );
 							}
-							return d.identifyMainMode( tripElements );
-						}
-					},
-					actTypesForAnalysis));
+						},
+						actTypesForAnalysis));
 
-		controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
+			controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
+		}
 
 		// run it
 		controller.run();
@@ -255,7 +331,7 @@ public class RunCliquesWithHardCodedStrategies {
 
 		// load "registry"
 		final Scenario scenario = createScenario( configFile );
-		runScenario( scenario , new Weights() );
+		runScenario( scenario , true );
 	}
 }
 
