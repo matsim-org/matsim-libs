@@ -38,7 +38,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
-import playground.christoph.analysis.TripDurationCalculator;
+import playground.christoph.analysis.TripsAnalyzer;
 import playground.christoph.controler.WithinDayInitialRoutesController;
 
 public class InitialRoutesController {
@@ -124,8 +124,10 @@ public class InitialRoutesController {
 				/*
 				 * Create average travel time statistics.
 				 */
-				String fileName = "tripDurations";
-				String outputFileName = event.getControler().getControlerIO().getOutputFilename(fileName);
+				String tripsFileName = "tripCounts";
+				String durationsFileName = "tripDurations";
+				String outputTripsFileName = event.getControler().getControlerIO().getOutputFilename(tripsFileName);
+				String outputDurationsFileName = event.getControler().getControlerIO().getOutputFilename(durationsFileName);
 				Set<String> modes = new HashSet<String>();
 				modes.add(TransportMode.bike);
 				modes.add(TransportMode.car);
@@ -134,12 +136,12 @@ public class InitialRoutesController {
 				modes.add(TransportMode.walk);
 				
 				// create TripDurationCalculator and register it as ControlerListener and EventsHandler
-				TripDurationCalculator tripDurationCalculator = new TripDurationCalculator(outputFileName, modes, true);
-				event.getControler().addControlerListener(tripDurationCalculator);
-				event.getControler().getEvents().addHandler(tripDurationCalculator);
+				TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(outputTripsFileName, outputDurationsFileName, modes, true);
+				event.getControler().addControlerListener(tripsAnalyzer);
+				event.getControler().getEvents().addHandler(tripsAnalyzer);
 				
 				// TripDurationCalculator is a StartupEventListener, therefore pass event over to it.
-				tripDurationCalculator.notifyStartup(event);
+				tripsAnalyzer.notifyStartup(event);
 			}
 		});
 		
