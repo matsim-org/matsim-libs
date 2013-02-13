@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.qsim;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Random;
 
