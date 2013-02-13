@@ -125,10 +125,11 @@ public abstract class OutputDirectoryLogging {
 
 	private static void initLogging(String outputFilename, String warnLogfileName) throws IOException {
 		Logger root = Logger.getRootLogger();
-		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputFilename);
+		final boolean appendToExistingFile = false; 
+		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputFilename, appendToExistingFile);
 		appender.setName(LOGFILE);
 		root.addAppender(appender);
-		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, warnLogfileName);
+		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, warnLogfileName, appendToExistingFile);
 		warnErrorAppender.setName(WARNLOGFILE);
 		warnErrorAppender.setThreshold(Level.WARN);
 		root.addAppender(warnErrorAppender);
