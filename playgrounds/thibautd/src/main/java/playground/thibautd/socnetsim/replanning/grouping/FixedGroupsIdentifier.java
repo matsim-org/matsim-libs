@@ -29,6 +29,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
 
 /**
  * @author thibautd
@@ -41,6 +43,28 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 
 	public FixedGroupsIdentifier(final Collection<? extends Collection<Id>> groups) {
 		this.groupsInfo = groups;
+	}
+
+	/**
+	 * for convenience: takes the grouping information in the household
+	 * container.
+	 * <br>
+	 * After initialization, any change in the household container will
+	 * <b><u>NOT</u></b> be reflected here!!!
+	 */
+	public FixedGroupsIdentifier(final Households households) {
+		this( extractGroups( households ) );
+	}
+
+	private static Collection<? extends Collection<Id>> extractGroups(
+			final Households households) {
+		final List<List<Id>> groups = new ArrayList<List<Id>>();
+
+		for ( Household hh : households.getHouseholds().values() ) {
+			groups.add( new ArrayList<Id>( hh.getMemberIds() ) );
+		}
+
+		return groups;
 	}
 
 	public Collection<? extends Collection<Id>> getGroupInfo() {
