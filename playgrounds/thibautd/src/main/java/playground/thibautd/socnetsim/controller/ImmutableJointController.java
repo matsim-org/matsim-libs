@@ -162,11 +162,6 @@ public final class ImmutableJointController extends AbstractController {
 		return registry;
 	}
 
-//	public OutputDirectoryHierarchy getControlerIO() {
-//		return super.controlerIO;
-//	}
-	// I don't think you need this (?).  kai, apr'13
-
 	private static class PreparePersonAlgorithm extends AbstractPersonAlgorithm {
 		private final AbstractPersonAlgorithm prepareForSim;
 		private final AbstractPersonAlgorithm checkJointRoutes;
