@@ -44,6 +44,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
 import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
 
 /**
  * @author thibautd
@@ -105,7 +106,7 @@ public class JointQSimFactory implements MobsimFactory {
 						agentFactory,
 						netsimEngine);
         final AgentSource agentSource =
-			new PopulationAgentSource(
+			new PopulationAgentSourceWithVehicles(
 					sc.getPopulation(),
 					passAgentFactory,
 					qSim);

@@ -74,6 +74,7 @@ public class JointTravelingSimulationTest {
 	private static final Id travelLink1 = new IdImpl( 1 );
 	private static final Id travelLink2 = new IdImpl( 2 );
 	private static final Id doLink = new IdImpl( "do" );
+	private static final Id toDestinationLink = new IdImpl( "to_destination" );
 	private static final Id destinationLink = new IdImpl( "destination" );
 	
 	@Test
@@ -254,7 +255,7 @@ public class JointTravelingSimulationTest {
 		}
 
 		l = factory.createLeg( TransportMode.car );
-		l.setRoute( new LinkNetworkRouteImpl( doLink , Collections.<Id>emptyList() , destinationLink ) );
+		l.setRoute( new LinkNetworkRouteImpl( doLink , Arrays.asList( toDestinationLink ) , destinationLink ) );
 		driverPlan.addLeg( l );
 
 		act = factory.createActivityFromLinkId( "h" , destinationLink );
@@ -331,7 +332,7 @@ public class JointTravelingSimulationTest {
 		network.addNode( node2 );
 		network.addLink( network.getFactory().createLink( originLink , node1 , node2 ) );
 
-		for (Id linkId : new Id[]{ toPuLink , puLink , travelLink1 , travelLink2 , doLink , destinationLink }) {
+		for (Id linkId : new Id[]{ toPuLink , puLink , travelLink1 , travelLink2 , doLink , toDestinationLink , destinationLink }) {
 			node1 = node2;
 			node2 = network.getFactory().createNode( new IdImpl( c++ ) , new CoordImpl( 0 , d++ ) );
 			network.addNode( node2 );
