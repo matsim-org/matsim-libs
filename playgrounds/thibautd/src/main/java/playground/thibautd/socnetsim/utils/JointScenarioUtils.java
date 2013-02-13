@@ -50,23 +50,12 @@ public class JointScenarioUtils {
 	 * @param configFile the path to the configFile
 	 * @return a ready to use scenario
 	 */
-	public static Scenario createScenario(final String configFile) {
-		return createScenario(createConfig(configFile));
+	public static Scenario loadScenario(final String configFile) {
+		return loadScenario(createConfig(configFile));
 	}
 
-	/**
-	 * @param config a loaded config
-	 * @return a ready to use scenario
-	 */
 	public static Scenario createScenario(final Config config) {
-		Scenario scenario = ScenarioUtils.createScenario( config );
-		tuneScenario( scenario );
-		ScenarioUtils.loadScenario( scenario );
-
-		return scenario;
-	}
-
-	public static void tuneScenario(final Scenario sc) {
+		final Scenario sc = ScenarioUtils.createScenario( config );
 		ModeRouteFactory rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
 		rFactory.setRouteFactory(
 				JointActingTypes.DRIVER,
@@ -88,7 +77,21 @@ public class JointScenarioUtils {
 						return new PassengerRoute( s , e );
 					}
 				});
+		return sc;
 	}
+
+	/**
+	 * @param config a loaded config
+	 * @return a ready to use scenario
+	 */
+	public static Scenario loadScenario(final Config config) {
+		final Scenario scenario = createScenario( config );
+		ScenarioUtils.loadScenario( scenario );
+
+		return scenario;
+	}
+
+
 
 	/**
 	 * @param configFile the path to the config file

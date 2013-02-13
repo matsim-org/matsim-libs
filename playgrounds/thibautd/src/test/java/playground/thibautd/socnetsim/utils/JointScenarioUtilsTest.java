@@ -58,7 +58,7 @@ public class JointScenarioUtilsTest {
 		new PopulationWriter( dumpedPopulation , null ).write( popFile );
 		final Config config = JointScenarioUtils.createConfig( null );
 		config.plans().setInputFile( popFile );
-		final Scenario loadedScenario = JointScenarioUtils.createScenario( config );
+		final Scenario loadedScenario = JointScenarioUtils.loadScenario( config );
 
 		final Population loadedPopulation = loadedScenario.getPopulation();
 

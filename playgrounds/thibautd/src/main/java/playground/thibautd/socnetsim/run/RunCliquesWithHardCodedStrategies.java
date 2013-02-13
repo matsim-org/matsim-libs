@@ -38,7 +38,6 @@ import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
@@ -99,12 +98,7 @@ public class RunCliquesWithHardCodedStrategies {
 
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig( configFile );
-		// do not load joint plans (it fails with v5, and contrary to the "cliquessim"
-		// setting, it is not useful if reading plans without joint trips.
-		// XXX reading plans with joint trips will fail!
-		final Scenario scenario = ScenarioUtils.createScenario( config );
-		JointScenarioUtils.tuneScenario( scenario );
-		ScenarioUtils.loadScenario( scenario );
+		final Scenario scenario = JointScenarioUtils.createScenario( config );
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
