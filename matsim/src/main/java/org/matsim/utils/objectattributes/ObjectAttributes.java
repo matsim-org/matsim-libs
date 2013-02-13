@@ -19,6 +19,7 @@
 
 package org.matsim.utils.objectattributes;
 
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -89,6 +90,10 @@ public class ObjectAttributes {
 	 */
 	public void clear() {
 		this.attributes.clear();
+	}
+	
+	public Map<String,Object> getAllAttributes(final String objectId) {
+		return Collections.unmodifiableMap(this.attributes.get(objectId)) ;
 	}
 	
 
