@@ -82,7 +82,6 @@ public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
 		delegate.run( plan );
 
 		final Set<Id> vehicles = ressources.identifyVehiclesUsableForAgent( plan.getPerson().getId() );
-		if ( vehicles.isEmpty() ) return;
 
 		final List<Trip> newTrips =
 			TripStructureUtils.getTrips(
@@ -95,26 +94,33 @@ public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
 
 		// TODO: do this intelligently, ie knowing the vehicles allocated
 		// to other persons in the joint plan, if any.
+		// XXX: this does not consider the type of vehicle, ie if the simulation
+		// is run with motorcycle, bikes and car ressources, a car trip could
+		// be allocated a bicycle...
 		randomlyAllocateMissingVehicleFields( vehicles , newTrips );
 	}
 
 	private void randomlyAllocateMissingVehicleFields(
 			final Set<Id> vehicles,
 			final List<Trip> trips) {
-		final Id id = getRandomVehicle( vehicles );
+		final Id vehicleId = getRandomVehicle( vehicles );
 
 		for (Trip t : trips) {
 			for (Leg l : t.getLegsOnly()) {
 				if ( !(l.getRoute() instanceof NetworkRoute) ) continue;
 				final NetworkRoute r = (NetworkRoute) l.getRoute();
 				if ( r.getVehicleId() == null ) {
-					r.setVehicleId( id );
+					if ( vehicleId == null ) {
+						throw new RuntimeException( "no vehicle could be found. Make sure you do not create vehicle-based trips for agents without a vehicle!" );
+					}
+					r.setVehicleId( vehicleId );
 				}
 			}
 		}
 	}
 
 	private Id getRandomVehicle(final Set<Id> vehicles) {
+		if ( vehicles.isEmpty() ) return null;
 		final int choice = random.nextInt( vehicles.size() );
 		int curr = 0;
 
