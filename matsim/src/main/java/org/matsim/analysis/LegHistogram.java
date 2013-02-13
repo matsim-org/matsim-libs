@@ -25,9 +25,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -57,7 +57,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	private int iteration = 0;
 	private final int binSize;
 	private final int nofBins;
-	private final Map<String, ModeData> data = new HashMap<String, ModeData>(5, 0.85f);
+	private final Map<String, ModeData> data = new TreeMap<String, ModeData>();
 	private ModeData allModesData = null;
 
 	/**
