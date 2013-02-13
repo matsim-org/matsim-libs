@@ -38,11 +38,5 @@ public interface JointActingTypes {
 	public static final String PASSENGER = "car_passenger";
 	public static final String DRIVER = "car_driver";
 	public static final List<String> JOINT_MODES = Arrays.asList( PASSENGER , DRIVER );
-
-	//planFile constants
-	public static final String PICK_UP_SPLIT_EXPR = "_";
-	public static final String PICK_UP_BEGIN = "pu";
-	public static final String PICK_UP_REGEXP = 
-			PICK_UP_BEGIN + PICK_UP_SPLIT_EXPR + ".*";
 }
 
