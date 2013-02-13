@@ -35,6 +35,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.RoadPricing;
 
 import playground.tnicolai.matsim4opus.config.AccessibilityParameterConfigModule;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
@@ -270,6 +271,12 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels){
 		
 		Controler controler = new Controler(scenario);
+		if (scenario.getConfig().scenario().isUseRoadpricing()) {
+			controler.addControlerListener(new RoadPricing());
+			// yyyy this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
+			// remove those "configuration" flags completely from the config.  However, then some other mechanism needs to be found 
+			// to be able to configure externally written "scripts" (such as this one) in a simple way.  kai & michael z, feb'13
+		}
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(true);	// sets, whether output Graphs are created
 		
