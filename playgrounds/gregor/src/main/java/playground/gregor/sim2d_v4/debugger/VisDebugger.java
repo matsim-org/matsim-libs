@@ -252,7 +252,7 @@ public class VisDebugger extends PApplet {
 		drawIteration();
 		drawAgentsCount(agents);
 		drawSpeedup();
-
+		
 		if (this.fs != null) {
 			this.fs.saveFrame(this,this.it + "_" + this.time);
 		}
