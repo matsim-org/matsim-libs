@@ -27,7 +27,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
@@ -46,25 +45,7 @@ public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
 	private final PlanAlgorithm delegate;
 	private final VehicleRessources ressources;
 
-	public PlanRouterWithVehicleRessources(
-			final VehicleRessources ressources,
-			final TripRouter tripRouter) {
-		this( ressources,
-				new JointPlanRouter(
-					tripRouter) );
-	}
-
-	public PlanRouterWithVehicleRessources(
-			final VehicleRessources ressources,
-			final TripRouter tripRouter,
-			final ActivityFacilities facilities) {
-		this( ressources,
-				new JointPlanRouter(
-					tripRouter,
-					facilities) );
-	}
-
-	public PlanRouterWithVehicleRessources(
+	PlanRouterWithVehicleRessources(
 			final VehicleRessources ressources,
 			final PlanAlgorithm delegate) {
 		this.ressources = ressources;

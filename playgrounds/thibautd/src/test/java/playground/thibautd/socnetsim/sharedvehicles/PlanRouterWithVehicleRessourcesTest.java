@@ -41,6 +41,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -76,7 +77,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 		final PlanRouterWithVehicleRessources router =
 			new PlanRouterWithVehicleRessources(
 				new UnrestrictedVehicleRessources(),
-				tripRouter );
+				new PlanRouter( tripRouter ) );
 
 		router.run( plan );
 
@@ -119,7 +120,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 		final PlanRouterWithVehicleRessources router =
 			new PlanRouterWithVehicleRessources(
 				new UnrestrictedVehicleRessources(),
-				tripRouter );
+				new PlanRouter( tripRouter ) );
 
 		router.run( plan );
 

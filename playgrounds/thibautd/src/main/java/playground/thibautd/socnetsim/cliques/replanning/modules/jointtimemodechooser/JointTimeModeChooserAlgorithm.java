@@ -29,12 +29,14 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 
 import playground.thibautd.socnetsim.cliques.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
@@ -117,6 +119,7 @@ public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<Joint
 		TabuSearchConfiguration configuration = new TabuSearchConfiguration();
 		Solution initialSolution = new JointTimeModeChooserSolution(
 						jointPlan,
+						new JointPlanRouterFactory( ((ScenarioImpl) scenario).getActivityFacilities()),
 						estimatorRouterFactory.createTripRouter());
 		builder.buildConfiguration(
 				false,

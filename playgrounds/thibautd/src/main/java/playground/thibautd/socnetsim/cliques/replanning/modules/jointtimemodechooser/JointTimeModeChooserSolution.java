@@ -42,13 +42,14 @@ import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
+import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
-import playground.thibautd.socnetsim.router.JointPlanRouter;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 import playground.thibautd.tsplanoptimizer.framework.ValueImpl;
@@ -69,7 +70,8 @@ public class JointTimeModeChooserSolution implements Solution {
 	private final static Collection<String> chainBasedModes = Arrays.asList( TransportMode.car , TransportMode.bike );
 	private final static double SCENARIO_DUR = 24 * 3600;
 	private final JointPlan plan;
-	private final JointPlanRouter planRouter;
+	private final PlanAlgorithm planRouter;
+	private final TripRouter tripRouter;
 
 	// maintain two lists: the values, and the plan elements they are
 	// related to, in the same order. Compared to a map, this allows to
@@ -87,20 +89,24 @@ public class JointTimeModeChooserSolution implements Solution {
 	 */
 	public JointTimeModeChooserSolution(
 			final JointPlan plan,
+			final PlanRoutingAlgorithmFactory fact,
 			final TripRouter tripRouter) {
 		this(
 			plan,
 			extractValues( plan , tripRouter , new MainModeIdentifierImpl() ),
-			new JointPlanRouter( tripRouter ));
+			fact.createPlanRoutingAlgorithm( tripRouter ),
+			tripRouter);
 	}
 
 	private JointTimeModeChooserSolution(
 			final JointPlan plan,
 			final Values values,
-			final JointPlanRouter planRouter) {
+			final PlanAlgorithm planRouter,
+			final TripRouter tripRouter) {
 		this.plan = plan;
 		this.values = values;
 		this.planRouter = planRouter;
+		this.tripRouter = tripRouter;
 	}
 
 	@Override
@@ -246,7 +252,8 @@ public class JointTimeModeChooserSolution implements Solution {
 					Collections.unmodifiableList( newValues ),
 					values.associatedPlanElements,
 					values.planStructures),
-				planRouter);
+				planRouter,
+				tripRouter);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -411,7 +418,7 @@ public class JointTimeModeChooserSolution implements Solution {
 					Activity act = (Activity) pe;
 					// System.out.println( "now="+Time.writeTime( now ) );
 
-					if ( !planRouter.getTripRouter().getStageActivityTypes().isStageActivity( act.getType() ) ) {
+					if ( !tripRouter.getStageActivityTypes().isStageActivity( act.getType() ) ) {
 						if ( !( act.getType().equals( JointActingTypes.PICK_UP ) ||
 								act.getType().equals( JointActingTypes.DROP_OFF ) ) ) {
 							// router is supposed to set the time properly for activities.

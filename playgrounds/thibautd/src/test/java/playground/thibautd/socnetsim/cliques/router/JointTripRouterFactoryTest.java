@@ -51,11 +51,12 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;
-import playground.thibautd.socnetsim.router.JointPlanRouter;
+import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 
 /**
@@ -166,9 +167,11 @@ public class JointTripRouterFactoryTest {
 
 	@Test
 	public void testPassengerRoute() throws Exception {
-		JointPlanRouter planRouter = new JointPlanRouter( factory.createTripRouter() );
+		final PlanAlgorithm planRouter =
+			new JointPlanRouterFactory( null ).createPlanRoutingAlgorithm(
+					factory.createTripRouter() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
-			Plan plan = pers.getSelectedPlan();
+			final Plan plan = pers.getSelectedPlan();
 			boolean toRoute = false;
 			Id driver = null;
 
@@ -186,7 +189,7 @@ public class JointTripRouterFactoryTest {
 
 				for (PlanElement pe : plan.getPlanElements()) {
 					if ( pe instanceof Leg && ((Leg) pe).getMode().equals(  JointActingTypes.PASSENGER ) ) {
-						Id actualDriver = ((PassengerRoute) ((Leg) pe).getRoute()).getDriverId();
+						final Id actualDriver = ((PassengerRoute) ((Leg) pe).getRoute()).getDriverId();
 
 						Assert.assertEquals(
 								"wrong driver Id",
@@ -201,11 +204,13 @@ public class JointTripRouterFactoryTest {
 
 	@Test
 	public void testDriverRoute() throws Exception {
-		JointPlanRouter planRouter = new JointPlanRouter( factory.createTripRouter() );
+		final PlanAlgorithm planRouter =
+			new JointPlanRouterFactory( null ).createPlanRoutingAlgorithm(
+					factory.createTripRouter() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
-			Plan plan = pers.getSelectedPlan();
+			final Plan plan = pers.getSelectedPlan();
+			final List<Id> passengerIds = new ArrayList<Id>();
 			boolean toRoute = false;
-			List<Id> passengerIds = new ArrayList<Id>();
 
 			for (PlanElement pe : plan.getPlanElements()) {
 				if ( pe instanceof Leg && ((Leg) pe).getMode().equals(  JointActingTypes.DRIVER ) ) {
@@ -221,7 +226,7 @@ public class JointTripRouterFactoryTest {
 
 				for (PlanElement pe : plan.getPlanElements()) {
 					if ( pe instanceof Leg && ((Leg) pe).getMode().equals(  JointActingTypes.DRIVER ) ) {
-						Collection<Id> actualPassengers = ((DriverRoute) ((Leg) pe).getRoute()).getPassengersIds();
+						final Collection<Id> actualPassengers = ((DriverRoute) ((Leg) pe).getRoute()).getPassengersIds();
 
 						Assert.assertEquals(
 								"wrong number of passengers",

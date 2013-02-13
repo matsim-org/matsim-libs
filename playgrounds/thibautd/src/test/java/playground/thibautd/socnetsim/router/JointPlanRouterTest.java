@@ -66,7 +66,8 @@ public class JointPlanRouterTest {
 		final JointPlanRouter testee =
 			new JointPlanRouter(
 					createTripRouter(
-						populationFactory) );
+						populationFactory),
+					null);
 
 		final Id linkId = new IdImpl( "some_link" );
 		final Plan plan = populationFactory.createPlan();
@@ -117,7 +118,8 @@ public class JointPlanRouterTest {
 		final JointPlanRouter testee =
 			new JointPlanRouter(
 					createTripRouter(
-						populationFactory) );
+						populationFactory),
+					null);
 
 		final Id linkId = new IdImpl( "some_link" );
 		final Plan plan = populationFactory.createPlan();
