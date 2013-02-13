@@ -50,7 +50,7 @@ public class FixedGroupsTest {
 	@Test
 	public void testIterationOrderIsDeterministic() throws Exception {
 		final String configFile = new File( utils.getPackageInputDirectory() ).getParentFile().getParentFile()+"/config.xml";
-		final Config config = JointScenarioUtils.createConfig( configFile );
+		final Config config = JointScenarioUtils.loadConfig( configFile );
 
 		Collection<ReplanningGroup> previous = null;
 

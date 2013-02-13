@@ -66,7 +66,7 @@ public class IgnoranceBehaviorTest {
 
 	@Before
 	public void init() {
-		config = JointScenarioUtils.createConfig( null );
+		config = JointScenarioUtils.loadConfig( null );
 		tripRouter = new  TripRouter();
 		random = new Random( 1234 );
 	}

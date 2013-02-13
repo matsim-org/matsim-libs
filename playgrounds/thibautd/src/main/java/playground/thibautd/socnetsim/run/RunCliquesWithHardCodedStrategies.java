@@ -98,7 +98,7 @@ public class RunCliquesWithHardCodedStrategies {
 	}
 
 	public static Scenario createScenario(final String configFile) {
-		final Config config = JointScenarioUtils.createConfig( configFile );
+		final Config config = JointScenarioUtils.loadConfig( configFile );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {

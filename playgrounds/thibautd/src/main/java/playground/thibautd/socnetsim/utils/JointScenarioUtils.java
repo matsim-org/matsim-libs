@@ -54,7 +54,7 @@ public class JointScenarioUtils {
 	 * @return a ready to use scenario
 	 */
 	public static Scenario loadScenario(final String configFile) {
-		return loadScenario(createConfig(configFile));
+		return loadScenario(loadConfig(configFile));
 	}
 
 	public static Scenario createScenario(final Config config) {
@@ -106,22 +106,13 @@ public class JointScenarioUtils {
 		return scenario;
 	}
 
-
-
 	/**
 	 * @param configFile the path to the config file
 	 * @return a loaded config, including proper setting of joint trips specific groups
 	 */
-	public static Config createConfig(final String configFile) {
-		Config config = ConfigUtils.createConfig();
-		loadConfig( config , configFile );
-		return config;
-	}
+	public static Config createConfig() {
+		final Config config = ConfigUtils.createConfig();
 
-	public static void loadConfig(final Config config, final String configFile) {
-		// /////////////////////////////////////////////////////////////////////
-		// initialize the config before passing it to the controler
-		config.addCoreModules();
 		config.addModule(
 				CliquesConfigGroup.GROUP_NAME,
 				new CliquesConfigGroup());
@@ -138,8 +129,13 @@ public class JointScenarioUtils {
 				JointPlansConfigGroup.GROUP_NAME,
 				new JointPlansConfigGroup());
 
-		//read the config file
-		if (configFile != null) ConfigUtils.loadConfig(config, configFile);
+		return config;
+	}
+
+	public static Config loadConfig(final String configFile) {
+		final Config config = createConfig();
+		if (configFile != null) ConfigUtils.loadConfig( config , configFile );
+		return config;
 	}
 }
 
