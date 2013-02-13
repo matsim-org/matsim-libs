@@ -28,6 +28,7 @@ import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 
+import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtimeallocationmutator.JointTimeAllocationMutatorModule;
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtimemodechooser.JointTimeModeChooserAlgorithm;
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
@@ -39,7 +40,6 @@ import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.SplitJointPlansBasedOnJointTripsModule;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
-import playground.thibautd.socnetsim.router.JointPlanRouter;
 
 /**
  * Provides factory methods to create standard strategies.
@@ -53,16 +53,18 @@ public class GroupPlanStrategyFactory {
 	// /////////////////////////////////////////////////////////////////////////
 	public static GroupPlanStrategy createReRoute(
 			final Config config,
+			final PlanRoutingAlgorithmFactory planRouterFactory,
 			final TripRouterFactory tripRouterFactory) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
 	
-		strategy.addStrategyModule( createReRouteModule( config , tripRouterFactory ) );
+		strategy.addStrategyModule( createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
 
 		return strategy;
 	}
 
 	public static GroupPlanStrategy createTimeAllocationMutator(
 			final Config config,
+			final PlanRoutingAlgorithmFactory planRouterFactory,
 			final TripRouterFactory tripRouterFactory) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
 
@@ -75,7 +77,7 @@ public class GroupPlanStrategyFactory {
 								config,
 								tripRouterFactory)));
 
-		strategy.addStrategyModule( createReRouteModule( config , tripRouterFactory ) );
+		strategy.addStrategyModule( createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
 
 		return strategy;
 	}
@@ -129,6 +131,7 @@ public class GroupPlanStrategyFactory {
 		strategy.addStrategyModule(
 				createReRouteModule(
 					config,
+					registry.getPlanRoutingAlgorithmFactory(),
 					registry.getTripRouterFactory() ) );
 
 		if (optimize) {
@@ -168,16 +171,17 @@ public class GroupPlanStrategyFactory {
 
 	public static GroupPlanStrategy createSubtourModeChoice(
 			final Config config,
+			final PlanRoutingAlgorithmFactory planRouterFactory,
 			final TripRouterFactory tripRouterFactory) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
 
-		strategy.addStrategyModule( createReRouteModule( config , tripRouterFactory ) );
+		strategy.addStrategyModule( createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
 
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
 					new SubtourModeChoice( config ) ) );
 
-		strategy.addStrategyModule( createReRouteModule( config , tripRouterFactory ) );
+		strategy.addStrategyModule( createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
 
 		return strategy;
 	}
@@ -199,12 +203,13 @@ public class GroupPlanStrategyFactory {
 
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(
 			final Config config,
+			final PlanRoutingAlgorithmFactory planRouterFactory,
 			final TripRouterFactory tripRouterFactory) {
 		return new IndividualBasedGroupStrategyModule(
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override
 					public PlanAlgorithm getPlanAlgoInstance() {
-						return new JointPlanRouter( tripRouterFactory.createTripRouter() );
+						return planRouterFactory.createPlanRoutingAlgorithm( tripRouterFactory.createTripRouter() );
 					}
 				});
 	}

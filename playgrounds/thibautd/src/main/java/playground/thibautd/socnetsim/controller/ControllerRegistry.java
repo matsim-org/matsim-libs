@@ -38,6 +38,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 
+import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
@@ -55,14 +56,17 @@ public final class ControllerRegistry {
 	private final MobsimFactory mobsimFactory;
 	private final TripRouterFactory tripRouterFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 
 	public ControllerRegistry(
 			final Scenario scenario,
 			final JointPlans jointPlans,
+			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 			final ScoringFunctionFactory scoringFunctionFactory) {
 		this.scenario = scenario;
 		addJointPlansToScenario( scenario , jointPlans );
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 
 		this.events = EventsUtils.createEventsManager( scenario.getConfig() );
 
@@ -167,6 +171,10 @@ public final class ControllerRegistry {
 
 	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
 		return leastCostPathCalculatorFactory;
+	}
+
+	public PlanRoutingAlgorithmFactory getPlanRoutingAlgorithmFactory() {
+		return planRoutingAlgorithmFactory;
 	}
 }
 

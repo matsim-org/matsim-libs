@@ -37,12 +37,16 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.analysis.listeners.TripModeShares;
+import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
@@ -59,6 +63,7 @@ import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.selectors.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.router.JointPlanRouter;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**
@@ -124,6 +129,15 @@ public class RunCliquesWithHardCodedStrategies {
 			new ControllerRegistry(
 					scenario,
 					scenario.getScenarioElement( JointPlans.class ),
+					new PlanRoutingAlgorithmFactory() {
+						@Override
+						public PlanAlgorithm createPlanRoutingAlgorithm(
+								final TripRouter tripRouter) {
+							return new JointPlanRouter(
+								tripRouter,
+								((ScenarioImpl) scenario).getActivityFacilities());
+						}
+					},
 					new CharyparNagelScoringFunctionFactory(
 						config.planCalcScore(),
 						scenario.getNetwork()) );
@@ -133,11 +147,13 @@ public class RunCliquesWithHardCodedStrategies {
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createReRoute(
 					config,
+					controllerRegistry.getPlanRoutingAlgorithmFactory(),
 					controllerRegistry.getTripRouterFactory() ),
 				weights.reRoute);
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTimeAllocationMutator(
 					config,
+					controllerRegistry.getPlanRoutingAlgorithmFactory(),
 					controllerRegistry.getTripRouterFactory() ),
 				weights.timeMutator);
 		if (weights.jtmOptimizes) {
@@ -153,6 +169,7 @@ public class RunCliquesWithHardCodedStrategies {
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSubtourModeChoice(
 					config,
+					controllerRegistry.getPlanRoutingAlgorithmFactory(),
 					controllerRegistry.getTripRouterFactory() ),
 				weights.modeMutation);
 		strategyRegistry.addStrategy(
