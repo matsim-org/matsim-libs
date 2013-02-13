@@ -45,14 +45,17 @@ public class ParkAndRideConfigGroup extends ReflectiveModule {
 	// /////////////////////////////////////////////////////////////////////////
 	// getters/setters
 	// /////////////////////////////////////////////////////////////////////////
+	@StringSetter( "facilities" )
 	public void setFacilities(final String fileName) {
 		facilities = fileName;
 	}
 
+	@StringGetter( "facilities" )
 	public String getFacilities() {
 		return facilities;
 	}
 
+	@StringSetter( "availableModes" )
 	public void setAvailableModes(final String value) {
 		availableModes = value.split(",");
 		
@@ -65,6 +68,7 @@ public class ParkAndRideConfigGroup extends ReflectiveModule {
 		return availableModes;
 	}
 
+	@StringGetter( "availableModes" )
 	public String getAvailableModesAsString() {
 		return arrayToString( availableModes );
 	}
@@ -83,6 +87,7 @@ public class ParkAndRideConfigGroup extends ReflectiveModule {
 		return b.toString();
 	}
 
+	@StringSetter( "chainBasedModes" )
 	public void setChainBasedModes(final String value) {
 		chainBasedModes = value.split(",");
 		
@@ -95,30 +100,37 @@ public class ParkAndRideConfigGroup extends ReflectiveModule {
 		return chainBasedModes;
 	}
 
+	@StringGetter( "chainBasedModes" )
 	public String getChainBasedModesAsString() {
 		return arrayToString( chainBasedModes );
 	}
 
+	@StringSetter( "facilityChangeProbability" )
 	public void setFacilityChangeProbability(final String value) {
 		this.facilityChangeProbability = Double.parseDouble( value );
 	}
 
+	@StringGetter( "facilityChangeProbability" )
 	public double getFacilityChangeProbability() {
 		return facilityChangeProbability;
 	}
 
+	@StringSetter( "localSearchRadius" )
 	public void setLocalSearchRadius(final String value) {
 		this.localSearchRadius = Double.parseDouble( value );
 	}
 
+	@StringGetter( "localSearchRadius" )
 	public double getLocalSearchRadius() {
 		return localSearchRadius;
 	}
 
+	@StringSetter( "priceOfDistance" )
 	public void setPriceOfDistance(final String value) {
 		this.priceOfDistance = Double.parseDouble( value );
 	}
 
+	@StringGetter( "priceOfDistance" )
 	public double getPriceOfDistance() {
 		return priceOfDistance;
 	}

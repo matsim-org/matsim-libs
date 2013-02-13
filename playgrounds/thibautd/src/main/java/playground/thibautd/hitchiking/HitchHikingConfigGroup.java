@@ -35,18 +35,22 @@ public class HitchHikingConfigGroup extends ReflectiveModule {
 		super(GROUP_NAME);
 	}
 
+	@StringSetter( "maximumDetourFraction" )
 	public void setMaximumDetourFraction(final String value) {
 		maximumDetourFraction = Double.parseDouble( value );
 	}
 
+	@StringGetter( "maximumDetourFraction" )
 	public double getMaximumDetourFraction() {
 		return maximumDetourFraction;
 	}
 
+	@StringSetter( "spotsFile" )
 	public void setSpotsFile(final String value) {
 		spotsFile = value;
 	}
 
+	@StringGetter( "spotsFile" )
 	public String getSpotsFile() {
 		return spotsFile;
 	}

@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import java.lang.reflect.Field;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,133 +31,125 @@ import org.matsim.core.config.Module;
 
 /**
  * A module using reflection for easy implementation of config groups.
- * To implement a config group, extend this class and:
- *
- * <ul>
- * <li> create fields for your values. The name of those fields will be used as parameter name in the xml file.
- * The field should be set to a default value
- * <li> implement getters and setters for your fields. Each field should have a setter
- * accepting a string as argument, and a getter. naming conventions are usual,
- * an case independant.
- * <li> if the string encoding in the xml file is different of <tt>""+value</tt>
- * where <tt>value</tt> is the field value, a getter <tt>get---AsString</tt> should
- * be implemented.
- * </ul>
- *
- * The string value of all parameters not specified by a field will be accessible
- * as with the base Module (ie all string values are remembered).
+ * <br>
+ * This class takes care of all the housekeeping tasks that you normally have
+ * to manually implement when extending module (usually forgetting half of it).
+ * <br>
+ * For each field in the xml file, just implement a setter taking a String,
+ * and a getter returning a value which String representation must be writen to
+ * the xml file, and annotate them with the {@link StringSetter} and
+ * {@link StringGetter} annotation
+ * types.
+ * <br>
+ * Those annotations take a mandatory String argument, which is the parameter name
+ * in the xml.
+ * <br>
+ * If something is wrong (missing setter or getter, wrong parameter or return type),
+ * an {@link InconsistentModuleException} will be thrown at construction.
  *
  * @author thibautd
  */
-public class ReflectiveModule extends Module {
+public abstract class ReflectiveModule extends Module {
 	private static final Logger log =
 		Logger.getLogger(ReflectiveModule.class);
 
-	private final Map<String, Field> fields;
 	private final Map<String, Method> setters;
 	private final Map<String, Method> stringGetters;
-	private final Map<String, Method> getters;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// Construction
 	// /////////////////////////////////////////////////////////////////////////
 	public ReflectiveModule(final String name) {
 		super(name);
-		fields = getFields();
 		setters = getSetters();
 		stringGetters = getStringGetters();
-		getters = getGetters();
+
+		if ( !setters.keySet().equals( stringGetters.keySet() ) ) {
+			throw new InconsistentModuleException( "setters and getters inconsistent" );
+		}
 	}
 
 	private Map<String, Method> getStringGetters() {
-		Map<String, Method> gs = new HashMap<String, Method>();
-		Class<? extends ReflectiveModule> c = getClass();
+		final Map<String, Method> gs = new HashMap<String, Method>();
+		final Class<? extends ReflectiveModule> c = getClass();
 
-		Method[] allMethods = c.getDeclaredMethods();
+		final Method[] allMethods = c.getDeclaredMethods();
 
 		for (Method m : allMethods) {
-			if ( m.getName().toLowerCase().matches( "get.*asstring" ) &&
-					m.getParameterTypes().length == 0 &&
-					m.getReturnType().equals( String.class ) ) {
-				gs.put( m.getName().toLowerCase() , m );
+			final StringGetter annotation = m.getAnnotation( StringGetter.class );
+			if ( annotation != null ) {
+				checkGetterValidity( m );
+				final Method old = gs.put( annotation.value() , m );
+				if ( old != null ) {
+					throw new InconsistentModuleException( "several string getters for "+annotation.value() );
+				}
 			}
 		}
 
 		return gs;
 	}
 
-	private Map<String, Method> getGetters() {
-		Map<String, Method> gs = new HashMap<String, Method>();
-		Class<? extends ReflectiveModule> c = getClass();
-
-		Method[] allMethods = c.getDeclaredMethods();
-
-		for (Method m : allMethods) {
-			if ( m.getName().toLowerCase().matches( "get.*" ) &&
-					m.getParameterTypes().length == 0 ) {
-				gs.put( m.getName().toLowerCase() , m );
-			}
+	private static void checkGetterValidity(final Method m) {
+		if ( m.getParameterTypes().length > 0 ) {
+			throw new InconsistentModuleException( "getter "+m+" has parameters" );
 		}
 
-		return gs;
+		if ( m.getReturnType().equals( Void.TYPE ) ) {
+			throw new InconsistentModuleException( "getter "+m+" has void return type" );
+		}
 	}
 
 	private Map<String, Method> getSetters() {
-		Map<String, Method> ss = new HashMap<String, Method>();
-		Class<? extends ReflectiveModule> c = getClass();
+		final Map<String, Method> ss = new HashMap<String, Method>();
+		final Class<? extends ReflectiveModule> c = getClass();
 
-		Method[] allMethods = c.getDeclaredMethods();
+		final Method[] allMethods = c.getDeclaredMethods();
 
 		for (Method m : allMethods) {
-			if ( m.getName().toLowerCase().matches( "set.*" ) &&
-					m.getParameterTypes().length == 1 &&
-					m.getParameterTypes()[0].equals( String.class ) ) {
-				ss.put( m.getName().toLowerCase() , m );
+			final StringSetter annotation = m.getAnnotation( StringSetter.class );
+			if ( annotation != null ) {
+				checkSetterValidity( m );
+				final Method old = ss.put( annotation.value() , m );
+				if ( old != null ) {
+					throw new InconsistentModuleException( "several string setters for "+annotation.value() );
+				}
 			}
 		}
 
 		return ss;
 	}
 
-	private Map<String, Field> getFields() {
-		Map<String, Field> fs = new HashMap<String, Field>();
-		Class<? extends ReflectiveModule> c = getClass();
+	private static void checkSetterValidity(final Method m) {
+		final Class<?>[] params = m.getParameterTypes();
 
-		for (Field f : c.getDeclaredFields()) {
-			if ( !Modifier.isStatic( f.getModifiers() ) ) {
-				fs.put( f.getName() , f );
-			}
+		if (params.length != 1) {
+			throw new InconsistentModuleException( "setter "+m+" has "+params.length+" parameters instead of one" );
 		}
 
-		return fs;
+		if ( !params[ 0 ].equals( String.class ) ) {
+			throw new InconsistentModuleException( "setter "+m+" gets a "+params[ 0 ]+" instead of a string" );
+		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// module methods
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
-	public void addParam(
+	public final void addParam(
 			final String param_name,
 			final String value) {
-		Field f = fields.get( param_name );
+		Method setter = setters.get( param_name );
 
-		if (f == null) {
-			log.warn( "unknown parameter "+param_name+" for group "+getName()+". Here are the valid parameter names: "+fields.keySet() );
+		if (setter == null) {
+			log.warn( "unknown parameter "+param_name+" for group "+getName()+". Here are the valid parameter names: "+setters.keySet() );
 			log.warn( "Only the string value will be remembered" );
 			super.addParam( param_name , value );
 			return;
 		}
 
-		Method setter = setters.get( "set"+f.getName().toLowerCase() );
-
-		if (setter == null) {
-			log.warn( "field "+param_name+" for group "+getName()+" found but no setter found!" );
-			return;
-		}
-
 		try {
 			setter.invoke( this , value );
-			log.info( "value "+value+" successfully set for field "+param_name+" for group "+getName() );
+			log.trace( "value "+value+" successfully set for field "+param_name+" for group "+getName() );
 		}
 		catch (Exception e) {
 			throw new RuntimeException( e );
@@ -164,22 +157,15 @@ public class ReflectiveModule extends Module {
 	}
 
 	@Override
-	public String getValue(final String param_name) {
-		Method getter = stringGetters.get( "get"+param_name.toLowerCase()+"asstring" );
+	public final String getValue(final String param_name) {
+		Method getter = stringGetters.get( param_name );
+
 		try {
 			if (getter != null) {
 				return ""+getter.invoke( this );
 			}
 
-			log.warn( "no string getter found for param "+param_name+": trying regular getter" );
-
-			getter = getters.get( "get"+param_name.toLowerCase() );
-
-			if (getter != null) {
-				return ""+getter.invoke( this );
-			}
-
-			log.warn( "no getter found at all for param "+param_name+": trying parent method" );
+			log.warn( "no getter found for param "+param_name+": trying parent method" );
 			return super.getValue( param_name );
 		} catch (Exception e) {
 			throw new RuntimeException( e );
@@ -187,14 +173,55 @@ public class ReflectiveModule extends Module {
 	}
 
 	@Override
-	public Map<String, String> getParams() {
-		Map<String, String> map = super.getParams();
+	public final Map<String, String> getParams() {
+		final Map<String, String> map = super.getParams();
 
-		for (String f : fields.keySet()) {
+		for (String f : setters.keySet()) {
 			addParameterToMap( map , f );
 		}
 
 		return map;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// annotations
+	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * use to annotate the methods which should be used to read the string
+	 * values.
+	 * The methods must take one string parameter.
+	 */
+	@Documented
+	@Retention( RetentionPolicy.RUNTIME )
+	public static @interface StringSetter {
+		/**
+		 * the name of the field in the XML document
+		 */
+		String value();
+	}
+
+	/**
+	 * use to annotate the methods which should be used to get the string
+	 * values.
+	 * the methods must take no parameter and return an Object or primitive
+	 * data type which string representations is the one which should appear in the
+	 * xml.
+	 */
+	@Documented
+	@Retention( RetentionPolicy.RUNTIME )
+	public static @interface StringGetter {
+		/**
+		 * the name of the field in the XML document
+		 */
+		String value();
+	}
+
+	public static class InconsistentModuleException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		private InconsistentModuleException(final String msg) {
+			super( msg );
+		}
 	}
 }
 

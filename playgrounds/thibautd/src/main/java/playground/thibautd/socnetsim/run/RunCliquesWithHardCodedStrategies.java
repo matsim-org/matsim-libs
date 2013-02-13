@@ -75,7 +75,7 @@ public class RunCliquesWithHardCodedStrategies {
 		public double jointTripMutation = 0.1;
 		public double modeMutation = 0.1;
 		public double logitSelection = 0.6;
-		public boolean jtmOptimizes = true;
+		public boolean jtmOptimizes = false;
 
 		public void setAllToZero() {
 			reRoute = 0;

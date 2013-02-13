@@ -41,26 +41,33 @@ public class JointTripInsertorConfigGroup extends ReflectiveModule {
 		super( GROUP_NAME );
 	}
 
+	// XXX: invalid!
+	@StringGetter( "chainBasedModes" )
 	public List<String> getChainBasedModes() {
 		return this.chainBasedModes;
 	}
 
+	@StringGetter( "betaDetour" )
 	public double getBetaDetour() {
 		return this.betaDetour;
 	}
 
+	@StringSetter( "betaDetour" )
 	public void setBetaDetour(final String betaDetour) {
 		this.betaDetour = Double.parseDouble( betaDetour );
 	}
 
+	@StringGetter( "scale" )
 	public double getScale() {
 		return this.scale;
 	}
 
+	@StringSetter( "scale" )
 	public void setScale(final String scale) {
 		this.scale = Double.parseDouble( scale );
 	}
 
+	@StringSetter( "chainBasedModes" )
 	public void setChainBasedModes(final String chainBasedModes) {
 		this.chainBasedModes = Arrays.asList( chainBasedModes.split(",") );
 	}

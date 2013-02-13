@@ -33,10 +33,12 @@ public class JointPlansConfigGroup extends ReflectiveModule {
 
 	private String fileName = null;
 
+	@StringSetter( "fileName" )
 	public void setFileName( final String fileName ) {
 		this.fileName = fileName;
 	}
 
+	@StringGetter( "fileName" )
 	public String getFileName() {
 		return fileName;
 	}
