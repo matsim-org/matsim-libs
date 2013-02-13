@@ -56,7 +56,7 @@ public class Neighbors {
 		List<Sim2DAgent> agents = psec.getAgents(e);
 		//agents from same section visible by definition
 		for (Sim2DAgent b : agents) {
-			if (b == agent) {
+			if (b.equals(agent)) {
 				continue;
 			}
 			float[] bPos = b.getPos();

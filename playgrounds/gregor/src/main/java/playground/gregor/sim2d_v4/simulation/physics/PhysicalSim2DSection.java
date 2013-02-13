@@ -71,6 +71,8 @@ public class PhysicalSim2DSection {
 	
 	private final TwoDTree<Sim2DAgent> agentTwoDTree;
 
+	private final Map<Segment,Id> openingLinkIdMapping = new HashMap<Segment,Id>();
+
 	public PhysicalSim2DSection(Section sec, Sim2DScenario sim2dsc, double offsetX, double offsetY, PhysicalSim2DEnvironment penv) {
 		this.sec = sec;
 		this.sim2dsc = sim2dsc;
@@ -153,9 +155,35 @@ public class PhysicalSim2DSection {
 					agent.notifyMoveOverNode(nextLinkId);
 					this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
 				}
+			} else if (agent instanceof FailsafeAgentImpl) {
+				for (Segment open : this.openings) {
+					if (CGAL.isLeftOfLine(newXPosX, newXPosY, open.x0,open.y0,open.x1,open.y1) > 0) {
+						PhysicalSim2DSection nb = this.neighbors.get(open);
+						if (nb == null) {
+							continue;
+						}
+//						for (S)
+						it.remove();
+						nb.addAgentToInBuffer(agent);
+						this.penv.getEventsManager().processEvent(new LinkLeaveEvent(time, agent.getId(), currentLinkId, agent.getQVehicle().getId()));
+						Id nextLinkId = null;
+						for (Segment ivOpen : nb.getOpenings()) {
+							if (ivOpen.x0 == open.x1 && ivOpen.x1 == open.x0 && ivOpen.y0 == open.y1 && ivOpen.y1 == open.y0) {
+								nextLinkId = nb.getLinkId(ivOpen);
+								break;
+							}
+						}
+						this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
+						((FailsafeAgentImpl) agent).pushCurrentLinkId(nextLinkId);
+						break;
+					}
+				}
 			}
 			//			this.penv.getEventsManager().processEvent(new XYVxVyEventImpl(agent.getId(),agent.getPos()[0],agent.getPos()[1],agent.getVelocity()[0],agent.getVelocity()[1],time));
 			agent.move(dx, dy);
+			
+
+			
 			this.agentTwoDTree.insert(agent);
 		}
 
@@ -163,6 +191,10 @@ public class PhysicalSim2DSection {
 		
 	}
 
+	private Id getLinkId(Segment opening) {
+		return this.openingLinkIdMapping.get(opening);
+	}
+	
 	private void updateAgent(Sim2DAgent agent) {
 		//		agent.calcNeighbors(this);
 		//		agent.setObstacles(this.obstacles);
@@ -237,6 +269,7 @@ public class PhysicalSim2DSection {
 			if (toOpening != null) {
 				li.finishLine = toOpening;
 				li.width = (float)Math.sqrt((toOpening.x0-toOpening.x1)*(toOpening.x0-toOpening.x1)+(toOpening.y0-toOpening.y1)*(toOpening.y0-toOpening.y1)); 
+				this.openingLinkIdMapping .put(toOpening,id);
 			} else {
 				Segment finishLine = new Segment();
 				finishLine.x0 = seg.x1;
@@ -377,6 +410,22 @@ public class PhysicalSim2DSection {
 			}
 			visDebugger.addPolygon(x, y,32, 255, 64, 64,5);
 			visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId(),99);
+		}
+		
+		for (Sim2DAgent agent : this.agents) {
+			if (agent.getId().toString().equals("g3242")) {
+				Coordinate[] coords = this.sec.getPolygon().getExteriorRing().getCoordinates();
+				float [] x = new float[coords.length];
+				float [] y = new float[coords.length];
+				for (int i = 0; i < coords.length; i++) {
+					Coordinate c = coords[i];
+					x[i] = (float) (c.x - this.offsetX);
+					y[i] = (float) (c.y - this.offsetY);
+				}
+				visDebugger.addPolygon(x, y,0, 255, 255, 255,5);
+				visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId(),99);				
+			}
+				
 		}
 		for (Sim2DAgent agent : this.agents) {
 			agent.debug(visDebugger);

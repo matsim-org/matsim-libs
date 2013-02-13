@@ -41,8 +41,8 @@ import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
  * @author laemmel
  *
  */
-public class SocialForceAgent implements Sim2DAgent {
-	
+public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
+
 	//Helbing constants
 	private final float v0 = 1.34f; //desired velocity
 	private final float m = (float) (70 + (MatsimRandom.getRandom().nextDouble()*20)); //mass
@@ -53,28 +53,24 @@ public class SocialForceAgent implements Sim2DAgent {
 	private final float kappa = 2.4f * 100000;
 	private final float r = (float) (MatsimRandom.getRandom().nextDouble()*.1 + 0.25); //radius
 	private final float vmx = 1.5f;
-	
+
 	//additional constants
 	private final float CUTOFF_DIST = 20f;
-	
+
 	private final float [] pos = {0,0}; //location
-	
+
 	private final float [] v = {0,0}; //velocity
-	
+
 	private final QVehicle veh;
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
-	
+
 	private final Neighbors ncalc = new Neighbors();
 	private final Obstacles ocalc = new Obstacles();
-	private final DesiredDirection dd = new DesiredDirection();
+	private DesiredDirection dd;
 
 	private final float dT;
-	
-	private final float [] oldPos = {0,0};
-	private final int notMoved = 0;
-	private final float notMovedThreshold = 0.01f*0.01f;
-	private final int maxNotMoved = 10;
+
 
 	public SocialForceAgent(QVehicle veh, float spawnX, float spawnY, float deltaT) {
 		this.pos[0] = spawnX;
@@ -83,6 +79,7 @@ public class SocialForceAgent implements Sim2DAgent {
 		this.driver = veh.getDriver();
 		this.dT = deltaT;
 		this.ncalc.setRangeAndMaxNrOfNeighbors(5, 8);
+		this.dd = new DesiredDirection(this);
 	}
 
 	@Override
@@ -92,39 +89,24 @@ public class SocialForceAgent implements Sim2DAgent {
 
 	@Override
 	public void updateVelocity() {
-		
-//		//experimental
-//		float mvX = this.oldPos[0] - this.pos[0];
-//		float mvY = this.oldPos[1] - this.pos[1];
-//		this.oldPos[0] = this.pos[0];
-//		this.oldPos[1] = this.pos[1];
-//		float sqrMvd = mvX*mvX + mvY*mvY;
-//		if (sqrMvd < this.notMovedThreshold) {
-//			this.notMoved++;
-//			if (this.notMoved >= this.maxNotMoved) {
-//				this.notMoved = 0;
-//				this.v[0] = MatsimRandom.getRandom().nextFloat()-.5f;
-//				this.v[1] = MatsimRandom.getRandom().nextFloat()-.5f;
-//				return;
-//			}
-//		}
-		
+
+
 		List<Tuple<Float, Sim2DAgent>> neighbors = this.ncalc.computeNeighbors(this);
 		List<Segment> obstacles = this.ocalc.computeObstacles(this);
 
-		
-		float[] e0 = this.dd.computeDesiredDirection(this);
+
+		float[] e0 = this.dd.computeDesiredDirection();
 		float desiredDVx = this.v0 * e0[0] - this.v[0];
 		float desiredDVy = this.v0 * e0[1] - this.v[1];
-		
+
 		desiredDVx /= this.tau;
 		desiredDVy /= this.tau;
-		
+
 		//neighbors
 		float fnx = 0;
 		float fny = 0;
-		
-	
+
+
 		for (Tuple<Float, Sim2DAgent> t : neighbors) {
 			Sim2DAgent neighbor = t.getSecond();
 			float[] nPos = neighbor.getPos();
@@ -136,15 +118,15 @@ public class SocialForceAgent implements Sim2DAgent {
 			}
 			nx /= dist;
 			ny /= dist;
-			
+
 			float r = this.r + neighbor.getRadius();
-			
+
 			float exp = playground.gregor.sim2d_v4.math.Math.exp((r-dist)/this.B);
-			
+
 			if (dist < r) {
 				float overlap = (r-dist);
 				exp += this.k * overlap;
-				
+
 				float tx = -ny;
 				float ty = nx;
 				float[] nv = neighbor.getVelocity();
@@ -154,11 +136,11 @@ public class SocialForceAgent implements Sim2DAgent {
 				fnx += this.kappa * overlap * dv * tx;
 				fny += this.kappa * overlap * dv * ty;
 			}
-			
+
 			fnx += this.A * exp * nx;
 			fny += this.A * exp * ny;
 		}
-		
+
 		//obstacles
 		float fwx = 0;
 		float fwy = 0;
@@ -190,37 +172,43 @@ public class SocialForceAgent implements Sim2DAgent {
 					ny = -s.dx;
 				}
 			}
-			
+
 			//here we can optimize to avoid the sqrt if 0 <= r <= 1!
 			if (dist > this.CUTOFF_DIST) {
 				continue;
 			}
-			
+
 			float exp = playground.gregor.sim2d_v4.math.Math.exp((this.r-dist)/this.B);
 
 			if (dist < this.r &&  r >=0 && r <= 1) {
 				float overlap = (this.r-dist);
 				exp += this.k * overlap;
-				
+
 				float tx = -ny;
 				float ty = nx;
 				float dv = this.v[0]*tx + this.v[1]*ty;
 				fnx += this.kappa * overlap * dv * tx;
 				fny += this.kappa * overlap * dv * ty;
 			}
-			
+
 			fwx += this.A * exp * nx;
 			fwy += this.A * exp * ny;
 		}
-		
+
 		float dvx = desiredDVx + fnx/this.m + fwx/this.m;
 		float dvy = desiredDVy + fny/this.m + fwy/this.m;
 		dvx *= this.dT;
 		dvy *= this.dT;
+
+		if (Double.isNaN(dvy)) {
+			System.out.println("stop");
+		}
 		
 		this.v[0] += dvx;
 		this.v[1] += dvy;
 		
+	
+
 		if ((this.v[0]*this.v[0]+this.v[1]*this.v[1]) > (this.vmx*this.vmx)) { //velocity constraint speed never exceeds 5m/s
 			float v = (float) Math.sqrt((this.v[0]*this.v[0]+this.v[1]*this.v[1]));
 			this.v[0] /= v;
@@ -228,14 +216,16 @@ public class SocialForceAgent implements Sim2DAgent {
 			this.v[0] *= this.vmx;
 			this.v[1] *= this.vmx;
 		}
-		
-		
+
+
 	}
+
+	
 
 	@Override
 	public void setPSec(PhysicalSim2DSection physicalSim2DSection) {
 		this.currentPSec = physicalSim2DSection;
-		
+
 	}
 
 	@Override
@@ -277,7 +267,10 @@ public class SocialForceAgent implements Sim2DAgent {
 
 	@Override
 	public void debug(VisDebugger visDebugger) {
-		if (getId().toString().contains("g")) {
+		if (getId().toString().equals("g3242")){
+			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 255, 0, 0, 255,0,true);
+			visDebugger.addText(this.getPos()[0],this.getPos()[1], this.getCurrentLinkId().toString(), 90);
+		}else if (getId().toString().contains("g")) {
 			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 0, 192, 64, 128,0,true);
 		} else if (getId().toString().contains("r")) {
 			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 192, 0, 64, 128,0,true);
@@ -298,10 +291,10 @@ public class SocialForceAgent implements Sim2DAgent {
 				b=nr;
 			}
 			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, r, g, b, 222,0,true);
-//			visDebugger.addText(this.getPos()[0],this.getPos()[1], this.getId().toString(), 0);
 		}
+	
 		this.ocalc.addDebugger(visDebugger);
-		
+
 	}
 
 	@Override
@@ -322,6 +315,20 @@ public class SocialForceAgent implements Sim2DAgent {
 	@Override
 	public float getYLocation() {
 		return this.pos[1];
+	}
+
+	@Override
+	public void setDesiredDirectionCalculator(DesiredDirection dd) {
+		this.dd = dd;
+		
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Sim2DAgent) {
+			return getId().equals(((Sim2DAgent) obj).getId());
+		}
+		return false;
 	}
 
 }

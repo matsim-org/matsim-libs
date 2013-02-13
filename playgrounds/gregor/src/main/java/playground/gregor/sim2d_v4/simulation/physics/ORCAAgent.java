@@ -45,7 +45,7 @@ import playground.gregor.sim2d_v4.simulation.physics.orca.ORCASolver;
  * @author laemmel
  *
  */
-public class ORCAAgent implements Sim2DAgent {
+public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 
 
 	private final float r = (float) (MatsimRandom.getRandom().nextDouble()*.1 + .25); //radius
@@ -60,7 +60,7 @@ public class ORCAAgent implements Sim2DAgent {
 
 	private final Neighbors ncalc = new Neighbors();
 	private final Obstacles obst = new Obstacles();
-	private final DesiredDirection dd = new DesiredDirection();
+	private DesiredDirection dd = new DesiredDirection(this);
 	private final ORCASolver solver = new ORCASolver();
 	//	private VisDebugger debugger;
 	private final VisDebugger debugger = null;
@@ -116,7 +116,7 @@ public class ORCAAgent implements Sim2DAgent {
 
 
 
-		final float[] dir = this.dd.computeDesiredDirection(this);
+		final float[] dir = this.dd.computeDesiredDirection();
 		dir[0] *= this.v0;
 		dir[1] *= this.v0;
 
@@ -228,7 +228,19 @@ public class ORCAAgent implements Sim2DAgent {
 
 	@Override
 	public float getYLocation() {
-		return this.pos[0];
+		return this.pos[1];
 	}
 
+	@Override
+	public void setDesiredDirectionCalculator(DesiredDirection dd) {
+		this.dd = dd;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Sim2DAgent) {
+			return getId().equals(((Sim2DAgent) obj).getId());
+		}
+		return false;
+	}
 }

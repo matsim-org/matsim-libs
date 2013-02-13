@@ -33,6 +33,7 @@ public interface Sim2DAgent extends TwoDObject{
 //	public void calcNeighbors(PhysicalSim2DSection physicalSim2DSection);
 //
 //	public void setObstacles(Segment[] obstacles);
+	
 
 	public abstract void updateVelocity();
 

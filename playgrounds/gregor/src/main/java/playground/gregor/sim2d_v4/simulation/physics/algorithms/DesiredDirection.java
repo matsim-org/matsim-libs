@@ -32,14 +32,18 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 public class DesiredDirection {
 	
 	
+	private final Sim2DAgent agent;
+
+	public DesiredDirection(Sim2DAgent agent) {
+		this.agent = agent;
+	}
 	
-	
-	public float [] computeDesiredDirection(Sim2DAgent agent) {
+	public float [] computeDesiredDirection() {
 		
-		final float [] pos = agent.getPos();
+		final float [] pos = this.agent.getPos();
 		final float [] ret = {0,0};
-		PhysicalSim2DSection psec = agent.getPSec();
-		Id id = agent.getCurrentLinkId();
+		PhysicalSim2DSection psec = this.agent.getPSec();
+		Id id = this.agent.getCurrentLinkId();
 		LinkInfo li = psec.getLinkInfo(id);
 		final Segment link = li.link;
 		

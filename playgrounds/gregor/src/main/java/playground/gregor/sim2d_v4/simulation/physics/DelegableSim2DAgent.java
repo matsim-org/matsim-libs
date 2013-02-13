@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DAgentBuilder.java
+ * DelegableSim2DAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,28 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation;
+package playground.gregor.sim2d_v4.simulation.physics;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
 
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.simulation.physics.DelegableSim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.SocialForceAgent;
+public interface DelegableSim2DAgent extends Sim2DAgent{
 
-public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
+	public void setDesiredDirectionCalculator(DesiredDirection dd);
 	
-	private final Sim2DConfig conf;
-
-	public SocialForceSim2DAgentFactory(Sim2DConfig conf) {
-		this.conf = conf;
-	}
-
 	@Override
-	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
-		DelegableSim2DAgent delegate = new SocialForceAgent(veh, spawnX, spawnY,(float) this.conf.getTimeStepSize());
-//		Sim2DAgent agent = new FailsafeAgentImpl(delegate);
-		return delegate;
-	}
-
+	public boolean equals(Object obj);;
 }

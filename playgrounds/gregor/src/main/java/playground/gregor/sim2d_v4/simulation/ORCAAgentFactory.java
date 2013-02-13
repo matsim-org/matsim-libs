@@ -22,6 +22,8 @@ package playground.gregor.sim2d_v4.simulation;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
+import playground.gregor.sim2d_v4.simulation.physics.DelegableSim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.FailsafeAgentImpl;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAAgent;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
@@ -29,7 +31,9 @@ public class ORCAAgentFactory implements Sim2DAgentFactory {
 
 	@Override
 	public Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY) {
-		return new ORCAAgent(veh, spawnX, spawnY);
+		DelegableSim2DAgent delegate = new ORCAAgent(veh, spawnX, spawnY);
+		Sim2DAgent agent = new FailsafeAgentImpl(delegate);
+		return delegate;
 	}
 
 }

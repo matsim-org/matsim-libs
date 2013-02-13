@@ -88,21 +88,22 @@ public class TwoDTree<T extends TwoDObject> {
 
 	private static class TwoDNode<T extends TwoDObject> {
 		private static final Logger log = Logger.getLogger(TwoDNode.class);
-		private static final int cacheSize = 128; 
-		private static final int maxDepth = 128; 
+		private static final int cacheSize = 128;
+		private static final float EPSILON = 0.0001f; 
+		private int maxDepth = 128; 
 		
 		private final int depth;
 		private final Envelope envelope;
 		private TwoDNode<T> left = null;
 		private TwoDNode<T> right = null;
-		private final List<T> cache = new ArrayList<T>(this.cacheSize);
+		private final List<T> cache = new ArrayList<T>(cacheSize);
 
 		private boolean internalNode = false;
 
 		public TwoDNode(Envelope e, int i) {
 			this.depth = i;
 			this.envelope = e;
-			if (this.depth >= maxDepth) {
+			if (this.depth >= this.maxDepth) {
 				log.warn("Maximum recursion depth reached! The region is: " + this.envelope + " Data inserted into this region will be stored in a linear list.");
 				
 			}
@@ -113,7 +114,7 @@ public class TwoDTree<T extends TwoDObject> {
 			if (this.envelope.intersects(val.getXLocation(), val.getYLocation())) {
 				if (!this.internalNode) {
 					this.cache.add(val);
-					if (this.cache.size() >= TwoDNode.cacheSize && this.depth < TwoDNode.maxDepth) {
+					if (this.cache.size() >= TwoDNode.cacheSize && this.depth < this.maxDepth) {
 						split();
 					}
 
@@ -186,7 +187,11 @@ public class TwoDTree<T extends TwoDObject> {
 					xs[idx++] = x;
 				}
 				Arrays.sort(xs);
-				float median = xs[this.cache.size()/2];
+				final float median = xs[this.cache.size()/2];
+				if ((xs[this.cache.size()-1]-xs[0]) < EPSILON) {
+					log.warn("region to small can not split it!  The region is: " + this.envelope + " Data inserted into this region will be stored in a linear list.");
+					this.maxDepth = this.depth;
+				}
 				
 //				final double width = median - this.envelope.getMinX();
 				Envelope e1 = new Envelope(minX, median,  minY, maxY);
@@ -205,6 +210,11 @@ public class TwoDTree<T extends TwoDObject> {
 				}
 				Arrays.sort(ys);
 				float median = ys[this.cache.size()/2];
+				if ((ys[this.cache.size()-1]-ys[0]) < EPSILON) {
+					log.warn("region to small can not split it!  The region is: " + this.envelope + " Data inserted into this region will be stored in a linear list.");
+					this.maxDepth = this.depth;
+				}
+				
 				
 //				final double height = this.envelope.getHeight();
 				Envelope e1 = new Envelope(minX, maxX,  minY, median);
