@@ -38,7 +38,7 @@ import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
- * This class tests the pt simulation of matsim for a simple network created with CreateTestNetwork.java.
+ * This class tests the pt simulation of MATSim for a simple network created with CreateTestNetwork.java.
  * It checks the values of pt distances and times from the pt matrix for this network.
  * 
  * MATSim always calculates the total pt time and distance respectively between origin and destination facility as a sum of the following three values:
