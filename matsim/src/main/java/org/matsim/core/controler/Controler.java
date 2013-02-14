@@ -387,7 +387,6 @@ public class Controler extends AbstractController {
 	 */
 	@Override
 	protected final void loadCoreListeners() {
-		// yyyy cannot make this final since it is overridden about 4 times. kai, jan'13
 
 		/*
 		 * The order how the listeners are added is very important! As
