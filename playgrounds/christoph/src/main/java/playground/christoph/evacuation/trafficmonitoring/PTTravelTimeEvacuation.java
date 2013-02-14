@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -108,17 +109,18 @@ public class PTTravelTimeEvacuation implements SwissPTTravelTime {
 		}
 		
 		if (!isInformed) {
-			Path path = evacuationRouter.calcExitPath(fromAct.getCoord(), depTime, person);
+//			Path path = evacuationRouter.calcExitPath(fromAct.getCoord(), depTime, person);
+			Path path = evacuationRouter.calcPath(fromAct.getCoord(), toAct.getCoord(), depTime, person);
 			if (path != null) {
 				travelTime = path.travelTime;
 				exitCoord = path.nodes.get(path.nodes.size() - 1).getCoord();
-				
+					
 				/*
 				 * The person is not informed yet, but still the evacuation might have been started.
 				 * Therefore, a penalty might be added to the travel time since the public transport
 				 * availability might be reduced.
 				 */
-				if (depTime > EvacuationConfig.evacuationTime && travelTime < Double.MAX_VALUE) {
+				if (depTime >= EvacuationConfig.evacuationTime && travelTime < Double.MAX_VALUE) {
 					double penaltyFactor = EvacuationConfig.ptTravelTimePenaltyFactor;
 					travelTime *= penaltyFactor;
 				}
@@ -148,7 +150,8 @@ public class PTTravelTimeEvacuation implements SwissPTTravelTime {
 			 * other route
 			 */
 			else {
-				Path path = evacuationRouter.calcExitPath(fromAct.getCoord(), depTime, person); 
+//				Path path = evacuationRouter.calcExitPath(fromAct.getCoord(), depTime, person);
+				Path path = evacuationRouter.calcPath(fromAct.getCoord(), toAct.getCoord(), depTime, person);
 				if (path != null) {
 					travelTime = path.travelTime;
 					exitCoord = path.nodes.get(path.nodes.size() - 1).getCoord();
@@ -166,6 +169,10 @@ public class PTTravelTimeEvacuation implements SwissPTTravelTime {
 			log.warn("No transit route was found for agent " + person.getId().toString() + 
 					" from link " + fromAct.getLinkId().toString() + 
 					" to link " + toAct.getLinkId().toString());
+		} else if (travelTime == 0.0) {
+			double distance = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+			log.warn("Found travel time of 0.0 seconds for a crow fly distance of " + distance +
+					". Time: " + depTime + ", person: " + person.getId());
 		}
 		return new Tuple<Double, Coord>(travelTime, exitCoord);
 	}

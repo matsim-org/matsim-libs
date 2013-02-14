@@ -115,7 +115,7 @@ public class EvacuationTransitRouter {
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {
 
-			double initialTime = calcInitialTime(fromCoord, node.stop.getStopFacility().getCoord(), person);
+			double initialTime = calcInitialTime(toCoord, node.stop.getStopFacility().getCoord(), person);
 			
 			// in the evacuation case we use travel time as travel costs
 			double initialCost = initialTime;
@@ -125,6 +125,15 @@ public class EvacuationTransitRouter {
 		
 		// find routes between start and end stops
 		Path path = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
+		
+		/*
+		 * Walk trips to first stop and from last stop are NOT included in the path.
+		 */
+		InitialNode fromNode = wrappedFromNodes.get(path.nodes.get(0));
+		InitialNode toNode = wrappedToNodes.get(path.nodes.get(path.nodes.size() - 1));
+		double additionalCosts = fromNode.initialCost + toNode.initialCost;
+		double additionalTime = additionalCosts;	// travel time is used as travel cost in the evacuation case!
+		path = new Path(path.nodes, path.links, path.travelTime + additionalTime, path.travelCost + additionalCosts);
 		
 		return path;
 	}
@@ -158,6 +167,15 @@ public class EvacuationTransitRouter {
 		// find routes between start and end stops
 		Path path = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToExitNodes, person);
 
+		/*
+		 * Walk trips to first stop and from last stop are NOT included in the path.
+		 */
+		InitialNode fromNode = wrappedFromNodes.get(path.nodes.get(0));
+		InitialNode toNode = wrappedToExitNodes.get(path.nodes.get(path.nodes.size() - 1));
+		double additionalCosts = fromNode.initialCost + toNode.initialCost;
+		double additionalTime = additionalCosts;	// travel time is used as travel cost in the evacuation case!
+		path = new Path(path.nodes, path.links, path.travelTime + additionalTime, path.travelCost + additionalCosts);
+		
 		return path;
 	}
 
