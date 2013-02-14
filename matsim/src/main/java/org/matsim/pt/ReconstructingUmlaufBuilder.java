@@ -51,8 +51,8 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	};
 
 	private Collection<TransitLine> transitLines;
-	private Vehicles basicVehicles;
-	private Map<Id,Umlauf> umlaeufe = null ;
+	private Vehicles vehicles;
+	private Map<Id,Umlauf> umlaeufe = null;
 	private ArrayList<UmlaufStueck> umlaufStuecke;
 
 	private UmlaufInterpolator umlaufInterpolator;
@@ -66,14 +66,14 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 		super();
 		this.umlaufInterpolator = new UmlaufInterpolator(network, config);
 		this.transitLines = transitLines;
-		this.basicVehicles = basicVehicles;
+		this.vehicles = basicVehicles;
 		this.umlaufIdsByVehicleId = new HashMap<Id, Id>();
 	}
 
 	@Override
 	public Collection<Umlauf> build() {
 		if ( umlaeufe != null ) {
-			log.warn("Found `umlaeufe != null' thus re-using existing umlaufe.  This should be ok but it is not systematically tested." ) ;
+			log.warn("Found `umlaeufe != null' thus re-using existing umlaufe.  This should be ok but it is not systematically tested." );
 		} else {
 			umlaeufe = new HashMap<Id,Umlauf>();
 			createEmptyUmlaeufe();
@@ -84,11 +84,18 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	}
 	
 	private void createUmlaeufe(){
-		int cnt = 0 ;
+		int cnt = 0;
 		for (UmlaufStueck umlaufStueck : umlaufStuecke) {
-			Umlauf umlauf = umlaeufe.get(this.getUmlaufIdForVehicleId(umlaufStueck.getDeparture().getVehicleId()));
+			Id umlaufId = this.getUmlaufIdForVehicleId(umlaufStueck.getDeparture().getVehicleId());
+			if (umlaufId == null) {
+				throw new RuntimeException("UmlaufId could not be found. veh=" + umlaufStueck.getDeparture().getVehicleId());
+			}
+			Umlauf umlauf = umlaeufe.get(umlaufId);
+			if (umlauf == null) {
+				throw new RuntimeException("Umlauf could not be found: " + umlaufId);
+			}
 			umlaufInterpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
-			cnt++ ;
+			cnt++;
 			printStatus(cnt);
 		}
 	}
@@ -104,23 +111,23 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	}
 
 	private void createEmptyUmlaeufe() {
-		for (Vehicle basicVehicle : basicVehicles.getVehicles().values()) {
-			UmlaufImpl umlauf = new UmlaufImpl(this.createUmlaufIdFromVehicle(basicVehicle));
-			umlauf.setVehicleId(basicVehicle.getId());
+		for (Vehicle vehicle : vehicles.getVehicles().values()) {
+			UmlaufImpl umlauf = new UmlaufImpl(this.createUmlaufIdFromVehicle(vehicle));
+			umlauf.setVehicleId(vehicle.getId());
 			umlaeufe.put(umlauf.getId(), umlauf);
 		}
 	}
 
 	private void createUmlaufStuecke() {
 		this.umlaufStuecke = new ArrayList<UmlaufStueck>();
-		log.info("Generating UmlaufStuecke") ;
-		int cnt = 0 ;
+		log.info("Generating UmlaufStuecke");
+		int cnt = 0;
 		for (TransitLine line : transitLines) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
 					UmlaufStueck umlaufStueck = new UmlaufStueck(line, route, departure);
 					umlaufStuecke.add(umlaufStueck);
-					cnt++ ;
+					cnt++;
 					printStatus(cnt);
 				}
 			}
