@@ -137,12 +137,12 @@ public abstract class CGAL {
 	}
 
 	/**
-	 * determinate of 2x2 square matrix    
+	 * determinant of 2x2 square matrix    
 	 * @param x0
 	 * @param x1
 	 * @param y0
 	 * @param y1
-	 * @return determinante
+	 * @return determinant
 	 */
 	public static float det(float x0, float x1,
 			float y0, float y1) {
