@@ -22,6 +22,7 @@ package playground.christoph.dissertation;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -38,6 +39,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
+import playground.christoph.analysis.ActivitiesAnalyzer;
 import playground.christoph.analysis.TripsAnalyzer;
 import playground.christoph.controler.WithinDayInitialRoutesController;
 
@@ -116,7 +118,7 @@ public class InitialRoutesController {
 		if (useFacilityOpenTimes) {
 			controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));			
 		}
-				
+			
 		controler.addControlerListener(new StartupListener() {
 			
 			@Override
@@ -135,13 +137,20 @@ public class InitialRoutesController {
 				modes.add(TransportMode.ride);
 				modes.add(TransportMode.walk);
 				
-				// create TripDurationCalculator and register it as ControlerListener and EventsHandler
+				// create TripsAnalyzer and register it as ControlerListener and EventsHandler
 				TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(outputTripsFileName, outputDurationsFileName, modes, true);
 				event.getControler().addControlerListener(tripsAnalyzer);
 				event.getControler().getEvents().addHandler(tripsAnalyzer);
 				
-				// TripDurationCalculator is a StartupEventListener, therefore pass event over to it.
+				// TripsAnalyzer is a StartupEventListener, therefore pass event over to it.
 				tripsAnalyzer.notifyStartup(event);
+				
+				// create ActivitiesAnalyzer and register it as ControlerListener and EventsHandler
+				String activitiesFileName = "activityCounts";
+				Set<String> activityTypes = new TreeSet<String>(event.getControler().getConfig().planCalcScore().getActivityTypes());
+				ActivitiesAnalyzer activitiesAnalyzer = new ActivitiesAnalyzer(activitiesFileName, activityTypes, true);
+				event.getControler().addControlerListener(activitiesAnalyzer);
+				event.getControler().getEvents().addHandler(activitiesAnalyzer);
 			}
 		});
 		

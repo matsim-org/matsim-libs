@@ -22,8 +22,8 @@ package playground.christoph.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,21 +66,21 @@ public class TripsAnalyzer implements AgentDepartureEventHandler, AgentArrivalEv
 	private final Map<String, List<Double>> legTravelTimes = new HashMap<String, List<Double>>();
 	
 	private final String tripsFileName;
-	private final String durationFileName;
+	private final String durationsFileName;
 	private final boolean createGraphs;
 	
 	private double[][] tripsHistory;
 	private double[][] durationHistory;
 	private int minIteration;
 	
-	public TripsAnalyzer(String tripsFileName, String durationFileName, Set<String> modes, boolean createGraphs) {
+	public TripsAnalyzer(String tripsFileName, String durationsFileName, Set<String> modes, boolean createGraphs) {
 
 		this.tripsFileName = tripsFileName;
-		this.durationFileName = durationFileName;
+		this.durationsFileName = durationsFileName;
 		this.createGraphs = createGraphs;
 		
 		this.tripsWriter = IOUtils.getBufferedWriter(tripsFileName + ".txt");
-		this.durationWriter = IOUtils.getBufferedWriter(durationFileName + ".txt");
+		this.durationWriter = IOUtils.getBufferedWriter(durationsFileName + ".txt");
 		
 		sortedModes = new TreeSet<String>(modes);
 		try {
@@ -92,7 +92,7 @@ public class TripsAnalyzer implements AgentDepartureEventHandler, AgentArrivalEv
 				this.durationWriter.write("\t");
 				this.durationWriter.write(mode.toUpperCase());
 				
-				this.legTravelTimes.put(mode, new ArrayList<Double>());
+				this.legTravelTimes.put(mode, new LinkedList<Double>());
 			}
 			this.tripsWriter.write("\t");
 			this.tripsWriter.write("OVERALL");
@@ -116,7 +116,7 @@ public class TripsAnalyzer implements AgentDepartureEventHandler, AgentArrivalEv
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		
-		Double departureTime = departureTimes.get(event.getPersonId());
+		Double departureTime = departureTimes.remove(event.getPersonId());
 		if (departureTime == null) throw new RuntimeException("No departure time for agent " + event.getPersonId() + " was found!");
 		
 		double travelTime = event.getTime() - departureTime;
@@ -218,7 +218,7 @@ public class TripsAnalyzer implements AgentDepartureEventHandler, AgentArrivalEv
 			chart.addSeries("overall", iterations, values);
 			
 			chart.addMatsimLogo();
-			chart.saveAsPng(this.durationFileName + ".png", 800, 600);
+			chart.saveAsPng(this.durationsFileName + ".png", 800, 600);
 			
 			/*
 			 * number of trips
