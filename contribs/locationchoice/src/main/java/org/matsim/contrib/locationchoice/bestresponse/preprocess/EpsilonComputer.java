@@ -88,6 +88,7 @@ public class EpsilonComputer implements PlanAlgorithm {
 			}
 		}
 		// temporarily store maxEpsilon here: (s_l)
+		// TODO: get rid of that hack. ah feb'13
 		if (((PersonImpl)p).getDesires() == null) ((PersonImpl)p).createDesires("");
 		((PersonImpl)p).getDesires().setDesc(((PersonImpl)p).getDesires().getDesc() + maxEpsilon + "_");	
 	}
