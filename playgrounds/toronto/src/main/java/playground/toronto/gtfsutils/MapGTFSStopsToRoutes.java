@@ -121,7 +121,19 @@ public class MapGTFSStopsToRoutes {
 			
 			HashSet<String> modesServed = new HashSet<String>();
 			
-			for (String r : stopRoutesMap.get(id)) modesServed.add(routeModeMap.get(r));
+			ArrayList<String> routes = stopRoutesMap.get(id);
+			if (routes == null){
+				System.err.println("Could not find data for stop id " + id);
+				continue;
+			}
+			for (String r : routes) {
+				String x = routeModeMap.get(r);
+				if (x == null){
+					System.err.println("Could not find mode data for route " + r);
+				}
+				modesServed.add(x);
+			}
+				
 			
 			
 			writer.write("\n" + line);
