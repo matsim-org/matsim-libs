@@ -518,6 +518,55 @@ public class TransitDriverTest {
 		}
 	}
 
+	@Test
+	public void testExceptionWhenNotAllStopsServed() {
+		EventsManager events = EventsUtils.createEventsManager();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(2500, 0), false);
+		stop1.setLinkId(new IdImpl("1"));
+		stop2.setLinkId(new IdImpl("2"));
+		stop3.setLinkId(new IdImpl("33"));
+		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
+		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
+		NetworkRoute route = new LinkNetworkRouteImpl(new IdImpl(1), new IdImpl(2));
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
+		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		tqsim.addMobsimEngine(trEngine);
+		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(5));
+		vehType.setCapacity(capacity);
+		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
+		
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
+		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
+		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
+		driver.setVehicle(queueVehicle);
+		
+		driver.handleTransitStop(stop1, 60);
+		assertEquals(new IdImpl("2"), driver.chooseNextLinkId());
+		driver.notifyMoveOverNode(new IdImpl("2"));
+		driver.handleTransitStop(stop2, 120);
+		try {
+			assertNull(driver.chooseNextLinkId());
+			fail("missing exception: driver has not yet handled all stops, although it has no more links in its route.");
+		}
+		catch (RuntimeException e) {
+			log.info("catched expected exception.", e);
+		}
+	}
+	
 	protected static class SpyAgent implements PTPassengerAgent {
 		public TransitLine offeredLine;
 

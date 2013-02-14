@@ -107,6 +107,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		if (this.nextLinkIndex == linkIds.size()) {
 			return netR.getEndLinkId();
 		}
+		assertAllStopsServed();
 		return null;
 	}
 	
@@ -275,6 +276,15 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		this.currentStop = null;
 	}
 
+	private void assertAllStopsServed() {
+		if (this.nextStop != null) {
+			RuntimeException e = new RuntimeException("Transit vehicle is not yet at last stop! vehicle-id = " 
+					+ this.vehicle.getVehicle().getId() + "; next-stop = " + this.nextStop.getStopFacility().getId());
+			log.error(e);
+			throw e;
+		}
+	}
+	
 	private void assertVehicleIsEmpty() {
 		if (this.vehicle.getPassengers().size() > 0) {
 			RuntimeException e = new RuntimeException("Transit vehicle is at last stop but still contains passengers that did not leave the vehicle!");
