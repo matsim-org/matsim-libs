@@ -87,10 +87,6 @@ public class RunCliquesWithHardCodedStrategies {
 		}
 
 		@StringSetter( "reRoute" )
-		public void setReRouteWeight(final String s) {
-			this.reRoute = Double.parseDouble( s );
-		}
-
 		public void setReRouteWeight(final double v) {
 			this.reRoute = v;
 		}
@@ -101,10 +97,6 @@ public class RunCliquesWithHardCodedStrategies {
 		}
 
 		@StringSetter( "timeMutator" )
-		public void setTimeMutationWeight(final String s) {
-			this.timeMutator = Double.parseDouble( s );
-		}
-
 		public void setTimeMutationWeight(final double v) {
 			this.timeMutator = v;
 		}
@@ -115,10 +107,6 @@ public class RunCliquesWithHardCodedStrategies {
 		}
 
 		@StringSetter( "jointTripMutation" )
-		public void setJointTripMutationWeight(final String s) {
-			this.jointTripMutation = Double.parseDouble( s );
-		}
-
 		public void setJointTripMutationWeight(final double v) {
 			this.jointTripMutation = v;
 		}
@@ -129,10 +117,6 @@ public class RunCliquesWithHardCodedStrategies {
 		}
 
 		@StringSetter( "modeMutation" )
-		public void setModeMutationWeight(final String s) {
-			this.modeMutation = Double.parseDouble( s );
-		}
-
 		public void setModeMutationWeight(final double v) {
 			this.modeMutation = v;
 		}
@@ -143,10 +127,6 @@ public class RunCliquesWithHardCodedStrategies {
 		}
 
 		@StringSetter( "logitSelection" )
-		public void setLogitSelectionWeight(final String s) {
-			this.logitSelection = Double.parseDouble( s );
-		}
-
 		public void setLogitSelectionWeight(final double v) {
 			this.logitSelection = v;
 		}
@@ -165,10 +145,6 @@ public class RunCliquesWithHardCodedStrategies {
 		}
 
 		@StringSetter( "jtmOptimizes" )
-		public void setJtmOptimizes(final String s) {
-			this.jtmOptimizes = Boolean.parseBoolean( s );
-		}
-
 		public void setJtmOptimizes(final boolean v) {
 			this.jtmOptimizes = v;
 		}

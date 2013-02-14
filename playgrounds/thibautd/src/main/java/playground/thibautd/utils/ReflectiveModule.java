@@ -22,7 +22,10 @@ package playground.thibautd.utils;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -126,8 +129,13 @@ public abstract class ReflectiveModule extends Module {
 			throw new InconsistentModuleException( "setter "+m+" has "+params.length+" parameters instead of one" );
 		}
 
-		if ( !params[ 0 ].equals( String.class ) ) {
-			throw new InconsistentModuleException( "setter "+m+" gets a "+params[ 0 ]+" instead of a string" );
+		final Collection<Class<?>> allowedParameterTypes =
+			Arrays.<Class<?>>asList(
+					String.class,
+					Float.class, Double.class, Integer.class, Long.class, Boolean.class, Character.class, Byte.class, Short.class,
+					Float.TYPE, Double.TYPE, Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE);;
+		if ( !allowedParameterTypes.contains( params[ 0 ] ) ) {
+			throw new InconsistentModuleException( "setter "+m+" gets a "+params[ 0 ]+". Valid types are String, primitive types and their wrapper classes." );
 		}
 	}
 
@@ -148,11 +156,49 @@ public abstract class ReflectiveModule extends Module {
 		}
 
 		try {
-			setter.invoke( this , value );
+			invokeSetter( setter , value );
 			log.trace( "value "+value+" successfully set for field "+param_name+" for group "+getName() );
 		}
 		catch (Exception e) {
 			throw new RuntimeException( e );
+		}
+	}
+
+	private void invokeSetter(
+			final Method setter,
+			final String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		final Class<?>[] params = setter.getParameterTypes();
+		assert params.length == 1; // already checked at constr.
+
+		final Class<?> type = params[ 0 ];
+
+		if ( type.equals( String.class ) ) {
+			setter.invoke( this , value );
+		}
+		else if ( type.equals( Float.class ) || type.equals( Float.TYPE ) ) {
+			setter.invoke( this , Float.parseFloat( value ) );
+		}
+		else if ( type.equals( Double.class ) || type.equals( Double.TYPE ) ) {
+			setter.invoke( this , Double.parseDouble( value ) );
+		}
+		else if ( type.equals( Integer.class ) || type.equals( Integer.TYPE ) ) {
+			setter.invoke( this , Integer.parseInt( value ) );
+		}
+		else if ( type.equals( Long.class ) || type.equals( Long.TYPE ) ) {
+			setter.invoke( this , Long.parseLong( value ) );
+		}
+		else if ( type.equals( Boolean.class ) || type.equals( Boolean.TYPE ) ) {
+			setter.invoke( this , Boolean.parseBoolean( value ) );
+		}
+		else if ( type.equals( Character.class ) || type.equals( Character.TYPE ) ) {
+			if ( value.length() != 1 ) throw new IllegalArgumentException( value+" is not a single char!" );
+			setter.invoke( this , value.toCharArray()[ 0 ] );
+		}
+		else if ( type.equals( Byte.class ) || type.equals( Byte.TYPE ) ) {
+			setter.invoke( this , Byte.parseByte( value ) );
+		}
+		else if ( type.equals( Short.class ) || type.equals( Short.TYPE ) ) {
+			setter.invoke( this , Short.parseShort( value ) );
 		}
 	}
 
