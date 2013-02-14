@@ -20,11 +20,17 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -59,6 +65,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
@@ -66,21 +73,16 @@ import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
-
 /**
  * @author mrieser
  */
-public class TransitDriverTest extends MatsimTestCase {
+public class TransitDriverTest {
 
 	private static final Logger log = Logger.getLogger(TransitDriverTest.class);
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		Config c = super.loadConfig(null);
-		c.addQSimConfigGroup(new QSimConfigGroup());
-	}
-
+	public MatsimTestUtils util = new MatsimTestUtils();
+	
+	@Test
 	public void testInitializationNetworkRoute() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
@@ -105,6 +107,10 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, null, null);
+		VehicleType vehType = new VehicleTypeImpl(new IdImpl("T1"));
+		vehType.setCapacity(new VehicleCapacityImpl());
+		vehType.getCapacity().setSeats(5);
+		driver.setVehicle(new TransitQVehicle(new VehicleImpl(new IdImpl("V1"), vehType)));
 
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
 		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
@@ -135,6 +141,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals(null, driver.chooseNextLinkId());
 	}
 
+	@Test
 	public void testInitializationDeparture() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
@@ -146,6 +153,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testInitializationStops() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -194,6 +202,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals(null, driver.getNextTransitStop());
 	}
 
+	@Test
 	public void testHandleStop_EnterPassengers() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -295,6 +304,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		}
 	}
 
+	@Test
 	public void testHandleStop_ExitPassengers() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -357,6 +367,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals(0.0, driver.handleTransitStop(stop2, 160), MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testHandleStop_CorrectIdentification() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -394,6 +405,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals(tLine, agent.offeredLine);
 	}
 
+	@Test
 	public void testHandleStop_AwaitDepartureTime() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -449,6 +461,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		assertEquals(0.0, driver.handleTransitStop(stop3, departureTime + 210), MatsimTestCase.EPSILON);
 	}
 
+	@Test
 	public void testExceptionWhenNotEmptyAfterLastStop() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
