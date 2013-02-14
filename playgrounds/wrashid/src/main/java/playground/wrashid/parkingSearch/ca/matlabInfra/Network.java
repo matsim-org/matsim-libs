@@ -8,6 +8,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.NetworkImpl;
 
+import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
+import playground.wrashid.lib.tools.kml.Color;
+
 
 public class Network {
 
@@ -21,11 +24,37 @@ public class Network {
 				selectedLinks.add(link);
 			}
 		}
+		
+		writeOutLinksToKML(Config.getOutputFolder() + "links.kml", selectedLinks);
 
+		writeOutNodesToKML(Config.getOutputFolder() + "nodes.kml",  getUniqueNodes(selectedLinks));
+		
 		writeOutLinks(Config.getOutputFolder() + "links.xml", selectedLinks);
 
 		writeOutNodes(Config.getOutputFolder() +  "nodes.xml", getUniqueNodes(selectedLinks));
 
+	}
+	
+	private static void writeOutNodesToKML(String path, LinkedList<Node> selectedNodes){
+		BasicPointVisualizer bpv=new BasicPointVisualizer();
+		
+		for (Node node: selectedNodes){
+			bpv.addPointCoordinate(node.getCoord(), node.getId().toString(), Color.RED);
+		}
+		
+		bpv.write(path);
+		
+	}
+	
+	private static void writeOutLinksToKML(String path, LinkedList<Link> selectedLinks){
+		BasicPointVisualizer bpv=new BasicPointVisualizer();
+		
+		for (Link link: selectedLinks){
+			bpv.addPointCoordinate(link.getCoord(), link.getId().toString(), Color.RED);
+		}
+		
+		bpv.write(path);
+		
 	}
 
 	private static LinkedList<Node> getUniqueNodes(LinkedList<Link> selectedLinks) {
