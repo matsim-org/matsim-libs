@@ -71,9 +71,9 @@ public class Test {
 //		String network = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml";
 //		String output = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/sim2dEnv_0.gml.gz";
 
-		String p = "/Users/laemmel/devel/burgdorf2d/raw_input/env.shp";
-		String network = "/Users/laemmel/devel/burgdorf2d/raw_input/raw_network2d_0.xml";
-		String output = "/Users/laemmel/devel/burgdorf2d/raw_input_stage2/sim2dEnv_0.gml.gz";
+		String p = "/Users/laemmel/devel/burgdorf2d2/raw_input/station-1_stage1_simple_b.shp";
+		String network = "/Users/laemmel/devel/burgdorf2d2/raw_input/raw_network2d_-1.xml";
+		String output = "/Users/laemmel/devel/burgdorf2d2/raw_input_stage2/sim2dEnv_-1.gml.gz";
 		
 		GeometryFactory geofac = new GeometryFactory();
 
@@ -86,9 +86,9 @@ public class Test {
 		new MatsimNetworkReader(sc).readFile(network);
 		
 		for (Link  l : sc.getNetwork().getLinks().values()) {
-			if (l.getFromNode().getInLinks().size() <= 2 ||l.getToNode().getInLinks().size() <= 2){
-				continue;
-			}
+//			if (l.getFromNode().getInLinks().size() <= 2 ||l.getToNode().getInLinks().size() <= 2){
+//				continue;
+//			}
 			Coordinate c0 = MGC.coord2Coordinate(l.getFromNode().getCoord());
 			Coordinate c1 = MGC.coord2Coordinate(l.getToNode().getCoord());
 			Coordinate[] coords = new Coordinate[]{c0,c1};
@@ -147,7 +147,7 @@ public class Test {
 		}
 		GisDebugger.dump("/Users/laemmel/devel/convexdecomp/openings.shp");
 		int nr = 0;
-		CoordinateReferenceSystem crs = CRS.decode("EPSG:3395");
+		CoordinateReferenceSystem crs = CRS.decode("EPSG:21781");
 		Sim2DEnvironment env = new Sim2DEnvironment();
 		env.setCRS(crs);
 		env.setEnvelope(reader.getBounds());
@@ -208,7 +208,7 @@ public class Test {
 		conf.setTimeStepSize(0.1);
 		conf.addSim2DEnvironmentPath(output);
 		conf.addSim2DEnvNetworkMapping(output, network);
-		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/burgdorf2d/raw_input_stage2/sim2dConfig.xml");
+		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/burgdorf2d2/raw_input_stage2/sim2dConfig.xml");
 		
 		
 		

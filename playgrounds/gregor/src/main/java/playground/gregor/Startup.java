@@ -7,7 +7,7 @@ public class Startup {
 	public static int SIZE = 10000000;
 
 	public static void main(String [] args) {
-		String [] argsII = {"/Users/laemmel/devel/burgdorf2d/input/sim2d_network_env1.xml.gz","/Users/laemmel/tmp/vis/networkL.shp","/Users/laemmel/tmp/vis/networkP.shp","EPSG:3395"};
+		String [] argsII = {"/Users/laemmel/devel/burgdorf2d2/raw_input/raw_network2d_-1.xml","/Users/laemmel/devel/burgdorf2d2//tmp/networkL.shp","/Users/laemmel/devel/burgdorf2d2/tmp/networkP.shp","EPSG:21781"};
 		Links2ESRIShape.main(argsII);
 		
 	}

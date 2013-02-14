@@ -31,11 +31,12 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class SimplePopulationGenerator {
 	public static void main(String [] args) {
-		Config c = ConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/input/config.xml");
+		Config c = ConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d2/input/config.xml");
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		
 		int nrAgents = 20000;
@@ -44,30 +45,43 @@ public class SimplePopulationGenerator {
 		PopulationFactory fac = pop.getFactory();
 		double t = 120;
 		for (int i = 0; i < nrAgents/2; i++) {
-			Person pers = fac.createPerson(new IdImpl("r"+i));
+			Person pers = fac.createPerson(new IdImpl("b"+i));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
-			Activity act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_0_174673140"));
+			Activity act0;
+			if (MatsimRandom.getRandom().nextBoolean()) {
+				act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_3_rev_-11078"));
+			} else  {
+				act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_3_-11078"));
+			}
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_9_27062060"));
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_0_rev_-11064"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 //			t += .5;
 		}
 		t =0;
 		for (int i = nrAgents/2; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("g"+i));
+			Person pers = fac.createPerson(new IdImpl("b"+i));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
-			Activity act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_9_27062060"));
+			Activity act0;
+			double r = MatsimRandom.getRandom().nextDouble();
+			if (r < 0.33) {
+				act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_2_-11076"));
+			} else if (r < 0.66) {
+				act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_2_-11076"));
+			} else {
+				act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_0_-11076"));
+			}
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_0_174673140"));
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_0_rev_-11064"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 //			t += .5;

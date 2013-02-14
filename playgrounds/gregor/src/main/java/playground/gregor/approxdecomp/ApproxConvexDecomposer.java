@@ -36,6 +36,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.approxdecomp.Graph.Node;
+import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
@@ -61,7 +62,7 @@ public class ApproxConvexDecomposer {
 
 	private static final double S_D = 0.1;
 	private static final double S_C = .1;
-	private static final double TAU = 1.;
+	private static final double TAU =1.;
 	private static final boolean ALLOW_STEINER_VERTICES = true;
 	private static final double epsilon = 0.0001;
 
@@ -203,7 +204,12 @@ public class ApproxConvexDecomposer {
 
 		Tuple<CoordinateInfo,CoordinateInfo> resolve = getResolvePair(pi);
 		if (resolve.getFirst().cIdx == 0 || resolve.getSecond().cIdx == 0) {
-			throw new RuntimeException("needs to be rotated, which is not implemented yet!");
+			if (resolve.getFirst().cIdx == 0) {
+				rotate(pi,resolve.getFirst());
+			}
+			if (resolve.getSecond().cIdx == 0) {
+				rotate(pi,resolve.getSecond());
+			}
 		}
 
 		LinearRing lr2 = (LinearRing) pi.p.getInteriorRingN(resolve.getFirst().pIdx);
@@ -290,6 +296,31 @@ public class ApproxConvexDecomposer {
 		return ret;
 	}
 
+	private void rotate(PolygonInfo pi, CoordinateInfo ci) {
+		
+		LineString ls = null;
+		if (ci.pIdx == -1) {
+			ls = pi.p.getExteriorRing();
+			//rotate openings
+			for (Opening o : pi.openings) {
+				o.edge--;
+				if (o.edge == -1) {
+					o.edge = ls.getCoordinates().length-2;
+				}
+			}
+		} else {
+			ls = pi.p.getInteriorRingN(ci.pIdx);
+		}
+		Coordinate[] coords = ls.getCoordinates();
+		for (int i = 0; i < coords.length-1; i++) {
+			coords[i] = coords[i+1];
+		}
+		coords[coords.length-1] = coords[0];
+		
+	
+		
+	}
+
 	private LinearRing merge(LinearRing lr1, LinearRing lr2, int idx1, int idx2) {
 		Coordinate[] c1 = lr1.getCoordinates();
 		Coordinate[] c2 = lr2.getCoordinates();
@@ -362,6 +393,7 @@ public class ApproxConvexDecomposer {
 		Map<Integer, Double> concavity = new HashMap<Integer,Double>();
 		double mostConcave = 0;
 		Tuple<CoordinateInfo,CoordinateInfo> resolve = null;
+		boolean reverse =false;
 		while (!open.isEmpty()) {
 			Iterator<AntipodalPair> it = open.iterator();
 			while (it.hasNext()) {
@@ -373,10 +405,10 @@ public class ApproxConvexDecomposer {
 				Coordinate pcic = getCoord(pci.pIdx, pci.cIdx, pi.p);
 
 				CoordinateInfo cwpci = getNearestNoneIntersectingCoordinate(element.cwpi,element.pIdx,quadTree,pi.p, element.dist);
-				Coordinate cwpcic = getCoord(pci.pIdx, pci.cIdx, pi.p);
+				Coordinate cwpcic = getCoord(cwpci.pIdx, cwpci.cIdx, pi.p);
 				double cwdist = cwpcic.distance(cwpc);
 				double dist = pc.distance(pcic);
-				if (cwdist < dist) {
+				if (cwdist < dist && !reverse || cwdist > dist && reverse) {
 					double conc  = 0;
 					if (cwpci.pIdx == -1) {
 						conc = cwdist + element.dist;
@@ -428,6 +460,7 @@ public class ApproxConvexDecomposer {
 					concavity.put(ap.pIdx, 0.);
 				}
 			}
+//			reverse = !reverse;
 
 		}
 		return resolve;
@@ -453,6 +486,7 @@ public class ApproxConvexDecomposer {
 					}
 					double dist = tmp.distance(c);
 					if (dist < minDist) {
+						minDist = dist;
 						ret = ci;
 						found = true;
 					}
@@ -767,6 +801,8 @@ public class ApproxConvexDecomposer {
 		double [] ret = new double[shell.length];
 		boolean ccw = CGAlgorithms.isCCW(shell);
 		if (ccw) {
+			GisDebugger.addGeometry(p);
+			GisDebugger.dump("/Users/laemmel/devel/burgdorf2d2/tmp/dump.shp");
 			log.warn("wrong orientation. leaving polygon as it is!");
 			return ret;
 		}

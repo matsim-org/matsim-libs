@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.matsim.core.utils.collections.QuadTree;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
