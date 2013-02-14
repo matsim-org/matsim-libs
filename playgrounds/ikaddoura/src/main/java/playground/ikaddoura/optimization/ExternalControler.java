@@ -163,6 +163,8 @@ class ExternalControler {
 		
 		if (marginalCostPricing){
 			log.info("Marginal cost pricing is enabled.");
+		} else {
+			log.info("Marginal cost pricing is disabled.");
 		}
 		
 		log.info("Setting parameters... Done.");
@@ -197,7 +199,6 @@ class ExternalControler {
 
 						log.info("###################################################");
 						log.info("### EXTERNAL ITERATION " + iterationCounter + " BEGINS");
-						log.info("headway [sec]: " + headway + " // capacity [pax/veh]: " + capacity + " // fare [AUD]: " + fare);
 					
 						runInternalIteration(iterationCounter, demand, headway, capacity, fare, marginalCostPricing);
 						
@@ -310,8 +311,8 @@ class ExternalControler {
 		this.it2information.put(iterationCounter, info);
 		
 		this.textWriter.writeExtItData(outputPath, this.it2information);
-		this.textWriter.writeFareData(outputPath, analysis.getFareData());
 		this.textWriter.writeMatrices(outputPath, this.it2information);
+		this.textWriter.writeFareData(directoryIt, analysis.getFareData());
 		
 		iterationCounter++;
 	}
