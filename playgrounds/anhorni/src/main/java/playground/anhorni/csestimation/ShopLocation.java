@@ -19,6 +19,7 @@
 
 package playground.anhorni.csestimation;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 public class ShopLocation extends Location {	 
@@ -35,6 +36,10 @@ public class ShopLocation extends Location {
 	
 	public ShopLocation(Id id) {
 		super(id);
+	}
+	
+	public ShopLocation(Id id, Coord coord) {
+		super(id, coord);
 	}
 	
 	public int getPrevLoc() {

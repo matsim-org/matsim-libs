@@ -31,6 +31,11 @@ public class Location {
 		this.id = id;
 	}
 	
+	public Location(Id id, Coord coord) {
+		this.id = id;
+		this.coord = coord;
+	}
+	
 	public Id getId() {
 		return id;
 	}

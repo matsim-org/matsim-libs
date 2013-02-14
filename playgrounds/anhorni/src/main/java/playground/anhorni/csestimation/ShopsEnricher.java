@@ -51,6 +51,10 @@ public class ShopsEnricher {
 		this.assignPrice();
 		log.info("Enriching finished ------------------------------------------");
 	}
+	
+	public void setShops(TreeMap<Id, ShopLocation> shops) {
+		this.shops = shops;
+	}
 
 	/*
 	471901	0	Warenhäuser
@@ -60,7 +64,7 @@ public class ShopsEnricher {
 	471104	4	Grosse Geschäfte (100-399 m2)
 	471105	5	Kleine Geschäfte (< 100 m2)
 	*/	
-	private void readBZ(String bzFile) throws Exception {
+	public void readBZ(String bzFile) throws Exception {
 		FileReader fr = new FileReader(bzFile);
 		BufferedReader br = new BufferedReader(fr);
 		String curr_line = br.readLine();  // Skip header
@@ -91,7 +95,7 @@ public class ShopsEnricher {
 		log.info("Added " + bzShops.size() + " BZ shops");
 	}	
 	
-	private void assignSize() {
+	public void assignSize() {
 		QuadTree<Location> bzQuadTree = Utils.buildLocationQuadTree(this.bzShops); 
 		for (ShopLocation shop:this.shops.values()) {			
 			BZShop closestBZShop = (BZShop) bzQuadTree.get(shop.getCoord().getX(), shop.getCoord().getY());
@@ -142,7 +146,7 @@ public class ShopsEnricher {
 		}
 	}
 	
-	private void assignPrice() {
+	public void assignPrice() {
 		for (ShopLocation shop:this.shops.values()) {
 			int lidl_aldi = 1;
 			int denner = 2;
@@ -170,6 +174,10 @@ public class ShopsEnricher {
 				shop.setPrice(spar_other);
 			}
 		}
+	}
+	
+	public void assignPriceCH() {
+		
 	}
 
 	public TreeMap<Id, ShopLocation> getShops() {
