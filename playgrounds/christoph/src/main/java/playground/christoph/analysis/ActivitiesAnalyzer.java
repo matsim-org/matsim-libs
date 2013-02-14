@@ -20,6 +20,7 @@
 
 package playground.christoph.analysis;
 
+import java.awt.Font;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
@@ -29,6 +30,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -197,10 +200,10 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 				double lastValue = 0.0;
 				while (iter.hasNext()) {
 					ActivityData activityData = iter.next();
-					times[i] = Math.min(activityData.time, this.endTime);
+					times[i] = Math.min(activityData.time, this.endTime) / 3600.0;
 					counts[i] = activityData.activityCount;
 					if (i > 0) {
-						times[i - 1] = Math.min(activityData.time, this.endTime);
+						times[i - 1] = Math.min(activityData.time, this.endTime) / 3600.0;
 						counts[i - 1] = lastValue;
 					}
 					lastValue = activityData.activityCount;
@@ -216,16 +219,22 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 			double lastValue = 0.0;
 			while (iter.hasNext()) {
 				ActivityData activityData = iter.next();
-				times[i] = Math.min(activityData.time, this.endTime);
+				times[i] = Math.min(activityData.time, this.endTime) / 3600.0;
 				counts[i] = activityData.activityCount;
 				if (i > 0) {
-					times[i - 1] = Math.min(activityData.time, this.endTime);
+					times[i - 1] = Math.min(activityData.time, this.endTime) / 3600.0;
 					counts[i - 1] = lastValue;
 				}
 				lastValue = activityData.activityCount;
 				i += 2;
 			}
 			chart.addSeries("overall", times, counts);
+			
+		    NumberAxis domainAxis = (NumberAxis) chart.getChart().getXYPlot().getDomainAxis();
+		    domainAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 11));
+		    domainAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+		    domainAxis.setAutoRange(false);
+		    domainAxis.setRange(0, endTime / 3600.0);
 			
 			chart.addMatsimLogo();
 			String fileName = outputDirectoryHierarchy.getIterationFilename(event.getIteration(), this.activitiesFileName + ".png");
