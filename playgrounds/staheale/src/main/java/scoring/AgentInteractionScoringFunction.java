@@ -81,8 +81,11 @@ public class AgentInteractionScoringFunction extends CharyparNagelActivityScorin
 		this.attributes = attributes;
 		this.facilityOccupancies = facilityOccupancies;
 		this.config2 = config2;
-		this.destinationChoiceScoring = new DestinationChoiceScoring(
-				this.facilities, this.config2, facilitiesKValues, personsKValues, scaleEpsilon);
+//		this.destinationChoiceScoring = new DestinationChoiceScoring(
+//				this.facilities, this.config2, facilitiesKValues, personsKValues, scaleEpsilon);
+		
+		throw new RuntimeException("Hey Alex, sorry for that. I will show you how to integrate LC with a listener now. " +
+				"Large refactoring has been done in the LC module. ah feb'13");
 	}
 
 	/* 

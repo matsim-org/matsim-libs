@@ -28,7 +28,7 @@ import occupancy.FacilityOccupancy;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
+import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -121,12 +121,15 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 	}
 
 	private void computeAttributes(long seed) {
-		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, this.controler.getScenario(), this.scaleEpsilon, this.actTypeConverter, this.flexibleTypes);
-		computer.assignKValues();
-
-		this.personsKValues = computer.getPersonsKValues();
-		this.facilitiesKValues = computer.getFacilitiesKValues();
+//		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(
+//				seed, this.controler.getScenario(), this.scaleEpsilon, this.actTypeConverter, this.flexibleTypes);
+//		computer.assignKValues();
+//
+//		this.personsKValues = computer.getPersonsKValues();
+//		this.facilitiesKValues = computer.getFacilitiesKValues();
+		
+		throw new RuntimeException("Hey Alex, sorry for that. I will show you how to integrate LC with a listener now. " +
+				"Large refactoring has been done in the LC module. ah feb'13");
 	}
 
 	@Override
