@@ -22,12 +22,10 @@ package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
@@ -42,22 +40,15 @@ public class ReadOrComputeMaxDCScore {
 	private ScenarioImpl scenario;	
 	private Config config;	
 	private LocationChoiceBestResponseContext lcContext;
-	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();
-	
-	private ScaleEpsilon scaleEpsilon;
-	private ActTypeConverter actTypeConverter;
-	
-	private DestinationSampler sampler;
-	
+	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();	
+	private ScaleEpsilon scaleEpsilon;	
 	private HashSet<String> flexibleTypes;
 	
-	public ReadOrComputeMaxDCScore(Scenario scenario, ScaleEpsilon scaleEpsilon, 
-			ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes, LocationChoiceBestResponseContext lcContext) {
-		this.scenario = (ScenarioImpl) scenario;
+	public ReadOrComputeMaxDCScore(LocationChoiceBestResponseContext lcContext) {
+		this.scenario = (ScenarioImpl) lcContext.getScenario();
 		this.config = this.scenario.getConfig() ;
-		this.scaleEpsilon = scaleEpsilon;
-		this.actTypeConverter = actTypeConverter;
-		this.flexibleTypes = flexibleTypes;
+		this.scaleEpsilon = lcContext.getScaleEpsilon();
+		this.flexibleTypes = lcContext.getFlexibleTypes();
 		this.lcContext = lcContext;
 	}
 				
@@ -82,13 +73,13 @@ public class ReadOrComputeMaxDCScore {
 	}
 	
 	private void computeMaxDCScore() {			
-		this.sampler = new DestinationSampler(this.lcContext.getPersonsKValues(), this.lcContext.getFacilitiesKValues(), this.config.locationchoice());
+		DestinationSampler sampler = new DestinationSampler(this.lcContext.getPersonsKValues(), this.lcContext.getFacilitiesKValues(), this.config.locationchoice());
 				
 		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
 		for (String actType : this.scaleEpsilon.getFlexibleTypes()) {
 			log.info("Computing max epsilon for activity type " + actType);
 			ComputeMaxDCScoreMultiThreatedModule maxEpsilonComputer = new ComputeMaxDCScoreMultiThreatedModule(
-					this.scenario, actType, config, this.lcContext, this.sampler);
+					actType, this.lcContext, sampler);
 			maxEpsilonComputer.prepareReplanning(null);
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
 				maxEpsilonComputer.handlePlan(p.getSelectedPlan());
@@ -111,7 +102,6 @@ public class ReadOrComputeMaxDCScore {
 		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + "personsMaxDCScoreUnscaled.xml");
 	}
 	
-
 	public ObjectAttributes getPersonsMaxEpsUnscaled() {
 		return personsMaxDCScoreUnscaled;
 	}

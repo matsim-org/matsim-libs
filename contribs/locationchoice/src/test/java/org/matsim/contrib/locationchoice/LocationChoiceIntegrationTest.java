@@ -99,8 +99,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true) ;
 		
-		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(controler.getScenario(), lcContext.getScaleEpsilon(),
-  				lcContext.getConverter(), lcContext.getFlexibleTypes(), lcContext);
+		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
   		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
   		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
 
@@ -174,8 +173,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true) ;
 		
-		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(controler.getScenario(), lcContext.getScaleEpsilon(),
-  				lcContext.getConverter(), lcContext.getFlexibleTypes(), lcContext);
+		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
   		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
   		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
 

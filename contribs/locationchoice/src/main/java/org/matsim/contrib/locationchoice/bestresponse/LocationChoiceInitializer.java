@@ -32,8 +32,7 @@ public class LocationChoiceInitializer implements StartupListener {
   		  		
   		// compute or read maxDCScore but do not add it to the context:
   		// context can then be given to scoring classes both during regular scoring and in pre-processing 
-  		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(controler.getScenario(), lcContext.getScaleEpsilon(),
-  				lcContext.getConverter(), lcContext.getFlexibleTypes(), lcContext);
+  		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
   		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
   		this.personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
   		 		

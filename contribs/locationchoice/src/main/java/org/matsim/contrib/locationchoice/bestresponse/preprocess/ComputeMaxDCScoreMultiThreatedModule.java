@@ -27,26 +27,23 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedModule {	
-	private ScenarioImpl scenario;	
 	private String type;
 	private TreeMap<Id, ActivityFacility> typedFacilities;
 	private LocationChoiceBestResponseContext lcContext;
 	private static final Logger log = Logger.getLogger(ComputeMaxDCScoreMultiThreatedModule.class);
 	private DestinationSampler sampler;
 		
-	public ComputeMaxDCScoreMultiThreatedModule(ScenarioImpl scenario, String type, Config config, 
-			LocationChoiceBestResponseContext lcContext, DestinationSampler sampler) {
-		super(config.global().getNumberOfThreads());
-		this.scenario = scenario;
+	public ComputeMaxDCScoreMultiThreatedModule(String type, LocationChoiceBestResponseContext lcContext, DestinationSampler sampler) {
+		super(lcContext.getScenario().getConfig().global().getNumberOfThreads());
 		this.type = type;
 		this.lcContext = lcContext;
-		this.typedFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType(lcContext.getConverter().convertType(type));
+		this.typedFacilities = ((ScenarioImpl) lcContext.getScenario()).
+				getActivityFacilities().getFacilitiesForActivityType(lcContext.getConverter().convertType(type));
 		if (this.typedFacilities.size() == 0) {
 			log.warn("There are no facilities for type : " + type);
 		} 
@@ -55,12 +52,7 @@ public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedM
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		DestinationScoring scorer = new DestinationScoring(this.lcContext);
-		
-		return new ComputeMaxDCScorePlanAlgo(
-				this.scenario, this.type, typedFacilities, 
-				scorer,
-				this.lcContext.getConverter(),
-				this.sampler);
+		DestinationScoring scorer = new DestinationScoring(this.lcContext);		
+		return new ComputeMaxDCScorePlanAlgo(this.type, typedFacilities, scorer, this.sampler, lcContext);
 	}
 }

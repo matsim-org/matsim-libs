@@ -27,32 +27,30 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
+import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	private String type;
 	private TreeMap<Id, ActivityFacility> typedFacilities;
 	private DestinationScoring scorer;
-	private ActTypeConverter actTypeConverter;
 	private DestinationSampler sampler;
+	private LocationChoiceBestResponseContext lcContext;
 			
-	public ComputeMaxDCScorePlanAlgo(ScenarioImpl scenario, String type, TreeMap<Id, ActivityFacility> typedFacilities,
-			DestinationScoring scorer, ActTypeConverter actTypeConverter,
-			DestinationSampler sampler) {		
+	public ComputeMaxDCScorePlanAlgo(String type, TreeMap<Id, ActivityFacility> typedFacilities,
+			DestinationScoring scorer, DestinationSampler sampler, LocationChoiceBestResponseContext lcContext) {		
 		this.type = type;
 		this.typedFacilities = typedFacilities;
 		this.scorer = scorer;
-		this.actTypeConverter = actTypeConverter;
 		this.sampler = sampler;
+		this.lcContext = lcContext;
 	}
 		
 	@Override
@@ -62,7 +60,7 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		boolean typeInPlan = false;
 		for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof Activity) {
-				if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(type)) typeInPlan = true;
+				if (this.lcContext.getConverter().convertType(((Activity) pe).getType()).equals(type)) typeInPlan = true;
 			}
 		}
 		double maxEpsilon = 0.0;

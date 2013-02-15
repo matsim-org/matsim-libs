@@ -24,7 +24,7 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
- * Choses a stable sample of facilities for every person 
+ * Chooses a stable sample of facilities for every person 
  * 
  * At the moment it is only working for powers of 10 in the range [0..100]
  * The sample must remain stable over the course of iterations. Thus, person as well as facility k values
