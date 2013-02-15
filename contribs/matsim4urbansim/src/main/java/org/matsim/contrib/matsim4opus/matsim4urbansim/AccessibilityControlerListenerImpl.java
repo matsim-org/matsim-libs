@@ -420,7 +420,7 @@ public class AccessibilityControlerListenerImpl{
 				Link nearestLink = network.getNearestLinkExactly(coordFromZone);
 				
 				// captures the distance (as walk time) between a zone centroid and its nearest node
-				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
+				Distances distance = NetworkUtil.getDistance2Node(nearestLink, point, fromNode);
 				
 				double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
 				double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)
