@@ -67,10 +67,12 @@ public class SingleRunControler extends Controler {
 	  ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 	  ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
             
-      MixedScoringFunctionFactory mixedScoringFunctionFactory =
-			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon, actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
+ //     MixedScoringFunctionFactory mixedScoringFunctionFactory =
+//			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon, actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
   	
-		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
+//		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter));
+		
+		throw new RuntimeException("integrate LC with listener!");
 	}  
 }
