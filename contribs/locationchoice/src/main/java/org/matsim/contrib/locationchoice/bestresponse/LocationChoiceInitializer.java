@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -41,7 +41,7 @@ public class LocationChoiceInitializer implements StartupListener {
 		 * add ScoringFunctionFactory to controler
 		 *  in this way scoringFunction does not need to create new, identical k-vals by itself    
 		 */
-  		MixedScoringFunctionFactory mixedScoringFunctionFactory = new MixedScoringFunctionFactory(controler.getConfig(), controler, lcContext); 	
+  		DCScoringFunctionFactory mixedScoringFunctionFactory = new DCScoringFunctionFactory(controler.getConfig(), controler, lcContext); 	
 		controler.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		
 		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter()));

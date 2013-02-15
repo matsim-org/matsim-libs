@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -55,7 +55,7 @@ public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedM
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.lcContext);
+		DestinationScoring scorer = new DestinationScoring(this.lcContext);
 		
 		return new ComputeMaxDCScorePlanAlgo(
 				this.scenario, this.type, typedFacilities, scorer, this.lcContext.getScaleEpsilon(),
