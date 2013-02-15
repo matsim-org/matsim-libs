@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedActivityWOFacilitiesScoringFunction;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityWOFacilitiesScoringFunction;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -109,7 +109,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {		
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				scoringFunctionAccumulator.addScoringFunction(new MixedActivityWOFacilitiesScoringFunction(plan, lcContext ) );
+				scoringFunctionAccumulator.addScoringFunction(new DCActivityWOFacilitiesScoringFunction(plan, lcContext ) );
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), scenario.getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(lcContext.getParams()));
 				return scoringFunctionAccumulator;
@@ -180,7 +180,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
   		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
 
 		// set scoring function
-		MixedScoringFunctionFactory scoringFunctionFactory = new MixedScoringFunctionFactory(config, controler, lcContext);
+		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(config, controler, lcContext);
 		scoringFunctionFactory.setUsingFacilityOpeningTimes(false) ;
 
 		controler.setScoringFunctionFactory(scoringFunctionFactory);
