@@ -31,6 +31,8 @@ import java.util.Map.Entry;
  * heavily optimized.
  *
  * <em>This class is not thread-safe.</em>
+ * 
+ * More information can be found in the package's Javadoc.
  *
  * @author mrieser
  */
