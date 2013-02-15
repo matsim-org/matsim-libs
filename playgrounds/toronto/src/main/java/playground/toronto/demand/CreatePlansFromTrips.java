@@ -7,9 +7,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -44,24 +46,23 @@ import playground.balmermi.world.ZoneLayer;
 import playground.toronto.demand.util.TableReader;
 
 /**
- * A new class for creating MATSim plans from a record of trips,
+ * <p>A new class for creating MATSim plans from a record of trips,
  * generally an output of the Transportation Tomorrow Survey (TTS).
  * It could be adapted for use elsewhere, as long as the fields
  * are formatted the same (the only hard-coded values are 'H' as
- * the flag for 'home activity').
+ * the flag for 'home activity').</p>
  * 
- * Uses the TableReader class for a more relaxed file format.
+ * <p>Uses the TableReader class for a more relaxed file format.</p>
  * 
- * A bunch of added functionality, including a consistency checker,
- * and some simple GUIs for opening/saving files.
+ * <p>A bunch of added functionality, including a consistency checker,
+ * and some simple GUIs for opening/saving files.</p>
  * 
- * Also includes a getter of trips for a given person-id, for use
- * in post-process-analysis.
+ * <p>Also includes a getter of trips for a given person-id, for use
+ * in post-process-analysis.</p>
  * 
  * @author pkucirek
  *
  */
-@SuppressWarnings("deprecation")
 public class CreatePlansFromTrips {
 
 	// ////////////////////////////////////////////////////////////////////
@@ -774,8 +775,47 @@ public class CreatePlansFromTrips {
 		if (!hasHomeEpisode) return 1; //Does not have home activity.
 		
 		return 0;
-	}	
+	}
 	
+	private void scrambleIds(int seed){
+		
+		//Init
+		Id[] scrambler = new Id[scenario.getPopulation().getPersons().size()];
+		LinkedHashMap<Id, Integer> tracer = new LinkedHashMap<Id, Integer>();
+		
+		int i = 0;
+		for (Person p : this.scenario.getPopulation().getPersons().values()){
+			scrambler[i] = new IdImpl(i);
+			tracer.put(p.getId(), new Integer(i));
+			i++;
+		}
+		
+		//Scramble
+		Random rand = new Random(seed);
+		for (Person p : this.scenario.getPopulation().getPersons().values()){
+			int oldPos = tracer.get(p.getId()).intValue();
+			int newPos = rand.nextInt(scrambler.length);
+			
+			Id oldId = scrambler[oldPos];
+			Id newId = scrambler[newPos];
+			
+			scrambler[oldPos] = newId; //Swaps scrambler contents
+			scrambler[newPos] = oldId;
+		}
+		
+		//Apply new Ids to the population - can't actually copy 
+		for (Entry<Id, Integer> e : tracer.entrySet()){
+			Id oId = e.getKey();
+			Id nId = scrambler[e.getValue()];
+			
+			Person op = this.scenario.getPopulation().getPersons().remove(oId); //Removed from the population
+			Person np = new PersonImpl(nId);
+			np.addPlan(op.getSelectedPlan());
+			
+			this.scenario.getPopulation().addPerson(np);
+		}
+	}
+		
 	// ////////////////////////////////////////////////////////////////////
 	// main method
 	// ////////////////////////////////////////////////////////////////////
@@ -852,6 +892,16 @@ public class CreatePlansFromTrips {
 		////////////////////////
 		//converter.assignActsToNearestLink();
 		//////////////////////
+		String s = JOptionPane.showInputDialog("To encrypt household IDs, please enter a random seed. A value of '0' disables encryption.");
+		int seed = 0;
+		try{
+			seed = Integer.parseInt(s);
+		}
+		catch(NumberFormatException e){
+			seed = 0;
+		}
+		if (seed != 0)
+			converter.scrambleIds(seed);
 		
 		if (basefolder != ""){
 			fc = new JFileChooser(basefolder);
