@@ -124,22 +124,22 @@ public class MZ1994HouseholdParser {
 	
 		//number of cars
 		String nr_cars = entries[22];
-		if(nr_cars.equals("")){nr_cars = MZConstants.NO_ANSWER;}
+		if(nr_cars.equals(" ")){nr_cars = MZConstants.NO_ANSWER;}
 		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_CARS, nr_cars);
 		
 		//number of motorcycles
 		String nr_mcycles = entries[23];
-		if(nr_mcycles.equals("")){nr_mcycles = MZConstants.NO_ANSWER;}
+		if(nr_mcycles.equals(" ")){nr_mcycles = MZConstants.NO_ANSWER;}
 		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_MOTORCYCLES, nr_mcycles);
 		
 		//number of mofa
 		String nr_mofas = entries[24];
-		if( nr_mofas.equals("")){nr_mofas = MZConstants.NO_ANSWER;}
+		if( nr_mofas.equals(" ")){nr_mofas = MZConstants.NO_ANSWER;}
 		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_MOFAS, nr_mofas);
 		
 		//number of bicycles
 		String nr_bikes = entries[25];
-		if(nr_bikes.equals("")){nr_bikes = MZConstants.NO_ANSWER;}
+		if(nr_bikes.equals(" ")){nr_bikes = MZConstants.NO_ANSWER;}
 		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_BICYCLES, nr_bikes);
 		
 		// creating matsim household
@@ -158,6 +158,7 @@ public class MZ1994HouseholdParser {
 		
 		
 	}
+	
 	
 	
 }

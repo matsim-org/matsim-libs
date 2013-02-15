@@ -125,33 +125,33 @@ public class NetVisum2MATSim {
 
 		
 		//MIV NETWORK
-		NetVisum2MATSim n2m = new NetVisum2MATSim();
+		NetVisum2MATSim n2mMIV = new NetVisum2MATSim();
 		index = 0;
 		String outputMATSimNetworkFile = outputBase +  networks[index] + ".xml.gz";
 		String inputVisumNetFile = inputBase + networks[index] + ".net";
-		n2m.readVisumNets(inputVisumNetFile);
-		n2m.convertNetwork(inputVisumNetFile, outputZoneFile);
+		n2mMIV.readVisumNets(inputVisumNetFile);
+		n2mMIV.convertNetwork(inputVisumNetFile, outputZoneFile);
 		
-		NetworkPostProcessor postProcessor = new NetworkPostProcessor(n2m.network);
-		postProcessor.Process();
-		n2m.cleanNetwork();
-		n2m.writeMATSimNetwork(outputMATSimNetworkFile);
+		NetworkPostProcessor postProcessor = new NetworkPostProcessor(n2mMIV.network);
+		postProcessor.process();
+		n2mMIV.cleanNetwork();
+		n2mMIV.writeMATSimNetwork(outputMATSimNetworkFile);
 		
 		//OeV NETWORK
-		NetVisum2MATSim n2m_2 = new NetVisum2MATSim();
+		NetVisum2MATSim n2mOeV = new NetVisum2MATSim();
 		index = 1;
 		outputMATSimNetworkFile = outputBase +  networks[index] + ".xml.gz";
 		inputVisumNetFile = inputBase + networks[index] + ".net";
-		n2m_2.readVisumNets(inputVisumNetFile);
-		n2m_2.convertNetwork(inputVisumNetFile, outputZoneFile);
-		NetworkPostProcessor postProcessor2 = new NetworkPostProcessor(n2m_2.network);
-		postProcessor2.Process();
-		//n2m_2.cleanNetwork();
+		n2mOeV.readVisumNets(inputVisumNetFile);
+		n2mOeV.convertNetwork(inputVisumNetFile, outputZoneFile);
+		NetworkPostProcessor postProcessor2 = new NetworkPostProcessor(n2mOeV.network);
+		postProcessor2.process();
+		n2mOeV.cleanNetwork();
 
-		n2m_2.writeMATSimNetwork(outputMATSimNetworkFile);
+		n2mOeV.writeMATSimNetwork(outputMATSimNetworkFile);
 		String outputMATSimTransitScheduleFile = outputBase + networks[index] + "_TransitSchedule.xml";
 		String outputMATSimPTVehiclesFile = outputBase + networks[index] + "_PTVehicles.xml";
-		n2m_2.writeTransitScheduleAndVehiclesFiles(outputMATSimTransitScheduleFile, outputMATSimPTVehiclesFile );
+		n2mOeV.writeTransitScheduleAndVehiclesFiles(outputMATSimTransitScheduleFile, outputMATSimPTVehiclesFile );
 		
 
 		

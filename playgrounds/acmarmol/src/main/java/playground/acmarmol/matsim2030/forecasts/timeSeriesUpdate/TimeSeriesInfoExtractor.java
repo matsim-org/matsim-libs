@@ -88,6 +88,7 @@ public class TimeSeriesInfoExtractor {
 		String householdInputFile;
 		String populationAttributesInputFile;
 		String householdAttributesInputFile;
+		String householdpersonsAttributesInputFile;
 		Microcensus microcensus;
 		
 		populationInputFile = inputBase + "population.05.MZ1989.xml";	
@@ -132,13 +133,14 @@ public class TimeSeriesInfoExtractor {
 		householdInputFile = inputBase + "households.04.MZ2010.xml";
 		populationAttributesInputFile = inputBase + "populationAttributes.04.MZ2010.xml";
 		householdAttributesInputFile = inputBase + "householdAttributes.04.imputed.MZ2010.xml";
-		microcensus = new Microcensus(populationInputFile,householdInputFile,populationAttributesInputFile,householdAttributesInputFile, 2010);
+		householdpersonsAttributesInputFile = inputBase + "householdpersonsAttributes.01.MZ2010.xml";
+		microcensus = new MicrocensusV2(populationInputFile,householdInputFile,populationAttributesInputFile,householdAttributesInputFile, householdpersonsAttributesInputFile, 2010);
 		TimeSeriesInfoExtractor extractorMZ2010 = new TimeSeriesInfoExtractor(microcensus, COHORTS, COHORTS_STRINGS, AGE_GROUPS, AGE_GROUPS_STRINGS);	
 		
 //		extractorMZ1989.extractAndPrint(outputBase + "TimeSeriesInfoMZ1989.txt");
 //		extractorMZ1994.extractAndPrint(outputBase + "TimeSeriesInfoMZ1994.txt");
-//		extractorMZ2000.extractAndPrint(outputBase + "TimeSeriesInfoMZ2000.txt");
-//		extractorMZ2005.extractAndPrint(outputBase + "TimeSeriesInfoMZ2005.txt");
+		extractorMZ2000.extractAndPrint(outputBase + "TimeSeriesInfoMZ2000.txt");
+		extractorMZ2005.extractAndPrint(outputBase + "TimeSeriesInfoMZ2005.txt");
 		extractorMZ2010.extractAndPrint(outputBase + "TimeSeriesInfoMZ2010.txt");		
 		
 		 
@@ -151,11 +153,15 @@ public class TimeSeriesInfoExtractor {
 		
 		out = IOUtils.getBufferedWriter(outputFile);
 		
-		printTitle();
+//		printTitle();
 		printPopulationSize("Total population size");
 		
-//		filterPopulationEmployed();
-//		filterPopulationWeekday();
+		filterPopulationEmployed();
+		filterPopulationWeekday();
+//		filterByGender(MZConstants.MALE);
+//		filterByAgeRange(30,49);
+//		filterByIncome(7000);
+		
 //		filterPopulationWithWorkActivity();
 		filterPopulationOver18();
 		ArrayList<Id>[] ids_cohort = getIdsByCohort();
@@ -164,8 +170,8 @@ public class TimeSeriesInfoExtractor {
 //		printDriverLicenseByCohortAndGender(ids_cohort);
 //		printDriverLicenseByCohortAndResidence(ids_cohort);
 //		printDriverLicenseByCohortAndResidenceBigCities(ids_cohort);
-		printDriverLicenseByCohortAndSeasonTicket(ids_cohort);
-		printDriverLicenseByCohortAndPW_GA(ids_cohort);
+//		printDriverLicenseByCohortAndSeasonTicket(ids_cohort);
+//		printDriverLicenseByCohortAndPW_GA(ids_cohort);
 //		printCarAvailabilityByCohort(ids_cohort);
 //		printAbonnementOwnership(ids_cohort);
 //		printHalbTaxOwnershipByCohort(ids_cohort);
@@ -214,18 +220,68 @@ public class TimeSeriesInfoExtractor {
 //		printAbonnementOwnershipByCohortAndIncomeTercile(ids_cohort); //use MZ2000 with zid as id
 //		printAverageTripsByCohortAndIncomeTercile(ids_cohort);
 //		printDailyTripsDurationByCohortAndIncomeTercile(ids_cohort);
-//		printDailyDistancesByCohortAndIncomeTercile(ids_cohort);	
+		printDailyDistancesByCohortAndIncomeTercile(ids_cohort);	
 		
 //		printIncomeTerciles();
 		
 //		printTripsOutOfHomeActivitesRatioByCohortAndAge(ids_cohort);
 //		printShareOfCarTripsByCohortAndGroup(ids_cohort);
 		
+//		printPopulationIDs();
+		
+//		printNCarsAndNDrivingLicenseInHouseholdRatio(ids_cohort);
+		
 		out.close();
 	
 	}
 	
+	private void printNCarsAndNDrivingLicenseInHouseholdRatio(ArrayList<Id>[] ids_cohort) throws IOException {
+		
+		out.write("Number of Cars and Driving License Ratio (per household)"); 
+		out.newLine();
+
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+		
+			for(Household household: this.microcensus.getHouseholds().getHouseholds().values()){
+			
+				String id = household.getId().toString();
+				double hh_weight = Double.parseDouble((String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.HOUSEHOLD_WEIGHT));
+			
+				int total_cars = Integer.parseInt((String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.TOTAL_CARS));
+				int total_licenses = 0;
+				
+				List<Id> members = household.getMemberIds();
+				
+				for(int j=0;j<=members.size()-1;j++){
+					
+					Id m_id = members.get(j);
+					int license = (((String)((MicrocensusV2) microcensus).getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES))?1:0;
+					total_licenses+= license;
+					
+				}
+				
+			
+			}
+		}
+		
+	}
 	
+	private void printPopulationIDs() throws IOException {
+		
+		for(Person person: microcensus.getPopulation().getPersons().values()){
+			
+			out.write(person.getId().toString());
+			out.newLine();
+			
+		}
+		
+	}
+
+
 	private void printTripsOutOfHomeActivitesRatioByCohortAndAge(ArrayList<Id>[] ids_cohort) throws Exception {
 		out.write("------------------------------"); 
 		out.newLine();
@@ -2064,7 +2120,6 @@ public class TimeSeriesInfoExtractor {
 			for(Id id:tercile){
 				
 				
-				
 				double pw = Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.PERSON_WEIGHT));
 				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.HOUSEHOLD_NUMBER), "weight"));
 //				total = total + Double.parseDouble((String) microcensus.getPopulationAttributes().getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DISTANCE))*pw*hhw;
@@ -3033,6 +3088,79 @@ public class TimeSeriesInfoExtractor {
 		microcensus.getPopulation().getPersons().keySet().removeAll(ids_to_remove);
 		
 		out.write("Total weekday: \t\t" + microcensus.getPopulation().getPersons().size());
+		out.newLine();
+		
+		new PopulationWriter(microcensus.getPopulation(), null).write("C:/local/marmolea/output/Activity Chains Forecast/population_weekday_employed.xml");
+	}
+	
+	public void filterByGender(String gender_to_remove) throws IOException{
+		
+		
+		Set<Id> ids_to_remove = new HashSet<Id>();
+				
+		
+		for(Person person: microcensus.getPopulation().getPersons().values()){
+			
+			String gender = (String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.GENDER);
+			
+			if(gender.equals(gender_to_remove)){
+				ids_to_remove.add(person.getId());					
+			}
+			
+		}
+		
+		microcensus.getPopulation().getPersons().keySet().removeAll(ids_to_remove);
+		
+		out.write("Total after filtering all gender " + gender_to_remove + ": \t\t" + microcensus.getPopulation().getPersons().size());
+		out.newLine();
+		
+		new PopulationWriter(microcensus.getPopulation(), null).write("C:/local/marmolea/output/Activity Chains Forecast/population_weekday_employed.xml");
+	}
+	
+	public void filterByAgeRange(int fromAge, int toAge) throws IOException{
+			
+			
+			Set<Id> ids_to_remove = new HashSet<Id>();
+					
+			
+			for(Person person: microcensus.getPopulation().getPersons().values()){
+				
+				int age = Integer.parseInt((String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.AGE));
+				
+				if(age<fromAge || age>toAge){
+					ids_to_remove.add(person.getId());					
+				}
+				
+			}
+			
+			microcensus.getPopulation().getPersons().keySet().removeAll(ids_to_remove);
+			
+			out.write("Total after filtering all out of age range  " +fromAge +"-" +toAge+ ": \t\t" + microcensus.getPopulation().getPersons().size());
+			out.newLine();
+			
+			new PopulationWriter(microcensus.getPopulation(), null).write("C:/local/marmolea/output/Activity Chains Forecast/population_weekday_employed.xml");
+		}
+	
+	public void filterByIncome(int min_income) throws IOException{
+		
+		
+		Set<Id> ids_to_remove = new HashSet<Id>();
+				
+		
+		for(Person person: microcensus.getPopulation().getPersons().values()){
+			
+			String hhnr = (String)microcensus.getPopulationAttributes().getAttribute(person.getId().toString(), MZConstants.HOUSEHOLD_NUMBER);
+			int income = Integer.parseInt((String)this.microcensus.getHouseholdAttributes().getAttribute(hhnr, MZConstants.HOUSEHOLD_INCOME_MIDDLE_OF_INTERVAL));
+			
+			if(income<min_income){
+				ids_to_remove.add(person.getId());					
+			}
+			
+		}
+		
+		microcensus.getPopulation().getPersons().keySet().removeAll(ids_to_remove);
+		
+		out.write("Total after filtering all out with hh income <  " +min_income+ ": \t\t" + microcensus.getPopulation().getPersons().size());
 		out.newLine();
 		
 		new PopulationWriter(microcensus.getPopulation(), null).write("C:/local/marmolea/output/Activity Chains Forecast/population_weekday_employed.xml");

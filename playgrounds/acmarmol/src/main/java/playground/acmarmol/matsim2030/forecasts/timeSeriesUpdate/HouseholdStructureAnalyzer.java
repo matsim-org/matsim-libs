@@ -7,8 +7,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
@@ -80,9 +82,9 @@ public class HouseholdStructureAnalyzer {
 		HouseholdStructureAnalyzer mz2010 = new HouseholdStructureAnalyzer(microcensus);
 		
 		mz1994.extractAndPrint(outputBase+ "HouseholdStructureAnalysisMZ1994.txt");
-		//mz2000.extractAndPrint(outputBase+ "HouseholdStructureAnalysisMZ2000.txt");
-		//mz2005.extractAndPrint(outputBase+ "HouseholdStructureAnalysisMZ2005.txt");
-		//mz2010.extractAndPrint(outputBase+ "HouseholdStructureAnalysisMZ2010.txt");
+		mz2000.extractAndPrint(outputBase+ "HouseholdStructureAnalysisMZ2000.txt");
+		mz2005.extractAndPrint(outputBase+ "HouseholdStructureAnalysisMZ2005.txt");
+		mz2010.extractAndPrint(outputBase+ "HouseholdStructureAnalysisMZ2010.txt");
 		
 		
 	}
@@ -93,29 +95,165 @@ public class HouseholdStructureAnalyzer {
 		
 		out = IOUtils.getBufferedWriter(outputFile);
 		
-		printNumberOfHouseholdsBySize();
-		printSeparation();
-		printAgeRangeForSinglePersonHouseholds();
-		printSeparation();
-		printAgeRangeForNonSinglePersonHouseholds();
-		printSeparation();
-		printAgeRangeForMonoparentalHouseholds();
-		printSeparation();
-		printAgeRangeForCouplelHouseholds();
-		printSeparation();
-		printAgeRangeForChildsInHouseholds();
-		printSeparation();
-		printNumberOfChildsInHouseholdsDistribution();
-		printSeparation();		 
-		printCoupleHouseholdsAgeDifference();
-		printSeparation();	
-		printMotherBirthAges();
-		printSeparation();	
-		printAgeRangeForAllHouseholds();
-		printSeparation();	
-		printTypeOfHouseholdsDistribution();
+//		printNumberOfHouseholdsBySize();
+//		printSeparation();
+//		printAgeRangeForSinglePersonHouseholds();
+//		printSeparation();
+//		printAgeRangeForNonSinglePersonHouseholds();
+//		printSeparation();
+//		printAgeRangeForMonoparentalHouseholds();
+//		printSeparation();
+//		printAgeRangeForCouplelHouseholds();
+//		printSeparation();
+//		printAgeRangeForChildsInHouseholds();
+//		printSeparation();
+//		printNumberOfChildsInHouseholdsDistribution();
+//		printSeparation();		 
+//		printCoupleHouseholdsAgeDifference();
+//		printSeparation();	
+//		printMotherBirthAges();
+//		printSeparation();	
+//		printAgeRangeForAllHouseholds();
+//		printSeparation();	
+//		printTypeOfHouseholdsDistribution();
+//		printSeparation();		
+		printNCarsAndNDrivingLicenseInHouseholdRatio();
 		
 		out.close();
+		
+	}
+
+	private void printNCarsAndNDrivingLicenseInHouseholdRatio() throws IOException {
+		
+		out.write("Number of Cars and Driving License Ratio (per household)"); 
+		out.newLine();
+		int counter = 0;
+
+	
+		//[Single],[Single Parent], [Couple], [Couple with ch], [Complex]
+				double[] counters = new double[5];
+				double[] total = new double[5];
+				
+				TreeMap<Double, Double> table = new TreeMap<Double,Double>();
+				double[][] car_licence = new double[6][6];
+					
+				for(Household household: this.microcensus.getHouseholds().getHouseholds().values()){
+					
+					String id = household.getId().toString();
+					double hh_weight = Double.parseDouble((String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.HOUSEHOLD_WEIGHT));
+					int size = Integer.parseInt((String) this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.HOUSEHOLD_SIZE));
+					String anz_cars = (String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.TOTAL_CARS);
+					if(anz_cars.equals(MZConstants.NO_ANSWER) || anz_cars.equals(MZConstants.NOT_KNOWN))
+						continue;
+					if(anz_cars.equals("more than 6"))
+						anz_cars="7"; //special case for MZ2000, only 0.1% -> negligible
+					double total_cars = Integer.parseInt(anz_cars);
+					double total_licenses = 0;
+					
+//					if(total_cars==0)
+//						continue;
+					
+					List<Id> members = household.getMemberIds();
+					
+					for(int i=0;i<=members.size()-1;i++){
+						
+						Id m_id = members.get(i);
+						int license = (((String) microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.DRIVING_LICENCE)).equals(MZConstants.YES))?1:0;
+						total_licenses+= license;
+					}					
+
+//					if(total_licenses==0)
+//						continue;
+					
+					int typeOfHousehold = getTypeOfHousehold(members);
+					
+					if(typeOfHousehold!=4)
+						continue;
+					
+				
+					if(total_cars>5)
+						total_cars=5;
+					if(total_licenses>5)
+						total_licenses=5;
+					
+					car_licence[(int) total_cars][(int) total_licenses]+=hh_weight*members.size();
+				
+					counters[typeOfHousehold]+= hh_weight;
+					//total[typeOfHousehold] += (total_licenses/total_cars)*hh_weight;
+					total[typeOfHousehold] += (total_cars/total_licenses)*hh_weight;
+					
+					double product = total_cars*total_licenses;
+					
+					if(!table.containsKey(product)){
+						table.put(product, hh_weight);
+					}else{
+						table.put(product, table.get(product)+ hh_weight);
+					}
+					
+				}
+
+//				for(Entry<Double, Double> entry: table.entrySet()){
+//					out.write("Product: \t" + entry.getKey() + "\t Value: \t" +  entry.getValue());
+//					out.newLine();
+//				}
+				
+//				for(double k=0;k<=50;k++){
+//					if(table.get(k)==null){
+//						out.write("Product: \t" + k + "\t Value: \t" +  0);
+//					}else{
+//						out.write("Product: \t" + k + "\t Value: \t" +  table.get(k));
+//					}
+//					
+//					out.newLine();
+//				}
+				
+				for(int m1=0; m1<car_licence.length;m1++){
+					for(int m2 = 0; m2<car_licence.length;m2++){
+						out.write(car_licence[m1][m2] + "\t");
+						
+					}
+					
+					out.newLine();
+				}
+				
+				out.newLine();
+				out.newLine();
+				
+				for(int a=0;a<=counters.length-1;a++){
+					out.write("Type "+(a+1)+":\t" +total[a]/counters[a]);
+					out.newLine();
+				}		
+	}
+
+	private int getTypeOfHousehold(List<Id> members) {
+		//[Single],[Single Parent], [Couple], [Couple with ch], [Complex]
+		ArrayList<Integer> ages = new ArrayList<Integer>();
+
+		for(int i=0;i<=members.size()-1;i++){
+			
+			Id m_id = members.get(i);
+			int m_age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(m_id.toString(), MZConstants.AGE));
+			ages.add(m_age);
+		}
+		
+		int max_age = Collections.max(ages);
+		
+		List<Id> heads = getHeadsOfHouseholdIds(members, max_age);
+		ArrayList<Id> kids = new ArrayList<Id>(members);
+		kids.removeAll(heads);
+		
+	
+		if(members.size()==1){
+			return 0;
+		}else if(heads.size()==1){
+			return 1;
+		}else if(heads.size()==2 && kids.size()==0){
+			return 2;
+		}else if(heads.size()==2 && kids.size()!=0){
+			return 3;
+		}else{
+			return 4;
+		}
 		
 	}
 
@@ -203,39 +341,7 @@ public class HouseholdStructureAnalyzer {
 		
 	}
 
-	private int getTypeOfHousehold(ArrayList<Integer> ages_list) {
-		
-		//0: single person household
-		//1: 1 head of household + child(s)
-		//2: 2head of household (couple) + child(s)
-		//3: 2+ head of households
-		
-		ArrayList<Integer> ages = new ArrayList<Integer>(ages_list);
-		
-		if(ages.size()==1)		
-			return 0;
-		else{
-			int nr_heads = 1;
-			Collections.sort(ages);
-			Integer max_age = ages.remove(ages.size()-1);
-			
-			
-			for(int age:ages){
-				if((age>max_age-16 && age>=18) || age>=30){
-					nr_heads++;
-				}
-			}
-			
-			if(nr_heads>3)
-				nr_heads = 3;
-			
-			
-			return nr_heads;
-			
-		}
-				
-	}
-	
+
 	private List<Id> getHeadsOfHouseholdIds(List<Id> members, int max_age) {
 		
 		 List<Id> heads = new ArrayList<Id>();
@@ -1003,7 +1109,6 @@ private void printTypeOfHouseholdsDistribution() throws IOException {
 		for(Household household: this.microcensus.getHouseholds().getHouseholds().values()){
 			
 			String id = household.getId().toString();
-			int size = Integer.parseInt((String) this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.HOUSEHOLD_SIZE));
 			double hh_weight = Double.parseDouble((String)this.microcensus.getHouseholdAttributes().getAttribute(id, MZConstants.HOUSEHOLD_WEIGHT));
 		
 			

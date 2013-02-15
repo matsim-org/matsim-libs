@@ -1,9 +1,12 @@
 package playground.acmarmol.matsim2030.network;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -12,6 +15,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 
 
 public class NetworkPostProcessor {
@@ -30,13 +34,17 @@ public class NetworkPostProcessor {
 	}
 	
 	
-	public void Process(){
-		log.info("Starting processing...");
-		
+	public void process(){
+		log.info("Starting processing...");	
 		System.out.println("Initial network status");
-		
 		printNetworkStatus();
-		replaceWithReturnLinkAttributes();
+		removeDuplicatedNodes();
+			
+		System.out.println("Network status after eliminating duplicated nodes");
+		printNetworkStatus();
+		
+		
+		replaceWithReturnLinkAttributes();		
 		calculateMissingLengths(unresolved_length_links);
 		
 		System.out.println("Final network status");
@@ -45,15 +53,123 @@ public class NetworkPostProcessor {
 	}
 
 
+	private void removeDuplicatedNodes() {
+		
+		System.out.println("Updating network to avoid duplicated nodes...");
+		
+		TreeMap<Id, Id> duplicatedNodes = findDuplicatedNodes();
+		System.out.println("		"+duplicatedNodes.size()+" duplicated nodes found...");
+		
+		
+		
+		//change links and nodes information 
+		ArrayList<Id> linksToRemove = new ArrayList<Id>();
+		int links_edited = 0;
+		
+		
+		System.out.println("		changing links information...");
+			
+			for(Link link:network.getLinks().values()){
+				
+				boolean edited = false;
+				
+				Node fromNode = ((LinkImpl)link).getFromNode();
+				Node toNode = ((LinkImpl)link).getToNode();
+				
+				
+				if(duplicatedNodes.containsKey(fromNode.getId())){
+					link.setFromNode(network.getNodes().get(duplicatedNodes.get(fromNode.getId())));
+					edited = true;
+				}
+				
+				if(duplicatedNodes.containsKey(toNode.getId())){
+					link.setToNode(network.getNodes().get(duplicatedNodes.get(toNode.getId())));
+					edited = true;
+				}
+				
+				if(link.getFromNode().equals(link.getToNode())){
+					linksToRemove.add(link.getId());
+				}else if(edited)
+					links_edited++;
+				
+			}
+		
+		
+		System.out.println("			" +linksToRemove.size() + " links removed... ");
+		for(Id linkToRemoveID:linksToRemove){
+			network.removeLink(linkToRemoveID);
+			this.unresolved_capacity_links.remove(linkToRemoveID);
+			this.unresolved_freespeed_links.remove(linkToRemoveID);
+			this.unresolved_length_links.remove(linkToRemoveID);
+		}
+		System.out.println("			"+ links_edited + " links edited... ");
+		
+		
+		System.out.println("		removing duplicated nodes...");
+		for(Entry<Id, Id> entry  : duplicatedNodes.entrySet()){
+			
+			network.getNodes().remove(entry.getValue());
+		}
+		System.out.println("		" + duplicatedNodes.size() + " nodes removed...");
+		
+	}
+
+
+	private TreeMap<Id, Id> findDuplicatedNodes() {
+		
+		TreeMap<Id, Id> duplicatedNodes = new TreeMap<Id, Id>();
+		System.out.println(network.getNodes().size());
+
+		for(Node node : network.getNodes().values()){
+			
+			
+			if(duplicatedNodes.containsKey(node.getId()))
+				continue;
+			
+			double x = node.getCoord().getX();
+			double y = node.getCoord().getY();
+			Id id = node.getId();
+					
+			for(Node node2 : network.getNodes().values()){
+				
+				if(node2.getId().equals(id))
+					continue;
+				
+				if(node2.getCoord().getX()==x && node2.getCoord().getY()==y){
+					
+					//arbitrarily, smallest id prevails.
+					//key = node that is going to be removed.
+					//value = node that prevails.
+					
+					if(id.compareTo(node2.getId())<0){
+						duplicatedNodes.put(node2.getId(),id );
+					}else{
+						duplicatedNodes.put(id, node2.getId());
+					}
+						
+				}
+					
+
+				
+			}
+		
+		}
+		
+		return duplicatedNodes;
+		
+	}
+
+
 	private void calculateMissingLengths(LinkedList<Id> link_ids) {
 		
+		System.out.println("calculating missing lenghts with euclidian distance...");
 		for(Id link_id : link_ids){
 			
 			Link link = network.getLinks().get(link_id);
 			Node fromNode = link.getFromNode();
 			Node toNode = link.getToNode();
 			
-			int length = (int) Math.sqrt(Math.pow((fromNode.getCoord().getX()-toNode.getCoord().getX()),2)+Math.pow(fromNode.getCoord().getY()-toNode.getCoord().getY(),2));
+			double length = (double) Math.sqrt(Math.pow((fromNode.getCoord().getX()-toNode.getCoord().getX()),2)+Math.pow(fromNode.getCoord().getY()-toNode.getCoord().getY(),2));
 			link.setLength(length);
 			
 			
@@ -78,7 +194,9 @@ public class NetworkPostProcessor {
 
 
 	private void printNetworkStatus() {
-		
+		this.unresolved_capacity_links = new LinkedList<Id>();
+		this.unresolved_freespeed_links = new LinkedList<Id>();
+		this.unresolved_length_links = new LinkedList<Id>();
 		printNumberOfZeroCapacityLinks();
 		printNumberOfZeroFreespeedLinks();
 		printNumberOfZeroLengthLinks();
