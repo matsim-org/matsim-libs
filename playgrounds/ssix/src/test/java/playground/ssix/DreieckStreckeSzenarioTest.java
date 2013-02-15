@@ -238,10 +238,12 @@ public class DreieckStreckeSzenarioTest {
 		DreieckStreckeSzenarioTest dreieck = new DreieckStreckeSzenarioTest(2600);
 		dreieck.fillNetworkData();
 		
-		String dir = "./output/data.txt";
+		String dir = "./output/dataOnlyTruck.txt";
 		dreieck.openFile(dir);
-		for (long i=0; i<NUMBER_OF_AGENTS+1; i++){
-			dreieck.run(i, "constantModalSplit");
+		
+		long number_of_iterations = NUMBER_OF_AGENTS + 1;//-10 if constantFastDensity... because 10 vehicles are already in the sim
+		for (long i = 0; i < number_of_iterations; i++){
+			dreieck.run(i, "onlyTruck");
 		}
 		dreieck.closeFile();
 	}
@@ -377,9 +379,25 @@ public class DreieckStreckeSzenarioTest {
 			createWantedPopulation(n_trucks,n_med,n_fast,2);
 		}
 		
-		//TODO: other experimentations still need implementing.
 		//Idea1/1bis: Only one mode, see that you get back on the expected Q fundamental diagrams Simon/Esser/Nagel
+		if (mode.equals("onlyTruck")){
+			createWantedPopulation(n,0,0,2);
+		}/*
+		if (mode.equals("onlyMed")){
+			createWantedPopulation(0,n,0,2);
+		}*/
+		if (mode.equals("onlyFast")){
+			createWantedPopulation(0,0,n,2);
+		}
+				
 		//Idea2: constant truck density, fast from 0 to max // constant fast density, truck from 0 to max.
+		if (mode.equals("constantTruckDensity10veh")){
+			createWantedPopulation(10, 0, n, 2);
+		}
+		if (mode.equals("constantFastDensity10veh")){
+			createWantedPopulation(n, 0, 10, 2);
+		}
+		//TODO: other experimentations still need implementing?
 	}
 	
 	private void createRandomPopulation(long numberOfPeople, int sekundenFrequenz){
