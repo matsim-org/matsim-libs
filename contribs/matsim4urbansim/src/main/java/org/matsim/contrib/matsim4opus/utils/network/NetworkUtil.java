@@ -163,10 +163,10 @@ public class NetworkUtil {
 	}
 	
 	/**
-	 * This method calculates the distance between a node and a node via a link as the sum of
-	 * - the orthogonal distance between the node and the link and
-	 * - the distance between the intersection point of the orthogonal projection (from the node to the link) to the network node.
-	 * If the orthogonal projection of the node to the line does not intersects the link, the method returns the euclidean distance between the two nodes.
+	 * This method calculates the distance between a point and a node via a link (which should contains the node) as the sum of
+	 * - the orthogonal distance between the point and the link and
+	 * - the distance between the intersection point of the orthogonal projection (from the point to the link) to the node.
+	 * If the orthogonal projection of the point to the line does not intersects the link, the method returns the euclidean distance between the point and the node.
 	 * 
 	 * @param link
 	 * @param point
@@ -178,10 +178,10 @@ public class NetworkUtil {
 	}
 	
 	/**
-	 * This method calculates the distance between a node and a node via a link as the sum of
-	 * - the orthogonal distance between the node and the link and
-	 * - the distance between the intersection point of the orthogonal projection (from the node to the link) to the network node.
-	 * If the orthogonal projection of the node to the line does not intersects the link, the method returns the euclidean distance between the two nodes.
+	 * This method calculates the distance between a point and a node via a link (which should contains the node) as the sum of
+	 * - the orthogonal distance between the point and the link and
+	 * - the distance between the intersection point of the orthogonal projection (from the point to the link) to the node.
+	 * If the orthogonal projection of the point to the line does not intersects the link, the method returns the euclidean distance between the point and the node. 
 	 * 
 	 * @param link
 	 * @param point
@@ -193,10 +193,10 @@ public class NetworkUtil {
 	}
 	
 	/**
-	 * This method calculates the distance between a node and a node via a link as the sum of
-	 * - the orthogonal distance between the node and the link and
-	 * - the distance between the intersection point of the orthogonal projection (from the node to the link) to the network node.
-	 * If the orthogonal projection of the node to the line does not intersects the link, the method returns the euclidean distance between the two nodes.
+	 * This method calculates the distance between a point and a node via a link (which should contains the node) as the sum of
+	 * - the orthogonal distance between the point and the link and
+	 * - the distance between the intersection point of the orthogonal projection (from the point to the link) to the node.
+	 * If the orthogonal projection of the point to the line does not intersects the link, the method returns the euclidean distance between the point and the node.
 	 * 
 	 * @param link
 	 * @param pointx
