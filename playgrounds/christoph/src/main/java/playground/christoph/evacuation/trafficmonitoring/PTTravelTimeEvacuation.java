@@ -124,6 +124,11 @@ public class PTTravelTimeEvacuation implements SwissPTTravelTime {
 					double penaltyFactor = EvacuationConfig.ptTravelTimePenaltyFactor;
 					travelTime *= penaltyFactor;
 				}
+			} 
+			// no pt route was found was found
+			else {
+				travelTime = Double.MAX_VALUE;
+				exitCoord = null;
 			}
 		}
 		/*
@@ -145,6 +150,11 @@ public class PTTravelTimeEvacuation implements SwissPTTravelTime {
 						travelTime *= penaltyFactor;
 					}
 				}
+				// no pt route was found was found
+				else {
+					travelTime = Double.MAX_VALUE;
+					exitCoord = null;
+				}
 			}
 			/*
 			 * other route
@@ -161,6 +171,11 @@ public class PTTravelTimeEvacuation implements SwissPTTravelTime {
 						double penaltyFactor = EvacuationConfig.ptTravelTimePenaltyFactor;
 						travelTime *= penaltyFactor;
 					}
+				}
+				// no pt route was found was found
+				else {
+					travelTime = Double.MAX_VALUE;
+					exitCoord = null;
 				}
 			}
 		}

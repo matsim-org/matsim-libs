@@ -129,11 +129,13 @@ public class EvacuationTransitRouter {
 		/*
 		 * Walk trips to first stop and from last stop are NOT included in the path.
 		 */
-		InitialNode fromNode = wrappedFromNodes.get(path.nodes.get(0));
-		InitialNode toNode = wrappedToNodes.get(path.nodes.get(path.nodes.size() - 1));
-		double additionalCosts = fromNode.initialCost + toNode.initialCost;
-		double additionalTime = additionalCosts;	// travel time is used as travel cost in the evacuation case!
-		path = new Path(path.nodes, path.links, path.travelTime + additionalTime, path.travelCost + additionalCosts);
+		if (path != null) {
+			InitialNode fromNode = wrappedFromNodes.get(path.nodes.get(0));
+			InitialNode toNode = wrappedToNodes.get(path.nodes.get(path.nodes.size() - 1));
+			double additionalCosts = fromNode.initialCost + toNode.initialCost;
+			double additionalTime = additionalCosts;	// travel time is used as travel cost in the evacuation case!
+			path = new Path(path.nodes, path.links, path.travelTime + additionalTime, path.travelCost + additionalCosts);			
+		}
 		
 		return path;
 	}
@@ -170,11 +172,13 @@ public class EvacuationTransitRouter {
 		/*
 		 * Walk trips to first stop and from last stop are NOT included in the path.
 		 */
-		InitialNode fromNode = wrappedFromNodes.get(path.nodes.get(0));
-		InitialNode toNode = wrappedToExitNodes.get(path.nodes.get(path.nodes.size() - 1));
-		double additionalCosts = fromNode.initialCost + toNode.initialCost;
-		double additionalTime = additionalCosts;	// travel time is used as travel cost in the evacuation case!
-		path = new Path(path.nodes, path.links, path.travelTime + additionalTime, path.travelCost + additionalCosts);
+		if (path != null) {
+			InitialNode fromNode = wrappedFromNodes.get(path.nodes.get(0));
+			InitialNode toNode = wrappedToExitNodes.get(path.nodes.get(path.nodes.size() - 1));
+			double additionalCosts = fromNode.initialCost + toNode.initialCost;
+			double additionalTime = additionalCosts;	// travel time is used as travel cost in the evacuation case!
+			path = new Path(path.nodes, path.links, path.travelTime + additionalTime, path.travelCost + additionalCosts);			
+		}
 		
 		return path;
 	}
