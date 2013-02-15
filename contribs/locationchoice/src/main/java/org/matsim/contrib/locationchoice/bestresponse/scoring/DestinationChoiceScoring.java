@@ -22,12 +22,14 @@ package org.matsim.contrib.locationchoice.bestresponse.scoring;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class DestinationChoiceScoring { 
@@ -39,13 +41,12 @@ public class DestinationChoiceScoring {
 	private ObjectAttributes personsKValues;
 	private ScaleEpsilon scaleEpsilon;
 		
-	public DestinationChoiceScoring(ActivityFacilities facilities , Config config, 
-			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues, ScaleEpsilon scaleEpsilon) {
-		this.facilities = facilities;
-		this.config = config;
-		this.facilitiesKValues = facilitiesKValues;
-		this.personsKValues = personsKValues;
-		this.scaleEpsilon = scaleEpsilon;
+	public DestinationChoiceScoring(LocationChoiceBestResponseContext lcContext) {
+		this.facilities = ((ScenarioImpl)lcContext.getScenario()).getActivityFacilities();
+		this.config = lcContext.getScenario().getConfig();
+		this.facilitiesKValues = lcContext.getFacilitiesKValues();
+		this.personsKValues = lcContext.getPersonsKValues();
+		this.scaleEpsilon = lcContext.getScaleEpsilon();
 	}
 				
 	public double getDestinationScore(PlanImpl plan, ActivityImpl act) {

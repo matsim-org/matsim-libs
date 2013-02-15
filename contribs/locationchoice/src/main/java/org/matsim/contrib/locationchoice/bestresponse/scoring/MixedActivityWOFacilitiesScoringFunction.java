@@ -25,45 +25,21 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class MixedActivityWOFacilitiesScoringFunction extends CharyparNagelActivityScoring {
-	static final Logger log = Logger.getLogger(MixedActivityWOFacilitiesScoringFunction.class);
-	private final ActivityFacilities facilities;
-	
+	static final Logger log = Logger.getLogger(MixedActivityWOFacilitiesScoringFunction.class);	
 	private DestinationChoiceScoring destinationChoiceScoring;	
-	private Config config;
 	private Plan plan ;
 	
-	public MixedActivityWOFacilitiesScoringFunction(Plan plan, CharyparNagelScoringParameters params, 
-			final ActivityFacilities facilities, Config config,
-			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues, ScaleEpsilon scaleEpsilon) {
-		//super(plan, params, facilityPenalties, facilities);
-		super(params);
-		this.facilities = facilities;
-		this.config = config;
-		this.destinationChoiceScoring = new DestinationChoiceScoring(
-				this.facilities, this.config, facilitiesKValues, personsKValues, scaleEpsilon);
+	public MixedActivityWOFacilitiesScoringFunction(Plan plan, LocationChoiceBestResponseContext lcContext) {
+		super(lcContext.getParams());
+		this.destinationChoiceScoring = new DestinationChoiceScoring(lcContext);
 		this.plan = plan ;
 	}
 	
-	public MixedActivityWOFacilitiesScoringFunction(Plan plan2, LocationChoiceBestResponseContext lcContext) {
-		this( plan2, 
-				lcContext.getParams(), 
-				((ScenarioImpl)lcContext.getScenario()).getActivityFacilities(), 
-				lcContext.getScenario().getConfig(),
-				lcContext.getFacilitiesKValues(), 
-				lcContext.getPersonsKValues(), 
-				lcContext.getScaleEpsilon() ) ;
-	}
-
 	@Override
 	public void finish() {		
 		

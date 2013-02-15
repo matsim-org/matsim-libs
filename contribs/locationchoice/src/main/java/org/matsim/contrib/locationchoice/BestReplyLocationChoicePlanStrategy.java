@@ -12,6 +12,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
@@ -19,7 +20,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 	
 //	private static int locachoiceWrnCnt;
 	
-	public BestReplyLocationChoicePlanStrategy(LocationChoiceBestResponseContext lcContext) {
+	public BestReplyLocationChoicePlanStrategy(LocationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
 		if ( !LocationChoiceConfigGroup.Algotype.bestResponse.equals(lcContext.getScenario().getConfig().locationchoice().getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
@@ -34,7 +35,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		} else {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		}
-		delegate.addStrategyModule(new BestReplyLocationChoice(lcContext));
+		delegate.addStrategyModule(new BestReplyLocationChoice(lcContext, personsMaxDCScoreUnscaled));
 		delegate.addStrategyModule(new ReRoute(lcContext.getScenario()));
 	}
 	

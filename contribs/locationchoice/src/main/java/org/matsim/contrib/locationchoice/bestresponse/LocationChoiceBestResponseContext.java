@@ -22,39 +22,35 @@
  */
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.BestReplyLocationChoice;
-import org.matsim.contrib.locationchoice.BestReplyLocationChoice.AttrType;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
+import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrCreateKVals;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 /**
  * @author nagel
  *
  */
-public class LocationChoiceBestResponseContext {
-	
+public class LocationChoiceBestResponseContext {	
 	private final Scenario scenario;
-	private List<ObjectAttributes> attrs = new ArrayList<ObjectAttributes>() ; // would better be a Map
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
 	private CharyparNagelScoringParameters params;
 	private static final Logger log = Logger.getLogger(LocationChoiceBestResponseContext.class);
+	private int arekValsRead = 1;
+	private ObjectAttributes facilitiesKValues;
+	private ObjectAttributes personsKValues;
 
 	public LocationChoiceBestResponseContext(Scenario scenario) {
 		this.scenario = scenario;	
+		this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
 	}
 	
 	public void init() {
@@ -63,82 +59,20 @@ public class LocationChoiceBestResponseContext {
 		this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 		this.actTypeConverter = defineFlexibleActivities.getConverter() ;
 		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes() ;
-		this.readOrCreateObjectAttributes(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed())) ;
+		
+		this.readOrCreateKVals(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
+		log.info("lc context initialized");
 	}
 	
-	private void readOrCreateObjectAttributes(long seed) {
-		for ( int ii = 0 ; ii <= 2 ; ii++ ) {
-			attrs.add( new ObjectAttributes() );
-		}
-		
-		String pkValuesFileName = this.scenario.getConfig().locationchoice().getpkValuesFile();
-		String fkValuesFileName = this.scenario.getConfig().locationchoice().getfkValuesFile();
-		String maxEpsValuesFileName = this.scenario.getConfig().locationchoice().getMaxEpsFile();
-		if (!pkValuesFileName.equals("null") && !fkValuesFileName.equals("null") && !maxEpsValuesFileName.equals("null")) {			
-			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(attrs.get(AttrType.persKVals.ordinal()));
-			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(attrs.get(AttrType.facKVals.ordinal()));
-			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(attrs.get(AttrType.maxEpsUnsc.ordinal()));
-			try {
-				persKValuesReader.parse(pkValuesFileName);
-				facKValuesReader.parse(fkValuesFileName);
-				maxEpsReader.parse(maxEpsValuesFileName);
-				log.info("reading kvals and maxEpsilons from files:\n"+ pkValuesFileName + "\n" + fkValuesFileName + "\n" + maxEpsValuesFileName);
-			} catch  (UncheckedIOException e) {
-				// reading was not successful
-				log.error("unsuccessful reading kvals and maxEpsilons from files!\nThe values are now computed" +
-				" and following files are not considered!:\n" + pkValuesFileName + "\n" + fkValuesFileName + "\n" + maxEpsValuesFileName);
-				attrs = this.computeAttributes(seed);
-			}
-		}
-		else {
-			log.info("Generating kVals and computing maxEpsilons");
-			attrs = this.computeAttributes(seed);
-		}
+	private void readOrCreateKVals(long seed) {
+		ReadOrCreateKVals computer = new ReadOrCreateKVals(seed, (ScenarioImpl) this.scenario);
+		this.arekValsRead = computer.run();
+		this.personsKValues = computer.getPersonsKValues();
+		this.facilitiesKValues = computer.getFacilitiesKValues();
 	}
-	
-	private List<ObjectAttributes> computeAttributes(long seed) {
-		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, this.scenario, this.scaleEpsilon, 
-				this.actTypeConverter, this.flexibleTypes);
-
-		computer.run();
 		
-		// the reason for the following somewhat strange construct is that I want to _return_ the result, rather than
-		// having it as a side effect. kai, feb'13
-		// (this would now be better as a map)
-		List<ObjectAttributes> attributes = new ArrayList<ObjectAttributes>(3) ;
-		for ( AttrType type : AttrType.values() ) {
-			switch ( type ) {
-			case facKVals:
-				attributes.add( computer.getFacilitiesKValues() ) ;
-				break;
-			case maxEpsUnsc:
-				attributes.add( computer.getPersonsMaxEpsUnscaled() ) ;
-				break;
-			case persKVals:
-				attributes.add( computer.getPersonsKValues() ) ;
-				break;
-			}
-		}
-		
-		for ( AttrType type : AttrType.values() ) {
-			System.err.println( type.toString() + "\n" + attributes.get(type.ordinal()) ) ;
-		}
-		
-		return attributes ;
-		
-	}
-	
 	public Scenario getScenario() {
 		return scenario;
-	}
-
-	public ObjectAttributes getPersonsKValues() {
-		return attrs.get(BestReplyLocationChoice.AttrType.persKVals.ordinal()) ;
-	}
-
-	public ObjectAttributes getFacilitiesKValues() {
-		return attrs.get(BestReplyLocationChoice.AttrType.facKVals.ordinal()) ;
 	}
 
 	public ScaleEpsilon getScaleEpsilon() {
@@ -157,13 +91,15 @@ public class LocationChoiceBestResponseContext {
 		return params;
 	}
 
-	public ObjectAttributes getPersonsMaxEpsUnscaled() {
-		return attrs.get(BestReplyLocationChoice.AttrType.maxEpsUnsc.ordinal()) ;
+	public boolean kValsAreRead() {
+		return (this.arekValsRead == 0);
+	}
+
+	public ObjectAttributes getPersonsKValues() {
+		return personsKValues;
 	}
 	
-	public List<ObjectAttributes> getAttributes() {
-		return attrs ;
+	public ObjectAttributes getFacilitiesKValues() {
+		return facilitiesKValues;
 	}
-
-
 }

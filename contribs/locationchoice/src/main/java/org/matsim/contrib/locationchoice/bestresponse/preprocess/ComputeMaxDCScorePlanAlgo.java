@@ -39,7 +39,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class EpsilonComputer implements PlanAlgorithm {
+public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	private String type;
 	private TreeMap<Id, ActivityFacility> typedFacilities;
 	private DestinationChoiceScoring scorer;
@@ -47,7 +47,7 @@ public class EpsilonComputer implements PlanAlgorithm {
 	private ActTypeConverter actTypeConverter;
 	private DestinationSampler sampler;
 			
-	public EpsilonComputer(ScenarioImpl scenario, String type, TreeMap<Id, ActivityFacility> typedFacilities,
+	public ComputeMaxDCScorePlanAlgo(ScenarioImpl scenario, String type, TreeMap<Id, ActivityFacility> typedFacilities,
 			DestinationChoiceScoring scorer, ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter,
 			DestinationSampler sampler) {		
 		this.type = type;
@@ -89,6 +89,7 @@ public class EpsilonComputer implements PlanAlgorithm {
 		}
 		// temporarily store maxEpsilon here: (s_l)
 		// TODO: get rid of that hack. ah feb'13
+		// use customizable
 		if (((PersonImpl)p).getDesires() == null) ((PersonImpl)p).createDesires("");
 		((PersonImpl)p).getDesires().setDesc(((PersonImpl)p).getDesires().getDesc() + maxEpsilon + "_");	
 	}

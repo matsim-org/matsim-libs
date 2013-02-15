@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -54,49 +52,33 @@ public class BestReplyLocationChoice extends AbstractMultithreadedModule {
 
 	private static final Logger log = Logger.getLogger(BestReplyLocationChoice.class);
 	private ObjectAttributes personsMaxEpsUnscaled;
-	
-	public static enum AttrType { facKVals, persKVals, maxEpsUnsc } 
-
-	private ScaleEpsilon scaleEpsilon;
-	private ActTypeConverter actTypeConverter;
 	private DestinationSampler sampler;
-
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
-
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private final Scenario scenario;
-
 	private LocationChoiceBestResponseContext lcContext;
-
 	private HashSet<String> flexibleTypes;
 
-	public BestReplyLocationChoice(LocationChoiceBestResponseContext lcContext) {
+	public BestReplyLocationChoice(LocationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
 		super(lcContext.getScenario().getConfig().global());
 		if ( !LocationChoiceConfigGroup.Algotype.bestResponse.equals(lcContext.getScenario().getConfig().locationchoice().getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
 		this.lcContext = lcContext ;
 		this.scenario = lcContext.getScenario() ;
+		this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
 		initLocal();
 		
 	}
 
 	private void initLocal() {
-		this.flexibleTypes = this.lcContext.getFlexibleTypes() ;
-		
-		((NetworkImpl) this.scenario.getNetwork()).connect(); // ???
-
-		this.actTypeConverter = this.lcContext.getConverter() ;
-		
-		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());
-
-		this.scaleEpsilon = this.lcContext.getScaleEpsilon() ;
-
-		List<ObjectAttributes> epsilons = this.lcContext.getAttributes() ;
-		
-		this.sampler = new DestinationSampler(epsilons.get(AttrType.persKVals.ordinal()), epsilons.get(AttrType.facKVals.ordinal()), 
+		this.flexibleTypes = this.lcContext.getFlexibleTypes() ;		
+		((NetworkImpl) this.scenario.getNetwork()).connect(); // ???	
+		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), this.scenario.getConfig().locationchoice());	
+		this.sampler = new DestinationSampler(
+				this.lcContext.getPersonsKValues(), 
+				this.lcContext.getFacilitiesKValues(), 
 				this.scenario.getConfig().locationchoice());
-		this.personsMaxEpsUnscaled = epsilons.get(AttrType.maxEpsUnsc.ordinal() ) ;
 	}
 
 	/**
@@ -105,7 +87,7 @@ public class BestReplyLocationChoice extends AbstractMultithreadedModule {
 	private void initTrees(ActivityFacilities facilities, LocationChoiceConfigGroup config) {
 		log.info("Doing location choice for activities: " + this.flexibleTypes.toString());
 		TreesBuilder treesBuilder = new TreesBuilder(this.flexibleTypes, this.scenario.getNetwork(), config);
-		treesBuilder.setActTypeConverter(actTypeConverter);
+		treesBuilder.setActTypeConverter(this.lcContext.getConverter());
 		treesBuilder.createTrees(facilities);
 		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
@@ -127,8 +109,7 @@ public class BestReplyLocationChoice extends AbstractMultithreadedModule {
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 		this.planAlgoInstances.add(new BestResponseLocationMutator(this.scenario,   
 				this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
-				this.scaleEpsilon, this.actTypeConverter, this.sampler, this.getReplanningContext()));
+				this.lcContext.getScaleEpsilon(), this.lcContext.getConverter(), this.sampler, this.getReplanningContext()));
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
-
 }

@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeMaxEpsilons;
+import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeMaxDCScoreMultiThreatedModule;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;

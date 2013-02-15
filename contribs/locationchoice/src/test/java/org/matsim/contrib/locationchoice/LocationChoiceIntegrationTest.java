@@ -33,12 +33,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -69,11 +67,12 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
-
+	
 	public void testLocationChoiceJan2013() {
 		//	CONFIG:
 		final Config config = localCreateConfig();
@@ -95,10 +94,15 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// joint context (based on scenario):
 		final LocationChoiceBestResponseContext lcContext = new LocationChoiceBestResponseContext(scenario) ;
-		
+				
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true) ;
+		
+		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(controler.getScenario(), lcContext.getScaleEpsilon(),
+  				lcContext.getConverter(), lcContext.getFlexibleTypes(), lcContext);
+  		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
+  		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
 
 		// set scoring function factory:
 		controler.setScoringFunctionFactory( new ScoringFunctionFactory(){
@@ -116,7 +120,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
-				return new BestReplyLocationChoicePlanStrategy(lcContext) ;
+				return new BestReplyLocationChoicePlanStrategy(lcContext, personsMaxDCScoreUnscaled) ;
 				// yy MZ argues that this is not so great since the factory now has context that goes beyond Scenario and EventsManager.
 				// As an alternative, one could add the context to Scenario as scenario element.  I find the present version easier to read, and
 				// as long as the factories remain anonymous classes, this is most probably ok. kai, feb'13
@@ -169,14 +173,14 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true) ;
+		
+		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(controler.getScenario(), lcContext.getScaleEpsilon(),
+  				lcContext.getConverter(), lcContext.getFlexibleTypes(), lcContext);
+  		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
+  		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
 
 		// set scoring function
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(config.locationchoice());
-		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
-		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
-
-		MixedScoringFunctionFactory scoringFunctionFactory =
-			new MixedScoringFunctionFactory(config, controler, scaleEpsilon, actTypeConverter, defineFlexibleActivities.getFlexibleTypes() );
+		MixedScoringFunctionFactory scoringFunctionFactory = new MixedScoringFunctionFactory(config, controler, lcContext);
 		scoringFunctionFactory.setUsingFacilityOpeningTimes(false) ;
 
 		controler.setScoringFunctionFactory(scoringFunctionFactory);
@@ -185,7 +189,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
-				return new BestReplyLocationChoicePlanStrategy(lcContext) ;
+				return new BestReplyLocationChoicePlanStrategy(lcContext, personsMaxDCScoreUnscaled) ;
 			}
 		});
 

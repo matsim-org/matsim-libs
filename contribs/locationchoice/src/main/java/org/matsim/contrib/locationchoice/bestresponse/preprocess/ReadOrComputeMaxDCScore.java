@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -25,25 +25,24 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
+import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.contrib.locationchoice.utils.RandomFromVarDistr;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-public class ComputeKValsAndMaxEpsilon {	
-	private final static Logger log = Logger.getLogger(ComputeKValsAndMaxEpsilon.class);
+public class ReadOrComputeMaxDCScore {	
+	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
 	private ScenarioImpl scenario;	
 	private Config config;	
-	private RandomFromVarDistr rnd;
-	
-	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
-	private ObjectAttributes personsKValues = new ObjectAttributes();
-	private ObjectAttributes personsMaxEpsUnscaled = new ObjectAttributes();
+	private LocationChoiceBestResponseContext lcContext;
+	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();
 	
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
@@ -52,50 +51,44 @@ public class ComputeKValsAndMaxEpsilon {
 	
 	private HashSet<String> flexibleTypes;
 	
-	public ComputeKValsAndMaxEpsilon(long seed, Scenario scenario, ScaleEpsilon scaleEpsilon, 
-			ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes) {
-		rnd = new RandomFromVarDistr();
-		rnd.setSeed(seed);
+	public ReadOrComputeMaxDCScore(Scenario scenario, ScaleEpsilon scaleEpsilon, 
+			ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes, LocationChoiceBestResponseContext lcContext) {
 		this.scenario = (ScenarioImpl) scenario;
 		this.config = this.scenario.getConfig() ;
 		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;
 		this.flexibleTypes = flexibleTypes;
+		this.lcContext = lcContext;
+	}
+				
+	public void readOrCreateMaxDCScore(Controler controler, boolean arekValsRead) {		 		
+  		String maxEpsValuesFileName = controler.getConfig().locationchoice().getMaxEpsFile();
+		if (!maxEpsValuesFileName.equals("null") && arekValsRead) {			
+			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
+			try {
+				maxEpsReader.parse(maxEpsValuesFileName);
+				log.info("reading maxEpsilons from file:\n"+ maxEpsValuesFileName);
+			} catch  (UncheckedIOException e) {
+				// reading was not successful
+				log.error("unsuccessful reading of maxDCScore from file!\nThe values are now computed" +
+				" and following files are not considered!:\n" + maxEpsValuesFileName);
+				this.computeMaxDCScore();
+			}
+		}
+		else {
+			log.info("computing maxDCScore");
+			this.computeMaxDCScore();
+		}
 	}
 	
-	public void assignKValues() {				
-		this.assignKValuesPersons();
-		this.assignKValuesAlternatives();	
-		this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues, this.config.locationchoice());
-	}
-		
-	// does not matter which distribution is chosen here
-	private void assignKValuesPersons() {
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			personsKValues.putAttribute(p.getId().toString(), "k", rnd.getUniform(1.0));
-		}
-		// write person k values
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsKValues);
-		attributesWriter.writeFile(config.controler().getOutputDirectory() + "personsKValues.xml");
-	}	
-	private void assignKValuesAlternatives() {
-		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			facilitiesKValues.putAttribute(facility.getId().toString(), "k", rnd.getUniform(1.0));
-		}
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.facilitiesKValues);
-		attributesWriter.writeFile(config.controler().getOutputDirectory() + "facilitiesKValues.xml");
-	}
-	
-	public void run() {			
-		log.info("Assigning k values ...");				
-		this.assignKValues(); 
+	private void computeMaxDCScore() {			
+		this.sampler = new DestinationSampler(this.lcContext.getPersonsKValues(), this.lcContext.getFacilitiesKValues(), this.config.locationchoice());
 				
 		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
 		for (String actType : this.scaleEpsilon.getFlexibleTypes()) {
 			log.info("Computing max epsilon for activity type " + actType);
-			ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(
-					this.scenario, actType, config, this.facilitiesKValues, this.personsKValues, 
-					this.scaleEpsilon, this.actTypeConverter, this.sampler);
+			ComputeMaxDCScoreMultiThreatedModule maxEpsilonComputer = new ComputeMaxDCScoreMultiThreatedModule(
+					this.scenario, actType, config, this.lcContext, this.sampler);
 			maxEpsilonComputer.prepareReplanning(null);
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
 				maxEpsilonComputer.handlePlan(p.getSelectedPlan());
@@ -110,33 +103,16 @@ public class ComputeKValsAndMaxEpsilon {
 			int i = 0;
 			for (String flexibleType : this.flexibleTypes) {
 				double maxType = Double.parseDouble(((PersonImpl)person).getDesires().getDesc().split("_")[i]);
-				this.personsMaxEpsUnscaled.putAttribute(person.getId().toString(), flexibleType, maxType);
+				this.personsMaxDCScoreUnscaled.putAttribute(person.getId().toString(), flexibleType, maxType);
 				i++;
 			}	
 		}
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxEpsUnscaled);
-		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + "personsMaxEpsUnscaled.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxDCScoreUnscaled);
+		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + "personsMaxDCScoreUnscaled.xml");
 	}
-
-	public ObjectAttributes getFacilitiesKValues() {
-		return facilitiesKValues;
-	}
-
-//	public void setPersonsMaxEpsUnscaled(ObjectAttributes personsMaxEpsUnscaled) {
-//	this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
-//}
-//	public void setFacilitiesKValues(ObjectAttributes facilitiesKValues) {
-//		this.facilitiesKValues = facilitiesKValues;
-//	}
-//	public void setPersonsKValues(ObjectAttributes personsKValues) {
-//		this.personsKValues = personsKValues;
-//	}
-	// never used, and IMO not meaningful (complex objects should not have setters for internal state). kai, jan'13
 	
-	public ObjectAttributes getPersonsKValues() {
-		return personsKValues;
-	}
+
 	public ObjectAttributes getPersonsMaxEpsUnscaled() {
-		return personsMaxEpsUnscaled;
+		return personsMaxDCScoreUnscaled;
 	}
 }
