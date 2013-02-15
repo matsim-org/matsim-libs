@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
 import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
+import org.matsim.utils.objectattributes.attributeconverters.FloatConverter;
 import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
 import org.matsim.utils.objectattributes.attributeconverters.LongConverter;
 import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
@@ -61,6 +62,7 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 
 	private static final StringConverter STRING_Converter = new StringConverter();
 	private static final IntegerConverter INTEGER_Converter = new IntegerConverter();
+	private static final FloatConverter FLOAT_Converter = new FloatConverter();
 	private static final DoubleConverter DOUBLE_Converter = new DoubleConverter();
 	private static final BooleanConverter BOOLEAN_Converter = new BooleanConverter();
 	private static final LongConverter LONG_Converter = new LongConverter();
@@ -72,6 +74,7 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 		super.setValidating(false);
 		this.converters.put(String.class.getCanonicalName(), STRING_Converter);
 		this.converters.put(Integer.class.getCanonicalName(), INTEGER_Converter);
+		this.converters.put(Float.class.getCanonicalName(), FLOAT_Converter);
 		this.converters.put(Double.class.getCanonicalName(), DOUBLE_Converter);
 		this.converters.put(Boolean.class.getCanonicalName(), BOOLEAN_Converter);
 		this.converters.put(Long.class.getCanonicalName(), LONG_Converter);
