@@ -34,14 +34,11 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.LeastCostPathTree;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class AccessibilityCalc {//neue klasse für accessibilityComputation
 	
-	private static final Logger log = Logger.getLogger(MyParcelBasedAccessibilityControlerListener.class);
+	private static final Logger log = Logger.getLogger(AccessibilityCalc.class);
 	
 	private ActivityFacilitiesImpl parcels;
 	
@@ -50,6 +47,7 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 	private ScenarioImpl scenario;
 	
 	private ZoneLayer<Id> measuringPoints;
+	private String filename;
 	
 	protected AggregateObject2NearestNode[] aggregatedOpportunities;
 	
@@ -61,12 +59,13 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 	protected double betaCarTT = -12.;
 	protected double betaWalkTT = -12.;
 
-	public AccessibilityCalc(ActivityFacilitiesImpl parcels, ZoneLayer<Id> startZones, SpatialGrid freeSpeedGrid, ScenarioImpl scenario) {
+	public AccessibilityCalc(ActivityFacilitiesImpl parcels, ZoneLayer<Id> startZones, SpatialGrid freeSpeedGrid, ScenarioImpl scenario,String filename) {
 		
 		this.setParcels(parcels);
 		this.setFreeSpeedGrid(freeSpeedGrid);
 		this.setScenario(scenario);
 		this.setMeasuringPoints(startZones);
+		this.filename = filename;
 		
 	}
 	
@@ -84,7 +83,7 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 			
 			Random rnd = new Random();
 			
-			for(int i=0;i<2000;i++){
+			for(int i=0;i<300000;i++){
 				Coord coord = new CoordImpl(bbox.getXMin() + rnd.nextDouble() * (bbox.getXMax() - bbox.getXMin()),
 						bbox.getYMin() + rnd.nextDouble() * (bbox.getYMax() - bbox.getYMin()));
 				Id id = new IdImpl("parcel"+i);
@@ -99,7 +98,7 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 		
 		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, new TravelTimeCalculatorConfigGroup());
 		TravelTime ttc = ttCalc.getLinkTravelTimes();
-			
+		
 		LeastCostPathTree lcptFreeSpeedCarTravelTime = new LeastCostPathTree( ttc, new FreeSpeedTravelTimeCostCalculator() );
 		
 		log.info("Computing and writing cell based accessibility measures ...");
@@ -140,7 +139,6 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 			
 			Zone<Id> measurePoint = measuringPointIterator.next();
 			
-			Coordinate coord = measurePoint.getGeometry().getCoordinate();
 			Point p = measurePoint.getGeometry().getCentroid();
 			
 			Coord coordFromZone = new CoordImpl(p.getX(),p.getY());
@@ -187,7 +185,6 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 					
 					Zone<Id> measurePoint = originsIterator.next();
 					
-					Coordinate coord = measurePoint.getGeometry().getCoordinate();
 					Point p = measurePoint.getGeometry().getCentroid();
 
 					Coord coordFromZone = new CoordImpl(p.getX(),p.getY());
@@ -262,7 +259,7 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 
 	private void writePlottingData() {
 		GridUtils.writeSpatialGridTable(freeSpeedGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// freespeed results for plotting in R
-				+ "freespeedAccessibility_cellsize_" + freeSpeedGrid.getResolution()
+				+ "freespeedAccessibility_cellsize_" + freeSpeedGrid.getResolution() + filename
 				+ InternalConstants.FILE_TYPE_TXT);
 	}
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -18,6 +21,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.utils.charts.BarChart;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Point;
 
 public class NetworkInspector {
 	
@@ -29,7 +38,7 @@ public class NetworkInspector {
 	
 	private List<Node> deadEndNodes = new ArrayList<Node>();
 	private List<Node> exitRoadNodes = new ArrayList<Node>();
-	private List<Node> oneWayNodes = new ArrayList<Node>();
+	private List<Node> redundantNodes = new ArrayList<Node>();
 	
 	private Logger logger = Logger.getLogger(NetworkInspector.class);
 	
@@ -37,8 +46,8 @@ public class NetworkInspector {
 	
 	private double[] nLanes = new double[6];
 	
-	private double[] inDegrees = new double[6];
-	private double[] outDegrees = new double[6];
+	private double[] inDegrees = new double[7];
+	private double[] outDegrees = new double[7];
 	
 	private double[] lengths = new double[9];
 	private double[] geoLengths = new double[9];
@@ -50,6 +59,8 @@ public class NetworkInspector {
 	
 	private String outputFolder = "C:/Users/Daniel/Dropbox/bsc";
 	
+	private SimpleFeatureBuilder builder;
+	
 	public NetworkInspector(final Scenario sc){
 		
 		this.scenario = sc;
@@ -59,7 +70,7 @@ public class NetworkInspector {
 		
 		double factor = 0.9;
 		this.bbox.setCustomBoundaryBox(box.getXMin()+((box.getXMax()-box.getXMin())*(1-factor)),
-				box.getYMin()*+((box.getYMax()-box.getYMin())*(1-factor)),
+				box.getYMin()+((box.getYMax()-box.getYMin())*(1-factor)),
 				box.getXMax()-((box.getXMax()-box.getXMin())*(1-factor)),
 				box.getYMax()-((box.getYMax()-box.getYMin())*(1-factor)));
 		
@@ -274,6 +285,8 @@ public class NetworkInspector {
 		
 		for(Node node : this.scenario.getNetwork().getNodes().values()){
 			
+			if(node.getInLinks().size()>0&&node.getOutLinks().size()>0){
+			
 			this.inDegrees[node.getInLinks().size()-1]++;
 			this.outDegrees[node.getOutLinks().size()-1]++;
 			
@@ -285,12 +298,13 @@ public class NetworkInspector {
 				if(inLink.getFromNode().equals(outLink.getToNode())){
 					if(node.getCoord().getX()<=bbox.getXMax()&&node.getCoord().getX()>=bbox.getXMin()&&
 							node.getCoord().getY()<=bbox.getYMax()&&node.getCoord().getY()>=bbox.getYMin())
-						deadEndNodes.add(node);
+						this.deadEndNodes.add(node);
 					else
 						this.exitRoadNodes.add(node);
 				} else
-					this.oneWayNodes.add(node);
+					this.redundantNodes.add(node);
 				
+			}
 			}
 			
 		}
@@ -298,7 +312,7 @@ public class NetworkInspector {
 		logger.info("done.");
 		
 		logger.info(this.deadEndNodes.size() + " dead end nodes, "
-				+ this.exitRoadNodes.size() + " exit road nodes and " + this.oneWayNodes.size() + " one way nodes found.");
+				+ this.exitRoadNodes.size() + " exit road nodes and " + this.redundantNodes.size() + " redundant nodes found.");
 		
 		logger.info("writing node statistics files...");
 		
@@ -409,7 +423,7 @@ public class NetworkInspector {
 		
 		File file = new File(this.outputFolder+"/test/nodeDegrees.txt");
 		FileWriter writer = new FileWriter(file);
-		writer.write("in/out\t1\t2\t3\t4\t5\t6\nnobjects");
+		writer.write("in/out\t1\t2\t3\t4\t5\t6\t7\nnobjects");
 		
 		//dead ends, exit roads
 		
@@ -422,6 +436,41 @@ public class NetworkInspector {
 		chart.addSeries("in-degrees", inDegrees);
 		chart.addSeries("out-degrees", outDegrees);
 		chart.saveAsPng(this.outputFolder+"/test/nodeDegrees.png", 800, 600);
+	}
+	
+	public void shpExport(){
+		initFeatureType();
+		Collection<SimpleFeature> features = createFeatures();
+		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/pres/deadEndNodes_osm_main.shp");
+		
+	}
+	
+	private Collection<SimpleFeature> createFeatures() {
+		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		for(Node node : this.deadEndNodes){
+			features.add(getFeature(node));
+		}
+		return features;
+	}
+
+	private SimpleFeature getFeature(final Node node) {
+		Point p = MGC.coord2Point(node.getCoord());
+		try {
+			return this.builder.buildFeature(null, new Object[]{p,node.getId().toString()});
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void initFeatureType() {
+		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName("node");
+		typeBuilder.setCRS(crs);
+		typeBuilder.add("location",Point.class);
+		typeBuilder.add("ID",String.class);
+		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
+		
 	}
 	
 	private static DoubleFlagRole getDoubleFlag(final Node n, final Map<Node, DoubleFlagRole> nodeRoles) {
