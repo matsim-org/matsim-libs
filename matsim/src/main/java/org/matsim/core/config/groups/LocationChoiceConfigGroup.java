@@ -41,7 +41,7 @@ public class LocationChoiceConfigGroup extends Module {
 	
 	private static final String ALGO = "algorithm";
 	private static final String TT_APPROX_LEVEL = "tt_approximationLevel";
-	private static final String MAXDISTANCEEPSILON = "maxDistanceEpsilon";
+	private static final String MAXDISTANCEDCSCORE = "maxDistanceDCScore";
 	private static final String PLANSELECTOR = "planSelector";
 	
 	private static final String RANDOMSEED = "randomSeed";
@@ -52,7 +52,9 @@ public class LocationChoiceConfigGroup extends Module {
 	
 	private static final String PKVALS_FILE = "pkValuesFile";
 	private static final String FKVALS_FILE = "fkValuesFile";
-	private static final String MAXEPS_FILE = "maxEpsFile";
+	private static final String PBETAS_FILE = "pBetasFileName";
+	private static final String FATTRS_FILE = "fAttributesFileName";
+	private static final String MAXDCS_FILE = "maxDCScoreFile";
 	
 	private static final String ANALYSIS_BOUNDARY = "analysisBoundary";
 	private static final String ANALYSIS_BINSIZE = "analysisBinSize";
@@ -73,18 +75,18 @@ public class LocationChoiceConfigGroup extends Module {
 		
 	private Algotype algorithm = Algotype.random ;
 	private String tt_approximationLevel = "0";
-	private String maxDistanceEpsilon = "-1.0";
+	private String maxDistanceDCScore = "-1.0";
 	private String planSelector = "SelectExpBeta";
 	
 	private String randomSeed = "221177";
 	private String epsilonDistribution = "gumbel";
 	private String epsilonScaleFactors = "null";
-	private String probChoiceSetSize = "10";
-//	private String probChoiceExponent ="3";
-	
+	private String probChoiceSetSize = "10";	
 	private String pkValuesFile = "null";
 	private String fkValuesFile = "null";
-	private String maxEpsFile = "null";
+	private String pBetasFile = "null";
+	private String fAttributesFile = "null";
+	private String maxDCScoreFile = "null";
 	
 	private String analysisBoundary = "200000.0";
 	private String analysisBinSize = "20000.0";
@@ -134,8 +136,8 @@ public class LocationChoiceConfigGroup extends Module {
 		if (TT_APPROX_LEVEL.equals(key)) {
 			return getTravelTimeApproximationLevel();
 		}
-		if (MAXDISTANCEEPSILON.equals(key)) {
-			return getMaxDistanceEpsilon();
+		if (MAXDISTANCEDCSCORE.equals(key)) {
+			return getMaxDistanceDCScore();
 		}
 		if (PLANSELECTOR.equals(key)) {
 			return getPlanSelector();
@@ -152,18 +154,21 @@ public class LocationChoiceConfigGroup extends Module {
 		if (PROBCHOICESETSIZE.equals(key)) {
 			return getProbChoiceSetSize();
 		}
-//		if (PROBCHOICEEXP.equals(key)) {
-//			return getProbChoiceExponent();
-//		}
 		if (PKVALS_FILE.equals(key)) {
 			return getpkValuesFile();
 		}
 		if (FKVALS_FILE.equals(key)) {
 			return getfkValuesFile();
 		}
-		if (MAXEPS_FILE.equals(key)) {
-			return getMaxEpsFile();
+		if (PBETAS_FILE.equals(key)) {
+			return getpBetasFile();
 		}
+		if (FATTRS_FILE.equals(key)) {
+			return getfAttributesFile();
+		}
+		if (MAXDCS_FILE.equals(key)) {
+			return getMaxEpsFile();
+		}		
 		if (ANALYSIS_BOUNDARY.equals(key)) {
 			return getAnalysisBoundary();
 		}
@@ -257,8 +262,8 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setTravelTimeApproximationLevel(value);
 			}
-		} else if (MAXDISTANCEEPSILON.equals(key)) {
-			setMaxDistanceEpsilon(value);
+		} else if (MAXDISTANCEDCSCORE.equals(key)) {
+			setMaxDistanceDCScore(value);
 		} else if (PLANSELECTOR.equals(key)) {
 			if (!(value.equals("BestScore") || value.equals("SelectExpBeta") || value.equals("ChangeExpBeta") || value.equals("SelectRandom"))) {
 				log.warn("set a valid plan selector for location choice. Set to default value 'SelectExpBeta' now");
@@ -296,12 +301,6 @@ public class LocationChoiceConfigGroup extends Module {
 			}
 		} else if (PROBCHOICEEXP.equals(key)) {
 			log.error("location choice key " + PROBCHOICEEXP + " is no longer used.  Please remove.  This will be enforced more strictly in the future.  kai, jan'13") ;
-//			if (value.length() == 0) {
-//				log.warn("define weight (exponent) for weighting scores in candiate set. Set to default value '3' now");
-//			}
-//			else {
-//				setProbChoiceExponent(value);
-//			}
 		} else if (PKVALS_FILE.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define a persons k values file if available. Set to default value 'null' now");
@@ -316,7 +315,22 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setfkValuesFile(value);
 			}
-		} else if (MAXEPS_FILE.equals(key)) {
+		} else if (FATTRS_FILE.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define a facilities attributess file if available. Set to default value 'null' now");
+			}
+			else {
+				setfAttributesFile(value);
+			}
+		} else if (PBETAS_FILE.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define a person betas file if available. Set to default value 'null' now");
+			}
+			else {
+				setpBetasFile(value);
+			}
+			
+		} else if (MAXDCS_FILE.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define a max eps file if available. Set to default value 'null' now");
 			}
@@ -366,19 +380,19 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, CENTER_NODE);
 		this.addParameterToMap(map, RADIUS);
 		this.addParameterToMap(map, FLEXIBLE_TYPES);
-//		this.addParameterToMap(map, ALGO);
 		map.put(ALGO, this.getAlgorithm().toString()  ) ;
 		this.addParameterToMap(map, TT_APPROX_LEVEL);
-		this.addParameterToMap(map, MAXDISTANCEEPSILON);
+		this.addParameterToMap(map, MAXDISTANCEDCSCORE);
 		this.addParameterToMap(map, PLANSELECTOR);
 		this.addParameterToMap(map, RANDOMSEED);
 		this.addParameterToMap(map, EPSDISTR);
 		this.addParameterToMap(map, SCALE_EPS);
 		this.addParameterToMap(map, PROBCHOICESETSIZE);
-//		this.addParameterToMap(map, PROBCHOICEEXP);
 		this.addParameterToMap(map, PKVALS_FILE);
 		this.addParameterToMap(map, FKVALS_FILE);
-		this.addParameterToMap(map, MAXEPS_FILE);		
+		this.addParameterToMap(map, PBETAS_FILE);
+		this.addParameterToMap(map, FATTRS_FILE);
+		this.addParameterToMap(map, MAXDCS_FILE);		
 		this.addParameterToMap(map, ANALYSIS_BOUNDARY);
 		this.addParameterToMap(map, ANALYSIS_BINSIZE);
 		this.addParameterToMap(map, IDEXCLUSION);
@@ -440,6 +454,18 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setFlexibleTypes(final String flexibleTypes) {
 		this.flexible_types = flexibleTypes;
 	}
+	public String getpBetasFile() {
+		return pBetasFile;
+	}
+	public String getfAttributesFile() {
+		return fAttributesFile;
+	}
+	public void setpBetasFile(String pBetasFile) {
+		this.pBetasFile = pBetasFile;
+	}
+	public void setfAttributesFile(String fAttributesFile) {
+		this.fAttributesFile = fAttributesFile;
+	}
 	public Algotype getAlgorithm() {
 		return algorithm;
 	}
@@ -452,11 +478,11 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setTravelTimeApproximationLevel(String tt_approximationLevel) {
 		this.tt_approximationLevel = tt_approximationLevel;
 	}
-	public String getMaxDistanceEpsilon() {
-		return maxDistanceEpsilon;
+	public String getMaxDistanceDCScore() {
+		return maxDistanceDCScore;
 	}
-	public void setMaxDistanceEpsilon(String maxSearchSpaceRadius) {
-		this.maxDistanceEpsilon = maxSearchSpaceRadius;
+	public void setMaxDistanceDCScore(String maxSearchSpaceRadius) {
+		this.maxDistanceDCScore = maxSearchSpaceRadius;
 	}
 	public String getPlanSelector() {
 		return planSelector;
@@ -488,12 +514,6 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setProbChoiceSetSize(String probChoiceSetSize) {
 		this.probChoiceSetSize = probChoiceSetSize;
 	}
-//	public String getProbChoiceExponent() {
-//		return probChoiceExponent;
-//	}
-//	public void setProbChoiceExponent(String probChoiceExponent) {
-//		this.probChoiceExponent = probChoiceExponent;
-//	}
 	public String getpkValuesFile() {
 		return pkValuesFile;
 	}
@@ -507,10 +527,10 @@ public class LocationChoiceConfigGroup extends Module {
 		this.fkValuesFile = kValuesFile;
 	}
 	public String getMaxEpsFile() {
-		return maxEpsFile;
+		return maxDCScoreFile;
 	}
 	public void setMaxEpsFile(String maxEpsFile) {
-		this.maxEpsFile = maxEpsFile;
+		this.maxDCScoreFile = maxEpsFile;
 	}
 	public String getAnalysisBoundary() {
 		return this.analysisBoundary;

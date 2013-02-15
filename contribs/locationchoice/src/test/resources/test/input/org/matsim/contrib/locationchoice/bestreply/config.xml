@@ -30,6 +30,6 @@
 		<param name="epsilonScaleFactors" value="1.0, 1.0"/>
 		<param name="pkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestreply/personsKValues.xml"/>
 		<param name="fkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestreply/facilitiesKValues.xml"/>
-		<param name="maxEpsFile" value="test/input/org/matsim/contrib/locationchoice/bestreply/personsMaxEpsUnscaled.xml"/>
+		<param name="maxDCScoreFile" value="test/input/org/matsim/contrib/locationchoice/bestreply/personsMaxEpsUnscaled.xml"/>
 	</module>
 </config>

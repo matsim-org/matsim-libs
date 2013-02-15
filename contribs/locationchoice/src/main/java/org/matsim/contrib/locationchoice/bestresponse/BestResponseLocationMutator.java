@@ -259,8 +259,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 
 		// non-linear and tastes: exhaustive search for the moment
 		// later implement non-linear equation solver
-		if (Double.parseDouble(this.scenario.getConfig().locationchoice().getMaxDistanceEpsilon()) > 0.0) {
-			maxDistance = Double.parseDouble(this.scenario.getConfig().locationchoice().getMaxDistanceEpsilon());
+		if (Double.parseDouble(this.scenario.getConfig().locationchoice().getMaxDistanceDCScore()) > 0.0) {
+			maxDistance = Double.parseDouble(this.scenario.getConfig().locationchoice().getMaxDistanceDCScore());
 		}
 		return maxDistance;
 	}

@@ -31,7 +31,9 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 /**
  * @author nagel
@@ -47,6 +49,8 @@ public class LocationChoiceBestResponseContext {
 	private int arekValsRead = 1;
 	private ObjectAttributes facilitiesKValues;
 	private ObjectAttributes personsKValues;
+	private ObjectAttributes personsBetas = new ObjectAttributes();
+	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
 
 	public LocationChoiceBestResponseContext(Scenario scenario) {
 		this.scenario = scenario;	
@@ -61,6 +65,7 @@ public class LocationChoiceBestResponseContext {
 		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes() ;
 		
 		this.readOrCreateKVals(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
+		this.readFacilitesAttributesAndBetas();
 		log.info("lc context initialized");
 	}
 	
@@ -69,6 +74,23 @@ public class LocationChoiceBestResponseContext {
 		this.arekValsRead = computer.run();
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
+	}
+	
+	private void readFacilitesAttributesAndBetas() {
+		String pBetasFileName = this.scenario.getConfig().locationchoice().getpBetasFile();
+		String fAttributesFileName = this.scenario.getConfig().locationchoice().getfAttributesFile();
+		if (!pBetasFileName.equals("null") && !fAttributesFileName.equals("null")) {			
+			ObjectAttributesXmlReader personsBetasReader = new ObjectAttributesXmlReader(this.personsBetas);
+			ObjectAttributesXmlReader facilitiesAttributesReader = new ObjectAttributesXmlReader(this.facilitiesAttributes);
+			try {
+				personsBetasReader.parse(pBetasFileName);
+				facilitiesAttributesReader.parse(fAttributesFileName);
+				log.info("reading betas and facilities attributes from: \n"+ pBetasFileName + "\n" + fAttributesFileName);
+			} catch  (UncheckedIOException e) {
+				// reading was not successful
+				log.error("unsuccessful betas and facilities attributes from files!\n" + pBetasFileName + "\n" + fAttributesFileName);
+			}
+		}
 	}
 		
 	public Scenario getScenario() {
@@ -101,5 +123,13 @@ public class LocationChoiceBestResponseContext {
 	
 	public ObjectAttributes getFacilitiesKValues() {
 		return facilitiesKValues;
+	}
+
+	public ObjectAttributes getPersonsBetas() {
+		return personsBetas;
+	}
+
+	public ObjectAttributes getFacilitiesAttributes() {
+		return facilitiesAttributes;
 	}
 }
