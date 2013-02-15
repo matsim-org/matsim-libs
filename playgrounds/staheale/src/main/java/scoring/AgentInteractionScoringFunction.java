@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.BestReplyLocationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -370,7 +371,8 @@ public class AgentInteractionScoringFunction extends CharyparNagelActivityScorin
 		 */		
 		for (PlanElement pe : this.plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe);
+				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe, 
+						BestReplyLocationChoice.useScaleEpsilonFromConfig);
 			}
 		}
 	}

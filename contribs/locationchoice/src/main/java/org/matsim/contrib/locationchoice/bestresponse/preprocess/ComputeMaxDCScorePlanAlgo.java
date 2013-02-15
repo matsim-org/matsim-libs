@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
@@ -43,17 +42,15 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	private String type;
 	private TreeMap<Id, ActivityFacility> typedFacilities;
 	private DestinationScoring scorer;
-	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
 	private DestinationSampler sampler;
 			
 	public ComputeMaxDCScorePlanAlgo(ScenarioImpl scenario, String type, TreeMap<Id, ActivityFacility> typedFacilities,
-			DestinationScoring scorer, ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter,
+			DestinationScoring scorer, ActTypeConverter actTypeConverter,
 			DestinationSampler sampler) {		
 		this.type = type;
 		this.typedFacilities = typedFacilities;
 		this.scorer = scorer;
-		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;
 		this.sampler = sampler;
 	}
@@ -76,12 +73,10 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 				
 				ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
 				act.setFacilityId(f.getId());
-				double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act);
 				
-				// scale back epsilons
-				double scale = this.scaleEpsilon.getEpsilonFactor(act.getType());
-				epsilon /= scale;
-				
+				double epsilonScaleFactor = 1.0; // no scaling back needed here anymore
+				double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, epsilonScaleFactor);
+								
 				if (epsilon > maxEpsilon) {
 					maxEpsilon = epsilon;
 				}

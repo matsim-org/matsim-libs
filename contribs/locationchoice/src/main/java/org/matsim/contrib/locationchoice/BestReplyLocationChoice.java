@@ -58,6 +58,7 @@ public class BestReplyLocationChoice extends AbstractMultithreadedModule {
 	private final Scenario scenario;
 	private LocationChoiceBestResponseContext lcContext;
 	private HashSet<String> flexibleTypes;
+	public static double useScaleEpsilonFromConfig = -99.0;
 
 	public BestReplyLocationChoice(LocationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
 		super(lcContext.getScenario().getConfig().global());

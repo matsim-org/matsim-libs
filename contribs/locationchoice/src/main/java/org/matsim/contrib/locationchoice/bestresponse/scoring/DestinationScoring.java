@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.locationchoice.bestresponse.scoring;
 
+import java.util.Collection;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
@@ -31,6 +32,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 
 public class DestinationScoring { 
 	//As the random number generator is re-seeded here anyway, we do not need a rng given from outside!
@@ -40,6 +42,7 @@ public class DestinationScoring {
 	private ObjectAttributes facilitiesKValues;
 	private ObjectAttributes personsKValues;
 	private ScaleEpsilon scaleEpsilon;
+	private LocationChoiceBestResponseContext lcContext;
 		
 	public DestinationScoring(LocationChoiceBestResponseContext lcContext) {
 		this.facilities = ((ScenarioImpl)lcContext.getScenario()).getActivityFacilities();
@@ -47,15 +50,38 @@ public class DestinationScoring {
 		this.facilitiesKValues = lcContext.getFacilitiesKValues();
 		this.personsKValues = lcContext.getPersonsKValues();
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
+		this.lcContext = lcContext;
 	}
 				
-	public double getDestinationScore(PlanImpl plan, ActivityImpl act) {
+	public double getDestinationScore(PlanImpl plan, ActivityImpl act, double fVar) {
 		double score = 0.0;
 		if (this.scaleEpsilon.isFlexibleType(act.getType())) {
-			double fVar = this.scaleEpsilon.getEpsilonFactor(act.getType());
-			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson()));	
+			if (fVar < 0.0) fVar = this.scaleEpsilon.getEpsilonFactor(act.getType());
+			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson()));
+			score += this.getAttributesScore(act.getFacilityId(), plan.getPerson().getId());
 		}
 		return score;
+	}
+	
+	/*
+	 * linear at the moment
+	 */
+	private double getAttributesScore(Id facilityId, Id personId) {
+		double accumulatedScore = 0.0;
+		
+		if (this.lcContext.getPersonsBetas() != null && this.lcContext.getFacilitiesAttributes() != null) {
+			
+			// Maybe this is too dangerous and we should specify the available attributes and corresponding betas in the config as well
+			// let us see!
+			Collection<String> betas = ObjectAttributesUtils.getAllAttributeNames(this.lcContext.getPersonsBetas(), personId.toString());
+			for (String name:betas) {
+				double beta = (Double) this.lcContext.getPersonsBetas().getAttribute(personId.toString(), name);
+				double attribute = (Double) this.lcContext.getFacilitiesAttributes().getAttribute(facilityId.toString(), name);
+				accumulatedScore += beta * attribute;
+			}
+		}
+		
+		return accumulatedScore;
 	}
 	
 	private double getEpsilonAlternative(Id facilityId, PersonImpl person) {		

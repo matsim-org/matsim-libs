@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.BestReplyLocationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -47,7 +48,7 @@ public class DCActivityWOFacilitiesScoringFunction extends CharyparNagelActivity
 
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe);
+				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe, BestReplyLocationChoice.useScaleEpsilonFromConfig);
 			}
 		}
 	}

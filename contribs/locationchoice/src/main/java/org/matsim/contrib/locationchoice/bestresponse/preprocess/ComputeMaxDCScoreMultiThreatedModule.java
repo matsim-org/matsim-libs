@@ -58,7 +58,8 @@ public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedM
 		DestinationScoring scorer = new DestinationScoring(this.lcContext);
 		
 		return new ComputeMaxDCScorePlanAlgo(
-				this.scenario, this.type, typedFacilities, scorer, this.lcContext.getScaleEpsilon(),
+				this.scenario, this.type, typedFacilities, 
+				scorer,
 				this.lcContext.getConverter(),
 				this.sampler);
 	}
