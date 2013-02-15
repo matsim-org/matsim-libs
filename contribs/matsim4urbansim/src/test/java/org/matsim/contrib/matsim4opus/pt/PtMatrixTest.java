@@ -53,12 +53,14 @@ import org.matsim.testcases.MatsimTestCase;
  * 
  * The walk distances always are calculated as the euclidean distances between facilities and pt stops. The walk times corresponds to these distances for a given walk speed.
  * 
- * In our test network the euclidean distance between a facility and its nearest pt stop always is 50 m. So the total walk distance always is 100 m.
+ * In our test network the euclidean distance between a facility and its nearest pt stop is always 50 m. So the total walk distance always is 100 m.
  * If origin and destination pt stop coincide, the agents still have to walk via the pt stop to their destination. Even if origin and destination facility are the same.
  * Moreover there are four pt stops ordered as a square with an euclidean distance of 180 m as the distance between to neighboring pt stops.
- * The distance between to facilities always is bigger than the distance between their corresponding pt stops. So the euclidean distance between to facilities is an upper bound for the distance between to pt stops.
+ * There are four facilities, each corresponding to one of the four pt stop.
+ * The distance between to facilities is always bigger than the distance between their corresponding pt stops. So the euclidean distance between to facilities is an upper bound for the distance between to pt stops.
  * 
  * @author thomas
+ * @author tthunig
  */
 public class PtMatrixTest extends MatsimTestCase{
 	
@@ -132,7 +134,7 @@ public class PtMatrixTest extends MatsimTestCase{
 				else {
 					// In our test network pt stops are closer to each other than facilities.
 					// So an upper bound for the pt travel distance is the euclidean distance between the facilities (analog for the travel time).
-					// A lower bound for the pt travel distance and time are the values of neighboring origin destination pairs.
+					// A lower bound for pt travel distance and time are the values of neighboring origin destination pairs.
 					
 					double euclideanDistance= NetworkUtil.getEuclidianDistance(facilityList.get( origin ), facilityList.get( destination ));
 					
@@ -224,7 +226,7 @@ public class PtMatrixTest extends MatsimTestCase{
 					Assert.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
 					
 					// test pt travel distance and time
-					// in the csv-file the pt travel distance is given with 100 m; the pt travel time with 100 min
+					// in the csv-file the pt travel distance is given as 100 m; the pt travel time as 100 min
 					Assert.assertTrue(ptTravelDistance == 100.);
 					Assert.assertTrue(ptTravelTime == 100. * 60); // multiplied by 60 to convert minutes to seconds (csv-files are saved in minutes; matsim works with seconds)
 				}
