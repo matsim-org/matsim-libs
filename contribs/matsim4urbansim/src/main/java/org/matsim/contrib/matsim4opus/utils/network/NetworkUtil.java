@@ -206,8 +206,6 @@ public class NetworkUtil {
 	 */
 	private static Distances getDistance2Node(Link link, double pointx, double pointy, Node destinationNode){
 		
-		Distances d = new Distances();
-		
 		// line A B
 		double ax = link.getFromNode().getCoord().getX();
 		double ay = link.getFromNode().getCoord().getY();
