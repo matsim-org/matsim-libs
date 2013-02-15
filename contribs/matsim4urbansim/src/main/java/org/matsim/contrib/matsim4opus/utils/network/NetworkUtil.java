@@ -25,27 +25,49 @@ public class NetworkUtil {
 	public static long totalCounter = 0;
 
 	/**
-	 * returns the orthogonal distance between a point and a network link (a straight line)
+	 * Returns the orthogonal distance between a point and a network link (a straight line).
+	 * It assumes that a link has unlimited length.
+	 * So it gives just the distance between a point and a line.
+	 * 
+	 * tnicolai feb'13: not used any more for accessibility calculation
+	 * 
 	 * @param link
 	 * @param coord
 	 * @return
 	 */
-	public static double getOrthogonalDistance2NearestLink(Link link, Coord point){
+	public static double getOrthogonalDistance2Link(Link link, Coord point){
 		
 		return getOrthogonalDistance(link, point.getX(), point.getY());
 	}
 	
 	/**
-	 * returns the orthogonal distance between a point and a network link (a straight line)
+	 * Returns the orthogonal distance between a point and a network link (a straight line).
+	 * It assumes that a link has unlimited length.
+	 * So it gives just the distance between a point and a line.
+	 * 
+	 * tnicolai feb'13: not used any more for accessibility calculation
+	 * 
 	 * @param link
 	 * @param point
 	 * @return
 	 */
-	public static double getOrthogonalDistance2NearestLink(Link link, Point point){
+	public static double getOrthogonalDistance2Link(Link link, Point point){
 		
 		return getOrthogonalDistance(link, point.getX(), point.getY());
 	}
 	
+	/**
+	 * Returns the orthogonal distance between a point and a network link (a straight line).
+	 * It assumes that a link has unlimited length.
+	 * So it gives just the distance between a point and a line.
+	 * 
+	 * tnicolai feb'13: not used any more for accessibility calculation
+	 * 
+	 * @param link
+	 * @param pointx
+	 * @param pointy
+	 * @return
+	 */
 	private static double getOrthogonalDistance(Link link, double pointx, double pointy){
 		
 		double ax = link.getFromNode().getCoord().getX();
@@ -72,9 +94,10 @@ public class NetworkUtil {
 	 * @param destinationNode
 	 * @return
 	 */
-	public static double getDistance2Node(Link link, Coord point, Node destinationNode){
+	@Deprecated
+	public static double getDistance2NodeOldVersion(Link link, Coord point, Node destinationNode){
 		
-		return getDistance2Node(link, point.getX(), point.getY(), destinationNode);
+		return getDistance2NodeOldVersion(link, point.getX(), point.getY(), destinationNode);
 	}
 	
 	/**
@@ -89,9 +112,10 @@ public class NetworkUtil {
 	 * @param destinationNode
 	 * @return
 	 */
-	public static double getDistance2Node(Link link, Point point, Node destinationNode){
+	@Deprecated
+	public static double getDistance2NodeOldVersion(Link link, Point point, Node destinationNode){
 		
-		return getDistance2Node(link, point.getX(), point.getY(), destinationNode);
+		return getDistance2NodeOldVersion(link, point.getX(), point.getY(), destinationNode);
 	}
 	
 	/**
@@ -107,7 +131,8 @@ public class NetworkUtil {
 	 * @param destinationNode
 	 * @return
 	 */
-	private static double getDistance2Node(Link link, double pointx, double pointy, Node destinationNode){
+	@Deprecated
+	private static double getDistance2NodeOldVersion(Link link, double pointx, double pointy, Node destinationNode){
 		
 		double ax = link.getFromNode().getCoord().getX();
 		double ay = link.getFromNode().getCoord().getY();
@@ -138,32 +163,48 @@ public class NetworkUtil {
 	}
 	
 	/**
-	 * this is just another implementation of getDistance2Node, its implemented to test whether a faster implementation
-	 * is possible. 
+	 * This method calculates the distance between a node and a node via a link as the sum of
+	 * - the orthogonal distance between the node and the link and
+	 * - the distance between the intersection point of the orthogonal projection (from the node to the link) to the network node.
+	 * If the orthogonal projection of the node to the line does not intersects the link, the method returns the euclidean distance between the two nodes.
 	 * 
 	 * @param link
 	 * @param point
 	 * @param destinationNode
 	 * @return Distances
 	 */
-	public static Distances  getDistance2NodeV2(Link link, Coord point, Node destinationNode){
-		return getDistance2NodeV2(link, point.getX(), point.getY(), destinationNode);
+	public static Distances getDistance2Node(Link link, Coord point, Node destinationNode){
+		return getDistance2Node(link, point.getX(), point.getY(), destinationNode);
 	}
 	
 	/**
-	 * this is just another implementation of getDistance2Node, its implemented to test whether a faster implementation
-	 * is possible. 
+	 * This method calculates the distance between a node and a node via a link as the sum of
+	 * - the orthogonal distance between the node and the link and
+	 * - the distance between the intersection point of the orthogonal projection (from the node to the link) to the network node.
+	 * If the orthogonal projection of the node to the line does not intersects the link, the method returns the euclidean distance between the two nodes.
 	 * 
 	 * @param link
 	 * @param point
 	 * @param destinationNode
 	 * @return Distances
 	 */
-	public static Distances  getDistance2NodeV2(Link link, Point point, Node destinationNode){
-		return getDistance2NodeV2(link, point.getX(), point.getY(), destinationNode);
+	public static Distances getDistance2Node(Link link, Point point, Node destinationNode){
+		return getDistance2Node(link, point.getX(), point.getY(), destinationNode);
 	}
 	
-	private static Distances getDistance2NodeV2(Link link, double pointx, double pointy, Node destinationNode){
+	/**
+	 * This method calculates the distance between a node and a node via a link as the sum of
+	 * - the orthogonal distance between the node and the link and
+	 * - the distance between the intersection point of the orthogonal projection (from the node to the link) to the network node.
+	 * If the orthogonal projection of the node to the line does not intersects the link, the method returns the euclidean distance between the two nodes.
+	 * 
+	 * @param link
+	 * @param pointx
+	 * @param pointy
+	 * @param destinationNode
+	 * @return
+	 */
+	private static Distances getDistance2Node(Link link, double pointx, double pointy, Node destinationNode){
 		
 		Distances d = new Distances();
 		
@@ -351,16 +392,16 @@ public class NetworkUtil {
 		LinkImpl link3 = (LinkImpl) network.createAndAddLink(new IdImpl("3"), node3, node4, 1000, 1, 3600, 1);
 		LinkImpl link4 = (LinkImpl) network.createAndAddLink(new IdImpl("4"), node4, node5, 2800, 1, 3600, 1);
 
-		Distances distance1 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100, 0), node1);
+		Distances distance1 = NetworkUtil.getDistance2Node(link1, new CoordImpl(100, 0), node1);
 		log.info(distance1.getDisatancePoint2Road() + distance1.getDistanceRoad2Node() + " distance1");
 		
-		Distances distance2 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100, -10), node1);
+		Distances distance2 = NetworkUtil.getDistance2Node(link1, new CoordImpl(100, -10), node1);
 		log.info(distance2.getDisatancePoint2Road() + distance2.getDistanceRoad2Node() + " distance2");
 		
-		Distances distance3 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(100, 1000), node2);
+		Distances distance3 = NetworkUtil.getDistance2Node(link2, new CoordImpl(100, 1000), node2);
 		log.info(distance3.getDisatancePoint2Road() + distance3.getDistanceRoad2Node() + " distance3");
 		
-		Distances distance4 = NetworkUtil.getDistance2NodeV2(link2, new CoordImpl(-100, 1000), node2);
+		Distances distance4 = NetworkUtil.getDistance2Node(link2, new CoordImpl(-100, 1000), node2);
 		log.info(distance4.getDisatancePoint2Road() + distance4.getDistanceRoad2Node() + " distance4");
 	}
 }
