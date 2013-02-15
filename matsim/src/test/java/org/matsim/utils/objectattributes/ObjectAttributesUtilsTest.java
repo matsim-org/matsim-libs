@@ -20,37 +20,58 @@
 package org.matsim.utils.objectattributes;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.Iterator;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author mrieser / Senozon AG
  */
-public final class ObjectAttributesUtils {
+public class ObjectAttributesUtilsTest {
 
-	private ObjectAttributesUtils() {
-		// abstract helper class
+	@Test
+	public void testGetAllAttributes() {
+		ObjectAttributes oa = new ObjectAttributes();
+		oa.putAttribute("1", "a", "A");
+		oa.putAttribute("1", "b", "B");
+		oa.putAttribute("1", "c", "C");
+		
+		Collection<String> names = ObjectAttributesUtils.getAllAttributeNames(oa, "1");
+		Assert.assertEquals(3, names.size());
+		Assert.assertTrue(names.contains("a"));
+		Assert.assertTrue(names.contains("b"));
+		Assert.assertTrue(names.contains("c"));
+		Assert.assertFalse(names.contains("d"));
 	}
 	
-	public static void copyAllAttributes(ObjectAttributes source, ObjectAttributes destination, String objectId) {
-		Map<String, Object> sAttrs = source.attributes.get(objectId);
-		if (sAttrs != null) {
-			Map<String, Object> dAttrs = destination.attributes.get(objectId);
-			if (dAttrs == null) {
-				dAttrs = new IdentityHashMap<String, Object>();
-				destination.attributes.put(objectId, dAttrs);
-			}
-			dAttrs.putAll(sAttrs);
+	@Test
+	public void testGetAllAttributes_isImmutable() {
+		ObjectAttributes oa = new ObjectAttributes();
+		oa.putAttribute("1", "a", "A");
+		oa.putAttribute("1", "b", "B");
+		oa.putAttribute("1", "c", "C");
+		
+		Collection<String> names = ObjectAttributesUtils.getAllAttributeNames(oa, "1");
+		try {
+			names.add("d");
+			Assert.fail("Expected immutability-exception");
+		} catch (Exception everythingOkay) {
 		}
-	}
-	
-	public static Collection<String> getAllAttributeNames(ObjectAttributes attributes, final String objectId) {
-		Map<String, Object> map = attributes.attributes.get(objectId);
-		if (map == null) {
-			return Collections.emptyList();
+
+		try {
+			names.remove("b");
+			Assert.fail("Expected immutability-exception");
+		} catch (Exception everythingOkay) {
 		}
-		return Collections.unmodifiableCollection(map.keySet());
+		
+		try {
+			Iterator<String> iter = names.iterator();
+			iter.next();
+			iter.remove();
+			Assert.fail("Expected immutability-exception");
+		} catch (Exception everythingOkay) {
+		}
+		
 	}
-	
 }
