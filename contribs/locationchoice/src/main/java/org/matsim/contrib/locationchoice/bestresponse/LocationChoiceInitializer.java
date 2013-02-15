@@ -17,15 +17,17 @@ public class LocationChoiceInitializer implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler();  		
   		LocationChoiceBestResponseContext lcContext = new LocationChoiceBestResponseContext(event.getControler().getScenario());
-  		// TODO: insert an init method to context. Maybe easier to read.
+  		lcContext.init(); // For me easier to read with init.
+  		
   		  		
-  		// compute or read maxDCScore and add it to the context?
-  		// use context in scoring? but then we are again on the way towards side effects! 
+  		// compute or read maxDCScore but do not add it to the context:
+  		// context can then be given to scoring classes both during regular scoring and in pre-processing 
+
 		
   		
 		/* 
 		 * add ScoringFunctionFactory to controler
-		 *  in this way scoringFunction does not need to create new, identical k-vals      
+		 *  in this way scoringFunction does not need to create new, identical k-vals by itself    
 		 */
   		MixedScoringFunctionFactory mixedScoringFunctionFactory =
 			new MixedScoringFunctionFactory(controler.getConfig(), controler, 

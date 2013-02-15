@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.BestReplyLocationChoice;
 import org.matsim.contrib.locationchoice.BestReplyLocationChoice.AttrType;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeMaxEpsilons;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
@@ -55,15 +54,15 @@ public class LocationChoiceBestResponseContext {
 	private static final Logger log = Logger.getLogger(LocationChoiceBestResponseContext.class);
 
 	public LocationChoiceBestResponseContext(Scenario scenario) {
-		this.scenario = scenario;
-		
-		this.params = new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()) ;
-		
+		this.scenario = scenario;	
+	}
+	
+	public void init() {
+		this.params = new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()) ;		
 		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.scenario.getConfig().locationchoice());
 		this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 		this.actTypeConverter = defineFlexibleActivities.getConverter() ;
 		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes() ;
-		
 		this.readOrCreateObjectAttributes(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed())) ;
 	}
 	
