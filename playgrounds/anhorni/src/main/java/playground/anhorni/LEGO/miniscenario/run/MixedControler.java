@@ -20,7 +20,7 @@
 package playground.anhorni.LEGO.miniscenario.run;
 
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
