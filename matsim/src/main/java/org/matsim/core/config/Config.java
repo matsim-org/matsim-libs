@@ -393,9 +393,7 @@ public class Config {
 	 * @param value
 	 */
 	public final void setParam(final String moduleName, final String paramName, final String value) {
-		if ( this.isLocked() ) {
-			this.reactionToLocked() ;
-		}
+		checkIfLocked();
 		Module m = this.modules.get(moduleName);
 		if (m == null) {
 			m = createModule(moduleName);
@@ -545,20 +543,20 @@ public class Config {
 	}
 
 	public final void setLocked(boolean locked) {
-		if ( this.isLocked() ) {
-			this.reactionToLocked() ;
-		}
+		checkIfLocked();
 		this.locked = locked;
 	}
-	
-	private void reactionToLocked() {
-		log.error("too late in execution sequence to set config items. Use") ;
-		log.error("Config config = ConfigUtils.loadConfig(filename) ; ") ;
-		log.error("config.xxx().setYyy(...); ") ;
-		log.error("Controler ctrl = new Controler( config ) ;") ;
-		log.error("This will be changed to an abortive error in the future.") ; // kai, feb'13
-	}
 
+	private void checkIfLocked() {
+		if ( this.isLocked() ) {
+			log.error("too late in execution sequence to set config items. Use") ;
+			log.error("Config config = ConfigUtils.loadConfig(filename) ; ") ;
+			log.error("config.xxx().setYyy(...); ") ;
+			log.error("Controler ctrl = new Controler( config ) ;") ;
+			log.error("This will be changed to an abortive error in the future.") ; // kai, feb'13
+		}
+	}
+	
 
 
 }

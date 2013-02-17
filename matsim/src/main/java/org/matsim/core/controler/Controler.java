@@ -325,6 +325,15 @@ public class Controler extends AbstractController {
 		}
 		loadData();
 		run(config);
+		
+		// "run(config)" is:
+//		loadCoreListeners();
+//		this.controlerListenerManager.fireControlerStartupEvent();
+//		checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
+//		prepareForSim();
+//		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
+//		shutdown(false);
+
 	}
 
 	private final void setupMultiModalSimulation() {
@@ -387,7 +396,6 @@ public class Controler extends AbstractController {
 	 */
 	@Override
 	protected final void loadCoreListeners() {
-
 		/*
 		 * The order how the listeners are added is very important! As
 		 * dependencies between different listeners exist or listeners may read
@@ -462,7 +470,9 @@ public class Controler extends AbstractController {
 	 * are added must not affect the correctness of the code.
 	 */
 	protected void loadControlerListeners() {
-		// yyyy cannot make this method final since is is overridden about 13 times.  kai, jan'13
+		// Cannot make this method final since is is overridden about 13 times.  kai, jan'13
+		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
+		// The core controler listeners are separate, after all.  kai, feb'13
 
 		// optional: LegHistogram
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
@@ -719,7 +729,8 @@ public class Controler extends AbstractController {
 		}
 		if (simulation instanceof QSim) {
 			// The QSim may need a multiModalSimEngine, which needs travel times, which are kept from iteration to iteration by the Controler.
-			// One day, we may create a dynamic equivalent to the Scenario, which things like Mobsims have access to (and which would then also contain the Plan database).
+			// One day, we may create a dynamic equivalent to the Scenario, which things like Mobsims have access to 
+			// (and which would then also contain the Plan database).
 			// But until then, this is too special for my taste to put into the MobsimFactory interface, so we add it here in passing.  mz 2012-03
 			if (config.multiModal().isMultiModalSimulationEnabled()) {
 				log.info("Using MultiModalMobsim...");
