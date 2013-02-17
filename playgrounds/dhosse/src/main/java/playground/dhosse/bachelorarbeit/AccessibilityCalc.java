@@ -192,7 +192,12 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 					assert(coordFromZone!=null);
 					
 					Link nearestLink = network.getNearestLinkExactly(coordFromZone);
-					Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, coordFromZone, fromNode);
+
+//					Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, coordFromZone, fromNode);
+					Distances distance = NetworkUtil.getDistance2Node(nearestLink, coordFromZone, fromNode);
+					Logger.getLogger(this.getClass()).error("renamed the above method without testing it since the old name did not compile. " +
+							"Please check; aborting ... ") ;
+					System.exit(-1) ;
 					
 					double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
 					double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)
