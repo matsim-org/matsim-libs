@@ -35,7 +35,7 @@ public class Main {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
-		nr.readFile(path+"/"+file3+".xml");
+		nr.readFile(path+"/"+file2+".xml");
 		pr.readFile(path+"/"+"/test_population.xml");
 		
 		InternalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
@@ -70,10 +70,10 @@ public class Main {
 //		ac.runAccessibilityComputation();
 		
 		NetworkInspector ni = new NetworkInspector(scenario);
-		if(ni.isRoutable())
-			System.out.println("Netzwerk ist routbar...");
-		else
-			System.out.println("Netzwerk ist nicht routbar");
+//		if(ni.isRoutable())
+//			System.out.println("Netzwerk ist routbar...");
+//		else
+//			System.out.println("Netzwerk ist nicht routbar");
 		ni.checkLinkAttributes();
 		ni.checkNodeAttributes();
 		ni.shpExport();

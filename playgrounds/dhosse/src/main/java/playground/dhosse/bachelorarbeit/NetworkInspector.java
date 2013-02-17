@@ -441,13 +441,13 @@ public class NetworkInspector {
 	public void shpExport(){
 		initFeatureType();
 		Collection<SimpleFeature> features = createFeatures();
-		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/pres/deadEndNodes_osm_main.shp");
+		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/pres/nodes_osm.shp");
 		
 	}
 	
 	private Collection<SimpleFeature> createFeatures() {
 		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		for(Node node : this.deadEndNodes){
+		for(Node node : this.scenario.getNetwork().getNodes().values()){
 			features.add(getFeature(node));
 		}
 		return features;
@@ -456,7 +456,7 @@ public class NetworkInspector {
 	private SimpleFeature getFeature(final Node node) {
 		Point p = MGC.coord2Point(node.getCoord());
 		try {
-			return this.builder.buildFeature(null, new Object[]{p,node.getId().toString()});
+			return this.builder.buildFeature(null, new Object[]{p,node.getId().toString(),node.getInLinks().size(),node.getOutLinks().size()});
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		}
@@ -469,6 +469,8 @@ public class NetworkInspector {
 		typeBuilder.setCRS(crs);
 		typeBuilder.add("location",Point.class);
 		typeBuilder.add("ID",String.class);
+		typeBuilder.add("in-degree",String.class);
+		typeBuilder.add("out-degree",String.class);
 		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 		
 	}
