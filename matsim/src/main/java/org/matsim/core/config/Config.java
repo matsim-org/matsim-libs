@@ -51,6 +51,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -112,6 +113,8 @@ public class Config {
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
+	
+	private boolean locked = false ;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
@@ -184,10 +187,13 @@ public class Config {
 		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
 
-		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl()) ;
-		// (I deliberately put this here, rather into the Controler where the standard consistency checker is added,
-		// because at this point my intuition is that one should assume that this is _always_ added ... and not just
-		// in one specific execution path but not in another.  kai, may'11)
+		if ( ! this.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).
+				equalsIgnoreCase(VspExperimentalConfigGroup.IGNORE) ) {
+			this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl()) ;
+			// (I deliberately put this here, rather into the Controler where the standard consistency checker is added,
+			// because at this point my intuition is that one should assume that this is _always_ added ... and not just
+			// in one specific execution path but not in another.  kai, may'11)
+		}
 
 		this.otfVis = new OTFVisConfigGroup();
 		this.modules.put(OTFVisConfigGroup.GROUP_NAME, this.otfVis);
@@ -387,6 +393,9 @@ public class Config {
 	 * @param value
 	 */
 	public final void setParam(final String moduleName, final String paramName, final String value) {
+		if ( this.isLocked() ) {
+			this.reactionToLocked() ;
+		}
 		Module m = this.modules.get(moduleName);
 		if (m == null) {
 			m = createModule(moduleName);
@@ -530,5 +539,26 @@ public class Config {
 	public void addConfigConsistencyChecker(final ConfigConsistencyChecker checker) {
 		this.consistencyCheckers.add(checker);
 	}
+
+	public final boolean isLocked() {
+		return locked;
+	}
+
+	public final void setLocked(boolean locked) {
+		if ( this.isLocked() ) {
+			this.reactionToLocked() ;
+		}
+		this.locked = locked;
+	}
+	
+	private void reactionToLocked() {
+		log.error("too late in execution sequence to set config items. Use") ;
+		log.error("Config config = ConfigUtils.loadConfig(filename) ; ") ;
+		log.error("config.xxx().setYyy(...); ") ;
+		log.error("Controler ctrl = new Controler( config ) ;") ;
+		log.error("This will be changed to an abortive error in the future.") ; // kai, feb'13
+	}
+
+
 
 }
