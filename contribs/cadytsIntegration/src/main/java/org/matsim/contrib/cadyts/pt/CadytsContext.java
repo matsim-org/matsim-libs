@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
+/**
+ * 
+ */
 package org.matsim.contrib.cadyts.pt;
 
 import java.io.IOException;
@@ -27,9 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -37,17 +37,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -63,74 +57,46 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
 /**
- * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
- * select plans that better match to given occupancy counts.
+ * @author nagel
+ *
  */
-public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener {
+public class CadytsContext implements StartupListener, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener {
 
-	private final static Logger log = Logger.getLogger(CadytsPtPlanStrategy.class);
+	private final static Logger log = Logger.getLogger(CadytsContext.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 	private static final String OCCUPANCYANALYSIS_FILENAME = "cadytsPtOccupancyAnalysis.txt";
 
-	private PlanStrategyImpl delegate = null;
-
 	private AnalyticalCalibrator<TransitStopFacility> calibrator = null;
-	private final SimResultsContainerImpl simResults;
-	private final double countsScaleFactor;
+	private SimResultsContainerImpl simResults;
 	private final Counts occupCounts = new Counts();
 	private final Counts boardCounts = new Counts();
 	private final Counts alightCounts = new Counts();
-	private final CadytsPtOccupancyAnalyzer cadytsPtOccupAnalyzer;
-	private final boolean writeAnalysisFile;
-	private final CadytsPtPlanChanger cadytsPtPlanChanger;
-	private final Set<Id> calibratedLines;
+	private CadytsPtOccupancyAnalyzer cadytsPtOccupAnalyzer;
 	private PtPlanToPlanStepBasedOnEvents ptStep ;
-	public static final String CADYTS_CORRECTION = "cadytsCorrection";
-	
-	public static enum Mode { asPlanStrategy, inScoringFunction } ;
-	private Mode mode = Mode.asPlanStrategy ;
 
-	public CadytsPtPlanStrategy(final Controler controler) { // DO NOT CHANGE CONSTRUCTOR, needed for reflection-based instantiation
-		this( controler.getScenario(), controler.getEvents());
-		controler.addControlerListener(this);
+	private CadytsPtConfigGroup cadytsConfig;
 
-//		switch ( mode ) { 
-//		case asPlanStrategy:
-//			// see below
-//			break ;
-//		case inScoringFunction:
-//			controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
-//				@Override
-//				public ScoringFunction createNewScoringFunction(Plan plan) {
-//					ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-//					scoringFunctionAccumulator.addScoringFunction(new CadytsPtScoring(plan,ptStep,calibrator) );
-//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), controler.getScenario().getNetwork()));
-//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(lcContext.getParams()));
-//					return scoringFunctionAccumulator;
-//				}}) ;
-//		}
-		// starting point to also make this working by modifying the scores.  Not yet working.  kai, feb'2013
-			
+	private Config config;
+
+	public CadytsContext(Config config) {
+		this.config = config;
+		cadytsConfig = (CadytsPtConfigGroup) config.getModule(CadytsPtConfigGroup.GROUP_NAME);
 	}
 
-	/**
-	 * <i>IMPORTANT:</i> If you are using this constructor, you are responsible for adding is as a controler listener!
-	 */
-	public CadytsPtPlanStrategy(final Scenario scenario, final EventsManager events) {
-		Config config = scenario.getConfig() ;
-		CadytsPtConfigGroup cadytsConfig = new CadytsPtConfigGroup();
-		config.addModule(CadytsPtConfigGroup.GROUP_NAME, cadytsConfig);
-		// addModule() also initializes the config group with the values read from the config file
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		Scenario scenario = event.getControler().getScenario();
+		EventsManager events = event.getControler().getEvents();
 
-		this.calibratedLines = cadytsConfig.getCalibratedLines();
+
 
 		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedLines(), cadytsConfig.getTimeBinSize() );
 		events.addHandler(this.cadytsPtOccupAnalyzer);
 
-		this.countsScaleFactor = config.ptCounts().getCountsScaleFactor();
-		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer, this.countsScaleFactor);
+
+		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer, config.ptCounts().getCountsScaleFactor());
 
 		// this collects events and generates cadyts plans from it
 		this.ptStep = new PtPlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedLines());
@@ -141,21 +107,9 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.occupCounts /*, cadytsConfig.getTimeBinSize()*/);
-		
-		this.cadytsPtPlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
-		// (this is up here to satisfy the compiler re the final variable)
-		
-		switch ( mode ) { 
-		case asPlanStrategy:
-			// finally, we create the PlanStrategy, with the cadyts-based plan selector:
-			this.delegate = new PlanStrategyImpl(this.cadytsPtPlanChanger);
-			break ;
-		case inScoringFunction:
-			throw new RuntimeException("wrong constructor for this execution path. aborting ...") ;
-		}
-			
-		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
+
 	}
+
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
@@ -168,7 +122,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		if (isActiveInThisIteration(it, event.getControler())) {
 			// Get all stations of all analyzed lines and invoke the method write to get all information of them
 			Set<Id> stopIds = new HashSet<Id>();
-			for (Id lineId : this.calibratedLines) {
+			for (Id lineId : this.cadytsConfig.getCalibratedLines()) {
 				TransitLine line = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(lineId);
 				for (TransitRoute route : line.getRoutes().values()) {
 					for (TransitRouteStop stop : route.getStops()) {
@@ -183,7 +137,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		if (this.writeAnalysisFile) {
+		if (cadytsConfig.isWriteAnalysisFile()) {
 			String analysisFilepath = null;
 			if (isActiveInThisIteration(event.getIteration(), event.getControler())) {
 				analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
@@ -202,13 +156,6 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		}
 
 		generateAndWriteCountsComparisons(event);
-	}
-
-	/**
-	 * for testing purposes only
-	 */
-	/*package*/ AnalyticalCalibrator<TransitStopFacility> getCalibrator() {
-		return this.calibrator;
 	}
 
 	// ===========================================================================================================================
@@ -234,11 +181,11 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 				Network network = controler.getNetwork();
 				CadytsPtCountsComparisonAlgorithm ccaBoard = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.boardCounts,
-						network, this.countsScaleFactor);
+						network, config.ptCounts().getCountsScaleFactor());
 				CadytsPtCountsComparisonAlgorithm ccaAlight = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.alightCounts,
-						network, this.countsScaleFactor);
+						network, config.ptCounts().getCountsScaleFactor());
 				CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.occupCounts,
-						network, this.countsScaleFactor);
+						network, config.ptCounts().getCountsScaleFactor());
 
 				PtCountsConfigGroup ptCountsConfig = (PtCountsConfigGroup) config.getModule(PtCountsConfigGroup.GROUP_NAME);
 				Double distanceFilter = ptCountsConfig.getDistanceFilter();
@@ -261,7 +208,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(),
 							ccaAlight.getComparison(), ccaOccupancy.getComparison(), TransformationFactory.getCoordinateTransformation(config
 									.global().getCoordinateSystem(), TransformationFactory.WGS84), this.boardCounts, this.alightCounts,
-							this.occupCounts);
+									this.occupCounts);
 
 					kmlWriter.setIterationNumber(iter);
 					kmlWriter.writeFile(filename);
@@ -278,35 +225,6 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		}
 	}
 
-	public void addStrategyModule(final PlanStrategyModule module) {
-		this.delegate.addStrategyModule(module);
-	}
-
-	public int getNumberOfStrategyModules() {
-		return this.delegate.getNumberOfStrategyModules();
-	}
-
-	@Override
-	public void run(final Person person) {
-		this.delegate.run(person);
-	}
-
-	@Override
-	public void init(ReplanningContext replanningContext) {
-		this.delegate.init(replanningContext);
-	}
-
-	@Override
-	public void finish() {
-		this.delegate.finish();
-	}
-
-	@Override
-	public String toString() {
-		return this.delegate.toString();
-	}
-
-
 	/*package*/ static class SimResultsContainerImpl implements SimResults<TransitStopFacility> {
 		private static final long serialVersionUID = 1L;
 		private CadytsPtOccupancyAnalyzer occupancyAnalyzer = null;
@@ -320,9 +238,9 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		@Override
 		public double getSimValue(final TransitStopFacility stop, final int startTime_s, final int endTime_s, final TYPE type) { // stopFacility or link
 
-//			int hour = startTime_s / 3600;
+			//				int hour = startTime_s / 3600;
 			int hour = this.occupancyAnalyzer.getTimeSlotIndex(startTime_s) ;
-			
+
 			Id stopId = stop.getId();
 			int[] values = this.occupancyAnalyzer.getOccupancyVolumesForStop(stopId);
 
@@ -365,5 +283,14 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		}
 
 	}
+
+	AnalyticalCalibrator<TransitStopFacility> getCalibrator() {
+		return calibrator;
+	}
+
+	PtPlanToPlanStepBasedOnEvents getPtStep() {
+		return ptStep;
+	}
+
 
 }

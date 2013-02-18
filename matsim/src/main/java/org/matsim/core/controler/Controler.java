@@ -518,7 +518,6 @@ public class Controler extends AbstractController {
 
 	@Override
 	protected final void prepareForSim() {
-		// yyyy cannot make this final since it is overridden at 2 locations.  kai, jan'13
 		
 		setUp();
 		

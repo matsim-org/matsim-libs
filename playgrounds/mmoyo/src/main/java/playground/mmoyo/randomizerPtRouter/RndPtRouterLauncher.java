@@ -20,7 +20,8 @@
 package playground.mmoyo.randomizerPtRouter;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy;
+import org.matsim.contrib.cadyts.pt.CadytsContext;
+import org.matsim.contrib.cadyts.pt.CadytsPtPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -29,6 +30,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
@@ -100,13 +102,12 @@ public class RndPtRouterLauncher {
 		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
 //		controler.addControlerListener(new CadytsPtControlerListener(controler));  //<-set cadyts as controler listener
 		controler.setOverwriteFiles(true);
-		
+
+		final CadytsContext context = new CadytsContext( config ) ;
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				CadytsPtPlanStrategy cadytsPlanStrategy = new CadytsPtPlanStrategy(scenario, eventsManager) ;
-				controler.addControlerListener(cadytsPlanStrategy) ;
-				return cadytsPlanStrategy ;
+				return new PlanStrategyImpl(new CadytsPtPlanChanger(context));
 			}
 		});
 		

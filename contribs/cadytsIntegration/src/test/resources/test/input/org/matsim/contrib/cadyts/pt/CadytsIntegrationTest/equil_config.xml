@@ -7,9 +7,9 @@
 
 <config>
 	<module name="global">
-		<param name="randomSeed" value="4711" />
+		<param name="randomSeed" value="4711" /><!--
 		<param name="coordinateSystem" value="Atlantis" />
-	</module>
+	--></module>
 
 	<module name="network">
 		<param name="inputNetworkFile" value="&INPUTBASE;network.xml" />
@@ -31,23 +31,23 @@
 		<param name="writeEventsInterval" value="1" />
 	</module>
 
-	<module name="qsim">
+	<module name="qsim"><!--
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="30:00:00" />
 
-		<param name="flowCapacityFactor" value="0.02" />
+		--><param name="flowCapacityFactor" value="0.02" />
 		<param name="storageCapacityFactor" value="0.06" />
 
 		<param name="stuckTime" value="10.0" />
-		<param name="removeStuckVehicles" value="no" />
+		<param name="removeStuckVehicles" value="no" /><!--
 
 		<param name="numberOfThreads" value="1" />
-	</module>
+	--></module>
 
-	<module name="strategy">
-		<param name="maxAgentPlanMemorySize" value="4" /> <!-- 0 means unlimited -->
+	<module name="strategy"><!--
+		<param name="maxAgentPlanMemorySize" value="4" />  0 means unlimited 
 
-		<param name="ModuleProbability_1" value="1.0" />
+		--><param name="ModuleProbability_1" value="1.0" />
 		<param name="Module_1" value="org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy" />
 	</module>
 
@@ -57,11 +57,11 @@
 		<param name="transitModes" value="pt" />
 	</module>
 
-	<module name="planCalcScore">
+	<module name="planCalcScore"><!--
 		<param name="learningRate" value="1.0" />
 		<param name="BrainExpBeta" value="2.0" />
 
-		<param name="lateArrival" value="1e-9" />      <!-- Warning: score function is turned off here -->
+		<param name="lateArrival" value="1e-9" /> 
 		<param name="earlyDeparture" value="1e-9" />
 		<param name="performing" value="1e-9" />
 		<param name="traveling" value="1e-9" />
@@ -69,20 +69,20 @@
 		<param name="travelingWalk" value="1e-9" />
 		<param name="waiting" value="1e-9" />
 
-		<param name="activityType_0" value="h" /> <!-- home -->
+		--><param name="activityType_0" value="h" /> <!-- home --><!--
 		<param name="activityPriority_0" value="1" />
-		<param name="activityTypicalDuration_0" value="12:00:00" />
+		--><param name="activityTypicalDuration_0" value="12:00:00" /><!--
 		<param name="activityMinimalDuration_0" value="08:00:00" />
 
-		<param name="activityType_1" value="w" /> <!-- work -->
+		--><param name="activityType_1" value="w" /> <!-- work --><!--
 		<param name="activityPriority_1" value="1" />
-		<param name="activityTypicalDuration_1" value="08:00:00" />
+		--><param name="activityTypicalDuration_1" value="08:00:00" /><!--
 		<param name="activityMinimalDuration_1" value="06:00:00" />
 		<param name="activityOpeningTime_1" value="07:00:00" />
 		<param name="activityLatestStartTime_1" value="09:00:00" />
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1" value="18:00:00" />
-	</module>
+	--></module>
 
 	<module name="cadytsPt">
 		<param name="startTime" value="04:00:00" />    <!--It must be in "00:00" format !! -->

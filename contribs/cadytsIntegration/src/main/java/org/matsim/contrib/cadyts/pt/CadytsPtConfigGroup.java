@@ -48,8 +48,8 @@ public class CadytsPtConfigGroup extends Module {
 	public static final String START_TIME = "startTime";
 	public static final String END_TIME = "endTime";
 	public static final String WRITE_ANALYSIS_FILE = "writeAnalysisFile";
-	private static final String CALIBRATED_LINES = "calibratedLines";
-	private static final String TIME_BIN_SIZE = "timeBinSize" ;
+	public static final String CALIBRATED_LINES = "calibratedLines";
+	public static final String TIME_BIN_SIZE = "timeBinSize" ;
 
 	private double regressionInertia = MATSimUtilityModificationCalibrator.DEFAULT_REGRESSION_INERTIA;
 	private double minFlowStddev = MATSimUtilityModificationCalibrator.DEFAULT_MIN_FLOW_STDDEV_VEH_H;

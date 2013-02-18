@@ -24,7 +24,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy;
+import org.matsim.contrib.cadyts.pt.CadytsContext;
+import org.matsim.contrib.cadyts.pt.CadytsPtPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -36,6 +37,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -64,16 +66,15 @@ public class Controler_launcher {
 		stratSets.setProbability(0.1);
 		config.strategy().addStrategySettings(stratSets);
 
-
 		final Controler controler = new Controler(config);
+
+		final CadytsContext context = new CadytsContext( config ) ;
 		controler.setOverwriteFiles(true);
-		
+		controler.addControlerListener(context);
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				CadytsPtPlanStrategy cadytsPlanStrategy = new CadytsPtPlanStrategy(scenario, eventsManager) ;
-				controler.addControlerListener(cadytsPlanStrategy) ;
-				return cadytsPlanStrategy ;
+				return new PlanStrategyImpl(new CadytsPtPlanChanger(context));
 			}
 		});
 		
@@ -88,8 +89,8 @@ public class Controler_launcher {
 					for ( Plan plan : person.getPlans() ) {
 						Double cadytsCorrection = 0. ;
 						if ( plan.getCustomAttributes() != null ) {
-							cadytsCorrection = (Double) plan.getCustomAttributes().get(CadytsPtPlanStrategy.CADYTS_CORRECTION) ;
-							attrs.putAttribute( person.getId().toString()+Integer.toString(cnt) , CadytsPtPlanStrategy.CADYTS_CORRECTION, cadytsCorrection) ;
+							cadytsCorrection = (Double) plan.getCustomAttributes().get(CadytsPtPlanChanger.CADYTS_CORRECTION) ;
+							attrs.putAttribute( person.getId().toString()+Integer.toString(cnt) , CadytsPtPlanChanger.CADYTS_CORRECTION, cadytsCorrection) ;
 						}
 						System.err.println( " personId: " + person.getId() + " planScore: " + plan.getScore()  + " cadytsCorrection: " + cadytsCorrection ) ; 
 						cnt++ ;

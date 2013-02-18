@@ -119,7 +119,7 @@ public final class StrategyManagerConfigLoader {
 				planSelector = new PathSizeLogitSelector(config.planCalcScore(), controler.getScenario().getNetwork() ) ;
 				// yyyy this will select good? bad? plans for removal--?
 			} else {
-				planSelector = tryToLoadPlanSelectorByName(controler, name);
+				throw new RuntimeException("Unknown 'plan selector for removal'.");
 			}
 			manager.setPlanSelectorForRemoval(planSelector) ;
 		}
@@ -159,21 +159,8 @@ public final class StrategyManagerConfigLoader {
 				Class<?>[] args = new Class[1];
 				args[0] = Scenario.class;
 				Constructor<? extends PlanStrategy> c = null;
-				try{
-					c = klas.getConstructor(args);
-					strategy = c.newInstance(controler.getScenario());
-				} catch(NoSuchMethodException e){
-					log.info("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. " +
-							"This is not fatal, trying to find other constructor, however a constructor expecting Scenario as " +
-							"single argument is recommended!" );
-					log.info("(People who need access to events should ignore this warning.)") ;
-					// I think that one needs events fairly often. kai, sep'10
-					args[0] = Controler.class;
-					c = klas.getConstructor(args);
-					strategy = c.newInstance(controler);
-					log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
-				}
-
+				c = klas.getConstructor(args);
+				strategy = c.newInstance(controler.getScenario());
 			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			} catch (InstantiationException e) {
@@ -181,54 +168,7 @@ public final class StrategyManagerConfigLoader {
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			} catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return strategy;
-	}
-
-	private static PlanSelector tryToLoadPlanSelectorByName(final Controler controler, final String name) {
-		PlanSelector strategy = null;
-		//classes loaded by name must not be part of the matsim core
-		if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {
-			log.error("PlanSelectors in the org.matsim package must not be loaded by name!");
-		} else {
-			try {
-				Class<? extends PlanSelector> klas = (Class<? extends PlanSelector>) Class.forName(name);
-				Class<?>[] args = new Class[1];
-				args[0] = Scenario.class;
-				Constructor<? extends PlanSelector> c = null;
-				try{
-					c = klas.getConstructor(args);
-					strategy = c.newInstance(controler.getScenario());
-				} catch(NoSuchMethodException e){
-					log.info("Cannot find Constructor in PlanSelector " + name + " with single argument of type Scenario. " +
-							"This is not fatal, trying to find other constructor ...\n" ) ;
-				}
-				if ( c == null ) {
-					try{
-						c = klas.getConstructor(args);
-						strategy = c.newInstance(controler.getScenario(),controler.getEvents()); 
-					} catch(NoSuchMethodException e){
-						log.info("Cannot find Constructor in PlanSelector " + name + " with argument of type (Scenario, EventsManager). " +
-								"This is not fatal, trying to find other constructor ...\n" ) ;
-					}
-				}
-				if (c == null){
-					args[0] = Controler.class;
-					c = klas.getConstructor(args);
-					strategy = c.newInstance(controler);
-				}
-				log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
-			} catch (InstantiationException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (NoSuchMethodException e) {
+				log.info("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. ");
 				throw new RuntimeException(e);
 			} catch (InvocationTargetException e) {
 				throw new RuntimeException(e);

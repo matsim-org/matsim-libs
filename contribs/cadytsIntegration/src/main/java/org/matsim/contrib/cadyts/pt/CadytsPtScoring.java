@@ -43,11 +43,10 @@ public class CadytsPtScoring implements ArbitraryEventScoring {
 	private Plan plan;
 	private final double beta = 1.0;
 
-	
-	CadytsPtScoring(final Plan plan, final PtPlanToPlanStepBasedOnEvents ptStep, final AnalyticalCalibrator<TransitStopFacility> calib) {
+	CadytsPtScoring(final Plan plan, final CadytsContext context ) {
 		log.error("value for beta currently ignored (set to one)");
-		this.ptPlanToPlanStep = ptStep;
-		this.matsimCalibrator = calib;
+		this.ptPlanToPlanStep = context.getPtStep() ;
+		this.matsimCalibrator = context.getCalibrator() ;
 		this.plan = plan ;
 	}
 
