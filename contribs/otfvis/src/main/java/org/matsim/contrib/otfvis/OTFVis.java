@@ -191,16 +191,20 @@ public class OTFVis {
 			config.addQSimConfigGroup(new QSimConfigGroup());
 		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		playScenario(scenario);
+	}
+	
+	public static void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
-
-		OnTheFlyServer server = startServerAndRegisterWithQSim(config,scenario, events, qSim);
-		OTFClientLive.run(config, server);
-
+		
+		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim);
+		OTFClientLive.run(scenario.getConfig(), server);
+		
 		qSim.run();
 	}
 
