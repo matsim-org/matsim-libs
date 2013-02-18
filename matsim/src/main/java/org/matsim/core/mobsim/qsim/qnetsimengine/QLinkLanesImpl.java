@@ -53,8 +53,8 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author dgrether
  * @author mrieser
  *
- * A QueueLink can consist of one or more QueueLanes, which may have the following layout
- * (Dashes stand for the borders of the QueueLink, equal signs (===) depict one lane,
+ * A QLinkLanes can consist of one or more QLanes, which may have the following layout
+ * (Dashes stand for the borders of the QLink, equal signs (===) depict one lane,
  * plus signs (+) symbolize a decision point where one lane splits into several lanes) :
  * <pre>
  * ----------------
