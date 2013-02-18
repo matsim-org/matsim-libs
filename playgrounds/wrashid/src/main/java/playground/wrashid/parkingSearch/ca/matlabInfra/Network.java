@@ -2,10 +2,15 @@ package playground.wrashid.parkingSearch.ca.matlabInfra;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
@@ -13,54 +18,168 @@ import playground.wrashid.lib.tools.kml.Color;
 
 
 public class Network {
+	
+	private TreeMap<Id, Link> selectedLinks = new TreeMap<Id, Link>();
+	private LinkedList<Node> uniqueNodes;
+	private NetworkImpl network;
+	private final static Logger log = Logger.getLogger(Network.class);
 
 	public static void main(String[] args) {
-		NetworkImpl network = Config.getNetwork();
-
-		LinkedList<Link> selectedLinks = new LinkedList();
-
+		Network network = new Network();
+		network.run();
+	}
+	
+	private void run() {
+		network = Config.getNetwork();
+		this.selectedLinks = new TreeMap<Id, Link>();
 		for (Link link : network.getLinks().values()) {
-			if (Config.isInsideStudyArea(link.getFromNode().getCoord()) || Config.isInsideStudyArea(link.getToNode().getCoord())) {
-				selectedLinks.add(link);
+			if (Config.isInsideSNetworkArea(link.getFromNode().getCoord()) || 
+					Config.isInsideSNetworkArea(link.getToNode().getCoord())) {
+				selectedLinks.put(link.getId(), link);
+			}
+		}	
+		this.correctManually();
+		this.getUniqueNodes();
+		this.linkBack();
+				
+		writeOutLinksToKML(Config.getOutputFolder() + "links.kml", this.selectedLinks);
+		writeOutNodesToKML(Config.getOutputFolder() + "nodes.kml",  this.uniqueNodes);		
+		writeOutLinks(Config.getOutputFolder() + "links.xml", this.selectedLinks);
+		writeOutNodes(Config.getOutputFolder() +  "nodes.xml", this.uniqueNodes);
+		log.info("network files written ...");
+	}
+		
+	private void linkBack() {
+		for (Node node : this.uniqueNodes) {
+			if (node.getOutLinks().isEmpty()) {
+				if (!node.getInLinks().isEmpty()) {
+					Link firstInLink = this.generateReturnLink((Link)node.getInLinks().values().toArray()[0]);
+					this.selectedLinks.put(firstInLink.getId(), firstInLink);
+				}	
+				else {
+					log.info("we have a problem with node: (no in-links)" + node.getId());
+				}
+			}			
+			if (node.getInLinks().isEmpty()) {
+				if (!node.getOutLinks().isEmpty()) {
+					Link firstOutLink = this.generateReturnLink((Link)node.getOutLinks().values().toArray()[0]);
+					this.selectedLinks.put(firstOutLink.getId(), firstOutLink);
+				}
+				else {
+					log.info("we have a problem with node: (no out-links)" + node.getId());
+				}
 			}
 		}
-		
-		writeOutLinksToKML(Config.getOutputFolder() + "links.kml", selectedLinks);
-
-		writeOutNodesToKML(Config.getOutputFolder() + "nodes.kml",  getUniqueNodes(selectedLinks));
-		
-		writeOutLinks(Config.getOutputFolder() + "links.xml", selectedLinks);
-
-		writeOutNodes(Config.getOutputFolder() +  "nodes.xml", getUniqueNodes(selectedLinks));
-
 	}
 	
-	private static void writeOutNodesToKML(String path, LinkedList<Node> selectedNodes){
-		BasicPointVisualizer bpv=new BasicPointVisualizer();
+	private Link generateReturnLink(Link link) {
+		LinkFactoryImpl linkFactory = new LinkFactoryImpl();
+		Link returnLink = linkFactory.createLink(link.getId(), link.getToNode(), link.getFromNode(), network, 
+				link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		
+		return returnLink;
+	}
+	
+	private void correctManually() {
+		// jelmoli
+		String links2Remove[] = {
+				"17560001595533FT",
+				"17560001595533TF",
+				"17560001595534FT",
+				"17560001595510FT",
+				"17560001595510TF",
+				"17560001595536FT",
+				"17560001595511FT",
+				"17560001595511TF",
+				"17560001687929FT",
+				"17560001687929TF-dl",
+				"17560001687929TF",
+				"17560001595518FT",
+				"17560001595518TF",
+				"17560001687929FT-dl",
+				"17560001595528FT-dl",
+				"17560001595528TF",
+				"17560001595517FT",
+				"17560001595517TF",
+				"17560001595528TF-dl",
+				"17560001595528FT"
+		};		
+		for (String idstr:links2Remove) {
+			Id id = new IdImpl(idstr);
+			this.selectedLinks.remove(id);
+		}
+		
+		// add 4 jelmoli links
+		LinkFactoryImpl linkFactory = new LinkFactoryImpl();
+		Id id1 = new IdImpl("jelmoli-1");
+		Link jLink1 = linkFactory.createLink(
+				id1, 
+				this.network.getNodes().get(new IdImpl("17560200460795")),
+				this.network.getNodes().get(new IdImpl("17560200463426")), 
+				network, 
+				1.0, 50.0 / 3.6, 1000.0, 1);
+		this.selectedLinks.put(id1, jLink1);
+		
+		Id id2 = new IdImpl("jelmoli-2");
+		Link jLink2 = linkFactory.createLink(
+				id2, 
+				this.network.getNodes().get(new IdImpl("17560200463426")),
+				this.network.getNodes().get(new IdImpl("17560200460795")), 
+				network, 
+				1.0, 50.0 / 3.6, 1000.0, 1);
+		this.selectedLinks.put(id2, jLink2);
+		
+		Id id3 = new IdImpl("jelmoli-3");
+		Link jLink3 = linkFactory.createLink(
+				id3, 
+				this.network.getNodes().get(new IdImpl("17560200454496")),
+				this.network.getNodes().get(new IdImpl("17560200463426")), 
+				network, 
+				1.0, 50.0 / 3.6, 1000.0, 1);
+		this.selectedLinks.put(id3, jLink3);
+		
+		Id id4 = new IdImpl("jelmoli-4");
+		Link jLink4 = linkFactory.createLink(
+				id4, 
+				this.network.getNodes().get(new IdImpl("17560200463426")),
+				this.network.getNodes().get(new IdImpl("17560200454496")), 
+				network, 
+				1.0, 50.0 / 3.6, 1000.0, 1);
+		this.selectedLinks.put(id4, jLink4);
+		
+		Id id5 = new IdImpl("sihlbruecke-loop");
+		Link jLink5 = linkFactory.createLink(
+				id5, 
+				this.network.getNodes().get(new IdImpl("17560200133695-3")),
+				this.network.getNodes().get(new IdImpl("17560200133695-2")), 
+				network, 
+				1.0, 50.0 / 3.6, 1000.0, 1);
+		this.selectedLinks.put(id5, jLink5);				
+	}
+	
+	private void getUniqueNodes() {
+		this.uniqueNodes = getUniqueNodes(selectedLinks);
+	}
+		
+	private static void writeOutNodesToKML(String path, LinkedList<Node> selectedNodes){
+		BasicPointVisualizer bpv=new BasicPointVisualizer();	
 		for (Node node: selectedNodes){
 			bpv.addPointCoordinate(node.getCoord(), node.getId().toString(), Color.RED);
-		}
-		
-		bpv.write(path);
-		
+		}		
+		bpv.write(path);	
 	}
 	
-	private static void writeOutLinksToKML(String path, LinkedList<Link> selectedLinks){
-		BasicPointVisualizer bpv=new BasicPointVisualizer();
-		
-		for (Link link: selectedLinks){
+	private static void writeOutLinksToKML(String path, TreeMap<Id, Link> selectedLinks){
+		BasicPointVisualizer bpv=new BasicPointVisualizer();	
+		for (Link link: selectedLinks.values()){
 			bpv.addPointCoordinate(link.getCoord(), link.getId().toString(), Color.RED);
-		}
-		
-		bpv.write(path);
-		
+		}		
+		bpv.write(path);		
 	}
 
-	private static LinkedList<Node> getUniqueNodes(LinkedList<Link> selectedLinks) {
-		LinkedList<Node> selectedNodes = new LinkedList<Node>();
-
-		for (Link link : selectedLinks) {
+	private static LinkedList<Node> getUniqueNodes(TreeMap<Id, Link> selectedLinks) {
+		LinkedList<Node> selectedNodes = new LinkedList<Node>();		
+		for (Link link : selectedLinks.values()) {
 			if (!selectedNodes.contains(link.getFromNode())) {
 				selectedNodes.add(link.getFromNode());
 			}
@@ -68,57 +187,49 @@ public class Network {
 				selectedNodes.add(link.getToNode());
 			}
 		}
-
 		return selectedNodes;
 	}
-
+	
 	private static void writeOutNodes(String fileName, LinkedList<Node> selectedNodes) {
 		ArrayList<String> list = new ArrayList<String>();
 
 		list.add("<nodes>");
-
 		for (Node node : selectedNodes) {
-			StringBuffer stringBuffer = new StringBuffer();
-
-			stringBuffer.append("\t<node>\n");
-
-			stringBuffer.append("\t\t<id>" + node.getId() + "</id>\n");
-			stringBuffer.append("\t\t<x>" + node.getCoord().getX() + "</x>\n");
-			stringBuffer.append("\t\t<y>" + node.getCoord().getY() + "</y>\n");
-
-			stringBuffer.append("\t</node>\n");
-
-			list.add(stringBuffer.toString());
+				StringBuffer stringBuffer = new StringBuffer();
+				stringBuffer.append("\t<node>\n");
+				stringBuffer.append("\t\t<id>" + node.getId() + "</id>\n");
+				stringBuffer.append("\t\t<x>" + node.getCoord().getX() + "</x>\n");
+				stringBuffer.append("\t\t<y>" + node.getCoord().getY() + "</y>\n");
+				stringBuffer.append("\t</node>\n");
+				list.add(stringBuffer.toString());
 		}
-
 		list.add("</nodes>\n");
-
 		GeneralLib.writeList(list, fileName);
 	}
+	
 
-	private static void writeOutLinks(String fileName, LinkedList<Link> selectedLinks) {
+	private static void writeOutLinks(String fileName, TreeMap<Id, Link> selectedLinks) {
 		ArrayList<String> list = new ArrayList<String>();
 
 		list.add("<links>");
-
-		for (Link link : selectedLinks) {
-			StringBuffer stringBuffer = new StringBuffer();
-
-			stringBuffer.append("\t<link>\n");
-
-			stringBuffer.append("\t\t<id>" + link.getId() + "</id>\n");
-			stringBuffer.append("\t\t<fromNode>" + link.getFromNode().getId() + "</fromNode>\n");
-			stringBuffer.append("\t\t<toNode>" + link.getToNode().getId() + "</toNode>\n");
-
-			stringBuffer.append("\t</link>\n");
-
-			list.add(stringBuffer.toString());
+		for (Link link : selectedLinks.values()) {		
+			for (int ln = 0; ln < link.getNumberOfLanes(); ln++) {
+				StringBuffer stringBuffer = new StringBuffer();
+				stringBuffer.append("\t<link>\n");
+				
+				String prefix = "";
+				if (ln > 0) {
+					prefix = "_" + ln;
+				}				
+				stringBuffer.append("\t\t<id>" + link.getId() + prefix + "</id>\n");
+							
+				stringBuffer.append("\t\t<fromNode>" + link.getFromNode().getId() + "</fromNode>\n");
+				stringBuffer.append("\t\t<toNode>" + link.getToNode().getId() + "</toNode>\n");
+				stringBuffer.append("\t</link>\n");	
+				list.add(stringBuffer.toString());
+			}
 		}
-
 		list.add("</links>\n");
-
 		GeneralLib.writeList(list, fileName);
-
 	}
-
 }

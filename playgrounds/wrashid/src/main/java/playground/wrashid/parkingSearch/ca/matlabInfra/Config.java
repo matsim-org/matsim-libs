@@ -31,8 +31,8 @@ public class Config {
 
 	private static double radiusInMetersOfStudyArea = 1000;
 	private static Coord studyAreaCenter = ParkingHerbieControler.getCoordinatesQuaiBridgeZH();
-	private static String baseFolder = "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/";
-	private static String outputFolder= "H:/data/experiments/matlabExprVoresung/2013-feb/";
+	private static String baseFolder = "C:/l/studies/LaHowara_Parking/input/zurichCity/matsim_scenario/";
+	private static String outputFolder = baseFolder + "/created/";
 	
 	private static NetworkImpl network=null;
 	
@@ -67,5 +67,8 @@ public class Config {
 		}
 		return network;
 	}
-
+	
+	public static boolean isInsideSNetworkArea(Coord coord) {
+		return GeneralLib.getDistance(coord, studyAreaCenter) < 1.5 * radiusInMetersOfStudyArea;
+	}
 }
