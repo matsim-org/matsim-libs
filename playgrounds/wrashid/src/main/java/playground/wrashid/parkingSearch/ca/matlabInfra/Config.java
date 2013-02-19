@@ -69,6 +69,6 @@ public class Config {
 	}
 	
 	public static boolean isInsideSNetworkArea(Coord coord) {
-		return GeneralLib.getDistance(coord, studyAreaCenter) < 1.5 * radiusInMetersOfStudyArea;
+		return GeneralLib.getDistance(coord, studyAreaCenter) < 1.2 * radiusInMetersOfStudyArea;
 	}
 }
