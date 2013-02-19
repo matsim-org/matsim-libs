@@ -39,8 +39,10 @@ public class Network {
 			}
 		}	
 		this.correctManually();
+		
 		this.getUniqueNodes();
 		this.linkBack();
+		
 				
 		writeOutLinksToKML(Config.getOutputFolder() + "links.kml", this.selectedLinks);
 		writeOutNodesToKML(Config.getOutputFolder() + "nodes.kml",  this.uniqueNodes);		
@@ -183,19 +185,21 @@ public class Network {
 	private LinkedList<Node> getUniqueNodes(TreeMap<Id, Link> selectedLinks) {
 		for (Node node: this.network.getNodes().values()){
 			node.getInLinks().clear();
-			node.getInLinks().clear();
+			node.getOutLinks().clear();
 		}
 				
 		LinkedList<Node> selectedNodes = new LinkedList<Node>();		
 		for (Link link : selectedLinks.values()) {
 			if (!selectedNodes.contains(link.getFromNode())) {
 				selectedNodes.add(link.getFromNode());
+				
 				if (!link.getFromNode().getOutLinks().containsKey(link.getId())) {
 					link.getFromNode().addOutLink(link);
 				}
 			}
 			if (!selectedNodes.contains(link.getToNode())) {
 				selectedNodes.add(link.getToNode());
+				
 				if (!link.getToNode().getInLinks().containsKey(link.getId())) {
 					link.getToNode().addInLink(link);
 				}
