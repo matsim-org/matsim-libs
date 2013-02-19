@@ -35,8 +35,8 @@ public class KMZPtCountSimComparisonWriter {
 	private final Controler controler;
 	private Network net;
 	private double scalefactor;
-	final String kmzFile = "ptcountscompare_perzone.kmz";
-	final String txtCompFile = "ptcountscompare_perzone.txt";
+	final String kmzFile = "configurablePTcountsCompare.kmz";
+	final String txtCompFile = "configurablePTcountsCompare.txt";
 	
 	public KMZPtCountSimComparisonWriter (final Controler controler){
 		this.controler = controler;

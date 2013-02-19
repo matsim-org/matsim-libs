@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Population;
 /**
  *  List agents whose id start with a given criterion 
  */
-public class Agents_bySuffix {
+class Agents_bySuffix {
 	private final Population population;
 	final String SEPARATOR = ":\t ";
 	

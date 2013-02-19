@@ -38,8 +38,8 @@ public class ActTypeEnumerator implements PersonAlgorithm{
 	}
 	
 	public static void main(String[] args) {
-		String populationFile = "../../input/juni/newDemand/bvg.run190.25pct.100Cleaned.plans.xml.gz";
-		String networkFile = "../../input/juni/newDemand/multimodalNet.xml.gz";
+		String populationFile = "../../";
+		String networkFile = "../../";
 		
 		DataLoader dataLoader = new DataLoader();
 		ScenarioImpl scn = (ScenarioImpl) dataLoader.createScenario();

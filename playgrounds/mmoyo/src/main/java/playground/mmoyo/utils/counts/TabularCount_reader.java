@@ -65,8 +65,13 @@ public class TabularCount_reader implements TabularFileHandler {
 		rowNum++;
 	}
 	
+	
+	protected Map<Integer, TabularCountRecord> getCountRecordMap() {
+		return countRecordMap;
+	}
+
 	public static void main(String[] args) throws IOException {
-		String filePath= "../../input/newDemand/bvg.run189.10pct.100.ptLineCounts.txt";
+		String filePath= "../../bvg.run189.10pct.100.ptLineCounts.txt";
 		TabularCount_reader tabCount_reader= new TabularCount_reader();
 		tabCount_reader.readFile(filePath);
 		

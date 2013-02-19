@@ -22,10 +22,10 @@ package playground.mmoyo.utils.counts;
 import org.matsim.api.core.v01.Id;
 
 public class TabularCountRecord {
-	Id lineId;
-	char direction;
-	String stop;
-	double count;
+	private Id lineId;
+	private char direction;
+	private String stop;
+	private double count;
 		 
 	public TabularCountRecord (final Id lineId, final char direction, final String stop, final double count){
 		this.lineId = lineId; 

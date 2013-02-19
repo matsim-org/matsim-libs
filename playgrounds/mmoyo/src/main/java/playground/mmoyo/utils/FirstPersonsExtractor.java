@@ -19,9 +19,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.mmoyo.Validators.PlanValidator;
 
-/**Reads a population file, selects the first persons and creates a new population file with them*/ 
+/**Gets a population object and returns a sample population with first agents.
+ * The difference with FirstPersonExtractorFromFile is that this class receives a population object, not a population file to read.
+ * */ 
 public class FirstPersonsExtractor {
-	private boolean selectPlan_act = true;   //select only plans whose first and last activities are the same type.
+	private boolean selectPlan_act = false;   //select only plans whose first and last activities are the same type.
 	private boolean selectBuslines = false;  //select only plans with pt legs that have the mentioned transit routes.
 
 	public Population run(final Population pop, int agentNum){
@@ -51,9 +53,19 @@ public class FirstPersonsExtractor {
 	}
 
 	public static void main(String[] args) {
-		String netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String popFilePath = "../../input/basePlan5x/Baseplan_5x_36119agents.xml.gz";
-		final int agentNum=4;
+		String netFilePath;
+		String popFilePath;
+		final int agentNum;	
+		
+		if (args.length>0){
+			netFilePath = args[0];
+			popFilePath = args[1];
+			agentNum = Integer.valueOf (args[2]);
+		}else{
+			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			popFilePath = "../../input/NewTransitSchedule/routedPlan_walk10.0_dist0.0_tran240.0_wait0.0.xml.gz";
+			agentNum=50;	
+		}
 		
 		DataLoader dataLoader = new DataLoader();
 		final Population pop = dataLoader.readPopulation(popFilePath);
@@ -64,7 +76,7 @@ public class FirstPersonsExtractor {
 		System.out.println("writing output plan file...");
 		PopulationWriter popwriter = new PopulationWriter(popSample, net);
 		File file = new File(popFilePath);
-		popwriter.write(file.getParent() + "/4planSample.xml") ;
+		popwriter.write(file.getParent() + "/" + file.getName() + agentNum + "planSample.xml") ;
 		System.out.println("done");
 	}
 }

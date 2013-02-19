@@ -54,10 +54,10 @@ public class PopTimeMutator {
 			mutationRange = Double.valueOf(args[2]);
 			output = args[3];
 		}else{
-			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-			popFilePath = "../../input/bestValues_plans.xml.gz";
+			netFilePath = "../../";
+			popFilePath = "../../";
 			mutationRange = 7200.;
-			output = "../mmoyo/output/timeMutation/testMutation/bestValues_plansMutated.xml";
+			output = "";
 		}
 			
 		DataLoader dataLoader = new DataLoader();

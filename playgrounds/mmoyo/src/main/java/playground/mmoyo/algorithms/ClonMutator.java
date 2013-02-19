@@ -45,9 +45,9 @@ public class ClonMutator {
 	}
 	
 	public static void main(String[] args) {
-		String popFile = "../../input/basePlan5x/Baseplan_5x_36374agents.xml.gz";
-		String netFilePath= "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String outFile = "../../input/basePlan5x/Baseplan_5x_36374agentsMutated.xml.gz";
+		String popFile = "../../";
+		String netFilePath= "../../";
+		String outFile = "../../";
 		DataLoader dataLoader = new DataLoader();
 		Population pop = dataLoader.readPopulation(popFile);
 		new ClonMutator().mutateClons(pop, 7200);

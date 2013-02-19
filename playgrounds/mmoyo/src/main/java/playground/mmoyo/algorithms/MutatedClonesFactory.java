@@ -70,8 +70,8 @@ public class MutatedClonesFactory extends AbstractPersonAlgorithm{
 		}else{
 			mutRange = 7200;
 			numMutClons = 10;
-			popFilePath = "../../input/juni/passengersTracked.xml.gz";
-			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			popFilePath = "../../";
+			netFilePath = "../../";
 		}
 		DataLoader dataLoader = new DataLoader();
 		Population pop = dataLoader.readPopulation(popFilePath);

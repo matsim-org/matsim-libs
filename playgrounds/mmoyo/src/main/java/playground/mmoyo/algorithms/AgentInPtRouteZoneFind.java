@@ -82,8 +82,8 @@ public class AgentInPtRouteZoneFind extends AbstractPersonFilter {
 			netFilePath = args[1];
 			
 		}else{
-			popFilePath = "../../input/newDemand/bvg.run190.25pct.100.plans.xml";
-			netFilePath = "../../input/newDemand/network.final.xml.gz";   // "../../input/newDemand/multimodalNet.xml.gz";
+			popFilePath = "";
+			netFilePath = "";
 		}
 
 		DataLoader dataLoader = new DataLoader ();

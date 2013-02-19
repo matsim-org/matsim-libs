@@ -26,11 +26,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.scenario.ScenarioImpl;
+
 /**
  * finds activities taking place after 30:00 hr.
  */
-public class PlanTimeWatcher {
+class ActAfter30hrFinder {
 	final double hr30= 108000.0;
 
 	void run(Population population){
@@ -49,12 +49,10 @@ public class PlanTimeWatcher {
 	}
 	
 	public static void main(String[] args) {
-		String populationFile = "../playgrounds/mmoyo/output/test/doubleMinTransfersRoutes_plan2.xml.gz";
-		String networkFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-	
+		String populationFile = "";
+		String networkFile = "";
 		Scenario scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
-		
-		new PlanTimeWatcher().run(scenario.getPopulation());
+		new ActAfter30hrFinder().run(scenario.getPopulation());
 
 	}
 

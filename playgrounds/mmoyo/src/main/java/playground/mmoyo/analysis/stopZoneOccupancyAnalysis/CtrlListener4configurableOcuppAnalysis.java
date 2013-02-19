@@ -35,30 +35,35 @@ import org.matsim.core.utils.collections.CollectionUtils;
 /**
  * Controler listener for stop zone analysis
  */
-public class StopZoneAnalysisCtrlListener implements IterationEndsListener, BeforeMobsimListener {
-	StopZoneAndSelectedLinesOccupancyAnalyzer occupAnalyzerAllDay;
+public class CtrlListener4configurableOcuppAnalysis implements IterationEndsListener, BeforeMobsimListener {
+	ConfigurableOccupancyAnalyzer configurableOccupAnalyzer;
 	KMZPtCountSimComparisonWriter kmzPtCountSimComparisonWritter;
 	private final Set<Id> calibratedLines = new HashSet<Id>();
+	boolean stopZoneConversion;
 	
-	public StopZoneAnalysisCtrlListener(final Controler controler){
+	public CtrlListener4configurableOcuppAnalysis(final Controler controler){
 		
 		//create occupancy analyzer based on CadytsPtConfigGroup();
 		String strCalLibes = controler.getConfig().getParam(CadytsPtConfigGroup.GROUP_NAME, "calibratedLines");
 		String strTimeBinSize = controler.getConfig().getParam(CadytsPtConfigGroup.GROUP_NAME, "timeBinSize");
+		
+		System.out.println(strCalLibes);
+		System.exit(1);
+		
 		for (String lineId : CollectionUtils.stringToArray(strCalLibes)) {
 			this.calibratedLines.add(new IdImpl(lineId));
 		}
 		int timeBinSize = Integer.parseInt(strTimeBinSize);
-		occupAnalyzerAllDay = new StopZoneAndSelectedLinesOccupancyAnalyzer(this.calibratedLines, timeBinSize);
-		
-		controler.getEvents().addHandler(occupAnalyzerAllDay);
+		configurableOccupAnalyzer = new ConfigurableOccupancyAnalyzer(this.calibratedLines, timeBinSize);
+		controler.getEvents().addHandler(configurableOccupAnalyzer);
 			
 		kmzPtCountSimComparisonWritter = new KMZPtCountSimComparisonWriter(controler);
 	}
 	
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		occupAnalyzerAllDay.reset(event.getIteration());
+		configurableOccupAnalyzer.reset(event.getIteration());
+		configurableOccupAnalyzer.setStopZoneConversion(stopZoneConversion);
 	}
 
 	@Override
@@ -66,7 +71,7 @@ public class StopZoneAnalysisCtrlListener implements IterationEndsListener, Befo
 		int it = event.getIteration();
 		Controler controler = event.getControler();
 		if (isActiveInThisIteration(it,  controler)) {
-			kmzPtCountSimComparisonWritter.write( occupAnalyzerAllDay.getOccuAnalyzer(), it);
+			kmzPtCountSimComparisonWritter.write( configurableOccupAnalyzer.getOccuAnalyzer(), it);
 		}
 	}
 	
@@ -74,4 +79,7 @@ public class StopZoneAnalysisCtrlListener implements IterationEndsListener, Befo
 		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0);
 	}
 	
+	public void setStopZoneConversion(boolean stopZoneConversion){
+		this.stopZoneConversion = stopZoneConversion;
+	}
 }

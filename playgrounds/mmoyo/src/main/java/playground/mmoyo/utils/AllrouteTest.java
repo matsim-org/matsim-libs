@@ -44,7 +44,7 @@ import playground.mmoyo.ptRouterAdapted.AdaptedLauncher;
 /**
  * routes a plan applying many different travel parameter values. Includes method to simulate all routed plans in a directory
  */
-public class AllrouteTest {
+class AllrouteTest {
 	private final static Logger log = Logger.getLogger(AllrouteTest.class);
 	
 	final String configFile;

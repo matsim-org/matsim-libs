@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -138,15 +139,22 @@ public class PlansMerger {
 			popFilePathArray[2]=  args[2];
 			netFilePath = args[3];
 		}else{
-			popFilePathArray[0]="../../input/juni/overEstimatedDemandPlans.xml.gz";
-			popFilePathArray[1]="../../input/juni/output/overEstimatedDemandPlans.xml.gz";
-			popFilePathArray[2]="../../input/juni/output/overEstimatedDemandPlans.xml.gz";
-			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			popFilePathArray[0]="../../";
+			popFilePathArray[1]="../../";
+			popFilePathArray[2]="../../";
+			netFilePath = "../../";
 		}
 			
 		PlansMerger plansMerger = new PlansMerger();
 		plansMerger.setNetFilePath(netFilePath);
 		Population mergedPop = plansMerger.plansAggregator(popFilePathArray);
+		
+		for (Person person: mergedPop.getPersons().values()){
+			PersonImpl personImpl = (PersonImpl)person;
+			personImpl.setCarAvail(null);
+			personImpl.setEmployed(null);
+			personImpl.setLicence(null);
+		}
 		
 		//write population in same Directory
 		String outputFile = new File(popFilePathArray[0]).getParent() + File.separatorChar + "mergedPlans.xml.gz";		

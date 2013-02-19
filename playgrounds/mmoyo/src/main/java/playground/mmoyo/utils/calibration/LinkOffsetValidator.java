@@ -25,7 +25,7 @@ public class LinkOffsetValidator {
 		DataLoader dataLoader= new DataLoader();
 		TransitSchedule schedule = dataLoader.readTransitSchedule(trScheduleFile);
 
-		CadytsPtLinkCostOffsetsXMLFileIO reader = new org.matsim.contrib.cadyts.pt.CadytsPtLinkCostOffsetsXMLFileIO (schedule);
+		CadytsPtLinkCostOffsetsXMLFileIO reader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
 
 		/////create a PtBseOccupancyAnalyzer with simulated occupancy values

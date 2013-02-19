@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
@@ -19,11 +21,11 @@ public class TransitLinesList {
 		this.schedule = schedule;
 	}
 	
-	public Set<Id> getLines(){
+	private Set<Id> getLines(){
 		return this.schedule.getTransitLines().keySet();
 	}
 
-	public void saveLines(final String outFile){
+	private void saveLines(final String outFile){
 		StringBuffer sBuff = new StringBuffer();
 		final String lcg = "\n";
 		for (Id id :this.getLines()){
@@ -32,18 +34,35 @@ public class TransitLinesList {
 		new TextFileWriter().write(sBuff.toString(), outFile, false);
 	}
 	
-	public void printLinesIds(){
+	private void printLinesIds(){
 		for (Id id :this.getLines()){
 			System.out.println(id);
 		}
 	}
 	
+	private void countLines_Routes(){
+		int linesN= 0;
+		int routesN= 0;
+		final String TAB = "\t";
+		for (TransitLine line :this.schedule.getTransitLines().values()){
+			System.out.println(line.getId());
+			for (TransitRoute route : line.getRoutes().values()){
+				System.out.println(TAB + route.getId());
+				routesN++;
+			}
+			linesN++;
+		}
+		System.out.println("lines :" + linesN);
+		System.out.println("routes :" + routesN);
+	}
+	
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException  {
-		final String SCHEDULEFILE = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
+		final String SCHEDULEFILE = "../../transitSchedule.xml.gz";
 		DataLoader dLoader = new DataLoader();
 		TransitSchedule schedule = dLoader.readTransitSchedule(SCHEDULEFILE);
 		TransitLinesList transitLinesList = new TransitLinesList(schedule);
 		transitLinesList.printLinesIds();
+		transitLinesList.countLines_Routes();
 	}
 
 }

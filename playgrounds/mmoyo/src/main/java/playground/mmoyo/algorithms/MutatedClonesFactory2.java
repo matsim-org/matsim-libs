@@ -62,8 +62,8 @@ public class MutatedClonesFactory2 {
 	}
 	
 	public static void main(String[] args) {
-		String popFilePath = "../../input/juni/passengersTracked.xml.gz";  
-		String netFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_network.xml.gz";
+		String popFilePath = "../../";  
+		String netFile = "../../";
 		
 		DataLoader dLoader = new DataLoader();
 		Population pop = dLoader.readPopulation(popFilePath);

@@ -52,7 +52,7 @@ public class AnalysisLauncher {
 		config.addModule(CadytsPtConfigGroup.GROUP_NAME, cadytsConfig);
 		
 		//read events
-		StopZoneAndSelectedLinesOccupancyAnalyzer occupancyAnalyzerAllDay = new StopZoneAndSelectedLinesOccupancyAnalyzer(cadytsConfig.getCalibratedLines(), cadytsConfig.getTimeBinSize());
+		ConfigurableOccupancyAnalyzer occupancyAnalyzerAllDay = new ConfigurableOccupancyAnalyzer(cadytsConfig.getCalibratedLines(), cadytsConfig.getTimeBinSize());
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(occupancyAnalyzerAllDay);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);

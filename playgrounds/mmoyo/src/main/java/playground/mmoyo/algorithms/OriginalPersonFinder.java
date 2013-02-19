@@ -78,8 +78,8 @@ public class OriginalPersonFinder {
 			popFilePath = args[0];
 			netFilePath = args[1];
 		}else{
-			popFilePath = "../../input/popx5_8agents.xml.gz";
-			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			popFilePath = "../../";
+			netFilePath = "../../";
 		}
 		
 		DataLoader dataLoader = new DataLoader();

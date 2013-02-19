@@ -11,7 +11,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**chops up a population file in a given number of smaller files*/
-public class PopSplitter {
+class PopSplitter {
 	private static final Logger log = Logger.getLogger(PopSplitter.class);
 	
 	public void run(Scenario sc, int fileNum){
@@ -31,7 +31,6 @@ public class PopSplitter {
 				PopulationWriter writer = new PopulationWriter(newPopulation, sc.getNetwork());
 				String outFileName = sc.getConfig().controler().getOutputDirectory()  +  i + xmlgz; 
 				writer.write(outFileName);
-				new FileCompressor().run(outFileName);
 				
 				log.info(writting + i);
 				
@@ -49,7 +48,7 @@ public class PopSplitter {
 			configFile = args[0];
 			strFileNum = args[1];
 		}else{
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			configFile = "..";
 			strFileNum = "7";
 		}
 		Scenario scenario = new DataLoader().loadScenario(configFile);

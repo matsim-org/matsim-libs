@@ -54,7 +54,7 @@ public class PersonRepeater {
 	}
 	
 	public static void main(String[] args) {
-		String config = "../playgrounds/mmoyo/test/input/playground/mmoyo/CadytsIntegrationTest/testCalibration/equil_config.xml";
+		String config = "";
 		int repetitions= 10;
 		Id selectedId= new IdImpl("1");
 		new PersonRepeater(config, repetitions, selectedId);

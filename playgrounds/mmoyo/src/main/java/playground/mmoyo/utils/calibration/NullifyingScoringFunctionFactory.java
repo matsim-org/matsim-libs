@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.analysis.stopZoneOccupancyAnalysis;
+package playground.mmoyo.utils.calibration;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
-/**
- * invokes a standard MATSim transit simulation, pt occupancy analysis is done with configurable time bin size, selected lines, per stop zone 
- */
-public class ControlerLauncher {
+public class NullifyingScoringFunctionFactory implements ScoringFunctionFactory {
+	public NullifyingScoringFunctionFactory() {
+	}
 	
-	public static void main(String[] args) {
-		String configFile; 
-		if (args.length==1){
-			configFile = args[0];
-		}else{
-			configFile = "";
-		}
+	@Override
+	public ScoringFunction createNewScoringFunction(final Plan plan) {
+		return new NullifyingScoringFunction();
+	}
+}
 
-		Config config = null;
-		config = ConfigUtils.loadConfig(configFile);
+class NullifyingScoringFunction implements ScoringFunction {
+	protected double score;
+	protected double startTime;
+	
+	public NullifyingScoringFunction() {}
+	
+	@Override
+	public void agentStuck(final double time) {}
 
-		final Controler controler = new Controler(config);
-		StopZoneAnalysisCtrlListener stopZoneAnalysisCtrlListener = new StopZoneAnalysisCtrlListener(controler);
-		controler.addControlerListener(stopZoneAnalysisCtrlListener);   //add the special controler listener
-		controler.setOverwriteFiles(true);
-		controler.run();
-		
-	} 
+	@Override
+	public void addMoney(final double amount) {}
 
+	@Override
+	public void finish() {}
+
+	@Override
+	public double getScore() {return 0.0;}
+
+	@Override
+	public void reset() {score = 0.0;}
+
+	@Override
+	public void handleActivity(Activity activity) {}
+
+	@Override
+	public void handleLeg(Leg leg) {}
+
+	@Override
+	public void handleEvent(Event event) {}
 }

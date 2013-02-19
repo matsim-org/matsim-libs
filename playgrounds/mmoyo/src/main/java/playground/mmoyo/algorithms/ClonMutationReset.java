@@ -55,7 +55,7 @@ public class ClonMutationReset  {
 		if (args.length>0){
 			popFilePath = args[0];
 		}else{
-			popFilePath = "../../input/juni/poponlyM44.xml.gz";
+			popFilePath = "../../";
 		}
 		DataLoader dataLoader = new DataLoader (); 
 		Population pop= dataLoader.readPopulation(popFilePath);

@@ -1,10 +1,11 @@
 package playground.mmoyo.algorithms;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -17,8 +18,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -35,9 +34,10 @@ public class PersonClonner{
 		for (Plan plan :person.getPlans()){
 			PlanImpl newPlan = newPerson.createAndAddPlan(true);
 			
-			if (plan.isSelected()){
-				newPerson.setSelectedPlan(newPlan);
-			}
+			//if (plan.isSelected()){
+			//	newPerson.setSelectedPlan(newPlan);
+			//}
+			newPlan.setType(((PlanImpl)plan).getType());
 			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
@@ -64,42 +64,35 @@ public class PersonClonner{
 				}
 			}
 		} 
+		
+		int selInx = person.getPlans().indexOf(person.getSelectedPlan());
+		newPerson.setSelectedPlan(newPerson.getPlans().get(selInx));
 		return newPerson;
 	}
 	
 	public static void main(String[] args) {
-		String popFilePath = "../../berlin-bvg09/pt/nullfall_M44_344/test/pop.xml";
-		String strPersonId = "passenger1";
-		String netFilePath = "../../berlin-bvg09/pt/nullfall_M44_344/test/net.xml";
+		String popFilePath = "../../";
+		String netFilePath = "../../";
 		
 		DataLoader dataLoader = new DataLoader();
 		Scenario scn = dataLoader.readNetwork_Population(netFilePath, popFilePath);
-
-		Person newPerson = new PersonClonner().run(scn.getPopulation().getPersons().get(new IdImpl(strPersonId)), new IdImpl(strPersonId));
-
-		//--> send this to a test case
-		///erase routes from original person, the clon should retain the original routes
-		Person person = scn.getPopulation().getPersons().get(new IdImpl(strPersonId));
-		for (Plan plan : person.getPlans()){
-			for (PlanElement pe : plan.getPlanElements()){
-				if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
-					leg.setRoute(null);
-				}
-			}
+		Population pop= scn.getPopulation();
+		
+		String suf = "_2";
+		PersonClonner personClonner = new PersonClonner();
+		List<Person> clonsList = new ArrayList<Person>();
+		for (Person person: pop.getPersons().values()){
+			Id clonId = new IdImpl(person.getId() + suf); 
+			Person newPerson = personClonner.run(person, clonId);
+			clonsList.add(newPerson);
 		}
+		for (Person clon : clonsList){
+			pop.addPerson(clon);
+		}
+		
+		PopulationWriter popwriter = new PopulationWriter(pop, scn.getNetwork());
+		popwriter.write(new File(popFilePath).getParent() + "/clonedPopulation.xml.gz") ;
 
-		Population testPop = new PopulationImpl((ScenarioImpl) dataLoader.createScenario());
-		testPop.addPerson(newPerson);
-		
-		Network net = dataLoader.readNetwork(netFilePath);
-		
-		PopulationWriter popwriter = new PopulationWriter(testPop, net );
-		popwriter.write(new File(popFilePath).getParent() + "/clonedPerson.xml") ;
-
-		PopulationWriter popwriter2 = new PopulationWriter(scn.getPopulation(), net );
-		popwriter2.write(new File(popFilePath).getParent() + "/originalPerson.xml") ;
-		
 		System.out.println("done");
 	}
 }

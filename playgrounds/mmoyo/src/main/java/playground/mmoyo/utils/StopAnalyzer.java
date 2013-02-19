@@ -17,19 +17,22 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-
 import javax.imageio.ImageIO;
+import org.apache.log4j.Logger;
 
-/**Creates a sequence of graphs of a stop showing its evolution through iterations*/
+/** 
+ * Creates a sequence of graphs of a stop showing its evolution through iterations
+ */
 public class StopAnalyzer {
 	private String iterDir;
 	private final String STR_ZERO = "0";
+	private static final Logger log = Logger.getLogger(StopAnalyzer.class);
 	
 	public StopAnalyzer(final String iterDir){
 		this.iterDir = iterDir;
 	}
 	
-	public void createSequence (final String errorGraphName , final int maxGraphsNum) throws IOException{
+	public void createSequence (final String kmzFileName, final String graphName , final int maxGraphsNum) throws IOException{
 		
 		File dir = new File(iterDir); 
 		if (!dir.exists()){
@@ -43,23 +46,19 @@ public class StopAnalyzer {
 		for (int i=0; i<children.length ; i++){
 			String s = children[i];
 			int numIt=  Integer.valueOf (s.substring(s.indexOf(point)+1, s.length()));
-			if (numIt!=0){	 //iteration zero does not have kmz file
-				iterNumList.add(numIt);
-			}
+			iterNumList.add(numIt);
 		}
 		Collections.sort(iterNumList);
 		
+		//reduce the size of the list to have only maxGraphsNum
 		if (maxGraphsNum>0){
-			//reduce the size of the list to have only maxGraphsNum
 			while (iterNumList.size() > maxGraphsNum){
 				iterNumList.remove(iterNumList.size()-1);
 			}
 		}
 		
 		//look for kmz files in all iteration folders
-		final String countscompare = ".ptcountscompare.kmz";
 		final String slash = "/";
-		final String stopFileName = errorGraphName;
 		final String it = "it.";
 		BufferedImage bufferedImage = new BufferedImage(400* iterNumList.size(), 300 , BufferedImage.TYPE_INT_RGB);
 		Graphics graphics = bufferedImage.getGraphics();		
@@ -67,13 +66,14 @@ public class StopAnalyzer {
 		int i=0;
 		for (int itNum : iterNumList){
 			//get station graph file from each kmzFile
-			String kmzFilePath = this.iterDir + it + itNum + slash + itNum + countscompare;
+			String kmzFilePath = this.iterDir + it + itNum + slash + itNum + point + kmzFileName;
+			log.info(kmzFilePath);
 			ZipFile zipFile = new ZipFile(kmzFilePath);
-			ZipEntry zipEntry = zipFile.getEntry(stopFileName);
+			ZipEntry zipEntry = zipFile.getEntry(graphName);
 			
 			if (zipEntry!=null){   
 				//read zip file
-	    		File file = new File(stopFileName);
+	    		File file = new File(graphName);
 	    		InputStream inStream = zipFile.getInputStream(zipEntry);
 	        	OutputStream outStream = new BufferedOutputStream(new FileOutputStream(file));
 	        	byte[] buffer = new byte[1024];
@@ -91,7 +91,7 @@ public class StopAnalyzer {
 		}
 		graphics.dispose();
 
-		File outputGraphFile = new File(this.iterDir + stopFileName);
+		File outputGraphFile = new File(this.iterDir + graphName);
 		ImageIO.write(bufferedImage,"png", outputGraphFile);
 		System.out.println("graph series was written at: " + outputGraphFile.getCanonicalPath());
 	}
@@ -133,38 +133,27 @@ public class StopAnalyzer {
 				e.printStackTrace();
 		    }
 		}
-		/*
-		
-		//get file 
-		String kmzFile = tempOutDir + STR_COUNTPATH ;
-		KMZ_Extractor kmzExtractor = new KMZ_Extractor(kmzFile, strGraphDir);
-		kmzExtractor.extractFile(STR_ERRGRAPHFILE);
-	
-		//rename it with the combination name
-		File file = new File(strGraphDir + STR_ERRGRAPHFILE);
-		File file2 = new File(strGraphDir + strCombination + STR_PNG);
-		if (!file.renameTo(file2)) {
-		*/
+
 	}
 	
 	public static void main(String[] args) throws IOException {
 		String itDir= null;
 		int maxGraphsNum = 0;     //zero if all plots are desired for analysis. Otherwise, the maximum number must be set.
 		String graphName = null;
-		//String outDir;
+		String kmzFileName = null;
 		
 		if (args.length>0){
 			itDir = args[0];
-			maxGraphsNum = Integer.valueOf (args[1]);;
+			maxGraphsNum = Integer.valueOf (args[1]);
 			graphName = args[2];
-			//outDir = args[3];	
+			kmzFileName = args[3];
 		}else{
-			itDir = "../../runs_manuel/cad_FastestRoutes/output/ITERS/";
-			maxGraphsNum = 26;
-			graphName = "errorGraphErrorBiasOccupancy.png"; //"812030.1o.png"; //"errorGraphErrorBiasOccupancy.png";
-			//outDir = "C:/Users/omicron/workspace/playgrounds/mmoyo/output/taste/changeExpGraphs/evolution/"; 
+			itDir = "../../input/newDemand/apr2012/cal24/output/ITERS/";
+			maxGraphsNum = 0;
+			graphName = "Occupancy-countsSimRealPerHour_1.png";  //"errorGraphErrorBiasOccupancy.png";
+			kmzFileName = "cadytsPtCountscompare.kmz";
 		}
-		new StopAnalyzer(itDir).createSequence(graphName , maxGraphsNum );
+		new StopAnalyzer(itDir).createSequence(kmzFileName, graphName , maxGraphsNum );
 		//new StopAnalyzer(itDir).ExtractGraphs(graphName, outDir);
 	}
 }

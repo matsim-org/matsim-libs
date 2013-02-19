@@ -48,8 +48,8 @@ public class PopulationList extends AbstractPersonAlgorithm {
 	}
 	
 	public static void main(String[] args) {
-		String netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";   // "../../input/newDemand/multimodalNet.xml.gz";
-		String popFilePath = "../../input/newDemand/routed/routedTrackedAndMergedAndHomPlan.xml.gz";
+		String netFilePath = "../../";
+		String popFilePath = "../../";
 		log.info("counting...");
 		
 		ScenarioImpl scn = (ScenarioImpl) new DataLoader().createScenario(); 

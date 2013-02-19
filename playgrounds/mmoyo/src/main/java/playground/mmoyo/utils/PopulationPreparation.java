@@ -7,10 +7,10 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.mmoyo.analysis.comp.Controler_launcher;
+import playground.mmoyo.analysis.comp.CadytsIntegration_launcher;
 import playground.mmoyo.utils.calibration.OverDemandPlan_router;
 
-public class PopulationPreparation {
+class PopulationPreparation {
 
 	public static void main(String[] args) {
 		String configFile= null;
@@ -29,7 +29,7 @@ public class PopulationPreparation {
 			numHomePlans = Integer.valueOf(args[5]);
 			//allPop = args[6];
 		}else{
-			configFile = "../../berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			configFile = "../../";
 			valuesArray = new String[3];
 			valuesArray[0] = "6_0.0_1200";
 			valuesArray[1] = "10_0.0_240";
@@ -146,7 +146,7 @@ public class PopulationPreparation {
 		System.gc();
 		
 		//calibrate
-		Controler_launcher.main(new String[]{configClonedFile});
+		CadytsIntegration_launcher.main(new String[]{configClonedFile});
 	}
 	
 }

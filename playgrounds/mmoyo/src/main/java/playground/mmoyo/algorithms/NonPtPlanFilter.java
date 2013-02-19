@@ -38,8 +38,8 @@ public class NonPtPlanFilter {
 			popFile = args[0];
 			netFile = args[1];
 		}else{
-			popFile = "../../input/newDemand/firstPersons.xml";
-			netFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			popFile = "../../";
+			netFile = "../../";
 		}
 		
 		DataLoader dataLoader = new DataLoader();

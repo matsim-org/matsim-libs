@@ -27,7 +27,7 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import playground.mrieser.pt.utils.MergeNetworks;
 
 /**Adds the ptlinks from the pseudonetwork/transitschedule to the network*/
-public class CreateMultimodalNet {
+class CreateMultimodalNet {
 
 	public void run(ScenarioImpl scenario, final String outputFile) {
 		NetworkImpl ptNetwork = NetworkImpl.createNetwork();

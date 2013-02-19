@@ -1,6 +1,7 @@
 package playground.mmoyo.utils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -10,7 +11,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 //import org.matsim.pt.transitSchedule.api.TransitRoute;
 //import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -31,10 +31,12 @@ public class TrackAndMerge {
 			popArray[i]  = dataLoader.readNetwork_Population(networkFile, popFilesArray[i]).getPopulation();
 		}		
 
-		Network net = dataLoader.readNetwork(networkFile);
+		//Network net = dataLoader.readNetwork(networkFile);
 		
 		//track passengers
-		List<Id> travelPersonList = new PassengerTracker2(line, net, schedule).getTrackedPassengers(popArray);
+		List<Id> transitLineIdList = new ArrayList<Id>();
+		transitLineIdList.add(line.getId());
+		List<Id> travelPersonList = new PassengerTracker2(transitLineIdList, /*net,*/ schedule).getTrackedPassengers(popArray);
 		
 		//create new Population extracting the agents from the pop array
 		Scenario scn = dataLoader.createScenario();

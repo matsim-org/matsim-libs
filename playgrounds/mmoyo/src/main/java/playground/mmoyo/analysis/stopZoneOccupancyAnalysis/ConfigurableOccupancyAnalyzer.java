@@ -36,18 +36,23 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 
-class StopZoneAndSelectedLinesOccupancyAnalyzer implements 	PersonEntersVehicleEventHandler, 
+class ConfigurableOccupancyAnalyzer implements 	PersonEntersVehicleEventHandler, 
 																PersonLeavesVehicleEventHandler,
 																VehicleArrivesAtFacilityEventHandler, 
 																VehicleDepartsAtFacilityEventHandler, 
 																TransitDriverStartsEventHandler {
 	
-	private static final Logger log = Logger.getLogger(StopZoneAndSelectedLinesOccupancyAnalyzer.class);
+	private static final Logger log = Logger.getLogger(ConfigurableOccupancyAnalyzer.class);
 	private OccupancyAnalyzer delegOccuAnalyzer;
 	private int maxTime = (int)Time.MIDNIGHT-1;
 	private final Set<Id> calibratedLines;
+	private boolean stopZoneConversion;
 	
-	public StopZoneAndSelectedLinesOccupancyAnalyzer(Set<Id> calibratedLines, int timeBinSize_s) {
+	/**
+	 * Pt-occupancy analysis is configurable with StopZone conversion,  selected lines and time bin size. 
+	 */
+	
+	public ConfigurableOccupancyAnalyzer(Set<Id> calibratedLines, int timeBinSize_s) {
 		this.calibratedLines = calibratedLines;
 		delegOccuAnalyzer = new OccupancyAnalyzer(timeBinSize_s, 	maxTime);
 	
@@ -57,11 +62,19 @@ class StopZoneAndSelectedLinesOccupancyAnalyzer implements 	PersonEntersVehicleE
 		}
 	}
 
+	protected void setStopZoneConversion(boolean stopZoneConversion){
+		this.stopZoneConversion = stopZoneConversion;
+	}
+	
 	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		Id stopZoneId =FacilityUtils.convertFacilitytoZoneId(event.getFacilityId()); 
-		VehicleDepartsAtFacilityEvent stopZoneEvent = new VehicleDepartsAtFacilityEvent(event.getTime(), event.getVehicleId(), stopZoneId, event.getDelay());
-		delegOccuAnalyzer.handleEvent(stopZoneEvent);
+	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
+		if (stopZoneConversion){
+			Id stopId =FacilityUtils.convertFacilitytoZoneId(event.getFacilityId());	
+			VehicleDepartsAtFacilityEvent localEvent = new VehicleDepartsAtFacilityEvent(event.getTime(), event.getVehicleId(), stopId, event.getDelay());
+			delegOccuAnalyzer.handleEvent(localEvent);
+		}else{
+			delegOccuAnalyzer.handleEvent(event);
+		}
 	}
 
 	@Override
@@ -87,6 +100,5 @@ class StopZoneAndSelectedLinesOccupancyAnalyzer implements 	PersonEntersVehicleE
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {delegOccuAnalyzer.handleEvent(event);}
-
 
 }

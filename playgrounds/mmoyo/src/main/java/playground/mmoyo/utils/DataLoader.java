@@ -77,7 +77,9 @@ public class DataLoader {
 		return population;
 	}
 
-	// Caution: all previous references to scn.getPopulation will point to the new Population
+	/**
+	Caution: all previous references to scn.getPopulation will point to the new Population
+	*/
 	public void setNewPopulation(Scenario scenario, final String populationFile){
 		scenario.getPopulation().getPersons().clear();
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
@@ -107,11 +109,7 @@ public class DataLoader {
 	}
 
 	public Config readConfig(final String configFile){
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configFile);
-		configReader = null;
-		return config;
+		return ConfigUtils.loadConfig(configFile);
 	}
 	
 	//returns a transitRoute object of the schedule

@@ -23,7 +23,7 @@ public class ExpTransRouteUtils {
 	private final TransitRoute transitRoute;
 	private static final Logger log = Logger.getLogger(ExpTransRouteUtils.class);
 	
-	public ExpTransRouteUtils (Network network, TransitSchedule transitSchedule, ExperimentalTransitRoute experimentalTransitRoute){
+	public ExpTransRouteUtils (final Network network, final TransitSchedule transitSchedule, final ExperimentalTransitRoute experimentalTransitRoute){
 		this.network = network;
 		this.trSchedule = transitSchedule;
 		this.expTrRoute = experimentalTransitRoute;
@@ -37,6 +37,27 @@ public class ExpTransRouteUtils {
 			distance += this.getLinks().get(i).getLength();
 		}
 		return distance; //since this method include the last transit link in distance calculation, it does not match with org.matsim.core.utils.misc.RouteUtils.calcDistance. 
+	}
+	
+	/*
+	 returns the time required to travel along the route according to the transit schedule information.
+	  It might not  match the leg travel time because the waiting time can be included in leg travel time
+	  from boarding stop departure time to destination stop arrival time
+	 */ 
+	public double getScheduledTravelTime(){
+		double trTime=0;
+		List<TransitRouteStop> stops = this.getStops();
+		TransitRouteStop prevStop = null;
+		
+		for (TransitRouteStop stop : stops){
+			if (prevStop!=null){
+				trTime += stop.getDepartureOffset() - prevStop.getDepartureOffset() ;	
+			}
+			prevStop = stop;
+		}
+		TransitRouteStop lastStop= stops.get(stops.size()-1); //Subtract the last offset, because the passenger arriving does not care for next departure time anymore
+		trTime -= lastStop.getDepartureOffset() - lastStop.getArrivalOffset(); 
+		return trTime;
 	}
 	
 	public TransitRouteStop getAccessStop (){
@@ -92,6 +113,15 @@ public class ExpTransRouteUtils {
 		return transitRoute.getStops().subList(accessStopIndex, egressStopIndex + 1); //"sublist" excludes the last index, so this is necessary		
 	}
 
+	public List<Id> getStopsIds (){
+		List<TransitRouteStop> stopList=  this.getStops();
+		List<Id> stopIdList=  new ArrayList<Id>();
+		for (TransitRouteStop transitRouteStop : stopList){
+			stopIdList.add(transitRouteStop.getStopFacility().getId());
+		}
+		return stopIdList;
+	} 
+	
 	/**includes first and last link of the exp transit route*/  
 	public List<Link> getLinks(){
 		List<Id> completeIdList = new ArrayList<Id>();
@@ -122,18 +152,17 @@ public class ExpTransRouteUtils {
 	}
 	
 	/**
-	 * returns the complete transit route link list including star and end Links
+	 * Returns the complete transit route link list including start and end Links
 	 */
 	public List<Link> getAllLinks (){
 		List<Link> allLinkList  = new ArrayList<Link>();
 		allLinkList.add(this.network.getLinks().get(this.transitRoute.getRoute().getStartLinkId()));
 		for (Id id : this.transitRoute.getRoute().getLinkIds() ){
-			allLinkList.add(this.network.getLinks().get(id));	
+			allLinkList.add(this.network.getLinks().get(id));
 		}
 		allLinkList.add(this.network.getLinks().get(this.transitRoute.getRoute().getEndLinkId()));
 		return allLinkList;
 	}
-	
 	
 	public static void main(String[] args) {
 		String configFile; 
@@ -141,7 +170,7 @@ public class ExpTransRouteUtils {
 		if (args.length==1){
 			configFile = args[0];
 		}else{
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
+			configFile = "";
 		}
 		
 		String strTrLine = "B-296";
@@ -162,16 +191,24 @@ public class ExpTransRouteUtils {
 		System.out.println("Access stop: " + ptRouteUtill.getAccessStop().getStopFacility().getId());
 		System.out.println("Egress stop: " + ptRouteUtill.getEgressStop().getStopFacility().getId());
 		
+		System.out.println(" ");
 		//get Stops
 		List<TransitRouteStop> stopList = ptRouteUtill.getStops();
 		for (TransitRouteStop transitRouteStop : stopList){
-			System.out.println(transitRouteStop.getStopFacility().getId());
+			System.out.print(transitRouteStop.getStopFacility().getId() + " ");
 		}
+		
+		System.out.println(" ");
+		//again
+		for(Id id : ptRouteUtill.getStopsIds()){
+			System.out.print(id + " ");
+		}
+		
 		
 		//get links
 		List<Link> linkList = ptRouteUtill.getLinks();
 		for (Link link : linkList){
-			System.out.println(link.getId());
+			System.out.print(link.getId()+ " ");
 		}
 		
 		

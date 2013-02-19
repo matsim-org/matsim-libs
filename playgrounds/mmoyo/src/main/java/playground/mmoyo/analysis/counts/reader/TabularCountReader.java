@@ -34,7 +34,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.utils.DataLoader;
 
-/**Reads a tabular text with pt counts saved as ANSI. **/
+/**Reads a tabular text with pt counts saved as ANSI. (See the Header structure)**/
 public class TabularCountReader implements TabularFileHandler {
 	private static final Logger log = Logger.getLogger(TabularCountReader.class);
 	private static final String[] HEADER = {"id", "Haltestelle", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"};

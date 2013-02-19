@@ -34,9 +34,9 @@ public class PersonIdSuffixAdder {
 	}
 	
 	public static void main(String[] args) {
-		String netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String popFilePath= "../../input/rou_mut/ro_mut10_0_240__8_5_720__6_0_1200.xml.gz";
-		String output = "../../input/rou_mut/ro_mut10_0_240__8_5_720__6_0_1200.xml.gz";
+		String netFilePath = "../../";
+		String popFilePath= "../../";
+		String output = "../../";
 		String suffix = "_2";
 		
 		DataLoader dataLoader = new DataLoader();

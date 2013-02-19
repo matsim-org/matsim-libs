@@ -19,9 +19,9 @@ public class PlanScoreMinValue extends AbstractPersonAlgorithm {
 	}
 	
 	public static void main(String[] args) {
-		String populationFile = "../../input/base5xCloned4xMutatedRouted.xml.gz";
-		String networkFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String outputFile = "../../berlin-bvg09/ptManuel/calibration/inputPlans/NOSCOREplan_walk4.0_dist0.0_tran1020.0.xml.gz";
+		String populationFile = "../../";
+		String networkFile = "../../";
+		String outputFile = "../../";
 		
 		Scenario scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
 	

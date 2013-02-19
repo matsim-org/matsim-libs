@@ -12,10 +12,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-/**reads a multi-modal network and eliminates agents outside the street network area*/
-public class PopulationFilter {
+/**Reads a multi-modal network and eliminates agents outside the street network area*/
+class PopulationFilter {
 	private double minX;
 	private double maxX;
 	private double minY;
@@ -70,12 +69,15 @@ public class PopulationFilter {
 	}
 	
 	public static void main(String[] args) {
-		//String configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/NullFallAlles/configRouted.xml";
-		String configFile = args[0];
+		String configFile; 
+		if (args.length==1){
+			configFile = args[0];
+		}else{
+			configFile = "../../ptManuel/calibration/100plans_bestValues_config.xml";
+		}
 		
-		ScenarioLoaderImpl scenarioLoader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
-		Scenario scenario = scenarioLoader.getScenario();
-		scenarioLoader.loadScenario();
+		DataLoader dLoader = new DataLoader();
+		Scenario scenario= dLoader.loadScenario(configFile);
 		PopulationFilter populationFilter = new PopulationFilter();
 		populationFilter.run(scenario);
 		
@@ -84,7 +86,6 @@ public class PopulationFilter {
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write(outputFile) ;
 		System.out.println("done");
-
 	}
 
 }

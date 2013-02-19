@@ -43,8 +43,8 @@ public class FirstPersonExtractorFromFile implements PersonAlgorithm{
 		String netFile;
 		
 		if (args.length==0){
-			popFile = "../../input/juli/routedPlan_walk10.0_dist0.0_tran240.0.xml.gz";
-			netFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";	
+			popFile = "../../";
+			netFile = "../../";	
 		}else{
 			popFile = args[0];
 			netFile = args[1];

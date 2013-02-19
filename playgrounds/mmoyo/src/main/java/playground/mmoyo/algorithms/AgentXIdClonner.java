@@ -32,9 +32,9 @@ public class AgentXIdClonner{
 	}
 	
 	public static void main(String[] args) {
-		String popFilePath = "../../input/overEstimatedDemandPlans.xml.gz";
-		String idsFilePath = "../../input/clonableagents.txt";
-		String netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+		String popFilePath = "../../";
+		String idsFilePath = "../../";
+		String netFilePath = "../../";
 		int numClones = 4;
 		
 		DataLoader dataLoader = new DataLoader();

@@ -18,15 +18,17 @@ public class FirstPersonExtractorFromFile extends MatsimPopulationReader {
 	int personNum;
 	boolean cont = true;
 	Scenario scn;
+	String inputFileName;
 	
 	public FirstPersonExtractorFromFile(final Scenario scn){
 		super(scn);
 		this.scn = scn;
 	}
 	
-	public Population readFile(String filename, int personNum){
+	public Population readFile(final String fileName, int personNum){
 		this.personNum = personNum;
-		this.readFile(filename);
+		this.inputFileName = fileName;
+		this.readFile(fileName);
 		return this.scn.getPopulation();
 	}
 
@@ -50,24 +52,44 @@ public class FirstPersonExtractorFromFile extends MatsimPopulationReader {
 				this.personCounter ++;
 				if (this.personCounter == this.personNum){
 
-					//write the persons and break the execution . Not very good but avoid parsing the whole document
+					//write the persons and break the execution. Not very good but avoid parsing the whole document
+					//use thread.interrupt();
 					PopulationWriter popWriter = new PopulationWriter(scn.getPopulation(), scn.getNetwork());
-					popWriter.write(scn.getConfig().controler().getOutputDirectory() + "/firstPersons.xml" );
+					popWriter.write(inputFileName + personNum + "firstPersons.xml");
 					System.exit(0);
-				}			
+				}
 			}
 		}
 	}
 
 	public static void main(String[] args) {
-		final String popFilePath = "../../input/newDemand/bvg.run190.25pct.100.plans.xml";
-		final String netFilePath = "../../input/newDemand/network.final.xml.gz";
+		String netFilePath;
+		String popFilePath;
+		final int agentNum;	
 		
+		if (args.length>0){
+			netFilePath = args[0];
+			popFilePath = args[1];
+			agentNum = Integer.valueOf (args[2]);
+		}else{
+			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			popFilePath = "../../input/temp/110.plans.xml.gz";
+			agentNum=50;	
+		}
+		
+		//load data
 		DataLoader dataloader = new DataLoader(); 
 		ScenarioImpl scn = (ScenarioImpl) dataloader.createScenario();
 		new MatsimNetworkReader(scn).readFile(netFilePath);
-		scn.getConfig().controler().setOutputDirectory(new File (popFilePath).getParent());
-		new FirstPersonExtractorFromFile(scn).readFile(popFilePath, 10);
+		
+		//get first agents
+		Population pop = new FirstPersonExtractorFromFile(scn).readFile(popFilePath, agentNum);
+		
+		//write first agents in same directory
+		PopulationWriter popWriter = new PopulationWriter(pop, scn.getNetwork());
+		File file = new File(popFilePath);
+		popWriter.write(file.getPath() + ".firstPersons.xml") ;
+		
 	}
 	
 }

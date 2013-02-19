@@ -20,7 +20,6 @@
 package playground.mmoyo.taste_variations;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,10 +27,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.StopZoneAnalysisCtrlListener;
+import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 import playground.mmoyo.utils.DataLoader;
 
 public class PersonalizedTasteControler {
@@ -43,8 +40,8 @@ public class PersonalizedTasteControler {
 			configFile = args[0];
 			svdSolutionFile = args[1];
 		}else{
-			configFile = "../../ptManuel/calibration/my_config.xml";
-			svdSolutionFile = "../../input/choiceM44/500.cadytsCorrectionsNsvdValues.xml.gz";
+			configFile = "../../";
+			svdSolutionFile = "../../";
 		}
 		
 		//load data
@@ -57,39 +54,15 @@ public class PersonalizedTasteControler {
 		final Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true);
 		
-		Map <Id, SVDvalues> svdMap = getSvdValuesMap(pop, svdSolutionFile); 
-		controler.setScoringFunctionFactory(new PersonalizedTasteScoring(svdMap, net, schedule));
+		Map <Id, SVDvalues> svdMap = new SVDValuesReader(pop.getPersons().keySet()).readFile(svdSolutionFile); 
+		controler.setScoringFunctionFactory(new SVDScoringfunctionFactory(svdMap, net, schedule));
 		
 		//add analyzer for specific bus line
-		StopZoneAnalysisCtrlListener stopZoneAnalysisCtrlListener = new StopZoneAnalysisCtrlListener(controler);
-		controler.addControlerListener(stopZoneAnalysisCtrlListener);  
+		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
+		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(false);
+		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);  
 		
 		controler.run();
 	}
 	
-	private static Map <Id, SVDvalues> getSvdValuesMap(final Population pop, final String svdSolutionFile){
-		Map <Id, SVDvalues> svdMap = new TreeMap <Id, SVDvalues>();
-		
-		ObjectAttributes attributes = new ObjectAttributes();
-		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(attributes);
-		reader.parse(svdSolutionFile);
-		final String STR_wWalk="wWalk";
-		final String STR_wTime="wTime";
-		final String STR_wDista="wDista";
-		final String STR_wChng="wChng";
-		for(Id id : pop.getPersons().keySet()){
-			String strId = id.toString();
-			double wWalk = ((Double) attributes.getAttribute(strId, STR_wWalk)).doubleValue();
-			double wTime = ((Double) attributes.getAttribute(strId, STR_wTime)).doubleValue();
-			double wDista = ((Double) attributes.getAttribute(strId, STR_wDista)).doubleValue();
-			double wChng = ((Double) attributes.getAttribute(strId, STR_wChng)).doubleValue();
-			SVDvalues svdValues = new SVDvalues(id, wWalk, wTime, wDista, wChng); 
-			svdMap.put(id, svdValues);
-		}
-		return svdMap;
-	}
-	
-	
-	
-
 }

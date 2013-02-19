@@ -46,7 +46,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
  * 
  * invokes a standard MATSim transit simulation
  */
-public class Controler_launcher {
+public class CadytsIntegration_launcher {
 	
 	public static void main(String[] args) {
 		String configFile; 

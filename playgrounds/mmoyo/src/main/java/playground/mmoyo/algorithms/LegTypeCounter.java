@@ -42,7 +42,7 @@ public class LegTypeCounter {
 			popFilePath = args[0];
 			mode = args[0];
 		}else{
-			popFilePath = "../../input/2plansCleaned.xml"; // ;"../playgrounds/mmoyo/output/precalculation/routed3150/allRoutes3150.xml";
+			popFilePath = "../../"; // ;"../playgrounds/mmoyo/output/precalculation/routed3150/allRoutes3150.xml";
 			mode = TransportMode.pt;
 		}
 		

@@ -29,6 +29,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.mmoyo.ptRouterAdapted.AdaptedLauncher;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.PlansMerger;
+import playground.mmoyo.utils.TrRouteUsersFinder;
 
 /**
  *  -reads a base plan 
@@ -85,15 +86,24 @@ public class OverDemandPlan_router {
 		System.out.println("writing output cloned plan file..." +  overEstimDemPlansFile);
 		popwriter = new PopulationWriter(clonedPop, scenario.getNetwork());
 		popwriter.write(overEstimDemPlansFile);
+		String popFilePath = overEstimDemPlansFile;
+		String confFile = "configOverEstimatedDemandPlans.xml";
+		
+		//write the population filtering only M44 users
+		//TrRouteUsersFinder trRouteUsersFinder = new TrRouteUsersFinder(clonedPop, scenario.getTransitSchedule(),scenario.getNetwork() );
+		//String onlyM44users = overEstimDemPlansFile + "OnlyM44users.xml.gz";
+		//trRouteUsersFinder.writeUsersPop("M44", onlyM44users);
+		//popFilePath = onlyM44users;
+		//confFile = "configOverEstimatedDemandPlansOnlyM44.xml";
 		
 		//create the new config file
 		String oldOutdir= this.config.controler().getOutputDirectory();
 		String newOuputdirPath = this.config.controler().getOutputDirectory() + "outputCal/";
-		this.config.setParam("plans", "inputPlansFile", overEstimDemPlansFile );
+		this.config.setParam("plans", "inputPlansFile", popFilePath );
 		this.config.setParam("controler", "outputDirectory", newOuputdirPath);
 
 		ConfigWriter configWriter = new ConfigWriter(this.config);
-		String configClonedFile = oldOutdir + "configOverEstimatedDemandPlans.xml";
+		String configClonedFile = oldOutdir + confFile;
 		System.out.println(this.config.controler().getOutputDirectory());
 		System.out.println(configClonedFile);
 		configWriter.write(configClonedFile);

@@ -4,8 +4,8 @@ import org.matsim.api.core.v01.Id;
 
 import playground.mmoyo.analysis.counts.reader.CountsReader;
 
-/**compares the simulated values of two countsComparison files*/
-public class CountsComparison {
+/**Compares the simulated values of two countsComparison files*/
+class CountsComparison {
 
 	public static void main(String[] args) {
 		//count files should have the same stops

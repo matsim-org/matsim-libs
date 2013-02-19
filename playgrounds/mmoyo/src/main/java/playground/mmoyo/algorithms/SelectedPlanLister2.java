@@ -7,11 +7,14 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 import playground.mmoyo.io.PopSecReader;
-import playground.mmoyo.utils.DataLoader;
+
 
 /**list number of agents related to selected plan index in the population*/
 public class SelectedPlanLister2 implements PersonAlgorithm {
@@ -45,21 +48,23 @@ public class SelectedPlanLister2 implements PersonAlgorithm {
 		}
 	}
 	
-	
 	public static void main(String[] args) {
 		String popFilePath;
+		String netFilePath;
 		if (args.length>0){
 			popFilePath = args[0];
+			netFilePath = args[1];
 		}else{
-			popFilePath = "../mmoyo/output/taste/seeds/3/10.plans.xml.gz";
-			//popFilePath = "../mmoyo/output/taste/inputPlans/500.plans_fromCalibM44.xml.gzprobDistribSelectPlan.xml.gz";
+			popFilePath = "../../";
+			netFilePath = "../../";
 		}
 
-		DataLoader dataLoader = new DataLoader ();
-		ScenarioImpl scn = (ScenarioImpl) dataLoader.createScenario(); 
-			
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
+		matsimNetReader.readFile(netFilePath);	
+		
 		SelectedPlanLister2 selectedPlanLister2 = new SelectedPlanLister2();
-		new PopSecReader(scn, selectedPlanLister2).readFile(popFilePath);
+		new PopSecReader(scenario, selectedPlanLister2).readFile(popFilePath);
 		selectedPlanLister2.printSelectedIndex();
 	}
 	

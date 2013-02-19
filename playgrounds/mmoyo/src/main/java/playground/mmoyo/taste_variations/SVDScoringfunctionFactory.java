@@ -37,13 +37,12 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.utils.ExpTransRouteUtils;
 
-
-public class PersonalizedTasteScoring implements ScoringFunctionFactory {
+public class SVDScoringfunctionFactory implements ScoringFunctionFactory {
 	private final Map <Id, SVDvalues> svdValuesMap;
 	private final Network net;
 	private final TransitSchedule schedule;
 	
-	public PersonalizedTasteScoring(final Map <Id, SVDvalues> svdValuesMap, final Network net, final TransitSchedule schedule) {
+	public SVDScoringfunctionFactory(final Map <Id, SVDvalues> svdValuesMap, final Network net, final TransitSchedule schedule) {
 		this.svdValuesMap = svdValuesMap;
 		this.net = net; 
 		this.schedule = schedule;
@@ -52,12 +51,12 @@ public class PersonalizedTasteScoring implements ScoringFunctionFactory {
 	@Override
 	public ScoringFunction createNewScoringFunction(final Plan plan) {
 		final SVDvalues svdValues = svdValuesMap.get(plan.getPerson().getId());
-		ScoringFunction persTasteScoringFunction = new PersTasteScoringFunction(plan, svdValues, net, schedule);
-		return persTasteScoringFunction;
+		ScoringFunction svdScoringFunction = new SVDscoringFunction(plan, svdValues, net, schedule);
+		return svdScoringFunction;
 	}
 }
 
-class PersTasteScoringFunction implements ScoringFunction {
+class SVDscoringFunction implements ScoringFunction {
 	private final Network network;
 	private final SVDvalues svdValues;
 	protected double score;
@@ -65,7 +64,7 @@ class PersTasteScoringFunction implements ScoringFunction {
 	private Plan plan; 
 	private final TransitSchedule schedule;
 	
-	public PersTasteScoringFunction(final Plan plan, final SVDvalues svdValues, final Network network, final TransitSchedule schedule) {
+	public SVDscoringFunction(final Plan plan, final SVDvalues svdValues, final Network network, final TransitSchedule schedule) {
 		this.plan = plan;
 		this.schedule = schedule;
 		this.network = network;
@@ -99,7 +98,7 @@ class PersTasteScoringFunction implements ScoringFunction {
 						//double trTime = routUtil.getScheduledTravelTime(); <- CAUTION: travel time based on scheduled travel time!
 						double trTime =	leg.getTravelTime();  //according to playground.mmoyo.analysis.tools. this might include the waiting time at stop						   
 						
-						tmpScore += distance *  svdValues.getWeight_trDistance();  
+						tmpScore += distance *  svdValues.getWeight_trDistance();
 						tmpScore += trTime *  svdValues.getWeight_trTime();
 
 					}

@@ -16,7 +16,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 
 /**reads an events file and filters only events of the given agents*/  
-public class AgentEvents implements BasicEventHandler{
+	class AgentEvents implements BasicEventHandler{
 	private final static Logger log = Logger.getLogger(AgentEvents.class);
 	private List<String> strIdList;
 	Map <String, List<Event>> person2EventsMap = new TreeMap <String, List<Event>>();

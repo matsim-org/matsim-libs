@@ -45,8 +45,8 @@ public class ActLinkIdChanger extends AbstractPersonAlgorithm {
 	}
 	
 	public static void main(String[] args) {
-		String popFilePath = "../../input/juni/newDemand/bvg.run190.25pct.100Cleaned.plans.xml.gz";
-		String netFilePath = "../../input/juni/newDemand/multimodalNet.xml.gz";
+		String popFilePath = "";
+		String netFilePath = "";
 		String suffix ="miv_"; 
 
 		DataLoader dataLoader = new DataLoader();
@@ -56,7 +56,7 @@ public class ActLinkIdChanger extends AbstractPersonAlgorithm {
 		//write file
 		System.out.println("writing output plan file...");
 		PopulationWriter popwriter = new PopulationWriter(scn.getPopulation(), scn.getNetwork());
-		popwriter.write(new File(popFilePath).getParent() + "/popCleanedWithMivSuffix.xml.gz") ;
+		popwriter.write(new File(popFilePath).getPath() + "PopActLinkIdChangedWithSuffix.xml.gz") ;
 		System.out.println("done");
 	}
 }

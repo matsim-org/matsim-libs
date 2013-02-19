@@ -52,7 +52,7 @@ public class RndPtRouterLauncher {
 			public TransitRouter createTransitRouter() {
 				RandomizedTransitRouterNetworkTravelTimeAndDisutility2 ttCalculator = 
 					new RandomizedTransitRouterNetworkTravelTimeAndDisutility2(trConfig);
-				ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
+				ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
 				ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
 				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 			}
@@ -62,7 +62,7 @@ public class RndPtRouterLauncher {
 	public static void main(final String[] args) {
 		String configFile ;
 		if(args.length==0){
-			configFile = "../../ptManuel/calibration/100plans_bestValues_config.xml";
+			configFile = "../../";
 		}else{
 			configFile = args[0];
 		}

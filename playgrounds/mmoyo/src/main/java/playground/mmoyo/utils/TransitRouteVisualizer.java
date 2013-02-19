@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
-/**created a visual track of the transit route*/
+/**creates a visual track of the transit route*/
 public class TransitRouteVisualizer {
 	
 	public TransitRouteVisualizer(String configfile,String strTrRouteId){

@@ -1,76 +1,64 @@
 package playground.mmoyo.utils;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 import java.util.TreeSet;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Population;
-
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
 import playground.mmoyo.io.TextFileWriter;
 
-/**  prints all agents id's */
-	public class PopulationList {
-	private final Population population;
-	final String SEPARATOR = ":\t ";
+/**Reads only agents ids for analysis*/
+public class PopulationList  extends MatsimXmlParser {
+	private final String strPerson = "person";
+	private final String strId = "id";
+	private List<String> agentStrId_List = new ArrayList<String>();
 	
-	public PopulationList(final Population population){	
-		this.population= population;
+	@Override
+	public void startTag(String name, Attributes atts, Stack<String> context) {
+		if (strPerson.equals(name)) {
+			agentStrId_List.add(atts.getValue(strId));
+		}
 	}
 	
-	/**print id's in console*/
-	public void ListPersons(){
-		//final String strEmpty= "";
-		for(Id id: this.population.getPersons().keySet()){
-			//if (person.getSelectedPlan().getScore()!=null) str_score= Double.toString(person.getSelectedPlan().getScore());
-			System.out.println(id /* +  SEPARATOR + str_score*/);
-		}
-		System.out.println("Num of agents: " +  this.population.getPersons().size());
+	@Override
+	public void endTag(final String name, final String content, final Stack<String> context) {
+		
 	}
 	
 	/**saves id's in text file */
 	public void SavePersonsIds(final String outFile){
 		final String NR= "\n";
 		StringBuffer sBuff = new StringBuffer();
-		for(Id id: this.population.getPersons().keySet()){
-			sBuff.append(id + NR);
+		for(String strId : agentStrId_List){
+			sBuff.append(strId + NR);
 		}
-		
-		//write to output text file
-		new TextFileWriter().write(sBuff.toString(),outFile,true);
-		System.out.println("Num of agents: " +  this.population.getPersons().size());
+		new TextFileWriter().write(sBuff.toString(),outFile,false);
+		System.out.println("Num of agents: " +  agentStrId_List.size());
 	}
-	
+
+	/**sorted ids*/
 	public void SortAndListPersons(){
-		Set<Id> keySet = this.population.getPersons().keySet();
-		TreeSet<Id> treeSet = new TreeSet<Id>(keySet);
-		
-		int zeroFound =0;
-		for (Id id : treeSet){
-			double score = this.population.getPersons().get(id).getSelectedPlan().getScore();
-			System.out.println(id +  SEPARATOR + Double.toString(score));
-			if (score==0){
-				zeroFound++;
-				try {
-					throw new RuntimeException("Score equals zero" );
-				} catch (RuntimeException e) {
-					e.printStackTrace();
-				}
-			}
+		TreeSet<String> treeSet = new TreeSet<String>(agentStrId_List);
+		for (String strId : treeSet){
+			System.out.println(strId);
 		}
 		System.out.println("Number of persons: " + treeSet.size());
-		System.out.println("scores that equal zero: " + zeroFound);
 	}
 	
 	public static void main(String[] args) {
-		String populationFile;
+		String popFilePath;
 		if (args.length>0){
-			populationFile = args[0];
+			popFilePath = args[0];
 		}else{
-			populationFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/baseplan_5x_subset_xy2links_ptplansonly.xml.gz";	
+			popFilePath = "../../";
 		}
-		System.out.println("counting population for population file: " + populationFile);
-		Population population = new DataLoader().readPopulation(populationFile);
-		//new PopulationList(population).SavePersonsIds("../../input/bestValues_plansIDS.txt");
-		new PopulationList(population).ListPersons();
+
+		PopulationList populationListOnlyId = new PopulationList(); 
+		populationListOnlyId.parse(popFilePath);
+		//populationListOnlyId.SavePersonsIds("../../input/randomizedPtRouter/analysis/fragmentedPlansIds.txt");
+		System.out.println("Num of agents: " +  populationListOnlyId.agentStrId_List.size());
+		//populationListOnlyId.SortAndListPersons();
 	}
+	
 }
