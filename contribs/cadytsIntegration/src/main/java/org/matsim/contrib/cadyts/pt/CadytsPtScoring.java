@@ -41,20 +41,21 @@ public class CadytsPtScoring implements ArbitraryEventScoring {
 	private PtPlanToPlanStepBasedOnEvents ptPlanToPlanStep;
 	private AnalyticalCalibrator<TransitStopFacility> matsimCalibrator;
 	private Plan plan;
-	private final double beta = 1.0;
+	private final double beta ;
+	private double weightOfCadytsCorrection = 1. ;
 
 	CadytsPtScoring(final Plan plan, final CadytsContext context ) {
-		log.error("value for beta currently ignored (set to one)");
 		this.ptPlanToPlanStep = context.getPtStep() ;
 		this.matsimCalibrator = context.getCalibrator() ;
 		this.plan = plan ;
+		this.beta = context.getScenario().getConfig().planCalcScore().getBrainExpBeta() ;
 	}
-
+	
 	@Override
 	public void finish() {
 		cadyts.demand.Plan<TransitStopFacility> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(plan);
 		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
-		this.score = currentPlanCadytsCorrection ;
+		this.score = weightOfCadytsCorrection * currentPlanCadytsCorrection ;
 	}
 
 	@Override
@@ -70,6 +71,10 @@ public class CadytsPtScoring implements ArbitraryEventScoring {
 	@Override
 	public void handleEvent(Event event) {
 		
+	}
+
+	public void setWeightOfCadytsCorrection(double weightOfCadytsCorrection) {
+		this.weightOfCadytsCorrection = weightOfCadytsCorrection;
 	}
 
 }

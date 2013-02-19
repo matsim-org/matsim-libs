@@ -44,13 +44,19 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.counts.SimpleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 
 /**
  * Collects occupancy data of transit-line stations
  */
 public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
-		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
+		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler 
+		, SimResults<TransitStopFacility> {
 
+	private static final long serialVersionUID = 1L;
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
 	private Map<Id, int[]> occupancies; // Map< stopFacilityId,value[]>
@@ -61,9 +67,6 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	private final Set<Id> transitVehicles = new HashSet<Id>();
 	private final Set<Id> calibratedLines;
 
-//	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines) {
-//		this(calibratedLines,3600) ;
-//	}
 	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines, int timeBinSize_s ) {
 		this.calibratedLines = calibratedLines;
 		this.timeBinSize = timeBinSize_s ;
@@ -170,13 +173,7 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 		// since personEnters/LeavesVehicle does not carry stop id)
 	}
 
-	// occupancy methods
-	public void setOccupancies(final Map<Id, int[]> occupancies) {
-		this.occupancies = occupancies;
-	}
-
-	@Deprecated // try to use request that also contains time instead
-	int getTimeSlotIndex(final double time) {
+	private int getTimeSlotIndex(final double time) {
 		if (time > this.maxTime) {
 			return this.maxSlotIndex;
 		}
@@ -190,12 +187,16 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	 *         (timeBinSize-1)seconds.
 	 */
 	@Deprecated // try to use request that also contains time instead
-	public int[] getOccupancyVolumesForStop(final Id stopId) {
+	int[] getOccupancyVolumesForStop(final Id stopId) {
 		return this.occupancies.get(stopId);
 	}
 	 public int getOccupancyVolumeForStopAndTime(final Id stopId, final int time_s ) {
-		 int timeBinIndex = getTimeSlotIndex( time_s ) ;
-		 return this.occupancies.get(stopId)[timeBinIndex] ;
+		 if ( this.occupancies.get(stopId) != null ) {
+			 int timeBinIndex = getTimeSlotIndex( time_s ) ;
+			 return this.occupancies.get(stopId)[timeBinIndex] ;
+		 } else {
+			 return 0 ;
+		 }
 	 }
 
 	public Set<Id> getOccupancyStopIds() {
@@ -205,8 +206,8 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	public void writeResultsForSelectedStopIds(final String filename, final Counts occupCounts, final Collection<Id> stopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
-		final char TAB = '\t';
-		final char NL = '\n';
+		final String TAB = "\t";
+		final String NL = "\n";
 
 		// write header
 		writer.write("stopId\t");
@@ -246,15 +247,16 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 		writer.close();
 	}
 
-	private void readEvents(final String eventFileName) {
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(this);
-		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventFileName);
+	@Override
+	public double getSimValue(TransitStopFacility link, int startTimeS, int endTimeS, TYPE type) {
+		return this.getOccupancyVolumeForStopAndTime(link.getId(), startTimeS) ;
 	}
 
-	public void run(final String eventFileName) {
-		this.readEvents(eventFileName);
-	}
+//	public void run(final String eventFileName) {
+//		EventsManager events = EventsUtils.createEventsManager();
+//		events.addHandler(this);
+//		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
+//		reader.parse(eventFileName);
+//	}
 
 }

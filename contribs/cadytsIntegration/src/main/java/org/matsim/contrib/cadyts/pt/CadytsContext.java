@@ -78,7 +78,8 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 
 	private CadytsPtConfigGroup cadytsConfig;
 
-	private Config config;
+	private final Config config;
+	private Scenario scenario = null ;
 
 	public CadytsContext(Config config) {
 		this.config = config;
@@ -87,7 +88,7 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		Scenario scenario = event.getControler().getScenario();
+		this.scenario = event.getControler().getScenario();
 		EventsManager events = event.getControler().getEvents();
 
 
@@ -106,7 +107,7 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.occupCounts /*, cadytsConfig.getTimeBinSize()*/);
+		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.occupCounts );
 
 	}
 
@@ -161,7 +162,7 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
 
-	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
+	private static boolean isActiveInThisIteration(final int iter, final Controler controler) {
 		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0);
 	}
 
@@ -238,17 +239,18 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 		@Override
 		public double getSimValue(final TransitStopFacility stop, final int startTime_s, final int endTime_s, final TYPE type) { // stopFacility or link
 
-			//				int hour = startTime_s / 3600;
-			int hour = this.occupancyAnalyzer.getTimeSlotIndex(startTime_s) ;
-
-			Id stopId = stop.getId();
-			int[] values = this.occupancyAnalyzer.getOccupancyVolumesForStop(stopId);
-
-			if (values == null) {
-				return 0;
-			}
-
-			return values[hour] * this.countsScaleFactor;
+//			//				int hour = startTime_s / 3600;
+//			int hour = this.occupancyAnalyzer.getTimeSlotIndex(startTime_s) ;
+//
+//			Id stopId = stop.getId();
+//			int[] values = this.occupancyAnalyzer.getOccupancyVolumesForStop(stopId);
+//
+//			if (values == null) {
+//				return 0;
+//			}
+//
+//			return values[hour] * this.countsScaleFactor;
+			return this.occupancyAnalyzer.getOccupancyVolumeForStopAndTime(stop.getId(), startTime_s) * this.countsScaleFactor ;
 		}
 
 		@Override
@@ -290,6 +292,10 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 
 	PtPlanToPlanStepBasedOnEvents getPtStep() {
 		return ptStep;
+	}
+
+	Scenario getScenario() {
+		return scenario;
 	}
 
 

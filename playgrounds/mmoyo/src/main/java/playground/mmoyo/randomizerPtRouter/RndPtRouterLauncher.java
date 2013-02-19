@@ -107,7 +107,7 @@ public class RndPtRouterLauncher {
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				return new PlanStrategyImpl(new CadytsPtPlanChanger(context));
+				return new PlanStrategyImpl(new CadytsPtPlanChanger( context));
 			}
 		});
 		
