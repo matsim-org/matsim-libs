@@ -11,6 +11,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
@@ -40,7 +43,7 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 	
 	private static final Logger log = Logger.getLogger(AccessibilityCalc.class);
 	
-	private ActivityFacilitiesImpl parcels;
+	private ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl();
 	
 	private SpatialGrid freeSpeedGrid;
 	
@@ -59,9 +62,9 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 	protected double betaCarTT = -12.;
 	protected double betaWalkTT = -12.;
 
-	public AccessibilityCalc(ActivityFacilitiesImpl parcels, ZoneLayer<Id> startZones, SpatialGrid freeSpeedGrid, ScenarioImpl scenario,String filename) {
+	public AccessibilityCalc(/*ActivityFacilitiesImpl parcels,*/ ZoneLayer<Id> startZones, SpatialGrid freeSpeedGrid, ScenarioImpl scenario,String filename) {
 		
-		this.setParcels(parcels);
+//		this.setParcels(parcels);
 		this.setFreeSpeedGrid(freeSpeedGrid);
 		this.setScenario(scenario);
 		this.setMeasuringPoints(startZones);
@@ -73,7 +76,7 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 		
 		final NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		
-		if(this.parcels.getFacilities().size()<1){
+		if(this.scenario.getPopulation().getPersons().size()<1){
 			log.warn("no population initialized. running on random population...");
 			
 			NetworkBoundaryBox bbox = new NetworkBoundaryBox();
@@ -92,6 +95,23 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 			
 			this.setParcels(parcels);
 			
+		} else{
+			int i=0;
+			for(Person p : scenario.getPopulation().getPersons().values()){
+				PlanElement pe = p.getSelectedPlan().getPlanElements().get(0);
+				PlanElement pe2 = p.getSelectedPlan().getPlanElements().get(2);
+				Coord coord = new CoordImpl(0, 0);
+				if(pe instanceof Activity)
+					coord = ((Activity)pe).getCoord();
+				Id id = new IdImpl("parcel"+i);
+				i++;
+				parcels.createAndAddFacility(id, coord);
+				if(pe2 instanceof Activity)
+					coord = ((Activity)pe).getCoord();
+				id = new IdImpl("parcel"+i);
+				i++;
+				parcels.createAndAddFacility(id, coord);
+			}
 		}
 		
 		this.aggregatedOpportunities = aggregatedOpportunities(this.parcels, network);
@@ -193,11 +213,10 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 					
 					Link nearestLink = network.getNearestLinkExactly(coordFromZone);
 
-//					Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, coordFromZone, fromNode);
 					Distances distance = NetworkUtil.getDistance2Node(nearestLink, coordFromZone, fromNode);
-					Logger.getLogger(this.getClass()).error("renamed the above method without testing it since the old name did not compile. " +
-							"Please check; aborting ... ") ;
-					System.exit(-1) ;
+//					Logger.getLogger(this.getClass()).error("renamed the above method without testing it since the old name did not compile. " +
+//							"Please check; aborting ... ") ;
+//					System.exit(-1) ;
 					
 					double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
 					double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)

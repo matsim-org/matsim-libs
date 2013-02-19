@@ -40,15 +40,15 @@ public class Main {
 		
 		InternalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
 		
-//		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-//		bbox.setDefaultBoundaryBox(scenario.getNetwork());
-//		
-//		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(200, 
-//				   bbox.getBoundingBox());
-//		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 200);
-//		
+		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+		bbox.setDefaultBoundaryBox(scenario.getNetwork());
+		
+		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(200, 
+				   bbox.getBoundingBox());
+		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 200);
+		
 //		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl();
-//		
+		
 //		int i=0;
 //		for(Person p : scenario.getPopulation().getPersons().values()){
 //			PlanElement pe = p.getSelectedPlan().getPlanElements().get(0);
@@ -65,18 +65,18 @@ public class Main {
 //			i++;
 //			parcels.createAndAddFacility(id, coord);
 //		}
-//		
-//		AccessibilityCalc ac = new AccessibilityCalc(parcels, measuringPoints, freeSpeedGrid, (ScenarioImpl) scenario, file1);
-//		ac.runAccessibilityComputation();
+		
+		AccessibilityCalc ac = new AccessibilityCalc(/*parcels,*/ measuringPoints, freeSpeedGrid, (ScenarioImpl) scenario, file1);
+		ac.runAccessibilityComputation();
 		
 		NetworkInspector ni = new NetworkInspector(scenario);
 //		if(ni.isRoutable())
 //			System.out.println("Netzwerk ist routbar...");
 //		else
 //			System.out.println("Netzwerk ist nicht routbar");
-		ni.checkLinkAttributes();
-		ni.checkNodeAttributes();
-		ni.shpExport();
+//		ni.checkLinkAttributes();
+//		ni.checkNodeAttributes();
+//		ni.shpExport();
 		
 		//TODO: methode isRoutable nochmal umschreiben (s.u.), unterscheidung bei node degree 1: einbahnstraße oder sackgasse?, dimension des untersuchungsgebiets ausgeben lassen
 		//TODO: wenn sackgasse: sackgasse, weil se aus dem untersuchungsgebiet rausführt oder "echte" sackgasse
