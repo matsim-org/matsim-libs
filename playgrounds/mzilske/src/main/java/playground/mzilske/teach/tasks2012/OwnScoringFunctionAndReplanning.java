@@ -14,7 +14,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -91,11 +90,6 @@ public class OwnScoringFunctionAndReplanning {
 		@Override
 		public double getScore() {
 			return delegate.getScore();
-		}
-
-		@Override
-		public void reset() {
-			delegate.reset();
 		}
 
 		@Override

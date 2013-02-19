@@ -119,12 +119,6 @@ public class OnlyTravelTimeDependentScoringFunction extends ScoringFunctionAdapt
 		return score;
 	}
 
-	/**
-	 * May be used to reset scores and counters of implementations of scoring
-	 * functions in order to re-score the same plan object with different
-	 * time information.
-	 */
-	@Override
 	public void reset() {		
 		score = 0.0;
 	}

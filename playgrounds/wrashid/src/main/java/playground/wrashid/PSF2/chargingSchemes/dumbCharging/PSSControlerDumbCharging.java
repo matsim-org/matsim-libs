@@ -266,11 +266,6 @@ public class PSSControlerDumbCharging extends PSSControler {
                         return 0;  //To change body of implemented methods use File | Settings | File Templates.
                     }
 
-                    @Override
-                    public void reset() {
-                        //To change body of implemented methods use File | Settings | File Templates.
-                    }
-
 					@Override
 					public void handleEvent(Event event) {
 						// TODO Auto-generated method stub

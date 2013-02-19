@@ -199,7 +199,6 @@ public class ScoringFunctionAccumulatorWithAttrRecorder extends
 		return score;
 	}
 
-	@Override
 	public void reset() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.reset();

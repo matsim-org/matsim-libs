@@ -13,6 +13,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.meisterk.kti.scoring.ActivityScoringFunction;
@@ -41,16 +42,16 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
 
     scoringFunctionAccumulator.addScoringFunction(
       new ActivityScoringFunction(plan, 
-      super.getParams(), 
+      new CharyparNagelScoringParameters(config.planCalcScore()), 
       this.facilityPenalties, 
       this.facilities));
     scoringFunctionAccumulator.addScoringFunction(
       new LegScoringFunction((PlanImpl)plan, 
-      super.getParams(), 
+      new CharyparNagelScoringParameters(config.planCalcScore()), 
       this.config, 
       this.ftConfigGroup, network));
-    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(super.getParams()));
-    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
+    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
 
     return scoringFunctionAccumulator;
   }

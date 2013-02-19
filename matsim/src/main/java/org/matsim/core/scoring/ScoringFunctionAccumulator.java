@@ -170,7 +170,6 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		return score;
 	}
 
-	@Override
 	public void reset() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.reset();

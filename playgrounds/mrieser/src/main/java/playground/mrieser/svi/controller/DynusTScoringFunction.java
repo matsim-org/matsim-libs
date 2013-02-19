@@ -162,7 +162,6 @@ public class DynusTScoringFunction implements ScoringFunction {
 		return this.score;
 	}
 
-	@Override
 	public void reset() {
 		this.score = Double.NaN;
 	}

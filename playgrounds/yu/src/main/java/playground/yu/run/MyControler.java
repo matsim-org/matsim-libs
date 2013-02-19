@@ -40,10 +40,10 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.RouteUtils;
 
 /**
@@ -57,24 +57,27 @@ public class MyControler extends Controler {
 	private static class MyCharyparNagelScoringFunctionFactory extends
 			CharyparNagelScoringFunctionFactory {
 
+		private PlanCalcScoreConfigGroup config;
+
 		public MyCharyparNagelScoringFunctionFactory(
 				PlanCalcScoreConfigGroup config, final Network network) {
 			super(config, network);
+			this.config = config;
 		}
 
 		@Override
 		public ScoringFunction createNewScoringFunction(Plan plan) {
 			ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 			scoringFunctionAccumulator
-					.addScoringFunction(new CharyparNagelActivityScoring(getParams()));
+					.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config)));
 			scoringFunctionAccumulator
 					.addScoringFunction(new MyLegScoringFunction(plan,
-							getParams(), network));
+							new CharyparNagelScoringParameters(config), network));
 			scoringFunctionAccumulator
-					.addScoringFunction(new CharyparNagelMoneyScoring(getParams()));
+					.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config)));
 			scoringFunctionAccumulator
 					.addScoringFunction(new CharyparNagelAgentStuckScoring(
-							getParams()));
+							new CharyparNagelScoringParameters(config)));
 			return scoringFunctionAccumulator;
 		}
 

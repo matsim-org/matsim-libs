@@ -128,12 +128,6 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 		return delegate.getScore() + penalty.getPenalty();
 	}
 
-	@Override
-	public void reset() {
-		delegate.reset();
-		penalty.reset();
-	}
-
 	private Coord extractCoord(final Activity activity) {
 		// use in priority the coord from act
 		Coord coord = activity.getCoord();

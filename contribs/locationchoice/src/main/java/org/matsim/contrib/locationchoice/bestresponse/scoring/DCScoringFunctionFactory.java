@@ -29,10 +29,12 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
 	private final Controler controler;
 	private LocationChoiceBestResponseContext lcContext;
+	private Config config;
 
 	/*
 	 * TODO: remove unused params
@@ -41,6 +43,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 		super(config.planCalcScore(), controler.getNetwork());
 		this.controler = controler;
 		this.lcContext = lcContext;
+		this.config = config;
 	}
 		
 	private boolean usingFacilityOpeningTimes = true ;
@@ -64,8 +67,8 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 					this.lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(super.getParams(), controler.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
 		return scoringFunctionAccumulator;
 	}
 }

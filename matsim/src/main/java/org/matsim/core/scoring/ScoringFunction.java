@@ -81,13 +81,6 @@ public interface ScoringFunction {
 	 */
 	public double getScore();
 
-	/**
-	 * May be used to reset scores and counters of implementations of scoring
-	 * functions in order to re-score the same plan object with different
-	 * time information.
-	 */
-	public void reset();
-	
 	public void handleEvent( Event event ) ;
 
 }

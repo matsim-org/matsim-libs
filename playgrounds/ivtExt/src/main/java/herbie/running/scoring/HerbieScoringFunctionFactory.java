@@ -32,6 +32,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 
 public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
@@ -65,18 +66,18 @@ public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.functi
 		
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
 				plan, 
-				super.getParams(), 
+				new CharyparNagelScoringParameters(config.planCalcScore()), 
 				this.facilityPenalties,
 				this.facilities,
 				this.config));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
 				plan, 
-				super.getParams(),
+				new CharyparNagelScoringParameters(config.planCalcScore()),
 				config,
 				this.network,
 				this.ktiConfigGroup));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(super.getParams()));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
 		
 		return scoringFunctionAccumulator;
 	}

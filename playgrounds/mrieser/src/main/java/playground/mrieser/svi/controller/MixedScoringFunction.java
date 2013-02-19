@@ -75,10 +75,6 @@ public class MixedScoringFunction implements ScoringFunction {
 //		return this.delegate.getScore();
 	}
 
-	@Override
-	public void reset() {
-		this.delegate.reset();
-	}
 
 	@Override
 	public void handleEvent(Event event) {

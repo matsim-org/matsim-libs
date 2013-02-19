@@ -26,6 +26,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.surprice.AgentMemories;
@@ -36,6 +37,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 	private final Controler controler;
 	private AgentMemories memories = new AgentMemories();
 	private String day;
+	private PlanCalcScoreConfigGroup config;
 	
 
 	public SurpriceScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
@@ -44,6 +46,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		this.controler = controler;
 		this.memories = memories;
 		this.day = day;
+		this.config = configGroup;
 	}
 	
 	public ScoringFunction createNewScoringFunction(Plan plan) {			
@@ -52,18 +55,18 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 						
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
-				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(), 
+				plan, new CharyparNagelScoringParameters(config), controler.getConfig(), this.controler.getFacilities(), 
 				(Double)plan.getPerson().getCustomAttributes().get(this.day + ".alpha_tot"), this.day));
 		
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
-				super.getParams(), controler.getNetwork(), controler.getConfig(),
+				new CharyparNagelScoringParameters(config), controler.getNetwork(), controler.getConfig(),
 				this.memories.getMemory(plan.getPerson().getId()),
 				this.day, (Double)plan.getPerson().getCustomAttributes().get(this.day + ".alpha_tot"), 
 				(Double)plan.getPerson().getCustomAttributes().get(this.day + ".gamma_tot"), (PersonImpl)plan.getPerson()));
 		
 		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
 			scoringFunctionAccumulator.addScoringFunction(new SupriceMoneyScoringFunction(
-					super.getParams(), (Double)plan.getPerson().getCustomAttributes().get(this.day + ".gamma_tot"), (PersonImpl)plan.getPerson(), this.day));
+					new CharyparNagelScoringParameters(config), (Double)plan.getPerson().getCustomAttributes().get(this.day + ".gamma_tot"), (PersonImpl)plan.getPerson(), this.day));
 		}		
 		
 		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));

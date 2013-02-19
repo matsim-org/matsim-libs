@@ -124,7 +124,6 @@ class SVDscoringFunction implements ScoringFunction {
 		return tmpScore;
 	}
 
-	@Override
 	public void reset() {
 	}
 

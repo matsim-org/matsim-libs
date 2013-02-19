@@ -29,29 +29,33 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord
 		extends CharyparNagelScoringFunctionFactory {
 
+	private PlanCalcScoreConfigGroup config;
+
 	public CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord(
 			PlanCalcScoreConfigGroup config, Network network) {
 		super(config, network);
+		this.config = config;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator
-				.addScoringFunction(new CharyparNagelActivityScoring(getParams()));
+				.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config)));
 
 		LegScoringFunctionWithDetailedRecord legScoring = new LegScoringFunctionWithDetailedRecord(
-				plan, getParams(), network);
+				plan, new CharyparNagelScoringParameters(config), network);
 		scoringFunctionAccumulator.addScoringFunction(legScoring);
 
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(
-				getParams()));
+				new CharyparNagelScoringParameters(config)));
 		scoringFunctionAccumulator
-				.addScoringFunction(new CharyparNagelAgentStuckScoring(getParams()));
+				.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config)));
 		return scoringFunctionAccumulator;
 	}
 }

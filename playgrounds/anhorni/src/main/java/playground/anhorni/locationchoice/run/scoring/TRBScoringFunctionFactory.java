@@ -28,6 +28,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
@@ -42,12 +43,14 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 	private boolean shoppingCentersScore = false;
 	private QuadTree<ActivityFacility> shopQuadTree;
 	private final Controler controler;
+	private PlanCalcScoreConfigGroup config;
 
 	private final static Logger log = Logger.getLogger(TRBScoringFunctionFactory.class);
 
 	public TRBScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler) {
 		super(config, controler.getNetwork());
 		this.controler = controler;
+		this.config = config;
 		this.init();
 	}
 
@@ -85,7 +88,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		this.scoringFunction = new ActivityScoringFunction(plan, super.getParams(), this.controler.getFacilities());
+		this.scoringFunction = new ActivityScoringFunction(plan, new CharyparNagelScoringParameters(config), this.controler.getFacilities());
 		this.scoringFunction.setSign(this.sign);
 		this.scoringFunction.setSizeScore(this.sizeScore);
 		this.scoringFunction.setDensityScore(this.densityScore);
@@ -94,11 +97,11 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 
 		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelLegScoring(super.getParams(), controler.getNetwork()));
+				new org.matsim.core.scoring.functions.CharyparNagelLegScoring(new CharyparNagelScoringParameters(config), controler.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(super.getParams()));
+				new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config)));
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(super.getParams()));
+				new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config)));
 
 		return scoringFunctionAccumulator;
 	}

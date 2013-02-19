@@ -60,8 +60,6 @@ public class TestScoringFunctionState {
 		@Override
 		public double getScore() { return 0; }
 		@Override
-		public void reset() {}
-		@Override
 		public void handleEvent(Event event) {
 			// TODO Auto-generated method stub
 			

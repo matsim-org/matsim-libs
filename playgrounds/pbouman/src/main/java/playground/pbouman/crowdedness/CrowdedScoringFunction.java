@@ -155,15 +155,6 @@ public class CrowdedScoringFunction implements ScoringFunction {
 		delegate.handleLeg(leg);
 		
 	}
-
-	
-	@Override
-	public void reset() {
-		delegate.reset();
-		this.score = 0. ;
-		
-	}
-
 	
 
 }

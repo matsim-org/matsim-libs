@@ -32,14 +32,17 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 public class CharyparNagelScoringFunctionFactory4AttrRecorder extends
 		CharyparNagelScoringFunctionFactory {
 
+	private PlanCalcScoreConfigGroup config;
+
 	public CharyparNagelScoringFunctionFactory4AttrRecorder(
 			final PlanCalcScoreConfigGroup config, final Network network) {
 		super(config, network);
+		this.config = config;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
-		CharyparNagelScoringParameters params = getParams();
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config);
 		ScoringFunctionAccumulatorWithAttrRecorder scoringFunctionAccumulator = new ScoringFunctionAccumulatorWithAttrRecorder(
 				params);
 		scoringFunctionAccumulator

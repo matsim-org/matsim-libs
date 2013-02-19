@@ -128,12 +128,6 @@ public class AgentPropertiesScoringFunctionFactory implements ScoringFunctionFac
 			}
 
 			@Override
-			public void reset()
-			{
-				score = 0;
-			}
-
-			@Override
 			public void handleEvent(Event event) {
 				// TODO Auto-generated method stub
 				

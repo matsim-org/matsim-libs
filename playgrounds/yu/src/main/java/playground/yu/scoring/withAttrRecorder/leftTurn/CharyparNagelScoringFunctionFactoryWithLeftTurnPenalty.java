@@ -36,17 +36,18 @@ public class CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty extends
 		CharyparNagelScoringFunctionFactory {
 	// private final Config config;
 	private final AdditionalScoringParameters additionalParams;
+	private Config config;
 
 	public CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
 			Config config, Network network) {
 		super(config.planCalcScore(), network);
-		// this.config = config;
+		this.config = config;
 		additionalParams = new AdditionalScoringParameters(config);
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
-		CharyparNagelScoringParameters params = getParams();
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
 		ScoringFunctionAccumulatorWithLeftTurnPenalty scoringFunctionAccumulator = new ScoringFunctionAccumulatorWithLeftTurnPenalty(
 				params);
 		scoringFunctionAccumulator

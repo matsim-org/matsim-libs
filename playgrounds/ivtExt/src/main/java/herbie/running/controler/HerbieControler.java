@@ -77,7 +77,7 @@ public class HerbieControler extends Controler {
 				this.getNetwork());
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
 				
-		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
 		
 		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
 		TravelTime timeCalculator = super.getLinkTravelTimes();
