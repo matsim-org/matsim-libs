@@ -1,5 +1,6 @@
 package playground.wrashid.parkingSearch.ca.matlabInfra;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.TreeMap;
@@ -30,6 +31,7 @@ public class Network {
 	}
 	
 	private void run() {
+		new File(Config.getOutputFolder()).mkdir();
 		network = Config.getNetwork();
 		this.selectedLinks = new TreeMap<Id, Link>();
 		for (Link link : network.getLinks().values()) {
@@ -38,7 +40,7 @@ public class Network {
 				selectedLinks.put(link.getId(), link);
 			}
 		}	
-		this.correctManually();
+		//this.correctManually();
 		
 		this.getUniqueNodes();
 		this.linkBack();
