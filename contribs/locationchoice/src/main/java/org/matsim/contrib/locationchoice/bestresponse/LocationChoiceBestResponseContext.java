@@ -29,6 +29,8 @@ import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrCreateKVa
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
+import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -39,7 +41,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
  * @author nagel
  *
  */
-public class LocationChoiceBestResponseContext {	
+public class LocationChoiceBestResponseContext implements MatsimToplevelContainer {	
 	private final Scenario scenario;
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
@@ -131,5 +133,10 @@ public class LocationChoiceBestResponseContext {
 
 	public ObjectAttributes getFacilitiesAttributes() {
 		return facilitiesAttributes;
+	}
+
+	@Override
+	public MatsimFactory getFactory() {
+		return null;
 	}
 }

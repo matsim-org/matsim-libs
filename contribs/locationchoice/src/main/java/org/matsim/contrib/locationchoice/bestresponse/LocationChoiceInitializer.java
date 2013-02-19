@@ -1,17 +1,14 @@
 package org.matsim.contrib.locationchoice.bestresponse;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
+import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
@@ -40,18 +37,20 @@ public class LocationChoiceInitializer implements StartupListener {
 		 * add ScoringFunctionFactory to controler
 		 *  in this way scoringFunction does not need to create new, identical k-vals by itself    
 		 */
-  		DCScoringFunctionFactory mixedScoringFunctionFactory = new DCScoringFunctionFactory(controler.getConfig(), controler, lcContext); 	
-		controler.setScoringFunctionFactory(mixedScoringFunctionFactory);
+  		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(controler.getConfig(), controler, lcContext); 	
+		controler.setScoringFunctionFactory(dcScoringFunctionFactory);
+		// dcScoringFunctionFactory.setUsingFacilityOpeningTimes(false); // TODO: make this configurable
 		
 		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter()));
 		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter()));
+				
+		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
+		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
+		controler.getScenario().addScenarioElement(lcContext);
+		controler.getScenario().addScenarioElement(dcScore);
 		
-		controler.addPlanStrategyFactory("BestReplyLocationChoice", new PlanStrategyFactory(){
-			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
-				return new BestReplyLocationChoicePlanStrategy(lcContext, personsMaxDCScoreUnscaled);
-			}
-		});
+		// TODO: check why this is required here now. order of calling probably.
+		controler.getScenario().addScenarioElement(new FacilityPenalties()); 
 		log.info("lc initialized");
 	}	
 }
