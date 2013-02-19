@@ -117,34 +117,38 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		}
 	}
 
+	@Override
+	public void handleEvent(Event event) {
+		for ( ArbitraryEventScoring eventScoringFunction : this.arbtraryEventScoringFunctions ) {
+			eventScoringFunction.handleEvent(event) ;
+		}
+	}
+
+	@Deprecated
 	public void startActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.startActivity(time, act);
 		}
 	}
 
+	@Deprecated
 	public void endActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.endActivity(time, act);
 		}
 	}
-
+	
+	@Deprecated
 	public void startLeg(double time, Leg leg) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.startLeg(time, leg);
 		}
 	}
-
+	
+	@Deprecated
 	public void endLeg(double time) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.endLeg(time);
-		}
-	}
-
-	@Override
-	public void handleEvent(Event event) {
-		for ( ArbitraryEventScoring eventScoringFunction : this.arbtraryEventScoringFunctions ) {
-			eventScoringFunction.handleEvent(event) ;
 		}
 	}
 
@@ -170,10 +174,23 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		return score;
 	}
 
+	@Deprecated
+	/** 
+	 * Just create a fresh instance instead!
+	 */
 	public void reset() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.reset();
 		}
+	}
+
+	@Deprecated
+	/**
+	 * Excuse me? Can't you keep track of these from the outside?
+	 * @return
+	 */
+	public ArrayList<ActivityScoring> getActivityScoringFunctions() {
+		return activityScoringFunctions;
 	}
 
 	/**
@@ -205,10 +222,6 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 			this.arbtraryEventScoringFunctions.add((ArbitraryEventScoring) scoringFunction) ;
 		}
 
-	}
-
-	public ArrayList<ActivityScoring> getActivityScoringFunctions() {
-		return activityScoringFunctions;
 	}
 
 }

@@ -37,15 +37,23 @@ import org.matsim.core.api.experimental.events.Event;
  */
 public interface ScoringFunction {
 
+	/**
+	 * Tells the scoring function about an Activity. The Activity which
+	 * the agent is in when the simulation starts will have a startTime
+	 * of Time.UNDEFINED_TIME. The Activity which the agent is in when
+	 * the simulation ends will have an endTime of Time.UNDEFINED_TIME.
+	 * It is up to the implementation what to make of this, 
+	 * especially to "wrap" it "around".
+	 * @param activity
+	 */
     public void handleActivity(Activity activity);
 
+    /**
+     * Tells the scoring function about a Leg. Will contain complete route
+     * information for network routes (as you would expect in a Plan), but
+     * only a GenericRoute for everything else, especially transit.
+     */
     public void handleLeg(Leg leg);
-
-	/* In the case when every agent will have it's own scoring function, a
-	 * method named "startPlan(Plan plan)" (or something similar) may be
-	 * needed to reset the score calculation from iteration to iteration.
-	 * -marcel, 21jun07
-	 */
 
 	/**
 	 * Tells the scoring function that the agent got stuck in the simulation and
