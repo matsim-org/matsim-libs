@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
@@ -114,12 +115,17 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 				return scoringFunctionAccumulator;
 			}
 		}) ;
+		
+		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
+		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
+		controler.getScenario().addScenarioElement(lcContext);
+		controler.getScenario().addScenarioElement(dcScore);
 
 		// add locachoice strategy factory:
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
-				return new BestReplyLocationChoicePlanStrategy(lcContext, personsMaxDCScoreUnscaled) ;
+				return new BestReplyLocationChoicePlanStrategy(scenario) ;
 				// yy MZ argues that this is not so great since the factory now has context that goes beyond Scenario and EventsManager.
 				// As an alternative, one could add the context to Scenario as scenario element.  I find the present version easier to read, and
 				// as long as the factories remain anonymous classes, this is most probably ok. kai, feb'13
@@ -182,12 +188,17 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		scoringFunctionFactory.setUsingFacilityOpeningTimes(false) ;
 
 		controler.setScoringFunctionFactory(scoringFunctionFactory);
+		
+		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
+		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
+		controler.getScenario().addScenarioElement(lcContext);
+		controler.getScenario().addScenarioElement(dcScore);
 
 		// set locachoice strategy:
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
-				return new BestReplyLocationChoicePlanStrategy(lcContext, personsMaxDCScoreUnscaled) ;
+				return new BestReplyLocationChoicePlanStrategy(scenario) ;
 			}
 		});
 
