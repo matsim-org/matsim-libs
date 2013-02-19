@@ -55,9 +55,6 @@ class NullifyingScoringFunction implements ScoringFunction {
 	public double getScore() {return 0.0;}
 
 	@Override
-	public void reset() {score = 0.0;}
-
-	@Override
 	public void handleActivity(Activity activity) {}
 
 	@Override

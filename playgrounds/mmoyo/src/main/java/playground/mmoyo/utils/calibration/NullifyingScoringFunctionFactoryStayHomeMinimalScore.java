@@ -68,9 +68,6 @@ class NullifyingScoringFunctionStayHomeMinimalScore implements ScoringFunction {
 	}
 
 	@Override
-	public void reset() {score = 0.0;}
-
-	@Override
 	public void handleActivity(Activity activity) {
 	}
 
