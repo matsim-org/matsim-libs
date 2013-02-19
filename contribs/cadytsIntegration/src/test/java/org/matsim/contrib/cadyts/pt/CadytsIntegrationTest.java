@@ -37,6 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -87,7 +88,7 @@ public class CadytsIntegrationTest {
 		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				return new PlanStrategyImpl(new CadytsPtPlanChanger(context));
 			}} ) ;
 		
@@ -109,6 +110,7 @@ public class CadytsIntegrationTest {
 
 	}
 
+	@Test
 	public final void testCalibrationAsScoring() throws IOException {
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
@@ -116,7 +118,8 @@ public class CadytsIntegrationTest {
 		final Config config = createTestConfig(inputDir, outputDir);
 		
 		StrategySettings stratSets = new StrategySettings(new IdImpl("1")) ;
-		stratSets.setModuleName("ChangeExpBeta") ;
+//		stratSets.setModuleName("ChangeExpBeta") ;
+		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.0) ;
 		config.strategy().addStrategySettings(stratSets) ;
 		
@@ -130,21 +133,31 @@ public class CadytsIntegrationTest {
 		final CadytsContext cContext = new CadytsContext( config ) ;
 		controler.addControlerListener(cContext) ;
 		
-		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
-				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()) ;
-
-				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
-				scoringFunctionAccumulator.addScoringFunction(new CadytsPtScoring(plan,cContext) );
-
-				return scoringFunctionAccumulator;
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(cContext);
+				return new PlanStrategyImpl(planSelector);
 			}
-		}) ;
+		} ) ;
+
+//		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+//			@Override
+//			public ScoringFunction createNewScoringFunction(Plan plan) {
+//				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()) ;
+//
+//				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+//
+//				final CadytsPtScoring scoringFunction = new CadytsPtScoring(plan,cContext);
+//				scoringFunction.setWeightOfCadytsCorrection(0.) ;
+//				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+//
+//				return scoringFunctionAccumulator;
+//			}
+//		}) ;
 		
 		
 		controler.run();
@@ -251,15 +264,11 @@ public class CadytsIntegrationTest {
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
 
-//		String configFile = inputDir + "equil_config.xml";
-//		Config config = this.utils.loadConfig(configFile);
-		
 		Config config = createTestConfig(inputDir, outputDir) ;
 		
 		config.controler().setWriteEventsInterval(0) ;
 
 		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
-//		stratSets.setModuleName("org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy") ;
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
@@ -268,7 +277,6 @@ public class CadytsIntegrationTest {
 		
 		final Controler controler = new Controler( scenario );
 		controler.setCreateGraphs(false);
-//		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.setOverwriteFiles(true) ;
 		
@@ -277,8 +285,9 @@ public class CadytsIntegrationTest {
 		
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				return new PlanStrategyImpl(new CadytsPtPlanChanger(context));
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger( context);
+				return new PlanStrategyImpl(planSelector);
 			}} ) ;
 		
 		controler.run();
@@ -406,7 +415,7 @@ public class CadytsIntegrationTest {
 		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				return new PlanStrategyImpl(new CadytsPtPlanChanger(context));
 			}} ) ;
 		
@@ -539,7 +548,7 @@ public class CadytsIntegrationTest {
 		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				return new PlanStrategyImpl(new CadytsPtPlanChanger(context));
 			}} ) ;
 		
@@ -617,6 +626,7 @@ public class CadytsIntegrationTest {
 		config.controler().setLastIteration(10) ;
 		config.controler().setOutputDirectory(outputDir) ;
 		config.controler().setWriteEventsInterval(1) ;
+		config.controler().setMobsim(MobsimType.qsim.toString()) ;
 		// ---
 		QSimConfigGroup qsimConfigGroup = new QSimConfigGroup() ;
 		config.addQSimConfigGroup(qsimConfigGroup) ;
