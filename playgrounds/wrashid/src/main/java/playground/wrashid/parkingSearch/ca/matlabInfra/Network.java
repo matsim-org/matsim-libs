@@ -55,6 +55,7 @@ public class Network {
 				if (!node.getInLinks().isEmpty()) {
 					Link firstInLink = this.generateReturnLink((Link)node.getInLinks().values().toArray()[0]);
 					this.selectedLinks.put(firstInLink.getId(), firstInLink);
+					log.info("generated in-link " + firstInLink.getId());
 				}	
 				else {
 					log.info("we have a problem with node: (no in-links)" + node.getId());
@@ -64,6 +65,7 @@ public class Network {
 				if (!node.getOutLinks().isEmpty()) {
 					Link firstOutLink = this.generateReturnLink((Link)node.getOutLinks().values().toArray()[0]);
 					this.selectedLinks.put(firstOutLink.getId(), firstOutLink);
+					log.info("generated out-link " + firstOutLink.getId());
 				}
 				else {
 					log.info("we have a problem with node: (no out-links)" + node.getId());
@@ -74,7 +76,8 @@ public class Network {
 	
 	private Link generateReturnLink(Link link) {
 		LinkFactoryImpl linkFactory = new LinkFactoryImpl();
-		Link returnLink = linkFactory.createLink(link.getId(), link.getToNode(), link.getFromNode(), network, 
+		
+		Link returnLink = linkFactory.createLink(new IdImpl(link.getId().toString() + "back"), link.getToNode(), link.getFromNode(), network, 
 				link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		
 		return returnLink;
@@ -177,14 +180,25 @@ public class Network {
 		bpv.write(path);		
 	}
 
-	private static LinkedList<Node> getUniqueNodes(TreeMap<Id, Link> selectedLinks) {
+	private LinkedList<Node> getUniqueNodes(TreeMap<Id, Link> selectedLinks) {
+		for (Node node: this.network.getNodes().values()){
+			node.getInLinks().clear();
+			node.getInLinks().clear();
+		}
+				
 		LinkedList<Node> selectedNodes = new LinkedList<Node>();		
 		for (Link link : selectedLinks.values()) {
 			if (!selectedNodes.contains(link.getFromNode())) {
 				selectedNodes.add(link.getFromNode());
+				if (!link.getFromNode().getOutLinks().containsKey(link.getId())) {
+					link.getFromNode().addOutLink(link);
+				}
 			}
 			if (!selectedNodes.contains(link.getToNode())) {
 				selectedNodes.add(link.getToNode());
+				if (!link.getToNode().getInLinks().containsKey(link.getId())) {
+					link.getToNode().addInLink(link);
+				}
 			}
 		}
 		return selectedNodes;
