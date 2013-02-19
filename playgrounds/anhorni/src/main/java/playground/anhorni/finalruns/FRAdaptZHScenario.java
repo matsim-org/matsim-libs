@@ -51,6 +51,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 
 public class FRAdaptZHScenario {
@@ -66,8 +68,17 @@ public class FRAdaptZHScenario {
 	private double radius = 5000.0;
 			
 	public static void main(final String[] args) {		
-		FRAdaptZHScenario plansCreator = new FRAdaptZHScenario();		
-		plansCreator.run(args[0], args[1], args[2], args[3], args[4]);			
+		FRAdaptZHScenario plansCreator = new FRAdaptZHScenario();
+		
+		 String plansFilePath = args[0]; 
+		 String networkFilePath = args[1];
+		 String facilitiesFilePath = args[2];
+		 String outputFolder = args[3];
+		 String sampleRateStr = args[4];
+		 String bzFile = args[5];
+		 String csFile = args[6];
+		
+		plansCreator.run(plansFilePath, networkFilePath, facilitiesFilePath, outputFolder, sampleRateStr, bzFile, csFile);			
 		log.info("Adaptation finished -----------------------------------------");
 	}
 		
@@ -79,7 +90,7 @@ public class FRAdaptZHScenario {
 	}
 
 	public void run(final String plansFilePath, final String networkFilePath, final String facilitiesFilePath, final String outputFolder,
-			final String sampleRateStr) {
+			final String sampleRateStr, final String bzFile, final String csFile) {
 		this.plansFilePath = plansFilePath;
 		this.networkFilePath = networkFilePath;
 		this.facilitiesFilePath = facilitiesFilePath;
@@ -98,16 +109,36 @@ public class FRAdaptZHScenario {
 		this.removeBoderCrossers();
 		log.info("Population size :" + this.scenario.getPopulation().getPersons().size());
 		
-		log.info("Insert sg acts");
-		this.insertSG();
+//		log.info("Insert sg acts");
+//		this.insertSG();
 				
 		log.info("Add Facilities");
 		this.addfacilities2Plans();
 		
 		log.info("Clean routes");
 		this.cleanRoutes();
-				
+						
 		this.write();
+		
+		AddAttributesAndEpsilons adapter = new AddAttributesAndEpsilons();
+		adapter.run(plansFilePath, networkFilePath, facilitiesFilePath, outputFolder, bzFile, csFile);
+	}
+	
+	private void writeBetas() {
+		ObjectAttributes betas = new ObjectAttributes();
+		int counter = 0;
+		int nextMsg = 1;
+		for (Person p : this.scenario.getPopulation().getPersons().values()) {				
+			counter++;
+			if (counter % nextMsg == 0) {
+				nextMsg *= 2;
+				log.info(" person # " + counter);
+				betas.putAttribute(p.getId().toString(), "size", 1.0);
+				betas.putAttribute(p.getId().toString(), "price", -1.0);
+			}
+		}
+		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(betas);
+		betaWriter.writeFile(outputFolder + "/betas.xml");
 	}
 	
 	private void cleanRoutes() {
@@ -129,30 +160,30 @@ public class FRAdaptZHScenario {
 		}
 	}
 	
-	private void insertSG() {
-		Random random = new Random(37835409);
-		int counter = 0;
-		int nextMsg = 1;
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {				
-			Plan plan = p.getSelectedPlan();
-			counter++;
-			if (counter % nextMsg == 0) {
-				nextMsg *= 2;
-				log.info(" person # " + counter);
-			}
-			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					ActivityImpl act = (ActivityImpl)pe;					
-					if (act.getType().startsWith("s")) {
-						if (random.nextFloat() < 0.725) {
-							String duration = act.getType().substring(1);
-							act.setType("sg" + duration);
-						}
-					}
-				}
-			}
-		}
-	}
+//	private void insertSG() {
+//		Random random = new Random(37835409);
+//		int counter = 0;
+//		int nextMsg = 1;
+//		for (Person p : this.scenario.getPopulation().getPersons().values()) {				
+//			Plan plan = p.getSelectedPlan();
+//			counter++;
+//			if (counter % nextMsg == 0) {
+//				nextMsg *= 2;
+//				log.info(" person # " + counter);
+//			}
+//			for (PlanElement pe : plan.getPlanElements()) {
+//				if (pe instanceof Activity) {
+//					ActivityImpl act = (ActivityImpl)pe;					
+//					if (act.getType().startsWith("s")) {
+//						if (random.nextFloat() < 0.725) {
+//							String duration = act.getType().substring(1);
+//							act.setType("sg" + duration);
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
 	
 	private void removeBoderCrossers() {
 		List<PersonImpl> personsWithoutCB = new Vector<PersonImpl>();
@@ -173,7 +204,7 @@ public class FRAdaptZHScenario {
 		trees.put("w", this.builFacQuadTree("w", this.scenario.getActivityFacilities().getFacilitiesForActivityType("w")));
 		trees.put("e", this.builFacQuadTree("e", this.scenario.getActivityFacilities().getFacilitiesForActivityType("e")));
 		trees.put("s", this.builFacQuadTree("s", this.scenario.getActivityFacilities().getFacilitiesForActivityType("s")));
-		trees.put("sg", this.builFacQuadTree("sg", this.scenario.getActivityFacilities().getFacilitiesForActivityType("sg")));
+//		trees.put("sg", this.builFacQuadTree("sg", this.scenario.getActivityFacilities().getFacilitiesForActivityType("sg")));
 		trees.put("l", this.builFacQuadTree("l", this.scenario.getActivityFacilities().getFacilitiesForActivityType("l")));
 				
 		int counter = 0;
@@ -269,5 +300,7 @@ public class FRAdaptZHScenario {
 		new File(this.outputFolder).mkdirs();
 		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(this.outputFolder + "facilities.xml.gz");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.outputFolder + "plans.xml.gz");
+		
+		this.writeBetas();
 	}
 }

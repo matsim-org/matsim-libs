@@ -42,7 +42,6 @@ public class ShopsEnricher {
 	public void enrich(TreeMap<Id, ShopLocation> ucs, String bzFile) {
 		this.shops = ucs;
 		try {
-			log.info("reading: " + bzFile);
 			this.readBZ(bzFile);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -65,6 +64,7 @@ public class ShopsEnricher {
 	471105	5	Kleine Geschäfte (< 100 m2)
 	*/	
 	public void readBZ(String bzFile) throws Exception {
+		log.info("reading: " + bzFile);
 		FileReader fr = new FileReader(bzFile);
 		BufferedReader br = new BufferedReader(fr);
 		String curr_line = br.readLine();  // Skip header
