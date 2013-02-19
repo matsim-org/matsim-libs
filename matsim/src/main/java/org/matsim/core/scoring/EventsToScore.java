@@ -30,19 +30,13 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.TravelledEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
-import org.matsim.core.events.handler.TravelledEventHandler;
+import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
  * Calculates the score of the selected plans of a given scenario
@@ -59,10 +53,7 @@ import org.matsim.core.events.handler.TravelledEventHandler;
  *
  * @author mrieser, michaz
  */
-@Deprecated // seems that EventsToScore2 works well, so this one should be removed.  kai, feb'13
-public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
-AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkLeaveEventHandler,
-LinkEnterEventHandler, TravelledEventHandler {
+public class EventsToScore implements BasicEventHandler {
 
 	private EventsToActivities eventsToActivities;
 	private EventsToLegs eventsToLegs;
@@ -93,7 +84,7 @@ LinkEnterEventHandler, TravelledEventHandler {
 		this.scenario = scenario;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
-		initHandlers(scenario, scoringFunctionFactory, learningRate);
+		initHandlers(scoringFunctionFactory);
 		
 		String str = this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.scoreMSAStartsAtIteration) ;
 		if ( str.equals("null") ) {
@@ -103,8 +94,7 @@ LinkEnterEventHandler, TravelledEventHandler {
 		}
 	}
 
-	private void initHandlers(final Scenario scenario,
-			final ScoringFunctionFactory factory, final double learningRate) {
+	private void initHandlers(final ScoringFunctionFactory factory) {
 		this.eventsToActivities = new EventsToActivities();
 		this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(scenario, factory);
 		this.eventsToActivities.setActivityHandler(this.scoringFunctionsForPopulation);
@@ -113,59 +103,52 @@ LinkEnterEventHandler, TravelledEventHandler {
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
-		eventsToLegs.handleEvent(event);
-	}
+	public void handleEvent(Event event) {
+		// this is for the activity and leg related stuff ("old" scoring function)
+		if ( event instanceof LinkEnterEvent ) {
+			eventsToLegs.handleEvent((LinkEnterEvent) event) ;
+		} else if ( event instanceof LinkLeaveEvent ) {
+			eventsToLegs.handleEvent((LinkLeaveEvent) event ) ;
+		} else if ( event instanceof AgentDepartureEvent ) {
+			eventsToLegs.handleEvent((AgentDepartureEvent) event) ;
+		} else if ( event instanceof AgentArrivalEvent ) {
+			eventsToLegs.handleEvent((AgentArrivalEvent) event ) ;
+		} else if ( event instanceof ActivityStartEvent ) {
+			eventsToActivities.handleEvent((ActivityStartEvent) event) ;
+		} else if ( event instanceof ActivityEndEvent ) {
+			eventsToActivities.handleEvent( (ActivityEndEvent) event ) ;
+		} else if ( event instanceof TravelledEvent ) {
+			eventsToLegs.handleEvent( (TravelledEvent) event ) ;
+		} 
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		eventsToLegs.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		eventsToLegs.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
-		eventsToLegs.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(final AgentStuckEvent event) {
-		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
-		if (sf != null) {
-			sf.agentStuck(event.getTime());
+		// this is for the stuff that is directly based on events.
+		// note that this passes on _all_ person events, even those already passed above.
+		// for the time being, not all PersonEvents may "implement HasPersonId".
+		// link enter/leave events are NOT passed on, for performance reasons.
+		// kai/dominik, dec'12
+		if ( event instanceof HasPersonId ) {
+			ScoringFunction sf = getScoringFunctionForAgent( ((HasPersonId)event).getPersonId());
+			if (sf != null) {
+				if ( event instanceof AgentStuckEvent ) {
+					sf.agentStuck( event.getTime() ) ;
+				} else if ( event instanceof AgentMoneyEvent ) {
+					sf.addMoney( ((AgentMoneyEvent)event).getAmount() ) ;
+				} else {
+					sf.handleEvent( event ) ;
+				}
+			}
 		}
 	}
 
-	@Override
-	public void handleEvent(final AgentMoneyEvent event) {
-		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
-		if (sf != null) {
-			sf.addMoney(event.getAmount());
-		}
-	}
 
-	@Override
-	public void handleEvent(final ActivityStartEvent event) {
-		eventsToActivities.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(final ActivityEndEvent event) {
-		eventsToActivities.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(TravelledEvent travelEvent) {
-		eventsToLegs.handleEvent(travelEvent);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.matsim.core.scoring.EventsToScoreI#finish()
+	/**
+	 * Finishes the calculation of the plans' scores and assigns the new scores
+	 * to the plans.
+	 * I think this should be split into two methods: One can want to close the ScoringFunctions to look
+	 * at scores WITHOUT wanting something to be written into Plans.
+	 * Actually, I think the two belong in different classes. michaz '12
+	 * <p/>
+	 * yy Absolutely.  kai, oct'12
 	 */
 	public void finish() {
 		eventsToActivities.finish();	
@@ -207,8 +190,12 @@ LinkEnterEventHandler, TravelledEventHandler {
 
 	
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.scoring.EventsToScoreI#getAveragePlanPerformance()
+	/**
+	 * Returns the actual average plans' score before it was assigned to the
+	 * plan and possibility mixed with old scores (learningrate).
+	 *
+	 * @return the average score of the plans before mixing with the old scores
+	 *         (learningrate)
 	 */
 	public double getAveragePlanPerformance() {
 		if (this.scoreSum == 0)
@@ -217,8 +204,13 @@ LinkEnterEventHandler, TravelledEventHandler {
 			return (this.scoreSum / this.scoreCount);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.scoring.EventsToScoreI#getAgentScore(org.matsim.api.core.v01.Id)
+	/**
+	 * Returns the score of a single agent. This method only returns useful
+	 * values if the method {@link #finish() } was called before. description
+	 *
+	 * @param agentId
+	 *            The id of the agent the score is requested for.
+	 * @return The score of the specified agent.
 	 */
 	public Double getAgentScore(final Id agentId) {
 		if (!finished) {
@@ -230,29 +222,20 @@ LinkEnterEventHandler, TravelledEventHandler {
 		return scoringFunction.getScore();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.scoring.EventsToScoreI#reset(int)
-	 */
 	@Override
 	public void reset(final int iteration) {
 		this.eventsToActivities.reset(iteration);
 		this.eventsToLegs.reset(iteration);
-		initHandlers(scenario, scoringFunctionFactory, learningRate);
+		initHandlers(scoringFunctionFactory);
 		finished = false;
 		this.iteration = iteration ;
 		// ("reset" is called just before the mobsim starts, so it probably has the correct iteration number for our purposes) 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.scoring.EventsToScoreI#getScoringFunctionForAgent(org.matsim.api.core.v01.Id)
-	 */
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
 		return scoringFunctionsForPopulation.getScoringFunctionForAgent(agentId);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.scoring.EventsToScoreI#writeExperiencedPlans(java.lang.String)
-	 */
 	public void writeExperiencedPlans(String iterationFilename) {
 		scoringFunctionsForPopulation.writeExperiencedPlans(iterationFilename);
 	}

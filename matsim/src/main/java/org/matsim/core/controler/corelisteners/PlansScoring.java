@@ -31,7 +31,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.scoring.EventsToScore;
-import org.matsim.core.scoring.EventsToScore2;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -45,8 +44,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class PlansScoring implements ScoringListener, IterationStartsListener, IterationEndsListener {
 
-	private EventsToScore eventsToScore = null ;
-	private EventsToScore2 eventsToScore2 = null ;
+	private EventsToScore eventsToScore;
 
 	private Scenario sc;
 
@@ -55,7 +53,7 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	private ScoringFunctionFactory scoringFunctionFactory;
 
 	private OutputDirectoryHierarchy controlerIO;
-	
+
 	public PlansScoring( Scenario sc, EventsManager events, OutputDirectoryHierarchy controlerIO, ScoringFunctionFactory scoringFunctionFactory ) {
 		this.sc = sc ;
 		this.events = events ;
@@ -65,39 +63,20 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		// yyyy the awkward syntax with eventsToScore and eventsToScore2 is to facilitate easy switching between the two
-		// (done by modifying ONLY the following line).  If eventsToScore2 is successful, eventsToScore can be removed.   kai, dec'12
-		this.eventsToScore2 = new EventsToScore2( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
-		if ( eventsToScore != null ) {
-			this.events.addHandler(this.eventsToScore);
-		} else {
-			this.events.addHandler(this.eventsToScore2);
-		}
-			
+		this.eventsToScore = new EventsToScore( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
+		this.events.addHandler(this.eventsToScore);
 	}
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
-		if ( eventsToScore != null ) {
-			this.eventsToScore.finish();
-		} else {
-			this.eventsToScore2.finish() ;
-		}
+		this.eventsToScore.finish();
 	}
-	
+
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		if ( eventsToScore != null ) { 
-			this.events.removeHandler(this.eventsToScore);
-		} else {
-			this.events.removeHandler(this.eventsToScore2) ;
-		}
+		this.events.removeHandler(this.eventsToScore);
 		if(sc.getConfig().planCalcScore().isWriteExperiencedPlans()) {
-			if ( eventsToScore != null ){
-				this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml"));
-			} else {
-				this.eventsToScore2.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml"));
-			}
+			this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml"));
 		}
 	}
 
@@ -108,11 +87,7 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	 */
 	@Deprecated
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
-		if ( eventsToScore != null ) {
-			return this.eventsToScore.getScoringFunctionForAgent(agentId);
-		} else {
-			return this.eventsToScore2.getScoringFunctionForAgent(agentId);
-		}
+		return this.eventsToScore.getScoringFunctionForAgent(agentId);
 	}
 
 }

@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.EventsToScore2;
+import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 
@@ -45,7 +45,7 @@ public class SinglePlanScoring {
 		Config dummyConfig = ConfigUtils.createConfig() ;
 		Scenario dummyScenario = ScenarioUtils.createScenario(dummyConfig) ;
 	
-		EventsToScore2 ev2score = new EventsToScore2( dummyScenario, scoringFunctionFactory) ;
+		EventsToScore ev2score = new EventsToScore( dummyScenario, scoringFunctionFactory) ;
 		
 		int idx = -1 ;
 		double prevActEndTime = Time.UNDEFINED_TIME ;
