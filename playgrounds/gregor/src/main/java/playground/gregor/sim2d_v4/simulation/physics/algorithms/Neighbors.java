@@ -36,22 +36,22 @@ import com.vividsolutions.jts.geom.Envelope;
 public class Neighbors {
 
 	
-	private float sqRange = 10;
-	private float range = (float) Math.sqrt(this.sqRange);
+	private double sqRange = 10;
+	private double range = Math.sqrt(this.sqRange);
 	private int nrNeighbors = 3;
 	
 	
-	public List<Tuple<Float,Sim2DAgent>> computeNeighbors(Sim2DAgent agent) {
-		LinkedList<Tuple<Float,Sim2DAgent>> ret = new LinkedList<Tuple<Float,Sim2DAgent>>();
+	public List<Tuple<Double,Sim2DAgent>> computeNeighbors(Sim2DAgent agent) {
+		LinkedList<Tuple<Double,Sim2DAgent>> ret = new LinkedList<Tuple<Double,Sim2DAgent>>();
 		int size = 0;
 		
-		float[] aPos = agent.getPos();
+		double[] aPos = agent.getPos();
 		PhysicalSim2DSection psec = agent.getPSec();
 		
-		float currentMaxSqRange = this.sqRange;
+		double currentMaxSqRange = this.sqRange;
 		
 		
-		float twoDTreeRange = this.range;
+		double twoDTreeRange = this.range;
 		Envelope e = new Envelope(agent.getPos()[0]-twoDTreeRange,agent.getPos()[0]+twoDTreeRange,agent.getPos()[1]-twoDTreeRange,agent.getPos()[1]+twoDTreeRange);
 		List<Sim2DAgent> agents = psec.getAgents(e);
 		//agents from same section visible by definition
@@ -59,25 +59,25 @@ public class Neighbors {
 			if (b.equals(agent)) {
 				continue;
 			}
-			float[] bPos = b.getPos();
-			float xDiff = aPos[0] - bPos[0];
-			float yDiff = aPos[1] - bPos[1];
-			float sqRange = xDiff*xDiff + yDiff*yDiff;
+			double[] bPos = b.getPos();
+			double xDiff = aPos[0] - bPos[0];
+			double yDiff = aPos[1] - bPos[1];
+			double sqRange = xDiff*xDiff + yDiff*yDiff;
 			if (sqRange > currentMaxSqRange) {
 				continue;
 			}
-			ListIterator<Tuple<Float,Sim2DAgent>> it = ret.listIterator();
+			ListIterator<Tuple<Double,Sim2DAgent>> it = ret.listIterator();
 			boolean notPlaced = true;
 			while(notPlaced) {
 				if (!it.hasNext()) {
-					it.add(new Tuple<Float,Sim2DAgent>(sqRange,b));
+					it.add(new Tuple<Double,Sim2DAgent>(sqRange,b));
 					size++;
 					notPlaced = false;
 				} else {
-					Tuple<Float, Sim2DAgent> next = it.next();
+					Tuple<Double, Sim2DAgent> next = it.next();
 					if (sqRange < next.getFirst()) {
 						it.previous();
-						it.add(new Tuple<Float,Sim2DAgent>(sqRange,b));
+						it.add(new Tuple<Double,Sim2DAgent>(sqRange,b));
 						size++;
 						notPlaced = false;
 					}
@@ -105,28 +105,28 @@ public class Neighbors {
 			agents = qSec.getAgents(e);
 			//agents from neighboring sections need to check visibility
 			for (Sim2DAgent b : agents) {
-				float[] bPos = b.getPos();
+				double[] bPos = b.getPos();
 				if (!visible(aPos,bPos,opening)) {
 					continue;
 				}
-				float xDiff = aPos[0] - bPos[0];
-				float yDiff = aPos[1] - bPos[1];
-				float sqRange = xDiff*xDiff + yDiff*yDiff;
+				double xDiff = aPos[0] - bPos[0];
+				double yDiff = aPos[1] - bPos[1];
+				double sqRange = xDiff*xDiff + yDiff*yDiff;
 				if (sqRange > currentMaxSqRange) {
 					continue;
 				}
-				ListIterator<Tuple<Float,Sim2DAgent>> it = ret.listIterator();
+				ListIterator<Tuple<Double,Sim2DAgent>> it = ret.listIterator();
 				boolean notPlaced = true;
 				while(notPlaced) {
 					if (!it.hasNext()) {
-						it.add(new Tuple<Float,Sim2DAgent>(sqRange,b));
+						it.add(new Tuple<Double,Sim2DAgent>(sqRange,b));
 						size++;
 						notPlaced = false;
 					} else {
-						Tuple<Float, Sim2DAgent> next = it.next();
+						Tuple<Double, Sim2DAgent> next = it.next();
 						if (sqRange < next.getFirst()) {
 							it.previous();
-							it.add(new Tuple<Float,Sim2DAgent>(sqRange,b));
+							it.add(new Tuple<Double,Sim2DAgent>(sqRange,b));
 							size++;
 							notPlaced = false;
 						}
@@ -146,13 +146,13 @@ public class Neighbors {
 		
 	}
 
-	private boolean visible(float[] aPos, float[] bPos, Segment opening) {
-		float l0 = CGAL.isLeftOfLine( opening.x0, opening.y0,aPos[0], aPos[1],bPos[0], bPos[1]);
-		float l1 = CGAL.isLeftOfLine( opening.x1, opening.y1,aPos[0], aPos[1],bPos[0], bPos[1]);
+	private boolean visible(double[] aPos, double[] bPos, Segment opening) {
+		double l0 = CGAL.isLeftOfLine( opening.x0, opening.y0,aPos[0], aPos[1],bPos[0], bPos[1]);
+		double l1 = CGAL.isLeftOfLine( opening.x1, opening.y1,aPos[0], aPos[1],bPos[0], bPos[1]);
 		return l0*l1 < 0;
 	}
 
-	public void setRangeAndMaxNrOfNeighbors(float range, int nrNeighbors) {
+	public void setRangeAndMaxNrOfNeighbors(double range, int nrNeighbors) {
 		this.sqRange = range*range;
 		this.range = range;
 		this.nrNeighbors = nrNeighbors;

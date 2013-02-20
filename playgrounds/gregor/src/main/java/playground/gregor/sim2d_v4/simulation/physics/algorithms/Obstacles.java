@@ -40,7 +40,7 @@ public class Obstacles {
 		PhysicalSim2DSection psec = agent.getPSec();
 		ret.addAll(psec.getObstacles());
 
-		float[] aPos = agent.getPos();
+		double[] aPos = agent.getPos();
 		
 		//agents from neighboring sections
 		Segment[] openings = psec.getOpenings();
@@ -51,7 +51,7 @@ public class Obstacles {
 				continue;
 			}
 			//first test whether agent is inside the neighboring section, then we ignore the obstacles so that the agent does not become trapped!
-			float left = CGAL.isLeftOfLine(aPos[0], aPos[1], opening.x0, opening.y0, opening.x1, opening.y1);
+			double left = CGAL.isLeftOfLine(aPos[0], aPos[1], opening.x0, opening.y0, opening.x1, opening.y1);
 			if (left >= 0) {
 				continue;
 			}
@@ -70,24 +70,24 @@ public class Obstacles {
 	}
 
 	private boolean bothEndesVisible(Segment obstacle, Segment opening,
-			float[] aPos) {
+			double[] aPos) {
 		
-		float left0 = CGAL.isLeftOfLine(aPos[0],aPos[1], opening.x0, opening.y0, opening.x1, opening.y1);
-		float left1 = CGAL.isLeftOfLine(obstacle.x0,obstacle.y0, opening.x0, opening.y0, opening.x1, opening.y1);
+		double left0 = CGAL.isLeftOfLine(aPos[0],aPos[1], opening.x0, opening.y0, opening.x1, opening.y1);
+		double left1 = CGAL.isLeftOfLine(obstacle.x0,obstacle.y0, opening.x0, opening.y0, opening.x1, opening.y1);
 		if (left0*left1 > 0) {
 			return false;
 		}
-		float left2 = CGAL.isLeftOfLine(opening.x0, opening.y0,aPos[0],aPos[1], obstacle.x0,obstacle.y0);
-		float left3 = CGAL.isLeftOfLine(opening.x1, opening.y1,aPos[0],aPos[1], obstacle.x0,obstacle.y0);
+		double left2 = CGAL.isLeftOfLine(opening.x0, opening.y0,aPos[0],aPos[1], obstacle.x0,obstacle.y0);
+		double left3 = CGAL.isLeftOfLine(opening.x1, opening.y1,aPos[0],aPos[1], obstacle.x0,obstacle.y0);
 		if (left2*left3 > 0) {
 			return false;
 		}
-		float left4 = CGAL.isLeftOfLine(obstacle.x1,obstacle.y1, opening.x0, opening.y0, opening.x1, opening.y1);
+		double left4 = CGAL.isLeftOfLine(obstacle.x1,obstacle.y1, opening.x0, opening.y0, opening.x1, opening.y1);
 		if (left0*left4 > 0) {
 			return false;
 		}
-		float left5 = CGAL.isLeftOfLine(opening.x0, opening.y0,aPos[0],aPos[1], obstacle.x1,obstacle.y1);
-		float left6 = CGAL.isLeftOfLine(opening.x1, opening.y1,aPos[0],aPos[1], obstacle.x1,obstacle.y1);
+		double left5 = CGAL.isLeftOfLine(opening.x0, opening.y0,aPos[0],aPos[1], obstacle.x1,obstacle.y1);
+		double left6 = CGAL.isLeftOfLine(opening.x1, opening.y1,aPos[0],aPos[1], obstacle.x1,obstacle.y1);
 		if (left5*left6 > 0) {
 			return false;
 		}

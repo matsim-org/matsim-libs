@@ -40,15 +40,15 @@ public class DepartureBox extends PhysicalSim2DSection {
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
-			float [] v = agent.getVelocity();
-			float dx = v[0] * this.timeStepSize;
-			float dy = v[1] * this.timeStepSize;
+			double [] v = agent.getVelocity();
+			double dx = v[0] * this.timeStepSize;
+			double dy = v[1] * this.timeStepSize;
 			Id currentLinkId = agent.getCurrentLinkId();
 			LinkInfo li = this.linkInfos.get(currentLinkId);
-			float [] oldPos = agent.getPos();
-			float newXPosX = oldPos[0] + dx;
-			float newXPosY = oldPos[1] + dy;
-			float lefOfFinishLine = CGAL.isLeftOfLine(newXPosX, newXPosY, li.finishLine.x0, li.finishLine.y0, li.finishLine.x1, li.finishLine.y1);
+			double [] oldPos = agent.getPos();
+			double newXPosX = oldPos[0] + dx;
+			double newXPosY = oldPos[1] + dy;
+			double lefOfFinishLine = CGAL.isLeftOfLine(newXPosX, newXPosY, li.finishLine.x0, li.finishLine.y0, li.finishLine.x1, li.finishLine.y1);
 			if (lefOfFinishLine >= 0) { //agent has reached the end of link
 				it.remove(); //removing the agent from the agents list
 				PhysicalSim2DSection nextSection = this.penv.getPhysicalSim2DSectionAssociatedWithLinkId(agent.getCurrentLinkId());

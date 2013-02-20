@@ -29,19 +29,19 @@ import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.LinkIn
 
 public class SimpleAgent implements Sim2DAgent {
 	
-	private final float v0 = 1.f;
+	private double v0 = 1.f;
 	
-	private final float [] pos = {0,0};
+	private final double [] pos = {0,0};
 	
-	private final float [] v = {0,0};
+	private final double [] v = {0,0};
 	
 	private final QVehicle veh;
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
 
-	private final float r = .5f;
+	private final double r = .5f;
 
-	public SimpleAgent(QVehicle veh, float spawnX, float spawnY) {
+	public SimpleAgent(QVehicle veh, double spawnX, double spawnY) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
@@ -78,13 +78,13 @@ public class SimpleAgent implements Sim2DAgent {
 	}
 
 	@Override
-	public void move(float dx, float dy) {
+	public void move(double dx, double dy) {
 		this.pos[0] += dx;
 		this.pos[1] += dy;
 	}
 
 	@Override
-	public float[] getVelocity() {
+	public double[] getVelocity() {
 		return this.v;
 	}
 
@@ -94,7 +94,7 @@ public class SimpleAgent implements Sim2DAgent {
 	}
 
 	@Override
-	public float[] getPos() {
+	public double[] getPos() {
 		return this.pos;
 	}
 
@@ -117,9 +117,9 @@ public class SimpleAgent implements Sim2DAgent {
 	@Override
 	public void debug(VisDebugger visDebugger) {
 		if (getId().toString().contains("g")) {
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 0, 192, 64, 128,0,true);
+			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1], (float)this.r, 0, 192, 64, 128,0,true);
 		} else if (getId().toString().contains("r")) {
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 192, 0, 64, 128,0,true);
+			visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1],(float) this.r, 192, 0, 64, 128,0,true);
 		} else {
 			int nr = this.hashCode()%3*255;
 			int r,g,b;
@@ -136,7 +136,7 @@ public class SimpleAgent implements Sim2DAgent {
 				g=0;
 				b=nr;
 			}
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, r, g, b, 222,0,true);
+			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1], (float)this.r, r, g, b, 222,0,true);
 //			visDebugger.addText(this.getPos()[0],this.getPos()[1], this.getId().toString(), 0);
 		}
 		
@@ -148,18 +148,24 @@ public class SimpleAgent implements Sim2DAgent {
 	}
 
 	@Override
-	public float getRadius() {
+	public double getRadius() {
 		return this.r;
 	}
 
 	@Override
-	public float getXLocation() {
+	public double getXLocation() {
 		return this.pos[0];
 	}
 
 	@Override
-	public float getYLocation() {
+	public double getYLocation() {
 		return this.pos[1];
+	}
+
+	@Override
+	public void setDesiredSpeed(double v) {
+		this.v0 = v;
+		
 	}
 
 }

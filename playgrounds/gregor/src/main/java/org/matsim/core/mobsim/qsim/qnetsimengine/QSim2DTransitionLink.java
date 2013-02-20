@@ -96,6 +96,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 				throw new RuntimeException("trying to spawn agent in a non empty departure box");
 			}
 			Sim2DAgent agent = this.agentBuilder.buildAgent(veh,dbox.spawnX,dbox.spawnY);
+			agent.setDesiredSpeed(this.getLink().getFreespeed());
 			psecBox.addAgentToInBuffer(agent);
 			double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 			this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(
@@ -404,8 +405,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		}
 	}
 
-	public void createDepartureBox(PhysicalSim2DSection psecBox, float spawnX,
-			float spawnY) {
+	public void createDepartureBox(PhysicalSim2DSection psecBox, double spawnX,
+			double spawnY) {
 		DepartureBox dBox = new DepartureBox();
 		dBox.psecBox = psecBox;
 		dBox.spawnX = spawnX;
@@ -415,8 +416,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 	
 	private static final class DepartureBox implements Comparable<DepartureBox>{
 		PhysicalSim2DSection psecBox;
-		float spawnX;
-		float spawnY;
+		double spawnX;
+		double spawnY;
 		@Override
 		public int compareTo(DepartureBox o) {
 			if (this.psecBox.getNumberOfAllAgents() < o.psecBox.getNumberOfAllAgents()) {

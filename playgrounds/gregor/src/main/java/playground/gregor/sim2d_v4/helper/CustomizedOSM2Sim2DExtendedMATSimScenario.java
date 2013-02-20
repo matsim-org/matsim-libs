@@ -417,6 +417,9 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
+		
+		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.26);
+		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.71);
 		sc.addScenarioElement(s2dsc);
 
 

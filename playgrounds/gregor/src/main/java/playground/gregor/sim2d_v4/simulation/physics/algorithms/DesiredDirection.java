@@ -38,23 +38,23 @@ public class DesiredDirection {
 		this.agent = agent;
 	}
 	
-	public float [] computeDesiredDirection() {
+	public double [] computeDesiredDirection() {
 		
-		final float [] pos = this.agent.getPos();
-		final float [] ret = {0,0};
+		final double [] pos = this.agent.getPos();
+		final double [] ret = {0,0};
 		PhysicalSim2DSection psec = this.agent.getPSec();
 		Id id = this.agent.getCurrentLinkId();
 		LinkInfo li = psec.getLinkInfo(id);
 		final Segment link = li.link;
 		
 		
-		float dx = li.dx;
-		float dy = li.dy;
+		double dx = li.dx;
+		double dy = li.dy;
 		
-		float dist = CGAL.signDistPointLine(pos[0],pos[1], link.x0, link.y0, dx, dy);
+		double dist = CGAL.signDistPointLine(pos[0],pos[1], link.x0, link.y0, dx, dy);
 		
-		float px;
-		float py;
+		double px;
+		double py;
 		if (dist < 0) { //agent is on the left side of the link
 			px = dy;
 			py = -dx;
@@ -67,9 +67,9 @@ public class DesiredDirection {
 			dist = -dist;
 		}
 		
-		float exp = Math.exp(dist/(li.width));
-		float w0 = 1 - 1/exp;
-		float w1 = 1 - w0;
+		double exp = Math.exp(dist/(li.width));
+		double w0 = 1 - 1/exp;
+		double w1 = 1 - w0;
 		
 		ret[0] = w1 * dx + w0 * px;
 		ret[1] = w1 * dy + w0 * py;

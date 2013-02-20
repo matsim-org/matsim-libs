@@ -27,19 +27,23 @@ public interface ORCALine {
 
 //	public abstract void gisDump();
 
-	public abstract boolean solutionSatisfyConstraint(float[] v);
+	public abstract boolean solutionSatisfyConstraint(double[] v);
 
-	public abstract float getPointX();
+	public abstract double getPointX();
 
-	public abstract float getPointY();
+	public abstract double getPointY();
 	
-	public abstract void setPointX(float x);
+	public abstract void setPointX(double x);
 	
-	public abstract void setPointY(float y);
+	public abstract void setPointY(double y);
 
-	public abstract float getDirectionX();
+	public abstract double getDirectionX();
 
-	public abstract float getDirectionY();
+	public abstract double getDirectionY();
+
+	public abstract void setDirectionX(double x);
+	
+	public abstract void setDirectionY(double y);
 	
 	public abstract void debug(VisDebugger visDebugger, int r, int g, int b);
 

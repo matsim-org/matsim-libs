@@ -27,7 +27,7 @@ package playground.gregor.sim2d_v4.cgal;
  */
 public abstract class CGAL {
 
-	private static final float EPSILON = 0.0001f;
+	private static final double EPSILON = 0.0001f;
 
 
 	/**
@@ -42,7 +42,7 @@ public abstract class CGAL {
 	 * 		  ==0 if coordinate is on the vector
 	 * 		   <0 if coordinate is right of the vector
 	 */
-	public static float isLeftOfLine(float x0, float y0, float x1, float y1, float x2, float y2) {
+	public static double isLeftOfLine(double x0, double y0, double x1, double y1, double x2, double y2) {
 		return (x2 - x1)*(y0 - y1) - (x0 - x1) * (y2 - y1);
 	}
 
@@ -57,8 +57,8 @@ public abstract class CGAL {
 	 * @param y2 second y-coordinate of the vector
 	 * @return true if coordinate is on the vector
 	 */
-	public static boolean isOnVector(float x0, float y0, float x1, float y1, float x2, float y2) {
-		float left = isLeftOfLine(x0,y0,x1,y1,x2,y2);
+	public static boolean isOnVector(double x0, double y0, double x1, double y1, double x2, double y2) {
+		double left = isLeftOfLine(x0,y0,x1,y1,x2,y2);
 		return left*left < EPSILON;
 	}
 
@@ -75,9 +75,9 @@ public abstract class CGAL {
 	 * @param dyl normalized vector's y-direction
 	 * @return signed distance
 	 */
-	public static float signDistPointLine(float px, float py, float lx0, float ly0, float dxl, float dyl) {
-		//		float r = (px - lx0) * dxl + (py - ly0) * dyl;
-		float s = ((ly0 - py) * dxl - (lx0 - px) * dyl);
+	public static double signDistPointLine(double px, double py, double lx0, double ly0, double dxl, double dyl) {
+		//		double r = (px - lx0) * dxl + (py - ly0) * dyl;
+		double s = ((ly0 - py) * dxl - (lx0 - px) * dyl);
 
 		return s;
 	}
@@ -93,12 +93,12 @@ public abstract class CGAL {
 	 * @param v1y second y-coordinate of the vector
 	 * @return the coefficient by which the vector has to be multiplied
 	 */
-	public static float vectorCoefOfPerpendicularProjection(float x, float y, float v0x, float v0y, float v1x, float v1y) {
-		float vdx = v1x - v0x;
-		float vdy = v1y - v0y;
-		float numerator = (x-v0x) * vdx + (y - v0y) * vdy;
-		float denomenator  = vdx * vdx + vdy * vdy; //TODO in most sim2d cases this value can be precalculated [gl Jan'13] 
-		float r = numerator/denomenator;
+	public static double vectorCoefOfPerpendicularProjection(double x, double y, double v0x, double v0y, double v1x, double v1y) {
+		double vdx = v1x - v0x;
+		double vdy = v1y - v0y;
+		double numerator = (x-v0x) * vdx + (y - v0y) * vdy;
+		double denomenator  = vdx * vdx + vdy * vdy; //TODO in most sim2d cases this value can be precalculated [gl Jan'13] 
+		double r = numerator/denomenator;
 
 		return r;
 
@@ -115,10 +115,10 @@ public abstract class CGAL {
 	 * @param vdy y-direction of the vector
 	 * @return the coefficient by which the vector has to be multiplied
 	 */
-	public static float normVectorCoefOfPerpendicularProjection(float x, float y, float v0x, float v0y, float vdx, float vdy) {
-		float numerator = (x-v0x) * vdx + (y - v0y) * vdy;
-		float denomenator  = vdx * vdx + vdy * vdy; //TODO in most sim2d cases this value can be precalculated [gl Jan'13] 
-		float r = numerator/denomenator;
+	public static double normVectorCoefOfPerpendicularProjection(double x, double y, double v0x, double v0y, double vdx, double vdy) {
+		double numerator = (x-v0x) * vdx + (y - v0y) * vdy;
+		double denomenator  = vdx * vdx + vdy * vdy; //TODO in most sim2d cases this value can be precalculated [gl Jan'13] 
+		double r = numerator/denomenator;
 
 		return r;
 
@@ -132,7 +132,7 @@ public abstract class CGAL {
 	 * @param y1 the y-coordinate of the second vector
 	 * @return the dot product
 	 */
-	public static float dot(float x0, float y0, float x1, float y1) {
+	public static double dot(double x0, double y0, double x1, double y1) {
 		return x0 * x1 + y0  * y1;
 	}
 
@@ -144,8 +144,8 @@ public abstract class CGAL {
 	 * @param y1
 	 * @return determinant
 	 */
-	public static float det(float x0, float x1,
-			float y0, float y1) {
+	public static double det(double x0, double x1,
+			double y0, double y1) {
 
 		return x0*y1 - y0 * x1;
 	}

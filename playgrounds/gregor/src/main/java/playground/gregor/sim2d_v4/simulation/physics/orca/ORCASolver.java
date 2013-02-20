@@ -20,10 +20,10 @@
 
 package playground.gregor.sim2d_v4.simulation.physics.orca;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
 
 /**
  * linear problem solver as proposed by van den Berg et al (2009), Reciprocal n-body collision avoidance. In: Inter. Symp. on Robotics Research.
@@ -32,169 +32,187 @@ import playground.gregor.sim2d_v4.debugger.VisDebugger;
  *
  */
 public class ORCASolver {
-	private static final float ALMOST_ONE = 0.9999f;
-	private static final float[] center = {0f,0f};
-	private VisDebugger debugger;
-	
-	
-	
-	public void run(final List<ORCALine> constraints, final float [] vPref, final float maxSpeed) {
-		
-		float vxPref = vPref[0];
-		float vyPref = vPref[1];
-		
-		
+	private static final double ALMOST_ONE = 0.9999;
+
+
+	public void run(final List<ORCALine> constraints, final double [] vPref, final double maxSpeed) {
+
+		double vxPref = vPref[0];
+		double vyPref = vPref[1];
+
+
 		int handled = solveProblem(constraints, vPref, vxPref, vyPref, maxSpeed);
-		
+		if (handled < constraints.size()) {
+			pushORCALinesOutward(constraints, handled, maxSpeed, vPref);
+			//			vPref[0] = 100;
+			//			vPref[1] = 0;
+		}
+
 	}
 
-	private int solveProblem(List<ORCALine> constraints, float[] ret,
-			float vxPref, float vyPref, float maxSpeed) {
-		
-		for (int i = 0; i < constraints.size(); i++) {
-			//test whether constraints are not satisfied by current velocity
-			if (!constraints.get(i).solutionSatisfyConstraint(ret)) {
-				//if not try to find a new optimal solution that satisfies constraint i (and all previous)
-				boolean found = handleConstraint(constraints,ret,vxPref,vyPref,maxSpeed,i);
-				if(!found) { //linear program is infeasible
-					return i;
-				}
-			} else if (this.debugger != null) {
-				constraints.get(i).debug(this.debugger, 0, 255, 0);
-				this.debugger.addAll();
+	private void pushORCALinesOutward(List<ORCALine> constraints, int failedLine, double maxSpeed, final double [] ret) {
+
+		List<ORCALine> obst = new ArrayList<ORCALine>();
+		for (ORCALine oRCALine : constraints) {
+			if (oRCALine instanceof ORCALineEnvironment) {
+				obst.add(oRCALine);
 			}
 		}
-		
+
+		double distance = 0.f;
+		for (int i = failedLine; i < constraints.size(); i++) {
+			ORCALine ci = constraints.get(i);
+			if (ci instanceof ORCALineEnvironment) {
+				continue;
+			}
+			double tmp = CGAL.det(ci.getDirectionX(), ci.getDirectionY(), ci.getPointX()-ret[0], ci.getPointY()-ret[1]);
+			if (tmp > distance) {
+				List<ORCALine> projLines = new ArrayList<ORCALine>(obst);
+				for (int j = 0; j < i; j++) {
+					if (constraints.get(j) instanceof ORCALineEnvironment) {
+						continue;
+					}
+					ORCALine cj = constraints.get(j);
+					ORCALineUniversal line = new ORCALineUniversal();
+					double determinant = CGAL.det(ci.getDirectionX(),ci.getDirectionY(),cj.getDirectionX(),cj.getDirectionY());
+					
+					double cos = CGAL.dot(ci.getDirectionX(), ci.getDirectionY(), cj.getDirectionX(), cj.getDirectionY()); // /|ci|*|cj| (= 1)
+					if (Math.abs(cos) >= ALMOST_ONE) { //parallel
+						if ((ci.getDirectionX()*cj.getDirectionX()+ci.getDirectionY()*cj.getDirectionY()) > 0.f) {
+							continue;
+						} else {
+							line.setPointX(.5 * (ci.getPointX()+cj.getPointX()));
+							line.setPointY(.5 * (ci.getPointY()+cj.getPointY()));
+						}
+					} else {
+						double detTmp = CGAL.det(cj.getDirectionX(), cj.getDirectionY(), ci.getPointX()-cj.getPointX(),ci.getPointY()-cj.getPointY());
+						double quotient = detTmp/determinant;
+						line.setPointX(ci.getPointX()+ quotient * ci.getDirectionX());
+						line.setPointY(ci.getPointY()+ quotient * ci.getDirectionY());
+					}
+					double dxLine = cj.getDirectionX()-ci.getDirectionX();
+					double dyLine = cj.getDirectionY()-ci.getDirectionY();
+					double length = Math.sqrt(dxLine*dxLine+dyLine*dyLine);
+					dxLine /= length;
+					dyLine /= length;
+					line.setDirectionX(dxLine);
+					line.setDirectionY(dyLine);
+					projLines.add(line);
+				}
+				final double[] tmpRet = ret;
+				if (solveProblem(projLines, ret, -ci.getDirectionY(), ci.getDirectionX(),maxSpeed) < projLines.size()) {
+					ret[0] = tmpRet[0];
+					ret[1] = tmpRet[1];
+				}
+				distance = CGAL.det(ci.getDirectionX(), ci.getDirectionY(), ci.getPointX()-ret[0], ci.getPointY()-ret[1]);
+			}
+		}
+	}
+
+	//
+	//	        distance = det(lines[i].direction, lines[i].point - result);
+	//	      }
+	//	    }
+	//	  }
+
+	private int solveProblem(List<ORCALine> constraints, double[] ret,
+			double vxPref, double vyPref, double maxSpeed) {
+
+		for (int i = 0; i < constraints.size(); i++) {
+			//test whether constraints are not satisfied by current velocity
+
+
+			if (!constraints.get(i).solutionSatisfyConstraint(ret)) {
+				//if not try to find a new optimal solution that satisfies constraint i (and all previous)
+				final double [] tmp = ret.clone();
+				boolean found = handleConstraint(constraints,ret,vxPref,vyPref,maxSpeed,i);
+				if(!found) { //linear program is infeasible
+					ret[0] = tmp[0];
+					ret[1] = tmp[1];
+					return i;
+				}
+			}
+			//			else if (this.debugger != null) {
+			//				constraints.get(i).debug(this.debugger, 0, 255, 0);
+			//				this.debugger.addAll();
+			//			}
+		}
+
 		return constraints.size();
 	}
 
-	private boolean handleConstraint(final List<ORCALine> constraints, final float[] ret,
-			final float vxPref, final float vyPref, final float maxSpeed, final int idx) {
+	private boolean handleConstraint(final List<ORCALine> constraints, final double[] ret,
+			final double vxPref, final double vyPref, final double maxSpeed, final int idx) {
 		ORCALine constraint = constraints.get(idx);
 
-		if (this.debugger != null) {
-			this.debugger.addCircle(0, 0, 2*maxSpeed, 0, 0, 0, 255, 0, false);
-			constraint.debug(this.debugger, 255, 0, 0);
-			this.debugger.addAll();
+		//1. check whether constraint contradicts max speed constraint
+		//TODO replace max speed by max speed delta
+		//1.a calculate distance 
+		double dist = CGAL.signDistPointLine(0.f, 0.f, constraint.getPointX(), constraint.getPointY(), constraint.getDirectionX(), constraint.getDirectionY());
+		if (dist > maxSpeed) {
+			//constraint contradicts maxSpeed circle 
+			return false;
 		}
-		
-		
-		float dist = CGAL.signDistPointLine(0.f, 0.f, constraint.getPointX(), constraint.getPointY(), constraint.getDirectionX(), constraint.getDirectionY());
-		
-		//1. check whether constraint violates maxSpeed constraint
-		//1a check whether circle center does not satisfy constraint 
-		if (!constraint.solutionSatisfyConstraint(center)){
-			//1b center does not satisfy constraint so we have to check whether the distance of the center to the constraint is smaller then maxSpeed
-			if (Math.abs(dist) > maxSpeed) { //constraint can not be satisfied
-				return false;
-			}
-		}
-		
-		//it seems constraint can be handled
-		float r = CGAL.normVectorCoefOfPerpendicularProjection(0.f, 0.f, constraint.getPointX(), constraint.getPointY(), constraint.getDirectionX(), constraint.getDirectionY());
-		
-		//2. limit range by maxSpeed circle (intersection points of constraint an circle)
-		float rangeHalfe = (float)Math.sqrt(maxSpeed*maxSpeed-dist*dist); //TODO is there a faster approximation of Math.sqrt?
-		float leftBound = r-rangeHalfe;
-		float rightBound = r+rangeHalfe;
-		
-//		if (this.debugger != null) {
-//			float x0 = leftBound * constraint.getDirectionX() + constraint.getPointX();
-//			float y0 = leftBound * constraint.getDirectionY() + constraint.getPointY();
-//			float x1 = rightBound * constraint.getDirectionX() + constraint.getPointX();
-//			float y1 = rightBound * constraint.getDirectionY() + constraint.getPointY();
-//			this.debugger.addLine(x0, y0, x1, y1, 0, 0, 255, 255, 0);
-//			this.debugger.addAll();
-//			System.out.println(": ");
-//		}
-		
-		//3. now we iterate over all previous handled constraints and check if they are still satisfied, the range has to be further reduced, 
-		//or one of the previous constraints contradicts the current one. In this case the linear program is infeasible
+
+		//2. calculate intersections of constraint with max speed circle, since constraint was not fulfilled but max speed circle does not contradict the constraint, 
+		//there must be two intersection points
+
+		double b = CGAL.normVectorCoefOfPerpendicularProjection(0, 0, constraint.getPointX(), constraint.getPointY(), constraint.getDirectionX(), constraint.getDirectionY());//center of the line segment inside the circle
+		double rangeHalf = Math.sqrt(maxSpeed*maxSpeed-dist*dist);//distance from b to the circle boundary (on either side)
+
+		double leftBound = b-rangeHalf; //left intersection
+		double rightBound = b+rangeHalf;//right intersection
+
 		for (int i = 0; i < idx; i++) {
 			ORCALine tmp = constraints.get(i);
-//			if (this.debugger !=null) {
-//				tmp.debug(this.debugger, 192, 192, 192);
-//				this.debugger.addAll();
-//				System.out.println(": ");
-//			}
-			//3a. check whether tmp and constraint are collinear
-			float cosDirection = CGAL.dot(constraint.getDirectionX(), constraint.getDirectionY(), tmp.getDirectionX(), tmp.getDirectionY());
-			if (Math.abs(cosDirection) >= ALMOST_ONE) {
-				if (cosDirection < 0) { //opposite direction
-					if (constraint.solutionSatisfyConstraint(new float[]{tmp.getPointX(),tmp.getPointY()})){
+			double cos = CGAL.dot(constraint.getDirectionX(), constraint.getDirectionY(), tmp.getDirectionX(), tmp.getDirectionY()); // /|constraint|*|tmp| (= 1)
+			if (Math.abs(cos) >= ALMOST_ONE) { //parallel
+				if (cos < 0) { //opposite direction
+					if (constraint.solutionSatisfyConstraint(new double [] {tmp.getPointX(),tmp.getPointY()})) {
 						continue;
 					} else {
-						//contradiction --> infeasible linear program
 						return false;
 					}
 				} else { //same direction
-					if (tmp.solutionSatisfyConstraint(new float[]{constraint.getPointX(),constraint.getPointY()})) {
+					if (tmp.solutionSatisfyConstraint(new double []{constraint.getPointX(),constraint.getPointY()})) {
 						continue;
 					} else {
-						//contradiction --> infeasible linear program
 						return false;
 					}
 				}
 			}
-			
-			//3b. compute intersection point of constraint and tmp
-			float a11 = constraint.getDirectionX();
-			float a21 = constraint.getDirectionY();
-			float a12 = tmp.getDirectionX();
-			float a22 = tmp.getDirectionY();
-			float b1 = tmp.getPointX() - constraint.getPointX();
-			float b2 = tmp.getPointY() - constraint.getPointY();
-			float d = a11*a22 - a12*a21;
-			float n = b1*a22 - b2*a12;
-			float intersect = n/d;
-			
-			if (d >= 0) { //right boundary?
-				if ((rightBound) > (intersect)) {
-					rightBound = intersect;
-				}
-			} else {
-				if (leftBound < (intersect)) {
-					leftBound = intersect;
-				}
+			//line intersection (see, e.g. http://en.wikipedia.org/wiki/Line-line_intersection or http://en.wikipedia.org/wiki/Cramer%27s_rule) 
+			final double denominator = CGAL.det(constraint.getDirectionX(), constraint.getDirectionY(),tmp.getDirectionX(),tmp.getDirectionY());
+			final double numerator = CGAL.det(tmp.getDirectionX(), tmp.getDirectionY(), constraint.getPointX()-tmp.getPointX(), constraint.getPointY()-tmp.getPointY());
+			double c = numerator/denominator;
+
+			if (denominator > 0) { //right boundary constrain?
+				rightBound = Math.min(rightBound, c);
+			} else { //left boundary constraint?
+				leftBound = Math.max(leftBound, c);
 			}
-//			if (this.debugger != null) {
-//				float x0 = leftBound * constraint.getDirectionX() + constraint.getPointX();
-//				float y0 = leftBound * constraint.getDirectionY() + constraint.getPointY();
-//				float x1 = rightBound * constraint.getDirectionX() + constraint.getPointX();
-//				float y1 = rightBound * constraint.getDirectionY() + constraint.getPointY();
-//				this.debugger.addLine(x0, y0, x1, y1, 0, 255/(i+1), 255-(255/(i+1)), 255, 0);
-//				this.debugger.addAll();
-//				System.out.println(": ");
-//			}
-			
-			
+
+			if (leftBound > rightBound) {//contradiction
+				return false;
+			}
+
 		}
 		
-		//4. orthogonal projection of vpref on c
-		float coef = CGAL.normVectorCoefOfPerpendicularProjection(vxPref, vyPref, constraint.getPointX(), constraint.getPointY(), constraint.getDirectionX(), constraint.getDirectionY());
-		if (coef > rightBound) {
-			ret[0] = constraint.getPointX() + rightBound*constraint.getDirectionX();
-			ret[1] = constraint.getPointY() + rightBound*constraint.getDirectionY();
-		} else if (coef < leftBound) {
-			ret[0] = constraint.getPointX() + leftBound*constraint.getDirectionX();
-			ret[1] = constraint.getPointY() + leftBound*constraint.getDirectionY();
+		double tmp = CGAL.normVectorCoefOfPerpendicularProjection(vxPref, vyPref, constraint.getPointX(), constraint.getPointY(), constraint.getDirectionX(), constraint.getDirectionY());//orthogonal projection of preferred velocity on the unsatisfied constraint
+
+		if (tmp < leftBound) {
+			ret[0] = constraint.getPointX() + leftBound * constraint.getDirectionX();
+			ret[1] = constraint.getPointY() + leftBound * constraint.getDirectionY();
+		} else if (tmp > rightBound){
+			ret[0] = constraint.getPointX() + rightBound * constraint.getDirectionX();
+			ret[1] = constraint.getPointY() + rightBound * constraint.getDirectionY();
 		} else {
-			ret[0] = constraint.getPointX() + coef*constraint.getDirectionX();
-			ret[1] = constraint.getPointY() + coef*constraint.getDirectionY();
+			ret[0] = constraint.getPointX() + tmp * constraint.getDirectionX();
+			ret[1] = constraint.getPointY() + tmp * constraint.getDirectionY();
 		}
-		
-		
-		if (this.debugger != null) {
-			this.debugger.addLine(0, 0, ret[0], ret[1], 0, 0, 0, 255, 0);
-			this.debugger.addAll();
-			System.out.println(": ");
-		}
-		
+		  
 		return true;
 	}
 
-	public void addDebugger(VisDebugger debugger) {
-//		this.debugger = debugger;
-		
-	}
+
 }

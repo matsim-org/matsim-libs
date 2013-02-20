@@ -26,6 +26,6 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 public interface Sim2DAgentFactory {
 	
-	public abstract Sim2DAgent buildAgent(QVehicle veh, float spawnX, float spawnY);
+	public abstract Sim2DAgent buildAgent(QVehicle veh, double spawnX, double spawnY);
 
 }

@@ -23,6 +23,7 @@ package playground.gregor.sim2d_v4.simulation.physics;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -44,22 +45,22 @@ import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
 public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 
 	//Helbing constants
-	private final float v0 = 1.34f; //desired velocity
-	private final float m = (float) (70 + (MatsimRandom.getRandom().nextDouble()*20)); //mass
-	private final float tau = .5f; //acceleration time
-	private final float A = 2000f; // ??
-	private final float B = .08f; // ??
-	private final float k = 1.2f * 100000;
-	private final float kappa = 2.4f * 100000;
-	private final float r = (float) (MatsimRandom.getRandom().nextDouble()*.1 + 0.25); //radius
-	private final float vmx = 1.5f;
+	private double v0 = 1.34f; //desired velocity
+	private final double m = 70 + (MatsimRandom.getRandom().nextDouble()*20); //mass
+	private final double tau = .5f; //acceleration time
+	private final double A = 2000f; // ??
+	private final double B = .08f; // ??
+	private final double k = 1.2f * 100000;
+	private final double kappa = 2.4f * 100000;
+	private final double r = MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius
+	private final double vmx = 1.5f;
 
 	//additional constants
-	private final float CUTOFF_DIST = 20f;
+	private final double CUTOFF_DIST = 20f;
 
-	private final float [] pos = {0,0}; //location
+	private final double [] pos = {0,0}; //location
 
-	private final float [] v = {0,0}; //velocity
+	private final double [] v = {0,0}; //velocity
 
 	private final QVehicle veh;
 	private final MobsimDriverAgent driver;
@@ -69,10 +70,10 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	private final Obstacles ocalc = new Obstacles();
 	private DesiredDirection dd;
 
-	private final float dT;
+	private final double dT;
 
 
-	public SocialForceAgent(QVehicle veh, float spawnX, float spawnY, float deltaT) {
+	public SocialForceAgent(QVehicle veh, double spawnX, double spawnY, double deltaT) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
@@ -91,48 +92,48 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	public void updateVelocity() {
 
 
-		List<Tuple<Float, Sim2DAgent>> neighbors = this.ncalc.computeNeighbors(this);
+		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.computeNeighbors(this);
 		List<Segment> obstacles = this.ocalc.computeObstacles(this);
 
 
-		float[] e0 = this.dd.computeDesiredDirection();
-		float desiredDVx = this.v0 * e0[0] - this.v[0];
-		float desiredDVy = this.v0 * e0[1] - this.v[1];
+		double[] e0 = this.dd.computeDesiredDirection();
+		double desiredDVx = this.v0 * e0[0] - this.v[0];
+		double desiredDVy = this.v0 * e0[1] - this.v[1];
 
 		desiredDVx /= this.tau;
 		desiredDVy /= this.tau;
 
 		//neighbors
-		float fnx = 0;
-		float fny = 0;
+		double fnx = 0;
+		double fny = 0;
 
 
-		for (Tuple<Float, Sim2DAgent> t : neighbors) {
+		for (Tuple<Double, Sim2DAgent> t : neighbors) {
 			Sim2DAgent neighbor = t.getSecond();
-			float[] nPos = neighbor.getPos();
-			float nx = this.pos[0] - nPos[0];
-			float ny = this.pos[1] - nPos[1];
-			float dist = (float) Math.sqrt(nx * nx  + ny * ny);
+			double[] nPos = neighbor.getPos();
+			double nx = this.pos[0] - nPos[0];
+			double ny = this.pos[1] - nPos[1];
+			double dist = Math.sqrt(nx * nx  + ny * ny);
 			if (dist > this.CUTOFF_DIST) {
 				continue;
 			}
 			nx /= dist;
 			ny /= dist;
 
-			float r = this.r + neighbor.getRadius();
+			double r = this.r + neighbor.getRadius();
 
-			float exp = playground.gregor.sim2d_v4.math.Math.exp((r-dist)/this.B);
+			double exp = playground.gregor.sim2d_v4.math.Math.exp((r-dist)/this.B);
 
 			if (dist < r) {
-				float overlap = (r-dist);
+				double overlap = (r-dist);
 				exp += this.k * overlap;
 
-				float tx = -ny;
-				float ty = nx;
-				float[] nv = neighbor.getVelocity();
-				float dvx = nv[0] - this.v[0];
-				float dvy = nv[1] - this.v[1];
-				float dv = dvx*tx + dvy*ty;
+				double tx = -ny;
+				double ty = nx;
+				double[] nv = neighbor.getVelocity();
+				double dvx = nv[0] - this.v[0];
+				double dvy = nv[1] - this.v[1];
+				double dv = dvx*tx + dvy*ty;
 				fnx += this.kappa * overlap * dv * tx;
 				fny += this.kappa * overlap * dv * ty;
 			}
@@ -142,23 +143,23 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 		}
 
 		//obstacles
-		float fwx = 0;
-		float fwy = 0;
+		double fwx = 0;
+		double fwy = 0;
 		for (Segment s : obstacles) {
-			float r = CGAL.vectorCoefOfPerpendicularProjection(this.pos[0], this.pos[1], s.x0, s.y0, s.x1, s.y1);
-			float nx;
-			float ny;
-			float dist;
+			double r = CGAL.vectorCoefOfPerpendicularProjection(this.pos[0], this.pos[1], s.x0, s.y0, s.x1, s.y1);
+			double nx;
+			double ny;
+			double dist;
 			if (r < 0) {
 				nx = this.pos[0] - s.x0;
 				ny = this.pos[1] - s.y0;
-				dist = (float) Math.sqrt(nx*nx + ny*ny);
+				dist = Math.sqrt(nx*nx + ny*ny);
 				nx /= dist;
 				ny /= dist;
 			} else if (r > 1) {
 				nx = this.pos[0] - s.x1;
 				ny = this.pos[1] - s.y1;
-				dist = (float) Math.sqrt(nx*nx + ny*ny);
+				dist = Math.sqrt(nx*nx + ny*ny);
 				nx /= dist;
 				ny /= dist;
 			} else {
@@ -178,15 +179,15 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 				continue;
 			}
 
-			float exp = playground.gregor.sim2d_v4.math.Math.exp((this.r-dist)/this.B);
+			double exp = playground.gregor.sim2d_v4.math.Math.exp((this.r-dist)/this.B);
 
 			if (dist < this.r &&  r >=0 && r <= 1) {
-				float overlap = (this.r-dist);
+				double overlap = (this.r-dist);
 				exp += this.k * overlap;
 
-				float tx = -ny;
-				float ty = nx;
-				float dv = this.v[0]*tx + this.v[1]*ty;
+				double tx = -ny;
+				double ty = nx;
+				double dv = this.v[0]*tx + this.v[1]*ty;
 				fnx += this.kappa * overlap * dv * tx;
 				fny += this.kappa * overlap * dv * ty;
 			}
@@ -195,8 +196,8 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 			fwy += this.A * exp * ny;
 		}
 
-		float dvx = desiredDVx + fnx/this.m + fwx/this.m;
-		float dvy = desiredDVy + fny/this.m + fwy/this.m;
+		double dvx = desiredDVx + fnx/this.m + fwx/this.m;
+		double dvy = desiredDVy + fny/this.m + fwy/this.m;
 		dvx *= this.dT;
 		dvy *= this.dT;
 
@@ -210,7 +211,7 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	
 
 		if ((this.v[0]*this.v[0]+this.v[1]*this.v[1]) > (this.vmx*this.vmx)) { //velocity constraint speed never exceeds 5m/s
-			float v = (float) Math.sqrt((this.v[0]*this.v[0]+this.v[1]*this.v[1]));
+			double v = Math.sqrt((this.v[0]*this.v[0]+this.v[1]*this.v[1]));
 			this.v[0] /= v;
 			this.v[1] /= v;
 			this.v[0] *= this.vmx;
@@ -229,13 +230,13 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	}
 
 	@Override
-	public void move(float dx, float dy) {
+	public void move(double dx, double dy) {
 		this.pos[0] += dx;
 		this.pos[1] += dy;
 	}
 
 	@Override
-	public float[] getVelocity() {
+	public double[] getVelocity() {
 		return this.v;
 	}
 
@@ -245,7 +246,7 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	}
 
 	@Override
-	public float[] getPos() {
+	public double[] getPos() {
 		return this.pos;
 	}
 
@@ -263,17 +264,19 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	@Override
 	public void notifyMoveOverNode(Id nextLinkId) {
 		this.driver.notifyMoveOverNode(nextLinkId);
+		final Link l = this.currentPSec.getSim2dsc().getMATSimScenario().getNetwork().getLinks().get(nextLinkId);
+		this.setDesiredSpeed(l.getFreespeed());
 	}
 
 	@Override
 	public void debug(VisDebugger visDebugger) {
 		if (getId().toString().equals("g3242")){
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 255, 0, 0, 255,0,true);
-			visDebugger.addText(this.getPos()[0],this.getPos()[1], this.getCurrentLinkId().toString(), 90);
+			visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1], (float)this.r, 255, 0, 0, 255,0,true);
+			visDebugger.addText((float)this.getPos()[0],(float)this.getPos()[1], this.getCurrentLinkId().toString(), 90);
 		}else if (getId().toString().contains("g")) {
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 0, 192, 64, 128,0,true);
+			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1],(float) this.r, 0, 192, 64, 128,0,true);
 		} else if (getId().toString().contains("r")) {
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, 192, 0, 64, 128,0,true);
+			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1],(float) this.r, 192, 0, 64, 128,0,true);
 		} else {
 			int nr = this.hashCode()%3*255;
 			int r,g,b;
@@ -290,7 +293,7 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 				g=0;
 				b=nr;
 			}
-			visDebugger.addCircle(this.getPos()[0], this.getPos()[1], this.r, r, g, b, 222,0,true);
+			visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1], (float)this.r, r, g, b, 222,0,true);
 		}
 	
 		this.ocalc.addDebugger(visDebugger);
@@ -303,17 +306,17 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	}
 
 	@Override
-	public float getRadius() {
+	public double getRadius() {
 		return this.r;
 	}
 
 	@Override
-	public float getXLocation() {
+	public double getXLocation() {
 		return this.pos[0];
 	}
 
 	@Override
-	public float getYLocation() {
+	public double getYLocation() {
 		return this.pos[1];
 	}
 
@@ -329,6 +332,12 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 			return getId().equals(((Sim2DAgent) obj).getId());
 		}
 		return false;
+	}
+
+	@Override
+	public void setDesiredSpeed(double v) {
+		double g = MatsimRandom.getRandom().nextGaussian()*.26;
+		this.v0 = v+g;
 	}
 
 }

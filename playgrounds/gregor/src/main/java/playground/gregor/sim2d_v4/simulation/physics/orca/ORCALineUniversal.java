@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DAgentBuilder.java
+ * ORCALineUniversal.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,29 +18,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation;
+package playground.gregor.sim2d_v4.simulation.physics.orca;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.debugger.VisDebugger;
 
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.simulation.physics.DelegableSim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.FailsafeAgentImpl;
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.SocialForceAgent;
+public class ORCALineUniversal implements ORCALine{
 
-public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
+	private double x;
+	private double y;
+	private double dx;
+	private double dy;
 	
-	private final Sim2DConfig conf;
-
-	public SocialForceSim2DAgentFactory(Sim2DConfig conf) {
-		this.conf = conf;
+	@Override
+	public boolean solutionSatisfyConstraint(double[] v) {
+double leftVal = CGAL.isLeftOfLine(v[0], v[1],this.getPointX(), this.getPointY(), this.getPointX()+this.getDirectionX(),this.getPointY()+this.getDirectionY());
+		
+		return leftVal > 0;
 	}
 
 	@Override
-	public Sim2DAgent buildAgent(QVehicle veh, double spawnX, double spawnY) {
-		DelegableSim2DAgent delegate = new SocialForceAgent(veh, spawnX, spawnY,this.conf.getTimeStepSize());
-		Sim2DAgent agent = new FailsafeAgentImpl(delegate);
-		return agent;
+	public double getPointX() {
+		return this.x;
+	}
+
+	@Override
+	public double getPointY() {
+		return this.y;
+	}
+
+	@Override
+	public void setPointX(double x) {
+		this.x = x;
+	}
+
+	@Override
+	public void setPointY(double y) {
+		this.y = y;
+	}
+
+	@Override
+	public double getDirectionX() {
+		return this.dx;
+	}
+
+	@Override
+	public double getDirectionY() {
+		return this.dy;
+	}
+
+	@Override
+	public void debug(VisDebugger visDebugger, int r, int g, int b) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void setDirectionX(double x) {
+		this.dx = x;
+	}
+
+	@Override
+	public void setDirectionY(double y) {
+		this.dy = y;
 	}
 
 }

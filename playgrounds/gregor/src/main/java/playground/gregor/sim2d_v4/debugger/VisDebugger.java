@@ -70,7 +70,7 @@ public class VisDebugger extends PApplet {
 	private String time = "00:00.00.0";
 	private String iteration = "it: 0";
 	private final double dT;
-	private double speedup = 10;
+	private float speedup = 10;
 
 	private int bgXShift;
 	private int bgYShift;
@@ -190,7 +190,7 @@ public class VisDebugger extends PApplet {
 
 	void speedup(int delta) {
 		this.speedup += delta/10.;
-		this.speedup = Math.max(0.05, this.speedup);
+		this.speedup = Math.max(0.05f, this.speedup);
 		this.speedup = Math.min(100, this.speedup);
 		//		System.out.println(this.speedup);
 	}
@@ -629,7 +629,7 @@ public class VisDebugger extends PApplet {
 		return this.iteration;
 	}
 
-	public void setTransformationStuff(double x, double y) {
+	public void setTransformationStuff(float x, float y) {
 		if (this.pTileFac != null) {
 			return;
 		}

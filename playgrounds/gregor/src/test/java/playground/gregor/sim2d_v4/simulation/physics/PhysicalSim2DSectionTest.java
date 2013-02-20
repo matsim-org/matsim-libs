@@ -99,7 +99,7 @@ public class PhysicalSim2DSectionTest {
 		
 		Neighbors ncalc = new Neighbors();
 		ncalc.setRangeAndMaxNrOfNeighbors(10, 3);
-		List<Tuple<Float, Sim2DAgent>> neighbors = ncalc.computeNeighbors(agentInQuestion);
+		List<Tuple<Double, Sim2DAgent>> neighbors = ncalc.computeNeighbors(agentInQuestion);
 		assertEquals(neighbors.size(),3);
 		assertEquals(a1,neighbors.get(0).getSecond());
 		assertEquals(a0,neighbors.get(1).getSecond());
@@ -199,13 +199,13 @@ public class PhysicalSim2DSectionTest {
 	private class DummyAgent implements Sim2DAgent{
 
 
-		private final float [] pos = {0,0};
+		private final double [] pos = {0,0};
 
 		private PhysicalSim2DSection currentPSec;
 
-		public DummyAgent(float spawnX, float spawnY) {
-			this.pos[0] = (float) (spawnX - PhysicalSim2DSectionTest.this.e.getMinX());
-			this.pos[1] = (float) (spawnY - PhysicalSim2DSectionTest.this.e.getMinY());
+		public DummyAgent(double spawnX, double spawnY) {
+			this.pos[0] = (spawnX - PhysicalSim2DSectionTest.this.e.getMinX());
+			this.pos[1] = (spawnY - PhysicalSim2DSectionTest.this.e.getMinY());
 		}
 
 		@Override
@@ -225,12 +225,12 @@ public class PhysicalSim2DSectionTest {
 		}
 
 		@Override
-		public void move(float dx, float dy) {
+		public void move(double dx, double dy) {
 			throw new RuntimeException("don't call this method!");
 		}
 
 		@Override
-		public float[] getVelocity() {
+		public double[] getVelocity() {
 			throw new RuntimeException("don't call this method!");
 		}
 
@@ -240,7 +240,7 @@ public class PhysicalSim2DSectionTest {
 		}
 
 		@Override
-		public float[] getPos() {
+		public double[] getPos() {
 			return this.pos;
 		}
 
@@ -271,18 +271,24 @@ public class PhysicalSim2DSectionTest {
 		}
 
 		@Override
-		public float getRadius() {
+		public double getRadius() {
 			throw new RuntimeException("don't call this method!");
 		}
 
 		@Override
-		public float getXLocation() {
+		public double getXLocation() {
 			return this.pos[0];
 		}
 
 		@Override
-		public float getYLocation() {
+		public double getYLocation() {
 			return this.pos[1];
+		}
+
+		@Override
+		public void setDesiredSpeed(double v) {
+			// TODO Auto-generated method stub
+			
 		}
 
 

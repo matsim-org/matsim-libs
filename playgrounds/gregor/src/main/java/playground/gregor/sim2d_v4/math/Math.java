@@ -42,18 +42,6 @@ public abstract class Math {
 		return x;
 	}
 
-	/**
-	 * Fast approximation of the exponential function 
-	 * see http://www.javamex.com/tutorials/math/exp.shtml
-	 * @param x
-	 * @return exp(x)
-	 */
-	public static float exp(float x) {
-		x = 1f + x / 256f;
-		x *= x; x *= x; x *= x; x *= x;
-		x *= x; x *= x; x *= x; x *= x;
-		return x;
-	}
 
 
 
@@ -64,7 +52,7 @@ public abstract class Math {
 	//		for (int i = 0; i < MAX; i++) {
 	//			rnds.add((MatsimRandom.getRandom().nextDouble()-.5)*20);
 	//			double dbl = rnds.get(i);
-	//			frnds.add((float)dbl);
+	//			frnds.add((double)dbl);
 	//		}
 	//		for (int i = 0; i < MAX; i++) {
 	//			double [] dbl = new double[MAX];
@@ -91,8 +79,8 @@ public abstract class Math {
 	//			
 	//			long start = System.nanoTime();
 	//			for (int j = 0; j < MAX; j++) {
-	//				float rnd = frnds.get(j);
-	//				float exp = (float) java.lang.Math.exp(rnd);
+	//				double rnd = frnds.get(j);
+	//				double exp = (double) java.lang.Math.exp(rnd);
 	//				dbl[j] -= exp;
 	//			}
 	//			long end = System.nanoTime();
@@ -100,8 +88,8 @@ public abstract class Math {
 	//			
 	//			start = System.nanoTime();
 	//			for (int j = 0; j < MAX; j++) {
-	//				float rnd = frnds.get(j);
-	//				float exp = exp(rnd);
+	//				double rnd = frnds.get(j);
+	//				double exp = exp(rnd);
 	//				dbl[j] += exp;
 	//			}
 	//			end = System.nanoTime();

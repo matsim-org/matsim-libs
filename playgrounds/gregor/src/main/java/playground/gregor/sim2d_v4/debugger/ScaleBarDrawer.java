@@ -27,7 +27,7 @@ public class ScaleBarDrawer implements VisDebuggerAdditionalDrawer {
 		int w = p.getWidth();
 		int h = p.getHeight();
 		float scale = p.getScale();
-		double width = w / scale;
+		float width = w / scale;
 		if (width > 1000) {
 			draw(p,300,300*scale,h,w);
 		} else if (width > 500) {

@@ -46,7 +46,7 @@ public class PhysicalSim2DEnvironment {
 
 	private static final Logger log = Logger.getLogger(PhysicalSim2DEnvironment.class);
 
-	private static final float DEP_BOX_WIDTH = 0.9f; // must be >= agents' diameter
+	private static final double DEP_BOX_WIDTH = 0.9f; // must be >= agents' diameter
 
 	private final Sim2DEnvironment env;
 
@@ -165,15 +165,15 @@ public class PhysicalSim2DEnvironment {
 
 		
 		//create departure boxes
-		float dx = opening.x1 - opening.x0;
-		float dy = opening.y1 - opening.y0;
-		float width = (float) Math.sqrt(dx*dx+dy*dy);
+		double dx = opening.x1 - opening.x0;
+		double dy = opening.y1 - opening.y0;
+		double width = (double) Math.sqrt(dx*dx+dy*dy);
 		dx /= width;
 		dy /= width;
 
 		boolean ccw = CGAlgorithms.isCCW(sec.getPolygon().getExteriorRing().getCoordinates());
-		float bx;
-		float by;
+		double bx;
+		double by;
 		if (ccw) { // rotate right(currently not supported)
 			bx = dy;
 			by = -dx;
@@ -225,22 +225,22 @@ public class PhysicalSim2DEnvironment {
 			Id [] neighbors = {id};
 			int level = sec.getLevel();
 			Section s = this.env.createSection(boxId, p, openings, neighbors, level);
-			float spawnX = (float)(bottomX-this.offsetX) + bx/1.5f + dx/2;
-			float spawnY = (float)(bottomY-this.offsetY) + by/1.5f + dy/2;
+			double spawnX = (double)(bottomX-this.offsetX) + bx/1.5f + dx/2;
+			double spawnY = (double)(bottomY-this.offsetY) + by/1.5f + dy/2;
 			PhysicalSim2DSection psecBox = createAndAddDepartureBox(s);
 			
 			//create dbox link info
 			LinkInfo dboxLi = new LinkInfo();
 			Segment link = new Segment();
-			link.x0 = (float)(bottomX-this.offsetX) + bx + dx/2;
-			link.y0 = (float)(bottomY-this.offsetY) + by + dy/2;
-			link.x1 = (float)(bottomX-this.offsetX) + dx/2;
-			link.y1 = (float)(bottomY-this.offsetY) + dy/2;
-			float dbdx = link.x1 - link.x0;
-			float dbdy = link.y1 - link.y0;
+			link.x0 = (double)(bottomX-this.offsetX) + bx + dx/2;
+			link.y0 = (double)(bottomY-this.offsetY) + by + dy/2;
+			link.x1 = (double)(bottomX-this.offsetX) + dx/2;
+			link.y1 = (double)(bottomY-this.offsetY) + dy/2;
+			double dbdx = link.x1 - link.x0;
+			double dbdy = link.y1 - link.y0;
 			dbdx /= 1.5f * DEP_BOX_WIDTH;
 			dbdy /= 1.5f * DEP_BOX_WIDTH;
-//			float length = Math.sqrt()
+//			double length = Math.sqrt()
 			dboxLi.link = link;
 			dboxLi.dx = dbdx;
 			dboxLi.dy = dbdy;

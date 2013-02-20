@@ -62,7 +62,7 @@ public class Sim2DRunner implements IterationStartsListener{
 		sc.addScenarioElement(sim2dsc);
 		sim2dsc.connect(sc);
 
-		//offsets needed to convert to floats later in program
+		//offsets needed to convert to doubles later in program
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = minX;
 		for (Node n : sc.getNetwork().getNodes().values()) {
@@ -84,7 +84,7 @@ public class Sim2DRunner implements IterationStartsListener{
 
 		if (args[2].equals("true")) {
 			Sim2DRunner runner = new Sim2DRunner();
-			runner.visDebugger = new VisDebugger(sim2dc.getTimeStepSize());
+			runner.visDebugger = new VisDebugger( sim2dc.getTimeStepSize());
 //			runner.visDebugger.setTransformationStuff(minX, minY);
 			controller.addControlerListener(runner);
 			runner.controller = controller;

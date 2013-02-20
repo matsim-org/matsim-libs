@@ -40,12 +40,12 @@ public class FailsafeAgentImpl implements Sim2DAgent {
 
 	
 	@Override
-	public float getXLocation() {
+	public double getXLocation() {
 		return this.delegate.getXLocation();
 	}
 
 	@Override
-	public float getYLocation() {
+	public double getYLocation() {
 		return this.delegate.getYLocation();
 	}
 
@@ -70,18 +70,18 @@ public class FailsafeAgentImpl implements Sim2DAgent {
 	}
 
 	@Override
-	public void move(float dx, float dy) {
+	public void move(double dx, double dy) {
 		this.delegate.move(dx, dy);
 	}
 
 	@Override
-	public float[] getVelocity() {
+	public double[] getVelocity() {
 		return this.delegate.getVelocity();
 	}
 
 
 	@Override
-	public float[] getPos() {
+	public double[] getPos() {
 		return this.delegate.getPos();
 	}
 
@@ -97,7 +97,7 @@ public class FailsafeAgentImpl implements Sim2DAgent {
 	}
 
 	@Override
-	public float getRadius() {
+	public double getRadius() {
 		return this.delegate.getRadius();
 	}
 
@@ -141,5 +141,11 @@ public class FailsafeAgentImpl implements Sim2DAgent {
 			return getId().equals(((Sim2DAgent) obj).getId());
 		}
 		return false;
+	}
+
+
+	@Override
+	public void setDesiredSpeed(double v) {
+		this.delegate.setDesiredSpeed(v);
 	}
 }

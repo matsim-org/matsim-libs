@@ -67,7 +67,6 @@ public class QSimFibonacciPulser implements VisDebuggerAdditionalDrawer, AgentDe
 			LinkInfo info = new LinkInfo();
 			info.cap = (int) (l.getLength()*lanes/0.26);
 			WeightedLine line = new WeightedLine();
-			double ii = width/2;
 			line.x0 = (float) (l.getFromNode().getCoord().getX() - offsetX );
 			line.y0 = (float) (l.getFromNode().getCoord().getY() - offsetY );
 			line.x1 = (float) (l.getToNode().getCoord().getX() - offsetX );
@@ -76,14 +75,14 @@ public class QSimFibonacciPulser implements VisDebuggerAdditionalDrawer, AgentDe
 			line.a = 128;
 			line.weight = 1;
 			info.w = line;
-			info.width = width;
+			info.width = (float) width;
 
 			info.x0 = line.x0;
 			info.x1 = line.x1;
 			info.y1 = line.y1;
 			info.y0 = line.y0;
-			info.dx = dy;
-			info.dy = -dx;
+			info.dx = (float) dy;
+			info.dy = (float) -dx;
 
 
 			Text t = new Text();
@@ -109,11 +108,11 @@ public class QSimFibonacciPulser implements VisDebuggerAdditionalDrawer, AgentDe
 				ll.g=0;
 				ll.b=0;
 				ll.a=255;
-				ll.x0 = (float) (l.x0+l.dx*l.width/2);
-				ll.x1 = (float) (l.x1+l.dx*l.width/2);
-				ll.y0 = (float) (l.y0+l.dy*l.width/2);
-				ll.y1 = (float) (l.y1+l.dy*l.width/2);
-				ll.weight = (float) l.width;
+				ll.x0 = l.x0+l.dx*l.width/2;
+				ll.x1 = l.x1+l.dx*l.width/2;
+				ll.y0 = l.y0+l.dy*l.width/2;
+				ll.y1 = l.y1+l.dy*l.width/2;
+				ll.weight = l.width;
 				p.drawWeightedLine(ll);
 				if (l.onLink == 0) {
 					continue;
@@ -131,13 +130,13 @@ public class QSimFibonacciPulser implements VisDebuggerAdditionalDrawer, AgentDe
 				ll.a = 192;
 				p.drawWeightedLine(ll);
 				ll.a = 255;
-				ll.weight = (float) ((this.intensities[(int) l.count])*l.width/34);
+				ll.weight = (this.intensities[(int) l.count])*l.width/34;
 				//				for (int i = 0; i < 5; i++) {
 
-				ll.x0 = (float) (l.x0+l.dx*ll.weight);
-				ll.x1 = (float) (l.x1+l.dx*ll.weight);
-				ll.y0 = (float) (l.y0+l.dy*ll.weight);
-				ll.y1 = (float) (l.y1+l.dy*ll.weight);
+				ll.x0 = l.x0+l.dx*ll.weight;
+				ll.x1 = l.x1+l.dx*ll.weight;
+				ll.y0 = l.y0+l.dy*ll.weight;
+				ll.y1 = l.y1+l.dy*ll.weight;
 				p.drawWeightedLine(ll);
 				//					ll.weight /=2;
 				p.drawText(l.t);
@@ -157,26 +156,26 @@ public class QSimFibonacciPulser implements VisDebuggerAdditionalDrawer, AgentDe
 
 
 	private static final class LinkInfo {
-		public double dy;
-		public double dx;
+		public float dy;
+		public float dx;
 		public float y0;
 		public float y1;
 		public float x1;
 		public float x0;
 		public int cap;
-		public double incr = 0.1;
-		public double width;
-		//		public double incr;
+		public float incr = 0.1f;
+		public float width;
+		//		public float incr;
 		public int from=0; //0-5
 		public final int range = 4;
 		WeightedLine w;
-		double count = this.from;
+		float count = this.from;
 		public int onLink;
 		public int onLinkG;
 		public int onLinkR;
 		Text t;
 		public void revise() {
-			double load = this.onLink/this.cap;
+			float load = this.onLink/this.cap;
 			int from;
 			if (load >= 0.75) {
 				from = 3;
@@ -190,7 +189,7 @@ public class QSimFibonacciPulser implements VisDebuggerAdditionalDrawer, AgentDe
 			if (from != this.from) {
 				this.from = from;
 				this.count = from;
-				this.incr = 0.1;
+				this.incr = 0.1f;
 			}
 
 		}

@@ -41,13 +41,13 @@ public interface Sim2DAgent extends TwoDObject{
 	
 	public abstract PhysicalSim2DSection getPSec();
 	
-	public abstract void move(float dx, float dy);
+	public abstract void move(double dx, double dy);
 
-	public abstract float[] getVelocity();
+	public abstract double[] getVelocity();
 
 	public abstract Id getCurrentLinkId();
 
-	public abstract float[] getPos();
+	public abstract double[] getPos();
 
 	public abstract Id chooseNextLinkId();
 
@@ -57,8 +57,9 @@ public interface Sim2DAgent extends TwoDObject{
 
 	public abstract void debug(VisDebugger visDebugger);
 
-	public abstract float getRadius();
+	public abstract double getRadius();
 
+	public abstract void setDesiredSpeed(double v);
 	
 	
 

@@ -63,7 +63,7 @@ public class PhysicalSim2DSection {
 	private final List<Sim2DAgent> inBuffer = new LinkedList<Sim2DAgent>();
 	protected final List<Sim2DAgent> agents = new LinkedList<Sim2DAgent>();
 
-	protected final float timeStepSize;
+	protected final double timeStepSize;
 
 	protected final PhysicalSim2DEnvironment penv;
 
@@ -76,7 +76,7 @@ public class PhysicalSim2DSection {
 	public PhysicalSim2DSection(Section sec, Sim2DScenario sim2dsc, double offsetX, double offsetY, PhysicalSim2DEnvironment penv) {
 		this.sec = sec;
 		this.sim2dsc = sim2dsc;
-		this.timeStepSize = (float) sim2dsc.getSim2DConfig().getTimeStepSize();
+		this.timeStepSize = sim2dsc.getSim2DConfig().getTimeStepSize();
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
 		this.penv = penv;
@@ -113,15 +113,15 @@ public class PhysicalSim2DSection {
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
-			float [] v = agent.getVelocity();
-			float dx = v[0] * this.timeStepSize;
-			float dy = v[1] * this.timeStepSize;
+			double [] v = agent.getVelocity();
+			double dx = v[0] * this.timeStepSize;
+			double dy = v[1] * this.timeStepSize;
 			Id currentLinkId = agent.getCurrentLinkId();
 			LinkInfo li = this.linkInfos.get(currentLinkId);
-			float [] oldPos = agent.getPos();
-			float newXPosX = oldPos[0] + dx;
-			float newXPosY = oldPos[1] + dy;
-			float lefOfFinishLine = CGAL.isLeftOfLine(newXPosX, newXPosY, li.finishLine.x0, li.finishLine.y0, li.finishLine.x1, li.finishLine.y1);
+			double [] oldPos = agent.getPos();
+			double newXPosX = oldPos[0] + dx;
+			double newXPosY = oldPos[1] + dy;
+			double lefOfFinishLine = CGAL.isLeftOfLine(newXPosX, newXPosY, li.finishLine.x0, li.finishLine.y0, li.finishLine.x1, li.finishLine.y1);
 			if (lefOfFinishLine >= 0) { //agent has reached the end of link
 				Id nextLinkId = agent.chooseNextLinkId();
 				if (nextLinkId == null) {
@@ -217,13 +217,13 @@ public class PhysicalSim2DSection {
 			Coordinate c0 = coords[i];
 			Coordinate c1 = coords[i+1];
 			Segment seg = new Segment();
-			seg.x0 = (float) (c0.x-this.offsetX);
-			seg.x1 = (float) (c1.x-this.offsetX);
-			seg.y0 = (float) (c0.y-this.offsetY);
-			seg.y1 = (float) (c1.y-this.offsetY);
+			seg.x0 = c0.x-this.offsetX;
+			seg.x1 = c1.x-this.offsetX;
+			seg.y0 = c0.y-this.offsetY;
+			seg.y1 = c1.y-this.offsetY;
 
-			float dx = seg.x1-seg.x0;
-			float dy = seg.y1-seg.y0;
+			double dx = seg.x1-seg.x0;
+			double dy = seg.y1-seg.y0;
 			double length = Math.sqrt(dx*dx+dy*dy);
 			dx /= length;
 			dy /= length;
@@ -240,7 +240,7 @@ public class PhysicalSim2DSection {
 		this.obstacles = obst;
 		this.openings = open.toArray(new Segment[0]);
 
-		Map<Id, ? extends Link> links = this.sim2dsc.getMATSimScenario().getNetwork().getLinks();
+		Map<Id, ? extends Link> links = this.getSim2dsc().getMATSimScenario().getNetwork().getLinks();
 		for (Id id : this.sec.getRelatedLinkIds()) {
 			Link l = links.get(id);
 			LinkInfo li = new LinkInfo();
@@ -249,13 +249,13 @@ public class PhysicalSim2DSection {
 			Coord from = l.getFromNode().getCoord();
 			Coord to = l.getToNode().getCoord();
 			Segment seg = new Segment();
-			seg.x0 = (float) (from.getX()-this.offsetX);
-			seg.x1 = (float) (to.getX()-this.offsetX);
-			seg.y0 = (float) (from.getY()-this.offsetY);
-			seg.y1 = (float) (to.getY()-this.offsetY);
+			seg.x0 = from.getX()-this.offsetX;
+			seg.x1 = to.getX()-this.offsetX;
+			seg.y0 = from.getY()-this.offsetY;
+			seg.y1 = to.getY()-this.offsetY;
 
-			float dx = seg.x1-seg.x0;
-			float dy = seg.y1-seg.y0;
+			double dx = seg.x1-seg.x0;
+			double dy = seg.y1-seg.y0;
 			double length = Math.sqrt(dx*dx+dy*dy);
 			dx /= length;
 			dy /= length;
@@ -268,7 +268,7 @@ public class PhysicalSim2DSection {
 			li.fromOpening = fromOpening;
 			if (toOpening != null) {
 				li.finishLine = toOpening;
-				li.width = (float)Math.sqrt((toOpening.x0-toOpening.x1)*(toOpening.x0-toOpening.x1)+(toOpening.y0-toOpening.y1)*(toOpening.y0-toOpening.y1)); 
+				li.width = Math.sqrt((toOpening.x0-toOpening.x1)*(toOpening.x0-toOpening.x1)+(toOpening.y0-toOpening.y1)*(toOpening.y0-toOpening.y1)); 
 				this.openingLinkIdMapping .put(toOpening,id);
 			} else {
 				Segment finishLine = new Segment();
@@ -286,7 +286,7 @@ public class PhysicalSim2DSection {
 	}
 
 	/*package*/ void connect() {
-		Map<Id, ? extends Link> links = this.sim2dsc.getMATSimScenario().getNetwork().getLinks();
+		Map<Id, ? extends Link> links = this.getSim2dsc().getMATSimScenario().getNetwork().getLinks();
 		for (Id id : this.sec.getRelatedLinkIds()) {
 			Link l = links.get(id);
 			LinkInfo li = this.linkInfos.get(l.getId());
@@ -308,14 +308,14 @@ public class PhysicalSim2DSection {
 		this.linkInfos.put(id, li);
 	}
 
-	private Segment getTouchingSegment(float x0, float y0, float x1, float y1, Segment[] openings) {
+	private Segment getTouchingSegment(double x0, double y0, double x1, double y1, Segment[] openings) {
 
 		for (Segment opening : openings) {
 
 			boolean onSegment = CGAL.isOnVector(x0, y0,opening.x0, opening.y0, opening.x1, opening.y1); // this is a necessary but not sufficient condition since a section is only approx convex. so we need the following test as well
 			if (onSegment) {
-				float isLeft0  = CGAL.isLeftOfLine(opening.x0, opening.y0,x0, y0, x1, y1);
-				float isLeft1  = CGAL.isLeftOfLine(opening.x1, opening.y1,x0, y0, x1, y1);
+				double isLeft0  = CGAL.isLeftOfLine(opening.x0, opening.y0,x0, y0, x1, y1);
+				double isLeft1  = CGAL.isLeftOfLine(opening.x1, opening.y1,x0, y0, x1, y1);
 				if (isLeft0 * isLeft1 >= 0){ // coordinate is on a vector given by the segment opening but not on the segment itself. This case is unlikely to occur! 
 					onSegment = false;
 				}
@@ -329,19 +329,19 @@ public class PhysicalSim2DSection {
 
 
 	public static final class Segment {
-		public float  x0;
-		public float  x1;
-		public float  y0;
-		public float  y1;
-		public float dx;//normalized!!
-		public float dy;//normalized!!
+		public double  x0;
+		public double  x1;
+		public double  y0;
+		public double  y1;
+		public double dx;//normalized!!
+		public double dy;//normalized!!
 	}
 
 	public static final class LinkInfo {
 
-		public float width;
-		public float dx;
-		public float dy;
+		public double width;
+		public double dx;
+		public double dy;
 		public Segment link;
 		Segment fromOpening;
 		Segment finishLine;
@@ -376,24 +376,24 @@ public class PhysicalSim2DSection {
 	public void debug(VisDebugger visDebugger) {
 		if (visDebugger.isFirst()) {
 			for (Segment seg : this.obstacles) {
-				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 18, 34, 34, 128,0);
+				visDebugger.addLineStatic((float)seg.x0,(float) seg.y0, (float)seg.x1,(float) seg.y1, 18, 34, 34, 128,0);
 			}
 			for (Segment seg : this.openings) {
-				visDebugger.addLineStatic(seg.x0, seg.y0, seg.x1, seg.y1, 0, 192, 64, 128,128);
+				visDebugger.addLineStatic((float)seg.x0,(float) seg.y0,(float) seg.x1,(float) seg.y1, 0, 192, 64, 128,128);
 			}
 			for (Id key : this.linkInfos.keySet()) {
-				Link l = this.sim2dsc.getMATSimScenario().getNetwork().getLinks().get(key);
-				float x0 = (float) (l.getFromNode().getCoord().getX() - this.offsetX);
-				float x1 = (float) (l.getToNode().getCoord().getX() - this.offsetX);
-				float y0 = (float) (l.getFromNode().getCoord().getY() - this.offsetY);
-				float y1 = (float) (l.getToNode().getCoord().getY() - this.offsetY);
-				visDebugger.addLineStatic(x0, y0, x1, y1,0, 0, 0, 255,240);
-				float dx = x1-x0 + MatsimRandom.getRandom().nextFloat()-.5f;
-				float dy = y1-y0 + MatsimRandom.getRandom().nextFloat()-.5f;;
-				float length = (float) Math.sqrt(dx*dx+dy*dy);
+				Link l = this.getSim2dsc().getMATSimScenario().getNetwork().getLinks().get(key);
+				double x0 = l.getFromNode().getCoord().getX() - this.offsetX;
+				double x1 = l.getToNode().getCoord().getX() - this.offsetX;
+				double y0 = l.getFromNode().getCoord().getY() - this.offsetY;
+				double y1 = l.getToNode().getCoord().getY() - this.offsetY;
+				visDebugger.addLineStatic((float)x0,(float) y0,(float) x1,(float) y1,0, 0, 0, 255,240);
+				double dx = x1-x0 + MatsimRandom.getRandom().nextFloat()-.5f;
+				double dy = y1-y0 + MatsimRandom.getRandom().nextFloat()-.5f;;
+				double length = Math.sqrt(dx*dx+dy*dy);
 				dx /=length;
 				dy /=length;
-				visDebugger.addTextStatic((x1+x0)/2+dy/2, (y1+y0)/2-dx/2, key.toString(),99);
+				visDebugger.addTextStatic((float)((x1+x0)/2+dy/2), (float)((y1+y0)/2-dx/2), key.toString(),99);
 
 			}
 
@@ -432,7 +432,7 @@ public class PhysicalSim2DSection {
 //			LinkInfo li = this.linkInfos.get(agent.getCurrentLinkId());
 //			if (agent.getId().toString().equals("6")) {
 //				visDebugger.addLine(li.finishLine.x0, li.finishLine.y0, li.finishLine.x1, li.finishLine.y1, 255, 0, 0, 255, 0);
-//				visDebugger.addCircle(li.finishLine.x1,li.finishLine.y1,(float) .25, 255, 0, 0, 255, 0);
+//				visDebugger.addCircle(li.finishLine.x1,li.finishLine.y1,(double) .25, 255, 0, 0, 255, 0);
 //			}
 		}
 		for (Sim2DAgent agent : this.inBuffer) {
@@ -450,6 +450,10 @@ public class PhysicalSim2DSection {
 
 	public List<Segment> getObstacles() {
 		return this.obstacles;
+	}
+
+	public Sim2DScenario getSim2dsc() {
+		return sim2dsc;
 	}
 
 

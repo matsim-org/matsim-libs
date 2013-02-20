@@ -36,7 +36,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSim2DNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
 public class HybridQ2DMobsimFactory implements MobsimFactory {
 
@@ -88,9 +87,9 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
-		Sim2DScenario sc2d = sc.getScenarioElement(Sim2DScenario.class);
-		Sim2DAgentFactory aBuilder = new SocialForceSim2DAgentFactory(sc2d.getSim2DConfig());
-//		Sim2DAgentFactory aBuilder = new ORCAAgentFactory();
+//		Sim2DScenario sc2d = sc.getScenarioElement(Sim2DScenario.class);
+//		Sim2DAgentFactory aBuilder = new SocialForceSim2DAgentFactory(sc2d.getSim2DConfig());
+		Sim2DAgentFactory aBuilder = new ORCAAgentFactory();
 		
 		HybridQSim2DNetworkFactory networkFactory = new HybridQSim2DNetworkFactory(e,sc, aBuilder);
 		

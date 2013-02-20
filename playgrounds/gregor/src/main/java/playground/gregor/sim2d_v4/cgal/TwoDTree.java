@@ -89,7 +89,7 @@ public class TwoDTree<T extends TwoDObject> {
 	private static class TwoDNode<T extends TwoDObject> {
 		private static final Logger log = Logger.getLogger(TwoDNode.class);
 		private static final int cacheSize = 128;
-		private static final float EPSILON = 0.0001f; 
+		private static final double EPSILON = 0.0001f; 
 		private int maxDepth = 128; 
 		
 		private final int depth;
@@ -178,16 +178,16 @@ public class TwoDTree<T extends TwoDObject> {
 			final double maxY = this.envelope.getMaxY();
 
 			if (this.depth % 2 == 0) { //vertical split
-				final float [] xs = new float[this.cache.size()];
+				final double [] xs = new double[this.cache.size()];
 				int idx = 0;
 				Iterator<T> it = this.cache.iterator();
 				while (it.hasNext()) {
 					T next = it.next();
-					float x = next.getXLocation();
+					double x = next.getXLocation();
 					xs[idx++] = x;
 				}
 				Arrays.sort(xs);
-				final float median = xs[this.cache.size()/2];
+				final double median = xs[this.cache.size()/2];
 				if ((xs[this.cache.size()-1]-xs[0]) < EPSILON) {
 					log.warn("region to small can not split it!  The region is: " + this.envelope + " Data inserted into this region will be stored in a linear list.");
 					this.maxDepth = this.depth;
@@ -200,16 +200,16 @@ public class TwoDTree<T extends TwoDObject> {
 				this.right = new TwoDNode<T>(e2, this.depth+1);
 
 			} else {//horizontal split
-				final float [] ys = new float[this.cache.size()];
+				final double [] ys = new double[this.cache.size()];
 				int idx = 0;
 				Iterator<T> it = this.cache.iterator();
 				while (it.hasNext()) {
 					T next = it.next();
-					float y = next.getYLocation();
+					double y = next.getYLocation();
 					ys[idx++] = y;
 				}
 				Arrays.sort(ys);
-				float median = ys[this.cache.size()/2];
+				double median = ys[this.cache.size()/2];
 				if ((ys[this.cache.size()-1]-ys[0]) < EPSILON) {
 					log.warn("region to small can not split it!  The region is: " + this.envelope + " Data inserted into this region will be stored in a linear list.");
 					this.maxDepth = this.depth;
@@ -252,8 +252,8 @@ public class TwoDTree<T extends TwoDObject> {
 		Envelope e = new Envelope(-100,100,-100,100);
 		List<TwoDObj> os = new ArrayList<TwoDObj>();
 		for (int i = 0; i < TEST; i++) {
-			float x = (MatsimRandom.getRandom().nextFloat() - .5f) * 200;
-			float y = (MatsimRandom.getRandom().nextFloat() - .5f) * 200;
+			double x = (MatsimRandom.getRandom().nextFloat() - .5f) * 200;
+			double y = (MatsimRandom.getRandom().nextFloat() - .5f) * 200;
 			TwoDObj o = new TwoDObj(x,y);
 			os.add(o);
 		}
@@ -330,21 +330,21 @@ public class TwoDTree<T extends TwoDObject> {
 
 	private static final class TwoDObj implements TwoDObject {
 
-		private final float x;
-		private final float y;
+		private final double x;
+		private final double y;
 
-		public TwoDObj(float x, float y) {
+		public TwoDObj(double x, double y) {
 			this.x = x;
 			this.y = y;
 		}
 
 		@Override
-		public float getXLocation() {
+		public double getXLocation() {
 			return this.x;
 		}
 
 		@Override
-		public float getYLocation() {
+		public double getYLocation() {
 			return this.y;
 		}
 

@@ -24,7 +24,7 @@ public class MousePositionDrawer implements VisDebuggerAdditionalDrawer{
 
 	@Override
 	public void draw(VisDebugger p) {
-		final float scale = p.getScale();
+		final double scale = p.getScale();
 		p.fill(16,128);
 		p.stroke(0,0);
 		p.rect(10,p.getHeight()-45,120,40);

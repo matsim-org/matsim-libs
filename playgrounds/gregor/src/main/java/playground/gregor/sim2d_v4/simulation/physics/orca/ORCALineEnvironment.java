@@ -20,72 +20,66 @@
 
 package playground.gregor.sim2d_v4.simulation.physics.orca;
 
-//import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAAgent;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 
-@Deprecated
 public class ORCALineEnvironment implements ORCALine {
 
-	private float pointX;
-	private float pointY;
-	private float directionX;
-	private float directionY;
-	private float dbgX;
-	private float dbgY;
-	private float cy;
-	private float cx;
+	private double pointX;
+	private double pointY;
+	private double directionX;
+	private double directionY;
 
-	public ORCALineEnvironment(ORCAAgent orcaAgent, Segment seg, float tau) {
+	public ORCALineEnvironment(ORCAAgent orcaAgent, Segment seg, double tau) {
 		construct(orcaAgent,seg,tau);
 	}
 
-	private void construct(ORCAAgent orcaAgent, Segment seg, float tau) {
+	private void construct(ORCAAgent orcaAgent, Segment seg, double tau) {
 		
 		
 //		tau = 1f;
 		//mm line segment {x0,y0,x1,y1}
 		
-		final float posX = orcaAgent.getPos()[0];
-		final float posY = orcaAgent.getPos()[1];
+		final double posX = orcaAgent.getPos()[0];
+		final double posY = orcaAgent.getPos()[1];
 				
 		//here we have two possible orientations of the ORCA line, either it runs parallel to the line segment
 		//or it is a tangent on Minkowski sum circle that is closer to the point of origin
 		//1. check whether line segment is responsible
-		float xpBpA0 = (seg.x0 - posX)/tau;
-		float ypBpA0 = (seg.y0 - posY)/tau;
-		float xpBpA1 = (seg.x1 - posX)/tau;
-		float ypBpA1 = (seg.y1 - posY)/tau;
+		double xpBpA0 = (seg.x0 - posX)/tau;
+		double ypBpA0 = (seg.y0 - posY)/tau;
+		double xpBpA1 = (seg.x1 - posX)/tau;
+		double ypBpA1 = (seg.y1 - posY)/tau;
 		
 //		GuiDebugger.addVector(0, 0, xpBpA0, ypBpA0);
 //		GuiDebugger.addVector(0, 0, xpBpA1, ypBpA1);
 		
-		float rATau = (orcaAgent.getRadius())/tau;
+		double rATau = (orcaAgent.getRadius())/tau;
 		
-		float dxpBpA = xpBpA1-xpBpA0;
-		float dypBpA = ypBpA1-ypBpA0;
+		double dxpBpA = xpBpA1-xpBpA0;
+		double dypBpA = ypBpA1-ypBpA0;
 		
-		float c1 = ORCALineAgent.dot(-xpBpA0, -ypBpA0,dxpBpA,dypBpA);
-		float c2 = ORCALineAgent.dot(dxpBpA,dypBpA,dxpBpA,dypBpA);
-		float b  = c1/c2;
+		double c1 = ORCALineAgent.dot(-xpBpA0, -ypBpA0,dxpBpA,dypBpA);
+		double c2 = ORCALineAgent.dot(dxpBpA,dypBpA,dxpBpA,dypBpA);
+		double b  = c1/c2;
 		
 
 		if (b > 0 && b < 1) {// line segment
 			
-			float tmpX = (xpBpA0 + b*dxpBpA);
-			float tmpY = (ypBpA0 + b*dypBpA);
-			float norm = (float) Math.sqrt(tmpX*tmpX+tmpY*tmpY);//distance to origin
+			double tmpX = (xpBpA0 + b*dxpBpA);
+			double tmpY = (ypBpA0 + b*dypBpA);
+			double norm = Math.sqrt(tmpX*tmpX+tmpY*tmpY);//distance to origin
 
-			float xn  = tmpX/norm;
-			float yn  = tmpY/norm;
+			double xn  = tmpX/norm;
+			double yn  = tmpY/norm;
 			
 			if (norm < rATau) {
-				float move = rATau - norm;
-//				float coeff = move/norm;
-				this.pointX = xn*move;//(float) (a.getVx() - tmpX*coeff);
-				this.pointY = yn*move;//(float) (a.getVy() - tmpY*coeff);
+				double move = rATau - norm;
+//				double coeff = move/norm;
+				this.pointX = xn*move;//(double) (a.getVx() - tmpX*coeff);
+				this.pointY = yn*move;//(double) (a.getVy() - tmpY*coeff);
 			} else {
 				this.pointX = xn * (norm-rATau);
 				this.pointY = yn * (norm-rATau);
@@ -95,10 +89,10 @@ public class ORCALineEnvironment implements ORCALine {
 			this.directionY = xn;
 		} else {//circle
 			//1. determine which side
-			float sqrDist0 = xpBpA0 * xpBpA0  + ypBpA0 * ypBpA0;
-			float sqrDist1 = xpBpA1 * xpBpA1  + ypBpA1 * ypBpA1;
-			float cx;
-			float cy;
+			double sqrDist0 = xpBpA0 * xpBpA0  + ypBpA0 * ypBpA0;
+			double sqrDist1 = xpBpA1 * xpBpA1  + ypBpA1 * ypBpA1;
+			double cx;
+			double cy;
 			if (sqrDist0 < sqrDist1) {
 				cx = xpBpA0;
 				cy = ypBpA0;
@@ -106,9 +100,9 @@ public class ORCALineEnvironment implements ORCALine {
 				cx = xpBpA1;
 				cy = ypBpA1;
 			}
-			float norm = (float)Math.sqrt(cx*cx+cy*cy);
-			float xn = cx/norm;
-			float yn = cy/norm;
+			double norm = Math.sqrt(cx*cx+cy*cy);
+			double xn = cx/norm;
+			double yn = cy/norm;
 
 			this.pointX = xn * (norm-rATau);
 			this.pointY = yn * (norm-rATau);
@@ -119,77 +113,59 @@ public class ORCALineEnvironment implements ORCALine {
 				
 	}
 
-//	@Override
-//	public void gisDump() {
-//		
-//		//TODO create polygons!!
-////		LineString ls = GisDebugger.geofac.createLineString(new Coordinate[]{new Coordinate(this.pointX,this.pointY),new Coordinate(this.pointX+this.directionX,this.pointY+this.directionY),new Coordinate(this.pointX+this.directionX-this.directionY/10,this.pointY+this.directionY+this.directionX/10)});
-////		GisDebugger.addGeometry(ls,""+this.hashCode());
-////		LineString ls2 = GisDebugger.geofac.createLineString(this.lsc);
-////		GisDebugger.addGeometry(ls2,""+this.hashCode());
-//		
-//		Coordinate c0 = new Coordinate(this.pointX - 10*this.directionX,this.pointY - 10*this.directionY);
-//		Coordinate c1 = new Coordinate(this.pointX + 10*this.directionX,this.pointY + 10*this.directionY);
-//		Coordinate c2 = new Coordinate(this.pointX + 10*this.directionX+20*this.directionY,this.pointY + 10*this.directionY-20*this.directionX);
-//		Coordinate c3 = new Coordinate(this.pointX - 10*this.directionX+20*this.directionY,this.pointY - 10*this.directionY-20*this.directionX);
-//		Coordinate [] coords = {c0,c1,c2,c3,c0};
-//		LinearRing lr = GisDebugger.geofac.createLinearRing(coords);
-//		Polygon p = GisDebugger.geofac.createPolygon(lr, null);
-//		GisDebugger.addGeometry(p, "env");
-//	}
 
 	/* (non-Javadoc)
-	 * @see playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.ORCALineTMP#solutionSatisfyConstraint(float[])
+	 * @see playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.ORCALineTMP#solutionSatisfyConstraint(double[])
 	 */
 	@Override
-	public boolean solutionSatisfyConstraint(float[] v) {
-		float leftVal = CGAL.isLeftOfLine(v[0], v[1],this.getPointX(), this.getPointY(), this.getPointX()+this.getDirectionX(),this.getPointY()+this.getDirectionY());
+	public boolean solutionSatisfyConstraint(double[] v) {
+		double leftVal = CGAL.isLeftOfLine(v[0], v[1],this.getPointX(), this.getPointY(), this.getPointX()+this.getDirectionX(),this.getPointY()+this.getDirectionY());
 		
 		return leftVal >= 0;
 	}
 
 	@Override
-	public float getPointX() {
+	public double getPointX() {
 		return this.pointX;
 	}
 
 	@Override
-	public float getPointY() {
+	public double getPointY() {
 		return this.pointY;
 	}
 
 	@Override
-	public float getDirectionX() {
+	public double getDirectionX() {
 		return this.directionX;
 	}
 
 	@Override
-	public float getDirectionY() {
+	public double getDirectionY() {
 		return this.directionY;
 	}
 
 	@Override
-	public void setPointX(float x) {
+	public void setPointX(double x) {
 		throw new RuntimeException("not supported");
 		
 	}
 
 	@Override
-	public void setPointY(float y) {
+	public void setPointY(double y) {
 		throw new RuntimeException("not supported");
 	}
 	
 
 	@Override
 	public void debug(VisDebugger debugger, int r, int g, int b) {
-		float x0 = this.pointX - 10*this.directionX;
-		float y0 = this.pointY - 10*this.directionY;
-		float x1 = this.pointX + 10*this.directionX;
-		float y1 = this.pointY + 10*this.directionY;
-		float x2 = this.pointX + 10*this.directionX + 2*this.directionY;
-		float y2 = this.pointY + 10*this.directionY -2*this.directionX;
-		float x3 = this.pointX - 10*this.directionX + 2*this.directionY;
-		float y3 = this.pointY - 10*this.directionY -2*this.directionX;
+		float x0 = (float) (this.pointX - 10*this.directionX);
+		float y0 = (float) (this.pointY - 10*this.directionY);
+		float x1 = (float) (this.pointX + 10*this.directionX);
+		float y1 = (float) (this.pointY + 10*this.directionY);
+		float x2 = (float) (this.pointX + 10*this.directionX + 2*this.directionY);
+		float y2 = (float) (this.pointY + 10*this.directionY -2*this.directionX);
+		float x3 = (float) (this.pointX - 10*this.directionX + 2*this.directionY);
+		float y3 = (float) (this.pointY - 10*this.directionY -2*this.directionX);
 		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 32, 0);
 		x2 -= this.directionY;
 		y2 += this.directionX;
@@ -215,7 +191,17 @@ public class ORCALineEnvironment implements ORCALine {
 		y2 += this.directionX/16;
 		x3 -= this.directionY/16;
 		y3 += this.directionX/16;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 128, 0);;
+		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 128, 0);
+	}
+
+	@Override
+	public void setDirectionX(double x) {
+		this.directionX = x;
+	}
+
+	@Override
+	public void setDirectionY(double y) {
+		this.directionY = y;
 	}
 	
 
