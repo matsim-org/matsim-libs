@@ -171,4 +171,9 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	public Plan getSelectedPlan() {
 		return planDelegate.getSelectedPlan();
 	}
+
+	@Override
+	public String toString() {
+		return "["+getClass().getSimpleName()+": id="+getId()+"]";
+	}
 }

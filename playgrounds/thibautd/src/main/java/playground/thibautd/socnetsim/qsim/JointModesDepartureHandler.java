@@ -110,7 +110,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 					vehicle.addPassenger( passenger );
 				}
 			}
-			assert vehicle.getPassengers().size() == passengerIds.size() : vehicle.getPassengers()+" != "+passengerIds;
+			assert vehicle.getPassengers().size() == passengerIds.size() : vehicle.getPassengers()+" != "+passengerIds+" for driver "+agent.getId();
 
 			final boolean handled =
 				netsimEngine.getDepartureHandler().handleDeparture(
