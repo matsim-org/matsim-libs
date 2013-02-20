@@ -28,7 +28,7 @@
  *   &lt;param name="useBruteForce" value="true" /&gt;
  *
  * &lt;/module&gt;</pre>
- *   These parameters are defined in {@link org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup}
+ *   These parameters are defined in {@link org.matsim.contrib.CadytsCarConfigGroup.pt.CadytsPtConfigGroup}
  *
  * </li>
  * <li> There also needs to be a ptCounts entry, something like:

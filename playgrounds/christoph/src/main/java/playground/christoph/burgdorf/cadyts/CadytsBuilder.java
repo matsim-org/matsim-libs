@@ -45,7 +45,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 	}
 
 	/*package*/ static AnalyticalCalibrator<Link> buildCalibrator(final Scenario sc, final Counts occupCounts ) {
-		CadytsPtConfigGroup cadytsPtConfig = (CadytsPtConfigGroup) sc.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
+		CadytsCarConfigGroup cadytsPtConfig = (CadytsCarConfigGroup) sc.getConfig().getModule(CadytsCarConfigGroup.GROUP_NAME);
 
 		//get timeBinSize_s and validate it
 		int timeBinSize_s = cadytsPtConfig.getTimeBinSize();

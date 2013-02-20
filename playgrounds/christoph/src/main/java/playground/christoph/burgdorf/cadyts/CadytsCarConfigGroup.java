@@ -35,9 +35,9 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 /**
  * @author cdobler
  */
-public class CadytsPtConfigGroup extends Module {
+public class CadytsCarConfigGroup extends Module {
 
-	public static final String GROUP_NAME = "cadytsPt";
+	public static final String GROUP_NAME = "cadytsCar";
 
 	public static final String REGRESSION_INERTIA = "regressionInertia";
 	public static final String MIN_FLOW_STDDEV = "minFlowStddevVehH";
@@ -64,7 +64,7 @@ public class CadytsPtConfigGroup extends Module {
 
 	private final Set<Id> calibratedLinks = new HashSet<Id>();
 
-	public CadytsPtConfigGroup() {
+	public CadytsCarConfigGroup() {
 		super(GROUP_NAME);
 	}
 
