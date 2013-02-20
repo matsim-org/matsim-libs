@@ -36,8 +36,9 @@
 				<departure id="R2.4" departureTime="06:20:00" vehicleRefId="tr_3" />
 			</departures>
 		</transitRoute>
-
-		<transitRoute id="M44_Route10">
+	</transitLine>
+	<transitLine id="M43">
+		<transitRoute id="M43_Route10">
 			<description></description>
 			<transportMode>pt</transportMode>
 			<routeProfile>

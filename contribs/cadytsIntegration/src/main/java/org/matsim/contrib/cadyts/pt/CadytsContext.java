@@ -79,7 +79,6 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 	private CadytsPtConfigGroup cadytsConfig;
 
 	private final Config config;
-	private Scenario scenario = null ;
 
 	public CadytsContext(Config config) {
 		this.config = config;
@@ -88,7 +87,7 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.scenario = event.getControler().getScenario();
+		Scenario scenario = event.getControler().getScenario();
 		EventsManager events = event.getControler().getEvents();
 
 
@@ -214,7 +213,10 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 					kmlWriter.setIterationNumber(iter);
 					kmlWriter.writeFile(filename);
 				}
+				
 				if (outputFormat.contains("txt") || outputFormat.contains("all")) {
+					// yyyy As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
+					// yyyy As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13
 					OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
 					ccaBoard.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareBoarding.txt"));
 					ccaAlight.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareAlighting.txt"));
@@ -293,10 +295,5 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 	PtPlanToPlanStepBasedOnEvents getPtStep() {
 		return ptStep;
 	}
-
-	Scenario getScenario() {
-		return scenario;
-	}
-
 
 }

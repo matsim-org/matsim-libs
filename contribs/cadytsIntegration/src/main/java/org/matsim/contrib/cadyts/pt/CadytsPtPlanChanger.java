@@ -22,6 +22,7 @@ package org.matsim.contrib.cadyts.pt;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
@@ -37,7 +38,8 @@ public class CadytsPtPlanChanger implements PlanSelector {
 
 	private static final Logger log = Logger.getLogger(CadytsPtPlanChanger.class);
 
-	private final double beta = 1.0;
+	private final double beta ;
+	private double cadytsWeight = 1. ;
 
 	private boolean cadCorrMessGiven = false;
 
@@ -45,9 +47,9 @@ public class CadytsPtPlanChanger implements PlanSelector {
 
 	public static final String CADYTS_CORRECTION = "cadytsCorrection";
 
-	/*package*/ public CadytsPtPlanChanger(CadytsContext cadytsContext) {
-		log.error("value for beta currently ignored (set to one)");
+	public CadytsPtPlanChanger(Scenario scenario, CadytsContext cadytsContext) {
 		this.cadytsContext = cadytsContext;
+		this.beta = scenario.getConfig().planCalcScore().getBrainExpBeta() ;
 	}
 
 	@Override
@@ -70,19 +72,18 @@ public class CadytsPtPlanChanger implements PlanSelector {
 		}
 
 		cadyts.demand.Plan<TransitStopFacility> currentPlanSteps = this.cadytsContext.getPtStep().getPlanSteps(currentPlan);
-//		double currentPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(currentPlanSteps) / this.beta;
 		double currentPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(currentPlanSteps) / this.beta;
-		double currentScore = currentPlan.getScore().doubleValue() + currentPlanCadytsCorrection;
+		double currentScore = currentPlan.getScore().doubleValue() + cadytsWeight * currentPlanCadytsCorrection;
 
 		cadyts.demand.Plan<TransitStopFacility> otherPlanSteps = this.cadytsContext.getPtStep().getPlanSteps(otherPlan);
-//		double otherPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(otherPlanSteps) / this.beta;
 		double otherPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(otherPlanSteps) / this.beta;
-		double otherScore = otherPlan.getScore().doubleValue() + otherPlanCadytsCorrection;
+		double otherScore = otherPlan.getScore().doubleValue() + cadytsWeight * otherPlanCadytsCorrection;
 
-		if (currentPlanCadytsCorrection != otherPlanCadytsCorrection && !this.cadCorrMessGiven) {
-			log.info("currPlanCadytsCorr: " + currentPlanCadytsCorrection + " otherPlanCadytsCorr: " + otherPlanCadytsCorrection + Gbl.ONLYONCE);
+//		if (currentPlanCadytsCorrection != otherPlanCadytsCorrection && !this.cadCorrMessGiven) {
+			log.warn("currPlanCadytsCorr: " + currentPlanCadytsCorrection + " otherPlanCadytsCorr: " + otherPlanCadytsCorrection + Gbl.ONLYONCE);
+			log.warn("currPlanScore: " + currentScore + " otherPlanScore: " + otherScore ) ;
 			this.cadCorrMessGiven = true;
-		}
+//		}
 
 		Map<String,Object> planAttributes = currentPlan.getCustomAttributes() ;
 		planAttributes.put(CadytsPtPlanChanger.CADYTS_CORRECTION,currentPlanCadytsCorrection) ;
@@ -98,18 +99,16 @@ public class CadytsPtPlanChanger implements PlanSelector {
 		cadyts.demand.Plan<TransitStopFacility> selectedPlanSteps = currentPlanSteps;
 		if (MatsimRandom.getRandom().nextDouble() < 0.01 * weight) {
 			// as of now, 0.01 is hardcoded (proba to change when both scores are the same)
-
 			selectedPlan = otherPlan;
 			selectedPlanSteps = otherPlanSteps;
 		}
 
-		// sampler.enforceNextAccept();
-		// sampler.isAccepted(this.ptPlanToPlanStep.getPlanSteps(selectedPlan));
-
-//		this.matsimCalibrator.registerChoice(selectedPlanSteps);
 		this.cadytsContext.getCalibrator().addToDemand(selectedPlanSteps);
-		
 
 		return selectedPlan;
+	}
+
+	void setCadytsWeight(double cadytsWeight) {
+		this.cadytsWeight = cadytsWeight;
 	}
 }

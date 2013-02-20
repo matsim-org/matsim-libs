@@ -26,14 +26,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
@@ -63,8 +60,8 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	private final Map<Id, Id> vehStops = new HashMap<Id, Id>(); // Map< vehId,stopFacilityId>
 	private final Map<Id, Integer> vehPassengers = new HashMap<Id, Integer>(); // Map<vehId,passengersNo.in Veh>
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
-	private final Set<Id> transitDrivers = new HashSet<Id>();
-	private final Set<Id> transitVehicles = new HashSet<Id>();
+	private final Set<Id> analyzedTransitDrivers = new HashSet<Id>();
+	private final Set<Id> analyzedTransitVehicles = new HashSet<Id>();
 	private final Set<Id> calibratedLines;
 
 	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines, int timeBinSize_s ) {
@@ -85,21 +82,21 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 		this.vehStops.clear();
 		this.vehPassengers.clear();
 		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
-		this.transitDrivers.clear();
-		this.transitVehicles.clear();
+		this.analyzedTransitDrivers.clear();
+		this.analyzedTransitVehicles.clear();
 	}
 
 	@Override
 	public void handleEvent(final TransitDriverStartsEvent event) {
 		if (this.calibratedLines.contains(event.getTransitLineId())) {
-			this.transitDrivers.add(event.getDriverId());
-			this.transitVehicles.add(event.getVehicleId());
+			this.analyzedTransitDrivers.add(event.getDriverId());
+			this.analyzedTransitVehicles.add(event.getVehicleId());
 		}
 	}
 
 	@Override
 	public void handleEvent(final PersonEntersVehicleEvent event) {
-		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+		if (this.analyzedTransitDrivers.contains(event.getPersonId()) || !this.analyzedTransitVehicles.contains(event.getVehicleId())) {
 			return; // ignore transit drivers or persons entering non-(analyzed-)transit vehicles
 		}
 
@@ -114,7 +111,7 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 
 	@Override
 	public void handleEvent(final PersonLeavesVehicleEvent event) {
-		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
+		if (this.analyzedTransitDrivers.contains(event.getPersonId()) || !this.analyzedTransitVehicles.contains(event.getVehicleId())) {
 			return; // ignore transit drivers or persons entering non-(analyzed-)transit vehicles
 		}
 

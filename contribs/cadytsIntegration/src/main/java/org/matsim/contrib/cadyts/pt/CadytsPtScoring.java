@@ -25,6 +25,7 @@ package org.matsim.contrib.cadyts.pt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -44,11 +45,11 @@ public class CadytsPtScoring implements ArbitraryEventScoring {
 	private final double beta ;
 	private double weightOfCadytsCorrection = 1. ;
 
-	CadytsPtScoring(final Plan plan, final CadytsContext context ) {
+	CadytsPtScoring(final Plan plan, Config config, final CadytsContext context ) {
 		this.ptPlanToPlanStep = context.getPtStep() ;
 		this.matsimCalibrator = context.getCalibrator() ;
 		this.plan = plan ;
-		this.beta = context.getScenario().getConfig().planCalcScore().getBrainExpBeta() ;
+		this.beta = config.planCalcScore().getBrainExpBeta() ;
 	}
 	
 	@Override
