@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -49,8 +48,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 	// map driverId -> driver info
 	private final Map<Id , WaitingDriver> waitingDrivers =
 		new LinkedHashMap<Id , WaitingDriver>();
-	private InternalInterface internalInterface = null;
-
+	
 	public JointModesDepartureHandler(
 			final QNetsimEngine netsimEngine) {
 		this.netsimEngine = netsimEngine;
@@ -194,7 +192,6 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 
 	@Override
 	public void setInternalInterface(final InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

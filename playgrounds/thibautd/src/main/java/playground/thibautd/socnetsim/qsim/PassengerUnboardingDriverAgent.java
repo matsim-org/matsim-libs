@@ -39,8 +39,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
-import sun.management.resources.agent;
-
 class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, PassengerAgent {
 	private final MobsimDriverAgent delegate;
 	private final PlanAgent planDelegate;
