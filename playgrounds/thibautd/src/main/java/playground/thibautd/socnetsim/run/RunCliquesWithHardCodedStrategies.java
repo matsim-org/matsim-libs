@@ -192,6 +192,7 @@ public class RunCliquesWithHardCodedStrategies {
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createReRoute(
 					config,
+					controllerRegistry.getJointPlans().getFactory(),
 					controllerRegistry.getPlanRoutingAlgorithmFactory(),
 					controllerRegistry.getTripRouterFactory() ),
 				weights.reRoute);
@@ -214,6 +215,7 @@ public class RunCliquesWithHardCodedStrategies {
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSubtourModeChoice(
 					config,
+					controllerRegistry.getJointPlans().getFactory(),
 					controllerRegistry.getPlanRoutingAlgorithmFactory(),
 					controllerRegistry.getTripRouterFactory() ),
 				weights.modeMutation);
