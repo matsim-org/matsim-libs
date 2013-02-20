@@ -90,12 +90,12 @@ public class ScheduleFromCorridor {
 	 * based on the length of the corridor links.
 	 *
 	 */
-	public void createTransitSchedule(String transitRouteMode, boolean isBlocking, boolean awaitDeparture, double scheduleSpeed_m_sec, double stopTime_sec) {
+	public void createTransitSchedule(String transitRouteMode, boolean isBlocking, boolean awaitDeparture, double scheduleTravelTime_sec, double stopTime_sec) {
 				
 		Map<Id,List<Id>> routeID2linkIDs = getIDs(this.network, transitRouteMode);
 		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(this.network, routeID2linkIDs, isBlocking);
 		Map<Id, NetworkRoute> routeId2networkRoute = getRouteId2NetworkRoute(routeID2linkIDs);
-		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(stopTime_sec, scheduleSpeed_m_sec, awaitDeparture, network, routeId2transitStopFacilities);
+		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(stopTime_sec, scheduleTravelTime_sec, awaitDeparture, network, routeId2transitStopFacilities);
 
 		setRouteId2TransitRoute(transitRouteMode, routeId2networkRoute, routeId2TransitRouteStops);
 		setTransitLine(this.routeId2transitRoute);
@@ -186,7 +186,7 @@ public class ScheduleFromCorridor {
 		return routeId2NetworkRoute;
 	}
 
-	private Map<Id, List<TransitRouteStop>> getRouteId2TransitRouteStops(double stopTime, double scheduleSpeed_m_sec, boolean awaitDeparture, Network network, Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities) {
+	private Map<Id, List<TransitRouteStop>> getRouteId2TransitRouteStops(double stopTime, double scheduleTravelTime_sec, boolean awaitDeparture, Network network, Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities) {
 
 		Map<Id, List<TransitRouteStop>> routeId2transitRouteStops = new HashMap<Id, List<TransitRouteStop>>();
 		
@@ -208,11 +208,9 @@ public class ScheduleFromCorridor {
 				} else {
 
 //					travelTimeBus = this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed();
+//					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / scheduleSpeed_m_sec;
 
-					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / scheduleSpeed_m_sec;
-					if (scheduleSpeed_m_sec > network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed()){
-						log.warn("The free speed of a network link is less than the scheduled speed. This will cause schedule delays.");
-					}
+					travelTimeBus = scheduleTravelTime_sec;
 				}
 				
 				arrivalTime = departureTime + travelTimeBus;
