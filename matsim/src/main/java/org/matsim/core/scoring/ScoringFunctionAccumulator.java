@@ -89,6 +89,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	
 	public ScoringFunctionAccumulator() {} // empty constructor so I can find where this is called.  kai, dec'12
 
+	@Override
 	public final void handleActivity(Activity activity) {
         if (activity.getStartTime() != Time.UNDEFINED_TIME) {
             startActivity(activity.getStartTime(), activity);
@@ -98,6 +99,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
         }
     }
 
+	@Override
     public final void handleLeg(Leg leg) {
         startLeg(leg.getDepartureTime(), leg);
         endLeg(leg.getDepartureTime() + leg.getTravelTime());
@@ -124,34 +126,35 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		}
 	}
 
-	@Deprecated
+	@Deprecated // use handleActivity instead
 	public void startActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.startActivity(time, act);
 		}
 	}
 
-	@Deprecated
+	@Deprecated // use handleActivity instead
 	public void endActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.endActivity(time, act);
 		}
 	}
 	
-	@Deprecated
+	@Deprecated // use handleLeg instead
 	public void startLeg(double time, Leg leg) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.startLeg(time, leg);
 		}
 	}
 	
-	@Deprecated
+	@Deprecated // use handleLeg instead
 	public void endLeg(double time) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.endLeg(time);
 		}
 	}
 
+	@Override
 	public void finish() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.finish();
