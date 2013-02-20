@@ -49,6 +49,8 @@ public class Agent {
 		
 		return stringBuffer.toString();
 	}
-	
-	
+
+	public String getActType() {
+		return actType;
+	}	
 }

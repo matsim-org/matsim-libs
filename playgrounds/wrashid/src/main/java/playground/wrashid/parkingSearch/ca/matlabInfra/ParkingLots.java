@@ -15,22 +15,15 @@ public class ParkingLots {
 
 	public static void main(String[] args) {
 		ArrayList<String> outputList = new ArrayList<String>();
-
 		outputList.add("<parkinglots>");
-
 		collectStreetParkings(outputList);
-
 		collectGarageParkings(outputList);
-
 		outputList.add("</parkinglots>");
-
 		GeneralLib.writeList(outputList, Config.getOutputFolder() + "parkingLots.xml");
-
 	}
 
 	private static void collectGarageParkings(ArrayList<String> outputList) {
-		String sourcePath = "ETH/static data/parking/zürich city/Parkhaeuser/parkhäuser.txt";
-		StringMatrix garageParkingData = GeneralLib.readStringMatrix("c:/data/My Dropbox/" + sourcePath);
+		StringMatrix garageParkingData = GeneralLib.readStringMatrix(Config.baseFolder + "../parkhäuser.txt");
 
 		int totalCapacity = 0;
 		for (int i = 1; i < garageParkingData.getNumberOfRows(); i++) {
@@ -47,7 +40,7 @@ public class ParkingLots {
 	}
 
 	private static void collectStreetParkings(ArrayList<String> outputList) {
-		String streetParkings = "C:/data/My Dropbox/ETH/static data/parking/zürich city/Strassenparkplaetze/street parkings old - 2007 - aufbereitet/streetpark_facilities.xml";
+		String streetParkings = Config.baseFolder + "../streetpark_facilities.xml";
 		ActivityFacilitiesImpl streetParkingFacilities = GeneralLib.readActivityFacilities(streetParkings);
 
 		int totalCapacity = 0;
@@ -68,17 +61,12 @@ public class ParkingLots {
 
 	private static String getParkingString(String id, double x, double y, double capacity) {
 		StringBuffer stringBuffer = new StringBuffer();
-
 		stringBuffer.append("\t<parkinglot>\n");
-
 		stringBuffer.append("\t\t<id>" + id + "</id>\n");
 		stringBuffer.append("\t\t<x>" + x + "</x>\n");
 		stringBuffer.append("\t\t<y>" + y + "</y>\n");
 		stringBuffer.append("\t\t<size>" + capacity + "</size>\n");
-
 		stringBuffer.append("\t</parkinglot>\n");
-
 		return stringBuffer.toString();
 	}
-
 }

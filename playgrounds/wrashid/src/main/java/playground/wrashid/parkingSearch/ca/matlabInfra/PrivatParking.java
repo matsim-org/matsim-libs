@@ -10,21 +10,16 @@ import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.PrivateParking
 
 public class PrivatParking {
 
-	public static void main(String[] args) {
-		String inputDir="C:/data/My Dropbox/ETH/static data/parking/zürich city/Private Parkplätze/";
-		
-		printPrivateOutdoorParkingTotalCapacity(inputDir);
-		
-		printPrivatIndoorParkingTotalCapacitiesWithMainBuildingPurpose(inputDir);
-		
+	public static void main(String[] args) {		
+		printPrivateOutdoorParkingTotalCapacity();	
+		printPrivatIndoorParkingTotalCapacitiesWithMainBuildingPurpose();		
 	}
 
-	private static void printPrivatIndoorParkingTotalCapacitiesWithMainBuildingPurpose(String inputDir) {
+	private static void printPrivatIndoorParkingTotalCapacitiesWithMainBuildingPurpose() {
 		HashMap<Integer, String> mainBuildingUsagePurpose = PrivateParkingsIndoorWriter_v0.getMainBuildingUsagePurpose();
 		
-		StringMatrix privateParkingIndoor = GeneralLib.readStringMatrix(inputDir+"PrivateParkingIndoor.TXT");
-		
-		
+		StringMatrix privateParkingIndoor = GeneralLib.readStringMatrix(Config.baseFolder + "../PrivateParkingIndoor.TXT");
+				
 		DoubleValueHashMap<String> parkingCapacities=new DoubleValueHashMap<String>();
 		for (int i=1;i<privateParkingIndoor.getNumberOfRows();i++){
 			Integer egId = privateParkingIndoor.getInteger(i, 0);
@@ -36,15 +31,12 @@ public class PrivatParking {
 				parkingCapacities.increment(mainBuildingUsagePurpose.get(egId));
 			}
 		}
-		
 		System.out.println("indoor parkings (mit hauptnutzung des gebaeudes):");
-		
-		parkingCapacities.printToConsole();
-		
+		parkingCapacities.printToConsole();	
 	}
 
-	private static void printPrivateOutdoorParkingTotalCapacity(String inputDir) {
-		StringMatrix privateParkingOutdoor = GeneralLib.readStringMatrix(inputDir+"PrivateParkingOutdoor.txt");
+	private static void printPrivateOutdoorParkingTotalCapacity() {
+		StringMatrix privateParkingOutdoor = GeneralLib.readStringMatrix(Config.baseFolder + "../PrivateParkingOutdoor.txt");
 		
 		double totalNumberOfOutdoorPrivateParking=0;
 		for (int i=1;i<privateParkingOutdoor.getNumberOfRows();i++){
@@ -54,9 +46,7 @@ public class PrivatParking {
 			if (Config.isInsideStudyArea(x,y)){
 				totalNumberOfOutdoorPrivateParking+=privateParkingOutdoor.getDouble(i, 3);
 			}
-		}
-		
+		}		
 		System.out.println("total number of outdoor private parking in scenario area: " + totalNumberOfOutdoorPrivateParking);
-	}
-	
+	}	
 }

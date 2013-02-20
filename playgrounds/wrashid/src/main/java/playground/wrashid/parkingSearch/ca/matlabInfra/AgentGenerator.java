@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -22,6 +23,8 @@ import org.matsim.core.network.NetworkImpl;
 
 
 public class AgentGenerator {
+	
+	private final static Logger log = Logger.getLogger(AgentGenerator.class);
 
 	public static void main(String[] args) {
 		String eventsFile = Config.getEventsFile();
@@ -37,13 +40,23 @@ public class AgentGenerator {
 	}
 
 	private static void writeOutAgents(LinkedList<Agent> processedAgents, String fileName) {
+		int cntAgents = 0;
+		int cntParkers = 0;
 		ArrayList<String> list = new ArrayList<String>();
 		list.add("<agents>");
 		for (Agent agent : processedAgents) {
 			list.add(agent.getXMLString(Config.getNetwork()));
+			cntAgents++;
+			
+			if (agent.getActType() != null) {
+				cntParkers++;
+			}
+			
 		}
 		list.add("</agents>");
 		GeneralLib.writeList(list, fileName);
+		
+		log.info("Agents: " + cntAgents + " | parkers: " + cntParkers);
 	}
 }
 

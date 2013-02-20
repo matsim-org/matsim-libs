@@ -29,9 +29,9 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
 public class Config {
 
-	private static double radiusInMetersOfStudyArea = 1000;
+	private static double radiusInMetersOfStudyArea = 1500;
 	private static Coord studyAreaCenter = ParkingHerbieControler.getCoordinatesQuaiBridgeZH();
-	private static String baseFolder = "C:/l/studies/LaHowara_Parking/input/zurichCity/matsim_scenario/ivtch/";
+	public static String baseFolder = "C:/l/studies/LaHowara_Parking/input/zurichCity/matsim_scenario/ivtch/";
 	private static String outputFolder = baseFolder + "/created/";
 	
 	private static NetworkImpl network=null;
@@ -69,6 +69,6 @@ public class Config {
 	}
 	
 	public static boolean isInsideSNetworkArea(Coord coord) {
-		return GeneralLib.getDistance(coord, studyAreaCenter) < 2.0 * radiusInMetersOfStudyArea;
+		return GeneralLib.getDistance(coord, studyAreaCenter) < 1.0 * radiusInMetersOfStudyArea;
 	}
 }
