@@ -21,8 +21,10 @@ package playground.thibautd.socnetsim.qsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -34,13 +36,18 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
+import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
+
+import sun.management.resources.agent;
 
 class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, PassengerAgent {
 	private final MobsimDriverAgent delegate;
 	private final PlanAgent planDelegate;
 	private final QNetsimEngine netsimEngine;
 	private final InternalInterface internalInterface;
+
+	private final List<PassengerAgent> passengersToBoard = new ArrayList<PassengerAgent>();
 
 	public PassengerUnboardingDriverAgent(
 			final MobsimAgent delegate,
@@ -52,6 +59,68 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 		this.internalInterface = internalInterface;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// modified methods
+	// /////////////////////////////////////////////////////////////////////////
+	@Override
+	public void endLegAndComputeNextState(final double now) {
+		if ( delegate.getMode().equals( JointActingTypes.DRIVER ) ) {
+			final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
+			final Id linkId = delegate.getCurrentLinkId();
+			final Collection<PassengerAgent> passengersToUnboard = new ArrayList<PassengerAgent>();
+			assert vehicle != null;
+			for ( PassengerAgent p : vehicle.getPassengers() ) {
+				if ( p.getDestinationLinkId().equals( linkId ) ) {
+					passengersToUnboard.add( p );
+				}
+			}
+
+			final EventsManager events = internalInterface.getMobsim().getEventsManager();
+			for (PassengerAgent p : passengersToUnboard) {
+				vehicle.removePassenger( p );
+				((MobsimAgent) p).notifyArrivalOnLinkByNonNetworkMode( delegate.getCurrentLinkId() );
+				((MobsimAgent) p).endLegAndComputeNextState( now );
+				events.processEvent(
+						events.getFactory().createPersonLeavesVehicleEvent(
+							now,
+							p.getId(),
+							vehicle.getId()));
+				internalInterface.arrangeNextAgentState( (MobsimAgent) p );
+			}
+		}
+
+		delegate.endLegAndComputeNextState( now );
+	}
+
+	@Override
+	public void notifyMoveOverNode(final Id newLinkId) {
+		if ( !passengersToBoard.isEmpty() ) {
+			final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
+			final EventsManager events = internalInterface.getMobsim().getEventsManager();
+			for ( PassengerAgent passenger : passengersToBoard ) {
+				assert passenger.getCurrentLinkId().equals( getCurrentLinkId() );
+				vehicle.addPassenger( passenger );
+				events.processEvent(
+						events.getFactory().createPersonEntersVehicleEvent(
+							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+							passenger.getId(),
+							vehicle.getId()));
+			}
+			passengersToBoard.clear();
+
+			final DriverRoute dr = (DriverRoute) ((Leg) getCurrentPlanElement()).getRoute();
+			assert vehicle.getPassengers().size() == dr.getPassengersIds().size() : vehicle.getPassengers()+" != "+dr.getPassengersIds()+" for driver "+getId();
+		}
+		delegate.notifyMoveOverNode(newLinkId);
+	}
+
+	public void addPassengerToBoard(final PassengerAgent passenger) {
+		passengersToBoard.add( passenger );
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// pure delegation
+	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public Id getId() {
 		return delegate.getId();
@@ -83,11 +152,6 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	}
 
 	@Override
-	public void notifyMoveOverNode(final Id newLinkId) {
-		delegate.notifyMoveOverNode(newLinkId);
-	}
-
-	@Override
 	public State getState() {
 		return delegate.getState();
 	}
@@ -105,36 +169,6 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	@Override
 	public void endActivityAndComputeNextState(final double now) {
 		delegate.endActivityAndComputeNextState(now);
-	}
-
-	@Override
-	public void endLegAndComputeNextState(final double now) {
-		if ( delegate.getMode().equals( JointActingTypes.DRIVER ) ) {
-			final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
-			final Id linkId = delegate.getCurrentLinkId();
-			final Collection<PassengerAgent> passengersToUnboard = new ArrayList<PassengerAgent>();
-			assert vehicle != null;
-			for ( PassengerAgent p : vehicle.getPassengers() ) {
-				if ( p.getDestinationLinkId().equals( linkId ) ) {
-					passengersToUnboard.add( p );
-				}
-			}
-
-			final EventsManager events = internalInterface.getMobsim().getEventsManager();
-			for (PassengerAgent p : passengersToUnboard) {
-				vehicle.removePassenger( p );
-				((MobsimAgent) p).notifyArrivalOnLinkByNonNetworkMode( delegate.getCurrentLinkId() );
-				((MobsimAgent) p).endLegAndComputeNextState( now );
-				events.processEvent(
-						events.getFactory().createPersonLeavesVehicleEvent(
-							now,
-							p.getId(),
-							vehicle.getId()));
-				internalInterface.arrangeNextAgentState( (MobsimAgent) p );
-			}
-		}
-
-		delegate.endLegAndComputeNextState( now );
 	}
 
 	@Override

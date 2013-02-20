@@ -98,19 +98,13 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		if ( presentPassengers.containsAll( passengerIds ) ) {
 			// all passengers are or already in the car,
 			// or waiting. Board waiting passengers and depart.
-			final EventsManager events = internalInterface.getMobsim().getEventsManager();
 			for (Id passengerId : passengerIds) {
 				final PassengerAgent passenger = passengersWaiting.remove( passengerId );
-				if ( agent != null ) {
-					events.processEvent(
-							events.getFactory().createPersonEntersVehicleEvent(
-								now,
-								passengerId,
-								vehicleId ));
-					vehicle.addPassenger( passenger );
-				}
+				// say to the driver to board the passenger before leaving the first
+				// link. We cannot add the passengers to the vehicle here, as the driver
+				// may have to wait for the vehicle to come before departing.
+				((PassengerUnboardingDriverAgent) agent).addPassengerToBoard( passenger );
 			}
-			assert vehicle.getPassengers().size() == passengerIds.size() : vehicle.getPassengers()+" != "+passengerIds+" for driver "+agent.getId();
 
 			final boolean handled =
 				netsimEngine.getDepartureHandler().handleDeparture(
