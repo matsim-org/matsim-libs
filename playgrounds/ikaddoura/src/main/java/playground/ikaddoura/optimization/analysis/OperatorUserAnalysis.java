@@ -77,7 +77,7 @@ public class OperatorUserAnalysis {
 		events.addHandler(this.linksHandler);
 		events.addHandler(this.waitHandler);
 		events.addHandler(this.congestionHandler);
-		
+
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(this.lastEventFile);
 	}

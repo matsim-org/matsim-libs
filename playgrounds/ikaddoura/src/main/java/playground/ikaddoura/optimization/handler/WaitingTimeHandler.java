@@ -28,21 +28,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler {
+public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
+	private final static Logger log = Logger.getLogger(WaitingTimeHandler.class);
+
 	private final List <Double> waitingTimes = new ArrayList<Double>();
 	private final List <Double> waitingTimesMissed = new ArrayList<Double>();
 	private final List <Double> waitingTimesNotMissed = new ArrayList<Double>();
@@ -57,6 +62,17 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 		
 	private final double headway;
 	
+	private double maxArriveDelay = 0.;
+	private double maxDepartDelay = 0.;
+	
+	public double getMaxArriveDelay() {
+		return maxArriveDelay;
+	}
+
+	public double getMaxDepartDelay() {
+		return maxDepartDelay;
+	}
+
 	public WaitingTimeHandler(double headway) {
 		this.headway = headway;
 	}
@@ -73,6 +89,8 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 		busId2currentFacilityId.clear();
 		this.numberOfMissedVehicles = 0;
 	}
+	
+	
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
@@ -171,7 +189,12 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		Id busId = event.getVehicleId();
 		Id facilityId = event.getFacilityId();
-//		System.out.println("Bus " + busId + " arrives at " + facilityId + ".");
+		
+		if (event.getDelay()!=0){
+			if(event.getDelay()>maxArriveDelay){
+				maxArriveDelay = event.getDelay();
+			}
+		}		
 		this.busId2currentFacilityId.put(busId, facilityId);
 	}
 	
@@ -189,6 +212,17 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 
 	public Map <Id, List<Double>> getPersonId2waitingTimes() {
 		return personId2waitingTimes;
+	}
+
+	
+	@Override
+	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+
+		if (event.getDelay()!=0){
+			if(event.getDelay()>maxDepartDelay){
+				maxDepartDelay = event.getDelay();
+			}
+		}
 	}
 	
 }

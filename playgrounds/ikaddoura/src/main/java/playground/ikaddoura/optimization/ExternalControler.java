@@ -109,7 +109,7 @@ class ExternalControler {
 		if (args.length == 0){
 			settingsFile = "/Users/Ihab/Desktop/testScenario_input/settingsFile.csv";
 			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-			outputPath = "/Users/Ihab/Desktop/testScenario_output";
+			outputPath = "/Users/Ihab/Desktop/testScenario_outputTEST";
 			
 		} else {
 			settingsFile = args[0];
@@ -308,6 +308,9 @@ class ExternalControler {
 		info.setT0MinusTActSum(analysis.getCongestionHandler().getTActMinusT0Sum());
 		info.setAvgT0MinusTActDivT0PerTrip(analysis.getCongestionHandler().getAvgT0minusTActDivT0PerCarTrip());
 		
+//		System.out.println("MaxArrivalDelay: " + analysis.getWaitHandler().getMaxArriveDelay());
+//		System.out.println("MaxDeparturelDelay: " + analysis.getWaitHandler().getMaxDepartDelay());
+		
 		this.it2information.put(iterationCounter, info);
 		
 		this.textWriter.writeExtItData(outputPath, this.it2information);
@@ -349,17 +352,22 @@ class ExternalControler {
 		double headway = startHeadway;
 		for (int headwayStep = 0; headwayStep <= stepsHeadway ; headwayStep++){
 			
+			// remove the bus at a transit stop: 1 sec delay (e.g. opening the doors)
+			// handle transfers: 1 sec OR: number of agents boarding or alighting * boarding or alighting time
+			// insert the bus at a transit stop: 1 sec delay (e.g. closing the doors)
+			// = 3 sec delay if a bus stops at a transit stop!
+			
 			log.info("Writing transitSchedule...");
 			TransitSchedule schedule;
 			String scheduleFile = dir + "transitSchedule_headway" + headway + ".xml";
 			
 			ScheduleFromCorridor sfn = new ScheduleFromCorridor(scenario.getNetwork());
-			sfn.createTransitSchedule("bus", false, true, 8.3333333, 0);
+			sfn.createTransitSchedule("bus", false, true, 60, 0);
 			schedule = sfn.getTransitSchedule();
 			
 			List<Id> lineIDs = new ArrayList<Id>();
 			lineIDs.addAll(schedule.getTransitLines().keySet());
-			
+			 
 			DeparturesGenerator dg = new DeparturesGenerator();
 			dg.addDepartures(schedule, lineIDs, headway, 4. * 3600., 24. * 3600., 1200.);
 			
@@ -377,8 +385,8 @@ class ExternalControler {
 				int busSeats = (int) (capacity * 1.) + 1; // plus one seat because a seat for the driver is expected
 				int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 				
-				VehiclesGenerator vg = new VehiclesGenerator();
-				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 1.5, 2., DoorOperationMode.parallel, 2.5, Double.POSITIVE_INFINITY);
+				VehiclesGenerator vg = new VehiclesGenerator();				
+				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 1.5, 2.0, DoorOperationMode.parallel, 1.0, (500./59));
 				vehicles = vg.getVehicles();
 				
 				VehicleWriterV1 vehicleWriter = new VehicleWriterV1(vehicles);
