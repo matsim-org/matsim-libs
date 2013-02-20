@@ -41,6 +41,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.analysis.listeners.TripModeShares;
+import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
@@ -58,6 +59,8 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.selectors.AbstractHighestWeightSelector;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
+import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
+import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 import playground.thibautd.utils.ReflectiveModule;
 
@@ -179,7 +182,7 @@ public class RunCliquesWithHardCodedStrategies {
 			new ControllerRegistry(
 					scenario,
 					scenario.getScenarioElement( JointPlans.class ),
-					new JointPlanRouterFactory( ((ScenarioImpl) scenario).getActivityFacilities() ),
+					createPlanRouterFactory( scenario ),
 					new CharyparNagelScoringFunctionFactory(
 						config.planCalcScore(),
 						scenario.getNetwork()) );
@@ -220,6 +223,9 @@ public class RunCliquesWithHardCodedStrategies {
 
 		// create strategy manager
 		final FixedGroupsIdentifier cliques = 
+			config.scenario().isUseHouseholds() ?
+			new FixedGroupsIdentifier(
+					((ScenarioImpl) scenario).getHouseholds() ) :
 			FixedGroupsIdentifierFileParser.readCliquesFile(
 					cliquesConf.getInputFile() );
 		final GroupStrategyManager strategyManager =
@@ -298,6 +304,19 @@ public class RunCliquesWithHardCodedStrategies {
 
 		// run it
 		controller.run();
+	}
+
+	public static PlanRoutingAlgorithmFactory createPlanRouterFactory(
+			final Scenario scenario) {
+		final PlanRoutingAlgorithmFactory jointRouterFactory =
+					new JointPlanRouterFactory(
+							((ScenarioImpl) scenario).getActivityFacilities() );
+		return scenario.getConfig().scenario().isUseHouseholds() ?
+			new PlanRouterWithVehicleRessourcesFactory(
+					new HouseholdBasedVehicleRessources(
+						((ScenarioImpl) scenario).getHouseholds() ),
+					jointRouterFactory ) :
+			jointRouterFactory;
 	}
 
 	public static void main(final String[] args) {
