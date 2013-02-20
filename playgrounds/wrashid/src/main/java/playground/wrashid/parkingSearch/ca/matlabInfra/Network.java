@@ -57,7 +57,7 @@ public class Network {
 		for (Node node : this.uniqueNodes) {
 			if (node.getOutLinks().isEmpty()) {
 				if (!node.getInLinks().isEmpty()) {
-					Link firstInLink = this.generateReturnLink((Link)node.getInLinks().values().toArray()[0]);
+					Link firstInLink = this.generateReturnLink((Link)node.getInLinks().values().toArray()[0], "out");
 					this.selectedLinks.put(firstInLink.getId(), firstInLink);
 					log.info("generated in-link " + firstInLink.getId());
 				}	
@@ -67,7 +67,7 @@ public class Network {
 			}			
 			if (node.getInLinks().isEmpty()) {
 				if (!node.getOutLinks().isEmpty()) {
-					Link firstOutLink = this.generateReturnLink((Link)node.getOutLinks().values().toArray()[0]);
+					Link firstOutLink = this.generateReturnLink((Link)node.getOutLinks().values().toArray()[0], "in");
 					this.selectedLinks.put(firstOutLink.getId(), firstOutLink);
 					log.info("generated out-link " + firstOutLink.getId());
 				}
@@ -78,10 +78,10 @@ public class Network {
 		}
 	}
 	
-	private Link generateReturnLink(Link link) {
+	private Link generateReturnLink(Link link, String inout) {
 		LinkFactoryImpl linkFactory = new LinkFactoryImpl();
 		
-		Link returnLink = linkFactory.createLink(new IdImpl(link.getId().toString() + "back"), link.getToNode(), link.getFromNode(), network, 
+		Link returnLink = linkFactory.createLink(new IdImpl(link.getId().toString() + inout +"_back"), link.getToNode(), link.getFromNode(), network, 
 				link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		
 		return returnLink;
