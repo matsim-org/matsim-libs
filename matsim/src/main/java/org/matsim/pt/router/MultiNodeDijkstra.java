@@ -122,7 +122,6 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 		this.customDataManager.reset();
 
 		Set<Node> endNodes = new HashSet<Node>(toNodes.keySet());
-		Set<Node> foundNodes = new HashSet<Node>();
 
 		augmentIterationId();
 
@@ -145,9 +144,8 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 				endNodes.clear();
 			} else {
 				DijkstraNodeData data = getData(outNode);
-				if (endNodes.contains(outNode)) {
-					endNodes.remove(outNode);
-					foundNodes.add(outNode);
+				boolean isEndNode = endNodes.remove(outNode);
+				if (isEndNode) {
 					InitialNode initData = toNodes.get(outNode);
 					double cost = data.getCost() + initData.initialCost;
 					if (cost < minCost) {
