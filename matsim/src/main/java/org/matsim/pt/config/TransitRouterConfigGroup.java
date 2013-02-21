@@ -28,7 +28,7 @@ public class TransitRouterConfigGroup extends Module {
 	public static final String GROUP_NAME = "transitRouter";
 
 	/*package*/ static final String SEARCH_RADIUS = "searchRadius";
-	/*pacakge*/ static final String EXTENSION_RADIUS = "extensionRadius";
+	/*package*/ static final String EXTENSION_RADIUS = "extensionRadius";
 	/*package*/ static final String MAX_BEELINE_WALK_CONNECTION_DISTANCE = "maxBeelineWalkConnectionDistance";
 	/*package*/ static final String ADDITIONAL_TRANSFER_TIME = "additionalTransferTime";
 
