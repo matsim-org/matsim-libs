@@ -84,7 +84,14 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 	public void handleEvent(LinkLeaveEvent event) {
 		Id personId = event.getPersonId();
 		if (this.ptDriverIdAnalyzer.isPtDriver(personId)){
-			this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength() / 1000;
+			System.out.println(network.toString()); 
+			try {
+				this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength() / 1000;
+			} catch (NullPointerException e) {
+				// TODO repair this!
+				this.vehicleKm = .0;
+				
+			}
 		} else {
 			// no public vehicle
 		}
