@@ -54,7 +54,7 @@ public class PersonalizedTasteControler {
 		final Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true);
 		
-		Map <Id, SVDvalues> svdMap = new SVDValuesReader(pop.getPersons().keySet()).readFile(svdSolutionFile); 
+		Map <Id, SVDvalues> svdMap = new SVDValuesAsObjAttrReader(pop.getPersons().keySet()).readFile(svdSolutionFile); 
 		controler.setScoringFunctionFactory(new SVDScoringfunctionFactory(svdMap, net, schedule));
 		
 		//add analyzer for specific bus line

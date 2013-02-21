@@ -19,9 +19,19 @@ public class SetFirstPlanSelected extends AbstractPersonAlgorithm {
 	}
 	
 	public static void main(String[] args) {
-		String populationFile = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.plans.xml.gz";
-		String networkFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String outputFile = "../../mmoyo/output/tmp/10x_onlyM44users_firstplanselected.xml.gz";
+		String populationFile;
+		String networkFile;
+		String outputFile;
+		
+		if (args.length>0){
+			populationFile= args[0];
+			networkFile= args[1];
+			outputFile= args[2];
+		}else{
+			populationFile = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.plans.xml.gz";
+			networkFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			outputFile = "../../mmoyo/output/tmp/10x_onlyM44users_firstplanselected.xml.gz";
+		}
 		
 		Scenario scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
 		new SetFirstPlanSelected().run(scenario.getPopulation());

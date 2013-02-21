@@ -47,9 +47,6 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 		String strCalLibes = controler.getConfig().getParam(CadytsPtConfigGroup.GROUP_NAME, "calibratedLines");
 		String strTimeBinSize = controler.getConfig().getParam(CadytsPtConfigGroup.GROUP_NAME, "timeBinSize");
 		
-		System.out.println(strCalLibes);
-		System.exit(1);
-		
 		for (String lineId : CollectionUtils.stringToArray(strCalLibes)) {
 			this.calibratedLines.add(new IdImpl(lineId));
 		}

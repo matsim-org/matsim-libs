@@ -30,10 +30,10 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 /**
  * Parses a ObjectAttributes file with svd values and returns a tree map with them
  */
-public class SVDValuesReader {
+public class SVDValuesAsObjAttrReader {
 	 private Set<Id> personIds;
 	
-	public SVDValuesReader(final Set<Id> personIds) {
+	public SVDValuesAsObjAttrReader(final Set<Id> personIds) {
 		this.personIds = personIds;
 	}
 	

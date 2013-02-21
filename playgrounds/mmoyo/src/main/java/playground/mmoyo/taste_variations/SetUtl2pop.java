@@ -33,18 +33,31 @@ import org.matsim.core.population.PersonImpl;
 
 import playground.mmoyo.utils.DataLoader;
 
+/**
+ * Writes a plans file where each plan has the given utility correction as score 
+  */
+
 public class SetUtl2pop {
 
-	private static void setUtCorrections(String popFile, Map <Id, double[]> correcMap, String netFile){
+	protected String setUtCorrections(String popFile, Map <Id, double[]> correcMap, String netFile){
 		//load population
 		DataLoader loader = new DataLoader();
 		Scenario sn = loader.readNetwork_Population(netFile, popFile);
 		Population pop = sn.getPopulation();
+	
+		
 		for (Person person : pop.getPersons().values()){
-			for (int i=0;i<=3;i++){
-				double[] correctArray = correcMap.get(person.getId());
+			double[] correctArray = correcMap.get(person.getId());
+			int utlsNum = correctArray.length;
+			
+			//validation
+			if(person.getPlans().size() != utlsNum){
+				System.out.println("the number of available utilities is different to the number of plans: " + person.getId() );
+			}
+
+ 			for (int i=0;i<utlsNum;i++){
 				Plan plan = person.getPlans().get(i);
-				plan.setScore(correctArray[i+1]); // correcMap [selectedIndx, utl0, utl1, utl2, utl3] 
+				plan.setScore(correctArray[i]); // correcMap [utl0, utl1, utl2,... utln] 
 				if(i== (int)correctArray[0]){
 					((PersonImpl)person).setSelectedPlan(plan);
 				}
@@ -55,31 +68,32 @@ public class SetUtl2pop {
 		String corrPopFile = popFile + "WithUtilCorrections.xml.gz";
 		System.out.println("writing output plan file..." + corrPopFile);
 		new PopulationWriter(pop, net).write(corrPopFile);
+		return corrPopFile;
 	}
 	
 	public static void main(String[] args) {
-		String uiCorrectionsFile;
+		String inputUtlCorrectionsFile;
 		String popFile;
 		String netFile;
 		if(args.length>0){
 			popFile =args[0];
-			uiCorrectionsFile= args[1];
+			inputUtlCorrectionsFile= args[1];
 			netFile= args[2];
 		}else{
 			popFile ="../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/poponlyM44.xml.gz"; //"../../input/newDemand/ptLinecountsScenario/mergedPlans.xml.gztracked.xml.gzoverDemandPlanSample.xml";
-			uiCorrectionsFile= "../../input/choiceM44/m44utls.txt"; 	////"../../input/newDemand/ptLinecountsScenario/utlCorrections24hrs.txt";
+			inputUtlCorrectionsFile= "../../input/choiceM44/m44utls.txt"; 	////"../../input/newDemand/ptLinecountsScenario/utlCorrections24hrs.txt";
 			netFile= "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 		}
 
 		//read utilities corrections
 		UtilCorrectonReader reader= new UtilCorrectonReader();
 		try {
-			reader.readFile(uiCorrectionsFile);
+			reader.readFile(inputUtlCorrectionsFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		setUtCorrections(popFile, reader.getCorrecMap(), netFile);
+		new SetUtl2pop().setUtCorrections(popFile, reader.getCorrecMap(), netFile);
 	}
 	
 }

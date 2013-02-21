@@ -28,7 +28,7 @@ import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
-import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3.DataCollection;
+//import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3.DataCollection;
 
 public class RndPtRouterFactory {
 
@@ -38,8 +38,8 @@ public class RndPtRouterFactory {
 			@Override
 			public TransitRouter createTransitRouter() {
 				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
-				ttCalculator.setDataCollection(DataCollection.randomizedParameters, rndParams) ;
-				ttCalculator.setDataCollection(DataCollection.additionalInformation, addInfo) ;
+//				ttCalculator.setDataCollection(DataCollection.randomizedParameters, rndParams) ;
+//				ttCalculator.setDataCollection(DataCollection.additionalInformation, addInfo) ;
 				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 			}
 		};

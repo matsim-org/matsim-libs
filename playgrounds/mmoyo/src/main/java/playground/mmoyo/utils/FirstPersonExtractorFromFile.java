@@ -73,7 +73,7 @@ public class FirstPersonExtractorFromFile extends MatsimPopulationReader {
 			agentNum = Integer.valueOf (args[2]);
 		}else{
 			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-			popFilePath = "../../input/temp/110.plans.xml.gz";
+			popFilePath = "../../input/choiceM44/100.plans.xml";
 			agentNum=50;	
 		}
 		

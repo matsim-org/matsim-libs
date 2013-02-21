@@ -34,6 +34,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.mmoyo.analysis.tools.PtPlanAnalyzer;
 import playground.mmoyo.analysis.tools.PtPlanAnalyzer.PtPlanAnalysisValues;
@@ -44,6 +46,7 @@ import playground.mmoyo.utils.DataLoader;
 public class MySVDcalculator implements PersonAlgorithm{
 	PtPlanAnalyzer planAnalizer;
 	private StringBuffer sBuff = new StringBuffer("IdAgent\tBetawalk\tBetainvehTime\tBetaDistance\tBetaTransfer");
+	private ObjectAttributes attrs = new ObjectAttributes() ;
 	final String TB = "\t";
 	final String NL = "\n";
 	
@@ -60,13 +63,14 @@ public class MySVDcalculator implements PersonAlgorithm{
 		//plan3 | w3   t3	  d3 	c3  |  	| ßd  |	| λ3 |
 		//plan4 └ w4   t4	  d4   c4 ┘		└ ßc ┘	└λ4 ┘
 		
-		if (utilCorrection.length != person.getPlans().size()){
+		int plansNum = person.getPlans().size();
+		if (utilCorrection.length != plansNum){
 			throw new RuntimeException(" Number of plans utility corrections is not the same as the number of agent plans");
 		}
 		
 		//up to now it is hard coded to 4 beta values in matrix X: trWalkTime_sec, trTravelTime_sec, InVehDist_mts, transfers_num  
-		double[][] arrayA = new double [person.getPlans().size()][4]; 
-		double[] arrayB = new double [utilCorrection.length];
+		double[][] arrayA = new double [plansNum][4]; 
+		double[] arrayB = new double [utilCorrection.length]; //oder [plansNum]
 		int i = 0;
 		for (Plan plan: person.getPlans()){
 			PtPlanAnalysisValues v = planAnalizer.run(plan);
@@ -95,11 +99,20 @@ public class MySVDcalculator implements PersonAlgorithm{
 		}
 		SVDvalues svdValues = this.getSVDvalues(person, scores );
 		sBuff.append(NL + svdValues.getIdAgent() + TB + svdValues.getWeight_trWalkTime() + TB + svdValues.getWeight_trTime() + TB + svdValues.getWeight_trDistance() + TB + svdValues.getWeight_changes());
+		attrs.putAttribute( person.getId().toString() , "wWalk"  , svdValues.getWeight_trWalkTime()) ;
+		attrs.putAttribute( person.getId().toString() , "wTime"  , svdValues.getWeight_trTime()) ;
+		attrs.putAttribute( person.getId().toString() , "wDista"  , svdValues.getWeight_trDistance()) ;
+		attrs.putAttribute( person.getId().toString() , "wChng"  , svdValues.getWeight_changes()) ;
 	}
 
-	private void writeSolution(final String outFile){
+	protected void writeSolutionTXT(final String outFile){
 		new TextFileWriter().write(sBuff.toString(), outFile, false);
 	}
+	
+	protected void writeSolutionObjAttr(final String outFile){
+		new ObjectAttributesXmlWriter(attrs).writeFile(outFile);
+	}
+
 	
 	public static void main(String[] args) {
 		String netFilePath;
@@ -127,7 +140,7 @@ public class MySVDcalculator implements PersonAlgorithm{
 		
 		//write solutions file
 		File file = new File(popFilePath);
-		solver.writeSolution(file.getPath() + "SVDSolutions.xls");
+		solver.writeSolutionTXT(file.getPath() + "SVDSolutions.xls");
 	}
 
 }

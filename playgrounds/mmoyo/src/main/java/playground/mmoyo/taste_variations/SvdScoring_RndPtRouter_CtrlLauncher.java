@@ -59,14 +59,14 @@ public class SvdScoring_RndPtRouter_CtrlLauncher {
 		final Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true);
 		
-		//create and set randomized router factory
-		final TransitRouterConfig trConfig = new TransitRouterConfig( scn.getConfig() ) ;
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scn.getTransitSchedule(), trConfig.beelineWalkConnectionDistance);
-		TransitRouterFactory randomizedTransitRouterFactory = new RndPtRouterFactory().createFactory (scn.getTransitSchedule(), trConfig, routerNetwork, true, false);
-		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
+//		//create and set randomized router factory
+//		final TransitRouterConfig trConfig = new TransitRouterConfig( scn.getConfig() ) ;
+//		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scn.getTransitSchedule(), trConfig.beelineWalkConnectionDistance);
+//		TransitRouterFactory randomizedTransitRouterFactory = new RndPtRouterFactory().createFactory (scn.getTransitSchedule(), trConfig, routerNetwork, true, false);
+//		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
 		
 		//set SVD-Scoring function
-		Map <Id, SVDvalues> svdMap = new SVDValuesReader(pop.getPersons().keySet()).readFile(svdSolutionFile);
+		Map <Id, SVDvalues> svdMap = new SVDValuesAsObjAttrReader(pop.getPersons().keySet()).readFile(svdSolutionFile);
 		controler.setScoringFunctionFactory(new SVDScoringfunctionFactory(svdMap, net, schedule));
 		
 		//add analyzer for specific bus line
