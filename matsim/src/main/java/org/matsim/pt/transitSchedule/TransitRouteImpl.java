@@ -150,7 +150,7 @@ public class TransitRouteImpl implements TransitRoute {
 
 	@Override
 	public String toString() {
-		return "[TransitRouteImpl: route=" + this.lineRouteName + ", #departures=" + this.departures.size() + "]";
+		return "[TransitRouteImpl: route=" + this.routeId.toString() + ", #departures=" + this.departures.size() + "]";
 	}
 	
 }
