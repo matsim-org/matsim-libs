@@ -135,7 +135,7 @@ public class TestTransitEventHandler {
 		ptList.add("normal");
 		ptList.add("different links"); //ptList.add("different persons"); ptList.add("different persons2");
 		for(String id: ptList ){
-			//Assert.assertTrue("public transport", ptDriverIdAnalyzer.isPtDriver(new IdImpl(id)));
+			Assert.assertTrue("public transport", ptDriverIdAnalyzer.isPtDriver(new IdImpl(id)));
 			if(!ptDriverIdAnalyzer.isPtDriver(new IdImpl(id))){
 				Log.info(id + " should be in the ptList but isnt." );
 			}
