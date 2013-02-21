@@ -105,6 +105,10 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 //								SingleLinkMeasurement.TYPE.COUNT_VEH);
 						// changed this from FLOW_VEH_H to COUNT_VEH on 30/jul/2012 since this is no longer "hourly".  
 						// kai/manuel, jul'12
+						// Despite the above comment, I am finding this with FLOW_VEH_H.  Why?  kai, feb'13
+						// yyyyyy For the test case, this seems to produce weird results.  The expected counts are 1 and 5, the expected result is 0 and 4.
+						// Possibly, it divides 1 and 5 by 2 and then has 0.5 and 2.5 for the given hour, in which case 1 and 3 would be best?????
+						// kai, feb'13
 					}
 				}
 				timeBinIndex++ ;

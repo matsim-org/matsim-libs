@@ -415,7 +415,7 @@ public class CadytsIntegrationTest {
 		// cadytsSimCountComparisonOccupancy.txt are returning different results.  kai, feb'13
 		
 		final double beta = 30. ;
-		final int lastIteration = 50 ;
+		final int lastIteration = 20 ;
 		
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
@@ -423,6 +423,10 @@ public class CadytsIntegrationTest {
 		Config config = createTestConfig(inputDir, this.utils.getOutputDirectory());
 		
 		config.controler().setLastIteration(lastIteration) ;
+		config.controler().setWritePlansInterval(1) ;
+		config.controler().setWriteEventsInterval(1) ;
+		
+		config.ptCounts().setPtCountsInterval(1) ;
 		
 		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
 		stratSets.setModuleName("ccc") ;
@@ -431,6 +435,8 @@ public class CadytsIntegrationTest {
 		
 		CadytsPtConfigGroup cConfig = (CadytsPtConfigGroup) config.getModule(CadytsPtConfigGroup.GROUP_NAME) ;
 		cConfig.setTimeBinSize(7200) ;
+		
+		// ---
 		
 		final Controler controler = new Controler(config);
 		final CadytsContext context = new CadytsContext( config ) ;
@@ -508,8 +514,8 @@ public class CadytsIntegrationTest {
 			new TabularFileParser().parse(testCalibStatPath, calibrationStatReader);
 
 			CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(lastIteration);
-			Assert.assertEquals("different Count_ll", "-0.07421875", outStatData.getCount_ll() );
-			Assert.assertEquals("different Count_ll_pred_err",  "3.913536161803677E-15" , outStatData.getCount_ll_pred_err() );
+			Assert.assertEquals("different Count_ll", "-0.01171875", outStatData.getCount_ll() );
+			Assert.assertEquals("different Count_ll_pred_err",  "0.004590585907794875" , outStatData.getCount_ll_pred_err() );
 //			Assert.assertEquals("different Link_lambda_avg", "-1.8081427328702926E-9", outStatData.getLink_lambda_avg() );
 //			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
 //			Assert.assertEquals("different Link_lambda_min", "-1.4465142715757458E-8", outStatData.getLink_lambda_min() );
@@ -519,7 +525,7 @@ public class CadytsIntegrationTest {
 //			Assert.assertEquals("different Plan_lambda_max", "-2.5313998260184097E-8" , outStatData.getPlan_lambda_max() );
 //			Assert.assertEquals("different Plan_lambda_min", "-2.5313998260184097E-8" , outStatData.getPlan_lambda_min() );
 //			Assert.assertEquals("different Plan_lambda_stddev", "NaN" , outStatData.getPlan_lambda_stddev());
-			Assert.assertEquals("different Total_ll", "-0.07421875", outStatData.getTotal_ll() );
+			Assert.assertEquals("different Total_ll", "-0.01171875", outStatData.getTotal_ll() );
 		
 			
 		//test link offsets
@@ -541,10 +547,10 @@ public class CadytsIntegrationTest {
 			isZero = (Math.abs(stopOffsets.getBinValue(stop2 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
 		}while (isZero && binIndex<86400);
 		
-		Assert.assertEquals("Wrong Bin index for first link offset", 3, binIndex); // bin size = 3600; fix! yyyy  //done manuel jul.2012
-		Assert.assertEquals("Wrong link offset of stop 1", -1.4463133832582958E-8, stopOffsets.getBinValue(stop1 , binIndex), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong link offset of stop 2", -1.084734925418448E-8, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong link offset of stop 10", -1.084734925418448E-8, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong Bin index for first link offset", 3, binIndex); // bin size = 3600; fix!   //done manuel jul.2012
+		Assert.assertEquals("Wrong link offset of stop 1", 0.0, stopOffsets.getBinValue(stop1 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link offset of stop 2", -0.0028383120802772956, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link offset of stop 10", 0.00878939456017082, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
 	}
 
 

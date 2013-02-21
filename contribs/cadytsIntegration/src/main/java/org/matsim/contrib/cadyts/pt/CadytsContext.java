@@ -95,8 +95,8 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedLines(), cadytsConfig.getTimeBinSize() );
 		events.addHandler(this.cadytsPtOccupAnalyzer);
 
-
-		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer, config.ptCounts().getCountsScaleFactor());
+		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer, config.ptCounts().getCountsScaleFactor(), 
+				cadytsConfig.getTimeBinSize());
 
 		// this collects events and generates cadyts plans from it
 		this.ptStep = new PtPlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedLines());
@@ -167,15 +167,32 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 
 	private void generateAndWriteCountsComparisons(final IterationEndsEvent event) {
 		Config config = event.getControler().getConfig();
-		PtCountsConfigGroup ptCounts = config.ptCounts();
-		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration. kai,oct'10
+		
+		if ( this.cadytsConfig.getTimeBinSize()!=3600 ) {
+			log.warn("generateAndWriteCountsComparisons() does not work when time bin size != 3600.  See comments in code. Skipping the comparison ..." ) ;
+			return ;
+			// yyyy there are some conceptual problems behind this which are not resolved:
+			// () There should reasonably be two methods: one describing what cadyts _thinks_ it is comparing, and one that just
+			// compares the output.  There is one methods writing simCountCompare..., and then this one here 
+			// writing cadytsSimCountCompare... .  It is not clarified which one is doing which.
+			// () The method that just compares the output should not rely on cadyts but compute its own observations. --
+			// Unfortunately, this collides with the fact that the time bin size is part of the cadyts configuration.  This is, in the end, a 
+			// consequence of the fact that the Counts format assumes hourly counts (other than cadyts, which reasonably allows the
+			// specify the time span for every observation separately).
+			// kai, feb'13
+		}
+		
+		
+		PtCountsConfigGroup ptCountsConfig = config.ptCounts();
+		if (ptCountsConfig.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration. kai,oct'10
 			Controler controler = event.getControler();
 			int iter = event.getIteration();
 			if (isActiveInThisIteration(iter, controler)) {
 
-				if (config.ptCounts().getPtCountsInterval() != 10)
-					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
-							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10");
+//				if (config.ptCounts().getPtCountsInterval() != 10)
+//					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
+//							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10");
+				// looks like this just means "isActiveInThisIteration()" (maybe changed since above comment was made). kai, feb'13
 
 				controler.stopwatch.beginOperation("compare with pt counts");
 
@@ -187,7 +204,6 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 				CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.occupCounts,
 						network, config.ptCounts().getCountsScaleFactor());
 
-				PtCountsConfigGroup ptCountsConfig = (PtCountsConfigGroup) config.getModule(PtCountsConfigGroup.GROUP_NAME);
 				Double distanceFilter = ptCountsConfig.getDistanceFilter();
 				String distanceFilterCenterNodeId  = ptCountsConfig.getDistanceFilterCenterNode();
 				if ((distanceFilter != null) && (distanceFilterCenterNodeId != null)) {
@@ -200,7 +216,7 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 				ccaAlight.calculateComparison();
 				ccaOccupancy.calculateComparison();
 
-				String outputFormat = ((PtCountsConfigGroup) config.getModule(PtCountsConfigGroup.GROUP_NAME)).getOutputFormat();
+				String outputFormat = ptCountsConfig.getOutputFormat();
 				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
 					OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
 
@@ -215,8 +231,9 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 				}
 				
 				if (outputFormat.contains("txt") || outputFormat.contains("all")) {
-					// yyyy As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
-					// yyyy As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13
+					//  As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
+					//  As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13
+					//  See near beginning of method.  kai, feb'13 
 					OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
 					ccaBoard.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareBoarding.txt"));
 					ccaAlight.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareAlighting.txt"));
@@ -232,10 +249,12 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 		private static final long serialVersionUID = 1L;
 		private CadytsPtOccupancyAnalyzer occupancyAnalyzer = null;
 		private final double countsScaleFactor;
+		private final int timeBinSize_s;
 
-		SimResultsContainerImpl(final CadytsPtOccupancyAnalyzer oa, final double countsScaleFactor) {
+		SimResultsContainerImpl(final CadytsPtOccupancyAnalyzer oa, final double countsScaleFactor, int timeBinSize_s) {
 			this.occupancyAnalyzer = oa;
 			this.countsScaleFactor = countsScaleFactor;
+			this.timeBinSize_s = timeBinSize_s;
 		}
 
 		@Override
@@ -252,7 +271,19 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 //			}
 //
 //			return values[hour] * this.countsScaleFactor;
-			return this.occupancyAnalyzer.getOccupancyVolumeForStopAndTime(stop.getId(), startTime_s) * this.countsScaleFactor ;
+			
+			double retval = 0. ;
+			switch ( type ) {
+			case COUNT_VEH:
+				retval = this.occupancyAnalyzer.getOccupancyVolumeForStopAndTime(stop.getId(), startTime_s) * this.countsScaleFactor ;
+				break;
+			case FLOW_VEH_H:
+				int multiple = this.timeBinSize_s / 3600 ; // e.g. "3" when timeBinSize_s = 3*3600 = 10800
+				retval = this.occupancyAnalyzer.getOccupancyVolumeForStopAndTime(stop.getId(), startTime_s) * this.countsScaleFactor / multiple ;
+				break;
+			}
+			return retval ;
+			
 		}
 
 		@Override

@@ -115,9 +115,9 @@ BeforeMobsimListener, AfterMobsimListener  {
 			int iter = event.getIteration();
 			if ( isActiveInThisIteration( iter, controler ) ) {
 
-				if ( this.config.ptCounts().getPtCountsInterval() != 10 )
-					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
-							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
+//				if ( this.config.ptCounts().getPtCountsInterval() != 10 )
+//					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
+//							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
 
 				controler.stopwatch.beginOperation("compare with pt counts");
 
