@@ -39,7 +39,7 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
  */
 public class PtDriverIdHandler implements TransitDriverStartsEventHandler {
 	private final static Logger log = Logger.getLogger(PtDriverIdHandler.class);
-	private List<Id> ptDriverIDs = new ArrayList<Id>();
+	private final static List<Id> ptDriverIDs = new ArrayList<Id>(); //was neither final not static
 
 	@Override
 	public void reset(int iteration) {
@@ -52,10 +52,12 @@ public class PtDriverIdHandler implements TransitDriverStartsEventHandler {
 		
 		if (!this.ptDriverIDs.contains(ptDriverId)){
 			this.ptDriverIDs.add(ptDriverId);
+			
 		}
 	}
 
 	public List<Id> getPtDriverIDs() {
+		
 		if (ptDriverIDs.isEmpty()){
 			log.warn("No pt driver(s) identified. List is empty!");
 		}
