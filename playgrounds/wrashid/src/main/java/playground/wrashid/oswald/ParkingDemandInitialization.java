@@ -30,6 +30,8 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.objenesis.instantiator.basic.NewInstanceInstantiator;
 
+import playground.wrashid.bodenbender.StudyArea;
+
 
 /**
  * prints out coordinates of all parked vehicles at 'timeOfSnapShotInSeconds'
@@ -42,7 +44,7 @@ public class ParkingDemandInitialization {
 	public static void main(String[] args) {
 		String eventsFile = "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
 
-		double timeOfSnapShotInSeconds = 8 * 3600;
+		double timeOfSnapShotInSeconds = 7 * 3600;
 
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
@@ -61,7 +63,11 @@ public class ParkingDemandInitialization {
 		
 		for (Id agentId : arrivals.keySet()) {
 			Coord linkCoord = network.getLinks().get(arrivals.get(agentId)).getCoord();
-			System.out.println(agentId + "\t" + linkCoord.getX() + "\t" + linkCoord.getY());
+			
+			if (StudyArea.isInStudyArea(linkCoord)){
+				System.out.println(agentId + "\t" + linkCoord.getX() + "\t" + linkCoord.getY());
+			}
+			
 		}
 
 	}

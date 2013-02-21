@@ -28,6 +28,8 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
+import playground.wrashid.bodenbender.StudyArea;
+
 
 /**
  * write out first non-stationary position of agents after
@@ -42,10 +44,10 @@ public class TravelDemand {
 
 	public static void main(String[] args) {
 
-		String eventsFile = "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
+		String eventsFile = "H:/data/experiments/TRBAug2011/runs/ktiRun23/output/ITERS/it.50/50.events.xml.gz";
 
-		double simulationStartTimeInSeconds = 8 * 3600;
-		double simulationEndTimeInSeconds = simulationStartTimeInSeconds + 10 * 60;
+		double simulationStartTimeInSeconds = 7 * 3600;
+		double simulationEndTimeInSeconds = simulationStartTimeInSeconds + 2 * 3600;
 
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
@@ -75,8 +77,12 @@ public class TravelDemand {
 				 * anymore
 				 */
 				Coord endCoord = network.getLinks().get(endPositions.get(personId)).getCoord();
-				System.out.println(personId + "\t" + startCoord.getX() + "\t" + startCoord.getY() + "\t" + endCoord.getX() + "\t" + endCoord.getY()
-						+ "\t" + (lastEventWasArrivalEvent.get(personId) ? "1" : "0"));
+				
+				if (StudyArea.isInStudyArea(startCoord) || StudyArea.isInStudyArea(endCoord)){
+					System.out.println(personId + "\t" + startCoord.getX() + "\t" + startCoord.getY() + "\t" + endCoord.getX() + "\t" + endCoord.getY()
+							+ "\t" + (lastEventWasArrivalEvent.get(personId) ? "1" : "0"));
+				}
+				
 			}
 		}
 
