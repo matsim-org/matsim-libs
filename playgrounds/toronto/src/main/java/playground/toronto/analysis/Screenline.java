@@ -23,13 +23,26 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 
 /**
+ * A screenline is a traffic count tool where several count stations along a pre-determined
+ * boundary are aggregated into one - the border of a country, for example. This class
+ * facilitates screenline analysis by loading in a screenline geometry and figuring out
+ * which network links cross it (and in which direction).
+ * 
+ * <br><br>The screenline geometry is directional, in the order of its vertices. Therefore,
+ * links crossing the screnline right-to-left are considered the <em>positive direction</em>,
+ * while links crossing left-to-right are considered the <em>negative direction</em>. 
+ * It is up to the screenline coder to assign useful names to each direction.
+ * 
+ * <br><br>[Insert information about handler behaviour]
  * 
  * @author pkucirek
- *
+ * @author aweiss
  */
 public class Screenline implements LinkEnterEventHandler, LinkLeaveEventHandler{
 
+	/////////////////////////////////////////////////////////////////////////////////////
 	
+	// Identifiers for shapefile attributes.
 	public final static String ID = "Id";
 	public final static String POSDIRNAME = "PosDirName";
 	public final static String NEGDIRNAME = "NegDirName";
@@ -38,7 +51,7 @@ public class Screenline implements LinkEnterEventHandler, LinkLeaveEventHandler{
 	
 	/**
 	 * Loads a Map of {@link Screenline} (Id : Screenline) from a shapefile.
-	 * @param shapefile: The address of a properly-formatted shapefile. Its attribute
+	 * @param shapefile - The address of a properly-formatted shapefile. Its attribute
 	 * 		table must include columns labeled "Id", "PosDirName", "NegDirName", and
 	 * 		"Descr".
 	 * @return
@@ -78,10 +91,10 @@ public class Screenline implements LinkEnterEventHandler, LinkLeaveEventHandler{
 	/**
 	 * Loads a Map of {@link Screenline} (Id : Screenline) from a shapefile, initializing
 	 * each Screenline with links from the network.
-	 * @param shapefile: The address of a properly-formatted shapefile. Its attribute
+	 * @param shapefile - The address of a properly-formatted shapefile. Its attribute
 	 * 		table must include columns labeled "Id", "PosDirName", "NegDirName", and
 	 * 		"Descr".
-	 * @param network: The {@link Network} to load links from. 
+	 * @param network - The {@link Network} to load links from. 
 	 * @return
 	 */
 	public static Map<Id, Screenline> openShapefile(String shapefile, Network network){
