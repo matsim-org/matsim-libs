@@ -65,6 +65,7 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 		this.scenario = scenario;
 		
 		// (sub-)module
+		this.anaModules.clear();
 		this.ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
 		this.ptDriverIdAnalyzer.init(scenario);
 		this.anaModules.add(ptDriverIdAnalyzer);		
