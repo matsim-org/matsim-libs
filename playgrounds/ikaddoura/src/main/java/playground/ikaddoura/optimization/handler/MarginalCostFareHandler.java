@@ -39,7 +39,6 @@ import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
@@ -50,7 +49,15 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 /**
- * Calculates a fare equal to the marginal costs of causing delays when boarding / alighting a vehicle.
+ * Calculates a fare equal to the marginal user costs due to delays when boarding and alighting a public vehicle.
+ * So far two types of delays are considered only: An agent boarding or alighting delays all passengers...
+ * 1) ...who are in the pt vehicle.
+ * 2) ...who are right now waiting behind that agent or at bus stops ahead up until the next pt vehicle.
+ * 
+ * Note: Whenever a pt vehicle stops at a transit stop due to at least one agent boarding or alighting,
+ * the pt vehicle will be delayed by additional 2 sec. That is, the delay of the first transfer is equal to
+ * the transfer time per agent plus exactly these 2 sec. All following passengers only cause delays according to
+ * their transfer times.
  * 
  * @author Ihab
  *
@@ -70,15 +77,18 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 	private final Map<Id, Id> vehicleId2stopIdLastDeparture = new HashMap<Id, Id>();
 	private final Map<Id, Id> vehicleId2lineId = new HashMap<Id, Id>();
 	private final Map<Id, Id> vehicleId2routeId = new HashMap<Id, Id>();
+	private final Map<Id, Boolean> vehId2isFirstTransfer = new HashMap<Id, Boolean>();
 
 	public MarginalCostFareHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
 		
-		this.vtts_inVehicle = (this.scenario.getConfig().planCalcScore().getTravelingPt_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.vtts_inVehicle = (this.scenario.getConfig().planCalcScore().getTravelingPt_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();		
 //		this.vtts_inVehicle = this.scenario.getConfig().planCalcScore().getTravelingPt_utils_hr() / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(); // without opportunity costs of time
-		log.info("VTTS_inVehicleTime: " + vtts_inVehicle);
+	
 		this.vtts_waiting = (this.scenario.getConfig().planCalcScore().getMarginalUtlOfWaitingPt_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+
+		log.info("VTTS_inVehicleTime: " + vtts_inVehicle);
 		log.info("VTTS_waiting: " + vtts_waiting);
 	}
 	
@@ -119,20 +129,25 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 		Id vehId = event.getVehicleId();
 				
 		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){
-									
-			Id stopId = this.vehicleId2stopIdLastArrival.get(vehId);
-//			System.out.println("**** ENTERING ***** Bus " + vehId + " is currently at stop " + stopId);
+							
+			Id currentStopId = this.vehicleId2stopIdLastArrival.get(vehId);
+//			System.out.println("**** ENTERING ***** Bus " + vehId + " is currently at stop " + currentStopId);
 
 			// update number of passengers waiting at stops before calculating fare
-			if (this.stopId2waitingPassengers.containsKey(stopId)){
-				int waitingPassengers = this.stopId2waitingPassengers.get(stopId);
-				this.stopId2waitingPassengers.put(stopId, waitingPassengers - 1);
+			if (this.stopId2waitingPassengers.containsKey(currentStopId)){
+				int waitingPassengers = this.stopId2waitingPassengers.get(currentStopId);
+				this.stopId2waitingPassengers.put(currentStopId, waitingPassengers - 1);
 			} else {
 				throw new RuntimeException("Person enters vehicle without waiting for it. Aborting...");
 			}
 			
-			double costs = calculateEnteringDelayCosts(vehId, stopId);
-			AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), costs);
+			boolean isFirstTransfer = this.vehId2isFirstTransfer.get(vehId);
+			if (isFirstTransfer){
+				this.vehId2isFirstTransfer.put(vehId, false);
+			}
+//			System.out.println("isFirstTransfer: " + isFirstTransfer);
+			double marginalCosts = calculateEnteringDelayCosts(vehId, currentStopId, isFirstTransfer);
+			AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), marginalCosts);
 			this.events.processEvent(moneyEvent);
 			
 			// update number of passengers in vehicle after calculating fare
@@ -151,15 +166,16 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 		Id vehId = event.getVehicleId();
 		
 		if (ptDriverIDs.contains(personId)){
-			// a pt driver leaves the bus means the end of a transit route is reached and the vehicle is not in the system. Therefore resetting the vehicle position.
+			// A pt driver leaves the bus means the end of a transit route is reached and the vehicle is not in the system.
+			// Therefore resetting the vehicle position.
 			this.vehicleId2stopIdLastDeparture.remove(vehId);
 			this.vehicleId2stopIdLastArrival.remove(vehId);
 		}
 				
 		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){
 						
-			Id stopId = this.vehicleId2stopIdLastArrival.get(vehId);
-//			System.out.println("**** LEAVING ***** Bus " + vehId + " is currently at stop " + stopId);
+			Id currentStopId = this.vehicleId2stopIdLastArrival.get(vehId);
+//			System.out.println("**** LEAVING ***** Bus " + vehId + " is currently at stop " + currentStopId);
 			
 			// update number of passengers in vehicle before calculating fare
 			if (this.vehId2passengers.containsKey(vehId)){
@@ -168,20 +184,25 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 			} else {
 				throw new RuntimeException("A person leaves a vehicle without entering it before. Aborting...");
 			}
+
+			boolean isFirstTransfer = this.vehId2isFirstTransfer.get(vehId);
+			if (isFirstTransfer){
+				this.vehId2isFirstTransfer.put(vehId, false);
+			}
 			
-			double marginalCosts = calculateLeavingDelayCosts(vehId, stopId);
+			double marginalCosts = calculateLeavingDelayCosts(vehId, currentStopId, isFirstTransfer);
 			AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), marginalCosts);
 			this.events.processEvent(moneyEvent);
 			
 		}
 	}
 	
-	private double calculateEnteringDelayCosts(Id vehId, Id stopId) {
+	private double calculateEnteringDelayCosts(Id vehId, Id stopId, boolean isFirstTransfer) {
 		
 		double transferTimePerAgent = this.scenario.getVehicles().getVehicles().get(vehId).getType().getAccessTime();
 		
-		double delayCostsInVeh = calculateDelaysInVeh(vehId, transferTimePerAgent) * this.vtts_inVehicle;
-		double delaysCostsWaiting = calculateDelaysWaiting(vehId, stopId, transferTimePerAgent) * this.vtts_waiting;
+		double delayCostsInVeh = calculateDelaysInVeh(vehId, transferTimePerAgent, isFirstTransfer) * this.vtts_inVehicle;
+		double delaysCostsWaiting = calculateDelaysWaiting(vehId, stopId, transferTimePerAgent, isFirstTransfer) * this.vtts_waiting;
 
 //		System.out.println("DelayCostsInVeh: " + delayCostsInVeh);
 //		System.out.println("DelayCostsWaiting: " + delaysCostsWaiting);
@@ -191,12 +212,12 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 		return totalCosts;
 	}
 
-	private double calculateLeavingDelayCosts(Id vehId, Id stopId) {
+	private double calculateLeavingDelayCosts(Id vehId, Id stopId, boolean isFirstTransfer) {
 		
 		double transferTimePerAgent = this.scenario.getVehicles().getVehicles().get(vehId).getType().getEgressTime();
 		
-		double delayCostsInVeh = calculateDelaysInVeh(vehId, transferTimePerAgent) * this.vtts_inVehicle;
-		double delaysCostsWaiting = calculateDelaysWaiting(vehId, stopId, transferTimePerAgent) * this.vtts_waiting;
+		double delayCostsInVeh = calculateDelaysInVeh(vehId, transferTimePerAgent, isFirstTransfer) * this.vtts_inVehicle;
+		double delaysCostsWaiting = calculateDelaysWaiting(vehId, stopId, transferTimePerAgent, isFirstTransfer) * this.vtts_waiting;
 
 //		System.out.println("DelayCostsInVeh: " + delayCostsInVeh);
 //		System.out.println("DelayCostsWaiting: " + delaysCostsWaiting);
@@ -206,18 +227,27 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 		return totalCosts;
 	}
 	
-	private double calculateDelaysInVeh(Id vehId, double transferTime_sec) {
+	private double calculateDelaysInVeh(Id vehId, double transferTime_sec, boolean isFirstTransfer) {
 		double delaysInVeh_sec = 0.;
+		
 		if (this.vehId2passengers.containsKey(vehId)) {
-//			System.out.println("Agents in bus " + vehId + ": " + this.vehId2passengers.get(vehId));
-			delaysInVeh_sec = this.vehId2passengers.get(vehId) * transferTime_sec;
+			if (isFirstTransfer){
+//				Each time a public vehicle stops at a transit stop the public vehicle is delayed by 2 seconds.
+//				Assuming this time to belong to the marginal user costs of the first person entering or leaving a public vehicle.
+				double extraDelay = 2.;
+				delaysInVeh_sec = this.vehId2passengers.get(vehId) * (transferTime_sec + extraDelay);
+			} else {
+//				System.out.println("Agents in bus " + vehId + ": " + this.vehId2passengers.get(vehId));
+				delaysInVeh_sec = this.vehId2passengers.get(vehId) * transferTime_sec;
+			}
 		} else {
 //			System.out.println("Agents in bus " + vehId + ": 0");
 		}
 		return delaysInVeh_sec / 3600.;
 	}
 
-	private double calculateDelaysWaiting(Id vehId, Id stopId, double transferTime_sec) {
+	private double calculateDelaysWaiting(Id vehId, Id stopId, double transferTime_sec, boolean isFirstTransfer) {
+		double delaysWaiting_sec = 0.;
 		
 		// get all possible relevant stopIds beginning with the current stopId
 		List<Id> relevantStopIDsFromHere = getRelevantStopIDsFromHere(vehId, stopId);
@@ -243,7 +273,16 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 		
 //		System.out.println("Number of agents waiting at these stops: " + numberOfPassengersWaitingInRelevantArea);
 		
-		double delaysWaiting_sec = numberOfPassengersWaitingInRelevantArea * transferTime_sec;
+		if (isFirstTransfer){
+//			Each time a public vehicle stops at a transit stop the public vehicle is delayed by 2 seconds.
+//			Assuming this time to belong to the marginal user costs of the first person entering or leaving a public vehicle.
+			double extraDelay = 2.;
+			delaysWaiting_sec = numberOfPassengersWaitingInRelevantArea * (transferTime_sec + extraDelay);
+		} else {
+//			System.out.println("Agents in bus " + vehId + ": " + this.vehId2passengers.get(vehId));
+			delaysWaiting_sec = numberOfPassengersWaitingInRelevantArea * transferTime_sec;
+		}
+		
 		return delaysWaiting_sec / 3600.;
 	}
 	
@@ -328,6 +367,8 @@ public class MarginalCostFareHandler implements PersonEntersVehicleEventHandler,
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		this.vehicleId2stopIdLastArrival.put(event.getVehicleId(), event.getFacilityId());
+		// Vehicle has arrived at transit stop. The following agent will be the first transfer of this vehicle.
+		this.vehId2isFirstTransfer.put(event.getVehicleId(), true);
 	
 		if (event.getDelay() > 1200.) {
 			log.warn("Bus is more than 1200 seconds behind the schedule. More than the number of agents waiting along this transit route will be affected by delays.");
