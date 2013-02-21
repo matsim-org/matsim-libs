@@ -51,7 +51,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public final class BestResponseLocationMutator extends RecursiveLocationMutator {
 	private final ActivityFacilitiesImpl facilities;
-	private final ObjectAttributes personsMaxEpsUnscaled;
+	private final ObjectAttributes personsMaxDCScoreUnscaled;
 	private final ScaleEpsilon scaleEpsilon;
 	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
@@ -60,12 +60,12 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	public BestResponseLocationMutator(final Scenario scenario,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			ObjectAttributes personsMaxEpsUnscaled, ScaleEpsilon scaleEpsilon,
+			ObjectAttributes personsMaxDCScoreUnscaled, ScaleEpsilon scaleEpsilon,
 			ActTypeConverter actTypeConverter, DestinationSampler sampler,
 			ReplanningContext replanningContext) {
 		super(scenario, replanningContext.getTripRouterFactory().createTripRouter(), quad_trees, facilities_of_type, null);
 		this.facilities = (ActivityFacilitiesImpl) ((ScenarioImpl) scenario).getActivityFacilities();
-		this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
+		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;
 		this.sampler = sampler;
@@ -231,10 +231,10 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	 * Conversion of the "frozen" logit model epsilon into a distance.
 	 */
 	private double convertEpsilonIntoDistance(Person person, String type) {
-		double maxEpsilon = 0.0;
+		double maxDCScore = 0.0;
 		double scale = this.scaleEpsilon.getEpsilonFactor(type);		
-		maxEpsilon = (Double) this.personsMaxEpsUnscaled.getAttribute(person.getId().toString(), type);
-		maxEpsilon *= scale; // apply the scale factors given in the config file
+		maxDCScore = (Double) this.personsMaxDCScoreUnscaled.getAttribute(person.getId().toString(), type);
+		maxDCScore *= scale; // apply the scale factors given in the config file
 
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
@@ -250,7 +250,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			if ( betaTime >= 0. ) {
 				throw new RuntimeException("betaTime >= 0 in location choice; method not designed for this; aborting ...") ;
 			}
-			maxTravelTime = Math.abs(maxEpsilon / (-1.0 * betaTime) * 3600.0); //[s] // abs used for the case when somebody defines beta > 0
+			maxTravelTime = Math.abs(maxDCScore / (-1.0 * betaTime) * 3600.0); //[s] // abs used for the case when somebody defines beta > 0
 			// yy maybe one can still used it with betaTime>0 (i.e. traveling brings utility), but taking the "abs" of it is almost certainly not the
 			// correct way.  kai, jan'13
 		}
