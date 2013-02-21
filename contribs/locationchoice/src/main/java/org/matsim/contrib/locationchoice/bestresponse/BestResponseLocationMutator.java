@@ -25,7 +25,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -57,17 +56,18 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private final DestinationSampler sampler;
 	private ReplanningContext replanningContext;
 
-	public BestResponseLocationMutator(final Scenario scenario,
+	public BestResponseLocationMutator(
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			ObjectAttributes personsMaxDCScoreUnscaled, ScaleEpsilon scaleEpsilon,
-			ActTypeConverter actTypeConverter, DestinationSampler sampler,
+			ObjectAttributes personsMaxDCScoreUnscaled, LocationChoiceBestResponseContext lcContext,
+			DestinationSampler sampler,
 			ReplanningContext replanningContext) {
-		super(scenario, replanningContext.getTripRouterFactory().createTripRouter(), quad_trees, facilities_of_type, null);
-		this.facilities = (ActivityFacilitiesImpl) ((ScenarioImpl) scenario).getActivityFacilities();
+		
+		super(lcContext.getScenario(), replanningContext.getTripRouterFactory().createTripRouter(), quad_trees, facilities_of_type, null);
+		this.facilities = (ActivityFacilitiesImpl) ((ScenarioImpl) lcContext.getScenario()).getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
-		this.scaleEpsilon = scaleEpsilon;
-		this.actTypeConverter = actTypeConverter;
+		this.scaleEpsilon = lcContext.getScaleEpsilon();
+		this.actTypeConverter = lcContext.getConverter();
 		this.sampler = sampler;
 		this.replanningContext = replanningContext ;
 	}
@@ -257,8 +257,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// distance linear
 		double maxDistance = travelSpeedCrowFly * maxTravelTime; 
 
-		// non-linear and tastes: exhaustive search for the moment
-		// later implement non-linear equation solver
+		// define a maximum distance choice set manually
 		if (Double.parseDouble(this.scenario.getConfig().locationchoice().getMaxDistanceDCScore()) > 0.0) {
 			maxDistance = Double.parseDouble(this.scenario.getConfig().locationchoice().getMaxDistanceDCScore());
 		}

@@ -108,9 +108,8 @@ public class BestReplyLocationChoice extends AbstractMultithreadedModule {
 	public final PlanAlgorithm getPlanAlgoInstance() {		
 		// this one corresponds to the "frozen epsilon" paper(s)
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
-		this.planAlgoInstances.add(new BestResponseLocationMutator(this.scenario,   
-				this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
-				this.lcContext.getScaleEpsilon(), this.lcContext.getConverter(), this.sampler, this.getReplanningContext()));
+		this.planAlgoInstances.add(new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
+				this.lcContext, this.sampler, this.getReplanningContext()));
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 }
