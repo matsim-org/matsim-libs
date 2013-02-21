@@ -28,11 +28,15 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
 import org.matsim.population.Desires;
 
 /**
  * Same as CharyparNagelOpenTimesActivityScoring, but retrieves desired activity
  * durations from a person's desires instead of the config file.
+ * 
+ * Moreover, zeroUtilityDuration_h is calculated based on the agent's desired
+ * activity duration and not taken from the actParams object.
  *
  * @author cdobler
  *
@@ -140,8 +144,14 @@ public class DesiresAndOpenTimesActivityScoring extends CharyparNagelOpenTimesAc
 			}				
 
 			if (duration > 0) {
+//				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
+//						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
+				// the next four lines have also been inserted - copied and adapted them from ActivityUtilityParameters class
+				double priority = 1.0;
+				double zeroUtilityDuration_h = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration) / 3600;
 				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
-						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
+						* Math.log((duration / 3600.0) / zeroUtilityDuration_h);
+				
 				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 			} else {
