@@ -260,13 +260,14 @@ abstract class AbstractQLink extends QLinkInternalI {
 		}
 		
 		/*
-		 * If there is a driver waiting for its vehicle, insert it and let
-		 * the vehicle depart.
+		 * If there is a driver waiting for its vehicle, and this car is not currently already leaving again with the
+		 * same vehicle, put the new driver into the vehicle and let it depart.
 		 */
-		if (driverWaitingForCar != null) {
+		if (driverWaitingForCar != null && veh.getDriver() == null) {
 			// set agent as driver and then let the vehicle depart
 			driversWaitingForCars.remove(veh.getId());
 			veh.setDriver(driverWaitingForCar);
+			removeParkedVehicle( veh.getId() );
 			this.letVehicleDepart(veh, now);
 		}
 	}
