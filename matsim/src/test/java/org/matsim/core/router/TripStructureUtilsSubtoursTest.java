@@ -159,6 +159,7 @@ public class TripStructureUtilsSubtoursTest {
 			new Subtour(
 						Arrays.asList(
 							new Trip( act1 , trip1 , act2 ),
+							new Trip( act2 , trip2 , act3 ),
 							new Trip( act3 , trip3 , act4 ) ),
 						true);
 		final Subtour childSubtour =
@@ -167,6 +168,7 @@ public class TripStructureUtilsSubtoursTest {
 							new Trip( act2 , trip2 , act3 ) ),
 						true);
 		childSubtour.parent = rootSubtour;
+		rootSubtour.children.add( childSubtour );
 
 		return new Fixture(
 				plan,
@@ -263,6 +265,8 @@ public class TripStructureUtilsSubtoursTest {
 			new Subtour(
 						Arrays.asList(
 							new Trip( act4 , trip4 , act5 ),
+							new Trip( act5 , trip5 , act6 ),
+							new Trip( act6 , trip6 , act7 ),
 							new Trip( act7 , trip7 , act8 )),
 						true);
 
@@ -273,6 +277,7 @@ public class TripStructureUtilsSubtoursTest {
 							new Trip( act6 , trip6 , act7 )),
 						true);
 		childSubtour.parent = rootSubtour2;
+		rootSubtour2.children.add( childSubtour );
 
 		return new Fixture(
 				plan,
@@ -330,6 +335,7 @@ public class TripStructureUtilsSubtoursTest {
 			new Subtour(
 						Arrays.asList(
 							new Trip( act1 , trip1 , act2 ),
+							new Trip( act2 , trip2 , act3 ),
 							new Trip( act3 , trip3 , act4 ) ),
 						false);
 		final Subtour childSubtour =
@@ -338,12 +344,105 @@ public class TripStructureUtilsSubtoursTest {
 							new Trip( act2 , trip2 , act3 ) ),
 						true);
 		childSubtour.parent = rootSubtour;
+		rootSubtour.children.add( childSubtour );
 
 		return new Fixture(
 				plan,
 				Arrays.asList(
 					rootSubtour,
 					childSubtour));
+	}
+
+	private static Fixture createTwoChildren() {
+		final PopulationFactory fact = createPopulationFactory();
+
+		final Id id1 = new IdImpl( 1 );
+		final Id id2 = new IdImpl( 2 );
+		final Id id3 = new IdImpl( 3 );
+
+		final Plan plan = fact.createPlan();
+		final Activity act1 = fact.createActivityFromLinkId( "h" , id1 );
+		plan.addActivity( act1 );
+
+		final List<PlanElement> trip1 = new ArrayList<PlanElement>();
+		final Leg leg1 = fact.createLeg( "velo" );
+		plan.addLeg( leg1 );
+		trip1.add( leg1 );
+
+		final Activity act2 = fact.createActivityFromLinkId( "w" , id2 );
+		plan.addActivity( act2 );
+
+		final List<PlanElement> trip2 = new ArrayList<PlanElement>();
+		final Leg leg2 = fact.createLeg( "walk" );
+		plan.addLeg( leg2 );
+		trip2.add( leg2 );
+		final Activity stage = fact.createActivityFromLinkId( STAGE , id2 );
+		plan.addActivity( stage );
+		trip2.add( stage );
+		final Leg leg3 = fact.createLeg( "swim" );
+		plan.addLeg( leg3 );
+		trip2.add( leg3 );
+		final Leg leg4 = fact.createLeg( "walk" );
+		plan.addLeg( leg4 );
+		trip2.add( leg4 );
+
+		final Activity act3 = fact.createActivityFromLinkId( "h" , id2 );
+		plan.addActivity( act3 );
+
+		final List<PlanElement> trip3 = new ArrayList<PlanElement>();
+		final Leg leg5 = fact.createLeg( "velo" );
+		plan.addLeg( leg5 );
+		trip3.add( leg5 );
+
+		final Activity act4 = fact.createActivityFromLinkId( "h" , id3 );
+		plan.addActivity( act4 );
+
+		final List<PlanElement> trip4 = new ArrayList<PlanElement>();
+		final Leg leg6 = fact.createLeg( "bike" );
+		plan.addLeg( leg6 );
+		trip4.add( leg6 );
+
+		final Activity act5 = fact.createActivityFromLinkId( "h" , id3 );
+		plan.addActivity( act5 );
+
+		final List<PlanElement> trip5 = new ArrayList<PlanElement>();
+		final Leg leg7 = fact.createLeg( "flying_carpet" );
+		plan.addLeg( leg7 );
+		trip5.add( leg7 );
+
+		final Activity act6 = fact.createActivityFromLinkId( "h" , id1 );
+		plan.addActivity( act6 );
+
+		final Subtour rootSubtour =
+			new Subtour(
+						Arrays.asList(
+							new Trip( act1 , trip1 , act2 ),
+							new Trip( act2 , trip2 , act3 ),
+							new Trip( act3 , trip3 , act4 ),
+							new Trip( act4 , trip4 , act5 ),
+							new Trip( act5 , trip5 , act6 ) ),
+						true);
+		final Subtour childSubtour1 =
+			new Subtour(
+						Arrays.asList(
+							new Trip( act2 , trip2 , act3 ) ),
+						true);
+		final Subtour childSubtour2 =
+			new Subtour(
+						Arrays.asList(
+							new Trip( act4 , trip4 , act5 ) ),
+						true);
+		childSubtour1.parent = rootSubtour;
+		childSubtour2.parent = rootSubtour;
+		rootSubtour.children.add( childSubtour1 );
+		rootSubtour.children.add( childSubtour2 );
+
+		return new Fixture(
+				plan,
+				Arrays.asList(
+					rootSubtour,
+					childSubtour1,
+					childSubtour2));
 	}
 
 	private static Fixture createInconsistentTrips() {
@@ -389,6 +488,15 @@ public class TripStructureUtilsSubtoursTest {
 				null);
 	}
 
+	private static Collection<Fixture> allFixtures() {
+		return Arrays.asList(
+				createMonoSubtourFixture(),
+				createTwoNestedSubtours(),
+				createTwoChildren(),
+				createComplexSubtours(),
+				createOpenPlan());
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
@@ -400,6 +508,11 @@ public class TripStructureUtilsSubtoursTest {
 	@Test
 	public void testTwoNestedSubtours() {
 		performTest( createTwoNestedSubtours() );
+	}
+
+	@Test
+	public void testTwoChildren() {
+		performTest( createTwoChildren() );
 	}
 
 	@Test
@@ -447,6 +560,46 @@ public class TripStructureUtilsSubtoursTest {
 		assertTrue(
 				"no exception was thrown!",
 				hadException);
+	}
+
+	@Test
+	public void testGetTripsWithoutSubSubtours() throws Exception {
+		for (Fixture f : allFixtures()) {
+			final int nTrips = TripStructureUtils.getTrips( f.plan , CHECKER ).size();
+			final Collection<Subtour> subtours = TripStructureUtils.getSubtours( f.plan , CHECKER );
+			int countTrips = 0;
+
+			for (Subtour s : subtours) {
+				countTrips += s.getTripsWithoutSubSubtours().size();
+			}
+
+			assertEquals(
+					"unexpected total number of trips in subtours without subsubtours",
+					countTrips,
+					nTrips);
+		}
+	}
+
+	@Test
+	public void testFatherhood() throws Exception {
+		for (Fixture f : allFixtures()) {
+			final Collection<Subtour> subtours = TripStructureUtils.getSubtours( f.plan , CHECKER );
+
+			for (Subtour s : subtours) {
+				for ( Subtour child : s.getChildren() ) {
+					assertEquals(
+							"wrong father!",
+							child.getParent(),
+							s);
+				}
+
+				if ( s.getParent() != null ) {
+					assertTrue(
+							"father does not have subtour has a child",
+							s.getParent().getChildren().contains( s ));
+				}
+			}
+		}
 	}
 
 	private static PopulationFactory createPopulationFactory() {

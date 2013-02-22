@@ -22,9 +22,7 @@ package org.matsim.core.router;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -155,11 +153,14 @@ public class TripStructureUtils {
 	/**
 	 * Gives access to a list of the subtours in the plan.
 	 * A subtour is undestood as the smallest sequence of trips starting
-	 * and ending at the same location, without the smaller subtours it possibly
-	 * contains.
+	 * and ending at the same location (known as anchor point).
 	 * <br>
 	 * The subtour structure is a tree: a subtour may have a father subtour,
-	 * understood as the smallest subtour containing it.
+	 * understood as the smallest subtour containing it, and children subtours,
+	 * which are the "biggest" subtours it contains (ie the subtours it is the father
+	 * of).
+	 * Methods are provided to get or all the trips between the two anchor activities,
+	 * or just the trips not being part of any child subtour.
 	 * <br>
 	 * In case of "open" plans (which do not end by a subtour), one of the
 	 * {@link Subtour} objects contains a non-circular sequence of Trips
@@ -172,7 +173,7 @@ public class TripStructureUtils {
 	 * It is able to handle non-strict act/leg sequence and complex trips;
 	 * in case of successive activities not being located at the same location
 	 * (that is, if the origin of a trip is not the destination of the preceding
-	 * trip), an exception will be thrown
+	 * trip), an exception will be thrown.
 	 *
 	 * @throws RuntimeException if the Trip sequence has inconsistent location
 	 * sequence
@@ -207,12 +208,8 @@ public class TripStructureUtils {
 				final int subtourStartIndex = originIds.lastIndexOf( destinationId );
 				final int subtourEndIndex = originIds.size();
 
-				final List<Trip> subtour = new ArrayList<Trip>();
-				for (Trip tripInSubtour : trips.subList( subtourStartIndex , subtourEndIndex )) {
-					if ( nonAllocatedTrips.remove( tripInSubtour ) ) {
-						subtour.add( tripInSubtour );
-					}
-				}
+				final List<Trip> subtour = new ArrayList<Trip>( trips.subList( subtourStartIndex , subtourEndIndex ) );
+				nonAllocatedTrips.removeAll( subtour );
 
 				// do not consider the locations visited in finished subtours
 				// as possible anchor points
@@ -235,12 +232,15 @@ public class TripStructureUtils {
 			final Trip firstNonAllocated = nonAllocatedTrips.get( 0 );
 			final Trip lastNonAllocated = nonAllocatedTrips.get( nonAllocatedTrips.size() - 1 );
 
+			final int indexFirst = trips.indexOf( firstNonAllocated );
+			final int indexLast = trips.indexOf( lastNonAllocated ) + 1;
+
 			addSubtourAndUpdateParents(
 					subtours,
 					new Subtour(
-						trips.indexOf( firstNonAllocated ),
-						trips.indexOf( lastNonAllocated ) + 1,
-						nonAllocatedTrips,
+						indexFirst,
+						indexLast,
+						new ArrayList<Trip>( trips.subList( indexFirst , indexLast ) ),
 						false));
 		}
 
@@ -263,6 +263,7 @@ public class TripStructureUtils {
 			assert existingSubtour.endIndex < newSubtour.endIndex;
 
 			existingSubtour.parent = newSubtour;
+			newSubtour.children.add( existingSubtour );
 		}
 		subtours.add( newSubtour );
 	}
@@ -353,6 +354,7 @@ public class TripStructureUtils {
 		private final List<Trip> trips;
 		private final boolean isClosed;
 		Subtour parent = null;
+		final List<Subtour> children = new ArrayList<Subtour>();
 
 		// for tests
 		Subtour(final List<Trip> trips, final boolean isClosed) {
@@ -373,8 +375,36 @@ public class TripStructureUtils {
 			return trips;
 		}
 
+		public List<Trip> getTripsWithoutSubSubtours() {
+			final List<Trip> list = new ArrayList<Trip>();
+
+			for (Trip t : trips) {
+				boolean isInChildSt = false;
+				for (Subtour child : children) {
+					if ( child.contains( t ) ) {
+						isInChildSt = true;
+						break;
+					}
+				}
+
+				if ( !isInChildSt ) {
+					list.add( t );
+				}
+			}
+
+			return list;
+		}
+
+		private boolean contains(final Trip t) {
+			return trips.contains( t );
+		}
+
 		public Subtour getParent() {
 			return this.parent;
+		}
+
+		public Collection<Subtour> getChildren() {
+			return Collections.unmodifiableList( children );
 		}
 
 		public boolean isClosed() {
@@ -386,8 +416,19 @@ public class TripStructureUtils {
 			if ( !other.getClass().equals( getClass() ) ) return false;
 			final Subtour s = (Subtour) other;
 			return s.trips.equals( trips ) &&
+				areChildrenCompatible( children , s.children ) &&
 				(s.parent == null ? parent == null : s.parent.equals( parent )) &&
 				(s.isClosed == isClosed);
+		}
+
+		private static boolean areChildrenCompatible(
+				final List<Subtour> children2,
+				final List<Subtour> children3) {
+			if ( children2.size() != children3.size() ) return false;
+
+			// should check more, but risk of infinite recursion...
+
+			return true;
 		}
 
 		@Override
