@@ -20,20 +20,29 @@
 package org.matsim.core.router;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
 /**
- * Helps to work on plans with complew trips.
+ * Helps to work on plans with complex trips.
  * It provides convenience methods to get only the non-dummy activities
  * or the information about trips, in a way hopefully clean and useful.
  * <br>
  * The collections returned by this class are immutable.
+ * <br>
+ * Two versions of the methods are provided, working on {@link Plan}s
+ * or lists of {@link PlanElement}s.
  * <br>
  * The methods require an instance of {@link StageActivityTypes} as a parameter,
  * which is used to identify the dummy activities pertaining to trips.
@@ -42,14 +51,25 @@ import org.matsim.api.core.v01.population.PlanElement;
  * @author thibautd
  */
 public class TripStructureUtils {
+	private static final Logger log =
+		Logger.getLogger(TripStructureUtils.class);
+
 	private TripStructureUtils() {};
 
 	public static List<Activity> getActivities(
 			final Plan plan,
 			final StageActivityTypes stageActivities) {
+		return getActivities(
+				plan.getPlanElements(),
+				stageActivities);
+	}
+
+	public static List<Activity> getActivities(
+			final List<PlanElement> planElements,
+			final StageActivityTypes stageActivities) {
 		final List<Activity> activities = new ArrayList<Activity>();
 		
-		for (PlanElement pe : plan.getPlanElements()) {
+		for (PlanElement pe : planElements) {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
 
@@ -65,9 +85,16 @@ public class TripStructureUtils {
 	public static List<Trip> getTrips(
 			final Plan plan,
 			final StageActivityTypes stageActivities) {
+		return getTrips(
+				plan.getPlanElements(),
+				stageActivities);
+	}
+
+	public static List<Trip> getTrips(
+			final List<PlanElement> planElements,
+			final StageActivityTypes stageActivities) {
 		final List<Trip> trips = new ArrayList<Trip>();
 
-		final List<PlanElement> planElements = plan.getPlanElements();
 		int originActivityIndex = -1;
 		int currentIndex = -1;
 		for (PlanElement pe : planElements) {
@@ -96,6 +123,141 @@ public class TripStructureUtils {
 		}
 
 		return Collections.unmodifiableList( trips );
+	}
+
+	public static Collection<Subtour> getSubtours(
+			final Plan plan,
+			final StageActivityTypes stageActivityTypes) {
+		return getSubtours(
+				plan.getPlanElements(),
+				stageActivityTypes);
+	}
+
+	public static Collection<Subtour> getSubtours(
+			final List<PlanElement> plan,
+			final StageActivityTypes stageActivityTypes) {
+		return getSubtours(
+				plan,
+				stageActivityTypes,
+				false );
+	}
+
+	public static Collection<Subtour> getSubtours(
+			final Plan plan,
+			final StageActivityTypes stageActivityTypes,
+			final boolean useFacilitiesInsteadOfLinks) {
+		return getSubtours(
+				plan.getPlanElements(),
+				stageActivityTypes,
+				useFacilitiesInsteadOfLinks );
+	}
+
+	/**
+	 * Gives access to a list of the subtours in the plan.
+	 * A subtour is undestood as the smallest sequence of trips starting
+	 * and ending at the same location, without the smaller subtours it possibly
+	 * contains.
+	 * <br>
+	 * The subtour structure is a tree: a subtour may have a father subtour,
+	 * understood as the smallest subtour containing it.
+	 * <br>
+	 * In case of "open" plans (which do not end by a subtour), one of the
+	 * {@link Subtour} objects contains a non-circular sequence of Trips
+	 * (ie it is not a subtour according to the definition above).
+	 * In this case, the {@link Subtour#isClosed()} method returns false.
+	 * <br>
+	 * The order of iteration of the returned collection should not be considered
+	 * as significant, nor even stable facing refactorings.
+	 * <br>
+	 * It is able to handle non-strict act/leg sequence and complex trips;
+	 * in case of successive activities not being located at the same location
+	 * (that is, if the origin of a trip is not the destination of the preceding
+	 * trip), the result are however not guaranteed to make sense, nor to be stable
+	 * facing refactorings.
+	 */
+	public static Collection<Subtour> getSubtours(
+			final List<PlanElement> planElements,
+			final StageActivityTypes stageActivityTypes,
+			final boolean useFacilitiesInsteadOfLinks) {
+		final List<Subtour> subtours = new ArrayList<Subtour>();
+
+		final List<Id> originIds = new ArrayList<Id>();
+		final List<Trip> trips = getTrips( planElements , stageActivityTypes );
+		final List<Trip> nonAllocatedTrips = new ArrayList<Trip>( trips );
+		for (Trip trip : trips) {
+			final Id originId = useFacilitiesInsteadOfLinks ?
+				trip.getOriginActivity().getFacilityId() :
+				trip.getOriginActivity().getLinkId();
+
+			final Id destinationId = useFacilitiesInsteadOfLinks ?
+				trip.getDestinationActivity().getFacilityId() :
+				trip.getDestinationActivity().getLinkId();
+
+			originIds.add( originId );
+
+			if (originIds.contains( destinationId )) {
+				// end of a subtour
+				final int subtourStartIndex = originIds.lastIndexOf( destinationId );
+				final int subtourEndIndex = originIds.size();
+
+				final List<Trip> subtour = new ArrayList<Trip>();
+				for (Trip tripInSubtour : trips.subList( subtourStartIndex , subtourEndIndex )) {
+					if ( nonAllocatedTrips.remove( tripInSubtour ) ) {
+						subtour.add( tripInSubtour );
+					}
+				}
+
+				// do not consider the locations visited in finished subtours
+				// as possible anchor points
+				for (int i=subtourStartIndex; i < subtourEndIndex; i++) {
+					originIds.set( i , null );
+				}
+
+				addSubtourAndUpdateParents(
+						subtours,
+						new Subtour(
+							subtourStartIndex,
+							subtourEndIndex,
+							subtour,
+							true) );
+			}
+		}
+
+		if (nonAllocatedTrips.size() != 0) {
+			// "open" plan
+			final Trip firstNonAllocated = nonAllocatedTrips.get( 0 );
+			final Trip lastNonAllocated = nonAllocatedTrips.get( nonAllocatedTrips.size() - 1 );
+
+			addSubtourAndUpdateParents(
+					subtours,
+					new Subtour(
+						trips.indexOf( firstNonAllocated ),
+						trips.indexOf( lastNonAllocated ) + 1,
+						nonAllocatedTrips,
+						false));
+		}
+
+		return Collections.unmodifiableList( subtours );
+	}
+
+	private static void addSubtourAndUpdateParents(
+			final List<Subtour> subtours,
+			final Subtour newSubtour) {
+		// the parent of a subtour is the first found enclosing subtour
+		for (Subtour existingSubtour : subtours) {
+			if ( existingSubtour.parent != null ) continue;
+			if ( existingSubtour.startIndex < newSubtour.startIndex ) continue;
+			if ( existingSubtour.endIndex < newSubtour.startIndex ) continue;
+
+			// the trips are parsed in sequence, so it is not possible
+			// that a existing subtour contains elements later than the
+			// end of the new subtour.
+			assert existingSubtour.startIndex < newSubtour.endIndex;
+			assert existingSubtour.endIndex < newSubtour.endIndex;
+
+			existingSubtour.parent = newSubtour;
+		}
+		subtours.add( newSubtour );
 	}
 
 	/**
@@ -170,6 +332,65 @@ public class TripStructureUtils {
 		@Override
 		public int hashCode() {
 			return originActivity.hashCode() + trip.hashCode() + destinationActivity.hashCode();
+		}
+	}
+
+	public static final class Subtour {
+		// this is used at construction to find parents,
+		// but I do not think this should be made accessible from outside.
+		// I even think it should be stored somewhere else.
+		// td, feb.13
+		private final int startIndex;
+		private final int endIndex;
+
+		private final List<Trip> trips;
+		private final boolean isClosed;
+		Subtour parent = null;
+
+		// for tests
+		Subtour(final List<Trip> trips, final boolean isClosed) {
+			this( -1 , -1 , trips , isClosed );
+		}
+
+		private Subtour(final int startIndex,
+				final int endIndex,
+				final List<Trip> trips,
+				final boolean isClosed) {
+			this.startIndex = startIndex;
+			this.endIndex = endIndex;
+			this.trips = Collections.unmodifiableList( trips );
+			this.isClosed = isClosed;
+		}
+
+		public List<Trip> getTrips() {
+			return trips;
+		}
+
+		public Subtour getParent() {
+			return this.parent;
+		}
+
+		public boolean isClosed() {
+			return isClosed;
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if ( !other.getClass().equals( getClass() ) ) return false;
+			final Subtour s = (Subtour) other;
+			return s.trips.equals( trips ) &&
+				(s.parent == null ? parent == null : s.parent.equals( parent )) &&
+				(s.isClosed == isClosed);
+		}
+
+		@Override
+		public int hashCode() {
+			return trips.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return "Subtour: "+trips.toString();
 		}
 	}
 }
