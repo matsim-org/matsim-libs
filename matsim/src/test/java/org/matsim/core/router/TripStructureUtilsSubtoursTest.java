@@ -346,6 +346,49 @@ public class TripStructureUtilsSubtoursTest {
 					childSubtour));
 	}
 
+	private static Fixture createInconsistentTrips() {
+		final PopulationFactory fact = createPopulationFactory();
+
+		final Id id1 = new IdImpl( 1 );
+		final Id id2 = new IdImpl( 2 );
+
+		final Plan plan = fact.createPlan();
+		final Activity act1 = fact.createActivityFromLinkId( "h" , id1 );
+		plan.addActivity( act1 );
+
+		final List<PlanElement> trip1 = new ArrayList<PlanElement>();
+		final Leg leg1 = fact.createLeg( "velo" );
+		plan.addLeg( leg1 );
+		trip1.add( leg1 );
+
+		final Activity act2 = fact.createActivityFromLinkId( "w" , id2 );
+		plan.addActivity( act2 );
+
+		final Activity act2b = fact.createActivityFromLinkId( "w" , id1 );
+		plan.addActivity( act2b );
+
+		final List<PlanElement> trip2 = new ArrayList<PlanElement>();
+		final Leg leg2 = fact.createLeg( "walk" );
+		plan.addLeg( leg2 );
+		trip2.add( leg2 );
+		final Activity stage = fact.createActivityFromLinkId( STAGE , id2 );
+		plan.addActivity( stage );
+		trip2.add( stage );
+		final Leg leg3 = fact.createLeg( "swim" );
+		plan.addLeg( leg3 );
+		trip2.add( leg3 );
+		final Leg leg4 = fact.createLeg( "walk" );
+		plan.addLeg( leg4 );
+		trip2.add( leg4 );
+
+		final Activity act3 = fact.createActivityFromLinkId( "h" , id2 );
+		plan.addActivity( act3 );
+
+		return new Fixture(
+				plan,
+				null);
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
@@ -386,6 +429,24 @@ public class TripStructureUtilsSubtoursTest {
 				// but ensure you get some information on failure
 				new HashSet<Subtour>( fixture.subtoursIfLink ),
 				new HashSet<Subtour>( subtours ) );
+	}
+
+	@Test
+	public void testInconsistentPlan() throws Exception {
+		final Fixture fixture = createInconsistentTrips();
+		boolean hadException = false;
+		try {
+			TripStructureUtils.getSubtours(
+					fixture.plan,
+					CHECKER );
+		}
+		catch (RuntimeException e) {
+			hadException = true;
+		}
+
+		assertTrue(
+				"no exception was thrown!",
+				hadException);
 	}
 
 	private static PopulationFactory createPopulationFactory() {

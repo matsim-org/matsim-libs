@@ -172,8 +172,10 @@ public class TripStructureUtils {
 	 * It is able to handle non-strict act/leg sequence and complex trips;
 	 * in case of successive activities not being located at the same location
 	 * (that is, if the origin of a trip is not the destination of the preceding
-	 * trip), the result are however not guaranteed to make sense, nor to be stable
-	 * facing refactorings.
+	 * trip), an exception will be thrown
+	 *
+	 * @throws RuntimeException if the Trip sequence has inconsistent location
+	 * sequence
 	 */
 	public static Collection<Subtour> getSubtours(
 			final List<PlanElement> planElements,
@@ -181,6 +183,7 @@ public class TripStructureUtils {
 			final boolean useFacilitiesInsteadOfLinks) {
 		final List<Subtour> subtours = new ArrayList<Subtour>();
 
+		Id destinationId = null;
 		final List<Id> originIds = new ArrayList<Id>();
 		final List<Trip> trips = getTrips( planElements , stageActivityTypes );
 		final List<Trip> nonAllocatedTrips = new ArrayList<Trip>( trips );
@@ -189,7 +192,11 @@ public class TripStructureUtils {
 				trip.getOriginActivity().getFacilityId() :
 				trip.getOriginActivity().getLinkId();
 
-			final Id destinationId = useFacilitiesInsteadOfLinks ?
+			if (destinationId != null && !originId.equals( destinationId )) {
+				throw new RuntimeException( "unconsistent trip location sequence: "+destinationId+" != "+originId );
+			}
+
+			destinationId = useFacilitiesInsteadOfLinks ?
 				trip.getDestinationActivity().getFacilityId() :
 				trip.getDestinationActivity().getLinkId();
 
