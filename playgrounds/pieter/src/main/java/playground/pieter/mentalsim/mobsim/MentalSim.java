@@ -43,7 +43,13 @@ import playground.pieter.mentalsim.controler.MentalSimControler;
 import playground.pieter.mentalsim.util.CollectionUtils;
 
 /**
- * @author fouriep
+ * @author illenberger, fouriep
+ *         <p>
+ *         Original code by Johannes Illenberger for his social network
+ *         research, extended to produce link events, making it compatible with
+ *         road pricing. Currently, transit will only generate activity start
+ *         and end events, with travel times taken from the generic route
+ *         object.
  * 
  */
 public class MentalSim implements Mobsim {
@@ -90,21 +96,22 @@ public class MentalSim implements Mobsim {
 	public void run() {
 
 		Collection<Plan> plans = new LinkedHashSet<Plan>();
-		for (Person p : sc.getPopulation().getPersons().values()) {
-			if (controler.isSimulateSubsetPersonsOnly()) {
-				if (controler.getAgentsMarkedForMentalSim().getAttribute(
-						p.getId().toString(), controler.AGENT_ATT) != null){
-					plans.add(p.getSelectedPlan());					
-				}
-			} else {
 
-				if (p.getSelectedPlan().getScore() == 0.0) {
-
+		if (controler.isSimulateSubsetPersonsOnly()) {
+			for (Person p : sc.getPopulation().getPersons().values()) {
+				if (controler.getAgentPlansMarkedForSubsetMentalSim().getAttribute(
+						p.getId().toString(), controler.AGENT_ATT) != null) {
 					plans.add(p.getSelectedPlan());
 				}
 			}
+		} else {
 
+			// if (p.getSelectedPlan().getScore() == 0.0) {
+
+			plans.addAll(controler.getPlansForMentalSimulation());
+			// }
 		}
+
 		Logger.getLogger(this.getClass()).error(
 				"Executing " + plans.size() + " plans in mental simulation.");
 
@@ -119,8 +126,8 @@ public class MentalSim implements Mobsim {
 		 * submit tasks
 		 */
 		for (int i = 0; i < segments.length; i++) {
-			threads[i]
-					.init(segments[i], network, travelTimeCalculator, eventManager);
+			threads[i].init(segments[i], network, travelTimeCalculator,
+					eventManager);
 			futures[i] = executor.submit(threads[i]);
 		}
 		/*
@@ -292,31 +299,31 @@ public class MentalSim implements Mobsim {
 				for (int i = 0; i < ids.size(); i++) {
 					Id link = ids.get(i);
 					linkEnterTime = linkLeaveTime;
-					linkEnterEvent = new LinkEnterEvent(linkEnterTime,
-							agentId, link, agentId);
+					linkEnterEvent = new LinkEnterEvent(linkEnterTime, agentId,
+							link, agentId);
 					eventQueue.add(linkEnterEvent);
 
 					double linkTime = travelTime.getLinkTravelTime(network
-							.getLinks().get(link), startTime, null, null);
+							.getLinks().get(link), linkEnterTime, null, null);
 					tt += Math.max(linkTime, 1.0);
 
 					linkLeaveTime = Math.max(linkEnterTime + 1, linkEnterTime
 							+ linkTime);
-					linkLeaveEvent = new LinkLeaveEvent(linkLeaveTime,
-							agentId, link, agentId);
+					linkLeaveEvent = new LinkLeaveEvent(linkLeaveTime, agentId,
+							link, agentId);
 					eventQueue.add(linkLeaveEvent);
 
-					tt += travelTime.getLinkTravelTime(
-							network.getLinks().get(ids.get(i)), startTime, null, null);
+//					tt += travelTime.getLinkTravelTime(
+//							network.getLinks().get(ids.get(i)), linkLeaveTime,
+//							null, null);
 					// tt++;// 1 sec for each node
 				}
-				tt += travelTime
-						.getLinkTravelTime(
-								network.getLinks().get(route.getEndLinkId()),
-								startTime, null, null);
+				tt += travelTime.getLinkTravelTime(
+						network.getLinks().get(route.getEndLinkId()),
+						linkLeaveTime, null, null);
 			}
-			LinkEnterEvent linkEnterEvent = new LinkEnterEvent(tt,
-					agentId, route.getEndLinkId(), agentId);
+			LinkEnterEvent linkEnterEvent = new LinkEnterEvent(startTime+tt, agentId,
+					route.getEndLinkId(), agentId);
 			eventQueue.add(linkEnterEvent);
 			return tt;
 		}
@@ -329,13 +336,13 @@ public class MentalSim implements Mobsim {
 				List<Id> ids = route.getLinkIds();
 				for (int i = 0; i < ids.size(); i++) {
 					tt += travelTime.getLinkTravelTime(
-							network.getLinks().get(ids.get(i)), startTime, null, null);
+							network.getLinks().get(ids.get(i)), startTime,
+							null, null);
 					tt++;// 1 sec for each node
 				}
-				tt += travelTime
-						.getLinkTravelTime(
-								network.getLinks().get(route.getEndLinkId()),
-								startTime, null, null);
+				tt += travelTime.getLinkTravelTime(
+						network.getLinks().get(route.getEndLinkId()),
+						startTime, null, null);
 			}
 
 			return tt;

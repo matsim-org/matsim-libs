@@ -3,6 +3,7 @@ package playground.pieter.mentalsim.controler.listeners;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -10,6 +11,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
@@ -125,6 +127,8 @@ public class MobSimSwitcher implements ControlerListener,
 		} else {
 			log.info("Running a cheap iteration with mental simulation");
 			controler.setMobsimFactory(new MentalSimFactory(ttcalc, controler));
+			controler.clearPlansForMentalSimulation();
+
 		}
 	}
 

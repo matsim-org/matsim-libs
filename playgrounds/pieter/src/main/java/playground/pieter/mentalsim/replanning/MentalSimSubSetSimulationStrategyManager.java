@@ -27,7 +27,7 @@ public class MentalSimSubSetSimulationStrategyManager extends StrategyManager {
 	public PlanStrategy chooseStrategy(final Person person) {
 		if(!MobSimSwitcher.expensiveIter){
 			
-			if(controler.getAgentsMarkedForMentalSim().getAttribute(person.getId().toString(), controler.AGENT_ATT)==null){
+			if(controler.getAgentPlansMarkedForSubsetMentalSim().getAttribute(person.getId().toString(), controler.AGENT_ATT)==null){
 				return selectorStrategy;
 			}else{
 				return super.chooseStrategy(person);

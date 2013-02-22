@@ -4,7 +4,15 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
 
-public class ScoreResettingStrategyModule implements PlanStrategyModule {
+import playground.pieter.mentalsim.controler.MentalSimControler;
+
+public class MentalSimPlanMarkerModule implements PlanStrategyModule {
+
+	private MentalSimControler controler;
+
+	public MentalSimPlanMarkerModule(MentalSimControler controler) {
+		this.controler = controler;
+	}
 
 	@Override
 	public void prepareReplanning(ReplanningContext replanningContext) {
@@ -16,6 +24,7 @@ public class ScoreResettingStrategyModule implements PlanStrategyModule {
 	public void handlePlan(Plan plan) {
 		// TODO Auto-generated method stub
 		plan.setScore(0.0);
+		controler.addPlanForMentalSimulation(plan);
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package playground.pieter.mentalsim.controler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -32,7 +34,10 @@ import playground.pieter.mentalsim.replanning.MentalSimSubSetSimulationStrategyM
  */
 public class MentalSimControler extends Controler{
 	
-	private ObjectAttributes agentsMarkedForMentalSim = new ObjectAttributes();
+	private ObjectAttributes agentPlansMarkedForSubsetMentalSim = new ObjectAttributes();
+	private LinkedHashSet<Plan> plansForMentalSimulation = new LinkedHashSet<Plan>();
+	private LinkedHashSet<IdImpl> agentsForMentalSimulation = new LinkedHashSet<IdImpl>();
+	private HashMap<IdImpl,Double> nonSimulatedAgentSelectedPlanScores = new HashMap<IdImpl, Double>(); 
 	public static String AGENT_ATT = "mentalsimAgent";
 	boolean simulateSubsetPersonsOnly = false;
 	public boolean isSimulateSubsetPersonsOnly() {
@@ -59,8 +64,8 @@ public class MentalSimControler extends Controler{
 	}
 
 
-	public ObjectAttributes getAgentsMarkedForMentalSim() {
-		return agentsMarkedForMentalSim;
+	public ObjectAttributes getAgentPlansMarkedForSubsetMentalSim() {
+		return agentPlansMarkedForSubsetMentalSim;
 	}
 
 
@@ -71,9 +76,9 @@ public class MentalSimControler extends Controler{
 	 *            agent is cloned. The original population is stored for later
 	 *            retrieval.
 	 */
-	public void markMentalSimAgents(
+	public void markSubsetAgents(
 			double samplingProbability) {
-		agentsMarkedForMentalSim.clear();
+		agentPlansMarkedForSubsetMentalSim.clear();
 		for (Person p : this.getPopulation().getPersons().values()) {
 			PersonImpl pax = (PersonImpl) p;
 			// remember the person's original plans
@@ -82,7 +87,7 @@ public class MentalSimControler extends Controler{
 				for(Plan plan:p.getPlans()){
 					originalPlans.add(plan);
 				}
-				agentsMarkedForMentalSim.putAttribute(p.getId().toString(), AGENT_ATT,originalPlans);
+				agentPlansMarkedForSubsetMentalSim.putAttribute(p.getId().toString(), AGENT_ATT,originalPlans);
 			}
 
 		}
@@ -97,7 +102,10 @@ public class MentalSimControler extends Controler{
 	}
 
 
-
+	public void addPlanForMentalSimulation(Plan p){
+		plansForMentalSimulation.add(p);
+		agentsForMentalSimulation.add((IdImpl) p.getPerson().getId());
+	}
 
 
 	/**
@@ -112,7 +120,7 @@ public class MentalSimControler extends Controler{
 			PlanSelector planSelector) {
 		for (Person pax : this.getPopulation().getPersons().values()) {
 			PersonImpl p = (PersonImpl) pax;
-			ArrayList<Plan> originalPlans = (ArrayList<Plan>) agentsMarkedForMentalSim.getAttribute(p.getId().toString(), AGENT_ATT);
+			ArrayList<Plan> originalPlans = (ArrayList<Plan>) agentPlansMarkedForSubsetMentalSim.getAttribute(p.getId().toString(), AGENT_ATT);
 			if(originalPlans==null){
 				//skip this person
 				continue;
@@ -146,6 +154,30 @@ public class MentalSimControler extends Controler{
 		
 	}
 
+
+
+	public LinkedHashSet<Plan> getPlansForMentalSimulation() {
+		return plansForMentalSimulation;
+	}
+
+
+	public void clearPlansForMentalSimulation(){
+		plansForMentalSimulation = new LinkedHashSet<Plan>();
+		agentsForMentalSimulation = new LinkedHashSet<IdImpl>();
+		nonSimulatedAgentSelectedPlanScores = new HashMap<IdImpl, Double>();
+	}
+
+
+
+	public LinkedHashSet<IdImpl> getAgentsForMentalSimulation() {
+		return agentsForMentalSimulation;
+	}
+
+
+
+	public HashMap<IdImpl,Double> getNonSimulatedAgentSelectedPlanScores() {
+		return nonSimulatedAgentSelectedPlanScores;
+	}
 
 
 

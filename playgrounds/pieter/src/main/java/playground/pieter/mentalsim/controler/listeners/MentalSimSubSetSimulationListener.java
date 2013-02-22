@@ -19,7 +19,7 @@ import playground.pieter.mentalsim.controler.MentalSimControler;
  *         annealer itself
  *         <p/>
  *         This listener has to be added to the controler before the SimpleAnnealer
- *         because it overrides that modules annealing setting to force all
+ *         because it overrides that module's annealing setting to force all
  *         selected persons to replan
  * 
  */
@@ -51,7 +51,7 @@ public class MentalSimSubSetSimulationListener implements ControlerListener,
 			return;
 		
 		if (!MobSimSwitcher.expensiveIter && !fakePopulationActive) {
-			controler.markMentalSimAgents(SimpleAnnealer.currentProportion);
+			controler.markSubsetAgents(SimpleAnnealer.currentProportion);
 			String offLinePlanSizeString = controler.getConfig().getParam(
 					CONFIG_MODULE_NAME, OFFLINE_PLAN_SIZE);
 			int offLinePlanSizeInt = offLinePlanSizeString != null ? Integer

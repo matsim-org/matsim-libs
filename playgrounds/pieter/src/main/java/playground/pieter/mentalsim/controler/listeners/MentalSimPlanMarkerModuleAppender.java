@@ -9,13 +9,13 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 
 import playground.pieter.mentalsim.controler.MentalSimControler;
-import playground.pieter.mentalsim.replanning.ScoreResettingStrategyModule;
+import playground.pieter.mentalsim.replanning.MentalSimPlanMarkerModule;
 
-public class ScoreResetStrategyModuleAppender implements StartupListener {
+public class MentalSimPlanMarkerModuleAppender implements StartupListener {
 
 	private MentalSimControler controler;
 
-	public ScoreResetStrategyModuleAppender(MentalSimControler c) {
+	public MentalSimPlanMarkerModuleAppender(MentalSimControler c) {
 		this.controler = c;
 	}
 
@@ -30,7 +30,7 @@ public class ScoreResetStrategyModuleAppender implements StartupListener {
 			if (strategyName.contains("selector") && strategyName.contains("_")
 			// append the ScoreResettingStrategyModule
 			) {
-				((PlanStrategyImpl) strategy).addStrategyModule(new ScoreResettingStrategyModule());
+				((PlanStrategyImpl) strategy).addStrategyModule(new MentalSimPlanMarkerModule(controler));
 			}
 		}
 

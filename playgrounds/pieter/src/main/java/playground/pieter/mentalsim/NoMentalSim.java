@@ -6,7 +6,7 @@ import playground.pieter.mentalsim.controler.MentalSimControler;
 import playground.pieter.mentalsim.controler.listeners.ExpensiveSimScoreWriter;
 import playground.pieter.mentalsim.controler.listeners.MentalSimSubSetSimulationListener;
 import playground.pieter.mentalsim.controler.listeners.MobSimSwitcher;
-import playground.pieter.mentalsim.controler.listeners.ScoreResetStrategyModuleAppender;
+import playground.pieter.mentalsim.controler.listeners.MentalSimPlanMarkerModuleAppender;
 import playground.pieter.mentalsim.controler.listeners.SimpleAnnealer;
 import playground.pieter.mentalsim.trafficinfo.MyTTCalcFactory;
 import playground.pieter.router.costcalculators.CapacityFavoringStochasticCostCalculator;
@@ -27,7 +27,7 @@ public class NoMentalSim {
 //		str.setBeta(4);
 //		c.setLeastCostPathCalculatorFactory(str);
 //		c.setTravelDisutilityFactory(new CapacityFavoringStochasticCostCalculatorFactory());
-		c.addControlerListener(new SimpleAnnealer());
+//		c.addControlerListener(new SimpleAnnealer());
 		c.run();
 		System.exit(0);
 		
