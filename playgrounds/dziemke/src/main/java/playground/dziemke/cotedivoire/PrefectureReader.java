@@ -13,8 +13,10 @@ public class PrefectureReader {
 
 		List <Prefecture> subprefectures = new ArrayList <Prefecture>();
 		
+		BufferedReader reader = null;
+		
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			reader = new BufferedReader(new FileReader(filename));
 			String line = null;
 			int i=0;
 			while ((line = reader.readLine()) != null) {
@@ -36,7 +38,13 @@ public class PrefectureReader {
 	} catch (IOException e) {
 		System.err.println("I/O error...");
 		e.printStackTrace();
-		}
-		return subprefectures;
+	} finally {
+		try {
+            reader.close();
+		} catch (IOException ex) {
+            ex.printStackTrace();
+        }
+	}
+	return subprefectures;
 	}
 }

@@ -5,8 +5,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import com.vividsolutions.jts.geom.Point;
 
 public class RegionSubprefectureMatcher implements Runnable{
-	private List <Region> regions = ShapeReader.read("D:/Workspace/matsim-0.3.0/input/cotedivoire/CIV_adm1.shp");
-	private List <Prefecture> subprefectures = PrefectureReader.read("D:/Workspace/matsim-0.3.0/input/cotedivoire/SUBPREF_POS_LONLAT.TSV");
+	private List <Region> regions = ShapeReader.read("D:/Workspace/container/cotedivoire/input/CIV_adm1.shp");
+	private List <Prefecture> subprefectures = PrefectureReader.read("D:/Workspace/container/cotedivoire/input/SUBPREF_POS_LONLAT.TSV");
 	
 	
 	public static void main(String[] args) {
