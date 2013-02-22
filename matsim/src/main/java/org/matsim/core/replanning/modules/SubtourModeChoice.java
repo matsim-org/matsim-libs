@@ -23,6 +23,7 @@ package org.matsim.core.replanning.modules;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
@@ -79,7 +80,15 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		ChooseRandomLegModeForSubtour chooseRandomLegMode = new ChooseRandomLegModeForSubtour(this.permissibleModesCalculator, this.modes, this.chainBasedModes, MatsimRandom.getLocalInstance());
+		final TripRouter tripRouter = getReplanningContext().getTripRouterFactory().createTripRouter();
+		final ChooseRandomLegModeForSubtour chooseRandomLegMode =
+				new ChooseRandomLegModeForSubtour(
+						tripRouter.getStageActivityTypes(),
+						tripRouter.getMainModeIdentifier(),
+						this.permissibleModesCalculator,
+						this.modes,
+						this.chainBasedModes,
+						MatsimRandom.getLocalInstance());
 		chooseRandomLegMode.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
 		return chooseRandomLegMode;
 	}

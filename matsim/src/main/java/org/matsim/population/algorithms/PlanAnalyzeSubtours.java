@@ -34,11 +34,13 @@ import org.matsim.core.population.PlanImpl;
 /**
  * Analyses plans for subtours. See documentation <a href="http://matsim.org/node/266">here</a>.
  *
+ * @deprecated the functionality of this thing now lies in {@link TripStructureUtils#getSubtours()}.
  * @see PlanAnalyzeSubtoursTest
  *
  * @author meisterk
  *
  */
+@Deprecated
 public class PlanAnalyzeSubtours {
 
 	public static final int UNDEFINED = Integer.MIN_VALUE;
