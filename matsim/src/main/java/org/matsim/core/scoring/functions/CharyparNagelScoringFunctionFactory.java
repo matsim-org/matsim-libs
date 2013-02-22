@@ -42,9 +42,10 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 
 	protected Network network;
 	private final PlanCalcScoreConfigGroup config;
+	private CharyparNagelScoringParameters params = null;
 
 	public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
-		this.config = config ;
+		this.config = config;
 		this.network = network;
 	}
 
@@ -69,12 +70,19 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 	 */
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(this.config) ;
+		if (this.params == null) {
+			/* lazy initialization of params. not strictly thread safe, as different threads could
+			 * end up with different params-object, although all objects will have the same
+			 * values in them due to using the same config. Still much better from a memory performance
+			 * point of view than giving each ScoringFunction its own copy of the params.
+			 */
+			this.params = new CharyparNagelScoringParameters(this.config);
+		}
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(this.params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.params, this.network));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
 		return scoringFunctionAccumulator;
 	}
 }
