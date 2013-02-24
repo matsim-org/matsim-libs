@@ -134,23 +134,39 @@ public class ChoiceSet {
 	}
 	
 	public Id getWeightedRandomChoice(int actlegIndex, ActivityFacilities facilities,
-			ScoringFunctionAccumulator scoringFunction, Plan plan, ReplanningContext replanningContext) {
+			ScoringFunctionAccumulator scoringFunction, Plan plan, ReplanningContext replanningContext, double pKVal) {
 				
 		TreeMap<Double, Id> map = this.createReducedChoiceSetWithScores(actlegIndex, facilities, scoringFunction, plan, replanningContext);
+				
+		/* yyyyyy the same seed for every agent????? kai, jan'13
+		 * 
+		 * corrected, thx.
+		 * Probably this error was not dramatic as the cs is different for every agent anyway.
+		 */
+		Random random = new Random((long) (replanningContext.getIteration() * Long.MAX_VALUE * pKVal));
 		
-		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
-		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
-
-		Random random = new Random(replanningContext.getIteration() * 102830259L);
-		// yyyyyy the same seed for every agent????? kai, jan'13
-
-		// yyyyyy what is this supposed to do??? kai, jan'13
+		/* yyyyyy what is this supposed to do??? kai, jan'13
+		 * 
+		 * a couple of random draws to come to the "chaotic" region
+		 */
 		for (int i = 0; i < 10; i++) {
 			random.nextDouble();
 		}
 		double randomScore = random.nextDouble();
 		
-		Id id = map.get(map.firstKey());
+		/*
+		 * map is filled by summing up the normalized scores (in descending order!):
+		 * Thus small original scores have a large normalized sum score. This is required as we put elements with decreasing
+		 * original score into the choice set as long as there is space left (number of alternatives).
+		 * 
+		 * The map is thus here traversed (or sorted) in reverse order (descending), such that small normalized scores 
+		 * (== alternatives having large original scores) are visited first.
+		 *  TODO: Check if this really makes a difference ... (I think not!)... -> maybe do natural order and add "break" 
+		 * 
+		 * The last entry, that is still larger (descending order) than the random number is returned as id.
+		 * Essentially this is Monte Carlo sampling.
+		 */
+		Id id = map.get(map.firstKey());		
 		for (Entry<Double, Id> entry : map.entrySet()) {
 	        if (entry.getKey() > randomScore + 0.000000000000000001) {
 	        	id = entry.getValue();
@@ -260,7 +276,9 @@ public class ChoiceSet {
 	}
 	
 	private TreeMap<Double,Id> generateReducedChoiceSet(List<ScoredAlternative> list) {
-		// find the sum of the scores to normalize scores
+		/* 
+		 * list is given here in descending order -> see compareTo in ScoredAlternative
+		 */		
 		Collections.sort(list);
 		double totalScore = this.getTotalScore(list);
 		

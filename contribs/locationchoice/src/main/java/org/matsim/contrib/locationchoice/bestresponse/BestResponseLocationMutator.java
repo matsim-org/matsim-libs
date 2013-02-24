@@ -55,6 +55,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
 	private ReplanningContext replanningContext;
+	private LocationChoiceBestResponseContext lcContext;
 
 	public BestResponseLocationMutator(
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
@@ -70,6 +71,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		this.actTypeConverter = lcContext.getConverter();
 		this.sampler = sampler;
 		this.replanningContext = replanningContext ;
+		this.lcContext = lcContext;
 	}
 
 	@Override
@@ -148,7 +150,9 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					// maybe repeat this a couple of times
 					// yy why? kai, feb'13
 
-					final Id choice = cs.getWeightedRandomChoice(actlegIndex, this.facilities, scoringFunction, plan, replanningContext);
+					final Id choice = cs.getWeightedRandomChoice(
+							actlegIndex, this.facilities, scoringFunction, plan, replanningContext,
+							(Double) this.lcContext.getPersonsKValues().getAttribute(plan.getPerson().getId().toString(), "k"));
 
 					this.setLocation(actToMove, choice);	
 					
