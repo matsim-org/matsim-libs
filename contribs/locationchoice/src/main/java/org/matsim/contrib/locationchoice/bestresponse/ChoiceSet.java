@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -212,7 +213,7 @@ public class ChoiceSet {
 		
 		// Handling duplicates. This was may the source for (small) random fluctuations
 		// yyyy which duplicates?  and how are they handled?  kai, jan'13
-		List<ScoredAlternative> list = new Vector<ScoredAlternative>();						
+		ArrayList<ScoredAlternative> list = new ArrayList<ScoredAlternative>();						
 		// if no epsilons are used!
 		double largestValue = -1.0 * Double.MAX_VALUE; // would prefer Double.NEGATIVE_INFINITY. kai, jan'13
 		Id facilityIdWithLargestScore = act.getFacilityId();
@@ -258,24 +259,25 @@ public class ChoiceSet {
 		}
 	}
 	
-	private double getTotalScore(List<ScoredAlternative> list) {
-		int n = 0;
+	private double getTotalScore(ArrayList<ScoredAlternative> list) {
 		double totalScore = 0.0;
-		for (ScoredAlternative sa : list) {
-			if (n >= numberOfAlternatives) break;			
-//			if (largestValueIsNegative) {
-//				// if we only have negative values -> change sign of score // see my comment at the declaration of this.exponent.  kai, jan'13
-//				score *= -1.0;
-//			}
-//			if (score > 0.0) {
-				totalScore += sa.getScore();
-//			}
-			n++;
+		for (int index = 0; index < this.numberOfAlternatives; index++)  {
+			ScoredAlternative sa = list.get(index);
+			totalScore += sa.getScore() + this.getOffset(list);
 		}
 		return totalScore;
 	}
 	
-	private TreeMap<Double,Id> generateReducedChoiceSet(List<ScoredAlternative> list) {
+	private double getOffset(ArrayList<ScoredAlternative> list) {
+		double smallestScore = list.get(this.numberOfAlternatives - 1).getScore();
+		return Math.min(smallestScore, 0.0) * (-1.0); // if smallest score is negative, then add offsets!
+	}
+	
+	/*
+	 * Use offsets to only have positive scores for normalization.
+	 * I do not scale/transform with exp() due to numerical problems.
+	 */
+	private TreeMap<Double,Id> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
 		/* 
 		 * list is given here in descending order -> see compareTo in ScoredAlternative
 		 */		
@@ -283,19 +285,11 @@ public class ChoiceSet {
 		double totalScore = this.getTotalScore(list);
 		
 		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
-		int n = 0;
 		double sumScore = 0.0;
-		for (ScoredAlternative sa : list) {
-			if (n >= numberOfAlternatives) break;
-//			if (largestValueIsNegative) {
-//				// if we only have negative values -> change sign of score // see my comment at the declaration of this.exponent.  kai, jan'13
-//				score *= -1.0;
-//			}			
-//			if (score > 0.0) {
-				sumScore += (sa.getScore() / totalScore);				
-				mapNormalized.put(sumScore , sa.getAlternativeId());
-//			}
-			n++;	
+		for (int index = 0; index < this.numberOfAlternatives; index++)  {
+			ScoredAlternative sa = list.get(index);
+			sumScore += (sa.getScore() + this.getOffset(list)) / totalScore;				
+			mapNormalized.put(sumScore , sa.getAlternativeId());	
 		}
 		return mapNormalized;
 	}
