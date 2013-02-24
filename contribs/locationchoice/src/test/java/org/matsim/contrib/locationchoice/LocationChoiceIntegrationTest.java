@@ -145,7 +145,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		System.err.println( " newWork: " + newWork ) ;
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
 		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
-		assertEquals( new IdImpl(27), newWork.getFacilityId() );
+		assertEquals( new IdImpl(64), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->64
 	}
 
 	public void testLocationChoiceFeb2013NegativeScores() {

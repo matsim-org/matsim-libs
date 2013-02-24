@@ -110,7 +110,7 @@ public class DestinationScoring {
 		/*
 		 * generates a uniform rnd seed in [0,1[ 
 		 */
-		long seed = (long) ((kp + kf + ka) % 1.0 );
+		long seed = (long) (((kp + kf + ka) % 1.0) * Long.MAX_VALUE);
 		rnd.setSeed(seed);
 		
 		/*
