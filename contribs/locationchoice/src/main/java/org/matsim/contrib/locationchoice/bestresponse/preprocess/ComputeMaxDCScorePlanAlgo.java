@@ -56,34 +56,33 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	@Override
 	public void run(Plan plan) {
 		Person p = plan.getPerson();
-		//ceck if plan contains activity of type
-		boolean typeInPlan = false;
-		for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof Activity) {
-				if (this.lcContext.getConverter().convertType(((Activity) pe).getType()).equals(type)) typeInPlan = true;
-			}
-		}
-		double maxEpsilon = 0.0;
-		if (typeInPlan) {
-			for (Facility f : typedFacilities.values()) {
-				//check if facility is sampled
-				if (!this.sampler.sample(f.getId(), plan.getPerson().getId())) continue;
-				
-				ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
-				act.setFacilityId(f.getId());
-				
-				double epsilonScaleFactor = 1.0; // no scaling back needed here anymore
-				double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, epsilonScaleFactor);
-								
-				if (epsilon > maxEpsilon) {
-					maxEpsilon = epsilon;
+		double maxDCScore = 0.0;		
+		/*
+		 * Find the max dc score of all activities of this.type.
+		 * Different activities in a plan have now different epsilons!
+		 * TODO: Future improvement: store max dc score *per* activity -> computational gain 
+		 */			
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {					
+				if (this.lcContext.getConverter().convertType(((Activity) pe).getType()).equals(type)) {
+			
+					for (Facility f : typedFacilities.values()) {
+						//check if facility is sampled
+						if (!this.sampler.sample(f.getId(), plan.getPerson().getId())) continue;
+						
+						ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
+						act.setFacilityId(f.getId());
+						
+						double epsilonScaleFactor = 1.0; // no scaling back needed here anymore
+						double dcScore = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, epsilonScaleFactor);
+										
+						if (dcScore > maxDCScore) {
+							maxDCScore = dcScore;
+						}
+					}
 				}
 			}
 		}
-		// temporarily store maxEpsilon here: (s_l)
-		// TODO: get rid of that hack. ah feb'13
-		// use customizable
-		if (((PersonImpl)p).getDesires() == null) ((PersonImpl)p).createDesires("");
-		((PersonImpl)p).getDesires().setDesc(((PersonImpl)p).getDesires().getDesc() + maxEpsilon + "_");	
+		p.getCustomAttributes().put(this.type, maxDCScore);	
 	}
 }

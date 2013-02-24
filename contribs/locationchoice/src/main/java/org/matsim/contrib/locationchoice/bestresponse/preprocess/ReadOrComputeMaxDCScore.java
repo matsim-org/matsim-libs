@@ -91,11 +91,9 @@ public class ReadOrComputeMaxDCScore {
 	
 	private void writeMaxEps() {
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			int i = 0;
 			for (String flexibleType : this.flexibleTypes) {
-				double maxType = Double.parseDouble(((PersonImpl)person).getDesires().getDesc().split("_")[i]);
+				double maxType = (Double)person.getCustomAttributes().get(flexibleType);
 				this.personsMaxDCScoreUnscaled.putAttribute(person.getId().toString(), flexibleType, maxType);
-				i++;
 			}	
 		}
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxDCScoreUnscaled);
