@@ -85,6 +85,11 @@ public class InternalConstants {
 	public static final String LOG_FILE_WARNINGS_ERRORS_NAME = "logfileWarningsErrors.log";
 	public static final String OUTPUT_CONFIG_FILE_NAME = "output_config.xml.gz";
 	public static final String OUTPUT_NETWORK_FILE_NAME = "output_network.xml.gz";
+	public static final String OUTPUT_SCORESTATS_TXT = "scorestats.txt";
+	public static final String OUTPUT_SCORESTATS_PNG = "scorestats.png";
+	public static final String OUTPUT_TRAVELDISTANCESTATS_TXT = "traveldistancestats.txt";
+	public static final String OUTPUT_TRAVELDISTANCESTATS_PNG = "traveldistancestats.png";
+	public static final String OUTPUT_STOPWATCH = "stopwatch.txt";
 	public static final String GENERATED_MATSIM_CONFIG_FILE_NAME = "MATSimConfigFile.xml.gz";
 	public static final String URBANSIM_PARCEL_DATASET_TABLE = "parcel__dataset_table__exported_indicators__";
 	public static final String URBANSIM_ZONE_DATASET_TABLE = "zone__dataset_table__exported_indicators__";

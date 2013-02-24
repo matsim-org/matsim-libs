@@ -11,6 +11,7 @@ import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import org.matsim.contrib.matsim4opus.config.ConfigurationModule;
@@ -61,7 +62,16 @@ public class BackupMATSimOutput {
 			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.GENERATED_PLANS_FILE_NAME) , new File(savePath + InternalConstants.GENERATED_PLANS_FILE_NAME) );
 			// backup matsim config file
 			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_CONFIG_FILE_NAME) , new File(savePath + InternalConstants.OUTPUT_CONFIG_FILE_NAME) );
-			
+			// backup score stats
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_SCORESTATS_TXT) , new File(savePath + InternalConstants.OUTPUT_SCORESTATS_TXT) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_SCORESTATS_PNG) , new File(savePath + InternalConstants.OUTPUT_SCORESTATS_PNG) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_TRAVELDISTANCESTATS_TXT) , new File(savePath + InternalConstants.OUTPUT_TRAVELDISTANCESTATS_TXT) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_TRAVELDISTANCESTATS_PNG) , new File(savePath + InternalConstants.OUTPUT_TRAVELDISTANCESTATS_PNG) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_STOPWATCH) , new File(savePath + InternalConstants.OUTPUT_STOPWATCH) );
+			// backup last iteration
+			int iteration = ((ControlerConfigGroup) scenario.getConfig().getModule(ControlerConfigGroup.GROUP_NAME)).getLastIteration();
+			FileCopy.copyTree(InternalConstants.MATSIM_4_OPUS_OUTPUT + "ITERS/it."+iteration, savePath + "ITERS/it."+iteration);
+
 			// backup zone csv file (feedback for UrbanSim)
 			if(new File(InternalConstants.MATSIM_4_OPUS_TEMP + UrbanSimZoneCSVWriterV2.FILE_NAME).exists())
 				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + UrbanSimZoneCSVWriterV2.FILE_NAME), new File(savePath + UrbanSimZoneCSVWriterV2.FILE_NAME) );
