@@ -118,9 +118,9 @@ public class CreateNetwork {
 			} 
 			if(l instanceof LinkImpl)
 				((LinkImpl)l).setOrigId(origid);
-			linkCounter++;
-			
+
 			net.addLink(l);
+			linkCounter++;
 			
 			if(direction.equals("B")){
 				Link l2 = net.getFactory().createLink(new IdImpl(linkCounter), toNode, fromNode);
@@ -132,9 +132,9 @@ public class CreateNetwork {
 				if(l2 instanceof LinkImpl){
 					((LinkImpl)l2).setOrigId(origid);
 				}
-				linkCounter++;
 				
 				net.addLink(l2);
+				linkCounter++;
 			}
 			
 			toNode = null;

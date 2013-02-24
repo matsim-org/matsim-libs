@@ -22,11 +22,16 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class NetworkInspector {
 	
@@ -42,7 +47,7 @@ public class NetworkInspector {
 	
 	private Logger logger = Logger.getLogger(NetworkInspector.class);
 	
-	private double[] linkCapacities = new double[7];
+	private double[] linkCapacities = new double[6];
 	
 	private double[] nLanes = new double[6];
 	
@@ -61,18 +66,28 @@ public class NetworkInspector {
 	
 	private SimpleFeatureBuilder builder;
 	
+	private Geometry area;
+	
 	public NetworkInspector(final Scenario sc){
 		
 		this.scenario = sc;
 		
-		NetworkBoundaryBox box = new NetworkBoundaryBox();
-		box.setDefaultBoundaryBox(this.scenario.getNetwork());
+//		NetworkBoundaryBox box = new NetworkBoundaryBox();
+//		box.setDefaultBoundaryBox(this.scenario.getNetwork());
+//		
+//		double factor = 0.9;
+//		this.bbox.setCustomBoundaryBox(box.getXMin()+((box.getXMax()-box.getXMin())*(1-factor)),
+//				box.getYMin()+((box.getYMax()-box.getYMin())*(1-factor)),
+//				box.getXMax()-((box.getXMax()-box.getXMin())*(1-factor)),
+//				box.getYMax()-((box.getYMax()-box.getYMin())*(1-factor)));
 		
-		double factor = 0.9;
-		this.bbox.setCustomBoundaryBox(box.getXMin()+((box.getXMax()-box.getXMin())*(1-factor)),
-				box.getYMin()+((box.getYMax()-box.getYMin())*(1-factor)),
-				box.getXMax()-((box.getXMax()-box.getXMin())*(1-factor)),
-				box.getYMax()-((box.getYMax()-box.getYMin())*(1-factor)));
+		ShapeFileReader reader = new ShapeFileReader();
+		Collection<SimpleFeature> features = reader.readFileAndInitialize("C:/Users/Daniel/Dropbox/bsc/input/berlin.shp");
+		
+		Geometry g = ((Geometry)features.iterator().next().getDefaultGeometry());
+		
+//		this.area = g.buffer(-10.);
+		this.area = g.convexHull();
 		
 	}
 	
@@ -100,9 +115,6 @@ public class NetworkInspector {
 				} //else: andere cluster in extra datei schreiben?
 			}
 		}
-		
-//		NetworkCleaner nc = new NetworkCleaner();
-//		nc.run(this.scenario.getNetwork());
 		
 		logger.warn("size of the biggest cluster is " + biggestCluster.size() +
 				" but network contains " + this.scenario.getNetwork().getNodes().size() + " nodes...");
@@ -180,7 +192,7 @@ public class NetworkInspector {
 			
 			if(link.getCapacity()<500)
 				this.linkCapacities[0]++;
-			else if(link.getCapacity()<100&&link.getCapacity()>=500)
+			else if(link.getCapacity()<1000&&link.getCapacity()>=500)
 				this.linkCapacities[1]++;
 			else if(link.getCapacity()<1500&&link.getCapacity()>=1000)
 				this.linkCapacities[2]++;
@@ -188,13 +200,14 @@ public class NetworkInspector {
 				this.linkCapacities[3]++;
 			else if(link.getCapacity()<2500&&link.getCapacity()>=2000)
 				this.linkCapacities[4]++;
-			else if(link.getCapacity()<3000&&link.getCapacity()>=2500)
+			else if(link.getCapacity()>=2500)
 				this.linkCapacities[5]++;
-			else if(link.getCapacity()>=3000)
-				this.linkCapacities[6]++;
 			
-			if(link.getLength()<7)
+			if(link.getLength()<7){
 				this.lengths[0]++;
+				this.lengthBelowStorageCapacity.add(link);
+				writerIndex++;
+			}
 			else if(link.getLength()<15&&link.getLength()>=7)
 				this.lengths[1]++;
 			else if(link.getLength()<50&&link.getLength()>=15)
@@ -236,10 +249,6 @@ public class NetworkInspector {
 			this.totalLength += link.getLength();
 			this.totalGLength += distance;
 			
-			if(link.getLength()<7){
-				this.lengthBelowStorageCapacity.add(link);
-				writerIndex++;
-			}
 		}
 		
 		
@@ -296,8 +305,7 @@ public class NetworkInspector {
 				Link outLink = node.getOutLinks().values().iterator().next();
 				
 				if(inLink.getFromNode().equals(outLink.getToNode())){
-					if(node.getCoord().getX()<=bbox.getXMax()&&node.getCoord().getX()>=bbox.getXMin()&&
-							node.getCoord().getY()<=bbox.getYMax()&&node.getCoord().getY()>=bbox.getYMin())
+					if(this.area.contains(new Point(new CoordinateArraySequence(new Coordinate[]{new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory())))
 						this.deadEndNodes.add(node);
 					else
 						this.exitRoadNodes.add(node);
@@ -402,14 +410,13 @@ public class NetworkInspector {
 		logger.info("writing capacities statistics file...");
 		
 		//kategorien: 500|1000|1500|2000|>...
-		String[] categories = new String[7];
+		String[] categories = new String[6];
 		categories[0]="<500";
 		categories[1]="<1000";
 		categories[2]="<1500";
 		categories[3]="<2000";
 		categories[4]="<2500";
-		categories[5]="<3000";
-		categories[6]=">3000";
+		categories[5]=">2500";
 		
 		BarChart chart = new BarChart("Link capacities","capacity","number of objects",categories);
 		chart.addSeries("capacities", this.linkCapacities);
@@ -425,8 +432,6 @@ public class NetworkInspector {
 		FileWriter writer = new FileWriter(file);
 		writer.write("in/out\t1\t2\t3\t4\t5\t6\t7\nnobjects");
 		
-		//dead ends, exit roads
-		
 		for(int i=0;i<inDegrees.length;i++){
 			writer.write("\t"+inDegrees[i]+"/"+outDegrees[i]);
 		}
@@ -438,16 +443,40 @@ public class NetworkInspector {
 		chart.saveAsPng(this.outputFolder+"/test/nodeDegrees.png", 800, 600);
 	}
 	
-	public void shpExport(){
+	public List<Node> getDeadEndNodes() {
+		return deadEndNodes;
+	}
+
+	public void setDeadEndNodes(List<Node> deadEndNodes) {
+		this.deadEndNodes = deadEndNodes;
+	}
+
+	public List<Node> getExitRoadNodes() {
+		return exitRoadNodes;
+	}
+
+	public void setExitRoadNodes(List<Node> exitRoadNodes) {
+		this.exitRoadNodes = exitRoadNodes;
+	}
+
+	public List<Node> getRedundantNodes() {
+		return redundantNodes;
+	}
+
+	public void setRedundantNodes(List<Node> redundantNodes) {
+		this.redundantNodes = redundantNodes;
+	}
+	
+	public void shpExportNodeStatistics(Collection<Node> collection){
 		initFeatureType();
-		Collection<SimpleFeature> features = createFeatures();
-		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/pres/nodes_osm.shp");
+		Collection<SimpleFeature> features = createFeatures(collection);
+		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/pres/exitRoadNodes_osm2.shp");
 		
 	}
 	
-	private Collection<SimpleFeature> createFeatures() {
+	private Collection<SimpleFeature> createFeatures(Collection<Node> collection) {
 		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		for(Node node : this.scenario.getNetwork().getNodes().values()){
+		for(Node node : collection){
 			features.add(getFeature(node));
 		}
 		return features;
@@ -456,7 +485,7 @@ public class NetworkInspector {
 	private SimpleFeature getFeature(final Node node) {
 		Point p = MGC.coord2Point(node.getCoord());
 		try {
-			return this.builder.buildFeature(null, new Object[]{p,node.getId().toString(),node.getInLinks().size(),node.getOutLinks().size()});
+			return this.builder.buildFeature(null, new Object[]{p,node.getId().toString()});
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		}
@@ -469,8 +498,8 @@ public class NetworkInspector {
 		typeBuilder.setCRS(crs);
 		typeBuilder.add("location",Point.class);
 		typeBuilder.add("ID",String.class);
-		typeBuilder.add("in-degree",String.class);
-		typeBuilder.add("out-degree",String.class);
+//		typeBuilder.add("in-degree",String.class);
+//		typeBuilder.add("out-degree",String.class);
 		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 		
 	}
@@ -484,6 +513,14 @@ public class NetworkInspector {
 		return r;
 	}
 	
+	public Geometry getArea() {
+		return area;
+	}
+
+	public void setArea(Geometry area) {
+		this.area = area;
+	}
+
 	static class DoubleFlagRole {
 		protected boolean forwardFlag = false;
 		protected boolean backwardFlag = false;

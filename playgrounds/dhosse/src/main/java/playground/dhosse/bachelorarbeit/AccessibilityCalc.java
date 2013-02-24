@@ -39,7 +39,7 @@ import org.matsim.utils.LeastCostPathTree;
 
 import com.vividsolutions.jts.geom.Point;
 
-public class AccessibilityCalc {//neue klasse für accessibilityComputation
+public class AccessibilityCalc {
 	
 	private static final Logger log = Logger.getLogger(AccessibilityCalc.class);
 	
@@ -62,12 +62,11 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 	protected double betaCarTT = -12.;
 	protected double betaWalkTT = -12.;
 
-	public AccessibilityCalc(/*ActivityFacilitiesImpl parcels,*/ ZoneLayer<Id> startZones, SpatialGrid freeSpeedGrid, ScenarioImpl scenario,String filename) {
+	public AccessibilityCalc(ZoneLayer<Id> startZones, SpatialGrid freeSpeedGrid, ScenarioImpl scenario,String filename) {
 		
-//		this.setParcels(parcels);
-		this.setFreeSpeedGrid(freeSpeedGrid);
-		this.setScenario(scenario);
-		this.setMeasuringPoints(startZones);
+		this.freeSpeedGrid = freeSpeedGrid;
+		this.scenario = scenario;
+		this.measuringPoints = startZones;
 		this.filename = filename;
 		
 	}
@@ -82,7 +81,6 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 			NetworkBoundaryBox bbox = new NetworkBoundaryBox();
 			bbox.setDefaultBoundaryBox(network);
 			
-			ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl();
 			
 			Random rnd = new Random();
 			
@@ -93,7 +91,6 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 				parcels.createAndAddFacility(id, coord);
 			}
 			
-			this.setParcels(parcels);
 			
 		} else{
 			int i=0;
@@ -134,13 +131,6 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 		
 		System.out.println();
 		
-//		for(double y=freeSpeedGrid.getYmin();y<=freeSpeedGrid.getYmax();y+=freeSpeedGrid.getResolution()){
-//			for(double x = freeSpeedGrid.getXmin();x<=freeSpeedGrid.getXmax();x+=freeSpeedGrid.getResolution()){
-//				double val = freeSpeedGrid.getValue(x, y);
-//				System.out.println("("+x+","+y+"):"+val);
-//			}
-//		}
-		
 //		AnalysisCellBasedAccessibilityCSVWriterV2.close(); 
 		writePlottingData();						// plotting data for visual analysis via R
 		writeInterpolatedParcelAccessibilities();	// UrbanSim input file with interpolated accessibilities on parcel level
@@ -176,85 +166,79 @@ public class AccessibilityCalc {//neue klasse für accessibilityComputation
 			
 		}
 			
-			log.info("");
-			log.info("Number of measure points: " + size);
-			log.info("Number of aggregated measure points: " + aggregatedMeasurementPoints.size());
-			log.info("");
+		log.info("");
+		log.info("Number of measure points: " + size);
+		log.info("Number of aggregated measure points: " + aggregatedMeasurementPoints.size());
+		log.info("");
+		
+		ProgressBar bar = new ProgressBar(aggregatedMeasurementPoints.size());
 			
-			ProgressBar bar = new ProgressBar(aggregatedMeasurementPoints.size());
+		Iterator<Id> keyIterator = aggregatedMeasurementPoints.keySet().iterator();
 			
-			Iterator<Id> keyIterator = aggregatedMeasurementPoints.keySet().iterator();
+		Map<Id, Node> networkNodesMap = network.getNodes();
 			
-			Map<Id, Node> networkNodesMap = network.getNodes();
+		while(keyIterator.hasNext()){
+				
+			bar.update();
 			
-			while(keyIterator.hasNext()){
+			Id nodeId = keyIterator.next();
 				
-				bar.update();
+			Node fromNode = networkNodesMap.get(nodeId);
 				
-				Id nodeId = keyIterator.next();
+			lcptFreeSpeedCarTravelTime.calculate(network, fromNode, 8.*3600);//value of dep time from accessibilityControlerListenerImpl
 				
-				Node fromNode = networkNodesMap.get(nodeId);
+			ArrayList<Zone<Id>> origins = aggregatedMeasurementPoints.get(nodeId);
 				
-				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, 8.*3600);//value of dep time from accessibilityControlerListenerImpl
+			Iterator<Zone<Id>> originsIterator = origins.iterator();
 				
-				ArrayList<Zone<Id>> origins = aggregatedMeasurementPoints.get(nodeId);
-				
-				Iterator<Zone<Id>> originsIterator = origins.iterator();
-				
-				while(originsIterator.hasNext()){
+			while(originsIterator.hasNext()){
 					
-					Zone<Id> measurePoint = originsIterator.next();
+				Zone<Id> measurePoint = originsIterator.next();
 					
-					Point p = measurePoint.getGeometry().getCentroid();
+				Point p = measurePoint.getGeometry().getCentroid();
 
-					Coord coordFromZone = new CoordImpl(p.getX(),p.getY());
+				Coord coordFromZone = new CoordImpl(p.getX(),p.getY());
 					
-					assert(coordFromZone!=null);
+				assert(coordFromZone!=null);
 					
-					Link nearestLink = network.getNearestLinkExactly(coordFromZone);
+				Link nearestLink = network.getNearestLinkExactly(coordFromZone);
 
-					Distances distance = NetworkUtil.getDistance2Node(nearestLink, coordFromZone, fromNode);
-//					Logger.getLogger(this.getClass()).error("renamed the above method without testing it since the old name did not compile. " +
-//							"Please check; aborting ... ") ;
-//					System.exit(-1) ;
+				Distances distance = NetworkUtil.getDistance2Node(nearestLink, coordFromZone, fromNode);
 					
-					double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
-					double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)
+				double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
+				double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)
+				
+				double walkTravelTimePoint2Road_h 			= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
 					
-					double walkTravelTimePoint2Road_h 			= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
+				double freeSpeedTravelTimeOnNearestLink_meterpersec= nearestLink.getFreespeed();
 					
-					double freeSpeedTravelTimeOnNearestLink_meterpersec= nearestLink.getFreespeed();
+				double road2NodeFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTimeOnNearestLink_meterpersec * 3600);
 					
-					double road2NodeFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTimeOnNearestLink_meterpersec * 3600);
+				gcs.reset();
 					
-					gcs.reset();
-					
-					for(int i=0;i<this.aggregatedOpportunities.length;i++){
+				for(int i=0;i<this.aggregatedOpportunities.length;i++){
 						
-						Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
-						Id nodeID = destinationNode.getId();
+					Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
+					Id nodeID = destinationNode.getId();
 						
-						double freeSpeedTravelTime_h= (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getTime() / 3600.) + road2NodeFreeSpeedTime_h;
+					double freeSpeedTravelTime_h= (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getTime() / 3600.) + road2NodeFreeSpeedTime_h;
 						
-						sumDisutilityOfTravel(gcs, 
-								this.aggregatedOpportunities[i],
-								distanceMeasuringPoint2Road_meter,
-								distanceRoad2Node_meter, 
-								walkTravelTimePoint2Road_h,
-								freeSpeedTravelTime_h);
-						
-					}
-					
-					double freeSpeedAccessibility = this.inverseOfLogitScaleParameter * gcs.getFreeSpeedSum();;
-					
-					this.freeSpeedGrid.setValue(freeSpeedAccessibility, p);
-//					System.out.println(freeSpeedGrid.isInBounds(point));
-					
-//					System.out.println(measurePoint.getId()+":"+Double.isNaN(freeSpeedGrid.getValue(point))/*String.valueOf(freeSpeedGrid.getValue(point))*/);
+					sumDisutilityOfTravel(gcs, 
+							this.aggregatedOpportunities[i],
+							distanceMeasuringPoint2Road_meter,
+							distanceRoad2Node_meter, 
+							walkTravelTimePoint2Road_h,
+							freeSpeedTravelTime_h);
 					
 				}
 				
+				double freeSpeedAccessibility = this.inverseOfLogitScaleParameter *Math.log(gcs.getFreeSpeedSum());
+				
+				this.freeSpeedGrid.setValue(freeSpeedAccessibility, p);
+					
 			}
+				
+		}
 	}
 	
 	private void sumDisutilityOfTravel(GeneralizedCostSum gcs,
