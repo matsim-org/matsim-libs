@@ -56,8 +56,17 @@ public class DestinationScoring {
 	public double getDestinationScore(PlanImpl plan, ActivityImpl act, double fVar) {
 		double score = 0.0;
 		if (this.scaleEpsilon.isFlexibleType(act.getType())) {
+			/*
+			 * Different epsilon for every discretionary activity. Use plan index for that for now. 
+			 * TODO: Use a different unique identifier as plan elements index is not supported by api to be 
+			 * necessarily stable, I think (?)
+			 * But at this time I do not see another possibility. Every other element of Activity changes also.
+			 * java Object ID?
+			 */
+			int actIndex = plan.getActLegIndex(act);
+			
 			if (fVar < 0.0) fVar = this.scaleEpsilon.getEpsilonFactor(act.getType());
-			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson()));
+			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson(), actIndex));
 			score += this.getAttributesScore(act.getFacilityId(), plan.getPerson().getId());
 		}
 		return score;
@@ -84,20 +93,29 @@ public class DestinationScoring {
 		return accumulatedScore;
 	}
 	
-	private double getEpsilonAlternative(Id facilityId, PersonImpl person) {		
+	private double getEpsilonAlternative(Id facilityId, PersonImpl person, int actIndex) {
+		/*
+		 * k values are uniform in [0..1[, see class ReadOrCreateKVals.
+		 */
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);		
 		double kf = (Double) this.facilitiesKValues.getAttribute(facility.getId().toString(), "k");
 		double kp = (Double) this.personsKValues.getAttribute(person.getId().toString(), "k");
 		
-		/* long seed = (long) ((kp + kf) * Math.pow(2.0, 40)); 
-		/* This was not a good solution.
-		*/
-				
-		// I use now the uniform distribution for the generation of the k-values:
-		// kp= [0..1] kf=[0..1]
-		long seed = (long) ((kp * kf) * Long.MAX_VALUE);
+		/* generate another stable random number for the activity
+		 * TODO: check if there is enough randomness with this seed
+		 */
+		rnd.setSeed(actIndex);
+		double ka = rnd.nextDouble();
+		
+		/*
+		 * generates a uniform rnd seed in [0,1[ 
+		 */
+		long seed = (long) ((kp + kf + ka) % 1.0 );
 		rnd.setSeed(seed);
-				
+		
+		/*
+		 * generate the epsilons according to standard Gumbel or standard Gaussian distribution
+		 */
 		if (config.locationchoice().getEpsilonDistribution().equals("gumbel")) {
 			// take a few draws to come to the "chaotic region"
 			for (int i = 0; i < 5; i++) {
