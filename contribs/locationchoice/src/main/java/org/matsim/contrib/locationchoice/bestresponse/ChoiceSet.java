@@ -143,7 +143,7 @@ public class ChoiceSet {
 		 * corrected, thx.
 		 * Probably this error was not dramatic as the cs is different for every agent anyway.
 		 */
-		Random random = new Random((long) (replanningContext.getIteration() * Long.MAX_VALUE * pKVal));
+		Random random = new Random((long) (Long.MAX_VALUE / replanningContext.getIteration() * pKVal));
 		
 		/* yyyyyy what is this supposed to do??? kai, jan'13
 		 * 
