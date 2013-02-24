@@ -48,20 +48,12 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 
 public class ChoiceSet {
-		
-	// *************************************
-//	private double exponent;
-	private int numberOfAlternatives;
-	
-	private ApproximationLevel approximationLevel;	
-	// *************************************	
+	private int numberOfAlternatives;	
+	private ApproximationLevel approximationLevel;		
 	private List<Id> destinations = new Vector<Id>();
 	private List<Id> notYetVisited = new Vector<Id>();
 	private final Network network;
 	private Config config;
-
-	private PopulationFactoryImpl pFactory;
-
 	private Scenario scenario;
 	
 	@Override
@@ -85,7 +77,6 @@ public class ChoiceSet {
 		this.approximationLevel = approximationLevel;
 		this.network = scenario.getNetwork() ;
 		this.config = scenario.getConfig() ;
-		this.pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory() ;
 		this.scenario = scenario ;
 		
 //		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
@@ -213,9 +204,12 @@ public class ChoiceSet {
 		
 		// Handling duplicates. This was may the source for (small) random fluctuations
 		// yyyy which duplicates?  and how are they handled?  kai, jan'13
+		//
+		// that was not the problem of the fluctuations. alternatives with the same score are deterministically 
+		// handled now by including the id for compareTo evaluation.
+		// comment should be removed.
 		ArrayList<ScoredAlternative> list = new ArrayList<ScoredAlternative>();						
-		// if no epsilons are used!
-		double largestValue = -1.0 * Double.MAX_VALUE; // would prefer Double.NEGATIVE_INFINITY. kai, jan'13
+		double largestValue = Double.NEGATIVE_INFINITY; 
 		Id facilityIdWithLargestScore = act.getFacilityId();
 		
 		for (Id destinationId : this.destinations) {
@@ -243,16 +237,17 @@ public class ChoiceSet {
 			}
 			list.add(new ScoredAlternative(score, destinationId));
 		}	
-
 		TreeMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list);
-				
-		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
-		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
 		if (mapCorrected.size() > 0) {
 			return mapCorrected;
 		}
 		else  {	
-			// yyyyyy how is this supposed to happen at all?  kai, jan'13
+			/* yyyyyy how is this supposed to happen at all?  kai, jan'13
+			 * 
+			 * If the choice set is empty (for example due to sampling) use the current activity location.
+			 * TODO: add a mechanism to at least keep, a minimal number of alternatives (minimally the chosen 
+			 * location of the previous iteration. Then this "if" can go.
+			 */
 			TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
 			mapTmp.put(1.1, facilityIdWithLargestScore);
 			return mapTmp;
@@ -300,6 +295,5 @@ public class ChoiceSet {
 		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp , leastCostPathCalculatorForward, leastCostPathCalculatorBackward, 
 				router, this.scenario);
 		adapter.adaptTimesAndScorePlan(plan, actlegIndex, planTmp, scoringFunction);
-//		adapter.scorePlan(planTmp, actlegIndex, scoringFunction) ;
 	}
 }
