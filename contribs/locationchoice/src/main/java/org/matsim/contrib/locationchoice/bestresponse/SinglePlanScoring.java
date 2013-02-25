@@ -62,9 +62,6 @@ public class SinglePlanScoring {
 			} else if ( pe instanceof Leg ) {
 				Leg leg = (Leg) pe ;
 			} 
-		}
-		
-		
+		}	
 	}
-
 }

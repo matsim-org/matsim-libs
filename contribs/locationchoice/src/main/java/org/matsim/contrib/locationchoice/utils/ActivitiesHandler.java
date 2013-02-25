@@ -31,7 +31,6 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 
 public class ActivitiesHandler {
 	private HashSet<String> flexibleTypes = new HashSet<String>();
-	private static final Logger log = Logger.getLogger(ActivitiesHandler.class);
 	private LocationChoiceConfigGroup dcconfig;
 	private ActTypeConverter converter = null;
 

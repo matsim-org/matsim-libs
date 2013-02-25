@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.locationchoice.utils;
 
-import org.apache.log4j.Logger;
-
 public class ActTypeConverter {
 	
 	private boolean isV1;
