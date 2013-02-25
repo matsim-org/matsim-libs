@@ -390,7 +390,7 @@ class ExternalControler {
 				int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 				
 				VehiclesGenerator vg = new VehiclesGenerator();				
-				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 1.5, 2.0, DoorOperationMode.parallel, 1.0, (500./59));
+				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 0.75, 1.0, DoorOperationMode.serial, 1.0, (500./59));
 				vehicles = vg.getVehicles();
 				
 				VehicleWriterV1 vehicleWriter = new VehicleWriterV1(vehicles);
