@@ -40,7 +40,9 @@ public class Network {
 				selectedLinks.put(link.getId(), link);
 			}
 		}	
-		//this.correctManually();
+		if (Config.baseFolder.contains("tele")) {
+			this.correctManually();
+		}
 		
 		this.getUniqueNodes();
 		this.linkBack();
