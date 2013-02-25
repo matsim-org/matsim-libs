@@ -53,17 +53,20 @@ public class Main {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
+		Scenario sc2 = ScenarioUtils.createScenario(config);
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
-		nr.readFile(path+"/"+file2+".xml");
+		MatsimNetworkReader nr2 = new MatsimNetworkReader(sc2);
+		nr2.readFile(path+"/"+file2+".xml");
+		nr.readFile(path+"/"+file1+".xml");
 		pr.readFile(path+"/"+"/test_population.xml");
 		
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-		bbox.setDefaultBoundaryBox(scenario.getNetwork());
+		bbox.setDefaultBoundaryBox(sc2.getNetwork());
 		
-		measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(200, 
+		measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(400, 
 				   bbox.getBoundingBox());
-		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 200);
+		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 400);		
 		
 //		initFeatureType();
 //		Collection<SimpleFeature> features = createFeatures();
@@ -71,7 +74,7 @@ public class Main {
 			
 		InternalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
 		
-		AccessibilityCalc ac = new AccessibilityCalc(/*parcels,*/ measuringPoints, freeSpeedGrid, (ScenarioImpl) scenario, file2);
+		AccessibilityCalc ac = new AccessibilityCalc(/*parcels,*/ measuringPoints, freeSpeedGrid, (ScenarioImpl) scenario, file1);
 		ac.runAccessibilityComputation();
 		
 //		NetworkInspector ni = new NetworkInspector(scenario);
@@ -79,14 +82,9 @@ public class Main {
 //			System.out.println("Netzwerk ist routbar...");
 //		else
 //			System.out.println("Netzwerk ist nicht routbar");
-//		ni.checkLinkAttributes();
 //		ni.checkNodeAttributes();
+//		ni.checkLinkAttributes();
 //		ni.shpExportNodeStatistics(ni.getExitRoadNodes());
-		
-		//TODO: methode isRoutable nochmal umschreiben (s.u.), unterscheidung bei node degree 1: einbahnstraße oder sackgasse?, dimension des untersuchungsgebiets ausgeben lassen
-		//TODO: wenn sackgasse: sackgasse, weil se aus dem untersuchungsgebiet rausführt oder "echte" sackgasse
-		//TODO: eigenen!!! controlerListener schreiben, ohne vererbung und pipapo,accessibility berechnung soll auch OHNE simulation, OHNE population möglich sein
-		//TODO: WAS MACHT DER PARCELBASEDACCESSIBILITYCONTROLERLISTENER GENAU???
 		
 	}
 	

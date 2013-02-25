@@ -60,6 +60,8 @@ public class NetworkInspector {
 	private double totalLength = 0;
 	private double totalGLength = 0;
 	
+	private boolean nodeAttributesChecked = false;
+	
 	private NetworkBoundaryBox bbox = new NetworkBoundaryBox();
 	
 	private String outputFolder = "C:/Users/Daniel/Dropbox/bsc";
@@ -249,6 +251,20 @@ public class NetworkInspector {
 			this.totalLength += link.getLength();
 			this.totalGLength += distance;
 			
+			if(this.nodeAttributesChecked){
+				if(this.redundantNodes.contains(link.getFromNode())){
+					double capacity = link.getCapacity();
+					double prevCapacity = link.getFromNode().getInLinks().values().iterator().next().getCapacity();
+					if(capacity!=prevCapacity)
+						System.out.println("capacity of link" + link.getFromNode().getInLinks().values().iterator().next().getId() + " changes after a redundant node. may be wrong...");
+				} else if(this.redundantNodes.contains(link.getToNode())){
+					double capacity = link.getCapacity();
+					double nextCapacity = link.getToNode().getOutLinks().values().iterator().next().getCapacity();
+					if(capacity!=nextCapacity)
+						System.out.println("capacity of link" + link.getId() + " changes after a redundant node. may be wrong...");
+				}
+			}
+			
 		}
 		
 		
@@ -258,6 +274,7 @@ public class NetworkInspector {
 		
 		File file = new File(this.outputFolder+"/test/lengthBelowStorageCapacity.txt");
 		FileWriter writer;
+		
 		try {
 			
 			writer = new FileWriter(file);
@@ -296,23 +313,22 @@ public class NetworkInspector {
 			
 			if(node.getInLinks().size()>0&&node.getOutLinks().size()>0){
 			
-			this.inDegrees[node.getInLinks().size()-1]++;
-			this.outDegrees[node.getOutLinks().size()-1]++;
-			
-			if(node.getInLinks().size()==1&&node.getOutLinks().size()==1){
+				this.inDegrees[node.getInLinks().size()-1]++;
+				this.outDegrees[node.getOutLinks().size()-1]++;
 				
-				Link inLink = node.getInLinks().values().iterator().next();
-				Link outLink = node.getOutLinks().values().iterator().next();
+				if(node.getInLinks().size()==1&&node.getOutLinks().size()==1){
 				
-				if(inLink.getFromNode().equals(outLink.getToNode())){
-					if(this.area.contains(new Point(new CoordinateArraySequence(new Coordinate[]{new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory())))
-						this.deadEndNodes.add(node);
-					else
-						this.exitRoadNodes.add(node);
-				} else
-					this.redundantNodes.add(node);
+					Link inLink = node.getInLinks().values().iterator().next();
+					Link outLink = node.getOutLinks().values().iterator().next();
 				
-			}
+					if(inLink.getFromNode().equals(outLink.getToNode())){
+						if(this.area.contains(new Point(new CoordinateArraySequence(new Coordinate[]{new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory())))
+							this.deadEndNodes.add(node);
+						else
+							this.exitRoadNodes.add(node);
+					} else
+						this.redundantNodes.add(node);
+				}
 			}
 			
 		}
@@ -329,6 +345,8 @@ public class NetworkInspector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		this.nodeAttributesChecked = true;
 		
 		logger.info("done.");
 		
