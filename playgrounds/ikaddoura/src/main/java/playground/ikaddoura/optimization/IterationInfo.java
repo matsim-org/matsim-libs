@@ -62,6 +62,8 @@ public class IterationInfo {
 			
 	private int numberOfMissedVehicles;
 	
+	private double averageFarePerAgent;
+	
 	private Map <Id, List<Double>> personId2waitingTimes = new HashMap<Id, List<Double>>();
 	
 	public List <Double> getWaitingTimes() {
@@ -296,6 +298,14 @@ public class IterationInfo {
 
 	public void setFareDataList(List<FareData> fareDataList) {
 		this.fareDataList = fareDataList;
+	}
+
+	public double getAverageFarePerAgent() {
+		return averageFarePerAgent;
+	}
+
+	public void setAverageFarePerAgent(double averageFarePerAgent) {
+		this.averageFarePerAgent = averageFarePerAgent;
 	}
 		
 }

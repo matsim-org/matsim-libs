@@ -122,4 +122,8 @@ public class OperatorUserAnalysis {
 		return this.moneyHandler.getfareDataList();
 	}
 	
+	public Double getAverageFarePerAgent() {
+		return this.moneyHandler.getAverageAmountPerPerson();
+	}
+	
 }

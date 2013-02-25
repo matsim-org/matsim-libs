@@ -24,8 +24,11 @@
 package playground.ikaddoura.optimization.handler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 
@@ -39,20 +42,33 @@ public class MoneyEventHandler implements AgentMoneyEventHandler {
 
 	private double revenues;
 	private List<FareData> fareDataList = new ArrayList<FareData>();
+	private Map<Id, List<Double>> person2amounts = new HashMap<Id, List<Double>>();
 	
 	@Override
 	public void reset(int iteration) {
 		this.revenues = 0;
 		this.fareDataList.clear();
+		this.person2amounts.clear();
 	}
 
 	@Override
 	public void handleEvent(AgentMoneyEvent event) {
+		
 		this.revenues = this.revenues + (-1 * event.getAmount());
+		
 		FareData fareData = new FareData();
 		fareData.setAmount(-1 * event.getAmount());
 		fareData.setTime(event.getTime());
+		fareData.setPersonId(event.getPersonId());
 		this.fareDataList.add(fareData);
+		
+		if (person2amounts.containsKey(event.getPersonId())){
+			this.person2amounts.get(event.getPersonId()).add(event.getAmount());
+		} else {
+			List<Double> amounts = new ArrayList<Double>();
+			amounts.add(event.getAmount());
+			this.person2amounts.put(event.getPersonId(), amounts);
+		}
 	}
 
 	/**
@@ -64,6 +80,25 @@ public class MoneyEventHandler implements AgentMoneyEventHandler {
 
 	public List<FareData> getfareDataList() {
 		return fareDataList;
+	}
+	
+	public double getAverageAmountPerPerson() {
+		
+		double averageAmountSum = 0.;
+		int personCounter = 0;
+		for (Id personId : this.person2amounts.keySet()){			
+			double amountSum = 0.;
+			int counter = 0;
+			for (Double amount : this.person2amounts.get(personId)){
+				amountSum = amountSum + amount;				
+				counter++;
+			}
+			double averageAmount = amountSum / counter;
+			averageAmountSum = averageAmountSum + averageAmount;
+			personCounter++;
+		}
+		double avgAmountPerAgent = -1 * (averageAmountSum / personCounter);
+		return avgAmountPerAgent;
 	}
 	
 }
