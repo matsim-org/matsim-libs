@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -114,7 +113,6 @@ public class NonAlternativingPlanElementsIntegrationTest {
 	}
 
 	@Test
-	@Ignore( "This fails" )
 	public void test_Controler_QSim_Routechoice_acts() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setMobsim("qsim");
