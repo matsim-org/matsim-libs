@@ -46,13 +46,13 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class LocationChoice extends AbstractMultithreadedModule {
+public class DestinationChoice extends AbstractMultithreadedModule {
 
 	/**
 	 * yyyy It is unclear to me why we need this as a collection and not just as a variable.  kai, dec'12
 	 */
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
-	private static final Logger log = Logger.getLogger(LocationChoice.class);
+	private static final Logger log = Logger.getLogger(DestinationChoice.class);
 	private ActivitiesHandler defineFlexibleActivities;
 	private ActTypeConverter actTypeConverter;
 
@@ -61,7 +61,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private final Scenario scenario;
 
-	public LocationChoice(Scenario scenario) {
+	public DestinationChoice(Scenario scenario) {
 		super(scenario.getConfig().global());
 		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(scenario.getConfig().locationchoice().getAlgorithm()) ) {
 			throw new RuntimeException("best response location choice not supported as part of LocationChoice. " +

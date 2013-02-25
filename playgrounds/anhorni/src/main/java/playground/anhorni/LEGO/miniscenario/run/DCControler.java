@@ -19,7 +19,7 @@
 
 package playground.anhorni.LEGO.miniscenario.run;
 
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceInitializer;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.controler.Controler;
 
@@ -36,7 +36,7 @@ public class DCControler extends Controler {
     }  
 	
 	protected void loadControlerListeners() {
-		this.addControlerListener(new LocationChoiceInitializer());
+		this.addControlerListener(new DestinationChoiceInitializer());
 		super.loadControlerListeners();
 	}
 }

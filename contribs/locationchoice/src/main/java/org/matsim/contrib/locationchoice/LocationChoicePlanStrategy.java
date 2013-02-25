@@ -37,7 +37,7 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 		} else {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(scenario.getConfig().planCalcScore()));
 		}
-		delegate.addStrategyModule(new LocationChoice(scenario));
+		delegate.addStrategyModule(new DestinationChoice(scenario));
 		delegate.addStrategyModule(new ReRoute(scenario));
 	}
 	

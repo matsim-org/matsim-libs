@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -43,24 +43,24 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class BestReplyLocationChoice extends AbstractMultithreadedModule {
+public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	/**
 	 * yyyy It is unclear to me why we need this as a collection and not just as a variable.  kai, dec'12
 	 */
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 
-	private static final Logger log = Logger.getLogger(BestReplyLocationChoice.class);
+	private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private final Scenario scenario;
-	private LocationChoiceBestResponseContext lcContext;
+	private DestinationChoiceBestResponseContext lcContext;
 	private HashSet<String> flexibleTypes;
 	public static double useScaleEpsilonFromConfig = -99.0;
 
-	public BestReplyLocationChoice(LocationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
+	public BestReplyDestinationChoice(DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
 		super(lcContext.getScenario().getConfig().global());
 		if ( !LocationChoiceConfigGroup.Algotype.bestResponse.equals(lcContext.getScenario().getConfig().locationchoice().getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;

@@ -24,8 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.BestReplyLocationChoice;
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
@@ -35,7 +35,7 @@ public class DCActivityWOFacilitiesScoringFunction extends CharyparNagelActivity
 	private DestinationScoring destinationChoiceScoring;	
 	private Plan plan ;
 	
-	public DCActivityWOFacilitiesScoringFunction(Plan plan, LocationChoiceBestResponseContext lcContext) {
+	public DCActivityWOFacilitiesScoringFunction(Plan plan, DestinationChoiceBestResponseContext lcContext) {
 		super(lcContext.getParams());
 		this.destinationChoiceScoring = new DestinationScoring(lcContext);
 		this.plan = plan ;
@@ -48,7 +48,7 @@ public class DCActivityWOFacilitiesScoringFunction extends CharyparNagelActivity
 
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe, BestReplyLocationChoice.useScaleEpsilonFromConfig);
+				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe, BestReplyDestinationChoice.useScaleEpsilonFromConfig);
 			}
 		}
 	}

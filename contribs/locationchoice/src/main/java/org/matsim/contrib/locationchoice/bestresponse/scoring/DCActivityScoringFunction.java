@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.BestReplyLocationChoice;
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -38,7 +38,7 @@ public class DCActivityScoringFunction extends CharyparNagelOpenTimesActivitySco
 	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
 	private DestinationScoring destinationChoiceScoring;	
 	
-	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, LocationChoiceBestResponseContext lcContext) {
+	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext lcContext) {
 		super(plan, lcContext.getParams(), ((ScenarioImpl)lcContext.getScenario()).getActivityFacilities());
 		this.destinationChoiceScoring = new DestinationScoring(lcContext);
 	}
@@ -50,7 +50,7 @@ public class DCActivityScoringFunction extends CharyparNagelOpenTimesActivitySco
 		for (PlanElement pe : super.plan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe, 
-						BestReplyLocationChoice.useScaleEpsilonFromConfig);
+						BestReplyDestinationChoice.useScaleEpsilonFromConfig);
 			}
 		}
 	}

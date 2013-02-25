@@ -2,7 +2,7 @@ package org.matsim.contrib.locationchoice;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
@@ -35,7 +35,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		 * Somehow this is ugly. Should be initialized in the constructor. But I do not know, how to initialize the lc scenario elements
 		 * such that they are already available at the time of constructing this object. ah feb'13
 		 */
-		LocationChoiceBestResponseContext lcContext = scenario.getScenarioElement(LocationChoiceBestResponseContext.class);
+		DestinationChoiceBestResponseContext lcContext = scenario.getScenarioElement(DestinationChoiceBestResponseContext.class);
 		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.class);
 		if ( !LocationChoiceConfigGroup.Algotype.bestResponse.equals(lcContext.getScenario().getConfig().locationchoice().getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
@@ -51,7 +51,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		} else {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		}
-		delegate.addStrategyModule(new BestReplyLocationChoice(lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled()));
+		delegate.addStrategyModule(new BestReplyDestinationChoice(lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled()));
 		delegate.addStrategyModule(new ReRoute(lcContext.getScenario()));
 		
 		delegate.init(replanningContext);

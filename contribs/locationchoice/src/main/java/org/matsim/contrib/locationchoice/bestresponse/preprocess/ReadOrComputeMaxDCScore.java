@@ -24,7 +24,7 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -39,12 +39,12 @@ public class ReadOrComputeMaxDCScore {
 	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
 	private ScenarioImpl scenario;	
 	private Config config;	
-	private LocationChoiceBestResponseContext lcContext;
+	private DestinationChoiceBestResponseContext lcContext;
 	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();	
 	private ScaleEpsilon scaleEpsilon;	
 	private HashSet<String> flexibleTypes;
 	
-	public ReadOrComputeMaxDCScore(LocationChoiceBestResponseContext lcContext) {
+	public ReadOrComputeMaxDCScore(DestinationChoiceBestResponseContext lcContext) {
 		this.scenario = (ScenarioImpl) lcContext.getScenario();
 		this.config = this.scenario.getConfig() ;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();

@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.contrib.locationchoice.LocationChoice;
+import org.matsim.contrib.locationchoice.DestinationChoice;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -42,7 +42,7 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 		HashSet<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
-		addStrategyModule(new LocationChoice(controler.getScenario()));
+		addStrategyModule(new DestinationChoice(controler.getScenario()));
 		addStrategyModule(new TimeAllocationMutator(controler.getConfig()));
 		addStrategyModule(new ReRoute(controler.getScenario()));
 	}

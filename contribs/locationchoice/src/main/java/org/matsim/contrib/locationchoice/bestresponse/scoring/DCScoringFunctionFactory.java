@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.locationchoice.bestresponse.scoring;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -33,13 +33,13 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
 	private final Controler controler;
-	private LocationChoiceBestResponseContext lcContext;
+	private DestinationChoiceBestResponseContext lcContext;
 	private Config config;
 
 	/*
 	 * TODO: remove unused params
 	 */
-	public DCScoringFunctionFactory(Config config, Controler controler, LocationChoiceBestResponseContext lcContext) {
+	public DCScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext lcContext) {
 		super(config.planCalcScore(), controler.getNetwork());
 		this.controler = controler;
 		this.lcContext = lcContext;

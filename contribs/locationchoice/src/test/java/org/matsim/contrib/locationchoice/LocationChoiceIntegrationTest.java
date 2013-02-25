@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityWOFacilitiesScoringFunction;
@@ -94,7 +94,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
 
 		// joint context (based on scenario):
-		final LocationChoiceBestResponseContext lcContext = new LocationChoiceBestResponseContext(scenario) ;
+		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
 				
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
@@ -173,7 +173,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			scenario.addScenarioElement( facPenalties );
 		}
 
-		final LocationChoiceBestResponseContext lcContext = new LocationChoiceBestResponseContext(scenario) ;
+		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
 		
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);

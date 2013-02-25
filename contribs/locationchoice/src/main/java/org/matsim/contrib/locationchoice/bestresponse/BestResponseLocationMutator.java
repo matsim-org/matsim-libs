@@ -55,12 +55,12 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
 	private ReplanningContext replanningContext;
-	private LocationChoiceBestResponseContext lcContext;
+	private DestinationChoiceBestResponseContext lcContext;
 
 	public BestResponseLocationMutator(
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			ObjectAttributes personsMaxDCScoreUnscaled, LocationChoiceBestResponseContext lcContext,
+			ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceBestResponseContext lcContext,
 			DestinationSampler sampler,
 			ReplanningContext replanningContext) {
 		

@@ -41,20 +41,20 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
  * @author nagel
  *
  */
-public class LocationChoiceBestResponseContext implements MatsimToplevelContainer {	
+public class DestinationChoiceBestResponseContext implements MatsimToplevelContainer {	
 	private final Scenario scenario;
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
 	private CharyparNagelScoringParameters params;
-	private static final Logger log = Logger.getLogger(LocationChoiceBestResponseContext.class);
+	private static final Logger log = Logger.getLogger(DestinationChoiceBestResponseContext.class);
 	private int arekValsRead = 1;
 	private ObjectAttributes facilitiesKValues;
 	private ObjectAttributes personsKValues;
 	private ObjectAttributes personsBetas = new ObjectAttributes();
 	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
 
-	public LocationChoiceBestResponseContext(Scenario scenario) {
+	public DestinationChoiceBestResponseContext(Scenario scenario) {
 		this.scenario = scenario;	
 		this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
 	}

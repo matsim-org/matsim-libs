@@ -3,7 +3,7 @@ package org.matsim.contrib.locationchoice.bestreply;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeMaxDCScoreMultiThreatedModule;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -16,7 +16,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class BestReplyTest extends MatsimTestCase {
 	
 	private Scenario scenario;
-	private LocationChoiceBestResponseContext context;
+	private DestinationChoiceBestResponseContext context;
 	
 	private static final Logger log = Logger.getLogger(BestReplyTest.class);
 	
@@ -35,6 +35,6 @@ public class BestReplyTest extends MatsimTestCase {
 	public void init() {
 		String configFile = this.getPackageInputDirectory() + "/config.xml";
 		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
-		this.context = new LocationChoiceBestResponseContext(this.scenario);
+		this.context = new DestinationChoiceBestResponseContext(this.scenario);
 	}
 }

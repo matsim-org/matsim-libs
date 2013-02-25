@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.locationchoice.bestresponse.LocationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -42,9 +42,9 @@ public class DestinationScoring {
 	private ObjectAttributes facilitiesKValues;
 	private ObjectAttributes personsKValues;
 	private ScaleEpsilon scaleEpsilon;
-	private LocationChoiceBestResponseContext lcContext;
+	private DestinationChoiceBestResponseContext lcContext;
 		
-	public DestinationScoring(LocationChoiceBestResponseContext lcContext) {
+	public DestinationScoring(DestinationChoiceBestResponseContext lcContext) {
 		this.facilities = ((ScenarioImpl)lcContext.getScenario()).getActivityFacilities();
 		this.config = lcContext.getScenario().getConfig();
 		this.facilitiesKValues = lcContext.getFacilitiesKValues();

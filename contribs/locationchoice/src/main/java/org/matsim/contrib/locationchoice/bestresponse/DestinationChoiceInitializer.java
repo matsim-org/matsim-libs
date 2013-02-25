@@ -16,16 +16,16 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * Listener for inclusion of bestreply lc, very similar to roadpricing
  * no further coding should be required 
  */
-public class LocationChoiceInitializer implements StartupListener {
-	private LocationChoiceBestResponseContext lcContext;
+public class DestinationChoiceInitializer implements StartupListener {
+	private DestinationChoiceBestResponseContext lcContext;
 	private ObjectAttributes personsMaxDCScoreUnscaled;
-	private static final Logger log = Logger.getLogger(LocationChoiceInitializer.class);
+	private static final Logger log = Logger.getLogger(DestinationChoiceInitializer.class);
 	
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler();  		
-  		lcContext = new LocationChoiceBestResponseContext(event.getControler().getScenario()); 		
+  		lcContext = new DestinationChoiceBestResponseContext(event.getControler().getScenario()); 		
   		  		
   		// compute or read maxDCScore but do not add it to the context:
   		// context can then be given to scoring classes both during regular scoring and in pre-processing 
