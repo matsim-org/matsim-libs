@@ -19,7 +19,7 @@ public class Analyzer {
 	}
 	
 	public void run(String path) {
-		ArrayList<Double> searchtimes = this.readSummaryFile(path + "/ summary.txt");
+		ArrayList<Double> searchtimes = this.readSummaryFile(path + "/summary.txt");
 		this.createBins(searchtimes, path);
 	}
 	
