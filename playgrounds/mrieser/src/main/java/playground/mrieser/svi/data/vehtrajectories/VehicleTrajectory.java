@@ -31,7 +31,9 @@ public class VehicleTrajectory {
 	private final double startTime;
 	private final double travelTime;
 	private int[] travelledNodes = null;
+	private double[] timeStamps = null;
 	private double[] travelledNodeTimes = null;
+	private double[] jamTimes = null;
 
 	/**
 	 * @param vehNr
@@ -58,12 +60,28 @@ public class VehicleTrajectory {
 		return this.travelledNodes;
 	}
 	
+	public void setTimeStamps(double[] timeStamps) {
+		this.timeStamps = timeStamps;
+	}
+	
+	public double[] getTimeStamps() {
+		return timeStamps;
+	}
+	
 	public void setTravelledNodeTimes(final double[] times) {
 		this.travelledNodeTimes = times;
 	}
 
 	public double[] getTravelledNodeTimes() {
 		return this.travelledNodeTimes;
+	}
+	
+	public void setJamTimes(double[] jamTimes) {
+		this.jamTimes = jamTimes;
+	}
+	
+	public double[] getJamTimes() {
+		return jamTimes;
 	}
 	
 	public int getVehNr() {

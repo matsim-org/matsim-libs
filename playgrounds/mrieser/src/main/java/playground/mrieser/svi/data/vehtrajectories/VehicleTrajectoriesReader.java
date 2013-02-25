@@ -113,8 +113,20 @@ public class VehicleTrajectoriesReader {
 		}
 
 		// time stamp of vehicle in system at nodes
-		for (int i = 0; i < nOfLines; i++) {
-			line = reader.readLine(); // currently ignore
+		double[] timeStamps = new double[nOfNodes];
+		{
+			int nodesIdx = 0;
+			for (int i = 0; i < nOfLines; i++) {
+				line = reader.readLine(); // currently ignore
+				
+				String parts[] = line.split("\\s+");
+				for (String part : parts) {
+					if (part.length() > 0) {
+						timeStamps[nodesIdx] = Double.parseDouble(part) * 60.0; // convert minutes to seconds
+						nodesIdx++;
+					}
+				}
+			}
 		}
 
 		// travel time between nodes
@@ -135,13 +147,27 @@ public class VehicleTrajectoriesReader {
 		}
 
 		// delay times at nodes
-		for (int i = 0; i < nOfLines; i++) {
-			line = reader.readLine(); // currently ignore
+		double[] jamTimes = new double[nOfNodes];
+		{
+			int nodesIdx = 0;
+			for (int i = 0; i < nOfLines; i++) {
+				line = reader.readLine(); // currently ignore
+				
+				String parts[] = line.split("\\s+");
+				for (String part : parts) {
+					if (part.length() > 0) {
+						jamTimes[nodesIdx] = Double.parseDouble(part) * 60.0; // convert minutes to seconds
+						nodesIdx++;
+					}
+				}
+			}
 		}
 
 		VehicleTrajectory traj = new VehicleTrajectory(vehNr, tag, this.zoneIdxToIdMapping[origZ], this.zoneIdxToIdMapping[destZ], sTime, travelTime);
 		traj.setTravelledNodes(nodes);
+		traj.setTimeStamps(timeStamps);
 		traj.setTravelledNodeTimes(travelTimes);
+		traj.setJamTimes(jamTimes);
 		return traj;
 	}
 }

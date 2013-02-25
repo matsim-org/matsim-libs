@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.svi.data.DynamicODMatrix;
@@ -44,6 +45,7 @@ import playground.mrieser.svi.data.DynusTDynamicODDemandWriter;
 import playground.mrieser.svi.data.vehtrajectories.CalculateLinkStatsFromVehTrajectories;
 import playground.mrieser.svi.data.vehtrajectories.CalculateLinkTravelTimesFromVehTrajectories;
 import playground.mrieser.svi.data.vehtrajectories.CalculateTravelTimeMatrixFromVehTrajectories;
+import playground.mrieser.svi.data.vehtrajectories.CsvReformatter;
 import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
 import playground.mrieser.svi.data.vehtrajectories.Extractor;
 import playground.mrieser.svi.data.vehtrajectories.MultipleVehicleTrajectoryHandler;
@@ -137,6 +139,7 @@ public class DynusTMobsim implements Mobsim {
 		linkStats.writeLinkTravelSpeedsToFile(this.controler.getControlerIO().getIterationFilename(this.iteration, "dynust_linkTravelSpeeds.txt"));
 		exportTravelTimes(hourlyTravelTimesMatrix, hourlyTtmCalc.getZoneIds(), this.controler.getControlerIO().getIterationFilename(this.iteration, "dynust_odTravelTimes.txt"));
 		extractVehTrajectories(vehTrajFilename);
+		convertVehTrajectories(vehTrajFilename);
 	}
 
 	private void printModeShares(final DynamicODDemandCollector collector) {
@@ -327,6 +330,16 @@ public class DynusTMobsim implements Mobsim {
 			String filename = "VehTrajectories_" + Time.writeTime(t.getFirst(), Time.TIMEFORMAT_HHMM, '_') + "-" + Time.writeTime(t.getSecond(), Time.TIMEFORMAT_HHMM, '_') + ".dat";
 			String outputFile = this.controler.getControlerIO().getIterationFilename(this.iteration, filename);
 			Extractor.filterVehTrajectory(vehTrajFilename, t.getFirst() / 60.0, t.getSecond() / 60.0, outputFile); // convert times from seconds to minutes
+		}
+	}
+
+	private void convertVehTrajectories(final String vehTrajFilename) {
+		try {
+			CsvReformatter csv = new CsvReformatter(this.dc.getZoneIdToIndexMapping(), this.controler.getControlerIO().getIterationFilename(this.iteration, "vehTrajectories.csv"));
+			new VehicleTrajectoriesReader(csv, this.dc.getZoneIdToIndexMapping()).readFile(vehTrajFilename);
+			csv.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 }
