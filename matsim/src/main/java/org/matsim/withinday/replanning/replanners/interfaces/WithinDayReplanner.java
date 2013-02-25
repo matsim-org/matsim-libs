@@ -82,4 +82,9 @@ public abstract class WithinDayReplanner<T extends Identifier> {
 		}
 		return false;
 	}
+	
+	@Override
+	public int hashCode() {
+		return getId().hashCode();
+	}
 }
