@@ -64,19 +64,16 @@ public class Main {
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
 		bbox.setDefaultBoundaryBox(sc2.getNetwork());
 		
-		measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(400, 
-				   bbox.getBoundingBox());
-		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 400);		
+		measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
+		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 50);
+		InternalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
+		AccessibilityCalc ac = new AccessibilityCalc(measuringPoints, freeSpeedGrid, (ScenarioImpl) scenario, file1);
+		ac.runAccessibilityComputation();
 		
 //		initFeatureType();
 //		Collection<SimpleFeature> features = createFeatures();
 //		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/pres/measuringPoints.shp");
 			
-		InternalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
-		
-		AccessibilityCalc ac = new AccessibilityCalc(/*parcels,*/ measuringPoints, freeSpeedGrid, (ScenarioImpl) scenario, file1);
-		ac.runAccessibilityComputation();
-		
 //		NetworkInspector ni = new NetworkInspector(scenario);
 //		if(ni.isRoutable())
 //			System.out.println("Netzwerk ist routbar...");
