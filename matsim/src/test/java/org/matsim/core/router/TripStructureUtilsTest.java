@@ -50,7 +50,7 @@ public class TripStructureUtilsTest {
 					ConfigUtils.createConfig() ) );
 	private static final String dummyType = "dummy";
 	private static final StageActivityTypes stageActivities =
-		new StageActivityTypesImpl( Arrays.asList( dummyType ) );
+		new StageActivityTypesImpl( dummyType );
 
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 	private static class Fixture {

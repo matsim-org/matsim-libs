@@ -20,7 +20,6 @@
 package playground.thibautd.router.replanning;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -84,7 +83,7 @@ public class TimeAllocationMutatorTest {
 		TripsToLegsAlgorithm trips2legs =
 			new TripsToLegsAlgorithm(
 					new StageActivityTypesImpl(
-						Arrays.asList( PtConstants.TRANSIT_ACTIVITY_TYPE ) ));
+						PtConstants.TRANSIT_ACTIVITY_TYPE ));
 
 		Counter counter = new Counter( getClass().getSimpleName()+": testing plan # " );
 		for (PlanImpl plan : plans) {

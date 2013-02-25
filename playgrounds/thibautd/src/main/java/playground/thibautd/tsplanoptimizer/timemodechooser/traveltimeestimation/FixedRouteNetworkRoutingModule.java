@@ -39,9 +39,9 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -68,7 +68,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
  * @author thibautd
  */
 public class FixedRouteNetworkRoutingModule implements RoutingModule {
-	private static final StageActivityTypes EMPTY_CHECKER = new StageActivityTypesImpl( null );
+	private static final StageActivityTypes EMPTY_CHECKER = EmptyStageActivityTypes.INSTANCE;
 	private final Map< Tuple<Id, Id>, NetworkRoute> routes;
 
 	private final Network network;

@@ -20,6 +20,7 @@
 package org.matsim.core.router;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -34,14 +35,18 @@ public class StageActivityTypesImpl implements StageActivityTypes {
 	private final SortedSet<String> types = new TreeSet<String>();
 
 	/**
+	 * Initializes an instance with a single type
+	 */
+	public StageActivityTypesImpl(final String type) {
+		this( Collections.singleton( type ) );
+	}
+
+	/**
 	 * Initialises an instance with a given list of types
 	 * @param types a Collection containing the types to consider as stage types.
-	 * It is allowed to be null, in which case the list is empty.
 	 */
 	public StageActivityTypesImpl(final Collection<String> types) {
-		if (types != null) {
-			this.types.addAll( types );
-		}
+		this.types.addAll( types );
 	}
 
 	@Override

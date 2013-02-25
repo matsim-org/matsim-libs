@@ -16,6 +16,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -130,7 +131,7 @@ public class BushwhackingRoutingModule implements RoutingModule {
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		return new StageActivityTypesImpl(null);
+		return EmptyStageActivityTypes.INSTANCE;
 	}
 
 }

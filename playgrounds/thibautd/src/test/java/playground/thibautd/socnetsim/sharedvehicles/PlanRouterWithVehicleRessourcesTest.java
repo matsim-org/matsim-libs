@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.sharedvehicles;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -165,7 +164,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 					@Override
 					public StageActivityTypes getStageActivityTypes() {
-						return new StageActivityTypesImpl( Arrays.asList( stage ) );
+						return new StageActivityTypesImpl( stage );
 					}
 				});
 		return tripRouter;

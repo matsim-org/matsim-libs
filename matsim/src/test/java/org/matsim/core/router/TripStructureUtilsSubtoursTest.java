@@ -46,7 +46,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class TripStructureUtilsSubtoursTest {
 	private static final String STAGE = "stage_activity";
-	private static final StageActivityTypes CHECKER = new StageActivityTypesImpl( Arrays.asList( STAGE ) );
+	private static final StageActivityTypes CHECKER = new StageActivityTypesImpl( STAGE );
 
 	// /////////////////////////////////////////////////////////////////////////
 	// fixtures
