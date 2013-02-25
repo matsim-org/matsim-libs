@@ -31,13 +31,13 @@ public class Config {
 
 	private static double radiusInMetersOfStudyArea = 1500;
 	private static Coord studyAreaCenter = ParkingHerbieControler.getCoordinatesQuaiBridgeZH();
-	public static String baseFolder = "C:/l/studies/LaHowara_Parking/input/zurichCity/matsim_scenario/ivtch/";
+	public static String baseFolder = "C:/l/studies/LaHowara_Parking/input/zurichCity/matsim_scenario/teleatlas/";
 	private static String outputFolder = baseFolder + "/created/";
 	
 	private static NetworkImpl network=null;
 	
 	public static String getNetworkFile() {
-		return baseFolder + "zh10PctEps.output_network.xml.gz";
+		return baseFolder + "network.xml.gz";
 	}
 
 	public static String getOutputFolder(){
@@ -45,7 +45,7 @@ public class Config {
 	}
 	
 	public static String getEventsFile() {
-		return baseFolder + "zh10PctEps.100.events.xml.gz";
+		return baseFolder + "events.xml.gz";
 	}
 
 	public static boolean isInsideStudyArea(double x, double y) {
