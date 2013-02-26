@@ -120,7 +120,7 @@ public class FRAdaptZHScenario {
 						
 		this.write();
 		
-		AddAttributesAndEpsilons adapter = new AddAttributesAndEpsilons();
+		AddAttributes adapter = new AddAttributes();
 		adapter.run(plansFilePath, networkFilePath, facilitiesFilePath, outputFolder, bzFile, csFile);
 	}
 	
@@ -128,13 +128,13 @@ public class FRAdaptZHScenario {
 		ObjectAttributes betas = new ObjectAttributes();
 		int counter = 0;
 		int nextMsg = 1;
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {				
+		for (Person p : this.scenario.getPopulation().getPersons().values()) {	
+			betas.putAttribute(p.getId().toString(), "size", 1.0);
+			betas.putAttribute(p.getId().toString(), "price", -1.0);
 			counter++;
 			if (counter % nextMsg == 0) {
 				nextMsg *= 2;
 				log.info(" person # " + counter);
-				betas.putAttribute(p.getId().toString(), "size", 1.0);
-				betas.putAttribute(p.getId().toString(), "price", -1.0);
 			}
 		}
 		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(betas);
