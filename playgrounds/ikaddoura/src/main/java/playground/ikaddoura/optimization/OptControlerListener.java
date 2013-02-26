@@ -32,7 +32,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.optimization.handler.ConstantFareHandler;
-import playground.ikaddoura.optimization.handler.MarginalCostFareHandler;
+import playground.ikaddoura.optimization.handler.ExternalEffectHandler;
+import playground.ikaddoura.optimization.handler.MarginalCostPricingHandler;
 import playground.ikaddoura.optimization.handler.PtLegHandler;
 
 /**
@@ -59,14 +60,12 @@ public class OptControlerListener implements StartupListener {
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 		
-		ConstantFareHandler fareCalculator = new ConstantFareHandler(eventsManager, this.fare);
-		event.getControler().getEvents().addHandler(fareCalculator);
-
 		if (this.marginalCostPricing) {
-			MarginalCostFareHandler mcFareCalculator = new MarginalCostFareHandler(eventsManager, scenario);
-			event.getControler().getEvents().addHandler(mcFareCalculator);
+			event.getControler().getEvents().addHandler(new ExternalEffectHandler(eventsManager, scenario));
+			event.getControler().getEvents().addHandler(new MarginalCostPricingHandler(eventsManager, scenario));
 		}
 		
+		event.getControler().getEvents().addHandler(new ConstantFareHandler(eventsManager, this.fare));
 		event.getControler().getEvents().addHandler(ptScoringHandler);
 	}
 
