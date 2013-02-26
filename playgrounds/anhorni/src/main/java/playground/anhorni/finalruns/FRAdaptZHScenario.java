@@ -35,8 +35,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
@@ -88,6 +91,16 @@ public class FRAdaptZHScenario {
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);
 	}
+	
+	private void adaptOpenTimes() {
+		for (ActivityFacility fac:this.scenario.getActivityFacilities().getFacilities().values()) {
+			if (fac.getActivityOptions().get("h") != null) {
+				ActivityOptionImpl actOpt = (ActivityOptionImpl) fac.getActivityOptions().get("h");
+				actOpt.getOpeningTimes().clear();
+				actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 0.0, 24.0));
+			}
+		}
+	}
 
 	public void run(final String plansFilePath, final String networkFilePath, final String facilitiesFilePath, final String outputFolder,
 			final String sampleRateStr, final String bzFile, final String csFile) {
@@ -117,6 +130,8 @@ public class FRAdaptZHScenario {
 		
 		log.info("Clean routes");
 		this.cleanRoutes();
+		
+		this.adaptOpenTimes();
 						
 		this.write();
 		
