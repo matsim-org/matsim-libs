@@ -1,30 +1,28 @@
 package playground.dhosse.bachelorarbeit;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.LeastCostPathTree;
 import org.matsim.vehicles.Vehicle;
-import org.opengis.feature.Feature;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateList;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
@@ -64,14 +62,58 @@ public class Grid {
 		
 		double step = dim / 2;
 		
-		traverseNetwork(net1,step,1);
-		traverseNetwork(net2,step,2);
+//		traverseNetwork(net1,step,1);
+//		traverseNetwork(net2,step,2);
 		
 		log.info("done comparing");
 		
 	}
 	
+	public void traverseNetwork(Network net){
+		
+		List<Geometry> linkGeometryList = new ArrayList<Geometry>();
+		
+		for(Link link : net.getLinks().values()){
+			
+			Coordinate[] coord = new Coordinate[]{new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()),
+					new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY())};
+			LineString ls = new GeometryFactory().createLineString(coord);
+			linkGeometryList.add(ls);
+			
+		}
+		
+		List<Geometry> cellGeometries = new ArrayList<Geometry>();
+		
+		for(Cell cell : this.getCells().values()){
+			
+			Coordinate[] coords = new Coordinate[]{new Coordinate(cell.getRight(),cell.getBottom()),
+					new Coordinate(cell.getRight(),cell.getTop()),new Coordinate(cell.getLeft(),cell.getTop()),
+					new Coordinate(cell.getLeft(),cell.getBottom()),new Coordinate(cell.getRight(),cell.getBottom())};
+			LinearRing shell = new LinearRing(new CoordinateArraySequence(coords), new GeometryFactory());
+			
+			Polygon p = new Polygon(shell, null, new GeometryFactory());
+			cellGeometries.add(p);
+			
+		}
+		
+		log.info("starting traverseNetwork...");
+		
+		for(Geometry g : cellGeometries){
+			for(Geometry g2 : linkGeometryList){
+				if(g2.intersects(g)||g.contains(g2)){
+					break;
+				}
+			}
+		}
+		
+		
+		
+		log.info("done.");
+		
+	}
+	
 	public void traverseNetwork(Network net, double step, int it){
+		log.info("starting traverseNetwork...");
 		for(Link link : net.getLinks().values()){
 			
 			double nextX = link.getFromNode().getCoord().getX();
@@ -111,6 +153,7 @@ public class Grid {
 				}
 			}
 		}
+		log.info("done.");
 	}
 	
 //	public void generateSHPExport(String dname, String dname2){
@@ -181,38 +224,6 @@ public class Grid {
 	
 	public QuadTree<Cell> getCells(){
 		return Grid.cells;
-	}
-	
-	public void calculateTravelTime(Network net){
-//		
-		LeastCostPathTree lctp = new LeastCostPathTree(new TravelTimeCalculator(net, new TravelTimeCalculatorConfigGroup()).getLinkTravelTimes(), new TravelDisutility() {
-			
-			@Override
-			public double getLinkTravelDisutility(Link link, double time,
-					Person person, Vehicle vehicle) {
-				return 0;
-			}
-			
-			@Override
-			public double getLinkMinimumTravelDisutility(Link link) {
-				return 0;
-			}
-		}){
-
-			@SuppressWarnings("unused")
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				return 0;
-			}
-			
-		};
-		log.info("start calculating free speed travel time");
-		for(Link link : net.getLinks().values()){
-			lctp.calculate(net, link.getFromNode(), 0);
-		}
-		log.info("done calculating");
-		for(Node node : net.getNodes().values()){
-			System.out.println(lctp.getTree().get(node.getId()).getTime());
-		}
 	}
 	
 	/**
@@ -326,8 +337,9 @@ public class Grid {
 		private double xright;
 		private double ytop;
 		private double ybottom;
-		private int traversed;
 		
+		private int traversed;
+		private int importance;
 		private int id=0;
 		
 		public Cell(double left,double right,double top,double bottom,int id){
@@ -337,6 +349,7 @@ public class Grid {
 			this.ybottom = bottom;
 			this.id = id;
 			this.traversed = 0;
+			this.importance = 0;
 		}
 		
 		public double getLeft(){
@@ -381,6 +394,14 @@ public class Grid {
 			else{
 				return false;
 			}
+		}
+
+		public int getImportance() {
+			return importance;
+		}
+
+		public void setImportance(int importance) {
+			this.importance = importance;
 		}
 	}
 	

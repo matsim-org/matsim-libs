@@ -1,47 +1,13 @@
 package playground.dhosse.bachelorarbeit;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.gis.GridUtils;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
-import org.matsim.contrib.matsim4opus.gis.Zone;
-import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Main {
-	
-	private static SimpleFeatureBuilder builder;
-	static ZoneLayer<Id> measuringPoints;
 	
 	public static void main(String args[]) {
 		
@@ -53,27 +19,20 @@ public class Main {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		Scenario sc2 = ScenarioUtils.createScenario(config);
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
-		MatsimNetworkReader nr2 = new MatsimNetworkReader(sc2);
-		nr2.readFile(path+"/"+file2+".xml");
-		nr.readFile(path+"/"+file1+".xml");
-		pr.readFile(path+"/"+"/test_population.xml");
+		nr.readFile(path+"/"+file2+".xml");
+//		pr.readFile(path+"/"+"/test_population.xml");
 		
-		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-		bbox.setDefaultBoundaryBox(sc2.getNetwork());
+//		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+//		bbox.setDefaultBoundaryBox(scenario.getNetwork());
+//		
+//		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
+//		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 50);
+//		InternalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
+//		AccessibilityCalc ac = new AccessibilityCalc(measuringPoints, freeSpeedGrid, (ScenarioImpl) scenario, file1);
+//		ac.runAccessibilityComputation();
 		
-		measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
-		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 50);
-		InternalConstants.setOpusHomeDirectory("C:/Users/Daniel/Dropbox/bsc");
-		AccessibilityCalc ac = new AccessibilityCalc(measuringPoints, freeSpeedGrid, (ScenarioImpl) scenario, file1);
-		ac.runAccessibilityComputation();
-		
-//		initFeatureType();
-//		Collection<SimpleFeature> features = createFeatures();
-//		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/pres/measuringPoints.shp");
-			
 //		NetworkInspector ni = new NetworkInspector(scenario);
 //		if(ni.isRoutable())
 //			System.out.println("Netzwerk ist routbar...");
@@ -81,39 +40,8 @@ public class Main {
 //			System.out.println("Netzwerk ist nicht routbar");
 //		ni.checkNodeAttributes();
 //		ni.checkLinkAttributes();
-//		ni.shpExportNodeStatistics(ni.getExitRoadNodes());
+//		ni.shpExportNodeStatistics(ni.getRedundantNodes());
 		
 	}
-	
-//	private static Collection<SimpleFeature> createFeatures() {
-//		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
-//		Iterator<Zone<Id>> it = measuringPoints.getZones().iterator();
-//		while(it.hasNext()){
-//			Zone<Id> zone = it.next();
-//			features.add(getFeature(zone));
-//		}
-//		return features;
-//	}
-//
-//	private static SimpleFeature getFeature(final Zone<Id> zone) {
-//		
-//		Point p = MGC.coordinate2Point(zone.getGeometry().getCoordinate());
-//		
-//		try {
-//			return builder.buildFeature(null, new Object[]{p});
-//		} catch (IllegalArgumentException e) {
-//			throw new RuntimeException(e);
-//		}
-//	}
-//
-//	private static void initFeatureType() {
-//		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-//		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-//		typeBuilder.setName("node");
-//		typeBuilder.setCRS(crs);
-//		typeBuilder.add("location",Point.class);
-//		builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
-//		
-//	}
 
 }

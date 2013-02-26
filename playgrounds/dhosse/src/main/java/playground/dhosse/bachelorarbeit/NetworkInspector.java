@@ -88,8 +88,8 @@ public class NetworkInspector {
 		
 		Geometry g = ((Geometry)features.iterator().next().getDefaultGeometry());
 		
-//		this.area = g.buffer(-10.);
-		this.area = g.convexHull();
+		this.area = g.buffer(-10.);
+//		this.area = g.convexHull().buffer(-10.);
 		
 	}
 	
@@ -326,8 +326,13 @@ public class NetworkInspector {
 							this.deadEndNodes.add(node);
 						else
 							this.exitRoadNodes.add(node);
-					} else
-						this.redundantNodes.add(node);
+					} else{
+						if(inLink.getCapacity()==outLink.getCapacity()&&
+								inLink.getFreespeed()==outLink.getFreespeed()&&
+								inLink.getNumberOfLanes()==outLink.getNumberOfLanes()&&
+								inLink.getAllowedModes()==outLink.getAllowedModes())
+							this.redundantNodes.add(node);
+					}
 				}
 			}
 			
