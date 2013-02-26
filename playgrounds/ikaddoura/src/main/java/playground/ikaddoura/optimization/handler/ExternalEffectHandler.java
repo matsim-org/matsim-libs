@@ -115,7 +115,7 @@ public class ExternalEffectHandler implements PersonEntersVehicleEventHandler, P
 		if (!this.ptVehicleIDs.contains(event.getVehicleId())){
 			this.ptVehicleIDs.add(event.getVehicleId());
 		}
-		
+	
 		// reset the positions at the beginning of each cycle
 		this.vehicleId2stopIdLastArrival.remove(event.getVehicleId());
 		this.vehicleId2stopIdLastDeparture.remove(event.getVehicleId());
@@ -252,13 +252,14 @@ public class ExternalEffectHandler implements PersonEntersVehicleEventHandler, P
 	
 	private int calcDelayedPassengersWaiting(Id vehId, Id currentStopId) {
 		
+		
 		// get all possible relevant stopIds beginning with the current stopId
 		List<Id> relevantStopIDsFromHere = getRelevantStopIDsFromHere(vehId, currentStopId);
 		// get last relevant stopId
 		Id lastRelevantStopId = getLastRelevantStopId(vehId, relevantStopIDsFromHere);
 		// get all relevant stopIds between this bus and the next bus (including the current stop)
 		List<Id> relevantStopIDs = getAllRelevantStopIDs(relevantStopIDsFromHere, lastRelevantStopId);
-				
+		
 		// sum up the number of waiting passengers at these stops
 		int numberOfPassengersWaitingInRelevantArea = 0;
 		for (Id id : relevantStopIDs){
@@ -323,7 +324,16 @@ public class ExternalEffectHandler implements PersonEntersVehicleEventHandler, P
 			}
 		}
 		if (lastRelevantStopId == null){
-			lastRelevantStopId = relevantStopIDsFromHere.get(relevantStopIDsFromHere.size() - 1); // last stop
+			if (relevantStopIDsFromHere.size() == 1) {
+				// This stop is the transit stop of this route. Thus, no relevant transit stop.
+				
+			} else if (relevantStopIDsFromHere.size() < 1) {
+				throw new RuntimeException("No relevant stopID in List. Aborting...");
+				
+			} else {
+				// the stop before the last stop of the transit route
+				lastRelevantStopId = relevantStopIDsFromHere.get(relevantStopIDsFromHere.size() - 2);
+			}
 		}
 		return lastRelevantStopId;
 	}
