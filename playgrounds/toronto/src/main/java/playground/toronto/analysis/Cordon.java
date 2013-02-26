@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -23,7 +24,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author pkucirek
  *
  */
-public class Cordon {
+public class Cordon implements NetworkLinkFilter {
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 		
@@ -142,5 +143,15 @@ public class Cordon {
 	
 	public List<Id> getInteriorLinks(){
 		return this.interiorLinks;
+	}
+
+	@Override
+	public boolean judgeLink(Link l) {
+		if (inLinks.contains(l.getId()) ||
+				outLinks.contains(l.getId()) ||
+				interiorLinks.contains(l.getId()))
+			return true;
+		
+		return false;
 	}
 }
