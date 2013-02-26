@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
  * @author pkucirek
  * @author aweiss
  */
-public class Screenline implements LinkEnterEventHandler, LinkLeaveEventHandler{
+public class Screenline{
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	
@@ -208,24 +208,6 @@ public class Screenline implements LinkEnterEventHandler, LinkLeaveEventHandler{
 	
 	public List<Id> getMinusLinks(){
 		return this.minusLinks;
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 }
