@@ -97,7 +97,7 @@ public class FRAdaptZHScenario {
 			if (fac.getActivityOptions().get("h") != null) {
 				ActivityOptionImpl actOpt = (ActivityOptionImpl) fac.getActivityOptions().get("h");
 				actOpt.getOpeningTimes().clear();
-				actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 0.0, 24.0));
+				actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 0.0, 24.0 * 3600.0));
 			}
 		}
 	}
