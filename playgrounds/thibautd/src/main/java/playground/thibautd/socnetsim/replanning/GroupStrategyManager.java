@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -78,6 +79,7 @@ public class GroupStrategyManager {
 	}
 
 	public final void run(
+			final ReplanningContext replanningContext,
 			final JointPlans jointPlans,
 			final Population population) {
 		final Collection<ReplanningGroup> groups = groupIdentifier.identifyGroups( population );
@@ -103,7 +105,7 @@ public class GroupStrategyManager {
 			final GroupPlanStrategy strategy = e.getKey();
 			final List<ReplanningGroup> toHandle = e.getValue();
 			log.info( "passing "+toHandle.size()+" groups to strategy "+strategy );
-			strategy.run( jointPlans , toHandle );
+			strategy.run( replanningContext , jointPlans , toHandle );
 			log.info( "strategy "+strategy+" finished" );
 		}
 	}

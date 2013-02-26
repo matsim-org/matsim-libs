@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -53,8 +54,10 @@ public class IndividualBasedGroupStrategyModule implements GenericStrategyModule
 	}
 
 	@Override
-	public void handlePlans(final Collection<GroupPlans> groupPlans) {
-		delegate.prepareReplanning(null);
+	public void handlePlans(
+			final ReplanningContext replanningContext,
+			final Collection<GroupPlans> groupPlans) {
+		delegate.prepareReplanning( replanningContext );
 
 		log.info( "handling "+groupPlans.size()+" groups" );
 		for (GroupPlans plans : groupPlans) {

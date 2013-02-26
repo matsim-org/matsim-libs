@@ -241,8 +241,7 @@ public class RunCliquesWithHardCodedStrategies {
 			new ImmutableJointController(
 					controllerRegistry,
 					new GroupReplanningListenner(
-						scenario.getPopulation(),
-						controllerRegistry.getJointPlans(),
+						controllerRegistry,
 						strategyManager));
 
 		if (produceAnalysis) {

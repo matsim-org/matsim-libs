@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.ReplanningContext;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
@@ -64,7 +65,7 @@ public class GroupPlanStrategyTest {
 			selectedPlans.add( p.getSelectedPlan() );
 		}
 
-		strategy.run( jointPlans , Arrays.asList( group ) );
+		strategy.run( null , jointPlans , Arrays.asList( group ) );
 		for ( Person person : group.getPersons() ) {
 			for ( Plan plan : person.getPlans() ) {
 				if ( plan.isSelected() ) {
@@ -90,7 +91,7 @@ public class GroupPlanStrategyTest {
 
 		final ReplanningGroup group = createTestGroup( jointPlans );
 		final int groupSize = group.getPersons().size();
-		strategy.run( jointPlans , Arrays.asList( group ) );
+		strategy.run( null , jointPlans , Arrays.asList( group ) );
 
 		assertEquals(
 				"group size changed by strategy!",
@@ -105,7 +106,7 @@ public class GroupPlanStrategyTest {
 		strategy.addStrategyModule( new JointStructureInvertingModule( jointPlans.getFactory() ) );
 
 		final ReplanningGroup group = createTestGroup( jointPlans );
-		strategy.run( jointPlans , Arrays.asList( group ) );
+		strategy.run( null , jointPlans , Arrays.asList( group ) );
 
 		int countSelectedJoint = 0;
 		int countSelectedIndiv = 0;
@@ -137,7 +138,7 @@ public class GroupPlanStrategyTest {
 		strategy.addStrategyModule( new JointStructureInvertingModule( jointPlans.getFactory() ) );
 
 		final ReplanningGroup group = createTestGroup( jointPlans );
-		strategy.run( jointPlans , Arrays.asList( group ) );
+		strategy.run( null , jointPlans , Arrays.asList( group ) );
 
 		int countNonSelectedJoint = 0;
 		int countNonSelectedIndiv = 0;
@@ -211,7 +212,9 @@ public class GroupPlanStrategyTest {
 		}
 
 		@Override
-		public void handlePlans(final Collection<GroupPlans> groupPlans) {
+		public void handlePlans(
+				final ReplanningContext replanningContext,
+				final Collection<GroupPlans> groupPlans) {
 			for (GroupPlans plans : groupPlans) handlePlans( plans );
 		}
 

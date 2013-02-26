@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -50,7 +51,9 @@ public abstract class AbstractMultithreadedGenericStrategyModule<T> implements G
 	}
 
 	@Override
-	public void handlePlans(final Collection<T> groupPlans) {
+	public void handlePlans(
+			final ReplanningContext replanningContext,
+			final Collection<T> groupPlans) {
 		log.info( "running "+name+" on "+groupPlans.size()+" groups" );
 		final List<PlanRunnable<T>> runnables = getPlanRunnables( groupPlans );
 		final ExceptionHandler exceptionHandler = new ExceptionHandler();

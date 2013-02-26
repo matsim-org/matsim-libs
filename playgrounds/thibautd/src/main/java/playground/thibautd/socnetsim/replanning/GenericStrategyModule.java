@@ -21,10 +21,12 @@ package playground.thibautd.socnetsim.replanning;
 
 import java.util.Collection;
 
+import org.matsim.core.replanning.ReplanningContext;
+
 /**
  * @author thibautd
  */
 public interface GenericStrategyModule<T> {
-	public void handlePlans( Collection<T> toHandle );
+	public void handlePlans( ReplanningContext replanningContext , Collection<T> toHandle );
 }
 

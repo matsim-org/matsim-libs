@@ -19,32 +19,66 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.controller.ControllerRegistry;
 
 /**
  * @author thibautd
  */
 public class GroupReplanningListenner implements ReplanningListener {
-	private final Population population;
-	private final JointPlans jointPlans;
-	private GroupStrategyManager strategyManager;
+	private final GroupStrategyManager strategyManager;
+	private final ControllerRegistry registry;
 
 	public GroupReplanningListenner(
-			final Population population,
-			final JointPlans jointPlans,
+			final ControllerRegistry registry,
 			final GroupStrategyManager strategyManager) {
-		this.population = population;
-		this.jointPlans = jointPlans;
+		this.registry = registry;
 		this.strategyManager = strategyManager;
 	}
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-		strategyManager.run( jointPlans , population );
+		strategyManager.run(
+				// this is not so nice, but the context returned by the event
+				// delegates everything to Controler... And there is no clean way
+				// to change that without touching to the core.
+				new ReplanningContext() {
+					@Override
+					public TripRouterFactory getTripRouterFactory() {
+						return registry.getTripRouterFactory();
+					}
+
+					@Override
+					public TravelDisutility getTravelCostCalculator() {
+						return registry.getTravelDisutilityFactory().createTravelDisutility(
+							registry.getTravelTime().getLinkTravelTimes(),
+							registry.getScenario().getConfig().planCalcScore() );
+					}
+
+					@Override
+					public TravelTime getTravelTimeCalculator() {
+						return registry.getTravelTime().getLinkTravelTimes();
+					}
+
+					@Override
+					public ScoringFunctionFactory getScoringFunctionFactory() {
+						return registry.getScoringFunctionFactory();
+					}
+
+					@Override
+					public int getIteration() {
+						return event.getIteration();
+					}
+				},
+				registry.getJointPlans(),
+				registry.getScenario().getPopulation() );
 	}
 }
 

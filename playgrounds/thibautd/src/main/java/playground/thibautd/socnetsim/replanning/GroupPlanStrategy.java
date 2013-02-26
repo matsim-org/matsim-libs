@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -51,6 +52,7 @@ public class GroupPlanStrategy {
 	}
 
 	public void run(
+			final ReplanningContext replanningContext,
 			final JointPlans jointPlans,
 			final Collection<ReplanningGroup> groups) {
 		List<GroupPlans> plansToHandle = new ArrayList<GroupPlans>();
@@ -78,7 +80,7 @@ public class GroupPlanStrategy {
 		selectCounter.printCounter();
 
 		for (GenericStrategyModule<GroupPlans> module : strategyModules) {
-			module.handlePlans( plansToHandle );
+			module.handlePlans( replanningContext , plansToHandle );
 		}
 
 		// the modules are allowed to modify joint structure:

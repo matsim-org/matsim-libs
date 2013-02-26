@@ -28,6 +28,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -57,6 +58,7 @@ public class JointPlanBasedGroupStrategyModule implements GenericStrategyModule<
 
 	@Override
 	public void handlePlans(
+			final ReplanningContext replanningContext,
 			final Collection<GroupPlans> groupPlans) {
 		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
 		
@@ -73,7 +75,7 @@ public class JointPlanBasedGroupStrategyModule implements GenericStrategyModule<
 			}
 		}
 		
-		delegate.handlePlans( jointPlans );
+		delegate.handlePlans( replanningContext , jointPlans );
 	}
 
 	@Override
