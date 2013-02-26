@@ -52,6 +52,7 @@ import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGen
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule;
+import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
 
@@ -79,6 +80,11 @@ public class GroupPlanStrategyFactory {
 					config,
 					jpFactory));
 
+		strategy.addStrategyModule(
+				createSynchronizerModule(
+					config,
+					tripRouterFactory) );
+
 		return strategy;
 	}
 
@@ -98,6 +104,11 @@ public class GroupPlanStrategyFactory {
 								tripRouterFactory)));
 
 		strategy.addStrategyModule( createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
+
+		strategy.addStrategyModule(
+				createSynchronizerModule(
+					config,
+					tripRouterFactory) );
 
 		return strategy;
 	}
@@ -129,7 +140,7 @@ public class GroupPlanStrategyFactory {
 					1.0 ) );
 
 		strategy.addStrategyModule(
-				new JointPlanBasedGroupStrategyModule(
+			new JointPlanBasedGroupStrategyModule(
 					new AbstractMultithreadedGenericStrategyModule<JointPlan>( config.global() ) {
 						@Override
 						public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
@@ -178,6 +189,12 @@ public class GroupPlanStrategyFactory {
 							}
 						}));
 		}
+		else {
+			strategy.addStrategyModule(
+					createSynchronizerModule(
+						config,
+						registry.getTripRouterFactory()) );
+		}
 
 		return strategy;
 	}
@@ -209,6 +226,11 @@ public class GroupPlanStrategyFactory {
 					config,
 					jpFactory));
 
+		strategy.addStrategyModule(
+				createSynchronizerModule(
+					config,
+					tripRouterFactory) );
+
 		return strategy;
 	}
 
@@ -225,6 +247,15 @@ public class GroupPlanStrategyFactory {
 						return new TripsToLegsAlgorithm( tripRouterFactory.createTripRouter() );
 					}
 				});
+	}
+
+	public static GenericStrategyModule<GroupPlans> createSynchronizerModule(
+			final Config config,
+			final TripRouterFactory tripRouterFactory) {
+		return new JointPlanBasedGroupStrategyModule(
+				new SynchronizeCoTravelerPlansModule(
+					config.global().getNumberOfThreads(),
+					tripRouterFactory.createTripRouter().getStageActivityTypes() ) );
 	}
 
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(
