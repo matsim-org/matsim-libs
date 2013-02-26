@@ -68,7 +68,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		
 		this.readOrCreateKVals(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
 		this.readFacilitesAttributesAndBetas();
-		log.info("lc context initialized");
+		log.info("dc context initialized");
 	}
 	
 	private void readOrCreateKVals(long seed) {
