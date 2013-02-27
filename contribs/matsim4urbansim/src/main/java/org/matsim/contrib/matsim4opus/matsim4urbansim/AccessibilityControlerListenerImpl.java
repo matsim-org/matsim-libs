@@ -148,7 +148,6 @@ public class AccessibilityControlerListenerImpl{
 	protected void initAccessibilityParameter(ScenarioImpl scenario){
 		
 		AccessibilityParameterConfigModule moduleAPCM = ConfigurationModule.getAccessibilityParameterConfigModule(scenario);
-		// tnicolai TODO: use MATSimControlerConfigModuleV3 to get "timeofday", implement ConfigurationModuleVx which returns the current config modules
 		
 		useRawSum			= moduleAPCM.isUseRawSumsWithoutLn();
 		logitScaleParameter = moduleAPCM.getLogitScaleParameter();
@@ -196,7 +195,7 @@ public class AccessibilityControlerListenerImpl{
 		betaPtTCPower	= moduleAPCM.getBetaPtTravelCostPower2();
 		betaPtLnTC		= moduleAPCM.getBetaPtLnTravelCost();
 		
-		depatureTime 	= 8.*3600;	
+		depatureTime 	= this.main.getTimeOfDay(); // 8.*3600;	
 		printParameterSettings();
 	}
 	
