@@ -45,8 +45,6 @@ import org.matsim.core.mobsim.qsim.QSim;
  * The QSimEngineThreads will fulfill the QSimEngine interface downwards (i.e. against nodes and links).
  */
 class ParallelQNetsimEngine extends QNetsimEngine {
-	// yy I think we could consider moving the node-based rnd num gen also into the sequential version. kai, jun'10
-	// yy Until this is realized, the Random object is added as customizable objecte to the QNode. cdober, nov'10
 
 	final private static Logger log = Logger.getLogger(ParallelQNetsimEngine.class);
 
