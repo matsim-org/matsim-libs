@@ -285,9 +285,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			allFacilities = zones.getFacilities();	// used for UrbanSim Zone Models
 		else
 			allFacilities = parcels.getFacilities();// used for UrbanSim Parcel Models
-			
+		
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
-			
+
 			Plan plan = person.getSelectedPlan() ;
 			
 			boolean isFirstPlanActivity = true;
@@ -325,19 +325,26 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			}
 		}
 		// tnicolai: debugging
+//		double originCounter = 0.;
+//		double destinationCounter = 0.;
 //		for(Id fromId : originDestinationMatrix.getFromLocations().keySet()){
-//			System.out.println("From Zone: " + fromId.toString());
+//			log.info("From Zone: " + fromId.toString());
 //			for(Entry e : originDestinationMatrix.getFromLocEntries(fromId)){
-//				System.out.println("To Zone: " + e.getToLocation() + " value = " + e.getValue());
+//				originCounter += e.getValue();
+//				log.info("To Zone: " + e.getToLocation() + " value = " + e.getValue());
 //			}
 //		}
 //		
 //		for(Id ToId : originDestinationMatrix.getToLocations().keySet()){
-//			System.out.println("To Zone: " + ToId.toString());
+//			log.info("To Zone: " + ToId.toString());
 //			for(Entry e : originDestinationMatrix.getToLocEntries(ToId)){
-//				System.out.println("From Zone: " + e.getFromLocation() + " value = " + e.getValue());
+//				destinationCounter += e.getValue();
+//				log.info("From Zone: " + e.getFromLocation() + " value = " + e.getValue());
 //			}
 //		}
+//		log.info("Home-to-work trips: " + originCounter);
+//		log.info("Work-to-Home trips: " + destinationCounter);
+//		log.info("Total trips: " + (originCounter + destinationCounter));
 		log.info("DONE with computing zone2zone trip numbers ...") ;
 	}
 }
