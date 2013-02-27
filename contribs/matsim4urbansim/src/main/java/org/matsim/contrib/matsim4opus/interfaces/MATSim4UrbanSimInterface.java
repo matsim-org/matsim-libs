@@ -33,5 +33,5 @@ public interface MATSim4UrbanSimInterface {
 	public double getOpportunitySampleRate();
 	public ReadFromUrbanSimModel getReadFromUrbanSimModel();
 	public boolean isParcelMode();
-
+	public double getTimeOfDay();
 }
