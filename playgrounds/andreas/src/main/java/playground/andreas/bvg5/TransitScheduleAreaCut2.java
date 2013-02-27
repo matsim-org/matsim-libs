@@ -405,7 +405,7 @@ public class TransitScheduleAreaCut2 {
 	
 	
 	public static void main(String[] args) {
-		String dir ="C:/Users/Daniel/Desktop/para/";
+		String dir ="../para/";
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
