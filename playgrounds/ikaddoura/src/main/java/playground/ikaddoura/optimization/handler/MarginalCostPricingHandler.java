@@ -38,7 +38,7 @@ import playground.ikaddoura.optimization.events.ExternalEffectWaitingTimeEventHa
  */
 public class MarginalCostPricingHandler implements ExternalEffectInVehicleTimeEventHandler, ExternalEffectWaitingTimeEventHandler {
 
-	private final static Logger log = Logger.getLogger(ExternalEffectHandler.class);
+	private final static Logger log = Logger.getLogger(MarginalCostPricingHandler.class);
 
 	private final EventsManager events;
 	private final ScenarioImpl scenario;
@@ -61,14 +61,14 @@ public class MarginalCostPricingHandler implements ExternalEffectInVehicleTimeEv
 
 	@Override
 	public void handleEvent(ExternalEffectInVehicleTimeEvent event) {
-		double amount = (event.getExternalDelay() / 3600) * this.vtts_inVehicle;
+		double amount = (event.getDelay() * event.getAffectedAgents() / 3600) * this.vtts_inVehicle;
 		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), amount);
 		this.events.processEvent(moneyEvent);
 	}
 
 	@Override
 	public void handleEvent(ExternalEffectWaitingTimeEvent event) {
-		double amount = (event.getExternalDelay() / 3600) * this.vtts_waiting;
+		double amount = (event.getDelay() * event.getAffectedAgents() / 3600 ) * this.vtts_waiting;
 		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), amount);
 		this.events.processEvent(moneyEvent);		
 	}

@@ -38,22 +38,19 @@ public final class ExternalEffectWaitingTimeEvent extends Event implements HasPe
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_AFFECTED_AGENTS = "affectedAgents";
-	public static final String ATTRIBUTE_DELAY = "externalDelay";
-	public static final String ATTRIBUTE_IS_FIRST_TRANSFER = "isFirstTransfer";
+	public static final String ATTRIBUTE_DELAY = "delay";
 	
 	private final Id vehicleId;
 	private final Id personId;
 	private final int affectedAgents;
-	private final double externalDelay;
-	private final boolean isFirstTransfer;
+	private final double delay;
 
-	public ExternalEffectWaitingTimeEvent(Id personId, Id vehicleId, double time, int delayedPassengers, double externalDelay, boolean isFirstTransfer) {
+	public ExternalEffectWaitingTimeEvent(Id personId, Id vehicleId, double time, int delayedPassengers, double externalDelay) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.personId = personId;
 		this.affectedAgents = delayedPassengers;
-		this.externalDelay = externalDelay;
-		this.isFirstTransfer = isFirstTransfer;
+		this.delay = externalDelay;
 	}
 
 	@Override
@@ -68,13 +65,9 @@ public final class ExternalEffectWaitingTimeEvent extends Event implements HasPe
 	public int getAffectedAgents() {
 		return this.affectedAgents;
 	}
-
-	public boolean isFirstTransfer() {
-		return this.isFirstTransfer;
-	}
 	
-	public double getExternalDelay() {
-		return externalDelay;
+	public double getDelay() {
+		return delay;
 	}
 
 	@Override
@@ -88,8 +81,7 @@ public final class ExternalEffectWaitingTimeEvent extends Event implements HasPe
 		attrs.put(ATTRIBUTE_PERSON, this.personId.toString());
 		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		attrs.put(ATTRIBUTE_AFFECTED_AGENTS, Integer.toString(this.affectedAgents));
-		attrs.put(ATTRIBUTE_DELAY, Double.toString(this.externalDelay));
-		attrs.put(ATTRIBUTE_IS_FIRST_TRANSFER, Boolean.toString(isFirstTransfer));
+		attrs.put(ATTRIBUTE_DELAY, Double.toString(this.delay));
 		return attrs;
 	}
 	
