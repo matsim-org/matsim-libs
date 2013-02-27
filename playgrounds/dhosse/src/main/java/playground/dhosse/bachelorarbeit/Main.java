@@ -21,7 +21,7 @@ public class Main {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
-		nr.readFile(path+"/"+file2+".xml");
+		nr.readFile(path+"/"+file3+".xml");
 //		pr.readFile(path+"/"+"/test_population.xml");
 		
 //		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
@@ -33,11 +33,11 @@ public class Main {
 //		AccessibilityCalc ac = new AccessibilityCalc(measuringPoints, freeSpeedGrid, (ScenarioImpl) scenario, file1);
 //		ac.runAccessibilityComputation();
 		
-//		NetworkInspector ni = new NetworkInspector(scenario);
-//		if(ni.isRoutable())
-//			System.out.println("Netzwerk ist routbar...");
-//		else
-//			System.out.println("Netzwerk ist nicht routbar");
+		NetworkInspector ni = new NetworkInspector(scenario);
+		if(ni.isRoutable())
+			System.out.println("Netzwerk ist routbar...");
+		else
+			System.out.println("Netzwerk ist nicht routbar");
 //		ni.checkNodeAttributes();
 //		ni.checkLinkAttributes();
 //		ni.shpExportNodeStatistics(ni.getRedundantNodes());

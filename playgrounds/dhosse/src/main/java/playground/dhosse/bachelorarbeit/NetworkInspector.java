@@ -20,6 +20,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
+import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -33,7 +37,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
-public class NetworkInspector {
+public class NetworkInspector {//TODO pfade ändern
 	
 	private final Scenario scenario;
 	
@@ -97,6 +101,7 @@ public class NetworkInspector {
 		
 		final Map<Id,Node> visitedNodes = new TreeMap<Id,Node>();
 		Map<Id,Node> biggestCluster = new TreeMap<Id,Node>();
+		Network clusteredNet = scenario.getNetwork();
 		
 		logger.info("  checking " + this.scenario.getNetwork().getNodes().size() + " nodes and " +
 				this.scenario.getNetwork().getLinks().size() + " links for dead-ends...");
@@ -114,12 +119,23 @@ public class NetworkInspector {
 				if(biggestCluster.size()==this.scenario.getNetwork().getNodes().size()){
 					logger.info("size of the biggest cluster equals network size");
 					return true;
-				} //else: andere cluster in extra datei schreiben?
+				}
 			}
 		}
 		
 		logger.warn("size of the biggest cluster is " + biggestCluster.size() +
 				" but network contains " + this.scenario.getNetwork().getNodes().size() + " nodes...");
+		
+		//clear small clusters of biggest network cluster
+		
+		for(Node node : biggestCluster.values()){
+			clusteredNet.removeNode(node.getId());
+		}
+		
+		new NetworkWriter(clusteredNet).write("C:/Users/Daniel/Dropbox/bsc/input/smallClusters.xml");
+		
+		logger.info("cluster of " + clusteredNet.getNodes().size() + " nodes and " + clusteredNet.getLinks().size() +
+				" links written to file");
 		
 		return false;
 		
