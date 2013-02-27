@@ -243,23 +243,26 @@ public class FRAdaptZHScenario {
 					}
 					
 					// inner city assign sg and s
-					double dist = CoordUtils.calcDistance(act.getCoord(), center);
-					if (dist < radius) {
-						if (act.getType().startsWith("sg")) {
-							((ActivityImpl)pe).setFacilityId(trees.get("sg").get(act.getCoord().getX(), act.getCoord().getY()).getId());
-						}
-						else {
-							((ActivityImpl)pe).setFacilityId(trees.get("s").get(act.getCoord().getX(), act.getCoord().getY()).getId());
-						}
-					}
-					else {
-						if (act.getType().startsWith("sg")) {
-							((ActivityImpl)pe).setFacilityId(trees.get("s").get(act.getCoord().getX(), act.getCoord().getY()).getId());
-						}
-						else {
-							((ActivityImpl)pe).setFacilityId(trees.get(act.getType().substring(0, 1)).get(act.getCoord().getX(), act.getCoord().getY()).getId());					
-						}
-					}
+//					double dist = CoordUtils.calcDistance(act.getCoord(), center);
+//					if (dist < radius) {
+//						if (act.getType().startsWith("sg")) {
+//							((ActivityImpl)pe).setFacilityId(trees.get("sg").get(act.getCoord().getX(), act.getCoord().getY()).getId());
+//						}
+//						else {
+//							((ActivityImpl)pe).setFacilityId(trees.get("s").get(act.getCoord().getX(), act.getCoord().getY()).getId());
+//						}
+//					}
+//					else {
+//						if (act.getType().startsWith("sg")) {
+//							((ActivityImpl)pe).setFacilityId(trees.get("s").get(act.getCoord().getX(), act.getCoord().getY()).getId());
+//						}
+//						else {
+							((ActivityImpl)pe).setFacilityId(
+									trees.get(act.getType().substring(0, 1)).
+									get(act.getCoord().getX(), act.getCoord().getY()).
+									getId());					
+//						}
+//					}
 				}
 			}
 		}
