@@ -314,7 +314,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
 			// creates zone2zone impedance matrix
-			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
+			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( this,
+																					  zones, 
 																					  parcels,
 																					  ptMatrix,
 																					  benchmark) );
@@ -589,5 +590,9 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	
 	public double getOpportunitySampleRate(){
 		return this.opportunitySampleRate;
+	}
+	
+	public double getTimeOfDay(){
+		return this.timeOfDay;
 	}
 }
