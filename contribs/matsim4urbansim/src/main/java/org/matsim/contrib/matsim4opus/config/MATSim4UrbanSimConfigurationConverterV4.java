@@ -394,7 +394,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 				computeCellbasedAccessibilityShapeFile = true;
 		}
 		
-		double timeOfDay						= 8 * 3600.;
+		double timeOfDay						= 8 * 3600.; // default value
 		String ptStops							= null;
 		String ptTravelTimes					= null;
 		String ptTravelDistances				= null;
