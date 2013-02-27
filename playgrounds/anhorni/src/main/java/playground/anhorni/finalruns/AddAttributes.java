@@ -73,6 +73,7 @@ public class AddAttributes {
 			
 			if (CoordUtils.calcDistance(closestShopCS.getCoord(), shop.getCoord()) < 200) {
 				shop.setPrice(closestShopCS.getPrice());
+				shop.setSize(closestShopCS.getSize());
 			}
 			
 			/*
@@ -84,25 +85,25 @@ public class AddAttributes {
 			B015211E	5	Kleine Geschäfte (< 100 m2)
 			*/
 						
-			String keys [] = {"B015212A", "B015211A", "B015211B", "B015211C", "B015211D", "B015211E"};
-			if (f.getActivityOptions().containsKey(keys[0])) {
-				shop.setSize(0);
-			} 
-			else if (f.getActivityOptions().containsKey(keys[1])) {
-				shop.setSize(1);
-			}
-			else if (f.getActivityOptions().containsKey(keys[2])) {
-				shop.setSize(2);
-			}
-			else if (f.getActivityOptions().containsKey(keys[3])) {
-				shop.setSize(3);
-			}
-			else if (f.getActivityOptions().containsKey(keys[4])) {
-				shop.setSize(4);
-			}
-			else if (f.getActivityOptions().containsKey(keys[5])) {
-				shop.setSize(5);
-			}
+//			String keys [] = {"B015212A", "B015211A", "B015211B", "B015211C", "B015211D", "B015211E"};
+//			if (f.getActivityOptions().containsKey(keys[0])) {
+//				shop.setSize(0);
+//			} 
+//			else if (f.getActivityOptions().containsKey(keys[1])) {
+//				shop.setSize(1);
+//			}
+//			else if (f.getActivityOptions().containsKey(keys[2])) {
+//				shop.setSize(2);
+//			}
+//			else if (f.getActivityOptions().containsKey(keys[3])) {
+//				shop.setSize(3);
+//			}
+//			else if (f.getActivityOptions().containsKey(keys[4])) {
+//				shop.setSize(4);
+//			}
+//			else if (f.getActivityOptions().containsKey(keys[5])) {
+//				shop.setSize(5);
+//			}
 			
 		}			
 		this.computeAttributeAverages(shops);
