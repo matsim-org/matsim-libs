@@ -25,13 +25,13 @@ package playground.ikaddoura.optimization.externalDelayEffects;
 import org.matsim.api.core.v01.Id;
 
 /**
- * Collects the external delay effect for each person: the marginal delay in seconds, the Id of the delayed public vehicle and the number of affected agents.
+ * Collects the external waiting delay effect for each person: the marginal delay in seconds, the Id of the delayed public vehicle and the number of affected agents.
  * An agent is affected when entering or leaving a vehicle was delayed.
  * 
  * @author ikaddoura
  *
  */
-public class ExtDelayEffect {
+public class ExtEffectWaitingDelay {
 	
 	private Id personId;
 	private int affectedAgents;
@@ -61,6 +61,11 @@ public class ExtDelayEffect {
 	}
 	public void setPersonId(Id personId) {
 		this.personId = personId;
+	}
+	
+	@Override
+	public String toString() {
+		return "PersonId = " + this.personId + "; AffectedAgents = " + this.affectedAgents + "; AffectedVehicle = " + this.affectedVehicle + "; TransferDelay = " + this.transferDelay;
 	}
 	
 }
