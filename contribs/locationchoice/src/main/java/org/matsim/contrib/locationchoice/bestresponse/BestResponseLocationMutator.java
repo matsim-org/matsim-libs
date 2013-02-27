@@ -124,7 +124,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			actlegIndex++;
 			if (pe instanceof Activity) {
 				String actType = ((ActivityImpl)plan.getPlanElements().get(actlegIndex)).getType();
-				System.err.println("looking at act of type: " + actType ) ;
+//				System.err.println("looking at act of type: " + actType ) ;
 				if (actlegIndex > 0 && this.scaleEpsilon.isFlexibleType(actType)) {
 
 					List<? extends PlanElement> actslegs = plan.getPlanElements();
@@ -144,7 +144,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 
 					ChoiceSet cs = createChoiceSetFromCircle(plan, travelTimeApproximationLevel, actToMove, maxRadius, center);
 					
-					System.err.println("ChoiceSet cs:\n" + cs.toString() ) ;
+//					System.err.println("ChoiceSet cs:\n" + cs.toString() ) ;
 
 					// **************************************************
 					// maybe repeat this a couple of times
@@ -156,7 +156,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 
 					this.setLocation(actToMove, choice);	
 					
-					printTentativePlanToConsole(plan);
+//					printTentativePlanToConsole(plan);
 
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
 					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunction);
@@ -206,8 +206,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	
 	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlanSoFar, ChoiceSet cs, ScoringFunctionAccumulator scoringFunction) {		
 		double score = this.computeScoreAndAdaptPlan(plan, cs, scoringFunction);	
-		System.err.println("expected score of new plan is: " + score ) ;
-		System.err.println("existing score of old plan is: " + bestPlanSoFar.getScore() ) ;
+//		System.err.println("expected score of new plan is: " + score ) ;
+//		System.err.println("existing score of old plan is: " + bestPlanSoFar.getScore() ) ;
 		if (score > bestPlanSoFar.getScore() + 0.0000000000001) {
 			plan.setScore(score);
 			((PlanImpl)bestPlanSoFar).getPlanElements().clear();
