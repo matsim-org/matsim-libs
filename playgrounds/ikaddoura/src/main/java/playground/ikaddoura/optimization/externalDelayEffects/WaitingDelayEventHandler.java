@@ -20,48 +20,14 @@
 /**
  * 
  */
-package playground.ikaddoura.optimization.handler;
+package playground.ikaddoura.optimization.externalDelayEffects;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
  * @author ikaddoura
  *
  */
-public class ExtDelayEffect {
-	
-	private Id personId;
-	private double transferDelay;
-	private Id affectedVehicle;
-	private int affectedAgents;
-	
-	public double getTransferDelay() {
-		return transferDelay;
-	}
-	public void setTransferDelay(double transferDelay) {
-		this.transferDelay = transferDelay;
-	}
-	public Id getAffectedVehicle() {
-		return affectedVehicle;
-	}
-	public void setAffectedVehicle(Id affectedVehicle) {
-		this.affectedVehicle = affectedVehicle;
-	}
-	public int getAffectedAgents() {
-		return affectedAgents;
-	}
-	public void setAffectedAgents(int affectedAgents) {
-		this.affectedAgents = affectedAgents;
-	}
-	public Id getPersonId() {
-		return personId;
-	}
-	public void setPersonId(Id personId) {
-		this.personId = personId;
-	}
-	public double getExtDelay() {
-		double extDelay = this.affectedAgents * this.transferDelay;
-		return extDelay;
-	}
-
+public interface WaitingDelayEventHandler extends EventHandler {
+	public void handleEvent (WaitingDelayEvent event);
 }

@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.optimization.handler;
+package playground.ikaddoura.optimization.externalDelayEffects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,10 +41,9 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.optimization.events.ExternalEffectWaitingTimeEvent;
 
 /**
- * Calculates the external effect (caused by delays when boarding and alighting a public vehicle) on agents who are waiting for the public vehicle.
+ * Throws WatingDelayEvents to indicate that an agent entering or leaving a public vehicle delayed passengers waiting for that public vehicle.
  * 
  * External effects to be considered in future:
  * TODO: Capacity constraints.
@@ -64,8 +63,8 @@ import playground.ikaddoura.optimization.events.ExternalEffectWaitingTimeEvent;
  * @author Ihab
  *
  */
-public class ExternalEffectWaitingHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
-	private final static Logger log = Logger.getLogger(ExternalEffectWaitingHandler.class);
+public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
+	private final static Logger log = Logger.getLogger(WaitingDelayHandler.class);
 
 	private final ScenarioImpl scenario;
 	private final EventsManager events;
@@ -76,7 +75,7 @@ public class ExternalEffectWaitingHandler implements PersonEntersVehicleEventHan
 	private final Map<Id, ExtDelayEffect> personId2extBoardingDelayEffect = new HashMap<Id, ExtDelayEffect>();
 	private final Map<Id, ExtDelayEffect> personId2extAlightingDelayEffect = new HashMap<Id, ExtDelayEffect>();
 
-	public ExternalEffectWaitingHandler(EventsManager events, ScenarioImpl scenario) {
+	public WaitingDelayHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
 	}
@@ -157,7 +156,7 @@ public class ExternalEffectWaitingHandler implements PersonEntersVehicleEventHan
 				ExtDelayEffect delayEffect = this.personId2extBoardingDelayEffect.get(personId);
 				
 				if (delayEffect.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					ExternalEffectWaitingTimeEvent delayWaitingEvent = new ExternalEffectWaitingTimeEvent(personId, event.getVehicleId(), event.getTime(), delayEffect.getAffectedAgents(), delayEffect.getTransferDelay());
+					WaitingDelayEvent delayWaitingEvent = new WaitingDelayEvent(personId, event.getVehicleId(), event.getTime(), delayEffect.getAffectedAgents(), delayEffect.getTransferDelay());
 					this.events.processEvent(delayWaitingEvent);
 				}
 			}
@@ -166,7 +165,7 @@ public class ExternalEffectWaitingHandler implements PersonEntersVehicleEventHan
 				ExtDelayEffect delayEffect = this.personId2extAlightingDelayEffect.get(personId);
 				
 				if (delayEffect.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					ExternalEffectWaitingTimeEvent delayWaitingEvent = new ExternalEffectWaitingTimeEvent(personId, event.getVehicleId(), event.getTime(), delayEffect.getAffectedAgents(), delayEffect.getTransferDelay());
+					WaitingDelayEvent delayWaitingEvent = new WaitingDelayEvent(personId, event.getVehicleId(), event.getTime(), delayEffect.getAffectedAgents(), delayEffect.getTransferDelay());
 					this.events.processEvent(delayWaitingEvent);
 				}
 			}
@@ -212,8 +211,5 @@ public class ExternalEffectWaitingHandler implements PersonEntersVehicleEventHan
 		// Vehicle has arrived at transit stop. The following agent will be the first transfer of this vehicle.
 		this.vehId2isFirstTransfer.put(event.getVehicleId(), true);
 	}
-	
-	// #########################################################################################################
-	// #########################################################################################################
 
 }

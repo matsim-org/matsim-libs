@@ -27,16 +27,16 @@ import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.optimization.events.ExternalEffectInVehicleTimeEvent;
-import playground.ikaddoura.optimization.events.ExternalEffectInVehicleTimeEventHandler;
-import playground.ikaddoura.optimization.events.ExternalEffectWaitingTimeEvent;
-import playground.ikaddoura.optimization.events.ExternalEffectWaitingTimeEventHandler;
+import playground.ikaddoura.optimization.externalDelayEffects.InVehicleDelayEvent;
+import playground.ikaddoura.optimization.externalDelayEffects.InVehicleDelayEventHandler;
+import playground.ikaddoura.optimization.externalDelayEffects.WaitingDelayEvent;
+import playground.ikaddoura.optimization.externalDelayEffects.WaitingDelayEventHandler;
 
 /**
  * @author ikaddoura
  *
  */
-public class MarginalCostPricingHandler implements ExternalEffectInVehicleTimeEventHandler, ExternalEffectWaitingTimeEventHandler {
+public class MarginalCostPricingHandler implements InVehicleDelayEventHandler, WaitingDelayEventHandler {
 
 	private final static Logger log = Logger.getLogger(MarginalCostPricingHandler.class);
 
@@ -60,14 +60,14 @@ public class MarginalCostPricingHandler implements ExternalEffectInVehicleTimeEv
 	}
 
 	@Override
-	public void handleEvent(ExternalEffectInVehicleTimeEvent event) {
+	public void handleEvent(InVehicleDelayEvent event) {
 		double amount = (event.getDelay() * event.getAffectedAgents() / 3600) * this.vtts_inVehicle;
 		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), amount);
 		this.events.processEvent(moneyEvent);
 	}
 
 	@Override
-	public void handleEvent(ExternalEffectWaitingTimeEvent event) {
+	public void handleEvent(WaitingDelayEvent event) {
 		double amount = (event.getDelay() * event.getAffectedAgents() / 3600 ) * this.vtts_waiting;
 		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), amount);
 		this.events.processEvent(moneyEvent);		

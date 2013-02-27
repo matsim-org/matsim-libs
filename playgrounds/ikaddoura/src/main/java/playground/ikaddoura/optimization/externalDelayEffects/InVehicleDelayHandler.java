@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.optimization.handler;
+package playground.ikaddoura.optimization.externalDelayEffects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,28 +30,21 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
-import playground.ikaddoura.optimization.events.ExternalEffectInVehicleTimeEvent;
-import playground.ikaddoura.optimization.events.ExternalEffectWaitingTimeEvent;
+
 
 /**
- * Calculates the external effect (caused by delays when boarding and alighting a public vehicle) on passengers who are in the public vehicle.
+ * Throws InVehicleDelayEvents to indicate that an agent entering or leaving a public vehicle delayed passengers being in that public vehicle.
  * 
  * External effects to be considered in future:
  * TODO: Capacity constraints.
@@ -71,8 +64,8 @@ import playground.ikaddoura.optimization.events.ExternalEffectWaitingTimeEvent;
  * @author Ihab
  *
  */
-public class ExternalEffectInVehicleHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
-	private final static Logger log = Logger.getLogger(ExternalEffectInVehicleHandler.class);
+public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
+	private final static Logger log = Logger.getLogger(InVehicleDelayHandler.class);
 
 	private final ScenarioImpl scenario;
 	private final EventsManager events;
@@ -81,7 +74,7 @@ public class ExternalEffectInVehicleHandler implements PersonEntersVehicleEventH
 	private final Map<Id, Boolean> vehId2isFirstTransfer = new HashMap<Id, Boolean>();
 	private final Map<Id, Integer> vehId2passengers = new HashMap<Id, Integer>();
 
-	public ExternalEffectInVehicleHandler(EventsManager events, ScenarioImpl scenario) {
+	public InVehicleDelayHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
 	}
@@ -148,9 +141,6 @@ public class ExternalEffectInVehicleHandler implements PersonEntersVehicleEventH
 		this.vehId2isFirstTransfer.put(event.getVehicleId(), true);
 	}
 
-	// #########################################################################################################
-	// #########################################################################################################
-
 	private void calculateExternalEffects(Id vehId, Id personId, double transferTime, double time) {
 		
 		//	Each time a public vehicle stops at a transit stop the public vehicle is delayed by 2 seconds.
@@ -159,7 +149,7 @@ public class ExternalEffectInVehicleHandler implements PersonEntersVehicleEventH
 		
 		int delayedPassengers_inVeh = calcDelayedPassengersInVeh(vehId);
 					
-		ExternalEffectInVehicleTimeEvent delayInVehicleEvent = new ExternalEffectInVehicleTimeEvent(personId, vehId, time, delayedPassengers_inVeh, delay);
+		InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, vehId, time, delayedPassengers_inVeh, delay);
 		this.events.processEvent(delayInVehicleEvent);			
 	}
 	
