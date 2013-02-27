@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -51,6 +52,7 @@ import org.matsim.utils.LeastCostPathTree;
 
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.ZoneUtil;
+import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.ZoneObject;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
@@ -68,6 +70,9 @@ import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
  * - added pt for accessibility calculation
  * - added vehicle travel distance output
  * 
+ * improvements feb'13
+ * - trip matrix is now sensitive for time of day
+ * 
  * @author nagel
  * @author thomas
  *
@@ -77,6 +82,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 
 	public static final String FILE_NAME = "travel_data.csv";
 	
+	private MATSim4UrbanSimInterface main;
 	private ActivityFacilitiesImpl zones;
 	private ActivityFacilitiesImpl parcels;
 	private String travelDataPath;
@@ -88,7 +94,10 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	 * @param zones 
 	 * @param parcels
 	 */
-	public Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, PtMatrix ptMatrix, Benchmark benchmark) {
+	public Zone2ZoneImpedancesControlerListener( final MATSim4UrbanSimInterface main, final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, PtMatrix ptMatrix, Benchmark benchmark) {
+		
+		assert(main != null);
+		this.main = main;
 		assert(zones != null);
 		this.zones = zones;
 		assert(parcels != null);
@@ -129,7 +138,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
-		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
+		double depatureTime = this.main.getTimeOfDay(); // 8.*3600;
 		
 		// od-trip matrix (zonal based)
 		Matrix originDestinationMatrix = new Matrix("tripMatrix", "Zone to Zone origin destination trip matrix");
@@ -137,7 +146,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		try {
 			BufferedWriter travelDataWriter = initZone2ZoneImpedaceWriter(); // creating zone-to-zone impedance matrix with header
 			
-			computeZoneToZoneTrips(sc, originDestinationMatrix);
+			computeZoneToZoneTrips(sc, originDestinationMatrix, depatureTime);
 
 			log.info("Computing and writing zone2zone impedance matrix ..." );
 
@@ -275,7 +284,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	 * @param sc
 	 * @param originDestinationMatrix
 	 */
-	private void computeZoneToZoneTrips(Scenario sc, Matrix originDestinationMatrix){
+	private void computeZoneToZoneTrips(Scenario sc, Matrix originDestinationMatrix, double timeOfDay){
 		log.info("Computing zone2zone trip numbers ...") ;
 		// yyyy might make even more sense to do this via events.  kai, feb'11
 		Entry matrixEntry = null;
@@ -296,7 +305,10 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			if(plan.getPlanElements().size() <= 1) // check if activities available (then size of plan elements > 1)
 				continue;
 			
+			boolean enterTripInODMatrix = true;
+			
 			for ( PlanElement pe : plan.getPlanElements() ) {
+				
 				if ( pe instanceof Activity ) {
 					Activity act = (Activity) pe;
 					Id id = act.getFacilityId();
@@ -310,7 +322,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 
 					if (isFirstPlanActivity)
 						isFirstPlanActivity = false; 
-					else {
+					else if (enterTripInODMatrix){
 						matrixEntry = originDestinationMatrix.getEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID));
 						if(matrixEntry != null){
 							double trips = matrixEntry.getValue() + 1.;
@@ -322,6 +334,15 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					}
 					lastZoneId = zone_ID; // stores the first activity (e. g. "home")
 				}
+//				else if(pe instanceof Leg){ // tnicolai: enable this part to get time dependent trips
+//					
+//					Leg leg = (Leg)pe;
+//					
+//					double departureTime = leg.getDepartureTime();
+//					double arrivalTime = departureTime + leg.getTravelTime();
+//					
+//					enterTripInODMatrix = (timeOfDay >= departureTime && timeOfDay <= arrivalTime);
+//				}
 			}
 		}
 		// tnicolai: debugging
