@@ -14,16 +14,17 @@ public class Analyzer {
 	 */
 	public static void main(String[] args) {
 		String path = args[0];
+		double evaluationStartTimeInSeconds = Double.parseDouble(args[1]);
 		Analyzer analyzer = new Analyzer();
-		analyzer.run(path);
+		analyzer.run(path, evaluationStartTimeInSeconds);
 	}
 	
-	public void run(String path) {
-		ArrayList<Double> searchtimes = this.readSummaryFile(path + "/summary.txt");
+	public void run(String path, double evaluationStartTimeInSeconds) {
+		ArrayList<Double> searchtimes = this.readSummaryFile(path + "/summary.txt", evaluationStartTimeInSeconds);
 		this.createBins(searchtimes, path);
 	}
 	
-	private ArrayList<Double> readSummaryFile(String file) {
+	private ArrayList<Double> readSummaryFile(String file, double evaluationStartTimeInSeconds) {
 		ArrayList<Double> searchtimes = new ArrayList<Double>();
 		try {
 			FileReader fr = new FileReader(file);
@@ -33,8 +34,9 @@ public class Analyzer {
 			while ((curr_line = br.readLine()) != null) {
 				String[] entrs = curr_line.split("\t", -1);				
 				double ts = Double.parseDouble(entrs[5].trim());
+				double startSearchTime = Double.parseDouble(entrs[1].trim());
 				
-				if (ts > 0) searchtimes.add(ts);
+				if (ts > 0 && startSearchTime > evaluationStartTimeInSeconds) searchtimes.add(ts);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
