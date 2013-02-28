@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -28,6 +29,7 @@ public class Run {
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
 		config.controler().setMobsim("qsim");
+		config.controler().setLastIteration(0);
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		config.getQSimConfigGroup().setSnapshotPeriod(1);
@@ -40,6 +42,14 @@ public class Run {
 		config.plans().setInputFile("/Users/zilske/gtfs-bvg/population.xml");
 		config.transit().setTransitScheduleFile("/Users/zilske/gtfs-bvg/transit-schedule.xml");
 		config.transit().setVehiclesFile("/Users/zilske/gtfs-bvg/transit-vehicles.xml");
+		
+		ActivityParams home = new ActivityParams("home");
+		home.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(home);
+		ActivityParams work = new ActivityParams("work");
+		work.setTypicalDuration(8*60*60);
+		config.planCalcScore().addActivityParams(work);
+		config.planCalcScore().setWriteExperiencedPlans(true);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

@@ -578,15 +578,16 @@ public class GtfsConverter {
 		Network network = scenario.getNetwork();
 		// Add all stops as nodes
 		Map<Id, TransitStopFacility> stops = ts.getFacilities();
+		Map<Id, ? extends Node> nodes = network.getNodes();
 		for(Id id: stops.keySet()){
 			TransitStopFacility stop = stops.get(id);
 			NodeImpl n = new NodeImpl(id);
 			n.setCoord(stop.getCoord());
 			network.addNode(n);
+			createDummyNodeAndLinks(id, capacity, numLanes, network, nodes);
 			stop.setLinkId(new IdImpl("dL1_"+ stop.getId().toString()));
 		}
 		// Get the Links from the trips in stopTimesSource
-		Map<Id, ? extends Node> nodes = network.getNodes();
 		int tripIdIndex = stopTimesSource.getContentIndex("trip_id");
 		int stopIdIndex = stopTimesSource.getContentIndex("stop_id");
 		int arrivalTimeIndex = stopTimesSource.getContentIndex("arrival_time");
@@ -651,31 +652,7 @@ public class GtfsConverter {
 					addLink = false;				
 				}
 				// for each stop should exist one dummy node with a link in to it (dL2_) and a link back to the road (dL1_).
-				Id dummyId = new IdImpl("dN_" + toNodeId);
-				if(!(network.getNodes().containsKey(dummyId))){
-					NodeImpl n = new NodeImpl(dummyId);
-					n.setCoord(new CoordImpl(nodes.get(toNodeId).getCoord().getX()+1,nodes.get(toNodeId).getCoord().getY()+1));
-					network.addNode(n);
-					double length = 50;
-					Link link = network.getFactory().createLink(new IdImpl("dL1_" + toNodeId), n, nodes.get(toNodeId));
-					link.setLength(length);
-					link.setFreespeed(1000);
-					link.setCapacity(capacity);
-					link.setNumberOfLanes(numLanes);
-					network.addLink(link);
-					// Change the linktype to pt
-					Set<String> modes = new HashSet<String>();
-					modes.add(TransportMode.pt);
-					link.setAllowedModes(modes);
-					// Backwards
-					Link link2 = network.getFactory().createLink(new IdImpl("dL2_" + toNodeId), nodes.get(toNodeId), n);
-					link2.setLength(length);
-					link2.setFreespeed(1000);
-					link2.setCapacity(capacity);
-					link2.setNumberOfLanes(numLanes);
-					network.addLink(link2);
-					link2.setAllowedModes(modes);
-				}
+				
 				Link link = null;
 				if(addLink){
 					double length = CoordUtils.calcDistance(nodes.get(fromNodeId).getCoord(), nodes.get(toNodeId).getCoord());
@@ -718,6 +695,35 @@ public class GtfsConverter {
 					}						
 				}									
 			}		
+		}
+	}
+
+	private void createDummyNodeAndLinks(Id toNodeId, double capacity,
+			int numLanes, Network network, Map<Id, ? extends Node> nodes) {
+		Id dummyId = new IdImpl("dN_" + toNodeId);
+		if(!(network.getNodes().containsKey(dummyId))){
+			NodeImpl n = new NodeImpl(dummyId);
+			n.setCoord(new CoordImpl(nodes.get(toNodeId).getCoord().getX()+1,nodes.get(toNodeId).getCoord().getY()+1));
+			network.addNode(n);
+			double length = 50;
+			Link link = network.getFactory().createLink(new IdImpl("dL1_" + toNodeId), n, nodes.get(toNodeId));
+			link.setLength(length);
+			link.setFreespeed(1000);
+			link.setCapacity(capacity);
+			link.setNumberOfLanes(numLanes);
+			network.addLink(link);
+			// Change the linktype to pt
+			Set<String> modes = new HashSet<String>();
+			modes.add(TransportMode.pt);
+			link.setAllowedModes(modes);
+			// Backwards
+			Link link2 = network.getFactory().createLink(new IdImpl("dL2_" + toNodeId), nodes.get(toNodeId), n);
+			link2.setLength(length);
+			link2.setFreespeed(1000);
+			link2.setCapacity(capacity);
+			link2.setNumberOfLanes(numLanes);
+			network.addLink(link2);
+			link2.setAllowedModes(modes);
 		}
 	}
 

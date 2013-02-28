@@ -34,6 +34,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
@@ -120,7 +121,6 @@ public class OTPRoutingModule implements RoutingModule {
 			boolean onBoard = false;
 			String stop = null;
 			long time = 0;
-			boolean justMadeWalkLeg = false;
 			for (State state : path.states) {
 				Edge backEdge = state.getBackEdge();
 				if (backEdge != null) {
@@ -133,21 +133,25 @@ public class OTPRoutingModule implements RoutingModule {
 								stop = ((TransitVertex) state.getVertex()).getStopId().getId();
 								onBoard = true;
 								time = state.getElapsedTime();
+								TransitStopFacility accessFacility = transitSchedule.getFacilities().get(new IdImpl(stop));
+								if(!currentLinkId.equals(accessFacility.getLinkId())) {
+									throw new RuntimeException();
+								}
 							} else {
 								Leg leg = new LegImpl(TransportMode.pt);
 								String newStop = ((TransitVertex) state.getVertex()).getStopId().getId();
+								TransitStopFacility accessFacility = transitSchedule.getFacilities().get(new IdImpl(stop));
 								TransitStopFacility egressFacility = transitSchedule.getFacilities().get(new IdImpl(newStop));
-								leg.setRoute(new ExperimentalTransitRoute(transitSchedule.getFacilities().get(new IdImpl(stop)), createLine(backTrip), createRoute(), egressFacility));
+								leg.setRoute(new ExperimentalTransitRoute(accessFacility, createLine(backTrip), createRoute(), egressFacility));
 								leg.setTravelTime(state.getElapsedTime() - time);
 								legs.add(leg);
 								onBoard = false;
 								time = state.getElapsedTime();
 								stop = newStop;
 								currentLinkId = egressFacility.getLinkId();
-								justMadeWalkLeg = false;
 							}
 						}
-					} else if (backEdge instanceof FreeEdge) {
+					} else if (backEdge instanceof FreeEdge || backEdge instanceof TransferEdge) {
 						Leg leg = new LegImpl(TransportMode.transit_walk);
 						String newStop = ((TransitVertex) state.getVertex()).getStopId().getId();
 						Id startLinkId;
@@ -164,10 +168,7 @@ public class OTPRoutingModule implements RoutingModule {
 						legs.add(leg);
 						stop = newStop;
 						currentLinkId = endLinkId;
-						justMadeWalkLeg = true;
-					} else {
-						System.out.println(" +++|");
-					}
+					} 
 				}
 			}
 
