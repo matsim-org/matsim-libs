@@ -23,6 +23,8 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.apache.log4j.Logger;
+
 /**
  * A simple object to avoid multiplying identical instances of immutable objects.
  * It uses a WeakHashMap internally, so that no unecessary instances are remembered.
@@ -32,17 +34,30 @@ import java.util.WeakHashMap;
  * @author thibautd
  */
 public class ObjectPool<T extends Object> {
+	private static final Logger log =
+		Logger.getLogger(ObjectPool.class);
+
 	private final Map<T, WeakReference<T>> pool = new WeakHashMap<T, WeakReference<T>>();
+	private long queries = 0;
+	private long unknown = 0;
 
 	public T getPooledInstance( final T object ) {
+		queries++;
 		WeakReference<T> pooled = pool.get( object );
 
 		if (pooled == null) {
+			unknown++;
 			pooled = new WeakReference<T>( object );
 			pool.put( object , pooled );
 		}
 
 		return pooled.get();
+	}
+
+	public void printStats(final String poolName) {
+		log.info( "["+poolName+"]: "+queries+" queries handled" );
+		log.info( "["+poolName+"]: "+unknown+" instances pooled" );
+		log.info( "["+poolName+"]: => "+(queries - unknown) * 100 / ((double) queries)+"% of the queries returned pooled instances" );
 	}
 }
 
