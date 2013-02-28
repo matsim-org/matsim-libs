@@ -23,9 +23,11 @@ package playground.christoph.evacuation.analysis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,15 +46,19 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.GenericEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -64,6 +70,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -111,7 +119,8 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class DetailedAgentsTracker implements GenericEventHandler, PersonInformationEventHandler,
 		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler, LinkEnterEventHandler,
-		ActivityStartEventHandler, ActivityEndEventHandler {
+		ActivityStartEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
+		AgentStuckEventHandler {
 
 	static final Logger log = Logger.getLogger(DetailedAgentsTracker.class);
 	
@@ -162,6 +171,19 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	private final Set<Id> informedAgents = new HashSet<Id>();
 	private final Set<Id> enrouteDrivers = new HashSet<Id>();
 	private final Map<Id, Id> vehiclePositions = new HashMap<Id, Id>();
+	private final Map<Id, Collection<Id>> vehiclePassengers = new HashMap<Id, Collection<Id>>();
+	
+	private final Map<Id, Double> returnHomeTimes = new HashMap<Id, Double>();
+	private final Map<Id, String> returnHomeModes = new HashMap<Id, String>();
+	private final Map<Id, Double> evacuateFromHomeTimes = new HashMap<Id, Double>();
+	private final Map<Id, String> evacuateFromHomeModes = new HashMap<Id, String>();
+	private final Map<Id, Double> evacuateDirectlyTimes = new HashMap<Id, Double>();
+	private final Map<Id, String> evacuateDirectlyModes = new HashMap<Id, String>();
+	
+	private final Set<Id> agentsInEvacuationArea = new HashSet<Id>();
+	private final Map<Id, Double> leftEvacuationAreaTime = new HashMap<Id, Double>();
+	
+	private final Set<Id> stuckAgents = new HashSet<Id>();
 	
 	/*
 	 * List of all activities and legs an agent performs after being informed. If the agent
@@ -169,7 +191,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	 */
 	private final Map<Id, List<Activity>> agentActivities = new HashMap<Id, List<Activity>>();
 	private final Map<Id, List<Leg>> agentLegs = new HashMap<Id, List<Leg>>();
-	
+		
 	private final CoordAnalyzer coordAnalyzer;
 	private final HouseholdsTracker householdsTracker;
 	private final DecisionDataProvider decisionDataProvider;
@@ -183,13 +205,14 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	
 	private final String outputCountsFile = "evacuationDecisionCounts.txt";
 	private final String outputModesFile = "evacuationDecisionModes.txt";
+	private final String outputDetailsFile = "evacuationDecisionDetailed.txt";
 	
 	public static void main(String[] args) {
 		String configFile;
 		String evacuationConfigFile;
 		String outputPath;
 
-//		configFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac/evac.1.output_config.xml.gz";
+//		configFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac/evac.1.output_config.xml";
 //		evacuationConfigFile = "../../matsim/mysimulations/census2000V2/config_evacuation.xml";
 //		outputPath = "../../matsim/mysimulations/census2000V2/output_10pct_evac/";
 
@@ -303,7 +326,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		evacuationDecisionModel.readDecisionsFromFile(evacuationDecisionFile);
 		evacuationDecisionModel.printStatistics();
 		
-		// initialize agentActivities and agentLegs maps
+		// initialize agentActivities and agentLegs maps and set of affected agents
 		for (Id personId : scenario.getPopulation().getPersons().keySet()) {
 			Id householdId = householdsTracker.getPersonsHouseholdId(personId);
 			HouseholdDecisionData hdd = decisionDataProvider.getHouseholdDecisionData(householdId);
@@ -320,6 +343,10 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			agentActivities.put(personId, activities);
 			
 			agentLegs.put(personId, new ArrayList<Leg>());
+			
+			Facility homeFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(homeFacilityId);
+			boolean isAffected = this.coordAnalyzer.isFacilityAffected(homeFacility);
+			if (isAffected) this.agentsInEvacuationArea.add(personId);
 		}
 		
 		// Create the set of analyzed modes.
@@ -364,7 +391,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		 */
 		String countsFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputCountsFile);
 		String modesFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputModesFile);
-		writeResultsToFiles(countsFileName, modesFileName);
+		String detailsFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputDetailsFile);
+		writeResultsToFiles(countsFileName, modesFileName, detailsFileName);
 	}
 
 	private void analyzeA() {
@@ -394,6 +422,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						Set<String> modes = new TreeSet<String>();
 						for (Leg leg : legs) modes.add(leg.getMode());
 						String modesString = CollectionUtils.setToString(modes);
+						this.evacuateFromHomeModes.put(personId, modesString);
 						Integer count = evacuationModesA11.get(modesString);
 						if (count == null) evacuationModesA11.put(modesString, 1);
 						else evacuationModesA11.put(modesString, count + 1);
@@ -427,6 +456,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						Set<String> modes = new TreeSet<String>();
 						for (Leg leg : legs) modes.add(leg.getMode());
 						String modesString = CollectionUtils.setToString(modes);
+						this.evacuateFromHomeModes.put(personId, modesString);
 						Integer count = evacuationModesA21.get(modesString);
 						if (count == null) evacuationModesA21.put(modesString, 1);
 						else evacuationModesA21.put(modesString, count + 1);
@@ -523,6 +553,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 							Set<String> modes = new TreeSet<String>();
 							for (Leg leg : legs) modes.add(leg.getMode());
 							String modesString = CollectionUtils.setToString(modes);
+							this.returnHomeModes.put(personId, modesString);
+							this.returnHomeTimes.put(personId, lastActivity.getStartTime());
 							Integer count = evacuationModesB112.get(modesString);
 							if (count == null) evacuationModesB112.put(modesString, 1);
 							else evacuationModesB112.put(modesString, count + 1);
@@ -539,6 +571,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 								Activity activity = copy.get(i);
 								if (activity.getType().equals(CurrentLegToMeetingPointReplanner.activityType)) {
 									endHomeActivityTime = activity.getEndTime();
+									this.returnHomeTimes.put(personId, activity.getStartTime());
 									foundHomeActivity = true;
 									break;
 								}
@@ -560,11 +593,13 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 							Integer count;
 							
 							modesString = CollectionUtils.setToString(modesHome);
+							this.returnHomeModes.put(personId, modesString);
 							count = evacuationModesB111Home.get(modesString);
 							if (count == null) evacuationModesB111Home.put(modesString, 1);
 							else evacuationModesB111Home.put(modesString, count + 1);
 							
 							modesString = CollectionUtils.setToString(modesEvacuate);
+							this.evacuateFromHomeModes.put(personId, modesString);
 							count = evacuationModesB111Evacuate.get(modesString);
 							if (count == null) evacuationModesB111Evacuate.put(modesString, 1);
 							else evacuationModesB111Evacuate.put(modesString, count + 1);
@@ -576,6 +611,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						Set<String> modes = new TreeSet<String>();
 						for (Leg leg : legs) modes.add(leg.getMode());
 						String modesString = CollectionUtils.setToString(modes);
+						this.evacuateDirectlyModes.put(personId, modesString);
 						Integer count = evacuationModesB12.get(modesString);
 						if (count == null) evacuationModesB12.put(modesString, 1);
 						else evacuationModesB12.put(modesString, count + 1);
@@ -593,6 +629,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				Set<String> modes = new TreeSet<String>();
 				for (Leg leg : legs) modes.add(leg.getMode());
 				String modesString = CollectionUtils.setToString(modes);
+				this.evacuateDirectlyModes.put(personId, modesString);
 				Integer count = evacuationModesB2.get(modesString);
 				if (count == null) evacuationModesB2.put(modesString, 1);
 				else evacuationModesB2.put(modesString, count + 1);
@@ -686,6 +723,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 							Set<String> modes = new TreeSet<String>();
 							for (Leg leg : legs) modes.add(leg.getMode());
 							String modesString = CollectionUtils.setToString(modes);
+							this.returnHomeModes.put(personId, modesString);
+							this.returnHomeTimes.put(personId, lastActivity.getStartTime());
 							Integer count = evacuationModesC112.get(modesString);
 							if (count == null) evacuationModesC112.put(modesString, 1);
 							else evacuationModesC112.put(modesString, count + 1);
@@ -702,6 +741,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 								Activity activity = copy.get(i);
 								if (activity.getType().equals(CurrentLegToMeetingPointReplanner.activityType)) {
 									endHomeActivityTime = activity.getEndTime();
+									this.returnHomeTimes.put(personId, activity.getStartTime());
 									foundHomeActivity = true;
 									break;
 								}
@@ -723,11 +763,13 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 							Integer count;
 							
 							modesString = CollectionUtils.setToString(modesHome);
+							this.returnHomeModes.put(personId, modesString);
 							count = evacuationModesC111Home.get(modesString);
 							if (count == null) evacuationModesC111Home.put(modesString, 1);
 							else evacuationModesC111Home.put(modesString, count + 1);
-							
+														
 							modesString = CollectionUtils.setToString(modesEvacuate);
+							this.evacuateFromHomeModes.put(personId, modesString);
 							count = evacuationModesC111Evacuate.get(modesString);
 							if (count == null) evacuationModesC111Evacuate.put(modesString, 1);
 							else evacuationModesC111Evacuate.put(modesString, count + 1);
@@ -739,6 +781,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						Set<String> modes = new TreeSet<String>();
 						for (Leg leg : legs) modes.add(leg.getMode());
 						String modesString = CollectionUtils.setToString(modes);
+						this.evacuateDirectlyModes.put(personId, modesString);
 						Integer count = evacuationModesC12.get(modesString);
 						if (count == null) evacuationModesC12.put(modesString, 1);
 						else evacuationModesC12.put(modesString, count + 1);
@@ -756,6 +799,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				Set<String> modes = new TreeSet<String>();
 				for (Leg leg : legs) modes.add(leg.getMode());
 				String modesString = CollectionUtils.setToString(modes);
+				this.evacuateDirectlyModes.put(personId, modesString);
 				Integer count = evacuationModesC2.get(modesString);
 				if (count == null) evacuationModesC2.put(modesString, 1);
 				else evacuationModesC2.put(modesString, count + 1);
@@ -805,7 +849,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		}
 	}
 	
-	private void writeResultsToFiles(String countsFileName, String modesFileName) {
+	private void writeResultsToFiles(String countsFileName, String modesFileName, String detailsFileName) {
 		
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(countsFileName);
@@ -894,6 +938,169 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				if (i < modeValues.size() - 1) writer.write(delimiter);
 				else writer.write(newLine);
 			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+		
+		try {			
+			Map<Id, String> evacuationTypes = new HashMap<Id, String>();
+			for (Id personId : scenario.getPopulation().getPersons().keySet()) {
+				String evacuationType = "UNDEFINED";
+				
+				if (A11.contains(personId)) evacuationType = "A11";
+				else if (A12.contains(personId)) evacuationType = "A12";
+				else if (A21.contains(personId)) evacuationType = "A21";
+				else if (A22.contains(personId)) evacuationType = "A22";
+				
+				else if (B111.contains(personId)) evacuationType = "B111";
+				else if (B112.contains(personId)) evacuationType = "B112";
+				else if (B113.contains(personId)) evacuationType = "B113";
+				else if (B12.contains(personId)) evacuationType = "B12";
+				else if (B2.contains(personId)) evacuationType = "B2";
+				
+				else if (C111.contains(personId)) evacuationType = "C111";
+				else if (C112.contains(personId)) evacuationType = "C112";
+				else if (C113.contains(personId)) evacuationType = "C113";
+				else if (C12.contains(personId)) evacuationType = "C12";
+				else if (C2.contains(personId)) evacuationType = "C2";
+				
+				evacuationTypes.put(personId, evacuationType);
+			}
+			
+			// assign evacuation left times to evacuation types
+			for (Entry<Id, Double> entry : this.leftEvacuationAreaTime.entrySet()) {
+				
+				// ignore agents who left the evacuation area before the evacuation has started
+				if (entry.getValue() < EvacuationConfig.evacuationTime) {
+					this.evacuateDirectlyModes.remove(entry.getKey());
+					continue;
+				}
+				
+				String evacuationType = evacuationTypes.get(entry.getKey());
+				if (evacuationType.equals("A11")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
+				else if (evacuationType.equals("B111")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
+				else if (evacuationType.equals("B113")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
+				else if (evacuationType.equals("B12")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
+				else if (evacuationType.equals("B2")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
+				else if (evacuationType.equals("C111")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
+				else if (evacuationType.equals("C113")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
+				else if (evacuationType.equals("C12")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
+				else if (evacuationType.equals("C2")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
+				else throw new RuntimeException("Found an evacuation area left time for unexpected evacuation type: " 
+						+ evacuationType);
+			}
+			
+			BufferedWriter writer = IOUtils.getBufferedWriter(detailsFileName);
+			
+			writer.write("agentId");
+			writer.write(delimiter);
+			writer.write("evacuationType");
+			writer.write(delimiter);
+			writer.write("returnHomeTimes");
+			writer.write(delimiter);
+			writer.write("returnHomeModes");
+			writer.write(delimiter);
+			writer.write("evacuateFromHomeTimes");
+			writer.write(delimiter);
+			writer.write("evacuateFromHomeModes");
+			writer.write(delimiter);
+			writer.write("evacuateDirectlyTimes");
+			writer.write(delimiter);
+			writer.write("evacuateDirectlyModes");
+			writer.write(newLine);
+			
+			for (Id personId : scenario.getPopulation().getPersons().keySet()) {
+				writer.write(personId.toString());
+				writer.write(delimiter);
+				
+				String evacuationType = evacuationTypes.get(personId);
+				writer.write(evacuationType);
+				
+				// ignore stuck agents
+				if (this.stuckAgents.contains(personId)) {
+					writer.write("agentId");
+					writer.write(delimiter);
+					writer.write(evacuationType);
+					writer.write(delimiter);
+					writer.write(-1);
+					writer.write(delimiter);
+					writer.write(AgentStuckEvent.EVENT_TYPE);
+					writer.write(delimiter);
+					writer.write(-1);
+					writer.write(delimiter);
+					writer.write(AgentStuckEvent.EVENT_TYPE);
+					writer.write(delimiter);
+					writer.write(-1);
+					writer.write(delimiter);
+					writer.write(AgentStuckEvent.EVENT_TYPE);
+					writer.write(newLine);
+					
+					continue;
+				}
+				
+				writer.write(delimiter);
+				Double returnHomeTime = this.returnHomeTimes.get(personId);
+				if (returnHomeTime == null) writer.write("-1");
+				else writer.write(returnHomeTime.toString());
+				
+				writer.write(delimiter);
+				String returnHomeMode = this.returnHomeModes.get(personId);
+				if (returnHomeMode == null) writer.write("-1");
+				else writer.write(returnHomeMode);
+								
+				writer.write(delimiter);
+				Double evacuateFromHomeTime = this.evacuateFromHomeTimes.get(personId);
+				if (evacuateFromHomeTime == null) writer.write("-1");
+				else writer.write(evacuateFromHomeTime.toString());
+				
+				writer.write(delimiter);
+				String evacuateFromHomeMode = this.evacuateFromHomeModes.get(personId);
+				if (evacuateFromHomeMode == null) writer.write("-1");
+				else writer.write(evacuateFromHomeMode);
+				
+				writer.write(delimiter);
+				Double evacuateDirectlyTime = this.evacuateDirectlyTimes.get(personId);
+				if (evacuateDirectlyTime == null) writer.write("-1");
+				else writer.write(evacuateDirectlyTime.toString());
+				
+				writer.write(delimiter);
+				String evacuateDirectlyMode = this.evacuateDirectlyModes.get(personId);
+				if (evacuateDirectlyMode == null) writer.write("-1");
+				else writer.write(evacuateDirectlyMode);
+				writer.write(newLine);
+				
+				// consistency checks
+				if (returnHomeTime != null && returnHomeMode == null) {
+					throw new RuntimeException("Found return home time but no return home modes for agent " +
+							personId.toString() + " using evacuation strategy " + evacuationType);
+				}
+				if (returnHomeTime == null && returnHomeMode != null) {
+					throw new RuntimeException("Found return home modes but no return home time for agent " +
+							personId.toString() + " using evacuation strategy " + evacuationType);
+				}
+				
+				if (evacuateFromHomeTime != null && evacuateFromHomeMode == null) {
+					throw new RuntimeException("Found evacuate from home time but no evacuate from home modes for agent " +
+							personId.toString() + " using evacuation strategy " + evacuationType);
+				}
+				if (evacuateFromHomeTime == null && evacuateFromHomeMode != null) {
+					throw new RuntimeException("Found evacuate from home modes but no evacuate from home time for agent " +
+							personId.toString() + " using evacuation strategy " + evacuationType);
+				}
+				
+				if (evacuateDirectlyTime != null && evacuateDirectlyMode == null) {
+					throw new RuntimeException("Found evacuate directly time but no evacuate directly modes for agent " +
+							personId.toString() + " using evacuation strategy " + evacuationType);
+				}
+				// This might occur - but we are not interested in those agents anyway.
+//				if (evacuateDirectlyTime == null && evacuateDirectlyMode != null) {
+//					throw new RuntimeException("Found evacuate directly modes but no evacuate directly time for agent " +
+//							personId.toString() + " using evacuation strategy " + evacuationType);
+//				}
+			}
+			
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
@@ -1007,9 +1214,29 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.enrouteDrivers.contains(event.getPersonId())) {
-			vehiclePositions.put(event.getVehicleId(), event.getLinkId());
+		
+		Id personId = event.getPersonId();
+		Id vehicleId = event.getVehicleId();
+		Id linkId = event.getLinkId();
+		
+		boolean isDriver = this.enrouteDrivers.contains(personId);
+		if (isDriver) {
+			vehiclePositions.put(vehicleId, linkId);
 			if (event.getVehicleId() == null) log.warn("null vehicleId was found!");
+		}
+		
+		Link link = scenario.getNetwork().getLinks().get(linkId);
+		boolean wasAffected = this.agentsInEvacuationArea.contains(personId);
+		boolean isAffected = this.coordAnalyzer.isLinkAffected(link);
+				
+		checkAndUpdateAffected(personId, event.getTime(), wasAffected, isAffected);
+		
+		// if its a driver, also adapt passengers
+		if (isDriver) {
+			Collection<Id> passengers = this.vehiclePassengers.get(event.getVehicleId());
+			for (Id passengerId : passengers) {
+				checkAndUpdateAffected(passengerId, event.getTime(), wasAffected, isAffected);
+			}
 		}
 	}
 	
@@ -1024,6 +1251,12 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
         activity.setEndTime(Time.UNDEFINED_TIME);
 		
 		activities.add(activity);
+		
+		Facility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId());
+		boolean isAffected = this.coordAnalyzer.isFacilityAffected(facility);
+		boolean wasAffected = this.agentsInEvacuationArea.contains(event.getPersonId());
+		
+		checkAndUpdateAffected(personId, event.getTime(), wasAffected, isAffected);
 	}
 
 	@Override
@@ -1036,6 +1269,44 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		else {
 			Activity activity = activities.get(activities.size() - 1);
 			activity.setEndTime(event.getTime());			
+		}
+		
+		Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
+		boolean isAffected = this.coordAnalyzer.isLinkAffected(link);
+		boolean wasAffected = this.agentsInEvacuationArea.contains(event.getPersonId());
+		
+		checkAndUpdateAffected(personId, event.getTime(), wasAffected, isAffected);
+	}
+	
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		Collection<Id> agentsInVehicle = this.vehiclePassengers.get(event.getVehicleId());
+		if (agentsInVehicle == null) {
+			agentsInVehicle = new LinkedHashSet<Id>();
+			this.vehiclePassengers.put(event.getVehicleId(), agentsInVehicle);
+		}
+		agentsInVehicle.add(event.getPersonId());
+	}
+	
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		Collection<Id> agentsInVehicle = this.vehiclePassengers.get(event.getVehicleId());
+		agentsInVehicle.remove(event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(AgentStuckEvent event) {
+		this.stuckAgents.add(event.getPersonId());
+	}
+	
+	private void checkAndUpdateAffected(Id personId, double time, boolean wasAffected, boolean isAffected) {	
+		if (wasAffected && !isAffected) {
+			this.leftEvacuationAreaTime.put(personId, time);
+			this.agentsInEvacuationArea.remove(personId);
+		}
+		else if (!wasAffected && isAffected) {
+			this.leftEvacuationAreaTime.remove(personId);
+			this.agentsInEvacuationArea.add(personId);
 		}
 	}
 	
@@ -1067,7 +1338,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		@Override
 		public void reset(int iteration) {
 			// nothing to do here
-		}
+		}		
 	}
 
 }
