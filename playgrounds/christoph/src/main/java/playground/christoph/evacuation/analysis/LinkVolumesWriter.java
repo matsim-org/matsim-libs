@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -136,8 +137,8 @@ public class LinkVolumesWriter {
 				Double.parseDouble(scaleFactorString), true);
 		linkVolumesWriter.writeAbsoluteVolumes(absoluteVolumesFileName);
 		linkVolumesWriter.writeRelativeVolumes(relativeVolumesFileName);
-		linkVolumesWriter.writeAbsoluteSHPTravelTimes(absoluteVolumesSHPFileName, MGC.getCRS(crsString));
-		linkVolumesWriter.writeRelativeSHPTravelTimes(relativeVolumesSHPFileName, MGC.getCRS(crsString));
+		linkVolumesWriter.writeAbsoluteSHPVolumes(absoluteVolumesSHPFileName, MGC.getCRS(crsString));
+		linkVolumesWriter.writeRelativeSHPVolumes(relativeVolumesSHPFileName, MGC.getCRS(crsString));
 		log.info("done.");
 	}
 	
@@ -180,7 +181,14 @@ public class LinkVolumesWriter {
 			Set<String> modes = this.volumesAnalyzer.getModes();
 			Map<String, BufferedWriter> writers = new HashMap<String, BufferedWriter>();
 			
-			for (String mode : modes) {
+			// relative volumes only make sense for car mode since we do not know the capacities for other modes
+//			for (String mode : modes) {
+//				BufferedWriter writer = IOUtils.getBufferedWriter(file + "_" + mode + ".txt.gz");
+//				writers.put(mode, writer);
+//				writeHeader(writer);
+//			}
+			if (modes.contains(TransportMode.car)) {
+				String mode = TransportMode.car;
 				BufferedWriter writer = IOUtils.getBufferedWriter(file + "_" + mode + ".txt.gz");
 				writers.put(mode, writer);
 				writeHeader(writer);
@@ -226,7 +234,7 @@ public class LinkVolumesWriter {
 			
 			Map<String, double[]> linkVolumes = this.volumesAnalyzer.getVolumesPerHourForLink(link.getId());
 			
-			for (String mode : linkVolumes.keySet()) {
+			for (String mode : writers.keySet()) {
 				BufferedWriter writer = writers.get(mode);
 				writer.write(link.getId().toString());
 				writer.write(delimiter);
@@ -261,7 +269,7 @@ public class LinkVolumesWriter {
 		}
 	}
 		
-	public void writeAbsoluteSHPTravelTimes(String file, CoordinateReferenceSystem crs) {
+	public void writeAbsoluteSHPVolumes(String file, CoordinateReferenceSystem crs) {
 		try {
 			Map<String, Collection<SimpleFeature>> fts = generateSHPFileData(crs, this.network, true);
 			Set<String> modes = fts.keySet();
@@ -274,11 +282,19 @@ public class LinkVolumesWriter {
 		}
 	}
 
-	public void writeRelativeSHPTravelTimes(String file, CoordinateReferenceSystem crs) {
+	public void writeRelativeSHPVolumes(String file, CoordinateReferenceSystem crs) {
 		try {
 			Map<String, Collection<SimpleFeature>> fts = generateSHPFileData(crs, this.network, false);
 			Set<String> modes = fts.keySet();
-			for (String mode : modes) {
+
+			// relative volumes only make sense for car mode since we do not know the capacities for other modes
+//			for (String mode : modes) {			
+//				Collection<SimpleFeature> ft = fts.get(mode);
+//				ShapeFileWriter.writeGeometries(ft, file + "_" + mode + ".shp");
+//			}
+			
+			if (modes.contains(TransportMode.car)) {
+				String mode = TransportMode.car;
 				Collection<SimpleFeature> ft = fts.get(mode);
 				ShapeFileWriter.writeGeometries(ft, file + "_" + mode + ".shp");
 			}

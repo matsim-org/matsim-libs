@@ -28,11 +28,18 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+
+import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 
 /**
  * Counts the number of vehicles and agents using non-motorized modes leaving a link, 
@@ -40,7 +47,8 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
  *
  * @author cdobler
  */
-public class MultiModalVolumesAnalyzer implements LinkLeaveEventHandler, AgentDepartureEventHandler {
+public class MultiModalVolumesAnalyzer implements LinkLeaveEventHandler, AgentDepartureEventHandler,
+		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	private final static Logger log = Logger.getLogger(MultiModalVolumesAnalyzer.class);
 	private final int timeBinSize;
@@ -48,13 +56,15 @@ public class MultiModalVolumesAnalyzer implements LinkLeaveEventHandler, AgentDe
 	private final int maxSlotIndex;
 	private final Map<Id, Map<String,int[]>> links;
 	private final Map<Id, String> enRouteModes;
-
+	private final Map<Id, Integer> agentsInVehicles;
+	
 	public MultiModalVolumesAnalyzer(final int timeBinSize, final int maxTime, final Network network) {
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;
 		this.links = new HashMap<Id, Map<String, int[]>>((int) (network.getLinks().size() * 1.1), 0.95f);
 		this.enRouteModes = new HashMap<Id, String>();
+		this.agentsInVehicles = new HashMap<Id, Integer>();
 	}
 	
 	@Override
@@ -77,6 +87,23 @@ public class MultiModalVolumesAnalyzer implements LinkLeaveEventHandler, AgentDe
 		}
 		int timeslot = getTimeSlotIndex(event.getTime());
 		volumes[timeslot]++;
+		
+		boolean isCarTrip = mode.equals(TransportMode.car);
+		if (isCarTrip) {
+			Integer agentsInVehicle = agentsInVehicles.get(event.getVehicleId());
+			int passengers = agentsInVehicle - 1;
+			if (passengers < 0) throw new RuntimeException("Found negative passenger count for vehicle " +
+					event.getVehicleId().toString() + " at time " + event.getTime() + "!");
+			
+			// get ride passenger mode
+			mode = OldPassengerDepartureHandler.passengerTransportMode;
+			volumes = modesVolumes.get(mode);
+			if (volumes == null) {
+				volumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
+				modesVolumes.put(mode, volumes);
+			}
+			volumes[timeslot] = volumes[timeslot] + passengers;
+		}
 	}
 
 	private int getTimeSlotIndex(final double time) {
@@ -86,6 +113,22 @@ public class MultiModalVolumesAnalyzer implements LinkLeaveEventHandler, AgentDe
 		return ((int)time / this.timeBinSize);
 	}
 
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		Integer agentsInVehicle = agentsInVehicles.get(event.getVehicleId());
+		agentsInVehicles.put(event.getVehicleId(), agentsInVehicle - 1);
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		
+		Integer agentsInVehicle = agentsInVehicles.get(event.getVehicleId());
+		if (agentsInVehicle == null) {
+			agentsInVehicle = 0;
+		}
+		agentsInVehicles.put(event.getVehicleId(), agentsInVehicle + 1);
+	}
+	
 	/**
 	 * @param linkId
 	 * @return Map containing an array for each occuring mode. Each array containing 
