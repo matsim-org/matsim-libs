@@ -20,7 +20,7 @@
 
 package org.matsim.core.utils.misc;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
  */
 public final class Counter {
 	private final String prefix;
-	private AtomicInteger counter = new AtomicInteger(0);
-	private AtomicInteger nextCounter = new AtomicInteger(1);
+	private AtomicLong counter = new AtomicLong(0);
+	private AtomicLong nextCounter = new AtomicLong(1);
 	private static final Logger log = Logger.getLogger(Counter.class);
 
 	/**
@@ -44,8 +44,8 @@ public final class Counter {
 	}
 
 	public void incCounter() {
-		int i = this.counter.incrementAndGet();
-		int n = this.nextCounter.get();
+		long i = this.counter.incrementAndGet();
+		long n = this.nextCounter.get();
 		if (i >= n) {
 			if (this.nextCounter.compareAndSet(n, n*2)) {
 				log.info(this.prefix + n);
@@ -57,7 +57,7 @@ public final class Counter {
 		log.info(this.prefix + this.counter.get());
 	}
 
-	public int getCounter() {
+	public long getCounter() {
 		return this.counter.get();
 	}
 
