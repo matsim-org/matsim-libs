@@ -45,7 +45,7 @@ public class Analyzer {
 	}
 	
 	private void createBins(ArrayList<Double> searchtimes, String path) {
-		Bins ts = new Bins(1, 10, "searchtimes");		
+		Bins ts = new Bins(1, 15, "searchtimes");		
 		for (double t:searchtimes) {
 			ts.addVal(t / 60.0, 1.0);
 		}	
