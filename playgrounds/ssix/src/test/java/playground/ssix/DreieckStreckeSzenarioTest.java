@@ -201,14 +201,14 @@ public class DreieckStreckeSzenarioTest {
 	}
 	
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
-	public static double length = 200.;//in m, length of one the triangle sides.
+	public static double length = 166.67;//in m, length of one the triangle sides.
 	
-	private static long NUMBER_OF_AGENTS = 89;
+	private static long NUMBER_OF_AGENTS = 250;
 	
-	private static double FREESPEED = 90.;//in km/h
-	private static double P_TRUCK = 0.5;//no need to worry much about those, are normalized when choosing effective transport mode
+	private static double FREESPEED = 50.;//in km/h
+	private static double P_TRUCK = 0.85;//no need to worry much about those, are normalized when choosing effective transport mode
 	//private static double P_MED = 2.;
-	private static double P_FAST = 0.5;
+	private static double P_FAST = 0.15;
 	
 	private PrintStream writer;
 	
@@ -235,17 +235,56 @@ public class DreieckStreckeSzenarioTest {
 	}
 	
 	public static void main(String[] args) {
-		DreieckStreckeSzenarioTest dreieck = new DreieckStreckeSzenarioTest(2600);
+		DreieckStreckeSzenarioTest dreieck = new DreieckStreckeSzenarioTest(2700);
 		dreieck.fillNetworkData();
 		
-		String dir = "./output/dataOnlyTruck.txt";
+		String dir = "./output/data_Patna_all.txt";
 		dreieck.openFile(dir);
+		for (int number_cars = 0; number_cars < 81; number_cars+=5){//16
+			for (int number_bikes = 0; number_bikes < 330 - number_cars; number_bikes+=10){//33
+				dreieck.runParam(number_bikes,number_cars);
+			}
+		}
+		
 		
 		long number_of_iterations = NUMBER_OF_AGENTS + 1;//-10 if constantFastDensity... because 10 vehicles are already in the sim
 		for (long i = 0; i < number_of_iterations; i++){
-			dreieck.run(i, "onlyTruck");
+			dreieck.run(i, "constantModalSplit");
 		}
 		dreieck.closeFile();
+	}
+	
+	private void runParam(int number_trucks, int number_fast){
+		createWantedPopulation(number_trucks,0,number_fast,2);
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		
+		FunDiagramsWithPassing fundi3 = new FunDiagramsWithPassing(this.scenario);
+		events.addHandler(fundi3);
+		
+		runqsim(events);
+		
+		//writer.doSomething
+		writer.format("%d\t\t", number_trucks);
+		writer.format("%d\t", number_fast);
+		
+		log.info("Writing down data for "+number_trucks+number_fast+" people...");
+		
+		//writer.format("%.2f\t", fundi3.getEndDensity());
+		//writer.format("%.2f\t", fundi3.getEndDensity_truck());
+		//writer.format("%.2f\t", fundi3.getEndDensity_med());
+		//writer.format("%.2f\t\t", fundi3.getEndDensity_fast());
+		
+		writer.format("%.2f\t", fundi3.getEndFlow());
+		//writer.format("%.2f\t", fundi3.getEndFlow_truck());
+		//writer.format("%.2f\t", fundi3.getEndFlow_med());
+		//writer.format("%.2f\t\t", fundi3.getEndFlow_fast());
+		
+		writer.format("%.2f\t\n", fundi3.getEndAverageVelocity());
+		//writer.format("%.2f\t", fundi3.getEndAverageVelocity_truck());
+		//writer.format("%.2f\t", fundi3.getEndAverageVelocity_med());
+		//writer.format("%.2f\n", fundi3.getEndAverageVelocity_fast());
+		log.info("Done!");
 	}
 	
 	public void run(long numberOfPeople, String mode){
@@ -396,6 +435,11 @@ public class DreieckStreckeSzenarioTest {
 		}
 		if (mode.equals("constantFastDensity10veh")){
 			createWantedPopulation(n, 0, 10, 2);
+		}
+		
+		//Idea3: completely random
+		if (mode.equals("random")){
+			createRandomPopulation(n,2);
 		}
 		//TODO: other experimentations still need implementing?
 	}
@@ -613,10 +657,10 @@ public class DreieckStreckeSzenarioTest {
         //Third modification: Mobsim needs to know the different vehicle types (and their respective speeds)
         Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 		VehicleType truck = VehicleUtils.getFactory().createVehicleType(new IdImpl("truck"));
-		truck.setPcuEquivalents(1.0);
-		truck.setMaximumVelocity(12.0);
+		truck.setPcuEquivalents(0.25);
+		truck.setMaximumVelocity(5.56);
 		VehicleCapacity cap = new VehicleCapacityImpl();
-		cap.setSeats(4);
+		cap.setSeats(3);
 		truck.setCapacity(cap);
 		modeVehicleTypes.put("truck", truck);
 		VehicleType med = VehicleUtils.getFactory().createVehicleType(new IdImpl("med"));
@@ -626,7 +670,7 @@ public class DreieckStreckeSzenarioTest {
 		//modeVehicleTypes.put("med", med);
 		VehicleType fast = VehicleUtils.getFactory().createVehicleType(new IdImpl("fast"));
 		fast.setPcuEquivalents(1.0);
-		fast.setMaximumVelocity(18.);
+		fast.setMaximumVelocity(13.88);
 		fast.setCapacity(cap);
 		modeVehicleTypes.put("fast", fast);
 		
@@ -662,8 +706,11 @@ public class DreieckStreckeSzenarioTest {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		writer.format("%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\n",	
-				      "n",  "k", "k_t","k_f", "rho","rho_t","rho_f","v","v_t","v_f");
+		//writer.format("%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\n",	
+		//		      "n",  "k", "k_t","k_f", "rho","rho_t","rho_f","v","v_t","v_f");
+		
+		writer.format("%s\t%s\t%s\t%s\n",
+					  "n_bikes","n_cars","flow","speed");
 	}
 	
 	private void closeFile() {
