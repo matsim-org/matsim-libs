@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -90,16 +91,16 @@ public class RunSimulation {
 	}
 
 	public static void main(String[] args) {
-		Config config = createConfig("./0211-capital-only-025freespeed-beginning-disutility-travel", 4);
+		Config config = createConfig("./0213-capital-only-025freespeed-beginning-disutility-travel-qs", 4);
 		run(config);
-		config = createConfig("./0211-capital-only-05freespeed-beginning-disutility-travel", 2);
+		config = createConfig("./0213-capital-only-05freespeed-beginning-disutility-travel-qs", 2);
 		run(config);
-		config = createConfig("./0211-capital-only-0125freespeed-beginning-disutility-travel", 8);
-		run(config);
-		config = createConfig("./0211-capital-only-1freespeed-beginning-disutility-travel", 1);
-		run(config);
-		config = createConfig("./0211-capital-only-2freespeed-beginning-disutility-travel", 0.5);
-		run(config);
+//		config = createConfig("./0211-capital-only-0125freespeed-beginning-disutility-travel", 8);
+//		run(config);
+//		config = createConfig("./0211-capital-only-1freespeed-beginning-disutility-travel", 1);
+//		run(config);
+//		config = createConfig("./0211-capital-only-2freespeed-beginning-disutility-travel", 0.5);
+//		run(config);
 	}
 
 	private static void run(Config config) {
@@ -146,18 +147,18 @@ public class RunSimulation {
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setLastIteration(180);
-		config.controler().setMobsim("jdeqsim");
+		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.controler().setOutputDirectory(outputDirectory);
 		// config.controler().setMobsim("DoNothing");
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
-		config.controler().setWriteSnapshotsInterval(5);
-//		config.getQSimConfigGroup().setStorageCapFactor(0.01);
-//		config.getQSimConfigGroup().setFlowCapFactor(0.01);
-//		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-//		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
-//		config.getQSimConfigGroup().setNumberOfThreads(8);
-//		config.getQSimConfigGroup().setEndTime(27*60*60);
+		// config.controler().setWriteSnapshotsInterval(5);
+		config.getQSimConfigGroup().setStorageCapFactor(0.01);
+		config.getQSimConfigGroup().setFlowCapFactor(0.01);
+		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
+		config.getQSimConfigGroup().setNumberOfThreads(2);
+		config.getQSimConfigGroup().setEndTime(30*60*60);
 	
 		
 //		config.plansCalcRoute().setTeleportedModeSpeed("other", 30.0 / 3.6); //  km/h beeline
@@ -179,8 +180,8 @@ public class RunSimulation {
 		config.planCalcScore().setConstantCar(0);
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		// config.planCalcScore().setWriteExperiencedPlans(true);
-		config.setParam("JDEQSim", "flowCapacityFactor", "0.01");
-		config.setParam("JDEQSim", "storageCapacityFactor", "0.05");
+//		config.setParam("JDEQSim", "flowCapacityFactor", "0.01");
+//		config.setParam("JDEQSim", "storageCapacityFactor", "0.05");
 		double endTime= 60*60*32;
 		// config.setParam("JDEQSim", "endTime", Double.toString(endTime));
 		

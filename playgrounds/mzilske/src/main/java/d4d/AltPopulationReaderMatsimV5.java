@@ -22,6 +22,7 @@ package d4d;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,6 +51,13 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+
+import playground.mzilske.vbb.GenericRouteWithStartEndLinkId;
 
 
 
@@ -63,6 +71,14 @@ public class AltPopulationReaderMatsimV5 implements PopulationReader {
 
 	private Scenario scenario;
 	private Population population;
+	
+
+	private final static String SEPARATOR = "===";
+	private final static String IDENTIFIER_1 = "PT1" + SEPARATOR;
+	
+
+	private TransitScheduleFactory tsf = new TransitScheduleFactoryImpl();
+
 	
 	public AltPopulationReaderMatsimV5(final Scenario scenario) {
 		this.scenario = scenario;
@@ -265,6 +281,42 @@ public class AltPopulationReaderMatsimV5 implements PopulationReader {
 			currRoute = linkNetworkRoute;
 		} else if ("generic".equals(routeType)) {
 			GenericRouteImpl genericRoute = new GenericRouteImpl(null, null);
+			genericRoute.setRouteDescription(null, routeDescription.trim(), null);
+			currRoute = genericRoute;
+		} else if ("experimentalPt1".equals(routeType)) {
+			TransitSchedule transitSchedule = scenario.getTransitSchedule();
+			IdImpl accessStopId;
+			IdImpl lineId;
+			IdImpl routeId;
+			IdImpl egressStopId;
+			if (routeDescription.startsWith(IDENTIFIER_1)) {
+				String[] parts = routeDescription.split(SEPARATOR, 6);//StringUtils.explode(routeDescription, '\t', 6);
+				accessStopId = new IdImpl(parts[1]);
+				lineId = new IdImpl(parts[2]);
+				routeId = new IdImpl(parts[3]);
+				egressStopId = new IdImpl(parts[4]);
+				String description;
+				if (parts.length > 5) {
+					description = parts[5];
+				} else {
+					description = null;
+				}
+			} else {
+				accessStopId = null;
+				lineId = null;
+				routeId = null;
+				egressStopId = null;
+			}
+
+			List<TransitRouteStop> emptyList = Collections.emptyList();
+			ExperimentalTransitRoute transitRoute = new ExperimentalTransitRoute(
+					transitSchedule.getFacilities().get(accessStopId), 
+					tsf.createTransitLine(lineId), 
+					tsf.createTransitRoute(routeId, null , emptyList, null),
+					transitSchedule.getFacilities().get(egressStopId));
+			currRoute = transitRoute;
+		} else if ("genericRouteFromTo".equals(routeType)) {
+			GenericRouteWithStartEndLinkId genericRoute = new GenericRouteWithStartEndLinkId(null, null);
 			genericRoute.setRouteDescription(null, routeDescription.trim(), null);
 			currRoute = genericRoute;
 		} else {

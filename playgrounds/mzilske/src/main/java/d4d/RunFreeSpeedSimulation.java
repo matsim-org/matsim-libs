@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -26,7 +27,7 @@ public class RunFreeSpeedSimulation {
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory("./freespeed-output");
-		config.controler().setMobsim("jdeqsim");
+		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 		// config.controler().setMobsim("DoNothing");
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
