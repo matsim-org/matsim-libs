@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.thibautd.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -38,11 +39,14 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.thibautd.utils.PlanAnalyzeSubtours;
 
 /**
  * Test class for {@link PlanAnalyzeSubtours}.
@@ -77,7 +81,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
 	public void testNetworkBased() {
 		Config config = loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		this.runDemo((NetworkImpl) network, TripStructureAnalysisLayerOption.link);
@@ -154,10 +158,10 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 
 		if ( useFacilities ) {
-			return TestsUtil.createPlanFromFacilities((ActivityFacilitiesImpl) layer, person, TransportMode.car, facString);
+			return createPlanFromFacilities((ActivityFacilitiesImpl) layer, person, TransportMode.car, facString);
 		}
 
-		return TestsUtil.createPlanFromLinks((NetworkImpl) layer, person, TransportMode.car, facString);
+		return createPlanFromLinks((NetworkImpl) layer, person, TransportMode.car, facString);
 	}
 
 
@@ -167,6 +171,37 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 			l.add(index);
 		}
 		return l;
+	}
+
+	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, PersonImpl person, String mode, String facString) {
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		String[] locationIdSequence = facString.split(" ");
+		for (int aa=0; aa < locationIdSequence.length; aa++) {
+			BasicLocation location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
+			ActivityImpl act;
+			act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
+			act.setFacilityId(location.getId());
+			act.setEndTime(10*3600);
+			if (aa != (locationIdSequence.length - 1)) {
+				plan.createAndAddLeg(mode);
+			}
+		}
+		return plan;
+	}
+
+	static PlanImpl createPlanFromLinks(NetworkImpl layer, PersonImpl person, String mode, String linkString) {
+		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		String[] locationIdSequence = linkString.split(" ");
+		for (int aa=0; aa < locationIdSequence.length; aa++) {
+			BasicLocation location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
+			ActivityImpl act;
+			act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
+			act.setEndTime(10*3600);
+			if (aa != (locationIdSequence.length - 1)) {
+				plan.createAndAddLeg(mode);
+			}
+		}
+		return plan;
 	}
 
 }

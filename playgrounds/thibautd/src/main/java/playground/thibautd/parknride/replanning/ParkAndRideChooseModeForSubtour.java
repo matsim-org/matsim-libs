@@ -44,10 +44,10 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 import playground.thibautd.parknride.ParkAndRideConstants;
 import playground.thibautd.parknride.ParkAndRideUtils;
+import playground.thibautd.utils.PlanAnalyzeSubtours;
 
 /**
  * A special module meant at handling subtour mode choice for trips,

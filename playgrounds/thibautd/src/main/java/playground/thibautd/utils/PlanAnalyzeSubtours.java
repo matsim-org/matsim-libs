@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.thibautd.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;

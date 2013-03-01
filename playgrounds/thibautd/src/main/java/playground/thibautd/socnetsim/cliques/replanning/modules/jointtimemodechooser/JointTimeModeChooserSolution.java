@@ -43,7 +43,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.DriverRoute;
@@ -53,6 +52,7 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 import playground.thibautd.tsplanoptimizer.framework.ValueImpl;
+import playground.thibautd.utils.PlanAnalyzeSubtours;
 import playground.thibautd.utils.RoutingUtils;
 
 /**
