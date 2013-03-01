@@ -41,7 +41,7 @@ public class ExtEffectWaitingDelay {
 	public double getTransferDelay() {
 		return transferDelay;
 	}
-	public void setTransferDelay(double transferDelay) {
+	public void setDelay(double transferDelay) {
 		this.transferDelay = transferDelay;
 	}
 	public Id getAffectedVehicle() {
