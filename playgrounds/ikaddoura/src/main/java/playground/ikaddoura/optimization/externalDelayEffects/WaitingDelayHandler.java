@@ -121,9 +121,9 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 			for (ExtEffectWaitingDelay delay : this.boardingDelayEffects){
 				
 				if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && !delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					log.info("Agent is already being tracked. Starting parallel personTracking for different vehicles. " +
-							"That means the bus which was previously delayed by that agent has not yet arrived the end of the transit route. " +
-							"Must have been a very short activity... ");
+					// Agent is already being tracked. Starting parallel personTracking for different vehicles.
+					// That means the bus which was previously delayed by that agent has not yet arrived the end of the transit route.
+					// Must have been a very short activity...
 				
 				} else if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
 					throw new RuntimeException("Person and public vehicle are already being tracked. That means, an agent " +
@@ -274,8 +274,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 					this.extraDelayEffects.add(delayEffect);	
 				}
 			}
-		}
-		
+		}	
 	}
 
 }

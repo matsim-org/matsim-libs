@@ -25,8 +25,10 @@ package playground.ikaddoura.optimization.externalDelayEffects;
 import org.matsim.api.core.v01.Id;
 
 /**
- * Collects the external waiting delay effect for each person: the marginal delay in seconds, the Id of the delayed public vehicle and the number of affected agents.
- * An agent is affected when entering or leaving a vehicle was delayed.
+ * Collects the information of the external waiting delay effect for each person.
+ * Saves the marginal (boarding or alighting) delay in seconds and the Id of the delayed public vehicle.
+ * During tracking the external delay effect (person and vehicle) the number of affected agents will be increased.
+ * Every other agent entering or leaving that delayed public vehicle is affected.
  * 
  * @author ikaddoura
  *
