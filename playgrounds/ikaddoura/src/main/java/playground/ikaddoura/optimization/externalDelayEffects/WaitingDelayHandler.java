@@ -25,6 +25,7 @@ package playground.ikaddoura.optimization.externalDelayEffects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -72,8 +73,8 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
 		
 	private final Map<Id, Boolean> vehId2isFirstTransfer = new HashMap<Id, Boolean>();
-	private final Map<Id, ExtEffectWaitingDelay> personId2extBoardingDelayEffect = new HashMap<Id, ExtEffectWaitingDelay>();
-	private final Map<Id, ExtEffectWaitingDelay> personId2extAlightingDelayEffect = new HashMap<Id, ExtEffectWaitingDelay>();
+	private final List<ExtEffectWaitingDelay> boardingDelayEffects = new ArrayList<ExtEffectWaitingDelay>();
+	private final List<ExtEffectWaitingDelay> alightingDelayEffects = new ArrayList<ExtEffectWaitingDelay>();
 
 	public WaitingDelayHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -85,8 +86,8 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 		this.ptDriverIDs.clear();
 		this.ptVehicleIDs.clear();
 		this.vehId2isFirstTransfer.clear();
-		this.personId2extBoardingDelayEffect.clear();
-		this.personId2extAlightingDelayEffect.clear();
+		this.boardingDelayEffects.clear();
+		this.alightingDelayEffects.clear();
 	}
 
 	@Override
@@ -106,27 +107,45 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 	public void handleEvent(PersonEntersVehicleEvent event) {
 				
 		if (!ptDriverIDs.contains(event.getPersonId()) && ptVehicleIDs.contains(event.getVehicleId())){
-//			System.out.println("*** Entering ***");
+			System.out.println("*** " + event.getPersonId() + " enters " + event.getVehicleId());
 			
-			// remove previous waiting delay effect
-			if (this.personId2extBoardingDelayEffect.containsKey(event.getPersonId())){
-				throw new RuntimeException("Person is already being tracked. Aborting...");
+			for (ExtEffectWaitingDelay delay : this.boardingDelayEffects){
+				
+				if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && !delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
+					log.warn("Agent is already being tracked. Starting parallel personTracking for different vehicles. " +
+							"That means the bus which was previously delayed by that agent has not yet arrived the end of the transit route. " +
+							"Must have been a very short activity... ");
+				
+				} else if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
+					throw new RuntimeException("Person and public vehicle are already being tracked. That means, an agent " +
+							"enters a vehicle which was previously delayed by himself. Depending on the scenario this can happen if there are circle transit routes. " +
+							"Handling of this specific occurence is not implemented. ");
+				}
 			}
 			
-			// update the number of affected agents		
-			for (Id personId : this.personId2extBoardingDelayEffect.keySet()){
-				ExtEffectWaitingDelay delayEffect = this.personId2extBoardingDelayEffect.get(personId);
-	
-				if (delayEffect.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					int affectedAgents = delayEffect.getAffectedAgents();
-					delayEffect.setAffectedAgents(affectedAgents + 1);
+			// update the number of affected agents
+			System.out.println(" ### " + event.getPersonId() + " delayed " + event.getVehicleId()+". Searching for agents who have previously delayed that vehicle...");
+			for (ExtEffectWaitingDelay delay : this.boardingDelayEffects){
+				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
+					int affectedAgents = delay.getAffectedAgents();
+					System.out.println(" ### " + delay.getPersonId() + " has delayed this vehicle before. Increasing the number of affected agents for that person...");
+					delay.setAffectedAgents(affectedAgents + 1);
+					System.out.println(" ### " + delay.toString());
+				}
+			}
+			for (ExtEffectWaitingDelay delay : this.alightingDelayEffects){
+				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
+					int affectedAgents = delay.getAffectedAgents();
+					System.out.println(" ### " + delay.getPersonId() + " has delayed this vehicle before. Increasing the number of affected agents for that person...");
+					delay.setAffectedAgents(affectedAgents + 1);
+					System.out.println(" ### " + delay.toString());
 				}
 			}
 
 			// start tracking the delay effect induced by that person entering the public vehicle
 			double transferTime = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
 			ExtEffectWaitingDelay delayEffect = startTrackingDelayEffect(event.getVehicleId(), event.getPersonId(), transferTime);
-			this.personId2extBoardingDelayEffect.put(event.getPersonId(), delayEffect);
+			this.boardingDelayEffects.add(delayEffect);
 		}
 	}
 
@@ -136,69 +155,53 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 		if (ptDriverIDs.contains(event.getPersonId())){
 			// the transit vehicle driver leaves the vehicle at the end of the transit route
 			
-			List<Id> stopTrackingPersonIDsBoardingDelays = new ArrayList<Id>();
-			List<Id> stopTrackingPersonIDsAlightingDelays = new ArrayList<Id>();
-			
-			// throw waitingDelayEvents induced by agents entering a public vehicle
-			for (Id personId : this.personId2extBoardingDelayEffect.keySet()){
-				ExtEffectWaitingDelay delayEffect = this.personId2extBoardingDelayEffect.get(personId);
+			// throw waitingDelayEvents induced by agents entering a public vehicle and stop tracking delay effect of that person and public vehicle
+			for (Iterator<ExtEffectWaitingDelay> iterator = this.boardingDelayEffects.iterator(); iterator.hasNext();){
+				ExtEffectWaitingDelay delay = iterator.next();
 				
-				if (delayEffect.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-//					System.out.println(" +++ Vehicle has arrived at the end of the transit route. Throwing delayEvent (boarding) for that person: " + this.personId2extBoardingDelayEffect.get(personId).toString());
+				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
+					System.out.println(" +++ Vehicle has arrived at the end of the transit route. Throwing delayEvent (boarding) for that person: " + delay.getPersonId().toString());
 
-					WaitingDelayEvent delayWaitingEvent = new WaitingDelayEvent(personId, event.getVehicleId(), event.getTime(), delayEffect.getAffectedAgents(), delayEffect.getTransferDelay());
+					WaitingDelayEvent delayWaitingEvent = new WaitingDelayEvent(delay.getPersonId(), delay.getAffectedVehicle(), event.getTime(), delay.getAffectedAgents(), delay.getTransferDelay());
 					this.events.processEvent(delayWaitingEvent);
-					
-					stopTrackingPersonIDsBoardingDelays.add(personId);
-					
+					iterator.remove();
 				}
 			}
 			
-			// throw waitingDelayEvents induced by agents leaving a public vehicle
-			for (Id personId : this.personId2extAlightingDelayEffect.keySet()){
-				ExtEffectWaitingDelay delayEffect = this.personId2extAlightingDelayEffect.get(personId);
+			// throw waitingDelayEvents induced by agents leaving a public vehicle and stop tracking delay effect of that person and public vehicle
+			for (Iterator<ExtEffectWaitingDelay> iterator = this.alightingDelayEffects.iterator(); iterator.hasNext();){
+				ExtEffectWaitingDelay delay = iterator.next();
 				
-				if (delayEffect.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-//					System.out.println(" +++ Vehicle has arrived at the end of the transit route. Throwing delayEvent (leaving) for that person: " + this.personId2extAlightingDelayEffect.get(personId).toString());
+				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
+					System.out.println(" +++ Vehicle has arrived at the end of the transit route. Throwing delayEvent (alighting) for that person: " + delay.getPersonId().toString());
 
-					WaitingDelayEvent delayWaitingEvent = new WaitingDelayEvent(personId, event.getVehicleId(), event.getTime(), delayEffect.getAffectedAgents(), delayEffect.getTransferDelay());
+					WaitingDelayEvent delayWaitingEvent = new WaitingDelayEvent(delay.getPersonId(), delay.getAffectedVehicle(), event.getTime(), delay.getAffectedAgents(), delay.getTransferDelay());
 					this.events.processEvent(delayWaitingEvent);
-				
-					stopTrackingPersonIDsAlightingDelays.add(personId);
+					iterator.remove();
 				}
 			}
-			
-			// stop tracking delay effect of that public vehicle
-			for (Id personId : stopTrackingPersonIDsBoardingDelays){
-				this.personId2extBoardingDelayEffect.remove(personId);
-			}
-			for (Id personId : stopTrackingPersonIDsAlightingDelays){
-				this.personId2extAlightingDelayEffect.remove(personId);
-			}
-			
 
+						
 		} else if (!ptDriverIDs.contains(event.getPersonId()) && ptVehicleIDs.contains(event.getVehicleId())){
-//			System.out.println("*** Leaving ***");
-
-			// remove previous waiting delay effect
-			if (this.personId2extAlightingDelayEffect.containsKey(event.getPersonId())){
-				throw new RuntimeException("Person is already being tracked. Aborting...");
-			}
+			System.out.println("*** " + event.getPersonId() + " leaves " + event.getVehicleId());
 			
-			// update the number of affected agents
-			for (Id personId : this.personId2extAlightingDelayEffect.keySet()){
-				ExtEffectWaitingDelay delayEffect = this.personId2extAlightingDelayEffect.get(personId);
+			for (ExtEffectWaitingDelay delay : this.alightingDelayEffects){
+				if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && !delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
+					log.warn("Agent is already being tracked. Starting parallel personTracking for different vehicles. " +
+							"That means the bus which was previously delayed by that agent has not yet arrived the end of the transit route. " +
+							"Must have been a very short activity... ");
 				
-				if (delayEffect.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					int affectedAgents = delayEffect.getAffectedAgents();
-					delayEffect.setAffectedAgents(affectedAgents + 1);
+				} else if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
+					throw new RuntimeException("Person and public vehicle are already being tracked. That means, an agent " +
+							"leaves a vehicle which was previously delayed by himself. Depending on the scenario this can happen if there are circle transit routes. " +
+							"Handling of this specific occurence is not implemented. ");
 				}
 			}
 			
 			// start tracking the delay effect induced by that person leaving the public vehicle
 			double transferTime = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
 			ExtEffectWaitingDelay delayEffect = startTrackingDelayEffect(event.getVehicleId(), event.getPersonId(), transferTime);
-			this.personId2extAlightingDelayEffect.put(event.getPersonId(), delayEffect);
+			this.alightingDelayEffects.add(delayEffect);
 		}
 	}
 	
@@ -225,7 +228,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 		delayEffect.setTransferDelay(actualTransferTime);
 		delayEffect.setAffectedAgents(0);
 		
-//		System.out.println(" ---> Start Tracking delay effect: " + delayEffect.toString());
+		System.out.println(" ---> Start Tracking delay effect: " + delayEffect.toString());
 		return delayEffect;
 		
 	}

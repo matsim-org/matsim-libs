@@ -35,10 +35,12 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 
@@ -64,7 +66,7 @@ import org.matsim.core.scenario.ScenarioImpl;
  * @author Ihab
  *
  */
-public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
+public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 	private final static Logger log = Logger.getLogger(InVehicleDelayHandler.class);
 
 	private final ScenarioImpl scenario;
@@ -73,6 +75,7 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
 	private final Map<Id, Boolean> vehId2isFirstTransfer = new HashMap<Id, Boolean>();
 	private final Map<Id, Integer> vehId2passengers = new HashMap<Id, Integer>();
+	private final Map<Id, Id> vehId2lastLeavingAgent = new HashMap<Id, Id>();
 
 	public InVehicleDelayHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -131,7 +134,13 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 			int passengersInVeh = this.vehId2passengers.get(vehId);
 			this.vehId2passengers.put(vehId, passengersInVeh - 1);
 			
-			calculateExternalEffects(vehId, personId, this.scenario.getVehicles().getVehicles().get(vehId).getType().getEgressTime(), time);
+			// der erste verzögert nur um 1+alighting time
+			// der zweite dritte vierte ... um exakt die alighting time
+			// der letzte verzögert nochmal um 1+alighting time
+			// the last alighting agent will be charged extra, therefore remember last personId
+			this.vehId2lastLeavingAgent.put(vehId, personId);
+			
+			calculateExternalEffects2(vehId, personId, this.scenario.getVehicles().getVehicles().get(vehId).getType().getEgressTime(), time);
 		}
 	}
 
@@ -146,6 +155,18 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 		//	Each time a public vehicle stops at a transit stop the public vehicle is delayed by 2 seconds.
 		//	Assuming this time to belong to the marginal user costs of the first person entering or leaving a public vehicle.
 		double delay = getActualDelay(vehId, transferTime);
+		
+		int delayedPassengers_inVeh = calcDelayedPassengersInVeh(vehId);
+					
+		InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, vehId, time, delayedPassengers_inVeh, delay);
+		this.events.processEvent(delayInVehicleEvent);			
+	}
+	
+	private void calculateExternalEffects2(Id vehId, Id personId, double transferTime, double time) {
+		
+		//	Each time a public vehicle stops at a transit stop the public vehicle is delayed by 2 seconds.
+		//	Assuming this time to belong to the marginal user costs of the first person entering or leaving a public vehicle.
+		double delay = getActualDelay2(vehId, transferTime, personId);
 		
 		int delayedPassengers_inVeh = calcDelayedPassengersInVeh(vehId);
 					
@@ -177,4 +198,38 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 		return delay;
 	}
 
+	private double getActualDelay2(Id vehId, double transferTime, Id personId) {
+		
+		boolean isFirstTransfer = this.vehId2isFirstTransfer.get(vehId);
+		if (isFirstTransfer){
+			this.vehId2isFirstTransfer.put(vehId, false);
+		}
+				
+		double delay = transferTime;
+		if (isFirstTransfer){
+			double extraDelay = 1.;
+			delay = transferTime + extraDelay;
+		}
+		
+		return delay;
+	}
+
+	@Override
+	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+		// vehicle departs at facility. throw delay event for last agent that was leaving the public vehicle.
+		
+		if (this.vehId2lastLeavingAgent.get(event.getVehicleId()) == null){
+			// no agent left the vehicle at the stop where the bus is departing from.
+		} else {
+			int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
+			Id personId = this.vehId2lastLeavingAgent.get(event.getVehicleId());
+			double delay = 1;
+			InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
+			this.events.processEvent(delayInVehicleEvent);
+		}
+		
+		this.vehId2lastLeavingAgent.remove(event.getVehicleId());
+		
+	}
+	
 }
