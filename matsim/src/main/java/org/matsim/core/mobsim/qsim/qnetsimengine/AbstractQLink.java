@@ -73,7 +73,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 
 	private final Map<Id, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<Id, MobsimAgent>();
 
-	private final Map<Id, MobsimDriverAgent> driversWaitingForCars = new LinkedHashMap<Id, MobsimDriverAgent>();
+	private final Map<Id, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<Id, Queue<MobsimDriverAgent>>();
 	
 	private final Map<Id, MobsimDriverAgent> driversWaitingForPassengers = new LinkedHashMap<Id, MobsimDriverAgent>();
 	
@@ -197,14 +197,16 @@ abstract class AbstractQLink extends QLinkInternalI {
 		driversWaitingForPassengers.clear();
 		
 		
-		for (MobsimAgent driver : driversWaitingForCars.values()) {
-			if (stuckAgents.contains(driver.getId())) continue;
-			else stuckAgents.add(driver.getId());
-			
-			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
-			this.network.simEngine.getMobsim().getAgentCounter().incLost();
-			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
+		for (Queue<MobsimDriverAgent> queue : driversWaitingForCars.values()) {
+			for (MobsimAgent driver : queue) {
+				if (stuckAgents.contains(driver.getId())) continue;
+				stuckAgents.add(driver.getId());
+				
+				this.network.simEngine.getMobsim().getEventsManager().processEvent(
+						new AgentStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
+				this.network.simEngine.getMobsim().getAgentCounter().incLost();
+				this.network.simEngine.getMobsim().getAgentCounter().decLiving();
+			}
 		}
 		driversWaitingForCars.clear();
 		for (Set<MobsimAgent> passengers : passengersWaitingForCars.values()) {
@@ -253,9 +255,12 @@ abstract class AbstractQLink extends QLinkInternalI {
 		 * all passengers are also there. If not, the driver is not inserted
 		 * into the vehicle and the vehicle does not depart.
 		 */
-		MobsimDriverAgent driverWaitingForCar = driversWaitingForCars.get(veh.getId());
-		if (driverWaitingForCar != null) {
-			MobsimDriverAgent driverWaitingForPassengers = driversWaitingForPassengers.get(driverWaitingForCar.getId());
+		final Queue<MobsimDriverAgent> driversWaitingForCar = driversWaitingForCars.get(veh.getId());
+		final boolean thereIsDriverWaiting = driversWaitingForCar != null && !driversWaitingForCar.isEmpty();
+		if ( thereIsDriverWaiting ) {
+			MobsimDriverAgent driverWaitingForPassengers =
+				driversWaitingForPassengers.get(
+						driversWaitingForCar.element().getId());
 			if (driverWaitingForPassengers != null) return;
 		}
 		
@@ -263,10 +268,13 @@ abstract class AbstractQLink extends QLinkInternalI {
 		 * If there is a driver waiting for its vehicle, and this car is not currently already leaving again with the
 		 * same vehicle, put the new driver into the vehicle and let it depart.
 		 */
-		if (driverWaitingForCar != null && veh.getDriver() == null) {
+		if (thereIsDriverWaiting && veh.getDriver() == null) {
 			// set agent as driver and then let the vehicle depart
-			driversWaitingForCars.remove(veh.getId());
-			veh.setDriver(driverWaitingForCar);
+			veh.setDriver(driversWaitingForCar.remove());
+			if (driversWaitingForCar.isEmpty()) {
+				final Queue<MobsimDriverAgent> r = driversWaitingForCars.remove(veh.getId());
+				assert r == driversWaitingForCar;
+			}
 			removeParkedVehicle( veh.getId() );
 			this.letVehicleDepart(veh, now);
 		}
@@ -357,9 +365,16 @@ abstract class AbstractQLink extends QLinkInternalI {
 	}
 
 	@Override
-	/*package*/ void registerDriverAgentWaitingForCar(MobsimDriverAgent agent) {
-		Id vehicleId = agent.getPlannedVehicleId() ;
-		driversWaitingForCars.put(vehicleId, agent);
+	/*package*/ void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) {
+		final Id vehicleId = agent.getPlannedVehicleId() ;
+		Queue<MobsimDriverAgent> queue = driversWaitingForCars.get( vehicleId );
+
+		if ( queue == null ) {
+			queue = new LinkedList<MobsimDriverAgent>();
+			driversWaitingForCars.put( vehicleId , queue );
+		}
+
+		queue.add( agent );
 	}
 
 	@Override
