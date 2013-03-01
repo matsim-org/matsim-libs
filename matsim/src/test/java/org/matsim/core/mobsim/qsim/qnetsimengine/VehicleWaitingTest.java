@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -55,12 +57,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
+ * Tests the behavior of the qsim with agents waiting for vehicles.
+ * <br>
+ * This is not really a "unit" test anymore (thus it artificially increases test
+ * coverage of the qsim), but at least, it checks that recent bugfixes actually
+ * fixed something. td, mar. 2013
+ *
  * @author thibautd
  */
 public class VehicleWaitingTest {
 	private static final Logger log =
 		Logger.getLogger(VehicleWaitingTest.class);
-
 
 	@Test
 	public void testVehicleWaitingOneLapDoesntFailNoDummies() {
@@ -82,11 +89,14 @@ public class VehicleWaitingTest {
 		testVehicleWaitingDoesntFail( 4 , true );
 	}
 
-
 	private static void testVehicleWaitingDoesntFail(final int nLaps, final boolean insertActivities) {
 		final Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup( new QSimConfigGroup() );
+		// test behavior when agents wait for the car
 		config.getQSimConfigGroup().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT );
+		// fail if the simualtion hangs forever (for instance, if some agents
+		// just vanish as in MATSIM-71)
+		config.getQSimConfigGroup().setEndTime( 48 * 3600 );
 
 		final Scenario sc = ScenarioUtils.createScenario( config );
 		
@@ -110,10 +120,14 @@ public class VehicleWaitingTest {
 
 		final PopulationFactory popFact = sc.getPopulation().getFactory();
 
+		final List<Id> personIds = new ArrayList<Id>();
 		final Id personId1 = new IdImpl( "A" );
-		final Id personId2 = new IdImpl( "B" );
+		personIds.add( personId1 );
+		personIds.add( new IdImpl( "B" ) );
+		personIds.add( new IdImpl( "C" ) );
+		personIds.add( new IdImpl( "D" ) );
 
-		for ( Id id : new Id[]{personId1, personId2} ) {
+		for ( Id id : personIds ) {
 			final Person person = popFact.createPerson( id );
 			final Plan plan = popFact.createPlan();
 			plan.setPerson( person );
@@ -185,7 +199,10 @@ public class VehicleWaitingTest {
 //			Assert.fail( "got an exception in the mobsim with arrivals "+arrivalCounts+"! "+e.getMessage() );
 //		}
 
-		for ( Id id : new Id[]{personId1, personId2} ) {
+		for ( Id id : personIds ) {
+			Assert.assertNotNull(
+					"no arrivals for person "+id,
+					arrivalCounts.get( id ) );
 			Assert.assertEquals(
 					"unexpected number of arrivals for person "+id,
 					nLaps * 2,
