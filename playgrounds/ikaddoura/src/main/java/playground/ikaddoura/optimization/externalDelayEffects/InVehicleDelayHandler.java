@@ -69,14 +69,19 @@ import org.matsim.core.scenario.ScenarioImpl;
 public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 	private final static Logger log = Logger.getLogger(InVehicleDelayHandler.class);
 
+	private final double extraDelay = 1.0;
 	private final ScenarioImpl scenario;
 	private final EventsManager events;
 	private final List<Id> ptDriverIDs = new ArrayList<Id>();
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
-	private final Map<Id, Boolean> vehId2isFirstTransfer = new HashMap<Id, Boolean>();
 	private final Map<Id, Integer> vehId2passengers = new HashMap<Id, Integer>();
-	private final Map<Id, Id> vehId2lastLeavingAgent = new HashMap<Id, Id>();
-
+	
+	private final Map<Id, Id> vehId2firstTransferingAgent = new HashMap<Id, Id>();
+	private final Map<Id, Id> vehId2lastTransferingAgent = new HashMap<Id, Id>();
+	
+	private final Map<Id, Integer> vehId2firstTransferAffectedAgents = new HashMap<Id, Integer>();
+	private final Map<Id, Integer> vehId2lastTransferAffectedAgents = new HashMap<Id, Integer>();
+	
 	public InVehicleDelayHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
@@ -84,10 +89,13 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 	
 	@Override
 	public void reset(int iteration) {
-		this.vehId2isFirstTransfer.clear();
 		this.vehId2passengers.clear();
 		this.ptDriverIDs.clear();
 		this.ptVehicleIDs.clear();
+		this.vehId2firstTransferingAgent.clear();
+		this.vehId2lastTransferingAgent.clear();
+		this.vehId2firstTransferAffectedAgents.clear();
+		this.vehId2lastTransferAffectedAgents.clear();
 	}
 
 	@Override
@@ -104,74 +112,67 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id personId = event.getPersonId();
-		Id vehId = event.getVehicleId();
-		double time = event.getTime();
 				
-		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){
-										
-			calculateExternalEffects(vehId, personId, this.scenario.getVehicles().getVehicles().get(vehId).getType().getAccessTime(), time);
+		if (!ptDriverIDs.contains(event.getPersonId()) && ptVehicleIDs.contains(event.getVehicleId())){
+													
+			double delay = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
+			int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
+			InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(event.getPersonId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
+			this.events.processEvent(delayInVehicleEvent);
+			
+			// remember first and last transfering agent
+			if (this.vehId2firstTransferingAgent.get(event.getVehicleId()) == null){
+				// No agent was leaving the vehicle before. Thus, this agent is the first transfering agent.
+				this.vehId2firstTransferingAgent.put(event.getVehicleId(), event.getPersonId());
+				this.vehId2firstTransferAffectedAgents.put(event.getVehicleId(), delayedPassengers_inVeh);
+				
+			}
+			this.vehId2lastTransferingAgent.put(event.getVehicleId(), event.getPersonId());
+			this.vehId2lastTransferAffectedAgents.put(event.getVehicleId(), delayedPassengers_inVeh);
 			
 			// update number of passengers in vehicle after calculating the external effect
-			if (this.vehId2passengers.containsKey(vehId)){
-				int passengersInVeh = this.vehId2passengers.get(vehId);
-				this.vehId2passengers.put(vehId, passengersInVeh + 1);
+			if (this.vehId2passengers.containsKey(event.getVehicleId())){
+				int passengersInVeh = this.vehId2passengers.get(event.getVehicleId());
+				this.vehId2passengers.put(event.getVehicleId(), passengersInVeh + 1);
 			} else {
-				this.vehId2passengers.put(vehId, 1);
+				this.vehId2passengers.put(event.getVehicleId(), 1);
 			}
 		}
 	}
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Id personId = event.getPersonId();
-		Id vehId = event.getVehicleId();
-		double time = event.getTime();
 		
-		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){							
+		if (!ptDriverIDs.contains(event.getPersonId()) && ptVehicleIDs.contains(event.getVehicleId())){		
+						
+			// update number of passengers in vehicle before throwing delay event
+			int passengersInVeh = this.vehId2passengers.get(event.getVehicleId());
+			this.vehId2passengers.put(event.getVehicleId(), passengersInVeh - 1);
 			
-			// update number of passengers in vehicle before calculating the external effect
-			int passengersInVeh = this.vehId2passengers.get(vehId);
-			this.vehId2passengers.put(vehId, passengersInVeh - 1);
+			double delay = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
+			int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
 			
-			// der erste verzögert nur um 1+alighting time
-			// der zweite dritte vierte ... um exakt die alighting time
-			// der letzte verzögert nochmal um 1+alighting time
-			// the last alighting agent will be charged extra, therefore remember last personId
-			this.vehId2lastLeavingAgent.put(vehId, personId);
+			// throw delay event
+			InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(event.getPersonId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
+			this.events.processEvent(delayInVehicleEvent);
 			
-			calculateExternalEffects2(vehId, personId, this.scenario.getVehicles().getVehicles().get(vehId).getType().getEgressTime(), time);
+			// remember first and last transfering agent and the number of affected agents
+			if (this.vehId2firstTransferingAgent.get(event.getVehicleId()) == null){
+				this.vehId2firstTransferingAgent.put(event.getVehicleId(), event.getPersonId());
+				this.vehId2firstTransferAffectedAgents.put(event.getVehicleId(), delayedPassengers_inVeh);
+			}
+			this.vehId2lastTransferingAgent.put(event.getVehicleId(), event.getPersonId());
+			this.vehId2lastTransferAffectedAgents.put(event.getVehicleId(), delayedPassengers_inVeh);
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		// Vehicle has arrived at transit stop. The following agent will be the first transfer of this vehicle.
-		this.vehId2isFirstTransfer.put(event.getVehicleId(), true);
-	}
-
-	private void calculateExternalEffects(Id vehId, Id personId, double transferTime, double time) {
-		
-		//	Each time a public vehicle stops at a transit stop the public vehicle is delayed by 2 seconds.
-		//	Assuming this time to belong to the marginal user costs of the first person entering or leaving a public vehicle.
-		double delay = getActualDelay(vehId, transferTime);
-		
-		int delayedPassengers_inVeh = calcDelayedPassengersInVeh(vehId);
-					
-		InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, vehId, time, delayedPassengers_inVeh, delay);
-		this.events.processEvent(delayInVehicleEvent);			
-	}
-	
-	private void calculateExternalEffects2(Id vehId, Id personId, double transferTime, double time) {
-		
-		//	Each time a public vehicle stops at a transit stop the public vehicle is delayed by 2 seconds.
-		//	Assuming this time to belong to the marginal user costs of the first person entering or leaving a public vehicle.
-		double delay = getActualDelay2(vehId, transferTime, personId);
-		
-		int delayedPassengers_inVeh = calcDelayedPassengersInVeh(vehId);
-					
-		InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, vehId, time, delayedPassengers_inVeh, delay);
-		this.events.processEvent(delayInVehicleEvent);			
+		// Vehicle has arrived at transit stop. Reset all first / last transfer informations for that vehicle.
+		this.vehId2firstTransferingAgent.remove(event.getVehicleId());
+		this.vehId2lastTransferingAgent.remove(event.getVehicleId());
+		this.vehId2firstTransferAffectedAgents.remove(event.getVehicleId());
+		this.vehId2lastTransferAffectedAgents.remove(event.getVehicleId());	
 	}
 	
 	private int calcDelayedPassengersInVeh(Id vehId) {
@@ -181,55 +182,22 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 		}
 		return delayedPassengersInVeh;
 	}
-	
-	private double getActualDelay(Id vehId, double transferTime) {
-		
-		boolean isFirstTransfer = this.vehId2isFirstTransfer.get(vehId);
-		if (isFirstTransfer){
-			this.vehId2isFirstTransfer.put(vehId, false);
-		}
-		
-		double delay = transferTime;
-		if (isFirstTransfer){
-			double extraDelay = 2.;
-			delay = transferTime + extraDelay;
-		}
-		
-		return delay;
-	}
-
-	private double getActualDelay2(Id vehId, double transferTime, Id personId) {
-		
-		boolean isFirstTransfer = this.vehId2isFirstTransfer.get(vehId);
-		if (isFirstTransfer){
-			this.vehId2isFirstTransfer.put(vehId, false);
-		}
-				
-		double delay = transferTime;
-		if (isFirstTransfer){
-			double extraDelay = 1.;
-			delay = transferTime + extraDelay;
-		}
-		
-		return delay;
-	}
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		// vehicle departs at facility. throw delay event for last agent that was leaving the public vehicle.
+		// vehicle departs at facility.
 		
-		if (this.vehId2lastLeavingAgent.get(event.getVehicleId()) == null){
-			// no agent left the vehicle at the stop where the bus is departing from.
-		} else {
-			int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
-			Id personId = this.vehId2lastLeavingAgent.get(event.getVehicleId());
-			double delay = 1;
-			InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
+		if (!(this.vehId2firstTransferingAgent.get(event.getVehicleId()) == null)){
+			// throw extra delay event for first transfering agent.
+			InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(this.vehId2firstTransferingAgent.get(event.getVehicleId()), event.getVehicleId(), event.getTime(), this.vehId2firstTransferAffectedAgents.get(event.getVehicleId()), this.extraDelay);
 			this.events.processEvent(delayInVehicleEvent);
 		}
 		
-		this.vehId2lastLeavingAgent.remove(event.getVehicleId());
-		
+		if (!(this.vehId2lastTransferingAgent.get(event.getVehicleId()) == null)){
+			// throw extra delay event for last transfering agent.
+			InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(this.vehId2lastTransferingAgent.get(event.getVehicleId()), event.getVehicleId(), event.getTime(), this.vehId2lastTransferAffectedAgents.get(event.getVehicleId()), this.extraDelay);
+			this.events.processEvent(delayInVehicleEvent);
+		}
 	}
 	
 }
