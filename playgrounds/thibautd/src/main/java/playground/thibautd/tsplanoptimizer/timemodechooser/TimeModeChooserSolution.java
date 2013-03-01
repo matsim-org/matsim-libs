@@ -20,6 +20,7 @@
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -29,13 +30,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 import playground.thibautd.tsplanoptimizer.framework.ValueImpl;
@@ -258,8 +260,23 @@ public class TimeModeChooserSolution implements Solution {
 
 	private static List<List<PlanElement>> analyseSubtours(
 			final List<PlanElement> planStructure) {
-		PlanAnalyzeSubtours analyzer = new PlanAnalyzeSubtours( planStructure , false );
-		return analyzer.getSubtourElements();
+		final Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(planStructure, EmptyStageActivityTypes.INSTANCE);
+
+		// XXX this is a quick adaptation to the new way of presenting results
+		final List< List<PlanElement> > elements = new ArrayList<List<PlanElement>>();
+
+		for (TripStructureUtils.Subtour s : subtours) {
+			final List<PlanElement> subtourElements = new ArrayList<PlanElement>();
+			elements.add( subtourElements );
+			int i = 0;
+			for ( Trip t : s.getTrips() ) {
+				if ( i++ == 0 ) subtourElements.add( t.getOriginActivity() );
+				subtourElements.addAll( t.getTripElements() );
+				subtourElements.add( t.getDestinationActivity() );
+			}
+		}
+
+		return elements;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
