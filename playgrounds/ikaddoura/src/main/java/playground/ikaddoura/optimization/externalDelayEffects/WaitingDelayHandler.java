@@ -142,6 +142,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 
 			// start tracking the delay effect induced by that person entering the public vehicle
 			double transferTime = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
+			// assuming the first agent to cause an extra delay before bus arrives
 			ExtEffectWaitingDelay delayEffect = startTrackingDelayEffect(event.getVehicleId(), event.getPersonId(), transferTime, this.extraDelay);
 			this.boardingDelayEffects.add(delayEffect);
 		}
@@ -193,6 +194,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 			
 			// start tracking the delay effect induced by that person leaving the public vehicle
 			double transferTime = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
+			// assuming the first agent to cause an extra delay before bus arrives at stop AND after bus leaves the stop
 			ExtEffectWaitingDelay delayEffect = startTrackingDelayEffect(event.getVehicleId(), event.getPersonId(), transferTime, this.extraDelay * 2);
 			this.alightingDelayEffects.add(delayEffect);
 		}
