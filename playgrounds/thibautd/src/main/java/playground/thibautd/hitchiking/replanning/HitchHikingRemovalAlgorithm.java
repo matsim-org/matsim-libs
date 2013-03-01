@@ -20,17 +20,18 @@
 package playground.thibautd.hitchiking.replanning;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Subtour;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours.Subtour;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
 /**
@@ -49,16 +50,16 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		PlanAnalyzeSubtours structure = new PlanAnalyzeSubtours( plan );
+		Collection<Subtour> structure = TripStructureUtils.getSubtours( plan , EmptyStageActivityTypes.INSTANCE );
 
 		Subtour toActOn = getRandomHhSubtour( structure );
 
 		String mode = getNonHhMode( toActOn );
 
 		List<Leg> eligibleLegs = new ArrayList<Leg>();
-		for (PlanElement pe : toActOn.getPlanElements()) {
-			if ( !(pe instanceof Leg) ) continue;
-			Leg l = (Leg) pe;
+		for (Trip t : toActOn.getTrips()) {
+			if ( t.getTripElements().size() > 1 ) throw new RuntimeException( ""+t );
+			final Leg l = t.getLegsOnly().get( 0 );
 			if ( HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) ||
 					HitchHikingConstants.PASSENGER_MODE.equals( l.getMode() ) ) {
 				eligibleLegs.add( l );
@@ -80,9 +81,9 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 	private static String getNonHhMode(final Subtour s) {
 		if (s == null) return null;
 
-		for (PlanElement pe : s.getPlanElements()) {
-			if ( !(pe instanceof Leg) ) continue;
-			Leg l = (Leg) pe;
+		for (Trip t : s.getTrips()) {
+			if ( t.getTripElements().size() > 1 ) throw new RuntimeException( ""+t );
+			final Leg l = t.getLegsOnly().get( 0 );
 			if ( !HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) &&
 					!HitchHikingConstants.PASSENGER_MODE.equals( l.getMode() ) ) {
 				return l.getMode();
@@ -92,13 +93,13 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 		return getNonHhMode( s.getParent() );
 	}
 
-	private Subtour getRandomHhSubtour(final PlanAnalyzeSubtours structure) {
+	private Subtour getRandomHhSubtour(final Collection<Subtour> structure) {
 		List<Subtour> eligibleSubtours = new ArrayList<Subtour>();
 
-		for (Subtour s : structure.getSubtours()) {
-			for ( PlanElement pe : s.getPlanElements() ) {
-				if ( !(pe instanceof Leg) ) continue;
-				Leg l = (Leg) pe;
+		for (Subtour s : structure) {
+			for (Trip t : s.getTrips()) {
+				if ( t.getTripElements().size() > 1 ) throw new RuntimeException( ""+t );
+				final Leg l = t.getLegsOnly().get( 0 );
 				if ( HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) ||
 						HitchHikingConstants.PASSENGER_MODE.equals( l.getMode() ) ) {
 					// add once per leg, so that probability of selecting a subtour
