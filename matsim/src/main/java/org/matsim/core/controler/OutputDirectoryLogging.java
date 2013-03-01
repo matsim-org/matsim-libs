@@ -81,9 +81,18 @@ public abstract class OutputDirectoryLogging {
 	 * This variable is used to store the log4j output before it can be written
 	 * to a file. This is needed to set the output directory before logging.
 	 */
-	private static CollectLogMessagesAppender collectLogMessagesAppender;
+	private static CollectLogMessagesAppender collectLogMessagesAppender = null;
 
 	public static void catchLogEntries() {
+		if ( collectLogMessagesAppender != null ) {
+			// create a new instance only if there is not one yet, to allow
+			// collecting log messages issued _before_ controller construction.
+			// Otherwise, all log messages before the last call to this method
+			// are lost.
+			// td, mar. 2013
+			return;
+		}
+
 		collectLogMessagesAppender = new CollectLogMessagesAppender();
 		Logger.getRootLogger().addAppender(collectLogMessagesAppender);
 	}
