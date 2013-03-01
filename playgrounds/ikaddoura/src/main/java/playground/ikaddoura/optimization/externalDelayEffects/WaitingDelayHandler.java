@@ -51,17 +51,19 @@ import org.matsim.core.scenario.ScenarioImpl;
  * External effects to be considered in future:
  * TODO: Capacity constraints.
  * 
- * Assumptions for the current version:
+ * IMPORTANT Assumptions:
  * 1) The scheduled dwell time at transit stops is 0sec. TODO: Get dwell time from schedule and account for dwell times >0sec.
  * 2) The door operation mode of public vehicles is serial. TODO: Adjust for parallel door operation mode.
  * 3) Public vehicles start with no delay. The slack time at the end of a transit route has to be larger than the max. delay of public vehicles.
- * 4) Transit stops belong to single transit routes. Transit routes do not intersect or overlay.
  * 5) Agents board the first arriving public vehicle. The vehicle capacity has to be larger than the max. number of passengers.
  * 
  * Note: Whenever a pt vehicle stops at a transit stop due to at least one agent boarding or alighting,
- * the pt vehicle will be delayed by additional 2 sec. That is, the delay of the first transfer is equal to
- * the transfer time per agent plus exactly these 2 sec. All following passengers only cause delays according to
- * their transfer times.
+ * the pt vehicle will be delayed by additional 2 sec, e.g. 1 sec before and 1 sec after agents are entering and leaving.
+ * These seconds can be interpret as "doors opening" and "doors closing" time.
+ * It is assumed that these extra delay are caused by ALL agents entering and leaving the vehicle at the current transit stop.
+ * The delay per person is calculated by dividing the sum of "door opening" and "door closing" time by the total number of transfering agents.
+ * Another possibility (NOT implemented): Let the first transfering agent pay for these extra delay. But this may cause weird competition
+ * not to be the first boarding or alighting agent... 
  * 
  * @author Ihab
  *
@@ -69,8 +71,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 	private final static Logger log = Logger.getLogger(WaitingDelayHandler.class);
 
-	// extra delay for a bus to arrive and depart at a transit stop if there is at least one transfer
-	// (before and after agents are leaving and/or entering a public vehicle)
+	// extra delay for a bus before and after agents are entering or leaving a public vehicle
 	private final double doorOpeningTime = 1.0;
 	private final double doorClosingTime = 1.0;
 	private final Map<Id, List<Id>> vehId2agentsTransferingAtThisStop = new HashMap<Id, List<Id>>();
@@ -120,7 +121,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 			for (ExtEffectWaitingDelay delay : this.boardingDelayEffects){
 				
 				if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && !delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					log.warn("Agent is already being tracked. Starting parallel personTracking for different vehicles. " +
+					log.info("Agent is already being tracked. Starting parallel personTracking for different vehicles. " +
 							"That means the bus which was previously delayed by that agent has not yet arrived the end of the transit route. " +
 							"Must have been a very short activity... ");
 				
@@ -212,7 +213,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 			
 			for (ExtEffectWaitingDelay delay : this.alightingDelayEffects){
 				if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && !delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					log.warn("Agent is already being tracked. Starting parallel personTracking for different vehicles. " +
+					log.info("Agent is already being tracked. Starting parallel personTracking for different vehicles. " +
 							"That means the bus which was previously delayed by that agent has not yet arrived the end of the transit route. " +
 							"Must have been a very short activity... ");
 				
@@ -268,7 +269,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 				double delayPerPerson = (this.doorClosingTime + this.doorOpeningTime) / agentsTransferingAtThisStop.size();
 				
 				for (Id personId : agentsTransferingAtThisStop){
-					// start new tracking for each person
+					// start tracking for each person
 					ExtEffectWaitingDelay delayEffect = startTrackingDelayEffect(event.getVehicleId(), personId, delayPerPerson);
 					this.extraDelayEffects.add(delayEffect);	
 				}
