@@ -69,7 +69,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 	private final static Logger log = Logger.getLogger(InVehicleDelayHandler.class);
 
+	// extra delay for a bus to arrive and depart at a transit stop if there is at least one transfer
+	// (before and after agents are leaving and/or entering a public vehicle)
 	private final double extraDelay = 1.0;
+	
 	private final ScenarioImpl scenario;
 	private final EventsManager events;
 	private final List<Id> ptDriverIDs = new ArrayList<Id>();
