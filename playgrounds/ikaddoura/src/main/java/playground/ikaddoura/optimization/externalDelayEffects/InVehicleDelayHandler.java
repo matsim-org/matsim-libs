@@ -81,7 +81,8 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 	private final Map<Id, Integer> vehId2passengers = new HashMap<Id, Integer>();
 	
 	private final Map<Id, Integer> vehId2agentsInBusBeforeStop = new HashMap<Id, Integer>();
-	private final Map<Id, List<Id>> vehId2agentsTransferingAtThisStop = new HashMap<Id, List<Id>>();
+	private final Map<Id, List<Id>> vehId2agentsBoardingAtThisStop = new HashMap<Id, List<Id>>();
+	private final Map<Id, List<Id>> vehId2agentsAlightingAtThisStop = new HashMap<Id, List<Id>>();
 	
 	public InVehicleDelayHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -94,7 +95,8 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 		this.ptDriverIDs.clear();
 		this.ptVehicleIDs.clear();
 		this.vehId2agentsInBusBeforeStop.clear();
-		this.vehId2agentsTransferingAtThisStop.clear();
+		this.vehId2agentsBoardingAtThisStop.clear();
+		this.vehId2agentsAlightingAtThisStop.clear();
 	}
 
 	@Override
@@ -116,13 +118,13 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 			
 			// remember who was boarding and alighting at this stop.
 			List<Id> agentsTransferingAtThisStop;
-			if (this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null){
+			if (this.vehId2agentsBoardingAtThisStop.get(event.getVehicleId()) == null){
 				agentsTransferingAtThisStop = new ArrayList<Id>();
 			} else {
-				agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());
+				agentsTransferingAtThisStop = this.vehId2agentsBoardingAtThisStop.get(event.getVehicleId());
 			}
 			agentsTransferingAtThisStop.add(event.getPersonId());
-			this.vehId2agentsTransferingAtThisStop.put(event.getVehicleId(), agentsTransferingAtThisStop);
+			this.vehId2agentsBoardingAtThisStop.put(event.getVehicleId(), agentsTransferingAtThisStop);
 													
 			double delay = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
 			int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
@@ -146,13 +148,13 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 			
 			// remember who was boarding and alighting at this stop.
 			List<Id> agentsTransferingAtThisStop;
-			if (this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null){
+			if (this.vehId2agentsAlightingAtThisStop.get(event.getVehicleId()) == null){
 				agentsTransferingAtThisStop = new ArrayList<Id>();
 			} else {
-				agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());
+				agentsTransferingAtThisStop = this.vehId2agentsAlightingAtThisStop.get(event.getVehicleId());
 			}
 			agentsTransferingAtThisStop.add(event.getPersonId());
-			this.vehId2agentsTransferingAtThisStop.put(event.getVehicleId(), agentsTransferingAtThisStop);
+			this.vehId2agentsAlightingAtThisStop.put(event.getVehicleId(), agentsTransferingAtThisStop);
 			
 			// update number of passengers in vehicle before throwing delay event
 			int passengersInVeh = this.vehId2passengers.get(event.getVehicleId());
@@ -171,7 +173,9 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		// Vehicle has arrived at transit stop. Reset all informations for that vehicle.
 		this.vehId2agentsInBusBeforeStop.remove(event.getVehicleId());
-		this.vehId2agentsTransferingAtThisStop.remove(event.getVehicleId());
+
+		this.vehId2agentsBoardingAtThisStop.remove(event.getVehicleId());
+		this.vehId2agentsAlightingAtThisStop.remove(event.getVehicleId());
 		
 		this.vehId2agentsInBusBeforeStop.put(event.getVehicleId(), this.vehId2passengers.get(event.getVehicleId()));
 	}
@@ -187,18 +191,51 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		// vehicle departs at facility. Throw extra delay events for the doors opening and closing time
+		int numberOfAgentsBoarding = 0;
+		int numberOfAgentsAlighting = 0;
 		
-		if (!(this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null)){
+		if (!(this.vehId2agentsBoardingAtThisStop.get(event.getVehicleId()) == null)){
+			List<Id> agentsBoardingAtThisStop = this.vehId2agentsBoardingAtThisStop.get(event.getVehicleId());
+			numberOfAgentsBoarding = agentsBoardingAtThisStop.size();	
+		}
+		
+		if (!(this.vehId2agentsAlightingAtThisStop.get(event.getVehicleId()) == null)){
+			List<Id> agentsAlightingAtThisStop = this.vehId2agentsAlightingAtThisStop.get(event.getVehicleId());
+			numberOfAgentsAlighting = agentsAlightingAtThisStop.size();	
+		}
+		
+		int numberOfAgentsTransfering = numberOfAgentsBoarding + numberOfAgentsAlighting;
+		double delayPerPerson = (this.doorClosingTime + this.doorOpeningTime) / numberOfAgentsTransfering;
 
-			List<Id> agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());
-			if (!(agentsTransferingAtThisStop.size() == 0)){
-				double delayPerPerson = (this.doorClosingTime + this.doorOpeningTime) / agentsTransferingAtThisStop.size();
+		if (!(this.vehId2agentsBoardingAtThisStop.get(event.getVehicleId()) == null)){
+			List<Id> agentsBoardingAtThisStop = this.vehId2agentsBoardingAtThisStop.get(event.getVehicleId());
+			
+			if (!(agentsBoardingAtThisStop.size() == 0)) {
+				
 				int affectedAgents = 0;
 				if (!(this.vehId2agentsInBusBeforeStop.get(event.getVehicleId()) == null)){
 					affectedAgents = this.vehId2agentsInBusBeforeStop.get(event.getVehicleId());
 				}
-				for (Id id : agentsTransferingAtThisStop){
-					InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(id, event.getVehicleId(), event.getTime(), affectedAgents, delayPerPerson);
+				
+				for (Id personId : agentsBoardingAtThisStop){
+					InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, event.getVehicleId(), event.getTime(), affectedAgents, delayPerPerson);
+					this.events.processEvent(delayInVehicleEvent);
+				}
+			}
+		}
+		
+		if (!(this.vehId2agentsAlightingAtThisStop.get(event.getVehicleId()) == null)){
+			List<Id> agentsAlightingAtThisStop = this.vehId2agentsAlightingAtThisStop.get(event.getVehicleId());
+			
+			if (!(agentsAlightingAtThisStop.size() == 0)) {
+				
+				int affectedAgents = 0;
+				if (!(this.vehId2passengers.get(event.getVehicleId()) == null)){
+					affectedAgents = this.vehId2passengers.get(event.getVehicleId());
+				}
+				
+				for (Id personId : agentsAlightingAtThisStop){
+					InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, event.getVehicleId(), event.getTime(), affectedAgents, delayPerPerson);
 					this.events.processEvent(delayInVehicleEvent);
 				}
 			}
