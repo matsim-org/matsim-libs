@@ -303,17 +303,15 @@ class ExternalControler {
 		info.setWaitingTimesMissed(analysis.getWaitHandler().getWaitingTimesMissed());
 		info.setPersonId2waitingTimes(analysis.getWaitHandler().getPersonId2waitingTimes());
 		info.setNumberOfMissedVehicles(analysis.getWaitHandler().getNumberOfMissedVehicles());
-						
+		
+		info.setMaxDepartureDelay(analysis.getWaitHandler().getMaxDepartDelay());
+		info.setMaxArrivalDelay(analysis.getWaitHandler().getMaxArriveDelay());
+		
 		info.setAvgT0MinusTActPerPerson(analysis.getCongestionHandler().getAvgTActMinusT0PerPerson());
 		info.setT0MinusTActSum(analysis.getCongestionHandler().getTActMinusT0Sum());
 		info.setAvgT0MinusTActDivT0PerTrip(analysis.getCongestionHandler().getAvgT0minusTActDivT0PerCarTrip());
 		
 		info.setAverageFarePerAgent(analysis.getAverageFarePerAgent());
-		
-//		System.out.println("MaxArrivalDelay: " + analysis.getWaitHandler().getMaxArriveDelay());
-//		System.out.println("MaxDeparturelDelay: " + analysis.getWaitHandler().getMaxDepartDelay());
-		
-//		System.out.println("Average Fare per agent:  " +  analysis.getAverageFarePerAgent());
 		
 		this.it2information.put(iterationCounter, info);
 		

@@ -31,7 +31,7 @@ public class TextFileWriter {
 	    String zeile0 = directoryExtItParam;
 	    bw.write(zeile0);
 	    bw.newLine();
-	    String zeile1 = "ITERATION;Headway (sec);NumberOfBuses;Headway (hh:mm:ss);Fare (AUD);AvgFarePerAgent (AUD);Capacity (Pers/Veh);TotalDemand;OperatorCosts (AUD);OperatorRevenue (AUD);OperatorProfit (AUD);UsersLogSum (AUD);Welfare (AUD);CarLegs;PtLegs;WalkLegs;AvgWaitingTimeAll (sec);AvgWaitingTimeNotMissing (sec);AvgWaitingTimeMissing (sec);NumberOfMissedBusTrips;NumberOfNotMissedBusTrips;MissedBusses;t0MinusTActSum (sec);avgT0MinusTActPerPerson (sec);avgT0MinusTActDivT0perTrip;NumberOfAgentsNoValidPlan";
+	    String zeile1 = "ITERATION;Headway (sec);NumberOfBuses;Headway (hh:mm:ss);Fare (AUD);AvgFarePerAgent (AUD);Capacity (Pers/Veh);TotalDemand;OperatorCosts (AUD);OperatorRevenue (AUD);OperatorProfit (AUD);UsersLogSum (AUD);Welfare (AUD);CarLegs;PtLegs;WalkLegs;AvgWaitingTimeAll (sec);AvgWaitingTimeNotMissing (sec);AvgWaitingTimeMissing (sec);NumberOfMissedBusTrips;NumberOfNotMissedBusTrips;MissedBusses;t0MinusTActSum (sec);avgT0MinusTActPerPerson (sec);avgT0MinusTActDivT0perTrip;maxDepartureDelay (sec);maxArrivalDelay (sec);NumberOfAgentsNoValidPlan";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -61,7 +61,10 @@ public class TextFileWriter {
 	    	double avgT0MinusTActDivT0perTrip = extIt2information.get(iteration).getAvgT0MinusTActDivT0PerTrip();
 	    	double numberOfAgentsNoValidPlan = extIt2information.get(iteration).getNoValidPlanScore();
 	    	double avgFarePerAgent = extIt2information.get(iteration).getAverageFarePerAgent();
-	    	String zeile = iteration+ ";"+headway_sec+";"+numberOfBuses+";"+headway+";"+fare+";"+avgFarePerAgent+";"+capacity+";"+totalDemand+";"+costs+ ";"+revenue+";"+operatorProfit+";"+userScoreSum+";"+totalScore+";"+carLegs+";"+ptLegs+";"+walkLegs+";"+avgWaitTimeAll+";" +avgWaitTimeNotMissing+";"+avgWaitTimeMissing+";"+waitingTimeMoreThanHeadway+";"+waitingTimeLessThanHeadway+";"+missedBusses+ ";" +t0MinustActSum+ ";" +avgT0MinustActPerPerson+ ";" +avgT0MinusTActDivT0perTrip+ ";" +numberOfAgentsNoValidPlan;
+	    	double maxDepartureDelay = extIt2information.get(iteration).getMaxDepartureDelay();
+	    	double maxArrivalDelay = extIt2information.get(iteration).getMaxArrivalDelay();
+	    	
+	    	String zeile = iteration+ ";"+headway_sec+";"+numberOfBuses+";"+headway+";"+fare+";"+avgFarePerAgent+";"+capacity+";"+totalDemand+";"+costs+ ";"+revenue+";"+operatorProfit+";"+userScoreSum+";"+totalScore+";"+carLegs+";"+ptLegs+";"+walkLegs+";"+avgWaitTimeAll+";" +avgWaitTimeNotMissing+";"+avgWaitTimeMissing+";"+waitingTimeMoreThanHeadway+";"+waitingTimeLessThanHeadway+";"+missedBusses+ ";" +t0MinustActSum+ ";" +avgT0MinustActPerPerson+ ";" +avgT0MinusTActDivT0perTrip+ ";"+maxDepartureDelay+";"+maxArrivalDelay+";"+numberOfAgentsNoValidPlan;
 	
 	    	bw.write(zeile);
 	        bw.newLine();

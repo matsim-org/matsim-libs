@@ -55,7 +55,7 @@ import org.matsim.core.scenario.ScenarioImpl;
  * 1) The scheduled dwell time at transit stops is 0sec. TODO: Get dwell time from schedule and account for dwell times >0sec.
  * 2) The door operation mode of public vehicles is serial. TODO: Adjust for parallel door operation mode.
  * 3) Public vehicles start with no delay. The slack time at the end of a transit route has to be larger than the max. delay of public vehicles.
- * 5) Agents board the first arriving public vehicle. The vehicle capacity has to be larger than the max. number of passengers.
+ * 4) Agents board the first arriving public vehicle. The vehicle capacity has to be larger than the max. number of passengers.
  * 
  * Note: Whenever a pt vehicle stops at a transit stop due to at least one agent boarding or alighting,
  * the pt vehicle will be delayed by additional 2 sec, e.g. 1 sec before and 1 sec after agents are entering and leaving.

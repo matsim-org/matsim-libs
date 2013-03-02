@@ -61,6 +61,8 @@ public class IterationInfo {
 	private List <Double> waitingTimesNotMissed = new ArrayList<Double>();
 			
 	private int numberOfMissedVehicles;
+	private double maxArrivalDelay;
+	private double maxDepartureDelay;
 	
 	private double averageFarePerAgent;
 	
@@ -306,6 +308,22 @@ public class IterationInfo {
 
 	public void setAverageFarePerAgent(double averageFarePerAgent) {
 		this.averageFarePerAgent = averageFarePerAgent;
+	}
+
+	public double getMaxArrivalDelay() {
+		return maxArrivalDelay;
+	}
+
+	public void setMaxArrivalDelay(double maxArrivalDelay) {
+		this.maxArrivalDelay = maxArrivalDelay;
+	}
+
+	public double getMaxDepartureDelay() {
+		return maxDepartureDelay;
+	}
+
+	public void setMaxDepartureDelay(double maxDepartureDelay) {
+		this.maxDepartureDelay = maxDepartureDelay;
 	}
 		
 }
