@@ -55,6 +55,8 @@ public class DCControler extends Controler {
 	}
 	
 	protected void loadControlerListeners() {
+		this.lcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
+		
 		this.addControlerListener(new DestinationChoiceInitializer(this.lcContext));
 		super.loadControlerListeners();
 	}
