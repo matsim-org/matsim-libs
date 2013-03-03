@@ -18,6 +18,7 @@
  * *********************************************************************** */
 
 package org.matsim.contrib.locationchoice.bestresponse.scoring;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
@@ -35,6 +36,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 	private final Controler controler;
 	private DestinationChoiceBestResponseContext lcContext;
 	private Config config;
+	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 
 	/*
 	 * TODO: remove unused params
@@ -44,6 +46,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 		this.controler = controler;
 		this.lcContext = lcContext;
 		this.config = config;
+		log.info("creating DCScoringFunctionFactory");
 	}
 		
 	private boolean usingFacilityOpeningTimes = true ;
