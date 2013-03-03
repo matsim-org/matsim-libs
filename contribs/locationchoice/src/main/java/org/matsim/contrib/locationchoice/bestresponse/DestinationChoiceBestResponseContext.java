@@ -56,7 +56,8 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 
 	public DestinationChoiceBestResponseContext(Scenario scenario) {
 		this.scenario = scenario;	
-		this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
+		log.info("dc context created but not yet initialized");
+		//this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
 	}
 	
 	public void init() {

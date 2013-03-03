@@ -35,6 +35,7 @@ public class BestReplyTest extends MatsimTestCase {
 		String configFile = this.getPackageInputDirectory() + "/config.xml";
 		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		this.context = new DestinationChoiceBestResponseContext(this.scenario);
+		this.context.init();
 	}
 	
 	public void testRunControler() {

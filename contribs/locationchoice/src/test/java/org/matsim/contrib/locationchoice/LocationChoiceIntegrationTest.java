@@ -95,6 +95,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// joint context (based on scenario):
 		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
+		lcContext.init();
 				
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
@@ -174,6 +175,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		}
 
 		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
+		lcContext.init();
 		
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
