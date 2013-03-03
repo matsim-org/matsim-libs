@@ -255,15 +255,18 @@ public class ChoiceSet {
 	
 	private double getTotalScore(ArrayList<ScoredAlternative> list) {
 		double totalScore = 0.0;
-		for (int index = 0; index < this.numberOfAlternatives; index++)  {
+		
+		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
+		
+		for (int index = 0; index < nrElements; index++)  {
 			ScoredAlternative sa = list.get(index);
-			totalScore += sa.getScore() + this.getOffset(list);
+			totalScore += sa.getScore() + this.getOffset(list, nrElements);
 		}
 		return totalScore;
 	}
 	
-	private double getOffset(ArrayList<ScoredAlternative> list) {
-		double smallestScore = list.get(this.numberOfAlternatives - 1).getScore();
+	private double getOffset(ArrayList<ScoredAlternative> list, int nrElements) {
+		double smallestScore = list.get(nrElements - 1).getScore();
 		return Math.min(smallestScore, 0.0) * (-1.0); // if smallest score is negative, then add offsets!
 	}
 	
@@ -278,11 +281,13 @@ public class ChoiceSet {
 		Collections.sort(list);
 		double totalScore = this.getTotalScore(list);
 		
+		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
+		
 		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
 		double sumScore = 0.0;
-		for (int index = 0; index < this.numberOfAlternatives; index++)  {
+		for (int index = 0; index < nrElements; index++)  {
 			ScoredAlternative sa = list.get(index);
-			sumScore += (sa.getScore() + this.getOffset(list)) / totalScore;				
+			sumScore += (sa.getScore() + this.getOffset(list, nrElements)) / totalScore;				
 			mapNormalized.put(sumScore , sa.getAlternativeId());	
 		}
 		return mapNormalized;

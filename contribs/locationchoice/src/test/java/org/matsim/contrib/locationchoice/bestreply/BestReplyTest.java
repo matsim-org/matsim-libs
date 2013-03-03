@@ -2,12 +2,11 @@ package org.matsim.contrib.locationchoice.bestreply;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.DCControler;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ComputeMaxDCScoreMultiThreatedModule;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -36,5 +35,10 @@ public class BestReplyTest extends MatsimTestCase {
 		String configFile = this.getPackageInputDirectory() + "/config.xml";
 		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		this.context = new DestinationChoiceBestResponseContext(this.scenario);
+	}
+	
+	public void testRunControler() {
+		String args [] = {this.getPackageInputDirectory() + "/config.xml"};
+		DCControler.main(args);		
 	}
 }
