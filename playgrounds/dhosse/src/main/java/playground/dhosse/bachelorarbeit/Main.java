@@ -21,7 +21,7 @@ public class Main {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
-		nr.readFile(path+"/"+file3+".xml");
+		nr.readFile(path+"/"+file1+".xml");
 //		pr.readFile(path+"/"+"/test_population.xml");
 		
 //		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
