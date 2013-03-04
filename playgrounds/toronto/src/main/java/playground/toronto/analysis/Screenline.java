@@ -9,10 +9,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -33,8 +29,6 @@ import com.vividsolutions.jts.geom.MultiLineString;
  * while links crossing left-to-right are considered the <em>negative direction</em>. 
  * It is up to the screenline coder to assign useful names to each direction.
  * 
- * <br><br>[Insert information about handler behaviour]
- * 
  * @author pkucirek
  * @author aweiss
  */
@@ -50,11 +44,13 @@ public class Screenline{
 	
 	
 	/**
-	 * Loads a Map of {@link Screenline} (Id : Screenline) from a shapefile.
-	 * @param shapefile - The address of a properly-formatted shapefile. Its attribute
-	 * 		table must include columns labeled "Id", "PosDirName", "NegDirName", and
+	 * Loads a set of screenlines from a shapefile.
+	 * 
+	 * @param shapefile - The file location of a properly-formatted shapefile. The 
+	 * 		shapefile can only include POLYLINE geometries and its attribute
+	 * 		table MUST include columns labeled "Id", "PosDirName", "NegDirName", and
 	 * 		"Descr".
-	 * @return
+	 * @return Map of {@link Id} : {@link Screenline}.
 	 */
 	public static Map<Id, Screenline> openShapefile(String shapefile){
 		HashMap<Id, Screenline> result = new HashMap<Id, Screenline>();
@@ -89,13 +85,15 @@ public class Screenline{
 	}
 	
 	/**
-	 * Loads a Map of {@link Screenline} (Id : Screenline) from a shapefile, initializing
-	 * each Screenline with links from the network.
-	 * @param shapefile - The address of a properly-formatted shapefile. Its attribute
-	 * 		table must include columns labeled "Id", "PosDirName", "NegDirName", and
+	 * Loads a set of screenlines from a shapefile, initializing each Screenline with links 
+	 * from the network.
+	 * 
+	 * @param shapefile - The file location of a properly-formatted shapefile. The 
+	 * 		shapefile can only include POLYLINE geometries and its attribute
+	 * 		table MUST include columns labeled "Id", "PosDirName", "NegDirName", and
 	 * 		"Descr".
 	 * @param network - The {@link Network} to load links from. 
-	 * @return
+	 * @return Map of {@link Id} : {@link Screenline}.
 	 */
 	public static Map<Id, Screenline> openShapefile(String shapefile, Network network){
 		Map<Id, Screenline> result = Screenline.openShapefile(shapefile);
@@ -139,6 +137,7 @@ public class Screenline{
 	/**
 	 * Loads the screenline's links from a given {@link Network}. By
 	 * default, invoking this method will clear any stored link IDs.
+	 * 
 	 * @param network The {@link Network} to load links from.
 	 */
 	public void loadLinksFromNetwork(Network network){
@@ -202,10 +201,16 @@ public class Screenline{
 		return this.id;
 	}
 	
+	/**
+	 * @return Ids of links crossing in the positive direction (right-to-left)
+	 */
 	public List<Id> getPlusLinks(){
 		return this.plusLinks;
 	}
 	
+	/**
+	 * @return Ids of links crossing in the negative direction (left-to-right)
+	 */
 	public List<Id> getMinusLinks(){
 		return this.minusLinks;
 	}

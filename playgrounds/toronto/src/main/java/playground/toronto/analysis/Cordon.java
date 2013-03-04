@@ -3,7 +3,6 @@ package playground.toronto.analysis;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -20,6 +19,17 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
 /**
+ * A cordon is some kind of administrative boundary, represented by a closed polygon. Cordons
+ * are often used for modeling of 'congestion zone' type scenarios, but could also be used
+ * for analysis. This class facilitates cordon analysis by loading in a polyon geometry and 
+ * figuring out which network links cross it and which links are interior.
+ * 
+ * <br><br> In addition to metadata, the cordon contains three {@link Collection}s of link
+ * {@link Id}s: links crossing <em>into</em> the cordon, links crossing <em>out from</em> 
+ * the cordon, and interior links fully contained within the cordon.
+ * 
+ * <br><br>This class also implements the {@link NetworkLinkFilter} interface, which allows
+ * it to also be used to extract subareas from the network.
  * 
  * @author pkucirek
  *
@@ -32,6 +42,14 @@ public class Cordon implements NetworkLinkFilter {
 	public final static String ID = "Id";
 	public final static String DESCRNAME = "Descr";
 	
+	/**
+	 * Loads a set of cordons from a shapefile. 
+	 * 
+	 * @param shapefile - The file location of a properly-formatted shapefile. The
+	 * 		shapefile can only include POLYGON geometries, and the attribute table
+	 * 		MUST include columns labelled "Id" and "Descr".
+	 * @return Map of {@link Id} : {@link Cordon}
+	 */
 	public static Map<Id, Cordon> openShapefile(String shapefile){
 		HashMap<Id, Cordon> result = new HashMap<Id, Cordon>();
 		
@@ -62,6 +80,16 @@ public class Cordon implements NetworkLinkFilter {
 		return result;
 	}
 	
+	/**
+	 * Loads a set of cordons from a shapefile, initializing each Cordon with links 
+	 * from the network.
+	 * 
+	 * @param shapefile - The file location of a properly-formatted shapefile. The
+	 * 		shapefile can only include POLYGON geometries, and the attribute table
+	 * 		MUST include columns labelled "Id" and "Descr".
+	 * @param network - The {@link Network} to load links from. 
+	 * @return Map of {@link Id} : {@link Cordon}
+	 */
 	public static Map<Id, Cordon> openShapefile(String shapefile, Network network){
 		Map<Id, Cordon> result = Cordon.openShapefile(shapefile);
 		
@@ -78,9 +106,9 @@ public class Cordon implements NetworkLinkFilter {
 	private final Id id;
 	public String description;
 	
-	private List<Id> inLinks;
-	private List<Id> outLinks;
-	private List<Id> interiorLinks;
+	private Collection<Id> inLinks;
+	private Collection<Id> outLinks;
+	private Collection<Id> interiorLinks;
 	private final MultiPolygon geom;
 	private GeometryFactory factory;
 	
@@ -97,10 +125,23 @@ public class Cordon implements NetworkLinkFilter {
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Loads the cordon's links from a given {@link Network}. By
+	 * default, invoking this method will clear any stored link IDs.
+	 * 
+	 * @param network The {@link Network} to load links from.
+	 */
 	public void loadLinksFromNetwork(Network network){
 		this.loadLinksFromNetwork(network, true);
 	}
 	
+	/**
+	 * Loads the cordon's links from a given {@link Network}.
+	 * 
+	 * @param network The {@link Network} to load links from.
+	 * @param initializeLinks If <b>true</b>, this method will first clear
+	 * any stored link IDs.
+	 */
 	public void loadLinksFromNetwork(Network network, boolean initializeLinks){
 		if (initializeLinks){
 			this.inLinks.clear();
@@ -133,18 +174,29 @@ public class Cordon implements NetworkLinkFilter {
 		return this.id;
 	}
 	
-	public List<Id> getInLinks(){
+	/**
+	 * @return Ids of links crossing into the cordon
+	 */
+	public Collection<Id> getIncomingLinks(){
 		return this.inLinks;
 	}
 	
-	public List<Id> getOutLinks(){
+	/**
+	 * @return Ids of links crossing out from the cordon
+	 */
+	public Collection<Id> getOutgoingLinks(){
 		return this.outLinks;
 	}
 	
-	public List<Id> getInteriorLinks(){
+	/**
+	 * @return Ids of links containted within the cordon
+	 */
+	public Collection<Id> getInteriorLinks(){
 		return this.interiorLinks;
 	}
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	@Override
 	public boolean judgeLink(Link l) {
 		if (inLinks.contains(l.getId()) ||
