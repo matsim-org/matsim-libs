@@ -134,13 +134,13 @@ public class AddAttributes {
 			double priceScaled = this.avg_price;
 			double sizeScaled = this.avg_size;
 			if (shop.getPrice() > 0) {
-				priceScaled = shop.getPrice() - this.avg_price;
+				priceScaled = shop.getPrice();
 			}
 			else {
 				priceScaled = this.avg_price;
 			}
 			if (shop.getSize() > 0) {
-				sizeScaled = shop.getSize() - this.avg_size;
+				sizeScaled = shop.getSize();
 			}
 			else {
 				sizeScaled = this.avg_size;
