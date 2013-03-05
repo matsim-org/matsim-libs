@@ -19,48 +19,28 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
-import java.util.List;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
-import playground.thibautd.analysis.listeners.ModeAnalysis;
-import playground.thibautd.analysis.listeners.TripModeShares;
-import playground.thibautd.router.PlanRoutingAlgorithmFactory;
-import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
-import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
-import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
-import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
-import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.selectors.AbstractHighestWeightSelector;
-import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
-import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
-import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**
@@ -91,54 +71,20 @@ public class RunCliquesWithHardCodedStrategies {
 
 	public static void runScenario( final Scenario scenario, final boolean produceAnalysis ) {
 		final Config config = scenario.getConfig();
-		final WeightsConfigGroup weights = (WeightsConfigGroup)
-			config.getModule( WeightsConfigGroup.GROUP_NAME );
 		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
 					config.getModule( CliquesConfigGroup.GROUP_NAME );
 		final ControllerRegistry controllerRegistry =
 			new ControllerRegistry(
 					scenario,
 					scenario.getScenarioElement( JointPlans.class ),
-					createPlanRouterFactory( scenario ),
+					RunUtils.createPlanRouterFactory( scenario ),
 					new CharyparNagelScoringFunctionFactory(
 						config.planCalcScore(),
 						scenario.getNetwork()) );
 
 		// init strategies
 		final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
-		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createReRoute(
-					config,
-					controllerRegistry.getJointPlans().getFactory(),
-					controllerRegistry.getPlanRoutingAlgorithmFactory(),
-					controllerRegistry.getTripRouterFactory() ),
-				weights.reRoute);
-		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createTimeAllocationMutator(
-					config,
-					controllerRegistry.getPlanRoutingAlgorithmFactory(),
-					controllerRegistry.getTripRouterFactory() ),
-				weights.timeMutator);
-		if (weights.jtmOptimizes) {
-			strategyRegistry.addStrategy(
-					GroupPlanStrategyFactory.createCliqueJointTripMutator( controllerRegistry ),
-					weights.jointTripMutation);
-		}
-		else {
-			strategyRegistry.addStrategy(
-					GroupPlanStrategyFactory.createNonOptimizingCliqueJointTripMutator( controllerRegistry ),
-					weights.jointTripMutation);
-		}
-		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createSubtourModeChoice(
-					config,
-					controllerRegistry.getJointPlans().getFactory(),
-					controllerRegistry.getPlanRoutingAlgorithmFactory(),
-					controllerRegistry.getTripRouterFactory() ),
-				weights.modeMutation);
-		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createSelectExpBeta( config ),
-				weights.logitSelection );
+		RunUtils.loadStrategyRegistry( strategyRegistry , controllerRegistry );
 
 		// create strategy manager
 		final FixedGroupsIdentifier cliques = 
@@ -162,79 +108,11 @@ public class RunCliquesWithHardCodedStrategies {
 						strategyManager));
 
 		if (produceAnalysis) {
-			controller.addControlerListener(
-					new LegHistogramListenerWithoutControler(
-						controllerRegistry.getEvents(),
-						controller.getControlerIO() ));
-
-			CliquesSizeGroupIdentifier groupIdentifier =
-				new CliquesSizeGroupIdentifier(
-						cliques.getGroupInfo() );
-
-			controller.addControlerListener(
-					new FilteredScoreStats(
-						controller.getControlerIO(),
-						controllerRegistry.getScenario(),
-						groupIdentifier));
-
-			controller.addControlerListener(
-					new JointPlanSizeStats(
-						controller.getControlerIO(),
-						controllerRegistry.getScenario(),
-						groupIdentifier));
-
-			controller.addControlerListener(
-					new JointTripsStats(
-						controller.getControlerIO(),
-						controllerRegistry.getScenario(),
-						groupIdentifier));
-
-			final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
-			actTypesForAnalysis.addActivityTypes(
-					controllerRegistry.getTripRouterFactory().createTripRouter().getStageActivityTypes() );
-			actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-			controller.addControlerListener(
-					new TripModeShares(
-						controller.getControlerIO(),
-						controllerRegistry.getScenario(),
-						new MainModeIdentifier() {
-							private final MainModeIdentifier d = new MainModeIdentifierImpl();
-
-							@Override
-							public String identifyMainMode(
-									final List<PlanElement> tripElements) {
-								for (PlanElement pe : tripElements) {
-									if ( !(pe instanceof Leg) ) continue;
-									final String mode = ((Leg) pe).getMode();
-
-									if (mode.equals( JointActingTypes.DRIVER ) ||
-											mode.equals( JointActingTypes.PASSENGER ) ) {
-										return mode;
-									}
-								}
-								return d.identifyMainMode( tripElements );
-							}
-						},
-						actTypesForAnalysis));
-
-			controllerRegistry.getEvents().addHandler( new ModeAnalysis( true ) );
+			RunUtils.loadDefaultAnalysis( cliques , controller );
 		}
 
 		// run it
 		controller.run();
-	}
-
-	public static PlanRoutingAlgorithmFactory createPlanRouterFactory(
-			final Scenario scenario) {
-		final PlanRoutingAlgorithmFactory jointRouterFactory =
-					new JointPlanRouterFactory(
-							((ScenarioImpl) scenario).getActivityFacilities() );
-		return scenario.getConfig().scenario().isUseHouseholds() ?
-			new PlanRouterWithVehicleRessourcesFactory(
-					new HouseholdBasedVehicleRessources(
-						((ScenarioImpl) scenario).getHouseholds() ),
-					jointRouterFactory ) :
-			jointRouterFactory;
 	}
 
 	public static void main(final String[] args) {
