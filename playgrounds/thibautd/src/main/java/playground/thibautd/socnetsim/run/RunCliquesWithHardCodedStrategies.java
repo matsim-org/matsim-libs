@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -116,6 +117,7 @@ public class RunCliquesWithHardCodedStrategies {
 	}
 
 	public static void main(final String[] args) {
+		OutputDirectoryLogging.catchLogEntries();
 		if (DO_STRATEGY_TRACE) Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
 		if (DO_SELECT_TRACE) Logger.getLogger( AbstractHighestWeightSelector.class.getName() ).setLevel( Level.TRACE );
 		final String configFile = args[ 0 ];
