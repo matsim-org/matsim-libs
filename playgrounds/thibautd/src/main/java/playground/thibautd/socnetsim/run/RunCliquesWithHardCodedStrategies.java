@@ -62,7 +62,6 @@ import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
-import playground.thibautd.utils.ReflectiveModule;
 
 /**
  * @author thibautd
@@ -70,88 +69,6 @@ import playground.thibautd.utils.ReflectiveModule;
 public class RunCliquesWithHardCodedStrategies {
 	private static final boolean DO_STRATEGY_TRACE = false;
 	private static final boolean DO_SELECT_TRACE = false;
-
-	public static class WeightsConfigGroup extends ReflectiveModule {
-		public final static String GROUP_NAME = "groupReplanningWeights";
-		private double reRoute = 0.1;
-		private double timeMutator = 0.1;
-		private double jointTripMutation = 0.1;
-		private double modeMutation = 0.1;
-		private double logitSelection = 0.6;
-		private boolean jtmOptimizes = false;
-
-		public WeightsConfigGroup() {
-			super( GROUP_NAME );
-		}
-
-		@StringGetter( "reRoute" )
-		public double getReRouteWeight() {
-			return reRoute;
-		}
-
-		@StringSetter( "reRoute" )
-		public void setReRouteWeight(final double v) {
-			this.reRoute = v;
-		}
-
-		@StringGetter( "timeMutator" )
-		public double getTimeMutationWeight() {
-			return timeMutator;
-		}
-
-		@StringSetter( "timeMutator" )
-		public void setTimeMutationWeight(final double v) {
-			this.timeMutator = v;
-		}
-
-		@StringGetter( "jointTripMutation" )
-		public double getJointTripMutationWeight() {
-			return jointTripMutation;
-		}
-
-		@StringSetter( "jointTripMutation" )
-		public void setJointTripMutationWeight(final double v) {
-			this.jointTripMutation = v;
-		}
-
-		@StringGetter( "modeMutation" )
-		public double getModeMutationWeight() {
-			return modeMutation;
-		}
-
-		@StringSetter( "modeMutation" )
-		public void setModeMutationWeight(final double v) {
-			this.modeMutation = v;
-		}
-
-		@StringGetter( "logitSelection" )
-		public double getLogitSelectionWeight() {
-			return logitSelection;
-		}
-
-		@StringSetter( "logitSelection" )
-		public void setLogitSelectionWeight(final double v) {
-			this.logitSelection = v;
-		}
-
-		public void setAllToZero() {
-			reRoute = 0;
-			timeMutator = 0;
-			jointTripMutation = 0;
-			modeMutation = 0;
-			logitSelection = 0;
-		}
-
-		@StringGetter( "jtmOptimizes" )
-		public boolean getJtmOptimizes() {
-			return jtmOptimizes;
-		}
-
-		@StringSetter( "jtmOptimizes" )
-		public void setJtmOptimizes(final boolean v) {
-			this.jtmOptimizes = v;
-		}
-	}
 
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.loadConfig( configFile );

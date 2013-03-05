@@ -36,7 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.socnetsim.run.RunCliquesWithHardCodedStrategies;
-import playground.thibautd.socnetsim.run.RunCliquesWithHardCodedStrategies.WeightsConfigGroup;
+import playground.thibautd.socnetsim.run.WeightsConfigGroup;
 
 /**
  * Tests that the results are deterministic, by running several runs in numerous settings.
