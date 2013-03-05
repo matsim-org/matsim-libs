@@ -42,6 +42,7 @@ import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.selectors.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**
@@ -55,6 +56,12 @@ public class RunCliquesWithHardCodedStrategies {
 		final Config config = JointScenarioUtils.loadConfig( configFile );
 		config.addModule( WeightsConfigGroup.GROUP_NAME , new WeightsConfigGroup() );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
+
+		if ( config.scenario().isUseHouseholds() ) {
+			scenario.addScenarioElement(
+							new HouseholdBasedVehicleRessources(
+								((ScenarioImpl) scenario).getHouseholds() ) );
+		}
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {

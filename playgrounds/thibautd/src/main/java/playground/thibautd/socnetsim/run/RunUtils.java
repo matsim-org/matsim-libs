@@ -45,8 +45,8 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
-import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 /**
  * @author thibautd
@@ -55,14 +55,14 @@ public class RunUtils {
 	private RunUtils() {}
 
 	public static PlanRoutingAlgorithmFactory createPlanRouterFactory(
-			final Scenario scenario) {
+			final Scenario scenario ) {
 		final PlanRoutingAlgorithmFactory jointRouterFactory =
 					new JointPlanRouterFactory(
 							((ScenarioImpl) scenario).getActivityFacilities() );
-		return scenario.getConfig().scenario().isUseHouseholds() ?
+		final VehicleRessources vehicleRessources = scenario.getScenarioElement( VehicleRessources.class );
+		return vehicleRessources != null ?
 			new PlanRouterWithVehicleRessourcesFactory(
-					new HouseholdBasedVehicleRessources(
-						((ScenarioImpl) scenario).getHouseholds() ),
+					vehicleRessources,
 					jointRouterFactory ) :
 			jointRouterFactory;
 	}
