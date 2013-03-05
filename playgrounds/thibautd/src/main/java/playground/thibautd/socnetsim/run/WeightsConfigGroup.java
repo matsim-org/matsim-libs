@@ -23,12 +23,12 @@ import playground.thibautd.utils.ReflectiveModule;
 
 public class WeightsConfigGroup extends ReflectiveModule {
 	public final static String GROUP_NAME = "groupReplanningWeights";
-	double reRoute = 0.1;
-	double timeMutator = 0.1;
-	double jointTripMutation = 0.1;
-	double modeMutation = 0.1;
-	double logitSelection = 0.6;
-	boolean jtmOptimizes = false;
+	private double reRoute = 0.1;
+	private double timeMutator = 0.1;
+	private double jointTripMutation = 0.1;
+	private double modeMutation = 0.1;
+	private double logitSelection = 0.6;
+	private boolean jtmOptimizes = false;
 
 	public WeightsConfigGroup() {
 		super( GROUP_NAME );

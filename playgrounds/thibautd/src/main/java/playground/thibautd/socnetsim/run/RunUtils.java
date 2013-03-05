@@ -79,22 +79,22 @@ public class RunUtils {
 					controllerRegistry.getJointPlans().getFactory(),
 					controllerRegistry.getPlanRoutingAlgorithmFactory(),
 					controllerRegistry.getTripRouterFactory() ),
-				weights.reRoute);
+				weights.getReRouteWeight());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTimeAllocationMutator(
 					config,
 					controllerRegistry.getPlanRoutingAlgorithmFactory(),
 					controllerRegistry.getTripRouterFactory() ),
-				weights.timeMutator);
-		if (weights.jtmOptimizes) {
+				weights.getTimeMutationWeight());
+		if (weights.getJtmOptimizes()) {
 			strategyRegistry.addStrategy(
 					GroupPlanStrategyFactory.createCliqueJointTripMutator( controllerRegistry ),
-					weights.jointTripMutation);
+					weights.getJointTripMutationWeight());
 		}
 		else {
 			strategyRegistry.addStrategy(
 					GroupPlanStrategyFactory.createNonOptimizingCliqueJointTripMutator( controllerRegistry ),
-					weights.jointTripMutation);
+					weights.getJointTripMutationWeight());
 		}
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSubtourModeChoice(
@@ -102,10 +102,10 @@ public class RunUtils {
 					controllerRegistry.getJointPlans().getFactory(),
 					controllerRegistry.getPlanRoutingAlgorithmFactory(),
 					controllerRegistry.getTripRouterFactory() ),
-				weights.modeMutation);
+				weights.getModeMutationWeight());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSelectExpBeta( config ),
-				weights.logitSelection );
+				weights.getLogitSelectionWeight() );
 	}
 
 	public static void loadDefaultAnalysis(
