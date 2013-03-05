@@ -28,10 +28,21 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private double jointTripMutation = -1;
 	private double modeMutation = -1;
 	private double logitSelection = -1;
+	private double vehicleAllocation = -1;
 	private boolean jtmOptimizes = true;
 
 	public WeightsConfigGroup() {
 		super( GROUP_NAME );
+	}
+
+	@StringGetter( "reallocateVehicle" )
+	public double getReallocateVehicleWeight() {
+		return vehicleAllocation;
+	}
+
+	@StringSetter( "reallocateVehicle" )
+	public void setReallocateVehicleWeight(final double v) {
+		this.vehicleAllocation = v;
 	}
 
 	@StringGetter( "reRoute" )

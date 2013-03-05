@@ -106,6 +106,10 @@ public class RunUtils {
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSelectExpBeta( config ),
 				weights.getLogitSelectionWeight() );
+		strategyRegistry.addStrategy(
+				GroupPlanStrategyFactory.createTourVehicleAllocation(
+					controllerRegistry ),
+				weights.getReallocateVehicleWeight() );
 	}
 
 	public static void loadDefaultAnalysis(

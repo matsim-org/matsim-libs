@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -55,6 +56,8 @@ import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
+import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToSubtourModule;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 /**
  * Provides factory methods to create standard strategies.
@@ -230,6 +233,27 @@ public class GroupPlanStrategyFactory {
 				createSynchronizerModule(
 					config,
 					tripRouterFactory) );
+
+		return strategy;
+	}
+
+	public static GroupPlanStrategy createTourVehicleAllocation(
+			final ControllerRegistry registry) {
+		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+
+		strategy.addStrategyModule(
+				new IndividualBasedGroupStrategyModule(
+					new AllocateVehicleToSubtourModule(
+						registry.getScenario().getConfig().global().getNumberOfThreads(),
+						TransportMode.car,
+						registry.getScenario().getScenarioElement(
+							VehicleRessources.class ) ) ) );
+
+		strategy.addStrategyModule(
+				createReRouteModule(
+					registry.getScenario().getConfig(),
+					registry.getPlanRoutingAlgorithmFactory(),
+					registry.getTripRouterFactory() ) );
 
 		return strategy;
 	}
