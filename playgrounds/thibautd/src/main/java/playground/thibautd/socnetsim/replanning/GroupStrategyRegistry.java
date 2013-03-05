@@ -23,10 +23,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author thibautd
  */
 public final class GroupStrategyRegistry {
+	private static final Logger log = Logger.getLogger( GroupStrategyRegistry.class );
 	private final List<GroupPlanStrategy> strategies = new ArrayList<GroupPlanStrategy>();
 	private final List<Double> weights = new ArrayList<Double>();
 	private double sumOfWeights = 0;
@@ -34,6 +37,10 @@ public final class GroupStrategyRegistry {
 	public final void addStrategy(
 			final GroupPlanStrategy strategy,
 			final double weight) {
+		if ( weight <= 0.0 ) {
+			log.info( "strategy "+strategy+" with weight "+weight+" will not be added: weight negative or null." );
+			return;
+		}
 		strategies.add( strategy );
 		weights.add( weight );
 		sumOfWeights += weight;
