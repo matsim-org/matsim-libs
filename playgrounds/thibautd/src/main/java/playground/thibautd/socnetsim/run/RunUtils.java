@@ -136,11 +136,18 @@ public class RunUtils {
 					controller.getRegistry().getScenario(),
 					groupIdentifier));
 
-		controller.addControlerListener(
-				new JointTripsStats(
-					controller.getControlerIO(),
-					controller.getRegistry().getScenario(),
-					groupIdentifier));
+		final WeightsConfigGroup weights = (WeightsConfigGroup)
+			controller.getRegistry().getScenario().getConfig().getModule(
+					WeightsConfigGroup.GROUP_NAME );
+
+		// no need to track evolution of joint trips if they do not evolve
+		if ( weights.getJointTripMutationWeight() > 0 ) {
+			controller.addControlerListener(
+					new JointTripsStats(
+						controller.getControlerIO(),
+						controller.getRegistry().getScenario(),
+						groupIdentifier));
+		}
 
 		final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
 		actTypesForAnalysis.addActivityTypes(
