@@ -111,12 +111,13 @@ public class MultiModalDemo {
 	private static boolean createPlansForAllModes = false;
 	private static String randomMode = "RANDOM";
 //	private static String initialLegMode = TransportMode.car;
-	private static String initialLegMode = randomMode;
+	private static String initialLegMode = TransportMode.walk;
+//	private static String initialLegMode = randomMode;
 	private static String nonCarMode = TransportMode.walk;
 //	private static String legModes = TransportMode.car + "," + TransportMode.bike + "," + TransportMode.walk;
 	/*package*/ static String legModes = TransportMode.car + "," + TransportMode.walk;
-//	private static double capacity = 10000.0;
-	private static double capacity = 1400.0;
+	private static double capacity = 100000.0;
+//	private static double capacity = 2000.0;
 
 	private static double referenceCarSpeed = 50.0/3.6;
 	
@@ -157,7 +158,7 @@ public class MultiModalDemo {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(numIterations);
 		config.controler().setMobsim(ControlerConfigGroup.MobsimType.qsim.toString());
-		config.controler().setOutputDirectory("../../matsim/mysimulations/dissertation/MultiModalDemo");
+		config.controler().setOutputDirectory("../../matsim/mysimulations/dissertation/MultiModalDemo" + "_" + capacity);
 		
 		Set<String> networkRouteModes = CollectionUtils.stringToSet(TransportMode.car + "," + TransportMode.bike + "," + TransportMode.walk);
 		config.plansCalcRoute().setNetworkModes(networkRouteModes);
