@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package energy.consumption;
 
 import java.io.BufferedReader;
@@ -32,13 +51,15 @@ public abstract class AbstractEnergyConsumptionModelBerlin extends
 		log.warn("currently a factor of " + f + " is used for the discharging-Profiles, because the given values are to low...");
 		
 		for(String[] s: values){
-			if (s[0].equals("drivingType"))	  //DrivingType
+			if (s[0].equals(drivingType))	  //DrivingType
+				
+//				log.info("drivingType: "+drivingType);
 				if(s[2].equals("0"))	 //no slopes implemented
 				{
-					queue.add(new EnergyConsumption(Double.parseDouble(s[1]),f*Double.parseDouble(s[3])));
+					queue.add(new EnergyConsumption(Double.parseDouble(s[1]),f*Double.parseDouble(s[3])/1000));
+					//divide by 1000 - model requests [J/m]
 				}
 			
-			queue.add(new EnergyConsumption(5.555555556, 3.19E+02));
 		}
 				
 	}
@@ -54,6 +75,7 @@ public abstract class AbstractEnergyConsumptionModelBerlin extends
 		String line;
 		try {
 			log.info("start reading content of " + inFile);
+			
 			BufferedReader reader = IOUtils.getBufferedReader(inFile);
 			line = reader.readLine();
 			do{
