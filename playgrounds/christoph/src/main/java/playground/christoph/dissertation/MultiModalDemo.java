@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
@@ -36,12 +37,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -55,17 +58,30 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.analysis.ActivitiesAnalyzer;
+import playground.christoph.analysis.TripsAnalyzer;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 
@@ -89,23 +105,28 @@ public class MultiModalDemo {
 	
 	private static final Logger log = Logger.getLogger(MultiModalDemo.class);
 	
-	private static int numIterations = 250;
-	private static int numPersons = 2000;
-	private static String initialLegMode = TransportMode.car;
+	private static int numIterations = 100;
+	private static int numPersonsPerHour = 2500;
+	private static int hours = 2;
+	private static boolean createPlansForAllModes = false;
+	private static String randomMode = "RANDOM";
+//	private static String initialLegMode = TransportMode.car;
+	private static String initialLegMode = randomMode;
 	private static String nonCarMode = TransportMode.walk;
 //	private static String legModes = TransportMode.car + "," + TransportMode.bike + "," + TransportMode.walk;
-	private static String legModes = TransportMode.car + "," + TransportMode.walk;
-	private static double capacity = 10000.0;
-	private static int departureDelay = 10;	// time between the departure of two agents
+	/*package*/ static String legModes = TransportMode.car + "," + TransportMode.walk;
+//	private static double capacity = 10000.0;
+	private static double capacity = 1400.0;
 
 	private static double referenceCarSpeed = 50.0/3.6;
+	
 	private static String referenceSex = "m";
-	private static int referenceAge = 30;
+	private static int referenceAge = 50;
 	
 	/*
 	 * If you have to adapt this, then something seems to be wrong! 
 	 */
-	private static final double expectedReferenceTravelTime = 676.0;	// walk, m, 30
+	private static final double expectedReferenceTravelTime = 1406.0;	// walk, m, 50
 	
 	public static void main(String[] args) {
 		
@@ -115,12 +136,17 @@ public class MultiModalDemo {
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
 		qSimConfigGroup.setNumberOfThreads(1);
 		qSimConfigGroup.setStartTime(0.0);
-		qSimConfigGroup.setEndTime(86400.0);
+		qSimConfigGroup.setEndTime(2*86400.0);
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setRemoveStuckVehicles(false);
-		qSimConfigGroup.setStorageCapFactor(1.0);
+		qSimConfigGroup.setStorageCapFactor(2.0);
 		qSimConfigGroup.setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION);
+		qSimConfigGroup.setStuckTime(25.0);
 		config.addQSimConfigGroup(qSimConfigGroup);
+		
+		config.travelTimeCalculator().setTraveltimeBinSize(300);
+		config.travelTimeCalculator().setFilterModes(true);
+		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
 		
 		config.multiModal().setCreateMultiModalNetwork(false);
 		config.multiModal().setDropNonCarRoutes(false);
@@ -140,15 +166,24 @@ public class MultiModalDemo {
 		config.plansCalcRoute().setBikeSpeed(6.01);
 		config.plansCalcRoute().setPtSpeedFactor(2.0);
 		
-		config.strategy().setMaxAgentPlanMemorySize(4);
-		config.strategy().addParam("Module_1", "ChangeLegMode");
-		config.strategy().addParam("ModuleProbability_1", "0.10");
-//		config.strategy().addParam("Module_2", "SelectExpBeta");
-		config.strategy().addParam("Module_2", "BestScore");
-		config.strategy().addParam("ModuleProbability_2", "0.90");
+		/*		
+		config.strategy().setMaxAgentPlanMemorySize(3);
+		config.strategy().addParam("Module_1", "SelectExpBeta");
+		config.strategy().addParam("ModuleProbability_1", "1.00");
+		 */
+		
+		config.strategy().addParam("Module_1", "SelectExpBeta");
+//		config.strategy().addParam("Module_1", "BestScore");
+		config.strategy().addParam("ModuleProbability_1", "0.90");
+//		config.strategy().addParam("Module_2", "ChangeLegMode");
+//		config.strategy().addParam("ModuleProbability_2", "0.02");
+		config.strategy().addParam("Module_2", "playground.christoph.dissertation.ChooseBestLegModePlanStrategy");
+		config.strategy().addParam("ModuleProbability_2", "0.10");
+//		config.strategy().addParam("ModuleDisableAfterIteration_2", String.valueOf(numIterations - 1));
+		
 		
 		ActivityParams home = new ActivityParams("home");
-		home.setTypicalDuration(8*3600);
+		home.setTypicalDuration(24*3600);
 		config.planCalcScore().addActivityParams(home);
 		
 		Module module = config.createModule("changeLegMode");
@@ -164,9 +199,45 @@ public class MultiModalDemo {
 		Controler controler = new MultiModalDemoControler(scenario);
 		controler.setOverwriteFiles(true);
 		
+		// TravelTimeAnalyzer
 		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer();
 		controler.getEvents().addHandler(travelTimeAnalyzer);
 		controler.addControlerListener(travelTimeAnalyzer);
+		
+		// TripsAnalyzer
+		controler.addControlerListener(new StartupListener() {
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				/*
+				 * Create average travel time statistics.
+				 */
+				String tripsFileName = "tripCounts";
+				String durationsFileName = "tripDurations";
+				String outputTripsFileName = event.getControler().getControlerIO().getOutputFilename(tripsFileName);
+				String outputDurationsFileName = event.getControler().getControlerIO().getOutputFilename(durationsFileName);
+				Set<String> modes = new HashSet<String>();
+				modes.add(TransportMode.bike);
+				modes.add(TransportMode.car);
+				modes.add(TransportMode.pt);
+				modes.add(TransportMode.ride);
+				modes.add(TransportMode.walk);
+				
+				// create TripsAnalyzer and register it as ControlerListener and EventsHandler
+				TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(outputTripsFileName, outputDurationsFileName, modes, true);
+				event.getControler().addControlerListener(tripsAnalyzer);
+				event.getControler().getEvents().addHandler(tripsAnalyzer);
+				
+				// TripsAnalyzer is a StartupEventListener, therefore pass event over to it.
+				tripsAnalyzer.notifyStartup(event);
+				
+				// create ActivitiesAnalyzer and register it as ControlerListener and EventsHandler
+				String activitiesFileName = "activityCounts";
+				Set<String> activityTypes = new TreeSet<String>(event.getControler().getConfig().planCalcScore().getActivityTypes());
+				ActivitiesAnalyzer activitiesAnalyzer = new ActivitiesAnalyzer(activitiesFileName, activityTypes, true);
+				event.getControler().addControlerListener(activitiesAnalyzer);
+				event.getControler().getEvents().addHandler(activitiesAnalyzer);
+			}
+		});
 		
 		controler.run();
 		
@@ -174,16 +245,16 @@ public class MultiModalDemo {
 		
 		calculateExpectedModeShare(config);
 	}
-	
+
 	private static void createNetwork(Scenario scenario) {
 		NetworkFactory networkFactory = scenario.getNetwork().getFactory();
 		
 		Node n1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(0.0, 0.0));
 		Node n2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(100.0, 0.0));
 		Node n3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(100.0, 1000.0));
-		Node n4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(1100.0, 1000.0));
-		Node n5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(1100.0, 0.0));
-		Node n6 = networkFactory.createNode(scenario.createId("n6"), scenario.createCoord(1200.0, 0.0));
+		Node n4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(2100.0, 1000.0));
+		Node n5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(2100.0, 0.0));
+		Node n6 = networkFactory.createNode(scenario.createId("n6"), scenario.createCoord(2200.0, 0.0));
 		
 		scenario.getNetwork().addNode(n1);
 		scenario.getNetwork().addNode(n2);
@@ -216,7 +287,8 @@ public class MultiModalDemo {
 		l2.setAllowedModes(carMode);
 		
 		Link l3 = networkFactory.createLink(scenario.createId("l3"), n3, n4);
-		l3.setLength(1000.0);
+//		l3.setLength(1000.0);
+		l3.setLength(2000.0);
 		l3.setCapacity(capacity);
 		l3.setFreespeed(referenceCarSpeed);
 		l3.setAllowedModes(carMode);
@@ -228,7 +300,8 @@ public class MultiModalDemo {
 		l4.setAllowedModes(carMode);
 
 		Link l5 = networkFactory.createLink(scenario.createId("l5"), n2, n5);
-		l5.setLength(1000.0);
+//		l5.setLength(1000.0);
+		l5.setLength(2000.0);
 		l5.setCapacity(capacity);
 		l5.setFreespeed(referenceCarSpeed);
 		l5.setAllowedModes(nonCarMode);
@@ -316,7 +389,9 @@ public class MultiModalDemo {
 		adaptLinkLength(sc, refNonCarTravelTime);
 		
 		// create reference population
-		Person person = createPerson(sc, sc.createId("1"), referenceSex, referenceAge, 0.0, TransportMode.car);
+		Person person = createPerson(sc, sc.createId("1"), referenceSex, referenceAge);
+		Plan plan = createPlan(sc, 0.0, TransportMode.car);
+		person.addPlan(plan);
 		sc.getPopulation().addPerson(person);
 		
 		// create routes
@@ -350,7 +425,9 @@ public class MultiModalDemo {
 		
 		// create reference population
 		for (int i = 0; i < 5000; i++) {
-			Person person = createPerson(sc, sc.createId(String.valueOf(i)), referenceSex, referenceAge, 0.0, nonCarMode);
+			Person person = createPerson(sc, sc.createId(String.valueOf(i)), referenceSex, referenceAge);
+			Plan plan = createPlan(sc, 0.0, nonCarMode);
+			person.addPlan(plan);
 			sc.getPopulation().addPerson(person);
 		}
 		
@@ -380,25 +457,46 @@ public class MultiModalDemo {
 	private static void createPopulation(Scenario scenario) {
 		Random random = MatsimRandom.getLocalInstance();
 		
-		for (int i = 0; i < numPersons; i++) {
+		for (int hour = 0; hour < hours; hour++) {
 			
-			String sex;
-			if (random.nextDouble() > 0.5) sex = "f";
-			else sex = "m";
-			
-			int age = 1 + random.nextInt(100);
-			
-			Id personId = scenario.createId(String.valueOf(i));
-			double departureTime = 8*3600 + i*departureDelay;
-
-//			Person person = createPerson(scenario, personId, referenceSex, referenceAge, departureTime, initialLegMode);
-			Person person = createPerson(scenario, personId, sex, age, departureTime, initialLegMode);
-			
-			scenario.getPopulation().addPerson(person);
+			for (int i = 0; i < numPersonsPerHour; i++) {
+				
+				String sex;
+				if (random.nextDouble() > 0.5) sex = "f";
+				else sex = "m";
+				
+				int age = 18 + random.nextInt(82);
+				
+				Id personId = scenario.createId(String.valueOf(hour * numPersonsPerHour + i));
+				
+				double departureTime = 8*3600 + hour*3600 + random.nextInt(3600);
+				
+				Person person = createPerson(scenario, personId, sex, age);
+				
+				if (createPlansForAllModes) {
+					for (String legMode : CollectionUtils.stringToArray(legModes)) {
+						Plan plan = createPlan(scenario, departureTime, legMode);
+						person.addPlan(plan);
+						if (legMode.equals(initialLegMode)) ((PersonImpl) person).setSelectedPlan(plan);
+					}
+					if (initialLegMode.equals(randomMode)) ((PersonImpl) person).setSelectedPlan(((PersonImpl) person).getRandomPlan());				
+				} else {
+					if (initialLegMode.equals(randomMode)) {
+						String[] modes = CollectionUtils.stringToArray(legModes);
+						Plan plan = createPlan(scenario, departureTime, modes[random.nextInt(modes.length)]);
+						person.addPlan(plan);
+					} else {
+						Plan plan = createPlan(scenario, departureTime, initialLegMode);
+						person.addPlan(plan);
+					}
+				}
+				
+				scenario.getPopulation().addPerson(person);
+			}
 		}
 	}
 	
-	private static Person createPerson(Scenario scenario, Id id, String sex, int age, double departureTime, String legMode) {
+	private static Person createPerson(Scenario scenario, Id id, String sex, int age) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		
 		Person person = populationFactory.createPerson(id);
@@ -407,6 +505,12 @@ public class MultiModalDemo {
 		((PersonImpl) person).setAge(age);
 		((PersonImpl) person).setCarAvail("always");
 		
+		return person;
+	}
+	
+	private static Plan createPlan(Scenario scenario, double departureTime, String legMode) {
+		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+				
 		Plan plan = populationFactory.createPlan();
 		
 		Activity a1 = populationFactory.createActivityFromLinkId("home", scenario.createId("l1"));
@@ -423,9 +527,7 @@ public class MultiModalDemo {
 		plan.addLeg(l1);
 		plan.addActivity(a2);
 		
-		person.addPlan(plan);
-		
-		return person;
+		return plan;
 	}
 	
 	private static void calculatePopulationStatistics(Scenario scenario) {
@@ -433,7 +535,7 @@ public class MultiModalDemo {
 		int car = 0;
 		int nonCar = 0;
 		
-		double[] ages = new double[numPersons];
+		double[] ages = new double[numPersonsPerHour * hours];
 		int males = 0;
 		int females = 0;
 		
@@ -450,8 +552,8 @@ public class MultiModalDemo {
 			i++;
 		}
 		
-		log.info("Found " + males + " male agents (" + (1.0*males)/numPersons + "%).");
-		log.info("Found " + females + " female agents (" + (1.0*females)/numPersons + "%).");
+		log.info("Found " + males + " male agents (" + (100.0*males)/(numPersonsPerHour * hours) + "%).");
+		log.info("Found " + females + " female agents (" + (100.0*females)/(numPersonsPerHour * hours) + "%).");
 		log.info("Found mean age of " + StatUtils.percentile(ages, 50));
 		log.info("Found " + car + " agents where car is the best transport mode.");
 		log.info("Found " + nonCar + " agents where car is not the best transport mode.");
@@ -484,7 +586,9 @@ public class MultiModalDemo {
 		
 		for (int i = 0; i < numDraws; i++) {
 			Id id = sc.createId(referenceSex + "_" + referenceAge + "_" + i);
-			Person person = createPerson(sc, id, referenceSex, referenceAge, 0.0, nonCarMode);
+			Person person = createPerson(sc, id, referenceSex, referenceAge);
+			Plan plan = createPlan(sc, 0.0, nonCarMode);
+			person.addPlan(plan);
 			double tt = travelTime.getLinkTravelTime(dummyLink, 0.0, person, null);
 			travelTimes[i] = tt;
 		}
@@ -500,7 +604,9 @@ public class MultiModalDemo {
 				travelTimes = new double[numDraws];
 				for (int i = 0; i < numDraws; i++) {
 					Id id = sc.createId(referenceSex + "_" + referenceAge + "_" + i);
-					Person person = createPerson(sc, id, sex, age, 0.0, nonCarMode);
+					Person person = createPerson(sc, id, sex, age);
+					Plan plan = createPlan(sc, 0.0, nonCarMode);
+					person.addPlan(plan);
 					double tt = travelTime.getLinkTravelTime(dummyLink, 0.0, person, null);
 					travelTimes[i] = tt;
 				}
@@ -534,6 +640,13 @@ public class MultiModalDemo {
 			
 			super.getMultiModalTravelTimes().put(TransportMode.bike, bikeTravelTime);
 			super.getMultiModalTravelTimes().put(TransportMode.walk, walkTravelTime);
+			
+			for (PlanStrategy planStrategy : this.strategyManager.getStrategies()) {
+				if (planStrategy instanceof ChooseBestLegModePlanStrategy) {
+					((ChooseBestLegModePlanStrategy) planStrategy).setTravelTimes(this.getMultiModalTravelTimes());
+					((ChooseBestLegModePlanStrategy) planStrategy).setTravelDisutilityFactory(this.getTravelDisutilityFactory());
+				}
+			}
 		}
 	}
 	
@@ -629,5 +742,111 @@ public class MultiModalDemo {
 				}
 			}
 		}	
+	}
+	
+	/*package*/ static class ChooseBestLegModeModule extends AbstractMultithreadedModule {
+		
+		private final Scenario scenario;
+		private final Set<String> modes;
+		private Map<String, TravelTime> travelTimes;
+		private TravelDisutilityFactory travelDisutilityFactory;
+		
+		public ChooseBestLegModeModule(final Scenario scenario, final Set<String> modes) {
+			super(scenario.getConfig().global());
+			this.scenario = scenario;
+			this.modes = modes;
+		}
+
+		public void setTravelTimes(Map<String, TravelTime> travelTimes) {
+			this.travelTimes = travelTimes;
+		}
+		
+		public void setTravelDisutilityFactory(TravelDisutilityFactory travelDisutilityFactory) {
+			this.travelDisutilityFactory = travelDisutilityFactory;
+		}
+		
+		@Override
+		public PlanAlgorithm getPlanAlgoInstance() {
+				
+			Map<String, LeastCostPathCalculator> leastCostPathCalculators = new HashMap<String, LeastCostPathCalculator>();
+			for (String mode : travelTimes.keySet()) {				
+				TravelTime travelTime = this.travelTimes.get(mode);
+				TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, 
+						scenario.getConfig().planCalcScore());
+				
+				LeastCostPathCalculator leastCostPathCalculator = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), 
+						travelDisutility, travelTime);
+				((IntermodalLeastCostPathCalculator) leastCostPathCalculator).setModeRestriction(CollectionUtils.stringToSet(mode));
+				
+				leastCostPathCalculators.put(mode, leastCostPathCalculator);
+			}
+			
+			return new ChooseBestLegMode(leastCostPathCalculators, scenario.getNetwork(), modes);
+		}
+	}
+	
+	public static class ChooseBestLegMode implements PlanAlgorithm {
+
+		private final Map<String, LeastCostPathCalculator> leastCostPathCalculators;
+		private final Network network;
+		private final Set<String> modes;
+		private final Random random;
+		
+		private ChooseBestLegMode(Map<String, LeastCostPathCalculator> leastCostPathCalculators, Network network, final Set<String> modes) {
+			this.leastCostPathCalculators = leastCostPathCalculators;
+			this.network = network;
+			this.modes = modes;
+			this.random = MatsimRandom.getLocalInstance();
+		}
+		
+		@Override
+		public void run(Plan plan) {
+			
+			String bestMode = null;
+			double minTravelCost = Double.MAX_VALUE;
+			
+			for (String mode : modes) {
+				double travelCost = 0.0;
+				
+				LeastCostPathCalculator leastCostPathCalculator = leastCostPathCalculators.get(mode);
+				
+				for (PlanElement planElement : plan.getPlanElements()) {
+					if (planElement instanceof Leg) {
+						Leg leg = (Leg) planElement;
+						
+						Link fromLink = network.getLinks().get(leg.getRoute().getStartLinkId());
+						Link toLink = network.getLinks().get(leg.getRoute().getEndLinkId());
+						
+						Path path = leastCostPathCalculator.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), 
+								leg.getDepartureTime(), plan.getPerson(), null);
+						travelCost += path.travelCost;
+						
+						// add also costs of to-link
+						path = leastCostPathCalculator.calcLeastCostPath(toLink.getFromNode(), toLink.getToNode(), 
+								leg.getDepartureTime() + path.travelTime, plan.getPerson(), null);
+						travelCost += path.travelCost;
+						
+						if (travelCost < minTravelCost) {
+							bestMode = mode;
+							minTravelCost = travelCost;
+						} else if (travelCost == minTravelCost) {
+							if (this.random.nextBoolean()) {
+								bestMode = mode;
+								minTravelCost = travelCost;
+							}
+						}
+					}
+				}
+			}
+			
+			// set mode
+			for (PlanElement planElement : plan.getPlanElements()) {
+				if (planElement instanceof Leg) {
+					Leg leg = (Leg) planElement;
+					leg.setMode(bestMode);
+				}
+			}
+		}
+		
 	}
 }
