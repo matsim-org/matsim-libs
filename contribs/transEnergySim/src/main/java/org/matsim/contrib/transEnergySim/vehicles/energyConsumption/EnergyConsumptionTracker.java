@@ -38,6 +38,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * This module tracks the energy consumption of vehicles based on event
@@ -54,6 +55,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
  * TODO: add tests for this also
  * 
  * @author rashid_waraich
+ * 			jbischoff
  * 
  */
 
@@ -119,18 +121,25 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 			return;
 		}
 
+		if (vehicles.containsKey(personId)){
+			
 		Vehicle vehicle = vehicles.get(personId);
 		
 		double energyConsumptionInJoule=0;
 		if (averageSpeedDrivenInMetersPerSecond<=link.getFreespeed()){
 			energyConsumptionInJoule= vehicle.updateEnergyUse(link, averageSpeedDrivenInMetersPerSecond);
 		} else {
+			
 			energyConsumptionInJoule= vehicle.updateEnergyUse(link.getFreespeed()*timeSpendOnLink, link.getFreespeed(), link.getFreespeed());
 		}
 		 
 
 		if (loggingEnabled) {
+//			Id ll = new IdImpl(Math.round(link.getLength()));
+//			getLog().add(new EnergyConsumptionLogRow(personId, ll, energyConsumptionInJoule));
+
 			getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule));
+		}
 		}
 	}
 
