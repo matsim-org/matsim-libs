@@ -776,8 +776,11 @@ public class CreatePlansFromTrips {
 		
 		return 0;
 	}
+
 	
 	private void scrambleIds(int seed){
+		
+		this.log.info("Encrypting person IDs, random seed = " + seed);
 		
 		//Init
 		Id[] scrambler = new Id[scenario.getPopulation().getPersons().size()];
@@ -814,6 +817,8 @@ public class CreatePlansFromTrips {
 			
 			this.scenario.getPopulation().addPerson(np);
 		}
+		
+		log.info(this.scenario.getPopulation().getPersons().size() + " person IDs encrypted.");
 	}
 		
 	// ////////////////////////////////////////////////////////////////////
@@ -892,7 +897,7 @@ public class CreatePlansFromTrips {
 		////////////////////////
 		//converter.assignActsToNearestLink();
 		//////////////////////
-		String s = JOptionPane.showInputDialog("To encrypt household IDs, please enter a random seed. A value of '0' disables encryption.");
+		String s = JOptionPane.showInputDialog("To encrypt household IDs, please enter a random seed. A value of '0' (or any non-number value) disables encryption.");
 		int seed = 0;
 		try{
 			seed = Integer.parseInt(s);
@@ -900,8 +905,10 @@ public class CreatePlansFromTrips {
 		catch(NumberFormatException e){
 			seed = 0;
 		}
-		if (seed != 0)
+		if (seed != 0){
 			converter.scrambleIds(seed);
+			//converter.newScrambleIds(seed);
+		}
 		
 		if (basefolder != ""){
 			fc = new JFileChooser(basefolder);
