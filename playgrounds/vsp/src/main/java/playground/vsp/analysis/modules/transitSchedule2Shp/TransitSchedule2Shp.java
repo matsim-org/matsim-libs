@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 
+import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
@@ -50,7 +51,9 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * @author droeder
  */
 public class TransitSchedule2Shp extends AbstractAnalyisModule{
-
+	
+	private static final Logger log = Logger.getLogger(TransitSchedule2Shp.class);
+	
 	private Network network;
 	private TransitSchedule schedule;
 	private final String targetCoordinateSystem;
@@ -82,6 +85,10 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		// write a shape per line
 		for(TransitLine l: this.schedule.getTransitLines().values()){
+			if(l.getRoutes().isEmpty()){
+				log.warn("can not create a shapefile for transitline " + l.getId() + ", because the line contains no routes...");
+				continue;
+			}
 			Collection<SimpleFeature> temp = getTransitLineFeatures(l, this.targetCoordinateSystem);
 			features.addAll(temp);
 			try{
@@ -91,6 +98,10 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 			}
 		}
 		// write a complete shape 
+		if(features.isEmpty()){
+			log.error("the transitschedule seems to be empty. No features are created, thus no shapefile will be written...");
+			return;
+		}
 		try{
 			ShapeFileWriter.writeGeometries(features, outputFolder + "allLines.shp");
 		}catch(ServiceConfigurationError e){
