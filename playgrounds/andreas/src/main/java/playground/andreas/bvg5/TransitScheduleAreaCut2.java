@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -61,6 +62,8 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2P
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 import playground.andreas.utils.pt.transitSchedule2shape.DaShapeWriter;
 import playground.andreas.utils.pt.transitSchedule2shape.TransitSchedule2Shape;
+import playground.vsp.analysis.VspAnalyzer;
+import playground.vsp.analysis.modules.transitSchedule2Shp.TransitSchedule2Shp;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -159,8 +162,14 @@ public class TransitScheduleAreaCut2 {
 			for(TransitRoute newRoute: handleRoutes(factory,  oldLine.getRoutes().values())){
 				line.addRoute(newRoute);
 			}
-			// add the new line to the schedule
-			this.newSchedule.addTransitLine(line);
+			// add the new line to the schedule,
+			// but only when at least one route exists. It might happen that a route is completely covered by 
+			// area to cut. Thus, it would result in an empty line
+			if(line.getRoutes().isEmpty()){
+				log.warn("line " + oldLine.getId().toString() + " seems to be covered completely by the ``area to cut''. Thus, the line is completely deleted..."); 
+			}else{
+				this.newSchedule.addTransitLine(line);
+			}
 		}
 		
 		if(!(outdir == null)){
@@ -405,7 +414,7 @@ public class TransitScheduleAreaCut2 {
 	
 	
 	public static void main(String[] args) {
-		String dir ="../para/";
+		String dir ="C:/Users/Daniel/Desktop/para/";
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
@@ -423,6 +432,17 @@ public class TransitScheduleAreaCut2 {
 		TransitScheduleAreaCut2 areacut = new TransitScheduleAreaCut2(sc.getTransitSchedule(), dir + "scenarioArea.shp", lines2mode, modes2Cut, ((ScenarioImpl)sc).getVehicles());
 		areacut.run(dir);
 		DaShapeWriter.writeTransitLines2Shape(dir + "cuttedSchedule.shp", areacut.getNewSchedule(), null, TransitSchedule2Shape.getAttributesForLines(areacut.getNewSchedule(), "p"), TransformationFactory.WGS84_UTM33N);
+
+		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc2.getConfig().scenario().setUseTransit(true);
+		new TransitScheduleReader(sc2).readFile(dir + "cuttedSchedule.xml.gz");
+		new MatsimNetworkReader(sc2).readFile(dir + "network.final.xml.gz");
+		
+		
+		VspAnalyzer analyzer = new VspAnalyzer(dir);
+		analyzer.addAnalysisModule(new TransitSchedule2Shp(sc2, TransformationFactory.WGS84_UTM33N));
+		analyzer.run();
+		
 	}
 	
 
