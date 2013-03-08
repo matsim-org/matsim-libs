@@ -63,13 +63,13 @@ public class GroupStrategyManager {
 			final GroupIdentifier groupIdentifier,
 			final GroupStrategyRegistry registry,
 			final int maxPlanPerAgent) {
-		this( new LowestScoreSumSelectorForRemoval() , registry , groupIdentifier , maxPlanPerAgent );
+		this( new LowestScoreSumSelectorForRemoval() , groupIdentifier , registry , maxPlanPerAgent );
 	}
 
 	public GroupStrategyManager(
 			final GroupLevelPlanSelector selectorForRemoval,
-			final GroupStrategyRegistry registry,
 			final GroupIdentifier groupIdentifier,
+			final GroupStrategyRegistry registry,
 			final int maxPlanPerAgent) {
 		this.selectorForRemoval = selectorForRemoval;
 		this.registry = registry;
