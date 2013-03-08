@@ -124,7 +124,7 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 		Volume v;
 		try {
 			//create header
-			w.write("index;stopId;");
+			w.write("index;stopId;name;");
 			for(int i = 0; i < (maxSlice + 1); i++){
 				w.write(String.valueOf(i) + ";");
 			}
@@ -133,7 +133,7 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 			for(int i = 0; i < transitRoute.getStops().size(); i++){
 				stopId = new IdImpl(i);
 				c = counts.getCount(stopId);
-				w.write(String.valueOf(i) + ";" + c.getCsId() + ";");
+				w.write(String.valueOf(i) + ";" + c.getCsId() + ";" + transitRoute.getStops().get(i).getStopFacility().getName() + ";");
 				for(int j = 0; j < (maxSlice + 1); j++){
 					v = c.getVolume(j);
 					Double value = (v == null) ? 0. : v.getValue();
