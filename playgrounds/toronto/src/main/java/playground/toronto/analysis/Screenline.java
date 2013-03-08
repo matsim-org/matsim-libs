@@ -178,14 +178,13 @@ public class Screenline{
 				
 				if (gLink.crosses(temp)){
 					//Take the dot-product of the segment with the link
-					double dp = dotProduct(prevPoint, points[i], coord1, coord2);
+					double cp = crossProduct(prevPoint, points[i], coord1, coord2);
 					
-					if (dp < 0 )
+					if (cp < 0 )
 						minusLinks.add(link.getId());
-					else if (dp > 0 )
+					else if (cp > 0 )
 						plusLinks.add(link.getId());
-					//Do nothing if dp == 0; this implies the link is parallel.
-					
+					//Do nothing if dp == 0; this implies the link is parallel.					
 					break;
 				}
 				prevPoint = points[i];
@@ -193,8 +192,8 @@ public class Screenline{
 		}
 	}
 	
-	private double dotProduct(Coordinate from1, Coordinate to1, Coordinate from2, Coordinate to2){		
-		return ((to1.x - from1.x) * (to2.x - from2.x)) + ((to1.y - to1.y) * (to2.y - to2.y));
+	private double crossProduct(Coordinate from1, Coordinate to1, Coordinate from2, Coordinate to2){
+		return (to1.x - from1.x) * (to2.y - from2.y) - (to1.y - from1.y) * (to2.x - from2.x);
 	}
 	
 	public Id getID(){
