@@ -53,7 +53,7 @@ public class ConvertCliquesToHouseholds {
 		int currentVehicle = 0;
 		for ( Household household : parser.households.getHouseholds().values() ) {
 			for ( int nCreatedVehicles = 0 ;
-					nCreatedVehicles <= vehiclesPerPerson * household.getMemberIds().size();
+					nCreatedVehicles < vehiclesPerPerson * household.getMemberIds().size();
 					nCreatedVehicles++ ) {
 				if ( household.getVehicleIds() == null ) {
 					((HouseholdImpl) household).setVehicleIds( new ArrayList<Id>() );
