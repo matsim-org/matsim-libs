@@ -21,6 +21,8 @@ package playground.thibautd.socnetsim.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+
 /**
  * @author thibautd
  */
@@ -44,7 +46,9 @@ public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
 	}
 
 	@Override
-	public double getWeight(final Plan indivPlan) {
+	public double getWeight(
+			final Plan indivPlan,
+			final ReplanningGroup group) {
 		Double score = indivPlan.getScore();
 		// if there are unscored plan, one of them is selected
 		return score == null ? Double.POSITIVE_INFINITY : score;

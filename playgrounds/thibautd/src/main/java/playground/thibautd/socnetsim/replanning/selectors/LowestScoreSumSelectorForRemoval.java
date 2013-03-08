@@ -21,6 +21,8 @@ package playground.thibautd.socnetsim.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+
 /**
  * @author thibautd
  */
@@ -30,7 +32,9 @@ public class LowestScoreSumSelectorForRemoval extends AbstractHighestWeightSelec
 	}
 
 	@Override
-	public double getWeight(final Plan indivPlan) {
+	public double getWeight(
+			final Plan indivPlan,
+			final ReplanningGroup group) {
 		Double score = indivPlan.getScore();
 		// if there is a plan without score, select it
 		return score == null ? Double.POSITIVE_INFINITY : -score;

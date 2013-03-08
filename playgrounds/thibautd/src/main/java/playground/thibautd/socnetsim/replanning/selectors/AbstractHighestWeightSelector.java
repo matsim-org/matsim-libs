@@ -100,7 +100,20 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return allocation;
 	}
 
-	public abstract double getWeight(final Plan indivPlan);
+	/**
+	 * Defines the weight of a plan, used for selection.
+	 * The method is called once for each plan: it is not required that
+	 * the method returns the same result if called twice with the same
+	 * arguments (ie it can return a random number).
+	 *
+	 * @param indivPlan the plan to weight
+	 * @param replanningGroup the group for which plans are being selected.
+	 * Selectors using "niching" measures may need this. No modifications should
+	 * be done to the group.
+	 */
+	public abstract double getWeight(
+			final Plan indivPlan,
+			final ReplanningGroup replanningGroup);
 
 	// /////////////////////////////////////////////////////////////////////////
 	// "translation" to and from the internal data structures
@@ -130,7 +143,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		for (Person person : group.getPersons()) {
 			for (Plan plan : person.getPlans()) {
-				final double w = getWeight( plan );
+				final double w = getWeight( plan , group );
 				if ( Double.isNaN( w ) ) throw new IllegalArgumentException( "NaN weights are not allowed" );
 				weights.put( plan , w );
 			}

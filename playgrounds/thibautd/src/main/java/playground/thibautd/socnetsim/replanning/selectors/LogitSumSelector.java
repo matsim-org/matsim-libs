@@ -24,6 +24,8 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+
 /**
  * A selector which draws gumbel-distributed scores for individual plans.
  * Without joint plan, this results in logit marginals for the selection for
@@ -46,7 +48,9 @@ public class LogitSumSelector extends AbstractHighestWeightSelector {
 	}
 
 	@Override
-	public double getWeight(final Plan indivPlan) {
+	public double getWeight(
+			final Plan indivPlan,
+			final ReplanningGroup group) {
 		final Double score = indivPlan.getScore();
 		if (score == null) return Double.POSITIVE_INFINITY;
 		return score + nextErrorTerm();
