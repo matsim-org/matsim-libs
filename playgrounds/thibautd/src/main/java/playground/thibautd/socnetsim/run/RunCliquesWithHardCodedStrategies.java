@@ -103,6 +103,7 @@ public class RunCliquesWithHardCodedStrategies {
 					cliquesConf.getInputFile() );
 		final GroupStrategyManager strategyManager =
 			new GroupStrategyManager( 
+					//new NichingSelectorForRemoval(),
 					cliques,
 					strategyRegistry,
 					config.strategy().getMaxAgentPlanMemorySize());
