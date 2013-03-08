@@ -86,7 +86,14 @@ public class IndividualBasedGroupStrategyModule implements GenericStrategyModule
 		String delegateName = delegate.getClass().getSimpleName();
 		if (delegateName.length() == 0 && delegate instanceof AbstractMultithreadedModule) {
 			// anonymous class
-			delegateName = ((AbstractMultithreadedModule) delegate).getPlanAlgoInstance().getClass().getSimpleName();
+			try {
+				delegateName = ((AbstractMultithreadedModule) delegate).getPlanAlgoInstance().getClass().getSimpleName();
+			}
+			catch (Exception e) {
+				// no name: no big deal.
+				// such exceptions can happen if the delegate tries to get the replanning
+				// context, which is not yet set when this method is called.
+			}
 		}
 
 		return "["+getClass().getSimpleName()+": "+delegateName+"]";

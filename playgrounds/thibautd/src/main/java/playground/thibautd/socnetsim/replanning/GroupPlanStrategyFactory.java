@@ -22,6 +22,8 @@ package playground.thibautd.socnetsim.replanning;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,6 +33,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
+import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripStructureUtils;
@@ -40,11 +43,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
-import playground.thibautd.socnetsim.cliques.replanning.modules.jointtimeallocationmutator.JointTimeAllocationMutatorModule;
+import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtimemodechooser.JointTimeModeChooserAlgorithm;
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
@@ -65,6 +69,9 @@ import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
  * @author thibautd
  */
 public class GroupPlanStrategyFactory {
+	private static final Logger log =
+		Logger.getLogger(GroupPlanStrategyFactory.class);
+
 	private GroupPlanStrategyFactory() {}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -98,14 +105,33 @@ public class GroupPlanStrategyFactory {
 			final TripRouterFactory tripRouterFactory) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
 
-		// XXX trips to legs does not keeps co-traveler information
-		//strategy.addStrategyModule( createTripsToLegsModule( config , tripRouterFactory ) ) ;
-
 		strategy.addStrategyModule(
-				new JointPlanBasedGroupStrategyModule(
-							new JointTimeAllocationMutatorModule(
-								config,
-								tripRouterFactory)));
+				new IndividualBasedGroupStrategyModule(
+					new AbstractMultithreadedModule( config.global().getNumberOfThreads() ) {
+						@Override
+						public PlanAlgorithm getPlanAlgoInstance() {
+							final CompositeStageActivityTypes blackList = new CompositeStageActivityTypes();
+							blackList.addActivityTypes( tripRouterFactory.createTripRouter().getStageActivityTypes() );
+							blackList.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
+							final BlackListedTimeAllocationMutator algo =
+									new BlackListedTimeAllocationMutator(
+										blackList,
+										config.timeAllocationMutator().getMutationRange(),
+										MatsimRandom.getLocalInstance() );
+							final int iteration = getReplanningContext().getIteration();
+							final int firstIteration = config.controler().getFirstIteration();
+							final double nIters = config.controler().getLastIteration() - firstIteration;
+							// TODO: make temperature more configurable
+							final double maxTemp = 24;
+							final double minTemp = 1;
+							final double startMin = (2 / 3.) * nIters;
+							final double progress = (iteration - firstIteration) / startMin;
+							final double temp = minTemp + Math.max(1 - progress , 0) * (maxTemp - minTemp);
+							log.debug( "temperature in iteration "+iteration+": "+temp );
+							algo.setTemperature( temp );
+							return algo;
+						}
+					}));
 
 		strategy.addStrategyModule( createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
 

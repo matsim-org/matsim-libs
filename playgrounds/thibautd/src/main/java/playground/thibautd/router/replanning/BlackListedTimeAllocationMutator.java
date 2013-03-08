@@ -41,6 +41,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 	private static final Logger log =
 		Logger.getLogger(BlackListedTimeAllocationMutator.class);
 
+	private double temperature = 1;
 	private final double mutationRange;
 	private final StageActivityTypes blackList;
 	private final Random random;
@@ -66,6 +67,9 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 	public void run(final Plan plan) {
 		final List<Activity> activities = TripStructureUtils.getActivities( plan , blackList );
 		final int nActs = activities.size();
+		// when mutating durations "blindly", avoid creating activities ending before
+		// the previous activity.
+		double lastEndTime = Double.NEGATIVE_INFINITY;
 		for ( Activity a : activities ) {
 			switch ( setting ) {
 				case MUTATE_DUR:
@@ -73,6 +77,10 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 					break;
 				case MUTATE_END:
 					a.setEndTime( mutateTime( a.getEndTime() ) );
+					if ( a.getEndTime() < lastEndTime ) {
+						a.setEndTime( lastEndTime );
+					}
+					lastEndTime = a.getEndTime();
 					break;
 				case MUTATE_END_AS_DUR:
 					final double oldTime = a.getEndTime();
@@ -95,8 +103,19 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		// do not do anything if time is undefined
 		if ( time == Time.UNDEFINED_TIME ) return time;
 
-		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
+		final double actualRange = temperature * mutationRange;
+		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * actualRange);
 		return t < 0 ? 0 : t;
+	}
+
+	/**
+	 * @param t a constant by which to multiply the mutation range.
+	 * If used, this should start high and decrease with iterations.
+	 */
+	public void setTemperature(final double t) {
+		if ( t < 0 ) throw new IllegalArgumentException();
+		if ( t < 1 ) log.warn( "temperature below 1 is discouraged, as the meaning of the mutation range becomes dubious" );
+		this.temperature = t;
 	}
 
 	public void setSetting(final Setting setting) {
