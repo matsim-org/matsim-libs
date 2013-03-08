@@ -293,6 +293,11 @@ public class GroupPlanStrategyFactory {
 							VehicleRessources.class ) ) ) );
 
 		strategy.addStrategyModule(
+				createRecomposeJointPlansModule(
+					registry.getScenario().getConfig(),
+					registry.getJointPlans().getFactory()));
+
+		strategy.addStrategyModule(
 				createReRouteModule(
 					registry.getScenario().getConfig(),
 					registry.getPlanRoutingAlgorithmFactory(),
@@ -312,6 +317,11 @@ public class GroupPlanStrategyFactory {
 						VehicleRessources.class ),
 					TransportMode.car,
 					false));
+
+		strategy.addStrategyModule(
+				createRecomposeJointPlansModule(
+					registry.getScenario().getConfig(),
+					registry.getJointPlans().getFactory()));
 
 		strategy.addStrategyModule(
 				createReRouteModule(
