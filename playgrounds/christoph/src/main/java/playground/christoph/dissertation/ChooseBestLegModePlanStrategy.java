@@ -59,6 +59,10 @@ public class ChooseBestLegModePlanStrategy implements PlanStrategy {
 		chooseBestLegModeModule.setTravelTimes(travelTimes);
 	}
 	
+	public void setWaitToLinkCalculator(WaitToLinkCalculator waitToLinkCalculator) {
+		chooseBestLegModeModule.setWaitToLinkCalculator(waitToLinkCalculator);
+	}
+	
 	public void setTravelDisutilityFactory(TravelDisutilityFactory travelDisutilityFactory) {
 		chooseBestLegModeModule.setTravelDisutilityFactory(travelDisutilityFactory);
 	}

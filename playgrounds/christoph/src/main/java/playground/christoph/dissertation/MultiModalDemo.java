@@ -20,6 +20,8 @@
 
 package playground.christoph.dissertation;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,10 +59,14 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -78,10 +84,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.analysis.ActivitiesAnalyzer;
 import playground.christoph.analysis.TripsAnalyzer;
+import playground.christoph.evacuation.analysis.TravelTimesWriter;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 
@@ -110,14 +118,17 @@ public class MultiModalDemo {
 	private static int hours = 2;
 	private static boolean createPlansForAllModes = false;
 	private static String randomMode = "RANDOM";
+	
+	private static String initialLegMode = randomMode;
 //	private static String initialLegMode = TransportMode.car;
-	private static String initialLegMode = TransportMode.walk;
-//	private static String initialLegMode = randomMode;
+//	private static String initialLegMode = TransportMode.walk;
+	
 	private static String nonCarMode = TransportMode.walk;
 //	private static String legModes = TransportMode.car + "," + TransportMode.bike + "," + TransportMode.walk;
 	/*package*/ static String legModes = TransportMode.car + "," + TransportMode.walk;
-	private static double capacity = 100000.0;
-//	private static double capacity = 2000.0;
+	
+//	private static double capacity = Double.MAX_VALUE;
+	private static double capacity = 2500.0;
 
 	private static double referenceCarSpeed = 50.0/3.6;
 	
@@ -140,13 +151,14 @@ public class MultiModalDemo {
 		qSimConfigGroup.setEndTime(2*86400.0);
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setRemoveStuckVehicles(false);
-		qSimConfigGroup.setStorageCapFactor(2.0);
+		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION);
 		qSimConfigGroup.setStuckTime(25.0);
 		config.addQSimConfigGroup(qSimConfigGroup);
 		
 		config.travelTimeCalculator().setTraveltimeBinSize(300);
 		config.travelTimeCalculator().setFilterModes(true);
+		config.travelTimeCalculator().setAnalyzedModes("car");
 		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
 		
 		config.multiModal().setCreateMultiModalNetwork(false);
@@ -158,7 +170,8 @@ public class MultiModalDemo {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(numIterations);
 		config.controler().setMobsim(ControlerConfigGroup.MobsimType.qsim.toString());
-		config.controler().setOutputDirectory("../../matsim/mysimulations/dissertation/MultiModalDemo" + "_" + capacity);
+		config.controler().setOutputDirectory("../../matsim/mysimulations/dissertation/MultiModal/" 
+				+ initialLegMode.toLowerCase() + "/" + "capacity_" + capacity);
 		
 		Set<String> networkRouteModes = CollectionUtils.stringToSet(TransportMode.car + "," + TransportMode.bike + "," + TransportMode.walk);
 		config.plansCalcRoute().setNetworkModes(networkRouteModes);
@@ -167,17 +180,10 @@ public class MultiModalDemo {
 		config.plansCalcRoute().setBikeSpeed(6.01);
 		config.plansCalcRoute().setPtSpeedFactor(2.0);
 		
-		/*		
-		config.strategy().setMaxAgentPlanMemorySize(3);
-		config.strategy().addParam("Module_1", "SelectExpBeta");
-		config.strategy().addParam("ModuleProbability_1", "1.00");
-		 */
-		
+		config.strategy().setMaxAgentPlanMemorySize(4);
 		config.strategy().addParam("Module_1", "SelectExpBeta");
 //		config.strategy().addParam("Module_1", "BestScore");
 		config.strategy().addParam("ModuleProbability_1", "0.90");
-//		config.strategy().addParam("Module_2", "ChangeLegMode");
-//		config.strategy().addParam("ModuleProbability_2", "0.02");
 		config.strategy().addParam("Module_2", "playground.christoph.dissertation.ChooseBestLegModePlanStrategy");
 		config.strategy().addParam("ModuleProbability_2", "0.10");
 //		config.strategy().addParam("ModuleDisableAfterIteration_2", String.valueOf(numIterations - 1));
@@ -201,7 +207,7 @@ public class MultiModalDemo {
 		controler.setOverwriteFiles(true);
 		
 		// TravelTimeAnalyzer
-		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer();
+		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(scenario);
 		controler.getEvents().addHandler(travelTimeAnalyzer);
 		controler.addControlerListener(travelTimeAnalyzer);
 		
@@ -237,6 +243,34 @@ public class MultiModalDemo {
 				ActivitiesAnalyzer activitiesAnalyzer = new ActivitiesAnalyzer(activitiesFileName, activityTypes, true);
 				event.getControler().addControlerListener(activitiesAnalyzer);
 				event.getControler().getEvents().addHandler(activitiesAnalyzer);
+			}
+		});
+		
+		// car travel times writer
+		controler.addControlerListener(new AfterMobsimListener() {
+
+			@Override
+			public void notifyAfterMobsim(AfterMobsimEvent event) {
+				TravelTimesWriter travelTimesWriter = new TravelTimesWriter(event.getControler().getLinkTravelTimes(), 
+						event.getControler().getNetwork(), event.getControler().getConfig().travelTimeCalculator());
+				travelTimesWriter.collectTravelTimes();
+				
+				OutputDirectoryHierarchy controlerIO = event.getControler().getControlerIO();
+				int iteration = event.getIteration();
+				
+				String absoluteFile = TravelTimesWriter.travelTimesAbsoluteFile;
+				String relativeFile = TravelTimesWriter.travelTimesRelativeFile;
+				if (absoluteFile.toLowerCase().endsWith(".gz")) {
+					absoluteFile = absoluteFile.substring(0, absoluteFile.length() - 3);
+				}
+				if (relativeFile.toLowerCase().endsWith(".gz")) {
+					relativeFile = relativeFile.substring(0, relativeFile.length() - 3);
+				}
+				
+				String absoluteTravelTimesFile = controlerIO.getIterationFilename(iteration, absoluteFile);
+				String relativeTravelTimesFile = controlerIO.getIterationFilename(iteration, relativeFile);
+				travelTimesWriter.writeAbsoluteTravelTimes(absoluteTravelTimesFile);
+				travelTimesWriter.writeRelativeTravelTimes(relativeTravelTimesFile);				
 			}
 		});
 		
@@ -277,13 +311,19 @@ public class MultiModalDemo {
 	
 		Link l1 = networkFactory.createLink(scenario.createId("l1"), n1, n2);
 		l1.setLength(100.0);
-		l1.setCapacity(capacity);
+//		l1.setCapacity(capacity);
+		/*
+		 * Avoid that vehicles cannot be moved from the waiting queue onto the link.
+		 * Time they spent in the waiting queue is not noticed by the TravelTimeCalculator.
+		 */
+		l1.setCapacity(Double.MAX_VALUE);	
 		l1.setFreespeed(referenceCarSpeed);
 		l1.setAllowedModes(multiMode);
 		
 		Link l2 = networkFactory.createLink(scenario.createId("l2"), n2, n3);
 		l2.setLength(1000.0);
-		l2.setCapacity(capacity);
+//		l2.setCapacity(capacity);
+		l2.setCapacity(Double.MAX_VALUE);
 		l2.setFreespeed(referenceCarSpeed);
 		l2.setAllowedModes(carMode);
 		
@@ -296,7 +336,8 @@ public class MultiModalDemo {
 
 		Link l4 = networkFactory.createLink(scenario.createId("l4"), n4, n5);
 		l4.setLength(1000.0);
-		l4.setCapacity(capacity);
+//		l4.setCapacity(capacity);
+		l4.setCapacity(Double.MAX_VALUE);
 		l4.setFreespeed(referenceCarSpeed);
 		l4.setAllowedModes(carMode);
 
@@ -399,7 +440,7 @@ public class MultiModalDemo {
 		Controler controler = new MultiModalDemoControler(sc);
 		controler.setOverwriteFiles(true);
 		
-		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer();
+		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(sc);
 		controler.getEvents().addHandler(travelTimeAnalyzer);
 		controler.addControlerListener(travelTimeAnalyzer);
 		
@@ -436,7 +477,7 @@ public class MultiModalDemo {
 		Controler controler = new MultiModalDemoControler(sc);
 		controler.setOverwriteFiles(true);
 		
-		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer();
+		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(sc);
 		controler.getEvents().addHandler(travelTimeAnalyzer);
 		controler.addControlerListener(travelTimeAnalyzer);
 		
@@ -456,7 +497,13 @@ public class MultiModalDemo {
 	}
 	
 	private static void createPopulation(Scenario scenario) {
+//		MatsimRandom.reset();
 		Random random = MatsimRandom.getLocalInstance();
+		
+		// Draw some more random numbers to get a better 50:50 share if the initial mode is chosen randomly.
+		for (int i = 0; i < 2046; i++) random.nextInt();
+		
+		Map<Id, Double> departureTimes = new HashMap<Id, Double>();
 		
 		for (int hour = 0; hour < hours; hour++) {
 			
@@ -471,28 +518,33 @@ public class MultiModalDemo {
 				Id personId = scenario.createId(String.valueOf(hour * numPersonsPerHour + i));
 				
 				double departureTime = 8*3600 + hour*3600 + random.nextInt(3600);
+				departureTimes.put(personId, departureTime);
 				
 				Person person = createPerson(scenario, personId, sex, age);
-				
-				if (createPlansForAllModes) {
-					for (String legMode : CollectionUtils.stringToArray(legModes)) {
-						Plan plan = createPlan(scenario, departureTime, legMode);
-						person.addPlan(plan);
-						if (legMode.equals(initialLegMode)) ((PersonImpl) person).setSelectedPlan(plan);
-					}
-					if (initialLegMode.equals(randomMode)) ((PersonImpl) person).setSelectedPlan(((PersonImpl) person).getRandomPlan());				
-				} else {
-					if (initialLegMode.equals(randomMode)) {
-						String[] modes = CollectionUtils.stringToArray(legModes);
-						Plan plan = createPlan(scenario, departureTime, modes[random.nextInt(modes.length)]);
-						person.addPlan(plan);
-					} else {
-						Plan plan = createPlan(scenario, departureTime, initialLegMode);
-						person.addPlan(plan);
-					}
-				}
-				
+		
 				scenario.getPopulation().addPerson(person);
+			}
+		}
+		
+		// create and add plans
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			double departureTime = departureTimes.get(person.getId());
+			if (createPlansForAllModes) {
+				for (String legMode : CollectionUtils.stringToArray(legModes)) {					
+					Plan plan = createPlan(scenario, departureTime, legMode);
+					person.addPlan(plan);
+					if (legMode.equals(initialLegMode)) ((PersonImpl) person).setSelectedPlan(plan);
+				}
+				if (initialLegMode.equals(randomMode)) ((PersonImpl) person).setSelectedPlan(((PersonImpl) person).getRandomPlan());				
+			} else {
+				if (initialLegMode.equals(randomMode)) {
+					String[] modes = CollectionUtils.stringToArray(legModes);
+					Plan plan = createPlan(scenario, departureTime, modes[random.nextInt(modes.length)]);
+					person.addPlan(plan);
+				} else {
+					Plan plan = createPlan(scenario, departureTime, initialLegMode);
+					person.addPlan(plan);
+				}
 			}
 		}
 	}
@@ -639,11 +691,18 @@ public class MultiModalDemo {
 			TravelTime bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
 			TravelTime walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
 			
+			int timeSlice = this.config.travelTimeCalculator().getTraveltimeBinSize();
+			int maxTime = 30 * 3600;
+			WaitToLinkCalculator waitToLinkCalculator = new WaitToLinkCalculator(timeSlice, maxTime);
+			this.getEvents().addHandler(waitToLinkCalculator);
+			this.addControlerListener(waitToLinkCalculator);
+			
 			super.getMultiModalTravelTimes().put(TransportMode.bike, bikeTravelTime);
 			super.getMultiModalTravelTimes().put(TransportMode.walk, walkTravelTime);
 			
 			for (PlanStrategy planStrategy : this.strategyManager.getStrategies()) {
 				if (planStrategy instanceof ChooseBestLegModePlanStrategy) {
+					((ChooseBestLegModePlanStrategy) planStrategy).setWaitToLinkCalculator(waitToLinkCalculator);
 					((ChooseBestLegModePlanStrategy) planStrategy).setTravelTimes(this.getMultiModalTravelTimes());
 					((ChooseBestLegModePlanStrategy) planStrategy).setTravelDisutilityFactory(this.getTravelDisutilityFactory());
 				}
@@ -653,17 +712,25 @@ public class MultiModalDemo {
 	
 	private static class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler, IterationEndsListener {
 
+		/*package*/ final Scenario scenario;
+		
 		/*package*/ final Map<String, Map<Id, Double>> departures = new TreeMap<String, Map<Id, Double>>();
 		/*package*/ final Map<String, Map<Id, Double>> arrivals = new TreeMap<String, Map<Id, Double>>();
+		/*package*/ final Map<Id, String> modes = new HashMap<Id, String>();
 		
 		/*package*/ final Map<String, List<Double>> means = new TreeMap<String, List<Double>>();
 		/*package*/ final Map<String, List<Double>> stds = new TreeMap<String, List<Double>>();
 		/*package*/ final Map<String, List<Double>> medians = new TreeMap<String, List<Double>>();
 		
+		public TravelTimeAnalyzer(Scenario scenario) {
+			this.scenario = scenario;
+		}
+		
 		@Override
 		public void reset(int iteration) {
 			departures.clear();
 			arrivals.clear();
+			modes.clear();
 		}
 
 		@Override
@@ -675,6 +742,7 @@ public class MultiModalDemo {
 			}
 			
 			map.put(event.getPersonId(), event.getTime());
+			modes.put(event.getPersonId(), event.getLegMode());
 		}
 		
 		@Override
@@ -690,7 +758,7 @@ public class MultiModalDemo {
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			
+						
 			if (event.getIteration() == 0) {
 				for (String mode : CollectionUtils.stringToArray(legModes)) {
 					means.put(mode, new ArrayList<Double>());
@@ -742,7 +810,54 @@ public class MultiModalDemo {
 					medians.get(mode).add(Double.NaN);
 				}
 			}
-		}	
+			
+			try {
+				OutputDirectoryHierarchy outputDirectoryHierarchy = event.getControler().getControlerIO();
+				String travelTimesFileName = outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "travelTimes.txt");
+				BufferedWriter writer = IOUtils.getBufferedWriter(travelTimesFileName);
+				
+				writer.write("Id");
+				writer.write("\t");
+				writer.write("age");
+				writer.write("\t");
+				writer.write("gender");
+				writer.write("\t");
+				writer.write("mode");
+				writer.write("\t");
+				writer.write("departure");
+				writer.write("\t");
+				writer.write("arrival");
+				writer.write("\t");
+				writer.write("traveltime");
+				writer.write("\n");
+				
+				for (Person person : scenario.getPopulation().getPersons().values()) {
+					String mode = modes.get(person.getId());
+					double departure = this.departures.get(mode).get(person.getId());
+					double arrival = this.arrivals.get(mode).get(person.getId());
+					
+					writer.write(person.getId().toString());
+					writer.write("\t");
+					writer.write(String.valueOf(((PersonImpl) person).getAge()));
+					writer.write("\t");
+					writer.write(((PersonImpl) person).getSex());
+					writer.write("\t");
+					writer.write(mode);
+					writer.write("\t");
+					writer.write(String.valueOf(departure));
+					writer.write("\t");
+					writer.write(String.valueOf(arrival));
+					writer.write("\t");
+					writer.write(String.valueOf(arrival - departure));
+					writer.write("\n");
+				}
+				
+				writer.flush();
+				writer.close();
+			} catch (IOException e) {
+				Gbl.errorMsg(e);
+			}
+		}			
 	}
 	
 	/*package*/ static class ChooseBestLegModeModule extends AbstractMultithreadedModule {
@@ -750,6 +865,7 @@ public class MultiModalDemo {
 		private final Scenario scenario;
 		private final Set<String> modes;
 		private Map<String, TravelTime> travelTimes;
+		private WaitToLinkCalculator waitToLinkCalculator;
 		private TravelDisutilityFactory travelDisutilityFactory;
 		
 		public ChooseBestLegModeModule(final Scenario scenario, final Set<String> modes) {
@@ -760,6 +876,10 @@ public class MultiModalDemo {
 
 		public void setTravelTimes(Map<String, TravelTime> travelTimes) {
 			this.travelTimes = travelTimes;
+		}
+		
+		public void setWaitToLinkCalculator(WaitToLinkCalculator waitToLinkCalculator) {
+			this.waitToLinkCalculator = waitToLinkCalculator;
 		}
 		
 		public void setTravelDisutilityFactory(TravelDisutilityFactory travelDisutilityFactory) {
@@ -782,19 +902,22 @@ public class MultiModalDemo {
 				leastCostPathCalculators.put(mode, leastCostPathCalculator);
 			}
 			
-			return new ChooseBestLegMode(leastCostPathCalculators, scenario.getNetwork(), modes);
+			return new ChooseBestLegMode(leastCostPathCalculators, waitToLinkCalculator, scenario.getNetwork(), modes);
 		}
 	}
 	
 	public static class ChooseBestLegMode implements PlanAlgorithm {
 
 		private final Map<String, LeastCostPathCalculator> leastCostPathCalculators;
+		private final WaitToLinkCalculator waitToLinkCalculator;
 		private final Network network;
 		private final Set<String> modes;
 		private final Random random;
 		
-		private ChooseBestLegMode(Map<String, LeastCostPathCalculator> leastCostPathCalculators, Network network, final Set<String> modes) {
+		private ChooseBestLegMode(Map<String, LeastCostPathCalculator> leastCostPathCalculators, 
+				WaitToLinkCalculator waitToLinkCalculator, Network network, final Set<String> modes) {
 			this.leastCostPathCalculators = leastCostPathCalculators;
+			this.waitToLinkCalculator = waitToLinkCalculator;
 			this.network = network;
 			this.modes = modes;
 			this.random = MatsimRandom.getLocalInstance();
@@ -804,10 +927,10 @@ public class MultiModalDemo {
 		public void run(Plan plan) {
 			
 			String bestMode = null;
-			double minTravelCost = Double.MAX_VALUE;
+			double minTravelTime = Double.MAX_VALUE;
 			
 			for (String mode : modes) {
-				double travelCost = 0.0;
+				double travelTime = 0.0;
 				
 				LeastCostPathCalculator leastCostPathCalculator = leastCostPathCalculators.get(mode);
 				
@@ -818,22 +941,30 @@ public class MultiModalDemo {
 						Link fromLink = network.getLinks().get(leg.getRoute().getStartLinkId());
 						Link toLink = network.getLinks().get(leg.getRoute().getEndLinkId());
 						
+						double waitToLinkTime = 1.0;	// at least one second due to simulation logic
+						
+						// if it is car mode also take waitToLink time into account
+						if (mode.equals(TransportMode.car)) {
+							waitToLinkTime = waitToLinkCalculator.getWaitToLinkTime(leg.getRoute().getStartLinkId(), leg.getDepartureTime()); 
+						}
+						travelTime += waitToLinkTime;
+						
 						Path path = leastCostPathCalculator.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), 
-								leg.getDepartureTime(), plan.getPerson(), null);
-						travelCost += path.travelCost;
+								leg.getDepartureTime() + waitToLinkTime, plan.getPerson(), null);
+						travelTime += path.travelTime;
 						
 						// add also costs of to-link
 						path = leastCostPathCalculator.calcLeastCostPath(toLink.getFromNode(), toLink.getToNode(), 
-								leg.getDepartureTime() + path.travelTime, plan.getPerson(), null);
-						travelCost += path.travelCost;
-						
-						if (travelCost < minTravelCost) {
+								leg.getDepartureTime() + path.travelTime + waitToLinkTime, plan.getPerson(), null);
+						travelTime += path.travelTime;
+												
+						if (travelTime < minTravelTime) {
 							bestMode = mode;
-							minTravelCost = travelCost;
-						} else if (travelCost == minTravelCost) {
+							minTravelTime = travelTime;
+						} else if (travelTime == minTravelTime) {
 							if (this.random.nextBoolean()) {
 								bestMode = mode;
-								minTravelCost = travelCost;
+								minTravelTime = travelTime;
 							}
 						}
 					}
