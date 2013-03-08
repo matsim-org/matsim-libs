@@ -38,7 +38,7 @@ public class TransitRouteContainer {
 			.getLogger(TransitRouteContainer.class);
 	private Double interval;
 	private Id id;
-	private Integer maxSlice = 0;
+	private Integer maxSlice;
 	private Counts boarding;
 	private Counts alighting;
 	private Counts capacity;
@@ -54,8 +54,9 @@ public class TransitRouteContainer {
 	 * 
 	 * @param r
 	 * @param countsInterval, the length of an interval/timeslice ins second
+	 * @param maxSlice, the maximum number of timeslices. In the last timeslice all numbers of later e.g. boardings are summed up...
 	 */
-	public TransitRouteContainer(TransitRoute r, double countsInterval) {
+	public TransitRouteContainer(TransitRoute r, double countsInterval, int maxSlice) {
 		this.id = r.getId();
 		this.boarding = new Counts();
 		this.alighting = new Counts();
@@ -63,6 +64,7 @@ public class TransitRouteContainer {
 		this.totalPax = new Counts();
 		this.occupancy = new Counts();
 		this.interval = countsInterval;
+		this.maxSlice = maxSlice;
 		for(int i= 0; i < r.getStops().size() ; i++){
 			TransitRouteStop s = r.getStops().get(i);
 			create(this.boarding, new IdImpl(i), s.getStopFacility().getId(), 0., 0.);
@@ -115,9 +117,9 @@ public class TransitRouteContainer {
 			count = counts.getCount(stopId);
 		}
 		Integer slice = getTimeSlice(time);
-		if(slice > this.maxSlice){
-			this.maxSlice = slice;
-		}
+//		if(slice > this.maxSlice){
+//			this.maxSlice = slice;
+//		}
 		Volume v;
 		if(count.getVolumes().containsKey(slice)){
 			v = count.getVolume(slice);
@@ -135,9 +137,9 @@ public class TransitRouteContainer {
 			count = counts.getCount(stopIndexId);
 		}
 		Integer slice = getTimeSlice(time);
-		if(slice > this.maxSlice){
-			this.maxSlice = slice;
-		}
+//		if(slice > this.maxSlice){
+//			this.maxSlice = slice;
+//		}
 		Volume v;
 		if(count.getVolumes().containsKey(slice)){
 			v = count.getVolume(slice);
@@ -155,9 +157,9 @@ public class TransitRouteContainer {
 			count = counts.getCount(stopIndexId);
 		}
 		Integer slice = getTimeSlice(time);
-		if(slice > this.maxSlice){
-			this.maxSlice = slice;
-		}
+//		if(slice > this.maxSlice){
+//			this.maxSlice = slice;
+//		}
 		Volume v;
 		if(count.getVolumes().containsKey(slice)){
 			v = count.getVolume(slice);
@@ -168,7 +170,11 @@ public class TransitRouteContainer {
 	}
 	
 	private Integer getTimeSlice(double time){
-		return (int) (time / this.interval);
+		int slice =  (int) (time / this.interval);
+		if(slice >= this.maxSlice){
+			return this.maxSlice;
+		}
+		return slice;
 	}
 
 	/**

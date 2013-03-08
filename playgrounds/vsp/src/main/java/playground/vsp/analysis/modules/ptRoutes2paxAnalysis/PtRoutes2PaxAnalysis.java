@@ -59,9 +59,9 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 	private PtRoutes2PaxAnalysisHandler handler;
 	private Map<Id, TransitLine> lines;
 
-	public PtRoutes2PaxAnalysis(Map<Id, TransitLine> lines, Vehicles vehicles, double interval) {
+	public PtRoutes2PaxAnalysis(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices) {
 		super(PtRoutes2PaxAnalysis.class.getSimpleName());
-		this.handler = new PtRoutes2PaxAnalysisHandler(interval, lines, vehicles);
+		this.handler = new PtRoutes2PaxAnalysisHandler(interval, maxSlices, lines, vehicles);
 		this.lines = lines;
 	}
 
@@ -158,7 +158,7 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 		sc.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(sc).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.transitSchedule.xml.gz");
 		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.vehicles.xml.gz");
-		PtRoutes2PaxAnalysis ptRoutesPax = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600);
+		PtRoutes2PaxAnalysis ptRoutesPax = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600, 24);
 		analyzer.addAnalysisModule(ptRoutesPax);
 		analyzer.run();
 		

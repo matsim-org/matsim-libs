@@ -38,9 +38,9 @@ public class TransitLineContainer {
 	private Id id;
 	private Map<Id, TransitRouteContainer> routeContainer;
 
-	public TransitLineContainer(TransitLine l, double countsInterval) {
+	public TransitLineContainer(TransitLine l, double countsInterval, int maxSlice) {
 		this.id = l.getId();
-		this.routeContainer = getRouteContainer(l, countsInterval);
+		this.routeContainer = getRouteContainer(l, countsInterval, maxSlice);
 	}
 	
 	public Id getId(){
@@ -51,10 +51,10 @@ public class TransitLineContainer {
 	 * @param l
 	 * @return
 	 */
-	private Map<Id, TransitRouteContainer> getRouteContainer(TransitLine l, double countsInterval) {
+	private Map<Id, TransitRouteContainer> getRouteContainer(TransitLine l, double countsInterval, int maxSlice) {
 		Map<Id, TransitRouteContainer> rc = new HashMap<Id, TransitRouteContainer>();
 		for(TransitRoute r: l.getRoutes().values()){
-			rc.put(r.getId(), new TransitRouteContainer(r, countsInterval));
+			rc.put(r.getId(), new TransitRouteContainer(r, countsInterval, maxSlice));
 		}
 		return rc;
 	}
