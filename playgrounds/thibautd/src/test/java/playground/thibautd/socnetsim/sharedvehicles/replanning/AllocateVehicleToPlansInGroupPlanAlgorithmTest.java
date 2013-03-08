@@ -131,7 +131,8 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						random,
 						vehs,
-						MODE);
+						MODE,
+						false);
 			algo.run( testPlan );
 
 			final Set<Id> allocated = new HashSet<Id>();
@@ -157,7 +158,8 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						random,
 						vehs,
-						MODE);
+						MODE,
+						false);
 			algo.run( testPlan );
 
 			final Map<Id, Integer> counts = new LinkedHashMap<Id, Integer>();
@@ -190,7 +192,8 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						random,
 						vehs,
-						MODE);
+						MODE,
+						false);
 			algo.run( testPlan );
 
 			for ( Plan p : testPlan.getAllIndividualPlans() ) {
@@ -227,7 +230,8 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						new Random( 1432 ),
 						vehs,
-						MODE);
+						MODE,
+						false);
 			algo.run( testPlan );
 
 			for ( Plan p : testPlan.getAllIndividualPlans() ) {

@@ -32,14 +32,17 @@ import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 public class AllocateVehicleToPlansInGroupPlanModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
 	private final VehicleRessources vehicleRessources;
 	private final String mode;
+	private final boolean allowNullRoutes;
 
 	public AllocateVehicleToPlansInGroupPlanModule(
 			final int nThreads,
 			final VehicleRessources vehicleRessources,
-			final String mode) {
+			final String mode,
+			final boolean allowNullRoutes) {
 		super( nThreads );
 		this.vehicleRessources = vehicleRessources;
 		this.mode = mode;
+		this.allowNullRoutes = allowNullRoutes;
 	}
 
 	@Override
@@ -47,7 +50,8 @@ public class AllocateVehicleToPlansInGroupPlanModule extends AbstractMultithread
 		return new AllocateVehicleToPlansInGroupPlanAlgorithm(
 				MatsimRandom.getLocalInstance(),
 				vehicleRessources,
-				mode);
+				mode,
+				allowNullRoutes);
 	}
 }
 

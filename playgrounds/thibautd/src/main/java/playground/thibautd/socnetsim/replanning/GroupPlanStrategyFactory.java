@@ -294,7 +294,8 @@ public class GroupPlanStrategyFactory {
 					registry.getScenario().getConfig().global().getNumberOfThreads(),
 					registry.getScenario().getScenarioElement(
 						VehicleRessources.class ),
-					TransportMode.car));
+					TransportMode.car,
+					false));
 
 		strategy.addStrategyModule(
 				createReRouteModule(

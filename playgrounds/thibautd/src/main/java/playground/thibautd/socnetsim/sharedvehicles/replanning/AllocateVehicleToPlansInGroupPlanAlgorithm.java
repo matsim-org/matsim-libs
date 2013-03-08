@@ -54,14 +54,26 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 	private final Random random;
 	private final VehicleRessources vehicleRessources;
 	private final String mode;
+	private final boolean allowNullRoutes;
 
+	/**
+	 * @param random the random generator to use
+	 * @param vehicleRessources the vehicles
+	 * @param mode the mode for which to allocate vehicles
+	 * @param allowNullRoutes if true, when a leg of mode
+	 * <tt>mode</tt> has a null route, a new empty route
+	 * will be created to receive the vehicle Id. If false,
+	 * a null route will result in a exception.
+	 */
 	public AllocateVehicleToPlansInGroupPlanAlgorithm(
 			final Random random,
 			final VehicleRessources vehicleRessources,
-			final String mode) {
+			final String mode,
+			final boolean allowNullRoutes) {
 		this.random = random;
 		this.vehicleRessources = vehicleRessources;
 		this.mode = mode;
+		this.allowNullRoutes = allowNullRoutes;
 	}
 
 	@Override
@@ -80,7 +92,8 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 				final Leg leg = (Leg) pe;
 
 				if ( !mode.equals( leg.getMode() ) ) continue;
-				if ( !( leg.getRoute() instanceof NetworkRoute ) ) {
+				if ( !( ( allowNullRoutes && leg.getRoute() == null ) ||
+						( leg.getRoute() instanceof NetworkRoute ) ) ) {
 					throw new RuntimeException( "route for mode "+mode+" has non-network route "+leg.getRoute() );
 				}
 				plans.add( p );
@@ -108,9 +121,16 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 				final Leg leg = (Leg) pe;
 
 				if ( !mode.equals( leg.getMode() ) ) continue;
+
+				if ( allowNullRoutes && leg.getRoute() == null ) {
+					// this is not so nice...
+					leg.setRoute( new VehicleOnlyNetworkRoute() );
+				}
+
 				if ( !( leg.getRoute() instanceof NetworkRoute ) ) {
 					throw new RuntimeException( "route for mode "+mode+" has non-network route "+leg.getRoute() );
 				}
+
 				((NetworkRoute) leg.getRoute()).setVehicleId( v );
 			}
 		}
@@ -201,6 +221,104 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 		// make sure iteration order is deterministic
 		Collections.sort( leastUsedVehicles );
 		return leastUsedVehicles.get( random.nextInt( leastUsedVehicles.size() ) );
+	}
+
+	/**
+	 * to put vehicle Id in legs without route.
+	 * Try to make this the less dirty as possible: anything except vehicle-related
+	 * operations throws an UnsupportedOperationException, so that we are sure this
+	 * is not used for more than what it is meant to do.
+	 */
+	private static class VehicleOnlyNetworkRoute implements NetworkRoute {
+		private Id v = null;
+
+		// /////////////////////////////////////////////////////////////////////
+		// active methods
+		// /////////////////////////////////////////////////////////////////////
+		@Override
+		public void setVehicleId(final Id vehicleId) {
+			this.v = vehicleId;
+		}
+
+		@Override
+		public Id getVehicleId() {
+			return v;
+		}
+
+		// /////////////////////////////////////////////////////////////////////
+		// inactive methods
+		// /////////////////////////////////////////////////////////////////////
+		@Override
+		@Deprecated
+		public double getDistance() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setDistance(double distance) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public double getTravelTime() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setTravelTime(double travelTime) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Id getStartLinkId() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Id getEndLinkId() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setStartLinkId(Id linkId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setEndLinkId(Id linkId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setLinkIds(Id startLinkId, List<Id> linkIds, Id endLinkId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setTravelCost(double travelCost) {
+			throw new UnsupportedOperationException();
+			
+		}
+
+		@Override
+		public double getTravelCost() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public List<Id> getLinkIds() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public NetworkRoute getSubRoute(Id fromLinkId, Id toLinkId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public VehicleOnlyNetworkRoute clone() {
+			throw new UnsupportedOperationException();
+		}
 	}
 }
 

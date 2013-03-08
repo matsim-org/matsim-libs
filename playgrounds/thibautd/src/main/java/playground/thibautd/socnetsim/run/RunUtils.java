@@ -98,10 +98,7 @@ public class RunUtils {
 		}
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSubtourModeChoice(
-					config,
-					controllerRegistry.getJointPlans().getFactory(),
-					controllerRegistry.getPlanRoutingAlgorithmFactory(),
-					controllerRegistry.getTripRouterFactory() ),
+					controllerRegistry ),
 				weights.getModeMutationWeight());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSelectExpBeta( config ),
