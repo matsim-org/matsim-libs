@@ -48,7 +48,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author sergioo
  */
 
-public class WaitTimeCalculator implements WaitTime, AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentStuckEventHandler {
+public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentStuckEventHandler {
 	
 	// , AdditionalTeleportationDepartureEventHandler
 	
@@ -100,8 +100,17 @@ public class WaitTimeCalculator implements WaitTime, AgentDepartureEventHandler,
 	}
 
 	//Methods
-	@Override
-	public double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+	public WaitTime getWaitTimes() {
+		return new WaitTime() {
+			
+			@Override
+			public double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+				return WaitTimeCalculator.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
+			}
+		
+		};
+	}
+	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
 		String key = "("+lineId+")["+routeId+"]"+stopId;
 		WaitTimeData waitTimeData = waitTimes.get(key);
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
@@ -142,7 +151,8 @@ public class WaitTimeCalculator implements WaitTime, AgentDepartureEventHandler,
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
 						String key = "("+leg[2]+")["+leg[3]+"]"+leg[1];
-						waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+						if(waitTimes.get(key)!=null)
+							waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
 					}
@@ -184,7 +194,8 @@ public class WaitTimeCalculator implements WaitTime, AgentDepartureEventHandler,
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
 						String key = "("+leg[2]+")["+leg[3]+"]"+leg[1];
-						waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+						if(waitTimes.get(key)!=null)
+							waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
 					}
