@@ -28,6 +28,8 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator.Setting;
+
 /**
  * @author thibautd
  */
@@ -84,7 +86,7 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 					blackList != null ? blackList : controler.getTripRouterFactory().createTripRouter().getStageActivityTypes(),
 					this.mutationRange,
 					MatsimRandom.getLocalInstance());
-		mutator.setUseActivityDurations(this.useActivityDurations);
+		mutator.setSetting( useActivityDurations ? Setting.MUTATE_DUR : Setting.MUTATE_END_AS_DUR );
 		return mutator;
 	}
 }

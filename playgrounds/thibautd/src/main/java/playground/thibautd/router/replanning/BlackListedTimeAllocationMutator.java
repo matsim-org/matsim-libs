@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.router.replanning;
 
+import java.util.List;
 import java.util.Random;
+
+import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,10 +38,19 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author thibautd
  */
 public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
+	private static final Logger log =
+		Logger.getLogger(BlackListedTimeAllocationMutator.class);
+
 	private final double mutationRange;
 	private final StageActivityTypes blackList;
 	private final Random random;
-	private boolean useActivityDurations = false;
+	private Setting setting = Setting.MUTATE_END_AS_DUR;
+
+	public enum Setting {
+		MUTATE_DUR,
+		MUTATE_END,
+		MUTATE_END_AS_DUR;
+	}
 
 	public BlackListedTimeAllocationMutator(
 			final StageActivityTypes blackList,
@@ -47,16 +59,34 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		this.blackList = blackList;
 		this.mutationRange = mutationRange;
 		this.random = random;
+		log.debug( "setting initialized to "+setting );
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		for ( Activity a : TripStructureUtils.getActivities( plan , blackList ) ) {
-			if ( useActivityDurations ) {
-				((ActivityImpl) a).setMaximumDuration( mutateTime( a.getMaximumDuration() ) );
-			}
-			else {
-				a.setEndTime( mutateTime( a.getEndTime() ) );
+		final List<Activity> activities = TripStructureUtils.getActivities( plan , blackList );
+		final int nActs = activities.size();
+		for ( Activity a : activities ) {
+			switch ( setting ) {
+				case MUTATE_DUR:
+					((ActivityImpl) a).setMaximumDuration( mutateTime( a.getMaximumDuration() ) );
+					break;
+				case MUTATE_END:
+					a.setEndTime( mutateTime( a.getEndTime() ) );
+					break;
+				case MUTATE_END_AS_DUR:
+					final double oldTime = a.getEndTime();
+					final double newTime = mutateTime( oldTime );
+					// doing this so rather than sampling mut directly allows
+					// to avoid negative times
+					final double mut = newTime - oldTime;
+					// shift all times after the mutated time (as if we were working on durations)
+					for ( Activity currAct : activities.subList( activities.indexOf( a ) , nActs ) ) {
+						currAct.setEndTime( currAct.getEndTime() + mut );
+					}
+					break;
+				default:
+					throw new RuntimeException( "what is that? "+setting );
 			}
 		}
 	}
@@ -69,8 +99,9 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		return t < 0 ? 0 : t;
 	}
 
-	public void setUseActivityDurations(final boolean useActivityDurations) {
-		this.useActivityDurations = useActivityDurations;
+	public void setSetting(final Setting setting) {
+		log.debug( "setting set to "+setting );
+		this.setting = setting;
 	}
 }
 
