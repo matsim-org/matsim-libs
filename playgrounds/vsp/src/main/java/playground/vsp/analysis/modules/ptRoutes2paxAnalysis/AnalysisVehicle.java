@@ -20,6 +20,7 @@ package playground.vsp.analysis.modules.ptRoutes2paxAnalysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author droeder
@@ -35,6 +36,7 @@ public class AnalysisVehicle {
 	private Id id;
 	private Id lineId;
 	private Id routeId;
+	private int stopIndex = -1;
 
 	public AnalysisVehicle(Id id, Id locationId, double capacity, Id lineId, Id routeId) {
 		this.id = id;
@@ -58,6 +60,10 @@ public class AnalysisVehicle {
 			log.warn("vehicle " + this.id + ", less than zero seats are occupied. This should never happen!");
 		}
 	}
+	
+	public Id getStopIndexId(){
+		return new IdImpl(this.stopIndex);
+	}
 
 	/**
 	 * @return the locationId
@@ -67,10 +73,12 @@ public class AnalysisVehicle {
 	}
 
 	/**
+	 * sets the real location id and increases the index of the current stop...
 	 * @param locationId the locationId to set
 	 */
 	public final void setLocationId(Id locationId) {
 		this.locationId = locationId;
+		this.stopIndex ++;
 	}
 
 	/**

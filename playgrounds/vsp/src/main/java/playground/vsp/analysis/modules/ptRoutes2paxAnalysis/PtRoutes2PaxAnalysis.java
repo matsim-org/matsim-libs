@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -87,9 +88,9 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 		String dir;
 		for(TransitLineContainer lc: this.handler.getTransitLinesContainer().values()){
 			// put all routes of one line into an separat folder as an routes id is not necessarily unique
-			dir = outputFolder + lc.getId().toString() + "/";
-			File f = new File(dir);
-			if(!f.exists()) f.mkdirs();
+			dir = outputFolder + lc.getId().toString() + "--";
+//			File f = new File(dir);
+//			if(!f.exists()) f.mkdirs();
 			//parse the routes
 			for(TransitRouteContainer rc : lc.getTransitRouteContainer().values()){
 				writeRouteFiles(dir, rc, this.lines.get(lc.getId()).getRoutes().get(rc.getId()));
@@ -103,11 +104,11 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 	 * @param transitRoute 
 	 */
 	private void writeRouteFiles(String dir, TransitRouteContainer rc, TransitRoute transitRoute) {
-		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getAlighting(), dir + rc.getId().toString() + "_alighting.csv");
-		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getBoarding(), dir + rc.getId().toString() + "_boarding.csv");
-		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getCapacity(), dir + rc.getId().toString() + "_capacity.csv");
-		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getOccupancy(), dir + rc.getId().toString() + "_occupancy.csv");
-		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getTotalPax(), dir + rc.getId().toString() + "_totalPax.csv");
+		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getAlighting(), dir + rc.getId().toString() + "--alighting.csv");
+		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getBoarding(), dir + rc.getId().toString() + "--boarding.csv");
+		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getCapacity(), dir + rc.getId().toString() + "--capacity.csv");
+		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getOccupancy(), dir + rc.getId().toString() + "--occupancy.csv");
+		writeCounts2File(transitRoute, rc.getMaxSlice(), rc.getTotalPax(), dir + rc.getId().toString() + "--totalPax.csv");
 	}
 
 	/**
@@ -123,18 +124,18 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 		Volume v;
 		try {
 			//create header
-			w.write("stopId;");
+			w.write("index;stopId;");
 			for(int i = 0; i < (maxSlice + 1); i++){
 				w.write(String.valueOf(i) + ";");
 			}
 			w.write("\n");
 			// write numbers for stops in the correct order
-			for(TransitRouteStop s: transitRoute.getStops()){
-				stopId = s.getStopFacility().getId();
-				w.write(stopId.toString() + ";");
+			for(int i = 0; i < transitRoute.getStops().size(); i++){
+				stopId = new IdImpl(i);
 				c = counts.getCount(stopId);
-				for(int i = 0; i < (maxSlice + 1); i++){
-					v = c.getVolume(i);
+				w.write(String.valueOf(i) + ";" + c.getCsId() + ";");
+				for(int j = 0; j < (maxSlice + 1); j++){
+					v = c.getVolume(j);
 					Double value = (v == null) ? 0. : v.getValue();
 					w.write(String.valueOf(value) + ";");
 				}
