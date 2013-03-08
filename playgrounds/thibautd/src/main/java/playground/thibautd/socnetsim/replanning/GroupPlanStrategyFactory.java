@@ -56,6 +56,7 @@ import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
+import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToSubtourModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
@@ -248,6 +249,26 @@ public class GroupPlanStrategyFactory {
 						TransportMode.car,
 						registry.getScenario().getScenarioElement(
 							VehicleRessources.class ) ) ) );
+
+		strategy.addStrategyModule(
+				createReRouteModule(
+					registry.getScenario().getConfig(),
+					registry.getPlanRoutingAlgorithmFactory(),
+					registry.getTripRouterFactory() ) );
+
+		return strategy;
+	}
+
+	public static GroupPlanStrategy createGroupPlanVehicleAllocation(
+			final ControllerRegistry registry) {
+		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+
+		strategy.addStrategyModule(
+				new AllocateVehicleToPlansInGroupPlanModule(
+					registry.getScenario().getConfig().global().getNumberOfThreads(),
+					registry.getScenario().getScenarioElement(
+						VehicleRessources.class ),
+					TransportMode.car));
 
 		strategy.addStrategyModule(
 				createReRouteModule(

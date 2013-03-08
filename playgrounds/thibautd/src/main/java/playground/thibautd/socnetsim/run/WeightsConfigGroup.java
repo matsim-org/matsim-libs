@@ -29,19 +29,30 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private double modeMutation = -1;
 	private double logitSelection = -1;
 	private double vehicleAllocation = -1;
+	private double planVehicleAllocation = -1;
 	private boolean jtmOptimizes = true;
 
 	public WeightsConfigGroup() {
 		super( GROUP_NAME );
 	}
 
-	@StringGetter( "reallocateVehicle" )
-	public double getReallocateVehicleWeight() {
+	@StringGetter( "reallocateVehiclePlan" )
+	public double getPlanLevelReallocateVehicleWeight() {
+		return planVehicleAllocation;
+	}
+
+	@StringSetter( "reallocateVehiclePlan" )
+	public void setPlanLevelReallocateVehicleWeight(final double v) {
+		planVehicleAllocation = v;
+	}
+
+	@StringGetter( "reallocateVehicleTour" )
+	public double getTourLevelReallocateVehicleWeight() {
 		return vehicleAllocation;
 	}
 
-	@StringSetter( "reallocateVehicle" )
-	public void setReallocateVehicleWeight(final double v) {
+	@StringSetter( "reallocateVehicleTour" )
+	public void setTourLevelReallocateVehicleWeight(final double v) {
 		this.vehicleAllocation = v;
 	}
 
