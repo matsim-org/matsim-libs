@@ -237,29 +237,45 @@ public class GroupPlanStrategyFactory {
 	}
 
 	public static GroupPlanStrategy createSubtourModeChoice(
-			final Config config,
-			final JointPlanFactory jpFactory,
-			final PlanRoutingAlgorithmFactory planRouterFactory,
-			final TripRouterFactory tripRouterFactory) {
+			final ControllerRegistry registry) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
 
-		strategy.addStrategyModule( createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
+		// Why the hell did I put this here???
+		//strategy.addStrategyModule(
+		//		createReRouteModule(
+		//			registry.getScenario().getConfig(),
+		//			registry.getPlanRoutingAlgorithmFactory(),
+		//			registry.getTripRouterFactory() ) );
 
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
-					new SubtourModeChoice( config ) ) );
+					new SubtourModeChoice(
+						registry.getScenario().getConfig() ) ) );
 
-		strategy.addStrategyModule( createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
+		// TODO: add an option to enable or disable this part?
+		strategy.addStrategyModule(
+				new AllocateVehicleToPlansInGroupPlanModule(
+					registry.getScenario().getConfig().global().getNumberOfThreads(),
+					registry.getScenario().getScenarioElement(
+						VehicleRessources.class ),
+					TransportMode.car,
+					true));
+
+		strategy.addStrategyModule(
+				createReRouteModule(
+					registry.getScenario().getConfig(),
+					registry.getPlanRoutingAlgorithmFactory(),
+					registry.getTripRouterFactory() ) );
 
 		strategy.addStrategyModule(
 				createRecomposeJointPlansModule(
-					config,
-					jpFactory));
+					registry.getScenario().getConfig(),
+					registry.getJointPlans().getFactory()));
 
 		strategy.addStrategyModule(
 				createSynchronizerModule(
-					config,
-					tripRouterFactory) );
+					registry.getScenario().getConfig(),
+					registry.getTripRouterFactory()) );
 
 		return strategy;
 	}
