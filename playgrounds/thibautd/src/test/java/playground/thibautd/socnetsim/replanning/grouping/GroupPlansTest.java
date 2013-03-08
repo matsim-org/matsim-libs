@@ -33,13 +33,18 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
  * @author thibautd
@@ -82,6 +87,53 @@ public class GroupPlansTest {
 	@After
 	public void clear() {
 		testPlans.clear();
+	}
+
+	@Test
+	public void testGetters() throws Exception {
+		final List<Plan> indivPlans = new ArrayList<Plan>();
+		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
+
+		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
+		for ( int i = 0; i < 5; i++ ) {
+			final Person person = popFact.createPerson( new IdImpl( "indiv-"+i ) );
+			final Plan plan = popFact.createPlan();
+			person.addPlan( plan );
+			plan.setPerson( person );
+			indivPlans.add( plan );
+		}
+
+		int nIndivInJoints = 0;
+		final JointPlanFactory jpFact = new JointPlanFactory();
+		for ( int i = 1; i < 5; i++ ) {
+			final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+			for ( int j = 0; j < i; j++ ) {
+				nIndivInJoints++;
+				final Person person = popFact.createPerson( new IdImpl( "joint-"+i+"-"+j ) );
+				final Plan plan = popFact.createPlan();
+				person.addPlan( plan );
+				plan.setPerson( person );
+				plans.put( person.getId() , plan );
+			}
+			jointPlans.add( jpFact.createJointPlan( plans ) );
+		}
+
+		final GroupPlans testee = new GroupPlans( jointPlans , indivPlans );
+
+		assertEquals(
+				"wrong number of individual plans",
+				indivPlans.size(),
+				testee.getIndividualPlans().size());
+
+		assertEquals(
+				"wrong number of joint plans",
+				jointPlans.size(),
+				testee.getJointPlans().size());
+
+		assertEquals(
+				"wrong total number of indiv plans",
+				indivPlans.size() + nIndivInJoints,
+				testee.getAllIndividualPlans().size());
 	}
 
 	@Test

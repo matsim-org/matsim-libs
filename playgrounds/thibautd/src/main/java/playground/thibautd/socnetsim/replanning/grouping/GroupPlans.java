@@ -68,6 +68,17 @@ public class GroupPlans {
 		return this.unmodifiablePlans;
 	}
 
+	public Collection<Plan> getAllIndividualPlans() {
+		final Collection<Plan> plans = new ArrayList<Plan>();
+
+		plans.addAll( individualPlans );
+		for ( JointPlan jp : jointPlans ) {
+			plans.addAll( jp.getIndividualPlans().values() );
+		}
+
+		return plans;
+	}
+
 	public void addJointPlan(final JointPlan jp) {
 		jointPlans.add( jp );
 	}
