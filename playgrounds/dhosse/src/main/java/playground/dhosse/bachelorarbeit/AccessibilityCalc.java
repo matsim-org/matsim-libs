@@ -35,6 +35,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.LeastCostPathTree;
 
 import com.vividsolutions.jts.geom.Point;
@@ -62,12 +63,11 @@ public class AccessibilityCalc {
 	protected double betaCarTT = -12.;
 	protected double betaWalkTT = -12.;
 
-	public AccessibilityCalc(ZoneLayer<Id> startZones, SpatialGrid freeSpeedGrid, ScenarioImpl scenario,String filename) {
+	public AccessibilityCalc(ZoneLayer<Id> measuringPoints, SpatialGrid freeSpeedGrid, ScenarioImpl scenario) {
 		
 		this.freeSpeedGrid = freeSpeedGrid;
 		this.scenario = scenario;
-		this.measuringPoints = startZones;
-		this.filename = filename;
+		this.measuringPoints = measuringPoints;
 		
 	}
 	
@@ -75,41 +75,41 @@ public class AccessibilityCalc {
 		
 		final NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		
-		if(this.scenario.getPopulation().getPersons().size()<1){
-			log.warn("no population initialized. running on random population...");
-			
-			NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-			bbox.setDefaultBoundaryBox(network);
-			
-			
-			Random rnd = new Random();
-			
-			for(int i=0;i<300000;i++){
-				Coord coord = new CoordImpl(bbox.getXMin() + rnd.nextDouble() * (bbox.getXMax() - bbox.getXMin()),
-						bbox.getYMin() + rnd.nextDouble() * (bbox.getYMax() - bbox.getYMin()));
-				Id id = new IdImpl("parcel"+i);
-				parcels.createAndAddFacility(id, coord);
-			}
-			
-			
-		} else{
-			int i=0;
-			for(Person p : scenario.getPopulation().getPersons().values()){
-				PlanElement pe = p.getSelectedPlan().getPlanElements().get(0);
-				PlanElement pe2 = p.getSelectedPlan().getPlanElements().get(2);
-				Coord coord = new CoordImpl(0, 0);
-				if(pe instanceof Activity)
-					coord = ((Activity)pe).getCoord();
-				Id id = new IdImpl("parcel"+i);
-				i++;
-				parcels.createAndAddFacility(id, coord);
-				if(pe2 instanceof Activity)
-					coord = ((Activity)pe).getCoord();
-				id = new IdImpl("parcel"+i);
-				i++;
-				parcels.createAndAddFacility(id, coord);
-			}
-		}
+//		if(this.scenario.getPopulation().getPersons().size()<1){
+//			log.warn("no population initialized. running on random population...");
+//			
+//			NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+//			bbox.setDefaultBoundaryBox(network);
+//			
+//			
+//			Random rnd = new Random();
+//			
+//			for(int i=0;i<300000;i++){
+//				Coord coord = new CoordImpl(bbox.getXMin() + rnd.nextDouble() * (bbox.getXMax() - bbox.getXMin()),
+//						bbox.getYMin() + rnd.nextDouble() * (bbox.getYMax() - bbox.getYMin()));
+//				Id id = new IdImpl("parcel"+i);
+//				parcels.createAndAddFacility(id, coord);
+//			}
+//			
+//			
+//		} else{
+//			int i=0;
+//			for(Person p : scenario.getPopulation().getPersons().values()){
+//				PlanElement pe = p.getSelectedPlan().getPlanElements().get(0);
+//				PlanElement pe2 = p.getSelectedPlan().getPlanElements().get(2);
+//				Coord coord = new CoordImpl(0, 0);
+//				if(pe instanceof Activity)
+//					coord = ((Activity)pe).getCoord();
+//				Id id = new IdImpl("parcel"+i);
+//				i++;
+//				parcels.createAndAddFacility(id, coord);
+//				if(pe2 instanceof Activity)
+//					coord = ((Activity)pe).getCoord();
+//				id = new IdImpl("parcel"+i);
+//				i++;
+//				parcels.createAndAddFacility(id, coord);
+//			}
+//		}
 		
 		this.aggregatedOpportunities = aggregatedOpportunities(this.parcels, network);
 		
@@ -273,36 +273,42 @@ public class AccessibilityCalc {
 
 	protected AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl parcels, NetworkImpl network){
 		
-		log.info("Aggregating workplaces with identical nearest node ...");
+		log.info("Aggregating measuring points with identical nearest node ...");
 		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
 		
-		ProgressBar bar = new ProgressBar( parcels.getFacilities().size() );
+		ProgressBar bar = new ProgressBar( this.measuringPoints.getZones().size() );
 		
-		for(ActivityFacility facility : parcels.getFacilities().values()){
+		Iterator<Zone<Id>> measuringPointsIterator = this.measuringPoints.getZones().iterator();
+		
+		while(measuringPointsIterator.hasNext()){
 			
 			bar.update();
 			
-			Node nearestNode = network.getNearestNode( facility.getCoord() );
+			Zone<Id> measurePoint = measuringPointsIterator.next();
+			
+			Coord coord = MGC.coordinate2Coord(measurePoint.getGeometry().getCoordinate());
+			
+			Node nearestNode = network.getNearestNode( coord );
 			assert( nearestNode != null );
 			
 			// get euclidian distance to nearest node
-			double distance_meter 	= NetworkUtil.getEuclidianDistance(facility.getCoord(), nearestNode.getCoord());
+			double distance_meter 	= NetworkUtil.getEuclidianDistance(coord, nearestNode.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 			
 			double Vjk					= Math.exp(this.logitScaleParameter * walkTravelTime_h );
 			// add Vjk to sum
 			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
 				AggregateObject2NearestNode jco = opportunityClusterMap.get( nearestNode.getId() );
-				jco.addObject( facility.getId(), Vjk);
+				jco.addObject( measurePoint.getAttribute(), Vjk);
 			}
 			
 			// assign Vjk to given network node
 			else
 				opportunityClusterMap.put(
 						nearestNode.getId(),
-						new AggregateObject2NearestNode(facility.getId(), 
-														facility.getId(), 
-														facility.getId(), 
+						new AggregateObject2NearestNode(measurePoint.getAttribute(), 
+														measurePoint.getAttribute(), 
+														measurePoint.getAttribute(), 
 														nearestNode.getCoord(), 
 														nearestNode, 
 														Vjk));

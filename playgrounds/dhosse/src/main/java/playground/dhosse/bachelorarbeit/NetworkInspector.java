@@ -14,15 +14,23 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
-import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -34,20 +42,25 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class NetworkInspector {//TODO pfade ändern
 	
-	private final Scenario scenario;
+	private static Scenario scenario = null;
 	
 	private Map<Id,Double> distances = new HashMap<Id,Double>();
 	
 	private List<Link> lengthBelowStorageCapacity = new ArrayList<Link>();
 	
+	private Map<String,ArrayList<Node>> nodeTypes = new TreeMap<String,ArrayList<Node>>();
+	
 	private List<Node> deadEndNodes = new ArrayList<Node>();
 	private List<Node> exitRoadNodes = new ArrayList<Node>();
 	private List<Node> redundantNodes = new ArrayList<Node>();
+	
+	private Map<Id,ArrayList<Activity>> mappedPopulation = new HashMap<Id,ArrayList<Activity>>();
 	
 	private Logger logger = Logger.getLogger(NetworkInspector.class);
 	
@@ -74,19 +87,58 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private Geometry area;
 	
-	public NetworkInspector(final Scenario sc){
+	/**
+	 * 
+	 * @param args (i) network file (ii) population file (optional)
+	 */
+	public static void main(String args[]){
 		
-		this.scenario = sc;
+		NetworkInspector.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
 		
-//		NetworkBoundaryBox box = new NetworkBoundaryBox();
-//		box.setDefaultBoundaryBox(this.scenario.getNetwork());
+		if(args.length==1)
+			new MatsimNetworkReader(NetworkInspector.scenario).readFile(args[0]);
+		else if(args.length==2){
+			new MatsimNetworkReader(NetworkInspector.scenario).readFile(args[0]);
+			new MatsimPopulationReader(NetworkInspector.scenario).readFile(args[1]);
+		}
+		
+		new NetworkInspector().run();
+		
+	}
+	
+	private void run() {
+		
+		boolean routable = isRoutable();
+		checkNodeAttributes();
+		checkLinkAttributes();
+		
+		if(!(NetworkInspector.scenario.getPopulation()==null))
+			populationMapping();
+		
+		if(!routable)
+			new NetworkCleaner().run(NetworkInspector.scenario.getNetwork());
+		
+//		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(800, this.bbox.getBoundingBox());
+//		SpatialGrid freeSpeedGrid = new SpatialGrid(this.bbox.getBoundingBox(), 800);
+//		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
 //		
+//		new AccessibilityCalc(measuringPoints, freeSpeedGrid, sc).runAccessibilityComputation();
+		
+	}
+
+	public NetworkInspector(){
+		
+		this.bbox = new NetworkBoundaryBox();
+		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
+		
 //		double factor = 0.9;
 //		this.bbox.setCustomBoundaryBox(box.getXMin()+((box.getXMax()-box.getXMin())*(1-factor)),
 //				box.getYMin()+((box.getYMax()-box.getYMin())*(1-factor)),
 //				box.getXMax()-((box.getXMax()-box.getXMin())*(1-factor)),
 //				box.getYMax()-((box.getYMax()-box.getYMin())*(1-factor)));
 		
+		
+		//TODO ersetzen durch etwas sinnvolleres...
 		ShapeFileReader reader = new ShapeFileReader();
 		Collection<SimpleFeature> features = reader.readFileAndInitialize("C:/Users/Daniel/Dropbox/bsc/input/berlin.shp");
 		
@@ -97,50 +149,63 @@ public class NetworkInspector {//TODO pfade ändern
 		
 	}
 	
-	public boolean isRoutable(){
+	private boolean isRoutable(){
 		
+		//aus klasse "NetworkCleaner"
 		final Map<Id,Node> visitedNodes = new TreeMap<Id,Node>();
 		Map<Id,Node> biggestCluster = new TreeMap<Id,Node>();
-		Network clusteredNet = scenario.getNetwork();
 		
-		logger.info("  checking " + this.scenario.getNetwork().getNodes().size() + " nodes and " +
-				this.scenario.getNetwork().getLinks().size() + " links for dead-ends...");
+		Map<Id,Node> smallClusterNodes = new TreeMap<Id,Node>();
+		Map<Id,Link> smallClusterLinks = new TreeMap<Id,Link>();
+		
+		logger.info("  checking " + NetworkInspector.scenario.getNetwork().getNodes().size() + " nodes and " +
+				NetworkInspector.scenario.getNetwork().getLinks().size() + " links for dead-ends...");
 		
 		boolean stillSearching = true;
-		Iterator<? extends Node> iter = this.scenario.getNetwork().getNodes().values().iterator();
+		Iterator<? extends Node> iter = NetworkInspector.scenario.getNetwork().getNodes().values().iterator();
 		while (iter.hasNext() && stillSearching) {
 			Node startNode = iter.next();
 			if (!visitedNodes.containsKey(startNode.getId())) {
-				Map<Id, Node> cluster = this.findCluster(startNode, this.scenario.getNetwork());
+				Map<Id, Node> cluster = this.findCluster(startNode, NetworkInspector.scenario.getNetwork());
 				visitedNodes.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
+				} else {
+					smallClusterNodes.putAll(cluster);
 				}
-				if(biggestCluster.size()==this.scenario.getNetwork().getNodes().size()){
-					logger.info("size of the biggest cluster equals network size");
+				if(biggestCluster.size()==NetworkInspector.scenario.getNetwork().getNodes().size()){
+					logger.info("size of the biggest cluster equals network size...");
+					logger.info("network is routable.");
 					return true;
 				}
 			}
 		}
 		
+		//eigener teil		
 		logger.warn("size of the biggest cluster is " + biggestCluster.size() +
-				" but network contains " + this.scenario.getNetwork().getNodes().size() + " nodes...");
+				" but network contains " + NetworkInspector.scenario.getNetwork().getNodes().size() + " nodes...");
+		logger.warn("network is not routable");
 		
-		//clear small clusters of biggest network cluster
-		
-		for(Node node : biggestCluster.values()){
-			clusteredNet.removeNode(node.getId());
+		for(Id nodeId : smallClusterNodes.keySet()){
+			
+//			if()
+			
 		}
 		
-		new NetworkWriter(clusteredNet).write("C:/Users/Daniel/Dropbox/bsc/input/smallClusters.xml");
+//		for(Node node : biggestCluster.values()){
+//			smallClusters.removeNode(node.getId());
+//		}
 		
-		logger.info("cluster of " + clusteredNet.getNodes().size() + " nodes and " + clusteredNet.getLinks().size() +
-				" links written to file");
+//		new NetworkWriter(smallClusters).write("C:/Users/Daniel/Dropbox/bsc/input/smallClusters.xml");
+		
+//		logger.info("small clusters of " + smallClusters.getNodes().size() + " nodes and " + smallClusters.getLinks().size() +
+//				" links written to file");
 		
 		return false;
 		
 	}
 	
+	//aus klasse NetworkCleaner
 	private Map<Id, Node> findCluster(final Node startNode, final Network network) {
 
 		final Map<Node, DoubleFlagRole> nodeRoles = new HashMap<Node, DoubleFlagRole>(network.getNodes().size());
@@ -157,10 +222,9 @@ public class NetworkInspector {//TODO pfade ändern
 		pendingForward.add(startNode);
 		pendingBackward.add(startNode);
 
-		// step through the network in forward mode
 		while (pendingForward.size() > 0) {
 			int idx = pendingForward.size() - 1;
-			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
+			Node currNode = pendingForward.remove(idx);
 			for (Link link : currNode.getOutLinks().values()) {
 				Node node = link.getToNode();
 				r = getDoubleFlag(node, nodeRoles);
@@ -171,10 +235,9 @@ public class NetworkInspector {//TODO pfade ändern
 			}
 		}
 
-		// now step through the network in backward mode
 		while (pendingBackward.size() > 0) {
 			int idx = pendingBackward.size()-1;
-			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
+			Node currNode = pendingBackward.remove(idx);
 			for (Link link : currNode.getInLinks().values()) {
 				Node node = link.getFromNode();
 				r = getDoubleFlag(node, nodeRoles);
@@ -182,7 +245,6 @@ public class NetworkInspector {//TODO pfade ändern
 					r.backwardFlag = true;
 					pendingBackward.add(node);
 					if (r.forwardFlag) {
-						// the node can be reached forward and backward, add it to the cluster
 						clusterNodes.put(node.getId(), node);
 					}
 				}
@@ -192,13 +254,14 @@ public class NetworkInspector {//TODO pfade ändern
 		return clusterNodes;
 	}
 	
-	public void checkLinkAttributes() {
+	//eigene methode
+	private void checkLinkAttributes() {
 		
 		logger.info("checking link attributes...");
 		
 		int writerIndex = 0;
 		
-		for(Link link : this.scenario.getNetwork().getLinks().values()){
+		for(Link link : NetworkInspector.scenario.getNetwork().getLinks().values()){
 			double distance = 
 					Math.sqrt(Math.pow(link.getToNode().getCoord().getX() -
 							link.getFromNode().getCoord().getX(),2) +
@@ -321,11 +384,12 @@ public class NetworkInspector {//TODO pfade ändern
 
 	}
 	
-	public void checkNodeAttributes() {
+	//eigene methode
+	private void checkNodeAttributes() {
 		
 		logger.info("checking node attributes...");
 		
-		for(Node node : this.scenario.getNetwork().getNodes().values()){
+		for(Node node : NetworkInspector.scenario.getNetwork().getNodes().values()){
 			
 			if(node.getInLinks().size()>0&&node.getOutLinks().size()>0){
 			
@@ -373,9 +437,92 @@ public class NetworkInspector {//TODO pfade ändern
 		
 	}
 	
-	private void createLinkLengthFiles() throws IOException {
+	//eigene methode
+	private void populationMapping(){
 		
-		logger.info("writing length statistics file...");
+		//wie wird die population aufs netz "gepackt"?
+		
+		logger.info("checking where the population is mapped on the network...");
+		
+		for(Person p : NetworkInspector.scenario.getPopulation().getPersons().values()){
+			
+			Iterator<PlanElement> planElementIterator = p.getSelectedPlan().getPlanElements().iterator();
+			
+			while(planElementIterator.hasNext()){
+				
+				PlanElement pe = planElementIterator.next();
+				
+				if(pe instanceof Activity){
+					
+					Coord fromCoord = ((Activity)pe).getCoord();
+					
+					Id toLinkId = ((NetworkImpl)NetworkInspector.scenario.getNetwork()).getNearestLink(fromCoord).getId();
+					
+					if(!this.mappedPopulation.containsKey(toLinkId))
+						this.mappedPopulation.put(toLinkId, new ArrayList<Activity>());
+					
+					this.mappedPopulation.get(toLinkId).add((Activity)pe);
+					
+				}
+				
+			}
+			
+		}
+		
+		logger.info("writing pointers from activities to nearest links...");
+		
+		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName("shape");
+		typeBuilder.setCRS(crs);
+		typeBuilder.add("pointer",LineString.class);
+		typeBuilder.add("ID",String.class);
+		typeBuilder.add("LAENGE",Double.class);
+		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
+		
+		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		Iterator<Id> keyIterator = this.mappedPopulation.keySet().iterator();
+		
+		GeometryFactory gf = new GeometryFactory();
+		
+		while(keyIterator.hasNext()){
+			
+			Id linkId = keyIterator.next();
+			Link link = NetworkInspector.scenario.getNetwork().getLinks().get(linkId);
+			
+			ArrayList<Activity> activities = this.mappedPopulation.get(linkId);
+			
+			int i = 0;
+			
+			for(Activity act : activities){
+				
+				double length = NetworkUtil.getEuclidianDistance(act.getCoord(), link.getCoord());
+				
+				SimpleFeature feature = this.builder.buildFeature(null, new Object[]{
+						gf.createLineString(new Coordinate[]{
+								new Coordinate(act.getCoord().getX(),act.getCoord().getY()),
+								new Coordinate(link.getCoord().getX(),link.getCoord().getY())
+						}),
+						new IdImpl(linkId+"_"+Integer.toString(i)).toString(),
+						length
+				});
+				
+				features.add(feature);
+				i++;
+				
+			}
+			
+		}
+		
+		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/output/mapping/pointers.shp");
+		
+		logger.info("...done.");
+		
+	}
+	
+	//eigene methode
+	private void createLinkLengthFiles() throws IOException {
 		
 		File file = new File(this.outputFolder+"/test/lengthStatistics.txt");
 		FileWriter writer = new FileWriter(file);
@@ -405,9 +552,8 @@ public class NetworkInspector {//TODO pfade ändern
 		
 	}
 	
+	//eigene methode
 	private void createLaneStatisticsFiles() throws IOException {
-		
-		logger.info("writing lane statistics file...");
 		
 		File file = new File(this.outputFolder+"/test/laneStatistics.txt");
 		FileWriter writer = new FileWriter(file);
@@ -426,17 +572,16 @@ public class NetworkInspector {//TODO pfade ändern
 		chart.saveAsPng(this.outputFolder+"/test/laneStatistics.png", 800, 600);
 	}
 
+	//eigene methode
 	private void createLinkLengthComparisonFile() throws IOException {
 		
-		logger.info("writing length comparison file...");
-
 		File file = new File(this.outputFolder+"/test/linkLengthComparison.txt");
 		FileWriter writer = new FileWriter(file);
 		writer.write("Id\tlength\tgeometric Length");
 		
 		for(Id id : this.distances.keySet()){
 			writer.write("\n"+id.toString()+"\t"+
-					this.scenario.getNetwork().getLinks().get(id).getLength()+
+					NetworkInspector.scenario.getNetwork().getLinks().get(id).getLength()+
 					"\t"+this.distances.get(id));
 		}
 		
@@ -444,9 +589,8 @@ public class NetworkInspector {//TODO pfade ändern
 
 	}
 	
+	//eigene methode
 	private void createLinkCapacityFiles() throws IOException{
-		
-		logger.info("writing capacities statistics file...");
 		
 		//kategorien: 500|1000|1500|2000|>...
 		String[] categories = new String[6];
@@ -463,9 +607,8 @@ public class NetworkInspector {//TODO pfade ändern
 		
 	}
 
+	//eigene methode
 	private void createNodeDegreesFiles(double[] inDegrees, double[] outDegrees) throws IOException {
-		
-		logger.info("writing node degrees files");
 		
 		File file = new File(this.outputFolder+"/test/nodeDegrees.txt");
 		FileWriter writer = new FileWriter(file);
@@ -480,30 +623,6 @@ public class NetworkInspector {//TODO pfade ändern
 		chart.addSeries("in-degrees", inDegrees);
 		chart.addSeries("out-degrees", outDegrees);
 		chart.saveAsPng(this.outputFolder+"/test/nodeDegrees.png", 800, 600);
-	}
-	
-	public List<Node> getDeadEndNodes() {
-		return deadEndNodes;
-	}
-
-	public void setDeadEndNodes(List<Node> deadEndNodes) {
-		this.deadEndNodes = deadEndNodes;
-	}
-
-	public List<Node> getExitRoadNodes() {
-		return exitRoadNodes;
-	}
-
-	public void setExitRoadNodes(List<Node> exitRoadNodes) {
-		this.exitRoadNodes = exitRoadNodes;
-	}
-
-	public List<Node> getRedundantNodes() {
-		return redundantNodes;
-	}
-
-	public void setRedundantNodes(List<Node> redundantNodes) {
-		this.redundantNodes = redundantNodes;
 	}
 	
 	public void shpExportNodeStatistics(Collection<Node> collection){
