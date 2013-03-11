@@ -117,6 +117,7 @@ import playground.mrieser.osm.core.OsmParser.OsmWay;
 		} else if ("way".equals(name) & this.wayHandler != null) {
 			this.wayCounter.incCounter();
 			this.wayHandler.handleWay(this.currentWay);
+			this.currentWay = null;
 		} else if ("relation".equals(name) & this.relHandler != null) {
 			this.relationCounter.incCounter();
 			this.relHandler.handleRelation(this.currentRelation);
