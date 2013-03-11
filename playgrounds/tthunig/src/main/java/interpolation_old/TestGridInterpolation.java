@@ -2,17 +2,15 @@ package interpolation_old;
 
 import interpolation.Interpolation;
 
-import java.io.InputStream;
-
 import org.apache.log4j.Logger;
+import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
-
 /**
  * class for testing the implemented interpolation methods on a grid
+ * @deprecated
  * 
  * @author tthunig
  *

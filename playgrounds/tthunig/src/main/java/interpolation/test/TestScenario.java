@@ -3,6 +3,7 @@ package interpolation.test;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
@@ -17,7 +18,7 @@ import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
  */
 public class TestScenario {
 
-	private static final Logger log = Logger.getLogger(Interpolation.class);
+	private static final Logger log = Logger.getLogger(TestScenario.class);
 	
 	//information about the given data
 //	private static String filename_data100 = "zurich_carAccessibility_grid_cellsize_100m_SF";
@@ -58,37 +59,25 @@ public class TestScenario {
 		log.info("Start interpolation of file " + filename_data200 + " with the different interpolation methods:");
 		testOneMethod(Interpolation.BILINEAR, true, Double.NaN);
 		testOneMethod(Interpolation.BICUBIC, true, Double.NaN);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 1.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 2.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 3.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 4.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 5.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 6.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 7.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 8.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 9.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 10.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 11.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 12.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 13.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 14.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 15.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 1.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 2.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 3.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 4.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 5.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 6.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 7.);
 		
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 1.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 2.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 3.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 4.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 5.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 6.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 7.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 8.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 9.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 10.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 11.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 12.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 13.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 14.);
-		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 15.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 1.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 2.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 3.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 4.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 5.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 6.);
+//		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 7.);
+		
+		for (int e=1; e<=12; e++){
+			testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, e);
+		}
 		
 		try {
 			out.write("\nRemark: The interpolation difference is calculated to known data at the same resolution.\n");
@@ -109,7 +98,8 @@ public class TestScenario {
 		
 		log.info("Interpolate file " + filename_data200 + " with interpolation method " + interpolationMethod +":");
 		long startTime= System.currentTimeMillis();
-		Interpolation interpolation = new Interpolation(sg200, interpolationMethod, allNeighbors, exponent);
+//		Interpolation interpolation = new Interpolation(sg200, interpolationMethod, allNeighbors, exponent);
+		Interpolation interpolation = new Interpolation(sg200, interpolationMethod, exponent);
 		SpatialGrid interp_sg = new SpatialGrid(sg200.getXmin(), sg200.getYmin(), sg200.getXmax(), sg200.getYmax(), sg200.getResolution() / 2);
 		// calculate new values for higher resolution
 		for (double y = sg200.getYmin(); y <= sg200.getYmax(); y += sg200.getResolution()/2) {

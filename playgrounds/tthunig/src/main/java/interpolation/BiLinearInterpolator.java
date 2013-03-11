@@ -1,6 +1,6 @@
 package interpolation;
 
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 
 /**
  * Implements bilinear interpolation.

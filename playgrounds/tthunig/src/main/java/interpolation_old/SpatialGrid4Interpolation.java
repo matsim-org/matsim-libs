@@ -1,13 +1,18 @@
 package interpolation_old;
 
 import org.apache.log4j.Logger;
-
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
+/**
+ * @deprecated
+ * 
+ * @author tthunig
+ *
+ */
 public class SpatialGrid4Interpolation {
 	
 	// logger 

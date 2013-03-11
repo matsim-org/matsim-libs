@@ -2,8 +2,7 @@ package interpolation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 
 /**
  * Wrapper class for interpolation.

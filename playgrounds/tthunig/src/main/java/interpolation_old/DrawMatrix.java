@@ -8,7 +8,12 @@ package interpolation_old;
 import java.awt.*;
 import java.awt.event.*;
 
-
+/**
+ * @deprecated
+ * 
+ * @author tthunig
+ *
+ */
 public class DrawMatrix {
   private Frame frame;
   private MyCanvas myCanvas;

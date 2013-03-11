@@ -1,19 +1,17 @@
 package interpolation.test;
 
+import interpolation.Interpolation;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import interpolation.Interpolation;
-import interpolation_old.SpatialGrid4Interpolation;
-
 import org.apache.log4j.Logger;
+import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
 /**
  * Class for testing the implemented interpolation methods bilinear interpolation, bicubic spline interpolation and inverse distance weighting.
@@ -26,7 +24,7 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
  */
 public class MiniTest {
 	
-	private static final Logger logger = Logger.getLogger(SpatialGrid4Interpolation.class);	
+	private static final Logger logger = Logger.getLogger(MiniTest.class);	
 	
 	private SpatialGrid sg= null;
 	private SpatialGrid interpolatedSG= null;
@@ -328,7 +326,8 @@ public class MiniTest {
 		System.out.println("");
 		logger.info("-----Test of the inverse distance weighting method for interpolation-----");
 		
-		for (int exp=1; exp<=7; exp++){
+//		for (int exp=1; exp<=7; exp++){
+		for (int exp=2; exp<=10; exp+=8){
 			try{
 				out.write("\nidw with four neighbors and exp " + exp + "\t");
 			} catch (IOException e) {
@@ -339,16 +338,16 @@ public class MiniTest {
 			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,10,10, false, exp);
 		}
 		
-		for (int exp=1; exp<=7; exp++){
-			try{
-				out.write("\nidw with all neighbors and exp " + exp + "\t");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,1,2, true, exp);
-			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,3,3, true, exp);
-			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,10,10, true, exp);
-		}
+//		for (int exp=1; exp<=7; exp++){
+//			try{
+//				out.write("\nidw with all neighbors and exp " + exp + "\t");
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,1,2, true, exp);
+//			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,3,3, true, exp);
+//			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,10,10, true, exp);
+//		}
 	}
 
 	
