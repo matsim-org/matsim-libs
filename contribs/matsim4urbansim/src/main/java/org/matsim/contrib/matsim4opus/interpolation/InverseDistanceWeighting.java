@@ -100,7 +100,7 @@ class InverseDistanceWeighting {
 	}
 	
 	/**
-	 * Attention: Experimental version. Not tested sufficiently.
+	 * Attention: Experimental version. Not tested sufficiently. Requires too much calculation time.
 	 * 
 	 * Interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with variable power of weights:
 	 * z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp).
