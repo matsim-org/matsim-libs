@@ -15,7 +15,7 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
  * 
  * Bicubic spline interpolation:
  * 	Uses BicubicSplineInterpolator from apache (http://commons.apache.org/math/apidocs/org/apache/commons/math3/analysis/interpolation/BicubicSplineInterpolator.html).
- * 	Wave effect occurs.
+ * 	Wave effects may occur.
  * 
  * Inverse distance weighting:
  *  Uses inverse distance weighting for the 4 nearest known values. Own implementation.
@@ -96,7 +96,7 @@ public class Interpolation {
 	}
 	
 	/**
-	 * Interpolates the value at the given coordinate (x,y)
+	 * Interpolates the value at the given coordinate (x,y).
 	 * 
 	 * @param x the x-coordinate
 	 * @param y the y-coordinate

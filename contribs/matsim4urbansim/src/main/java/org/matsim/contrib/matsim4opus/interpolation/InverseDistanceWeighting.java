@@ -9,11 +9,12 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
  * 
  * Problem: Peaks and valleys occur.
  * 
- * For more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
+ * For more information see e.g.: 
+ * http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
  * or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (German).
  * 
  * @author tthunig
- *
+ * 
  */
 class InverseDistanceWeighting {
 
@@ -30,7 +31,8 @@ class InverseDistanceWeighting {
 	
 	/**
 	 * Interpolates the value on a arbitrary point with inverse distance weighting.
-	 * Considers only four neighboring values because this method needs less time for calculation than considering all known values and the result is even more suitable for accessibility interpolation.
+	 * Considers only four neighboring values because this method needs less time for calculation than considering all known values 
+	 * and the result is even more suitable for accessibility interpolation.
 	 * 
 	 * @param xCoord the x-coordinate of the point to interpolate
 	 * @param yCoord the y-coordinate of the point to interpolate
@@ -65,23 +67,23 @@ class InverseDistanceWeighting {
 		double y1= yCoord-yDif;
 		double y2= y1+sg.getResolution();
 		
-		//calculate distances to the 4 neighbors
+		//calculate distances to the 4 neighboring sampling points
 		double d11= Math.pow(distance(x1, y1, xCoord, yCoord), exp);
 		double d12= Math.pow(distance(x1, y2, xCoord, yCoord), exp);
 		double d21= Math.pow(distance(x2, y1, xCoord, yCoord), exp);
 		double d22= Math.pow(distance(x2, y2, xCoord, yCoord), exp);
 		
-		//interpolation on the boundary
+		//interpolation at the boundary
 		if (xCoord == sg.getXmax()){
-			//consider only 2 neighbors (up and down)
+			//consider only 2 neighboring sampling points (up and down)
 			return (sg.getValue(x1, y1)/d11 + sg.getValue(x1, y2)/d12) / (1/d11 + 1/d12);
 		}
 		if (yCoord == sg.getYmax()){
-			//consider only 2 neighbors (left and right)
+			//consider only 2 neighboring sampling points (left and right)
 			return (sg.getValue(x1, y1)/d11 + sg.getValue(x2, y1)/d21) / (1/d11 + 1/d21);
 		}
 		
-		//interpolation with 4 neighbors
+		//interpolation with 4 neighboring sampling points
 		return (sg.getValue(x1, y1)/d11 + sg.getValue(x1, y2)/d12 + sg.getValue(x2, y1)/d21 + sg.getValue(x2, y2)/d22) 
 				/ (1/d11 + 1/d12 + 1/d21 + 1/d22);
 	}
@@ -122,7 +124,7 @@ class InverseDistanceWeighting {
 			return sg.getValue(xCoord, yCoord);
 		}
 		
-		//interpolation with all neighbors
+		//interpolation with all known sampling points
 		double distanceSum=0;
 		double currentWeight=1;
 		double weightSum=0;

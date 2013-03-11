@@ -10,7 +10,7 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
  * Requires values on a SpatialGrid.
  * 
  * @author tthunig
- *
+ * 
  */
 class BiLinearInterpolator {
 
@@ -64,15 +64,16 @@ class BiLinearInterpolator {
 				//known value
 				return sg.getValue(xCoord, yCoord);
 			}
-			//point to interpolate lies on the grid cell boundary
+			//point to interpolate lies at the grid cell boundary
 			return sg.getValue(x1, y1)*(1-yWeight) + sg.getValue(x1, y2)*yWeight;
 		}
 		if (yDif==0){
-			//point to interpolate lies on the grid cell boundary
+			//point to interpolate lies at the grid cell boundary
 			return sg.getValue(x1, y1)*(1-xWeight) + sg.getValue(x2, y1)*xWeight;
 		}
 		
 		//interpolates first in y-direction then in x-direction with linear splines
-		return (sg.getValue(x1, y1)*(1-yWeight) + sg.getValue(x1, y2)*yWeight) * (1-xWeight) + (sg.getValue(x2, y1)*(1-yWeight) + sg.getValue(x2, y2)*yWeight) * xWeight;
+		return (sg.getValue(x1, y1)*(1-yWeight) + sg.getValue(x1, y2)*yWeight) * (1-xWeight) 
+				+ (sg.getValue(x2, y1)*(1-yWeight) + sg.getValue(x2, y2)*yWeight) * xWeight;
 	}
 }
