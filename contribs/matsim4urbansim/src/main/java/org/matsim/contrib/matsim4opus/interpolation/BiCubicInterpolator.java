@@ -14,7 +14,7 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
  * 
  * Requires values on a SpatialGrid.
  * 
- * Problem: Wave effect occurs.
+ * Problem: Wave effects may occur.
  * 
  * @author tthunig
  *
