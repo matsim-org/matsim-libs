@@ -96,6 +96,7 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 				writeRouteFiles(dir, rc, this.lines.get(lc.getId()).getRoutes().get(rc.getId()));
 			}
 		}
+		CreateRscript.createScript(this.lines, outputFolder);
 	}
 
 	/**
