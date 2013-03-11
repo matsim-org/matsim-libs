@@ -1,14 +1,11 @@
 package interpolation.test;
 
-import interpolation.Interpolation;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import org.apache.log4j.Logger;
-
-import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
 
 /**
  * Class for testing the implemented interpolation methods visually.
@@ -50,8 +47,10 @@ public class TestScenario {
 		
 		try {
 			out= new FileWriter(outputFile);
-			out.write("interpolation method \t\t\t\t interp. time \t sum of abs. differences \t rel. abs. difference \t sum of quadr. differences \t rel. quadr. difference\n");
-			out.write("----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+//			out.write("interpolation method \t\t\t\t interp. time \t sum of abs. differences \t rel. abs. difference \t sum of quadr. differences \t rel. quadr. difference\n");
+//			out.write("----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+			out.write("interpolation method \t\t\t\t interp. time \t sum of abs. differences \t rel. difference \n");
+			out.write("-----------------------------------------------------------------------------------------\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -66,6 +65,15 @@ public class TestScenario {
 		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 5.);
 		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 6.);
 		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 7.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 8.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 9.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 10.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 11.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 12.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 13.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 14.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 15.);
+		
 		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 1.);
 		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 2.);
 		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 3.);
@@ -73,6 +81,14 @@ public class TestScenario {
 		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 5.);
 		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 6.);
 		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 7.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 8.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 9.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 10.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 11.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 12.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 13.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 14.);
+		testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 15.);
 		
 		try {
 			out.write("\nRemark: The interpolation difference is calculated to known data at the same resolution.\n");
@@ -118,7 +134,7 @@ public class TestScenario {
 			case 1: evalMethod= "bicubic spline interpolation \t"; break;
 			case 2: evalMethod= "idw with " + neighbors + " neighbors and exp " + exponent;
 		}
-		String eval= evalMethod +  "\t\t" + interpolationTime + " ms \t\t\t" + Math.round(difference[0]*100)/100. + "\t\t\t\t\t\t" + Math.round((difference[0]/difference[2])*10000)/10000. + "\t\t\t\t\t" + Math.round(difference[1]*100)/100. + "\t\t\t\t\t\t" + Math.round((difference[1]/difference[2])*10000)/10000.;
+		String eval= evalMethod +  "\t\t" + interpolationTime + " ms \t\t\t" + Math.round(difference[0]*100)/100. + "\t\t\t\t\t\t" + Math.round((difference[0]/difference[1])*10000)/10000.;// + "\t\t\t\t\t" + Math.round(difference[1]*100)/100. + "\t\t\t\t\t\t" + Math.round((difference[1]/difference[2])*10000)/10000.;
 		System.out.println("Evaluation: " + eval);
 		try {
 			out.write(eval+"\n");
@@ -133,11 +149,11 @@ public class TestScenario {
 	 * 
 	 * @param sg100 the original SpatialGrid with resolution 100
 	 * @param sg200_interpolated the interpolated SpatialGrid with resolution 200
-	 * @return the absolute and quadratic difference between them and the number of interpolated values to calculate the relative difference
+	 * @return the absolute difference between them and the number of interpolated values to calculate the relative difference
 	 */
 	private static double[] differenceComputation(SpatialGrid sg100, SpatialGrid sg200_interpolated){
 		double differenceToOriginalSG = 0;
-		double quadDiffToOriginalSG = 0;
+//		double quadDiffToOriginalSG = 0;
 		int numberOfIntpValues = 0;
 		//sum difference at all coordinates where interpolated values are known
 		for (double y = sg200_interpolated.getYmin(); y <= sg200_interpolated.getYmax(); y += sg200_interpolated.getResolution()){
@@ -147,12 +163,13 @@ public class TestScenario {
 				//calculate difference only in the zurich area
 				if(!Double.isNaN(value100) && !Double.isNaN(value200)){
 					differenceToOriginalSG += Math.abs(value100 - value200);
-					quadDiffToOriginalSG += (value100 - value200)*(value100 - value200);
+//					quadDiffToOriginalSG += (value100 - value200)*(value100 - value200);
 					numberOfIntpValues++;
 				}
 			}
 		}
-		double[] differences= {differenceToOriginalSG, quadDiffToOriginalSG, numberOfIntpValues};
+//		double[] differences= {differenceToOriginalSG, quadDiffToOriginalSG, numberOfIntpValues};
+		double[] differences= {differenceToOriginalSG, numberOfIntpValues};
 		return differences;
 	}
 
