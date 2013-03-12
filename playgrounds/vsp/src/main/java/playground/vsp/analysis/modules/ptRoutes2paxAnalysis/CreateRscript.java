@@ -123,7 +123,7 @@ public class CreateRscript {
 		BufferedWriter w = IOUtils.getBufferedWriter(outdir + "read.R");
 		try {
 			w.write(
-					"data <- read.table(file, sep=\";\", header=T, na.strings=\"-\")\n" +
+					"data <- read.table(file, sep=\";\", header=T, na.strings=\"--\", fileEncoding=\"UTF8\")\n" +
 					"values <- array(0, dim=c(length(data$index),25))\n" +
 					"values[,1]  <- data$X0\n" +
 					"values[,2]  <- data$X1\n" +
@@ -149,7 +149,7 @@ public class CreateRscript {
 					"values[,22]  <- data$X21\n" +
 					"values[,23]  <- data$X22\n" +
 					"values[,24]  <- data$X23\n" +
-					"values[,25]  <- data$X24\n" 
+					"values[,25]  <- data$X24\n"
 					);
 			w.flush();
 			w.close();
@@ -173,6 +173,7 @@ public class CreateRscript {
 							"colsep=c(1:25),\n\t"+
 							"rowsep=c(1:length(data$index)),\n\t"+
 							"sepcolor=\"white\",\n\t"+
+							"tracecol=\"white\", \n\t" +
 							"sepwidth=c(1/length(data$index),1/25),\n\t"+
 							"dendrogram=\"none\",\n\t"+
 							"Colv=\"none\",\n\t"+
@@ -186,7 +187,8 @@ public class CreateRscript {
 							"lmat=rbind(c(2,0,0,4), c(0,3,3,4), c(0,1,1,0), c(0,1,1,0)), \n\t" + 
 							"lhei=c(0.5,0.5,1,1), \n\t" +
 							"lwid=c(0.1,1,1,1), \n\t" +
-							"col=brewer.pal(9,\"Greys\"), \n\t" +
+							"col=colorRampPalette(c(\"#e6e6e6\", \"#010101\"))(9), \n\t" +
+//							"col=brewer.pal(9,\"Greys\"), \n\t" +
 							"labCol=" + labCol.toString() + "\n" + 
 					")"
 				);

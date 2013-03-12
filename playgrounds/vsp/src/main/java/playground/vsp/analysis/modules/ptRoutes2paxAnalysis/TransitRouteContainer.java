@@ -102,6 +102,12 @@ public class TransitRouteContainer {
 	 * @param stopIndexId
 	 */
 	public void vehicleDeparts(double time, double vehCapacity,	double nrSeatsInUse, Id stopIndexId) {
+		if(this.alighting.getCount(stopIndexId).getVolume(getTimeSlice(time)) == null){
+			set(this.alighting, stopIndexId, time, 0);
+		}
+		if(this.boarding.getCount(stopIndexId).getVolume(getTimeSlice(time)) == null){
+			set(this.boarding, stopIndexId, time, 0);
+		}
 		increase(this.capacity, stopIndexId, time, vehCapacity);
 		increase(this.totalPax, stopIndexId, time, nrSeatsInUse);
 		Integer slice = getTimeSlice(time);
@@ -152,21 +158,21 @@ public class TransitRouteContainer {
 	private void create(Counts counts, Id stopIndexId, Id stationName, Double time, double value){
 		//create a new count
 		Count count = counts.createCount(stopIndexId, stationName.toString());
-		if(count == null){
-			//or get the old one if there is one
-			count = counts.getCount(stopIndexId);
-		}
-		Integer slice = getTimeSlice(time);
-//		if(slice > this.maxSlice){
-//			this.maxSlice = slice;
+//		if(count == null){
+//			//or get the old one if there is one
+//			count = counts.getCount(stopIndexId);
 //		}
-		Volume v;
-		if(count.getVolumes().containsKey(slice)){
-			v = count.getVolume(slice);
-		}else{
-			v = count.createVolume(slice, 0);
-		}
-		v.setValue(value);
+//		Integer slice = getTimeSlice(time);
+////		if(slice > this.maxSlice){
+////			this.maxSlice = slice;
+////		}
+//		Volume v;
+//		if(count.getVolumes().containsKey(slice)){
+//			v = count.getVolume(slice);
+//		}else{
+//			v = count.createVolume(slice, 0);
+//		}
+//		v.setValue(value);
 	}
 	
 	private Integer getTimeSlice(double time){

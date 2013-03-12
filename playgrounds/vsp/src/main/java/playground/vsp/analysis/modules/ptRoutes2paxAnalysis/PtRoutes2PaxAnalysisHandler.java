@@ -89,13 +89,13 @@ public class PtRoutes2PaxAnalysisHandler implements
 		if(this.drivers.contains(event.getPersonId())){
 			// but finish his route and remove him and the vehicle
 			this.drivers.remove(event.getPersonId());
-			AnalysisVehicle v = this.transitVehicles.remove(event.getVehicleId());
-			this.linesContainer.get(v.getLineId()).vehicleDeparts(
-					event.getTime(), 
-					v.getCapacity(), 
-					v.getSeatsOccupied(), 
-					v.getStopIndexId(),
-					v.getRouteId());
+//			AnalysisVehicle v = this.transitVehicles.remove(event.getVehicleId());
+//			this.linesContainer.get(v.getLineId()).vehicleDeparts(
+//					event.getTime(), 
+//					v.getCapacity(), 
+//					v.getSeatsOccupied(), 
+//					v.getStopIndexId(),
+//					v.getRouteId());
 		}else{
 			// only count boarding/alighting for transit
 			if(!this.transitVehicles.keySet().contains(event.getVehicleId())) return;
