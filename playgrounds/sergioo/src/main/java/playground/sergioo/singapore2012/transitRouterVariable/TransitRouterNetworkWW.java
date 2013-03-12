@@ -133,13 +133,20 @@ public final class TransitRouterNetworkWW implements Network {
 		final Id id;
 		private double length;
 
-		public TransitRouterNetworkLink(final Id id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
+		public TransitRouterNetworkLink(final Id id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line, Network network) {
 			this.id = id;
 			this.fromNode = fromNode;
 			this.toNode = toNode;
 			this.route = route;
 			this.line = line;
-			this.length = CoordUtils.calcDistance(this.toNode.stop.getStopFacility().getCoord(), this.fromNode.stop.getStopFacility().getCoord());
+			if(route==null)
+				this.length = CoordUtils.calcDistance(this.toNode.stop.getStopFacility().getCoord(), this.fromNode.stop.getStopFacility().getCoord());
+			else {
+				this.length = 0;
+				for(Id linkId:route.getRoute().getSubRoute(fromNode.stop.getStopFacility().getLinkId(), toNode.stop.getStopFacility().getLinkId()).getLinkIds())
+					this.length += network.getLinks().get(linkId).getLength();
+				this.length += network.getLinks().get(toNode.stop.getStopFacility().getLinkId()).getLength();
+			}
 		}
 
 		@Override
@@ -259,15 +266,15 @@ public final class TransitRouterNetworkWW implements Network {
 		return node;
 	}
 
-	public TransitRouterNetworkLink createLink(final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, null, null);
+	public TransitRouterNetworkLink createLink(final Network network, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode) {
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, null, null, network);
 		this.links.put(link.getId(), link);
 		fromNode.outgoingLinks.put(link.getId(), link);
 		toNode.ingoingLinks.put(link.getId(), link);
 		return link;
 	}
 	public TransitRouterNetworkLink createLink(final Network network, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, route, line);
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, route, line, network);
 		if(route!=null) {
 			double length = 0;
 			for(Id linkId:route.getRoute().getSubRoute(fromNode.stop.getStopFacility().getLinkId(), toNode.stop.getStopFacility().getLinkId()).getLinkIds())
@@ -339,7 +346,7 @@ public final class TransitRouterNetworkWW implements Network {
 		for (TransitRouterNetworkNode node : transitNetwork.getNodes().values())
 			for (TransitRouterNetworkNode node2 : transitNetwork.getNearestNodes(node.stop.getStopFacility().getCoord(), maxBeelineWalkConnectionDistance))
 				if (node!=node2) {
-					transitNetwork.createLink(node, node2);
+					transitNetwork.createLink(network, node, node2);
 					linkCounter.incCounter();
 					numTransferLinks++;
 				}
@@ -358,10 +365,10 @@ public final class TransitRouterNetworkWW implements Network {
 						numTravelLinks++;
 					}
 					prevNode = nodeSR;
-					transitNetwork.createLink(nodeS, nodeSR);
+					transitNetwork.createLink(network, nodeS, nodeSR);
 					linkCounter.incCounter();
 					numWaitingLinks++;
-					transitNetwork.createLink(nodeSR, nodeS);
+					transitNetwork.createLink(network, nodeSR, nodeS);
 					linkCounter.incCounter();
 					numInsideLinks++;
 				}
