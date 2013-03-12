@@ -184,9 +184,12 @@ public class CreateRscript {
 							"labRow=data$name, \n\t" +
 							"# the position of the tables elements, 1 = heatmap, 2 = ??, 3 = heading, 4 = legend \n\t" +
 							"# the graphic area is divided into a matrix with 4 lines and 4 columns, c(...) are the lines. \n\t" +
-							"lmat=rbind(c(2,0,0,4), c(0,3,3,4), c(0,1,1,0), c(0,1,1,0)), \n\t" + 
-							"lhei=c(0.5,0.5,1,1), \n\t" +
-							"lwid=c(0.1,1,1,1), \n\t" +
+//							"lmat=rbind(c(2,0,0,4), c(0,3,3,4), c(0,1,1,0), c(0,1,1,0)), \n\t" + 
+//							"lhei=c(0.5,0.5,1,1), \n\t" +
+//							"lwid=c(0.1,1,1,1), \n\t" +
+							"lmat=rbind(c(2,0,3,0,0), c(0,1,1,1,0), c(0,1,1,1,0), c(0,1,1,1,0), c(0,1,1,1,4), c(0,0,0,4,4)), \n\t" + 
+							"lhei=c(0.5,1,1,1,0.4,1), \n\t" +
+							"lwid=c(0.2,1,1,0.3,0.7),\n\t"+
 							"col=colorRampPalette(c(\"#e6e6e6\", \"#010101\"))(9), \n\t" +
 //							"col=brewer.pal(9,\"Greys\"), \n\t" +
 							"labCol=" + labCol.toString() + "\n" + 
