@@ -48,7 +48,7 @@
  * follows: Counts still refer to hours.  If, say, you use timeBinSize of 7200 and start/endTime as 05:00/09:00, then the code
  * will aggregate counts from the 6th and 7th hour into one time bin, etc.  If things do not correspond, the code will probably
  * complain.  See CadytsBuilder.buildCalibrator, since there are some consistency checks.  (kai, oct'12) 
- * <li>Typically, {@link org.matsim.contrib.CadytsPlanStrategy.pt.CadytsPtPlanStrategy} should be the only
+ * <li>Typically, {@link org.matsim.contrib.CadytsContext.pt.CadytsPtPlanStrategy} should be the only
  *     plan strategy being used. So it is advised to first run the simulation until every
  *     agent has a few (different) plans, and then do some iterations using only the
  *     calibration strategy.</li>

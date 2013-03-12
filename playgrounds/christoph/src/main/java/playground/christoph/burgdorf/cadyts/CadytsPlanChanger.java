@@ -34,22 +34,21 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 /**
  * @author cdobler
  */
-/*package*/ class CadytsPlanChanger implements PlanSelector {
+public class CadytsPlanChanger implements PlanSelector {
 
 	private static final Logger log = Logger.getLogger(CadytsPlanChanger.class);
 
 	private final double beta = 1.0;
 
-	private final PlanToPlanStepBasedOnEvents planToPlanStep;
+	private double cadytsWeight = 1.0;
 
-	private final AnalyticalCalibrator<Link> matsimCalibrator;
-
+	private final CadytsContext cadytsContext;
+	
 	private boolean cadCorrMessGiven = false;
 
-	/*package*/ CadytsPlanChanger(final PlanToPlanStepBasedOnEvents planToPlanStep, final AnalyticalCalibrator<Link> calib) {
+	public CadytsPlanChanger(CadytsContext cadytsContext) {
 		log.error("value for beta currently ignored (set to one)");
-		this.planToPlanStep = planToPlanStep;
-		this.matsimCalibrator = calib;
+		this.cadytsContext = cadytsContext;
 	}
 
 	@Override
@@ -71,15 +70,19 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 			return otherPlan;
 		}
 
-		cadyts.demand.Plan<Link> currentPlanSteps = this.planToPlanStep.getPlanSteps(currentPlan);
-//		double currentPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(currentPlanSteps) / this.beta;
-		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
-		double currentScore = currentPlan.getScore().doubleValue() + currentPlanCadytsCorrection;
+		PlanToPlanStepBasedOnEvents planToPlanStep = cadytsContext.getPlanToPlanStepBasedOnEvents();
+		
+		AnalyticalCalibrator<Link> matsimCalibrator = cadytsContext.getAnalyticalCalibrator();
+		
+		cadyts.demand.Plan<Link> currentPlanSteps = planToPlanStep.getPlanSteps(currentPlan);
+//		double currentPlanCadytsCorrection = matsimCalibrator.getUtilityCorrection(currentPlanSteps) / this.beta;
+		double currentPlanCadytsCorrection = matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
+		double currentScore = currentPlan.getScore().doubleValue() + this.cadytsWeight * currentPlanCadytsCorrection;
 
-		cadyts.demand.Plan<Link> otherPlanSteps = this.planToPlanStep.getPlanSteps(otherPlan);
-//		double otherPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(otherPlanSteps) / this.beta;
-		double otherPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(otherPlanSteps) / this.beta;
-		double otherScore = otherPlan.getScore().doubleValue() + otherPlanCadytsCorrection;
+		cadyts.demand.Plan<Link> otherPlanSteps = planToPlanStep.getPlanSteps(otherPlan);
+//		double otherPlanCadytsCorrection = matsimCalibrator.getUtilityCorrection(otherPlanSteps) / this.beta;
+		double otherPlanCadytsCorrection = matsimCalibrator.calcLinearPlanEffect(otherPlanSteps) / this.beta;
+		double otherScore = otherPlan.getScore().doubleValue() + this.cadytsWeight * otherPlanCadytsCorrection;
 
 		if (currentPlanCadytsCorrection != otherPlanCadytsCorrection && !this.cadCorrMessGiven) {
 			log.info("currPlanCadytsCorr: " + currentPlanCadytsCorrection + " otherPlanCadytsCorr: " + otherPlanCadytsCorrection + Gbl.ONLYONCE);
@@ -102,9 +105,13 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 		// sampler.enforceNextAccept();
 		// sampler.isAccepted(this.ptPlanToPlanStep.getPlanSteps(selectedPlan));
 
-//		this.matsimCalibrator.registerChoice(selectedPlanSteps);
-		this.matsimCalibrator.addToDemand(selectedPlanSteps);
+//		matsimCalibrator.registerChoice(selectedPlanSteps);
+		matsimCalibrator.addToDemand(selectedPlanSteps);
 
 		return selectedPlan;
+	}
+	
+	void setCadytsWeight(double cadytsWeight) {
+		this.cadytsWeight = cadytsWeight;
 	}
 }

@@ -80,10 +80,10 @@ public class CreateBackgroundPopulation {
 	// to 1: 17560000269853FT
 	// from 2: 17560001622819FT
 	// to 2: 17560002068622TF
-	// from 3: 17560000122176TF
-	// to 3: 17560000122178FT
-	public static String[] intersectionStartLinks = new String[]{"17560000270156FT", "17560001622819FT", "17560000122176TF"};
-	public static String[] intersectionEndLinks = new String[]{"17560000269853FT", "17560002068622TF", "17560000122178FT"};
+	// from 3: old: 17560000122176TF -> new: 17560001247396TF
+	// to 3: old: 17560000122178FT -> new: 17560001247396FT
+	public static String[] intersectionStartLinks = new String[]{"17560000270156FT", "17560001622819FT", "17560001247396TF"};
+	public static String[] intersectionEndLinks = new String[]{"17560000269853FT", "17560002068622TF", "17560001247396FT"};
 	
 	public static String[] intersection1InCounts = {"17560001357914FT", "17560001811776FT", "17560001383083TF"};
 	public static String[] intersection1OutCounts = {"17560000270101FT", "17560001885464FT", "17560000150179FT"};
@@ -110,12 +110,13 @@ public class CreateBackgroundPopulation {
 //	public static int[] agentsPerOrigin = new int[]{3500, 3500, 3500, 3500, 3500};
 	public static int[] agentsPerOrigin = new int[]{6000, 6000, 6000, 6000, 6000};
 	
-	public static double scaleFactor = 0.10;
+	public static double scaleFactor = 1.00;
 	
 	public static String countsFile = "../../matsim/mysimulations/burgdorf/input/counts_burgdorf.xml";
-	public static String networkFile = "../../matsim/mysimulations/burgdorf/input/network.xml.gz";
+//	public static String networkFile = "../../matsim/mysimulations/burgdorf/input/network.xml.gz";
+	public static String networkFile = "../../matsim/mysimulations/burgdorf/input/network_burgdorf_cut.xml.gz";
 //	public static String facilitiesFile = "";
-	public static String populationFile = "../../matsim/mysimulations/burgdorf/input/plans.xml.gz";
+	public static String populationFile = "../../matsim/mysimulations/burgdorf/input/plans_background.xml.gz";
 	
 	public static boolean printRoutes = false;
 	private Map<String, Route> routes;
