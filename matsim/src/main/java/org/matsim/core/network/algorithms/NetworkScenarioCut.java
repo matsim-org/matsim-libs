@@ -28,36 +28,60 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class NetworkScenarioCut implements NetworkRunnable {
 
+	private enum CutType {RECTANGLE, CIRCLE};
+	private final CutType cutType;
+	
 	private final double minX;
 	private final double maxX;
 	private final double minY;
 	private final double maxY;
+	
+	private final double radius;
+	private final Coord center;
 
 	private final static Logger log = Logger.getLogger(NetworkScenarioCut.class);
 
 	public NetworkScenarioCut(final Coord min, final Coord max) {
 		super();
+		
+		this.cutType = CutType.RECTANGLE;
+		
 		this.minX = min.getX();
 		this.maxX = max.getX();
 		this.minY = min.getY();
 		this.maxY = max.getY();
+		
+		this.radius = Double.MAX_VALUE;
+		this.center = null;
 	}
 
+	public NetworkScenarioCut(final Coord center, final double radius) {
+		super();
+		
+		this.cutType = CutType.CIRCLE;
+		
+		this.center = center;
+		this.radius = radius;
+		
+		this.minX = Double.MIN_VALUE;
+		this.maxX = Double.MAX_VALUE;
+		this.minY = Double.MIN_VALUE;
+		this.maxY = Double.MAX_VALUE;
+	}
+	
 	@Override
 	public void run(final Network network) {
-		Set<Node> nodesToRemove = new HashSet<Node>();
-		for (Node n : network.getNodes().values()) {
-			Coord coord = n.getCoord();
-			double x = coord.getX();
-			double y = coord.getY();
-			if (!((x < this.maxX) && (this.minX < x) && (y < this.maxY) && (this.minY < y))) {
-				nodesToRemove.add(n);
-			}
-		}
-
+		
+		Set<Node> nodesToRemove; 
+		
+		if (this.cutType == CutType.RECTANGLE) nodesToRemove = rectangularCut(network);
+		else if (this.cutType == CutType.CIRCLE) nodesToRemove = circularCut(network);
+		else return;
+		
 		int nofLinksRemoved = 0;
 		for (Node n : nodesToRemove) {
 			nofLinksRemoved += n.getInLinks().size() + n.getOutLinks().size();
@@ -68,5 +92,30 @@ public class NetworkScenarioCut implements NetworkRunnable {
 		log.info("number of links removed: "+nofLinksRemoved);
 		log.info("number of nodes remaining: "+network.getNodes().size());
 		log.info("number of links remaining: "+network.getLinks().size());
+	}
+	
+	private final Set<Node> rectangularCut(Network network) {
+		Set<Node> nodesToRemove = new HashSet<Node>();
+		for (Node n : network.getNodes().values()) {
+			Coord coord = n.getCoord();
+			double x = coord.getX();
+			double y = coord.getY();
+			if (!((x < this.maxX) && (this.minX < x) && (y < this.maxY) && (this.minY < y))) {
+				nodesToRemove.add(n);
+			}
+		}
+		return nodesToRemove;
+	}
+	
+	private final Set<Node> circularCut(Network network) {
+		Set<Node> nodesToRemove = new HashSet<Node>();
+		for (Node n : network.getNodes().values()) {
+			Coord coord = n.getCoord();
+			double distance = CoordUtils.calcDistance(coord, center);
+			if (distance > radius) {
+				nodesToRemove.add(n);
+			}
+		}
+		return nodesToRemove;
 	}
 }
