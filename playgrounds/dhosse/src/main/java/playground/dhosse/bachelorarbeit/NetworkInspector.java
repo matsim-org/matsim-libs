@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -34,7 +33,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -53,8 +51,6 @@ public class NetworkInspector {//TODO pfade ändern
 	private Map<Id,Double> distances = new HashMap<Id,Double>();
 	
 	private List<Link> lengthBelowStorageCapacity = new ArrayList<Link>();
-	
-	private Map<String,ArrayList<Node>> nodeTypes = new TreeMap<String,ArrayList<Node>>();
 	
 	private List<Node> deadEndNodes = new ArrayList<Node>();
 	private List<Node> exitRoadNodes = new ArrayList<Node>();
@@ -79,13 +75,11 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private boolean nodeAttributesChecked = false;
 	
-	private NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-	
 	private String outputFolder = "C:/Users/Daniel/Dropbox/bsc";
 	
 	private SimpleFeatureBuilder builder;
 	
-	private Geometry area;
+	private Geometry envelope;
 	
 	/**
 	 * 
@@ -112,7 +106,14 @@ public class NetworkInspector {//TODO pfade ändern
 		checkNodeAttributes();
 		checkLinkAttributes();
 		
-		if(!(NetworkInspector.scenario.getPopulation()==null))
+		if(!(this.deadEndNodes.size()<1))
+			shpExportNodeStatistics(this.deadEndNodes, "C:/Users/Daniel/Dropbox/bsc/pres/deadEndNodes.shp");
+		if(!(this.redundantNodes.size()<1))
+			shpExportNodeStatistics(this.redundantNodes, "C:/Users/Daniel/Dropbox/bsc/pres/redundantNodes.shp");
+		if(!(this.exitRoadNodes.size()<1))
+			shpExportNodeStatistics(this.exitRoadNodes, "C:/Users/Daniel/Dropbox/bsc/pres/exitRoadNodes.shp");
+		
+		if(!(NetworkInspector.scenario.getPopulation().getPersons().size()<1))
 			populationMapping();
 		
 		if(!routable)
@@ -128,24 +129,7 @@ public class NetworkInspector {//TODO pfade ändern
 
 	public NetworkInspector(){
 		
-		this.bbox = new NetworkBoundaryBox();
-		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
-		
-//		double factor = 0.9;
-//		this.bbox.setCustomBoundaryBox(box.getXMin()+((box.getXMax()-box.getXMin())*(1-factor)),
-//				box.getYMin()+((box.getYMax()-box.getYMin())*(1-factor)),
-//				box.getXMax()-((box.getXMax()-box.getXMin())*(1-factor)),
-//				box.getYMax()-((box.getYMax()-box.getYMin())*(1-factor)));
-		
-		
-		//TODO ersetzen durch etwas sinnvolleres...
-		ShapeFileReader reader = new ShapeFileReader();
-		Collection<SimpleFeature> features = reader.readFileAndInitialize("C:/Users/Daniel/Dropbox/bsc/input/berlin.shp");
-		
-		Geometry g = ((Geometry)features.iterator().next().getDefaultGeometry());
-		
-		this.area = g.buffer(-10.);
-//		this.area = g.convexHull().buffer(-10.);
+		this.envelope = MinimumEnvelope.main(NetworkInspector.scenario.getNetwork()).buffer(-10);
 		
 	}
 	
@@ -188,18 +172,42 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		for(Id nodeId : smallClusterNodes.keySet()){
 			
-//			if()
+			Node node = NetworkInspector.scenario.getNetwork().getNodes().get(nodeId);
+			
+			for(Link l : node.getOutLinks().values()){
+				if(!smallClusterLinks.containsKey(l.getId()))
+					smallClusterLinks.put(l.getId(), l);
+			}
 			
 		}
 		
-//		for(Node node : biggestCluster.values()){
-//			smallClusters.removeNode(node.getId());
-//		}
+		logger.info("writing small clusters into shapefile...");
 		
-//		new NetworkWriter(smallClusters).write("C:/Users/Daniel/Dropbox/bsc/input/smallClusters.xml");
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName("shape");
+		typeBuilder.add("link",LineString.class);
+		typeBuilder.add("ID",String.class);
+		typeBuilder.add("length",Double.class);
+		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 		
-//		logger.info("small clusters of " + smallClusters.getNodes().size() + " nodes and " + smallClusters.getLinks().size() +
-//				" links written to file");
+		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		for(Link link : smallClusterLinks.values()){
+			
+			SimpleFeature feature = this.builder.buildFeature(null, new Object[]{
+					new GeometryFactory().createLineString(new Coordinate[]{
+							new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()),
+							new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY())
+					}),
+					link.getId(),
+					link.getLength()
+			});
+			
+			features.add(feature);
+			
+		}
+		
+		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/output/smallClusters.shp");		
 		
 		return false;
 		
@@ -402,7 +410,8 @@ public class NetworkInspector {//TODO pfade ändern
 					Link outLink = node.getOutLinks().values().iterator().next();
 				
 					if(inLink.getFromNode().equals(outLink.getToNode())){
-						if(this.area.contains(new Point(new CoordinateArraySequence(new Coordinate[]{new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory())))
+						if(this.envelope.contains(new Point(new CoordinateArraySequence(new Coordinate[]{
+								new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory())))
 							this.deadEndNodes.add(node);
 						else
 							this.exitRoadNodes.add(node);
@@ -440,8 +449,6 @@ public class NetworkInspector {//TODO pfade ändern
 	//eigene methode
 	private void populationMapping(){
 		
-		//wie wird die population aufs netz "gepackt"?
-		
 		logger.info("checking where the population is mapped on the network...");
 		
 		for(Person p : NetworkInspector.scenario.getPopulation().getPersons().values()){
@@ -471,10 +478,8 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		logger.info("writing pointers from activities to nearest links...");
 		
-		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		typeBuilder.setName("shape");
-		typeBuilder.setCRS(crs);
 		typeBuilder.add("pointer",LineString.class);
 		typeBuilder.add("ID",String.class);
 		typeBuilder.add("LAENGE",Double.class);
@@ -625,10 +630,10 @@ public class NetworkInspector {//TODO pfade ändern
 		chart.saveAsPng(this.outputFolder+"/test/nodeDegrees.png", 800, 600);
 	}
 	
-	public void shpExportNodeStatistics(Collection<Node> collection){
+	public void shpExportNodeStatistics(Collection<Node> collection, String directory){
 		initFeatureType();
 		Collection<SimpleFeature> features = createFeatures(collection);
-		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/pres/exitRoadNodes_osm2.shp");
+		ShapeFileWriter.writeGeometries(features, directory);
 		
 	}
 	
@@ -672,11 +677,11 @@ public class NetworkInspector {//TODO pfade ändern
 	}
 	
 	public Geometry getArea() {
-		return area;
+		return envelope;
 	}
 
 	public void setArea(Geometry area) {
-		this.area = area;
+		this.envelope = area;
 	}
 
 	static class DoubleFlagRole {

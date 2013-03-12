@@ -4,16 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
@@ -24,10 +20,7 @@ import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedT
 import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Distances;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
@@ -74,42 +67,6 @@ public class AccessibilityCalc {
 	public void runAccessibilityComputation(){
 		
 		final NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
-		
-//		if(this.scenario.getPopulation().getPersons().size()<1){
-//			log.warn("no population initialized. running on random population...");
-//			
-//			NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-//			bbox.setDefaultBoundaryBox(network);
-//			
-//			
-//			Random rnd = new Random();
-//			
-//			for(int i=0;i<300000;i++){
-//				Coord coord = new CoordImpl(bbox.getXMin() + rnd.nextDouble() * (bbox.getXMax() - bbox.getXMin()),
-//						bbox.getYMin() + rnd.nextDouble() * (bbox.getYMax() - bbox.getYMin()));
-//				Id id = new IdImpl("parcel"+i);
-//				parcels.createAndAddFacility(id, coord);
-//			}
-//			
-//			
-//		} else{
-//			int i=0;
-//			for(Person p : scenario.getPopulation().getPersons().values()){
-//				PlanElement pe = p.getSelectedPlan().getPlanElements().get(0);
-//				PlanElement pe2 = p.getSelectedPlan().getPlanElements().get(2);
-//				Coord coord = new CoordImpl(0, 0);
-//				if(pe instanceof Activity)
-//					coord = ((Activity)pe).getCoord();
-//				Id id = new IdImpl("parcel"+i);
-//				i++;
-//				parcels.createAndAddFacility(id, coord);
-//				if(pe2 instanceof Activity)
-//					coord = ((Activity)pe).getCoord();
-//				id = new IdImpl("parcel"+i);
-//				i++;
-//				parcels.createAndAddFacility(id, coord);
-//			}
-//		}
 		
 		this.aggregatedOpportunities = aggregatedOpportunities(this.parcels, network);
 		
