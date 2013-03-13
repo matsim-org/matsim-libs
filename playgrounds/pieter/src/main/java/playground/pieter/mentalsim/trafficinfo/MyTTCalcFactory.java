@@ -8,11 +8,15 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import playground.pieter.mentalsim.trafficinfo.MyTravelTimeCalculator;
 
 public class MyTTCalcFactory implements TravelTimeCalculatorFactory {
-
+	MyTravelTimeCalculator mtc;
 	@Override
 	public TravelTimeCalculator createTravelTimeCalculator(Network network,
 			TravelTimeCalculatorConfigGroup group) {
-		return new MyTravelTimeCalculator(network, group);
+		if(mtc == null){
+			mtc = new MyTravelTimeCalculator(network, group);
+			
+		}
+		return mtc;
 	}
 
 }

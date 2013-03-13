@@ -56,7 +56,7 @@ public class EventsMergeSorter {
 	
 	private void splitEventsToMultipleSortedFiles() {
 		this.events = EventsUtils.createEventsManager();
-		SplitEventsToMultipleSortedFiles setmsf = new SplitEventsToMultipleSortedFiles(outputPath+"\\sorted_", 10000);
+		SplitEventsToMultipleSortedFiles setmsf = new SplitEventsToMultipleSortedFiles(outputPath+"\\sorted_", 100000);
 		events.addHandler(setmsf);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.setValidating(false);

@@ -21,13 +21,12 @@ import playground.pieter.mentalsim.trafficinfo.MyTTCalcFactory;
 public class Main {
 
 	/**
-	 * @param args
+	 * @param args - The name of the config file for the mentalsim run.
 	 */
 	public static void main(String[] args) {
 		MentalSimControler c = new MentalSimControler(args);
-//		Controler c = new Controler(args);
 		c.setOverwriteFiles(true);
-		c.setSimulateSubsetPersonsOnly(false);
+		c.setSimulateSubsetPersonsOnly(true);
 		c.setTravelTimeCalculatorFactory(new MyTTCalcFactory());
 //		execution order of these iteration start listeners is in reverse order of adding them to the controler
 //		PlanSelector mentalPlanSelector = new ExpBetaPlanSelector(new PlanCalcScoreConfigGroup());
@@ -38,8 +37,8 @@ public class Main {
 		c.addControlerListener(new MentalSimPlanMarkerModuleAppender(c));
 		c.addControlerListener(new ExpensiveSimScoreWriter(c));
 //		c.addControlerListener(new BeforeMentalSimSelectedPlanNullifier(c));
-		c.addControlerListener(new BeforeMentalSimSelectedPlanScoreRecorder(c));
-		c.addControlerListener(new IterationEndsSelectedPlanScoreRestoreListener(c));
+//		c.addControlerListener(new BeforeMentalSimSelectedPlanScoreRecorder(c));
+//		c.addControlerListener(new IterationEndsSelectedPlanScoreRestoreListener(c));
 		c.run();
 		System.exit(0);
 		

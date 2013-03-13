@@ -161,7 +161,7 @@ public class HITSTrip implements Serializable{
 	 double busDistance;
 	 double trainDistance;
 	 double busTrainDistance;
-	private double journeyDistance;
+	private double freeSpeedCarJourneyDistance;
 	public double straightLineDistance;
 	
 	 static public final String FORMATSTRING = "%s,%d,%d," +
@@ -196,7 +196,7 @@ public class HITSTrip implements Serializable{
 		",busDistance"+
 		",trainDistance"+
 		",busTrainDistance"+
-		",journeyDistance"+
+		",freeSpeedCarJourneyDistance"+
 		"\n";
 	
 
@@ -224,7 +224,7 @@ public class HITSTrip implements Serializable{
 				,subjTimeError
 				,transitStartTime != null ? this.dfm.format(transitStartTime) : null
 				,transitEndTime   != null ? this.dfm.format(transitEndTime)   : null
-				,busDistance,trainDistance,busTrainDistance,journeyDistance
+				,busDistance,trainDistance,busTrainDistance,freeSpeedCarJourneyDistance
 		);
 	}
 	public void calcTransients() {
@@ -293,7 +293,7 @@ public class HITSTrip implements Serializable{
 				}else {
 					System.out.println("special transit case");
 				}
-				transitModeChain += stage.t10_mode + " ";
+				transitModeChain += stage.t10_mode + "_";
 				lastTransit = stage.t10_mode;
 				if(stage.t10_mode.equals("publBus"))busTripSwitch = true;
 				if(stage.t10_mode.equals("lrt") || stage.t10_mode.equals("mrt")) trainTripSwitch=true;
@@ -319,13 +319,13 @@ public class HITSTrip implements Serializable{
 		Coord endCoord = HITSAnalyser.getZip2Coord(this.t2_destpcode);
 		if(startCoord != null && endCoord != null){
 			if(trainTripSwitch && !busTripSwitch){
-				this.trainDistance = HITSAnalyser.getShortestPathDistance(startCoord, endCoord);
+				this.trainDistance = HITSAnalyser.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
 			}else if(busTripSwitch && !trainTripSwitch){
-				this.busDistance = HITSAnalyser.getShortestPathDistance(startCoord, endCoord);
+				this.busDistance = HITSAnalyser.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
 			}else if(busTripSwitch && trainTripSwitch){
-				this.busTrainDistance = HITSAnalyser.getShortestPathDistance(startCoord, endCoord);
+				this.busTrainDistance = HITSAnalyser.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
 			}else {
-				this.journeyDistance = HITSAnalyser.getShortestPathDistance(startCoord, endCoord);
+				this.freeSpeedCarJourneyDistance = HITSAnalyser.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
 			}
 			this.straightLineDistance = HITSAnalyser.getStraightLineDistance(startCoord, endCoord);
 			
