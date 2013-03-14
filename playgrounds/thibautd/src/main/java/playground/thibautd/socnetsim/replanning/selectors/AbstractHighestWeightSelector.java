@@ -332,14 +332,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final double minimalWeightToObtain) {
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 		final PersonRecord currentPerson = personsStillToAllocate.get(0);
-		// tag all other joint plans of the current agent as impossible
-		for ( PlanRecord pr : currentPerson.plans ) {
-			if ( pr.jointPlan == null ) continue;
-			for ( Plan p : pr.jointPlan.getIndividualPlans().values() ) {
-				if ( p.getPerson() == currentPerson.person ) continue;
-				feasibilityChanger.markInfeasible( allPersonsRecord.get( p.getPerson().getId() ).getRecord( p ) );
-			}
-		}
+		tagJointPlansOfPersonAsInfeasible(
+				allPersonsRecord,
+				currentPerson,
+				feasibilityChanger);
 
 		assert str == null || !str.containsPerson( currentPerson.person.getId() );
 		if (log.isTraceEnabled()) {
@@ -441,26 +437,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				tail = getOtherPlansAsString( r , allPersonsRecord , tail);
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 
-				// tag all joint plans containing agents in the joint plan to select
-				// as infeasible
-				for ( Id cotravId : r.jointPlan.getIndividualPlans().keySet() ) {
-					final PersonRecord cotrav = allPersonsRecord.get( cotravId );
-					for ( PlanRecord pr : cotrav.plans ) {
-						if ( pr.jointPlan == null ) continue;
-						for ( Id linkedId : pr.jointPlan.getIndividualPlans().keySet() ) {
-							final PersonRecord linkedPerson = allPersonsRecord.get( linkedId );
-							for ( PlanRecord linkedpr : linkedPerson.plans ) {
-								if ( linkedpr.isStillFeasible &&
-										linkedpr.jointPlan != null &&
-										intersect(
-											linkedpr.jointPlan.getIndividualPlans().keySet() ,
-											r.jointPlan.getIndividualPlans().keySet() )) {
-									localFeasibilityChanger.markInfeasible( linkedpr );
-								}
-							}
-						}
-					}
-				}
+				tagJointPlansOfPartnersAsInfeasible(
+						allPersonsRecord,
+						r,
+						localFeasibilityChanger);
 			}
 
 
@@ -506,6 +486,43 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		feasibilityChanger.resetFeasibilities();
 		return constructedString;
+	}
+
+	private static void tagJointPlansOfPersonAsInfeasible(
+			final Map<Id, PersonRecord> allPersonsRecord,
+			final PersonRecord person,
+			final FeasibilityChanger changer) {
+		for ( PlanRecord pr : person.plans ) {
+			if ( pr.jointPlan == null ) continue;
+			for ( Plan p : pr.jointPlan.getIndividualPlans().values() ) {
+				if ( p.getPerson() == person.person ) continue;
+				changer.markInfeasible( allPersonsRecord.get( p.getPerson().getId() ).getRecord( p ) );
+			}
+		}
+	}
+
+	private static void tagJointPlansOfPartnersAsInfeasible(
+			final Map<Id, PersonRecord> allPersonsRecord,
+			final PlanRecord r,
+			final FeasibilityChanger changer) {
+		for ( Id cotravId : r.jointPlan.getIndividualPlans().keySet() ) {
+			final PersonRecord cotrav = allPersonsRecord.get( cotravId );
+			for ( PlanRecord pr : cotrav.plans ) {
+				if ( pr.jointPlan == null ) continue;
+				for ( Id linkedId : pr.jointPlan.getIndividualPlans().keySet() ) {
+					final PersonRecord linkedPerson = allPersonsRecord.get( linkedId );
+					for ( PlanRecord linkedpr : linkedPerson.plans ) {
+						if ( linkedpr.isStillFeasible &&
+								linkedpr.jointPlan != null &&
+								intersect(
+									linkedpr.jointPlan.getIndividualPlans().keySet() ,
+									r.jointPlan.getIndividualPlans().keySet() )) {
+							changer.markInfeasible( linkedpr );
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**
