@@ -51,9 +51,11 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
+import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 
@@ -79,6 +81,7 @@ public class ControllerRegistryBuilder {
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = null;
 	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory = null;
 	private GroupIdentifier groupIdentifier = null;
+	private PlanLinkIdentifier planLinkIdentifier = null;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// contrs
@@ -157,6 +160,12 @@ public class ControllerRegistryBuilder {
 		return this;
 	}
 
+	public ControllerRegistryBuilder withPlanLinkIdentifier(
+			final PlanLinkIdentifier identifier) {
+		this.planLinkIdentifier = identifier;
+		return this;
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// build
 	private boolean wasBuild = false;
@@ -180,7 +189,8 @@ public class ControllerRegistryBuilder {
 			leastCostPathCalculatorFactory,
 			planRoutingAlgorithmFactory,
 			groupIdentifier,
-			prepareForSimAlgorithms);
+			prepareForSimAlgorithms,
+			planLinkIdentifier);
 	}
 
 	private final void setDefaults() {
@@ -215,6 +225,10 @@ public class ControllerRegistryBuilder {
 
 		if ( mobsimFactory == null ) {
 			this.mobsimFactory = new JointQSimFactory();
+		}
+
+		if ( planLinkIdentifier == null ) {
+			this.planLinkIdentifier = new DefaultPlanLinkIdentifier();
 		}
 
 		if ( travelTime == null ) {

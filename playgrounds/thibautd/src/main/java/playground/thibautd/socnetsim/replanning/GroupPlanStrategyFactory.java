@@ -19,25 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
@@ -47,11 +37,9 @@ import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtimemodechooser.JointTimeModeChooserAlgorithm;
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
@@ -78,23 +66,25 @@ public class GroupPlanStrategyFactory {
 	// strategies
 	// /////////////////////////////////////////////////////////////////////////
 	public static GroupPlanStrategy createReRoute(
-			final Config config,
-			final JointPlanFactory jpFactory,
-			final PlanRoutingAlgorithmFactory planRouterFactory,
-			final TripRouterFactory tripRouterFactory) {
+			final ControllerRegistry registry) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
 	
-		strategy.addStrategyModule( createReRouteModule( config , planRouterFactory , tripRouterFactory ) );
+		strategy.addStrategyModule(
+				createReRouteModule(
+					registry.getScenario().getConfig(),
+					registry.getPlanRoutingAlgorithmFactory(),
+					registry.getTripRouterFactory() ) );
 
 		strategy.addStrategyModule(
 				createRecomposeJointPlansModule(
-					config,
-					jpFactory));
+					registry.getScenario().getConfig(),
+					registry.getJointPlans().getFactory(),
+					registry.getPlanLinkIdentifier()));
 
 		strategy.addStrategyModule(
 				createSynchronizerModule(
-					config,
-					tripRouterFactory) );
+					registry.getScenario().getConfig(),
+					registry.getTripRouterFactory() ) );
 
 		return strategy;
 	}
@@ -193,7 +183,8 @@ public class GroupPlanStrategyFactory {
 		strategy.addStrategyModule(
 				createRecomposeJointPlansModule(
 					config,
-					registry.getJointPlans().getFactory()));
+					registry.getJointPlans().getFactory(),
+					registry.getPlanLinkIdentifier()));
 
 		if (optimize) {
 			final DepartureDelayAverageCalculator delay =
@@ -270,7 +261,8 @@ public class GroupPlanStrategyFactory {
 		strategy.addStrategyModule(
 				createRecomposeJointPlansModule(
 					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory()));
+					registry.getJointPlans().getFactory(),
+					registry.getPlanLinkIdentifier()));
 
 		strategy.addStrategyModule(
 				createSynchronizerModule(
@@ -295,7 +287,8 @@ public class GroupPlanStrategyFactory {
 		strategy.addStrategyModule(
 				createRecomposeJointPlansModule(
 					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory()));
+					registry.getJointPlans().getFactory(),
+					registry.getPlanLinkIdentifier()));
 
 		strategy.addStrategyModule(
 				createReRouteModule(
@@ -321,7 +314,8 @@ public class GroupPlanStrategyFactory {
 		strategy.addStrategyModule(
 				createRecomposeJointPlansModule(
 					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory()));
+					registry.getJointPlans().getFactory(),
+					registry.getPlanLinkIdentifier()));
 
 		strategy.addStrategyModule(
 				createReRouteModule(
@@ -371,86 +365,18 @@ public class GroupPlanStrategyFactory {
 
 	public static GenericStrategyModule<GroupPlans> createRecomposeJointPlansModule(
 			final Config config,
-			final JointPlanFactory jpFactory) {
+			final JointPlanFactory jpFactory,
+			final PlanLinkIdentifier linkIdentifier) {
 		return new RecomposeJointPlanModule(
 				config.global().getNumberOfThreads(),
 				jpFactory,
-				new DefaultPlanLinkIdentifier() );
+				linkIdentifier );
 	}
 
 	private static GroupPlanStrategy createRandomSelectingStrategy() {
 		return new GroupPlanStrategy(
 				new RandomGroupLevelSelector(
 					MatsimRandom.getLocalInstance() ) );
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	// helpers
-	// /////////////////////////////////////////////////////////////////////////
-	private static class DefaultPlanLinkIdentifier implements PlanLinkIdentifier {
-		@Override
-		public boolean areLinked(
-				final Plan p1,
-				final Plan p2) {
-			return areLinkedByJointTrips( p1 , p2 ) || areLinkedByVehicles( p1 , p2 );
-		}
-
-		private static boolean areLinkedByVehicles(
-				final Plan p1,
-				final Plan p2) {
-			final List<Id> vehIdsIn1 = new ArrayList<Id>();
-
-			for ( Trip t : TripStructureUtils.getTrips( p1 , EmptyStageActivityTypes.INSTANCE ) ) {
-				for ( Leg l : t.getLegsOnly() ) {
-					if ( l.getRoute() instanceof NetworkRoute ) {
-						final Id vehId = ((NetworkRoute) l.getRoute()).getVehicleId();
-						if ( vehId == null ) continue;
-						vehIdsIn1.add( vehId );
-					}
-				}
-			}
-
-			if ( vehIdsIn1.isEmpty() ) return false;
-
-			for ( Trip t : TripStructureUtils.getTrips( p2 , EmptyStageActivityTypes.INSTANCE ) ) {
-				for ( Leg l : t.getLegsOnly() ) {
-					if ( l.getRoute() instanceof NetworkRoute &&
-							vehIdsIn1.contains( ((NetworkRoute) l.getRoute()).getVehicleId() ) ) {
-						return true;
-					}
-				}
-			}
-
-			return false;
-		}
-
-		private static boolean areLinkedByJointTrips(
-				final Plan p1,
-				final Plan p2) {
-			final boolean areLinked = containsCoTraveler( p1 , p2.getPerson().getId() );
-			assert areLinked == containsCoTraveler( p2 , p1.getPerson().getId() ) : "inconsistent plans";
-			return areLinked;
-		}
-
-		private static boolean containsCoTraveler(
-				final Plan plan,
-				final Id cotraveler) {
-			for ( Trip t : TripStructureUtils.getTrips( plan , EmptyStageActivityTypes.INSTANCE ) ) {
-				for ( Leg l : t.getLegsOnly() ) {
-					if ( l.getRoute() instanceof DriverRoute ) {
-						if ( ((DriverRoute) l.getRoute()).getPassengersIds().contains( cotraveler ) ) {
-							return true;
-						}
-					}
-					else if ( l.getRoute() instanceof PassengerRoute ) {
-						if ( ((PassengerRoute) l.getRoute()).getDriverId().equals( cotraveler ) ) {
-							return true;
-						}
-					}
-				}
-			}
-			return false;
-		}
 	}
 }
 

@@ -75,10 +75,7 @@ public class RunUtils {
 
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createReRoute(
-					config,
-					controllerRegistry.getJointPlans().getFactory(),
-					controllerRegistry.getPlanRoutingAlgorithmFactory(),
-					controllerRegistry.getTripRouterFactory() ),
+					controllerRegistry ),
 				weights.getReRouteWeight());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTimeAllocationMutator(
