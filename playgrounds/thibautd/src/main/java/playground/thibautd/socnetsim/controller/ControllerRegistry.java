@@ -124,27 +124,28 @@ public final class ControllerRegistry {
 	// XXX ouch... if this thing starts to provide factory methods, not sure it is a "registry"...
 	// though it is just a wrapper to see the object under another interface, so it is probably ok.
 	public ReplanningContext createReplanningContext(final int iter) {
+		final ControllerRegistry registry = this;
 		return new ReplanningContext() {
 			@Override
 			public TripRouterFactory getTripRouterFactory() {
-				return getTripRouterFactory();
+				return registry.getTripRouterFactory();
 			}
 
 			@Override
 			public TravelDisutility getTravelCostCalculator() {
-				return getTravelDisutilityFactory().createTravelDisutility(
-					getTravelTime().getLinkTravelTimes(),
-					getScenario().getConfig().planCalcScore() );
+				return registry.getTravelDisutilityFactory().createTravelDisutility(
+					registry.getTravelTime().getLinkTravelTimes(),
+					registry.getScenario().getConfig().planCalcScore() );
 			}
 
 			@Override
 			public TravelTime getTravelTimeCalculator() {
-				return getTravelTime().getLinkTravelTimes();
+				return registry.getTravelTime().getLinkTravelTimes();
 			}
 
 			@Override
 			public ScoringFunctionFactory getScoringFunctionFactory() {
-				return getScoringFunctionFactory();
+				return registry.getScoringFunctionFactory();
 			}
 
 			@Override
