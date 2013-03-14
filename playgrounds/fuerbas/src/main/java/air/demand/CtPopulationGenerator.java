@@ -119,6 +119,10 @@ public class CtPopulationGenerator {
 				missingFromAirports = missingFromAirports + " " + fromLinkIdString;
 				continue;
 			}
+
+			if (od.getNumberOfTrips() == null){
+				continue;
+			}
 			
 			for ( int i=0; i< od.getNumberOfTrips(); i++){		// eingangsdatearraynindex+2 ist aktuelle Passagieranzahl
 				String toLinkIdString = od.getToAirportCode();
@@ -128,8 +132,8 @@ public class CtPopulationGenerator {
 				}
 				Link destinationLink = sc.getNetwork().getLinks().get(toLinkId);
 				if (destinationLink == null) {	// abfangen von Flughäfen die in den Passagierdaten von DeStatis vorkommen, allerdings nicht im verwendeten Flugnetzwerk vorkommen
-					log.warn("Link id " + fromLinkIdString + " not found in network!");
-					missingOdPais = missingOdPais + " " + fromLinkIdString + " -> " + toLinkIdString; 
+					log.warn("Link id " + toLinkIdString + " not found in network!");
+					missingOdPais = missingOdPais + "; " + fromLinkIdString + " -> " + toLinkIdString; 
 					continue;
 				}
 				Person person = populationFactory.createPerson(sc.createId(String.valueOf(personid_zaehler)));	// ID für aktuellen Passagier
