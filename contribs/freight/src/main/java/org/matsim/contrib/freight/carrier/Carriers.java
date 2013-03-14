@@ -7,6 +7,14 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
 public class Carriers {
+	
+	public static Carriers newInstance(){
+		return new Carriers();
+	}
+	
+	public static Carriers newInstance(Collection<Carrier> carriers){
+		return new Carriers(carriers);
+	}
 
 	private Map<Id, Carrier> carriers = new HashMap<Id, Carrier>();
 

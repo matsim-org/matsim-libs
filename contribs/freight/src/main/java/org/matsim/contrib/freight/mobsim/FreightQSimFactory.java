@@ -112,4 +112,6 @@ public class FreightQSimFactory implements MobsimFactory {
 	public void setWithinDayActivityReScheduling(boolean withinDayReScheduling) {
 		this.withinDayReScheduling = withinDayReScheduling;
 	}
+	
+//	public void set
 }

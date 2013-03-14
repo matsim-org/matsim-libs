@@ -37,8 +37,6 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	private final Carriers carriers;
 
-	private final Network network;
-
 	private final EventsManager eventsManager;
 
 	private final Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
@@ -47,7 +45,6 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	public CarrierAgentTracker(Carriers carriers, Network network, CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		this.carriers = carriers;
-		this.network = network;
 		createCarrierAgents(carrierScoringFunctionFactory);
 		eventsManager = EventsUtils.createEventsManager();
 	}

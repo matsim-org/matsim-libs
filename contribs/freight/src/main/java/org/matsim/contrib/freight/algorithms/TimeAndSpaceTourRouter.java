@@ -24,7 +24,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class TimeAndSpaceTourRouter {
 	
-private static Logger logger = Logger.getLogger(ReRouteVehicles.class);
+	private static Logger logger = Logger.getLogger(TimeAndSpaceTourRouter.class);
 	
 	private LeastCostPathCalculator router;
 	

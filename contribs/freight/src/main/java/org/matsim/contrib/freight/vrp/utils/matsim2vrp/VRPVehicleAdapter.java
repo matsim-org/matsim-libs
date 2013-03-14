@@ -4,9 +4,12 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleImpl;
 import org.matsim.contrib.freight.vrp.basics.VehicleImpl.Type;
 
-public class VRPVehicleAdapter implements
-		org.matsim.contrib.freight.vrp.basics.Vehicle {
+public class VRPVehicleAdapter implements org.matsim.contrib.freight.vrp.basics.Vehicle {
 
+	public static org.matsim.contrib.freight.vrp.basics.Vehicle newInstance(CarrierVehicle carrierVehicle){
+		return new VRPVehicleAdapter(carrierVehicle);
+	}
+	
 	private final CarrierVehicle carrierVehicle;
 
 	private final Type type;

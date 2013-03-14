@@ -4,6 +4,10 @@ import org.matsim.api.core.v01.Id;
 
 public class CarrierVehicle {
 
+	public static CarrierVehicle newInstance(Id vehicleId, Id locationId){
+		return new CarrierVehicle(vehicleId,locationId);
+	}
+	
 	private final Id location;
 
 	private final Id vehicleId;

@@ -81,6 +81,10 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 		this.carrierFilename = carrierConfig.plans().getInputFile();
 		this.carrierConfig = carrierConfig;
 	}
+	
+//	public CarrierControler(Carriers carriers){
+//		
+//	}
 
 	public Map<Id,Carrier> getCarriers() {
 		return carriers.getCarriers();
@@ -90,8 +94,7 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 		return carrierScoringFunctionFactory;
 	}
 
-	public void setCarrierScoringFunctionFactory(
-			CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
+	public void setCarrierScoringFunctionFactory(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		this.carrierScoringFunctionFactory = carrierScoringFunctionFactory;
 	}
 

@@ -29,8 +29,7 @@ public class TourBuilder {
 
 	private boolean previousElementIsActivity;
 
-	public void scheduleStart(Id startLinkId, double earliestDeparture,
-			double latestDeparture) {
+	public void scheduleStart(Id startLinkId, double earliestDeparture, double latestDeparture) {
 		this.startLinkId = startLinkId;
 		this.earliestDeparture = earliestDeparture;
 		this.latestDeparture = latestDeparture;
@@ -50,6 +49,16 @@ public class TourBuilder {
 		}
 		tourElements.add(leg);
 		previousElementIsActivity = false;
+	}
+	
+	public void addLegAtBeginning(Leg leg) {
+		assertIsNotNull(leg);
+//		if (!previousElementIsActivity) {
+//			throw new RuntimeException(
+//					"cannot add leg, since last tour element is not an activity.");
+//		}
+		tourElements.add(0,leg);
+//		previousElementIsActivity = false;
 	}
 
 	private void assertIsNotNull(Object o) {
@@ -71,6 +80,19 @@ public class TourBuilder {
 		pickup.setExpectedActEnd(end_time);
 		tourElements.add(pickup);
 		previousElementIsActivity = true;
+	}
+	
+	public void schedulePickupAtBeginning(CarrierShipment shipment) {
+		assertIsNotNull(shipment);
+		boolean wasNew = openPickups.add(shipment);
+		if (!wasNew) {
+			throw new RuntimeException(
+					"Trying to deliver something which was already picked up.");
+		}
+//		assertLastElementIsLeg();
+		Pickup pickup = createPickup(shipment);
+		tourElements.add(0, pickup);
+//		previousElementIsActivity = true;
 	}
 
 	public void schedulePickup(CarrierShipment shipment) {
@@ -138,10 +160,8 @@ public class TourBuilder {
 		return new Leg();
 	}
 
-	public NetworkRoute createRoute(Id startLinkId, List<Id> linkIds,
-			Id endLinkId) {
-		LinkNetworkRouteImpl linkNetworkRouteImpl = new LinkNetworkRouteImpl(
-				startLinkId, endLinkId);
+	public NetworkRoute createRoute(Id startLinkId, List<Id> linkIds, Id endLinkId) {
+		LinkNetworkRouteImpl linkNetworkRouteImpl = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 		if (linkIds != null && !linkIds.isEmpty()) {
 			linkNetworkRouteImpl.setLinkIds(startLinkId, linkIds, endLinkId);
 		}

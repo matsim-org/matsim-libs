@@ -10,56 +10,69 @@ import org.matsim.core.basic.v01.IdImpl;
 
 public class CarrierFactory {
 
+	@Deprecated
 	public Carrier createCarrier(String carrierId, String linkId) {
 		return new CarrierImpl(createId(carrierId), createId(linkId));
 	}
 
+	@Deprecated
 	public CarrierVehicle createVehicle(Id vehicleId, Id linkId) {
 		return new CarrierVehicle(vehicleId, linkId);
 	}
 
+	@Deprecated
 	public CarrierShipment createShipment(Id from, Id to, int size,TimeWindow pickupTW, TimeWindow deliveryTW) {
 		return new CarrierShipment(from, to, size, pickupTW, deliveryTW);
 	}
 
+	@Deprecated
 	public CarrierShipment createShipment(String from, String to, int size,double pickupStart, double pickupEnd, double deliveryStart,double deliveryEnd) {
 		return createShipment(createId(from), createId(to), size,createTimeWindow(pickupStart, pickupEnd),createTimeWindow(deliveryStart, deliveryEnd));
 	}
 
+	@Deprecated
 	public TimeWindow createTimeWindow(double start, double end) {
 		return new TimeWindow(start, end);
 	}
 
+	@Deprecated
 	public CarrierCapabilities createCapabilities() {
 		return new CarrierCapabilities();
 	}
 
+	@Deprecated
 	public ScheduledTour createScheduledTour(Tour tour, CarrierVehicle vehicle,double departureTime) {
 		return new ScheduledTour(tour, vehicle, departureTime);
 	}
 
+	@Deprecated
 	public TourBuilder createTourBuilder() {
 		return new TourBuilder();
 	}
 
+	@Deprecated
 	public Carriers createCarriers() {
 		return new Carriers();
 	}
 
+	@Deprecated
 	public Id createId(String id) {
 		return new IdImpl(id);
 	}
 
+	@Deprecated
 	public CarrierPlan createPlan(Carrier carrier, Collection<ScheduledTour> sTours) {
 		return new CarrierPlan(carrier, sTours);
 	}
 
+	@Deprecated
 	public CarrierVehicleType createVehicleType(String id, double fix,double costPerTimeUnit, double costPerDistanceUnit) {
 		CarrierVehicleType t = new CarrierVehicleType(createId(id));
 		t.setVehicleCostParams(new VehicleCostInformation(fix,costPerDistanceUnit, costPerTimeUnit));
 		return t;
 	}
 
+	@Deprecated
 	public CarrierVehicle createVehicle(String vehicleId,String vehicleLocationId, int vehicleCapacity,CarrierVehicleType vehicleType) {
 		CarrierVehicle vehicle = new CarrierVehicle(createId(vehicleId),createId(vehicleLocationId));
 		vehicle.setCapacity(vehicleCapacity);
@@ -68,6 +81,7 @@ public class CarrierFactory {
 		return vehicle;
 	}
 
+	@Deprecated
 	public CarrierVehicle createAndAddVehicle(Carrier carrier,String vehicleId, String vehicleLocationId, int vehicleCapacity,String type, double earliestOperationStart,double latestOperationEnd) {
 		CarrierVehicle v = createAndAddVehicle(carrier, vehicleId,vehicleLocationId, vehicleCapacity, type);
 		v.setEarliestStartTime(earliestOperationStart);
@@ -75,6 +89,7 @@ public class CarrierFactory {
 		return v;
 	}
 
+	
 	public CarrierVehicle createAndAddVehicle(Carrier carrier,String vehicleId, String vehicleLocationId, int vehicleCapacity,String type) {
 		CarrierVehicle vehicle = new CarrierVehicle(createId(vehicleId),createId(vehicleLocationId));
 		vehicle.setCapacity(vehicleCapacity);
