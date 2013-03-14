@@ -335,7 +335,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final double minimalWeightToObtain) {
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 		final PersonRecord currentPerson = personsStillToAllocate.get(0);
-		tagJointPlansOfPersonAsInfeasible(
+		// the joint plans implying this person will be considered "selectable"
+		// only when considering this joint plan as being selected for currentPerson
+		tagLinkedPlansOfPersonAsInfeasible(
 				currentPerson,
 				feasibilityChanger);
 
@@ -354,19 +356,24 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		final List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 		for (PlanRecord r : records) {
-			if ( r.jointPlan != null ) {
-				tagJointPlansOfPartnersAsInfeasible(
+			if ( r.isStillFeasible ) {
+				tagLinkedPlansOfPartnersAsInfeasible(
 						r,
 						localFeasibilityChanger);
+				r.cachedMaximumWeight = exploreAll ?
+					Double.POSITIVE_INFINITY :
+					alreadyAllocatedWeight +
+						getMaxWeightFromPersons(
+								r,
+								str,
+								remainingPersons );
+				localFeasibilityChanger.resetFeasibilities();
 			}
-			r.cachedMaximumWeight = exploreAll ?
-				Double.POSITIVE_INFINITY :
-				alreadyAllocatedWeight +
-					getMaxWeightFromPersons(
-							r,
-							str,
-							remainingPersons );
-			localFeasibilityChanger.resetFeasibilities();
+			else {
+				r.cachedMaximumWeight = exploreAll ?
+					Double.POSITIVE_INFINITY :
+					Double.NEGATIVE_INFINITY;
+			}
 		}
 
 		// Sort in decreasing order of upper bound: we can stop as soon
@@ -431,7 +438,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				tail = getOtherPlansAsString( r , tail);
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 
-				tagJointPlansOfPartnersAsInfeasible(
+				tagLinkedPlansOfPartnersAsInfeasible(
 						r,
 						localFeasibilityChanger);
 			}
@@ -475,7 +482,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return constructedString;
 	}
 
-	private static void tagJointPlansOfPersonAsInfeasible(
+	private static void tagLinkedPlansOfPersonAsInfeasible(
 			final PersonRecord person,
 			final FeasibilityChanger changer) {
 		for ( PlanRecord pr : person.plans ) {
@@ -486,13 +493,13 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		}
 	}
 
-	private static void tagJointPlansOfPartnersAsInfeasible(
+	private static void tagLinkedPlansOfPartnersAsInfeasible(
 			final PlanRecord r,
 			final FeasibilityChanger changer) {
-		if ( r.jointPlan == null ) return;
+		assert !r.linkedPlans.contains( r );
 		for ( PlanRecord linkedPlan : r.linkedPlans ) {
 			final PersonRecord cotrav = linkedPlan.person;
-			tagJointPlansOfPersonAsInfeasible( cotrav , changer );
+			tagLinkedPlansOfPersonAsInfeasible( cotrav , changer );
 		}
 	}
 
