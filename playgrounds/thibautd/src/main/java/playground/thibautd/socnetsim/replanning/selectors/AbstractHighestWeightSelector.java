@@ -149,6 +149,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 		}
 
+		final Map<JointPlan, Collection<PlanRecord>> recordsPerJp = new HashMap<JointPlan, Collection<PlanRecord>>();
 		for (Person person : group.getPersons()) {
 			final LinkedList<PlanRecord> plans = new LinkedList<PlanRecord>();
 			for (Plan plan : person.getPlans()) {
@@ -163,17 +164,36 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 					w /= jp.getIndividualPlans().size();
 				}
 				
-				plans.add( new PlanRecord(
+				final PlanRecord r = new PlanRecord(
 							plan,
 							jp,
-							w));
+							w);
+				plans.add( r );
+				if ( jp != null ) {
+					Collection<PlanRecord> rs = recordsPerJp.get( jp );
+					if ( rs == null ) {
+						rs = new ArrayList<PlanRecord>();
+						recordsPerJp.put( jp , rs );
+					}
+					rs.add( r );
+				}
 			}
+			final PersonRecord pr = new PersonRecord( person , plans );
 			map.put(
 					person.getId(),
-					new PersonRecord( person , plans ) );
+					pr );
+			for ( PlanRecord p : plans ) {
+				p.person = pr;
+			}
 		}
 
 		for (PersonRecord personRecord : map.values()) {
+			for ( PlanRecord pr : personRecord.plans ) {
+				if ( pr.jointPlan == null ) continue;
+				pr.linkedPlans.addAll( recordsPerJp.get( pr.jointPlan ) );
+				pr.linkedPlans.remove( pr );
+			}
+
 			Collections.sort(
 					personRecord.plans,
 					new Comparator<PlanRecord>() {
@@ -203,7 +223,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			count++;
 			final PlanString allocation = buildPlanString(
 				forbiden,
-				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
 				null,
 				Double.NEGATIVE_INFINITY);
@@ -326,14 +345,12 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	 */
 	private PlanString buildPlanString(
 			final ForbidenCombinations forbidenCombinations,
-			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate,
 			final PlanString str,
 			final double minimalWeightToObtain) {
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 		final PersonRecord currentPerson = personsStillToAllocate.get(0);
 		tagJointPlansOfPersonAsInfeasible(
-				allPersonsRecord,
 				currentPerson,
 				feasibilityChanger);
 
@@ -358,7 +375,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		for (PlanRecord r : records) {
 			if ( r.jointPlan != null ) {
 				tagJointPlansOfPartnersAsInfeasible(
-						allPersonsRecord,
 						r,
 						localFeasibilityChanger);
 			}
@@ -441,11 +457,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				//if ( intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons ) ) continue;
 				// impossible if "isStillPossible" correctly implemented
 				assert !intersect( r.jointPlan.getIndividualPlans().keySet() , str );
-				tail = getOtherPlansAsString( r , allPersonsRecord , tail);
+				tail = getOtherPlansAsString( r , tail);
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 
 				tagJointPlansOfPartnersAsInfeasible(
-						allPersonsRecord,
 						r,
 						localFeasibilityChanger);
 			}
@@ -455,7 +470,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			if ( !actuallyRemainingPersons.isEmpty() ) {
 				newString = buildPlanString(
 						forbidenCombinations,
-						allPersonsRecord,
 						actuallyRemainingPersons,
 						new PlanString( r , tail ),
 						Math.max(
@@ -496,39 +510,35 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	}
 
 	private static void tagJointPlansOfPersonAsInfeasible(
-			final Map<Id, PersonRecord> allPersonsRecord,
 			final PersonRecord person,
 			final FeasibilityChanger changer) {
 		for ( PlanRecord pr : person.plans ) {
 			if ( pr.jointPlan == null ) continue;
-			for ( Plan p : pr.jointPlan.getIndividualPlans().values() ) {
-				if ( p.getPerson() == person.person ) continue;
-				changer.markInfeasible( allPersonsRecord.get( p.getPerson().getId() ).getRecord( p ) );
+			for ( PlanRecord p : pr.linkedPlans ) {
+				changer.markInfeasible( p );
 			}
 		}
 	}
 
 	private static void tagJointPlansOfPartnersAsInfeasible(
-			final Map<Id, PersonRecord> allPersonsRecord,
 			final PlanRecord r,
 			final FeasibilityChanger changer) {
+		if ( r.jointPlan == null ) return;
 		final Id ego = r.plan.getPerson().getId();
-		for ( Id cotravId : r.jointPlan.getIndividualPlans().keySet() ) {
-			if ( ego.equals( cotravId ) ) continue;
-			final PersonRecord cotrav = allPersonsRecord.get( cotravId );
+		for ( PlanRecord linkedPlan : r.linkedPlans ) {
+			final PersonRecord cotrav = linkedPlan.person;
 			for ( PlanRecord pr : cotrav.plans ) {
 				if ( pr.jointPlan == null ) continue;
-				for ( Id linkedId : pr.jointPlan.getIndividualPlans().keySet() ) {
-					if ( linkedId.equals( cotravId ) ) continue;
-					if ( linkedId.equals( ego ) ) continue;
-					final PersonRecord linkedPerson = allPersonsRecord.get( linkedId );
-					for ( PlanRecord linkedpr : linkedPerson.plans ) {
-						if ( linkedpr.isStillFeasible &&
-								linkedpr.jointPlan != null &&
+				for ( PlanRecord colinkedPlan : pr.linkedPlans ) {
+					if ( colinkedPlan.person.person.getId().equals( ego ) ) continue;
+					final PersonRecord colinkedPerson = colinkedPlan.person;
+					for ( PlanRecord colinkedpr : colinkedPerson.plans ) {
+						if ( colinkedpr.isStillFeasible &&
+								colinkedpr.jointPlan != null &&
 								intersect(
-									linkedpr.jointPlan.getIndividualPlans().keySet() ,
+									colinkedpr.jointPlan.getIndividualPlans().keySet() ,
 									r.jointPlan.getIndividualPlans().keySet() )) {
-							changer.markInfeasible( linkedpr );
+							changer.markInfeasible( colinkedpr );
 						}
 					}
 				}
@@ -632,16 +642,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 	private static PlanString getOtherPlansAsString(
 			final PlanRecord r,
-			final Map<Id, PersonRecord> allPersonsRecords,
 			final PlanString additionalTail) {
 		PlanString str = additionalTail;
 
-		for (Plan p : r.jointPlan.getIndividualPlans().values()) {
-			if (p == r.plan) continue;
-
-			str = new PlanString(
-					allPersonsRecords.get( p.getPerson().getId() ).getRecord( p ),
-					str);
+		for (PlanRecord p : r.linkedPlans) {
+			str = new PlanString( p , str );
 		}
 
 		return str;
@@ -744,12 +749,17 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	}
 
 	private static class PlanRecord {
+		PersonRecord person;
 		final Plan plan;
 		/**
 		 * The joint plan to which pertains the individual plan,
 		 * if any.
 		 */
 		final JointPlan jointPlan;
+		/**
+		 * the plan records corresponding to the other plans in the joint plan
+		 */
+		final Collection<PlanRecord> linkedPlans = new HashSet<PlanRecord>();
 		final double avgJointPlanWeight;
 		double cachedMaximumWeight = Double.NaN;
 		// true if all partners are still unallocated
