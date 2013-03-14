@@ -30,7 +30,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
 
@@ -38,7 +39,7 @@ import playground.thibautd.socnetsim.population.DriverRoute;
  * Checks driver routes, in case only passengers were provided in the plan file
  * @author thibautd
  */
-public class ImportedJointRoutesChecker extends AbstractPersonAlgorithm {
+public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorithm {
 	private final TripRouter router;
 
 	public ImportedJointRoutesChecker(final TripRouter router) {
@@ -47,38 +48,43 @@ public class ImportedJointRoutesChecker extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(final Person person) {
-		for (Plan plan : person.getPlans()) {
-			Iterator<PlanElement> pes = plan.getPlanElements().iterator();
+		for ( Plan plan : person.getPlans() ) {
+			run( plan );
+		}
+	}
 
-			Activity origin = (Activity) pes.next();
-			double now = 0;
-			while (pes.hasNext()) {
-				// FIXME: relies on the assumption of strict alternance leg/act
-				Leg l = (Leg) pes.next();
-				Activity dest = (Activity) pes.next();
+	@Override
+	public void run(final Plan plan) {
+		Iterator<PlanElement> pes = plan.getPlanElements().iterator();
 
-				now = updateTime( now , origin );
-				if (l.getRoute() != null && l.getRoute() instanceof DriverRoute) {
-					List<? extends PlanElement> trip =
-						router.calcRoute(
-								l.getMode(),
-								new ActivityWrapperFacility( origin ),
-								new ActivityWrapperFacility( dest ),
-								now,
-								person);
+		Activity origin = (Activity) pes.next();
+		double now = 0;
+		while (pes.hasNext()) {
+			// FIXME: relies on the assumption of strict alternance leg/act
+			Leg l = (Leg) pes.next();
+			Activity dest = (Activity) pes.next();
 
-					if (trip.size() != 1) {
-						throw new RuntimeException( "unexpected trip length "+trip.size()+" for "+trip+" for mode "+l.getMode());
-					}
+			now = updateTime( now , origin );
+			if (l.getRoute() != null && l.getRoute() instanceof DriverRoute) {
+				List<? extends PlanElement> trip =
+					router.calcRoute(
+							l.getMode(),
+							new ActivityWrapperFacility( origin ),
+							new ActivityWrapperFacility( dest ),
+							now,
+							plan.getPerson());
 
-					DriverRoute newRoute = (DriverRoute) ((Leg) trip.get( 0 )).getRoute();
-					newRoute.setPassengerIds( ((DriverRoute) l.getRoute()).getPassengersIds() );
-					l.setRoute( newRoute );
+				if (trip.size() != 1) {
+					throw new RuntimeException( "unexpected trip length "+trip.size()+" for "+trip+" for mode "+l.getMode());
 				}
 
-				now = updateTime( now , l );
-				origin = dest;
+				DriverRoute newRoute = (DriverRoute) ((Leg) trip.get( 0 )).getRoute();
+				newRoute.setPassengerIds( ((DriverRoute) l.getRoute()).getPassengersIds() );
+				l.setRoute( newRoute );
 			}
+
+			now = updateTime( now , l );
+			origin = dest;
 		}
 	}
 
