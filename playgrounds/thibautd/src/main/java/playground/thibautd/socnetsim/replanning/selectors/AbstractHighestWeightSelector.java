@@ -332,7 +332,16 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final Set<Id> alreadyAllocatedPersons,
 			final PlanString str,
 			final double minimalWeightToObtain) {
+		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 		final PersonRecord currentPerson = personsStillToAllocate.get(0);
+		// tag all other joint plans of the current agent as impossible
+		for ( PlanRecord pr : currentPerson.plans ) {
+			if ( pr.jointPlan == null ) continue;
+			for ( Plan p : pr.jointPlan.getIndividualPlans().values() ) {
+				if ( p.getPerson() == currentPerson.person ) continue;
+				feasibilityChanger.markInfeasible( allPersonsRecord.get( p.getPerson().getId() ).getRecord( p ) );
+			}
+		}
 
 		assert !alreadyAllocatedPersons.contains( currentPerson.person.getId() ) :
 			"still to allocate: "+personsStillToAllocate+
@@ -411,6 +420,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				break;
 			}
 
+			if (!r.isStillFeasible) {
+				assert intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons );
+				continue;
+			}
+
 			final Set<Id> cotravelers = r.jointPlan == null ? null : r.jointPlan.getIndividualPlans().keySet();
 			if ( knownBranches.isExplored( cotravelers ) ) continue;
 			// if we find something, it is the best given the joint structure
@@ -420,6 +434,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			// will not change anything.
 			knownBranches.tagAsExplored( cotravelers );
 
+			final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 			PlanString tail = str;
 			// TODO: find a better way to filter persons (should be
 			// possible in PlanString), ie without having to create new collections
@@ -430,12 +445,36 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				// normally, it is impossible that it is always the case if there
 				// is a valid plan: a branch were this would be the case would
 				// have a infinitely negative weight and not explored.
-				if ( intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons ) ) continue;
+				//if ( intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons ) ) continue;
+				// impossible if "isStillPossible" correctly implemented
+				assert !intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons );
 				tail = getOtherPlansAsString( r , allPersonsRecord , tail);
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 				actuallyAllocatedPersons = new HashSet<Id>( newAllocatedPersons );
 				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
+
+				// tag all joint plans containing agents in the joint plan to select
+				// as infeasible
+				for ( Id cotravId : r.jointPlan.getIndividualPlans().keySet() ) {
+					final PersonRecord cotrav = allPersonsRecord.get( cotravId );
+					for ( PlanRecord pr : cotrav.plans ) {
+						if ( pr.jointPlan == null ) continue;
+						for ( Id linkedId : pr.jointPlan.getIndividualPlans().keySet() ) {
+							final PersonRecord linkedPerson = allPersonsRecord.get( linkedId );
+							for ( PlanRecord linkedpr : linkedPerson.plans ) {
+								if ( linkedpr.isStillFeasible &&
+										linkedpr.jointPlan != null &&
+										intersect(
+											linkedpr.jointPlan.getIndividualPlans().keySet() ,
+											r.jointPlan.getIndividualPlans().keySet() )) {
+									localFeasibilityChanger.markInfeasible( linkedpr );
+								}
+							}
+						}
+					}
+				}
 			}
+
 
 			PlanString newString;
 			if ( !actuallyRemainingPersons.isEmpty() ) {
@@ -461,6 +500,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 					newString = null;
 				}
 			}
+			localFeasibilityChanger.resetFeasibilities();
 
 			if (newString == null) continue;
 
@@ -477,6 +517,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 		}
 
+		feasibilityChanger.resetFeasibilities();
 		return constructedString;
 	}
 
@@ -539,10 +580,14 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
 
+			if ( !plan.isStillFeasible ) {
+				assert intersect( plan.jointPlan.getIndividualPlans().keySet() , personsSelected );
+				continue;
+			}
 			if (plan.jointPlan == null) return plan.avgJointPlanWeight;
 
 			// skip this plan if its participants already have a plan
-			if (intersect( plan.jointPlan.getIndividualPlans().keySet() , personsSelected )) continue;
+			assert !intersect( plan.jointPlan.getIndividualPlans().keySet() , personsSelected );
 			if (intersect( plan.jointPlan.getIndividualPlans().keySet() , idsInJpToSelect )) continue;
 			return plan.avgJointPlanWeight;
 		}
@@ -675,6 +720,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		final JointPlan jointPlan;
 		final double avgJointPlanWeight;
 		double cachedMaximumWeight = Double.NaN;
+		// true if all partners are still unallocated
+		boolean isStillFeasible = true;
 
 		public PlanRecord(
 				final Plan plan,
@@ -754,6 +801,20 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		public boolean isExplored(final Set<Id> branch) {
 			return prune && branches.contains( branch );
+		}
+	}
+
+	private static class FeasibilityChanger {
+		private final List<PlanRecord> changedRecords = new ArrayList<PlanRecord>();
+
+		public void markInfeasible( final PlanRecord r ) {
+			if ( r.isStillFeasible ) changedRecords.add( r );
+			r.isStillFeasible = false;
+		}
+
+		public void resetFeasibilities() {
+			for ( PlanRecord r : changedRecords ) r.isStillFeasible = true;
+			changedRecords.clear();
 		}
 	}
 }
