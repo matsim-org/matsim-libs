@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -50,9 +49,6 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
  * @author thibautd
  */
 public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSelector {
-	private static final Logger log =
-		Logger.getLogger(AbstractHighestWeightSelector.class);
-
 	private static final double EPSILON = 1E-7;
 	private final boolean forbidBlockingCombinations;
 	private final boolean pruneSimilarBranches;
@@ -91,12 +87,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	public final GroupPlans selectPlans(
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		if (log.isTraceEnabled()) log.trace( "handling group "+group );
 		Map<Id, PersonRecord> personRecords = getPersonRecords( jointPlans , group );
 
 		GroupPlans allocation = selectPlans( personRecords );
 
-		if (log.isTraceEnabled()) log.trace( "returning allocation "+allocation );
 		return allocation;
 	}
 
@@ -244,20 +238,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final GroupPlans allocation) {
 		if ( !forbidBlockingCombinations ) return false;
 
-		if (log.isTraceEnabled()) log.trace( "checking if need to continue" );
 		assert !forbiden.isForbidden( allocation ) : "forbidden combination was re-examined";
 
 		if (isBlocking( personRecords, allocation )) {
-			if (log.isTraceEnabled()) {
-				log.trace( allocation+" is blocking" );
-			}
-
 			forbiden.forbid( allocation );
 			return true;
-		}
-
-		if (log.isTraceEnabled()) {
-			log.trace( allocation+" is not blocking" );
 		}
 
 		return false;
@@ -355,10 +340,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				feasibilityChanger);
 
 		assert str == null || !str.containsPerson( currentPerson.person.getId() );
-		if (log.isTraceEnabled()) {
-			log.trace( "looking at person "+currentPerson.person.getId()+
-					" with already selected "+str );
-		}
 
 		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
@@ -417,20 +398,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			if (!exploreAll &&
 					constructedString != null &&
 					r.cachedMaximumWeight <= constructedString.getWeight()) {
-				if (log.isTraceEnabled()) {
-					log.trace( "maximum weight from now on: "+r.cachedMaximumWeight );
-					log.trace( "weight obtained: "+constructedString.getWeight() );
-					log.trace( " => CUTOFF by upper bound" );
-				}
 				break;
 			}
 
 			if (!exploreAll && r.cachedMaximumWeight < minimalWeightToObtain) {
-				if (log.isTraceEnabled()) {
-					log.trace( "maximum weight from now on: "+r.cachedMaximumWeight );
-					log.trace( "minimum weight to obtain: "+minimalWeightToObtain );
-					log.trace( " => CUTOFF by lower bound" );
-				}
 				break;
 			}
 
@@ -484,7 +455,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				if ( forbidBlockingCombinations && forbidenCombinations.isForbidden( newString ) ) {
 					// we are on a leaf (ie a full plan).
 					// If some combinations are forbidden, check if this one is.
-					if ( log.isTraceEnabled() ) log.trace( "skipping forbiden string "+newString );
 					newString = null;
 				}
 			}
@@ -498,10 +468,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			if (constructedString == null ||
 					newString.getWeight() > constructedString.getWeight()) {
 				constructedString = newString;
-				if (log.isTraceEnabled()) log.trace( "new string "+constructedString+" with weight "+constructedString.getWeight() );
-			}
-			else if (log.isTraceEnabled()) {
-				log.trace( "string "+newString+" with weight "+newString.getWeight()+" did not improve" );
 			}
 		}
 
@@ -567,11 +533,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 					planToSelect , string ,
 					// actually useful:
 					record , jointPlanToSelect );
-			if (log.isTraceEnabled()) {
-				log.trace( "estimated max weight for person "+
-						record.person.getId()+
-						" is "+max );
-			}
 			// if negative, no need to continue
 			// moreover, returning here makes sure the branch has infinitely negative
 			// weight, even if plans in it have infinitely positive weights
