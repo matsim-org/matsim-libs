@@ -414,6 +414,12 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 			final Set<Id> cotravelers = r.jointPlan == null ? null : r.jointPlan.getIndividualPlans().keySet();
 			if ( knownBranches.isExplored( cotravelers ) ) continue;
+			// if we find something, it is the best given the joint structure
+			// (plans are sorted by avg joint plan weight): do not search more
+			// for this particular structure.
+			// If we do not find anything, trying again with the same structure
+			// will not change anything.
+			knownBranches.tagAsExplored( cotravelers );
 
 			PlanString tail = str;
 			// TODO: find a better way to filter persons (should be
@@ -445,12 +451,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 							constructedString != null ?
 								constructedString.getWeight() - EPSILON :
 								Double.NEGATIVE_INFINITY));
-				// if we found something, it is the best given the joint structure
-				// (plans are sorted by avg joint plan weight): do not search more
-				// for this particular structure.
-				// If we did not found something, trying again with the same structure
-				// will not change anything.
-				knownBranches.tagAsExplored( cotravelers );
 			}
 			else {
 				newString = new PlanString( r , tail );
