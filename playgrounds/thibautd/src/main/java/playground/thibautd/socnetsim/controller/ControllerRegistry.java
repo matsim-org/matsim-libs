@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -34,6 +35,8 @@ import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -175,6 +178,38 @@ public final class ControllerRegistry {
 
 	public PlanRoutingAlgorithmFactory getPlanRoutingAlgorithmFactory() {
 		return planRoutingAlgorithmFactory;
+	}
+
+	// XXX ouch... if this thing starts to provide factory methods, not sure it is a "registry"...
+	public ReplanningContext createReplanningContext(final int iter) {
+		return new ReplanningContext() {
+			@Override
+			public TripRouterFactory getTripRouterFactory() {
+				return getTripRouterFactory();
+			}
+
+			@Override
+			public TravelDisutility getTravelCostCalculator() {
+				return getTravelDisutilityFactory().createTravelDisutility(
+					getTravelTime().getLinkTravelTimes(),
+					getScenario().getConfig().planCalcScore() );
+			}
+
+			@Override
+			public TravelTime getTravelTimeCalculator() {
+				return getTravelTime().getLinkTravelTimes();
+			}
+
+			@Override
+			public ScoringFunctionFactory getScoringFunctionFactory() {
+				return getScoringFunctionFactory();
+			}
+
+			@Override
+			public int getIteration() {
+				return iter;
+			}
+		};
 	}
 }
 
