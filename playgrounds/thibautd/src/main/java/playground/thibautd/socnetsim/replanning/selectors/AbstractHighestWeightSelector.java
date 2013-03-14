@@ -490,25 +490,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final PlanRecord r,
 			final FeasibilityChanger changer) {
 		if ( r.jointPlan == null ) return;
-		final Id ego = r.plan.getPerson().getId();
 		for ( PlanRecord linkedPlan : r.linkedPlans ) {
 			final PersonRecord cotrav = linkedPlan.person;
-			for ( PlanRecord pr : cotrav.plans ) {
-				if ( pr.jointPlan == null ) continue;
-				for ( PlanRecord colinkedPlan : pr.linkedPlans ) {
-					if ( colinkedPlan.person.person.getId().equals( ego ) ) continue;
-					final PersonRecord colinkedPerson = colinkedPlan.person;
-					for ( PlanRecord colinkedpr : colinkedPerson.plans ) {
-						if ( colinkedpr.isStillFeasible &&
-								colinkedpr.jointPlan != null &&
-								intersect(
-									colinkedpr.jointPlan.getIndividualPlans().keySet() ,
-									r.jointPlan.getIndividualPlans().keySet() )) {
-							changer.markInfeasible( colinkedpr );
-						}
-					}
-				}
-			}
+			tagJointPlansOfPersonAsInfeasible( cotrav , changer );
 		}
 	}
 
