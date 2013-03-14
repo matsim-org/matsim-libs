@@ -65,11 +65,21 @@ public class PlanRouterWithVehicleRessourcesTest {
 		person.addPlan( plan );
 		plan.setPerson( person );
 
-		final Activity firstAct = factory.createActivityFromLinkId( "h" , linkId );
+		final Activity firstAct = factory.createActivityFromLinkId( "first" , linkId );
 		plan.addActivity( firstAct );
 		firstAct.setEndTime( 223 );
+
 		plan.addLeg( factory.createLeg( TransportMode.car ) );
-		plan.addActivity( factory.createActivityFromLinkId( "h" , linkId ) );
+
+		final Activity secondAct = factory.createActivityFromLinkId( "second" , linkId );
+		plan.addActivity( secondAct );
+		secondAct.setEndTime( 2012 );
+
+		final Leg secondLeg = factory.createLeg( TransportMode.car );
+		plan.addLeg( secondLeg );
+		secondLeg.setRoute( new LinkNetworkRouteImpl( linkId , Collections.<Id>emptyList(), linkId ) );
+
+		plan.addActivity( factory.createActivityFromLinkId( "third" , linkId ) );
 
 		final TripRouter tripRouter = createTripRouter( factory );
 
@@ -83,7 +93,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 		for ( Trip trip : TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() ) ) {
 			for (Leg l : trip.getLegsOnly()) {
 				assertEquals(
-					"unexpected vehicle id",
+					"unexpected vehicle id in "+trip,
 					personId,
 					((NetworkRoute) l.getRoute()).getVehicleId());
 			}
