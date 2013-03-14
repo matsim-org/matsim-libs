@@ -5,6 +5,7 @@ package playground.pieter.singapore.hits;
 //import java.util.List;
 //import java.util.TimeZone;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -74,6 +75,8 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
+
+import others.sergioo.util.dataBase.DataBaseAdmin;
 
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra;
 import playground.sergioo.hitsRouter2013.TransitRouterVariableImpl;
@@ -414,8 +417,8 @@ public class HITSAnalyser {
 				System.out
 						.println("Starting summary : " + new java.util.Date());
 				Statement s = conn.createStatement();
-				s.execute("DROP TABLE IF EXISTS trip_summary;");
-				s.execute("CREATE TABLE trip_summary (pax_idx VARCHAR(45), trip_idx VARCHAR(45),    "
+				s.execute("DROP TABLE IF EXISTS trip_summary_routed;");
+				s.execute("CREATE TABLE trip_summary_routed (pax_idx VARCHAR(45), trip_idx VARCHAR(45),    "
 						+ "totalWalkTime int,  totalTravelTime int, estTravelTime int, tripcount int, "
 						+ "invehtime int, freeCarDistance double, calcEstTripTime double, mainmode varchar(20), "
 						+ "timeperiod varchar(2), busDistance double, trainDistance double, "
@@ -597,7 +600,7 @@ public class HITSAnalyser {
 							timeperiod = "PM";
 
 						insertString = String
-								.format("INSERT INTO trip_summary VALUES(\'%s\',\'%s\',%d,%d,%d,%d,%d,%f,%f,\'%s\',\'%s\',%f,%f,%f,%f,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f);",
+								.format("INSERT INTO trip_summary_routed VALUES(\'%s\',\'%s\',%d,%d,%d,%d,%d,%f,%f,\'%s\',\'%s\',%f,%f,%f,%f,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f);",
 										pax_idx, trip_idx, t.totalWalkTimeTrip,
 										t.calculatedJourneyTime,
 										t.estimatedJourneyTime, tripcount,
@@ -967,13 +970,9 @@ public class HITSAnalyser {
 		System.out.println(new java.util.Date());
 		HITSAnalyser hp;
 		System.out.println(args[0].equals("sql"));
-		String fileName = "f:/temp/serial";
-		Connection conn = null;
-		String userName = "root";
-		String password = "kosirosi";
-		String url = "jdbc:mysql://localhost:3306/hits";
-		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		conn = DriverManager.getConnection(url, userName, password);
+		String fileName = "data/serial";
+		DataBaseAdmin dba = new DataBaseAdmin(new File("data/hitsdb.properties"));
+		Connection conn = dba.getConnection();
 		System.out.println("Database connection established");
 		HITSAnalyser.setConn(conn);
 		HITSAnalyser.initXrefs();
