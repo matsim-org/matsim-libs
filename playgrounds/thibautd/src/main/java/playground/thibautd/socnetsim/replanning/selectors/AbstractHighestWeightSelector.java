@@ -289,7 +289,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			Set<Id> actuallyAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
 			actuallyAllocatedPersons.add( currentPerson.person.getId() );
 			if (r.jointPlan != null) {
-				if ( contains( r.jointPlan , alreadyAllocatedPersons ) ) continue;
+				if ( intersect( r.jointPlan.getIndividualPlans().keySet(), alreadyAllocatedPersons ) ) continue;
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 				actuallyAllocatedPersons = new HashSet<Id>( actuallyAllocatedPersons );
 				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
@@ -431,7 +431,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				// normally, it is impossible that it is always the case if there
 				// is a valid plan: a branch were this would be the case would
 				// have a infinitely negative weight and not explored.
-				if ( contains( r.jointPlan , alreadyAllocatedPersons ) ) continue;
+				if ( intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons ) ) continue;
 				tail = getOtherPlansAsString( r , allPersonsRecord , tail);
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 				actuallyAllocatedPersons = new HashSet<Id>( newAllocatedPersons );
@@ -543,8 +543,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			if (plan.jointPlan == null) return plan.avgJointPlanWeight;
 
 			// skip this plan if its participants already have a plan
-			if (contains( plan.jointPlan , personsSelected )) continue;
-			if (contains( plan.jointPlan , idsInJpToSelect )) continue;
+			if (intersect( plan.jointPlan.getIndividualPlans().keySet() , personsSelected )) continue;
+			if (intersect( plan.jointPlan.getIndividualPlans().keySet() , idsInJpToSelect )) continue;
 			return plan.avgJointPlanWeight;
 		}
 
@@ -586,12 +586,22 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return str;
 	}
 
-	private static boolean contains(
-			final JointPlan jp,
-			final Collection<Id> personsSelected) {
-		for (Id id : personsSelected) {
-			if (jp.getIndividualPlans().containsKey( id )) return true;
+	private static boolean intersect(
+			final Collection<Id> ids1,
+			final Collection<Id> ids2) {
+		final boolean moreIn1 = ids1.size() > ids2.size();
+
+		// iterate over the smaller of the collections.
+		// normally, the collections are HashSets, so that
+		// contains is O(1): this can improve running time a lot
+		// (from several minutes to a few seconds for plan removal!).
+		final Collection<Id> iterated = moreIn1 ? ids2 : ids1;
+		final Collection<Id> tested = moreIn1 ? ids1 : ids2;
+
+		for (Id id : iterated) {
+			if ( tested.contains( id ) ) return true;
 		}
+
 		return false;
 	}
 
