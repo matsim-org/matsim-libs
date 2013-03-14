@@ -268,7 +268,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
 			Collections.<PersonRecord> emptyList();
 
-		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
+		final List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 
 		final KnownBranches knownBranches = new KnownBranches( pruneSimilarBranches );
 		for (PlanRecord r : records) {
@@ -284,6 +284,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 			final Set<Id> cotravelers = r.jointPlan == null ? null : r.jointPlan.getIndividualPlans().keySet();
 			if ( knownBranches.isExplored( cotravelers ) ) continue;
+			// if we do not find anything here, it is impossible to find allowed
+			// plans with the remaining agents. No need to re-explore.
+			knownBranches.tagAsExplored( cotravelers );
 
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			Set<Id> actuallyAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
@@ -291,7 +294,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			if (r.jointPlan != null) {
 				if ( intersect( r.jointPlan.getIndividualPlans().keySet(), alreadyAllocatedPersons ) ) continue;
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
-				actuallyAllocatedPersons = new HashSet<Id>( actuallyAllocatedPersons );
 				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
 			}
 
@@ -302,9 +304,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 						actuallyRemainingPersons,
 						actuallyAllocatedPersons);
 				if (found) return true;
-				// if we are here, it is impossible to find allowed plans with the remaining
-				// agents. No need to re-explore.
-				knownBranches.tagAsExplored( cotravelers );
 			}
 			else {
 				return true;
