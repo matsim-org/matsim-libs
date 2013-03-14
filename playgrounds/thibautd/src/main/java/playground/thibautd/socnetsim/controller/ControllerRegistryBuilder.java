@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.controller;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.population.Person;
@@ -64,6 +65,8 @@ public class ControllerRegistryBuilder {
 	private final Scenario scenario;
 	private final EventsManager events;
 	private final CalcLegTimes legTimes;
+	private final LinkedList<GenericPlanAlgorithm<ReplanningGroup>> prepareForSimAlgorithms =
+			new LinkedList<GenericPlanAlgorithm<ReplanningGroup>>();
 
 	// configurable elements
 	// if still null at build time, defaults will be created
@@ -76,7 +79,6 @@ public class ControllerRegistryBuilder {
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = null;
 	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory = null;
 	private GroupIdentifier groupIdentifier = null;
-	private GenericPlanAlgorithm<ReplanningGroup> prepareForSimAlgorithm = null;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// contrs
@@ -149,9 +151,9 @@ public class ControllerRegistryBuilder {
 		return this;
 	}
 
-	public ControllerRegistryBuilder withPrepareForSimAlgorithm(
+	public ControllerRegistryBuilder withAdditionalPrepareForSimAlgorithms(
 			final GenericPlanAlgorithm<ReplanningGroup> algo ) {
-		this.prepareForSimAlgorithm = algo;
+		this.prepareForSimAlgorithms.add( algo );
 		return this;
 	}
 
@@ -178,7 +180,7 @@ public class ControllerRegistryBuilder {
 			leastCostPathCalculatorFactory,
 			planRoutingAlgorithmFactory,
 			groupIdentifier,
-			prepareForSimAlgorithm);
+			prepareForSimAlgorithms);
 	}
 
 	private final void setDefaults() {
@@ -269,24 +271,25 @@ public class ControllerRegistryBuilder {
 					null); // last arg: transit router factory.
 		}
 
-		if ( prepareForSimAlgorithm == null ) {
-			final PersonAlgorithm prepareForSim =
-				new PersonPrepareForSim(
-						planRoutingAlgorithmFactory.createPlanRoutingAlgorithm(
-							tripRouterFactory.createTripRouter() ),
-						scenario);
-			final PersonAlgorithm checkJointRoutes =
-				new ImportedJointRoutesChecker( tripRouterFactory.createTripRouter() );
-			this.prepareForSimAlgorithm = new GenericPlanAlgorithm<ReplanningGroup>() {
-				@Override
-				public void run(final ReplanningGroup group) {
-					for ( Person person : group.getPersons() ) {
-						checkJointRoutes.run( person );
-						prepareForSim.run( person );
+		// we do this here, as we need configurable objects
+		final PersonAlgorithm prepareForSim =
+			new PersonPrepareForSim(
+					planRoutingAlgorithmFactory.createPlanRoutingAlgorithm(
+						tripRouterFactory.createTripRouter() ),
+					scenario);
+		final PersonAlgorithm checkJointRoutes =
+			new ImportedJointRoutesChecker( tripRouterFactory.createTripRouter() );
+		// but we want it to be executed at the start!
+		this.prepareForSimAlgorithms.addFirst(
+				new GenericPlanAlgorithm<ReplanningGroup>() {
+					@Override
+					public void run(final ReplanningGroup group) {
+						for ( Person person : group.getPersons() ) {
+							checkJointRoutes.run( person );
+							prepareForSim.run( person );
+						}
 					}
-				}
-			};
-		}
+				});
 	}
 }
 

@@ -30,6 +30,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 
 import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
 /**
@@ -136,11 +137,13 @@ public final class ImmutableJointController extends AbstractController {
 				registry.getScenario().getConfig(),
 				"Config dump before doIterations:");
 
-		// TODO: parallelize. This may force to create several instances of the algo!
+		// TODO: parallelize. This may force to create several instances of the algos!
 		for ( ReplanningGroup group :
 				registry.getGroupIdentifier().identifyGroups(
 					registry.getScenario().getPopulation() ) ) {
-			registry.getPrepareForSimAlgorithm().run( group );
+			for ( GenericPlanAlgorithm<ReplanningGroup> algo : registry.getPrepareForSimAlgorithms() ) {
+				algo.run( group );
+			}
 		}
 	}
 

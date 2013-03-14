@@ -53,7 +53,7 @@ public final class ControllerRegistry {
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final GroupIdentifier groupIdentifier;
-	private final GenericPlanAlgorithm<ReplanningGroup> prepareForSimAlgorithm;
+	private final Iterable<GenericPlanAlgorithm<ReplanningGroup>> prepareForSimAlgorithms;
 
 	ControllerRegistry(
 			final Scenario scenario,
@@ -67,7 +67,7 @@ public final class ControllerRegistry {
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 			final GroupIdentifier groupIdentifier,
-			final GenericPlanAlgorithm<ReplanningGroup> prepareForSimAlgorithm) {
+			final Iterable<GenericPlanAlgorithm<ReplanningGroup>> prepareForSimAlgorithms) {
 		this.scenario = scenario;
 		this.events = events;
 		this.travelTime = travelTime;
@@ -79,7 +79,7 @@ public final class ControllerRegistry {
 		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.groupIdentifier = groupIdentifier;
-		this.prepareForSimAlgorithm = prepareForSimAlgorithm;
+		this.prepareForSimAlgorithms = prepareForSimAlgorithms;
 	}
 
 	public Scenario getScenario() {
@@ -164,8 +164,8 @@ public final class ControllerRegistry {
 		return groupIdentifier;
 	}
 
-	public GenericPlanAlgorithm<ReplanningGroup> getPrepareForSimAlgorithm() {
-		return prepareForSimAlgorithm;
+	public Iterable<GenericPlanAlgorithm<ReplanningGroup>> getPrepareForSimAlgorithms() {
+		return prepareForSimAlgorithms;
 	}
 }
 
