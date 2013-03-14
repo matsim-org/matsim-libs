@@ -349,12 +349,19 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
 			Collections.<PersonRecord> emptyList();
 
+		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 		// get a list of plans in decreasing order of maximum possible weight.
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
 		final List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 		for (PlanRecord r : records) {
+			if ( r.jointPlan != null ) {
+				tagJointPlansOfPartnersAsInfeasible(
+						allPersonsRecord,
+						r,
+						localFeasibilityChanger);
+			}
 			r.cachedMaximumWeight = exploreAll ?
 				Double.POSITIVE_INFINITY :
 				alreadyAllocatedWeight +
@@ -362,6 +369,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 							r,
 							str,
 							remainingPersons );
+			localFeasibilityChanger.resetFeasibilities();
 		}
 
 		// Sort in decreasing order of upper bound: we can stop as soon
@@ -424,7 +432,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			// will not change anything.
 			knownBranches.tagAsExplored( cotravelers );
 
-			final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 			PlanString tail = str;
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			if (r.jointPlan != null) {
@@ -505,11 +512,15 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final PlanRecord r,
 			final FeasibilityChanger changer) {
+		final Id ego = r.plan.getPerson().getId();
 		for ( Id cotravId : r.jointPlan.getIndividualPlans().keySet() ) {
+			if ( ego.equals( cotravId ) ) continue;
 			final PersonRecord cotrav = allPersonsRecord.get( cotravId );
 			for ( PlanRecord pr : cotrav.plans ) {
 				if ( pr.jointPlan == null ) continue;
 				for ( Id linkedId : pr.jointPlan.getIndividualPlans().keySet() ) {
+					if ( linkedId.equals( cotravId ) ) continue;
+					if ( linkedId.equals( ego ) ) continue;
 					final PersonRecord linkedPerson = allPersonsRecord.get( linkedId );
 					for ( PlanRecord linkedpr : linkedPerson.plans ) {
 						if ( linkedpr.isStillFeasible &&
@@ -588,18 +599,13 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
 
-			if ( !plan.isStillFeasible ) {
-				assert plan.jointPlan.getIndividualPlans().containsKey( planToSelect.plan.getPerson().getId() ) ||
-					intersect( plan.jointPlan.getIndividualPlans().keySet() , string );
-				continue;
-			}
-			if (plan.jointPlan == null) return plan.avgJointPlanWeight;
+			assert plan.jointPlan == null ||
+				!plan.isStillFeasible ==
+				plan.jointPlan.getIndividualPlans().containsKey( planToSelect.plan.getPerson().getId() ) ||
+				intersect( plan.jointPlan.getIndividualPlans().keySet() , string ) ||
+				intersect( plan.jointPlan.getIndividualPlans().keySet() , idsInJpToSelect );
 
-			// skip this plan if its participants already have a plan
-			assert !plan.jointPlan.getIndividualPlans().containsKey( planToSelect.plan.getPerson().getId() ) &&
-				!intersect( plan.jointPlan.getIndividualPlans().keySet() , string );
-			if (intersect( plan.jointPlan.getIndividualPlans().keySet() , idsInJpToSelect )) continue;
-			return plan.avgJointPlanWeight;
+			if ( plan.isStillFeasible ) return plan.avgJointPlanWeight;
 		}
 
 		// this combination is impossible
