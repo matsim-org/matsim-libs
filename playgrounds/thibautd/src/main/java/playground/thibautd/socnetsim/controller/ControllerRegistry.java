@@ -34,7 +34,9 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
 /**
  * @author thibautd
@@ -51,6 +53,7 @@ public final class ControllerRegistry {
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final GroupIdentifier groupIdentifier;
+	private final GenericPlanAlgorithm<ReplanningGroup> prepareForSimAlgorithm;
 
 	ControllerRegistry(
 			final Scenario scenario,
@@ -63,7 +66,8 @@ public final class ControllerRegistry {
 			final TripRouterFactory tripRouterFactory,
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
-			final GroupIdentifier groupIdentifier) {
+			final GroupIdentifier groupIdentifier,
+			final GenericPlanAlgorithm<ReplanningGroup> prepareForSimAlgorithm) {
 		this.scenario = scenario;
 		this.events = events;
 		this.travelTime = travelTime;
@@ -75,6 +79,7 @@ public final class ControllerRegistry {
 		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.groupIdentifier = groupIdentifier;
+		this.prepareForSimAlgorithm = prepareForSimAlgorithm;
 	}
 
 	public Scenario getScenario() {
@@ -157,6 +162,10 @@ public final class ControllerRegistry {
 
 	public GroupIdentifier getGroupIdentifier() {
 		return groupIdentifier;
+	}
+
+	public GenericPlanAlgorithm<ReplanningGroup> getPrepareForSimAlgorithm() {
+		return prepareForSimAlgorithm;
 	}
 }
 

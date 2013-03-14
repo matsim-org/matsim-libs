@@ -21,20 +21,16 @@ package playground.thibautd.socnetsim.controller;
 
 import java.io.File;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.PersonPrepareForSim;
 
 import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
-import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
 /**
  * A simple controler for the process with joint plans.
@@ -140,15 +136,12 @@ public final class ImmutableJointController extends AbstractController {
 				registry.getScenario().getConfig(),
 				"Config dump before doIterations:");
 
-		ParallelPersonAlgorithmRunner.run(
-				registry.getScenario().getPopulation(),
-				registry.getScenario().getConfig().global().getNumberOfThreads(),
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-					@Override
-					public PersonAlgorithm getPersonAlgorithm() {
-						return new PreparePersonAlgorithm( registry );
-					}
-				});
+		// TODO: parallelize. This may force to create several instances of the algo!
+		for ( ReplanningGroup group :
+				registry.getGroupIdentifier().identifyGroups(
+					registry.getScenario().getPopulation() ) ) {
+			registry.getPrepareForSimAlgorithm().run( group );
+		}
 	}
 
 	@Override
@@ -159,27 +152,5 @@ public final class ImmutableJointController extends AbstractController {
 	public final ControllerRegistry getRegistry() {
 		return registry;
 	}
-
-	private static class PreparePersonAlgorithm implements PersonAlgorithm {
-		private final PersonAlgorithm prepareForSim;
-		private final PersonAlgorithm checkJointRoutes;
-
-		public PreparePersonAlgorithm(final ControllerRegistry registry) {
-			prepareForSim =
-				new PersonPrepareForSim(
-						registry.getPlanRoutingAlgorithmFactory().createPlanRoutingAlgorithm(
-							registry.getTripRouterFactory().createTripRouter() ),
-						registry.getScenario());
-			checkJointRoutes =
-				new ImportedJointRoutesChecker( registry.getTripRouterFactory().createTripRouter() );
-		}
-
-		@Override
-		public void run(final Person person) {
-			checkJointRoutes.run( person );
-			prepareForSim.run( person );
-		}
-	}
-
 }
 

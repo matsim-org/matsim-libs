@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -43,13 +44,17 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 
 /**
  * Allows to build a ControllerRegistry with certain default values
@@ -71,6 +76,7 @@ public class ControllerRegistryBuilder {
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = null;
 	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory = null;
 	private GroupIdentifier groupIdentifier = null;
+	private GenericPlanAlgorithm<ReplanningGroup> prepareForSimAlgorithm = null;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// contrs
@@ -140,6 +146,12 @@ public class ControllerRegistryBuilder {
 	public ControllerRegistryBuilder withGroupIdentifier(
 			final GroupIdentifier groupIdentifier2) {
 		this.groupIdentifier = groupIdentifier2;
+		return this;
+	}
+
+	public ControllerRegistryBuilder withPrepareForSimAlgorithm(
+			final GenericPlanAlgorithm<ReplanningGroup> algo ) {
+		this.prepareForSimAlgorithm = algo;
 		return this;
 	}
 
@@ -255,6 +267,25 @@ public class ControllerRegistryBuilder {
 					travelTime.getLinkTravelTimes(),
 					leastCostPathCalculatorFactory,
 					null); // last arg: transit router factory.
+		}
+
+		if ( prepareForSimAlgorithm == null ) {
+			final PersonAlgorithm prepareForSim =
+				new PersonPrepareForSim(
+						planRoutingAlgorithmFactory.createPlanRoutingAlgorithm(
+							tripRouterFactory.createTripRouter() ),
+						scenario);
+			final PersonAlgorithm checkJointRoutes =
+				new ImportedJointRoutesChecker( tripRouterFactory.createTripRouter() );
+			this.prepareForSimAlgorithm = new GenericPlanAlgorithm<ReplanningGroup>() {
+				@Override
+				public void run(final ReplanningGroup group) {
+					for ( Person person : group.getPersons() ) {
+						checkJointRoutes.run( person );
+						prepareForSim.run( person );
+					}
+				}
+			};
 		}
 	}
 }
