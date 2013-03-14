@@ -58,17 +58,19 @@ import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 public class ControllerRegistryBuilder {
 	private final Scenario scenario;
 	private final EventsManager events;
+	private final CalcLegTimes legTimes;
 
 	// configurable elements
-	private TravelTimeCalculator travelTime;
-	private TravelDisutilityFactory travelDisutilityFactory;
-	private ScoringFunctionFactory scoringFunctionFactory;
-	private CalcLegTimes legTimes;
-	private MobsimFactory mobsimFactory;
-	private TripRouterFactory tripRouterFactory;
-	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
-	private GroupIdentifier groupIdentifier;
+	// if still null at build time, defaults will be created
+	// lazily. This allows to used other fields at construction
+	private TravelTimeCalculator travelTime = null;
+	private TravelDisutilityFactory travelDisutilityFactory = null;
+	private ScoringFunctionFactory scoringFunctionFactory = null;
+	private MobsimFactory mobsimFactory = null;
+	private TripRouterFactory tripRouterFactory = null;
+	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = null;
+	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory = null;
+	private GroupIdentifier groupIdentifier = null;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// contrs
@@ -78,31 +80,6 @@ public class ControllerRegistryBuilder {
 	 */
 	public ControllerRegistryBuilder( final Scenario scenario ) {
 		this.scenario = scenario;
-
-		// by default, no groups (results in individual replanning)
-		this.groupIdentifier = new GroupIdentifier() {
-			@Override
-			public Collection<ReplanningGroup> identifyGroups(
-					final Population population) {
-				return Collections.<ReplanningGroup>emptyList();
-			}
-		};
-
-		this.scoringFunctionFactory =
-				new CharyparNagelScoringFunctionFactory(
-					scenario.getConfig().planCalcScore(),
-					scenario.getNetwork());
-		// by default: do not care about joint trips, vehicles or what not
-		this.planRoutingAlgorithmFactory = new PlanRoutingAlgorithmFactory() {
-			@Override
-			public PlanAlgorithm createPlanRoutingAlgorithm(
-					final TripRouter tripRouter) {
-				return new PlanRouter( tripRouter );
-			}
-		};
-
-		this.mobsimFactory = new JointQSimFactory();
-
 		this.events = EventsUtils.createEventsManager( scenario.getConfig() );
 
 		// some analysis utils
@@ -114,51 +91,6 @@ public class ControllerRegistryBuilder {
 
 		this.legTimes = new CalcLegTimes();
 		this.events.addHandler( legTimes );
-		this.travelTime =
-			new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
-					scenario.getNetwork(),
-					scenario.getConfig().travelTimeCalculator());
-		// XXX this will stay if travel time is replaced!
-		this.events.addHandler(travelTime);	
-
-		this.travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
-		switch (scenario.getConfig().controler().getRoutingAlgorithmType()) {
-			case AStarLandmarks:
-				this.leastCostPathCalculatorFactory =
-						new AStarLandmarksFactory(
-									scenario.getNetwork(),
-									travelDisutilityFactory.createTravelDisutility(
-										travelTime.getLinkTravelTimes(),
-										scenario.getConfig().planCalcScore()));
-				break;
-			case Dijkstra:
-				PreProcessDijkstra ppd = new PreProcessDijkstra();
-				ppd.run( scenario.getNetwork() );
-				this.leastCostPathCalculatorFactory = new DijkstraFactory( ppd );
-				break;
-			case FastAStarLandmarks:
-				this.leastCostPathCalculatorFactory =
-						new FastAStarLandmarksFactory(
-									scenario.getNetwork(),
-									travelDisutilityFactory.createTravelDisutility(
-										travelTime.getLinkTravelTimes(),
-										scenario.getConfig().planCalcScore()));
-				break;
-			case FastDijkstra:
-				PreProcessDijkstra ppfd = new PreProcessDijkstra();
-				ppfd.run( scenario.getNetwork() );
-				this.leastCostPathCalculatorFactory = new FastDijkstraFactory( ppfd );
-				break;
-			default:
-				throw new IllegalArgumentException( "unkown algorithm "+scenario.getConfig().controler().getRoutingAlgorithmType() );
-		}
-
-		this.tripRouterFactory = new JointTripRouterFactory(
-				scenario,
-				travelDisutilityFactory,
-				travelTime.getLinkTravelTimes(),
-				leastCostPathCalculatorFactory,
-				null); // last arg: transit router factory.
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -178,12 +110,6 @@ public class ControllerRegistryBuilder {
 	public ControllerRegistryBuilder withScoringFunctionFactory(
 			final ScoringFunctionFactory scoringFunctionFactory2) {
 		this.scoringFunctionFactory = scoringFunctionFactory2;
-		return this;
-	}
-
-	public ControllerRegistryBuilder withCalcLegTimes(
-			final CalcLegTimes legTimes2) {
-		this.legTimes = legTimes2;
 		return this;
 	}
 
@@ -219,7 +145,15 @@ public class ControllerRegistryBuilder {
 
 	// /////////////////////////////////////////////////////////////////////////
 	// build
+	private boolean wasBuild = false;
 	public ControllerRegistry build() {
+		if ( wasBuild ) {
+			throw new IllegalStateException( "building several instances is unsafe!" );
+		}
+		wasBuild = true;
+
+		// set defaults at the last time, in case we must access user-defined elements
+		setDefaults();
 		return new ControllerRegistry(
 			scenario,
 			events,
@@ -231,7 +165,97 @@ public class ControllerRegistryBuilder {
 			tripRouterFactory,
 			leastCostPathCalculatorFactory,
 			planRoutingAlgorithmFactory,
-			groupIdentifier);
+			groupIdentifier,
+			prepareForSimAlgorithm);
+	}
+
+	private final void setDefaults() {
+		// by default, no groups (results in individual replanning)
+		if ( groupIdentifier == null ) {
+			this.groupIdentifier = new GroupIdentifier() {
+				@Override
+				public Collection<ReplanningGroup> identifyGroups(
+						final Population population) {
+					return Collections.<ReplanningGroup>emptyList();
+				}
+			};
+		}
+
+		if ( scoringFunctionFactory == null ) {
+			this.scoringFunctionFactory =
+					new CharyparNagelScoringFunctionFactory(
+						scenario.getConfig().planCalcScore(),
+						scenario.getNetwork());
+		}
+
+		if ( planRoutingAlgorithmFactory == null ) {
+			// by default: do not care about joint trips, vehicles or what not
+			this.planRoutingAlgorithmFactory = new PlanRoutingAlgorithmFactory() {
+				@Override
+				public PlanAlgorithm createPlanRoutingAlgorithm(
+						final TripRouter tripRouter) {
+					return new PlanRouter( tripRouter );
+				}
+			};
+		}
+
+		if ( mobsimFactory == null ) {
+			this.mobsimFactory = new JointQSimFactory();
+		}
+
+		if ( travelTime == null ) {
+			this.travelTime =
+				new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
+						scenario.getNetwork(),
+						scenario.getConfig().travelTimeCalculator());
+			this.events.addHandler(travelTime);	
+		}
+
+		if ( travelDisutilityFactory == null ) {
+			this.travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+		}
+
+		if ( leastCostPathCalculatorFactory == null ) {
+			switch (scenario.getConfig().controler().getRoutingAlgorithmType()) {
+				case AStarLandmarks:
+					this.leastCostPathCalculatorFactory =
+							new AStarLandmarksFactory(
+										scenario.getNetwork(),
+										travelDisutilityFactory.createTravelDisutility(
+											travelTime.getLinkTravelTimes(),
+											scenario.getConfig().planCalcScore()));
+					break;
+				case Dijkstra:
+					PreProcessDijkstra ppd = new PreProcessDijkstra();
+					ppd.run( scenario.getNetwork() );
+					this.leastCostPathCalculatorFactory = new DijkstraFactory( ppd );
+					break;
+				case FastAStarLandmarks:
+					this.leastCostPathCalculatorFactory =
+							new FastAStarLandmarksFactory(
+										scenario.getNetwork(),
+										travelDisutilityFactory.createTravelDisutility(
+											travelTime.getLinkTravelTimes(),
+											scenario.getConfig().planCalcScore()));
+					break;
+				case FastDijkstra:
+					PreProcessDijkstra ppfd = new PreProcessDijkstra();
+					ppfd.run( scenario.getNetwork() );
+					this.leastCostPathCalculatorFactory = new FastDijkstraFactory( ppfd );
+					break;
+				default:
+					throw new IllegalArgumentException( "unkown algorithm "+scenario.getConfig().controler().getRoutingAlgorithmType() );
+			}
+		}
+
+		if ( tripRouterFactory == null ) {
+			this.tripRouterFactory = new JointTripRouterFactory(
+					scenario,
+					travelDisutilityFactory,
+					travelTime.getLinkTravelTimes(),
+					leastCostPathCalculatorFactory,
+					null); // last arg: transit router factory.
+		}
 	}
 }
 
