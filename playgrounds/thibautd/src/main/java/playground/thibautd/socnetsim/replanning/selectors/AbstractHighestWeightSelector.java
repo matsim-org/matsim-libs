@@ -205,7 +205,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				forbiden,
 				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
-				Collections.<Id>emptySet(),
 				null,
 				Double.NEGATIVE_INFINITY);
 
@@ -329,7 +328,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final ForbidenCombinations forbidenCombinations,
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate,
-			final Set<Id> alreadyAllocatedPersons,
 			final PlanString str,
 			final double minimalWeightToObtain) {
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
@@ -343,12 +341,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 		}
 
-		assert !alreadyAllocatedPersons.contains( currentPerson.person.getId() ) :
-			"still to allocate: "+personsStillToAllocate+
-			 ", already allocated: "+alreadyAllocatedPersons;
+		assert str == null || !str.containsPerson( currentPerson.person.getId() );
 		if (log.isTraceEnabled()) {
 			log.trace( "looking at person "+currentPerson.person.getId()+
-					" with already selected "+alreadyAllocatedPersons );
+					" with already selected "+str );
 		}
 
 		// do one step forward: "point" to the next person
@@ -356,8 +352,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			personsStillToAllocate.size() > 1 ?
 			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
 			Collections.<PersonRecord> emptyList();
-		final Set<Id> newAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
-		newAllocatedPersons.add( currentPerson.person.getId() );
 
 		// get a list of plans in decreasing order of maximum possible weight.
 		// The weight is always computed on the full joint plan, and thus consists
@@ -370,7 +364,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				alreadyAllocatedWeight +
 					getMaxWeightFromPersons(
 							r,
-							newAllocatedPersons,
+							str,
 							remainingPersons );
 		}
 
@@ -421,7 +415,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			}
 
 			if (!r.isStillFeasible) {
-				assert intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons );
+				assert intersect( r.jointPlan.getIndividualPlans().keySet() , str );
 				continue;
 			}
 
@@ -436,22 +430,16 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 			final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 			PlanString tail = str;
-			// TODO: find a better way to filter persons (should be
-			// possible in PlanString), ie without having to create new collections
-			// over and over, which is messy and inefficient
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
-			Set<Id> actuallyAllocatedPersons = newAllocatedPersons;
 			if (r.jointPlan != null) {
 				// normally, it is impossible that it is always the case if there
 				// is a valid plan: a branch were this would be the case would
 				// have a infinitely negative weight and not explored.
 				//if ( intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons ) ) continue;
 				// impossible if "isStillPossible" correctly implemented
-				assert !intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons );
+				assert !intersect( r.jointPlan.getIndividualPlans().keySet() , str );
 				tail = getOtherPlansAsString( r , allPersonsRecord , tail);
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
-				actuallyAllocatedPersons = new HashSet<Id>( newAllocatedPersons );
-				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
 
 				// tag all joint plans containing agents in the joint plan to select
 				// as infeasible
@@ -482,7 +470,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 						forbidenCombinations,
 						allPersonsRecord,
 						actuallyRemainingPersons,
-						actuallyAllocatedPersons,
 						new PlanString( r , tail ),
 						Math.max(
 							minimalWeightToObtain,
@@ -528,10 +515,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	 */
 	private static double getMaxWeightFromPersons(
 			final PlanRecord planToSelect,
-			// the joint plans linking to persons with a plan
-			// already selected cannot be selected.
-			// This list contains the agent to be selected.
-			final Collection<Id> personsSelected,
+			final PlanString string,
 			final List<PersonRecord> remainingPersons) {
 		double score = planToSelect.avgJointPlanWeight;
 
@@ -540,7 +524,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		final JointPlan jointPlanToSelect = planToSelect.jointPlan;
 
 		for (PersonRecord record : remainingPersons) {
-			final double max = getMaxWeight( record , personsSelected , jointPlanToSelect );
+			final double max = getMaxWeight(
+					// for assertions:
+					planToSelect , string ,
+					// actually useful:
+					record , jointPlanToSelect );
 			if (log.isTraceEnabled()) {
 				log.trace( "estimated max weight for person "+
 						record.person.getId()+
@@ -562,8 +550,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	 * plan shared with agents in personsSelected
 	 */
 	private static double getMaxWeight(
+			// arguments used for assertions
+			final PlanRecord planToSelect,
+			final PlanString string,
+			// actual "useful" arguments
 			final PersonRecord record,
-			final Collection<Id> personsSelected,
 			final JointPlan jointPlanToSelect) {
 		// case in jp: plan is fully determined
 		if (jointPlanToSelect != null) {
@@ -581,13 +572,15 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			// consider the first valid plan
 
 			if ( !plan.isStillFeasible ) {
-				assert intersect( plan.jointPlan.getIndividualPlans().keySet() , personsSelected );
+				assert plan.jointPlan.getIndividualPlans().containsKey( planToSelect.plan.getPerson().getId() ) ||
+					intersect( plan.jointPlan.getIndividualPlans().keySet() , string );
 				continue;
 			}
 			if (plan.jointPlan == null) return plan.avgJointPlanWeight;
 
 			// skip this plan if its participants already have a plan
-			assert !intersect( plan.jointPlan.getIndividualPlans().keySet() , personsSelected );
+			assert !plan.jointPlan.getIndividualPlans().containsKey( planToSelect.plan.getPerson().getId() ) &&
+				!intersect( plan.jointPlan.getIndividualPlans().keySet() , string );
 			if (intersect( plan.jointPlan.getIndividualPlans().keySet() , idsInJpToSelect )) continue;
 			return plan.avgJointPlanWeight;
 		}
@@ -595,6 +588,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		// this combination is impossible
 		return Double.NEGATIVE_INFINITY;
 	}
+
 
 	// /////////////////////////////////////////////////////////////////////////
 	// various small helper methods
@@ -649,6 +643,16 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return false;
 	}
 
+	private static boolean intersect(
+			final Set<Id> set,
+			final PlanString string) {
+		if ( string == null ) return false;
+		for ( Id id : set ) {
+			if ( string.containsPerson( id ) ) return true;
+		}
+		return false;
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// classes: data structures used during the search process
 	// /////////////////////////////////////////////////////////////////////////
@@ -668,6 +672,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		public double getWeight() {
 			return weight;
+		}
+
+		public boolean containsPerson(final Id id) {
+			return planRecord.plan.getPerson().getId().equals( id ) ||
+				(tail != null && tail.containsPerson( id ));
 		}
 
 		@Override
