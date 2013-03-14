@@ -21,12 +21,15 @@ package playground.thibautd.socnetsim.controller;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
@@ -40,6 +43,7 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
  * @author thibautd
  */
 public final class ImmutableJointController extends AbstractController {
+	private static final Logger log = Logger.getLogger( ImmutableJointController.class );
 	private final ControllerRegistry registry;
 	private final ReplanningListener replanner;
 
@@ -138,13 +142,18 @@ public final class ImmutableJointController extends AbstractController {
 				"Config dump before doIterations:");
 
 		// TODO: parallelize. This may force to create several instances of the algos!
+		final Counter counter = new Counter( "[PrepareForSim] handling group # " );
+		final Iterable<GenericPlanAlgorithm<ReplanningGroup>> algos = registry.getPrepareForSimAlgorithms();
+		log.info( "preparing agents for sim with algos "+algos );
 		for ( ReplanningGroup group :
 				registry.getGroupIdentifier().identifyGroups(
 					registry.getScenario().getPopulation() ) ) {
-			for ( GenericPlanAlgorithm<ReplanningGroup> algo : registry.getPrepareForSimAlgorithms() ) {
+			counter.incCounter();
+			for ( GenericPlanAlgorithm<ReplanningGroup> algo : algos ) {
 				algo.run( group );
 			}
 		}
+		counter.printCounter();
 	}
 
 	@Override

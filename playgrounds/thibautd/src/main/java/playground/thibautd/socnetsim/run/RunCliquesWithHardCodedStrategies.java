@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -35,13 +36,20 @@ import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
+import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
+import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.AbstractHighestWeightSelector;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
+import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**
@@ -88,12 +96,33 @@ public class RunCliquesWithHardCodedStrategies {
 			FixedGroupsIdentifierFileParser.readCliquesFile(
 					cliquesConf.getInputFile() );
 
+		final PlanLinkIdentifier planLinkIdentifier =
+			new DefaultPlanLinkIdentifier();
+
+		final GenericPlanAlgorithm<ReplanningGroup> additionalPrepareAlgo =
+			scenario.getScenarioElement( VehicleRessources.class ) != null ?
+			new PrepareVehicleAllocationForSimAlgorithm(
+					MatsimRandom.getLocalInstance(),
+					scenario.getScenarioElement( JointPlans.class ),
+					scenario.getScenarioElement( VehicleRessources.class ),
+					planLinkIdentifier) :
+			new GenericPlanAlgorithm<ReplanningGroup>() {
+				@Override
+				public void run(final ReplanningGroup plan) {
+					// do nothing more than default
+				}
+			};
+
 		final ControllerRegistry controllerRegistry =
 			new ControllerRegistryBuilder( scenario )
 					.withPlanRoutingAlgorithmFactory(
-						RunUtils.createPlanRouterFactory( scenario ) )
+							RunUtils.createPlanRouterFactory( scenario ) )
 					.withGroupIdentifier(
-						cliques )
+							cliques )
+					.withPlanLinkIdentifier(
+							planLinkIdentifier )
+					.withAdditionalPrepareForSimAlgorithms(
+							additionalPrepareAlgo )
 					.build();
 
 		// init strategies
