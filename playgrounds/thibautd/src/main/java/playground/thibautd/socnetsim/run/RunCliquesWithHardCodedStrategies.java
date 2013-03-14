@@ -81,10 +81,17 @@ public class RunCliquesWithHardCodedStrategies {
 		final Config config = scenario.getConfig();
 		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
 					config.getModule( CliquesConfigGroup.GROUP_NAME );
+		final FixedGroupsIdentifier cliques = 
+			config.scenario().isUseHouseholds() ?
+			new FixedGroupsIdentifier(
+					((ScenarioImpl) scenario).getHouseholds() ) :
+			FixedGroupsIdentifierFileParser.readCliquesFile(
+					cliquesConf.getInputFile() );
 		final ControllerRegistry controllerRegistry =
 			new ControllerRegistry(
 					scenario,
 					scenario.getScenarioElement( JointPlans.class ),
+					cliques,
 					RunUtils.createPlanRouterFactory( scenario ),
 					new CharyparNagelScoringFunctionFactory(
 						config.planCalcScore(),
@@ -95,16 +102,8 @@ public class RunCliquesWithHardCodedStrategies {
 		RunUtils.loadStrategyRegistry( strategyRegistry , controllerRegistry );
 
 		// create strategy manager
-		final FixedGroupsIdentifier cliques = 
-			config.scenario().isUseHouseholds() ?
-			new FixedGroupsIdentifier(
-					((ScenarioImpl) scenario).getHouseholds() ) :
-			FixedGroupsIdentifierFileParser.readCliquesFile(
-					cliquesConf.getInputFile() );
 		final GroupStrategyManager strategyManager =
 			new GroupStrategyManager( 
-					//new NichingSelectorForRemoval(),
-					cliques,
 					strategyRegistry,
 					config.strategy().getMaxAgentPlanMemorySize());
 

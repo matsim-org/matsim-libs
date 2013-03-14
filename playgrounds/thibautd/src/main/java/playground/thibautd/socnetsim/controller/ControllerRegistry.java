@@ -44,6 +44,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
+import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 
 /**
@@ -60,14 +61,17 @@ public final class ControllerRegistry {
 	private final TripRouterFactory tripRouterFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+	private final GroupIdentifier groupIdentifier;
 
 	public ControllerRegistry(
 			final Scenario scenario,
 			final JointPlans jointPlans,
+			final GroupIdentifier groupIdentifier,
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 			final ScoringFunctionFactory scoringFunctionFactory) {
 		this.scenario = scenario;
 		addJointPlansToScenario( scenario , jointPlans );
+		this.groupIdentifier = groupIdentifier;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 
@@ -181,6 +185,7 @@ public final class ControllerRegistry {
 	}
 
 	// XXX ouch... if this thing starts to provide factory methods, not sure it is a "registry"...
+	// though it is just a wrapper to see the object under another interface, so it is probably ok.
 	public ReplanningContext createReplanningContext(final int iter) {
 		return new ReplanningContext() {
 			@Override
@@ -210,6 +215,10 @@ public final class ControllerRegistry {
 				return iter;
 			}
 		};
+	}
+
+	public GroupIdentifier getGroupIdentifier() {
+		return groupIdentifier;
 	}
 }
 

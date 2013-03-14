@@ -52,6 +52,7 @@ public class GroupPlanStrategy {
 	}
 
 	public void run(
+			// XXX what is the best at this level: ReplanningContext or ControllerRegistry?
 			final ReplanningContext replanningContext,
 			final JointPlans jointPlans,
 			final Collection<ReplanningGroup> groups) {

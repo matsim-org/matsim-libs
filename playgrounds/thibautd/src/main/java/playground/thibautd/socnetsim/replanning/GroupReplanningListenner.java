@@ -41,12 +41,8 @@ public class GroupReplanningListenner implements ReplanningListener {
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
 		strategyManager.run(
-				// this is not so nice, but the context returned by the event
-				// delegates everything to Controler... And there is no clean way
-				// to change that without touching to the core.
-				registry.createReplanningContext( event.getIteration() ),
-				registry.getJointPlans(),
-				registry.getScenario().getPopulation() );
+				event.getIteration(),
+				registry );
 	}
 }
 

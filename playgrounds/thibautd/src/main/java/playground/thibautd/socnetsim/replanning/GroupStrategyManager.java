@@ -33,11 +33,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.ReplanningContext;
-
+import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
@@ -55,41 +53,38 @@ public class GroupStrategyManager {
 	private GroupStrategyRegistry registry;
 
 	private final GroupLevelPlanSelector selectorForRemoval;
-	private final GroupIdentifier groupIdentifier;
 	private final int maxPlanPerAgent;
 	private final Random random;
 
 	public GroupStrategyManager(
-			final GroupIdentifier groupIdentifier,
 			final GroupStrategyRegistry registry,
 			final int maxPlanPerAgent) {
-		this( new LowestScoreSumSelectorForRemoval() , groupIdentifier , registry , maxPlanPerAgent );
+		this( new LowestScoreSumSelectorForRemoval() , registry , maxPlanPerAgent );
 	}
 
 	public GroupStrategyManager(
 			final GroupLevelPlanSelector selectorForRemoval,
-			final GroupIdentifier groupIdentifier,
 			final GroupStrategyRegistry registry,
 			final int maxPlanPerAgent) {
 		this.selectorForRemoval = selectorForRemoval;
 		this.registry = registry;
-		this.groupIdentifier = groupIdentifier;
 		this.maxPlanPerAgent = maxPlanPerAgent;
 		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	public final void run(
-			final ReplanningContext replanningContext,
-			final JointPlans jointPlans,
-			final Population population) {
-		final Collection<ReplanningGroup> groups = groupIdentifier.identifyGroups( population );
+			final int iteration,
+			final ControllerRegistry controllerRegistry) {
+		final Population population = controllerRegistry.getScenario().getPopulation();
+		final JointPlans jointPlans = controllerRegistry.getJointPlans();
+		final Collection<ReplanningGroup> groups = controllerRegistry.getGroupIdentifier().identifyGroups( population );
 
-		Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
+		final Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
 			new LinkedHashMap<GroupPlanStrategy, List<ReplanningGroup>>();
 		for (ReplanningGroup g : groups) {
 			removeExtraPlans( jointPlans , g );
 
-			GroupPlanStrategy strategy = registry.chooseStrategy( random.nextDouble() );
+			final GroupPlanStrategy strategy = registry.chooseStrategy( random.nextDouble() );
 			List<ReplanningGroup> alloc = strategyAllocations.get( strategy );
 
 			if (alloc == null) {
@@ -105,7 +100,10 @@ public class GroupStrategyManager {
 			final GroupPlanStrategy strategy = e.getKey();
 			final List<ReplanningGroup> toHandle = e.getValue();
 			log.info( "passing "+toHandle.size()+" groups to strategy "+strategy );
-			strategy.run( replanningContext , jointPlans , toHandle );
+			strategy.run(
+					controllerRegistry.createReplanningContext( iteration ),
+					jointPlans,
+					toHandle );
 			log.info( "strategy "+strategy+" finished" );
 		}
 	}
