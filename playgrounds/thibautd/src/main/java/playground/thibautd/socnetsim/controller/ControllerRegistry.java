@@ -20,32 +20,21 @@
 package playground.thibautd.socnetsim.controller;
 
 import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
-import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 
 /**
  * @author thibautd
@@ -63,81 +52,29 @@ public final class ControllerRegistry {
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final GroupIdentifier groupIdentifier;
 
-	public ControllerRegistry(
+	ControllerRegistry(
 			final Scenario scenario,
-			final JointPlans jointPlans,
-			final GroupIdentifier groupIdentifier,
+			final EventsManager events,
+			final TravelTimeCalculator travelTime,
+			final TravelDisutilityFactory travelDisutilityFactory,
+			final ScoringFunctionFactory scoringFunctionFactory,
+			final CalcLegTimes legTimes,
+			final MobsimFactory mobsimFactory,
+			final TripRouterFactory tripRouterFactory,
+			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
-			final ScoringFunctionFactory scoringFunctionFactory) {
+			final GroupIdentifier groupIdentifier) {
 		this.scenario = scenario;
-		addJointPlansToScenario( scenario , jointPlans );
-		this.groupIdentifier = groupIdentifier;
+		this.events = events;
+		this.travelTime = travelTime;
+		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.legTimes = legTimes;
+		this.mobsimFactory = mobsimFactory;
+		this.tripRouterFactory = tripRouterFactory;
+		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
-
-		this.events = EventsUtils.createEventsManager( scenario.getConfig() );
-
-	 	this.mobsimFactory = new JointQSimFactory();
-
-		// some analysis utils
-		this.events.addHandler(
-				new VolumesAnalyzer(
-					3600, 24 * 3600 - 1,
-					scenario.getNetwork()));
-		this.legTimes = new CalcLegTimes();
-		this.events.addHandler( legTimes );
-		this.travelTime =
-			new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
-					scenario.getNetwork(),
-					scenario.getConfig().travelTimeCalculator());
-		this.events.addHandler(travelTime);	
-
-		this.travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
-		switch (scenario.getConfig().controler().getRoutingAlgorithmType()) {
-			case AStarLandmarks:
-				this.leastCostPathCalculatorFactory =
-						new AStarLandmarksFactory(
-									scenario.getNetwork(),
-									travelDisutilityFactory.createTravelDisutility(
-										travelTime.getLinkTravelTimes(),
-										scenario.getConfig().planCalcScore()));
-				break;
-			case Dijkstra:
-				PreProcessDijkstra ppd = new PreProcessDijkstra();
-				ppd.run( scenario.getNetwork() );
-				this.leastCostPathCalculatorFactory = new DijkstraFactory( ppd );
-				break;
-			case FastAStarLandmarks:
-				this.leastCostPathCalculatorFactory =
-						new FastAStarLandmarksFactory(
-									scenario.getNetwork(),
-									travelDisutilityFactory.createTravelDisutility(
-										travelTime.getLinkTravelTimes(),
-										scenario.getConfig().planCalcScore()));
-				break;
-			case FastDijkstra:
-				PreProcessDijkstra ppfd = new PreProcessDijkstra();
-				ppfd.run( scenario.getNetwork() );
-				this.leastCostPathCalculatorFactory = new FastDijkstraFactory( ppfd );
-				break;
-			default:
-				throw new IllegalArgumentException( "unkown algorithm "+scenario.getConfig().controler().getRoutingAlgorithmType() );
-		}
-
-		this.tripRouterFactory = new JointTripRouterFactory(
-				scenario,
-				travelDisutilityFactory,
-				travelTime.getLinkTravelTimes(),
-				leastCostPathCalculatorFactory,
-				null); // last arg: transit router factory.
-	}
-
-	private static void addJointPlansToScenario(
-			final Scenario scenario,
-			final JointPlans jointPlans) {
-		final JointPlans alreadyHere = scenario.getScenarioElement( JointPlans.class );
-		if (alreadyHere != null && alreadyHere != jointPlans) throw new IllegalArgumentException();
-		scenario.addScenarioElement( jointPlans );
+		this.groupIdentifier = groupIdentifier;
 	}
 
 	public Scenario getScenario() {

@@ -31,11 +31,10 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
-import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
@@ -81,21 +80,21 @@ public class RunCliquesWithHardCodedStrategies {
 		final Config config = scenario.getConfig();
 		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
 					config.getModule( CliquesConfigGroup.GROUP_NAME );
+
 		final FixedGroupsIdentifier cliques = 
 			config.scenario().isUseHouseholds() ?
 			new FixedGroupsIdentifier(
 					((ScenarioImpl) scenario).getHouseholds() ) :
 			FixedGroupsIdentifierFileParser.readCliquesFile(
 					cliquesConf.getInputFile() );
+
 		final ControllerRegistry controllerRegistry =
-			new ControllerRegistry(
-					scenario,
-					scenario.getScenarioElement( JointPlans.class ),
-					cliques,
-					RunUtils.createPlanRouterFactory( scenario ),
-					new CharyparNagelScoringFunctionFactory(
-						config.planCalcScore(),
-						scenario.getNetwork()) );
+			new ControllerRegistryBuilder( scenario )
+					.withPlanRoutingAlgorithmFactory(
+						RunUtils.createPlanRouterFactory( scenario ) )
+					.withGroupIdentifier(
+						cliques )
+					.build();
 
 		// init strategies
 		final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
