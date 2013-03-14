@@ -84,6 +84,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 					break;
 				case MUTATE_END_AS_DUR:
 					final double oldTime = a.getEndTime();
+					if ( oldTime == Time.UNDEFINED_TIME ) break;
 					final double newTime = mutateTime( oldTime );
 					// doing this so rather than sampling mut directly allows
 					// to avoid negative times
@@ -102,9 +103,12 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 	private double mutateTime(final double time) {
 		// do not do anything if time is undefined
 		if ( time == Time.UNDEFINED_TIME ) return time;
+		if ( Double.isNaN( time ) ) throw new IllegalArgumentException( ""+time );
 
 		final double actualRange = temperature * mutationRange;
 		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * actualRange);
+		assert !Double.isNaN( t ) : t;
+		assert !Double.isInfinite( t ) : t;
 		return t < 0 ? 0 : t;
 	}
 

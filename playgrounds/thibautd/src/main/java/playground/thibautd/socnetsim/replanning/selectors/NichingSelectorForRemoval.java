@@ -71,8 +71,12 @@ public class NichingSelectorForRemoval extends AbstractHighestWeightSelector {
 							// even in correct plans, this happens in the last act
 							continue;
 						}
+						if ( Double.isNaN( endTime1 ) || Double.isNaN( endTime2 ) ) {
+							throw new RuntimeException( act1+" with end time "+endTime1
+									+" or "+act2+" with end time "+endTime2+" have a NaN end time." );
+						}
 
-						d += Math.abs( endTime1 -endTime2 );
+						d += Math.abs( endTime1 - endTime2 );
 					}
 				}
 				assert !iter2.hasNext();
@@ -101,7 +105,9 @@ public class NichingSelectorForRemoval extends AbstractHighestWeightSelector {
 					indivPlan,
 					indivPlan.getPerson().getPlans() );
 
-		return unscaledWeight / crowdingFactor;
+		final double weight =  unscaledWeight / crowdingFactor;
+		assert !Double.isNaN( weight ) : unscaledWeight+" / "+crowdingFactor;
+		return weight;
 	}
 
 	private double calcCrowding(
@@ -111,10 +117,21 @@ public class NichingSelectorForRemoval extends AbstractHighestWeightSelector {
 
 		for ( Plan p : plans ) {
 			if ( p == indivPlan ) continue;
-			v += 1 / (1 + distanceFunction.calcDistance( p , indivPlan ));
+			final double d = distanceFunction.calcDistance( p , indivPlan );
+			checkDistanceValidity( d );
+			v += 1 / (1 + d);
 		}
 
 		return v;
+	}
+
+	private void checkDistanceValidity(final double d) {
+		if ( d < 0 ) {
+			throw new IllegalArgumentException( "negative distance "+d );
+		}
+		if ( Double.isNaN( d ) ) {
+			throw new IllegalArgumentException( "NaN distance" );
+		}
 	}
 
 	private double bestScore(final List<? extends Plan> plans) {
