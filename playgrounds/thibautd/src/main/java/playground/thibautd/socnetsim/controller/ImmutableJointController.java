@@ -29,7 +29,6 @@ import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -162,14 +161,15 @@ public final class ImmutableJointController extends AbstractController {
 		return registry;
 	}
 
-	private static class PreparePersonAlgorithm extends AbstractPersonAlgorithm {
-		private final AbstractPersonAlgorithm prepareForSim;
-		private final AbstractPersonAlgorithm checkJointRoutes;
+	private static class PreparePersonAlgorithm implements PersonAlgorithm {
+		private final PersonAlgorithm prepareForSim;
+		private final PersonAlgorithm checkJointRoutes;
 
 		public PreparePersonAlgorithm(final ControllerRegistry registry) {
 			prepareForSim =
 				new PersonPrepareForSim(
-						new PlanRouter( registry.getTripRouterFactory().createTripRouter() ),
+						registry.getPlanRoutingAlgorithmFactory().createPlanRoutingAlgorithm(
+							registry.getTripRouterFactory().createTripRouter() ),
 						registry.getScenario());
 			checkJointRoutes =
 				new ImportedJointRoutesChecker( registry.getTripRouterFactory().createTripRouter() );
