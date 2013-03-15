@@ -325,5 +325,5 @@ public class IterationInfo {
 	public void setMaxDepartureDelay(double maxDepartureDelay) {
 		this.maxDepartureDelay = maxDepartureDelay;
 	}
-		
+	
 }

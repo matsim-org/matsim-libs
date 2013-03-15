@@ -24,7 +24,9 @@
 package playground.ikaddoura.optimization.analysis;
 
 import java.util.List;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -34,6 +36,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import playground.ikaddoura.optimization.handler.CarCongestionHandlerAdvanced;
 import playground.ikaddoura.optimization.handler.DepartureArrivalEventHandler;
 import playground.ikaddoura.optimization.handler.LinksEventHandler;
+import playground.ikaddoura.optimization.handler.MoneyDetailEventHandler;
 import playground.ikaddoura.optimization.handler.MoneyEventHandler;
 import playground.ikaddoura.optimization.handler.TransitEventHandler;
 import playground.ikaddoura.optimization.handler.WaitingTimeHandler;
@@ -46,6 +49,7 @@ public class OperatorUserAnalysis {
 
 	private DepartureArrivalEventHandler departureHandler;
 	private MoneyEventHandler moneyHandler;
+	private MoneyDetailEventHandler moneyDetailHandler;
 	private TransitEventHandler transitHandler;
 	private LinksEventHandler linksHandler;
 	private WaitingTimeHandler waitHandler;
@@ -66,13 +70,15 @@ public class OperatorUserAnalysis {
 		EventsManager events = EventsUtils.createEventsManager();
 		this.departureHandler = new DepartureArrivalEventHandler();
 		this.moneyHandler = new MoneyEventHandler();
+		this.moneyDetailHandler = new MoneyDetailEventHandler();
 		this.transitHandler = new TransitEventHandler();
 		this.linksHandler = new LinksEventHandler(this.network);
 		this.waitHandler = new WaitingTimeHandler(headway);
 		this.congestionHandler = new CarCongestionHandlerAdvanced(this.network);
 		
 		events.addHandler(this.departureHandler);	
-		events.addHandler(this.moneyHandler);	
+		events.addHandler(this.moneyHandler);
+		events.addHandler(this.moneyDetailHandler);
 		events.addHandler(this.transitHandler);
 		events.addHandler(this.linksHandler);
 		events.addHandler(this.waitHandler);
@@ -126,4 +132,15 @@ public class OperatorUserAnalysis {
 		return this.moneyHandler.getAverageAmountPerPerson();
 	}
 	
+	public Map<Double, Double> getAvgFarePerDepartureTimePeriod() {
+		return this.moneyDetailHandler.getAvgFarePerTripDepartureTime();
+	}
+
+	public Map<Id, Double> getFirstTripFares() {
+		return this.moneyDetailHandler.getPersonId2fareFirstTrip();
+	}
+	
+	public Map<Id, Double> getSecondTripFares() {
+		return this.moneyDetailHandler.getPersonId2fareSecondTrip();
+	}
 }

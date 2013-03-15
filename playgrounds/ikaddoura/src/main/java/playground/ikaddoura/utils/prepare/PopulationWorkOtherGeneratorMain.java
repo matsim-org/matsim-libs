@@ -37,9 +37,9 @@ public class PopulationWorkOtherGeneratorMain {
 
 	public static void main(String[] args) {
 		
-		String networkFile = "/Users/Ihab/Desktop/input/network.xml";
-		String dir = "/Users/Ihab/Desktop/populationFiles/";
-		int totalDemand = 2500;
+		String networkFile = "/Users/Ihab/Desktop/network_busLane_capacity99999.xml";
+		String dir = "/Users/Ihab/Desktop/";
+		int totalDemand = 5000;
 		
 		File directory = new File(dir);
 		directory.mkdirs();

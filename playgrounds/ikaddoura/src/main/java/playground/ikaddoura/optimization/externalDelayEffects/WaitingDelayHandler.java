@@ -31,12 +31,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
@@ -72,6 +74,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 	private final static Logger log = Logger.getLogger(WaitingDelayHandler.class);
 
 	// extra delay for a bus before and after agents are entering or leaving a public vehicle
+	// currently there is an extra delay of 1 sec before and 1 sec after agents are entering or leaving
 	private final double doorOpeningTime = 1.0;
 	private final double doorClosingTime = 1.0;
 	private final Map<Id, List<Id>> vehId2agentsTransferingAtThisStop = new HashMap<Id, List<Id>>();
@@ -132,7 +135,13 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 				}
 			}
 			
-			// update the number of affected agents: search for the agent entering the affected bus in all maps
+//			System.out.println("++++ AgentId: " + event.getPersonId());
+//			System.out.println("WaitingTime: " + waitingTime);
+//			System.out.println("VehicleDelay: " + vehicleDelay);
+			
+		
+			// the person entering the busX right now was delayed by other agents boarding or alighting before.
+			// Therefore, go through all agents that are currently being tracked, check who was delaying that busX before and update the number of affected agents.
 			for (ExtEffectWaitingDelay delay : this.boardingDelayEffects){
 				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
 					int affectedAgents = delay.getAffectedAgents();
@@ -213,9 +222,9 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 			
 			for (ExtEffectWaitingDelay delay : this.alightingDelayEffects){
 				if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && !delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					log.info("Agent is already being tracked. Starting parallel personTracking for different vehicles. " +
-							"That means the bus which was previously delayed by that agent has not yet arrived the end of the transit route. " +
-							"Must have been a very short activity... ");
+					// log.info("Agent is already being tracked. Starting parallel personTracking for different vehicles. " +
+							// "That means the bus which was previously delayed by that agent has not yet arrived the end of the transit route. " +
+							// "Must have been a very short activity... ");
 				
 				} else if (delay.getPersonId().toString().equals(event.getPersonId().toString()) && delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
 					throw new RuntimeException("Person and public vehicle are already being tracked. That means, an agent " +
@@ -260,8 +269,8 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		// vehicle departs at facility. Throw extra delay events for the doors opening and closing time
 		
+		// start tracking the extra delays for "opening" and "closing" the doors
 		if (!(this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null)){
 
 			List<Id> agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());

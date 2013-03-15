@@ -318,6 +318,8 @@ class ExternalControler {
 		this.textWriter.writeExtItData(outputPath, this.it2information);
 		this.textWriter.writeMatrices(outputPath, this.it2information);
 		this.textWriter.writeFareData(directoryIt, analysis.getFareData());
+		this.textWriter.wrtieFarePerTime(directoryIt, analysis.getAvgFarePerDepartureTimePeriod());
+		this.textWriter.writeTripFarePerId(directoryIt, analysis.getFirstTripFares(), analysis.getSecondTripFares());
 		
 		iterationCounter++;
 	}

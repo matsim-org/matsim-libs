@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -256,6 +257,63 @@ public class TextFileWriter {
 	    log.info("Textfile written to "+file.toString());
     
 	    } catch (IOException e) {}
+	}
+
+	public void wrtieFarePerTime(String outputPath, Map<Double, Double> detailFareAnalysis) {
+		File file = new File(outputPath + "/tripDepartureTimePeriod2avgFare.csv");
+		   
+	    try {
+	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+	    String zeile0 = outputPath;
+	    bw.write(zeile0);
+	    bw.newLine();
+	    String zeile1 = "Trip departure time period (bis unter);average fare per trip (AUD)";
+	    bw.write(zeile1);
+	    bw.newLine();
+	
+	    for (Double time : detailFareAnalysis.keySet()){
+	    	
+	    	String zeile = time + ";" + detailFareAnalysis.get(time);
+	
+	    	bw.write(zeile);
+	        bw.newLine();
+	    }
+	
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
+		
+	}
+
+	public void writeTripFarePerId(String outputPath, Map<Id, Double> firstTripFares, Map<Id, Double> secondTripFares) {
+	
+		File file = new File(outputPath + "/personId2tripFares.csv");
+		   
+	    try {
+	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+	    String zeile0 = outputPath;
+	    bw.write(zeile0);
+	    bw.newLine();
+	    String zeile1 = "PersonID;fare first trip (AUD);fare second trip (AUD)";
+	    bw.write(zeile1);
+	    bw.newLine();
+	
+	    for (Id id : firstTripFares.keySet()){
+	    	
+	    	String zeile = id + ";" + firstTripFares.get(id) + ";" + secondTripFares.get(id);
+	
+	    	bw.write(zeile);
+	        bw.newLine();
+	    }
+	
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
+		
 	}
 	
 }
