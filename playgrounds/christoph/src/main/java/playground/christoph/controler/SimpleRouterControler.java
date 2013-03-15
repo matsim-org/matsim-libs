@@ -22,6 +22,7 @@ package playground.christoph.controler;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -44,7 +45,6 @@ import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFacto
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
@@ -327,29 +327,28 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 				else simpleRouterControler.getWithinDayEngine().doInitialReplanning(true);
 			}
 			
-			CollectionAgentFilterFactory agentFilterFactory = new CollectionAgentFilterFactory();
-			
-			CollectionAgentFilter filter;
-			
-			filter = agentFilterFactory.createAgentFilter();
-			filter.addIncludedAgents(randomAgents);
-			simpleRouterControler.randomIdentifier.addAgentFilter(filter);
+			Set<Id> includedAgents;
+			CollectionAgentFilterFactory agentFilterFactory;
 
-			filter = agentFilterFactory.createAgentFilter();
-			filter.addIncludedAgents(tabuAgents);
-			simpleRouterControler.tabuIdentifier.addAgentFilter(filter);
+			includedAgents = new LinkedHashSet<Id>(randomAgents);
+			agentFilterFactory = new CollectionAgentFilterFactory(includedAgents);
+			simpleRouterControler.randomIdentifier.addAgentFilter(agentFilterFactory.createAgentFilter());
+
+			includedAgents = new LinkedHashSet<Id>(tabuAgents);
+			agentFilterFactory = new CollectionAgentFilterFactory(includedAgents);
+			simpleRouterControler.tabuIdentifier.addAgentFilter(agentFilterFactory.createAgentFilter());
 			
-			filter = agentFilterFactory.createAgentFilter();
-			filter.addIncludedAgents(compassAgents);
-			simpleRouterControler.compassIdentifier.addAgentFilter(filter);
+			includedAgents = new LinkedHashSet<Id>(compassAgents);
+			agentFilterFactory = new CollectionAgentFilterFactory(includedAgents);
+			simpleRouterControler.compassIdentifier.addAgentFilter(agentFilterFactory.createAgentFilter());
 			
-			filter = agentFilterFactory.createAgentFilter();
-			filter.addIncludedAgents(randomCompassAgents);
-			simpleRouterControler.randomCompassIdentifier.addAgentFilter(filter);
+			includedAgents = new LinkedHashSet<Id>(randomCompassAgents);
+			agentFilterFactory = new CollectionAgentFilterFactory(includedAgents);
+			simpleRouterControler.randomCompassIdentifier.addAgentFilter(agentFilterFactory.createAgentFilter());
 			
-			filter = agentFilterFactory.createAgentFilter();
-			filter.addIncludedAgents(dijkstraAgents);
-			simpleRouterControler.dijkstraIdentifier.addAgentFilter(filter);
+			includedAgents = new LinkedHashSet<Id>(dijkstraAgents);
+			agentFilterFactory = new CollectionAgentFilterFactory(includedAgents);
+			simpleRouterControler.dijkstraIdentifier.addAgentFilter(agentFilterFactory.createAgentFilter());
 			
 			log.info("Random Routing Probability: " + simpleRouterControler.pRandomRouter);
 			log.info("Tabu Routing Probability: " + simpleRouterControler.pTabuRouter);
