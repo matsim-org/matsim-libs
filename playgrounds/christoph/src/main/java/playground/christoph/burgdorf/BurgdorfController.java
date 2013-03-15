@@ -28,6 +28,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -38,6 +39,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.controller.WithinDayController;
+import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.LinkFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -57,6 +59,7 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 	private DuringLegIdentifierFactory duringLegFactory;
 	private DuringLegIdentifier parkingIdentifier;
 	
+	private CollectionAgentFilterFactory visitorAgentFilterFactory;
 	private TransportModeFilterFactory carLegAgentsFilterFactory;
 	private LinkFilterFactory linkFilterFactory;
 	
@@ -141,6 +144,12 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
 		duringLegRerouteTransportModes.add(TransportMode.car);
 
+		Set<Id> visitorAgents = new HashSet<Id>();
+		for (Person person : scenarioData.getPopulation().getPersons().values()) {
+			if (person.getId().toString().toLowerCase().contains("visitor")) visitorAgents.add(person.getId());
+		}
+		visitorAgentFilterFactory = new CollectionAgentFilterFactory(visitorAgents);
+		
 		carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes);
 		this.getMobsimListeners().add(carLegAgentsFilterFactory);			
 
@@ -150,6 +159,7 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 		this.getMobsimListeners().add(linkFilterFactory);
 		
 		duringLegFactory = new ParkingIdentifierFactory(this.getLinkReplanningMap());
+		duringLegFactory.addAgentFilterFactory(visitorAgentFilterFactory);
 		duringLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
 		duringLegFactory.addAgentFilterFactory(linkFilterFactory);
 		this.parkingIdentifier = duringLegFactory.createIdentifier();

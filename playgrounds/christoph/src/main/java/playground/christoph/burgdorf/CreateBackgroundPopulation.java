@@ -110,7 +110,7 @@ public class CreateBackgroundPopulation {
 //	public static int[] agentsPerOrigin = new int[]{3500, 3500, 3500, 3500, 3500};
 	public static int[] agentsPerOrigin = new int[]{6000, 6000, 6000, 6000, 6000};
 	
-	public static double scaleFactor = 1.00;
+	public static double scaleFactor = 0.10;
 	
 	public static String countsFile = "../../matsim/mysimulations/burgdorf/input/counts_burgdorf.xml";
 //	public static String networkFile = "../../matsim/mysimulations/burgdorf/input/network.xml.gz";

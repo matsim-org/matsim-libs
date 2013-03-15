@@ -77,6 +77,7 @@ public class ParkingInfrastructure {
 		list.add(new IdImpl("P03"));
 		list.add(new IdImpl("P04"));
 		list.add(new IdImpl("P05"));
+		list.add(new IdImpl("P07a"));	// can be reached from both
 		availableParkings.put(new IdImpl("L30"), list);
 
 		list = new ArrayList<Id>();
@@ -116,8 +117,11 @@ public class ParkingInfrastructure {
 		
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking07) list.add(new IdImpl(id));
-		list.add(new IdImpl("LP07a"));
 		parkingSubRoutes.put(new IdImpl("P07"), list);
+		
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.toParking07a) list.add(new IdImpl(id));
+		parkingSubRoutes.put(new IdImpl("P07a"), list);
 		
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking08) list.add(new IdImpl(id));
