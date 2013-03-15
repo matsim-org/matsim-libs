@@ -36,12 +36,19 @@ public class MergeBurgdorfPopulation {
 	
 	private static final Logger log = Logger.getLogger(MergeBurgdorfPopulation.class);
 
+//	private String day = "freitag";
+//	private String day = "samstag";
+	private String day = "sonntag";
+	
+//	private String direction = "to";
+	private String direction = "from";
+	
 	private String backgroundPopulationFile = "../../matsim/mysimulations/burgdorf/input/plans_background_samstag.xml.gz";
-	private String visitorPopulationFile = "../../matsim/mysimulations/burgdorf/input/plans_visitors_samstag.xml.gz";
-	private String campingPopulationFile = "../../matsim/mysimulations/burgdorf/input/plans_camping_samstag.xml.gz";
+	private String visitorPopulationFile = "../../matsim/mysimulations/burgdorf/input/plans_visitors_" + day + "_" + direction + "_burgdorf.xml.gz";
+	private String campingPopulationFile = "../../matsim/mysimulations/burgdorf/input/plans_camping_" + day + "_" + direction + "_burgdorf.xml.gz";
 	
 	private String networkFile = "../../matsim/mysimulations/burgdorf/input/network_burgdorf_cut.xml.gz";
-	private String outFile = "../../matsim/mysimulations/burgdorf/input/plans_merged_samstag.xml.gz";
+	private String outFile = "../../matsim/mysimulations/burgdorf/input/plans_merged_" + day + "_" + direction + "_burgdorf.xml.gz";
 		
 	public static void main(String[] args) {
 		new MergeBurgdorfPopulation(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
@@ -60,10 +67,10 @@ public class MergeBurgdorfPopulation {
 		log.info("Found " + scenario.getPopulation().getPersons().size() + " visitor persons.");
 		popSize = scenario.getPopulation().getPersons().size();
 		
-		log.info("Read camping population...");
-		new MatsimPopulationReader(scenario).readFile(campingPopulationFile);
-		log.info("Found " + (scenario.getPopulation().getPersons().size() - popSize) + " camping persons.");	
-		popSize = scenario.getPopulation().getPersons().size();
+//		log.info("Read camping population...");
+//		new MatsimPopulationReader(scenario).readFile(campingPopulationFile);
+//		log.info("Found " + (scenario.getPopulation().getPersons().size() - popSize) + " camping persons.");	
+//		popSize = scenario.getPopulation().getPersons().size();
 		
 		log.info("Read background population...");
 		new MatsimPopulationReader(scenario).readFile(backgroundPopulationFile);

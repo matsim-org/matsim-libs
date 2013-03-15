@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
@@ -56,6 +55,9 @@ import playground.christoph.burgdorf.withinday.replanners.ParkingReplannerFactor
  */
 public class BurgdorfController extends WithinDayController implements StartupListener {
 
+//	private static String runId = "SamstagToBurgdorf";
+	private static String runId = "SonntagFromBurgdorf";
+	
 	private DuringLegIdentifierFactory duringLegFactory;
 	private DuringLegIdentifier parkingIdentifier;
 	
@@ -64,7 +66,9 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 	private LinkFilterFactory linkFilterFactory;
 	
 	private double duringLegReroutingShare = 1.00;
-		
+	
+	private boolean useWithinDayReplanning = false;
+	
 	/*
 	 * ===================================================================
 	 * main
@@ -78,15 +82,10 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 		} else {
 			final Controler controler = new BurgdorfController(args);
 			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setRunId(runId);
 			controler.run();
 		}
 		System.exit(0);
-	}
-	
-	public BurgdorfController(Scenario scenario) {
-		super(scenario);
-		
-		init();
 	}
 	
 	public BurgdorfController(String[] args) {
@@ -103,24 +102,25 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 		
 	@Override
 	public void notifyStartup(StartupEvent event) {
-				
+						
+		if (useWithinDayReplanning) {
+			/*
+			 * Initialize TravelTimeCollector.
+			 */
+			Set<String> analyzedModes = new HashSet<String>();
+			analyzedModes.add(TransportMode.car);
+			super.createAndInitTravelTimeCollector(analyzedModes);
+			
+			/*
+			 * Create and initialize replanning manager and replanning maps.
+			 */
+			super.createAndInitLinkReplanningMap();			
+		}
 		/*
-		 * Get number of threads from config file.
+		 * Get number of threads from config file and initialize WithinDayEngine.
 		 */
 		int numReplanningThreads = this.config.global().getNumberOfThreads();
-		
-		/*
-		 * Initialize TravelTimeCollector.
-		 */
-		Set<String> analyzedModes = new HashSet<String>();
-		analyzedModes.add(TransportMode.car);
-		super.createAndInitTravelTimeCollector(analyzedModes);
-		
-		/*
-		 * Create and initialize replanning manager and replanning maps.
-		 */
 		super.initWithinDayEngine(numReplanningThreads);
-		super.createAndInitLinkReplanningMap();
 	}
 	
 	@Override
@@ -132,8 +132,10 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 		super.setUp();
 				
 		// initialize Identifiers and Replanners
-		this.initIdentifiers();
-		this.initReplanners();
+		if (useWithinDayReplanning) {
+			this.initIdentifiers();
+			this.initReplanners();			
+		}
 	}
 	
 	private void initIdentifiers() {

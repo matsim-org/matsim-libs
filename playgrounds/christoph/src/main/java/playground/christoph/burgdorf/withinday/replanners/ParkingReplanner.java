@@ -64,7 +64,7 @@ public class ParkingReplanner extends WithinDayDuringLegReplanner {
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 
 		Id parkingId = ParkingInfrastructure.selectedParkings.get(withinDayAgent.getId());
-		List<Id> parkingSubRoute = ParkingInfrastructure.parkingSubRoutes.get(parkingId);
+		List<Id> parkingSubRoute = ParkingInfrastructure.toParkingSubRoutes.get(parkingId);
 		
 		Leg currentLeg = (Leg) executedPlan.getPlanElements().get(currentLegIndex);
 		NetworkRoute route = (NetworkRoute) currentLeg.getRoute(); 

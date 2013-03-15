@@ -45,7 +45,8 @@ public class ParkingInfrastructure {
 	/*
 	 * Sub-routes from the parking decision links to the parkings.
 	 */
-	public static Map<Id, List<Id>> parkingSubRoutes = new HashMap<Id, List<Id>>();
+	public static Map<Id, List<Id>> toParkingSubRoutes = new HashMap<Id, List<Id>>();
+	public static Map<Id, List<Id>> fromParkingSubRoutes = new HashMap<Id, List<Id>>();
 	
 	/*
 	 * Parkings, that can be reached from a given decision link. 
@@ -93,42 +94,85 @@ public class ParkingInfrastructure {
 		 */
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking01) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P01"), list);
+		toParkingSubRoutes.put(new IdImpl("P01"), list);
 
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking02) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P02"), list);
+		toParkingSubRoutes.put(new IdImpl("P02"), list);
 
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking03) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P03"), list);
+		toParkingSubRoutes.put(new IdImpl("P03"), list);
 
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking04) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P04"), list);
+		toParkingSubRoutes.put(new IdImpl("P04"), list);
 		
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking05) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P05"), list);
+		toParkingSubRoutes.put(new IdImpl("P05"), list);
 		
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking06) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P06"), list);
+		toParkingSubRoutes.put(new IdImpl("P06"), list);
 		
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking07) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P07"), list);
+		toParkingSubRoutes.put(new IdImpl("P07"), list);
 		
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking07a) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P07a"), list);
+		toParkingSubRoutes.put(new IdImpl("P07a"), list);
 		
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking08) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P08"), list);
+		toParkingSubRoutes.put(new IdImpl("P08"), list);
 		
 		list = new ArrayList<Id>();
 		for (String id : CreateVisitorPopulation.toParking09) list.add(new IdImpl(id));
-		parkingSubRoutes.put(new IdImpl("P09"), list);
+		toParkingSubRoutes.put(new IdImpl("P09"), list);
+		
+		/*
+		 * from the parkings...
+		 */
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking01) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P01"), list);
+
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking02) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P02"), list);
+
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking03) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P03"), list);
+
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking04) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P04"), list);
+		
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking05) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P05"), list);
+		
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking06) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P06"), list);
+		
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking07) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P07"), list);
+		
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking07a) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P07a"), list);
+		
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking08) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P08"), list);
+		
+		list = new ArrayList<Id>();
+		for (String id : CreateVisitorPopulation.fromParking09) list.add(new IdImpl(id));
+		fromParkingSubRoutes.put(new IdImpl("P09"), list);
 	}
 }
