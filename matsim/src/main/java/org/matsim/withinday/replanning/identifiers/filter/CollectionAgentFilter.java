@@ -22,7 +22,6 @@ package org.matsim.withinday.replanning.identifiers.filter;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -34,24 +33,8 @@ public class CollectionAgentFilter implements AgentFilter {
 	private final Set<Id> includedAgents;
 	
 	// use the factory
-	/*package*/ CollectionAgentFilter() {
-		this.includedAgents = new HashSet<Id>();
-	}
-
-	public boolean addIncludedAgent(Id id) {
-		return this.includedAgents.add(id);
-	}
-	
-	public boolean addIncludedAgents(Collection<Id> ids) {
-		return this.includedAgents.addAll(ids);
-	}
-	
-	public boolean removeIncludedAgent(Id id) {
-		return this.includedAgents.remove(id);
-	}
-
-	public Collection<Id> getIncludedAgents() {
-		return Collections.unmodifiableSet(this.includedAgents);
+	/*package*/ CollectionAgentFilter(Set<Id> includedAgents) {
+		this.includedAgents = includedAgents;
 	}
 	
 	@Override
@@ -64,4 +47,7 @@ public class CollectionAgentFilter implements AgentFilter {
 		}
 	}
 
+	public Collection<Id> getIncludedAgents() {
+		return Collections.unmodifiableSet(this.includedAgents);
+	}
 }

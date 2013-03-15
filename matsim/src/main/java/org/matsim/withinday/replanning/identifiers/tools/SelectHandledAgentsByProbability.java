@@ -23,8 +23,10 @@ package org.matsim.withinday.replanning.identifiers.tools;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -68,10 +70,10 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 
 		Random random = MatsimRandom.getLocalInstance();
 		double probability;
-		List<Id> agentsToHandle;
+		Set<Id> agentsToHandle;
 
 		for (Tuple<Identifier, Double> tuple : identifierProbabilities) {
-			agentsToHandle = new ArrayList<Id>();
+			agentsToHandle = new LinkedHashSet<Id>();
 
 			for (Id agentId : this.withinDayAgents) {
 				probability = random.nextDouble();
@@ -85,8 +87,7 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 				}				
 			}
 			
-			CollectionAgentFilter filter = new CollectionAgentFilterFactory().createAgentFilter();
-			filter.addIncludedAgents(agentsToHandle);
+			CollectionAgentFilter filter = new CollectionAgentFilterFactory(agentsToHandle).createAgentFilter();
 			tuple.getFirst().addAgentFilter(filter);
 		}
 

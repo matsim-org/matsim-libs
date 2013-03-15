@@ -20,13 +20,21 @@
 
 package org.matsim.withinday.replanning.identifiers.filter;
 
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
 public class CollectionAgentFilterFactory implements AgentFilterFactory {
 
+	private final Set<Id> includedAgents;
+
+	public CollectionAgentFilterFactory(Set<Id> includedAgents) {
+		this.includedAgents = includedAgents;
+	}
+	
 	@Override
 	public CollectionAgentFilter createAgentFilter() {
-		return new CollectionAgentFilter();
+		return new CollectionAgentFilter(includedAgents);
 	}
-
 }
