@@ -31,7 +31,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -48,7 +47,7 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private static Scenario scenario = null;
 	
-	private Map<Id,Double> distances = new HashMap<Id,Double>();
+	private Map<Id,Double> geometricLengths = new HashMap<Id,Double>();
 	
 	private List<Link> lengthBelowStorageCapacity = new ArrayList<Link>();
 	
@@ -60,20 +59,11 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private Logger logger = Logger.getLogger(NetworkInspector.class);
 	
-	private double[] linkCapacities = new double[6];
-	
-	private double[] nLanes = new double[6];
-	
 	private double[] inDegrees = new double[7];
 	private double[] outDegrees = new double[7];
 	
-	private double[] lengths = new double[9];
-	private double[] geoLengths = new double[9];
-	
 	private double totalLength = 0;
 	private double totalGLength = 0;
-	
-	private boolean nodeAttributesChecked = false;
 	
 	private String outputFolder = "C:/Users/Daniel/Dropbox/bsc";
 	
@@ -114,7 +104,7 @@ public class NetworkInspector {//TODO pfade ändern
 			shpExportNodeStatistics(this.exitRoadNodes, "C:/Users/Daniel/Dropbox/bsc/pres/exitRoadNodes.shp");
 		
 		if(!(NetworkInspector.scenario.getPopulation().getPersons().size()<1))
-			populationMapping();
+			populationLinking();
 		
 		if(!routable)
 			new NetworkCleaner().run(NetworkInspector.scenario.getNetwork());
@@ -155,7 +145,7 @@ public class NetworkInspector {//TODO pfade ändern
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
 				} else {
-					smallClusterNodes.putAll(cluster);
+					smallClusterNodes.putAll(cluster); //eigener teil
 				}
 				if(biggestCluster.size()==NetworkInspector.scenario.getNetwork().getNodes().size()){
 					logger.info("size of the biggest cluster equals network size...");
@@ -181,7 +171,7 @@ public class NetworkInspector {//TODO pfade ändern
 			
 		}
 		
-		logger.info("writing small clusters into shapefile...");
+		logger.info("writing small clusters into ESRI shapefile...");
 		
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		typeBuilder.setName("shape");
@@ -270,94 +260,30 @@ public class NetworkInspector {//TODO pfade ändern
 		int writerIndex = 0;
 		
 		for(Link link : NetworkInspector.scenario.getNetwork().getLinks().values()){
-			double distance = 
+			double geometricLength = 
 					Math.sqrt(Math.pow(link.getToNode().getCoord().getX() -
 							link.getFromNode().getCoord().getX(),2) +
 							Math.pow(link.getToNode().getCoord().getY() -
 							link.getFromNode().getCoord().getY(), 2));
 			
-			int numberOfLanes = (int) link.getNumberOfLanes();
-			this.nLanes[numberOfLanes-1]++;
+			this.geometricLengths.put(link.getId(), geometricLength);
 			
-			if(link.getCapacity()<500)
-				this.linkCapacities[0]++;
-			else if(link.getCapacity()<1000&&link.getCapacity()>=500)
-				this.linkCapacities[1]++;
-			else if(link.getCapacity()<1500&&link.getCapacity()>=1000)
-				this.linkCapacities[2]++;
-			else if(link.getCapacity()<2000&&link.getCapacity()>=1500)
-				this.linkCapacities[3]++;
-			else if(link.getCapacity()<2500&&link.getCapacity()>=2000)
-				this.linkCapacities[4]++;
-			else if(link.getCapacity()>=2500)
-				this.linkCapacities[5]++;
+			this.totalLength += link.getLength();
+			this.totalGLength += geometricLength;
 			
-			if(link.getLength()<7){
-				this.lengths[0]++;
+			if(link.getLength()<7||geometricLength<7){
 				this.lengthBelowStorageCapacity.add(link);
 				writerIndex++;
 			}
-			else if(link.getLength()<15&&link.getLength()>=7)
-				this.lengths[1]++;
-			else if(link.getLength()<50&&link.getLength()>=15)
-				this.lengths[2]++;
-			else if(link.getLength()<100&&link.getLength()>=50)
-				this.lengths[3]++;
-			else if(link.getLength()>=100&&link.getLength()<150)
-				this.lengths[4]++;
-			else if(link.getLength()>=150&&link.getLength()<200)
-				this.lengths[5]++;
-			else if(link.getLength()>=200&&link.getLength()<300)
-				this.lengths[6]++;
-			else if(link.getLength()>=300&&link.getLength()<500)
-				this.lengths[7]++;
-			else if(link.getLength()>=500)
-				this.lengths[8]++;
-			
-			if(distance<7)
-				this.geoLengths[0]++;
-			else if(distance<15&&distance>=7)
-				this.geoLengths[1]++;
-			else if(distance<50&&distance>=15)
-				this.geoLengths[2]++;
-			else if(distance<100&&distance>=50)
-				this.geoLengths[3]++;
-			else if(distance>=100&&distance<150)
-				this.geoLengths[4]++;
-			else if(distance>=150&&distance<200)
-				this.geoLengths[5]++;
-			else if(distance>=200&&distance<300)
-				this.geoLengths[6]++;
-			else if(distance>=300&&distance<500)
-				this.geoLengths[7]++;
-			else if(distance>=500)
-				this.geoLengths[8]++;
-			
-			this.distances.put(link.getId(), distance);
-			
-			this.totalLength += link.getLength();
-			this.totalGLength += distance;
-			
-			if(this.nodeAttributesChecked){
-				if(this.redundantNodes.contains(link.getFromNode())){
-					double capacity = link.getCapacity();
-					double prevCapacity = link.getFromNode().getInLinks().values().iterator().next().getCapacity();
-					if(capacity!=prevCapacity)
-						System.out.println("capacity of link" + link.getFromNode().getInLinks().values().iterator().next().getId() + " changes after a redundant node. may be wrong...");
-				} else if(this.redundantNodes.contains(link.getToNode())){
-					double capacity = link.getCapacity();
-					double nextCapacity = link.getToNode().getOutLinks().values().iterator().next().getCapacity();
-					if(capacity!=nextCapacity)
-						System.out.println("capacity of link" + link.getId() + " changes after a redundant node. may be wrong...");
-				}
-			}
-			
+					
 		}
 		
 		
 		logger.info("done.");
 		
 		logger.info("writing link statistics files...");
+		
+		createLinkStatisticsFile();
 		
 		File file = new File(this.outputFolder+"/test/lengthBelowStorageCapacity.txt");
 		FileWriter writer;
@@ -370,17 +296,11 @@ public class NetworkInspector {//TODO pfade ändern
 						link.getLength() + "m instead of 7 m)\n");
 			}
 			writer.close();
-			
-			createLaneStatisticsFiles();
-			
-			createLinkLengthComparisonFile();
-			
-			createLinkCapacityFiles();
-			
-			createLinkLengthFiles();
-			
+						
 		} catch (IOException e) {
+			
 			e.printStackTrace();
+			
 		}
 		
 		if(writerIndex>0)
@@ -434,22 +354,17 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		logger.info("writing node statistics files...");
 		
-		try {
-			createNodeDegreesFiles(this.inDegrees, this.outDegrees);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
-		this.nodeAttributesChecked = true;
+		createNodeStatisticsFile();
 		
 		logger.info("done.");
 		
 	}
 	
 	//eigene methode
-	private void populationMapping(){
+	private void populationLinking(){
 		
-		logger.info("checking where the population is mapped on the network...");
+		logger.info("checking where the population is linked on the network...");
 		
 		for(Person p : NetworkInspector.scenario.getPopulation().getPersons().values()){
 			
@@ -520,117 +435,73 @@ public class NetworkInspector {//TODO pfade ändern
 			
 		}
 		
+		logger.info("writing pointers from activities to nearest links to ESRI shapefile...");
+		
 		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/output/mapping/pointers.shp");
 		
 		logger.info("...done.");
 		
 	}
 	
-	//eigene methode
-	private void createLinkLengthFiles() throws IOException {
+	private void createLinkStatisticsFile(){
 		
-		File file = new File(this.outputFolder+"/test/lengthStatistics.txt");
-		FileWriter writer = new FileWriter(file);
+		File file = new File(this.outputFolder+"/test/linkStatistics.txt");
 		
-		writer.write("\t\t<7\t<15\t<50\t<100\t<150\t<200\t<300\t<500\t>500\nnObjects");
-		
-		for(int j=0;j<this.lengths.length;j++){
-			writer.write("\t"+this.lengths[j]);
+		try {
+			
+			FileWriter writer = new FileWriter(file);
+			
+			writer.write("ID \t length \t geometricLength \t nlanes \t capacity");
+			
+			for(Link l : NetworkInspector.scenario.getNetwork().getLinks().values()){
+				
+				writer.write("\n"+ l.getId() +
+						"\t"+l.getLength() +
+						"\t" + this.geometricLengths.get(l.getId()) +
+						"\t" + l.getNumberOfLanes() +
+						"\t" + l.getCapacity());
+				
+			}
+			
+			writer.close();
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
 		}
-		writer.close();
-		
-		String[] categories = new String[9];
-		categories[0]="< 7";
-		categories[1]="< 15";
-		categories[2]="< 50";
-		categories[3]="< 100";
-		categories[4]="< 150";
-		categories[5]="< 200";
-		categories[6]="< 300";
-		categories[7]="< 500";
-		categories[8]="> 500";
-		
-		BarChart chart = new BarChart("Link lengths", "length [m]", "number of objects",categories);
-		chart.addSeries("link lengths", this.lengths);
-		chart.addSeries("geometric link lengths", this.geoLengths);
-		chart.saveAsPng(this.outputFolder+"/test/lengthStatistics.png", 800, 600);
 		
 	}
 	
 	//eigene methode
-	private void createLaneStatisticsFiles() throws IOException {
+	private void createNodeStatisticsFile() {
 		
-		File file = new File(this.outputFolder+"/test/laneStatistics.txt");
-		FileWriter writer = new FileWriter(file);
-		writer.write("NLanes");
-		for(int i=0;i<this.nLanes.length;i++){
-			writer.write("\t"+ (i+1));
+		File file = new File(this.outputFolder+"/test/nodeStatistics.txt");
+		FileWriter writer;
+		try {
+			writer = new FileWriter(file);
+			
+			writer.write("ID\tinDegree\toutDegree");
+			
+			for(Node n : NetworkInspector.scenario.getNetwork().getNodes().values()){
+				
+				writer.write("\n"+n.getId()+"\t"+n.getInLinks().size()+"\t"+n.getOutLinks().size());
+				System.out.println(n.getInLinks().size()+","+n.getOutLinks().size());
+				
+			}
+			
+			writer.close();
+			
+		} catch (IOException e1) {
+			
+			e1.printStackTrace();
+			
 		}
-		writer.write("\nnObjects");
-		for(int j=0;j<this.nLanes.length;j++){
-			writer.write("\t"+this.nLanes[j]);
-		}
-		writer.close();
-		
-		BarChart chart = new BarChart("Number of lanes", "number of lanes", "number of objects");
-		chart.addSeries("nlanes", this.nLanes);
-		chart.saveAsPng(this.outputFolder+"/test/laneStatistics.png", 800, 600);
-	}
 
-	//eigene methode
-	private void createLinkLengthComparisonFile() throws IOException {
-		
-		File file = new File(this.outputFolder+"/test/linkLengthComparison.txt");
-		FileWriter writer = new FileWriter(file);
-		writer.write("Id\tlength\tgeometric Length");
-		
-		for(Id id : this.distances.keySet()){
-			writer.write("\n"+id.toString()+"\t"+
-					NetworkInspector.scenario.getNetwork().getLinks().get(id).getLength()+
-					"\t"+this.distances.get(id));
-		}
-		
-		writer.close();
-
-	}
-	
-	//eigene methode
-	private void createLinkCapacityFiles() throws IOException{
-		
-		//kategorien: 500|1000|1500|2000|>...
-		String[] categories = new String[6];
-		categories[0]="<500";
-		categories[1]="<1000";
-		categories[2]="<1500";
-		categories[3]="<2000";
-		categories[4]="<2500";
-		categories[5]=">2500";
-		
-		BarChart chart = new BarChart("Link capacities","capacity","number of objects",categories);
-		chart.addSeries("capacities", this.linkCapacities);
-		chart.saveAsPng(this.outputFolder+"/test/linkCapacities.png", 800, 600);
-		
-	}
-
-	//eigene methode
-	private void createNodeDegreesFiles(double[] inDegrees, double[] outDegrees) throws IOException {
-		
-		File file = new File(this.outputFolder+"/test/nodeDegrees.txt");
-		FileWriter writer = new FileWriter(file);
-		writer.write("in/out\t1\t2\t3\t4\t5\t6\t7\nnobjects");
-		
-		for(int i=0;i<inDegrees.length;i++){
-			writer.write("\t"+inDegrees[i]+"/"+outDegrees[i]);
-		}
-		writer.close();
-
-		BarChart chart = new BarChart("Node degrees", "degree", "number of objects");
-		chart.addSeries("in-degrees", inDegrees);
-		chart.addSeries("out-degrees", outDegrees);
-		chart.saveAsPng(this.outputFolder+"/test/nodeDegrees.png", 800, 600);
 	}
 	
 	public void shpExportNodeStatistics(Collection<Node> collection, String directory){
+		
 		initFeatureType();
 		Collection<SimpleFeature> features = createFeatures(collection);
 		ShapeFileWriter.writeGeometries(features, directory);
@@ -661,8 +532,6 @@ public class NetworkInspector {//TODO pfade ändern
 		typeBuilder.setCRS(crs);
 		typeBuilder.add("location",Point.class);
 		typeBuilder.add("ID",String.class);
-//		typeBuilder.add("in-degree",String.class);
-//		typeBuilder.add("out-degree",String.class);
 		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 		
 	}
