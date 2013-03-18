@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.pt.transitSchedule;
+package org.matsim.pt.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -44,10 +45,16 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.xml.sax.SAXException;
 
 /**
+ * An abstract class offering a number of static methods to validate several aspects of transit schedules.
+ * 
  * @author mrieser
  */
 public abstract class TransitScheduleValidator {
 
+	private TransitScheduleValidator() {
+		// this class should not be instantiated
+	}
+	
 	/**
 	 * Checks that the links specified for a network route really builds a complete route that can be driven along.
 	 *
@@ -157,28 +164,56 @@ public abstract class TransitScheduleValidator {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (TransitRouteStop stop : route.getStops()) {
 					if (stop.getStopFacility() == null) {
-						result.addError("TransitRoute " + route.getId() + " of line " + line.getId() + " contains a stop (dep-offset=" + stop.getDepartureOffset() + ") without stop-facility. Most likely, a wrong id was specified in the file.");
+						result.addError("Transit line " + line.getId() + ", route " + route.getId() + " contains a stop (dep-offset=" + stop.getDepartureOffset() + ") without stop-facility. Most likely, a wrong id was specified in the file.");
 					} else if (schedule.getFacilities().get(stop.getStopFacility().getId()) == null) {
-						result.addError("TransitRoute " + route.getId() + " of line " + line.getId() + " contains a stop (stop-facility " + stop.getStopFacility().getId() + ") that is not contained in the list of all stop facilities.");
+						result.addError("Transit line " + line.getId() + ", route " + route.getId() + " contains a stop (stop-facility " + stop.getStopFacility().getId() + ") that is not contained in the list of all stop facilities.");
 					}
 				}
 			}
 		}
 		return result;
 	}
+	
+	public static ValidationResult validateOffsets(final TransitSchedule schedule) {
+		ValidationResult result = new ValidationResult();
+
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(route.getStops());
+				int stopCount = stops.size();
+				
+				TransitRouteStop stop = stops.get(0);
+				if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
+					result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The first stop does not contain any departure offset.");
+				}
+				
+				for (int i = 1; i < stopCount - 1; i++) {
+					stop = stops.get(i);
+					if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
+						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": Stop " + i + " does not contain any departure offset.");
+					}
+				}
+
+				stop = stops.get(stopCount - 1);
+				if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
+					result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The last stop does not contain any arrival offset.");
+				}
+			}
+		}
+		
+		return result;
+	}
 
 	public static ValidationResult validateAll(final TransitSchedule schedule, final Network network) {
 		ValidationResult v = validateUsedStopsHaveLinkId(schedule);
-		ValidationResult v2 = validateNetworkRoutes(schedule, network);
-		v.add(v2);
+		v.add(validateNetworkRoutes(schedule, network));
 		try {
-			ValidationResult v3 = validateStopsOnNetworkRoute(schedule, network);
-			v.add(v3);
+			v.add(validateStopsOnNetworkRoute(schedule, network));
 		} catch (NullPointerException e) {
-			v.addError("Exception during 'validateStopsOnNetworkRoute'. Most likely something is wrong in the file, but it cannot be specified in more detail." + Arrays.toString(e.getStackTrace())); // TODO [MR] improve
+			v.addError("Exception during 'validateStopsOnNetworkRoute'. Most likely something is wrong in the file, but it cannot be specified in more detail." + Arrays.toString(e.getStackTrace()));
 		}
-		ValidationResult v4 = validateAllStopsExist(schedule);
-		v.add(v4);
+		v.add(validateAllStopsExist(schedule));
+		v.add(validateOffsets(schedule));
 		return v;
 	}
 	
@@ -203,23 +238,21 @@ public abstract class TransitScheduleValidator {
 	}
 
 	/**
-	 * @param args [0] path to transitSchedule.xml, [1] path to network.xml
+	 * @param args [0] path to transitSchedule.xml, [1] path to network.xml (optional)
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
+		if (args.length > 2 || args.length < 1) {
+			System.err.println("Usage: TransitScheduleValidator transitSchedule.xml [network.xml]");
+			return;
+		}
+		
 		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		s.getConfig().scenario().setUseTransit(true);
 		TransitSchedule ts = s.getTransitSchedule();
 		Network net = s.getNetwork();
-
-//		args = new String[] {"/data/projects/bvg2010/Daten/transitSchedule.oevnet.xml", "/data/projects/bvg2010/Daten/transit-network.xml"};
-//		args = new String[] {"/Users/cello/Desktop/MATSim/pt-test/matsim-0.2.0-rc1-release/pt-rdam/transitSchedule.xml", "/Users/cello/Desktop/MATSim/pt-test/matsim-0.2.0-rc1-release/pt-rdam/rdamnetwork.xml"};
-//		args = new String[] {"/data/senozon/visumData/matsim/transitSchedule.xml", "/data/senozon/visumData/matsim/network.cleaned.xml"};
-//		args = new String[] {"/Users/cello/Desktop/bvgnet8/transitSchedule.xml", "/Users/cello/Desktop/bvgnet8/network.xml"};
-//		args = new String[] {"/Users/cello/Downloads/0.transitSchedule.xml.gz", "/Users/cello/Downloads/network.final.xml.gz"};
-		args = new String[] {"/Users/cello/Desktop/gaojian/pt-tutorial/TransitSchedule_Baoding.xml", "/Users/cello/Desktop/gaojian/pt-tutorial/multimodalnetwork_baoding.xml"};
 
 		if (args.length > 1) {
 			new MatsimNetworkReader(s).parse(args[1]);
