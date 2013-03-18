@@ -122,6 +122,11 @@ public final class TransitRouterNetwork implements Network {
 		public TransitLine getLine() {
 			return line;
 		}
+		
+		@Override
+		public String toString() {
+			return this.id.toString();
+		}
 	}
 
 	/**
@@ -252,6 +257,11 @@ public final class TransitRouterNetwork implements Network {
 
 		public TransitLine getLine() {
 			return line;
+		}
+		
+		@Override
+		public String toString() {
+			return "[" + this.id.toString() + " (" + this.getFromNode().id + " > " + this.getToNode().id + ")]";
 		}
 
 	}
