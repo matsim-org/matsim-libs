@@ -1,4 +1,4 @@
-package playground.toronto.transitfares;
+package playground.toronto.transitfares.deprecated;
 
 import java.util.Map;
 

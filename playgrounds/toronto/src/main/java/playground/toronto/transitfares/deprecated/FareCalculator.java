@@ -1,4 +1,4 @@
-package playground.toronto.transitfares;
+package playground.toronto.transitfares.deprecated;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;

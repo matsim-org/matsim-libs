@@ -1,4 +1,4 @@
-package playground.toronto.transitfares;
+package playground.toronto.transitfares.deprecated;
 
 import java.util.Map;
 
@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
+
 
 /**
  * A {@link FareCalculator} wrapper which allows different agencies to have their own fare
