@@ -14,8 +14,8 @@ import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
 
-import playground.toronto.transitfares.FareCalculator;
-import playground.toronto.transitfares.NullFareCalculator;
+import playground.toronto.transitfares.deprecated.FareCalculator;
+import playground.toronto.transitfares.deprecated.NullFareCalculator;
 
 /**
  * <p>A significantly upgraded version of the base {@link TransitNetworkTravelTimeAndDisutility} calculator for transit, with several differences:
