@@ -23,6 +23,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.matsim4opus.gis.GridUtils;
+import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
+import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -30,11 +34,11 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -48,14 +52,14 @@ public class NetworkInspector {//TODO pfade ändern
 	private static Scenario scenario = null;
 	
 	private Map<Id,Double> geometricLengths = new HashMap<Id,Double>();
+	private Map<Id,ArrayList<Activity>> mappedPopulation = new HashMap<Id,ArrayList<Activity>>();
+	private Map<Id,String> nodeTypes = new HashMap<Id,String>();
 	
 	private List<Link> lengthBelowStorageCapacity = new ArrayList<Link>();
 	
 	private List<Node> deadEndNodes = new ArrayList<Node>();
 	private List<Node> exitRoadNodes = new ArrayList<Node>();
 	private List<Node> redundantNodes = new ArrayList<Node>();
-	
-	private Map<Id,ArrayList<Activity>> mappedPopulation = new HashMap<Id,ArrayList<Activity>>();
 	
 	private Logger logger = Logger.getLogger(NetworkInspector.class);
 	
@@ -90,39 +94,38 @@ public class NetworkInspector {//TODO pfade ändern
 		
 	}
 	
-	private void run() {
-		
-		boolean routable = isRoutable();
-		checkNodeAttributes();
-		checkLinkAttributes();
-		
-		if(!(this.deadEndNodes.size()<1))
-			shpExportNodeStatistics(this.deadEndNodes, "C:/Users/Daniel/Dropbox/bsc/pres/deadEndNodes.shp");
-		if(!(this.redundantNodes.size()<1))
-			shpExportNodeStatistics(this.redundantNodes, "C:/Users/Daniel/Dropbox/bsc/pres/redundantNodes.shp");
-		if(!(this.exitRoadNodes.size()<1))
-			shpExportNodeStatistics(this.exitRoadNodes, "C:/Users/Daniel/Dropbox/bsc/pres/exitRoadNodes.shp");
-		
-		if(!(NetworkInspector.scenario.getPopulation().getPersons().size()<1))
-			populationLinking();
-		
-		if(!routable)
-			new NetworkCleaner().run(NetworkInspector.scenario.getNetwork());
-		
-//		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(800, this.bbox.getBoundingBox());
-//		SpatialGrid freeSpeedGrid = new SpatialGrid(this.bbox.getBoundingBox(), 800);
-//		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
-//		
-//		new AccessibilityCalc(measuringPoints, freeSpeedGrid, sc).runAccessibilityComputation();
-		
-	}
-
 	public NetworkInspector(){
 		
 		this.envelope = MinimumEnvelope.main(NetworkInspector.scenario.getNetwork()).buffer(-10);
 		
 	}
 	
+	private void run() {
+		
+		boolean routable = isRoutable();
+		checkNodeAttributes();
+		checkLinkAttributes();
+		
+		if(!(this.nodeTypes.size()<1))
+			exportNodesToShape();
+		
+		if(!(NetworkInspector.scenario.getPopulation().getPersons().size()<1))
+			populationLinking();
+		
+//		if(!routable)
+//			new NetworkCleaner().run(NetworkInspector.scenario.getNetwork());
+		
+		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
+		
+		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(100, bbox.getBoundingBox());
+		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
+		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
+		
+		new AccessibilityCalcV2(measuringPoints, freeSpeedGrid, sc).runAccessibilityComputation();
+		
+	}
+
 	private boolean isRoutable(){
 		
 		//aus klasse "NetworkCleaner"
@@ -331,16 +334,22 @@ public class NetworkInspector {//TODO pfade ändern
 				
 					if(inLink.getFromNode().equals(outLink.getToNode())){
 						if(this.envelope.contains(new Point(new CoordinateArraySequence(new Coordinate[]{
-								new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory())))
+								new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory()))){
 							this.deadEndNodes.add(node);
-						else
+							this.nodeTypes.put(node.getId(), "deadEnd");
+						}
+						else{
 							this.exitRoadNodes.add(node);
+							this.nodeTypes.put(node.getId(), "exit");
+						}
 					} else{
 						if(inLink.getCapacity()==outLink.getCapacity()&&
 								inLink.getFreespeed()==outLink.getFreespeed()&&
 								inLink.getNumberOfLanes()==outLink.getNumberOfLanes()&&
-								inLink.getAllowedModes()==outLink.getAllowedModes())
+								inLink.getAllowedModes()==outLink.getAllowedModes()){
 							this.redundantNodes.add(node);
+							this.nodeTypes.put(node.getId(), "redundant");
+						}
 					}
 				}
 			}
@@ -486,7 +495,6 @@ public class NetworkInspector {//TODO pfade ändern
 			for(Node n : NetworkInspector.scenario.getNetwork().getNodes().values()){
 				
 				writer.write("\n"+n.getId()+"\t"+n.getInLinks().size()+"\t"+n.getOutLinks().size());
-				System.out.println(n.getInLinks().size()+","+n.getOutLinks().size());
 				
 			}
 			
@@ -500,39 +508,29 @@ public class NetworkInspector {//TODO pfade ändern
 
 	}
 	
-	public void shpExportNodeStatistics(Collection<Node> collection, String directory){
+	private void exportNodesToShape(){
 		
-		initFeatureType();
-		Collection<SimpleFeature> features = createFeatures(collection);
-		ShapeFileWriter.writeGeometries(features, directory);
-		
-	}
-	
-	private Collection<SimpleFeature> createFeatures(Collection<Node> collection) {
-		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		for(Node node : collection){
-			features.add(getFeature(node));
-		}
-		return features;
-	}
-
-	private SimpleFeature getFeature(final Node node) {
-		Point p = MGC.coord2Point(node.getCoord());
-		try {
-			return this.builder.buildFeature(null, new Object[]{p,node.getId().toString()});
-		} catch (IllegalArgumentException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void initFeatureType() {
-		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		typeBuilder.setName("node");
-		typeBuilder.setCRS(crs);
 		typeBuilder.add("location",Point.class);
 		typeBuilder.add("ID",String.class);
+		typeBuilder.add("type",String.class);
 		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		for(Id nodeId : this.nodeTypes.keySet()){
+			
+			Point p = MGC.coord2Point(NetworkInspector.scenario.getNetwork().getNodes().get(nodeId).getCoord());
+			try {
+				features.add(this.builder.buildFeature(null, new Object[]{p,nodeId.toString(),this.nodeTypes.get(nodeId)}));
+			} catch (IllegalArgumentException e) {
+				throw new RuntimeException(e);
+			}
+			
+		}
+		
+		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/pres/nodeTypes.shp");
 		
 	}
 	
