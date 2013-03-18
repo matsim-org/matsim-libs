@@ -19,6 +19,7 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -38,6 +39,7 @@ public class BVGLines2PtModes implements PtMode2LineSetter{
 	
 	private final static Logger log = Logger.getLogger(BVGLines2PtModes.class);
 	private HashMap<Id, String> lineId2ptMode;
+	private String pIdentifier;
 	
 	public BVGLines2PtModes(){
 		log.info("using BVG naming sheme to tag lines");
@@ -45,9 +47,12 @@ public class BVGLines2PtModes implements PtMode2LineSetter{
 	
 	public void setPtModesForEachLine(TransitSchedule transitSchedule, String pIdentifier){
 		this.lineId2ptMode = new HashMap<Id, String>();
+		this.pIdentifier = pIdentifier;
 		
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
-			if (transitLine.getId().toString().contains("-B-") ) {
+			if (transitLine.getId().toString().contains(this.pIdentifier)) {
+				this.lineId2ptMode.put(transitLine.getId(), new String(this.pIdentifier));
+			} else if (transitLine.getId().toString().contains("-B-") ) {
 				this.lineId2ptMode.put(transitLine.getId(), new String("bvg_bus"));
 			} else if (transitLine.getId().toString().contains("-T-")) {
 				this.lineId2ptMode.put(transitLine.getId(), new String("bvg_tram"));
@@ -55,8 +60,6 @@ public class BVGLines2PtModes implements PtMode2LineSetter{
 				this.lineId2ptMode.put(transitLine.getId(), new String("s-bahn"));
 			} else if (transitLine.getId().toString().contains("-U-")) {
 				this.lineId2ptMode.put(transitLine.getId(), new String("u-bahn"));
-			} else if (transitLine.getId().toString().contains(pIdentifier)) {
-				this.lineId2ptMode.put(transitLine.getId(), new String(pIdentifier));
 			} else {
 				this.lineId2ptMode.put(transitLine.getId(), new String("other"));
 			}
@@ -66,6 +69,37 @@ public class BVGLines2PtModes implements PtMode2LineSetter{
 	
 	public HashMap<Id, String> getLineId2ptModeMap(){
 		return this.lineId2ptMode;
+	}
+	
+	public Color getColorForLine(Id lineId) {
+		String lineType = this.lineId2ptMode.get(lineId);
+		Color color;
+		if (lineType != null) {
+			if (lineType.equalsIgnoreCase("bvg_bus")) {
+//				color = Color.MAGENTA;
+				color = new Color(149, 39, 110);
+			} else if (lineType.equalsIgnoreCase("bvg_tram")) {
+//				color = Color.RED;
+				color = new Color(190, 20, 20);
+			} else if (lineType.equalsIgnoreCase("s-bahn")) {
+//				color = Color.GREEN;
+				color = new Color(64, 131, 53);
+			} else if (lineType.equalsIgnoreCase("u-bahn")) {
+//				color = Color.BLUE;
+				color = new Color(17, 93, 145);
+			} else if (lineType.equalsIgnoreCase(this.pIdentifier)) {
+//				color = Color.CYAN;
+				color = new Color(82, 141, 186);
+			} else {
+//				color = Color.ORANGE;
+				color = new Color(243, 121, 29);
+			}
+		} else {
+//			color = Color.YELLOW;
+			color = new Color(240, 215, 34);
+		}
+		
+		return color;
 	}
 	
 	@Override
