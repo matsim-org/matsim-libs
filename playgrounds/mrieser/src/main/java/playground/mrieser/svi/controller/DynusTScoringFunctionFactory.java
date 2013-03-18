@@ -27,7 +27,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.mrieser.svi.data.ActivityToZoneMapping;
-import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
 
 /**
  * @author mrieser

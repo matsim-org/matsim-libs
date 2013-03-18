@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data.vehtrajectories;
+package playground.mrieser.svi.data.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -35,7 +35,13 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
+import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectory;
+import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectoryHandler;
+
 /**
+ * Calculates the number of vehicles per link and per hour. Outputs the data
+ * in a textual table.
+ * 
  * @author mrieser
  */
 public class CalculateLinkStatsFromVehTrajectories implements VehicleTrajectoryHandler {

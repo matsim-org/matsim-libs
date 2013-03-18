@@ -39,7 +39,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import playground.mrieser.svi.data.ActivityToZoneMappingReader;
 import playground.mrieser.svi.data.ShapeZonesReader;
 import playground.mrieser.svi.data.ZoneIdToIndexMappingReader;
-import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
 import playground.mrieser.svi.pt.PtLines;
 import playground.mrieser.svi.pt.PtLinesReader;
 import playground.mrieser.svi.pt.PtLinesStatistics;

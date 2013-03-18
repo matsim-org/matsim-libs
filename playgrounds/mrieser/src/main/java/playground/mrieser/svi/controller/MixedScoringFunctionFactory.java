@@ -25,7 +25,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.mrieser.svi.data.ActivityToZoneMapping;
-import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
 
 public class MixedScoringFunctionFactory implements ScoringFunctionFactory {
 

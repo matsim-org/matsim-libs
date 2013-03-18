@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data.vehtrajectories;
+package playground.mrieser.svi.data.analysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,6 +29,9 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.NetworkUtils;
+
+import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectory;
+import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectoryHandler;
 
 /**
  * @author mrieser

@@ -33,7 +33,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 import playground.mrieser.svi.data.ActivityToZoneMapping;
-import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
 
 /**
  * @author mrieser

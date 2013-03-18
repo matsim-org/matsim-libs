@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data.vehtrajectories;
+package playground.mrieser.svi.data.analysis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -27,6 +27,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.mrieser.svi.data.ZoneIdToIndexMapping;
 import playground.mrieser.svi.data.ZoneIdToIndexMappingReader;
+import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectoriesReader;
 
 /**
  * @author mrieser

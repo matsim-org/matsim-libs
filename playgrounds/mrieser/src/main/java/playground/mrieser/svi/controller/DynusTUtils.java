@@ -29,7 +29,7 @@ import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.svi.converters.DynusTNetworkReader;
-import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
 
 /**
  * @author mrieser

@@ -42,11 +42,11 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.svi.data.DynamicODMatrix;
 import playground.mrieser.svi.data.DynusTDynamicODDemandWriter;
-import playground.mrieser.svi.data.vehtrajectories.CalculateLinkStatsFromVehTrajectories;
-import playground.mrieser.svi.data.vehtrajectories.CalculateLinkTravelTimesFromVehTrajectories;
-import playground.mrieser.svi.data.vehtrajectories.CalculateTravelTimeMatrixFromVehTrajectories;
+import playground.mrieser.svi.data.analysis.CalculateLinkStatsFromVehTrajectories;
+import playground.mrieser.svi.data.analysis.CalculateLinkTravelTimesFromVehTrajectories;
+import playground.mrieser.svi.data.analysis.CalculateTravelTimeMatrixFromVehTrajectories;
+import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
 import playground.mrieser.svi.data.vehtrajectories.CsvReformatter;
-import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
 import playground.mrieser.svi.data.vehtrajectories.Extractor;
 import playground.mrieser.svi.data.vehtrajectories.MultipleVehicleTrajectoryHandler;
 import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectoriesReader;

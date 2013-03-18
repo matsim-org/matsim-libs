@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data.vehtrajectories;
+package playground.mrieser.svi.data.analysis;
 
 import java.util.HashMap;
 import java.util.Map;

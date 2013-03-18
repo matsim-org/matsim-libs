@@ -17,10 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data.vehtrajectories;
+package playground.mrieser.svi.data.analysis;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectory;
+import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectoryHandler;
+
 
 /**
  * @author mrieser
