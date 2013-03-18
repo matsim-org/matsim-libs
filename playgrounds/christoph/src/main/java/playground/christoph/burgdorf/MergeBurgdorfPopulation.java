@@ -72,9 +72,9 @@ public class MergeBurgdorfPopulation {
 //		log.info("Found " + (scenario.getPopulation().getPersons().size() - popSize) + " camping persons.");	
 //		popSize = scenario.getPopulation().getPersons().size();
 		
-		log.info("Read background population...");
-		new MatsimPopulationReader(scenario).readFile(backgroundPopulationFile);
-		log.info("Found " + (scenario.getPopulation().getPersons().size() - popSize) + " background persons.");
+//		log.info("Read background population...");
+//		new MatsimPopulationReader(scenario).readFile(backgroundPopulationFile);
+//		log.info("Found " + (scenario.getPopulation().getPersons().size() - popSize) + " background persons.");
 		
 		log.info("Writing Burgdorf population to file...");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outFile);

@@ -56,6 +56,9 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 	public static String networkFile = "../../matsim/mysimulations/burgdorf/input/network_burgdorf_cut.xml.gz";
 	public static String populationFile = "../../matsim/mysimulations/burgdorf/input/plans_visitors_" + day + "_" + direction + "_burgdorf.xml.gz";
 
+	private boolean viaKriegstetten = true;
+	private boolean viaSchoenbuehl = false;
+	
 	/*
 	 * The array below contain the expected arrival time but we have to set the departure times.
 	 * Therefore let the agents depart earlier.
@@ -154,11 +157,19 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		// from parking routes
 		routeFromParkingsTo1 = new ArrayList<Id>();
 		for (String id : highwayToZurich) routeFromParkingsTo1.add(scenario.createId(id));
-		for (String id : to1) routeFromParkingsTo1.add(scenario.createId(id));
+		if (!this.viaKriegstetten) for (String id : to1) routeFromParkingsTo1.add(scenario.createId(id));
+		else {
+			for (String id : toKriegstetten) routeFromParkingsTo1.add(scenario.createId(id));
+			for (String id : to1FromKriegstetten) routeFromParkingsTo1.add(scenario.createId(id));
+		}
 
 		routeFromParkingsTo2 = new ArrayList<Id>();
 		for (String id : highwayToZurich) routeFromParkingsTo2.add(scenario.createId(id));
-		for (String id : to2) routeFromParkingsTo2.add(scenario.createId(id));
+		if (!this.viaKriegstetten) for (String id : to2) routeFromParkingsTo2.add(scenario.createId(id));
+		else {
+			for (String id : toKriegstetten) routeFromParkingsTo2.add(scenario.createId(id));
+			for (String id : to2FromKriegstetten) routeFromParkingsTo2.add(scenario.createId(id));
+		}
 
 		routeFromParkingsTo3 = new ArrayList<Id>();
 		for (String id : highwayToBern) routeFromParkingsTo3.add(scenario.createId(id));
