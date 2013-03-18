@@ -68,6 +68,7 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 	private double duringLegReroutingShare = 1.00;
 	
 	private boolean useWithinDayReplanning = false;
+//	private boolean useWithinDayReplanning = true;
 	
 	/*
 	 * ===================================================================
