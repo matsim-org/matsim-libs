@@ -32,7 +32,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -73,7 +72,7 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private SimpleFeatureBuilder builder;
 	
-	private Geometry envelope;
+	private Geometry envelope;//population ganz raus!!
 	
 	/**
 	 * 
@@ -102,28 +101,31 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private void run() {
 		
-		boolean routable = isRoutable();
-		checkNodeAttributes();
-		checkLinkAttributes();
-		
-		if(!(this.nodeTypes.size()<1))
-			exportNodesToShape();
-		
-		if(!(NetworkInspector.scenario.getPopulation().getPersons().size()<1))
-			populationLinking();
-		
-//		if(!routable)
-//			new NetworkCleaner().run(NetworkInspector.scenario.getNetwork());
-		
-		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
-		
-		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(100, bbox.getBoundingBox());
-		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
-		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
-		
-		new AccessibilityCalcV2(measuringPoints, freeSpeedGrid, sc).runAccessibilityComputation();
-		
+		if(isRoutable()){
+			
+			checkNodeAttributes();
+			checkLinkAttributes();
+			
+			if(!(this.nodeTypes.size()<1))
+				exportNodesToShape();
+			
+			if(!(NetworkInspector.scenario.getPopulation().getPersons().size()<1))
+				populationLinking();
+			
+//			if(!routable)
+//				new NetworkCleaner().run(NetworkInspector.scenario.getNetwork());
+			
+			NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+			bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
+			
+			ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(100, bbox.getBoundingBox());
+			SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 100);
+			ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
+			
+			new AccessibilityCalcV2(measuringPoints, freeSpeedGrid, sc).runAccessibilityComputation();
+			
+		}
+			
 	}
 
 	private boolean isRoutable(){
@@ -322,6 +324,13 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		for(Node node : NetworkInspector.scenario.getNetwork().getNodes().values()){
 			
+			if(!this.envelope.contains(new Point(new CoordinateArraySequence(new Coordinate[]{
+					new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory()))){
+				this.exitRoadNodes.add(node);
+				this.nodeTypes.put(node.getId(), "exit");
+				continue;
+			}
+			
 			if(node.getInLinks().size()>0&&node.getOutLinks().size()>0){
 			
 				this.inDegrees[node.getInLinks().size()-1]++;
@@ -338,10 +347,10 @@ public class NetworkInspector {//TODO pfade ändern
 							this.deadEndNodes.add(node);
 							this.nodeTypes.put(node.getId(), "deadEnd");
 						}
-						else{
-							this.exitRoadNodes.add(node);
-							this.nodeTypes.put(node.getId(), "exit");
-						}
+//						else{
+//							this.exitRoadNodes.add(node);
+//							this.nodeTypes.put(node.getId(), "exit");
+//						}
 					} else{
 						if(inLink.getCapacity()==outLink.getCapacity()&&
 								inLink.getFreespeed()==outLink.getFreespeed()&&

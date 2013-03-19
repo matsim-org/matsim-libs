@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -21,7 +20,6 @@ import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2Neares
 import org.matsim.contrib.matsim4opus.utils.io.writer.SpatialGridTableWriter;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -30,8 +28,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import com.vividsolutions.jts.geom.Point;
 
 public class AccessibilityCalcV2 {
-	
-private static final Logger log = Logger.getLogger(AccessibilityCalc.class);
 	
 	private SpatialGrid freeSpeedGrid;
 	
