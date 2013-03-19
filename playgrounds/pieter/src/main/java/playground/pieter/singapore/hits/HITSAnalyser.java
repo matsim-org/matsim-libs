@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
@@ -72,7 +73,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.transitSchedule.TransitLineImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 
@@ -123,7 +127,13 @@ public class HITSAnalyser {
 	private static MultiNodeDijkstra transitMultiNodeDijkstra;
 	private static TransitRouterNetworkTravelTimeAndDisutilityVariableWW transitTravelFunction;
 	private static TransitRouterNetworkWW transitRouterNetwork;
-	private static TransitRouterConfig transitRouterConfig;
+	private static MyTransitRouterConfig transitRouterConfig;
+	private static HashSet<TransitLine> mrtLines;
+	private static HashSet<TransitLine> lrtLines;
+	private static String[] MRT_LINES;
+	private static String[] LRT_LINES;
+	private static HashMap<String, Coord> mrtCoords;
+	private static HashMap<String, Coord> lrtCoords;
 
 	static void createRouters(String[] args) {
 		scenario = ScenarioUtils
@@ -139,47 +149,80 @@ public class HITSAnalyser {
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl()
 				.createTravelTimeCalculator(scenario.getNetwork(), scenario
 						.getConfig().travelTimeCalculator());
-//		 EventsManager eventsManager =
-//		 EventsUtils.createEventsManager(scenario.getConfig());
-//		 eventsManager.addHandler(waitTimeCalculator);
-//		 eventsManager.addHandler(travelTimeCalculator);
-//		 (new EventsReaderXMLv1(eventsManager)).parse(args[4]);
-		transitRouterConfig = new TransitRouterConfig(
-				scenario.getConfig().planCalcScore(), scenario.getConfig()
-						.plansCalcRoute(),
+		System.out.println("Loading events");
+		// EventsManager eventsManager =
+		// EventsUtils.createEventsManager(scenario.getConfig());
+		// eventsManager.addHandler(waitTimeCalculator);
+		// eventsManager.addHandler(travelTimeCalculator);
+		// (new EventsReaderXMLv1(eventsManager)).parse(args[4]);
+		transitRouterConfig = new MyTransitRouterConfig(scenario.getConfig()
+				.planCalcScore(), scenario.getConfig().plansCalcRoute(),
 				scenario.getConfig().transitRouter(), scenario.getConfig()
 						.vspExperimental());
-		transitRouterNetwork = TransitRouterNetworkWW
-				.createFromSchedule(scenario.getNetwork(),
-						scenario.getTransitSchedule(),
-						transitRouterConfig.beelineWalkConnectionDistance);
-		 transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityVariableWW(
-				transitRouterConfig, scenario.getNetwork(), transitRouterNetwork,
+		transitRouterNetwork = TransitRouterNetworkWW.createFromSchedule(
+				scenario.getNetwork(), scenario.getTransitSchedule(),
+				transitRouterConfig.beelineWalkConnectionDistance);
+		transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityVariableWW(
+				transitRouterConfig, scenario.getNetwork(),
+				transitRouterNetwork,
 				travelTimeCalculator.getLinkTravelTimes(),
 				waitTimeCalculator.getWaitTimes(), scenario.getConfig()
 						.travelTimeCalculator(), startTime, endTime);
 		transitRouter = new TransitRouterVariableImpl(transitRouterConfig,
-				transitTravelFunction, transitRouterNetwork, scenario.getNetwork());
-		transitMultiNodeDijkstra = new MultiNodeDijkstra(transitRouterNetwork, transitTravelFunction, transitTravelFunction);
-		Set<Id> mrtLines = scenario.getTransitSchedule().getTransitLines().keySet();
-		
-		
-		// for(int p=0;p<1000;p++) {
-		// Set<TransitLine> lines = new HashSet<TransitLine>();
-		// for(int p2=0;p2<1000;p2++)
-		// lines.add(scenario.getTransitSchedule().getTransitLines().get(""));
-		// transitRouterVariableImpl.setAllowedLines(lines);
-		// Path path = transitRouterVariableImpl.calcPathRoute(new CoordImpl("",
-		// ""), new CoordImpl("", ""), new Double(""), null);
-		// }
-		
-		//now for car
+				transitTravelFunction, transitRouterNetwork,
+				scenario.getNetwork());
+		transitMultiNodeDijkstra = new MultiNodeDijkstra(transitRouterNetwork,
+				transitTravelFunction, transitTravelFunction);
+		// get the set of mrt and lrt lines for special case routing
+		mrtLines = new HashSet<TransitLine>();
+		lrtLines = new HashSet<TransitLine>();
+		Collection<TransitLine> lines = scenario.getTransitSchedule()
+				.getTransitLines().values();
+		MRT_LINES = new String[] { "EW", "NS", "NE", "CC" };
+		LRT_LINES = new String[] { "SW", "SE", "PE", "BP" };
+		Arrays.sort(MRT_LINES);
+		Arrays.sort(LRT_LINES);
+		List<TransitRouteStop> mrtStops = new ArrayList<TransitRouteStop>();
+		List<TransitRouteStop> lrtStops = new ArrayList<TransitRouteStop>();
+		mrtCoords = new HashMap<String, Coord>();
+		lrtCoords = new HashMap<String, Coord>();
+
+		for (TransitLine line : lines) {
+			if (line.getRoutes().size() != 0) {
+				if (Arrays.binarySearch(MRT_LINES, 0, 4, line.getId()
+						.toString()) >= 0) {
+					mrtLines.add(line);
+					// get the mrt stops
+					for (TransitRoute route : line.getRoutes().values()) {
+						mrtStops.addAll(route.getStops());
+					}
+
+				}
+				if (Arrays.binarySearch(LRT_LINES, 0, 4, line.getId()
+						.toString()) >= 0) {
+					lrtLines.add(line);
+					for (TransitRoute route : line.getRoutes().values()) {
+						lrtStops.addAll(route.getStops());
+					}
+				}
+			}
+		}
+		for (TransitRouteStop stop : mrtStops) {
+			mrtCoords.put(stop.getStopFacility().getName(), stop
+					.getStopFacility().getCoord());
+		}
+		for (TransitRouteStop stop : lrtStops) {
+			mrtCoords.put(stop.getStopFacility().getName(), stop
+					.getStopFacility().getCoord());
+		}
+
+		// now for car
 		TravelDisutility travelDisutility = new TravelCostCalculatorFactoryImpl()
 				.createTravelDisutility(travelTimeCalculator
 						.getLinkTravelTimes(), scenario.getConfig()
 						.planCalcScore());
-		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(), travelDisutility,
-				travelTimeCalculator.getLinkTravelTimes());
+		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(),
+				travelDisutility, travelTimeCalculator.getLinkTravelTimes());
 		HashSet<String> modeSet = new HashSet<String>();
 		modeSet.add("car");
 		carCongestedDijkstra.setModeRestriction(modeSet);
@@ -296,8 +339,8 @@ public class HITSAnalyser {
 		Node startNode = carFreeSpeedNetwork.getNearestNode(startCoord);
 		Node endNode = carFreeSpeedNetwork.getNearestNode(endCoord);
 
-		Path path = carCongestedDijkstra.calcLeastCostPath(startNode, endNode, time, null,
-				null);
+		Path path = carCongestedDijkstra.calcLeastCostPath(startNode, endNode,
+				time, null, null);
 		for (Link l : path.links) {
 			distance += l.getLength();
 			travelTime = l.getLength() / (l.getFreespeed() / 3.6);
@@ -409,7 +452,8 @@ public class HITSAnalyser {
 		}
 	}
 
-	private void createSQLSummary(Connection conn) {
+	private void createSQLSummary(Connection conn, double busSearchradius,
+			double mrtSearchRadius, boolean writeTransitCoords) {
 		// arb code for summary generation
 		try {
 			boolean again = true;
@@ -419,12 +463,13 @@ public class HITSAnalyser {
 				Statement s = conn.createStatement();
 				s.execute("DROP TABLE IF EXISTS trip_summary_routed;");
 				s.execute("CREATE TABLE trip_summary_routed (pax_idx VARCHAR(45), trip_idx VARCHAR(45),    "
+						+ ""
 						+ "totalWalkTime int,  totalTravelTime int, estTravelTime int, tripcount int, "
 						+ "invehtime int, freeCarDistance double, calcEstTripTime double, mainmode varchar(20), "
 						+ "timeperiod varchar(2), busDistance double, trainDistance double, "
 						+ "busTrainDistance double,"
 						+ "straightLineDistance double,"
-						+ " origdgp int, destdgp int, " 
+						+ " origdgp int, destdgp int, "
 						+ "congestedCarDistance double,"
 						+ "walkTimeFromRouter double, "
 						+ "walkDistanceFromRouter double, "
@@ -433,14 +478,28 @@ public class HITSAnalyser {
 						+ "transitInVehTimeFromRouter double, "
 						+ "transitInVehDistFromRouter double, "
 						+ "transitTotalTimeFromRouter double, "
-						+ "transitTotalDistanceFromRouter double);");
+						+ "transitTotalDistanceFromRouter double,"
+						+ "stageChainSimple varchar(512));");
 				s.execute("DROP TABLE IF EXISTS person_summary;");
 				s.execute("CREATE TABLE person_summary (h1_hhid varchar(20), pax_idx VARCHAR(45), "
 						+ "numberOfTrips int,  numberOfWalkStagesPax int, "
 						+ "totalWalkTimePax double, actMainModeChainPax  varchar(512), actStageChainPax  varchar(512), "
 						+ "actChainPax varchar(255))");
+				if(writeTransitCoords){
+					s.execute("DROP TABLE IF EXISTS transit_coords;");
+					s.execute("CREATE TABLE transit_coords (" +
+							"pax_idx VARCHAR(45)" +
+							", trip_idx VARCHAR(45)" +
+							", x_utm48n double" +
+							", y_utm48n double" +
+							", coord_type VARCHAR(255)" +
+							", id INT NOT NULL AUTO_INCREMENT" +
+							", PRIMARY KEY (id)" +
+							")");
+					
+				}
 				ArrayList<HITSPerson> persons = this.getHitsData().getPersons();
-				for (HITSPerson p : persons) {
+				PERSONS: for (HITSPerson p : persons) {
 
 					String insertString = String
 							.format("INSERT INTO person_summary VALUES(\'%s\',\'%s\',%d,%d,%f,\'%s\',\'%s\',\'%s\');",
@@ -457,10 +516,18 @@ public class HITSAnalyser {
 						double straightDistance = 0;
 						double freeCarTripTime = 0;
 						double congestedCarDistance = 0;
-						double walkTimeFromRouter = 0;
-						double walkDistanceFromRouter = 0;
-						double waitTimeFromRouter = 0;
-						double transferTimeFromRouter = 0;
+						double walkTimeTotalFromRouter = 0;
+						double walkDistanceTotalFromRouter = 0;
+						double walkDistanceAccessFromRouter = 0;
+						double walkDistanceEgressFromRouter = 0;
+						double walkDistanceTransferFromRouter = 0;
+						double walkTimeAccessFromRouter = 0;
+						double walkTimeEgressFromRouter = 0;
+						double walkTimeTransferFromRouter = 0;
+						double waitTimeAccessFromRouter = 0;
+						double waitTimeTransferFromRouter = 0;
+						double waitTimeTotalFromRouter = 0;
+						double transferTimeTotalFromRouter = 0;
 						double transitInVehTimeFromRouter = 0;
 						double transitInVehDistFromRouter = 0;
 						double transitTotalTimeFromRouter = 0;
@@ -470,7 +537,6 @@ public class HITSAnalyser {
 						double startTime = ((double) (t.t3_starttime_24h
 								.getTime() - this.referenceDate.getTime()))
 								/ (double) Timer.ONE_SECOND;
-						double linkStartTime = startTime;
 						try {
 							origCoord = HITSAnalyser.zip2Coord
 									.get(t.p13d_origpcode);
@@ -487,99 +553,304 @@ public class HITSAnalyser {
 							congestedCarDistance = HITSAnalyser
 									.getCarCongestedShortestPathDistance(
 											origCoord, destCoord, startTime).distance;
-							
+
 							// route transit-only trips using the transit router
-							
-							if (t.stageChainSimple.equals(t.stageChainTransit)) {								
+
+							if (t.stageChainSimple.equals(t.stageChainTransit)) {
 								Set<TransitLine> lines = new HashSet<TransitLine>();
 								Coord orig = origCoord;
 								Coord dest = destCoord;
+								Coord firstBoardPoint = null;
+								Coord finalAlightPoint = null;
 								Coord interimOrig = orig;
 								Coord interimDest = dest;
 								Path path = null;
 								// deal with the 7 most common cases for now
-								if (t.stageChainSimple.equals("publBus")) {
-									lines.add(HITSAnalyser.scenario
-											.getTransitSchedule()
-											.getTransitLines()
-											.get(new IdImpl(t.getStages()
-													.get(0).t11_boardsvcstn)));
-									transitRouter.setAllowedLines(lines);
-									path = transitRouter.calcPathRoute(orig,
-											dest, startTime, null);
+								HITSStage stage = t.getStages().get(0);
+								boolean busCheck = stage.t10_mode
+										.equals("publBus");
+								boolean mrtCheck = stage.t10_mode.equals("mrt");
+								boolean lrtCheck = stage.t10_mode.equals("lrt");
+								List<TransitStageRoutingInput> transitStages = new ArrayList<TransitStageRoutingInput>();
+								boolean doneCompilingTransitStages = false;
+								STAGES: while (!doneCompilingTransitStages) {
+//									System.out.println(p.pax_idx + "_"
+//											+ t.trip_id);
+									if (busCheck) {
+										lines.add(HITSAnalyser.scenario
+												.getTransitSchedule()
+												.getTransitLines()
+												.get(new IdImpl(
+														stage.t11_boardsvcstn)));
+										if (stage.nextStage != null) {
+											if (stage.nextStage.t10_mode
+													.equals("publBus")) {
+												stage = stage.nextStage;
+												continue STAGES;
+											} else {
 
+												// going to an lrt or mrt
+												// station
+												busCheck = false;
+												mrtCheck = stage.nextStage.t10_mode
+														.equals("mrt");
+												lrtCheck = stage.nextStage.t10_mode
+														.equals("lrt");
+												interimDest = mrtCheck ? mrtCoords
+														.get(stage.nextStage.t11_boardsvcstn)
+														: lrtCoords
+																.get(stage.nextStage.t11_boardsvcstn);
+											}
+											transitStages
+													.add(new TransitStageRoutingInput(
+															interimOrig,
+															interimDest, lines,
+															true));
+											lines = new HashSet<TransitLine>();
+											interimOrig = interimDest;
+											interimDest = dest;
+											stage = stage.nextStage;
+											continue STAGES;
+										}// next stage is null
+										transitStages
+												.add(new TransitStageRoutingInput(
+														interimOrig,
+														interimDest, lines,
+														true));
+										doneCompilingTransitStages = true;
+									}// end of bus stage chain check
+									if (mrtCheck || lrtCheck) {
+										HashMap<String, Coord> theCoords = mrtCheck ? mrtCoords
+												: lrtCoords;
+										lines = mrtCheck ? mrtLines : lrtLines;
+										interimOrig = theCoords
+												.get(stage.t11_boardsvcstn);
+										interimDest = theCoords
+												.get(stage.t12_alightstn);
+										transitStages
+												.add(new TransitStageRoutingInput(
+														interimOrig,
+														interimDest, lines,
+														false));
+										if (stage.nextStage != null) {
+											busCheck = stage.nextStage.t10_mode
+													.equals("publBus");
+											mrtCheck = stage.nextStage.t10_mode
+													.equals("mrt");
+											lrtCheck = stage.nextStage.t10_mode
+													.equals("lrt");
+											lines = new HashSet<TransitLine>();
+											interimOrig = interimDest;
+											interimDest = dest;
+											stage = stage.nextStage;
+											continue STAGES;
+										} else {
+											doneCompilingTransitStages = true;
+
+										}
+									}
+								}
+
+								// traverse the list of transitStages and
+								// generate paths
+								double linkStartTime = startTime;
+								Coord walkOrigin = orig;
+
+								String insertString2 ="INSERT INTO transit_coords" +
+										"(pax_idx, trip_idx, x_utm48n, y_utm48n, coord_type)" +
+										" VALUES ";
+								String lastLineRoute = "";
+								PATHS: for (int i = 0; i < transitStages.size(); i++) {
+									TransitStageRoutingInput ts = transitStages
+											.get(i);
+									transitRouter.setAllowedLines(ts.lines);
+									if (ts.busStage) {
+										HITSAnalyser.transitRouterConfig
+												.setSearchradius(busSearchradius);
+									} else {
+										HITSAnalyser.transitRouterConfig
+												.setSearchradius(mrtSearchRadius);
+									}
+									path = transitRouter.calcPathRoute(ts.orig,
+											ts.dest, linkStartTime, null);
+									if (path == null) {
 										System.out.println(t.h1_hhid + "_"
 												+ t.pax_id + "_" + t.trip_id
 												+ "\t" + orig + "\t" + dest
 												+ "\t line: " + lines);
-									double accessWalkDistance = CoordUtils
-											.calcDistance(orig,
-													path.nodes.get(0)
-															.getCoord());
-									double egressWalkDistance = CoordUtils
-											.calcDistance(
-													dest,
-													path.nodes
-															.get(path.nodes
-																	.size() - 1)
-															.getCoord());
-									walkDistanceFromRouter += (accessWalkDistance + egressWalkDistance);
-									double accessWalkTime = accessWalkDistance
-											/ transitRouterConfig
-													.getBeelineWalkSpeed();
-									double egressWalkTime = egressWalkDistance
-											/ transitRouterConfig
-													.getBeelineWalkSpeed();
-									walkTimeFromRouter += (accessWalkTime + egressWalkTime);
-									transitTotalTimeFromRouter = path.travelTime
-											+ walkTimeFromRouter;
-									transitTotalDistanceFromRouter += (accessWalkDistance + egressWalkDistance);
+										break PATHS;
+									}
+
+									if (i == 0 ) {
+										Coord boardCoord = path.nodes.get(0).getCoord();
+										if(writeTransitCoords){
+											insertString2 += String.format(
+													"(\'%s\', \'%s\', %f, %f, \'%s\'),",
+													t.h1_hhid+"_"+t.pax_id,
+													t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id,
+													orig.getX(),
+													orig.getY(),
+													"origin");
+											insertString2 += String.format(
+													"(\'%s\', \'%s\', %f, %f, \'%s\'),",
+													t.h1_hhid+"_"+t.pax_id,
+													t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id,
+													boardCoord.getX(),
+													boardCoord.getY(),
+													("board "+
+													(ts.busStage?"bus":"mrt_lrt"))
+													);
+										}
+										walkDistanceAccessFromRouter = CoordUtils
+												.calcDistance(orig,boardCoord);
+										walkTimeAccessFromRouter = walkDistanceAccessFromRouter
+												/ transitRouterConfig
+												.getBeelineWalkSpeed();
+									} 
+									if(i>0){// in-between transitStage
+										Coord boardCoord = path.nodes.get(0).getCoord();
+										if(writeTransitCoords){
+											TransitStageRoutingInput prevStage = transitStages.get(i-1);
+											insertString2 += String.format(
+													"(\'%s\', \'%s\', %f, %f, \'%s\'),",
+													t.h1_hhid+"_"+t.pax_id,
+													t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id,
+													walkOrigin.getX(),
+													walkOrigin.getY(),
+													("alight "+
+															(prevStage.busStage?"bus ":"mrt_lrt ")+ lastLineRoute));
+											insertString2 += String.format(
+													"(\'%s\', \'%s\', %f, %f, \'%s\'),",
+													t.h1_hhid+"_"+t.pax_id,
+													t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id,
+													boardCoord.getX(),
+													boardCoord.getY(),
+													("board "+
+															(ts.busStage?"bus":"mrt_lrt"))
+													);
+										}
+										double interModalTransferDistance = CoordUtils
+												.calcDistance(walkOrigin,boardCoord);
+										double interModalTransferTime = interModalTransferDistance
+												/ transitRouterConfig
+												.getBeelineWalkSpeed();
+										walkDistanceTransferFromRouter += interModalTransferDistance;
+										walkTimeTransferFromRouter += interModalTransferTime;
+									}
+									walkOrigin = path.nodes.get(path.nodes.size() - 1).getCoord();
+									for (int j = 0; j < path.links.size(); j++) {
+										Link l = path.links.get(j);
+										TransitRouterNetworkWW.TransitRouterNetworkLink transitLink = (TransitRouterNetworkLink) l;
+										if (transitLink.getRoute() != null) {
+											// in line link
+											double linkLength = transitLink
+													.getLength();
+											transitInVehDistFromRouter += linkLength;
+											double linkTime = transitTravelFunction
+													.getLinkTravelTime(
+															transitLink,
+															linkStartTime,
+															null, null);
+											linkStartTime += linkTime;
+											transitInVehTimeFromRouter += linkTime;
+											lastLineRoute = transitLink.getRoute().getId().toString();
+										} else if (transitLink.toNode.route == null) {
+											// transfer link
+											double linkLength = transitLink
+													.getLength();
+											walkDistanceTransferFromRouter += linkLength;
+											double linkTime = transitTravelFunction
+													.getLinkTravelTime(
+															transitLink,
+															linkStartTime,
+															null, null);
+											linkStartTime += linkTime;
+											walkTimeTransferFromRouter += linkTime;
+											if(writeTransitCoords && linkLength>0){
+												insertString2 += String.format(
+														"(\'%s\', \'%s\', %f, %f, \'%s\'),",
+														t.h1_hhid+"_"+t.pax_id,
+														t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id,
+														transitLink.fromNode.getCoord().getX(),
+														transitLink.fromNode.getCoord().getY(),
+														("alight " +
+														(ts.busStage?"bus ":"mrt_lrt ")+ transitLink.getRoute().getId().toString()));
+												TransitRouterNetworkLink nextLineLink = (TransitRouterNetworkLink) path.links.get(j+2);
+												insertString2 += String.format(
+														"(\'%s\', \'%s\', %f, %f, \'%s\'),",
+														t.h1_hhid+"_"+t.pax_id,
+														t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id,
+														nextLineLink.fromNode.getCoord().getX(),
+														nextLineLink.fromNode.getCoord().getY(),
+														("board "+
+														(ts.busStage?"bus ":"mrt_lrt ")+ nextLineLink.getRoute().getId().toString())
+														);												
+											}
+										} else if (transitLink.fromNode.route == null) {
+											// wait link
+											double linkTime = transitTravelFunction
+													.getLinkTravelTime(
+															transitLink,
+															linkStartTime,
+															null, null);
+											linkStartTime += linkTime;
+											if (i == 0 && j == 0) {
+												waitTimeAccessFromRouter += linkTime;
+											} else {
+												waitTimeTransferFromRouter += linkTime;
+											}
+
+										} else
+											throw new RuntimeException(
+													"Bad transit router link");
+									}//end path traversal
+									if (i + 1 == transitStages
+											.size()) {
+										Coord alightCoord = path.nodes.get(
+												path.nodes.size() - 1).getCoord();
+										if(writeTransitCoords){
+											insertString2 += String.format(
+													"(\'%s\', \'%s\', %f, %f, \'%s\'),",
+													t.h1_hhid+"_"+t.pax_id,
+													t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id,
+													alightCoord.getX(),
+													alightCoord.getY(),
+													("alight "+
+															(ts.busStage?"bus ":"mrt_lrt ") + lastLineRoute)
+													);
+											insertString2 += String.format(
+													"(\'%s\', \'%s\', %f, %f, \'%s\');",
+													t.h1_hhid+"_"+t.pax_id,
+													t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id,
+													dest.getX(),
+													dest.getY(),
+													"destination");
+											
+											s.executeUpdate(insertString2);
+//											System.out.println(insertString2);
+										}
+										walkDistanceEgressFromRouter = CoordUtils
+												.calcDistance(alightCoord,dest);
+										walkTimeEgressFromRouter = walkDistanceEgressFromRouter
+												/ transitRouterConfig
+												.getBeelineWalkSpeed();										
+									} 
 								}
-								
-								for (Link l : path.links) {
-									TransitRouterNetworkWW.TransitRouterNetworkLink transitLink = (TransitRouterNetworkLink) l;
-									if (transitLink.getRoute() != null) {
-										// in line link
-										double linkLength = transitLink
-												.getLength();
-										transitInVehDistFromRouter += linkLength;
-										transitTotalDistanceFromRouter += linkLength;
-										double linkTime = transitTravelFunction
-												.getLinkTravelTime(transitLink,
-														linkStartTime, null,
-														null);
-										linkStartTime += linkTime;
-										transitInVehTimeFromRouter += linkTime;
-									} else if (transitLink.toNode.route == null) {
-										// transfer link
-										double linkLength = transitLink
-												.getLength();
-										walkDistanceFromRouter += linkLength;
-										transitTotalDistanceFromRouter += linkLength;
-										double linkTime = transitTravelFunction
-												.getLinkTravelTime(transitLink,
-														linkStartTime, null,
-														null);
-										linkStartTime += linkTime;
-										walkTimeFromRouter += linkTime;
-									} else if (transitLink.fromNode.route == null) {
-										// wait link
-										double linkTime = transitTravelFunction
-												.getLinkTravelTime(transitLink,
-														linkStartTime, null,
-														null);
-										linkStartTime += linkTime;
-										waitTimeFromRouter += linkTime;
-									} else
-										throw new RuntimeException(
-												"Bad transit router link");
-								}
-								if (transitInVehTimeFromRouter
-										+ walkTimeFromRouter
-										+ waitTimeFromRouter
-										- transitTotalTimeFromRouter > 60)
-									System.out
-											.println("More than a minute off");
+								walkDistanceTotalFromRouter = walkDistanceAccessFromRouter
+										+ walkDistanceEgressFromRouter
+										+ walkDistanceTransferFromRouter;
+								walkTimeTotalFromRouter = walkTimeAccessFromRouter
+										+ walkTimeEgressFromRouter
+										+ walkTimeTransferFromRouter;
+								waitTimeTotalFromRouter = waitTimeAccessFromRouter
+										+ waitTimeTransferFromRouter;
+								transferTimeTotalFromRouter = walkTimeTransferFromRouter
+										+ waitTimeTransferFromRouter;
+								transitTotalTimeFromRouter = transitInVehTimeFromRouter
+										+ waitTimeTotalFromRouter
+										+ walkTimeTotalFromRouter;
+								transitTotalDistanceFromRouter = transitInVehDistFromRouter
+										+ walkDistanceTotalFromRouter;
 
 							}
 						} catch (NullPointerException e) {
@@ -600,7 +871,7 @@ public class HITSAnalyser {
 							timeperiod = "PM";
 
 						insertString = String
-								.format("INSERT INTO trip_summary_routed VALUES(\'%s\',\'%s\',%d,%d,%d,%d,%d,%f,%f,\'%s\',\'%s\',%f,%f,%f,%f,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f);",
+								.format("INSERT INTO trip_summary_routed VALUES(\'%s\',\'%s\',%d,%d,%d,%d,%d,%f,%f,\'%s\',\'%s\',%f,%f,%f,%f,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,\'%s\');",
 										pax_idx, trip_idx, t.totalWalkTimeTrip,
 										t.calculatedJourneyTime,
 										t.estimatedJourneyTime, tripcount,
@@ -611,16 +882,16 @@ public class HITSAnalyser {
 										straightDistance,
 										this.zip2DGP.get(t.p13d_origpcode),
 										this.zip2DGP.get(t.t2_destpcode),
-										congestedCarDistance, 
-										 walkTimeFromRouter,
-								 walkDistanceFromRouter,
-								 waitTimeFromRouter,
-								 transferTimeFromRouter,
-								 transitInVehTimeFromRouter,
-								 transitInVehDistFromRouter,
-								 transitTotalTimeFromRouter,
-								 transitTotalDistanceFromRouter
-										);
+										congestedCarDistance,
+										walkTimeTotalFromRouter,
+										walkDistanceTotalFromRouter,
+										waitTimeTotalFromRouter,
+										transferTimeTotalFromRouter,
+										transitInVehTimeFromRouter,
+										transitInVehDistFromRouter,
+										transitTotalTimeFromRouter,
+										transitTotalDistanceFromRouter,
+										t.stageChainSimple);
 						s.executeUpdate(insertString);
 					}
 
@@ -647,9 +918,15 @@ public class HITSAnalyser {
 
 	}
 
+	private Path routeBus(Coord orig, Coord dest, double startTime,
+			double busSearchradius) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private void doTransitRouting() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void jointTripSummary() {
@@ -971,7 +1248,8 @@ public class HITSAnalyser {
 		HITSAnalyser hp;
 		System.out.println(args[0].equals("sql"));
 		String fileName = "data/serial";
-		DataBaseAdmin dba = new DataBaseAdmin(new File("data/hitsdb.properties"));
+		DataBaseAdmin dba = new DataBaseAdmin(
+				new File("data/hitsdb.properties"));
 		Connection conn = dba.getConnection();
 		System.out.println("Database connection established");
 		HITSAnalyser.setConn(conn);
@@ -1012,9 +1290,9 @@ public class HITSAnalyser {
 		// hp.writeTripSummary();
 		// System.out.println("wrote trip summary");
 		// hp.jointTripSummary();
-//		System.out.println("wrote joint trip summary");
+		// System.out.println("wrote joint trip summary");
 
-		hp.createSQLSummary(conn);
+		hp.createSQLSummary(conn, 2000, 100,true);
 
 		System.out.println("exiting...");
 		System.out.println(new java.util.Date());
@@ -1033,3 +1311,19 @@ class TimeAndDistance {
 
 }
 
+class TransitStageRoutingInput {
+	Coord orig;
+
+	public TransitStageRoutingInput(Coord orig, Coord dest,
+			Set<TransitLine> lines, boolean busStage) {
+		super();
+		this.orig = orig;
+		this.dest = dest;
+		this.lines = lines;
+		this.busStage = busStage;
+	}
+
+	Coord dest;
+	boolean busStage;
+	Set<TransitLine> lines;
+}

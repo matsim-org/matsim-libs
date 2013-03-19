@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.matsim.api.core.v01.Coord;
+
 import com.sun.xml.bind.v2.runtime.RuntimeUtil.ToStringAdapter;
 
 
@@ -34,6 +36,10 @@ public class HITSStage implements Serializable {
 	String t19a_parkftyp;
 	String t20_parkreimb;
 	int stageDuration;
+	HITSStage prevStage;
+	HITSStage nextStage;
+	Coord stageOrigCoord;
+	Coord stageDestCoord;
 
 //	String mainmode;
 	
@@ -65,6 +71,7 @@ public class HITSStage implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	}
 	
 	public HITSStage(){

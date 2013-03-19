@@ -121,6 +121,20 @@ public class HITSTrip implements Serializable{
 			while (srs.next()) {
 				s.add(new HITSStage(srs,this));
 			}
+			if (s != null) {
+				for (HITSStage stage : s) {
+					stage.prevStage = null;
+
+					if (stage.stage_id < s.size()) {
+						// stages are numbered starting from 1
+						stage.nextStage = s.get(stage.stage_id);
+					} 
+					if (s.size() > 1 && stage.stage_id > 1) {
+						stage.prevStage = s.get(stage.stage_id - 2);
+					}
+				}
+
+			}
 			srs.close();
 			ss.close();
 		} catch (SQLException e1) {
@@ -293,7 +307,7 @@ public class HITSTrip implements Serializable{
 				}else {
 					System.out.println("special transit case");
 				}
-				transitModeChain += stage.t10_mode + "_";
+				transitModeChain += (i==0?"":"_") + stage.t10_mode;
 				lastTransit = stage.t10_mode;
 				if(stage.t10_mode.equals("publBus"))busTripSwitch = true;
 				if(stage.t10_mode.equals("lrt") || stage.t10_mode.equals("mrt")) trainTripSwitch=true;
