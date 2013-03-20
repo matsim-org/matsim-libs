@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -169,6 +170,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	private final Map<String, Integer> evacuationModesC2 = new TreeMap<String, Integer>();
 	
 	private final Set<Id> informedAgents = new HashSet<Id>();
+	private final Map<Id, Double> informationTime = new HashMap<Id, Double>();
 	private final Set<Id> enrouteDrivers = new HashSet<Id>();
 	private final Map<Id, Id> vehiclePositions = new HashMap<Id, Id>();
 	private final Map<Id, Collection<Id>> vehiclePassengers = new HashMap<Id, Collection<Id>>();
@@ -204,10 +206,15 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	private final List<String> values = new ArrayList<String>();
 	
 	private final String outputCountsFile = "evacuationDecisionCounts.txt";
+	private final String outputTimesFile = "evacuationDecisionTimes.txt";
 	private final String outputModesFile = "evacuationDecisionModes.txt";
 	private final String outputDetailsFile = "evacuationDecisionDetailed.txt";
 	
 	public static void main(String[] args) {
+
+		Logger root = Logger.getRootLogger();
+		root.setLevel(Level.INFO);
+		
 		String configFile;
 		String evacuationConfigFile;
 		String outputPath;
@@ -390,9 +397,10 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		 * Write results to files.
 		 */
 		String countsFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputCountsFile);
+		String timesFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputTimesFile);
 		String modesFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputModesFile);
 		String detailsFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputDetailsFile);
-		writeResultsToFiles(countsFileName, modesFileName, detailsFileName);
+		writeResultsToFiles(countsFileName, timesFileName, modesFileName, detailsFileName);
 	}
 
 	private void analyzeA() {
@@ -506,7 +514,6 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		for (String modes : evacuationModesA21.keySet()) {
 			log.info("\tA21\t" + "mode(s):\t" + modes + "\tcount:\t" + evacuationModesA21.get(modes));			
 		}
-
 	}
 	
 	private void analyzeB() {
@@ -579,7 +586,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 							if (!foundHomeActivity) {
 								throw new RuntimeException("Could not identify agent's return home activity: " + personId);
 							}
-														
+									
 							List<Leg> legs = agentLegs.get(personId);
 							Set<String> modesHome = new TreeSet<String>();
 							Set<String> modesEvacuate = new TreeSet<String>();
@@ -849,7 +856,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		}
 	}
 	
-	private void writeResultsToFiles(String countsFileName, String modesFileName, String detailsFileName) {
+	private void writeResultsToFiles(String countsFileName, String timesFileName, String modesFileName, 
+			String detailsFileName) {
 		
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(countsFileName);
@@ -944,7 +952,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			Gbl.errorMsg(e);
 		}
 		
-		try {			
+		try {
 			Map<Id, String> evacuationTypes = new HashMap<Id, String>();
 			for (Id personId : scenario.getPopulation().getPersons().keySet()) {
 				String evacuationType = "UNDEFINED";
@@ -973,7 +981,13 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			for (Entry<Id, Double> entry : this.leftEvacuationAreaTime.entrySet()) {
 				
 				// ignore agents who left the evacuation area before the evacuation has started
-				if (entry.getValue() < EvacuationConfig.evacuationTime) {
+				if (entry.getValue() < EvacuationConfig.evacuationTime) {					
+					this.evacuateDirectlyModes.remove(entry.getKey());
+					continue;
+				}
+				
+				// ignore agents who left the evacuation area before they were informed
+				if (entry.getValue() < this.informationTime.get(entry.getKey())) {					
 					this.evacuateDirectlyModes.remove(entry.getKey());
 					continue;
 				}
@@ -988,10 +1002,16 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				else if (evacuationType.equals("C113")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
 				else if (evacuationType.equals("C12")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
 				else if (evacuationType.equals("C2")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
-				else throw new RuntimeException("Found an evacuation area left time for unexpected evacuation type: " 
-						+ evacuationType);
+				else {
+					log.info("agentId: " + entry.getKey().toString());
+					log.info("time: " + entry.getValue());
+					log.info("informationTime: " + informationTime.get(entry.getKey()));
+
+					throw new RuntimeException("Found an evacuation area left time for unexpected evacuation type: " 
+							+ evacuationType);
+				}
 			}
-			
+
 			BufferedWriter writer = IOUtils.getBufferedWriter(detailsFileName);
 			
 			writer.write("agentId");
@@ -1106,6 +1126,175 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
+		
+//		try {
+//			BufferedWriter writer = IOUtils.getBufferedWriter(timesFileName);
+//			
+//			for (int i = 0; i < headers.size(); i++) {
+//				String header = headers.get(i);
+//				writer.write(header);
+//				if (i < headers.size() - 1) writer.write(delimiter);
+//				else writer.write(newLine);
+//			}
+//			
+//			for (int i = 0; i < values.size(); i++) {
+//				String value = values.get(i);
+//				writer.write(value);
+//				if (i < values.size() - 1) writer.write(delimiter);
+//				else writer.write(newLine);
+//			}
+//			writer.flush();
+//			writer.close();
+//		} catch (IOException e) {
+//			Gbl.errorMsg(e);
+//		}
+		
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(timesFileName);
+						
+			Set<String> modes = new TreeSet<String>();
+			modes.add(TransportMode.bike);
+			modes.add(TransportMode.car);
+			modes.add(TransportMode.ride);
+			modes.add(TransportMode.pt);
+			modes.add(TransportMode.walk);
+			modes.add(OldPassengerDepartureHandler.passengerTransportMode);
+			modes.add(OldPassengerDepartureHandler.passengerTransportMode + "," + TransportMode.walk);
+						
+			List<String> modeHeaders = new ArrayList<String>();
+			List<String> modeValues = new ArrayList<String>();
+			List<String> modeCounts = new ArrayList<String>();
+			
+			Map<String, Map<String, List<Double>>> maps = new LinkedHashMap<String, Map<String, List<Double>>>();
+			maps.put("A11", new LinkedHashMap<String, List<Double>>());
+			maps.put("A21", new LinkedHashMap<String, List<Double>>());
+			
+			maps.put("B111Home", new LinkedHashMap<String, List<Double>>());
+			maps.put("B111Evacuate", new LinkedHashMap<String, List<Double>>());
+			maps.put("B112", new LinkedHashMap<String, List<Double>>());
+			maps.put("B12", new LinkedHashMap<String, List<Double>>());
+			maps.put("B2", new LinkedHashMap<String, List<Double>>());
+			
+			maps.put("C111Home", new LinkedHashMap<String, List<Double>>());
+			maps.put("C111Evacuate", new LinkedHashMap<String, List<Double>>());
+			maps.put("C112", new LinkedHashMap<String, List<Double>>());
+			maps.put("C12", new LinkedHashMap<String, List<Double>>());
+			maps.put("C2", new LinkedHashMap<String, List<Double>>());
+			
+			for (Entry<String, Map<String, List<Double>>> entry : maps.entrySet()) {
+				
+				Map<String, List<Double>> map =  entry.getValue();				
+				for (String mode : modes) {
+					map.put(mode, new ArrayList<Double>());
+				}
+			}
+			
+			// get return home times
+			for (Entry<Id, Double> e : this.returnHomeTimes.entrySet()) {
+				Id id = e.getKey();
+				double returnHomeTime = e.getValue();
+				String mode = this.returnHomeModes.get(id);
+				
+				if (B111.contains(id)) {
+					maps.get("B111Home").get(mode).add(returnHomeTime);
+				} else if (B112.contains(id)) {
+					maps.get("B112").get(mode).add(returnHomeTime);
+				} else if (C111.contains(id)) {
+					maps.get("C111Home").get(mode).add(returnHomeTime);
+				} else if (C112.contains(id)) {
+					maps.get("C112").get(mode).add(returnHomeTime);
+				} else {
+					throw new RuntimeException("Unexpected behaviour found for agent " + id.toString());
+				}
+			}
+			
+			// get evacuate from home times
+			for (Entry<Id, Double> e : this.evacuateFromHomeTimes.entrySet()) {
+				Id id = e.getKey();
+				double evacuateFromHomeTime = e.getValue();
+				String mode = this.evacuateFromHomeModes.get(id);
+				
+				if (A11.contains(id)) {
+					maps.get("A11").get(mode).add(evacuateFromHomeTime);
+				} else if (B111.contains(id)) {
+					maps.get("B111Evacuate").get(mode).add(evacuateFromHomeTime);
+				} else if (C111.contains(id)) {
+					maps.get("C111Evacuate").get(mode).add(evacuateFromHomeTime);
+				} else {
+					throw new RuntimeException("Unexpected behaviour found for agent " + id.toString());
+				}
+			}
+			
+			// get evacuate directly times
+			for (Entry<Id, Double> e : this.evacuateDirectlyTimes.entrySet()) {
+				Id id = e.getKey();
+				double evacuateDirectlyTime = e.getValue();
+				String mode = this.evacuateDirectlyModes.get(id);
+				
+				if (B12.contains(id)) {
+					maps.get("B12").get(mode).add(evacuateDirectlyTime);
+				} else if (B2.contains(id)) {
+					maps.get("B2").get(mode).add(evacuateDirectlyTime);
+				} else if (C12.contains(id)) {
+					maps.get("C12").get(mode).add(evacuateDirectlyTime);
+				} else if (C2.contains(id)) {
+					maps.get("C2").get(mode).add(evacuateDirectlyTime);
+				} else {
+					throw new RuntimeException("Unexpected behaviour found for agent " + id.toString());
+				}
+			}				
+			
+			for (Entry<String, Map<String, List<Double>>> entry : maps.entrySet()) {
+				
+				String string = entry.getKey();
+				Map<String, List<Double>> map =  entry.getValue();
+				
+				for (String mode : modes) {
+					List<Double> list = map.get(mode);
+					double avgTime = Double.NaN;
+					int sampleSize = 0;
+					if (list != null) {
+						avgTime = 0.0;
+						// subtract evacuationStartTime to get "real" evacuationTime
+						for (double time : list) avgTime += (time - EvacuationConfig.evacuationTime);
+						sampleSize = list.size();
+						avgTime /= sampleSize;
+					}
+					modeHeaders.add(string + "_" + mode);
+					modeValues.add(String.valueOf(avgTime));
+					modeCounts.add(String.valueOf(sampleSize));
+					
+					// only for debugging
+//					log.info(string + "_" + mode + "_" + String.valueOf(list.size()));
+				}
+			}
+						
+			for (int i = 0; i < modeHeaders.size(); i++) {
+				String header = modeHeaders.get(i);
+				writer.write(header);
+				if (i < modeHeaders.size() - 1) writer.write(delimiter);
+				else writer.write(newLine);
+			}
+			
+			for (int i = 0; i < modeValues.size(); i++) {
+				String value = modeValues.get(i);
+				writer.write(value);
+				if (i < modeValues.size() - 1) writer.write(delimiter);
+				else writer.write(newLine);
+			}
+			
+			for (int i = 0; i < modeCounts.size(); i++) {
+				String value = modeCounts.get(i);
+				writer.write(value);
+				if (i < modeCounts.size() - 1) writer.write(delimiter);
+				else writer.write(newLine);
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+
 	}
 	
 	@Override
@@ -1132,6 +1321,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		Id personId = event.getPersonId();
 		
 		informedAgents.add(personId);
+		informationTime.put(personId, event.getTime());
 		
 		AgentPosition agentPosition = householdsTracker.getAgentPosition(personId);
 		Position position = agentPosition.getPositionType();
