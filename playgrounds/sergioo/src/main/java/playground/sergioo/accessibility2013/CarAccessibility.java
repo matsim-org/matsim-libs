@@ -18,7 +18,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 
 public class CarAccessibility {
-	
+
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario)).readFile(args[1]);
