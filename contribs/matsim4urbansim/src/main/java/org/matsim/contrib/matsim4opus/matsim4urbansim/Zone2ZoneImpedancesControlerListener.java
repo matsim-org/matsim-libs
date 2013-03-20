@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeBasedTravelDisutility;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
@@ -52,6 +51,7 @@ import org.matsim.utils.LeastCostPathTree;
 
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.ZoneUtil;
+import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.ZoneObject;

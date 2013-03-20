@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4opus.matsim4urbansim.router;
+package org.matsim.contrib.matsim4opus.improvedpseudopt;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;

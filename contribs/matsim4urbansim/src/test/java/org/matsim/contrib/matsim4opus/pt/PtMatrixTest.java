@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.router.PtMatrix;
+import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
