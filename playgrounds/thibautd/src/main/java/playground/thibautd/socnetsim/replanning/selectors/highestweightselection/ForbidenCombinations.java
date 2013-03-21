@@ -44,6 +44,20 @@ final class ForbidenCombinations {
 		return forbidden.contains( groupPlans );
 	}
 
+	public boolean isForbidden(final PlanAllocation alloc) {
+		for (GroupPlans gp : forbidden) {
+			if ( forbids( gp , alloc ) ) return true;
+		}
+		return false;
+	}
+
+	private static boolean forbids(final GroupPlans gp, final PlanAllocation alloc) {
+		for ( PlanRecord p : alloc.getPlans() ) {
+			if ( !gp.getAllIndividualPlans().contains( p.plan ) ) return false;
+		}
+		return true;
+	}
+
 	private static boolean forbids(
 			final GroupPlans forbidden,
 			final PlanString string) {

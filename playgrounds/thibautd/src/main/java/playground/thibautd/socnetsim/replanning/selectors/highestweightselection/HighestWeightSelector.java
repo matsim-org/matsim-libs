@@ -108,17 +108,16 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	// /////////////////////////////////////////////////////////////////////////
 	// "translation" to and from the internal data structures
 	// /////////////////////////////////////////////////////////////////////////
-	private static GroupPlans toGroupPlans(final PlanString allocation) {
+	private static GroupPlans toGroupPlans(final PlanAllocation allocation) {
 		Set<JointPlan> jointPlans = new HashSet<JointPlan>();
 		List<Plan> individualPlans = new ArrayList<Plan>();
-		for (PlanString curr = allocation;
-				curr != null;
-				curr = curr.tail) {
-			if (curr.planRecord.jointPlan != null) {
-				jointPlans.add( curr.planRecord.jointPlan );
+
+		for ( PlanRecord p : allocation.getPlans() ) {
+			if ( p.jointPlan != null ) {
+				jointPlans.add( p.jointPlan );
 			}
 			else {
-				individualPlans.add( curr.planRecord.plan );
+				individualPlans.add( p.plan );
 			}
 		}
 
@@ -211,11 +210,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		int count = 0;
 		do {
 			count++;
-			final PlanString allocation = buildPlanString(
-				forbiden,
-				new ArrayList<PersonRecord>( personRecords.values() ),
-				null,
-				Double.NEGATIVE_INFINITY);
+			final PlanAllocation allocation = buildPlanString(
+					forbiden,
+					new ArrayList<PersonRecord>( personRecords.values() ),
+					new PlanAllocation(),
+					Double.NEGATIVE_INFINITY);
 
 			plans = allocation == null ? null : toGroupPlans( allocation );
 		} while (
@@ -324,10 +323,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 * used to determine which joint plans are stil possible
 	 * @param str the PlanString of the plan constructed until now
 	 */
-	private PlanString buildPlanString(
+	private PlanAllocation buildPlanString(
 			final ForbidenCombinations forbidenCombinations,
 			final List<PersonRecord> personsStillToAllocate,
-			final PlanString str,
+			// needed to check whether a leave is forbidden or not
+			final PlanAllocation currentAllocation,
 			final double minimalWeightToObtain) {
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 
@@ -335,26 +335,23 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		final List<PersonRecord> remainingPersons =
 			new ArrayList<PersonRecord>( personsStillToAllocate );
 		final PersonRecord currentPerson = remainingPersons.remove(0);
+
 		// the joint plans implying this person will be considered "selectable"
 		// only when considering this joint plan as being selected for currentPerson
 		tagLinkedPlansOfPersonAsInfeasible(
 				currentPerson,
 				feasibilityChanger);
 
-		assert str == null || !str.containsPerson( currentPerson.person.getId() );
-
 		// get a list of plans in decreasing order of maximum possible weight.
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
 		final List<PlanRecord> records = new ArrayList<PlanRecord>();
 		for ( PlanRecord r : currentPerson.bestPlansPerJointStructure ) {
-			assert !r.isStillFeasible == (r.jointPlan != null && intersect( r.jointPlan.getIndividualPlans().keySet() , str ));
 			if ( r.isStillFeasible ) records.add( r );
 		}
 
 		weightPlanRecords(
 				records,
-				str,
 				remainingPersons );
 
 		// Sort in decreasing order of upper bound: we can stop as soon
@@ -377,7 +374,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// get the actual allocation, and stop when the allocation
 		// is better than the maximum possible in remaining plans
 		// or worst than the worst possible at a higher level
-		PlanString constructedString = null;
+		PlanAllocation constructedString = null;
 
 		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 		for (PlanRecord r : records) {
@@ -392,16 +389,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 			assert r.isStillFeasible;
 
-			PlanString tail = str;
+			PlanAllocation tail = new PlanAllocation();
+			tail.add( r );
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			if (r.jointPlan != null) {
-				// normally, it is impossible that it is always the case if there
-				// is a valid plan: a branch were this would be the case would
-				// have a infinitely negative weight and not explored.
-				//if ( intersect( r.jointPlan.getIndividualPlans().keySet() , alreadyAllocatedPersons ) ) continue;
-				// impossible if "isStillPossible" correctly implemented
-				assert !intersect( r.jointPlan.getIndividualPlans().keySet() , str );
-				tail = getOtherPlansAsString( r , tail);
+				tail.addAll( r.linkedPlans );
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 
 				tagLinkedPlansOfPartnersAsInfeasible(
@@ -409,23 +401,24 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 						localFeasibilityChanger);
 			}
 
-
-			PlanString newString;
+			PlanAllocation newString = tail;
+			final PlanAllocation newCurrentAlloc = new PlanAllocation();
+			newCurrentAlloc.addAll( currentAllocation.getPlans() );
+			newCurrentAlloc.addAll( tail.getPlans() );
 			if ( !actuallyRemainingPersons.isEmpty() ) {
 				newString = buildPlanString(
 						forbidenCombinations,
 						actuallyRemainingPersons,
-						new PlanString( r , tail ),
+						newCurrentAlloc,
 						Math.max(
 							minimalWeightToObtain,
 							constructedString != null ?
-								constructedString.getWeight() - EPSILON :
-								Double.NEGATIVE_INFINITY));
+								constructedString.getWeight() :
+								Double.NEGATIVE_INFINITY) - tail.getWeight() );
+				if ( newString != null ) newString.addAll( tail.getPlans() );
 			}
 			else {
-				newString = new PlanString( r , tail );
-
-				if ( forbidBlockingCombinations && forbidenCombinations.isForbidden( newString ) ) {
+				if ( forbidBlockingCombinations && forbidenCombinations.isForbidden( newCurrentAlloc ) ) {
 					// we are on a leaf (ie a full plan).
 					// If some combinations are forbidden, check if this one is.
 					newString = null;
@@ -450,10 +443,8 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 	private static void weightPlanRecords(
 			final Collection<PlanRecord> records,
-			final PlanString str,
 			final List<PersonRecord> remainingPersons) {
 		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
-		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 
 		for (PlanRecord r : records) {
 			if ( r.isStillFeasible ) {
@@ -464,10 +455,8 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				}
 
 				r.cachedMaximumWeight =
-					alreadyAllocatedWeight +
 						getMaxWeightFromPersons(
 								r,
-								str,
 								remainingPersons );
 
 				localFeasibilityChanger.resetFeasibilities();
@@ -509,13 +498,12 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 */
 	private static double getMaxWeightFromPersons(
 			final PlanRecord planToSelect,
-			final PlanString string,
 			final List<PersonRecord> remainingPersons) {
 		double score = planToSelect.avgJointPlanWeight;
 
 		for (PersonRecord record : remainingPersons) {
 			final double max = getMaxWeight(
-					planToSelect , string ,
+					planToSelect ,
 					record );
 			// if negative, no need to continue
 			// moreover, returning here makes sure the branch has infinitely negative
@@ -534,7 +522,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 */
 	private static double getMaxWeight(
 			final PlanRecord planToSelect,
-			final PlanString string,
 			final PersonRecord record) {
 		// case in jp: plan is fully determined
 		if (planToSelect.jointPlan != null) {
@@ -548,17 +535,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		for (PlanRecord plan : record.bestPlansPerJointStructure ) {
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
-
-			assert plan.jointPlan == null ||
-				!plan.isStillFeasible ==
-				plan.jointPlan.getIndividualPlans().containsKey( planToSelect.plan.getPerson().getId() ) ||
-				intersect( plan.jointPlan.getIndividualPlans().keySet() , string ) ||
-				intersect(
-						plan.jointPlan.getIndividualPlans().keySet(),
-						planToSelect.jointPlan == null ?
-							Collections.<Id> emptySet() :
-							planToSelect.jointPlan.getIndividualPlans().keySet() );
-
 
 			if ( plan.isStillFeasible ) return plan.avgJointPlanWeight;
 			// no need to continue if we now the result can only be infinitely neg.
@@ -587,18 +563,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		return newList;
 	}
 
-	private static PlanString getOtherPlansAsString(
-			final PlanRecord r,
-			final PlanString additionalTail) {
-		PlanString str = additionalTail;
-
-		for (PlanRecord p : r.linkedPlans) {
-			str = new PlanString( p , str );
-		}
-
-		return str;
-	}
-
 	private static boolean intersect(
 			final Collection<Id> ids1,
 			final Collection<Id> ids2) {
@@ -615,16 +579,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			if ( tested.contains( id ) ) return true;
 		}
 
-		return false;
-	}
-
-	private static boolean intersect(
-			final Set<Id> set,
-			final PlanString string) {
-		if ( string == null ) return false;
-		for ( Id id : set ) {
-			if ( string.containsPerson( id ) ) return true;
-		}
 		return false;
 	}
 }
