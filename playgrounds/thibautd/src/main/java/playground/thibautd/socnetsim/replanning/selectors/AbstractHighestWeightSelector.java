@@ -349,32 +349,15 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
 			Collections.<PersonRecord> emptyList();
 
-		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 		// get a list of plans in decreasing order of maximum possible weight.
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
 		final List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
-		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
-		for (PlanRecord r : records) {
-			if ( r.isStillFeasible ) {
-				tagLinkedPlansOfPartnersAsInfeasible(
-						r,
-						localFeasibilityChanger);
-				r.cachedMaximumWeight = exploreAll ?
-					Double.POSITIVE_INFINITY :
-					alreadyAllocatedWeight +
-						getMaxWeightFromPersons(
-								r,
-								str,
-								remainingPersons );
-				localFeasibilityChanger.resetFeasibilities();
-			}
-			else {
-				r.cachedMaximumWeight = exploreAll ?
-					Double.POSITIVE_INFINITY :
-					Double.NEGATIVE_INFINITY;
-			}
-		}
+
+		weightPlanRecords(
+				records,
+				str,
+				remainingPersons );
 
 		// Sort in decreasing order of upper bound: we can stop as soon
 		// as the constructed plan has weight greater than the upper bound
@@ -401,6 +384,7 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		// allocate. We can stop at the first found solution.
 		final KnownBranches knownBranches = new KnownBranches( pruneSimilarBranches );
 
+		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 		for (PlanRecord r : records) {
 			if (!exploreAll &&
 					constructedString != null &&
@@ -480,6 +464,35 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		feasibilityChanger.resetFeasibilities();
 		return constructedString;
+	}
+
+	private void weightPlanRecords(
+			final Collection<PlanRecord> records,
+			final PlanString str,
+			final List<PersonRecord> remainingPersons) {
+		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
+		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
+
+		for (PlanRecord r : records) {
+			if ( r.isStillFeasible ) {
+				tagLinkedPlansOfPartnersAsInfeasible(
+						r,
+						localFeasibilityChanger);
+				r.cachedMaximumWeight = exploreAll ?
+					Double.POSITIVE_INFINITY :
+					alreadyAllocatedWeight +
+						getMaxWeightFromPersons(
+								r,
+								str,
+								remainingPersons );
+				localFeasibilityChanger.resetFeasibilities();
+			}
+			else {
+				r.cachedMaximumWeight = exploreAll ?
+					Double.POSITIVE_INFINITY :
+					Double.NEGATIVE_INFINITY;
+			}
+		}
 	}
 
 	private static void tagLinkedPlansOfPersonAsInfeasible(
