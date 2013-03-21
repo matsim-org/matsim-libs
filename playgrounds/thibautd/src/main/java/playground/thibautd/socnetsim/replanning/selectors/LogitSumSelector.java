@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
 
 /**
  * A selector which draws gumbel-distributed scores for individual plans.

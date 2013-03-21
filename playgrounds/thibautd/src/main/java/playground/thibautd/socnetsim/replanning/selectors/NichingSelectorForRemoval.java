@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
 
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
 
 /**
  * @author thibautd

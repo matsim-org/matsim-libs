@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractHighestWeightSelectorTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +16,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Plan;
+package playground.thibautd.socnetsim.replanning.selectors.highestweightselection;
 
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * @author thibautd
- */
-public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
-	public HighestScoreSumSelector() {}
 
-	// for tests
-	HighestScoreSumSelector(final boolean blocking) {
-		super( blocking );
+final class FeasibilityChanger {
+	private final List<PlanRecord> changedRecords = new ArrayList<PlanRecord>();
+
+	public void markInfeasible( final PlanRecord r ) {
+		if ( r.isStillFeasible ) changedRecords.add( r );
+		r.isStillFeasible = false;
 	}
 
-	HighestScoreSumSelector(final boolean blocking , final boolean exploreAll) {
-		super( blocking , exploreAll );
-	}
-
-	HighestScoreSumSelector(
-			final boolean blocking,
-			final boolean exploreAll,
-			final boolean pruneUnplausiblePlans) {
-		super( blocking , exploreAll , pruneUnplausiblePlans );
-	}
-
-	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup group) {
-		Double score = indivPlan.getScore();
-		// if there are unscored plan, one of them is selected
-		return score == null ? Double.POSITIVE_INFINITY : score;
+	public void resetFeasibilities() {
+		for ( PlanRecord r : changedRecords ) r.isStillFeasible = true;
+		changedRecords.clear();
 	}
 }

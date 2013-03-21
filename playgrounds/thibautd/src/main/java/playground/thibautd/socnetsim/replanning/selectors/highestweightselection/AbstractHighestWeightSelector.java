@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.selectors;
+package playground.thibautd.socnetsim.replanning.selectors.highestweightselection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +39,7 @@ import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
 /**
  * Selects the plan combination with the highest (implementation specific)
@@ -666,185 +667,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			if ( string.containsPerson( id ) ) return true;
 		}
 		return false;
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	// classes: data structures used during the search process
-	// /////////////////////////////////////////////////////////////////////////
-
-	private static final class PlanString {
-		public final PlanRecord planRecord;
-		public final PlanString tail;
-		private final double weight;
-
-		public PlanString(
-				final PlanRecord head,
-				final PlanString tail) {
-			this.planRecord = head;
-			this.tail = tail;
-			this.weight = head.avgJointPlanWeight + (tail == null ? 0 : tail.getWeight());
-		}
-
-		public double getWeight() {
-			return weight;
-		}
-
-		public boolean containsPerson(final Id id) {
-			return planRecord.plan.getPerson().getId().equals( id ) ||
-				(tail != null && tail.containsPerson( id ));
-		}
-
-		@Override
-		public String toString() {
-			return "("+planRecord+"; "+tail+")";
-		}
-	}
-
-	private static class PersonRecord {
-		final Person person;
-		final LinkedList<PlanRecord> plans;
-
-		public PersonRecord(
-				final Person person,
-				final LinkedList<PlanRecord> plans) {
-			this.person = person;
-			this.plans = plans;
-			Collections.sort(
-					this.plans,
-					new Comparator<PlanRecord>() {
-						@Override
-						public int compare(
-								final PlanRecord o1,
-								final PlanRecord o2) {
-							// sort in DECREASING order
-							return -Double.compare( o1.avgJointPlanWeight , o2.avgJointPlanWeight );
-						}
-					});
-		}
-
-		public PlanRecord getRecord( final Plan plan ) {
-			for (PlanRecord r : plans) {
-				if (r.plan == plan) return r;
-			}
-			throw new IllegalArgumentException();
-		}
-
-		@Override
-		public String toString() {
-			return "{PersonRecord: person="+person+"; plans="+plans+"}";
-		}
-	}
-
-	private static class PlanRecord {
-		PersonRecord person;
-		final Plan plan;
-		/**
-		 * The joint plan to which pertains the individual plan,
-		 * if any.
-		 */
-		final JointPlan jointPlan;
-		/**
-		 * the plan records corresponding to the other plans in the joint plan
-		 */
-		final Collection<PlanRecord> linkedPlans = new HashSet<PlanRecord>();
-		final double avgJointPlanWeight;
-		double cachedMaximumWeight = Double.NaN;
-		// true if all partners are still unallocated
-		boolean isStillFeasible = true;
-
-		public PlanRecord(
-				final Plan plan,
-				final JointPlan jointPlan,
-				final double weight) {
-			this.plan = plan;
-			this.jointPlan = jointPlan;
-			this.avgJointPlanWeight = weight;
-		}
-
-		@Override
-		public String toString() {
-			return "{PlanRecord: "+plan.getPerson().getId()+":"+plan.getScore()+
-				" linkedWith:"+(jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())+
-				" weight="+avgJointPlanWeight+"}";
-		}
-	}
-
-	private static class ForbidenCombinations {
-		private final List<GroupPlans> forbidden = new ArrayList<GroupPlans>();
-
-		public void forbid(final GroupPlans plans) {
-			forbidden.add( plans );
-		}
-
-		public boolean isForbidden(final PlanString ps) {
-			for (GroupPlans p : forbidden) {
-				if ( forbids( p , ps ) ) return true;
-			}
-			return false;
-		}
-
-		public boolean isForbidden(final GroupPlans groupPlans) {
-			return forbidden.contains( groupPlans );
-		}
-
-		private static boolean forbids(
-				final GroupPlans forbidden,
-				final PlanString string) {
-			PlanString tail = string;
-
-			// check if all plans in the string are in the groupPlans
-			// copying the list and removing the elements is much faster
-			// than using "contains" on big lists.
-			final List<Plan> plans = new ArrayList<Plan>( forbidden.getIndividualPlans() );
-			while (tail != null) {
-				final PlanRecord head = tail.planRecord;
-				tail = tail.tail;
-
-				if (head.jointPlan != null &&
-						!forbidden.getJointPlans().contains( head.jointPlan )) {
-					return false;
-				}
-
-				if (head.jointPlan == null &&
-						!plans.remove( head.plan )) {
-					assert !forbidden.getIndividualPlans().contains( head.plan ) : "planString contains duplicates";
-					return false;
-				}
-			}
-
-			return true;
-		}
-	}
-
-	private static class KnownBranches {
-		private final boolean prune;
-		private final List<Set<Id>> branches = new ArrayList<Set<Id>>();
-
-		public KnownBranches(final boolean prune) {
-			this.prune = prune;
-		}
-
-		public void tagAsExplored(final Set<Id> branch) {
-			if (prune) branches.add( branch );
-		}
-
-		public boolean isExplored(final Set<Id> branch) {
-			return prune && branches.contains( branch );
-		}
-	}
-
-	private static class FeasibilityChanger {
-		private final List<PlanRecord> changedRecords = new ArrayList<PlanRecord>();
-
-		public void markInfeasible( final PlanRecord r ) {
-			if ( r.isStillFeasible ) changedRecords.add( r );
-			r.isStillFeasible = false;
-		}
-
-		public void resetFeasibilities() {
-			for ( PlanRecord r : changedRecords ) r.isStillFeasible = true;
-			changedRecords.clear();
-		}
 	}
 }
 

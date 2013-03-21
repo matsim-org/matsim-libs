@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractHighestWeightSelectorTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +16,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.selectors;
 
+package playground.thibautd.socnetsim.replanning.selectors.highestweightselection;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
 
-/**
- * @author thibautd
- */
-public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
-	public HighestScoreSumSelector() {}
+final class PersonRecord {
+	final Person person;
+	final LinkedList<PlanRecord> plans;
 
-	// for tests
-	HighestScoreSumSelector(final boolean blocking) {
-		super( blocking );
+	public PersonRecord(
+			final Person person,
+			final LinkedList<PlanRecord> plans) {
+		this.person = person;
+		this.plans = plans;
+		Collections.sort(
+				this.plans,
+				new Comparator<PlanRecord>() {
+					@Override
+					public int compare(
+							final PlanRecord o1,
+							final PlanRecord o2) {
+						// sort in DECREASING order
+						return -Double.compare( o1.avgJointPlanWeight , o2.avgJointPlanWeight );
+					}
+				});
 	}
 
-	HighestScoreSumSelector(final boolean blocking , final boolean exploreAll) {
-		super( blocking , exploreAll );
-	}
-
-	HighestScoreSumSelector(
-			final boolean blocking,
-			final boolean exploreAll,
-			final boolean pruneUnplausiblePlans) {
-		super( blocking , exploreAll , pruneUnplausiblePlans );
+	public PlanRecord getRecord( final Plan plan ) {
+		for (PlanRecord r : plans) {
+			if (r.plan == plan) return r;
+		}
+		throw new IllegalArgumentException();
 	}
 
 	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup group) {
-		Double score = indivPlan.getScore();
-		// if there are unscored plan, one of them is selected
-		return score == null ? Double.POSITIVE_INFINITY : score;
+	public String toString() {
+		return "{PersonRecord: person="+person+"; plans="+plans+"}";
 	}
 }

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractHighestWeightSelectorTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +16,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.selectors;
+
+package playground.thibautd.socnetsim.replanning.selectors.highestweightselection;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.population.JointPlan;
 
-/**
- * @author thibautd
- */
-public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
-	public HighestScoreSumSelector() {}
+final class PlanRecord {
+	PersonRecord person;
+	final Plan plan;
+	/**
+	 * The joint plan to which pertains the individual plan,
+	 * if any.
+	 */
+	final JointPlan jointPlan;
+	/**
+	 * the plan records corresponding to the other plans in the joint plan
+	 */
+	final Collection<PlanRecord> linkedPlans = new HashSet<PlanRecord>();
+	final double avgJointPlanWeight;
+	double cachedMaximumWeight = Double.NaN;
+	// true if all partners are still unallocated
+	boolean isStillFeasible = true;
 
-	// for tests
-	HighestScoreSumSelector(final boolean blocking) {
-		super( blocking );
-	}
-
-	HighestScoreSumSelector(final boolean blocking , final boolean exploreAll) {
-		super( blocking , exploreAll );
-	}
-
-	HighestScoreSumSelector(
-			final boolean blocking,
-			final boolean exploreAll,
-			final boolean pruneUnplausiblePlans) {
-		super( blocking , exploreAll , pruneUnplausiblePlans );
+	public PlanRecord(
+			final Plan plan,
+			final JointPlan jointPlan,
+			final double weight) {
+		this.plan = plan;
+		this.jointPlan = jointPlan;
+		this.avgJointPlanWeight = weight;
 	}
 
 	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup group) {
-		Double score = indivPlan.getScore();
-		// if there are unscored plan, one of them is selected
-		return score == null ? Double.POSITIVE_INFINITY : score;
+	public String toString() {
+		return "{PlanRecord: "+plan.getPerson().getId()+":"+plan.getScore()+
+			" linkedWith:"+(jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())+
+			" weight="+avgJointPlanWeight+"}";
 	}
 }

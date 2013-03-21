@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractHighestWeightSelectorTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +16,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Plan;
+package playground.thibautd.socnetsim.replanning.selectors.highestweightselection;
 
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
+import org.matsim.api.core.v01.Id;
 
-/**
- * @author thibautd
- */
-public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
-	public HighestScoreSumSelector() {}
+final class PlanString {
+	public final PlanRecord planRecord;
+	public final PlanString tail;
+	private final double weight;
 
-	// for tests
-	HighestScoreSumSelector(final boolean blocking) {
-		super( blocking );
+	public PlanString(
+			final PlanRecord head,
+			final PlanString tail) {
+		this.planRecord = head;
+		this.tail = tail;
+		this.weight = head.avgJointPlanWeight + (tail == null ? 0 : tail.getWeight());
 	}
 
-	HighestScoreSumSelector(final boolean blocking , final boolean exploreAll) {
-		super( blocking , exploreAll );
+	public double getWeight() {
+		return weight;
 	}
 
-	HighestScoreSumSelector(
-			final boolean blocking,
-			final boolean exploreAll,
-			final boolean pruneUnplausiblePlans) {
-		super( blocking , exploreAll , pruneUnplausiblePlans );
+	public boolean containsPerson(final Id id) {
+		return planRecord.plan.getPerson().getId().equals( id ) ||
+			(tail != null && tail.containsPerson( id ));
 	}
 
 	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup group) {
-		Double score = indivPlan.getScore();
-		// if there are unscored plan, one of them is selected
-		return score == null ? Double.POSITIVE_INFINITY : score;
+	public String toString() {
+		return "("+planRecord+"; "+tail+")";
 	}
 }
