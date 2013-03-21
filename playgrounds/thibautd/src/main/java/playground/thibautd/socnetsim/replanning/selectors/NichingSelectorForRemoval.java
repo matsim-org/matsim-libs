@@ -27,14 +27,18 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
 
+import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 /**
  * @author thibautd
  */
-public class NichingSelectorForRemoval extends AbstractHighestWeightSelector {
-	private final PlanDistance distanceFunction;
+public class NichingSelectorForRemoval implements GroupLevelPlanSelector {
+
+	private final GroupLevelPlanSelector delegate;
 
 	public NichingSelectorForRemoval() {
 		this( new PlanDistance() {
@@ -88,67 +92,82 @@ public class NichingSelectorForRemoval extends AbstractHighestWeightSelector {
 	}
 
 	public  NichingSelectorForRemoval(final PlanDistance distanceFunction) {
-		super( true );
-		this.distanceFunction = distanceFunction;
+		delegate = new HighestWeightSelector( true , new Weight( distanceFunction) );
 	}
-
+	
 	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup replanningGroup) {
-		// substract the best score, so that al fitnesses are negative
-		// and the best one is null. Then pass to the minus.
-		final double unscaledWeight = - (indivPlan.getScore()
-			- bestScore( indivPlan.getPerson().getPlans() ) );
-
-		final double crowdingFactor =
-			calcCrowding(
-					indivPlan,
-					indivPlan.getPerson().getPlans() );
-
-		final double weight =  unscaledWeight / crowdingFactor;
-		assert !Double.isNaN( weight ) : unscaledWeight+" / "+crowdingFactor;
-		return weight;
+	public final GroupPlans selectPlans(
+			final JointPlans jointPlans,
+			final ReplanningGroup group) {
+		return delegate.selectPlans(jointPlans, group);
 	}
 
-	private double calcCrowding(
-			final Plan indivPlan,
-			final List<? extends Plan> plans) {
-		double v = 0;
-
-		for ( Plan p : plans ) {
-			if ( p == indivPlan ) continue;
-			final double d = distanceFunction.calcDistance( p , indivPlan );
-			checkDistanceValidity( d );
-			v += 1 / (1 + d);
+	private static class Weight implements WeightCalculator {
+		private final PlanDistance distanceFunction;
+		
+		public Weight(final PlanDistance d) {
+			this.distanceFunction = d;
 		}
-
-		return v;
-	}
-
-	private void checkDistanceValidity(final double d) {
-		if ( d < 0 ) {
-			throw new IllegalArgumentException( "negative distance "+d );
+		
+		@Override
+		public double getWeight(
+				final Plan indivPlan,
+				final ReplanningGroup replanningGroup) {
+			// substract the best score, so that al fitnesses are negative
+			// and the best one is null. Then pass to the minus.
+			final double unscaledWeight = - (indivPlan.getScore()
+				- bestScore( indivPlan.getPerson().getPlans() ) );
+	
+			final double crowdingFactor =
+				calcCrowding(
+						indivPlan,
+						indivPlan.getPerson().getPlans() );
+	
+			final double weight =  unscaledWeight / crowdingFactor;
+			assert !Double.isNaN( weight ) : unscaledWeight+" / "+crowdingFactor;
+			return weight;
 		}
-		if ( Double.isNaN( d ) ) {
-			throw new IllegalArgumentException( "NaN distance" );
+	
+		private double calcCrowding(
+				final Plan indivPlan,
+				final List<? extends Plan> plans) {
+			double v = 0;
+	
+			for ( Plan p : plans ) {
+				if ( p == indivPlan ) continue;
+				final double d = distanceFunction.calcDistance( p , indivPlan );
+				checkDistanceValidity( d );
+				v += 1 / (1 + d);
+			}
+	
+			return v;
 		}
-	}
-
-	private double bestScore(final List<? extends Plan> plans) {
-		double best = Double.NEGATIVE_INFINITY;
-
-		for ( Plan p : plans ) {
-			// if score null, NPE
-			final double score = p.getScore();
-			if ( score > best ) best = score;
+	
+		private void checkDistanceValidity(final double d) {
+			if ( d < 0 ) {
+				throw new IllegalArgumentException( "negative distance "+d );
+			}
+			if ( Double.isNaN( d ) ) {
+				throw new IllegalArgumentException( "NaN distance" );
+			}
 		}
-
-		return best;
+	
+		private double bestScore(final List<? extends Plan> plans) {
+			double best = Double.NEGATIVE_INFINITY;
+	
+			for ( Plan p : plans ) {
+				// if score null, NPE
+				final double score = p.getScore();
+				if ( score > best ) best = score;
+			}
+	
+			return best;
+		}
 	}
 
 	public static interface PlanDistance {
 		public double calcDistance( Plan p1 , Plan p2 );
 	}
+
 }
 

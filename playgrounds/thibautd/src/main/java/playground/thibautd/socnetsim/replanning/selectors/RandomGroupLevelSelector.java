@@ -23,24 +23,34 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 /**
  * @author thibautd
  */
-public class RandomGroupLevelSelector extends AbstractHighestWeightSelector {
-	private final Random random;
+public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
+
+	private final GroupLevelPlanSelector delegate;
 
 	public RandomGroupLevelSelector(final Random random) {
-		this.random = random;
+		delegate = new HighestWeightSelector(
+				new WeightCalculator() {
+					@Override
+					public double getWeight(
+							final Plan indivPlan,
+							final ReplanningGroup group) {
+						return random.nextDouble();
+					}
+				});
 	}
 
 	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup group) {
-		return random.nextDouble();
+	public GroupPlans selectPlans(final JointPlans jointPlans, final ReplanningGroup group) {
+		return delegate.selectPlans( jointPlans , group );
 	}
 }
 

@@ -24,8 +24,11 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 /**
  * A selector which draws gumbel-distributed scores for individual plans.
@@ -34,45 +37,63 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
  *
  * @author thibautd
  */
-public class LogitSumSelector extends AbstractHighestWeightSelector {
+public class LogitSumSelector implements GroupLevelPlanSelector {
 	private static final Logger log =
 		Logger.getLogger(LogitSumSelector.class);
 
-	private final Random random;
-	private final double scaleParameter;
+	private final GroupLevelPlanSelector delegate;
 
 	public LogitSumSelector(
 			final Random random,
 			final double scaleParameter) {
-		this.random = random;
-		this.scaleParameter = scaleParameter;
+		this.delegate = new HighestWeightSelector( new Weight( random , scaleParameter ) );
 	}
-
+	
 	@Override
-	public double getWeight(
-			final Plan indivPlan,
+	public GroupPlans selectPlans(
+			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		final Double score = indivPlan.getScore();
-		if (score == null) return Double.POSITIVE_INFINITY;
-		return score + nextErrorTerm();
+		return delegate.selectPlans(jointPlans, group);
 	}
 
-	private double nextErrorTerm() {
-		// "inversion sampling": sample a number between 0 and 1,
-		// and apply the inverse of the CDF to it.
-		double choice = random.nextDouble();
-
-		double value = Math.log( choice );
-		if (value == Double.MIN_VALUE) {
-			log.warn( "underflow 1 for choice "+choice );
+	private static class Weight implements WeightCalculator {
+		private final Random random;
+		private final double scaleParameter;
+		
+		public Weight(
+				final Random random,
+				final double scale) {
+			this.random = random;
+			this.scaleParameter = scale;
 		}
-
-		value = Math.log( -value );
-		if (value == Double.MIN_VALUE) {
-			log.warn( "underflow 2 for choice "+choice );
+		
+		@Override
+		public double getWeight(
+				final Plan indivPlan,
+				final ReplanningGroup group) {
+			final Double score = indivPlan.getScore();
+			if (score == null) return Double.POSITIVE_INFINITY;
+			return score + nextErrorTerm();
 		}
-
-		return -value / scaleParameter;
+	
+		private double nextErrorTerm() {
+			// "inversion sampling": sample a number between 0 and 1,
+			// and apply the inverse of the CDF to it.
+			double choice = random.nextDouble();
+	
+			double value = Math.log( choice );
+			if (value == Double.MIN_VALUE) {
+				log.warn( "underflow 1 for choice "+choice );
+			}
+	
+			value = Math.log( -value );
+			if (value == Double.MIN_VALUE) {
+				log.warn( "underflow 2 for choice "+choice );
+			}
+	
+			return -value / scaleParameter;
+		}
 	}
+
 }
 

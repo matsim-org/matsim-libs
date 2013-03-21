@@ -47,7 +47,7 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.NichingSelectorForRemoval;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
@@ -156,7 +156,7 @@ public class RunCliquesWithHardCodedStrategies {
 	public static void main(final String[] args) {
 		OutputDirectoryLogging.catchLogEntries();
 		if (DO_STRATEGY_TRACE) Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
-		if (DO_SELECT_TRACE) Logger.getLogger( AbstractHighestWeightSelector.class.getName() ).setLevel( Level.TRACE );
+		if (DO_SELECT_TRACE) Logger.getLogger( HighestWeightSelector.class.getName() ).setLevel( Level.TRACE );
 		final String configFile = args[ 0 ];
 
 		// load "registry"

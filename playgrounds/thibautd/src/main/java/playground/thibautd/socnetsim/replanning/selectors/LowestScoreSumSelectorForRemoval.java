@@ -21,24 +21,35 @@ package playground.thibautd.socnetsim.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 /**
  * @author thibautd
  */
-public class LowestScoreSumSelectorForRemoval extends AbstractHighestWeightSelector {
+public class LowestScoreSumSelectorForRemoval implements GroupLevelPlanSelector {
+	private final GroupLevelPlanSelector delegate;
+	
 	public LowestScoreSumSelectorForRemoval() {
-		super( true );
+		delegate = new HighestWeightSelector( true ,
+				new WeightCalculator() {
+					@Override
+					public double getWeight(
+							final Plan indivPlan,
+							final ReplanningGroup group) {
+						Double score = indivPlan.getScore();
+						// if there is a plan without score, select it
+						return score == null ? Double.POSITIVE_INFINITY : -score;
+					}
+				});
 	}
 
 	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup group) {
-		Double score = indivPlan.getScore();
-		// if there is a plan without score, select it
-		return score == null ? Double.POSITIVE_INFINITY : -score;
+	public GroupPlans selectPlans(final JointPlans jointPlans, final ReplanningGroup group) {
+		return delegate.selectPlans(jointPlans, group);
 	}
 }
 

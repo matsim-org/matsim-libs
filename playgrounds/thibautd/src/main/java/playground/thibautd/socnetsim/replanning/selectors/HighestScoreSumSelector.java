@@ -21,37 +21,53 @@ package playground.thibautd.socnetsim.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.AbstractHighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 /**
  * @author thibautd
  */
-public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
-	public HighestScoreSumSelector() {}
+public class HighestScoreSumSelector implements GroupLevelPlanSelector {
+	private final GroupLevelPlanSelector delegate;
+	
+	public HighestScoreSumSelector() {
+		delegate = new HighestWeightSelector( new Weight() );
+	}
 
 	// for tests
 	HighestScoreSumSelector(final boolean blocking) {
-		super( blocking );
+		delegate = new HighestWeightSelector( blocking , new Weight() );
 	}
 
 	HighestScoreSumSelector(final boolean blocking , final boolean exploreAll) {
-		super( blocking , exploreAll );
+		delegate = new HighestWeightSelector( blocking , exploreAll , new Weight() );
 	}
 
 	HighestScoreSumSelector(
 			final boolean blocking,
 			final boolean exploreAll,
 			final boolean pruneUnplausiblePlans) {
-		super( blocking , exploreAll , pruneUnplausiblePlans );
+		delegate = new HighestWeightSelector( blocking , exploreAll , pruneUnplausiblePlans , new Weight() );
+	}
+
+	private static class Weight implements WeightCalculator {
+		@Override
+		public double getWeight(
+				final Plan indivPlan,
+				final ReplanningGroup group) {
+			Double score = indivPlan.getScore();
+			// if there are unscored plan, one of them is selected
+			return score == null ? Double.POSITIVE_INFINITY : score;
+		}
 	}
 
 	@Override
-	public double getWeight(
-			final Plan indivPlan,
+	public GroupPlans selectPlans(
+			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		Double score = indivPlan.getScore();
-		// if there are unscored plan, one of them is selected
-		return score == null ? Double.POSITIVE_INFINITY : score;
+		return delegate.selectPlans( jointPlans, group );
 	}
 }
