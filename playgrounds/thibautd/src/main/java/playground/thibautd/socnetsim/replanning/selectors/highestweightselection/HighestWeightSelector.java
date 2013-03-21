@@ -211,6 +211,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		do {
 			count++;
 			final PlanAllocation allocation = buildPlanString(
+					new KnownStates(),
 					forbiden,
 					new ArrayList<PersonRecord>( personRecords.values() ),
 					new PlanAllocation(),
@@ -324,17 +325,30 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 * @param str the PlanString of the plan constructed until now
 	 */
 	private PlanAllocation buildPlanString(
+			final KnownStates knownStates,
 			final ForbidenCombinations forbidenCombinations,
 			final List<PersonRecord> personsStillToAllocate,
 			// needed to check whether a leave is forbidden or not
 			final PlanAllocation currentAllocation,
 			final double minimalWeightToObtain) {
-		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
+		assert !intersectsRecords( personsStillToAllocate , currentAllocation );
+		if ( knownStates.isUnfeasible( personsStillToAllocate , minimalWeightToObtain ) ) {
+			return null;
+		}
 
+		PlanAllocation constructedString = knownStates.getCachedSolutionForRemainingAgents( personsStillToAllocate );
+		if ( constructedString != null ) {
+			assert constructedString.getPlans().size() == personsStillToAllocate.size() :
+				constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
+			return constructedString;
+		}
+
+		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
 			new ArrayList<PersonRecord>( personsStillToAllocate );
 		final PersonRecord currentPerson = remainingPersons.remove(0);
+		assert remainingPersons.size() == personsStillToAllocate.size() - 1;
 
 		// the joint plans implying this person will be considered "selectable"
 		// only when considering this joint plan as being selected for currentPerson
@@ -347,6 +361,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// of the weight until now plus the upper bound
 		final List<PlanRecord> records = new ArrayList<PlanRecord>();
 		for ( PlanRecord r : currentPerson.bestPlansPerJointStructure ) {
+			assert !r.isStillFeasible == (r.jointPlan != null && intersects( r.jointPlan.getIndividualPlans().keySet() , currentAllocation ));
 			if ( r.isStillFeasible ) records.add( r );
 		}
 
@@ -374,7 +389,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// get the actual allocation, and stop when the allocation
 		// is better than the maximum possible in remaining plans
 		// or worst than the worst possible at a higher level
-		PlanAllocation constructedString = null;
+		assert constructedString == null;
 
 		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 		for (PlanRecord r : records) {
@@ -389,47 +404,62 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 			assert r.isStillFeasible;
 
-			PlanAllocation tail = new PlanAllocation();
-			tail.add( r );
+			final PlanAllocation newAllocation = new PlanAllocation();
+			newAllocation.add( r );
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			if (r.jointPlan != null) {
-				tail.addAll( r.linkedPlans );
+				assert !intersects( r.jointPlan.getIndividualPlans().keySet() , currentAllocation );
+				assert r.linkedPlans.size() == r.jointPlan.getIndividualPlans().size() -1;
+
+				newAllocation.addAll( r.linkedPlans );
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
+
+				assert actuallyRemainingPersons.size() + r.jointPlan.getIndividualPlans().size() == personsStillToAllocate.size();
 
 				tagLinkedPlansOfPartnersAsInfeasible(
 						r,
 						localFeasibilityChanger);
 			}
 
-			PlanAllocation newString = tail;
-			final PlanAllocation newCurrentAlloc = new PlanAllocation();
-			newCurrentAlloc.addAll( currentAllocation.getPlans() );
-			newCurrentAlloc.addAll( tail.getPlans() );
-			if ( !actuallyRemainingPersons.isEmpty() ) {
-				newString = buildPlanString(
-						forbidenCombinations,
-						actuallyRemainingPersons,
-						newCurrentAlloc,
-						Math.max(
-							minimalWeightToObtain,
-							constructedString != null ?
-								constructedString.getWeight() :
-								Double.NEGATIVE_INFINITY) - tail.getWeight() );
-				if ( newString != null ) newString.addAll( tail.getPlans() );
-			}
-			else {
-				if ( forbidBlockingCombinations && forbidenCombinations.isForbidden( newCurrentAlloc ) ) {
-					// we are on a leaf (ie a full plan).
-					// If some combinations are forbidden, check if this one is.
-					newString = null;
+			PlanAllocation newString = null;
+			/*scope*/ {
+				final PlanAllocation newCurrentAlloc = new PlanAllocation();
+				newCurrentAlloc.addAll( currentAllocation.getPlans() );
+				newCurrentAlloc.addAll( newAllocation.getPlans() );
+				if ( !actuallyRemainingPersons.isEmpty() ) {
+					newString = buildPlanString(
+							knownStates,
+							forbidenCombinations,
+							actuallyRemainingPersons,
+							newCurrentAlloc,
+							Math.max(
+								minimalWeightToObtain,
+								constructedString != null ?
+									constructedString.getWeight() :
+									Double.NEGATIVE_INFINITY) - newAllocation.getWeight() );
+					if ( newString != null ) {
+						assert newString.getPlans().size() == actuallyRemainingPersons.size() : newString.getPlans().size()+" plans for "+actuallyRemainingPersons.size()+" agents";
+						newString.addAll( newAllocation.getPlans() );
+						assert newString.getPlans().size() == personsStillToAllocate.size() : newString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
+					}
+				}
+				else {
+					newString = newAllocation;
+					assert newString.getPlans().size() == personsStillToAllocate.size() : newString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
+					if ( forbidBlockingCombinations && forbidenCombinations.isForbidden( newCurrentAlloc ) ) {
+						// we are on a leaf (ie a full plan).
+						// If some combinations are forbidden, check if this one is.
+						newString = null;
+					}
 				}
 			}
 			localFeasibilityChanger.resetFeasibilities();
 
-			if (newString == null) continue;
+			if ( newString == null || newString.getWeight() <= minimalWeightToObtain ) continue;
 
 			assert newString.getWeight() <= r.cachedMaximumWeight :
-				getClass()+" weight higher than estimated max: "+newString.getWeight()+" > "+r.cachedMaximumWeight;
+				getClass()+" weight higher than estimated max: "+newString.getPlans()+" has weight "+newString.getWeight()+" > "+r.cachedMaximumWeight;
+			assert newString.getWeight() > minimalWeightToObtain : newString.getWeight() +"<="+ minimalWeightToObtain;
 
 			if (constructedString == null ||
 					newString.getWeight() > constructedString.getWeight()) {
@@ -438,6 +468,12 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		}
 
 		feasibilityChanger.resetFeasibilities();
+
+		assert constructedString == null || constructedString.getPlans().size() == personsStillToAllocate.size() :
+			constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
+		if ( !forbidBlockingCombinations ) {
+			knownStates.cacheSolution( personsStillToAllocate , constructedString , minimalWeightToObtain );
+		}
 		return constructedString;
 	}
 
@@ -579,6 +615,24 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			if ( tested.contains( id ) ) return true;
 		}
 
+		return false;
+	}
+
+	private static boolean intersects(
+			final Collection<Id> ids1,
+			final PlanAllocation alloc) {
+		for ( PlanRecord p : alloc.getPlans() ) {
+			if ( ids1.contains( p.person.person.getId() ) ) return true;
+		}
+		return false;
+	}
+
+	private static boolean intersectsRecords(
+			final Collection<PersonRecord> records,
+			final PlanAllocation alloc) {
+		for ( PlanRecord p : alloc.getPlans() ) {
+			if ( records.contains( p.person ) ) return true;
+		}
 		return false;
 	}
 }
