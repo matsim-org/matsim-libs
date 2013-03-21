@@ -581,7 +581,10 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// case in jp: plan is fully determined
 		if (jointPlanToSelect != null) {
 			final Plan plan = jointPlanToSelect.getIndividualPlan( record.person.getId() );
-			if (plan != null) return record.getRecord( plan ).avgJointPlanWeight;
+			if (plan != null) {
+				assert Math.abs( record.getRecord( plan ).avgJointPlanWeight - planToSelect.avgJointPlanWeight ) < EPSILON;
+				return planToSelect.avgJointPlanWeight;
+			}
 		}
 
 		for (PlanRecord plan : record.plans) {
