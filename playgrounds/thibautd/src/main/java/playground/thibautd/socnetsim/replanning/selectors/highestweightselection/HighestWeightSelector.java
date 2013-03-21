@@ -356,7 +356,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// get a list of plans in decreasing order of maximum possible weight.
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
-		final List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
+		final List<PlanRecord> records =
+			new ArrayList<PlanRecord>(
+					exploreAll ?
+						currentPerson.plans :
+						currentPerson.bestPlansPerJointStructure );
 
 		weightPlanRecords(
 				records,
@@ -386,6 +390,8 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		PlanString constructedString = null;
 		// the plans got after this step only depend on the agents still to
 		// allocate. We can stop at the first found solution.
+		// this is only useful when exploreAll is enabled (otherwise, only
+		// the best plan per joint structure is kept)
 		final KnownBranches knownBranches = new KnownBranches( pruneSimilarBranches );
 
 		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
@@ -477,19 +483,8 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 
-		final Set<Set<Id>> knownSets = new HashSet<Set<Id>>();
-		double lastRecordWeight = Double.POSITIVE_INFINITY;
 		for (PlanRecord r : records) {
-			assert r.avgJointPlanWeight <= lastRecordWeight : records;
-			lastRecordWeight = r.avgJointPlanWeight;
-
-			final Set<Id> cotravs = r.jointPlan == null ?
-				Collections.<Id>emptySet() :
-				r.jointPlan.getIndividualPlans().keySet();
-			// only compute bound for best record of a given structure:
-			// the other ones will not be selected for sure, so no need
-			// to bother.
-			if ( !exploreAll && r.isStillFeasible && knownSets.add( cotravs ) ) {
+			if ( r.isStillFeasible ) {
 				tagLinkedPlansOfPartnersAsInfeasible(
 						r,
 						localFeasibilityChanger);
@@ -511,10 +506,10 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		}
 	}
 
-	private static void tagLinkedPlansOfPersonAsInfeasible(
+	private void tagLinkedPlansOfPersonAsInfeasible(
 			final PersonRecord person,
 			final FeasibilityChanger changer) {
-		for ( PlanRecord pr : person.plans ) {
+		for ( PlanRecord pr : exploreAll ? person.plans : person.bestPlansPerJointStructure ) {
 			if ( pr.jointPlan == null ) {
 				assert pr.linkedPlans.isEmpty();
 				continue;
@@ -525,7 +520,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		}
 	}
 
-	private static void tagLinkedPlansOfPartnersAsInfeasible(
+	private void tagLinkedPlansOfPartnersAsInfeasible(
 			final PlanRecord r,
 			final FeasibilityChanger changer) {
 		assert !r.linkedPlans.contains( r );
@@ -540,7 +535,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 * plans of remainingPersons, given the alradySelected has been
 	 * selected, and that planToSelect is about to be selected.
 	 */
-	private static double getMaxWeightFromPersons(
+	private double getMaxWeightFromPersons(
 			final PlanRecord planToSelect,
 			final PlanString string,
 			final List<PersonRecord> remainingPersons) {
@@ -571,7 +566,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 * @return the highest weight of a plan wich does not pertains to a joint
 	 * plan shared with agents in personsSelected
 	 */
-	private static double getMaxWeight(
+	private double getMaxWeight(
 			// arguments used for assertions
 			final PlanRecord planToSelect,
 			final PlanString string,
@@ -587,7 +582,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			}
 		}
 
-		for (PlanRecord plan : record.plans) {
+		for (PlanRecord plan : exploreAll ? record.plans : record.bestPlansPerJointStructure ) {
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
 
