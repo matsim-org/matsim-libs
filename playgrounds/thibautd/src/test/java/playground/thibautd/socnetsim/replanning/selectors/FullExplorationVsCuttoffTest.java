@@ -53,6 +53,7 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.FullExplorationSelector;
 
 /**
  * @author thibautd
@@ -68,7 +69,7 @@ public class FullExplorationVsCuttoffTest {
 	@Ignore
 	public void testExistenceOfBlockingDoesNotDependOnOrder() throws Exception {
 		final Scenario sc = createTestScenario();
-		final HighestScoreSumSelector highestSelector = new HighestScoreSumSelector( true , false );
+		final HighestScoreSumSelector highestSelector = new HighestScoreSumSelector( true );
 		final LowestScoreSumSelectorForRemoval lowestSelector = new LowestScoreSumSelectorForRemoval( );
 
 		final JointPlans jointPlans = sc.getScenarioElement( JointPlans.class );
@@ -111,8 +112,19 @@ public class FullExplorationVsCuttoffTest {
 
 	private void testFullExplorationVsCuttoff(final boolean blocking) throws Exception {
 		final Scenario sc = createTestScenario();
-		final HighestScoreSumSelector fastSelector = new HighestScoreSumSelector( blocking , false );
-		final HighestScoreSumSelector fullSelector = new HighestScoreSumSelector( blocking , true );
+		final HighestScoreSumSelector fastSelector = new HighestScoreSumSelector( blocking );
+		final GroupLevelPlanSelector fullSelector =
+			new FullExplorationSelector(
+					blocking,
+					new FullExplorationSelector.WeightCalculator() {
+						@Override
+						public double getWeight(
+								final Plan indivPlan,
+								final ReplanningGroup replanningGroup) {
+							final Double score = indivPlan.getScore();
+							return score == null ? Double.POSITIVE_INFINITY : score;
+						}
+					});
 
 		final JointPlans jointPlans = sc.getScenarioElement( JointPlans.class );
 		final GroupIdentifier cliquesIdentifier = sc.getScenarioElement( GroupIdentifier.class );
@@ -154,65 +166,6 @@ public class FullExplorationVsCuttoffTest {
 		log.info( "full took "+timeFull+"ms" );
 		log.info( "fast took "+timeFast+"ms" );
 		log.info( "full took "+(timeFull / timeFast)+" times the time needed by fast" );
-	}
-
-	@Test
-	public void testPruningVsNoPruningBlocking() throws Exception {
-		log.info( "test: testPruningVsNoPruningBlocking()" );
-		testPruningVsNoPruning( true );
-	}
-
-	@Test
-	public void testPruningVsNoPruningNonBlocking() throws Exception {
-		log.info( "test: testPruningVsNoPruningNonBlocking()" );
-		testPruningVsNoPruning( false );
-	}
-
-	private void testPruningVsNoPruning(final boolean blocking) throws Exception {
-		final Scenario sc = createTestScenario();
-		final HighestScoreSumSelector pruningSelector = new HighestScoreSumSelector( blocking , false , true );
-		final HighestScoreSumSelector nonPruningSelector = new HighestScoreSumSelector( blocking , false , false );
-
-		final JointPlans jointPlans = sc.getScenarioElement( JointPlans.class );
-		final GroupIdentifier cliquesIdentifier = sc.getScenarioElement( GroupIdentifier.class );
-
-		final Counter count = new Counter( "test plan # " );
-		final SelectionStopWatch stopWatch = new SelectionStopWatch();
-		for (ReplanningGroup clique : cliquesIdentifier.identifyGroups( sc.getPopulation() )) {
-			count.incCounter();
-			stopWatch.startFast();
-			final GroupPlans fastResult = pruningSelector.selectPlans( jointPlans , clique );
-			stopWatch.endFast();
-			stopWatch.startFull();
-			final GroupPlans fullResult = nonPruningSelector.selectPlans( jointPlans , clique );
-			stopWatch.endFull();
-
-			final double scoreFast = calcScore( fastResult );
-			final double scoreFull = calcScore( fullResult );
-
-			// allow different results, as long as the scores are identical
-			assertEquals(
-					"different scores with both exploration types."+
-					"          full: "+fullResult+
-					"          fast: "+fastResult+
-					"          ",
-					scoreFull,
-					scoreFast,
-					MatsimTestUtils.EPSILON);
-
-			if ( !fastResult.equals( fullResult ) ) {
-				log.warn( "non pruned result "+fullResult+" with score "+scoreFull+
-						" is not identical to pruned result "+fastResult+" with score "+scoreFast );
-			}
-		}
-		count.printCounter();
-
-		// print some stats on time needed
-		final double timeFast = stopWatch.endFastAndGetTime();
-		final double timeFull = stopWatch.endFullAndGetTime();
-		log.info( "no pruning took "+timeFull+"ms" );
-		log.info( "pruning took "+timeFast+"ms" );
-		log.info( "no pruning took "+(timeFull / timeFast)+" times the time needed by pruning" );
 	}
 
 	private double calcScore(final GroupPlans plans) {

@@ -42,17 +42,6 @@ public class HighestScoreSumSelector implements GroupLevelPlanSelector {
 		delegate = new HighestWeightSelector( blocking , new Weight() );
 	}
 
-	HighestScoreSumSelector(final boolean blocking , final boolean exploreAll) {
-		delegate = new HighestWeightSelector( blocking , exploreAll , new Weight() );
-	}
-
-	HighestScoreSumSelector(
-			final boolean blocking,
-			final boolean exploreAll,
-			final boolean pruneUnplausiblePlans) {
-		delegate = new HighestWeightSelector( blocking , exploreAll , pruneUnplausiblePlans , new Weight() );
-	}
-
 	private static class Weight implements WeightCalculator {
 		@Override
 		public double getWeight(
