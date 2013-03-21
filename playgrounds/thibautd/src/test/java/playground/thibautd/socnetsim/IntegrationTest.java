@@ -221,6 +221,7 @@ public class IntegrationTest {
 					sha1);
 
 		while (stream.read() != -1);
+		stream.close();
 		return sha1.digest();
 	}
 }

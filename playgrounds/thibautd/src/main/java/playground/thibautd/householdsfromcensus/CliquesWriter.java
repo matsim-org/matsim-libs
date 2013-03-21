@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.householdsfromcensus;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * Writes clique pertenancy information to an XML file.
@@ -51,11 +49,7 @@ public class CliquesWriter extends MatsimXmlWriter {
 	public void writeFile(String fileName) {
 		this.openFile(fileName);
 		this.writeXmlHead();
-		try {
-			this.writeCliques();
-		} catch (IOException e) {
-			throw new UncheckedIOException("problem while writing cliques", e);
-		}
+		this.writeCliques();
 		this.close();
 
 		log.info(count+" cliques succesfully dumped to "+fileName);
@@ -63,7 +57,7 @@ public class CliquesWriter extends MatsimXmlWriter {
 		nextLog = 1;
 	}
 
-	private void writeCliques() throws IOException {
+	private void writeCliques() {
 		this.atts.clear();
 
 		//this.atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
@@ -75,7 +69,7 @@ public class CliquesWriter extends MatsimXmlWriter {
 		this.writeEndTag(CliquesSchemaNames.CLIQUES);
 	}
 
-	private void writeClique(Id id) throws IOException {
+	private void writeClique(Id id) {
 		this.logCount();
 		this.atts.clear();
 		this.atts.add(this.createTuple(CliquesSchemaNames.CLIQUE_ID, id.toString()));
@@ -94,7 +88,7 @@ public class CliquesWriter extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeMembers(List<Id> clique) throws IOException {
+	private void writeMembers(List<Id> clique) {
 		for (Id id : clique) {
 			this.atts.clear();
 			this.atts.add(this.createTuple(CliquesSchemaNames.MEMBER_ID, id.toString()));
