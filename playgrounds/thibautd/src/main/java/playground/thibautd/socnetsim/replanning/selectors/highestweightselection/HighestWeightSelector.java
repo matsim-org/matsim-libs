@@ -477,38 +477,31 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 
-		// cache the last set of co-travelers for which the upper bound
-		// was computed, to avoid recomputing it if we stumble upon the same
-		// set afterwards. This does not ensures that we do not recompute things
-		// for the same set, but the advantage over more sophisticated methods
-		// is that there is virtually no overhead, so that there is no risk of making
-		// things worse. Empirically, this improves things quite a bit (twice as fast!)
-		Set<Id> lastCotravs = null;
-		double lastWeight = Double.NaN;
+		final Set<Set<Id>> knownSets = new HashSet<Set<Id>>();
+		double lastRecordWeight = Double.POSITIVE_INFINITY;
 		for (PlanRecord r : records) {
-			if ( r.isStillFeasible ) {
-				final Set<Id> cotravs =
-					r.jointPlan == null ?
-						Collections.<Id>emptySet() :
-						r.jointPlan.getIndividualPlans().keySet();
+			assert r.avgJointPlanWeight <= lastRecordWeight : records;
+			lastRecordWeight = r.avgJointPlanWeight;
 
-				assert cotravs != null;
-				if ( !cotravs.equals( lastCotravs ) ) {
-					lastCotravs = cotravs;
-					tagLinkedPlansOfPartnersAsInfeasible(
-							r,
-							localFeasibilityChanger);
-					lastWeight =
-							getMaxWeightFromPersons(
-									r,
-									str,
-									remainingPersons );
-					localFeasibilityChanger.resetFeasibilities();
-				}
+			final Set<Id> cotravs = r.jointPlan == null ?
+				Collections.<Id>emptySet() :
+				r.jointPlan.getIndividualPlans().keySet();
+			// only compute bound for best record of a given structure:
+			// the other ones will not be selected for sure, so no need
+			// to bother.
+			if ( !exploreAll && r.isStillFeasible && knownSets.add( cotravs ) ) {
+				tagLinkedPlansOfPartnersAsInfeasible(
+						r,
+						localFeasibilityChanger);
 
-				r.cachedMaximumWeight = exploreAll ?
-					Double.POSITIVE_INFINITY :
-					alreadyAllocatedWeight + lastWeight;
+				r.cachedMaximumWeight =
+					alreadyAllocatedWeight +
+						getMaxWeightFromPersons(
+								r,
+								str,
+								remainingPersons );
+
+				localFeasibilityChanger.resetFeasibilities();
 			}
 			else {
 				r.cachedMaximumWeight = exploreAll ?
