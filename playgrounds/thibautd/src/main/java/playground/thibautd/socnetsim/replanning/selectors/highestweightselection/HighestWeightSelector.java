@@ -340,7 +340,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final PlanString str,
 			final double minimalWeightToObtain) {
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
-		final PersonRecord currentPerson = personsStillToAllocate.get(0);
+
+		// do one step forward: "point" to the next person
+		final List<PersonRecord> remainingPersons =
+			new ArrayList<PersonRecord>( personsStillToAllocate );
+		final PersonRecord currentPerson = remainingPersons.remove(0);
 		// the joint plans implying this person will be considered "selectable"
 		// only when considering this joint plan as being selected for currentPerson
 		tagLinkedPlansOfPersonAsInfeasible(
@@ -348,12 +352,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				feasibilityChanger);
 
 		assert str == null || !str.containsPerson( currentPerson.person.getId() );
-
-		// do one step forward: "point" to the next person
-		final List<PersonRecord> remainingPersons =
-			personsStillToAllocate.size() > 1 ?
-			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
-			Collections.<PersonRecord> emptyList();
 
 		// get a list of plans in decreasing order of maximum possible weight.
 		// The weight is always computed on the full joint plan, and thus consists
