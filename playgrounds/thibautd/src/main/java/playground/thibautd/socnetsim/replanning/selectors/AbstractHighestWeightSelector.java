@@ -565,11 +565,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			if (plan != null) return record.getRecord( plan ).avgJointPlanWeight;
 		}
 
-		final Collection<Id> idsInJpToSelect =
-			jointPlanToSelect == null ?
-			Collections.<Id> emptySet() :
-			jointPlanToSelect.getIndividualPlans().keySet();
-
 		for (PlanRecord plan : record.plans) {
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
@@ -578,7 +573,12 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				!plan.isStillFeasible ==
 				plan.jointPlan.getIndividualPlans().containsKey( planToSelect.plan.getPerson().getId() ) ||
 				intersect( plan.jointPlan.getIndividualPlans().keySet() , string ) ||
-				intersect( plan.jointPlan.getIndividualPlans().keySet() , idsInJpToSelect );
+				intersect(
+						plan.jointPlan.getIndividualPlans().keySet(),
+						jointPlanToSelect == null ?
+							Collections.<Id> emptySet() :
+							jointPlanToSelect.getIndividualPlans().keySet() );
+
 
 			if ( plan.isStillFeasible ) return plan.avgJointPlanWeight;
 		}
