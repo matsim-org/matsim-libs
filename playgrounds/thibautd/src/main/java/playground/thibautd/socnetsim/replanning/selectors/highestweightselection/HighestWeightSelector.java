@@ -563,7 +563,9 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		if (planToSelect.jointPlan != null) {
 			final Plan plan = planToSelect.jointPlan.getIndividualPlan( record.person.getId() );
 			if (plan != null) {
-				assert Math.abs( record.getRecord( plan ).avgJointPlanWeight - planToSelect.avgJointPlanWeight ) < EPSILON;
+				// the "==" part allows to take into account infinite weights
+				assert record.getRecord( plan ).avgJointPlanWeight == planToSelect.avgJointPlanWeight ||
+					Math.abs( record.getRecord( plan ).avgJointPlanWeight - planToSelect.avgJointPlanWeight ) < EPSILON;
 				return planToSelect.avgJointPlanWeight;
 			}
 		}
