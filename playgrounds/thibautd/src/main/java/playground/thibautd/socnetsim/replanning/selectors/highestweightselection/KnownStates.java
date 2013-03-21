@@ -19,25 +19,21 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors.highestweightselection;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author thibautd
  */
 public final class KnownStates {
-	private final Map<Set<PersonRecord>, PlanAllocation> cache = new HashMap<Set<PersonRecord>, PlanAllocation>();
-	private final Map<Set<PersonRecord>, Double> unfeasibleProblems = new HashMap<Set<PersonRecord>, Double>();
+	// note: using lists assumes that records are always ordered the same way
+	private final Map<List<PersonRecord>, PlanAllocation> cache = new HashMap<List<PersonRecord>, PlanAllocation>();
+	private final Map<List<PersonRecord>, Double> unfeasibleProblems = new HashMap<List<PersonRecord>, Double>();
 
 	public PlanAllocation getCachedSolutionForRemainingAgents(
-			final Collection<PersonRecord> remainingAgents) {
-		final Set<PersonRecord> set = new HashSet<PersonRecord>( remainingAgents );
-		assert set.size() == remainingAgents.size() : set.size() +"!="+ remainingAgents.size();
-
-		final PlanAllocation alloc = cache.get( set );
+			final List<PersonRecord> remainingAgents) {
+		final PlanAllocation alloc = cache.get( remainingAgents );
 		if ( alloc == null ) return null;
 
 		final PlanAllocation copy = new PlanAllocation();
@@ -46,32 +42,28 @@ public final class KnownStates {
 	}
 
 	public boolean isUnfeasible(
-			final Collection<PersonRecord> remainingAgents,
+			final List<PersonRecord> remainingAgents,
 			final double minimalWeightToAttain) {
-		final Set<PersonRecord> set = new HashSet<PersonRecord>( remainingAgents );
-		assert set.size() == remainingAgents.size() : set.size() +"!="+ remainingAgents.size();
-
-		final Double level = unfeasibleProblems.get( set );
+		final Double level = unfeasibleProblems.get( remainingAgents );
 		return level != null && minimalWeightToAttain > level;
 	}
 
 	public void cacheSolution(
-			final Collection<PersonRecord> remainingAgents,
+			final List<PersonRecord> remainingAgents,
 			final PlanAllocation solution,
 			final double minimalWeightToAttain) {
-		final Set<PersonRecord> set = new HashSet<PersonRecord>( remainingAgents );
-		assert set.size() == remainingAgents.size() : set.size() +"!="+ remainingAgents.size();
+		// XXX list should be copied to be on the safe side
 		if ( solution != null ) {
 			final PlanAllocation copy = new PlanAllocation();
 			copy.addAll( solution.getPlans() );
 			cache.put( 
-					set,
+					remainingAgents,
 					copy );
 		}
 		else {
-			final Double level = unfeasibleProblems.get( set );
+			final Double level = unfeasibleProblems.get( remainingAgents );
 			if ( level == null || level > minimalWeightToAttain ) {
-				unfeasibleProblems.put( set , minimalWeightToAttain );
+				unfeasibleProblems.put( remainingAgents , minimalWeightToAttain );
 			}
 		}
 	}
