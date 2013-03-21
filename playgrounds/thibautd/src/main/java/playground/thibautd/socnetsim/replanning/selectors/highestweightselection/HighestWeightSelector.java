@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -152,7 +151,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		final Map<JointPlan, Collection<PlanRecord>> recordsPerJp = new HashMap<JointPlan, Collection<PlanRecord>>();
 		for (Person person : group.getPersons()) {
-			final LinkedList<PlanRecord> plans = new LinkedList<PlanRecord>();
+			final List<PlanRecord> plans = new ArrayList<PlanRecord>();
 			for (Plan plan : person.getPlans()) {
 				double w = weights.get( plan );
 				final JointPlan jp = jointPlans.getJointPlan( plan );
