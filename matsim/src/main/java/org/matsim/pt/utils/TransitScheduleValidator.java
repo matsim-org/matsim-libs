@@ -195,7 +195,7 @@ public abstract class TransitScheduleValidator {
 				}
 
 				stop = stops.get(stopCount - 1);
-				if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
+				if (stop.getArrivalOffset() == Time.UNDEFINED_TIME) {
 					result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The last stop does not contain any arrival offset.");
 				}
 			}
