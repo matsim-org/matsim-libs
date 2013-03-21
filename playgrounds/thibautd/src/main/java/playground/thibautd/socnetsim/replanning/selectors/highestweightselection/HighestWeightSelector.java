@@ -50,6 +50,16 @@ import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector
  */
 public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	private static final double EPSILON = 1E-7;
+	/**
+	 * if true, when computing bounds, all joint plans of agents in the joint
+	 * plan to select will be considered as unfeasible.
+	 * if false, just the joint plans of the current agent will be considered
+	 * as unfeasible.
+	 * There is no optimal value: it is a threadoff between tightness of the bounds
+	 * and complexity of computing them.
+	 * TODO: make configurable.
+	 */
+	private static final boolean CONSIDER_SECOND_ORDER_IN_BOUNDS = true;
 	private final boolean forbidBlockingCombinations;
 	private final WeightCalculator weightCalculator;
 
@@ -336,7 +346,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// get a list of plans in decreasing order of maximum possible weight.
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
-		final List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.bestPlansPerJointStructure );
+		final List<PlanRecord> records = new ArrayList<PlanRecord>();
+		for ( PlanRecord r : currentPerson.bestPlansPerJointStructure ) {
+			assert !r.isStillFeasible == (r.jointPlan != null && intersect( r.jointPlan.getIndividualPlans().keySet() , str ));
+			if ( r.isStillFeasible ) records.add( r );
+		}
 
 		weightPlanRecords(
 				records,
@@ -376,10 +390,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				break;
 			}
 
-			if (!r.isStillFeasible) {
-				assert intersect( r.jointPlan.getIndividualPlans().keySet() , str );
-				continue;
-			}
+			assert r.isStillFeasible;
 
 			PlanString tail = str;
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
@@ -446,9 +457,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		for (PlanRecord r : records) {
 			if ( r.isStillFeasible ) {
-				tagLinkedPlansOfPartnersAsInfeasible(
-						r,
-						localFeasibilityChanger);
+				if ( CONSIDER_SECOND_ORDER_IN_BOUNDS ) {
+					tagLinkedPlansOfPartnersAsInfeasible(
+							r,
+							localFeasibilityChanger);
+				}
 
 				r.cachedMaximumWeight =
 					alreadyAllocatedWeight +
@@ -500,16 +513,10 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final List<PersonRecord> remainingPersons) {
 		double score = planToSelect.avgJointPlanWeight;
 
-		// if the plan to select is a joint plan,
-		// we know exactly what plan to get the score from.
-		final JointPlan jointPlanToSelect = planToSelect.jointPlan;
-
 		for (PersonRecord record : remainingPersons) {
 			final double max = getMaxWeight(
-					// for assertions:
 					planToSelect , string ,
-					// actually useful:
-					record , jointPlanToSelect );
+					record );
 			// if negative, no need to continue
 			// moreover, returning here makes sure the branch has infinitely negative
 			// weight, even if plans in it have infinitely positive weights
@@ -526,15 +533,12 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 * plan shared with agents in personsSelected
 	 */
 	private static double getMaxWeight(
-			// arguments used for assertions
 			final PlanRecord planToSelect,
 			final PlanString string,
-			// actual "useful" arguments
-			final PersonRecord record,
-			final JointPlan jointPlanToSelect) {
+			final PersonRecord record) {
 		// case in jp: plan is fully determined
-		if (jointPlanToSelect != null) {
-			final Plan plan = jointPlanToSelect.getIndividualPlan( record.person.getId() );
+		if (planToSelect.jointPlan != null) {
+			final Plan plan = planToSelect.jointPlan.getIndividualPlan( record.person.getId() );
 			if (plan != null) {
 				assert Math.abs( record.getRecord( plan ).avgJointPlanWeight - planToSelect.avgJointPlanWeight ) < EPSILON;
 				return planToSelect.avgJointPlanWeight;
@@ -551,9 +555,9 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				intersect( plan.jointPlan.getIndividualPlans().keySet() , string ) ||
 				intersect(
 						plan.jointPlan.getIndividualPlans().keySet(),
-						jointPlanToSelect == null ?
+						planToSelect.jointPlan == null ?
 							Collections.<Id> emptySet() :
-							jointPlanToSelect.getIndividualPlans().keySet() );
+							planToSelect.jointPlan.getIndividualPlans().keySet() );
 
 
 			if ( plan.isStillFeasible ) return plan.avgJointPlanWeight;
