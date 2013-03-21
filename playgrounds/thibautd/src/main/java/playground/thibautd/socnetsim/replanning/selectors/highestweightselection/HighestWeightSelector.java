@@ -471,7 +471,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		assert constructedString == null || constructedString.getPlans().size() == personsStillToAllocate.size() :
 			constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-		if ( !forbidBlockingCombinations ) {
+		if ( !forbidBlockingCombinations || !forbidenCombinations.partialAllocationCanLeadToForbidden( currentAllocation ) ) {
 			knownStates.cacheSolution( personsStillToAllocate , constructedString , minimalWeightToObtain );
 		}
 		return constructedString;
