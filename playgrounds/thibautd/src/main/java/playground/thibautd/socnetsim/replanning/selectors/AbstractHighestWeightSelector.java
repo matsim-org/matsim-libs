@@ -473,19 +473,38 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 
+		// cache the last set of co-travelers for which the upper bound
+		// was computed, to avoid recomputing it if we stumble upon the same
+		// set afterwards. This does not ensures that we do not recompute things
+		// for the same set, but the advantage over more sophisticated methods
+		// is that there is virtually no overhead, so that there is no risk of making
+		// things worse. Empirically, this improves things quite a bit (twice as fast!)
+		Set<Id> lastCotravs = null;
+		double lastWeight = Double.NaN;
 		for (PlanRecord r : records) {
 			if ( r.isStillFeasible ) {
-				tagLinkedPlansOfPartnersAsInfeasible(
-						r,
-						localFeasibilityChanger);
+				final Set<Id> cotravs =
+					r.jointPlan == null ?
+						Collections.<Id>emptySet() :
+						r.jointPlan.getIndividualPlans().keySet();
+
+				assert cotravs != null;
+				if ( !cotravs.equals( lastCotravs ) ) {
+					lastCotravs = cotravs;
+					tagLinkedPlansOfPartnersAsInfeasible(
+							r,
+							localFeasibilityChanger);
+					lastWeight =
+							getMaxWeightFromPersons(
+									r,
+									str,
+									remainingPersons );
+					localFeasibilityChanger.resetFeasibilities();
+				}
+
 				r.cachedMaximumWeight = exploreAll ?
 					Double.POSITIVE_INFINITY :
-					alreadyAllocatedWeight +
-						getMaxWeightFromPersons(
-								r,
-								str,
-								remainingPersons );
-				localFeasibilityChanger.resetFeasibilities();
+					alreadyAllocatedWeight + lastWeight;
 			}
 			else {
 				r.cachedMaximumWeight = exploreAll ?
@@ -499,7 +518,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final PersonRecord person,
 			final FeasibilityChanger changer) {
 		for ( PlanRecord pr : person.plans ) {
-			if ( pr.jointPlan == null ) continue;
+			if ( pr.jointPlan == null ) {
+				assert pr.linkedPlans.isEmpty();
+				continue;
+			}
 			for ( PlanRecord p : pr.linkedPlans ) {
 				changer.markInfeasible( p );
 			}
