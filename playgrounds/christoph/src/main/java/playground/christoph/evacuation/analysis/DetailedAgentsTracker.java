@@ -88,6 +88,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -109,6 +110,7 @@ import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel;
+import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.EvacuationDecision;
 import playground.christoph.evacuation.mobsim.decisionmodel.PanicModel;
 import playground.christoph.evacuation.mobsim.decisionmodel.PickupModel;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplanner;
@@ -141,8 +143,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	private final Set<Id> B11 = new HashSet<Id>();
 	private final Set<Id> B111 = new HashSet<Id>();
 	private final Set<Id> B112 = new HashSet<Id>();
-	private final Set<Id> B113 = new HashSet<Id>();
 	private final Set<Id> B12 = new HashSet<Id>();
+	private final Set<Id> B13 = new HashSet<Id>();
 	private final Set<Id> B2 = new HashSet<Id>();
 	
 	private final Set<Id> C = new HashSet<Id>();
@@ -150,8 +152,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	private final Set<Id> C11 = new HashSet<Id>();
 	private final Set<Id> C111 = new HashSet<Id>();
 	private final Set<Id> C112 = new HashSet<Id>();
-	private final Set<Id> C113 = new HashSet<Id>();
 	private final Set<Id> C12 = new HashSet<Id>();
+	private final Set<Id> C13 = new HashSet<Id>();
 	private final Set<Id> C2 = new HashSet<Id>();
 	
 	private final Map<String, Integer> evacuationModesA11 = new TreeMap<String, Integer>();
@@ -172,6 +174,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	private final Set<Id> informedAgents = new HashSet<Id>();
 	private final Map<Id, Double> informationTime = new HashMap<Id, Double>();
 	private final Set<Id> enrouteDrivers = new HashSet<Id>();
+	private final Map<Id, Id> driverVehicles = new HashMap<Id, Id>();
 	private final Map<Id, Id> vehiclePositions = new HashMap<Id, Id>();
 	private final Map<Id, Collection<Id>> vehiclePassengers = new HashMap<Id, Collection<Id>>();
 	
@@ -218,11 +221,15 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		String configFile;
 		String evacuationConfigFile;
 		String outputPath;
-
+		
 //		configFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac/evac.1.output_config.xml";
 //		evacuationConfigFile = "../../matsim/mysimulations/census2000V2/config_evacuation.xml";
 //		outputPath = "../../matsim/mysimulations/census2000V2/output_10pct_evac/";
-
+		
+//		configFile = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/config.xml";
+//		evacuationConfigFile = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/config_evacuation_run_33.xml";
+//		outputPath = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/";
+		
 		if (args.length != 3) return;
 		else {
 			configFile = args[0];
@@ -442,9 +449,14 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					Set<String> modes = new TreeSet<String>();
 					for (Leg leg : legs) modes.add(leg.getMode());
 					String modesString = CollectionUtils.setToString(modes);
-					Integer count = evacuationModesA11.get(modesString);
-					if (count == null) evacuationModesA11.put(modesString, 1);
-					else evacuationModesA11.put(modesString, count + 1);
+					
+					// only define the evacuation modes if the agent has left the evacuation area 
+					if (this.leftEvacuationAreaTime.containsKey(personId)) {
+						this.evacuateFromHomeModes.put(personId, modesString);
+						Integer count = evacuationModesA11.get(modesString);
+						if (count == null) evacuationModesA11.put(modesString, 1);
+						else evacuationModesA11.put(modesString, count + 1);
+					}
 					
 					log.warn("Agent is not in a facility when simulation ends: " + personId);
 				}
@@ -476,9 +488,14 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					Set<String> modes = new TreeSet<String>();
 					for (Leg leg : legs) modes.add(leg.getMode());
 					String modesString = CollectionUtils.setToString(modes);
-					Integer count = evacuationModesA21.get(modesString);
-					if (count == null) evacuationModesA21.put(modesString, 1);
-					else evacuationModesA21.put(modesString, count + 1);
+					
+					// only define the evacuation modes if the agent has left the evacuation area
+					if (this.leftEvacuationAreaTime.containsKey(personId)) {
+						this.evacuateFromHomeModes.put(personId, modesString);
+						Integer count = evacuationModesA21.get(modesString);
+						if (count == null) evacuationModesA21.put(modesString, 1);
+						else evacuationModesA21.put(modesString, count + 1);
+					}
 					
 					log.warn("Agent is not in a facility when simulation ends: " + personId);
 				}
@@ -544,7 +561,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					
 					boolean returnsHome = false;
 					boolean endsAtHome = false;
-					for (int i = 0; i < copy.size() - 1; i++) {
+					for (int i = 0; i < copy.size(); i++) {
 						Activity activity = copy.get(i);
 						if (activity.getFacilityId().equals(homeFacilityId)) returnsHome = true;
 					}
@@ -625,8 +642,88 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					}
 					
 				} else {
-					B113.add(personId);
-					log.warn("Agent is not in a facility when simulation ends: " + personId);
+					/*
+					 * The person might have returned home and then started to evacuate. Then,
+					 * the person's behaviour is B111. Otherwise we do not know. It could be
+					 * either B111, B112 or B12.
+					 */					
+					List<Activity> list = this.agentActivities.get(personId);
+					List<Activity> copy = new ArrayList<Activity>();
+					
+					// ignore pick-up and drop-off activities
+					for (Activity activity : list) {
+						if (activity.getType().equals(PickupAgentReplanner.activityType)) continue;
+						else if (activity.getType().equals(DropOffAgentReplanner.activityType)) continue;
+						
+						copy.add(activity);
+					}
+					
+					boolean returnsHome = false;
+					for (int i = 0; i < copy.size(); i++) {
+						Activity activity = copy.get(i);
+						if (activity.getFacilityId().equals(homeFacilityId)) returnsHome = true;
+					}
+					
+					/*
+					 * If the person returned home (and we know that the person is currently en-route),
+					 * the person is currently evacuating, i.e. its behaviour type is B111.
+					 */
+					if (returnsHome) {
+						B11.add(personId);
+						B111.add(personId);
+						
+						/*
+						 * Split "returning home" and "evacuate from home" trips.
+						 */
+						boolean foundHomeActivity = false;
+						double endHomeActivityTime = Double.MAX_VALUE;
+						for (int i = copy.size() - 1; i >= 0; i--) {
+							Activity activity = copy.get(i);
+							if (activity.getType().equals(CurrentLegToMeetingPointReplanner.activityType)) {
+								endHomeActivityTime = activity.getEndTime();
+								this.returnHomeTimes.put(personId, activity.getStartTime());
+								foundHomeActivity = true;
+								break;
+							}
+						}
+						if (!foundHomeActivity) {
+							throw new RuntimeException("Could not identify agent's return home activity: " + personId);
+						}
+								
+						List<Leg> legs = agentLegs.get(personId);
+						Set<String> modesHome = new TreeSet<String>();
+						Set<String> modesEvacuate = new TreeSet<String>();
+						
+						for (Leg leg : legs) {
+							if (leg.getDepartureTime() < endHomeActivityTime) modesHome.add(leg.getMode());
+							else modesEvacuate.add(leg.getMode());
+						}
+						
+						String modesString;
+						Integer count;
+						
+						modesString = CollectionUtils.setToString(modesHome);
+						this.returnHomeModes.put(personId, modesString);
+						count = evacuationModesB111Home.get(modesString);
+						if (count == null) evacuationModesB111Home.put(modesString, 1);
+						else evacuationModesB111Home.put(modesString, count + 1);
+						
+						/*
+						 * If the person already left the evacuation area, we also set the used transport modes.
+						 * Otherwise we do not set them since this would end up in a situation where evacuation
+						 * modes are defined but no evacuation time is known.
+						 */
+						if (this.evacuateFromHomeTimes.containsKey(personId)) {
+							modesString = CollectionUtils.setToString(modesEvacuate);
+							this.evacuateFromHomeModes.put(personId, modesString);
+							count = evacuationModesB111Evacuate.get(modesString);
+							if (count == null) evacuationModesB111Evacuate.put(modesString, 1);
+							else evacuationModesB111Evacuate.put(modesString, count + 1);							
+						}
+					} else {
+						B13.add(personId);
+						log.warn("Agent is not in a facility when simulation ends: " + personId);
+					}
 				}
 				
 			} else {
@@ -650,20 +747,20 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		log.info("\tB11\t" + "in evacuation area and not at home, home affected, return home:\t" + B11.size());
 		log.info("\tB111\t" + "in evacuation area and not at home, home affected, return home, then evacuate:\t" + B111.size());
 		log.info("\tB112\t" + "in evacuation area and not at home, home affected, return home and stay there:\t" + B112.size());
-		log.info("\tB113\t" + "in evacuation area and not at home, home affected, still en-route (i.e. stuck/undefined):\t" + B113.size());
 		log.info("\tB12\t" + "in evacuation area and not at home, home affected, evacuate immediately:\t" + B12.size());
+		log.info("\tB13\t" + "in evacuation area and not at home, home affected, still en-route (i.e. stuck/undefined):\t" + B13.size());
 		headers.add("B1");
 		headers.add("B11");
 		headers.add("B111");
 		headers.add("B112");
-		headers.add("B113");
 		headers.add("B12");
+		headers.add("B13");
 		values.add(String.valueOf(B1.size()));
 		values.add(String.valueOf(B11.size()));
 		values.add(String.valueOf(B111.size()));
 		values.add(String.valueOf(B112.size()));
-		values.add(String.valueOf(B113.size()));
 		values.add(String.valueOf(B12.size()));
+		values.add(String.valueOf(B13.size()));
 		
 		log.info("\tB2\t" + "in evacuation area and not at home, home not affected:\t" + B2.size());
 		headers.add("B2");
@@ -714,7 +811,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					
 					boolean returnsHome = false;
 					boolean endsAtHome = false;
-					for (int i = 0; i < copy.size() - 1; i++) {
+					for (int i = 0; i < copy.size(); i++) {
 						Activity activity = copy.get(i);
 						if (activity.getFacilityId().equals(homeFacilityId)) returnsHome = true;
 					}
@@ -795,8 +892,88 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					}
 					
 				} else {
-					C113.add(personId);
-					log.warn("Agent is not in a facility when simulation ends: " + personId);
+					/*
+					 * The person might have returned home and then started to evacuate. Then,
+					 * the person's behaviour is C111. Otherwise we do not know. It could be
+					 * either C111, C112 or C12.
+					 */
+					List<Activity> list = this.agentActivities.get(personId);
+					List<Activity> copy = new ArrayList<Activity>();
+					
+					// ignore pick-up and drop-off activities
+					for (Activity activity : list) {
+						if (activity.getType().equals(PickupAgentReplanner.activityType)) continue;
+						else if (activity.getType().equals(DropOffAgentReplanner.activityType)) continue;
+						
+						copy.add(activity);
+					}
+					
+					boolean returnsHome = false;
+					for (int i = 0; i < copy.size(); i++) {
+						Activity activity = copy.get(i);
+						if (activity.getFacilityId().equals(homeFacilityId)) returnsHome = true;
+					}
+					
+					/*
+					 * If the person returned home (and we know that the person is currently en-route),
+					 * the person is currently evacuating, i.e. its behaviour type is C111.
+					 */
+					if (returnsHome) {
+						C11.add(personId);
+						C111.add(personId);
+						
+						/*
+						 * Split "returning home" and "evacuate from home" trips.
+						 */
+						boolean foundHomeActivity = false;
+						double endHomeActivityTime = Double.MAX_VALUE;
+						for (int i = copy.size() - 1; i >= 0; i--) {
+							Activity activity = copy.get(i);
+							if (activity.getType().equals(CurrentLegToMeetingPointReplanner.activityType)) {
+								endHomeActivityTime = activity.getEndTime();
+								this.returnHomeTimes.put(personId, activity.getStartTime());
+								foundHomeActivity = true;
+								break;
+							}
+						}
+						if (!foundHomeActivity) {
+							throw new RuntimeException("Could not identify agent's return home activity: " + personId);
+						}
+													
+						List<Leg> legs = agentLegs.get(personId);
+						Set<String> modesHome = new TreeSet<String>();
+						Set<String> modesEvacuate = new TreeSet<String>();
+						
+						for (Leg leg : legs) {
+							if (leg.getDepartureTime() < endHomeActivityTime) modesHome.add(leg.getMode());
+							else modesEvacuate.add(leg.getMode());
+						}
+						
+						String modesString;
+						Integer count;
+						
+						modesString = CollectionUtils.setToString(modesHome);
+						this.returnHomeModes.put(personId, modesString);
+						count = evacuationModesC111Home.get(modesString);
+						if (count == null) evacuationModesC111Home.put(modesString, 1);
+						else evacuationModesC111Home.put(modesString, count + 1);
+													
+						/*
+						 * If the person already left the evacuation area, we also set the used transport modes.
+						 * Otherwise we do not set them since this would end up in a situation where evacuation
+						 * modes are defined but no evacuation time is known.
+						 */
+						if (this.evacuateFromHomeTimes.containsKey(personId)) {
+							modesString = CollectionUtils.setToString(modesEvacuate);
+							this.evacuateFromHomeModes.put(personId, modesString);
+							count = evacuationModesC111Evacuate.get(modesString);
+							if (count == null) evacuationModesC111Evacuate.put(modesString, 1);
+							else evacuationModesC111Evacuate.put(modesString, count + 1);							
+						}
+					} else {
+						C13.add(personId);
+						log.warn("Agent is not in a facility when simulation ends: " + personId);
+					}					
 				}
 				
 			} else {
@@ -820,20 +997,20 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		log.info("\tC11\t" + "outside evacuation area and not at home, home affected, return home:\t" + C11.size());
 		log.info("\tC111\t" + "outside evacuation area and not at home, home affected, return home, then evacuate:\t" + C111.size());
 		log.info("\tC112\t" + "outside evacuation area and not at home, home affected, return home and stay there:\t" + C112.size());
-		log.info("\tC113\t" + "outside evacuation area and not at home, home affected, still en-route (i.e. stuck/undefined):\t" + C113.size());
 		log.info("\tC12\t" + "outside evacuation area and not at home, home affected, evacuate immediately:\t" + C12.size());
+		log.info("\tC13\t" + "outside evacuation area and not at home, home affected, still en-route (i.e. stuck/undefined):\t" + C13.size());
 		headers.add("C1");
 		headers.add("C11");
 		headers.add("C111");
 		headers.add("C112");
-		headers.add("C113");
 		headers.add("C12");
+		headers.add("C13");
 		values.add(String.valueOf(C1.size()));
 		values.add(String.valueOf(C11.size()));
 		values.add(String.valueOf(C111.size()));
 		values.add(String.valueOf(C112.size()));
-		values.add(String.valueOf(C113.size()));
 		values.add(String.valueOf(C12.size()));
+		values.add(String.valueOf(C13.size()));
 		
 		log.info("\tC2\t" + "outside evacuation area and not at home, home not affected:\t" + C2.size());
 		headers.add("C2");
@@ -859,9 +1036,14 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	private void writeResultsToFiles(String countsFileName, String timesFileName, String modesFileName, 
 			String detailsFileName) {
 		
+		/*
+		 * Counts
+		 */
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(countsFileName);
 			
+			writer.write("TYPE");
+			writer.write(delimiter);
 			for (int i = 0; i < headers.size(); i++) {
 				String header = headers.get(i);
 				writer.write(header);
@@ -869,21 +1051,81 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				else writer.write(newLine);
 			}
 			
+			writer.write("ALL");
+			writer.write(delimiter);
 			for (int i = 0; i < values.size(); i++) {
 				String value = values.get(i);
 				writer.write(value);
 				if (i < values.size() - 1) writer.write(delimiter);
 				else writer.write(newLine);
 			}
+			
+			List<String> valuesImmediately = new ArrayList<String>();
+			List<String> valuesLater = new ArrayList<String>();
+			List<String> valuesNever = new ArrayList<String>();
+			List<String> valuesUndefined = new ArrayList<String>();
+
+			List<Set<Id>> sets = new ArrayList<Set<Id>>();
+			sets.add(A); sets.add(A1); sets.add(A11); sets.add(A12); sets.add(A2); sets.add(A21); sets.add(A22);
+			sets.add(B); sets.add(B1); sets.add(B11); sets.add(B111); sets.add(B112); sets.add(B12); sets.add(B13); sets.add(B2);
+			sets.add(C); sets.add(C1); sets.add(C11); sets.add(C111); sets.add(C112); sets.add(C12); sets.add(C13); sets.add(C2);
+			
+			for (Set<Id> set : sets) {
+				int immediately = 0;
+				int later = 0;
+				int never = 0;
+				int undefined = 0;
+				for (Id id : set) {
+					Id householdId = this.decisionDataProvider.getPersonDecisionData(id).getHouseholdId();
+					EvacuationDecision decision = this.decisionDataProvider.getHouseholdDecisionData(householdId).getEvacuationDecision();
+					
+					if (decision == EvacuationDecision.IMMEDIATELY) {
+						immediately++;
+					} else if (decision == EvacuationDecision.LATER) {
+						later++;
+					} else if (decision == EvacuationDecision.NEVER) {
+						never++;
+					} else if (decision == EvacuationDecision.UNDEFINED) {
+						undefined++;
+					}
+				}
+				valuesImmediately.add(String.valueOf(immediately));
+				valuesLater.add(String.valueOf(later));
+				valuesNever.add(String.valueOf(never));
+				valuesUndefined.add(String.valueOf(undefined));				
+			}
+			
+			List<Tuple<String, List<String>>> lists = new ArrayList<Tuple<String, List<String>>>();
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.IMMEDIATELY.toString(), valuesImmediately));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.LATER.toString(), valuesLater));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.NEVER.toString(), valuesNever));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.UNDEFINED.toString(), valuesUndefined));
+			
+			for (Tuple<String, List<String>> tuple : lists) {
+				writer.write(tuple.getFirst());
+				writer.write(delimiter);
+				
+				List<String> list = tuple.getSecond();
+				for (int i = 0; i < list.size(); i++) {
+					String value = list.get(i);
+					writer.write(value);
+					if (i < list.size() - 1) writer.write(delimiter);
+					else writer.write(newLine);
+				}
+			}
+			
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
 		
+		/*
+		 * Modes
+		 */
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(modesFileName);
-						
+			
 			Set<String> modes = new TreeSet<String>();
 			modes.add(TransportMode.bike);
 			modes.add(TransportMode.car);
@@ -892,9 +1134,13 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			modes.add(TransportMode.walk);
 			modes.add(OldPassengerDepartureHandler.passengerTransportMode);
 			modes.add(OldPassengerDepartureHandler.passengerTransportMode + "," + TransportMode.walk);
-						
+			
 			List<String> modeHeaders = new ArrayList<String>();
-			List<String> modeValues = new ArrayList<String>();
+			List<String> modeValuesOverall = new ArrayList<String>();
+			List<String> modeValuesImmediately = new ArrayList<String>();
+			List<String> modeValuesLater = new ArrayList<String>();
+			List<String> modeValuesNever = new ArrayList<String>();
+			List<String> modeValuesUndefined = new ArrayList<String>();
 			
 			Map<String, Map<String, Integer>> maps = new LinkedHashMap<String, Map<String, Integer>>();
 			maps.put("A11", evacuationModesA11);
@@ -912,7 +1158,6 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			maps.put("C12", evacuationModesC12);
 			maps.put("C2", evacuationModesC2);
 			
-			
 			for (Entry<String, Map<String, Integer>> entry : maps.entrySet()) {
 				
 				String string = entry.getKey();
@@ -929,10 +1174,82 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					Integer count = map.get(mode);
 					if (count == null) count = 0;
 					modeHeaders.add(string + "_" + mode);
-					modeValues.add(String.valueOf(count));
+					modeValuesOverall.add(String.valueOf(count));
 				}
 			}
 			
+			List<Tuple<Set<Id>, Map<Id, String>>> tuples = new ArrayList<Tuple<Set<Id>, Map<Id, String>>>();
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(A11, evacuateFromHomeModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(A21, evacuateFromHomeModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(B111, returnHomeModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(B111, evacuateFromHomeModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(B112, returnHomeModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(B12, evacuateDirectlyModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(B2, evacuateDirectlyModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(C111, returnHomeModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(C111, evacuateFromHomeModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(C112, returnHomeModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(C12, evacuateDirectlyModes));
+			tuples.add(new Tuple<Set<Id>, Map<Id, String>>(C2, evacuateDirectlyModes));
+			
+			for(Tuple<Set<Id>, Map<Id, String>> tuple : tuples) {
+				
+				Set<Id> set = tuple.getFirst();
+				Map<Id, String> map = tuple.getSecond();
+				
+				Map<String, Integer> countsImmediately = new LinkedHashMap<String, Integer>();
+				Map<String, Integer> countsLater = new LinkedHashMap<String, Integer>();
+				Map<String, Integer> countsNever = new LinkedHashMap<String, Integer>();
+				Map<String, Integer> countsUndefined = new LinkedHashMap<String, Integer>();
+				
+				for (String mode : modes) countsImmediately.put(mode, 0);
+				for (String mode : modes) countsLater.put(mode, 0);
+				for (String mode : modes) countsNever.put(mode, 0);
+				for (String mode : modes) countsUndefined.put(mode, 0);
+				
+				for (Id id : set) {
+					
+					String mode;
+					
+					// Check whether there is an entry in the modes map.
+					mode = map.get(id);
+					if (mode == null) {
+						log.warn("No mode(s) for agent " + id.toString() + " was found. Ignore agent for mode analysis!");
+						continue;
+					}
+					
+					if (!modes.contains(mode)) {
+						throw new RuntimeException("Mode " + mode + " was found but was not expected!");
+					}
+					
+					Id householdId = this.decisionDataProvider.getPersonDecisionData(id).getHouseholdId();
+					EvacuationDecision decision = this.decisionDataProvider.getHouseholdDecisionData(householdId).getEvacuationDecision();
+					
+					if (decision == EvacuationDecision.IMMEDIATELY) {
+						int count = countsImmediately.get(mode);
+						countsImmediately.put(mode, count + 1);
+					} else if (decision == EvacuationDecision.LATER) {
+						int count = countsLater.get(mode);
+						countsLater.put(mode, count + 1);
+					} else if (decision == EvacuationDecision.NEVER) {
+						int count = countsNever.get(mode);
+						countsNever.put(mode, count + 1);
+					} else if (decision == EvacuationDecision.UNDEFINED) {
+						int count = countsUndefined.get(mode);
+						countsUndefined.put(mode, count + 1);
+					}
+				}
+				
+				for (String mode : modes) {
+					modeValuesImmediately.add(String.valueOf(countsImmediately.get(mode)));
+					modeValuesLater.add(String.valueOf(countsLater.get(mode)));
+					modeValuesNever.add(String.valueOf(countsNever.get(mode)));
+					modeValuesUndefined.add(String.valueOf(countsUndefined.get(mode)));				
+				}
+			}		
+
+			writer.write("TYPE");
+			writer.write(delimiter);
 			for (int i = 0; i < modeHeaders.size(); i++) {
 				String header = modeHeaders.get(i);
 				writer.write(header);
@@ -940,18 +1257,35 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				else writer.write(newLine);
 			}
 			
-			for (int i = 0; i < modeValues.size(); i++) {
-				String value = modeValues.get(i);
-				writer.write(value);
-				if (i < modeValues.size() - 1) writer.write(delimiter);
-				else writer.write(newLine);
+			List<Tuple<String, List<String>>> lists = new ArrayList<Tuple<String, List<String>>>();
+			lists.add(new Tuple<String, List<String>>("ALL", modeValuesOverall));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.IMMEDIATELY.toString(), modeValuesImmediately));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.LATER.toString(), modeValuesLater));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.NEVER.toString(), modeValuesNever));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.UNDEFINED.toString(), modeValuesUndefined));
+			
+			for (Tuple<String, List<String>> tuple : lists) {
+				writer.write(tuple.getFirst());
+				writer.write(delimiter);
+				
+				List<String> list = tuple.getSecond();
+				for (int i = 0; i < list.size(); i++) {
+					String value = list.get(i);
+					writer.write(value);
+					if (i < list.size() - 1) writer.write(delimiter);
+					else writer.write(newLine);
+				}				
 			}
+
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
 		
+		/*
+		 * Details
+		 */
 		try {
 			Map<Id, String> evacuationTypes = new HashMap<Id, String>();
 			for (Id personId : scenario.getPopulation().getPersons().keySet()) {
@@ -964,14 +1298,14 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				
 				else if (B111.contains(personId)) evacuationType = "B111";
 				else if (B112.contains(personId)) evacuationType = "B112";
-				else if (B113.contains(personId)) evacuationType = "B113";
 				else if (B12.contains(personId)) evacuationType = "B12";
+				else if (B13.contains(personId)) evacuationType = "B13";
 				else if (B2.contains(personId)) evacuationType = "B2";
 				
 				else if (C111.contains(personId)) evacuationType = "C111";
 				else if (C112.contains(personId)) evacuationType = "C112";
-				else if (C113.contains(personId)) evacuationType = "C113";
 				else if (C12.contains(personId)) evacuationType = "C12";
+				else if (C13.contains(personId)) evacuationType = "C13";
 				else if (C2.contains(personId)) evacuationType = "C2";
 				
 				evacuationTypes.put(personId, evacuationType);
@@ -993,13 +1327,17 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				}
 				
 				String evacuationType = evacuationTypes.get(entry.getKey());
+				
+				// ignore agents with undefined evacuation strategy
+				if (evacuationType.equals("B13")) continue;
+				else if (evacuationType.equals("C13")) continue;
+				
+				// assign left times
 				if (evacuationType.equals("A11")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
 				else if (evacuationType.equals("B111")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
-				else if (evacuationType.equals("B113")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
 				else if (evacuationType.equals("B12")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
 				else if (evacuationType.equals("B2")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
 				else if (evacuationType.equals("C111")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
-				else if (evacuationType.equals("C113")) this.evacuateFromHomeTimes.put(entry.getKey(), entry.getValue());
 				else if (evacuationType.equals("C12")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
 				else if (evacuationType.equals("C2")) this.evacuateDirectlyTimes.put(entry.getKey(), entry.getValue());
 				else {
@@ -1040,21 +1378,36 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				
 				// ignore stuck agents
 				if (this.stuckAgents.contains(personId)) {
-					writer.write("agentId");
 					writer.write(delimiter);
-					writer.write(evacuationType);
+					
+					Double time;
+					String mode;
+					
+					time = this.returnHomeTimes.get(personId);
+					if (time != null) writer.write(time.toString());
+					else writer.write("-1");
 					writer.write(delimiter);
-					writer.write(-1);
+					mode = this.returnHomeModes.get(personId);
+					if (mode != null) writer.write(mode);
+					else writer.write(AgentStuckEvent.EVENT_TYPE);
 					writer.write(delimiter);
-					writer.write(AgentStuckEvent.EVENT_TYPE);
+					
+					time = this.evacuateFromHomeTimes.get(personId);
+					if (time != null) writer.write(time.toString());
+					else writer.write("-1");
 					writer.write(delimiter);
-					writer.write(-1);
+					mode = this.evacuateFromHomeModes.get(personId);
+					if (mode != null) writer.write(mode);
+					else writer.write(AgentStuckEvent.EVENT_TYPE);
 					writer.write(delimiter);
-					writer.write(AgentStuckEvent.EVENT_TYPE);
+					
+					time = this.evacuateDirectlyTimes.get(personId);
+					if (time != null) writer.write(time.toString());
+					else writer.write("-1");
 					writer.write(delimiter);
-					writer.write(-1);
-					writer.write(delimiter);
-					writer.write(AgentStuckEvent.EVENT_TYPE);
+					mode = this.evacuateDirectlyModes.get(personId);
+					if (mode != null) writer.write(mode);
+					else writer.write(AgentStuckEvent.EVENT_TYPE);
 					writer.write(newLine);
 					
 					continue;
@@ -1127,28 +1480,9 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			Gbl.errorMsg(e);
 		}
 		
-//		try {
-//			BufferedWriter writer = IOUtils.getBufferedWriter(timesFileName);
-//			
-//			for (int i = 0; i < headers.size(); i++) {
-//				String header = headers.get(i);
-//				writer.write(header);
-//				if (i < headers.size() - 1) writer.write(delimiter);
-//				else writer.write(newLine);
-//			}
-//			
-//			for (int i = 0; i < values.size(); i++) {
-//				String value = values.get(i);
-//				writer.write(value);
-//				if (i < values.size() - 1) writer.write(delimiter);
-//				else writer.write(newLine);
-//			}
-//			writer.flush();
-//			writer.close();
-//		} catch (IOException e) {
-//			Gbl.errorMsg(e);
-//		}
-		
+		/*
+		 * Times
+		 */
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(timesFileName);
 						
@@ -1162,30 +1496,38 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			modes.add(OldPassengerDepartureHandler.passengerTransportMode + "," + TransportMode.walk);
 						
 			List<String> modeHeaders = new ArrayList<String>();
-			List<String> modeValues = new ArrayList<String>();
-			List<String> modeCounts = new ArrayList<String>();
+			List<String> modeValuesOverall = new ArrayList<String>();
+			List<String> modeValuesImmediately = new ArrayList<String>();
+			List<String> modeValuesLater = new ArrayList<String>();
+			List<String> modeValuesNever = new ArrayList<String>();
+			List<String> modeValuesUndefined = new ArrayList<String>();
+			List<String> modeCountsOverall = new ArrayList<String>();
+			List<String> modeCountsImmediately = new ArrayList<String>();
+			List<String> modeCountsLater = new ArrayList<String>();
+			List<String> modeCountsNever = new ArrayList<String>();
+			List<String> modeCountsUndefined = new ArrayList<String>();
 			
-			Map<String, Map<String, List<Double>>> maps = new LinkedHashMap<String, Map<String, List<Double>>>();
-			maps.put("A11", new LinkedHashMap<String, List<Double>>());
-			maps.put("A21", new LinkedHashMap<String, List<Double>>());
+			Map<String, Map<String, List<Tuple<Id, Double>>>> maps = new LinkedHashMap<String, Map<String, List<Tuple<Id, Double>>>>();
+			maps.put("A11", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+			maps.put("A21", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
 			
-			maps.put("B111Home", new LinkedHashMap<String, List<Double>>());
-			maps.put("B111Evacuate", new LinkedHashMap<String, List<Double>>());
-			maps.put("B112", new LinkedHashMap<String, List<Double>>());
-			maps.put("B12", new LinkedHashMap<String, List<Double>>());
-			maps.put("B2", new LinkedHashMap<String, List<Double>>());
+			maps.put("B111Home", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+			maps.put("B111Evacuate", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+			maps.put("B112", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+			maps.put("B12", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+			maps.put("B2", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
 			
-			maps.put("C111Home", new LinkedHashMap<String, List<Double>>());
-			maps.put("C111Evacuate", new LinkedHashMap<String, List<Double>>());
-			maps.put("C112", new LinkedHashMap<String, List<Double>>());
-			maps.put("C12", new LinkedHashMap<String, List<Double>>());
-			maps.put("C2", new LinkedHashMap<String, List<Double>>());
-			
-			for (Entry<String, Map<String, List<Double>>> entry : maps.entrySet()) {
+			maps.put("C111Home", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+			maps.put("C111Evacuate", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+			maps.put("C112", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+			maps.put("C12", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+			maps.put("C2", new LinkedHashMap<String, List<Tuple<Id, Double>>>());
+						
+			for (Entry<String, Map<String, List<Tuple<Id, Double>>>> entry : maps.entrySet()) {
 				
-				Map<String, List<Double>> map =  entry.getValue();				
+				Map<String, List<Tuple<Id, Double>>> map =  entry.getValue();				
 				for (String mode : modes) {
-					map.put(mode, new ArrayList<Double>());
+					map.put(mode, new ArrayList<Tuple<Id, Double>>());
 				}
 			}
 			
@@ -1196,13 +1538,13 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				String mode = this.returnHomeModes.get(id);
 				
 				if (B111.contains(id)) {
-					maps.get("B111Home").get(mode).add(returnHomeTime);
+					maps.get("B111Home").get(mode).add(new Tuple<Id, Double>(id, returnHomeTime));
 				} else if (B112.contains(id)) {
-					maps.get("B112").get(mode).add(returnHomeTime);
+					maps.get("B112").get(mode).add(new Tuple<Id, Double>(id, returnHomeTime));
 				} else if (C111.contains(id)) {
-					maps.get("C111Home").get(mode).add(returnHomeTime);
+					maps.get("C111Home").get(mode).add(new Tuple<Id, Double>(id, returnHomeTime));
 				} else if (C112.contains(id)) {
-					maps.get("C112").get(mode).add(returnHomeTime);
+					maps.get("C112").get(mode).add(new Tuple<Id, Double>(id, returnHomeTime));
 				} else {
 					throw new RuntimeException("Unexpected behaviour found for agent " + id.toString());
 				}
@@ -1214,12 +1556,15 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				double evacuateFromHomeTime = e.getValue();
 				String mode = this.evacuateFromHomeModes.get(id);
 				
+				// If the agent got stuck within the evacuation area, ignore it since evacuation time is not known. 
+				if (mode == null && this.stuckAgents.contains(id)) continue;
+				
 				if (A11.contains(id)) {
-					maps.get("A11").get(mode).add(evacuateFromHomeTime);
+					maps.get("A11").get(mode).add(new Tuple<Id, Double>(id, evacuateFromHomeTime));
 				} else if (B111.contains(id)) {
-					maps.get("B111Evacuate").get(mode).add(evacuateFromHomeTime);
+					maps.get("B111Evacuate").get(mode).add(new Tuple<Id, Double>(id, evacuateFromHomeTime));
 				} else if (C111.contains(id)) {
-					maps.get("C111Evacuate").get(mode).add(evacuateFromHomeTime);
+					maps.get("C111Evacuate").get(mode).add(new Tuple<Id, Double>(id, evacuateFromHomeTime));
 				} else {
 					throw new RuntimeException("Unexpected behaviour found for agent " + id.toString());
 				}
@@ -1232,43 +1577,97 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				String mode = this.evacuateDirectlyModes.get(id);
 				
 				if (B12.contains(id)) {
-					maps.get("B12").get(mode).add(evacuateDirectlyTime);
+					maps.get("B12").get(mode).add(new Tuple<Id, Double>(id, evacuateDirectlyTime));
 				} else if (B2.contains(id)) {
-					maps.get("B2").get(mode).add(evacuateDirectlyTime);
+					maps.get("B2").get(mode).add(new Tuple<Id, Double>(id, evacuateDirectlyTime));
 				} else if (C12.contains(id)) {
-					maps.get("C12").get(mode).add(evacuateDirectlyTime);
+					maps.get("C12").get(mode).add(new Tuple<Id, Double>(id, evacuateDirectlyTime));
 				} else if (C2.contains(id)) {
-					maps.get("C2").get(mode).add(evacuateDirectlyTime);
+					maps.get("C2").get(mode).add(new Tuple<Id, Double>(id, evacuateDirectlyTime));
 				} else {
 					throw new RuntimeException("Unexpected behaviour found for agent " + id.toString());
 				}
 			}				
 			
-			for (Entry<String, Map<String, List<Double>>> entry : maps.entrySet()) {
+			for (Entry<String, Map<String, List<Tuple<Id, Double>>>> entry : maps.entrySet()) {
 				
 				String string = entry.getKey();
-				Map<String, List<Double>> map =  entry.getValue();
+				Map<String, List<Tuple<Id, Double>>> map =  entry.getValue();
 				
 				for (String mode : modes) {
-					List<Double> list = map.get(mode);
-					double avgTime = Double.NaN;
-					int sampleSize = 0;
+					List<Tuple<Id, Double>> list = map.get(mode);
+					
+					double avgTimeOverall = Double.NaN;
+					double avgTimeImmediately = Double.NaN;
+					double avgTimeLater = Double.NaN;
+					double avgTimeNever = Double.NaN;
+					double avgTimeUndefined = Double.NaN;
+					
+					int sampleSizeOverall = 0;
+					int sampleSizeImmediately = 0;
+					int sampleSizeLater = 0;
+					int sampleSizeNever = 0;
+					int sampleSizeUndefined = 0;
+					
 					if (list != null) {
-						avgTime = 0.0;
+						avgTimeOverall = 0.0;
+						avgTimeImmediately = 0.0;
+						avgTimeLater = 0.0;
+						avgTimeNever = 0.0;
+						avgTimeUndefined = 0.0;
 						// subtract evacuationStartTime to get "real" evacuationTime
-						for (double time : list) avgTime += (time - EvacuationConfig.evacuationTime);
-						sampleSize = list.size();
-						avgTime /= sampleSize;
+						for (Tuple<Id, Double> tuple : list) {
+							Id id = tuple.getFirst();
+							double time = tuple.getSecond();
+							avgTimeOverall += (time - EvacuationConfig.evacuationTime);
+							
+							Id householdId = this.decisionDataProvider.getPersonDecisionData(id).getHouseholdId();
+							EvacuationDecision decision = this.decisionDataProvider.getHouseholdDecisionData(householdId).getEvacuationDecision();
+							
+							if (decision == EvacuationDecision.IMMEDIATELY) {
+								avgTimeImmediately += (time - EvacuationConfig.evacuationTime);
+								sampleSizeImmediately++;
+							} else if (decision == EvacuationDecision.LATER) {
+								avgTimeLater += (time - EvacuationConfig.evacuationTime);
+								sampleSizeLater++;
+							} else if (decision == EvacuationDecision.NEVER) {
+								avgTimeNever += (time - EvacuationConfig.evacuationTime);
+								sampleSizeNever++;
+							} else if (decision == EvacuationDecision.UNDEFINED) {
+								avgTimeUndefined += (time - EvacuationConfig.evacuationTime);
+								sampleSizeUndefined++;
+							}
+						}
+						sampleSizeOverall = list.size();
+						
+						if (sampleSizeOverall > 0) avgTimeOverall /= sampleSizeOverall;
+						if (sampleSizeImmediately > 0) avgTimeImmediately /= sampleSizeImmediately;
+						if (sampleSizeLater > 0) avgTimeLater /= sampleSizeLater;
+						if (sampleSizeNever > 0) avgTimeNever /= sampleSizeNever;
+						if (avgTimeUndefined > 0) avgTimeUndefined /= sampleSizeUndefined;
 					}
+					
 					modeHeaders.add(string + "_" + mode);
-					modeValues.add(String.valueOf(avgTime));
-					modeCounts.add(String.valueOf(sampleSize));
+					
+					modeValuesOverall.add(String.valueOf(avgTimeOverall));
+					modeValuesImmediately.add(String.valueOf(avgTimeImmediately));
+					modeValuesLater.add(String.valueOf(avgTimeLater));
+					modeValuesNever.add(String.valueOf(avgTimeNever));
+					modeValuesUndefined.add(String.valueOf(avgTimeUndefined));
+					
+					modeCountsOverall.add(String.valueOf(sampleSizeOverall));
+					modeCountsImmediately.add(String.valueOf(sampleSizeImmediately));
+					modeCountsLater.add(String.valueOf(sampleSizeLater));
+					modeCountsNever.add(String.valueOf(sampleSizeNever));
+					modeCountsUndefined.add(String.valueOf(sampleSizeUndefined));
 					
 					// only for debugging
 //					log.info(string + "_" + mode + "_" + String.valueOf(list.size()));
 				}
 			}
-						
+			
+			writer.write("TYPE");
+			writer.write(delimiter);
 			for (int i = 0; i < modeHeaders.size(); i++) {
 				String header = modeHeaders.get(i);
 				writer.write(header);
@@ -1276,19 +1675,48 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 				else writer.write(newLine);
 			}
 			
-			for (int i = 0; i < modeValues.size(); i++) {
-				String value = modeValues.get(i);
-				writer.write(value);
-				if (i < modeValues.size() - 1) writer.write(delimiter);
-				else writer.write(newLine);
+			List<Tuple<String, List<String>>> lists = new ArrayList<Tuple<String, List<String>>>();
+			lists.add(new Tuple<String, List<String>>("ALL", modeValuesOverall));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.IMMEDIATELY.toString(), modeValuesImmediately));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.LATER.toString(), modeValuesLater));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.NEVER.toString(), modeValuesNever));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.UNDEFINED.toString(), modeValuesUndefined));
+			
+			for (Tuple<String, List<String>> tuple : lists) {
+				writer.write(tuple.getFirst());
+				writer.write(delimiter);
+				
+				List<String> list = tuple.getSecond();
+				for (int i = 0; i < list.size(); i++) {
+					String value = list.get(i);
+					writer.write(value);
+					if (i < list.size() - 1) writer.write(delimiter);
+					else writer.write(newLine);
+				}				
 			}
 			
-			for (int i = 0; i < modeCounts.size(); i++) {
-				String value = modeCounts.get(i);
-				writer.write(value);
-				if (i < modeCounts.size() - 1) writer.write(delimiter);
-				else writer.write(newLine);
+			writer.write(newLine);
+			
+			lists.clear();
+			lists.add(new Tuple<String, List<String>>("ALL", modeCountsOverall));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.IMMEDIATELY.toString(), modeCountsImmediately));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.LATER.toString(), modeCountsLater));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.NEVER.toString(), modeCountsNever));
+			lists.add(new Tuple<String, List<String>>(EvacuationDecision.UNDEFINED.toString(), modeCountsUndefined));
+			
+			for (Tuple<String, List<String>> tuple : lists) {
+				writer.write(tuple.getFirst());
+				writer.write(delimiter);
+				
+				List<String> list = tuple.getSecond();
+				for (int i = 0; i < list.size(); i++) {
+					String value = list.get(i);
+					writer.write(value);
+					if (i < list.size() - 1) writer.write(delimiter);
+					else writer.write(newLine);
+				}
 			}
+			
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
@@ -1364,9 +1792,13 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		this.enrouteDrivers.remove(event.getPersonId());
-		
 		Id personId = event.getPersonId();
+		
+		if (event.getLegMode().equals(TransportMode.car)) {
+			this.enrouteDrivers.add(personId);
+		}
+//		this.enrouteDrivers.remove(event.getPersonId());
+		
 		List<Leg> legs = agentLegs.get(personId);
 		
 		LegImpl leg = new LegImpl(event.getLegMode());
@@ -1380,9 +1812,10 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	public void handleEvent(AgentArrivalEvent event) {
 		Id personId = event.getPersonId();
 
-		if (event.getLegMode().equals(TransportMode.car)) {
-			this.enrouteDrivers.add(personId);
-		}
+		this.enrouteDrivers.remove(event.getPersonId());
+//		if (event.getLegMode().equals(TransportMode.car)) {
+//			this.enrouteDrivers.add(personId);
+//		}
 		
 		List<Leg> legs = agentLegs.get(personId);
 		
@@ -1476,17 +1909,31 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			this.vehiclePassengers.put(event.getVehicleId(), agentsInVehicle);
 		}
 		agentsInVehicle.add(event.getPersonId());
+		
+		if (this.enrouteDrivers.contains(event.getPersonId())) this.driverVehicles.put(event.getPersonId(), event.getVehicleId());
 	}
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		Collection<Id> agentsInVehicle = this.vehiclePassengers.get(event.getVehicleId());
 		agentsInVehicle.remove(event.getPersonId());
+		
+		this.driverVehicles.remove(event.getVehicleId());
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		this.stuckAgents.add(event.getPersonId());
+		
+		/*
+		 * Seems that stuck events have not been created for passengers. Therefore,
+		 * mark them manually as stuck. 
+		 */
+		if (this.enrouteDrivers.contains(event.getPersonId())) {
+			Id vehicleId = this.driverVehicles.remove(event.getPersonId());
+			Collection<Id> agentsInVehicle = this.vehiclePassengers.get(vehicleId);
+			this.stuckAgents.addAll(agentsInVehicle);
+		}
 	}
 	
 	private void checkAndUpdateAffected(Id personId, double time, boolean wasAffected, boolean isAffected) {	
