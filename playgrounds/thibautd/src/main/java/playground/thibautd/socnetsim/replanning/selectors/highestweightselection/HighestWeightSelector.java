@@ -396,7 +396,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				break;
 			}
 
-			if (!exploreAll && r.cachedMaximumWeight < minimalWeightToObtain) {
+			if (!exploreAll && r.cachedMaximumWeight <= minimalWeightToObtain) {
 				break;
 			}
 
@@ -600,6 +600,8 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 
 			if ( plan.isStillFeasible ) return plan.avgJointPlanWeight;
+			// no need to continue if we now the result can only be infinitely neg.
+			if ( plan.avgJointPlanWeight == Double.NEGATIVE_INFINITY ) break;
 		}
 
 		// this combination is impossible
