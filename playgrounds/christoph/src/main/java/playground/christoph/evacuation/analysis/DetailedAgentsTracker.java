@@ -216,7 +216,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	public static void main(String[] args) {
 
 		Logger root = Logger.getRootLogger();
-		root.setLevel(Level.INFO);
+		root.setLevel(Level.ALL);
 		
 		String configFile;
 		String evacuationConfigFile;
@@ -229,7 +229,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 //		configFile = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/config.xml";
 //		evacuationConfigFile = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/config_evacuation_run_33.xml";
 //		outputPath = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/";
-		
+			
 		if (args.length != 3) return;
 		else {
 			configFile = args[0];
@@ -1876,6 +1876,16 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		activities.add(activity);
 		
 		Facility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId());
+		
+		/*
+		 * Workaround for runs 01a to 32a. There, dummy facility are used for pickup activities. They are not included in the
+		 * facilities file and therefore would produce a null pointer exception. Therefore, we ignore those events.
+		 */
+		if (facility == null) {
+			String facilityIdString = event.getFacilityId().toString();
+			if (facilityIdString.contains("_pickup")) return;
+		}
+		
 		boolean isAffected = this.coordAnalyzer.isFacilityAffected(facility);
 		boolean wasAffected = this.agentsInEvacuationArea.contains(event.getPersonId());
 		
