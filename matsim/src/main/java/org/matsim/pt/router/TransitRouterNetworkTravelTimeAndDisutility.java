@@ -57,8 +57,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	 */
 	@Deprecated
 	public TransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config) {
-		this.config = config;
-		this.preparedTransitSchedule = new PreparedTransitSchedule();
+		this(config, new PreparedTransitSchedule());
 	}
 	
 	public TransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config, PreparedTransitSchedule preparedTransitSchedule) {
@@ -76,10 +75,10 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			
 		} else {
 			double offVehWaitTime = offVehicleWaitTime(link, time);		
-			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime ;		
-			cost = - inVehTime                   * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
-					-offVehWaitTime				 * this.config.getMarginalUtilityOfWaitingPt_utl_s()
-					-link.getLength() 			 * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
+			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime;		
+			cost = - inVehTime       * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
+			       -offVehWaitTime   * this.config.getMarginalUtilityOfWaitingPt_utl_s()
+			       -link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 
 		}
 		return cost;
