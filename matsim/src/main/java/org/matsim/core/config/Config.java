@@ -87,7 +87,7 @@ public class Config {
 	private LocationChoiceConfigGroup locationchoice = null;
 	private MultiModalConfigGroup multiModal = null;
 	private NetworkConfigGroup network = null;
-	private ParallelEventHandlingConfigGroup parallelEventHandling = null ;
+	private ParallelEventHandlingConfigGroup parallelEventHandling = null;
 	private PlansCalcRouteConfigGroup plansCalcRoute = null;
 	private PlansConfigGroup plans = null;
 	private QSimConfigGroup qSimConfigGroup = null;
@@ -100,7 +100,7 @@ public class Config {
 	private TransitRouterConfigGroup transitRouter = null;
 	private LinkStatsConfigGroup linkStats = null;
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
-	private TimeAllocationMutatorConfigGroup timeAllocationMutator = null ;
+	private TimeAllocationMutatorConfigGroup timeAllocationMutator = null;
 	private SubtourModeChoiceConfigGroup subtourModeChoice = null;
 
 	// config groups that are elsewhere:
@@ -114,7 +114,7 @@ public class Config {
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
 	
-	private boolean locked = false ;
+	private boolean locked = false;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
@@ -154,8 +154,8 @@ public class Config {
 		this.households = new HouseholdsConfigGroup();
 		this.modules.put(HouseholdsConfigGroup.GROUP_NAME, this.households);
 		
-		this.parallelEventHandling = new ParallelEventHandlingConfigGroup() ;
-		this.modules.put(ParallelEventHandlingConfigGroup.GROUP_NAME, this.parallelEventHandling ) ;
+		this.parallelEventHandling = new ParallelEventHandlingConfigGroup();
+		this.modules.put(ParallelEventHandlingConfigGroup.GROUP_NAME, this.parallelEventHandling );
 
 		this.facilities = new FacilitiesConfigGroup();
 		this.modules.put(FacilitiesConfigGroup.GROUP_NAME, this.facilities);
@@ -181,15 +181,15 @@ public class Config {
 		this.plansCalcRoute = new PlansCalcRouteConfigGroup();
 		this.modules.put(PlansCalcRouteConfigGroup.GROUP_NAME, this.plansCalcRoute);
 		
-		this.timeAllocationMutator = new TimeAllocationMutatorConfigGroup() ;
-		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, this.timeAllocationMutator ) ;
+		this.timeAllocationMutator = new TimeAllocationMutatorConfigGroup();
+		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, this.timeAllocationMutator );
 
 		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
 
 		if ( ! this.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).
 				equalsIgnoreCase(VspExperimentalConfigGroup.IGNORE) ) {
-			this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl()) ;
+			this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 			// (I deliberately put this here, rather into the Controler where the standard consistency checker is added,
 			// because at this point my intuition is that one should assume that this is _always_ added ... and not just
 			// in one specific execution path but not in another.  kai, may'11)
@@ -504,12 +504,12 @@ public class Config {
 		return this.linkStats;
 	}
 	
-	public TimeAllocationMutatorConfigGroup timeAllocationMutator(){
-		return this.timeAllocationMutator ;
+	public TimeAllocationMutatorConfigGroup timeAllocationMutator() {
+		return this.timeAllocationMutator;
 	}
 	
 	public ParallelEventHandlingConfigGroup parallelEventHandling() {
-		return this.parallelEventHandling ;
+		return this.parallelEventHandling;
 	}
 
 	public SubtourModeChoiceConfigGroup subtourModeChoice() {
@@ -520,8 +520,8 @@ public class Config {
 	// (config groups that are not core config groups are, in principle, not typed.  This is a way around that.)
 
 	public void addSimulationConfigGroup( final SimulationConfigGroup tmp ) {
-		this.simulation = tmp ;
-		this.addModule( SimulationConfigGroup.GROUP_NAME, tmp ) ;
+		this.simulation = tmp;
+		this.addModule( SimulationConfigGroup.GROUP_NAME, tmp );
 	}
 
 	public void addQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
@@ -529,7 +529,7 @@ public class Config {
 //		log.warn("Might be better to modify the code to use the existing create/add/removeModule mechanics. kai, oct'10");
 		this.qSimConfigGroup = qSimConfigGroup;
 //		this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
-		this.addModule(QSimConfigGroup.GROUP_NAME, qSimConfigGroup) ;
+		this.addModule(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
 	}
 
 	// other:
@@ -549,14 +549,12 @@ public class Config {
 
 	private void checkIfLocked() {
 		if ( this.isLocked() ) {
-			log.error("too late in execution sequence to set config items. Use") ;
-			log.error("Config config = ConfigUtils.loadConfig(filename) ; ") ;
-			log.error("config.xxx().setYyy(...); ") ;
-			log.error("Controler ctrl = new Controler( config ) ;") ;
-			log.error("This will be changed to an abortive error in the future.") ; // kai, feb'13
+			log.error("too late in execution sequence to set config items. Use");
+			log.error("Config config = ConfigUtils.loadConfig(filename); ");
+			log.error("config.xxx().setYyy(...); ");
+			log.error("Controler ctrl = new Controler( config );");
+			log.error("This will be changed to an abortive error in the future."); // kai, feb'13
 		}
 	}
-	
-
 
 }
