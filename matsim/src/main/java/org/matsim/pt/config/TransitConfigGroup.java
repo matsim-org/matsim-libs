@@ -39,12 +39,14 @@ public class TransitConfigGroup extends Module {
 
 	/*package*/ static final String TRANSIT_SCHEDULE_FILE = "transitScheduleFile";
 	private static final String TRANSIT_LINES_ATTRIBUTES = "transitLinesAttributesFile";
+	private static final String TRANSIT_STOPS_ATTRIBUTES = "transitStopsAttributesFile";
 	/*package*/ static final String VEHICLES_FILE = "vehiclesFile";
 	/*package*/ static final String TRANSIT_MODES = "transitModes";
 
 	private String transitScheduleFile = null;
 	private String vehiclesFile = null;
 	private String transitLinesAttributesFile = null;
+	private String transitStopsAttributesFile = null;
 
 	private Set<String> transitModes;
 
@@ -65,6 +67,8 @@ public class TransitConfigGroup extends Module {
 			this.transitModes = Collections.unmodifiableSet(CollectionUtils.stringToSet(value));
 		} else if (TRANSIT_LINES_ATTRIBUTES.equals(paramName)) {
 			this.transitLinesAttributesFile = value;
+		} else if (TRANSIT_STOPS_ATTRIBUTES.equals(paramName)) {
+			this.transitStopsAttributesFile = value;
 		} else {
 			throw new IllegalArgumentException(paramName);
 		}
@@ -102,6 +106,9 @@ public class TransitConfigGroup extends Module {
 		if (this.transitLinesAttributesFile != null) {
 			params.put(TRANSIT_LINES_ATTRIBUTES, this.transitLinesAttributesFile);
 		}
+		if (this.transitStopsAttributesFile != null) {
+			params.put(TRANSIT_STOPS_ATTRIBUTES, this.transitStopsAttributesFile);
+		}
 		return params;
 	}
 
@@ -112,6 +119,7 @@ public class TransitConfigGroup extends Module {
 		comments.put(VEHICLES_FILE, "Input file containing the vehicles used by the departures in the transit schedule.");
 		comments.put(TRANSIT_MODES, "Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt'.");
 		comments.put(TRANSIT_LINES_ATTRIBUTES, "Optional input file containing additional attributes for transit lines, stored as ObjectAttributes.");
+		comments.put(TRANSIT_STOPS_ATTRIBUTES, "Optional input file containing additional attributes for transit stop facilities, stored as ObjectAttributes.");
 		return comments;
 	}
 
@@ -145,5 +153,13 @@ public class TransitConfigGroup extends Module {
 	
 	public void setTransitLinesAttributesFile(final String transitLinesAttributesFile) {
 		this.transitLinesAttributesFile = transitLinesAttributesFile;
+	}
+
+	public String getTransitStopsAttributesFile() {
+		return this.transitStopsAttributesFile;
+	}
+	
+	public void setTransitStopsAttributesFile(final String transitStopsAttributesFile) {
+		this.transitStopsAttributesFile = transitStopsAttributesFile;
 	}
 }

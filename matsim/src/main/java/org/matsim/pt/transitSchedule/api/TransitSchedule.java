@@ -59,4 +59,6 @@ public interface TransitSchedule extends MatsimToplevelContainer {
 
 	public abstract ObjectAttributes getTransitLinesAttributes();
 	
+	public abstract ObjectAttributes getTransitStopsAttributes();
+	
 }

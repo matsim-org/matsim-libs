@@ -43,6 +43,7 @@ public class PTransitScheduleImpl implements TransitSchedule {
 	private final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
 	private final TransitScheduleFactory factory;
 	private final ObjectAttributes transitLinesAttributes = new ObjectAttributes();
+	private final ObjectAttributes transitStopsAttributes = new ObjectAttributes();
 	
 	public PTransitScheduleImpl(final TransitScheduleFactory builder) {
 		this.factory = builder;
@@ -77,18 +78,23 @@ public class PTransitScheduleImpl implements TransitSchedule {
 	public Map<Id, TransitStopFacility> getFacilities() {
 		return this.stopFacilities;
 	}
-	
+
 	@Override
 	public boolean removeStopFacility(final TransitStopFacility stop) {
 		return this.stopFacilities.remove(stop.getId()) != null;
 	}
-	
+
 	public TransitScheduleFactory getFactory() {
 		return this.factory;
 	}
-	
+
 	@Override
 	public ObjectAttributes getTransitLinesAttributes() {
 		return this.transitLinesAttributes;
+	}
+
+	@Override
+	public ObjectAttributes getTransitStopsAttributes() {
+		return this.transitStopsAttributes;
 	}
 }

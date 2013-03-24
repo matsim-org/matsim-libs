@@ -256,6 +256,11 @@ public class ScenarioLoaderImpl {
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
 			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes()).parse(transitLinesAttributesFileName);
 		}
+		if ((this.config.transit() != null) && (this.config.transit().getTransitStopsAttributesFile() != null)) {
+			String transitStopsAttributesFileName = this.config.transit().getTransitStopsAttributesFile();
+			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);
+			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes()).parse(transitStopsAttributesFileName);
+		}
 	}
 
 	private void loadVehicles() throws UncheckedIOException {

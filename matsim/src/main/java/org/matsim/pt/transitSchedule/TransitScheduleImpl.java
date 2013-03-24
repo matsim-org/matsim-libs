@@ -44,7 +44,8 @@ public class TransitScheduleImpl implements TransitSchedule {
 	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();
 	private final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
 	private final TransitScheduleFactory factory;
-	private final ObjectAttributes transitLineAttributes = new ObjectAttributes();
+	private final ObjectAttributes transitLinesAttributes = new ObjectAttributes();
+	private final ObjectAttributes transitStopsAttributes = new ObjectAttributes();
 	
 	protected TransitScheduleImpl(final TransitScheduleFactory builder) {
 		this.factory = builder;
@@ -111,7 +112,12 @@ public class TransitScheduleImpl implements TransitSchedule {
 
 	@Override
 	public ObjectAttributes getTransitLinesAttributes() {
-		return this.transitLineAttributes;
+		return this.transitLinesAttributes;
+	}
+	
+	@Override
+	public ObjectAttributes getTransitStopsAttributes() {
+		return this.transitStopsAttributes;
 	}
 	
 }
