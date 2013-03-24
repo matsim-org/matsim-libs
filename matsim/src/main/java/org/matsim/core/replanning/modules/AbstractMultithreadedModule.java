@@ -89,17 +89,17 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		this.numOfThreads = numOfThreads;
 	}
 	
-	protected void beforePrepareReplanningHook( @SuppressWarnings("unused") ReplanningContext replanningContextTmp ) {
+	protected void beforePrepareReplanningHook(@SuppressWarnings("unused") ReplanningContext replanningContextTmp) {
 		// left empty for inheritance
 	}
 
-	protected void afterPrepareReplanningHook( @SuppressWarnings("unused") ReplanningContext replanningContextTmp ) {
+	protected void afterPrepareReplanningHook(@SuppressWarnings("unused") ReplanningContext replanningContextTmp) {
 		// left empty for inheritance
 	}
 
 	@Override
 	public final void prepareReplanning(ReplanningContext replanningContextTmp) {
-		this.beforePrepareReplanningHook(replanningContextTmp) ;
+		this.beforePrepareReplanningHook(replanningContextTmp);
 		this.replanningContext = replanningContextTmp;
 		if (this.numOfThreads == 0) {
 			// it seems, no threads are desired :(
@@ -107,7 +107,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		} else {
 			initThreads();
 		}
-		this.afterPrepareReplanningHook(replanningContextTmp) ;
+		this.afterPrepareReplanningHook(replanningContextTmp);
 	}
 
 	protected final ReplanningContext getReplanningContext() {
@@ -133,11 +133,11 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	
 	@Override
 	public final void finishReplanning() {
-		this.beforeFinishReplanningHook() ;
+		this.beforeFinishReplanningHook();
 		
 		if (this.directAlgo == null) {
 			// only try to start threads if we did not directly work on all the plans
-			log.info("[" + this.name + "] starting threads, handling " + this.count + " plans");
+			log.info("[" + this.name + "] starting " + this.threads.length + " threads, handling " + this.count + " plans");
 
 			// start threads
 			for (Thread thread : this.threads) {
@@ -152,7 +152,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
-			log.info("[" + this.name + "] all threads finished.");
+			log.info("[" + this.name + "] all " + this.threads.length + " threads finished.");
 			if (this.hadException.get()) {
 				throw new RuntimeException("Some threads crashed, thus not all plans may have been handled.");
 			}
@@ -163,7 +163,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		this.replanningContext = null;
 		this.count = 0;
 		
-		this.afterFinishReplanningHook() ;
+		this.afterFinishReplanningHook();
 	}
 
 	private final void initThreads() {
