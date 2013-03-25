@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice.bestresponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -36,6 +37,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -129,17 +132,14 @@ public class ChoiceSet {
 				
 		TreeMap<Double, Id> map = this.createReducedChoiceSetWithScores(actlegIndex, facilities, scoringFunction, plan, replanningContext);
 				
-		/* yyyyyy the same seed for every agent????? kai, jan'13
+		/*  the same seed for every agent????? kai, jan'13
 		 * 
 		 * corrected, thx.
 		 * Probably this error was not dramatic as the cs is different for every agent anyway.
 		 */
 		Random random = new Random((long) (Long.MAX_VALUE / replanningContext.getIteration() * pKVal));
 		
-		/* yyyyyy what is this supposed to do??? kai, jan'13
-		 * 
-		 * a couple of random draws to come to the "chaotic" region
-		 */
+		//	a couple of random draws to come to the "chaotic" region:
 		for (int i = 0; i < 10; i++) {
 			random.nextDouble();
 		}
@@ -156,6 +156,8 @@ public class ChoiceSet {
 		 * 
 		 * The last entry, that is still larger (descending order) than the random number is returned as id.
 		 * Essentially this is Monte Carlo sampling.
+		 * 
+		 * NOTE: Scores are not only normalized, but also accumulated!!!
 		 */
 		Id id = map.get(map.firstKey());		
 		for (Entry<Double, Id> entry : map.entrySet()) {
@@ -163,9 +165,29 @@ public class ChoiceSet {
 	        	id = entry.getValue();
 	        }
 	    }
-		// yyyyyy looks to me like: "the last facility with a double value larger than the random number is returned.  If this returns null,
-		// then the first entry in the choice set is returned."  But why???  And why the same randomScore for all agents???  kai, jan'13
-
+		
+//		// ich würde es wohl in etwa wie folgt probieren:
+//		// assumes that entry.getKey() just has the normal scores, not something modified.
+//		// what is pKVal doing??
+//		double sum = 0 ;
+//		double offset = map.firstKey() ; // oder lastKey; denke aber, dass das eigentlich egal ist.
+//		int ii = 0 ;
+//		for ( Map.Entry<Double,Id> entry : map.entrySet() ) {
+//			ii ++ ;
+//			if ( ii > this.numberOfAlternatives ) break ;
+//			sum += entry.getKey()-offset ;
+//		}
+//
+//		double sum2 = 0. ;
+//		double rnd = MatsimRandom.getRandom().nextDouble() * sum ; // note *sum!!  could also deal with offset here
+//		for ( Map.Entry<Double,Id> entry : map.entrySet() ) {
+//			sum2 += entry.getKey() - offset ;
+//			if ( sum2 > rnd ) {
+//				return entry.getValue() ;
+//			}
+//		}
+//		throw new RuntimeException("at this point, I see no reason why it should ever get here; may need some fix later ...") ;
+		
 		return id;
 	}
 	
@@ -241,11 +263,13 @@ public class ChoiceSet {
 			return mapCorrected;
 		}
 		else  {	
-			/* yyyyyy how is this supposed to happen at all?  kai, jan'13
+			/* how is this supposed to happen at all?  kai, jan'13
 			 * 
 			 * If the choice set is empty (for example due to sampling) use the current activity location.
 			 * TODO: add a mechanism to at least keep, a minimal number of alternatives (minimally the chosen 
 			 * location of the previous iteration. Then this "if" can go.
+			 * 
+			 * yyyyyy If facilityIdWithLargestScore is defined, it is also in list and thus in mapCorrected.  No?  kai, feb'13
 			 */
 			TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
 			mapTmp.put(1.1, facilityIdWithLargestScore);
