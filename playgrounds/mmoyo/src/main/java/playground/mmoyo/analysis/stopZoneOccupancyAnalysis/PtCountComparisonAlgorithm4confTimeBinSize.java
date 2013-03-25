@@ -49,7 +49,7 @@ public class PtCountComparisonAlgorithm4confTimeBinSize {
 	private final Network network;
 	double countsScaleFactor;
 	final static Logger log = Logger.getLogger(PtCountComparisonAlgorithm4confTimeBinSize.class);
-	StringBuffer content = new StringBuffer();
+	//StringBuffer content = new StringBuffer();
 
 	PtCountComparisonAlgorithm4confTimeBinSize(final OccupancyAnalyzer oa, final Counts counts, final Network network, final double countsScaleFactor) {
 		this.oa = oa;
@@ -81,30 +81,30 @@ public class PtCountComparisonAlgorithm4confTimeBinSize {
 				continue;
 			}
 
-			this.content.append(this.STR_STOPID);
-			this.content.append(stopId.toString());
-			this.content.append(this.STR_HEAD);
+//			this.content.append(this.STR_STOPID);
+//			this.content.append(stopId.toString());
+//			this.content.append(this.STR_HEAD);
 
 			for (int hour = 1; hour <= volumes.length; hour++) {
 				// real volumes:
 				Volume volume = count.getVolume(hour);
 				if (volume != null) {
 
-					this.content.append(hour);
-					this.content.append(this.CHR_HT);
+//					this.content.append(hour);
+//					this.content.append(this.CHR_HT);
 
 					countValue = volume.getValue();
 					double simValue = volumes[hour - 1];
 
-					this.content.append(simValue);
-					this.content.append(this.CHR_HT);
+//					this.content.append(simValue);
+//					this.content.append(this.CHR_HT);
 
 					simValue *= this.countsScaleFactor;
 
-					this.content.append(simValue);
-					this.content.append(this.CHR_HT);
-					this.content.append(countValue);
-					this.content.append(this.CHR_NL);
+//					this.content.append(simValue);
+//					this.content.append(this.CHR_HT);
+//					this.content.append(countValue);
+//					this.content.append(this.CHR_NL);
 
 					this.countSimComp.add(new CountSimComparisonImpl(stopId, hour, countValue, simValue));
 
@@ -138,7 +138,7 @@ public class PtCountComparisonAlgorithm4confTimeBinSize {
 		this.distanceFilterNode = this.network.getNodes().get(new IdImpl(nodeId));
 	}
 
-	void write(final String outputFilename) {
-		new SimpleWriter(outputFilename, this.content.toString());
-	}
+//	void write(final String outputFilename) {
+//		new SimpleWriter(outputFilename, this.content.toString());
+//	}
 }

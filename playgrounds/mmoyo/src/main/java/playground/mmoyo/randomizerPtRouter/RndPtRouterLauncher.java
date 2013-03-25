@@ -21,6 +21,7 @@ package playground.mmoyo.randomizerPtRouter;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.cadyts.pt.CadytsContext;
+import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
 import org.matsim.contrib.cadyts.pt.CadytsPtPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -40,8 +41,9 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterNetworkTravelTimeAndDisutility2;
-import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterNetworkTravelTimeAndDisutility2.DataCollection;
+import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
+import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3.DataCollection;
+import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 
 public class RndPtRouterLauncher {
 
@@ -50,10 +52,10 @@ public class RndPtRouterLauncher {
 		new TransitRouterFactory() {
 			@Override
 			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterNetworkTravelTimeAndDisutility2 ttCalculator = 
-					new RandomizedTransitRouterNetworkTravelTimeAndDisutility2(trConfig);
+				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = 
+					new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
 				ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
-				ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
+				ttCalculator.setDataCollection(DataCollection.additionalInformation, false) ;
 				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 			}
 		};
@@ -61,56 +63,73 @@ public class RndPtRouterLauncher {
 		 
 	public static void main(final String[] args) {
 		String configFile ;
+		final double cadytsWeight;
 		if(args.length==0){
-			configFile = "../../";
+			configFile = "../../ptManuel/calibration/my_config.xml";
+			cadytsWeight = 30.0;
 		}else{
 			configFile = args[0];
+			cadytsWeight = Double.parseDouble(args[1]);
 		}
 		
 		Config config = ConfigUtils.loadConfig(configFile) ;
 		
+		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
 		
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
 		if ( lastStrategyIdx >= 1 ) {
 			throw new RuntimeException("remove all strategy settings from config; should be done here") ;
 		}
 		
-		{
+		//strategies settings
+		{ 
 		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
 		stratSets.setModuleName("myCadyts");
 		stratSets.setProbability(0.9);
 		config.strategy().addStrategySettings(stratSets);
 		}
-		{
+		
+		{    //////!!!!!!!!!!!!!!!!!!!!!///////
 		StrategySettings stratSets2 = new StrategySettings(new IdImpl(lastStrategyIdx+2));
 		stratSets2.setModuleName("ReRoute"); // test that this does work.  Otherwise define this strategy in config file
-		stratSets2.setProbability(0.9);
+		stratSets2.setProbability(0.1);
 		stratSets2.setDisableAfter(400) ;
 		config.strategy().addStrategySettings(stratSets2);
 		}
 		
 		//load data
-		Scenario scn = ScenarioUtils.loadScenario(config);
-		final TransitRouterConfig trConfig = new TransitRouterConfig( scn.getConfig() ) ; 
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scn.getTransitSchedule(), trConfig.beelineWalkConnectionDistance);
-		
-		//create the factory for rndizedRouter
-		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (scn.getTransitSchedule(), trConfig, routerNetwork);
+		final Scenario scn = ScenarioUtils.loadScenario(config);
+		final TransitRouterConfig trConfig = new TransitRouterConfig( config ) ; 
+		final TransitSchedule trSchedule =  scn.getTransitSchedule();
+		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(trSchedule, trConfig.beelineWalkConnectionDistance);
 		
 		//set the controler
 		final Controler controler = new Controler(scn);
-		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
-//		controler.addControlerListener(new CadytsPtControlerListener(controler));  //<-set cadyts as controler listener
 		controler.setOverwriteFiles(true);
-
-		final CadytsContext context = new CadytsContext( config ) ;
+		
+		//add cadytsContext as ctrListener
+		final double beta = 30. ;
+		final CadytsContext context = new CadytsContext(config) ;
+		controler.addControlerListener(context) ;
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager events) {
-				return new PlanStrategyImpl(new CadytsPtPlanChanger( scenario, context));
-			}
-		});
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(scenario2, context);
+///				planSelector.setCadytsWeight(beta*cadytsWeight) ;   
+				return new PlanStrategyImpl(planSelector);
+			}} ) ;
 		
+		//create the factory for rndizedRouter
+		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (trSchedule, trConfig, routerNetwork);
+		controler.setTransitRouterFactory(randomizedTransitRouterFactory);		
+		
+		//add analyzer for specific bus line and stop Zone conversion
+		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
+		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(true); 
+		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);  
+		
+	
 		controler.run();
 	}
 

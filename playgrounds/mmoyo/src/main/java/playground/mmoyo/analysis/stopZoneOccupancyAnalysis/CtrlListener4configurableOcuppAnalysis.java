@@ -19,18 +19,12 @@
 
 package playground.mmoyo.analysis.stopZoneOccupancyAnalysis;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * Controler listener for stop zone analysis
@@ -38,22 +32,15 @@ import org.matsim.core.utils.collections.CollectionUtils;
 public class CtrlListener4configurableOcuppAnalysis implements IterationEndsListener, BeforeMobsimListener {
 	ConfigurableOccupancyAnalyzer configurableOccupAnalyzer;
 	KMZPtCountSimComparisonWriter kmzPtCountSimComparisonWritter;
-	private final Set<Id> calibratedLines = new HashSet<Id>();
 	boolean stopZoneConversion;
 	
 	public CtrlListener4configurableOcuppAnalysis(final Controler controler){
 		
 		//create occupancy analyzer based on CadytsPtConfigGroup();
-		String strCalLibes = controler.getConfig().getParam(CadytsPtConfigGroup.GROUP_NAME, "calibratedLines");
-		String strTimeBinSize = controler.getConfig().getParam(CadytsPtConfigGroup.GROUP_NAME, "timeBinSize");
-		
-		for (String lineId : CollectionUtils.stringToArray(strCalLibes)) {
-			this.calibratedLines.add(new IdImpl(lineId));
-		}
-		int timeBinSize = Integer.parseInt(strTimeBinSize);
-		configurableOccupAnalyzer = new ConfigurableOccupancyAnalyzer(this.calibratedLines, timeBinSize);
+		CadytsPtConfigGroup cptcg = (CadytsPtConfigGroup) controler.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
+		configurableOccupAnalyzer = new ConfigurableOccupancyAnalyzer( cptcg.getCalibratedLines() ,  cptcg.getTimeBinSize());
 		controler.getEvents().addHandler(configurableOccupAnalyzer);
-			
+		
 		kmzPtCountSimComparisonWritter = new KMZPtCountSimComparisonWriter(controler);
 	}
 	

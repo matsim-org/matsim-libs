@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AdaptedControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.analysis.comp;
+package playground.mmoyo.randomizerPtRouter;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
@@ -51,14 +50,12 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
 
-/**
- * this class uses also randomized router, in the same way as the class CadytsScoringFunctionAndRndRouterLauncher,
- * this one is meant to used for scenario without stopZone conversion
- */
-public class CadytsIntegration_launcher {
-	
+import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
+import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
+
+public class CadytsScoringFunctionAndRndRouterLauncher {
+
 	private static TransitRouterFactory createRandomizedTransitRouterFactory (final TransitSchedule schedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
 		return 
 		new TransitRouterFactory() {
@@ -87,6 +84,8 @@ public class CadytsIntegration_launcher {
 		final Config config = ConfigUtils.loadConfig(configFile) ;
 		final double beta=30. ;
 		
+		configFile= null; //M
+		
 		config.planCalcScore().setBrainExpBeta(beta) ;
 		
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
@@ -110,13 +109,11 @@ public class CadytsIntegration_launcher {
 		config.strategy().addStrategySettings(stratSets2);
 		}		
 
-		//load data
-		final Scenario scn = ScenarioUtils.loadScenario(config);
-		
 		//set the controler
+		final Scenario scn = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true) ;
-
+		
 		//create cadyts context
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
 		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
@@ -135,14 +132,14 @@ public class CadytsIntegration_launcher {
 		
 
 		//set scoring functions
+		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()); //M
+		
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			private CharyparNagelScoringParameters params = null;
-			
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
-				if (this.params == null) {																			//<- see comment about performance improvement in 
-					this.params = new CharyparNagelScoringParameters(config.planCalcScore()); //org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.createNewScoringFunction
-				}
+				//if (params == null) {																			//<- see comment about performance improvement in 
+				//	params = new CharyparNagelScoringParameters(config.planCalcScore()); //org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.createNewScoringFunction
+				//}
 
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
@@ -159,41 +156,20 @@ public class CadytsIntegration_launcher {
 		
 		
 		//create and set the factory for rndizedRouter 
-		final TransitSchedule routerSchedule = scn.getTransitSchedule();
+		final TransitSchedule routerSchedule = controler.getScenario().getTransitSchedule();
 		final TransitRouterConfig trConfig = new TransitRouterConfig( config );
+		
 		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
 		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (routerSchedule, trConfig, routerNetwork);
 		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
 		
+		//add analyzer for specific bus line and stop Zone conversion
+		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
+		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(true); 
+		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);  
 		
-		///controler listener to write object attributes each 10 iterations.  They are obtained from plan's custom attributes
-//		controler.addControlerListener(new IterationEndsListener() {
-//			final String strPlan = "plan";
-//			
-//			@Override
-//			public void notifyIterationEnds(IterationEndsEvent event) {
-//				if ( event.getIteration()%10==0  && event.getIteration()>0){
-//					ObjectAttributes attrs = new ObjectAttributes() ;
-//					
-//					Population pop = event.getControler().getPopulation() ;
-//					for ( Person person : pop.getPersons().values() ) {
-//						int cnt = 0 ;
-//						for ( Plan plan : person.getPlans() ) {
-//							Double cadytsCorrection = 0. ;
-//							if ( plan.getCustomAttributes() != null ) {
-//								cadytsCorrection = (Double) plan.getCustomAttributes().get(CadytsPtPlanChanger.CADYTS_CORRECTION) ;
-//								attrs.putAttribute( person.getId().toString() , strPlan  + Integer.toString(cnt) , cadytsCorrection) ;
-//							}
-//							//System.err.println( " personId: " + person.getId() + " planScore: " + plan.getScore()  + " cadytsCorrection: " + cadytsCorrection ) ; 
-//							cnt++ ;
-//						}
-//					}
-//					OutputDirectoryHierarchy hhh = event.getControler().getControlerIO() ;
-//					new ObjectAttributesXmlWriter(attrs).writeFile(hhh.getIterationFilename(event.getIteration(), "cadytsCorrections.xml") ) ;					
-//				}
-//			}
-//		}) ;
-
+	
 		controler.run();
-	} 
+	}
+
 }

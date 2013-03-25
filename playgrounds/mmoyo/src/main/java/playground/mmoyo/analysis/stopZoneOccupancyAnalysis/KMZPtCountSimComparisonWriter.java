@@ -37,15 +37,23 @@ public class KMZPtCountSimComparisonWriter {
 	private double scalefactor;
 	final String kmzFile = "configurablePTcountsCompare.kmz";
 	final String txtCompFile = "configurablePTcountsCompare.txt";
+	final String ITERS = "ITERS/it.";
+	final String SL = "/.";
+	final String PNT = ".";
+	final String strDONE = " done.";
 	
 	public KMZPtCountSimComparisonWriter (final Controler controler){
 		this.controler = controler;
 		
 		//load data
 		net = controler.getScenario().getNetwork();
-		new MatsimCountsReader(occupCounts).readFile(controler.getConfig().ptCounts().getOccupancyCountsFileName());
+		MatsimCountsReader reader = new MatsimCountsReader(occupCounts);
+		reader.readFile(controler.getConfig().ptCounts().getOccupancyCountsFileName());
 		scalefactor = controler.getConfig().ptCounts().getCountsScaleFactor();
+		
+		reader= null; //M
 	}
+
 	
 	protected void write (final OccupancyAnalyzer ocupAnalizer,  final int itNum){
 		
@@ -62,18 +70,18 @@ public class KMZPtCountSimComparisonWriter {
 
 		//write counts comparison
 		String kmlFile;
-		String ocuppCompTxtFile;
+//		String ocuppCompTxtFile;
 		if(controler.getControlerIO()!=null){
 			kmlFile = controler.getControlerIO().getIterationFilename(itNum, kmzFile);
-			ocuppCompTxtFile = controler.getControlerIO().getIterationFilename(itNum, txtCompFile);
+//			ocuppCompTxtFile = controler.getControlerIO().getIterationFilename(itNum, txtCompFile);
 		}else{  //<-it happens when this method is invoked outside a simulation run
-			String outDir = controler.getConfig().controler().getOutputDirectory() + "ITERS/it." + itNum + "/." + itNum + ".";
+			String outDir = controler.getConfig().controler().getOutputDirectory() + ITERS + itNum + SL + itNum + PNT;
 			kmlFile = outDir + kmzFile;
-			ocuppCompTxtFile =  outDir + txtCompFile;
+//			ocuppCompTxtFile =  outDir + txtCompFile;
 		}
 		kmlWriter.writeFile(kmlFile);
-		ccaOccupancy.write(ocuppCompTxtFile);
-		log.info(kmlFile + " done.");
+//		ccaOccupancy.write(ocuppCompTxtFile);
+		log.info(kmlFile + strDONE);
 	}
 	
 }
