@@ -138,6 +138,8 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 			this.planAlgoInstances.add(new SingleActLocationMutator(this.scenario, this.quadTreesOfType, 
 					this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
+		case bestResponse:
+			throw new RuntimeException("wrong class for this locachoice algo; aborting ...") ;
 		}		
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
