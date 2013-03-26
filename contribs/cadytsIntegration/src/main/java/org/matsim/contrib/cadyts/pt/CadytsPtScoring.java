@@ -45,7 +45,7 @@ public class CadytsPtScoring implements ArbitraryEventScoring {
 	private final double beta ;
 	private double weightOfCadytsCorrection = 1. ;
 
-	CadytsPtScoring(final Plan plan, Config config, final CadytsContext context ) {
+	public CadytsPtScoring(final Plan plan, Config config, final CadytsContext context ) {
 		this.ptPlanToPlanStep = context.getPtStep() ;
 		this.matsimCalibrator = context.getCalibrator() ;
 		this.plan = plan ;
