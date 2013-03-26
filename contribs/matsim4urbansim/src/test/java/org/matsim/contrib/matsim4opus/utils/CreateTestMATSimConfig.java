@@ -36,7 +36,10 @@ import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.AccessibilityParameterType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
@@ -52,6 +55,7 @@ import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.StrategyType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.UrbansimParameterType;
 import org.matsim.contrib.matsim4opus.utils.io.LoadFile;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
+import org.matsim.core.config.Module;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.SAXException;

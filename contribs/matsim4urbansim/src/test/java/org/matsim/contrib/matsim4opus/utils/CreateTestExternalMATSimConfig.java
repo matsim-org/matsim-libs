@@ -36,7 +36,10 @@ import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.MatsimConfigType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ObjectFactory;
@@ -245,6 +248,37 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	
+	public AccessibilityParameterConfigModule getAccessibilityParameterConfig(Config config) {
+		Module m = config.getModule(AccessibilityParameterConfigModule.GROUP_NAME);
+		if (m instanceof AccessibilityParameterConfigModule) {
+			return (AccessibilityParameterConfigModule) m;
+		}
+		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME);
+		config.getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
+		return apcm;
+	}
+	
+	public MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig(Config config) {
+		Module m = config.getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
+		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
+			return (MATSim4UrbanSimControlerConfigModuleV3) m;
+		}
+		MATSim4UrbanSimControlerConfigModuleV3 mccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
+		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
+		return mccm;
+	}
+	
+	public UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig(Config config) {
+		Module m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		if (m instanceof UrbanSimParameterConfigModuleV3) {
+			return (UrbanSimParameterConfigModuleV3) m;
+		}
+		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
+		return upcm;
 	}
 
 }

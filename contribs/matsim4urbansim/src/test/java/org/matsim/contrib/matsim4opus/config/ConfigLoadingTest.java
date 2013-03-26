@@ -135,6 +135,10 @@ public class ConfigLoadingTest extends MatsimTestCase{
 			CreateTestExternalMATSimConfig testExternalConfig,
 			CreateTestMATSimConfig testConfig, Config config) {
 		
+		MATSim4UrbanSimControlerConfigModuleV3 matsim4UrbanSimControlerModule = testExternalConfig.getMATSim4UrbaSimControlerConfig(config);
+		Assert.assertTrue( matsim4UrbanSimControlerModule.getTimeOfDay() == testExternalConfig.timeOfDay );
+		// Assert.assertTrue( Paths.checkPathEnding( matsim4UrbanSimControlerModule.getShapeFileCellBasedAccessibility() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.urbanSimZoneShapefileLocationDistribution )));
+		// Assert.assertTrue( Paths.checkPathEnding( matsim4UrbanSimControlerModule.getPtStopsInputFile()  ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.ptStops ) ));
 		
 		
 		ControlerConfigGroup contolerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
