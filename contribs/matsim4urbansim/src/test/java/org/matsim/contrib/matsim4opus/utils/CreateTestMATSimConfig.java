@@ -53,6 +53,7 @@ import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.UrbansimParame
 import org.matsim.contrib.matsim4opus.utils.io.LoadFile;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.SAXException;
 
 
@@ -66,22 +67,117 @@ public class CreateTestMATSimConfig {
 	public static final int WARRM_START = 1;
 	public static final int HOT_START = 2;
 	
-	private int startMode;
-	private String destination;
-	private String dummyPath;
-	private String dummyFile;
+	public static final String DUMMY_FILE = "/dummy.xml";
 	
+	private int startMode;
+	protected String dummyPath;
+	
+	public String matsimConfigInputFile 				= "";
+	public String networkInputFile 	 					= "";
+	public String inputPlansFile 						= "";
+	public String hotstartPlansFile						= "";
+	public BigInteger firstIteration					= new BigInteger("0");
+	public BigInteger lastIteration						= new BigInteger("0");
+	public String activityType_0						= "home";
+	public String activityType_1						= "work";
+	public BigInteger homeActivityTypicalDuration		= new BigInteger("43200");	
+	public BigInteger workActivityTypicalDuration		= new BigInteger("28800");	
+	public BigInteger workActivityOpeningTime			= new BigInteger("25200");
+	public BigInteger workActivityLatestStartTime		= new BigInteger("32400");
+	public BigInteger maxAgentPlanMemorySize			= new BigInteger("5");
+	public Double timeAllocationMutatorProbability		= 0.1;
+	public Double changeExpBetaProbability				= 0.9;
+	public Double reRouteDijkstraProbability			= 0.1;
+	public Double populationSamplingRate				= 1.0;
+	public BigInteger year								= new BigInteger("2000");
+	public String opusHome								= "";
+	public String opusDataPath							= "";
+	public String matsim4opus							= "";
+	public String matsim4opusConfig						= "";
+	public String matsim4opusOutput 					= "";
+	public String matsim4opusTemp						= "";
+	public boolean isTestRun							= false;
+	public Double randomLocationDistributionRadiusForUrbanSimZone	= 0.;
+	public String testParameter							= "";
+	public boolean backupRunData						= false;
+	public boolean zone2zoneImpedance					= true;
+	public boolean agentPerformance						= true;
+	public boolean zoneBasedAccessibility				= true;
+	public boolean cellBasedAccessibility 				= true;
+	public BigInteger cellSizeCellBasedAccessibility	= new BigInteger("100");
+	public String shapeFileCellBasedAccessibilityInputFile	= "";
+	public boolean useCustomBoundingBox 				= false;
+	public Double boundingBoxTop						= 0.;
+	public Double boundingBoxLeft						= 0.;
+	public Double boundingBoxRight 						= 0.;
+	public Double boundingBoxBottom						= 0.;
+	public Double accessibilityDestinationSamplingRate	= 1.0;
+	public boolean useLogitScaleParameterFromMATSim		= true;
+	public boolean useCarParameterFromMATSim			= true;
+	public boolean useWalkParameterFromMATSim			= true;
+	public boolean useRawSumsWithoutLn					= false;
+	public Double logitScaleParameter					= 1.0;
+	public Double betaCarTravelTime						= 0.;
+	public Double betaCarTravelTimePower2				= 0.;
+	public Double betaCarLnTravelTime					= 0.;
+	public Double betaCarTravelDistance					= 0.;
+	public Double betaCarTravelDistancePower2			= 0.;
+	public Double betaCarLnTravelDistance				= 0.;
+	public Double betaCarTravelCost						= 0.;
+	public Double betaCarTravelCostPower2				= 0.;
+	public Double betaCarLnTravelCost					= 0.;
+	public Double betaWalkTravelTime					= 0.;
+	public Double betaWalkTravelTimePower2				= 0.;
+	public Double betaWalkLnTravelTime					= 0.;
+	public Double betaWalkTravelDistance				= 0.;
+	public Double betaWalkTravelDistancePower2			= 0.;
+	public Double betaWalkLnTravelDistance				= 0.;
+	public Double betaWalkTravelCost					= 0.;
+	public Double betaWalkTravelCostPower2				= 0.;
+	public Double betaWalkLnTravelCost					= 0.;
+	
+	/**
+	 * This entry point is configured for ConfigLoadTest, create a new entry for another test
+	 * @param startMode
+	 * @param path
+	 */
 	public CreateTestMATSimConfig(final int startMode, String path){
+		this.startMode 			= startMode;
+		this.dummyPath 			= path;
+		this.networkInputFile 	= path + DUMMY_FILE;
+		this.inputPlansFile		= path + DUMMY_FILE;
+		this.hotstartPlansFile	= path + DUMMY_FILE;
+		this.opusHome			= path;
+		this.opusDataPath		= path;
+		this.matsim4opus		= path;
+		this.matsim4opusConfig	= path;
+		this.matsim4opusOutput	= path;
+		this.matsim4opusTemp	= path;
+		this.matsimConfigInputFile = "";
+	}
+	
+	/**
+	 * This entry point is configured for ConfigLoadTest, create a new entry for another test
+	 * @param startMode
+	 * @param path
+	 * @param externalConfig
+	 */
+	public CreateTestMATSimConfig(final int startMode, String path, String externalConfig){
 		this.startMode = startMode;
-		this.destination = path + "/test_config.xml";	
 		this.dummyPath = path;
-		this.dummyFile = path + "/dummy.xml";
+		this.networkInputFile 	= path + "/dummy.xml";
+		this.inputPlansFile		= path + "/dummy.xml";
+		this.hotstartPlansFile	= path + "/dummy.xml";
+		this.opusHome			= path;
+		this.opusDataPath		= path;
+		this.matsim4opus		= path;
+		this.matsim4opusConfig	= path;
+		this.matsim4opusOutput	= path;
+		this.matsim4opusTemp	= path;
+		this.matsimConfigInputFile = externalConfig;
 	}
 
-	
 	public String generate(){
-		
-		BufferedWriter bw = IOUtils.getBufferedWriter( this.destination );
 		
 		ObjectFactory of = new ObjectFactory();	
 		
@@ -89,32 +185,34 @@ public class CreateTestMATSimConfig {
 		
 		// Config Type
 		FileType matsim_config = of.createFileType();
-		matsim_config.setInputFile("");
+		matsim_config.setInputFile( this.matsimConfigInputFile );
 		FileType network = of.createFileType();
-		network.setInputFile( this.dummyFile );
+		network.setInputFile( this.networkInputFile );
 		InputPlansFileType inputPlansFileType = of.createInputPlansFileType();
 		if(this.startMode == this.COLD_START)
 			inputPlansFileType.setInputFile( "" );
 		else if(this.startMode == this.WARRM_START)
-			inputPlansFileType.setInputFile( this.dummyFile );
+			inputPlansFileType.setInputFile( this.inputPlansFile );
 		InputPlansFileType hotStratPlansFile = of.createInputPlansFileType();
 		if(this.startMode == this.HOT_START)
-			hotStratPlansFile.setInputFile( this.dummyFile );
+			hotStratPlansFile.setInputFile( this.hotstartPlansFile );
+		else
+			hotStratPlansFile.setInputFile( "" );
 		ControlerType controler = of.createControlerType();
-		controler.setFirstIteration(new BigInteger("0"));
-		controler.setLastIteration(new BigInteger("0"));
+		controler.setFirstIteration( this.firstIteration );
+		controler.setLastIteration(  this.lastIteration );
 		PlanCalcScoreType planCalcScore = of.createPlanCalcScoreType();
-		planCalcScore.setActivityType0("home");
-		planCalcScore.setActivityType1("work");
-		planCalcScore.setHomeActivityTypicalDuration(new BigInteger("43200"));
-		planCalcScore.setWorkActivityTypicalDuration(new BigInteger("28800"));
-		planCalcScore.setWorkActivityOpeningTime(new BigInteger("25200"));
-		planCalcScore.setWorkActivityLatestStartTime(new BigInteger("32400"));
+		planCalcScore.setActivityType0( this.activityType_0 );
+		planCalcScore.setActivityType1( this.activityType_1 );
+		planCalcScore.setHomeActivityTypicalDuration( this.homeActivityTypicalDuration );
+		planCalcScore.setWorkActivityTypicalDuration( this.workActivityTypicalDuration );
+		planCalcScore.setWorkActivityOpeningTime( this.workActivityOpeningTime );
+		planCalcScore.setWorkActivityLatestStartTime( this.workActivityLatestStartTime );
 		StrategyType strategy = of.createStrategyType();
-		strategy.setMaxAgentPlanMemorySize( new BigInteger("5") );
-		strategy.setTimeAllocationMutatorProbability( 0.1 );
-		strategy.setChangeExpBetaProbability( 0.9 );
-		strategy.setReRouteDijkstraProbability( 0.1 );
+		strategy.setMaxAgentPlanMemorySize( this.maxAgentPlanMemorySize );
+		strategy.setTimeAllocationMutatorProbability( this.timeAllocationMutatorProbability );
+		strategy.setChangeExpBetaProbability( this.changeExpBetaProbability );
+		strategy.setReRouteDijkstraProbability( this.reRouteDijkstraProbability );
 		
 		ConfigType configType = of.createConfigType();
 		configType.setMatsimConfig(matsim_config);
@@ -127,59 +225,60 @@ public class CreateTestMATSimConfig {
 		
 		// UrbanSimParameterType
 		UrbansimParameterType ubansimParameterType = of.createUrbansimParameterType();
-		ubansimParameterType.setPopulationSamplingRate( 1. );
-		ubansimParameterType.setYear( new BigInteger("2000") );
-		ubansimParameterType.setOpusHome( this.dummyPath );
-		ubansimParameterType.setOpusDataPath( this.dummyPath );
-		ubansimParameterType.setMatsim4Opus( this.dummyPath );
-		ubansimParameterType.setMatsim4OpusConfig( this.dummyPath );
-		ubansimParameterType.setMatsim4OpusOutput( this.dummyPath );
-		ubansimParameterType.setMatsim4OpusTemp( this.dummyPath );
-		ubansimParameterType.setIsTestRun(true);
-		ubansimParameterType.setRandomLocationDistributionRadiusForUrbanSimZone( 500. );
-		ubansimParameterType.setTestParameter( "" );
-		ubansimParameterType.setBackupRunData(false);
+		ubansimParameterType.setPopulationSamplingRate( this.populationSamplingRate );
+		ubansimParameterType.setYear( this.year );
+		ubansimParameterType.setOpusHome( this.opusHome );
+		ubansimParameterType.setOpusDataPath( this.opusDataPath );
+		ubansimParameterType.setMatsim4Opus( this.matsim4opus );
+		ubansimParameterType.setMatsim4OpusConfig( this.matsim4opusConfig );
+		ubansimParameterType.setMatsim4OpusOutput( this.matsim4opusOutput );
+		ubansimParameterType.setMatsim4OpusTemp( this.matsim4opusTemp );
+		ubansimParameterType.setIsTestRun( this.isTestRun );
+		ubansimParameterType.setRandomLocationDistributionRadiusForUrbanSimZone( this.randomLocationDistributionRadiusForUrbanSimZone );
+		ubansimParameterType.setTestParameter( this.testParameter );
+		ubansimParameterType.setBackupRunData( this.backupRunData );
 		
 		// matsim4UrbanSimControlerType
 		Matsim4UrbansimContolerType matsim4UrbanSimControlerType = of.createMatsim4UrbansimContolerType();
-		matsim4UrbanSimControlerType.setZone2ZoneImpedance(true);
-		matsim4UrbanSimControlerType.setAgentPerformance(true);
-		matsim4UrbanSimControlerType.setZoneBasedAccessibility(true);
-		matsim4UrbanSimControlerType.setCellBasedAccessibility(true);
+		matsim4UrbanSimControlerType.setZone2ZoneImpedance( this.zone2zoneImpedance );
+		matsim4UrbanSimControlerType.setAgentPerformance( this.agentPerformance );
+		matsim4UrbanSimControlerType.setZoneBasedAccessibility( this.zoneBasedAccessibility );
+		matsim4UrbanSimControlerType.setCellBasedAccessibility( this.cellBasedAccessibility );
+		matsim4UrbanSimControlerType.setCellSizeCellBasedAccessibility( this.cellSizeCellBasedAccessibility );
 		FileType shapeFile = of.createFileType();
-		shapeFile.setInputFile("");
+		shapeFile.setInputFile( this.shapeFileCellBasedAccessibilityInputFile );
 		matsim4UrbanSimControlerType.setShapeFileCellBasedAccessibility( shapeFile );
-		matsim4UrbanSimControlerType.setUseCustomBoundingBox(false);
-		matsim4UrbanSimControlerType.setBoundingBoxBottom( 0. );
-		matsim4UrbanSimControlerType.setBoundingBoxLeft( 0. );
-		matsim4UrbanSimControlerType.setBoundingBoxRight( 0. );
-		matsim4UrbanSimControlerType.setBoundingBoxTop( 0. );
+		matsim4UrbanSimControlerType.setUseCustomBoundingBox( this.useCustomBoundingBox );
+		matsim4UrbanSimControlerType.setBoundingBoxBottom( this.boundingBoxTop );
+		matsim4UrbanSimControlerType.setBoundingBoxLeft( this.boundingBoxLeft );
+		matsim4UrbanSimControlerType.setBoundingBoxRight( this.boundingBoxRight );
+		matsim4UrbanSimControlerType.setBoundingBoxTop( this.boundingBoxBottom );
 		
 		// accessibilityParameterType
 		AccessibilityParameterType accessibilityParameterType = of.createAccessibilityParameterType();
-		accessibilityParameterType.setAccessibilityDestinationSamplingRate( 1. );
-		accessibilityParameterType.setUseLogitScaleParameterFromMATSim(true);
-		accessibilityParameterType.setUseCarParameterFromMATSim(true);
-		accessibilityParameterType.setUseWalkParameterFromMATSim(true);
-		accessibilityParameterType.setUseRawSumsWithoutLn(false);
-		accessibilityParameterType.setBetaCarTravelTime( 0. );
-		accessibilityParameterType.setBetaCarTravelTimePower2( 0. );
-		accessibilityParameterType.setBetaCarLnTravelTime( 0. );
-		accessibilityParameterType.setBetaCarTravelDistance( 0. );
-		accessibilityParameterType.setBetaCarTravelDistancePower2( 0. );
-		accessibilityParameterType.setBetaCarLnTravelDistance( 0. );
-		accessibilityParameterType.setBetaCarTravelCost( 0. );
-		accessibilityParameterType.setBetaCarTravelCostPower2( 0. );
-		accessibilityParameterType.setBetaCarLnTravelCost( 0. );
-		accessibilityParameterType.setBetaWalkTravelTime( 0. );
-		accessibilityParameterType.setBetaWalkTravelTimePower2( 0. );
-		accessibilityParameterType.setBetaWalkLnTravelTime( 0. );
-		accessibilityParameterType.setBetaWalkTravelDistance( 0. );
-		accessibilityParameterType.setBetaWalkTravelDistancePower2( 0. );
-		accessibilityParameterType.setBetaWalkLnTravelDistance( 0. );
-		accessibilityParameterType.setBetaWalkTravelCost( 0. );
-		accessibilityParameterType.setBetaWalkTravelCostPower2( 0. );
-		accessibilityParameterType.setBetaWalkLnTravelCost( 0. );
+		accessibilityParameterType.setAccessibilityDestinationSamplingRate( this.accessibilityDestinationSamplingRate );
+		accessibilityParameterType.setUseLogitScaleParameterFromMATSim( this.useLogitScaleParameterFromMATSim );
+		accessibilityParameterType.setUseCarParameterFromMATSim( this.useCarParameterFromMATSim );
+		accessibilityParameterType.setUseWalkParameterFromMATSim( this.useWalkParameterFromMATSim );
+		accessibilityParameterType.setUseRawSumsWithoutLn( this.useRawSumsWithoutLn );
+		accessibilityParameterType.setBetaCarTravelTime( this.betaCarTravelTime );
+		accessibilityParameterType.setBetaCarTravelTimePower2( this.betaCarTravelTimePower2 );
+		accessibilityParameterType.setBetaCarLnTravelTime( this.betaCarLnTravelTime );
+		accessibilityParameterType.setBetaCarTravelDistance( this.betaCarTravelDistance );
+		accessibilityParameterType.setBetaCarTravelDistancePower2( this.betaCarTravelDistancePower2 );
+		accessibilityParameterType.setBetaCarLnTravelDistance( this.betaCarLnTravelDistance );
+		accessibilityParameterType.setBetaCarTravelCost( this.betaCarTravelCost );
+		accessibilityParameterType.setBetaCarTravelCostPower2( this.betaCarTravelCostPower2 );
+		accessibilityParameterType.setBetaCarLnTravelCost( this.betaCarLnTravelCost );
+		accessibilityParameterType.setBetaWalkTravelTime( this.betaWalkTravelTime );
+		accessibilityParameterType.setBetaWalkTravelTimePower2( this.betaWalkTravelTimePower2 );
+		accessibilityParameterType.setBetaWalkLnTravelTime( this.betaWalkLnTravelTime );
+		accessibilityParameterType.setBetaWalkTravelDistance( this.betaWalkTravelDistance );
+		accessibilityParameterType.setBetaWalkTravelDistancePower2( this.betaWalkTravelDistancePower2 );
+		accessibilityParameterType.setBetaWalkLnTravelDistance( this.betaWalkLnTravelDistance );
+		accessibilityParameterType.setBetaWalkTravelCost( this.betaWalkTravelCost );
+		accessibilityParameterType.setBetaWalkTravelCostPower2( this.betaWalkTravelCostPower2 );
+		accessibilityParameterType.setBetaWalkLnTravelCost( this.betaWalkLnTravelCost );
 		
 		// matsim4urbansimtype
 		Matsim4UrbansimType matsim4UrbanSimType = of.createMatsim4UrbansimType();
@@ -192,7 +291,18 @@ public class CreateTestMATSimConfig {
 		matsimConfigType.setConfig(configType);
 		matsimConfigType.setMatsim4Urbansim(matsim4UrbanSimType);
 		
+		return writeConfigFile(matsimConfigType);
+	}
+
+	/**
+	 * @param matsimConfigType
+	 * @throws UncheckedIOException
+	 */
+	String writeConfigFile(MatsimConfigType matsimConfigType) throws UncheckedIOException {
 		try {
+			String destination = this.dummyPath + "/test_config.xml";	
+			BufferedWriter bw = IOUtils.getBufferedWriter( destination );
+			
 			String xsdPath = TempDirectoryUtil.createCustomTempDirectory("xsd");
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
 			LoadFile loadFile = new LoadFile(InternalConstants.V2_MATSIM_4_URBANSIM_XSD_MATSIMORG, xsdPath, InternalConstants.V2_XSD_FILE_NAME);
@@ -215,7 +325,7 @@ public class CreateTestMATSimConfig {
 			JAXBElement elem = new JAXBElement( new QName("","matsim_config"), MatsimConfigType.class, matsimConfigType); // this is because there is no XMLRootElemet annotation
 			m.marshal(elem, bw );
 			
-			return this.destination;
+			return destination;
 			
 		} catch (JAXBException e) {
 			e.printStackTrace();
@@ -225,6 +335,10 @@ public class CreateTestMATSimConfig {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public int getStartMode(){
+		return this.startMode;
 	}
 	
 	public static void main(String args[]){
@@ -238,4 +352,5 @@ public class CreateTestMATSimConfig {
 		
 		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
+	
 }
