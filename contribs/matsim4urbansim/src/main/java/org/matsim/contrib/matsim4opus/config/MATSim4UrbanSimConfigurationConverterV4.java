@@ -187,11 +187,11 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			// get root elements from JAXB matsim4urbansim config object
 			ConfigType matsimParameter = matsimConfig.getConfig();
 			Matsim4UrbansimType matsim4UrbanSimParameter = matsimConfig.getMatsim4Urbansim();
-			
-			// init standard MATSim config first, this may be overwritten from MATSim4UrbanSim config
-			// initExternalMATSimConfig(matsimParameter);
-			
+
+			// creates an empty config to be filled by settings from the MATSim4UrbanSim
+			// and external config file
 			createEmptyConfigWithVSPExperimentalAbort(matsimParameter);
+			// loads the external MATSim config separately (to get additional MATSim 4UrbanSim parameters)
 			initMATSim4UrbanSimModule(matsimParameter);
 			
 			// initializing config with MATSim4UrbanSim parameter
@@ -205,8 +205,12 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			initPlanCalcRoute();
 			initQSim();
 			
+			// loading the external MATSim config in to the initialized config
+			// overlapping parameter settings (in MATSim4UrbanSim and external MATSim config)
+			// are overwritten by the external MATSim settings
 			loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsimParameter);
 			
+			// show final settings
 			printGlobalConfigGroupSettings();
 			printUrbanSimParameterSettings();
 			printMATSim4UrbanSimControlerSettings();
@@ -241,7 +245,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 
 	/**
-	 * 
+	 * creates an empty MATSim config to be filled by MATSim4UrbanSim + external MATSim config settings
 	 */
 	private void createEmptyConfigWithVSPExperimentalAbort(ConfigType matsimParameter) {
 		log.info("Creating an empty MATSim scenario.");
@@ -254,6 +258,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 
 	/**
+	 * loads the external config into a temporary structure
+	 * this is done to initialize MATSim4UrbanSim settings that are defined
+	 * in the external MATSim config
+	 * 
 	 * @param matsimParameter
 	 * @throws UncheckedIOException
 	 */
@@ -316,7 +324,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		GlobalConfigGroup globalCG = (GlobalConfigGroup) config.getModule(GlobalConfigGroup.GROUP_NAME);
 		globalCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
 		
-		// printGlobalConfigGroupSettings();
+		printGlobalConfigGroupSettings();
 		log.info("...done!");
 	}
 	
@@ -407,7 +415,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		InternalConstants.MATSIM_4_OPUS_TEMP = module.getMATSim4OpusTemp();
 		InternalConstants.MATSIM_4_OPUS_BACKUP = module.getMATSim4OpusBackup();
 		
-		// printUrbanSimParameterSettings();
+		printUrbanSimParameterSettings();
 	}
 
 	
@@ -519,7 +527,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		module.setPtTravelTimesInputFile(ptTravelTimes);
 		module.setPtTravelDistancesInputFile(ptTravelDistances);
 		
-		// printMATSim4UrbanSimControlerSettings();
+		printMATSim4UrbanSimControlerSettings();
 	}
 	
 	private void initAccessibilityParameter(Matsim4UrbansimType matsim4UrbanSimParameter){
@@ -703,7 +711,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		module.setBetaPtTravelCostPower2(betaPtTCPower);
 		module.setBetaPtLnTravelCost(betaPtLnTC);
 		
-		// printAccessibilityParameterSettings();
+		printAccessibilityParameterSettings();
 	}
 	
 	/**
@@ -721,20 +729,20 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		// the MATSim4UrbanSim config contains a network file
 		if(!networkFile.isEmpty()){
 			// check if a network was already set by an external matsim config.
-			if(networkCG.getInputFile() != null && !networkCG.getInputFile().isEmpty()){
-				log.warn("A network file is already set by an external matsim config: " + networkCG.getInputFile());
-				log.warn("It will be replaced by the MATSim4UrbanSim network file: " + networkFile);
-				log.warn("To avoid this, keep the network parameter in MATSim4UrbanSim empty!");
-			}
+			//if(networkCG.getInputFile() != null && !networkCG.getInputFile().isEmpty()){
+			//	log.warn("A network file is already set by an external matsim config: " + networkCG.getInputFile());
+			//	log.warn("It will be replaced by the MATSim4UrbanSim network file: " + networkFile);
+			//	log.warn("To avoid this, keep the network parameter in MATSim4UrbanSim empty!");
+			//}
 			// set MATSim4UrbanSim network
 			networkCG.setInputFile( networkFile );
 		}
-		else if (networkCG.getInputFile() == null || networkCG.getInputFile().isEmpty()){
+		else{ // if (networkCG.getInputFile() == null || networkCG.getInputFile().isEmpty()){
 			log.error("Missing MATSim network! The network must be specified either directly in the MATSim4UrbanSim configuration or in an external MATSim configuration.");
 			System.exit( InternalConstants.NO_MATSIM_NETWORK );
 		}
 
-		// printNetworkConfigGroupSettings();
+		printNetworkConfigGroupSettings();
 		log.info("...done!");
 	}
 	
@@ -789,7 +797,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		// set input plans file
 		plansCG.setInputFile( plansFile );
 		
-		// printPlansConfigGroupSettings();
+		printPlansConfigGroupSettings();
 		log.info("...done!");
 	}
 	
@@ -814,7 +822,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		// set Qsim
 		controlerCG.setMobsim(QSimConfigGroup.GROUP_NAME);
 		
-		// printControlerConfigGroupSetting();
+		printControlerConfigGroupSetting();
 		log.info("...done!");
 	}
 	
@@ -838,7 +846,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		config.planCalcScore().addActivityParams( homeActivity );
 		config.planCalcScore().addActivityParams( workActivity );
 
-		// printPlanCalcScoreSettings();
+		printPlanCalcScoreSettings();
 		log.info("...done!");
 	}
 	
@@ -886,7 +894,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		qsimCG.setStuckTime(10.);
 		qsimCG.setEndTime(30.*3600.); // 30h
 		
-		// printQSimConfigGroupSettings();
+		printQSimConfigGroupSettings();
 		log.info("...done!");
 	}
 	
@@ -936,16 +944,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 				log.info("Following modes are found: " + changelegMode.getValue("modes"));
 		}
 		
-		// tnicolai old version
-		// StrategyConfigGroup.StrategySettings changeLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
-		// changeLegMode.setModuleName(moduleName);		// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
-		// changeLegMode.setProbability( module4Probability );
-		// changeLegMode.setDisableAfter(disableStrategyAfterIteration);
-		// scenario.getConfig().strategy().addStrategySettings(changeLegMode);‚
-		// this sets some additional modes. by default car and pt is available
-		// scenario.getConfig().setParam("changeLegMode", "modes", TransportMode.car +","+ TransportMode.pt +"," + TransportMode.bike + "," + TransportMode.walk);
-		
-		// printStrategyConfigGroupSettings();
+		printStrategyConfigGroupSettings();
 		log.info("...done!");
 	}
 
@@ -979,7 +978,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		config.plansCalcRoute().setBikeSpeed( defaultBicycleSpeed );
 		config.plansCalcRoute().setPtSpeed( defaultPtSpeed );
 
-		// printPlanCalcRouteGroupSettings();
+		printPlanCalcRouteGroupSettings();
 		log.info("...done!");
 	}
 	
@@ -1075,7 +1074,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing GlobalConfigGroupSettings
 	 */
 	private void printGlobalConfigGroupSettings() {
 		
@@ -1086,7 +1085,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing UrbanSimParameterSettings
 	 */
 	private void printUrbanSimParameterSettings() {
 		
@@ -1112,7 +1111,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing MATSim4UrbanSimControlerSettings
 	 */
 	private void printMATSim4UrbanSimControlerSettings() {
 		
@@ -1139,7 +1138,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing AccessibilityParameterSettings
 	 */
 	private void printAccessibilityParameterSettings() {
 		
@@ -1194,7 +1193,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing NetworkConfigGroupSettings
 	 */
 	private void printNetworkConfigGroupSettings() {
 		
@@ -1205,7 +1204,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing PlansConfigGroupSettings
 	 */
 	private void printPlansConfigGroupSettings() {
 		
@@ -1216,7 +1215,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing StrategyConfigGroupSettings
 	 */
 	private void printStrategyConfigGroupSettings() {
 		
@@ -1232,7 +1231,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing ControlerConfigGroupSetting
 	 */
 	private void printControlerConfigGroupSetting() {
 		
@@ -1246,7 +1245,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing PlanCalcScoreSettings
 	 */
 	private void printPlanCalcScoreSettings() {
 		
@@ -1261,7 +1260,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing QSimConfigGroupSettings
 	 */
 	private void printQSimConfigGroupSettings() {
 		
@@ -1278,7 +1277,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	/**
-	 * 
+	 * printing PlanCalcRouteGroupSettings
 	 */
 	private void printPlanCalcRouteGroupSettings() {
 		log.info("PlanCalcRouteGroup settings:");							 
