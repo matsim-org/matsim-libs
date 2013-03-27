@@ -141,9 +141,13 @@ public class CreateTestMATSimConfig {
 	public Double betaWalkLnTravelCost					= 0.;
 	
 	/**
-	 * This entry point is configured for ConfigLoadTest, create a new entry for another test
-	 * @param startMode
-	 * @param path
+	 * constructor
+	 * 
+	 * this is makes parameter settings for ConfigLoadTest, 
+	 * create another constructor for another test
+	 * 
+	 * @param startMode distinguishes between cold, warm and hot start
+	 * @param path gives the path, were the generated config (and other files) should be stored
 	 */
 	public CreateTestMATSimConfig(final int startMode, String path){
 		this.startMode 			= startMode;
@@ -161,10 +165,14 @@ public class CreateTestMATSimConfig {
 	}
 	
 	/**
-	 * This entry point is configured for ConfigLoadTest, create a new entry for another test
-	 * @param startMode
-	 * @param path
-	 * @param externalConfig
+	 * constructor
+	 * 
+	 * this is makes parameter settings for ConfigLoadTest, 
+	 * create another constructor for another test#
+	 * 
+	 * @param startMode distinguishes between cold, warm and hot start
+	 * @param path gives the path, were the generated config (and other files) should be stored
+	 * @param externalConfig gives the path, were the external MATSim config is stored
 	 */
 	public CreateTestMATSimConfig(final int startMode, String path, String externalConfig){
 		this.startMode = startMode;
@@ -181,11 +189,14 @@ public class CreateTestMATSimConfig {
 		this.matsimConfigInputFile = externalConfig;
 	}
 
+	/**
+	 * generates the external MATSim config file with the specified parameter settings
+	 */
 	public String generate(){
 		
 		ObjectFactory of = new ObjectFactory();	
 		
-		// create xml hierarchy
+		// create MATSim4UrbanSim xml hierarchy
 		
 		// Config Type
 		FileType matsim_config = of.createFileType();
@@ -193,12 +204,12 @@ public class CreateTestMATSimConfig {
 		FileType network = of.createFileType();
 		network.setInputFile( this.networkInputFile );
 		InputPlansFileType inputPlansFileType = of.createInputPlansFileType();
-		if(this.startMode == this.COLD_START)
+		if(this.startMode == CreateTestMATSimConfig.COLD_START)
 			inputPlansFileType.setInputFile( "" );
-		else if(this.startMode == this.WARRM_START)
+		else if(this.startMode == CreateTestMATSimConfig.WARRM_START)
 			inputPlansFileType.setInputFile( this.inputPlansFile );
 		InputPlansFileType hotStratPlansFile = of.createInputPlansFileType();
-		if(this.startMode == this.HOT_START)
+		if(this.startMode == CreateTestMATSimConfig.HOT_START)
 			hotStratPlansFile.setInputFile( this.hotstartPlansFile );
 		else
 			hotStratPlansFile.setInputFile( "" );
@@ -299,7 +310,9 @@ public class CreateTestMATSimConfig {
 	}
 
 	/**
-	 * @param matsimConfigType
+	 * writes the MATSim4UrbanSim confing at the specified place using JAXB
+	 * 
+	 * @param matsimConfigType config in MATSim4UrbanSim format 
 	 * @throws UncheckedIOException
 	 */
 	String writeConfigFile(MatsimConfigType matsimConfigType) throws UncheckedIOException {
@@ -345,6 +358,10 @@ public class CreateTestMATSimConfig {
 		return this.startMode;
 	}
 	
+	/**
+	 * for quick test
+	 * @param args
+	 */
 	public static void main(String args[]){
 		
 		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");

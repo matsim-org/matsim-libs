@@ -89,6 +89,9 @@ import org.matsim.contrib.matsim4opus.utils.io.Paths;
  * changes jan'13
  * - added attributes for pt stop, travel times and distances input files 
  *
+ * changes march'13
+ * - now, the external config overwrites all parameter settings that overlap with the settings 
+ *   made in the MATSim4UrbanSim config (see also test cases in "ConfigLoadingTest")
  */
 public class MATSim4UrbanSimConfigurationConverterV4 {
 	

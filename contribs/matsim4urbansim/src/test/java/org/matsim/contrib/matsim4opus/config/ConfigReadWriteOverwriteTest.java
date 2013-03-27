@@ -33,6 +33,7 @@ import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -45,9 +46,9 @@ import org.matsim.testcases.MatsimTestCase;
  * @author thomas
  *
  */
-public class ConfigLoadingTest extends MatsimTestCase{
+public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 	
-	private static final Logger log = Logger.getLogger(ConfigLoadingTest.class);
+	private static final Logger log = Logger.getLogger(ConfigReadWriteOverwriteTest.class);
 	
 	/**
 	 * This test makes sure that the MATSim4UrbanSim config file will be correctly written, 
@@ -87,7 +88,11 @@ public class ConfigLoadingTest extends MatsimTestCase{
 	
 	/**
 	 * This test makes sure that settings made in an external config
-	 * file will always overwrite MATSim4UrbanSim settings
+	 * file will always overwrite MATSim4UrbanSim settings. 
+	 * 
+	 * In this test, some parameters settings in the external config are
+	 * overlapping with settings made in the MATSim4UrbanSim config. To detect
+	 * this, different parameter settings are used in the external config.
 	 */
 	@Test
 	public void testExternalMATSimConfig(){
@@ -100,12 +105,17 @@ public class ConfigLoadingTest extends MatsimTestCase{
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
+			// this creates an external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
 			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestExternalMATSimConfig.COLD_START, path);
 			String externalConfigLocation = testExternalConfig.generate();
 			
+			// this creates a MATSim4UrbanSim configuration
 			CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(CreateTestMATSimConfig.COLD_START, path, externalConfigLocation);
 			String configLocation = testConfig.generate();
 			
+			// This converts the MATSim4UrbanSim configuration into MATSim format, 
+			// i.e. puts the settings into the MATSim config groups or adds new MATSim modules
+			// An important task is that settings from the external config file are overwriting the settings from MATSim4UrbanSim
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
 			if( !(connector = new MATSim4UrbanSimConfigurationConverterV4( configLocation )).init() ){
 				log.error("An error occured while initializing MATSim scenario ...");
@@ -115,7 +125,7 @@ public class ConfigLoadingTest extends MatsimTestCase{
 			log.info("Getting config settings in matsim format");
 			Config config = connector.getConfig();
 
-			// check all settings
+			// checking if overlapping parameter settings are overwritten by the external config
 			checkCoreModulesAndExternalConfigSettings(testExternalConfig, testConfig, config);
 			
 		} catch(Exception e){
@@ -127,20 +137,21 @@ public class ConfigLoadingTest extends MatsimTestCase{
 	}
 
 	/**
-	 * @param testExternalConfig
-	 * @param testConfig
-	 * @param config
+	 * This tests if overlapping parameter settings are overwritten by the external config.
+	 * Settings that are overlapping in the MATSim4UrbanSimConfig and the external config 
+	 * should be overwritten by parameter settings from the external config.
+	 * 
+	 * @param testExternalConfig contains all parameter settings from the external config 
+	 * @param testConfig contains all parameter from the MATSim4UrbanSim config
+	 * @param config is the merged config in standard MATSim format.
 	 */
 	void checkCoreModulesAndExternalConfigSettings(
 			CreateTestExternalMATSimConfig testExternalConfig,
 			CreateTestMATSimConfig testConfig, Config config) {
 		
-		MATSim4UrbanSimControlerConfigModuleV3 matsim4UrbanSimControlerModule = testExternalConfig.getMATSim4UrbaSimControlerConfig(config);
-		Assert.assertTrue( matsim4UrbanSimControlerModule.getTimeOfDay() == testExternalConfig.timeOfDay );
-		// Assert.assertTrue( Paths.checkPathEnding( matsim4UrbanSimControlerModule.getShapeFileCellBasedAccessibility() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.urbanSimZoneShapefileLocationDistribution )));
-		// Assert.assertTrue( Paths.checkPathEnding( matsim4UrbanSimControlerModule.getPtStopsInputFile()  ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.ptStops ) ));
-		
-		
+		///////////////////////////////////////////////////
+		// Testing overlapping parameter settings (these settings must be equal to the settings in "testExternalConfig" 
+		///////////////////////////////////////////////////
 		ControlerConfigGroup contolerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
 		Assert.assertTrue(contolerCG.getFirstIteration() == testExternalConfig.firstIteration.intValue());
 		Assert.assertTrue(contolerCG.getLastIteration() == testExternalConfig.lastIteration.intValue());
@@ -149,7 +160,7 @@ public class ConfigLoadingTest extends MatsimTestCase{
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
 		Assert.assertTrue( Paths.checkPathEnding( networkCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.networkInputFile ) ));
 		
-		if(testConfig.getStartMode() != testConfig.COLD_START){
+		if(testConfig.getStartMode() != testExternalConfig.COLD_START){
 			PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
 			Assert.assertTrue( Paths.checkPathEnding( plansCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.inputPlansFile ) ));
 		}
@@ -175,6 +186,67 @@ public class ConfigLoadingTest extends MatsimTestCase{
 		Assert.assertTrue(workActivity.getType().equalsIgnoreCase( testExternalConfig.activityType_1 ));
 		// Assert.assertTrue(workActivity.getOpeningTime() == testExternalConfig.workActivityOpeningTime.intValue());
 		// Assert.assertTrue(workActivity.getLatestStartTime() == testExternalConfig.workActivityLatestStartTime.intValue());
+		
+		
+		///////////////////////////////////////////////////
+		// Here, additional parameters from the external config, that are not overlapping, are tested!
+		///////////////////////////////////////////////////
+		
+		Module matsim4UrbanSimModule = config.getModule(MATSim4UrbanSimConfigurationConverterV4.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+		
+		///////////////////////////////////////////////////
+		// MATSim4UrbanSim Controler Config Module Settings
+		///////////////////////////////////////////////////
+		MATSim4UrbanSimControlerConfigModuleV3 matsim4UrbanSimControlerModule = testExternalConfig.getMATSim4UrbaSimControlerConfig(config);
+		// time of day
+		Assert.assertTrue( matsim4UrbanSimControlerModule.getTimeOfDay() == testExternalConfig.timeOfDay );
+		// use pt stops flag
+		boolean usePtStopsFlagFromConfig = matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigurationConverterV4.PT_STOPS_SWITCH ) != null && matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigurationConverterV4.PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE");
+		Assert.assertTrue( usePtStopsFlagFromConfig == testExternalConfig.usePtStops.equalsIgnoreCase("TRUE") );
+		// pt stops
+		if(testExternalConfig.usePtStops.equalsIgnoreCase("TRUE"))
+			Assert.assertTrue( Paths.checkPathEnding( matsim4UrbanSimControlerModule.getPtStopsInputFile()  ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.ptStops ) ));
+		// use pt travel times and distances
+		boolean usePtTimesAndDiastances = matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null && matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase("TRUE");
+		Assert.assertTrue( usePtTimesAndDiastances == testExternalConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") );
+		
+		if( testExternalConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") ){
+			// pt travel times
+			Assert.assertTrue( Paths.checkPathEnding( matsim4UrbanSimControlerModule.getPtTravelTimesInputFile() ).equalsIgnoreCase( testExternalConfig.ptTravelTimes ));
+			// pt travel distances
+			Assert.assertTrue(Paths.checkPathEnding( matsim4UrbanSimControlerModule.getPtTravelDistancesInputFile() ).equalsIgnoreCase( testExternalConfig.ptTravelDistances ));
+		
+		}
+		
+		///////////////////////////////////////////////////
+		// UrbanSim Parameter Config Module Settings
+		///////////////////////////////////////////////////
+		UrbanSimParameterConfigModuleV3 urbansimParameterConfigModule = testExternalConfig.getUrbanSimParameterConfig(config);
+		// shape file for population distribution (zone)
+		Assert.assertTrue( Paths.checkPathEnding( urbansimParameterConfigModule.getUrbanSimZoneShapefileLocationDistribution() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.urbanSimZoneShapefileLocationDistribution )));
+		
+		// Accessibility Parameter Config Module settings
+		AccessibilityParameterConfigModule accessibilityParameterModule = testExternalConfig.getAccessibilityParameterConfig(config);
+		// bike parameter
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelTime() 	== testExternalConfig.betaBikeTravelTime );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelTimePower2()== testExternalConfig.betaBikeTravelTimePower2 );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelTime()  	== testExternalConfig.betaBikeLnTravelTime );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelDistance() == testExternalConfig.betaBikeTravelDistance );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelDistancePower2() == testExternalConfig.betaBikeTravelDistancePower2 );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelDistance()== testExternalConfig.betaBikeLnTravelDistance );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelCost()  	== testExternalConfig.betaBikeTravelCost );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelCostPower2() == testExternalConfig.betaBikeTravelCostPower2 );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelCost()  	== testExternalConfig.betaBikeLnTravelCost );
+		// pt parameter
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelTime() 		== testExternalConfig.betaPtTravelTime );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelTimePower2() == testExternalConfig.betaPtTravelTimePower2 );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelTime()  	== testExternalConfig.betaPtLnTravelTime );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelDistance()  	== testExternalConfig.betaPtTravelDistance );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelDistancePower2() == testExternalConfig.betaPtTravelDistancePower2 );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelDistance() == testExternalConfig.betaPtLnTravelDistance );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelCost()  		== testExternalConfig.betaPtTravelCost );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelCostPower2() == testExternalConfig.betaPtTravelCostPower2 );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelCost()  	== testExternalConfig.betaPtLnTravelCost );
 	}
 
 	/**

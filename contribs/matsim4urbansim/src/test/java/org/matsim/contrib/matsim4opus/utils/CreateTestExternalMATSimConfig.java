@@ -22,29 +22,12 @@
  */
 package org.matsim.contrib.matsim4opus.utils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
-
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.MatsimConfigType;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ObjectFactory;
-import org.matsim.contrib.matsim4opus.utils.io.LoadFile;
-import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -54,10 +37,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.replanning.modules.ChangeLegMode;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.xml.sax.SAXException;
 
 /**
  * @author thomas
@@ -133,7 +113,12 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 	public final String teleportedModeSpeedPtParamName= "teleportedModeSpeed_pt";
 	public final double teleportedModeSpeedPtValue	= 7.0;
 	
-	
+	/**
+	 * constructor
+	 * 
+	 * @param startMode distinguishes between cold, warm and hot start
+	 * @param path gives the path, were the generated config (and other files) should be stored
+	 */
 	public CreateTestExternalMATSimConfig(final int startMode, String path){
 		super(startMode, path);
 		
@@ -148,39 +133,42 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		this.inputPlansFile		= path + DUMMY_FILE_2;
 	}
 
+	/**
+	 * generates the external MATSim config file with the specified parameter settings
+	 */
 	@Override
 	public String generate(){
 		
-		MATSim4UrbanSimConfigurationConverterV4 m4uConverter = new MATSim4UrbanSimConfigurationConverterV4( new MatsimConfigType());
+		// creating an empty MASim config
 		Config config = new Config();
 		
 		// matsim4urbansimParameter module
-		Module matsim4UrbanSimModule = config.createModule( m4uConverter.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		matsim4UrbanSimModule.addParam(m4uConverter.TIME_OF_DAY, this.timeOfDay + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
-		matsim4UrbanSimModule.addParam(m4uConverter.PT_STOPS, this.ptStops);
-		matsim4UrbanSimModule.addParam(m4uConverter.PT_STOPS_SWITCH, this.usePtStops);
-		matsim4UrbanSimModule.addParam(m4uConverter.PT_TRAVEL_TIMES, this.ptTravelTimes);
-		matsim4UrbanSimModule.addParam(m4uConverter.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
-		matsim4UrbanSimModule.addParam(m4uConverter.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_BIKE_TRAVEL_TIME, this.betaBikeTravelTime + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_BIKE_TRAVEL_TIME_POWER2, this.betaBikeTravelTimePower2 + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_BIKE_LN_TRAVEL_TIME, this.betaBikeLnTravelTime + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_BIKE_TRAVEL_DISTANCE, this.betaBikeTravelDistance + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_BIKE_TRAVEL_DISTANCE_POWER2, this.betaBikeTravelDistancePower2 + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_BIKE_LN_TRAVEL_DISTANCE, this.betaBikeLnTravelDistance + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_BIKE_TRAVEL_COST, this.betaBikeTravelCost + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_BIKE_TRAVEL_COST_POWER2, this.betaBikeTravelCostPower2+ "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_BIKE_LN_TRAVEL_COST, this.betaBikeLnTravelCost + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_PT_TRAVEL_TIME, this.betaPtTravelTime + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_PT_TRAVEL_TIME_POWER2, this.betaPtTravelTimePower2 + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_PT_LN_TRAVEL_TIME, this.betaPtLnTravelTime + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_PT_TRAVEL_DISTANCE, this.betaPtTravelDistance + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_PT_TRAVEL_DISTANCE_POWER2, this.betaPtTravelDistancePower2 + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_PT_LN_TRAVEL_DISTANCE, this.betaPtLnTravelDistance + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_PT_TRAVEL_COST, this.betaPtTravelCost + "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_PT_TRAVEL_COST_POWER2, this.betaPtTravelCostPower2+ "");
-		matsim4UrbanSimModule.addParam(m4uConverter.BETA_PT_LN_TRAVEL_COST, this.betaPtLnTravelCost + "");
+		Module matsim4UrbanSimModule = config.createModule( MATSim4UrbanSimConfigurationConverterV4.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.TIME_OF_DAY, this.timeOfDay + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_STOPS, this.ptStops);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_STOPS_SWITCH, this.usePtStops);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES, this.ptTravelTimes);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME, this.betaBikeTravelTime + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME_POWER2, this.betaBikeTravelTimePower2 + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_TIME, this.betaBikeLnTravelTime + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_DISTANCE, this.betaBikeTravelDistance + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_DISTANCE_POWER2, this.betaBikeTravelDistancePower2 + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_DISTANCE, this.betaBikeLnTravelDistance + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_COST, this.betaBikeTravelCost + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_COST_POWER2, this.betaBikeTravelCostPower2+ "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_COST, this.betaBikeLnTravelCost + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_TIME, this.betaPtTravelTime + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_TIME_POWER2, this.betaPtTravelTimePower2 + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_TIME, this.betaPtLnTravelTime + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_DISTANCE, this.betaPtTravelDistance + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_DISTANCE_POWER2, this.betaPtTravelDistancePower2 + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_DISTANCE, this.betaPtLnTravelDistance + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_COST, this.betaPtTravelCost + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_COST_POWER2, this.betaPtTravelCostPower2+ "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_COST, this.betaPtLnTravelCost + "");
 		
 		// changeLegMode module
 		Module changeLegModeModule = config.createModule(changeLegModeModuleName);
@@ -234,7 +222,10 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 	}
 	
 	/**
-	 * @param matsimConfigType
+	 * writes the external MATSim confing at the specified place
+	 * 
+	 * @param config in MATSim format
+	 * @return location of the written external config file
 	 * @throws UncheckedIOException
 	 */
 	String writeConfigFile(Config config) throws UncheckedIOException {
