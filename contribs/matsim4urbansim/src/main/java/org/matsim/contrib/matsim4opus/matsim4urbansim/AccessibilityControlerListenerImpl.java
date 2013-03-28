@@ -145,7 +145,7 @@ public class AccessibilityControlerListenerImpl{
 	 * setting parameter for accessibility calculation
 	 * @param scenario
 	 */
-	protected void initAccessibilityParameter(ScenarioImpl scenario){
+	protected final void initAccessibilityParameter(ScenarioImpl scenario){
 		
 		AccessibilityParameterConfigModule moduleAPCM = ConfigurationModule.getAccessibilityParameterConfigModule(scenario);
 		
@@ -202,7 +202,7 @@ public class AccessibilityControlerListenerImpl{
 	/**
 	 * displays settings
 	 */
-	protected void printParameterSettings(){
+	protected final void printParameterSettings(){
 		log.info("Computing and writing grid based accessibility measures with following settings:" );
 		log.info("Returning raw sum (not logsum): " + useRawSum);
 		log.info("Logit Scale Parameter: " + logitScaleParameter);
@@ -253,7 +253,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param network the road network
 	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j 
 	 */
-	protected AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final NetworkImpl network, final boolean isParcelMode){
+	protected final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final NetworkImpl network, final boolean isParcelMode){
 		
 		// readJobs creates a hash map of job with key = job id
 		// this hash map includes jobs according to job sample size
@@ -336,7 +336,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param accCsvWriter
 	 * @param measuringPointIterator
 	 */
-	protected void accessibilityComputation(TravelTime ttc,
+	protected final void accessibilityComputation(TravelTime ttc,
 											LeastCostPathTree lcptFreeSpeedCarTravelTime,
 											LeastCostPathTree lcptCongestedCarTravelTime,
 											LeastCostPathTree lcptTravelDistance, 
@@ -560,7 +560,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param walkTravelTime_h walk travel times in h on the network to get to destination node j
 	 * @param congestedCarTravelTime_h congested car travel times in h on the network to get to destination node j
 	 */
-	protected void sumDisutilityOfTravel(GeneralizedCostSum gcs,
+	protected final void sumDisutilityOfTravel(GeneralizedCostSum gcs,
 									   AggregateObject2NearestNode aggregatedOpportunities,
 									   double distanceMeasuringPoint2Road_meter,
 									   double distanceRoad2Node_meter, 
@@ -693,7 +693,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param walkOrigin2NetworkX travel costs like travel times or distances for traveling on foot
 	 * @return disutility of traveling
 	 */
-	protected double getAsUtil(final double betaModeX, final double ModeTravelCostX, final double betaWalkX, final double walkOrigin2NetworkX){
+	protected final double getAsUtil(final double betaModeX, final double ModeTravelCostX, final double betaWalkX, final double walkOrigin2NetworkX){
 		if(betaModeX != 0.)
 			return (betaModeX * ModeTravelCostX + betaWalkX * walkOrigin2NetworkX);
 		return 0.;
