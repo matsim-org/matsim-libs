@@ -129,15 +129,15 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		// checks if args parameter contains a valid path
 		Paths.isValidPath(matsimConfiFile);
 		
-		if( !(connector = new MATSim4UrbanSimConfigurationConverterV4( matsimConfiFile )).init() ){
+		connector = new MATSim4UrbanSimConfigurationConverterV4( matsimConfiFile ) ;
+		if( !(connector.init()) ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
 		}
 		
-		Config config = connector.getConfig();
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario( config );
+		scenario = (ScenarioImpl) ScenarioUtils.createScenario( connector.getConfig() );
 		ScenarioUtils.loadScenario(scenario);
-		setControlerSettings(scenario, args);
+		setControlerSettings(args);
 		// init Benchmark as default
 		benchmark = new Benchmark();
 	}
@@ -420,10 +420,9 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	
 	/**
 	 * 
-	 * @param scenario
 	 * @param args
 	 */
-	void setControlerSettings(ScenarioImpl scenario, String[] args) {
+	void setControlerSettings(String[] args) {
 
 		AccessibilityParameterConfigModule moduleAccessibility = getAccessibilityParameterConfig();
 		MATSim4UrbanSimControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbanSimControlerConfig();

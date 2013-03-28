@@ -575,9 +575,11 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaCarTTPower	= 0.;
 			betaCarLnTT		= 0.;
 			betaCarTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar(); 	// this is [utils/money * money/meter] = [utils/meter]
+			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
 			betaCarTDPower	= 0.;																														// useful setting for MonetaryDistanceCostRateCar: 10cent/km (only fuel) or 
 			betaCarLnTD		= 0.;																														// 80cent/km (including taxes, insurance ...)
 			betaCarTC		= 0.;//planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money], (no computation of money in MATSim implemented yet)
+			log.error("marginal utility of money is NOT taken from matsim but set to zero") ;
 			betaCarTCPower	= 0.;
 			betaCarLnTC		= 0.;
 		}
