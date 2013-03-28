@@ -51,7 +51,11 @@ public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeRea
 	/**
 	 * Creates a new reader for MATSim configuration files.
 	 *
-	 * @param config The Config-object to store the configuration settings in.
+	 * @param config The Config-object to store the configuration settings in. 
+	 * <p/>
+	 * As far as I can tell, pre-existing settings in config are preserved
+	 * except if they are explicitly overwritten by entries in the config file.  The MATSim4UrbanSim initialization sequence depends on this
+	 * behavior.  kn, mar'13 
 	 */
 	public MatsimConfigReader(final Config config) {
 		this.config = config;
