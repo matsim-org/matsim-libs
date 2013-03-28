@@ -9,11 +9,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.LeastCostPathTree;
@@ -111,6 +113,40 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		LeastCostPathTree lcptCongestedCarTravelTime = new LeastCostPathTree( ttc, new TravelTimeCostCalculator(ttc) );
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
+
+		// some ideas about how to use a more correct approach:
+		LeastCostPathTree lcptCar ;
+		
+		boolean usingMatsimParams = true ;
+		if ( usingMatsimParams ) {
+			lcptCar = new LeastCostPathTree( ttc, controler.createTravelCostCalculator() ) ; 
+			System.exit(-1) ;
+		} else {
+			TravelDisutilityFactory factory = controler.getTravelDisutilityFactory();
+			
+			// faking a scoring group with the urbansim params:
+			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup() ;
+
+			// marginal utility of money (should usually be positive):
+			final double margUtlOfMoney = this.betaCarTC;
+			cnScoringGroup.setMarginalUtilityOfMoney( margUtlOfMoney ) ; // (!!)
+			log.error("is the sign correct??") ; System.exit(-1) ;
+
+			// marginal utility (should usually be negative):
+			cnScoringGroup.setTraveling_utils_hr( this.betaCarTT ) ; 
+			log.error("units of betaCarTT = ??") ; System.exit(-1) ;
+			log.error("need to add utl of perf?  probably not since this is matsim-indep (may be confusing??)") ;
+			
+			// monetaryDistanceCostRateCar (should usually be positive??? negative???):
+			double monetaryDistanceCostRateCar /* money/meter */ = this.betaCarTD /* utl/meter*/ / margUtlOfMoney /* utl/money */ ;
+			log.error("is the sign correct??") ; System.exit(-1) ;
+			cnScoringGroup.setMonetaryDistanceCostRateCar(monetaryDistanceCostRateCar) ;
+			
+			cnScoringGroup.setConstantCar(0.) ; // no information; not a problem as long as we compute mode-based accessibilities 
+			// separately
+			
+			lcptCar = new LeastCostPathTree( ttc, factory.createTravelDisutility(ttc, cnScoringGroup) ) ;
+		}
 		
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
