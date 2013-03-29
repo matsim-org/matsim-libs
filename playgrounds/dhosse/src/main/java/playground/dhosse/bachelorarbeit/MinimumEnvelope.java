@@ -3,6 +3,7 @@ package playground.dhosse.bachelorarbeit;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
@@ -22,6 +23,8 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class MinimumEnvelope {
 	
+	private Logger log = Logger.getLogger(this.getClass());
+	
 	private Network net;
 	
 	private SimpleFeatureBuilder builder;
@@ -40,6 +43,8 @@ public class MinimumEnvelope {
 	}
 	
 	private Geometry createMinimumEnvelope(){
+		
+		log.info("creating minimum envelope for given network...");
 		
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
 		bbox.setDefaultBoundaryBox(this.net);
@@ -72,6 +77,8 @@ public class MinimumEnvelope {
 			}
 		}
 		
+		log.info("writing minimum envelope into ESRI shapefile...");
+		
 		Coordinate[] coords = new Coordinate[outerNodes.size()+1];
 		int i = 0;
 		
@@ -89,12 +96,14 @@ public class MinimumEnvelope {
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		typeBuilder.setName("shape");
 		typeBuilder.add("envelope",LinearRing.class);
+		typeBuilder.add("area",Double.class);
 		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 		
 		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
 		SimpleFeature feature = this.builder.buildFeature(null, new Object[]{
-				poly
+				poly,
+				poly.getArea()
 		});
 		
 		features.add(feature);
