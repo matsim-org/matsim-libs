@@ -83,7 +83,7 @@ public class NetworkInspector {//TODO pfade ändern
 			e.printStackTrace();
 		}
 		
-		this.envelope = MinimumEnvelope.main(NetworkInspector.scenario.getNetwork()).buffer(-50);
+		this.envelope = MinimumEnvelope.run(NetworkInspector.scenario.getNetwork()).buffer(-50);
 		
 	}
 	

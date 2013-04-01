@@ -35,7 +35,7 @@ public class MinimumEnvelope {
 		
 	}
 	
-	public static Geometry main(Network net){
+	public static Geometry run(Network net){
 		
 		MinimumEnvelope me = new MinimumEnvelope(net);
 		return(me.createMinimumEnvelope());
@@ -45,6 +45,10 @@ public class MinimumEnvelope {
 	private Geometry createMinimumEnvelope(){
 		
 		log.info("creating minimum envelope for given network...");
+		
+		long start,end;
+		
+		start=System.currentTimeMillis();
 		
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
 		bbox.setDefaultBoundaryBox(this.net);
@@ -76,6 +80,9 @@ public class MinimumEnvelope {
 				outerNodes.add(nodeId);
 			}
 		}
+		end=System.currentTimeMillis();
+		
+		System.out.println(end-start);		
 		
 		log.info("writing minimum envelope into ESRI shapefile...");
 		

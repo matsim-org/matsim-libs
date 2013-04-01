@@ -7,11 +7,9 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl.GeneralizedCostSum;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import org.matsim.contrib.matsim4opus.utils.io.writer.SpatialGridTableWriter;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
@@ -33,8 +31,6 @@ public class AccessibilityCalcV2 {
 	protected AggregateObject2NearestNode[] aggregatedOpportunities;
 	
 	protected double walkSpeedMeterPerHour = 3000.;
-	protected double logitScaleParameter = 1.;
-	protected double inverseOfLogitScaleParameter = 1/this.logitScaleParameter;
 	
 	private String ouputFolder = null;
 	
@@ -53,13 +49,9 @@ public class AccessibilityCalcV2 {
 		
 		ProgressBar bar = new ProgressBar( this.measuringPoints.getZones().size() );
 		
-		GeneralizedCostSum gcs = new GeneralizedCostSum();
-		
 		for(Zone<Id> measurePoint : this.measuringPoints.getZones()){
 			
 			bar.update();
-			
-			gcs.reset();
 			
 			Coord coord = MGC.point2Coord(measurePoint.getGeometry().getCentroid());
 			Point p = measurePoint.getGeometry().getCentroid();
@@ -69,13 +61,7 @@ public class AccessibilityCalcV2 {
 			double distance_meter = NetworkUtil.getEuclidianDistance(coord, nearestLink.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 			
-			double Vjk = Math.exp(this.logitScaleParameter * walkTravelTime_h);
-			
-			gcs.addFreeSpeedCost(Vjk);
-			
-			double freeSpeedAccessibility = - this.inverseOfLogitScaleParameter * Math.log(gcs.getFreeSpeedSum());
-			
-			this.freeSpeedGrid.setValue(freeSpeedAccessibility, p);
+			this.freeSpeedGrid.setValue(walkTravelTime_h, p);
 			
 		}
 		
