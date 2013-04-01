@@ -50,27 +50,30 @@ public class SvdValuesFromUtlTxtFile {
 			inputUtlCorrectionsFile = args[1];
 		}else{
 			configFile = "../../ptManuel/calibration/my_config2.xml";
-			inputUtlCorrectionsFile = "../../input/choiceM44/10plans/10corrections.txt";
+			//inputUtlCorrectionsFile = "../../input/choiceM44/10plans/10corrections.txt";
 		}
 
-		//read utilities corrections from txt
-		UtilCorrectonReader2 reader= new UtilCorrectonReader2();
-		try {
-			reader.readFile(inputUtlCorrectionsFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		//read utilities corrections from txt  //commented out if the plans already contain the score as utility
+		//UtilCorrectonReader2 reader= new UtilCorrectonReader2();
+		//try {
+		//	reader.readFile(inputUtlCorrectionsFile);
+		//} catch (IOException e) {
+		//	e.printStackTrace();
+		//}
 		
 		//load config
 		DataLoader loader = new DataLoader(); 
 		final Config config = loader.readConfig(configFile);
 		String popFile = config.plans().getInputFile();
+		String netFile = config.network().getInputFile();
 		
 		//Set utCorr to plans  
-		SetUtl2pop setUtl2pop = new SetUtl2pop();
-		String netFile = config.network().getInputFile();
-		String popWutlCorr = setUtl2pop.setUtCorrections(popFile, reader.getCorrecMap() , netFile);
+		//SetUtl2pop setUtl2pop = new SetUtl2pop();
+		//String popWutlCorr = setUtl2pop.setUtCorrections(popFile, reader.getCorrecMap() , netFile);
 
+		//if the plans already have the correction as score
+		String popWutlCorr = popFile; 
+		
 		//svd calculation of travel parameters and write solutions file 
 		ScenarioImpl scnWOpop = (ScenarioImpl) loader.createScenario();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scnWOpop);

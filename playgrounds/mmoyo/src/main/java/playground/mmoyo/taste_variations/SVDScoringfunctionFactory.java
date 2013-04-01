@@ -78,10 +78,7 @@ class SVDscoringFunction implements ScoringFunction {
 	public void addMoney(final double amount) {}
 
 	@Override
-	public void finish() {}
-
-	@Override
-	public double getScore() {
+	public void finish() {
 		double tmpScore =0.0;
 		String lastActType=null;
 		String lastLegMode = null;
@@ -120,11 +117,16 @@ class SVDscoringFunction implements ScoringFunction {
 				lastActType=act.getType();
 			}
 		}
-		
-		return tmpScore;
+		this.score = tmpScore;
+	}
+
+	@Override
+	public double getScore() {
+		return this.score;
 	}
 
 	public void reset() {
+		this.score = 0.0;
 	}
 
 	@Override

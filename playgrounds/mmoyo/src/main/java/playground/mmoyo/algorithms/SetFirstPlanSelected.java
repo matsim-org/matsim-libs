@@ -9,13 +9,13 @@ import playground.mmoyo.utils.DataLoader;
 
 
 public class SetFirstPlanSelected extends AbstractPersonAlgorithm {
-	PlanScoreNullifier planScoreNullifier = new PlanScoreNullifier();
+	//PlanScoreNullifier planScoreNullifier = new PlanScoreNullifier();
 	
 	@Override
 	public void run(Person person) {
 		PersonImpl p2 = (PersonImpl) person;
 		p2.setSelectedPlan(p2.getPlans().get(0));
-		planScoreNullifier.run(p2);	
+		//planScoreNullifier.run(p2);	
 	}
 	
 	public static void main(String[] args) {

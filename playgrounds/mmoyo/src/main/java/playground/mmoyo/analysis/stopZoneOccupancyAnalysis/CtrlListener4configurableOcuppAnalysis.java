@@ -47,7 +47,7 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		configurableOccupAnalyzer.reset(event.getIteration());
-		configurableOccupAnalyzer.setStopZoneConversion(stopZoneConversion);
+		//configurableOccupAnalyzer.setStopZoneConversion(stopZoneConversion);
 	}
 
 	@Override

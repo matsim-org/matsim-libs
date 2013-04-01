@@ -19,11 +19,15 @@
 
 package playground.mmoyo.analysis.stopZoneOccupancyAnalysis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.counts.OccupancyAnalyzer;
@@ -32,6 +36,8 @@ import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
 public class KMZPtCountSimComparisonWriter {
 	private static final Logger log = Logger.getLogger(KMZPtCountSimComparisonWriter.class);
 	private Counts occupCounts = new Counts();
+	private final Counts dummyCounts = new Counts();
+	private final List<CountSimComparison> dummyComparison = new ArrayList<CountSimComparison>();
 	private final Controler controler;
 	private Network net;
 	private double scalefactor;
@@ -62,26 +68,36 @@ public class KMZPtCountSimComparisonWriter {
 		
 		//set and use kml writter
 		Config config = controler.getConfig();
-		PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaOccupancy.getComparison(),
-				ccaOccupancy.getComparison(), ccaOccupancy.getComparison(), TransformationFactory.getCoordinateTransformation(config
-						.global().getCoordinateSystem(), TransformationFactory.WGS84), occupCounts, occupCounts,
-						occupCounts);
+		PtCountSimComparisonKMLWriter kmlWriter = 
+			new PtCountSimComparisonKMLWriter(dummyComparison, //no boarding
+																dummyComparison, //no alighting
+																ccaOccupancy.getComparison(), 
+																TransformationFactory.getCoordinateTransformation(config	.global().getCoordinateSystem(), TransformationFactory.WGS84), 
+																dummyCounts,   //no boarding
+																dummyCounts,  //no alighting
+																occupCounts);
 		kmlWriter.setIterationNumber(itNum);
 
 		//write counts comparison
 		String kmlFile;
-//		String ocuppCompTxtFile;
+		String ocuppCompTxtFile;
 		if(controler.getControlerIO()!=null){
 			kmlFile = controler.getControlerIO().getIterationFilename(itNum, kmzFile);
-//			ocuppCompTxtFile = controler.getControlerIO().getIterationFilename(itNum, txtCompFile);
+			ocuppCompTxtFile = controler.getControlerIO().getIterationFilename(itNum, txtCompFile);
 		}else{  //<-it happens when this method is invoked outside a simulation run
 			String outDir = controler.getConfig().controler().getOutputDirectory() + ITERS + itNum + SL + itNum + PNT;
 			kmlFile = outDir + kmzFile;
-//			ocuppCompTxtFile =  outDir + txtCompFile;
+			ocuppCompTxtFile =  outDir + txtCompFile;
+			outDir = null;
 		}
 		kmlWriter.writeFile(kmlFile);
-//		ccaOccupancy.write(ocuppCompTxtFile);
+		ccaOccupancy.write(ocuppCompTxtFile);
 		log.info(kmlFile + strDONE);
+		
+		kmlFile = null;
+		ccaOccupancy= null;
+		kmlWriter = null;
+		
 	}
 	
 }

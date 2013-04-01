@@ -25,13 +25,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 import playground.mmoyo.utils.DataLoader;
 
-public class PersonalizedTasteControler {
+public class SVD_CtrlLauncher {
 
 	public static void main(String[] args) {
 		String configFile;
@@ -53,6 +54,9 @@ public class PersonalizedTasteControler {
 		
 		final Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true);
+		
+		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
 		
 		Map <Id, SVDvalues> svdMap = new SVDValuesAsObjAttrReader(pop.getPersons().keySet()).readFile(svdSolutionFile); 
 		controler.setScoringFunctionFactory(new SVDScoringfunctionFactory(svdMap, net, schedule));

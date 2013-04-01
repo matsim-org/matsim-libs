@@ -56,7 +56,7 @@ import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configur
 
 public class CadytsScoringFunctionAndRndRouterLauncher {
 
-	private static TransitRouterFactory createRandomizedTransitRouterFactory (final TransitSchedule schedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
+	private static TransitRouterFactory createRandomizedTransitRouterFactory (final PreparedTransitSchedule preparedSchedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
 		return 
 		new TransitRouterFactory() {
 			@Override
@@ -65,7 +65,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 					new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
 				//ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
 				//ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
-				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
+				return new TransitRouterImpl(trConfig, preparedSchedule, routerNetwork, ttCalculator, ttCalculator);
 			}
 		};
 	}
@@ -160,14 +160,15 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		final TransitRouterConfig trConfig = new TransitRouterConfig( config );
 		
 		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
-		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (routerSchedule, trConfig, routerNetwork);
+		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(routerSchedule);
+		final TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (preparedSchedule, trConfig, routerNetwork);
 		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
 		
 		//add analyzer for specific bus line and stop Zone conversion
 		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
 		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(true); 
 		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);  
-		
+
 	
 		controler.run();
 	}
