@@ -42,6 +42,18 @@ public abstract class Math {
 		return x;
 	}
 
+	/**
+	 * Fast approximation of the exponential function 
+	 * see http://www.javamex.com/tutorials/math/exp.shtml
+	 * @param x
+	 * @return exp(x)
+	 */
+	public static float exp(float x) {
+		x = 1f + x / 256f;
+		x *= x; x *= x; x *= x; x *= x;
+		x *= x; x *= x; x *= x; x *= x;
+		return x;
+	}
 
 
 
