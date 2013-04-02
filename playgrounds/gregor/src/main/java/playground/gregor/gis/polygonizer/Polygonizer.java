@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class Polygonizer {
 	
 	public static void main(String args[]) {
-		String input = "/Users/laemmel/devel/burgdorf/dxf/station-1_1.shp";
+		String input = "/Users/laemmel/devel/burgdorf2d2/raw_input/merging.shp";
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(input);
 		Geometry res = null;
@@ -42,13 +42,15 @@ public class Polygonizer {
 				res = res.union(geo);
 			}
 		}
-		Geometry res2 = res.buffer(.05);
+		Geometry res2 = res.buffer(.05,1);
 		
 		Geometry e = res.getEnvelope();
 		
 		Geometry e2 = e.difference(res2);
+		GisDebugger.setCRSString("EPSG:21781");
 		GisDebugger.addGeometry(e2);
-		GisDebugger.dump("/Users/laemmel/devel/burgdorf2d2/raw_input/station-1_stage1.shp");
+		
+		GisDebugger.dump("/Users/laemmel/devel/burgdorf2d2/raw_input/merging_p.shp");
 		
 		System.out.println(res);
 		

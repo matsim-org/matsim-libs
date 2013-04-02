@@ -17,12 +17,9 @@
 			<version>0.2</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/jmatio/jamtio.jar</systemPath>
-		</dependency> 
-		<!--<dependency>
-			<groupId>Jama</groupId>
-			<artifactId>Jama</artifactId>
-			<version>1.0.2</version>
-		</dependency> -->
+		</dependency>
+		<!--<dependency> <groupId>Jama</groupId> <artifactId>Jama</artifactId> 
+			<version>1.0.2</version> </dependency> -->
 		<dependency>
 			<groupId>com.vividsolutions</groupId>
 			<artifactId>jts</artifactId>
@@ -38,13 +35,13 @@
 			<artifactId>wfs-v_1_1_0-schema</artifactId>
 			<version>1.0.3</version>
 		</dependency>
-		<dependency><!--  xerces import needed since org.jvnet.ogc imports an older version and 
-				so ``overwrites'' the actual version needed by matsim so please don't remove 
-				this gl(nov. 2012) -->
+		<dependency><!-- xerces import needed since org.jvnet.ogc imports an older 
+				version and so ``overwrites'' the actual version needed by matsim so please 
+				don't remove this gl(nov. 2012) -->
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<version>2.7.1</version>
-		</dependency> 
+		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>evacuation</artifactId>
@@ -70,12 +67,44 @@
 			<version>2.0.b7</version>
 			<systemPath>${basedir}/lib/processing-2.0b7/core.jar</systemPath>
 		</dependency>
-				<dependency>
+		<dependency>
+			<groupId>processing</groupId>
+			<artifactId>pdf</artifactId>
+			<scope>system</scope>
+			<version>2.0.b7</version>
+			<systemPath>${basedir}/lib/processing-2.0b7/pdf.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>processing</groupId>
+			<artifactId>itext</artifactId>
+			<scope>system</scope>
+			<version>2.0.b7</version>
+			<systemPath>${basedir}/lib/processing-2.0b7/itext.jar</systemPath>
+		</dependency>
+
+		<dependency>
 			<groupId>kabeja</groupId>
 			<artifactId>kabeja-0.4</artifactId>
 			<scope>system</scope>
 			<version>0.4</version>
 			<systemPath>${basedir}/lib/kabeja/kabeja-0.4.jar</systemPath>
 		</dependency>
+<!-- 		<dependency>
+			<groupId>org.jogamp.gluegen</groupId>
+			<artifactId>gluegen-rt-main</artifactId>
+			<version>2.0-rc11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.jogl</groupId>
+			<artifactId>jogl-all-main</artifactId>
+			<version>2.0-rc11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.jocl</groupId>
+			<artifactId>jocl-main</artifactId>
+			<scope>system</scope>
+			<version>2.0</version>
+			<systemPath>${basedir}/lib/jogamp-2.0/jogamp-all-platforms/jar/jocl.jar</systemPath>
+		</dependency> -->
 	</dependencies>
 </project>

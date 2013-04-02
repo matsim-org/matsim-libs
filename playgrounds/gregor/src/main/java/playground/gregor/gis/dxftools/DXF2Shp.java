@@ -30,6 +30,7 @@ import org.kabeja.dxf.DXFEntity;
 import org.kabeja.dxf.DXFLayer;
 import org.kabeja.dxf.DXFLine;
 import org.kabeja.dxf.DXFPolyline;
+import org.kabeja.dxf.DXFSolid;
 import org.kabeja.dxf.DXFVertex;
 import org.kabeja.dxf.helpers.Point;
 import org.kabeja.parser.DXFParser;
@@ -43,6 +44,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class DXF2Shp {
 
@@ -91,6 +93,27 @@ public class DXF2Shp {
 						String layerId = dxfl.getLayerName();
 						SimpleFeature ft = lf.createPolyline(koords, new Object[]{layerId,id,dxfl.getColor()}, id);
 						lts.add(ft);						
+					} else if (e instanceof DXFSolid) {
+						DXFSolid dxfs = (DXFSolid) e;
+						String id = dxfs.getID();
+						String layerId = dxfs.getLayerName();
+						Coordinate [] coords = new Coordinate[4];
+						coords[0] = new Coordinate(Math.abs(dxfs.getPoint1().getX()),dxfs.getPoint1().getY());
+						coords[1] = new Coordinate(Math.abs(dxfs.getPoint2().getX()),dxfs.getPoint2().getY());
+						coords[2] = new Coordinate(Math.abs(dxfs.getPoint3().getX()),dxfs.getPoint3().getY());
+						coords[3] = new Coordinate(Math.abs(dxfs.getPoint4().getX()),dxfs.getPoint4().getY());
+						
+//						if (layerId.equals("Projekt")) {
+//							System.out.println("sss");
+//						}
+							
+						SimpleFeature ft = lf.createPolyline(coords, new Object[]{layerId,id,dxfs.getColor()}, id);
+						Geometry geo = (Geometry) ft.getDefaultGeometry();
+						Geometry hull = geo.convexHull();
+						Coordinate[] koords = hull.getCoordinates();
+						SimpleFeature ft2 = lf.createPolyline(koords, new Object[]{layerId,id,dxfs.getColor()}, id);
+						lts.add(ft2);
+						
 					}
 				}
 			}
