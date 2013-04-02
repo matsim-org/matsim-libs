@@ -52,7 +52,7 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 
 	private final double r = MatsimRandom.getRandom().nextDouble()*.1 + .25; //radius
 	private final double tau = 1.f;
-	private double v0 = 1.34f; //desired velocity
+	private double v0 = 1.f; //desired velocity
 
 	private PhysicalSim2DSection psec;
 	private final double[] pos = {0,0};
@@ -66,13 +66,17 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 	private final ORCASolver solver = new ORCASolver();
 	//	private VisDebugger debugger;
 	private final VisDebugger debugger = null;
+	private final double dT;
+	private final double maxDelta;
 
-	public ORCAAgent(QVehicle veh, double spawnX, double spawnY) {
+	public ORCAAgent(QVehicle veh, double spawnX, double spawnY, double dT) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
 		this.driver = veh.getDriver();
 		this.ncalc.setRangeAndMaxNrOfNeighbors(5, 5);
+		this.dT = dT;
+		this.maxDelta =.25;// * dT;
 	}
 
 	@Override
@@ -121,9 +125,21 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 		final double[] dir = this.dd.computeDesiredDirection();
 		dir[0] *= this.v0;
 		dir[1] *= this.v0;
-
+		double dx = dir[0] - this.v[0];
+		double dy = dir[1] - this.v[1];
+		double sqrDelta = (dx*dx+dy*dy);
+		if (sqrDelta > this.maxDelta*this.maxDelta){
+			double delta = Math.sqrt(sqrDelta);
+			dx /= delta;
+			dx *= this.maxDelta;
+			dy /= delta;
+			dy *= this.maxDelta;
+			dir[0] = this.v[0] + dx;
+			dir[1] = this.v[1] + dy;
+		}
 		
-		this.solver.run(constr, dir, this.v0);
+		
+		this.solver.run(constr, dir, this.v0, new double []{0.,0.});
 		
 		
 

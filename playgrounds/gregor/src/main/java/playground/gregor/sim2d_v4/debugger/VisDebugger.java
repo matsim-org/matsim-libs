@@ -21,6 +21,8 @@
 package playground.gregor.sim2d_v4.debugger;
 
 import java.awt.BorderLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -28,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -37,7 +41,6 @@ import org.matsim.core.utils.misc.Time;
 
 import processing.core.PApplet;
 import processing.core.PImage;
-
 public class VisDebugger extends PApplet {
 
 	/**
@@ -55,7 +58,6 @@ public class VisDebugger extends PApplet {
 
 	//	private static final int W = 1000;
 
-	private float scale = 2;
 	private List<Object> elements = Collections.synchronizedList(new ArrayList<Object>());
 	private final List<Object> elementsStatic = Collections.synchronizedList(new ArrayList<Object>());
 	private final List<Object> newElements = new ArrayList<Object>();
@@ -63,17 +65,32 @@ public class VisDebugger extends PApplet {
 	protected int dragY = 0;
 	protected int mx =0;
 	protected int my = 0;
-	protected int omx= 0;
-	protected int omy= 0;
+
+	//overview
+	//	private float scale = .5f;
+	//	protected int omx= 125;
+	//	protected int omy= -43;
+
+	private static enum SC {overview,station,merging,evacuation};
+	private final SC sc = SC.evacuation;
+	private final boolean drawInfo = false;
+
+	private float scale = .5f;
+	protected int omx= 125;
+	protected int omy= -43;
 
 	private boolean first = true;
 	private String time = "00:00.00.0";
+	private String time2 = "00:00.00.0";
 	private String iteration = "it: 0";
 	private final double dT;
-	private float speedup = 10;
+	private float speedup = 1000;
 
 	private int bgXShift;
 	private int bgYShift;
+
+	private boolean makeScreenshot = false;
+	private final CyclicBarrier screenshotBarrier = new CyclicBarrier(2);
 
 
 
@@ -82,11 +99,42 @@ public class VisDebugger extends PApplet {
 
 	private FrameSaver fs = null;
 	private int it = 0;
+	double dblTime;
+	
 
 	public VisDebugger(double dT) {
+		if (this.sc == SC.overview) {
+			this.scale = .6f;
+			this.omx= 155;
+			this.omy= 12;
+		} else if (this.sc == SC.station) {
+			this.scale = 1.5f;
+			this.omx= -755;
+			this.omy= -37;
+		}else if (this.sc == SC.merging) {
+			this.scale = 2.5f;
+			this.omx= -817;
+			this.omy= 1406;
+		} else if (this.sc == SC.evacuation) {
+			this.scale = .6f;
+			this.omx= -262;
+			this.omy= 21;
+		}
+
 		this.dT = dT;
 		this.fr = new JFrame();
-		this.fr.setSize(1024, 768);
+
+		//overview
+		//		this.fr.setSize(1280,740);
+		if (this.sc == SC.overview) {
+			this.fr.setSize(1024,788);
+		}else if (this.sc == SC.station) {
+			this.fr.setSize(360,380);
+		}else if (this.sc == SC.merging) {
+			this.fr.setSize(360,440);
+		} else if (this.sc == SC.evacuation) {
+			this.fr.setSize(1024,788);
+		}
 
 		JPanel compositePanel = new JPanel();
 		compositePanel.setLayout(new OverlayLayout(compositePanel));
@@ -98,11 +146,37 @@ public class VisDebugger extends PApplet {
 		compositePanel.setVisible(true);
 		this.init();
 		this.fr.setVisible(true);
+
+
 	}
 
 
 	@Override
 	public void setup() {
+		addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				if (arg0.getKeyChar() == 's'){
+					System.out.println("make screenshot");
+					VisDebugger.this.makeScreenshot = true;
+				}
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
 		addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
 			@Override
 			public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) { 
@@ -165,9 +239,18 @@ public class VisDebugger extends PApplet {
 
 			}
 		});
-		size(1024,768);
+		//		size(640,480);
+		//		setSize(640,480);
+		if (this.sc == SC.overview) {
+			size(1024,768);
+		}else if (this.sc == SC.station) {
+			this.fr.setSize(512,512);
+		}else if (this.sc == SC.merging) {
+			this.fr.setSize(360,382);
+		} else if (this.sc == SC.evacuation) {
+			size(1024,768);
+		}
 		background(0);
-
 	}
 
 	void mouseWheel(int delta)
@@ -176,7 +259,7 @@ public class VisDebugger extends PApplet {
 		float x1 = deScaleX(getWidth()/2);
 		float y1 = deScaleY(getHeight()/2);
 		this.scale-= delta;
-		this.scale = Math.max(1, this.scale);
+		this.scale = Math.max(.5f, this.scale);
 		this.scale = Math.min(100, this.scale);
 		float x2 = deScaleX(getWidth()/2);
 		float y2 = deScaleY(getHeight()/2);
@@ -198,11 +281,17 @@ public class VisDebugger extends PApplet {
 	private void computeBGShift(){
 		this.bgYShift = (this.dragY+this.omy)/(256);
 		this.bgXShift = (-(VisDebugger.this.dragX +VisDebugger.this.omx))/(256);
-//		System.out.println("scale:" + this.scale + " omx:" + this.omx + " omy:" + this.omy + " width:" + getWidth() + " height:" + getHeight());
+		System.out.println("scale:" + this.scale + " omx:" + this.omx + " omy:" + this.omy + " width:" + getWidth() + " height:" + getHeight());
 	}
 
 	@Override
 	public void draw() {
+
+		boolean recording = false;
+		if (this.makeScreenshot && this.screenshotBarrier.getNumberWaiting()==1) {
+			beginRecord(PDF, "/Users/laemmel/Desktop/" + this.it + "_" + this.time + ".pdf");
+			recording = true;
+		}
 
 		stroke(255);
 		background(255,237,187,255);
@@ -213,7 +302,7 @@ public class VisDebugger extends PApplet {
 		for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
 			d.draw(this);
 		}
-		
+
 		synchronized(this.elementsStatic) {
 			Iterator<Object> it = this.elementsStatic.iterator();
 			while (it.hasNext()) {
@@ -247,14 +336,29 @@ public class VisDebugger extends PApplet {
 			}
 		}
 
-		strokeWeight(2);
-		drawTime();
-		drawIteration();
-		drawAgentsCount(agents);
-		drawSpeedup();
-		
+		if(this.drawInfo) {
+			strokeWeight(2);
+			drawTime();
+			drawIteration();
+			drawAgentsCount(agents);
+			drawSpeedup();
+		}
+
+		if (recording) {
+			endRecord();
+
+			try {
+				this.screenshotBarrier.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (BrokenBarrierException e) {
+				e.printStackTrace();
+			}
+			this.makeScreenshot = false;
+		}
+
 		if (this.fs != null) {
-			this.fs.saveFrame(this,this.it + "_" + this.time);
+			this.fs.saveFrame(this,this.it + "_" + this.time2);
 		}
 	}
 
@@ -272,7 +376,7 @@ public class VisDebugger extends PApplet {
 			for (int x = 0; x <= xTiles+2; x++) {
 				//				int logscale = (int)(log(this.scale)/log(2));
 				//				System.out.println(logscale);
-				PImage img = this.pTileFac.getTile(xidx, yidx, (int)(this.scale+.5f));
+				PImage img = this.pTileFac.getTile(xidx, yidx, (this.scale));
 
 				float xx =  xidx * 256/this.scale;
 				//				float yy =  yidx * 256/this.scale;
@@ -283,7 +387,8 @@ public class VisDebugger extends PApplet {
 				//				PImage img = loadPImage(xx, yy, xx1, yy1);
 				if (img != null) {
 					image(img,scaleFlX(xx),scaleFlY(yy1),256,256);
-				}
+				} 
+
 
 
 
@@ -514,6 +619,18 @@ public class VisDebugger extends PApplet {
 		addElement(p);
 	}
 
+	public void addPolygonStatic(float [] x, float [] y, int r, int g, int b, int a, int minScale) {
+		Polygon p = new Polygon();
+		p.x = x;
+		p.y = y;
+		p.r = r;
+		p.g = g;
+		p.b = b;
+		p.a = a;
+		p.minScale = minScale;
+		addElementStatic(p);
+	}
+
 	public void addText(float x, float y, String string, int minScale) {
 		Text text = new Text();
 		text.x = x;
@@ -534,6 +651,16 @@ public class VisDebugger extends PApplet {
 	}
 
 	public void update(double time) {
+
+		if (this.makeScreenshot) {
+			try {
+				this.screenshotBarrier.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (BrokenBarrierException e) {
+				e.printStackTrace();
+			}
+		}
 
 		if (this.fs != null) {
 			this.fs.await();
@@ -608,13 +735,21 @@ public class VisDebugger extends PApplet {
 
 	synchronized public String setTime(double time2) {
 		if (time2 > 0) {
-			String strTime = Time.writeTime(time2, Time.TIMEFORMAT_HHMMSSDOTSS);
-			if (strTime.length() > 11) {
-				strTime = strTime.substring(0, 11);
-			} else if (strTime.length() < 11) {
-				strTime = strTime + "0";
-			}
+			String strTime = Time.writeTime(time2, Time.TIMEFORMAT_HHMM);
+//			if (strTime.length() > 11) {
+//				strTime = strTime.substring(0, 11);
+//			} else if (strTime.length() < 11) {
+//				strTime = strTime + "0";
+//			}
+			this.dblTime = time2;
 			this.time = strTime;
+			String strTime2 = Time.writeTime(time2, Time.TIMEFORMAT_HHMMSSDOTSS);
+			if (strTime2.length() > 11) {
+				strTime2 = strTime2.substring(0, 11);
+			} else if (strTime2.length() < 11) {
+				strTime2 = strTime2 + "0";
+			}
+			this.time2 = strTime2;
 		}
 		return this.time;
 
@@ -623,13 +758,13 @@ public class VisDebugger extends PApplet {
 	synchronized public String setIteration(int it) {
 		if (it > 0) {
 			this.iteration = "iteration: " + it;
-//			this.speedup = 1;
+			//			this.speedup = 1;
 			this.it  = it;
 		}
 		return this.iteration;
 	}
 
-	public void setTransformationStuff(float x, float y) {
+	public void setTransformationStuff(double x, double y) {
 		if (this.pTileFac != null) {
 			return;
 		}
@@ -642,7 +777,7 @@ public class VisDebugger extends PApplet {
 
 	public void setFrameSaver(FrameSaver fs) {
 		this.fs = fs;
-		
+
 	}
 
 

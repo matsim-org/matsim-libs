@@ -100,6 +100,9 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 		double desiredDVx = this.v0 * e0[0] - this.v[0];
 		double desiredDVy = this.v0 * e0[1] - this.v[1];
 
+//		desiredDVx *= e0[2];
+//		desiredDVy *= e0[2];
+		
 		desiredDVx /= this.tau;
 		desiredDVy /= this.tau;
 
@@ -179,10 +182,12 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 				continue;
 			}
 
-			double exp = playground.gregor.sim2d_v4.math.Math.exp((this.r-dist)/this.B);
+			double radius = (this.currentPSec instanceof DepartureBox) ? this.r/2 : this.r; 
+			double exp = playground.gregor.sim2d_v4.math.Math.exp((radius-dist)/this.B);
+			
 
-			if (dist < this.r &&  r >=0 && r <= 1) {
-				double overlap = (this.r-dist);
+			if (dist < radius &&  r >=0 && r <= 1) {
+				double overlap = (radius-dist);
 				exp += this.k * overlap;
 
 				double tx = -ny;
@@ -201,10 +206,6 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 		dvx *= this.dT;
 		dvy *= this.dT;
 
-		if (Double.isNaN(dvy)) {
-			System.out.println("stop");
-		}
-		
 		this.v[0] += dvx;
 		this.v[1] += dvy;
 		
@@ -270,14 +271,12 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 
 	@Override
 	public void debug(VisDebugger visDebugger) {
-		if (getId().toString().equals("g3242")){
-			visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1], (float)this.r, 255, 0, 0, 255,0,true);
-			visDebugger.addText((float)this.getPos()[0],(float)this.getPos()[1], this.getCurrentLinkId().toString(), 90);
-		}else if (getId().toString().contains("g")) {
-			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1],(float) this.r, 0, 192, 64, 128,0,true);
-		} else if (getId().toString().contains("r")) {
-			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1],(float) this.r, 192, 0, 64, 128,0,true);
-		} else {
+//		if (getId().toString().contains("b4849")) {
+//			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1],(float) this.r, 255, 0, 0, 255,0,true);
+//		} else
+//			if (getId().toString().contains("r")) {
+//			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1],(float) this.r, 192, 0, 64, 128,0,true);
+//		} else {
 			int nr = this.hashCode()%3*255;
 			int r,g,b;
 			if (nr > 2*255) {
@@ -294,11 +293,13 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 				b=nr;
 			}
 			visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1], (float)this.r, r, g, b, 222,0,true);
-		}
+			visDebugger.addText((float)this.getPos()[0],(float)this.getPos()[1], this.getId().toString(), 90);
+//		}
 	
 		this.ocalc.addDebugger(visDebugger);
 
 	}
+
 
 	@Override
 	public PhysicalSim2DSection getPSec() {
@@ -337,7 +338,16 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	@Override
 	public void setDesiredSpeed(double v) {
 		double g = MatsimRandom.getRandom().nextGaussian()*.26;
-		this.v0 = v+g;
+		if (Math.abs(g)>.5*v){
+			this.v0 = v;
+		} else {
+			this.v0 = v+g;
+		}
+		if (this.v0 < 0.1) {
+			this.v0 = v;
+		}
 	}
+
+
 
 }

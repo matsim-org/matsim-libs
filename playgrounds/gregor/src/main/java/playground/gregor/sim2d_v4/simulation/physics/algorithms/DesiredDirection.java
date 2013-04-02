@@ -67,13 +67,12 @@ public class DesiredDirection {
 			dist = -dist;
 		}
 		
-		double exp = Math.exp(dist/(li.width));
+		double exp = Math.exp(dist/(li.width/2)); //TODO does this (width/2) make sense? [gl - April'13]
 		double w0 = 1 - 1/exp;
 		double w1 = 1 - w0;
 		
 		ret[0] = w1 * dx + w0 * px;
 		ret[1] = w1 * dy + w0 * py;
-		
 		return ret;
 	}
 

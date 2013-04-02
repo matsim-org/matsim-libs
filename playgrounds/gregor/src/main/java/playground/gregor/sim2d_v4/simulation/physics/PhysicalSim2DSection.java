@@ -73,6 +73,8 @@ public class PhysicalSim2DSection {
 
 	private final Map<Segment,Id> openingLinkIdMapping = new HashMap<Segment,Id>();
 
+//	private VisDebugger debugger;
+
 	public PhysicalSim2DSection(Section sec, Sim2DScenario sim2dsc, double offsetX, double offsetY, PhysicalSim2DEnvironment penv) {
 		this.sec = sec;
 		this.sim2dsc = sim2dsc;
@@ -96,8 +98,10 @@ public class PhysicalSim2DSection {
 	}
 
 	public void updateAgents() {
+		this.agentTwoDTree.clear();
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
+		this.agentTwoDTree.buildTwoDTree(this.agents);
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
@@ -108,11 +112,14 @@ public class PhysicalSim2DSection {
 
 
 	public void moveAgents(double time) {
-		this.agentTwoDTree.clear();
+	
 		
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
+//			if (agent.getId().toString().equals("b4849")) {
+//				System.out.println("got you!");
+//			}
 			double [] v = agent.getVelocity();
 			double dx = v[0] * this.timeStepSize;
 			double dy = v[1] * this.timeStepSize;
@@ -162,6 +169,13 @@ public class PhysicalSim2DSection {
 						if (nb == null) {
 							continue;
 						}
+//						if (open == li.finishLine) {
+//							System.out.println("got you");
+//						}
+						
+//						if (agent.getId().toString().equals("b4849")) {
+//							System.out.println("got you!");
+//						}
 //						for (S)
 						it.remove();
 						nb.addAgentToInBuffer(agent);
@@ -170,6 +184,19 @@ public class PhysicalSim2DSection {
 						for (Segment ivOpen : nb.getOpenings()) {
 							if (ivOpen.x0 == open.x1 && ivOpen.x1 == open.x0 && ivOpen.y0 == open.y1 && ivOpen.y1 == open.y0) {
 								nextLinkId = nb.getLinkId(ivOpen);
+								
+//								if (nb.getId().equals(new IdImpl("sec360637413"))) {
+//									break;
+//								}
+//								LinkInfo li2 = nb.getLinkInfo(nextLinkId);
+//								this.debugger.addLine((float)li2.link.x0,(float) li2.link.y0,(float) li2.link.x1,(float) li2.link.y1,255,0,0,255,0);
+//								this.debugger.addLine((float)li2.finishLine.x0,(float) li2.finishLine.y0,(float) li2.finishLine.x1,(float) li2.finishLine.y1,255,0,0,255,0);
+//								((FailsafeAgentImpl)agent).debugR(this.debugger);
+//								
+//								this.debugger.addLine((float)li.link.x0,(float) li.link.y0,(float) li.link.x1,(float) li.link.y1,0,255,0,255,0);
+//								this.debugger.addLine((float)li.finishLine.x0,(float) li.finishLine.y0,(float) li.finishLine.x1,(float) li.finishLine.y1,0,255,0,255,0);
+//								
+//								this.debugger.addAll();
 								break;
 							}
 						}
@@ -184,7 +211,7 @@ public class PhysicalSim2DSection {
 			
 
 			
-			this.agentTwoDTree.insert(agent);
+//			this.agentTwoDTree.insert(agent);
 		}
 
 		
@@ -279,7 +306,7 @@ public class PhysicalSim2DSection {
 				finishLine.x1 = finishLine.x0 + li.dy;
 				finishLine.y1 = finishLine.y0 - li.dx;
 				li.finishLine = finishLine;
-				li.width = 20; //TODO section width [gl Jan'13]
+				li.width = 10; //TODO section width [gl Jan'13]
 			}
 		}
 
@@ -374,7 +401,19 @@ public class PhysicalSim2DSection {
 	}
 
 	public void debug(VisDebugger visDebugger) {
+//		this.debugger = visDebugger;
 		if (visDebugger.isFirst()) {
+			Coordinate[] coords = this.sec.getPolygon().getExteriorRing().getCoordinates();
+			float [] x = new float[coords.length];
+			float [] y = new float[coords.length];
+			for (int i = 0; i < coords.length; i++) {
+				Coordinate c = coords[i];
+				x[i] = (float) (c.x - this.offsetX);
+				y[i] = (float) (c.y - this.offsetY);
+			}
+			visDebugger.addPolygonStatic(x, y,255,237,187,255,0);
+
+			
 			for (Segment seg : this.obstacles) {
 				visDebugger.addLineStatic((float)seg.x0,(float) seg.y0, (float)seg.x1,(float) seg.y1, 18, 34, 34, 128,0);
 			}
@@ -396,7 +435,7 @@ public class PhysicalSim2DSection {
 				visDebugger.addTextStatic((float)((x1+x0)/2+dy/2), (float)((y1+y0)/2-dx/2), key.toString(),99);
 
 			}
-
+			
 
 		}
 		if (this.agents.size() > 0) {
@@ -430,11 +469,13 @@ public class PhysicalSim2DSection {
 		for (Sim2DAgent agent : this.agents) {
 			agent.debug(visDebugger);
 //			LinkInfo li = this.linkInfos.get(agent.getCurrentLinkId());
-//			if (agent.getId().toString().equals("6")) {
-//				visDebugger.addLine(li.finishLine.x0, li.finishLine.y0, li.finishLine.x1, li.finishLine.y1, 255, 0, 0, 255, 0);
-//				visDebugger.addCircle(li.finishLine.x1,li.finishLine.y1,(double) .25, 255, 0, 0, 255, 0);
+//			if (agent.getId().toString().equals("b9112")) {
+//				visDebugger.addLine((float)li.finishLine.x0, (float)li.finishLine.y0, (float)li.finishLine.x1, (float)li.finishLine.y1, 255, 0, 0, 255, 0);
+//				visDebugger.addCircle((float)li.finishLine.x1,(float)li.finishLine.y1,.25f, 255, 0, 0, 255, 0,true);
+//				visDebugger.addCircle((float)agent.getPos()[0],(float)agent.getPos()[1],(float)agent.getRadius(), 255, 0, 0, 255, 0,true);
 //			}
 		}
+			
 		for (Sim2DAgent agent : this.inBuffer) {
 			agent.debug(visDebugger);
 		}
@@ -453,7 +494,7 @@ public class PhysicalSim2DSection {
 	}
 
 	public Sim2DScenario getSim2dsc() {
-		return sim2dsc;
+		return this.sim2dsc;
 	}
 
 

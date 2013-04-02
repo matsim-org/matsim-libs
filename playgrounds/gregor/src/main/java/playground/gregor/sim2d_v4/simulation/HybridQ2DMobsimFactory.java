@@ -32,10 +32,12 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSim2DNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
 public class HybridQ2DMobsimFactory implements MobsimFactory {
 
@@ -87,9 +89,9 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
-//		Sim2DScenario sc2d = sc.getScenarioElement(Sim2DScenario.class);
-//		Sim2DAgentFactory aBuilder = new SocialForceSim2DAgentFactory(sc2d.getSim2DConfig());
-		Sim2DAgentFactory aBuilder = new ORCAAgentFactory();
+		Sim2DScenario sc2d = sc.getScenarioElement(Sim2DScenario.class);
+		Sim2DAgentFactory aBuilder = new SocialForceSim2DAgentFactory(sc2d.getSim2DConfig());
+//		Sim2DAgentFactory aBuilder = new ORCAAgentFactory(sc2d.getSim2DConfig());
 		
 		HybridQSim2DNetworkFactory networkFactory = new HybridQSim2DNetworkFactory(e,sc, aBuilder);
 		
@@ -101,6 +103,10 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 
+		if (sc.getConfig().network().isTimeVariantNetwork()) {
+			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+		}
+		
 		return qSim;
 	}
 

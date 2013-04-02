@@ -78,7 +78,7 @@ public class PTileFactory {
 	}
 
 
-	public PImage getTile(final int itpx, final int itpy, final int zoom) {
+	public PImage getTile(final int itpx, final int itpy, final double zoom) {
 		String key = getKey(itpx, itpy, zoom);//TODO use url as key
 		PTile pTile = this.tiles.get(key);
 
@@ -114,14 +114,14 @@ public class PTileFactory {
 	}
 
 
-	private PTile loadTile(int itpx, int itpy, int zoom) {
+	private PTile loadTile(int itpx, int itpy, double zoom) {
 		String url = getTileUrl(itpx, itpy, zoom);
 		PTile pTile = new PTile(url);
 		this.loader.addTile(pTile);
 		return pTile;
 	}
 
-	private String getKey(final int itpx, final int itpy, final int zoom) {
+	private String getKey(final int itpx, final int itpy, final double zoom) {
 		StringBuffer bf = new StringBuffer();
 		bf.append(itpx);
 		bf.append('_');
@@ -171,7 +171,7 @@ public class PTileFactory {
 				}
 				synchronized (pTile) {
 					String url = pTile.getUrl();
-					PImage img = PTileFactory.this.visDebugger.loadImage(url,"jpg");
+					PImage img = PTileFactory.this.visDebugger.loadImage(url,"png");
 					pTile.setPImage(img);
 				}				
 			}
@@ -187,7 +187,7 @@ public class PTileFactory {
 		}
 	}
 
-	private String getTileUrl(int x, int y, int zoom) {
+	private String getTileUrl(int x, int y, double zoom) {
 		//HACK HACK
 		double xc = this.offsetX + x*256./zoom;
 		double yc = this.offsetY + y*256./zoom;
@@ -205,11 +205,7 @@ public class PTileFactory {
 			e.printStackTrace();
 		}
 
-		if (dest.x > 8) {
-			System.out.println("stop!!!");
-		}
-
-		String url = "http://localhost:8080/geoserver/wms?service=WMS&version=1.1.0&request=GetMap&layers=ch_day&styles=&bbox=" +
+		String url = "http://localhost:8080/geoserver/wms?service=WMS&version=1.1.0&request=GetMap&layers=hh&styles=&bbox=" +
 				dest.x +
 				"," +
 				dest.y +
@@ -217,7 +213,8 @@ public class PTileFactory {
 				dest1.x +
 				"," +
 				dest1.y +
-				"&width=256&height=256&srs=EPSG:4326&format=image/jpeg";					
+				"&width=256&height=256&srs=EPSG:4326&format=image/png";
+
 
 		return url;
 	}

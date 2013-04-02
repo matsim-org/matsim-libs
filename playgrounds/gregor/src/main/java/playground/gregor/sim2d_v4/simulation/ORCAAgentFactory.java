@@ -22,6 +22,7 @@ package playground.gregor.sim2d_v4.simulation;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.DelegableSim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.FailsafeAgentImpl;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAAgent;
@@ -29,11 +30,17 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 public class ORCAAgentFactory implements Sim2DAgentFactory {
 
+	private final Sim2DConfig config;
+
+	public ORCAAgentFactory(Sim2DConfig config) {
+		this.config = config;
+	}
+	
 	@Override
 	public Sim2DAgent buildAgent(QVehicle veh, double spawnX, double spawnY) {
-		DelegableSim2DAgent delegate = new ORCAAgent(veh, spawnX, spawnY);
+		DelegableSim2DAgent delegate = new ORCAAgent(veh, spawnX, spawnY,this.config.getTimeStepSize());
 		Sim2DAgent agent = new FailsafeAgentImpl(delegate);
-		return delegate;
+		return agent;
 	}
 
 }

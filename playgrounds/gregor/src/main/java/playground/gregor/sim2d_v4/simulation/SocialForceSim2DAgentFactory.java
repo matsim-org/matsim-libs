@@ -40,6 +40,7 @@ public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
 	public Sim2DAgent buildAgent(QVehicle veh, double spawnX, double spawnY) {
 		DelegableSim2DAgent delegate = new SocialForceAgent(veh, spawnX, spawnY,this.conf.getTimeStepSize());
 		Sim2DAgent agent = new FailsafeAgentImpl(delegate);
+//		SimpleAgent agent = new SimpleAgent(veh, spawnX, spawnY);
 		return agent;
 	}
 

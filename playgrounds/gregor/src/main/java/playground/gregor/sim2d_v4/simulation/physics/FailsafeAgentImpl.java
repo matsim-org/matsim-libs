@@ -96,6 +96,12 @@ public class FailsafeAgentImpl implements Sim2DAgent {
 		this.delegate.debug(visDebugger);
 	}
 
+	public void debugR(VisDebugger visDebugger) {
+		visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1], (float)this.delegate.getRadius(), 255,0, 0, 222,0,true);
+		visDebugger.addText((float)this.getPos()[0],(float)this.getPos()[1], this.getId().toString(), 90);
+		
+	}
+	
 	@Override
 	public double getRadius() {
 		return this.delegate.getRadius();

@@ -46,7 +46,7 @@ public class PhysicalSim2DEnvironment {
 
 	private static final Logger log = Logger.getLogger(PhysicalSim2DEnvironment.class);
 
-	private static final double DEP_BOX_WIDTH = 0.9f; // must be >= agents' diameter
+	private static final double DEP_BOX_WIDTH = 1./1.3; // must be >= agents' diameter
 
 	private final Sim2DEnvironment env;
 
@@ -167,7 +167,7 @@ public class PhysicalSim2DEnvironment {
 		//create departure boxes
 		double dx = opening.x1 - opening.x0;
 		double dy = opening.y1 - opening.y0;
-		double width = (double) Math.sqrt(dx*dx+dy*dy);
+		double width = Math.sqrt(dx*dx+dy*dy);
 		dx /= width;
 		dy /= width;
 
@@ -225,17 +225,17 @@ public class PhysicalSim2DEnvironment {
 			Id [] neighbors = {id};
 			int level = sec.getLevel();
 			Section s = this.env.createSection(boxId, p, openings, neighbors, level);
-			double spawnX = (double)(bottomX-this.offsetX) + bx/1.5f + dx/2;
-			double spawnY = (double)(bottomY-this.offsetY) + by/1.5f + dy/2;
+			double spawnX = bottomX-this.offsetX + bx/1.5f + dx/2;
+			double spawnY = bottomY-this.offsetY + by/1.5f + dy/2;
 			PhysicalSim2DSection psecBox = createAndAddDepartureBox(s);
 			
 			//create dbox link info
 			LinkInfo dboxLi = new LinkInfo();
 			Segment link = new Segment();
-			link.x0 = (double)(bottomX-this.offsetX) + bx + dx/2;
-			link.y0 = (double)(bottomY-this.offsetY) + by + dy/2;
-			link.x1 = (double)(bottomX-this.offsetX) + dx/2;
-			link.y1 = (double)(bottomY-this.offsetY) + dy/2;
+			link.x0 = bottomX-this.offsetX + bx + dx/2;
+			link.y0 = bottomY-this.offsetY + by + dy/2;
+			link.x1 = bottomX-this.offsetX + dx/2;
+			link.y1 = bottomY-this.offsetY + dy/2;
 			double dbdx = link.x1 - link.x0;
 			double dbdy = link.y1 - link.y0;
 			dbdx /= 1.5f * DEP_BOX_WIDTH;

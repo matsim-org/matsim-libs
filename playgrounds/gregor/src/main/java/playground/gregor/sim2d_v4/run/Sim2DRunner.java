@@ -30,9 +30,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
-import playground.gregor.sim2d_v4.debugger.MousePositionDrawer;
-import playground.gregor.sim2d_v4.debugger.QSimFibonacciPulser;
-import playground.gregor.sim2d_v4.debugger.ScaleBarDrawer;
+import playground.gregor.sim2d_v4.debugger.QSimDensityDrawer;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
@@ -44,7 +42,7 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	private VisDebugger visDebugger = null;
 	private Controler controller;
-	private QSimFibonacciPulser qSimDrawer;
+	private QSimDensityDrawer qSimDrawer;
 	private HybridQ2DMobsimFactory factory;
 
 	public static void main(String [] args) {
@@ -57,10 +55,12 @@ public class Sim2DRunner implements IterationStartsListener{
 		Sim2DConfig sim2dc = Sim2DConfigUtils.loadConfig(sim2DConf);
 		Sim2DScenario sim2dsc = Sim2DScenarioUtils.loadSim2DScenario(sim2dc);
 		Config c = ConfigUtils.loadConfig(qsimConf);
-		
+//		c.controler().setLastIteration(0);
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		sc.addScenarioElement(sim2dsc);
 		sim2dsc.connect(sc);
+		
+//		c.getQSimConfigGroup().setEndTime(8*3600+40*60);
 
 		//offsets needed to convert to doubles later in program
 		double minX = Double.POSITIVE_INFINITY;
@@ -85,17 +85,19 @@ public class Sim2DRunner implements IterationStartsListener{
 		if (args[2].equals("true")) {
 			Sim2DRunner runner = new Sim2DRunner();
 			runner.visDebugger = new VisDebugger( sim2dc.getTimeStepSize());
-//			runner.visDebugger.setTransformationStuff(minX, minY);
+			runner.visDebugger.setTransformationStuff(minX, minY);
 			controller.addControlerListener(runner);
 			runner.controller = controller;
 			runner.factory = factory;
-			runner.qSimDrawer = new QSimFibonacciPulser(sc);
+			runner.qSimDrawer = new QSimDensityDrawer(sc);
+//			runner.burgdorfInfoDrawer = new BurgdorfInfoDrawer(sc);
 			
 			runner.visDebugger.addAdditionalDrawer(runner.qSimDrawer);
+//			runner.visDebugger.addAdditionalDrawer(runner.burgdorfInfoDrawer);
 //			runner.visDebugger.addAdditionalDrawer();
-			runner.visDebugger.addAdditionalDrawer(new ScaleBarDrawer());
-			runner.visDebugger.addAdditionalDrawer(new MousePositionDrawer());
-//			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 9);
+//			runner.visDebugger.addAdditionalDrawer(new ScaleBarDrawer());
+//			runner.visDebugger.addAdditionalDrawer(new MousePositionDrawer());
+//			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 111);
 //			runner.visDebugger.setFrameSaver(fs);
 		}
 
@@ -122,7 +124,7 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 50) {
+		if ((event.getIteration()) % 10 == 0 || event.getIteration() > 50) {
 			this.factory.debug(this.visDebugger);
 			this.controller.getEvents().addHandler(this.qSimDrawer);
 			this.controller.setCreateGraphs(true);
