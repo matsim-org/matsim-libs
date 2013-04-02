@@ -1,4 +1,4 @@
-package playground.gregor.sim2d_v3.helper.experimentalgraphgenerator;
+package playground.gregor.sim2denvironment.graphgenerator;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

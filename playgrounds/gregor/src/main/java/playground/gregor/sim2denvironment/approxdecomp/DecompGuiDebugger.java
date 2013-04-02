@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.approxdecomp;
+package playground.gregor.sim2denvironment.approxdecomp;
 
 import java.awt.BorderLayout;
 import java.awt.event.MouseEvent;

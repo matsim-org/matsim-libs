@@ -18,17 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.approxdecomp;
+package playground.gregor.sim2denvironment.approxdecomp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import playground.gregor.approxdecomp.ApproxConvexDecomposer.PocketBridge;
-import playground.gregor.approxdecomp.Graph.Link;
-import playground.gregor.approxdecomp.Graph.Node;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
+import playground.gregor.sim2denvironment.approxdecomp.ApproxConvexDecomposer.PocketBridge;
+import playground.gregor.sim2denvironment.approxdecomp.Graph.Link;
+import playground.gregor.sim2denvironment.approxdecomp.Graph.Node;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

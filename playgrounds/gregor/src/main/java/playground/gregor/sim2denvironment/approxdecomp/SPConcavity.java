@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Graph.java
+ * SPConcavity.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,50 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.approxdecomp;
+package playground.gregor.sim2denvironment.approxdecomp;
 
-import java.util.ArrayList;
-import java.util.List;
+import playground.gregor.sim2denvironment.approxdecomp.ApproxConvexDecomposer.PocketBridge;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class Graph {
+public class SPConcavity {
 
-	/*package*/ static class Node {
-
-		/*package*/ final Coordinate c;
-		/*package*/ final int id;
-		/*package*/ final List<Link> outLinks = new ArrayList<Link>();
-
-		public Node(Coordinate c, int id) {
-			this.c = c;
-			this.id = id;
-		}
+	public void computeSPConcavity(Coordinate [] shell, PocketBridge pb, double [] concavity) {
 		
-		public void addOutLink(Link l) {
-			this.outLinks.add(l);
-		}
 		
 
+		VisibilityGraph visibilityGraph = new VisibilityGraph(shell, pb);
+		
+		
+		
+		for (int i = pb.betaMinus+1; i < pb.betaPlus; i++) {
+			double val = visibilityGraph.computeSPLength(i);
+			concavity[i%shell.length] = val;
+		}
 		
 	}
+
 	
-	/*package*/ static class Link {
-
-		/*package*/ final Node n0;
-		/*package*/ final Node n1;
-		/*package*/ double length;
-
-		public Link(Node n0, Node n1) {
-			this.n0 = n0;
-			this.n1 = n1;
-			this.length = n0.c.distance(n1.c);
-		}
-		
-		public void setLength(double length) {
-			this.length = length;
-		}
-		
-	}
+	
 	
 }

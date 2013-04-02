@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.approxdecomp;
+package playground.gregor.sim2denvironment.approxdecomp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,9 +35,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.gregor.approxdecomp.Graph.Node;
 import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
+import playground.gregor.sim2denvironment.approxdecomp.Graph.Node;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;

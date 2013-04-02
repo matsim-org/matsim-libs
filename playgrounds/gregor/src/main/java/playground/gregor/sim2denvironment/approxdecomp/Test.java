@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.approxdecomp;
+package playground.gregor.sim2denvironment.approxdecomp;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,8 +44,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.approxdecomp.ApproxConvexDecomposer.Opening;
-import playground.gregor.approxdecomp.ApproxConvexDecomposer.PolygonInfo;
 import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v4.io.Sim2DConfigWriter01;
 import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
@@ -53,6 +51,8 @@ import playground.gregor.sim2d_v4.io.Sim2DEnvironmentWriter02;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
+import playground.gregor.sim2denvironment.approxdecomp.ApproxConvexDecomposer.Opening;
+import playground.gregor.sim2denvironment.approxdecomp.ApproxConvexDecomposer.PolygonInfo;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

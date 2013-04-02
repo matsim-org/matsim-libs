@@ -1,4 +1,4 @@
-package playground.gregor.sim2d_v3.helper.experimentalgraphgenerator;
+package playground.gregor.sim2denvironment.graphgenerator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
