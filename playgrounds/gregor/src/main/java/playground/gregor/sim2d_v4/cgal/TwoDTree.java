@@ -58,9 +58,13 @@ public class TwoDTree<T extends TwoDObject> {
 	}
 
 	public void buildTwoDTree(List<T> values) {
-		
+		this.root.maxDepth = 0;
 		for (T val : values) {
 			insert(val);
+		}
+		this.root.maxDepth = 128;
+		if (values.size() > 128) {
+			this.root.split();
 		}
 	}
 
