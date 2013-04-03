@@ -229,6 +229,8 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		plot.getRenderer().setSeriesStroke(1, new BasicStroke(2.0f));
 		plot.getRenderer().setSeriesStroke(2, new BasicStroke(2.0f));
 		plot.setBackgroundPaint(Color.white);
+		plot.setRangeGridlinePaint(Color.gray);  
+		plot.setDomainGridlinePaint(Color.gray);  
 		
 		return chart;
 	}
