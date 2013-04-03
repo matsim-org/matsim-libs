@@ -35,13 +35,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.PolylineFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.dgrether.DgPaths;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -60,34 +53,13 @@ public class DgMatsimPopulation2Zones {
 	
 	private GeometryFactory geoFac = new GeometryFactory();
 
-	private List<SimpleFeature> featureCollection;
-
-	private PolylineFeatureFactory featureFactory;
-
-	//FIXME remove shape file writer
 	public List<DgZone> convert2Zones(Network network, Population pop, List<DgZone> cells, Envelope networkBoundingBox, double startTime, double endTime) {
 		this.cells = cells;
-		this.initShapeFileWriter();
 		this.convertPopulation2OD(network, pop, networkBoundingBox, startTime, endTime);
-		this.writeShape();
 		return cells;
 	}
 	
-	private void writeShape() {
-		ShapeFileWriter.writeGeometries(featureCollection, DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/od_pairs.shp");
-	}
 
-	private void initShapeFileWriter() {
-		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		this.featureCollection = new ArrayList<SimpleFeature>();
-		
-		this.featureFactory = new PolylineFeatureFactory.Builder().
-				setCrs(crs).
-				setName("od_pair").
-				create();
-	}
-
-	
 	private void convertPopulation2OD(Network net, Population pop, Envelope networkBoundingBox, double startTime, double endTime) {
 		for (Person person : pop.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
@@ -114,16 +86,8 @@ public class DgMatsimPopulation2Zones {
 			}
 		}
 	}
-
-	private void addFromToRelationshipToShape(Coordinate startCoordinate, Coordinate endCoordinate){
-		Coordinate[] coordinates = {startCoordinate, endCoordinate};
-		SimpleFeature feature = this.featureFactory.createPolyline(coordinates);
-		this.featureCollection.add(feature);
-	}
-
 	
 	private void addFromZoneToZoneRelationshipToGrid(Coordinate startCoordinate, Coordinate endCoordinate){
-		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
 		DgZone startCell = this.searchGridCell(startCoordinate);
 		DgZone endCell = this.searchGridCell(endCoordinate);
 //		log.debug("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
@@ -136,7 +100,6 @@ public class DgMatsimPopulation2Zones {
 		Coordinate endCoordinate = MGC.coord2Coordinate(endLink.getCoord());
 		DgZone endCell = this.searchGridCell(endCoordinate);
 		startCell.getFromLink(startLink).addToLinkRelation(endLink);
-		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
 //		log.debug("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
 	}
 
@@ -145,7 +108,6 @@ public class DgMatsimPopulation2Zones {
 		Coordinate endCoordinate = MGC.coord2Coordinate(endLink.getCoord());
 		DgZone endCell = this.searchGridCell(endCoordinate);
 		startCell.addToLinkRelation(endLink);
-		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
 //		log.debug("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
 	}
 
@@ -154,7 +116,6 @@ public class DgMatsimPopulation2Zones {
 		DgZone startCell = this.searchGridCell(startCoordinate);
 		DgZone endCell = this.searchGridCell(endCoordinate);
 		startCell.getFromLink(startLink).addToZoneRelation(endCell);
-		this.addFromToRelationshipToShape(startCoordinate, endCoordinate);
 //		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
 
 	}
