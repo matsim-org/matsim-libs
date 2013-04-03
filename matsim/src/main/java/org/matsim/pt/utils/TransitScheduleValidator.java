@@ -280,16 +280,16 @@ public abstract class TransitScheduleValidator {
 			return Collections.unmodifiableList(this.errors);
 		}
 
-		/*package*/ void addWarning(final String warning) {
+		public void addWarning(final String warning) {
 			this.warnings.add(warning);
 		}
 
-		/*package*/ void addError(final String error) {
+		public void addError(final String error) {
 			this.errors.add(error);
 			this.isValid = false;
 		}
 
-		/*package*/ void add(final ValidationResult otherResult) {
+		public void add(final ValidationResult otherResult) {
 			this.warnings.addAll(otherResult.warnings);
 			this.errors.addAll(otherResult.errors);
 			this.isValid = this.isValid && otherResult.isValid;
