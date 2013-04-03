@@ -44,7 +44,7 @@ public class TravelDemand {
 
 	public static void main(String[] args) {
 
-		String eventsFile = "H:/data/experiments/TRBAug2011/runs/ktiRun23/output/ITERS/it.50/50.events.xml.gz";
+		String eventsFile = "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
 
 		double simulationStartTimeInSeconds = 7 * 3600;
 		double simulationEndTimeInSeconds = simulationStartTimeInSeconds + 2 * 3600;
