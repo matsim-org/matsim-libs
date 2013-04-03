@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
@@ -45,9 +51,11 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
-import playground.dgrether.signalsystems.cottbus.scripts.DgCottbusSmallNetworkGenerator;
+import playground.dgrether.signalsystems.cottbus.scripts.DgNetworkShrinker;
+import playground.dgrether.signalsystems.utils.DgSignalsBoundingBox;
 import playground.dgrether.utils.DgGrid;
 import playground.dgrether.utils.DgGridUtils;
+import playground.dgrether.utils.DgNet2Shape;
 import playground.dgrether.utils.DgPopulationSampler;
 import playground.dgrether.utils.zones.DgMatsimPopulation2Zones;
 import playground.dgrether.utils.zones.DgZone;
@@ -66,27 +74,42 @@ public class DgMATSimScenario2KoehlerStrehler2010 {
 	private static final String modelOutfile = "koehler_strehler_model.xml";
 	private double matsimPopSampleSize = 1.0;
 	private double ksModelCommoditySampleSize = 1.0;
+	private String shapeFileDirectory = "shapes/";
 
 	private Scenario fullScenario;
+
+	private CoordinateReferenceSystem crs;
 	
 	
-	public DgMATSimScenario2KoehlerStrehler2010(Scenario scenario) {
+	public DgMATSimScenario2KoehlerStrehler2010(Scenario scenario, CoordinateReferenceSystem crs) {
 		this.fullScenario = scenario;
+		this.crs = crs;
 	}
 
 	public void convert(String outputDirectory, String name, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
+		String shapeFileDirectory = this.createShapeFileDirectory(outputDirectory);
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
+		
+		DgSignalsBoundingBox signalsBoundingBox = new DgSignalsBoundingBox(crs);
+		SimpleFeature bb = signalsBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), boundingBoxOffset);
+		signalsBoundingBox.writeBoundingBox(bb, shapeFileDirectory);
+		
 		String smallNetworkFile = outputDirectory +  smallNetworkFilename;
+		DgNetworkShrinker netShrinker = new DgNetworkShrinker();
+		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), bb, crs);
+		NetworkCleaner cleaner = new NetworkCleaner();
+		cleaner.run(smallNetwork);
 		
-		DgCottbusSmallNetworkGenerator netShrinker = new DgCottbusSmallNetworkGenerator();
-		netShrinker.createSmallNetwork(fullScenario.getNetwork(), fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), outputDirectory, boundingBoxOffset);
-		Network smallNetwork = netShrinker.getShrinkedNetwork();
 		this.writeNetwork(smallNetwork, smallNetworkFile);
-		
+		this.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small");
+
+//		String smallNetworkClean = outputDirectory + "network_small_clean.xml.gz";
+//		this.writeNetwork(smallNetwork, smallNetworkClean);
+//		this.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small_clean");
 //		System.exit(0);
-		DgGrid grid = createAndWriteGrid(netShrinker.getBoundingBox(), netShrinker.getCrs(), cellsX, cellsY,  outputDirectory + "grid.shp");
+		DgGrid grid = createAndWriteGrid(signalsBoundingBox.getBoundingBox(),  crs, cellsX, cellsY,  shapeFileDirectory + "grid.shp");
 		
 		//create some zones and map demand on the zones
 		if (matsimPopSampleSize != 1.0){
@@ -94,10 +117,10 @@ public class DgMATSimScenario2KoehlerStrehler2010 {
 		}
 		List<DgZone> cells = DgZonesUtils.createZonesFromGrid(grid);
 		cells = new DgMatsimPopulation2Zones().convert2Zones(this.fullScenario.getNetwork(), this.fullScenario.getPopulation(), cells,
-				netShrinker.getBoundingBox(), startTimeSec, endTimeSec);
-		DgZonesUtils.writePolygonZones2Shapefile(cells, netShrinker.getCrs(), outputDirectory + "grid_cells.shp");
-		DgZonesUtils.writeLineStringOdPairsFromZones2Shapefile(cells, netShrinker.getCrs(), outputDirectory + "grid_od_pairs.shp");
-		Map<DgZone, Link> zones2LinkMap = DgZonesUtils.createZoneCenter2LinkMapping(cells, (NetworkImpl) netShrinker.getShrinkedNetwork());
+				signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
+		DgZonesUtils.writePolygonZones2Shapefile(cells, crs, shapeFileDirectory + "grid_cells.shp");
+		DgZonesUtils.writeLineStringOdPairsFromZones2Shapefile(cells, crs, shapeFileDirectory + "grid_od_pairs.shp");
+		Map<DgZone, Link> zones2LinkMap = DgZonesUtils.createZoneCenter2LinkMapping(cells, (NetworkImpl) smallNetwork);
 
 		//create koehler strehler network
 		Config smallNetConfig = ConfigUtils.createConfig();
@@ -135,6 +158,13 @@ public class DgMATSimScenario2KoehlerStrehler2010 {
 	}
 	
 	
+	private String createShapeFileDirectory(String outputDirectory) {
+		String shapeDir = outputDirectory + shapeFileDirectory;
+		File outdir = new File(shapeDir);
+		outdir.mkdir();
+		return shapeDir;
+	}
+
 	public void writeStats(int cellsX, int cellsY, double boundingBoxOffset, double startTime, double endTime, DgKSNetwork ksNet, DgCommodities commodities){
 		log.info("Cells:");
 		log.info("  X " + cellsX + " Y " + cellsY);
@@ -191,16 +221,10 @@ public class DgMATSimScenario2KoehlerStrehler2010 {
 	}
 	
 
-
-	
-	
-	public DgCottbusSmallNetworkGenerator shrinkAndWriteNetwork(String networkFile, String outputDirectory, String signalSystemsFile, String shrinkedNetOutfile, double offset){
-		DgCottbusSmallNetworkGenerator netShrinker = new DgCottbusSmallNetworkGenerator();
-		netShrinker.createSmallNetwork(networkFile, outputDirectory, signalSystemsFile, offset);
-		Network smallNetwork = netShrinker.getShrinkedNetwork();
-		NetworkWriter netWriter = new NetworkWriter(smallNetwork);
-		netWriter.write(shrinkedNetOutfile);
-		return netShrinker;
+	private void writeNetwork2Shape(Network net, String outputFilename){
+		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
+		new DgNet2Shape().write(net, outputFilename + "_links.shp", crs);
+		new Nodes2ESRIShape(net, outputFilename + "_nodes.shp", crs).write();
 	}
 
 	

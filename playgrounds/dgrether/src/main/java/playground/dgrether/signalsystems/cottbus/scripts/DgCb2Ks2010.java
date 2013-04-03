@@ -20,6 +20,8 @@
 package playground.dgrether.signalsystems.cottbus.scripts;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.DgMATSimScenario2KoehlerStrehler2010;
@@ -35,14 +37,14 @@ public class DgCb2Ks2010 {
 	public static void main(String[] args) throws Exception {
 		int cellsX = 5;
 		int cellsY = 5;
-		double boundingBoxOffset = 250.0;
+		double boundingBoxOffset = 450.0;
 		double startTime = 5.5 * 3600.0;
 		double endTime = 9.5 * 3600.0;
 	//private static double startTime = 13.5 * 3600.0;
 	//private static double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 0.01;
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/run1292_0530_0930_5_5_001coms/";
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/test/";
 
 		String networkFilename = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		String lanesFilename = DgCottbusScenarioPaths.LANES_FILENAME;
@@ -56,7 +58,7 @@ public class DgCb2Ks2010 {
 		
 		String name = "run 1292 output plans between 05:30 and 09:30";
 
-		DgMATSimScenario2KoehlerStrehler2010 matsim2KsConverter = new DgMATSimScenario2KoehlerStrehler2010(fullScenario);
+		DgMATSimScenario2KoehlerStrehler2010 matsim2KsConverter = new DgMATSimScenario2KoehlerStrehler2010(fullScenario,  MGC.getCRS(TransformationFactory.WGS84_UTM33N));
 		matsim2KsConverter.setMatsimPopSampleSize(matsimPopSampleSize);
 		matsim2KsConverter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
 		matsim2KsConverter.convert(outputDirectory, name, boundingBoxOffset, cellsX, cellsY, startTime, endTime);
