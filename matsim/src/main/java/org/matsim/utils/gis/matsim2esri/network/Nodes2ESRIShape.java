@@ -56,10 +56,15 @@ public class Nodes2ESRIShape {
 	private final String filename;
 	private SimpleFeatureBuilder builder;
 
+	
 	public Nodes2ESRIShape(final Network network, final String filename, final String coordinateSystem) {
+		this(network, filename, MGC.getCRS(coordinateSystem));
+	}
+	
+	public Nodes2ESRIShape(Network network, String filename, CoordinateReferenceSystem crs) {
 		this.network = network;
 		this.filename = filename;
-		initFeatureType(coordinateSystem);
+		initFeatureType(crs);
 	}
 
 	public void write() {
@@ -80,9 +85,7 @@ public class Nodes2ESRIShape {
 		}
 	}
 
-	private void initFeatureType(final String coordinateSystem) {
-		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
-
+	private void initFeatureType(final CoordinateReferenceSystem crs) {
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		typeBuilder.setName("node");
 		typeBuilder.setCRS(crs);
