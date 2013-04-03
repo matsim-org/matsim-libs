@@ -85,7 +85,7 @@ public class Sim2DRunner implements IterationStartsListener{
 		if (args[2].equals("true")) {
 			Sim2DRunner runner = new Sim2DRunner();
 			runner.visDebugger = new VisDebugger( sim2dc.getTimeStepSize());
-			runner.visDebugger.setTransformationStuff(minX, minY);
+//			runner.visDebugger.setTransformationStuff(minX, minY);
 			controller.addControlerListener(runner);
 			runner.controller = controller;
 			runner.factory = factory;

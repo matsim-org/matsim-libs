@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
@@ -60,7 +61,7 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 	private final QVehicle veh;
 	private final MobsimDriverAgent driver;
 
-	private final Neighbors ncalc = new Neighbors();
+	private final Neighbors ncalc;
 	private final Obstacles obst = new Obstacles();
 	private DesiredDirection dd = new DesiredDirection(this);
 	private final ORCASolver solver = new ORCASolver();
@@ -69,13 +70,14 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 	private final double dT;
 	private final double maxDelta;
 
-	public ORCAAgent(QVehicle veh, double spawnX, double spawnY, double dT) {
+	public ORCAAgent(QVehicle veh, double spawnX, double spawnY, Sim2DConfig config) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
 		this.driver = veh.getDriver();
+		this.ncalc = new Neighbors(this, config);
 		this.ncalc.setRangeAndMaxNrOfNeighbors(5, 5);
-		this.dT = dT;
+		this.dT = config.getTimeStepSize();
 		this.maxDelta =.25;// * dT;
 	}
 
@@ -103,7 +105,7 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 //				}
 //			}
 //		}
-		for (Tuple<Double, Sim2DAgent> neighbor : this.ncalc.computeNeighbors(this)) {
+		for (Tuple<Double, Sim2DAgent> neighbor : this.ncalc.getNeighbors()) {
 //			if (this.debugger != null && ( getId().toString().equals("r876"))){//&& neighbor.getSecond().getId().toString().equals("r5")) {
 //				ORCALine ol = new ORCALineAgent(this, neighbor, this.tau,this.debugger);
 //				constr.add(ol);				

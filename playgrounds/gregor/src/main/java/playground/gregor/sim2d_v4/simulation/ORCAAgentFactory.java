@@ -38,7 +38,7 @@ public class ORCAAgentFactory implements Sim2DAgentFactory {
 	
 	@Override
 	public Sim2DAgent buildAgent(QVehicle veh, double spawnX, double spawnY) {
-		DelegableSim2DAgent delegate = new ORCAAgent(veh, spawnX, spawnY,this.config.getTimeStepSize());
+		DelegableSim2DAgent delegate = new ORCAAgent(veh, spawnX, spawnY,this.config);
 		Sim2DAgent agent = new FailsafeAgentImpl(delegate);
 		return agent;
 	}

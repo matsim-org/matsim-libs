@@ -73,7 +73,7 @@ public class VisDebugger extends PApplet {
 
 	private static enum SC {overview,station,merging,evacuation};
 	private final SC sc = SC.evacuation;
-	private final boolean drawInfo = false;
+	private final boolean drawInfo = true;
 
 	private float scale = .5f;
 	protected int omx= 125;
@@ -417,7 +417,7 @@ public class VisDebugger extends PApplet {
 	}
 
 	private void drawTime() {
-		String strTime = setTime(-1);
+		String strTime = this.time2;
 		fill(64, 192);
 		stroke(0);
 		rect(0, 0, 105, 25);

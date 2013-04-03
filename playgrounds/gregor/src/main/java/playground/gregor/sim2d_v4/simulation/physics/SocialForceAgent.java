@@ -31,6 +31,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
@@ -66,20 +67,21 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
 
-	private final Neighbors ncalc = new Neighbors();
+	private final Neighbors ncalc;
 	private final Obstacles ocalc = new Obstacles();
 	private DesiredDirection dd;
 
 	private final double dT;
-
-
-	public SocialForceAgent(QVehicle veh, double spawnX, double spawnY, double deltaT) {
+	
+	public SocialForceAgent(QVehicle veh, double spawnX, double spawnY, Sim2DConfig conf) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
 		this.driver = veh.getDriver();
-		this.dT = deltaT;
-		this.ncalc.setRangeAndMaxNrOfNeighbors(5, 8);
+		this.dT = conf.getTimeStepSize();
+		this.ncalc = new Neighbors(this,conf);
+		this.ncalc.setRangeAndMaxNrOfNeighbors(8, 8);
+		this.ncalc.setUpdateInterval(1);
 		this.dd = new DesiredDirection(this);
 	}
 
@@ -91,8 +93,8 @@ public class SocialForceAgent implements Sim2DAgent, DelegableSim2DAgent {
 	@Override
 	public void updateVelocity() {
 
-
-		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.computeNeighbors(this);
+		
+		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors();
 		List<Segment> obstacles = this.ocalc.computeObstacles(this);
 
 

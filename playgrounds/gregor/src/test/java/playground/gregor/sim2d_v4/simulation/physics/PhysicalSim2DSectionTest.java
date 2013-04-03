@@ -95,11 +95,12 @@ public class PhysicalSim2DSectionTest {
 		
 		this.psec0.updatedTwoDTree();
 		this.psec1.updatedTwoDTree();
+		
 		this.psec2.updatedTwoDTree();
 		
-		Neighbors ncalc = new Neighbors();
+		Neighbors ncalc = new Neighbors(agentInQuestion,Sim2DConfigUtils.createConfig());
 		ncalc.setRangeAndMaxNrOfNeighbors(10, 3);
-		List<Tuple<Double, Sim2DAgent>> neighbors = ncalc.computeNeighbors(agentInQuestion);
+		List<Tuple<Double, Sim2DAgent>> neighbors = ncalc.getNeighbors();
 		assertEquals(neighbors.size(),3);
 		assertEquals(a1,neighbors.get(0).getSecond());
 		assertEquals(a0,neighbors.get(1).getSecond());

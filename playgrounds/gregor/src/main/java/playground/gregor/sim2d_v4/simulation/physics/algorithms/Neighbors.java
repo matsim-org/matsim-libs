@@ -20,13 +20,18 @@
 
 package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
@@ -35,28 +40,80 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class Neighbors {
 
-	
+
 	private double sqRange = 10;
 	private double range = Math.sqrt(this.sqRange);
 	private int nrNeighbors = 3;
+
+	List<Sim2DAgent> agentsSec = new ArrayList<Sim2DAgent>();
+	Map<Segment,List<Sim2DAgent>> agentsNeigh = new HashMap<Segment,List<Sim2DAgent>>();
+	private final Sim2DAgent agent;
+
+	private List<Tuple<Double,Sim2DAgent>> cachedNeighbors;
+	private final double dT;
+	private double updateIntervall;
+	private double timeAfterLastUpdate = Double.POSITIVE_INFINITY;
 	
+	public Neighbors(Sim2DAgent agent, Sim2DConfig conf) {
+		this.agent = agent;
+		this.dT = conf.getTimeStepSize();
+		this.updateIntervall = this.dT;
+	}
+	private void updateNeighbors() {
+		this.agentsSec.clear();
+		this.agentsNeigh.clear();
+		double[] aPos = this.agent.getPos();
+		PhysicalSim2DSection psec = this.agent.getPSec();
+
+
+
+		double twoDTreeRange = this.range;
+		Envelope e = new Envelope(aPos[0]-twoDTreeRange,aPos[0]+twoDTreeRange,aPos[1]-twoDTreeRange,aPos[1]+twoDTreeRange);
+		List<Sim2DAgent> agents = psec.getAgents(e);
+		this.agentsSec.addAll(agents);
+
+
+		//agents from neighboring sections
+		Segment[] openings = psec.getOpenings();
+		for (int i = 0; i < openings.length; i++) {
+			Segment opening = openings[i];
+			PhysicalSim2DSection qSec = psec.getNeighbor(opening);
+			if (qSec == null) {
+				continue;
+			}
+
+			twoDTreeRange = this.range;
+			e = new Envelope(this.agent.getPos()[0]-twoDTreeRange,this.agent.getPos()[0]+twoDTreeRange,this.agent.getPos()[1]-twoDTreeRange,this.agent.getPos()[1]+twoDTreeRange);
+			List<Sim2DAgent> tmp = qSec.getAgents(e);
+			this.agentsNeigh.put(opening, tmp);
+			//agents from neighboring sections need to check visibility
+		}
+	}
+
+	public List<Tuple<Double,Sim2DAgent>> getNeighbors() {//TODO consider adding time as attribute [gl April '13]
+		this.timeAfterLastUpdate += this.dT;
+		if (this.timeAfterLastUpdate >= this.updateIntervall) {
+			computeNeighbors();
+			this.timeAfterLastUpdate = 0;
+		} 
+		
+		
+		return this.cachedNeighbors;
+	}
 	
-	public List<Tuple<Double,Sim2DAgent>> computeNeighbors(Sim2DAgent agent) {
+	private List<Tuple<Double,Sim2DAgent>> computeNeighbors() {
+		
+		updateNeighbors();
+		
 		LinkedList<Tuple<Double,Sim2DAgent>> ret = new LinkedList<Tuple<Double,Sim2DAgent>>();
 		int size = 0;
-		
-		double[] aPos = agent.getPos();
-		PhysicalSim2DSection psec = agent.getPSec();
-		
+
+		double[] aPos = this.agent.getPos();
 		double currentMaxSqRange = this.sqRange;
-		
-		
-		double twoDTreeRange = this.range;
-		Envelope e = new Envelope(agent.getPos()[0]-twoDTreeRange,agent.getPos()[0]+twoDTreeRange,agent.getPos()[1]-twoDTreeRange,agent.getPos()[1]+twoDTreeRange);
-		List<Sim2DAgent> agents = psec.getAgents(e);
+
 		//agents from same section visible by definition
-		for (Sim2DAgent b : agents) {
-			if (b.equals(agent)) {
+		for (Sim2DAgent b : this.agentsSec) {
+			if (b.equals(this.agent)) {
 				continue;
 			}
 			double[] bPos = b.getPos();
@@ -87,22 +144,14 @@ public class Neighbors {
 				ret.removeLast();
 				size = this.nrNeighbors;
 				currentMaxSqRange = ret.getLast().getFirst();
-				
+
 			}
 		}
-		
+
 		//agents from neighboring sections
-		Segment[] openings = psec.getOpenings();
-		for (int i = 0; i < openings.length; i++) {
-			Segment opening = openings[i];
-			PhysicalSim2DSection qSec = psec.getNeighbor(opening);
-			if (qSec == null) {
-				continue;
-			}
-			
-			twoDTreeRange = this.range;
-			e = new Envelope(agent.getPos()[0]-twoDTreeRange,agent.getPos()[0]+twoDTreeRange,agent.getPos()[1]-twoDTreeRange,agent.getPos()[1]+twoDTreeRange);
-			agents = qSec.getAgents(e);
+		for (Entry<Segment, List<Sim2DAgent>> e : this.agentsNeigh.entrySet()) {
+			List<Sim2DAgent> agents = e.getValue();
+			Segment opening = e.getKey();
 			//agents from neighboring sections need to check visibility
 			for (Sim2DAgent b : agents) {
 				double[] bPos = b.getPos();
@@ -136,14 +185,14 @@ public class Neighbors {
 					ret.removeLast();
 					size = this.nrNeighbors;
 					currentMaxSqRange = ret.getLast().getFirst();
-					
+
 				}
 			}
 			//..
 		}
-		
+		this.cachedNeighbors = ret;
 		return ret;
-		
+
 	}
 
 	private boolean visible(double[] aPos, double[] bPos, Segment opening) {
@@ -156,5 +205,9 @@ public class Neighbors {
 		this.sqRange = range*range;
 		this.range = range;
 		this.nrNeighbors = nrNeighbors;
+	}
+	
+	public void setUpdateInterval(double intervall) {
+		this.updateIntervall = intervall;
 	}
 }
