@@ -20,6 +20,8 @@
 
 package org.matsim.analysis;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -222,6 +224,12 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		final CategoryAxis axis1 = new CategoryAxis("hour");
 		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
 		plot.setDomainAxis(new NumberAxis("time"));
+		
+		plot.getRenderer().setSeriesStroke(0, new BasicStroke(2.0f));
+		plot.getRenderer().setSeriesStroke(1, new BasicStroke(2.0f));
+		plot.getRenderer().setSeriesStroke(2, new BasicStroke(2.0f));
+		plot.setBackgroundPaint(Color.white);
+		
 		return chart;
 	}
 
