@@ -1,4 +1,4 @@
-package playground.pieter.singapore.utils;
+package playground.pieter.singapore.utils.events;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -21,8 +21,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.pieter.singapore.utils.events.GetPersonIdsCrossingLinkSelection;
-import playground.pieter.singapore.utils.events.TrimEventsWithPersonIds;
+import playground.pieter.singapore.utils.Sample;
+import playground.pieter.singapore.utils.events.listeners.GetPersonIdsCrossingLinkSelection;
+import playground.pieter.singapore.utils.events.listeners.TrimEventsWithPersonIds;
 
 public class EventsExtractedForSelectedLinks {
 

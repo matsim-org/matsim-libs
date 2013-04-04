@@ -18,51 +18,80 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.pieter.singapore.utils.events;
+package playground.pieter.singapore.utils.events.listeners;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.*;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-public class GetPersonIdsCrossingLinkSelection implements BasicEventHandler {
+public class TrimEventWriterHITS implements EventWriter, BasicEventHandler {
 	private BufferedWriter out = null;
-	private HashSet<String> linkIds;
-	private HashSet<String> personIds;
 
 	public void reset(int iteration) {
-		
+		closeFile();
 	}
 
+	public void closeFile() {
+		if (this.out != null)
+			try {
+				this.out.write("</events>");
+				this.out.close();
+				this.out = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
 
 	public void handleEvent(Event event) {
-		Map<String, String> attrs = event.getAttributes();
-		if(linkIds.contains(attrs.get("link"))){
-			personIds.add(attrs.get("person"));
+		StringBuilder eventXML = new StringBuilder(180);
+		Map<String, String> attr = event.getAttributes();
+		String pax_idx = attr.get("person");
+		// the filter, in this case, show the first 2/3/4 of each instantiation
+		// of a HITS person
+		if (pax_idx == null
+				|| (pax_idx.endsWith("_1") || pax_idx.endsWith("_2")
+						|| pax_idx.endsWith("_3") || pax_idx.endsWith("_4")
+						|| pax_idx.endsWith("_5") || pax_idx.startsWith("pt"))) {
+
+			eventXML.append("\t<event ");
+			for (Map.Entry<String, String> entry : attr.entrySet()) {
+				eventXML.append(entry.getKey());
+				eventXML.append("=\"");
+				eventXML.append(entry.getValue());
+				eventXML.append("\" ");
+			}
+			eventXML.append(" />\n");
+			try {
+				this.out.write(eventXML.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
-	public GetPersonIdsCrossingLinkSelection(HashSet<String> linkIds2) {
-		this.linkIds = linkIds2;
-		this.personIds = new HashSet<String>();
+	public TrimEventWriterHITS(final String filename, ArrayList<String> filter) {
+		init(filename);
 	}
 
-
-	public HashSet<String> getPersonIds() {
-		return personIds;
+	public void init(final String outfilename) {
+		closeFile();
+		try {
+			this.out = IOUtils.getBufferedWriter(outfilename);
+			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-
-
-
+	public static void main(String[] args){
+		
+	}
 
 }

@@ -1,7 +1,7 @@
-package playground.pieter.singapore.utils;
+package playground.pieter.singapore.utils.events;
 
 import playground.pieter.singapore.hits.HITSData;
-import playground.pieter.singapore.utils.events.TrimEventWriterHITS;
+import playground.pieter.singapore.utils.events.listeners.TrimEventWriterHITS;
 
 import java.io.File;
 import java.io.IOException;

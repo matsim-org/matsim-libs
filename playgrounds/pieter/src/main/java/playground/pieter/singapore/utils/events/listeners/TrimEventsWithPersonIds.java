@@ -18,79 +18,77 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.pieter.singapore.utils.events;
+package playground.pieter.singapore.utils.events.listeners;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeSet;
 
-import org.apache.bcel.generic.NEW;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.*;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-public class TravelTimeListener implements BasicEventHandler {
+public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 	private BufferedWriter out = null;
+	private HashSet<String> sampledIds;
 
-	private HashMap<String,Double> paxTravelTimes = new HashMap<String, Double>();
-	public HashMap<String, Double> getPaxTravelTimes() {
-		return paxTravelTimes;
-	}
-	private HashMap<String,Double> paxTempTravelTimes = new HashMap<String, Double>();
-	private HashMap<String,String> paxModes = new HashMap<String, String>();
-	public HashMap<String, String> getPaxModes() {
-		return paxModes;
-	}
-	private NetworkImpl network;
 	public void reset(int iteration) {
+		closeFile();
 	}
 
+	public void closeFile() {
+		if (this.out != null)
+			try {
+				this.out.write("</events>");
+				this.out.close();
+				this.out = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
 
 	public void handleEvent(Event event) {
 		StringBuilder eventXML = new StringBuilder(180);
 		Map<String, String> attr = event.getAttributes();
-		String type = attr.get("type");
-		String mode = "";
-		if(type.equals("actend") || type.equals("actstart") || type.equals("departure")){
-			String pax_idx = attr.get("person");
-			double currentTime = 0;
-			if (pax_idx != null){
-				if(type.equals("departure"))
-					mode += attr.get("legMode");
-				if(type.equals("actend")){
-					paxTempTravelTimes.put(pax_idx, Double.parseDouble(attr.get("time")));					
-				}else{
-					currentTime += Double.parseDouble(attr.get("time")) - paxTempTravelTimes.get(pax_idx);
-//					paxTempTravelTimes.remove(pax_idx);					
-				}
-				if(paxTravelTimes.get(pax_idx) == null){
-					paxTravelTimes.put(pax_idx, currentTime);
-					paxModes.put(pax_idx, mode);
-				}else{
-					currentTime += paxTravelTimes.get(pax_idx);
-					mode = paxModes.get(pax_idx) + mode;
-					paxTravelTimes.put(pax_idx,currentTime);
-					paxModes.put(pax_idx, mode);
-					
-				}
+		String personId = attr.get("person");
+
+		if (sampledIds.contains(personId)) {
+
+			eventXML.append("\t<event ");
+			for (Map.Entry<String, String> entry : attr.entrySet()) {
+				eventXML.append(entry.getKey());
+				eventXML.append("=\"");
+				eventXML.append(entry.getValue());
+				eventXML.append("\" ");
 			}
-			
+			eventXML.append(" />\n");
+			try {
+				this.out.write(eventXML.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-
 	}
 
-	public TravelTimeListener(){
+	public TrimEventsWithPersonIds(final String filename, HashSet<String> sampledIds) {
+		init(filename);
+		this.sampledIds = sampledIds;
 	}
 
-	public void init() {
-
+	public void init(final String outfilename) {
+		closeFile();
+		try {
+			this.out = IOUtils.getBufferedWriter(outfilename);
+			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public static void main(String[] args){
 		
