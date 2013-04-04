@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.io.PushbackReader;
 import java.io.StringReader;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
@@ -541,9 +542,13 @@ public class Version2pt1DemandGenerationScript {
 		StringBuilder sb = new StringBuilder();
 		PushbackReader reader = new PushbackReader( new StringReader(""), 10000000 );
 		try {
+			Date date = new Date();
 			CopyManager cpManager = ((PGConnection)dba.getConnection()).getCopyAPI();
 			dba.executeStatement("DROP TABLE IF EXISTS u_fouriep.main_act_locations_new;");
 			dba.executeStatement("CREATE TABLE u_fouriep.main_act_locations_new (full_pop_pid int , facility_id varchar(255), distance real);");
+			dba.executeStatement(String.format("COMMENT ON TABLE m_calibration.main_act_location_assignment IS" +
+					" \'Main activity locations set during the MATSim demand generation process run on %s.\';",
+					date.toString()));
 			for(PaxSG p:inputData.getPersons().values()){
 				if(p.mainActType == null)
 					continue;

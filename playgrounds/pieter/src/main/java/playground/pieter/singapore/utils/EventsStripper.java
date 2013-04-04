@@ -2,6 +2,7 @@ package playground.pieter.singapore.utils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -15,7 +16,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.pieter.singapore.utils.events.TrimEventsWithIds;
+import playground.pieter.singapore.utils.events.TrimEventsWithPersonIds;
 
 public class EventsStripper {
 
@@ -51,11 +52,11 @@ public class EventsStripper {
 		this.events = EventsUtils.createEventsManager();
 		int N = choiceSet.length;
 		int M = (int) ((double)N*frequency);
-		TreeSet<String> sampledIds = new TreeSet<String>();
+		HashSet<String> sampledIds = new HashSet<String>();
 		for(int i: Sample.sampleMfromN(M, N)){
 			sampledIds.add(choiceSet[i]);
 		}
-		TrimEventsWithIds filteredWriter = new TrimEventsWithIds(outfileName, sampledIds);
+		TrimEventsWithPersonIds filteredWriter = new TrimEventsWithPersonIds(outfileName, sampledIds);
 		events.addHandler(filteredWriter);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(inFileName);
