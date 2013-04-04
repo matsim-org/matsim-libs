@@ -35,7 +35,7 @@ public class EventsExtractedForSelectedLinks {
 			String eventsINPUTFile, String eventsOUTPUTFile) throws IOException {
 
 		this.populateList(idFile, networkFile);
-		this.stripEvents(eventsINPUTFile, eventsOUTPUTFile, 1);
+		this.stripEvents(eventsINPUTFile, eventsOUTPUTFile, 0.1);
 	}
 
 	private void populateList(String idFile, String networkFile)
@@ -52,27 +52,33 @@ public class EventsExtractedForSelectedLinks {
 		}
 	}
 
-	public void stripEvents(String inFileName, String outfileName, double frequency){
+	public void stripEvents(String inFileName, String outfileName,
+			double frequency) {
 		this.events = EventsUtils.createEventsManager();
-//		first, read through the events file and get all person ids crossing the link set
-		GetPersonIdsCrossingLinkSelection idFinder = new GetPersonIdsCrossingLinkSelection(linkIds);
+		// first, read through the events file and get all person ids crossing
+		// the link set
+		GetPersonIdsCrossingLinkSelection idFinder = new GetPersonIdsCrossingLinkSelection(
+				linkIds);
 		events.addHandler(idFinder);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(inFileName);
 		ArrayList<String> personIds = new ArrayList<String>();
 		personIds.addAll(idFinder.getPersonIds());
 		int N = personIds.size();
-		int M = (int) ((double)N*frequency);
+		int M = (int) ((double) N * frequency);
 		HashSet<String> sampledIds = new HashSet<String>();
-		for(int i: Sample.sampleMfromN(M, N)){
+		for (int i : Sample.sampleMfromN(M, N)) {
 			sampledIds.add(personIds.get(i));
 		}
-//		re-initialise the events manager to fileter events by person id
+		// re-initialise the events manager to fileter events by person id
+		events = null;
 		this.events = EventsUtils.createEventsManager();
-		TrimEventsWithPersonIds trimmer = new TrimEventsWithPersonIds(outfileName, sampledIds);
+		TrimEventsWithPersonIds trimmer = new TrimEventsWithPersonIds(
+				outfileName, sampledIds);
 		events.addHandler(trimmer);
+		reader = new EventsReaderXMLv1(events);
 		reader.parse(inFileName);
-		
+		trimmer.closeFile();
 	}
 
 	public static void main(String[] args) throws IOException {
