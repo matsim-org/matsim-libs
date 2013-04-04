@@ -6,7 +6,7 @@
 //
 
 
-package playground.andreas.gexf;
+package playground.vsp.gexf;
 
 import java.util.ArrayList;
 import java.util.List;

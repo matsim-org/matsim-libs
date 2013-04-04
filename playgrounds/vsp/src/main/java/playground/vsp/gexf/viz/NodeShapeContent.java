@@ -6,14 +6,14 @@
 //
 
 
-package playground.andreas.gexf.viz;
+package playground.vsp.gexf.viz;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import playground.andreas.gexf.XMLSpellsContent;
+import playground.vsp.gexf.XMLSpellsContent;
 
 
 /**

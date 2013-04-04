@@ -6,7 +6,7 @@
 //
 
 
-package playground.andreas.gexf.viz;
+package playground.vsp.gexf.viz;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;

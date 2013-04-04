@@ -6,7 +6,7 @@
 //
 
 
-package playground.andreas.gexf;
+package playground.vsp.gexf;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

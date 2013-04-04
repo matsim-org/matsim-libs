@@ -6,4 +6,4 @@
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.gexf.net/1.2draft/viz", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package playground.andreas.gexf.viz;
+package playground.vsp.gexf.viz;

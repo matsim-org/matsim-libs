@@ -6,13 +6,13 @@
 //
 
 
-package playground.andreas.gexf.viz;
+package playground.vsp.gexf.viz;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import playground.andreas.gexf.XMLSpellsContent;
+import playground.vsp.gexf.XMLSpellsContent;
 
 
 /**

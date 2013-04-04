@@ -6,22 +6,22 @@
 //
 
 
-package playground.andreas.gexf;
+package playground.vsp.gexf;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import playground.andreas.gexf.viz.ColorContent;
-import playground.andreas.gexf.viz.PositionContent;
-import playground.andreas.gexf.viz.SizeContent;
-import playground.andreas.gexf.viz.ThicknessContent;
+import playground.vsp.gexf.viz.ColorContent;
+import playground.vsp.gexf.viz.PositionContent;
+import playground.vsp.gexf.viz.SizeContent;
+import playground.vsp.gexf.viz.ThicknessContent;
 
 
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the playground.andreas.gexf package. 
+ * generated in the playground.vsp.gexf package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -58,7 +58,7 @@ public class ObjectFactory {
     private final static QName _Options_QNAME = new QName("http://www.gexf.net/1.2draft", "options");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: playground.andreas.gexf
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: playground.vsp.gexf
      * 
      */
     public ObjectFactory() {

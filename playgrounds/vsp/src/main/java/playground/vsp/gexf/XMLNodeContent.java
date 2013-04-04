@@ -6,7 +6,7 @@
 //
 
 
-package playground.andreas.gexf;
+package playground.vsp.gexf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +19,10 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import playground.andreas.gexf.viz.ColorContent;
-import playground.andreas.gexf.viz.NodeShapeContent;
-import playground.andreas.gexf.viz.PositionContent;
-import playground.andreas.gexf.viz.SizeContent;
+import playground.vsp.gexf.viz.ColorContent;
+import playground.vsp.gexf.viz.NodeShapeContent;
+import playground.vsp.gexf.viz.PositionContent;
+import playground.vsp.gexf.viz.SizeContent;
 
 
 /**
