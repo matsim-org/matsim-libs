@@ -20,18 +20,18 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import playground.andreas.gexf.ObjectFactory;
-import playground.andreas.gexf.XMLDefaultedgetypeType;
-import playground.andreas.gexf.XMLEdgeContent;
-import playground.andreas.gexf.XMLEdgesContent;
-import playground.andreas.gexf.XMLGexfContent;
-import playground.andreas.gexf.XMLGraphContent;
-import playground.andreas.gexf.XMLIdtypeType;
-import playground.andreas.gexf.XMLModeType;
-import playground.andreas.gexf.XMLNodeContent;
-import playground.andreas.gexf.XMLNodesContent;
-import playground.andreas.gexf.XMLTimeformatType;
-import playground.andreas.gexf.viz.PositionContent;
+import playground.vsp.gexf.ObjectFactory;
+import playground.vsp.gexf.XMLDefaultedgetypeType;
+import playground.vsp.gexf.XMLEdgeContent;
+import playground.vsp.gexf.XMLEdgesContent;
+import playground.vsp.gexf.XMLGexfContent;
+import playground.vsp.gexf.XMLGraphContent;
+import playground.vsp.gexf.XMLIdtypeType;
+import playground.vsp.gexf.XMLModeType;
+import playground.vsp.gexf.XMLNodeContent;
+import playground.vsp.gexf.XMLNodesContent;
+import playground.vsp.gexf.XMLTimeformatType;
+import playground.vsp.gexf.viz.PositionContent;
 
 public class Network2Gexf extends MatsimJaxbXmlWriter{
 	
@@ -65,7 +65,7 @@ public class Network2Gexf extends MatsimJaxbXmlWriter{
 		log.info("writing output to " + filename);
 		JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(playground.andreas.gexf.ObjectFactory.class);
+			jc = JAXBContext.newInstance(playground.vsp.gexf.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
 			super.setMarshallerProperties(Network2Gexf.xsdPath, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
@@ -106,7 +106,7 @@ public class Network2Gexf extends MatsimJaxbXmlWriter{
 			n.setId(node.getId().toString());
 			n.setLabel("network edge");
 			
-			playground.andreas.gexf.viz.ObjectFactory vizFac = new playground.andreas.gexf.viz.ObjectFactory();
+			playground.vsp.gexf.viz.ObjectFactory vizFac = new playground.vsp.gexf.viz.ObjectFactory();
 			PositionContent pos = vizFac.createPositionContent();
 			pos.setX((float) node.getCoord().getX());
 			pos.setY((float) node.getCoord().getY());
