@@ -424,17 +424,19 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 						incompatibleRecords,
 						localFeasibilityChanger);
 
+				currentAllocation.addAll( newAllocation.getPlans() );
 				newString = buildPlanString(
 						knownFeasibleAllocations,
 						incompatibleRecords,
 						actuallyRemainingPersons,
 						allPersons,
-						merge( currentAllocation , newAllocation ),
+						currentAllocation,
 						Math.max(
 							minimalWeightToObtain,
 							constructedString != null ?
 								constructedString.getWeight() :
 								Double.NEGATIVE_INFINITY) - newAllocation.getWeight() );
+				currentAllocation.removeAll( newAllocation.getPlans() );
 
 				localFeasibilityChanger.resetFeasibilities();
 

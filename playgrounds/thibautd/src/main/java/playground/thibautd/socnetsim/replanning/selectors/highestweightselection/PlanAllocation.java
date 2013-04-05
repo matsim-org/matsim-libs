@@ -49,6 +49,15 @@ final class PlanAllocation {
 		for ( PlanRecord p : ps ) add( p );
 	}
 
+	public void remove(final PlanRecord p) {
+		plans.remove( p );
+		weight -= p.avgJointPlanWeight;
+	}
+
+	public void removeAll(final Collection<PlanRecord> ps) {
+		for ( PlanRecord p : ps ) remove( p );
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		return o instanceof PlanAllocation && ((PlanAllocation) o).plans.equals( plans );
