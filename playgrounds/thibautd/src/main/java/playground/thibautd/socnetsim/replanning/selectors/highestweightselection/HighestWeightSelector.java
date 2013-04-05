@@ -251,38 +251,36 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final IncompatiblePlanRecords incompatibleRecords,
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans groupPlan) {
-		return !searchForCombinationsWithoutForbiddenPlans(
-				groupPlan,
+		final FeasibilityChanger feasibility = new FeasibilityChanger();
+
+		for ( Plan p : groupPlan.getAllIndividualPlans() ) {
+			final PersonRecord person = personRecords.get( p.getPerson().getId() );
+			final PlanRecord plan = person.getRecord( p );
+			feasibility.markInfeasible( plan );
+		}
+
+		final boolean isBlocking = !searchForCombinationsWithoutForbiddenPlans(
 				incompatibleRecords,
 				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ));
+		feasibility.resetFeasibilities();
+
+		return isBlocking;
 	}
 
 	private boolean searchForCombinationsWithoutForbiddenPlans(
-			final GroupPlans forbidenPlans,
 			final IncompatiblePlanRecords incompatibleRecords,
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate) {
-		final PersonRecord currentPerson = personsStillToAllocate.get(0);
-
 		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
-			personsStillToAllocate.size() > 1 ?
-			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
-			Collections.<PersonRecord> emptyList();
+			new ArrayList<PersonRecord>( personsStillToAllocate );
+		final PersonRecord currentPerson = remainingPersons.remove(0);
 
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 		for (PlanRecord r : currentPerson.plans) {
 			// skip forbidden plans
 			if ( !r.isStillFeasible ) continue;
-			if ( r.jointPlan == null &&
-					forbidenPlans.getIndividualPlans().contains( r.plan ) ) {
-				continue;
-			}
-			if ( r.jointPlan != null &&
-					forbidenPlans.getJointPlans().contains( r.jointPlan ) ) {
-				continue;
-			}
 
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			if (r.jointPlan != null) {
@@ -297,7 +295,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 			if ( !actuallyRemainingPersons.isEmpty() ) {
 				final boolean found = searchForCombinationsWithoutForbiddenPlans(
-						forbidenPlans,
 						incompatibleRecords,
 						allPersonsRecord,
 						actuallyRemainingPersons);
