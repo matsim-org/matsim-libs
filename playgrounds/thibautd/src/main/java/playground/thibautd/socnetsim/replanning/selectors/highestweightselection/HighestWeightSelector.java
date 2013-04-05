@@ -50,16 +50,6 @@ import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector
  */
 public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	private static final double EPSILON = 1E-7;
-	/**
-	 * if true, when computing bounds, all joint plans of agents in the joint
-	 * plan to select will be considered as unfeasible.
-	 * if false, just the joint plans of the current agent will be considered
-	 * as unfeasible.
-	 * There is no optimal value: it is a threadoff between tightness of the bounds
-	 * and complexity of computing them.
-	 * TODO: make configurable.
-	 */
-	private static final boolean CONSIDER_SECOND_ORDER_IN_BOUNDS = true;
 	private final boolean forbidBlockingCombinations;
 	private final WeightCalculator weightCalculator;
 
@@ -213,6 +203,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final PlanAllocation allocation = buildPlanString(
 					new KnownStates(),
 					forbiden,
+					new IncompatiblePlanRecords(),
 					new ArrayList<PersonRecord>( personRecords.values() ),
 					new PlanAllocation(),
 					Double.NEGATIVE_INFINITY);
@@ -327,6 +318,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	private PlanAllocation buildPlanString(
 			final KnownStates knownStates,
 			final ForbidenCombinations forbidenCombinations,
+			final IncompatiblePlanRecords incompatibleRecords,
 			final List<PersonRecord> personsStillToAllocate,
 			// needed to check whether a leave is forbidden or not
 			final PlanAllocation currentAllocation,
@@ -350,12 +342,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		final PersonRecord currentPerson = remainingPersons.remove(0);
 		assert remainingPersons.size() == personsStillToAllocate.size() - 1;
 
-		// the joint plans implying this person will be considered "selectable"
-		// only when considering this joint plan as being selected for currentPerson
-		tagLinkedPlansOfPersonAsInfeasible(
-				currentPerson,
-				feasibilityChanger);
-
 		// get a list of plans in decreasing order of maximum possible weight.
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
@@ -366,6 +352,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		}
 
 		weightPlanRecords(
+				incompatibleRecords,
 				records,
 				remainingPersons );
 
@@ -415,11 +402,12 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 
 				assert actuallyRemainingPersons.size() + r.jointPlan.getIndividualPlans().size() == personsStillToAllocate.size();
-
-				tagLinkedPlansOfPartnersAsInfeasible(
-						r,
-						localFeasibilityChanger);
 			}
+
+			tagIncompatiblePlansAsInfeasible(
+					r,
+					incompatibleRecords,
+					localFeasibilityChanger);
 
 			PlanAllocation newString = null;
 			/*scope*/ {
@@ -430,6 +418,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					newString = buildPlanString(
 							knownStates,
 							forbidenCombinations,
+							incompatibleRecords,
 							actuallyRemainingPersons,
 							newCurrentAlloc,
 							Math.max(
@@ -477,18 +466,27 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		return constructedString;
 	}
 
+	private static void tagIncompatiblePlansAsInfeasible(
+			final PlanRecord r,
+			final IncompatiblePlanRecords incompatibleRecords,
+			final FeasibilityChanger localFeasibilityChanger) {
+		for ( PlanRecord incompatible : incompatibleRecords.getIncompatiblePlans( r ) ) {
+			localFeasibilityChanger.markInfeasible( incompatible );
+		}
+	}
+
 	private static void weightPlanRecords(
+			final IncompatiblePlanRecords incompatibleRecords,
 			final Collection<PlanRecord> records,
 			final List<PersonRecord> remainingPersons) {
 		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 
 		for (PlanRecord r : records) {
 			if ( r.isStillFeasible ) {
-				if ( CONSIDER_SECOND_ORDER_IN_BOUNDS ) {
-					tagLinkedPlansOfPartnersAsInfeasible(
-							r,
-							localFeasibilityChanger);
-				}
+				tagIncompatiblePlansAsInfeasible(
+						r,
+						incompatibleRecords,
+						localFeasibilityChanger);
 
 				r.cachedMaximumWeight =
 						getMaxWeightFromPersons(
@@ -500,30 +498,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			else {
 				r.cachedMaximumWeight = Double.NEGATIVE_INFINITY;
 			}
-		}
-	}
-
-	private static void tagLinkedPlansOfPersonAsInfeasible(
-			final PersonRecord person,
-			final FeasibilityChanger changer) {
-		for ( PlanRecord pr : person.bestPlansPerJointStructure ) {
-			if ( pr.jointPlan == null ) {
-				assert pr.linkedPlans.isEmpty();
-				continue;
-			}
-			for ( PlanRecord p : pr.linkedPlans ) {
-				changer.markInfeasible( p );
-			}
-		}
-	}
-
-	private static void tagLinkedPlansOfPartnersAsInfeasible(
-			final PlanRecord r,
-			final FeasibilityChanger changer) {
-		assert !r.linkedPlans.contains( r );
-		for ( PlanRecord linkedPlan : r.linkedPlans ) {
-			final PersonRecord cotrav = linkedPlan.person;
-			tagLinkedPlansOfPersonAsInfeasible( cotrav , changer );
 		}
 	}
 
