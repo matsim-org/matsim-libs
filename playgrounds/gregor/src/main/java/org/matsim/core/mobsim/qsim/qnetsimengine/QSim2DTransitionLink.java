@@ -40,7 +40,7 @@ import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.Sim2DAgentFactory;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
-import playground.gregor.sim2d_v4.simulation.physics.SimpleAgent;
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 public class QSim2DTransitionLink extends QLinkInternalI {
 
@@ -95,7 +95,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 			if (psecBox.getNumberOfAllAgents() != 0) {
 				throw new RuntimeException("trying to spawn agent in a non empty departure box");
 			}
-			SimpleAgent agent = this.agentBuilder.buildAgent(veh,dbox.spawnX,dbox.spawnY, psecBox.getPhysicalEnvironment());
+			Sim2DAgent agent = this.agentBuilder.buildAgent(veh,dbox.spawnX,dbox.spawnY, psecBox.getPhysicalEnvironment());
 			agent.setDesiredSpeed(this.getLink().getFreespeed());
 			psecBox.addAgentToInBuffer(agent);
 			double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();

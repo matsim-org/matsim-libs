@@ -210,7 +210,7 @@ public class PhysicalSim2DSectionTest {
 
 	}
 
-	private class DummyAgent extends SimpleAgent{
+	private class DummyAgent extends Sim2DAgent{
 
 
 		private final double [] pos = {0,0};

@@ -27,14 +27,14 @@ import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
-import playground.gregor.sim2d_v4.simulation.physics.SimpleAgent;
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 public class Obstacles {
 	
 
 	private VisDebugger debugger;
 
-	public List<Segment> computeObstacles(SimpleAgent agent) {
+	public List<Segment> computeObstacles(Sim2DAgent agent) {
 		List<Segment> ret = new ArrayList<Segment>(100);
 		
 		PhysicalSim2DSection psec = agent.getPSec();

@@ -60,9 +60,9 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 	private DesiredDirection dd;
 
 	private final double dT;
-	private final SimpleAgent agent;
+	private final Sim2DAgent agent;
 	
-	public SocialForceVelocityUpdater(DesiredDirection dd, Neighbors ncalc, Sim2DConfig conf, SimpleAgent agent) {
+	public SocialForceVelocityUpdater(DesiredDirection dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dd = dd;
 		this.agent = agent;
@@ -76,7 +76,7 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 	public void updateVelocity() {
 
 		
-		List<Tuple<Double, SimpleAgent>> neighbors = this.ncalc.getNeighbors();
+		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors();
 		List<Segment> obstacles = this.ocalc.computeObstacles(this.agent);
 
 		double[] v = this.agent.getVelocity();
@@ -96,8 +96,8 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 		
 		double[] pos = this.agent.getPos();
 
-		for (Tuple<Double, SimpleAgent> t : neighbors) {
-			SimpleAgent neighbor = t.getSecond();
+		for (Tuple<Double, Sim2DAgent> t : neighbors) {
+			Sim2DAgent neighbor = t.getSecond();
 			double[] nPos = neighbor.getPos();
 			double nx = pos[0] - nPos[0];
 			double ny = pos[1] - nPos[1];

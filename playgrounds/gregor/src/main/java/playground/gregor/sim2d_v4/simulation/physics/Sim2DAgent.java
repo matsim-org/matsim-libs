@@ -34,7 +34,7 @@ import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
 
 
-public class SimpleAgent implements TwoDObject {
+public class Sim2DAgent implements TwoDObject {
 	
 	private double v0 = 1.f;
 	
@@ -62,7 +62,7 @@ public class SimpleAgent implements TwoDObject {
 
 	private VelocityUpdater vu;
 
-	public SimpleAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
+	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
@@ -203,8 +203,8 @@ public class SimpleAgent implements TwoDObject {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof SimpleAgent) {
-			return getId().equals(((SimpleAgent) obj).getId());
+		if (obj instanceof Sim2DAgent) {
+			return getId().equals(((Sim2DAgent) obj).getId());
 		}
 		return false;
 	}

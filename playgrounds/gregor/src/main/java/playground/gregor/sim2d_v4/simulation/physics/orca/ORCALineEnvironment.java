@@ -22,7 +22,7 @@ package playground.gregor.sim2d_v4.simulation.physics.orca;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
-import playground.gregor.sim2d_v4.simulation.physics.ORCAAgent;
+import playground.gregor.sim2d_v4.simulation.physics.ORCAVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 
 public class ORCALineEnvironment implements ORCALine {
@@ -32,11 +32,11 @@ public class ORCALineEnvironment implements ORCALine {
 	private double directionX;
 	private double directionY;
 
-	public ORCALineEnvironment(ORCAAgent orcaAgent, Segment seg, double tau) {
+	public ORCALineEnvironment(ORCAVelocityUpdater orcaAgent, Segment seg, double tau) {
 		construct(orcaAgent,seg,tau);
 	}
 
-	private void construct(ORCAAgent orcaAgent, Segment seg, double tau) {
+	private void construct(ORCAVelocityUpdater orcaAgent, Segment seg, double tau) {
 		
 		
 //		tau = 1f;

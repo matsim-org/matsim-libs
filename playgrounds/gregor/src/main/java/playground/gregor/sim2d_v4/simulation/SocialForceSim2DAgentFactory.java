@@ -25,7 +25,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
-import playground.gregor.sim2d_v4.simulation.physics.SimpleAgent;
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.SocialForceVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
@@ -42,9 +42,9 @@ public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
 	}
 
 	@Override
-	public SimpleAgent buildAgent( QVehicle veh, double spawnX, double spawnY, PhysicalSim2DEnvironment pEnv) {
+	public Sim2DAgent buildAgent( QVehicle veh, double spawnX, double spawnY, PhysicalSim2DEnvironment pEnv) {
 		LinkSwitcher ls = new LinkSwitcher(this.sc, pEnv);
-		SimpleAgent agent = new SimpleAgent(this.sc,veh, spawnX, spawnY, ls, pEnv);
+		Sim2DAgent agent = new Sim2DAgent(this.sc,veh, spawnX, spawnY, ls, pEnv);
 		SocialForceVelocityUpdater vu = new SocialForceVelocityUpdater(new DesiredDirection(agent, ls), new Neighbors(agent, this.conf), this.conf, agent);
 		agent.setVelocityUpdater(vu);
 		return agent;

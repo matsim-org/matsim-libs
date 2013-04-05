@@ -25,16 +25,16 @@ import org.matsim.api.core.v01.Id;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.math.Math;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
-import playground.gregor.sim2d_v4.simulation.physics.SimpleAgent;
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher.LinkInfo;
 
 public class DesiredDirection {
 	
 	
-	private final SimpleAgent agent;
+	private final Sim2DAgent agent;
 	private final LinkSwitcher ls;
 
-	public DesiredDirection(SimpleAgent agent, LinkSwitcher ls) {
+	public DesiredDirection(Sim2DAgent agent, LinkSwitcher ls) {
 		this.agent = agent;
 		this.ls = ls;
 	}

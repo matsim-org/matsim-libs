@@ -58,8 +58,8 @@ public class PhysicalSim2DSection {
 
 	private final double offsetX;
 
-	private final List<SimpleAgent> inBuffer = new LinkedList<SimpleAgent>();
-	protected final List<SimpleAgent> agents = new LinkedList<SimpleAgent>();
+	private final List<Sim2DAgent> inBuffer = new LinkedList<Sim2DAgent>();
+	protected final List<Sim2DAgent> agents = new LinkedList<Sim2DAgent>();
 
 	protected final double timeStepSize;
 
@@ -67,7 +67,7 @@ public class PhysicalSim2DSection {
 
 	private final Map<Segment,PhysicalSim2DSection> neighbors = new HashMap<Segment,PhysicalSim2DSection>();
 
-	private final TwoDTree<SimpleAgent> agentTwoDTree;
+	private final TwoDTree<Sim2DAgent> agentTwoDTree;
 
 	//	private final Map<Segment,Id> openingLinkIdMapping = new HashMap<Segment,Id>();
 
@@ -84,7 +84,7 @@ public class PhysicalSim2DSection {
 		this.offsetY = offsetY;
 		this.penv = penv;
 		Envelope e = this.sec.getPolygon().getEnvelopeInternal();
-		this.agentTwoDTree = new TwoDTree<SimpleAgent>(new Envelope(e.getMinX()-offsetX,e.getMaxX()-offsetX,e.getMinY()-offsetY,e.getMaxY()-offsetY));
+		this.agentTwoDTree = new TwoDTree<Sim2DAgent>(new Envelope(e.getMinX()-offsetX,e.getMaxX()-offsetX,e.getMinY()-offsetY,e.getMaxY()-offsetY));
 		init();
 	}
 
@@ -93,7 +93,7 @@ public class PhysicalSim2DSection {
 		return this.inBuffer.size() + this.agents.size();
 	}
 
-	public void addAgentToInBuffer(SimpleAgent agent) {
+	public void addAgentToInBuffer(Sim2DAgent agent) {
 		this.inBuffer.add(agent);
 		agent.setPSec(this);
 	}
@@ -103,9 +103,9 @@ public class PhysicalSim2DSection {
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
 		this.agentTwoDTree.buildTwoDTree(this.agents);
-		Iterator<SimpleAgent> it = this.agents.iterator();
+		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
-			SimpleAgent agent = it.next();
+			Sim2DAgent agent = it.next();
 			updateAgent(agent);
 		}
 	}
@@ -115,9 +115,9 @@ public class PhysicalSim2DSection {
 	public void moveAgents(double time) {
 
 
-		Iterator<SimpleAgent> it = this.agents.iterator();
+		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
-			SimpleAgent agent = it.next();
+			Sim2DAgent agent = it.next();
 
 			double [] v = agent.getVelocity();
 			double dx = v[0] * this.timeStepSize;
@@ -167,7 +167,7 @@ public class PhysicalSim2DSection {
 	//		return this.openingLinkIdMapping.get(opening);
 	//	}
 
-	private void updateAgent(SimpleAgent agent) {
+	private void updateAgent(Sim2DAgent agent) {
 		//		agent.calcNeighbors(this);
 		//		agent.setObstacles(this.obstacles);
 		agent.updateVelocity();
@@ -331,12 +331,12 @@ public class PhysicalSim2DSection {
 		return this.sec.getId();
 	}
 
-	public List<SimpleAgent> getAgents() {
+	public List<Sim2DAgent> getAgents() {
 
 		return this.agents;
 	}
 
-	public List<SimpleAgent> getAgents(Envelope e) {
+	public List<Sim2DAgent> getAgents(Envelope e) {
 		return this.agentTwoDTree.get(e);
 	}
 
@@ -395,7 +395,7 @@ public class PhysicalSim2DSection {
 			//			visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId(),99);
 		}
 
-		for (SimpleAgent agent : this.agents) {
+		for (Sim2DAgent agent : this.agents) {
 			agent.debug(visDebugger);
 			//			LinkInfo li = this.linkInfos.get(agent.getCurrentLinkId());
 			//			if (agent.getId().toString().equals("b9112")) {
@@ -405,7 +405,7 @@ public class PhysicalSim2DSection {
 			//			}
 		}
 
-		for (SimpleAgent agent : this.inBuffer) {
+		for (Sim2DAgent agent : this.inBuffer) {
 			agent.debug(visDebugger);
 		}
 	}

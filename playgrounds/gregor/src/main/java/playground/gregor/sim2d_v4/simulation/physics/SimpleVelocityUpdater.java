@@ -29,12 +29,12 @@ import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher.Lin
 
 public class SimpleVelocityUpdater implements VelocityUpdater {
 
-	private final SimpleAgent agent;
+	private final Sim2DAgent agent;
 	private final LinkSwitcher ls;
 
 	private final double v0 = 1.34;
 	
-	public SimpleVelocityUpdater(SimpleAgent agent, LinkSwitcher ls, Scenario sc) {
+	public SimpleVelocityUpdater(Sim2DAgent agent, LinkSwitcher ls, Scenario sc) {
 		this.agent = agent;
 		this.ls = ls;
 		

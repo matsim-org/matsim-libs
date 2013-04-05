@@ -44,7 +44,7 @@ import playground.gregor.sim2d_v4.simulation.physics.orca.ORCASolver;
  * @author laemmel
  *
  */
-public class ORCAAgent implements VelocityUpdater {
+public class ORCAVelocityUpdater implements VelocityUpdater {
 
 
 	private final double tau = 1.f;
@@ -60,9 +60,9 @@ public class ORCAAgent implements VelocityUpdater {
 	private final double dT;
 	private final double maxDelta;
 	private final DesiredDirection dd;
-	private final SimpleAgent agent;
+	private final Sim2DAgent agent;
 
-	public ORCAAgent(DesiredDirection dd, Neighbors ncalc, Sim2DConfig conf, SimpleAgent agent) {
+	public ORCAVelocityUpdater(DesiredDirection dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dT = conf.getTimeStepSize();
 		this.maxDelta =.25;// * dT;
@@ -90,7 +90,7 @@ public class ORCAAgent implements VelocityUpdater {
 //				}
 //			}
 //		}
-		for (Tuple<Double, SimpleAgent> neighbor : this.ncalc.getNeighbors()) {
+		for (Tuple<Double, Sim2DAgent> neighbor : this.ncalc.getNeighbors()) {
 //			if (this.debugger != null && ( getId().toString().equals("r876"))){//&& neighbor.getSecond().getId().toString().equals("r5")) {
 //				ORCALine ol = new ORCALineAgent(this, neighbor, this.tau,this.debugger);
 //				constr.add(ol);				
