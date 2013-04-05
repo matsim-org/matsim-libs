@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DepartureBox.java
+ * SimpleVelocityUpdater.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,42 +20,34 @@
 
 package playground.gregor.sim2d_v4.simulation.physics;
 
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 
-import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.scenario.Section;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher.LinkInfo;
 
-public class DepartureBox extends PhysicalSim2DSection {
 
-	public DepartureBox(Section sec, Sim2DScenario sim2dsc, double offsetX,
-			double offsetY, PhysicalSim2DEnvironment penv) {
-		super(sec, sim2dsc, offsetX, offsetY, penv);
+public class SimpleVelocityUpdater implements VelocityUpdater {
+
+	private final SimpleAgent agent;
+	private final LinkSwitcher ls;
+
+	private final double v0 = 1.34;
+	
+	public SimpleVelocityUpdater(SimpleAgent agent, LinkSwitcher ls, Scenario sc) {
+		this.agent = agent;
+		this.ls = ls;
+		
 	}
-
+	
 	@Override
-	public void moveAgents(double time) {
-		Iterator<Sim2DAgent> it = this.agents.iterator();
-		while (it.hasNext()) {
-			Sim2DAgent agent = it.next();
-			double [] v = agent.getVelocity();
-			double dx = v[0] * this.timeStepSize;
-			double dy = v[1] * this.timeStepSize;
-			Id currentLinkId = agent.getCurrentLinkId();
-			LinkInfo li = this.linkInfos.get(currentLinkId);
-			double [] oldPos = agent.getPos();
-			double newXPosX = oldPos[0] + dx;
-			double newXPosY = oldPos[1] + dy;
-			double lefOfFinishLine = CGAL.isLeftOfLine(newXPosX, newXPosY, li.finishLine.x0, li.finishLine.y0, li.finishLine.x1, li.finishLine.y1);
-			if (lefOfFinishLine >= 0) { //agent has reached the end of link
-				it.remove(); //removing the agent from the agents list
-				PhysicalSim2DSection nextSection = this.penv.getPhysicalSim2DSectionAssociatedWithLinkId(agent.getCurrentLinkId());
-				nextSection.addAgentToInBuffer(agent);
-			}
-			agent.move(dx, dy);
-		}
+	public void updateVelocity() {
+		Id id = this.agent.getCurrentLinkId();
+		LinkInfo li = this.ls.getLinkInfo(id);
+		double[] v = this.agent.getVelocity();
+		v[0] = li.dx * this.v0;
+		v[1] = li.dy * this.v0;
 	}
+	
 
 }

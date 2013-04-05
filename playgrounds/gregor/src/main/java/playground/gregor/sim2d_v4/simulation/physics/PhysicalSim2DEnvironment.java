@@ -24,16 +24,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
+import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.LinkInfo;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
@@ -74,6 +75,7 @@ public class PhysicalSim2DEnvironment {
 
 	private final EventsManager eventsManager;
 
+
 	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc, EventsManager eventsManager) {
 		this.env = env;
 		this.offsetX = sim2dsc.getSim2DConfig().getOffsetX();
@@ -102,13 +104,13 @@ public class PhysicalSim2DEnvironment {
 		return psec;
 	}
 
-	private DepartureBox createAndAddDepartureBox(Section sec) {
-		DepartureBox psec = new DepartureBox(sec,this.sim2dsc,this.offsetX,this.offsetY,this);
+	private PhysicalSim2DSection createAndAddDepartureBox(Section sec) {
+		PhysicalSim2DSection psec = new PhysicalSim2DSection(sec,this.sim2dsc,this.offsetX,this.offsetY,this);
 		this.psecs.put(sec.getId(),psec);
 		return psec;
 	}
 
-	/*package*/ PhysicalSim2DSection getPhysicalSim2DSectionAssociatedWithLinkId(Id id) {
+	public PhysicalSim2DSection getPhysicalSim2DSectionAssociatedWithLinkId(Id id) {
 		return this.linkIdPsecsMapping.get(id);
 	}
 
@@ -160,8 +162,16 @@ public class PhysicalSim2DEnvironment {
 		PhysicalSim2DSection psec = this.psecs.get(id);
 
 		//retrieve opening
-		LinkInfo li = psec.getLinkInfo(hiResLink.getLink().getId());
-		Segment opening = li.fromOpening;
+		Segment opening = null;
+		Coord c = hiResLink.getLink().getFromNode().getCoord();
+		double cx = c.getX()-this.offsetX;
+		double cy = c.getY()-this.offsetY;
+		for (Segment op : psec.getOpenings()) {
+			if (CGAL.isOnVector(cx, cy, op.x0, op.y0, op.x1, op.y1)){ //TODO this a necessary but not necessarily a sufficient condition! [gl April '13] 
+				opening = op;
+				break;
+			}
+		}
 
 		
 		//create departure boxes
@@ -230,30 +240,29 @@ public class PhysicalSim2DEnvironment {
 			PhysicalSim2DSection psecBox = createAndAddDepartureBox(s);
 			
 			//create dbox link info
-			LinkInfo dboxLi = new LinkInfo();
-			Segment link = new Segment();
-			link.x0 = bottomX-this.offsetX + bx + dx/2;
-			link.y0 = bottomY-this.offsetY + by + dy/2;
-			link.x1 = bottomX-this.offsetX + dx/2;
-			link.y1 = bottomY-this.offsetY + dy/2;
-			double dbdx = link.x1 - link.x0;
-			double dbdy = link.y1 - link.y0;
-			dbdx /= 1.5f * DEP_BOX_WIDTH;
-			dbdy /= 1.5f * DEP_BOX_WIDTH;
+//			LinkInfo dboxLi = new LinkInfo();
+//			Segment link = new Segment();
+//			link.x0 = bottomX-this.offsetX + bx + dx/2;
+//			link.y0 = bottomY-this.offsetY + by + dy/2;
+//			link.x1 = bottomX-this.offsetX + dx/2;
+//			link.y1 = bottomY-this.offsetY + dy/2;
+//			double dbdx = link.x1 - link.x0;
+//			double dbdy = link.y1 - link.y0;
+//			dbdx /= 1.5f * DEP_BOX_WIDTH;
+//			dbdy /= 1.5f * DEP_BOX_WIDTH;
 //			double length = Math.sqrt()
-			dboxLi.link = link;
-			dboxLi.dx = dbdx;
-			dboxLi.dy = dbdy;
-			Segment dboxFl = new Segment();
-			dboxFl.x1 = li.fromOpening.x0; 
-			dboxFl.x0 = li.fromOpening.x1;
-			dboxFl.y1 = li.fromOpening.y0;
-			dboxFl.y0 = li.fromOpening.y1;
-			dboxLi.finishLine = dboxFl;
-			dboxLi.fromOpening = dboxFl;
-			dboxLi.width = DEP_BOX_WIDTH/2;
+//			dboxLi.link = link;
+//			dboxLi.dx = dbdx;
+//			dboxLi.dy = dbdy;
+//			Segment dboxFl = new Segment();
+//			dboxFl.x1 = li.fromOpening.x0; 
+//			dboxFl.x0 = li.fromOpening.x1;
+//			dboxFl.y1 = li.fromOpening.y0;
+//			dboxFl.y0 = li.fromOpening.y1;
+//			dboxLi.finishLine = dboxFl;
+//			dboxLi.fromOpening = dboxFl;
+//			dboxLi.width = DEP_BOX_WIDTH/2;
 			
-			psecBox.putLinkInfo(hiResLinkId, dboxLi);
 			Segment o = psecBox.getOpenings()[0];
 			psecBox.putNeighbor(o,psec);
 			hiResLink.createDepartureBox(psecBox,spawnX,spawnY);

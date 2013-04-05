@@ -27,14 +27,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Coord;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.TwoDTree;
@@ -47,12 +43,14 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class PhysicalSim2DSection {
 
+	private static final Logger log = Logger.getLogger(PhysicalSim2DSection.class);
+
 	private final Section sec;
 
 	List<Segment> obstacles;
-	Segment [] openings;
+	Segment [] openings;//TODO why not using a list, is array really faster?? [gl April '13]
 
-	Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
+	//	Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
 
 	private final Sim2DScenario sim2dsc;
 
@@ -60,20 +58,23 @@ public class PhysicalSim2DSection {
 
 	private final double offsetX;
 
-	private final List<Sim2DAgent> inBuffer = new LinkedList<Sim2DAgent>();
-	protected final List<Sim2DAgent> agents = new LinkedList<Sim2DAgent>();
+	private final List<SimpleAgent> inBuffer = new LinkedList<SimpleAgent>();
+	protected final List<SimpleAgent> agents = new LinkedList<SimpleAgent>();
 
 	protected final double timeStepSize;
 
 	protected final PhysicalSim2DEnvironment penv;
 
 	private final Map<Segment,PhysicalSim2DSection> neighbors = new HashMap<Segment,PhysicalSim2DSection>();
-	
-	private final TwoDTree<Sim2DAgent> agentTwoDTree;
 
-	private final Map<Segment,Id> openingLinkIdMapping = new HashMap<Segment,Id>();
+	private final TwoDTree<SimpleAgent> agentTwoDTree;
 
-//	private VisDebugger debugger;
+	//	private final Map<Segment,Id> openingLinkIdMapping = new HashMap<Segment,Id>();
+
+	private int numOpenings;
+
+
+	//	private VisDebugger debugger;
 
 	public PhysicalSim2DSection(Section sec, Sim2DScenario sim2dsc, double offsetX, double offsetY, PhysicalSim2DEnvironment penv) {
 		this.sec = sec;
@@ -83,7 +84,7 @@ public class PhysicalSim2DSection {
 		this.offsetY = offsetY;
 		this.penv = penv;
 		Envelope e = this.sec.getPolygon().getEnvelopeInternal();
-		this.agentTwoDTree = new TwoDTree<Sim2DAgent>(new Envelope(e.getMinX()-offsetX,e.getMaxX()-offsetX,e.getMinY()-offsetY,e.getMaxY()-offsetY));
+		this.agentTwoDTree = new TwoDTree<SimpleAgent>(new Envelope(e.getMinX()-offsetX,e.getMaxX()-offsetX,e.getMinY()-offsetY,e.getMaxY()-offsetY));
 		init();
 	}
 
@@ -92,7 +93,7 @@ public class PhysicalSim2DSection {
 		return this.inBuffer.size() + this.agents.size();
 	}
 
-	public void addAgentToInBuffer(Sim2DAgent agent) {
+	public void addAgentToInBuffer(SimpleAgent agent) {
 		this.inBuffer.add(agent);
 		agent.setPSec(this);
 	}
@@ -102,9 +103,9 @@ public class PhysicalSim2DSection {
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
 		this.agentTwoDTree.buildTwoDTree(this.agents);
-		Iterator<Sim2DAgent> it = this.agents.iterator();
+		Iterator<SimpleAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
-			Sim2DAgent agent = it.next();
+			SimpleAgent agent = it.next();
 			updateAgent(agent);
 		}
 	}
@@ -112,117 +113,61 @@ public class PhysicalSim2DSection {
 
 
 	public void moveAgents(double time) {
-	
-		
-		Iterator<Sim2DAgent> it = this.agents.iterator();
+
+
+		Iterator<SimpleAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
-			Sim2DAgent agent = it.next();
-//			if (agent.getId().toString().equals("b4849")) {
-//				System.out.println("got you!");
-//			}
+			SimpleAgent agent = it.next();
+
 			double [] v = agent.getVelocity();
 			double dx = v[0] * this.timeStepSize;
 			double dy = v[1] * this.timeStepSize;
-			Id currentLinkId = agent.getCurrentLinkId();
-			LinkInfo li = this.linkInfos.get(currentLinkId);
 			double [] oldPos = agent.getPos();
 			double newXPosX = oldPos[0] + dx;
 			double newXPosY = oldPos[1] + dy;
-			double lefOfFinishLine = CGAL.isLeftOfLine(newXPosX, newXPosY, li.finishLine.x0, li.finishLine.y0, li.finishLine.x1, li.finishLine.y1);
-			if (lefOfFinishLine >= 0) { //agent has reached the end of link
-				Id nextLinkId = agent.chooseNextLinkId();
-				if (nextLinkId == null) {
-					throw new RuntimeException("agent with id:" + agent.getId() + " has reached the end of her current leg, which is not (yet) supported in the Sim2D.");
-				}
-				if (this.linkInfos.get(nextLinkId) == null) { //agent leaves current section
-					PhysicalSim2DSection nextSection = this.penv.getPhysicalSim2DSectionAssociatedWithLinkId(nextLinkId);
-					if (nextSection == null) { //agent intends to leave sim2d
-						Sim2DQTransitionLink loResLink = this.penv.getLowResLink(nextLinkId);
-						if (loResLink.hasSpace()) {
-							it.remove();
-							QVehicle veh = agent.getQVehicle();
-							veh.setCurrentLink(loResLink.getLink());
-							loResLink.addFromIntersection(veh);
-							this.penv.getEventsManager().processEvent(new LinkLeaveEvent(time, agent.getId(), currentLinkId, agent.getQVehicle().getId()));
-							agent.notifyMoveOverNode(nextLinkId);
-//							this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
-						} else {
-							dx = 0;
-							dy = 0;
-						}
-					} else {
-						it.remove(); //removing the agent from the agents list
-						nextSection.addAgentToInBuffer(agent);
-						this.penv.getEventsManager().processEvent(new LinkLeaveEvent(time, agent.getId(), currentLinkId, agent.getQVehicle().getId()));
-						agent.notifyMoveOverNode(nextLinkId);
-						this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
-					}
-				} else {
-					this.penv.getEventsManager().processEvent(new LinkLeaveEvent(time, agent.getId(), currentLinkId, agent.getQVehicle().getId()));
-					agent.notifyMoveOverNode(nextLinkId);
-					this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
-				}
-			} else if (agent instanceof FailsafeAgentImpl) {
-				for (Segment open : this.openings) {
-					if (CGAL.isLeftOfLine(newXPosX, newXPosY, open.x0,open.y0,open.x1,open.y1) > 0) {
-						PhysicalSim2DSection nb = this.neighbors.get(open);
-						if (nb == null) {
-							continue;
-						}
-//						if (open == li.finishLine) {
-//							System.out.println("got you");
-//						}
-						
-//						if (agent.getId().toString().equals("b4849")) {
-//							System.out.println("got you!");
-//						}
-//						for (S)
-						it.remove();
-						nb.addAgentToInBuffer(agent);
-						this.penv.getEventsManager().processEvent(new LinkLeaveEvent(time, agent.getId(), currentLinkId, agent.getQVehicle().getId()));
-						Id nextLinkId = null;
-						for (Segment ivOpen : nb.getOpenings()) {
-							if (ivOpen.x0 == open.x1 && ivOpen.x1 == open.x0 && ivOpen.y0 == open.y1 && ivOpen.y1 == open.y0) {
-								nextLinkId = nb.getLinkId(ivOpen);
-								
-//								if (nb.getId().equals(new IdImpl("sec360637413"))) {
-//									break;
-//								}
-//								LinkInfo li2 = nb.getLinkInfo(nextLinkId);
-//								this.debugger.addLine((float)li2.link.x0,(float) li2.link.y0,(float) li2.link.x1,(float) li2.link.y1,255,0,0,255,0);
-//								this.debugger.addLine((float)li2.finishLine.x0,(float) li2.finishLine.y0,(float) li2.finishLine.x1,(float) li2.finishLine.y1,255,0,0,255,0);
-//								((FailsafeAgentImpl)agent).debugR(this.debugger);
-//								
-//								this.debugger.addLine((float)li.link.x0,(float) li.link.y0,(float) li.link.x1,(float) li.link.y1,0,255,0,255,0);
-//								this.debugger.addLine((float)li.finishLine.x0,(float) li.finishLine.y0,(float) li.finishLine.x1,(float) li.finishLine.y1,0,255,0,255,0);
-//								
-//								this.debugger.addAll();
+
+			boolean inSection = true;
+			for (int i = 0; i < this.numOpenings; i++) {
+				Segment opening = this.openings[i];
+				double leftOfOpening = CGAL.isLeftOfLine(newXPosX, newXPosY, opening.x0, opening.y0, opening.x1, opening.y1);
+				if (leftOfOpening > 0) {
+					//					double left1 = CGAL.isLeftOfLine(opening.x0, opening.y0, oldPos[0], oldPos[1], newXPosX, newXPosY);
+					//					double left2 = CGAL.isLeftOfLine(opening.x1, opening.y1, oldPos[0], oldPos[1], newXPosX, newXPosY);
+					//					if (left1 * left2 < 0) {
+					PhysicalSim2DSection nextSection = this.neighbors.get(opening);
+					if (nextSection == null) { //if null agent should leave 2Dsim now
+						if (agent.move(dx, dy,time)) {
+							if (!agent.hasLeft2DSim()){ //for now the physical transition is performed in the mental model of the agent (yeah sounds odd). 
+								//for that reason we have to check if everything went fine. [gl April' 13] 
+								log.warn("Agent:" + agent.getId() + " has left sim2d physically but not mentally. This should not happen!");
+								inSection = false;
 								break;
 							}
+							it.remove();
+							inSection = false;
+							break;
 						}
-						this.penv.getEventsManager().processEvent(new LinkEnterEvent(time, agent.getId(), nextLinkId, agent.getQVehicle().getId()));
-						((FailsafeAgentImpl) agent).pushCurrentLinkId(nextLinkId);
+					} else { //business as usual  
+						it.remove();
+						nextSection.addAgentToInBuffer(agent);
+						agent.move(dx, dy,time);
+						inSection = false;
 						break;
 					}
 				}
+				//				}
 			}
-			//			this.penv.getEventsManager().processEvent(new XYVxVyEventImpl(agent.getId(),agent.getPos()[0],agent.getPos()[1],agent.getVelocity()[0],agent.getVelocity()[1],time));
-			agent.move(dx, dy);
-			
-
-			
-//			this.agentTwoDTree.insert(agent);
+			if (inSection) {
+				agent.move(dx, dy,time);
+			}
 		}
-
-		
-		
 	}
 
-	private Id getLinkId(Segment opening) {
-		return this.openingLinkIdMapping.get(opening);
-	}
-	
-	private void updateAgent(Sim2DAgent agent) {
+	//	private Id getLinkId(Segment opening) {
+	//		return this.openingLinkIdMapping.get(opening);
+	//	}
+
+	private void updateAgent(SimpleAgent agent) {
 		//		agent.calcNeighbors(this);
 		//		agent.setObstacles(this.obstacles);
 		agent.updateVelocity();
@@ -266,142 +211,141 @@ public class PhysicalSim2DSection {
 		}
 		this.obstacles = obst;
 		this.openings = open.toArray(new Segment[0]);
+		this.numOpenings = this.openings.length;
 
-		Map<Id, ? extends Link> links = this.getSim2dsc().getMATSimScenario().getNetwork().getLinks();
-		for (Id id : this.sec.getRelatedLinkIds()) {
-			Link l = links.get(id);
-			LinkInfo li = new LinkInfo();
-			this.linkInfos.put(id, li);
-
-			Coord from = l.getFromNode().getCoord();
-			Coord to = l.getToNode().getCoord();
-			Segment seg = new Segment();
-			seg.x0 = from.getX()-this.offsetX;
-			seg.x1 = to.getX()-this.offsetX;
-			seg.y0 = from.getY()-this.offsetY;
-			seg.y1 = to.getY()-this.offsetY;
-
-			double dx = seg.x1-seg.x0;
-			double dy = seg.y1-seg.y0;
-			double length = Math.sqrt(dx*dx+dy*dy);
-			dx /= length;
-			dy /= length;
-
-			li.link = seg;
-			li.dx = dx;
-			li.dy = dy;
-			Segment fromOpening = getTouchingSegment(seg.x0,seg.y0, seg.x1,seg.y1,this.openings);
-			Segment toOpening = getTouchingSegment(seg.x1,seg.y1, seg.x0,seg.y0,this.openings);
-			li.fromOpening = fromOpening;
-			if (toOpening != null) {
-				li.finishLine = toOpening;
-				li.width = Math.sqrt((toOpening.x0-toOpening.x1)*(toOpening.x0-toOpening.x1)+(toOpening.y0-toOpening.y1)*(toOpening.y0-toOpening.y1)); 
-				this.openingLinkIdMapping .put(toOpening,id);
-			} else {
-				Segment finishLine = new Segment();
-				finishLine.x0 = seg.x1;
-				finishLine.y0 = seg.y1;
-
-				//all polygons are clockwise oriented so we rotate to the right here 
-				finishLine.x1 = finishLine.x0 + li.dy;
-				finishLine.y1 = finishLine.y0 - li.dx;
-				li.finishLine = finishLine;
-				li.width = 10; //TODO section width [gl Jan'13]
-			}
-		}
+		//		Map<Id, ? extends Link> links = this.getSim2dsc().getMATSimScenario().getNetwork().getLinks();
+		//		for (Id id : this.sec.getRelatedLinkIds()) {
+		//			Link l = links.get(id);
+		//			LinkInfo li = new LinkInfo();
+		//			this.linkInfos.put(id, li);
+		//
+		//			Coord from = l.getFromNode().getCoord();
+		//			Coord to = l.getToNode().getCoord();
+		//			Segment seg = new Segment();
+		//			seg.x0 = from.getX()-this.offsetX;
+		//			seg.x1 = to.getX()-this.offsetX;
+		//			seg.y0 = from.getY()-this.offsetY;
+		//			seg.y1 = to.getY()-this.offsetY;
+		//
+		//			double dx = seg.x1-seg.x0;
+		//			double dy = seg.y1-seg.y0;
+		//			double length = Math.sqrt(dx*dx+dy*dy);
+		//			dx /= length;
+		//			dy /= length;
+		//
+		//			li.link = seg;
+		//			li.dx = dx;
+		//			li.dy = dy;
+		//			Segment fromOpening = getTouchingSegment(seg.x0,seg.y0, seg.x1,seg.y1,this.openings);
+		//			Segment toOpening = getTouchingSegment(seg.x1,seg.y1, seg.x0,seg.y0,this.openings);
+		//			li.fromOpening = fromOpening;
+		//			if (toOpening != null) {
+		//				li.finishLine = toOpening;
+		//				li.width = Math.sqrt((toOpening.x0-toOpening.x1)*(toOpening.x0-toOpening.x1)+(toOpening.y0-toOpening.y1)*(toOpening.y0-toOpening.y1)); 
+		//				this.openingLinkIdMapping .put(toOpening,id);
+		//			} else {
+		//				Segment finishLine = new Segment();
+		//				finishLine.x0 = seg.x1;
+		//				finishLine.y0 = seg.y1;
+		//
+		//				//all polygons are clockwise oriented so we rotate to the right here 
+		//				finishLine.x1 = finishLine.x0 + li.dy;
+		//				finishLine.y1 = finishLine.y0 - li.dx;
+		//				li.finishLine = finishLine;
+		//				li.width = 10; //TODO section width [gl Jan'13]
+		//			}
+		//		}
 
 	}
 
 	/*package*/ void connect() {
-		Map<Id, ? extends Link> links = this.getSim2dsc().getMATSimScenario().getNetwork().getLinks();
-		for (Id id : this.sec.getRelatedLinkIds()) {
-			Link l = links.get(id);
-			LinkInfo li = this.linkInfos.get(l.getId());
-			for (Link ll : l.getToNode().getOutLinks().values()) {
-				PhysicalSim2DSection psec = this.penv.getPhysicalSim2DSectionAssociatedWithLinkId(ll.getId());
-				if (psec != this) {
-					this.neighbors.put(li.finishLine, psec);
+		for (Segment opening : this.openings) {
+			for (Id n : this.sec.getNeighbors()) {
+				PhysicalSim2DSection nPSec = this.penv.psecs.get(n);
+				if (isConnectedViaOpening(opening,nPSec)){
+					this.neighbors.put(opening, nPSec);
+					break;
 				}
 			}
 		}
 	}
 
+	private boolean isConnectedViaOpening(Segment opening,
+			PhysicalSim2DSection nPSec) {
+		for (Segment nOpening : nPSec.getOpenings()) {
+			if (nOpening.equalInverse(opening)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//	//
+	//	public LinkInfo getLinkInfo(Id id) {
+	//		return this.linkInfos.get(id);
+	//	}
 	//
-	public LinkInfo getLinkInfo(Id id) {
-		return this.linkInfos.get(id);
-	}
+	//	/*package*/ void putLinkInfo(Id id, LinkInfo li) {
+	//		this.linkInfos.put(id, li);
+	//	}
 
-	/*package*/ void putLinkInfo(Id id, LinkInfo li) {
-		this.linkInfos.put(id, li);
-	}
-
-	private Segment getTouchingSegment(double x0, double y0, double x1, double y1, Segment[] openings) {
-
-		for (Segment opening : openings) {
-
-			boolean onSegment = CGAL.isOnVector(x0, y0,opening.x0, opening.y0, opening.x1, opening.y1); // this is a necessary but not sufficient condition since a section is only approx convex. so we need the following test as well
-			if (onSegment) {
-				double isLeft0  = CGAL.isLeftOfLine(opening.x0, opening.y0,x0, y0, x1, y1);
-				double isLeft1  = CGAL.isLeftOfLine(opening.x1, opening.y1,x0, y0, x1, y1);
-				if (isLeft0 * isLeft1 >= 0){ // coordinate is on a vector given by the segment opening but not on the segment itself. This case is unlikely to occur! 
-					onSegment = false;
-				}
-				if (onSegment) {
-					return opening;
-				}
-			}
-		}
-		return null;
-	}
+	//	private Segment getTouchingSegment(double x0, double y0, double x1, double y1, Segment[] openings) {
+	//
+	//		for (Segment opening : openings) {
+	//
+	//			boolean onSegment = CGAL.isOnVector(x0, y0,opening.x0, opening.y0, opening.x1, opening.y1); // this is a necessary but not sufficient condition since a section is only approx convex. so we need the following test as well
+	//			if (onSegment) {
+	//				double isLeft0  = CGAL.isLeftOfLine(opening.x0, opening.y0,x0, y0, x1, y1);
+	//				double isLeft1  = CGAL.isLeftOfLine(opening.x1, opening.y1,x0, y0, x1, y1);
+	//				if (isLeft0 * isLeft1 >= 0){ // coordinate is on a vector given by the segment opening but not on the segment itself. This case is unlikely to occur! 
+	//					onSegment = false;
+	//				}
+	//				if (onSegment) {
+	//					return opening;
+	//				}
+	//			}
+	//		}
+	//		return null;
+	//	}
 
 
-	public static final class Segment {
+	public static final class Segment {//TODO move this inner class elsewhere [gl April '13]
 		public double  x0;
 		public double  x1;
 		public double  y0;
 		public double  y1;
 		public double dx;//normalized!!
 		public double dy;//normalized!!
+
+		/*package*/ boolean equalInverse(Segment other) {
+			if (this.x0 == other.x1 && this.x1 == other.x0 && this.y0 == other.y1 && this.y1 == other.y0) {
+				return true;
+			}
+			return false;
+		}
 	}
 
-	public static final class LinkInfo {
 
-		public double width;
-		public double dx;
-		public double dy;
-		public Segment link;
-		Segment fromOpening;
-		Segment finishLine;
-	}
 
 	public Id getId() {
 		return this.sec.getId();
 	}
 
-	public List<Sim2DAgent> getAgents() {
-		
+	public List<SimpleAgent> getAgents() {
+
 		return this.agents;
 	}
-	
-	public List<Sim2DAgent> getAgents(Envelope e) {
+
+	public List<SimpleAgent> getAgents(Envelope e) {
 		return this.agentTwoDTree.get(e);
 	}
 
-	//HACK remove this
-	public void updatedTwoDTree() {
-		this.agentTwoDTree.clear();
-		for (Sim2DAgent a: this.agents) {
-			this.agentTwoDTree.insert(a);
-		}
-	}
-	
 	public Segment [] getOpenings() {
 		return this.openings;
 
 	}
 
 	public void debug(VisDebugger visDebugger) {
-//		this.debugger = visDebugger;
 		if (visDebugger.isFirst()) {
 			Coordinate[] coords = this.sec.getPolygon().getExteriorRing().getCoordinates();
 			float [] x = new float[coords.length];
@@ -413,14 +357,14 @@ public class PhysicalSim2DSection {
 			}
 			visDebugger.addPolygonStatic(x, y,255,237,187,255,0);
 
-			
+
 			for (Segment seg : this.obstacles) {
 				visDebugger.addLineStatic((float)seg.x0,(float) seg.y0, (float)seg.x1,(float) seg.y1, 18, 34, 34, 128,0);
 			}
 			for (Segment seg : this.openings) {
 				visDebugger.addLineStatic((float)seg.x0,(float) seg.y0,(float) seg.x1,(float) seg.y1, 0, 192, 64, 128,128);
 			}
-			for (Id key : this.linkInfos.keySet()) {
+			for (Id key : this.sec.getRelatedLinkIds()) {
 				Link l = this.getSim2dsc().getMATSimScenario().getNetwork().getLinks().get(key);
 				double x0 = l.getFromNode().getCoord().getX() - this.offsetX;
 				double x1 = l.getToNode().getCoord().getX() - this.offsetX;
@@ -432,10 +376,10 @@ public class PhysicalSim2DSection {
 				double length = Math.sqrt(dx*dx+dy*dy);
 				dx /=length;
 				dy /=length;
-				visDebugger.addTextStatic((float)((x1+x0)/2+dy/2), (float)((y1+y0)/2-dx/2), key.toString(),99);
+				//				visDebugger.addTextStatic((float)((x1+x0)/2+dy/2), (float)((y1+y0)/2-dx/2), key.toString(),99);
 
 			}
-			
+
 
 		}
 		if (this.agents.size() > 0) {
@@ -448,45 +392,34 @@ public class PhysicalSim2DSection {
 				y[i] = (float) (c.y - this.offsetY);
 			}
 			visDebugger.addPolygon(x, y,32, 255, 64, 64,5);
-			visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId(),99);
+			//			visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId(),99);
 		}
-		
-		for (Sim2DAgent agent : this.agents) {
-			if (agent.getId().toString().equals("g3242")) {
-				Coordinate[] coords = this.sec.getPolygon().getExteriorRing().getCoordinates();
-				float [] x = new float[coords.length];
-				float [] y = new float[coords.length];
-				for (int i = 0; i < coords.length; i++) {
-					Coordinate c = coords[i];
-					x[i] = (float) (c.x - this.offsetX);
-					y[i] = (float) (c.y - this.offsetY);
-				}
-				visDebugger.addPolygon(x, y,0, 255, 255, 255,5);
-				visDebugger.addText((float)(this.sec.getPolygon().getCentroid().getX()-this.offsetX),(float) (this.sec.getPolygon().getCentroid().getY()-this.offsetY),""+this.sec.getId(),99);				
-			}
-				
-		}
-		for (Sim2DAgent agent : this.agents) {
+
+		for (SimpleAgent agent : this.agents) {
 			agent.debug(visDebugger);
-//			LinkInfo li = this.linkInfos.get(agent.getCurrentLinkId());
-//			if (agent.getId().toString().equals("b9112")) {
-//				visDebugger.addLine((float)li.finishLine.x0, (float)li.finishLine.y0, (float)li.finishLine.x1, (float)li.finishLine.y1, 255, 0, 0, 255, 0);
-//				visDebugger.addCircle((float)li.finishLine.x1,(float)li.finishLine.y1,.25f, 255, 0, 0, 255, 0,true);
-//				visDebugger.addCircle((float)agent.getPos()[0],(float)agent.getPos()[1],(float)agent.getRadius(), 255, 0, 0, 255, 0,true);
-//			}
+			//			LinkInfo li = this.linkInfos.get(agent.getCurrentLinkId());
+			//			if (agent.getId().toString().equals("b9112")) {
+			//				visDebugger.addLine((float)li.finishLine.x0, (float)li.finishLine.y0, (float)li.finishLine.x1, (float)li.finishLine.y1, 255, 0, 0, 255, 0);
+			//				visDebugger.addCircle((float)li.finishLine.x1,(float)li.finishLine.y1,.25f, 255, 0, 0, 255, 0,true);
+			//				visDebugger.addCircle((float)agent.getPos()[0],(float)agent.getPos()[1],(float)agent.getRadius(), 255, 0, 0, 255, 0,true);
+			//			}
 		}
-			
-		for (Sim2DAgent agent : this.inBuffer) {
+
+		for (SimpleAgent agent : this.inBuffer) {
 			agent.debug(visDebugger);
 		}
 	}
 
 	public PhysicalSim2DSection getNeighbor(Segment opening) {
-		return this.neighbors .get(opening);
+		return this.neighbors.get(opening);
 	}
 
-	public void putNeighbor(Segment finishLine, PhysicalSim2DSection psec) {
+	/*package*/ void putNeighbor(Segment finishLine, PhysicalSim2DSection psec) {
 		this.neighbors.put(finishLine, psec);
+	}
+
+	public PhysicalSim2DEnvironment getPhysicalEnvironment() {
+		return this.penv;
 	}
 
 	public List<Segment> getObstacles() {

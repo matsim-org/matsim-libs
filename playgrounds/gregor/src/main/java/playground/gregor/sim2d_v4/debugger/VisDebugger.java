@@ -71,8 +71,8 @@ public class VisDebugger extends PApplet {
 	//	protected int omx= 125;
 	//	protected int omy= -43;
 
-	private static enum SC {overview,station,merging,evacuation};
-	private final SC sc = SC.evacuation;
+	private static enum SC {overview,station,merging,evacuation,none};
+	private final SC sc = SC.none;
 	private final boolean drawInfo = true;
 
 	private float scale = .5f;
@@ -84,7 +84,7 @@ public class VisDebugger extends PApplet {
 	private String time2 = "00:00.00.0";
 	private String iteration = "it: 0";
 	private final double dT;
-	private float speedup = 1000;
+	private float speedup = 1;
 
 	private int bgXShift;
 	private int bgYShift;
@@ -119,6 +119,10 @@ public class VisDebugger extends PApplet {
 			this.scale = .6f;
 			this.omx= -262;
 			this.omy= 21;
+		} else {
+			this.scale = 18;
+			this.omx = 319;
+			this.omy = -266;
 		}
 
 		this.dT = dT;
@@ -134,6 +138,8 @@ public class VisDebugger extends PApplet {
 			this.fr.setSize(360,440);
 		} else if (this.sc == SC.evacuation) {
 			this.fr.setSize(1024,788);
+		} else {
+			this.fr.setSize(1024,768);
 		}
 
 		JPanel compositePanel = new JPanel();
@@ -249,6 +255,8 @@ public class VisDebugger extends PApplet {
 			this.fr.setSize(360,382);
 		} else if (this.sc == SC.evacuation) {
 			size(1024,768);
+		} else {
+			size(1024,768);
 		}
 		background(0);
 	}
@@ -281,7 +289,7 @@ public class VisDebugger extends PApplet {
 	private void computeBGShift(){
 		this.bgYShift = (this.dragY+this.omy)/(256);
 		this.bgXShift = (-(VisDebugger.this.dragX +VisDebugger.this.omx))/(256);
-		System.out.println("scale:" + this.scale + " omx:" + this.omx + " omy:" + this.omy + " width:" + getWidth() + " height:" + getHeight());
+//		System.out.println("scale:" + this.scale + " omx:" + this.omx + " omy:" + this.omy + " width:" + getWidth() + " height:" + getHeight());
 	}
 
 	@Override
@@ -528,7 +536,7 @@ public class VisDebugger extends PApplet {
 		return this.scale * y1 + this.dragX + this.omx;
 	}
 
-	private float deScaleX(float x) {
+	/*package*/ float deScaleX(float x) {
 		return (x -this.dragX - this.omx)/this.scale;
 	}
 
@@ -536,8 +544,8 @@ public class VisDebugger extends PApplet {
 		return this.getHeight() - this.scale* y1 + this.dragY + this.omy;
 	}
 
-	private float deScaleY(float y) {
-		return (this.getHeight()/2 + this.dragY + this.omy)/this.scale;
+	/*package*/ float deScaleY(float y) {
+		return (y + this.dragY + this.omy)/this.scale;
 	}
 
 	public void addLineStatic(float x0, float y0, float x1, float y1, int r, int g, int b, int a, int minScale) {

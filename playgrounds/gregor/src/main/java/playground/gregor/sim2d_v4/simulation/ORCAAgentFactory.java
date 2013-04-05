@@ -20,26 +20,34 @@
 
 package playground.gregor.sim2d_v4.simulation;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.simulation.physics.DelegableSim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.FailsafeAgentImpl;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAAgent;
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
+import playground.gregor.sim2d_v4.simulation.physics.SimpleAgent;
+import playground.gregor.sim2d_v4.simulation.physics.VelocityUpdater;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 
 public class ORCAAgentFactory implements Sim2DAgentFactory {
 
 	private final Sim2DConfig config;
+	private final Scenario sc;
 
-	public ORCAAgentFactory(Sim2DConfig config) {
+	public ORCAAgentFactory(Sim2DConfig config, Scenario sc) {
 		this.config = config;
+		this.sc = sc;
 	}
 	
 	@Override
-	public Sim2DAgent buildAgent(QVehicle veh, double spawnX, double spawnY) {
-		DelegableSim2DAgent delegate = new ORCAAgent(veh, spawnX, spawnY,this.config);
-		Sim2DAgent agent = new FailsafeAgentImpl(delegate);
+	public SimpleAgent buildAgent(QVehicle veh, double spawnX, double spawnY,PhysicalSim2DEnvironment pEnv) {
+		LinkSwitcher ls = new LinkSwitcher(this.sc, pEnv);
+		SimpleAgent agent = new SimpleAgent(this.sc,veh, spawnX, spawnY, ls, pEnv);
+		VelocityUpdater vu = new ORCAAgent(new DesiredDirection(agent, ls), new Neighbors(agent, this.config), this.config, agent);
+		agent.setVelocityUpdater(vu);
 		return agent;
 	}
 

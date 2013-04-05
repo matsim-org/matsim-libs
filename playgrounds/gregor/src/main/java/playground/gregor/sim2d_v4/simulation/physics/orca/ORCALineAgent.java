@@ -26,7 +26,7 @@ import org.matsim.core.utils.collections.Tuple;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAAgent;
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.SimpleAgent;
 
 public class ORCALineAgent implements ORCALine {
 
@@ -49,25 +49,25 @@ public class ORCALineAgent implements ORCALine {
 	private static final boolean debug = false;
 
 
-	public ORCALineAgent(ORCAAgent orcaAgent, Tuple<Double,Sim2DAgent> neighbor, double tau) {
+	public ORCALineAgent(ORCAAgent orcaAgent, Tuple<Double,SimpleAgent> neighbor, double tau) {
 		construct(orcaAgent,neighbor,tau);
 //		this.id = neighbor.getSecond().getId();
 	}
 
 	//DEBUG
-	public ORCALineAgent(ORCAAgent orcaAgent, Tuple<Double,Sim2DAgent> neighbor, double tau, VisDebugger debugger) {
+	public ORCALineAgent(ORCAAgent orcaAgent, Tuple<Double,SimpleAgent> neighbor, double tau, VisDebugger debugger) {
 		this.debugSetOffset(orcaAgent.getPos()[0], orcaAgent.getPos()[1]);
 		this.debugger = debugger;
 		construct(orcaAgent,neighbor,tau);
 		this.id = neighbor.getSecond().getId();
 	}
 
-	private void construct(ORCAAgent a, Tuple<Double,Sim2DAgent> neighbor, double tau) {
+	private void construct(ORCAAgent a, Tuple<Double,SimpleAgent> neighbor, double tau) {
 
 
 
 		final double sqrDist = neighbor.getFirst();
-		Sim2DAgent b = neighbor.getSecond();
+		SimpleAgent b = neighbor.getSecond();
 
 		if (ORCALineAgent.debug) {
 			this.debugger.addCircle((float)a.getPos()[0],(float) a.getPos()[1],(float)a.getRadius(), 0, 255, 0, 255, 0, false);

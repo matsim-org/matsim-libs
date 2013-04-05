@@ -22,10 +22,12 @@ package playground.gregor.sim2d_v4.simulation;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
+import playground.gregor.sim2d_v4.simulation.physics.SimpleAgent;
 
 public interface Sim2DAgentFactory {
 	
-	public abstract Sim2DAgent buildAgent(QVehicle veh, double spawnX, double spawnY);
+	public abstract SimpleAgent buildAgent(QVehicle veh, double spawnX, double spawnY, PhysicalSim2DEnvironment physicalSim2DEnvironment);
+	
 
 }

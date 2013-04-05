@@ -29,8 +29,11 @@ public class MousePositionDrawer implements VisDebuggerAdditionalDrawer{
 		p.stroke(0,0);
 		p.rect(10,p.getHeight()-45,120,40);
 		StringBuffer tt = new StringBuffer();
-		int mx = (int) (p.mouseX/scale);
-		int cmx = (int) (((p.mouseX/scale) - mx)*100);
+		
+		double x = p.deScaleX(p.mouseX);
+		double y = p.deScaleY(p.mouseY);
+		int mx = (int) (x);
+		int cmx = (int) ((x - mx)*100);
 		tt.append(mx);
 		tt.append(".");
 		if (cmx < 10) {
@@ -38,8 +41,8 @@ public class MousePositionDrawer implements VisDebuggerAdditionalDrawer{
 		}
 		tt.append(cmx);
 		tt.append(" ; ");
-		int my = (int) (p.mouseY/scale);
-		int cmy = (int) (((p.mouseY/scale) - my)*100);
+		int my = (int) (y);
+		int cmy = (int) ((y - my)*100);
 		tt.append(my);
 		tt.append(".");
 		if (cmy < 10) {

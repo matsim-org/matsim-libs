@@ -34,7 +34,7 @@ import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.SimpleAgent;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -45,16 +45,16 @@ public class Neighbors {
 	private double range = Math.sqrt(this.sqRange);
 	private int nrNeighbors = 3;
 
-	List<Sim2DAgent> agentsSec = new ArrayList<Sim2DAgent>();
-	Map<Segment,List<Sim2DAgent>> agentsNeigh = new HashMap<Segment,List<Sim2DAgent>>();
-	private final Sim2DAgent agent;
+	List<SimpleAgent> agentsSec = new ArrayList<SimpleAgent>();
+	Map<Segment,List<SimpleAgent>> agentsNeigh = new HashMap<Segment,List<SimpleAgent>>();
+	private final SimpleAgent agent;
 
-	private List<Tuple<Double,Sim2DAgent>> cachedNeighbors;
+	private List<Tuple<Double,SimpleAgent>> cachedNeighbors;
 	private final double dT;
 	private double updateIntervall;
 	private double timeAfterLastUpdate = Double.POSITIVE_INFINITY;
 	
-	public Neighbors(Sim2DAgent agent, Sim2DConfig conf) {
+	public Neighbors(SimpleAgent agent, Sim2DConfig conf) {
 		this.agent = agent;
 		this.dT = conf.getTimeStepSize();
 		this.updateIntervall = this.dT;
@@ -69,7 +69,7 @@ public class Neighbors {
 
 		double twoDTreeRange = this.range;
 		Envelope e = new Envelope(aPos[0]-twoDTreeRange,aPos[0]+twoDTreeRange,aPos[1]-twoDTreeRange,aPos[1]+twoDTreeRange);
-		List<Sim2DAgent> agents = psec.getAgents(e);
+		List<SimpleAgent> agents = psec.getAgents(e);
 		this.agentsSec.addAll(agents);
 
 
@@ -84,13 +84,13 @@ public class Neighbors {
 
 			twoDTreeRange = this.range;
 			e = new Envelope(this.agent.getPos()[0]-twoDTreeRange,this.agent.getPos()[0]+twoDTreeRange,this.agent.getPos()[1]-twoDTreeRange,this.agent.getPos()[1]+twoDTreeRange);
-			List<Sim2DAgent> tmp = qSec.getAgents(e);
+			List<SimpleAgent> tmp = qSec.getAgents(e);
 			this.agentsNeigh.put(opening, tmp);
 			//agents from neighboring sections need to check visibility
 		}
 	}
 
-	public List<Tuple<Double,Sim2DAgent>> getNeighbors() {//TODO consider adding time as attribute [gl April '13]
+	public List<Tuple<Double,SimpleAgent>> getNeighbors() {//TODO consider adding time as attribute [gl April '13]
 		this.timeAfterLastUpdate += this.dT;
 		if (this.timeAfterLastUpdate >= this.updateIntervall) {
 			computeNeighbors();
@@ -101,18 +101,18 @@ public class Neighbors {
 		return this.cachedNeighbors;
 	}
 	
-	private List<Tuple<Double,Sim2DAgent>> computeNeighbors() {
+	private List<Tuple<Double,SimpleAgent>> computeNeighbors() {
 		
 		updateNeighbors();
 		
-		LinkedList<Tuple<Double,Sim2DAgent>> ret = new LinkedList<Tuple<Double,Sim2DAgent>>();
+		LinkedList<Tuple<Double,SimpleAgent>> ret = new LinkedList<Tuple<Double,SimpleAgent>>();
 		int size = 0;
 
 		double[] aPos = this.agent.getPos();
 		double currentMaxSqRange = this.sqRange;
 
 		//agents from same section visible by definition
-		for (Sim2DAgent b : this.agentsSec) {
+		for (SimpleAgent b : this.agentsSec) {
 			if (b.equals(this.agent)) {
 				continue;
 			}
@@ -123,18 +123,18 @@ public class Neighbors {
 			if (sqRange > currentMaxSqRange) {
 				continue;
 			}
-			ListIterator<Tuple<Double,Sim2DAgent>> it = ret.listIterator();
+			ListIterator<Tuple<Double,SimpleAgent>> it = ret.listIterator();
 			boolean notPlaced = true;
 			while(notPlaced) {
 				if (!it.hasNext()) {
-					it.add(new Tuple<Double,Sim2DAgent>(sqRange,b));
+					it.add(new Tuple<Double,SimpleAgent>(sqRange,b));
 					size++;
 					notPlaced = false;
 				} else {
-					Tuple<Double, Sim2DAgent> next = it.next();
+					Tuple<Double, SimpleAgent> next = it.next();
 					if (sqRange < next.getFirst()) {
 						it.previous();
-						it.add(new Tuple<Double,Sim2DAgent>(sqRange,b));
+						it.add(new Tuple<Double,SimpleAgent>(sqRange,b));
 						size++;
 						notPlaced = false;
 					}
@@ -149,11 +149,11 @@ public class Neighbors {
 		}
 
 		//agents from neighboring sections
-		for (Entry<Segment, List<Sim2DAgent>> e : this.agentsNeigh.entrySet()) {
-			List<Sim2DAgent> agents = e.getValue();
+		for (Entry<Segment, List<SimpleAgent>> e : this.agentsNeigh.entrySet()) {
+			List<SimpleAgent> agents = e.getValue();
 			Segment opening = e.getKey();
 			//agents from neighboring sections need to check visibility
-			for (Sim2DAgent b : agents) {
+			for (SimpleAgent b : agents) {
 				double[] bPos = b.getPos();
 				if (!visible(aPos,bPos,opening)) {
 					continue;
@@ -164,18 +164,18 @@ public class Neighbors {
 				if (sqRange > currentMaxSqRange) {
 					continue;
 				}
-				ListIterator<Tuple<Double,Sim2DAgent>> it = ret.listIterator();
+				ListIterator<Tuple<Double,SimpleAgent>> it = ret.listIterator();
 				boolean notPlaced = true;
 				while(notPlaced) {
 					if (!it.hasNext()) {
-						it.add(new Tuple<Double,Sim2DAgent>(sqRange,b));
+						it.add(new Tuple<Double,SimpleAgent>(sqRange,b));
 						size++;
 						notPlaced = false;
 					} else {
-						Tuple<Double, Sim2DAgent> next = it.next();
+						Tuple<Double, SimpleAgent> next = it.next();
 						if (sqRange < next.getFirst()) {
 							it.previous();
-							it.add(new Tuple<Double,Sim2DAgent>(sqRange,b));
+							it.add(new Tuple<Double,SimpleAgent>(sqRange,b));
 							size++;
 							notPlaced = false;
 						}

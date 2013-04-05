@@ -21,13 +21,20 @@
 package playground.gregor.sim2d_v4.simulation.physics;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
+import playground.gregor.sim2d_v4.cgal.TwoDObject;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.LinkInfo;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
 
-public class SimpleAgent implements Sim2DAgent {
+
+public class SimpleAgent implements TwoDObject {
 	
 	private double v0 = 1.f;
 	
@@ -39,82 +46,106 @@ public class SimpleAgent implements Sim2DAgent {
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
 
-	private final double r = .5f;
+	private final double r = MatsimRandom.getRandom().nextDouble()*.1 + 0.15; //radius
+	
+//	private Id currentLinkId;
+//
+//	private LinkInfo cachedLi;
 
-	public SimpleAgent(QVehicle veh, double spawnX, double spawnY) {
+	private final Scenario sc;
+
+	private final LinkSwitcher ls;
+
+	private final PhysicalSim2DEnvironment pEnv;
+
+	private boolean hasLeft2DSim = false;
+
+	private VelocityUpdater vu;
+
+	public SimpleAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
 		this.driver = veh.getDriver();
+		this.sc = sc;
+		this.ls = ls;
+		this.pEnv = pEnv;
+		this.vu = new SimpleVelocityUpdater(this, ls, sc);
 	}
 
-	@Override
+	public void setVelocityUpdater(VelocityUpdater vu) {
+		this.vu = vu;
+	}
+	
 	public QVehicle getQVehicle() {
 		return this.veh;
 	}
 
-//	@Override
-//	public void calcNeighbors(PhysicalSim2DSection physicalSim2DSection) {
-//		//nothing to be done here
-//	}
-//
-//	@Override
-//	public void setObstacles(Segment[] obstacles) {
-//		//nothing to be done here
-//	}
-
-	@Override
 	public void updateVelocity() {
-		Id id = this.driver.getCurrentLinkId();
-		LinkInfo li = this.currentPSec.getLinkInfo(id);
-		this.v[0] = li.dx * this.v0;
-		this.v[1] = li.dy * this.v0;
+		this.vu.updateVelocity();
 	}
 
-	@Override
+
+
 	public void setPSec(PhysicalSim2DSection physicalSim2DSection) {
 		this.currentPSec = physicalSim2DSection;
 		
 	}
 
-	@Override
-	public void move(double dx, double dy) {
+	public boolean move(double dx, double dy, double time) {
+		if (this.ls.isSwitchLink(this.pos, dx, dy, this.getCurrentLinkId())) {
+			Id nextLinkId = this.chooseNextLinkId();
+			Sim2DQTransitionLink loResLink = this.pEnv.getLowResLink(nextLinkId);
+			if (loResLink != null) { //HACK? we are in the agent's mental model but perform a physical sim2D --> qSim transition 
+				// this should be handled in to the link corresponding PhysicalSim2DSection [gl April '13]
+				if (loResLink.hasSpace()) {
+					QVehicle veh = this.getQVehicle();
+					veh.setCurrentLink(loResLink.getLink());
+					loResLink.addFromIntersection(veh);
+					this.hasLeft2DSim = true;
+				} else {
+					return false;
+				}
+			}
+			this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, getId(), this.getCurrentLinkId(), this.veh.getId()));
+			this.notifyMoveOverNode(nextLinkId);
+			this.pEnv.getEventsManager().processEvent(new LinkEnterEvent(time, getId(), nextLinkId, this.veh.getId()));
+		}
+		
+		
 		this.pos[0] += dx;
 		this.pos[1] += dy;
+		
+		
+		
+		return true;
 	}
 
-	@Override
 	public double[] getVelocity() {
 		return this.v;
 	}
 
-	@Override
 	public Id getCurrentLinkId() {
 		return this.driver.getCurrentLinkId();
 	}
 
-	@Override
 	public double[] getPos() {
 		return this.pos;
 	}
 
-	@Override
 	public Id chooseNextLinkId() {
 		Id id = this.driver.chooseNextLinkId();
 		return id;
 	}
 
-	@Override
 	public Id getId() {
 		return this.driver.getId();
 	}
 
-	@Override
 	public void notifyMoveOverNode(Id nextLinkId) {
 		this.driver.notifyMoveOverNode(nextLinkId);
 	}
 
-	@Override
 	public void debug(VisDebugger visDebugger) {
 		if (getId().toString().contains("g")) {
 			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1], (float)this.r, 0, 192, 64, 128,0,true);
@@ -137,17 +168,16 @@ public class SimpleAgent implements Sim2DAgent {
 				b=nr;
 			}
 			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1], (float)this.r, r, g, b, 222,0,true);
-//			visDebugger.addText(this.getPos()[0],this.getPos()[1], this.getId().toString(), 0);
 		}
+		visDebugger.addText((float)this.getPos()[0],(float)this.getPos()[1], this.getId().toString(), 90);
+		
 		
 	}
 
-	@Override
 	public PhysicalSim2DSection getPSec() {
 		return this.currentPSec;
 	}
 
-	@Override
 	public double getRadius() {
 		return this.r;
 	}
@@ -162,10 +192,21 @@ public class SimpleAgent implements Sim2DAgent {
 		return this.pos[1];
 	}
 
-	@Override
 	public void setDesiredSpeed(double v) {
 		this.v0 = v;
 		
 	}
 
+	public boolean hasLeft2DSim() {
+		return this.hasLeft2DSim ;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SimpleAgent) {
+			return getId().equals(((SimpleAgent) obj).getId());
+		}
+		return false;
+	}
+	
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DelegableSim2DAgent.java
+ * VelocityUpdater.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,12 +20,8 @@
 
 package playground.gregor.sim2d_v4.simulation.physics;
 
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
+public interface VelocityUpdater {
 
-public interface DelegableSim2DAgent extends Sim2DAgent{
+	public abstract void updateVelocity();
 
-	public void setDesiredDirectionCalculator(DesiredDirection dd);
-	
-	@Override
-	public boolean equals(Object obj);;
 }

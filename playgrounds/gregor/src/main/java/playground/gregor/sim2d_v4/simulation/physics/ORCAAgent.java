@@ -23,10 +23,6 @@ package playground.gregor.sim2d_v4.simulation.physics;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
@@ -48,49 +44,38 @@ import playground.gregor.sim2d_v4.simulation.physics.orca.ORCASolver;
  * @author laemmel
  *
  */
-public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
+public class ORCAAgent implements VelocityUpdater {
 
 
-	private final double r = MatsimRandom.getRandom().nextDouble()*.1 + .25; //radius
 	private final double tau = 1.f;
-	private double v0 = 1.f; //desired velocity
+	private final double v0 = 1.f; //desired velocity
 
 	private PhysicalSim2DSection psec;
-	private final double[] pos = {0,0};
-	private final double[] v = {0,0};
-	private final QVehicle veh;
-	private final MobsimDriverAgent driver;
 
 	private final Neighbors ncalc;
 	private final Obstacles obst = new Obstacles();
-	private DesiredDirection dd = new DesiredDirection(this);
 	private final ORCASolver solver = new ORCASolver();
 	//	private VisDebugger debugger;
 	private final VisDebugger debugger = null;
 	private final double dT;
 	private final double maxDelta;
+	private final DesiredDirection dd;
+	private final SimpleAgent agent;
 
-	public ORCAAgent(QVehicle veh, double spawnX, double spawnY, Sim2DConfig config) {
-		this.pos[0] = spawnX;
-		this.pos[1] = spawnY;
-		this.veh = veh;
-		this.driver = veh.getDriver();
-		this.ncalc = new Neighbors(this, config);
-		this.ncalc.setRangeAndMaxNrOfNeighbors(5, 5);
-		this.dT = config.getTimeStepSize();
+	public ORCAAgent(DesiredDirection dd, Neighbors ncalc, Sim2DConfig conf, SimpleAgent agent) {
+		this.ncalc = ncalc;
+		this.dT = conf.getTimeStepSize();
 		this.maxDelta =.25;// * dT;
+		this.dd = dd;
+		this.agent = agent;
 	}
 
-	@Override
-	public QVehicle getQVehicle() {
-		return this.veh;
-	}
 
 	@Override
 	public void updateVelocity() {
 
 		List<ORCALine> constr = new ArrayList<ORCALine>();
-		for (Segment seg : this.psec.getObstacles()) {
+		for (Segment seg : this.agent.getPSec().getObstacles()) {
 			ORCALineEnvironment ol = new ORCALineEnvironment(this, seg, this.tau);
 			constr.add(ol);
 
@@ -105,7 +90,7 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 //				}
 //			}
 //		}
-		for (Tuple<Double, Sim2DAgent> neighbor : this.ncalc.getNeighbors()) {
+		for (Tuple<Double, SimpleAgent> neighbor : this.ncalc.getNeighbors()) {
 //			if (this.debugger != null && ( getId().toString().equals("r876"))){//&& neighbor.getSecond().getId().toString().equals("r5")) {
 //				ORCALine ol = new ORCALineAgent(this, neighbor, this.tau,this.debugger);
 //				constr.add(ol);				
@@ -121,14 +106,14 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 
 		//		Collections.reverse(constr);
 
-
+		double[] v = this.agent.getVelocity();
 
 
 		final double[] dir = this.dd.computeDesiredDirection();
 		dir[0] *= this.v0;
 		dir[1] *= this.v0;
-		double dx = dir[0] - this.v[0];
-		double dy = dir[1] - this.v[1];
+		double dx = dir[0] - v[0];
+		double dy = dir[1] - v[1];
 		double sqrDelta = (dx*dx+dy*dy);
 		if (sqrDelta > this.maxDelta*this.maxDelta){
 			double delta = Math.sqrt(sqrDelta);
@@ -136,8 +121,8 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 			dx *= this.maxDelta;
 			dy /= delta;
 			dy *= this.maxDelta;
-			dir[0] = this.v[0] + dx;
-			dir[1] = this.v[1] + dy;
+			dir[0] = v[0] + dx;
+			dir[1] = v[1] + dy;
 		}
 		
 		
@@ -150,8 +135,8 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 //			System.out.println("debug!");
 //		}
 		
-		this.v[0] = dir[0];
-		this.v[1] = dir[1];
+		v[0] = dir[0];
+		v[1] = dir[1];
 
 //		if (this.debugger != null &&  getId().toString().equals("r876")){
 //			this.debugger.addLine(this.pos[0], this.pos[1], this.pos[0]+this.v[0], this.pos[1]+this.v[1], 0, 255, 0, 255, 0);
@@ -161,112 +146,19 @@ public class ORCAAgent implements Sim2DAgent, DelegableSim2DAgent {
 
 	}
 
-	@Override
-	public void setPSec(PhysicalSim2DSection physicalSim2DSection) {
-		this.psec = physicalSim2DSection;
-	}
 
-	@Override
-	public PhysicalSim2DSection getPSec() {
-		return this.psec;
-	}
-
-	@Override
-	public double getRadius() {
-		return this.r;
-	}
-
-	@Override
-	public void move(double dx, double dy) {
-		this.pos[0] += dx;
-		this.pos[1] += dy;
-	}
-
-	@Override
-	public double[] getVelocity() {
-		return this.v;
-	}
-
-	@Override
-	public Id getCurrentLinkId() {
-		return this.driver.getCurrentLinkId();
-	}
-
-	@Override
 	public double[] getPos() {
-		return this.pos;
+		return this.agent.getPos();
 	}
 
-	@Override
-	public Id chooseNextLinkId() {
-		Id id = this.driver.chooseNextLinkId();
-		return id;
+
+	public double getRadius() {
+		return this.agent.getRadius();
 	}
 
-	@Override
-	public Id getId() {
-		return this.driver.getId();
+
+	public double[] getVelocity() {
+		return this.agent.getVelocity();
 	}
 
-	@Override
-	public void notifyMoveOverNode(Id nextLinkId) {
-		this.driver.notifyMoveOverNode(nextLinkId);
-	}
-
-	@Override
-	public void debug(VisDebugger visDebugger) {
-		if (getId().toString().contains("g")) {
-			visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1], (float)this.r, 0, 192, 64, 128,0,true);
-		} else if (getId().toString().contains("r")) {
-			visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1], (float)this.r, 192, 0, 64, 128,0,true);
-		} else {
-			int nr = this.hashCode()%3*255;
-			int r,g,b;
-			if (nr > 2*255) {
-				r= nr-2*255;
-				g =0;
-				b=64;
-			} else if (nr > 255) {
-				r=0;
-				g=nr-255;
-				b=64;
-			} else {
-				r=64;
-				g=0;
-				b=nr;
-			}
-			visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1], (float)this.r, r, g, b, 222,0,true);
-		}
-		visDebugger.addText((float)this.getPos()[0], (float)this.getPos()[1], this.driver.getId()+"", 50);
-//		this.debugger = visDebugger;
-	}
-
-	@Override
-	public double getXLocation() {
-		return this.pos[0];
-	}
-
-	@Override
-	public double getYLocation() {
-		return this.pos[1];
-	}
-
-	@Override
-	public void setDesiredDirectionCalculator(DesiredDirection dd) {
-		this.dd = dd;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Sim2DAgent) {
-			return getId().equals(((Sim2DAgent) obj).getId());
-		}
-		return false;
-	}
-
-	@Override
-	public void setDesiredSpeed(double v) {
-		this.v0 = v;
-		
-	}
 }

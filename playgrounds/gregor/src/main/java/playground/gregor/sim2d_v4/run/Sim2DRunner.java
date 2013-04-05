@@ -124,7 +124,7 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if ((event.getIteration()) % 10 == 0 || event.getIteration() > 50) {
+		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 50) {
 			this.factory.debug(this.visDebugger);
 			this.controller.getEvents().addHandler(this.qSimDrawer);
 			this.controller.setCreateGraphs(true);
