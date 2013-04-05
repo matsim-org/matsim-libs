@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors.highestweightselection;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -28,12 +31,15 @@ import java.util.Map;
  */
 public final class KnownStates {
 	// note: using lists assumes that records are always ordered the same way
-	private final Map<List<PersonRecord>, PlanAllocation> cache = new HashMap<List<PersonRecord>, PlanAllocation>();
-	private final Map<List<PersonRecord>, Double> unfeasibleProblems = new HashMap<List<PersonRecord>, Double>();
+	private final Collection<List<PersonRecord>> cachedRemainingPersons = new HashSet<List<PersonRecord>>();
+	private final Map<Collection<PlanRecord>, PlanAllocation> cache = new HashMap<Collection<PlanRecord>, PlanAllocation>();
+	private final Collection<List<PersonRecord>> cachedUnfeasibleProblems = new HashSet<List<PersonRecord>>();
+	private final Map<Collection<PlanRecord>, Double> unfeasibleProblems = new HashMap<Collection<PlanRecord>, Double>();
 
 	public PlanAllocation getCachedSolutionForRemainingAgents(
 			final List<PersonRecord> remainingAgents) {
-		final PlanAllocation alloc = cache.get( remainingAgents );
+		if ( !cachedRemainingPersons.contains( remainingAgents ) ) return null;
+		final PlanAllocation alloc = cache.get( getFeasibleRecords( remainingAgents ) );
 		if ( alloc == null ) return null;
 
 		final PlanAllocation copy = new PlanAllocation();
@@ -44,7 +50,8 @@ public final class KnownStates {
 	public boolean isUnfeasible(
 			final List<PersonRecord> remainingAgents,
 			final double minimalWeightToAttain) {
-		final Double level = unfeasibleProblems.get( remainingAgents );
+		if ( !cachedUnfeasibleProblems.contains( remainingAgents ) ) return false;
+		final Double level = unfeasibleProblems.get( getFeasibleRecords( remainingAgents ) );
 		return level != null && minimalWeightToAttain > level;
 	}
 
@@ -56,16 +63,30 @@ public final class KnownStates {
 		if ( solution != null ) {
 			final PlanAllocation copy = new PlanAllocation();
 			copy.addAll( solution.getPlans() );
+			cachedRemainingPersons.add( remainingAgents );
 			cache.put( 
-					remainingAgents,
+					getFeasibleRecords( remainingAgents ),
 					copy );
 		}
 		else {
 			final Double level = unfeasibleProblems.get( remainingAgents );
 			if ( level == null || level > minimalWeightToAttain ) {
-				unfeasibleProblems.put( remainingAgents , minimalWeightToAttain );
+				cachedUnfeasibleProblems.add( remainingAgents );
+				unfeasibleProblems.put( getFeasibleRecords( remainingAgents ) , minimalWeightToAttain );
 			}
 		}
+	}
+
+	private static Collection<PlanRecord> getFeasibleRecords(
+			final List<PersonRecord> persons ) {
+		final List<PlanRecord> plans = new ArrayList<PlanRecord>();
+
+		for ( PersonRecord person : persons ) {
+			for ( PlanRecord pr : person.bestPlansPerJointStructure ) {
+				if ( pr.isStillFeasible ) plans.add( pr );
+			}
+		}
+		return plans;
 	}
 }
 
