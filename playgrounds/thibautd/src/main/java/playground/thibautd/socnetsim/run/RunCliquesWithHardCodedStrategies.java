@@ -157,6 +157,8 @@ public class RunCliquesWithHardCodedStrategies {
 			RunUtils.loadDefaultAnalysis( cliques , controller );
 		}
 
+		RunUtils.addConsistencyCheckingListeners( controller );
+
 		// run it
 		controller.run();
 	}
