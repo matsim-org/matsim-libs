@@ -105,6 +105,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		GroupPlans plans = null;
 
 		final PlanAllocation allocation = buildPlanString(
+				new KnownFeasibleAllocations(),
 				new KnownStates(),
 				incompatibleRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
@@ -213,11 +214,16 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	}
 
 	private boolean isBlocking(
+			final KnownFeasibleAllocations knownFeasibleAllocations,
 			final IncompatiblePlanRecords incompatibleRecords,
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans groupPlan) {
 		final FeasibilityChanger everybodyChanger = new FeasibilityChanger( true );
 		final FeasibilityChanger infeasibility = new FeasibilityChanger();
+
+		if ( !knownFeasibleAllocations.blocksAllKnownAllocations( groupPlan ) ) {
+			return false;
+		}
 
 		for ( PersonRecord person : personRecords.values() ) {
 			for ( PlanRecord plan : person.plans ) everybodyChanger.changeIfNecessary( plan );
@@ -229,17 +235,27 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			infeasibility.changeIfNecessary( plan );
 		}
 
+		final GroupPlans nonBlockingPlan = new GroupPlans();
 		final boolean isBlocking = !searchForCombinationsWithoutForbiddenPlans(
 				incompatibleRecords,
+				nonBlockingPlan,
 				new ArrayList<PersonRecord>( personRecords.values() ));
 		infeasibility.resetFeasibilities();
 		everybodyChanger.resetFeasibilities();
+
+		if ( !isBlocking ) {
+			// if the plan found here remains feasible,
+			// no need to re-do the search.
+			assert nonBlockingPlan.getAllIndividualPlans().size() == groupPlan.getAllIndividualPlans().size();
+			knownFeasibleAllocations.addFeasibleAllocation( nonBlockingPlan );
+		}
 
 		return isBlocking;
 	}
 
 	private boolean searchForCombinationsWithoutForbiddenPlans(
 			final IncompatiblePlanRecords incompatibleRecords,
+			final GroupPlans constructedPlan,
 			final List<PersonRecord> personsStillToAllocate) {
 		if ( !remainsFeasible( personsStillToAllocate ) ) return false;
 		// do one step forward: "point" to the next person
@@ -248,7 +264,13 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		final PersonRecord currentPerson = remainingPersons.remove(0);
 
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
-		for (PlanRecord r : currentPerson.plans) {
+		// examine plans from worst to best. This increases a lot the chances
+		// that the non-blocked plan found for a given leave is also non-blocked
+		// for the next leave
+		int i = currentPerson.plans.size() - 1;
+		for (PlanRecord r = currentPerson.plans.get( i );
+				r != null;
+				r = i-- > 0 ? currentPerson.plans.get( i ) : null ) {
 			// skip forbidden plans
 			if ( !r.isStillFeasible ) continue;
 
@@ -259,25 +281,39 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			}
 
 
+			boolean found = true;
 			if ( !actuallyRemainingPersons.isEmpty() ) {
 				tagIncompatiblePlansAsInfeasible(
 						r,
 						incompatibleRecords,
 						feasibilityChanger);
 
-				final boolean found = searchForCombinationsWithoutForbiddenPlans(
+				found = searchForCombinationsWithoutForbiddenPlans(
 						incompatibleRecords,
+						constructedPlan,
 						actuallyRemainingPersons);
 
 				feasibilityChanger.resetFeasibilities();
-				if (found) return true;
 			}
-			else {
+
+			if (found) {
+				add( constructedPlan , r );
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	private static void add(
+			final GroupPlans constructedPlan,
+			final PlanRecord r) {
+		if ( r.jointPlan == null ) {
+			constructedPlan.addIndividualPlan( r.plan );
+		}
+		else {
+			constructedPlan.addJointPlan( r.jointPlan );
+		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -293,6 +329,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 * @param str the PlanString of the plan constructed until now
 	 */
 	private PlanAllocation buildPlanString(
+			final KnownFeasibleAllocations knownFeasibleAllocations,
 			final KnownStates knownStates,
 			final IncompatiblePlanRecords incompatibleRecords,
 			final List<PersonRecord> personsStillToAllocate,
@@ -311,6 +348,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
 			assert isNullOrEqual(
 					buildPlanString(
+						new KnownFeasibleAllocations(),
 						new KnownStates(),
 						incompatibleRecords,
 						personsStillToAllocate,
@@ -401,6 +439,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 							localFeasibilityChanger);
 
 					newString = buildPlanString(
+							knownFeasibleAllocations,
 							knownStates,
 							incompatibleRecords,
 							actuallyRemainingPersons,
@@ -427,7 +466,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					if ( forbidBlockingCombinations &&
 							// no need to check if blocking if it will not be returned anyway
 							(constructedString == null || newString.getWeight() > constructedString.getWeight()) &&
-							isBlocking( incompatibleRecords , allPersons , toGroupPlans( newCurrentAlloc ) ) ) {
+							isBlocking(
+									knownFeasibleAllocations,
+									incompatibleRecords,
+									allPersons,
+									toGroupPlans( newCurrentAlloc ) ) ) {
 						newString = null;
 					}
 				}
