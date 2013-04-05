@@ -241,6 +241,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	private boolean searchForCombinationsWithoutForbiddenPlans(
 			final IncompatiblePlanRecords incompatibleRecords,
 			final List<PersonRecord> personsStillToAllocate) {
+		if ( !remainsFeasible( personsStillToAllocate ) ) return false;
 		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
 			new ArrayList<PersonRecord>( personsStillToAllocate );
@@ -600,5 +601,21 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		return false;
 	}
+
+	private static boolean remainsFeasible(
+			final List<PersonRecord> personsStillToAllocate) {
+		for ( PersonRecord person : personsStillToAllocate ) {
+			if ( !remainsFeasibleForPerson( person ) ) return false;
+		}
+		return true;
+	}
+
+	private static boolean remainsFeasibleForPerson(final PersonRecord person) {
+		for ( PlanRecord pr : person.plans ) {
+			if ( pr.isStillFeasible ) return true;
+		}
+		return false;
+	}
+
 }
 
