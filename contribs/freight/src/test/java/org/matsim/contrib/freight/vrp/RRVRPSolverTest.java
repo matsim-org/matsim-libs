@@ -12,7 +12,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierFactory;
+import org.matsim.contrib.freight.carrier.CarrierCapabilities;
+import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
@@ -30,7 +31,6 @@ import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -142,12 +142,13 @@ public class RRVRPSolverTest extends TestCase {
 	}
 
 	public void testSolveWithNoShipments() {
-		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"),makeId("vehicleLocation"));
-		vehicle.setVehicleType(new CarrierVehicleType(makeId("standard")));
-		vehicle.setCapacity(10);
+		
+		CarrierVehicle vehicle = CarrierVehicle.Builder.newInstance(makeId("vehicle"),makeId("vehicleLocation")).setCapacity(10).build();
+		vehicle.setVehicleType(CarrierVehicleType.Builder.newInstance(makeId("standard")).build());
+//		vehicle.setCapacity(10);
 		vehicles.add(vehicle);
-		Carrier carrier = new CarrierFactory().createCarrier("c", "l1");
-		carrier.setCarrierCapabilities(new CarrierFactory().createCapabilities());
+		Carrier carrier = CarrierImpl.newInstance(makeId("c"), makeId("l1"));
+		carrier.setCarrierCapabilities(CarrierCapabilities.newInstance());
 		carrier.getCarrierCapabilities().getCarrierVehicles().add(vehicle);
 		carrier.getShipments().addAll(shipments);
 		Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(carrier, scenario.getNetwork(), tourCost,costs).solve();
@@ -157,8 +158,8 @@ public class RRVRPSolverTest extends TestCase {
 	public void testSolveWithNoVehicles() {
 		vehicles.clear();
 		shipments.add(makeShipment("depotLocation", "customerLocation", 20));
-		Carrier carrier = new CarrierFactory().createCarrier("c", "l1");
-		carrier.setCarrierCapabilities(new CarrierFactory().createCapabilities());
+		Carrier carrier = CarrierImpl.newInstance(makeId("c"), makeId("l1"));
+		carrier.setCarrierCapabilities(CarrierCapabilities.newInstance());
 		carrier.getShipments().addAll(shipments);
 		try {
 			Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(carrier, scenario.getNetwork(), tourCost,costs).solve();
@@ -170,8 +171,7 @@ public class RRVRPSolverTest extends TestCase {
 	}
 
 	private CarrierShipment makeShipment(String from, String to, int size) {
-		return new CarrierFactory().createShipment(from, to, size, 0.0,
-				Double.MAX_VALUE, 0.0, Double.MAX_VALUE);
+		return CarrierShipment.Builder.newInstance(makeId(from), makeId(to), size).build();
 	}
 
 }

@@ -1,11 +1,12 @@
-package org.matsim.contrib.freight.carrier;
+package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
 
-public class FreightActivity implements Activity{
+class FreightActivity implements Activity{
 
 	private Activity act;
 	

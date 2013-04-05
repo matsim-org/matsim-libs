@@ -16,6 +16,12 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
+/**
+ * A writer that writes carriers and their plans in an xml-file.
+ * 
+ * @author sschroeder
+ *
+ */
 public class CarrierPlanWriter extends MatsimXmlWriter {
 
 	private static Logger logger = Logger.getLogger(CarrierPlanWriter.class);
@@ -26,11 +32,21 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 
 	private Map<CarrierShipment, Id> registeredShipments = new HashMap<CarrierShipment, Id>();
 
+	/**
+	 * Constructs the writer with the carriers to be written.
+	 * 
+	 * @param carriers to be written
+	 */
 	public CarrierPlanWriter(Collection<Carrier> carriers) {
 		super();
 		this.carriers = carriers;
 	}
 
+	/**
+	 * Writes carriers and their plans into a xml-file.
+	 * 
+	 * @param filename should be the target xml-file
+	 */
 	public void write(String filename) {
 		logger.info("write carrier plans");
 		try {
@@ -72,7 +88,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 			writer.write("\t\t\t\t<vehicle id=\"" + v.getVehicleId()
 					+ "\" linkId=\"" + v.getLocation() + "\"" + " cap=\""
 					+ v.getCapacity() + "\" typeId=\""
-					+ v.getVehicleType().getId().toString()
+					+ v.getVehicleTypeId().toString()
 					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
 					+ "\" latestEnd=\"" + getTime(v.getLatestEndTime())
 					+ "\"/>\n");

@@ -4,6 +4,12 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * 
+ * 
+ * @author sschroeder
+ *
+ */
 public interface Carrier {
 	
 	public static int PLAN_MEMORY = 5;

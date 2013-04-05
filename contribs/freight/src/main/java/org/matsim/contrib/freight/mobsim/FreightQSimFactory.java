@@ -82,7 +82,8 @@ public class FreightQSimFactory implements MobsimFactory {
 	}
 	
 	private CarrierAgentTracker carrierAgentTracker;
-	private boolean withinDayReScheduling;
+	
+	private boolean withinDayReScheduling = false;
 
 	public FreightQSimFactory(CarrierAgentTracker carrierAgentTracker) {
 		this.carrierAgentTracker = carrierAgentTracker;
@@ -109,9 +110,17 @@ public class FreightQSimFactory implements MobsimFactory {
 		return sim;
 	}
 
+	/**
+	 * Enables within-day activity-rescheduling.
+	 * 
+	 * <p>The default value is false. Activities contain expected activity end-times that are estimated based on another iteration. To model fixed service-times
+	 * agents arrivals have to be observed during simulation. And in some case, activity end-times have to be rescheduled.
+	 * 
+	 * @param withinDayReScheduling
+	 * @see WithinDayActivityReScheduling
+	 */
 	public void setWithinDayActivityReScheduling(boolean withinDayReScheduling) {
 		this.withinDayReScheduling = withinDayReScheduling;
 	}
-	
-//	public void set
+
 }

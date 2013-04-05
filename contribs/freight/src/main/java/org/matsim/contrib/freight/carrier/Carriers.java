@@ -6,15 +6,13 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * A container that maps carriers.
+ * 
+ * @author sschroeder
+ *
+ */
 public class Carriers {
-	
-	public static Carriers newInstance(){
-		return new Carriers();
-	}
-	
-	public static Carriers newInstance(Collection<Carrier> carriers){
-		return new Carriers(carriers);
-	}
 
 	private Map<Id, Carrier> carriers = new HashMap<Id, Carrier>();
 
@@ -26,7 +24,6 @@ public class Carriers {
 		for (Carrier c : carriers) {
 			this.carriers.put(c.getId(), c);
 		}
-
 	}
 
 	public Carriers() {

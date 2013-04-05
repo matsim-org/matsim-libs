@@ -4,6 +4,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.core.api.experimental.events.Event;
 
+/**
+ * This informs the world that a shipment has been picked up.
+ * 
+ * @author sschroeder
+ *
+ */
 public class ShipmentPickedUpEvent extends Event {
 
 	private CarrierShipment shipment;

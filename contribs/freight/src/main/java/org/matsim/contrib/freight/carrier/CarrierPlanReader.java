@@ -9,6 +9,8 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.CarrierShipment.Builder;
+import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -17,6 +19,12 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 
+/**
+ * A reader that reads carriers and their plans.
+ * 
+ * @author sschroeder
+ *
+ */
 public class CarrierPlanReader extends MatsimXmlParser {
 
 	public static Logger logger = Logger.getLogger(CarrierPlanReader.class);
@@ -61,7 +69,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	private CarrierVehicle currentVehicle = null;
 
-	private ScheduledTourBuilder currentTourBuilder = null;
+	private ScheduledTour.Builder currentTourBuilder = null;
 
 	private Double currentStartTime = null;
 
@@ -89,25 +97,41 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	private double currentLegDepTime;
 
+	/**
+	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
+	 * 
+	 * @param carriers which is a map that stores carriers
+	 */
 	public CarrierPlanReader(Carriers carriers) {
 		super();
 		this.carriers = carriers;
 	}
 
+	/**
+	 * Reads a xml-file that contains carriers and their plans.
+	 * 
+	 * <p> Builds carriers and plans, and stores them in the carriers-object coming with this constructor.
+	 * 
+	 * @param filename
+	 */
 	public void read(String filename) {
-
 		logger.info("read carrier plans");
 		this.setValidating(false);
 		parse(filename);
 		logger.info("done");
 
 	}
+	
+	private Id createId(String id) {
+		return new IdImpl(id);
+	}
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equals(CARRIER)) {
-			currentCarrier = new CarrierFactory().createCarrier(
-					atts.getValue(ID), atts.getValue(LINKID));
+			String id = atts.getValue(ID);
+			String linkId = atts.getValue(LINKID);
+			currentCarrier = CarrierImpl.newInstance(createId(id), createId(linkId)); 
 		}
 		if (name.equals(SHIPMENTS)) {
 			currentShipments = new HashMap<String, CarrierShipment>();
@@ -122,25 +146,16 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			String endDelivery = atts.getValue("endDelivery");
 			String pickupServiceTime = atts.getValue("pickupServiceTime");
 			String deliveryServiceTime = atts.getValue("deliveryServiceTime");
-			CarrierShipment shipment = null;
+			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(createId(from), createId(to), size);
 			if (startPickup == null) {
-				shipment = new CarrierFactory().createShipment(from, to, size,
-						0, 24 * 3600, 0, 24 * 3600);
+				shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(0.0, Integer.MAX_VALUE)).setDeliveryTimeWindow(TimeWindow.newInstance(0.0, Integer.MAX_VALUE));
 			} else {
-				shipment = new CarrierFactory().createShipment(from, to, size,
-						getDouble(startPickup), getDouble(endPickup),
-						getDouble(startDelivery), getDouble(endDelivery));
+				shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(getDouble(startPickup), getDouble(endPickup))).
+						setDeliveryTimeWindow(TimeWindow.newInstance(getDouble(startDelivery), getDouble(endDelivery)));
 			}
-			if (pickupServiceTime == null) {
-				shipment.setPickupServiceTime(0.0);
-			} else {
-				shipment.setPickupServiceTime(getDouble(pickupServiceTime));
-			}
-			if (deliveryServiceTime == null) {
-				shipment.setDeliveryServiceTime(0.0);
-			} else {
-				shipment.setDeliveryServiceTime(getDouble(deliveryServiceTime));
-			}
+			if (pickupServiceTime != null) shipmentBuilder.setPickupServiceTime(getDouble(pickupServiceTime)); 
+			if (deliveryServiceTime != null) shipmentBuilder.setDeliveryServiceTime(getDouble(deliveryServiceTime));
+			CarrierShipment shipment = shipmentBuilder.build();
 			currentShipments.put(atts.getValue(ID), shipment);
 			currentCarrier.getShipments().add(shipment);
 		}
@@ -160,18 +175,14 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				logger.warn("no vehicle type. set type='default' -> defaultVehicleType (see CarrierVehicleTypeImpl)");
 				typeId = "default";
 			}
-			CarrierVehicle vehicle = new CarrierFactory().createAndAddVehicle(
-					currentCarrier, vId, linkId, cap, typeId);
-			if (startTime == null) {
-				vehicle.setEarliestStartTime(0.0);
-			} else {
-				vehicle.setEarliestStartTime(getDouble(startTime));
-			}
-			if (endTime == null) {
-				vehicle.setLatestEndTime(Double.MAX_VALUE);
-			} else {
-				vehicle.setLatestEndTime(getDouble(endTime));
-			}
+			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(createId(vId), createId(linkId));
+			vehicleBuilder.setCapacity(cap);
+			vehicleBuilder.setTypeId(createId(typeId));
+			vehicleBuilder.setType(CarrierVehicleType.Builder.newInstance(createId(typeId)).build());
+			if (startTime != null) vehicleBuilder.setEarliestStart(getDouble(startTime));
+			if (endTime != null) vehicleBuilder.setLatestEnd(getDouble(endTime));
+			CarrierVehicle vehicle = vehicleBuilder.build();
+			currentCarrier.getCarrierCapabilities().getCarrierVehicles().add(vehicle);
 			vehicles.put(vId, vehicle);
 		}
 		if(name.equals("plan")){
@@ -197,7 +208,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 		if (name.equals("tour")) {
 			String vehicleId = atts.getValue("vehicleId");
 			currentVehicle = vehicles.get(vehicleId);
-			currentTourBuilder = new ScheduledTourBuilder(currentVehicle);
+			currentTourBuilder = ScheduledTour.Builder.newInstance(currentVehicle);
 		}
 		if (name.equals("leg")) {
 			currentLegDepTime = getDouble(atts.getValue("dep_time"));
@@ -238,8 +249,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				route.setLinkIds(previousActLoc, linkIds, toLocation);
 			}
 		}
-		currentTourBuilder.scheduleLeg(route, currentLegDepTime,
-				currentLegTransTime);
+		currentTourBuilder.scheduleLeg(route, currentLegDepTime,currentLegTransTime);
 		currentLeg = null;
 		previousRouteContent = null;
 	}

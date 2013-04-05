@@ -33,7 +33,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierConfig;
 import org.matsim.contrib.freight.carrier.CarrierPlanReader;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
@@ -58,14 +57,24 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-public class CarrierControler implements StartupListener, ShutdownListener,
-		BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+/**
+ * Controls the workflow of the simulation.
+ * 
+ * <p>Processes the required actions during the matsim simulation workflow (replanning, scoring, sim). For example, it informs agents to 
+ * score their plans when it is scoring time, and it informs them to re-plan, or it injects carriers into the simulation when it is time 
+ * to inject them. Currently it is kept to minimum functions, i.e. injecting carrier plans into sim and the possibility 
+ * to set custom scoring- and replanning-functionalities. 
+ * 
+ * @author sschroeder, mzilske
+ *
+ */
+public class CarrierController implements StartupListener, ShutdownListener,BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 		ReplanningListener, IterationEndsListener {
 
 	
-	private static Logger logger = Logger.getLogger(CarrierControler.class);
+	private static Logger logger = Logger.getLogger(CarrierController.class);
 
-	private final String carrierFilename;
+	private boolean withinDayReSchedulingEnabled = false;
 
 	private CarrierScoringFunctionFactory carrierScoringFunctionFactory;
 	
@@ -75,16 +84,37 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 	
 	private Carriers carriers;
 	
-	private CarrierConfig carrierConfig;
+//	private CarrierConfig carrierConfig;
 
-	public CarrierControler(CarrierConfig carrierConfig) {
-		this.carrierFilename = carrierConfig.plans().getInputFile();
-		this.carrierConfig = carrierConfig;
+	/**
+	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
+	 * 
+	 * @param carriers
+	 * @param strategyManagerFactory
+	 * @param scoringFunctionFactory
+	 * 
+	 */
+	public CarrierController(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory){
+		this.carriers = carriers;
+		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
+		this.carrierScoringFunctionFactory = scoringFunctionFactory;
 	}
 	
-//	public CarrierControler(Carriers carriers){
-//		
-//	}
+	/**
+	 * Constructs a controller with a carriersPlanFileName, re-planning capabilities and scoring-functions.
+	 * 
+	 * <p>The carriers will then be read and built at the start of matsim.
+	 * 
+	 * @param carrierPlansFilename
+	 * @param strategyManagerFactory
+	 * @param scoringFunctionFactory
+	 */
+	public CarrierController(String carrierPlansFilename, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory){
+		this.carriers = new Carriers();
+		new CarrierPlanReader(carriers).read(carrierPlansFilename);
+		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
+		this.carrierScoringFunctionFactory = scoringFunctionFactory;
+	}
 
 	public Map<Id,Carrier> getCarriers() {
 		return carriers.getCarriers();
@@ -94,23 +124,21 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 		return carrierScoringFunctionFactory;
 	}
 
-	public void setCarrierScoringFunctionFactory(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
-		this.carrierScoringFunctionFactory = carrierScoringFunctionFactory;
-	}
-
 	public CarrierPlanStrategyManagerFactory getCarrierPlanStrategyManagerFactory() {
 		return carrierPlanStrategyManagerFactory;
 	}
 
-	public void setCarrierPlanStrategyManagerFactory(CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory) {
-		this.carrierPlanStrategyManagerFactory = carrierPlanStrategyManagerFactory;
+	public void setEnableWithinDayActivityReScheduling(boolean enableWithinDayReScheduling) {
+		this.withinDayReSchedulingEnabled = enableWithinDayReScheduling;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		carriers = new Carriers();
-		new CarrierPlanReader(carriers).read(carrierFilename);
-		assert carrierScoringFunctionFactory != null : "carrierScoringFunctionFactory must be set";
+//		if(carriers == null){
+//			carriers = new Carriers();
+//			new CarrierPlanReader(carriers).read(carrierPlanFilename);
+//		}
+//		assert carrierScoringFunctionFactory != null : "carrierScoringFunctionFactory must be set";
 //		assert carrierPlanStrategyManagerFactory != null : "strategyManagerFactory must be set";
 	}
 
@@ -119,7 +147,7 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 		Controler controler = event.getControler();
 		carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getNetwork(), carrierScoringFunctionFactory);
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
-		mobsimFactory.setWithinDayActivityReScheduling(carrierConfig.isWithinDayReScheduling());
+		mobsimFactory.setWithinDayActivityReScheduling(withinDayReSchedulingEnabled);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		controler.getEvents().addHandler(carrierAgentTracker);
 		carrierAgentTracker.createPlans();

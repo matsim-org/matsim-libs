@@ -42,11 +42,9 @@ public class CarrierPlanWriterTest extends MatsimTestCase {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
 		carrierPlanReader.read(getInputDirectory() + "carrierPlansEquils.xml");
-		CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers
-				.getCarriers().values());
+		CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
 		try {
-			planWriter.write(getInputDirectory()
-					+ "carrierPlansEquilsWritten.xml");
+			planWriter.write(getInputDirectory() + "carrierPlansEquilsWritten.xml");
 			assertTrue(true);
 		} catch (Exception e) {
 			assertFalse(true);
@@ -59,11 +57,9 @@ public class CarrierPlanWriterTest extends MatsimTestCase {
 		{
 			CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
 			carrierPlanReader.read(getInputDirectory() + "carrierPlansEquils.xml");
-			CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers
-					.getCarriers().values());
+			CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
 			try {
-				planWriter.write(getInputDirectory()
-						+ "carrierPlansEquilsWritten.xml");
+				planWriter.write(getInputDirectory() + "carrierPlansEquilsWritten.xml");
 				assertTrue(true);
 			} catch (Exception e) {
 				assertFalse(true);

@@ -6,24 +6,47 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
+ * 
+ *  
+ * @author sschroeder, mzilske
+ *
+ */
 public class CarrierImpl implements Carrier {
 
 	public static Carrier newInstance(Id id, Id linkId){
 		return new CarrierImpl(id,linkId);
 	}
 	
+	/**
+	 * A builder that builds a carrier.
+	 * 
+	 * @author sschroeder
+	 *
+	 */
 	public static class Builder {
 		
+		/**
+		 * Returns a new carrier builder.
+		 * 
+		 * Note that the capability object of the carrier is constructed as well. If you set the capabilities with the carrier.setCarrierCap...()
+		 * the existing CarrierCapabilities are lost.
+		 * 
+		 * @param id
+		 * @param linkId
+		 * @return
+		 */
 		public static Builder newInstance(Id id, Id linkId){
 			return new Builder(id,linkId);
 		}
 		
-		List<CarrierShipment> shipments;
-		List<CarrierVehicle> vehicles;
-		List<CarrierPlan> plans;
-		Id id;
-		Id linkId;
-		CarrierPlan selectedPlan;
+		private List<CarrierShipment> shipments;
+		private List<CarrierVehicle> vehicles;
+		private List<CarrierPlan> plans;
+		private Id id;
+		private Id linkId;
+		private CarrierPlan selectedPlan;
 		
 		private Builder(Id id, Id linkId) {
 			shipments = new ArrayList<CarrierShipment>();
@@ -53,6 +76,12 @@ public class CarrierImpl implements Carrier {
 			return this;
 		}
 		
+		/**
+		 * Finally builds the carrier.
+		 * 
+		 * @return Carrier
+		 * @see Carrier
+		 */
 		public Carrier build(){
 			return new CarrierImpl(this);
 		}
@@ -72,6 +101,7 @@ public class CarrierImpl implements Carrier {
 
 	private CarrierCapabilities carrierCapabilities;
 	
+	
 	private CarrierImpl(Builder builder){
 		this.carrierCapabilities = CarrierCapabilities.newInstance();
 		this.carrierCapabilities.getCarrierVehicles().addAll(builder.vehicles);
@@ -82,8 +112,9 @@ public class CarrierImpl implements Carrier {
 		depotLinkId = builder.linkId;		
 	}
 	
-	public CarrierImpl(final Id id, final Id depotLinkId) {
+	private CarrierImpl(final Id id, final Id depotLinkId) {
 		super();
+		this.carrierCapabilities = CarrierCapabilities.newInstance();
 		this.id = id;
 		this.depotLinkId = depotLinkId;
 	}
@@ -138,15 +169,16 @@ public class CarrierImpl implements Carrier {
 		return selectedPlan;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Selects the selectedPlan.
 	 * 
-	 * @see
-	 * playground.mzilske.freight.Carrier#setSelectedPlan(playground.mzilske
-	 * .freight.CarrierPlan)
+	 * <p> If the plan-collection does not contain the selectedPlan, it is added to that collection.
+	 * 
+	 * @param selectedPlan to be selected
 	 */
 	@Override
 	public void setSelectedPlan(CarrierPlan selectedPlan) {
+		if(!plans.contains(selectedPlan)) plans.add(selectedPlan);
 		this.selectedPlan = selectedPlan;
 	}
 

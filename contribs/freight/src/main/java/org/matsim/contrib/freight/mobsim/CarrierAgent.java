@@ -18,7 +18,6 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.FreightActivity;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
@@ -51,8 +50,20 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
+/**
+ * This keeps track of the carrier during simulation.
+ * 
+ * @author mzilske, sschroeder
+ *
+ */
 class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler{
 
+	/**
+	 * This keeps track of a scheduledTour during simulation and can thus be seen as the driver of the vehicle that runs the tour.
+	 * 
+	 * @author mzilske, sschroeder
+	 *
+	 */
 	static class CarrierDriverAgent {
 
 		private static Logger logger = Logger.getLogger(CarrierDriverAgent.class);
@@ -219,6 +230,14 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		return id;
 	}
 
+	/**
+	 * Returns a list of plans created on the basis of the carrier's plan.
+	 * 
+	 * <p>A carrier plan consists usually of many tours (activity chains). Each plan in the returned list represents a carrier tour.
+	 *  
+	 * @return list of plans
+	 * @see Plan, CarrierPlan
+	 */
 	public List<Plan> createFreightDriverPlans() {
 		clear();
 		List<Plan> plans = new ArrayList<Plan>();

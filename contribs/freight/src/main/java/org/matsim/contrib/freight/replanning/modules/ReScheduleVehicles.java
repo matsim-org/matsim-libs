@@ -12,6 +12,12 @@ import org.matsim.contrib.freight.vrp.MatsimVrpSolverFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
+/**
+ * This is an experimental strategy module which is very likely to be changed soon (April 2013).
+ * 
+ * @author sschroeder
+ *
+ */
 public class ReScheduleVehicles implements CarrierReplanningStrategyModule {
 
 	private Network network;
@@ -30,9 +36,13 @@ public class ReScheduleVehicles implements CarrierReplanningStrategyModule {
 		this.tourCost = tourCost;
 	}
 
+	/**
+	 * @param carrierPlan
+	 * @throws IllegalStateException if carrierPlan is null.
+	 */
 	@Override
 	public void handlePlan(CarrierPlan carrierPlan) {
-		assert carrierPlan != null : "cannot handle plan. plan is null";
+		if(carrierPlan == null) throw new IllegalStateException("carrierPlan is null and cannot be handled.");
 		Carrier carrier = carrierPlan.getCarrier();
 		MatsimVrpSolver solver = vrpSolverFactory.createSolver(carrier, network, tourCost, costs);
 		Collection<ScheduledTour> tours = solver.solve();

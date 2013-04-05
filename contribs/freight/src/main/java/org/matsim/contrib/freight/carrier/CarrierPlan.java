@@ -4,11 +4,9 @@ import java.util.Collection;
 
 /**
  * 
- * Ein CarrierPlan kann sinnvoll nur dem Carrier hinzugefügt werden, nach dessen
- * CarrierCapabilities und mit dessen Shipments er erzeugt worden ist. Trotzdem
- * hat er keinen expliziten Verweis auf seinen Carrier. Naja. Mal sehen.
+ * A specific plan of a carrier, and its score. 
  * 
- * @author michaz
+ * @author mzilske, sschroeder
  * 
  */
 public class CarrierPlan {

@@ -21,8 +21,7 @@
 package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierConfig;
-import org.matsim.contrib.freight.controler.CarrierControler;
+import org.matsim.contrib.freight.controler.CarrierController;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -34,7 +33,9 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	
 	Controler controler;
 	
-	CarrierControler carrierControler;
+	CarrierController carrierControler;
+
+	private String planFile;
 	
 	public void setUp() throws Exception{
 		super.setUp();
@@ -69,20 +70,17 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 		controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setCreateGraphs(false);
-		CarrierConfig carrierConfig = new CarrierConfig();
-		carrierConfig.addCoreModules();
-		carrierConfig.plans().setInputFile(getInputDirectory() + "carrierPlansEquils.xml");
-		carrierConfig.setWithinDayReScheduling(true);
-		carrierControler = new CarrierControler(carrierConfig);
-		carrierControler.setCarrierPlanStrategyManagerFactory(new StrategyManagerFactoryForTests());
-		controler.addControlerListener(carrierControler);
-		controler.setOverwriteFiles(true);
+
+		planFile = getInputDirectory() + "carrierPlansEquils.xml";
 	}
 
 	
 	public void testMobsimWithCarrierRunsWithoutException() {
 		try{
-			carrierControler.setCarrierScoringFunctionFactory(new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
+			CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
+			carrierControler.setEnableWithinDayActivityReScheduling(true);
+			controler.addControlerListener(carrierControler);
+			controler.setOverwriteFiles(true);
 			controler.run();
 //			assertTrue(true);
 		}
@@ -93,7 +91,10 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	
 	public void testScoringInMeters(){
 		try{
-			carrierControler.setCarrierScoringFunctionFactory(new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
+			CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
+			carrierControler.setEnableWithinDayActivityReScheduling(true);
+			controler.addControlerListener(carrierControler);
+			controler.setOverwriteFiles(true);
 			controler.run();
 			
 			Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
@@ -110,15 +111,20 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	
 	public void testScoringInSeconds(){
 //		try{
-			carrierControler.setCarrierScoringFunctionFactory(new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
-			controler.run();
-			
-			Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
-			assertEquals(-8040.0,carrier1.getSelectedPlan().getScore());
-			
-			Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
-			assertEquals(-3062.0,carrier2.getSelectedPlan().getScore());
-			
+		CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
+		carrierControler.setEnableWithinDayActivityReScheduling(true);
+		controler.addControlerListener(carrierControler);
+		controler.setOverwriteFiles(true);
+		controler.run();	
+
+
+
+		Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
+		assertEquals(-8040.0,carrier1.getSelectedPlan().getScore());
+
+		Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
+		assertEquals(-3062.0,carrier2.getSelectedPlan().getScore());
+
 //		}
 //		catch(Exception e){
 //			assertTrue(false);

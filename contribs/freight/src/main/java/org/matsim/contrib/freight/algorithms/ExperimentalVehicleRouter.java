@@ -20,7 +20,13 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-public class VehicleRouter implements CarrierAlgorithm{
+/**
+ * This will change (april 2013).
+ * 
+ * @author sschroeder
+ *
+ */
+public class ExperimentalVehicleRouter {
 	
 	public static int TIMESLICE = 24*3600;
 	
@@ -50,7 +56,7 @@ public class VehicleRouter implements CarrierAlgorithm{
 
 	private Network network;
 
-	public VehicleRouter(Network network, TravelDisutility travelDisutility, TravelTime travelTime) {
+	public ExperimentalVehicleRouter(Network network, TravelDisutility travelDisutility, TravelTime travelTime) {
 		super();
 		this.travelDisutility = travelDisutility;
 		this.travelTime = travelTime;
@@ -69,7 +75,6 @@ public class VehicleRouter implements CarrierAlgorithm{
 	 * 3) adds the plan to carriers plans
 	 * 4) sets this plan to selected plan  
 	 */
-	@Override
 	public void run(Carrier carrier) {
 		init(); 
 		MatsimVrpSolver matsimVrpSolver = matsimVrpSolverFactory.createSolver(carrier, network, getTourCost(), transportCostCalculator); 

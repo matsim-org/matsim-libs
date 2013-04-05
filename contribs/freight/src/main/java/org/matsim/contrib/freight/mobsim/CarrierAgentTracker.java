@@ -17,6 +17,7 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
 import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
+import org.matsim.contrib.freight.events.ShipmentPickedUpEventHandler;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -33,6 +34,12 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
 
+/**
+ * This keeps track of all carrierAgents during simulation.
+ * 
+ * @author mzilske, sschroeder
+ *
+ */
 public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler {
 
 	private final Carriers carriers;
@@ -60,6 +67,12 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		return eventsManager;
 	}
 
+	/**
+	 * Returns the entire set of selected carrier plans.
+	 * 
+	 * @return collection of plans
+	 * @see Plan, CarrierPlan
+	 */
 	public Collection<Plan> createPlans() {
 		List<Plan> plans = new ArrayList<Plan>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
@@ -69,6 +82,10 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		return plans;
 	}
 
+	/**
+	 * Request all carrier agents to score their plans.
+	 * 
+	 */
 	public void scoreSelectedPlans() {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			CarrierAgent agent = findCarrierAgent(carrier.getId());
@@ -95,6 +112,18 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		eventsManager.processEvent(event);
 	}
 
+	/**
+	 * Informs the world that a shipment has been picked up.
+	 * 
+	 * <p>Is called by carrierAgent in charge of picking up shipments. It throws an ShipmentPickedupEvent which can be listened to
+	 * with an ShipmentPickedUpListener.
+	 * 
+	 * @param carrierId
+	 * @param driverId
+	 * @param shipment
+	 * @param time
+	 * @see ShipmentPickedUpEvent, ShipmentPickedUpEventHandler
+	 */
 	public void notifyPickedUp(Id carrierId, Id driverId, CarrierShipment shipment, double time) {
 		processEvent(new ShipmentPickedUpEvent(carrierId, driverId, shipment, time));
 	}

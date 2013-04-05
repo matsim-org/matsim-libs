@@ -2,6 +2,15 @@ package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * A shipment from one location to another, with certain size and other constraints such as time-windows and service-times.
+ * 
+ * <p>Use the builder to build a shipment. 
+ * @code CarrierShipment.Builder.newInstance(from,to,size) 
+ * 
+ * @author sschroeder
+ *
+ */
 public final class CarrierShipment {
 
 	public static class TimeWindow {
@@ -14,7 +23,7 @@ public final class CarrierShipment {
 
 		private final double end;
 
-		public TimeWindow(final double start, final double end) {
+		private TimeWindow(final double start, final double end) {
 			this.start = start;
 			this.end = end;
 		}
@@ -34,8 +43,25 @@ public final class CarrierShipment {
 
 	}
 	
+	/**
+	 * A builder that builds shipments.
+	 * 
+	 * @author sschroeder
+	 *
+	 */
 	public static class Builder {
 		
+		/**
+		 * Returns a new shipment builder.
+		 * 
+		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
+		 * The default-value for serviceTime is 0.0. The default-value for a timeWindow is [start=0.0, end=Double.maxValue()].
+		 * 
+		 * @param from
+		 * @param to
+		 * @param size
+		 * @return the builder
+		 */
 		public static Builder newInstance(Id from, Id to, int size){
 			return new Builder(from,to,size);
 		}
@@ -43,8 +69,8 @@ public final class CarrierShipment {
 		Id from;
 		Id to;
 		int size;
-		TimeWindow pickTW = TimeWindow.newInstance(0.0, Double.MAX_VALUE);
-		TimeWindow delTW = TimeWindow.newInstance(0.0, Double.MAX_VALUE);
+		TimeWindow pickTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
+		TimeWindow delTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		double pickServiceTime = 0.0;
 		double delServiceTime = 0.0;
 		
@@ -94,14 +120,14 @@ public final class CarrierShipment {
 
 	private double deliveryServiceTime;
 
-	public CarrierShipment(final Id from, final Id to, final int size, final TimeWindow pickupTimeWindow, final TimeWindow deliveryTimeWindow) {
-		super();
-		this.from = from;
-		this.to = to;
-		this.size = size;
-		this.pickupTimeWindow = pickupTimeWindow;
-		this.deliveryTimeWindow = deliveryTimeWindow;
-	}
+//	public CarrierShipment(final Id from, final Id to, final int size, final TimeWindow pickupTimeWindow, final TimeWindow deliveryTimeWindow) {
+//		super();
+//		this.from = from;
+//		this.to = to;
+//		this.size = size;
+//		this.pickupTimeWindow = pickupTimeWindow;
+//		this.deliveryTimeWindow = deliveryTimeWindow;
+//	}
 
 	private CarrierShipment(Builder builder) {
 		from = builder.from;
@@ -151,8 +177,8 @@ public final class CarrierShipment {
 
 	@Override
 	public String toString() {
-		return "[from=" + from.toString() + "][to=" + to.toString() + "][size="
-				+ size + "]";
+		return "[from=" + from.toString() + "][to=" + to.toString() + "][size=" + size + "][pickupServiceTime=" + pickupServiceTime + "]" +
+				"[deliveryServiceTime="+deliveryServiceTime+"][pickupTimeWindow="+pickupTimeWindow+"][deliveryTimeWindow="+deliveryTimeWindow+"]";
 	}
 
 }

@@ -8,20 +8,24 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.vrp.utils.matsim2vrp.MatsimVehicleAdapter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * Router routing scheduledTours.
+ * 
+ * @author sschroeder
+ *
+ */
 public class TimeAndSpaceTourRouter {
 	
 	private static Logger logger = Logger.getLogger(TimeAndSpaceTourRouter.class);
@@ -32,6 +36,13 @@ public class TimeAndSpaceTourRouter {
 	
 	private TravelTime travelTime;
 
+	/**
+	 * Constructs the timeAndSpaceRouter with a leastCostPathCalculator, network and travelTime.
+	 * @param router
+	 * @param network
+	 * @param travelTime
+	 * @see LeastCostPathCalculator, Network, TravelTime
+	 */
 	public TimeAndSpaceTourRouter(LeastCostPathCalculator router, Network network, TravelTime travelTime) {
 		super();
 		this.router = router;
@@ -39,6 +50,13 @@ public class TimeAndSpaceTourRouter {
 		this.travelTime = travelTime;
 	}
 	
+	/**
+	 * Routes a scheduledTour in time and space.
+	 * 
+	 * <p>Uses a leastCostPathCalculator to calculate a route/path from one activity to another. It starts at the departureTime of 
+	 * the scheduledTour and determines activity arrival and departure times considering activities time-windows.
+	 * @param tour
+	 */
 	public void route(ScheduledTour tour) {
 		MatsimVehicleAdapter matsimVehicle = new MatsimVehicleAdapter(tour.getVehicle());
 		double currTime = tour.getDeparture();

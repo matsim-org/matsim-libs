@@ -9,7 +9,6 @@ import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.carrier.TourBuilder;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.End;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
@@ -27,7 +26,7 @@ class Matsim2VrpUtils {
 		Collection<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
 		for (VehicleRoute route : vehicleRoutes) {
 			org.matsim.contrib.freight.carrier.Tour vehicleTour = createTour(matsim2vrpMap, route);
-			ScheduledTour scheduledTour = new ScheduledTour(vehicleTour,matsim2vrpMap.getCarrierVehicle(route.getVehicle()),vehicleTour.getEarliestDeparture());
+			ScheduledTour scheduledTour = ScheduledTour.newInstance(vehicleTour,matsim2vrpMap.getCarrierVehicle(route.getVehicle()),vehicleTour.getEarliestDeparture());
 			scheduledTours.add(scheduledTour);
 		}
 		return scheduledTours;
@@ -35,7 +34,7 @@ class Matsim2VrpUtils {
 
 	private static org.matsim.contrib.freight.carrier.Tour createTour(Matsim2VrpMap matsim2vrpMap, VehicleRoute route) {
 		TourImpl tour = route.getTour();
-		TourBuilder tourBuilder = new TourBuilder();
+		org.matsim.contrib.freight.carrier.Tour.Builder tourBuilder = org.matsim.contrib.freight.carrier.Tour.Builder.newInstance();
 		for (TourActivity act : tour.getActivities()) {
 			if (act instanceof Pickup) {
 				Shipment shipment = (Shipment) ((Pickup) act).getJob();
@@ -48,7 +47,7 @@ class Matsim2VrpUtils {
 				tourBuilder.addLeg(new Leg());
 				tourBuilder.scheduleDelivery(carrierShipment);
 			} else if (act instanceof Start) {
-				tourBuilder.scheduleStart(makeId(act.getLocationId()),act.getEarliestOperationStartTime(),act.getLatestOperationStartTime());
+				tourBuilder.scheduleStart(makeId(act.getLocationId()));
 			} else if (act instanceof End) {
 				tourBuilder.addLeg(new Leg());
 				tourBuilder.scheduleEnd(makeId(act.getLocationId()));

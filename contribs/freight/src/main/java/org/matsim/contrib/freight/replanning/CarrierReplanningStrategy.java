@@ -5,13 +5,18 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.replanning.selectors.CarrierPlanSelector;
 
+/**
+ * A strategy to modify a selected plan.
+ * 
+ * @author sschroeder
+ *
+ */
 public class CarrierReplanningStrategy {
 
 	private static Logger logger = Logger.getLogger(CarrierReplanningStrategy.class);
@@ -20,6 +25,12 @@ public class CarrierReplanningStrategy {
 
 	private CarrierPlanSelector carrierPlanSelector;
 	
+	/**
+	 * Constructs the strategy with a plan selector.
+	 * 
+	 * @param carrierPlanSelector
+	 * @see CarrierPlanSelector
+	 */
 	public CarrierReplanningStrategy(CarrierPlanSelector carrierPlanSelector) {
 		super();
 		this.carrierPlanSelector = carrierPlanSelector;
@@ -80,7 +91,7 @@ public class CarrierReplanningStrategy {
 			double depTime = sTour.getDeparture();
 			CarrierVehicle vehicle = sTour.getVehicle();
 			Tour tour = sTour.getTour().duplicate();
-			tours.add(new CarrierFactory().createScheduledTour(tour, vehicle, depTime));
+			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
 		}
 		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
 		copiedPlan.setScore(plan2copy.getScore());
