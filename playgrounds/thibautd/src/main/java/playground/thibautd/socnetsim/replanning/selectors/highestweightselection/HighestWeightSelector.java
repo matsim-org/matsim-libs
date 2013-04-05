@@ -257,7 +257,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final IncompatiblePlanRecords incompatibleRecords,
 			final GroupPlans constructedPlan,
 			final List<PersonRecord> personsStillToAllocate) {
-		if ( !remainsFeasible( personsStillToAllocate ) ) return false;
+		//if ( !remainsFeasible( personsStillToAllocate ) ) return false;
 		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
 			new ArrayList<PersonRecord>( personsStillToAllocate );
@@ -279,7 +279,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				assert containsAllIds( personsStillToAllocate , r.jointPlan.getIndividualPlans().keySet() ); 
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 			}
-
 
 			boolean found = true;
 			if ( !actuallyRemainingPersons.isEmpty() ) {
@@ -346,6 +345,8 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		if ( constructedString != null ) {
 			assert constructedString.getPlans().size() == personsStillToAllocate.size() :
 				constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
+			// due to the minimal weight to attain, the string can be null
+			// while there is a solution cached.
 			assert isNullOrEqual(
 					buildPlanString(
 						new KnownFeasibleAllocations(),
@@ -356,7 +357,18 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 						currentAllocation,
 						minimalWeightToObtain),
 					constructedString ) : personsStillToAllocate+" cached:"+constructedString ;
-			return constructedString;
+			if ( !forbidBlockingCombinations ||
+				!isBlocking(
+						knownFeasibleAllocations,
+						incompatibleRecords,
+						allPersons,
+						toGroupPlans(
+							merge(
+								currentAllocation,
+								constructedString ) ) ) ) {
+				return constructedString;
+			}
+			constructedString = null;
 		}
 
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
@@ -428,52 +440,48 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			}
 
 			PlanAllocation newString = null;
-			/*scope*/ {
-				final PlanAllocation newCurrentAlloc = new PlanAllocation();
-				newCurrentAlloc.addAll( currentAllocation.getPlans() );
-				newCurrentAlloc.addAll( newAllocation.getPlans() );
-				if ( !actuallyRemainingPersons.isEmpty() ) {
-					tagIncompatiblePlansAsInfeasible(
-							r,
-							incompatibleRecords,
-							localFeasibilityChanger);
 
-					newString = buildPlanString(
-							knownFeasibleAllocations,
-							knownStates,
-							incompatibleRecords,
-							actuallyRemainingPersons,
-							allPersons,
-							newCurrentAlloc,
-							Math.max(
-								minimalWeightToObtain,
-								constructedString != null ?
-									constructedString.getWeight() :
-									Double.NEGATIVE_INFINITY) - newAllocation.getWeight() );
+			if ( !actuallyRemainingPersons.isEmpty() ) {
+				tagIncompatiblePlansAsInfeasible(
+						r,
+						incompatibleRecords,
+						localFeasibilityChanger);
 
-					localFeasibilityChanger.resetFeasibilities();
+				newString = buildPlanString(
+						knownFeasibleAllocations,
+						knownStates,
+						incompatibleRecords,
+						actuallyRemainingPersons,
+						allPersons,
+						merge( currentAllocation , newAllocation ),
+						Math.max(
+							minimalWeightToObtain,
+							constructedString != null ?
+								constructedString.getWeight() :
+								Double.NEGATIVE_INFINITY) - newAllocation.getWeight() );
 
-					if ( newString != null ) {
-						assert newString.getPlans().size() == actuallyRemainingPersons.size() : newString.getPlans().size()+" plans for "+actuallyRemainingPersons.size()+" agents";
-						newString.addAll( newAllocation.getPlans() );
-						assert newString.getPlans().size() == personsStillToAllocate.size() : newString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-					}
-				}
-				else {
-					newString = newAllocation;
+				localFeasibilityChanger.resetFeasibilities();
+
+				if ( newString != null ) {
+					assert newString.getPlans().size() == actuallyRemainingPersons.size() : newString.getPlans().size()+" plans for "+actuallyRemainingPersons.size()+" agents";
+					newString.addAll( newAllocation.getPlans() );
 					assert newString.getPlans().size() == personsStillToAllocate.size() : newString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
+				}
+			}
+			else {
+				newString = newAllocation;
+				assert newString.getPlans().size() == personsStillToAllocate.size() : newString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
 
-					if ( forbidBlockingCombinations &&
-							// no need to check if blocking if it will not be returned anyway
-							(constructedString == null || newString.getWeight() > constructedString.getWeight()) &&
-							isBlocking(
-									knownFeasibleAllocations,
-									incompatibleRecords,
-									allPersons,
-									toGroupPlans( newCurrentAlloc ) ) ) {
+				if ( forbidBlockingCombinations &&
+						// no need to check if blocking if it will not be returned anyway
+						(constructedString == null || newString.getWeight() > constructedString.getWeight()) &&
+						isBlocking(
+								knownFeasibleAllocations,
+								incompatibleRecords,
+								allPersons,
+								toGroupPlans( merge( currentAllocation , newAllocation ) ) ) ) {
 						newString = null;
 					}
-				}
 			}
 
 			if ( newString == null || newString.getWeight() <= minimalWeightToObtain ) continue;
@@ -492,7 +500,9 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		assert constructedString == null || constructedString.getPlans().size() == personsStillToAllocate.size() :
 			constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-		if ( !forbidBlockingCombinations ) {
+		if ( !forbidBlockingCombinations ||
+				// would be good to be able to cache null which doesn't come from blocking...
+				(constructedString != null && !constructedString.isResultsFromBlockingConstraint()) ) {
 			knownStates.cacheSolution( personsStillToAllocate , constructedString , minimalWeightToObtain );
 		}
 
@@ -645,20 +655,13 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		return false;
 	}
 
-	private static boolean remainsFeasible(
-			final List<PersonRecord> personsStillToAllocate) {
-		for ( PersonRecord person : personsStillToAllocate ) {
-			if ( !remainsFeasibleForPerson( person ) ) return false;
-		}
-		return true;
+	private static PlanAllocation merge(
+			final PlanAllocation currentAllocation,
+			final PlanAllocation constructedString) {
+		final PlanAllocation merged = new PlanAllocation();
+		merged.addAll( currentAllocation.getPlans() );
+		merged.addAll( constructedString.getPlans() );
+		return merged;
 	}
-
-	private static boolean remainsFeasibleForPerson(final PersonRecord person) {
-		for ( PlanRecord pr : person.plans ) {
-			if ( pr.isStillFeasible ) return true;
-		}
-		return false;
-	}
-
 }
 
