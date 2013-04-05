@@ -105,7 +105,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		GroupPlans plans = null;
 
 		final PlanAllocation allocation = buildPlanString(
-				new KnownFeasibleAllocations(),
+				new KnownFeasibleAllocations( 20 ),
 				new KnownStates(),
 				incompatibleRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
@@ -369,18 +369,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 						currentAllocation,
 						minimalWeightToObtain),
 					constructedString ) : personsStillToAllocate+" cached:"+constructedString ;
-			if ( !forbidBlockingCombinations ||
-				!isBlocking(
-						knownFeasibleAllocations,
-						incompatibleRecords,
-						allPersons,
-						toGroupPlans(
-							merge(
-								currentAllocation,
-								constructedString ) ) ) ) {
-				return constructedString;
-			}
-			constructedString = null;
+			return constructedString;
 		}
 
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
@@ -512,9 +501,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		assert constructedString == null || constructedString.getPlans().size() == personsStillToAllocate.size() :
 			constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-		if ( !forbidBlockingCombinations ||
-				// would be good to be able to cache null which doesn't come from blocking...
-				(constructedString != null && !constructedString.isResultsFromBlockingConstraint()) ) {
+		if ( !forbidBlockingCombinations ) {
 			knownStates.cacheSolution( personsStillToAllocate , constructedString , minimalWeightToObtain );
 		}
 
