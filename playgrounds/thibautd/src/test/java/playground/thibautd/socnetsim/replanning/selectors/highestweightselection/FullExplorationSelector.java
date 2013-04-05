@@ -194,7 +194,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	// "outer loop": search and forbid if blocking (if forbid blocking is true)
 	// /////////////////////////////////////////////////////////////////////////
 	private GroupPlans selectPlans( final Map<Id, PersonRecord> personRecords ) {
-		final ForbidenCombinations forbiden = new ForbidenCombinations();
+		final ForbidenPlanStrings forbiden = new ForbidenPlanStrings();
 
 		GroupPlans plans = null;
 
@@ -219,7 +219,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	}
 
 	private boolean continueIterations(
-			final ForbidenCombinations forbiden,
+			final ForbidenPlanStrings forbiden,
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans allocation) {
 		if ( !forbidBlockingCombinations ) return false;
@@ -315,7 +315,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	 * @param str the PlanString of the plan constructed until now
 	 */
 	private PlanString buildPlanString(
-			final ForbidenCombinations forbidenCombinations,
+			final ForbidenPlanStrings forbidenCombinations,
 			final List<PersonRecord> personsStillToAllocate,
 			final PlanString str,
 			final double minimalWeightToObtain) {
