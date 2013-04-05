@@ -39,6 +39,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 
 /**
@@ -90,7 +91,13 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final IncompatiblePlansIdentifierFactory incompFactory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		final Map<Id, PersonRecord> personRecords = getPersonRecords( jointPlans , group );
+		final IncompatiblePlansIdentifier incompatiblePlansIdentifier =
+			incompFactory.createIdentifier( jointPlans , group );
+		final Map<Id, PersonRecord> personRecords =
+			getPersonRecords(
+					incompatiblePlansIdentifier,
+					jointPlans,
+					group );
 		final ForbidenCombinations forbiden = new ForbidenCombinations();
 
 		GroupPlans plans = null;
@@ -102,7 +109,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					new KnownStates(),
 					forbiden,
 					new IncompatiblePlanRecords(
-						incompFactory.createIdentifier( jointPlans , group ),
+						incompatiblePlansIdentifier,
 						personRecords ),
 					new ArrayList<PersonRecord>( personRecords.values() ),
 					new PlanAllocation(),
@@ -139,6 +146,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	}
 
 	private Map<Id, PersonRecord> getPersonRecords(
+			final IncompatiblePlansIdentifier incompatiblePlansIdentifier,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		final Map<Id, PersonRecord> map = new LinkedHashMap<Id, PersonRecord>();
@@ -181,7 +189,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					rs.add( r );
 				}
 			}
-			final PersonRecord pr = new PersonRecord( person , plans );
+			final PersonRecord pr = new PersonRecord( person , plans , incompatiblePlansIdentifier );
 			map.put(
 					person.getId(),
 					pr );
@@ -344,7 +352,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
 		final List<PlanRecord> records = new ArrayList<PlanRecord>();
-		for ( PlanRecord r : currentPerson.plans ) {
+		for ( PlanRecord r : currentPerson.bestPlansPerJointStructure ) {
 			assert !r.isStillFeasible == (r.jointPlan != null && intersects( r.jointPlan.getIndividualPlans().keySet() , currentAllocation ));
 			if ( r.isStillFeasible ) records.add( r );
 		}
@@ -542,7 +550,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			}
 		}
 
-		for (PlanRecord plan : record.plans ) {
+		for (PlanRecord plan : record.bestPlansPerJointStructure ) {
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
 
