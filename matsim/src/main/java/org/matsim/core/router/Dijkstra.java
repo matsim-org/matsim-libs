@@ -34,6 +34,7 @@ import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -208,9 +209,6 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
 
-		double arrivalTime = 0;
-		boolean stillSearching = true;
-
 		augmentIterationId(); // this call makes the class not threadsafe
 		this.person = person;
 		this.vehicle = vehicle;
@@ -222,6 +220,28 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
 		initFromNode(fromNode, toNode, startTime, pendingNodes);
 
+		Node foundToNode = searchLogic(fromNode, toNode, pendingNodes);
+		
+		if (foundToNode == null) return null;
+		else {
+			DijkstraNodeData outData = getData(foundToNode);
+			double arrivalTime = outData.getTime();
+			
+			// now construct and return the path
+			return constructPath(fromNode, foundToNode, startTime, arrivalTime);			
+		}
+	}
+
+	/**
+	 * Logic that was previously located in the calcLeastCostPath(...) method.
+	 * Can be overwritten in the MultiModalDijkstra.
+	 * Returns the last node of the path. By default this is the to-node.
+	 * The MultiNodeDijkstra returns the cheapest of all given to-nodes.
+	 */
+	/*package*/ Node searchLogic(final Node fromNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+		
+		boolean stillSearching = true;
+		
 		while (stillSearching) {
 			Node outNode = pendingNodes.poll();
 
@@ -232,18 +252,13 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 
 			if (outNode == toNode) {
 				stillSearching = false;
-				DijkstraNodeData outData = getData(outNode);
-				arrivalTime = outData.getTime();
 			} else {
 				relaxNode(outNode, toNode, pendingNodes);
 			}
 		}
-
-		// now construct and return the path
-		return constructPath(fromNode, toNode, startTime, arrivalTime);
-
+		return toNode;
 	}
-
+	
 	/**
 	 * Constructs the path after the algorithm has been run.
 	 *
