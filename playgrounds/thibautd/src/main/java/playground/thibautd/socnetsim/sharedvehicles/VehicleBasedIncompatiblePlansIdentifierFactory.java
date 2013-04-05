@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.sharedvehicles;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -34,6 +34,7 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierImpl;
+import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd
@@ -63,7 +64,7 @@ public class VehicleBasedIncompatiblePlansIdentifierFactory implements Incompati
 			final Plan plan = entry.getKey();
 			final Collection<Id> vehs = entry.getValue();
 
-			final Collection<Plan> incompatiblePlans = new HashSet<Plan>();
+			final Set<Plan> incompatiblePlans = new HashSet<Plan>();
 			for ( Id v : vehs ) {
 				incompatiblePlans.addAll( plansPerVehicle.get( v ) );
 			}
@@ -83,23 +84,12 @@ public class VehicleBasedIncompatiblePlansIdentifierFactory implements Incompati
 				final Collection<Id> vehicles = SharedVehicleUtils.getVehiclesInPlan( plan , mode );
 				vehiclesPerPlan.put( plan , vehicles );
 				for ( Id v : vehicles ) {
-					getCollection( v , plansPerVehicle ).add( plan );
+					MapUtils.getCollection( v , plansPerVehicle ).add( plan );
 				}
 			}
 		}
 	}
 
-	private static <K,V> Collection<V> getCollection(
-			final K key,
-			final Map<K, Collection<V>> map) {
-		Collection<V> coll = map.get( key );
 
-		if ( coll == null ) {
-			coll = new ArrayList<V>();
-			map.put( key , coll );
-		}
-
-		return coll;
-	}
 }
 

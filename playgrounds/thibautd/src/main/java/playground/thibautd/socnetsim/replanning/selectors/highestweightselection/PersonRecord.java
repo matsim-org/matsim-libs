@@ -22,8 +22,9 @@ package playground.thibautd.socnetsim.replanning.selectors.highestweightselectio
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
+import playground.thibautd.utils.MapUtils;
 
 final class PersonRecord {
 	final Person person;
@@ -60,8 +62,9 @@ final class PersonRecord {
 			return;
 		}
 
+		// TODO: pass this in the selector, as it is very linked to the way it works
 		bestPlansPerJointStructure = new ArrayList<PlanRecord>();
-		final Set<Set<Id>> knownSets = new HashSet<Set<Id>>();
+		final Map<Set<Id>, Set<Set<Plan>>> knownIncompatiblePlans = new HashMap<Set<Id>, Set<Set<Plan>>>();
 		double lastRecordWeight = Double.POSITIVE_INFINITY;
 		for (PlanRecord r : this.plans) {
 			assert r.avgJointPlanWeight <= lastRecordWeight : this.plans;
@@ -70,10 +73,9 @@ final class PersonRecord {
 			final Set<Id> cotravs = r.jointPlan == null ?
 				Collections.<Id>emptySet() :
 				r.jointPlan.getIndividualPlans().keySet();
-			// only consider the best plans until the first plan which is not incompatible
-			// with any plan for each joint structure
-			if ( !incompatiblePlans.identifyIncompatiblePlans( r.plan ).isEmpty() ||
-					knownSets.add( cotravs ) ) {
+			// only consider the best plan of each structure for each set of
+			// incompatible plans.
+			if ( MapUtils.getSet( cotravs , knownIncompatiblePlans ).add( incompatiblePlans.identifyIncompatiblePlans( r.plan ) ) ) {
 				bestPlansPerJointStructure.add( r );
 			}
 		}

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmptyIncompatiblePlansIdentifierFactory.java
+ * MapUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,32 +17,58 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.selectors;
+package playground.thibautd.utils;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.matsim.api.core.v01.population.Plan;
-
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-
 /**
- * The default factory: no incomaptibility relationships
  * @author thibautd
  */
-public class EmptyIncompatiblePlansIdentifierFactory implements IncompatiblePlansIdentifierFactory {
+public class MapUtils {
+	private MapUtils() {}
 
-	@Override
-	public IncompatiblePlansIdentifier createIdentifier(
-			final JointPlans jointPlans,
-			final ReplanningGroup group) {
-		return new IncompatiblePlansIdentifier() {
-			@Override
-			public Set<Plan> identifyIncompatiblePlans(final Plan plan) {
-				return Collections.<Plan>emptySet();
-			}
-		};
+	public static <K,V> Collection<V> getCollection(
+			final K key,
+			final Map<K, Collection<V>> map) {
+		Collection<V> coll = map.get( key );
+
+		if ( coll == null ) {
+			coll = new ArrayList<V>();
+			map.put( key , coll );
+		}
+
+		return coll;
+	}
+
+	public static <K,V> List<V> getList(
+			final K key,
+			final Map<K, List<V>> map) {
+		List<V> coll = map.get( key );
+
+		if ( coll == null ) {
+			coll = new ArrayList<V>();
+			map.put( key , coll );
+		}
+
+		return coll;
+	}
+
+	public static <K,V> Set<V> getSet(
+			final K key,
+			final Map<K, Set<V>> map) {
+		Set<V> coll = map.get( key );
+
+		if ( coll == null ) {
+			coll = new HashSet<V>();
+			map.put( key , coll );
+		}
+
+		return coll;
 	}
 }
 

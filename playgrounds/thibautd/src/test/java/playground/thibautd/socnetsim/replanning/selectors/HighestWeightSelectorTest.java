@@ -24,8 +24,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -62,7 +64,7 @@ public class HighestWeightSelectorTest {
 		final GroupPlans expectedSelectedPlansWhenBlocking;
 		final GroupPlans expectedSelectedPlansWhenForbidding;
 		final JointPlans jointPlans;
-		final Collection<Plan> forbiddenPlans;
+		final Set<Plan> forbiddenPlans;
 
 		public Fixture(
 				final String name,
@@ -70,7 +72,7 @@ public class HighestWeightSelectorTest {
 				final GroupPlans expectedPlans,
 				final GroupPlans expectedSelectedPlansWhenBlocking,
 				final GroupPlans expectedSelectedPlansWhenForbidding,
-				final Collection<Plan> forbiddenPlans,
+				final Set<Plan> forbiddenPlans,
 				final JointPlans jointPlans) {
 			this.name = name;
 			this.group = group;
@@ -245,7 +247,7 @@ public class HighestWeightSelectorTest {
 				expected,
 				// not much we can forbid...
 				expected,
-				Collections.<Plan>emptyList(),
+				Collections.<Plan>emptySet(),
 				jointPlans);
 	}
 
@@ -329,7 +331,7 @@ public class HighestWeightSelectorTest {
 				expected,
 				expected,
 				expectedForbidding,
-				jp2.values(),
+				new HashSet<Plan>(jp2.values()),
 				jointPlans);
 
 	}
@@ -414,7 +416,7 @@ public class HighestWeightSelectorTest {
 				expected,
 				expected,
 				expectedForbid,
-				jp2.values(),
+				new HashSet<Plan>( jp2.values() ),
 				jointPlans);
 	}
 
@@ -535,7 +537,7 @@ public class HighestWeightSelectorTest {
 				expected,
 				expected,
 				expectedForbid,
-				jp5.values(),
+				new HashSet<Plan>( jp5.values() ),
 				jointPlans);
 	}
 
@@ -592,7 +594,7 @@ public class HighestWeightSelectorTest {
 				expected,
 				null,
 				expected,
-				Collections.<Plan>emptyList(),
+				Collections.<Plan>emptySet(),
 				jointPlans);
 	}
 
@@ -700,7 +702,7 @@ public class HighestWeightSelectorTest {
 				expected,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptyList(),
+				Collections.<Plan>emptySet(),
 				jointPlans);
 	}
 
@@ -758,7 +760,7 @@ public class HighestWeightSelectorTest {
 				null,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptyList(),
+				Collections.<Plan>emptySet(),
 				jointPlans);
 	}
 
@@ -818,7 +820,7 @@ public class HighestWeightSelectorTest {
 				null,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptyList(),
+				Collections.<Plan>emptySet(),
 				jointPlans);
 	}
 
@@ -902,7 +904,7 @@ public class HighestWeightSelectorTest {
 				expectedBlock,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptyList(),
+				Collections.<Plan>emptySet(),
 				jointPlans);
 	}
 
@@ -970,7 +972,7 @@ public class HighestWeightSelectorTest {
 				expectedBlock,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptyList(),
+				Collections.<Plan>emptySet(),
 				jointPlans);
 	}
 
@@ -1045,7 +1047,7 @@ public class HighestWeightSelectorTest {
 									final ReplanningGroup group) {
 								return new IncompatiblePlansIdentifier() {
 									@Override
-									public Collection<Plan> identifyIncompatiblePlans(
+									public Set<Plan> identifyIncompatiblePlans(
 											final Plan plan) {
 										return fixture.forbiddenPlans.contains( plan ) ?
 											nonForbiddenPlans( group , fixture.forbiddenPlans ) :
@@ -1074,10 +1076,10 @@ public class HighestWeightSelectorTest {
 				selected);
 	}
 
-	private static Collection<Plan> nonForbiddenPlans(
+	private static Set<Plan> nonForbiddenPlans(
 			final ReplanningGroup group,
 			final Collection<Plan> forbiddenPlans) {
-		final Collection<Plan> nonForbidden = new ArrayList<Plan>();
+		final Set<Plan> nonForbidden = new HashSet<Plan>();
 
 		for ( Person person : group.getPersons() ) nonForbidden.addAll( person.getPlans() );
 		nonForbidden.removeAll( forbiddenPlans );

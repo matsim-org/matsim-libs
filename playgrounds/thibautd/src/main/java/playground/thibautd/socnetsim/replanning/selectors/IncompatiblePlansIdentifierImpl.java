@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.population.Plan;
 
@@ -32,16 +32,16 @@ import org.matsim.api.core.v01.population.Plan;
  * @author thibautd
  */
 public final class IncompatiblePlansIdentifierImpl implements IncompatiblePlansIdentifier {
-	private final Map<Plan, Collection<Plan>> incompatiblePlansPerPlans =
-		new HashMap<Plan, Collection<Plan>>();
+	private final Map<Plan, Set<Plan>> incompatiblePlansPerPlans =
+		new HashMap<Plan, Set<Plan>>();
 
 	@Override
-	public Collection<Plan> identifyIncompatiblePlans(final Plan plan) {
-		final Collection<Plan> plans = incompatiblePlansPerPlans.get( plan );
+	public Set<Plan> identifyIncompatiblePlans(final Plan plan) {
+		final Set<Plan> plans = incompatiblePlansPerPlans.get( plan );
 		return plans != null ? plans : Collections.<Plan>emptySet();
 	}
 
-	public void put( final Plan plan , final Collection<Plan> incompatiblePlans ) {
+	public void put( final Plan plan , final Set<Plan> incompatiblePlans ) {
 		incompatiblePlansPerPlans.put( plan , incompatiblePlans );
 	}
 }

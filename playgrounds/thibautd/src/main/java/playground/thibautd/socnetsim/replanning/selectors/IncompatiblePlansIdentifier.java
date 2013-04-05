@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
-import java.util.Collection;
+import java.util.Set;
 
 import org.matsim.api.core.v01.population.Plan;
 
@@ -48,6 +48,6 @@ public interface IncompatiblePlansIdentifier {
 	 * the plan B must pertain to the collection returned for the plan A.
 	 * </ul>
 	 */
-	public Collection<Plan> identifyIncompatiblePlans(Plan plan);
+	public Set<Plan> identifyIncompatiblePlans(Plan plan);
 }
 
