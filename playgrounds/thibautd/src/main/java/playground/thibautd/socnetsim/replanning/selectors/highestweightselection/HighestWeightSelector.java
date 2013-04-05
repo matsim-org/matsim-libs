@@ -99,7 +99,10 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					jointPlans,
 					group );
 		final ForbidenCombinations forbiden = new ForbidenCombinations();
-
+		final IncompatiblePlanRecords incompatibleRecords =
+			new IncompatiblePlanRecords(
+					incompatiblePlansIdentifier,
+					personRecords );
 		GroupPlans plans = null;
 
 		int count = 0;
@@ -108,9 +111,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final PlanAllocation allocation = buildPlanString(
 					new KnownStates(),
 					forbiden,
-					new IncompatiblePlanRecords(
-						incompatiblePlansIdentifier,
-						personRecords ),
+					incompatibleRecords,
 					new ArrayList<PersonRecord>( personRecords.values() ),
 					new PlanAllocation(),
 					Double.NEGATIVE_INFINITY);
@@ -118,7 +119,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			plans = allocation == null ? null : toGroupPlans( allocation );
 		} while (
 				plans != null &&
-				continueIterations( forbiden , personRecords , plans ) );
+				continueIterations(
+					incompatibleRecords,
+					forbiden,
+					personRecords,
+					plans ) );
 
 		assert forbidBlockingCombinations || count == 1 : count;
 		assert plans == null || !forbiden.isForbidden( plans );
@@ -226,6 +231,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	// /////////////////////////////////////////////////////////////////////////
 
 	private boolean continueIterations(
+			final IncompatiblePlanRecords incompatibleRecords,
 			final ForbidenCombinations forbiden,
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans allocation) {
@@ -233,7 +239,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		assert !forbiden.isForbidden( allocation ) : "forbidden combination was re-examined";
 
-		if (isBlocking( personRecords, allocation )) {
+		if (isBlocking( incompatibleRecords , personRecords , allocation )) {
 			forbiden.forbid( allocation );
 			return true;
 		}
@@ -242,20 +248,21 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	}
 
 	private boolean isBlocking(
+			final IncompatiblePlanRecords incompatibleRecords,
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans groupPlan) {
 		return !searchForCombinationsWithoutForbiddenPlans(
 				groupPlan,
+				incompatibleRecords,
 				personRecords,
-				new ArrayList<PersonRecord>( personRecords.values() ),
-				Collections.<Id> emptySet());
+				new ArrayList<PersonRecord>( personRecords.values() ));
 	}
 
 	private boolean searchForCombinationsWithoutForbiddenPlans(
 			final GroupPlans forbidenPlans,
+			final IncompatiblePlanRecords incompatibleRecords,
 			final Map<Id, PersonRecord> allPersonsRecord,
-			final List<PersonRecord> personsStillToAllocate,
-			final Set<Id> alreadyAllocatedPersons) {
+			final List<PersonRecord> personsStillToAllocate) {
 		final PersonRecord currentPerson = personsStillToAllocate.get(0);
 
 		// do one step forward: "point" to the next person
@@ -264,11 +271,10 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
 			Collections.<PersonRecord> emptyList();
 
-		final List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
-
-		final KnownBranches knownBranches = new KnownBranches( true );
-		for (PlanRecord r : records) {
+		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
+		for (PlanRecord r : currentPerson.plans) {
 			// skip forbidden plans
+			if ( !r.isStillFeasible ) continue;
 			if ( r.jointPlan == null &&
 					forbidenPlans.getIndividualPlans().contains( r.plan ) ) {
 				continue;
@@ -278,30 +284,28 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				continue;
 			}
 
-			final Set<Id> cotravelers = r.jointPlan == null ? null : r.jointPlan.getIndividualPlans().keySet();
-			if ( knownBranches.isExplored( cotravelers ) ) continue;
-			// if we do not find anything here, it is impossible to find allowed
-			// plans with the remaining agents. No need to re-explore.
-			knownBranches.tagAsExplored( cotravelers );
-
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
-			Set<Id> actuallyAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
-			actuallyAllocatedPersons.add( currentPerson.person.getId() );
 			if (r.jointPlan != null) {
-				if ( intersect( r.jointPlan.getIndividualPlans().keySet(), alreadyAllocatedPersons ) ) continue;
+				assert containsAllIds( personsStillToAllocate , r.jointPlan.getIndividualPlans().keySet() ); 
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
-				actuallyAllocatedPersons.addAll( r.jointPlan.getIndividualPlans().keySet() );
 			}
+
+			tagIncompatiblePlansAsInfeasible(
+					r,
+					incompatibleRecords,
+					feasibilityChanger);
 
 			if ( !actuallyRemainingPersons.isEmpty() ) {
 				final boolean found = searchForCombinationsWithoutForbiddenPlans(
 						forbidenPlans,
+						incompatibleRecords,
 						allPersonsRecord,
-						actuallyRemainingPersons,
-						actuallyAllocatedPersons);
+						actuallyRemainingPersons);
+				feasibilityChanger.resetFeasibilities();
 				if (found) return true;
 			}
 			else {
+				feasibilityChanger.resetFeasibilities();
 				return true;
 			}
 		}
@@ -581,25 +585,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		return newList;
 	}
 
-	private static boolean intersect(
-			final Collection<Id> ids1,
-			final Collection<Id> ids2) {
-		final boolean moreIn1 = ids1.size() > ids2.size();
-
-		// iterate over the smaller of the collections.
-		// normally, the collections are HashSets, so that
-		// contains is O(1): this can improve running time a lot
-		// (from several minutes to a few seconds for plan removal!).
-		final Collection<Id> iterated = moreIn1 ? ids2 : ids1;
-		final Collection<Id> tested = moreIn1 ? ids1 : ids2;
-
-		for (Id id : iterated) {
-			if ( tested.contains( id ) ) return true;
-		}
-
-		return false;
-	}
-
 	private static boolean intersects(
 			final Collection<Id> ids1,
 			final PlanAllocation alloc) {
@@ -615,6 +600,19 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		for ( PlanRecord p : alloc.getPlans() ) {
 			if ( records.contains( p.person ) ) return true;
 		}
+		return false;
+	}
+
+	private static boolean containsAllIds(
+			final List<PersonRecord> persons,
+			final Set<Id> ids) {
+		final Collection<Id> remainingIds = new HashSet<Id>( ids );
+
+		for ( PersonRecord p : persons ) {
+			remainingIds.remove( p.person.getId() );
+			if ( remainingIds.isEmpty() ) return true;
+		}
+
 		return false;
 	}
 }
