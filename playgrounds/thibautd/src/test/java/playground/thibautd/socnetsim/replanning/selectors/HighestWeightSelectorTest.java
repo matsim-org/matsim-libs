@@ -954,7 +954,10 @@ public class HighestWeightSelectorTest {
 			planCounts.put( p.getId() , p.getPlans().size() );
 		}
 
-		selector.selectPlans( fixture.jointPlans , fixture.group );
+		selector.selectPlans(
+					new EmptyIncompatiblePlansIdentifierFactory(),
+					fixture.jointPlans,
+					fixture.group );
 
 		Assert.assertEquals(
 				"unexpected change in group size for fixture "+fixture.name,
@@ -973,7 +976,10 @@ public class HighestWeightSelectorTest {
 		HighestScoreSumSelector selector = new HighestScoreSumSelector( blocking );
 		GroupPlans selected = null;
 		try {
-			selected = selector.selectPlans( fixture.jointPlans , fixture.group );
+			selected = selector.selectPlans(
+					new EmptyIncompatiblePlansIdentifierFactory(),
+					fixture.jointPlans,
+					fixture.group );
 		}
 		catch (Exception e) {
 			throw new RuntimeException( "exception thrown for instance <<"+fixture.name+">>", e );

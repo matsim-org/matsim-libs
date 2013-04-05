@@ -79,8 +79,14 @@ public class FullExplorationVsCuttoffTest {
 		int c = 0;
 		for (ReplanningGroup clique : cliquesIdentifier.identifyGroups( sc.getPopulation() )) {
 			count.incCounter();
-			final GroupPlans highResult = highestSelector.selectPlans( jointPlans , clique );
-			final GroupPlans lowResult = lowestSelector.selectPlans( jointPlans , clique );
+			final GroupPlans highResult = highestSelector.selectPlans(
+					new EmptyIncompatiblePlansIdentifierFactory(),
+					jointPlans,
+					clique );
+			final GroupPlans lowResult = lowestSelector.selectPlans(
+					new EmptyIncompatiblePlansIdentifierFactory(),
+					jointPlans,
+					clique );
 
 			if (highResult == null || lowResult == null) {
 				c++;
@@ -134,10 +140,16 @@ public class FullExplorationVsCuttoffTest {
 		for (ReplanningGroup clique : cliquesIdentifier.identifyGroups( sc.getPopulation() )) {
 			count.incCounter();
 			stopWatch.startFast();
-			final GroupPlans fastResult = fastSelector.selectPlans( jointPlans , clique );
+			final GroupPlans fastResult = fastSelector.selectPlans(
+					new EmptyIncompatiblePlansIdentifierFactory(),
+					jointPlans,
+					clique );
 			stopWatch.endFast();
 			stopWatch.startFull();
-			final GroupPlans fullResult = fullSelector.selectPlans( jointPlans , clique );
+			final GroupPlans fullResult = fullSelector.selectPlans(
+					new EmptyIncompatiblePlansIdentifierFactory(),
+					jointPlans,
+					clique );
 			stopWatch.endFull();
 
 			final double scoreFast = calcScore( fastResult );

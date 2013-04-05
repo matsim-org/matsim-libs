@@ -51,9 +51,10 @@ public class LogitSumSelector implements GroupLevelPlanSelector {
 	
 	@Override
 	public GroupPlans selectPlans(
+			final IncompatiblePlansIdentifierFactory factory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		return delegate.selectPlans(jointPlans, group);
+		return delegate.selectPlans( factory , jointPlans , group);
 	}
 
 	private static class Weight implements WeightCalculator {

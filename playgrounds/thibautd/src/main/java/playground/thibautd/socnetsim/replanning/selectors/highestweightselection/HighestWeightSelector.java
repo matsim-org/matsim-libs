@@ -39,6 +39,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 
 /**
  * Selects the plan combination with the highest (implementation specific)
@@ -86,6 +87,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public final GroupPlans selectPlans(
+			final IncompatiblePlansIdentifierFactory incompFactory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		Map<Id, PersonRecord> personRecords = getPersonRecords( jointPlans , group );

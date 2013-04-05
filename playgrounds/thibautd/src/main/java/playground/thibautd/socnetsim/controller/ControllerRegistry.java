@@ -23,7 +23,6 @@ import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -35,9 +34,11 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.JointReplanningContext;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 
 /**
  * @author thibautd
@@ -56,6 +57,7 @@ public final class ControllerRegistry {
 	private final GroupIdentifier groupIdentifier;
 	private final Iterable<GenericPlanAlgorithm<ReplanningGroup>> prepareForSimAlgorithms;
 	private final PlanLinkIdentifier planLinkIdentifier;
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 
 	ControllerRegistry(
 			final Scenario scenario,
@@ -70,7 +72,8 @@ public final class ControllerRegistry {
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 			final GroupIdentifier groupIdentifier,
 			final Iterable<GenericPlanAlgorithm<ReplanningGroup>> prepareForSimAlgorithms,
-			final PlanLinkIdentifier planLinkIdentifier) {
+			final PlanLinkIdentifier planLinkIdentifier,
+			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
 		this.scenario = scenario;
 		this.events = events;
 		this.travelTime = travelTime;
@@ -84,6 +87,7 @@ public final class ControllerRegistry {
 		this.groupIdentifier = groupIdentifier;
 		this.prepareForSimAlgorithms = prepareForSimAlgorithms;
 		this.planLinkIdentifier = planLinkIdentifier;
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
 	}
 
 	public Scenario getScenario() {
@@ -132,9 +136,9 @@ public final class ControllerRegistry {
 
 	// XXX ouch... if this thing starts to provide factory methods, not sure it is a "registry"...
 	// though it is just a wrapper to see the object under another interface, so it is probably ok.
-	public ReplanningContext createReplanningContext(final int iter) {
+	public JointReplanningContext createReplanningContext(final int iter) {
 		final ControllerRegistry registry = this;
-		return new ReplanningContext() {
+		return new JointReplanningContext() {
 			@Override
 			public TripRouterFactory getTripRouterFactory() {
 				return registry.getTripRouterFactory();
@@ -158,6 +162,11 @@ public final class ControllerRegistry {
 			}
 
 			@Override
+			public IncompatiblePlansIdentifierFactory getIncompatiblePlansIdentifierFactory() {
+				return registry.getIncompatiblePlansIdentifierFactory();
+			}
+
+			@Override
 			public int getIteration() {
 				return iter;
 			}
@@ -174,6 +183,10 @@ public final class ControllerRegistry {
 
 	public PlanLinkIdentifier getPlanLinkIdentifier() {
 		return planLinkIdentifier;
+	}
+
+	public IncompatiblePlansIdentifierFactory getIncompatiblePlansIdentifierFactory() {
+		return this.incompatiblePlansIdentifierFactory;
 	}
 }
 

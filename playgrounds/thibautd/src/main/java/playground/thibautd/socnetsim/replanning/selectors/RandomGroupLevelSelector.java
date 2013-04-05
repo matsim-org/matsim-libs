@@ -49,8 +49,11 @@ public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
 	}
 
 	@Override
-	public GroupPlans selectPlans(final JointPlans jointPlans, final ReplanningGroup group) {
-		return delegate.selectPlans( jointPlans , group );
+	public GroupPlans selectPlans(
+			final IncompatiblePlansIdentifierFactory factory,
+			final JointPlans jointPlans,
+			final ReplanningGroup group) {
+		return delegate.selectPlans( factory , jointPlans , group );
 	}
 }
 

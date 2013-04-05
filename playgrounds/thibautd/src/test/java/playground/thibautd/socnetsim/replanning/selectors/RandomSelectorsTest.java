@@ -293,7 +293,9 @@ public class RandomSelectorsTest {
 				count.incCounter();
 				GroupLevelPlanSelector selector = factory.create( new Random( seed ) );
 
-				final GroupPlans selected = selector.selectPlans( jointPlans , group );
+				final GroupPlans selected = selector.selectPlans(
+						new EmptyIncompatiblePlansIdentifierFactory(),
+						jointPlans , group );
 				if (previous != null) {
 					assertEquals(
 							"different results with the same random seed",

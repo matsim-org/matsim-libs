@@ -39,6 +39,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 
 /**
@@ -81,8 +82,12 @@ public class GroupStrategyManager {
 
 		final Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
 			new LinkedHashMap<GroupPlanStrategy, List<ReplanningGroup>>();
+		final JointReplanningContext context =  controllerRegistry.createReplanningContext( iteration );
 		for (ReplanningGroup g : groups) {
-			removeExtraPlans( jointPlans , g );
+			removeExtraPlans(
+					context.getIncompatiblePlansIdentifierFactory(),
+					jointPlans,
+					g );
 
 			final GroupPlanStrategy strategy = registry.chooseStrategy( random.nextDouble() );
 			List<ReplanningGroup> alloc = strategyAllocations.get( strategy );
@@ -109,10 +114,11 @@ public class GroupStrategyManager {
 	}
 
 	private final void removeExtraPlans(
+			final IncompatiblePlansIdentifierFactory incompatibleFactory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		int c = 0;
-		while ( removeOneExtraPlan( jointPlans , group ) ) c++;
+		while ( removeOneExtraPlan( incompatibleFactory , jointPlans , group ) ) c++;
 		if (c > 0) {
 			// in the clique setting, it is impossible.
 			// replace by a warning (or nothing) when there is a setting
@@ -122,6 +128,7 @@ public class GroupStrategyManager {
 	}
 
 	private final boolean removeOneExtraPlan(
+			final IncompatiblePlansIdentifierFactory incompatibleFactory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		if (log.isTraceEnabled()) log.trace( "removing plans for group "+group );
@@ -136,7 +143,7 @@ public class GroupStrategyManager {
 			if (log.isTraceEnabled()) log.trace( "Too many plans for person "+person );
 
 			if (toRemove == null) {
-				toRemove = selectorForRemoval.selectPlans( jointPlans , group );
+				toRemove = selectorForRemoval.selectPlans( incompatibleFactory , jointPlans , group );
 				if (log.isTraceEnabled()) log.trace( "plans to remove will be taken from "+toRemove );
 				if ( toRemove == null ) {
 					throw new RuntimeException(

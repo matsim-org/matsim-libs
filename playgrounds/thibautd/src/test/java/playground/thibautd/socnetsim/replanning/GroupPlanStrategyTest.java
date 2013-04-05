@@ -35,10 +35,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -65,7 +68,7 @@ public class GroupPlanStrategyTest {
 			selectedPlans.add( p.getSelectedPlan() );
 		}
 
-		strategy.run( null , jointPlans , Arrays.asList( group ) );
+		strategy.run( createContext() , jointPlans , Arrays.asList( group ) );
 		for ( Person person : group.getPersons() ) {
 			for ( Plan plan : person.getPlans() ) {
 				if ( plan.isSelected() ) {
@@ -91,7 +94,7 @@ public class GroupPlanStrategyTest {
 
 		final ReplanningGroup group = createTestGroup( jointPlans );
 		final int groupSize = group.getPersons().size();
-		strategy.run( null , jointPlans , Arrays.asList( group ) );
+		strategy.run( createContext() , jointPlans , Arrays.asList( group ) );
 
 		assertEquals(
 				"group size changed by strategy!",
@@ -106,7 +109,7 @@ public class GroupPlanStrategyTest {
 		strategy.addStrategyModule( new JointStructureInvertingModule( jointPlans.getFactory() ) );
 
 		final ReplanningGroup group = createTestGroup( jointPlans );
-		strategy.run( null , jointPlans , Arrays.asList( group ) );
+		strategy.run( createContext() , jointPlans , Arrays.asList( group ) );
 
 		int countSelectedJoint = 0;
 		int countSelectedIndiv = 0;
@@ -138,7 +141,7 @@ public class GroupPlanStrategyTest {
 		strategy.addStrategyModule( new JointStructureInvertingModule( jointPlans.getFactory() ) );
 
 		final ReplanningGroup group = createTestGroup( jointPlans );
-		strategy.run( null , jointPlans , Arrays.asList( group ) );
+		strategy.run( createContext() , jointPlans , Arrays.asList( group ) );
 
 		int countNonSelectedJoint = 0;
 		int countNonSelectedIndiv = 0;
@@ -202,6 +205,12 @@ public class GroupPlanStrategyTest {
 		if ( !plan.isSelected() ) throw new RuntimeException();
 
 		return person;
+	}
+	
+	private static JointReplanningContext createContext() {
+		return new ControllerRegistryBuilder(
+				ScenarioUtils.createScenario( ConfigUtils.createConfig() )
+				).build().createReplanningContext( 0 );
 	}
 
 	private static class JointStructureInvertingModule implements GenericStrategyModule<GroupPlans> {

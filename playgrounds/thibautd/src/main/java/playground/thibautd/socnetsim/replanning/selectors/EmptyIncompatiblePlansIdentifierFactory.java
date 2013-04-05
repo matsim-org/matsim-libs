@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LowestScoreSumSelector.java
+ * EmptyIncompatiblePlansIdentifierFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,40 +19,30 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 /**
+ * The default factory: no incomaptibility relationships
  * @author thibautd
  */
-public class LowestScoreSumSelectorForRemoval implements GroupLevelPlanSelector {
-	private final GroupLevelPlanSelector delegate;
-	
-	public LowestScoreSumSelectorForRemoval() {
-		delegate = new HighestWeightSelector( true ,
-				new WeightCalculator() {
-					@Override
-					public double getWeight(
-							final Plan indivPlan,
-							final ReplanningGroup group) {
-						Double score = indivPlan.getScore();
-						// if there is a plan without score, select it
-						return score == null ? Double.POSITIVE_INFINITY : -score;
-					}
-				});
-	}
+public class EmptyIncompatiblePlansIdentifierFactory implements IncompatiblePlansIdentifierFactory {
 
 	@Override
-	public GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory factory,
+	public IncompatiblePlansIdentifier createIdentifier(
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		return delegate.selectPlans( factory , jointPlans , group);
+		return new IncompatiblePlansIdentifier() {
+			@Override
+			public Collection<Plan> identifyIncompatiblePlans(final Plan plan) {
+				return Collections.<Plan>emptySet();
+			}
+		};
 	}
 }
 

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GroupLevelPlanSelector.java
+ * JointReplanningContext.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,19 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.selectors;
+package playground.thibautd.socnetsim.replanning;
 
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import org.matsim.core.replanning.ReplanningContext;
+
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 
 /**
  * @author thibautd
  */
-public interface GroupLevelPlanSelector {
-	public GroupPlans selectPlans(
-			IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory,
-			JointPlans jointPlans,
-			ReplanningGroup group);
+public interface JointReplanningContext extends ReplanningContext {
+	public IncompatiblePlansIdentifierFactory getIncompatiblePlansIdentifierFactory();
 }
 

@@ -56,6 +56,8 @@ import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 
@@ -82,6 +84,7 @@ public class ControllerRegistryBuilder {
 	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory = null;
 	private GroupIdentifier groupIdentifier = null;
 	private PlanLinkIdentifier planLinkIdentifier = null;
+	private IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory = null;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// contrs
@@ -166,6 +169,12 @@ public class ControllerRegistryBuilder {
 		return this;
 	}
 
+	public ControllerRegistryBuilder withIncompatiblePlansIdentifierFactory(
+			final IncompatiblePlansIdentifierFactory factory) {
+		this.incompatiblePlansIdentifierFactory = factory;
+		return this;
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// build
 	private boolean wasBuild = false;
@@ -190,7 +199,8 @@ public class ControllerRegistryBuilder {
 			planRoutingAlgorithmFactory,
 			groupIdentifier,
 			prepareForSimAlgorithms,
-			planLinkIdentifier);
+			planLinkIdentifier,
+			incompatiblePlansIdentifierFactory);
 	}
 
 	private final void setDefaults() {
@@ -283,6 +293,10 @@ public class ControllerRegistryBuilder {
 					travelTime.getLinkTravelTimes(),
 					leastCostPathCalculatorFactory,
 					null); // last arg: transit router factory.
+		}
+
+		if ( incompatiblePlansIdentifierFactory == null ) {
+			incompatiblePlansIdentifierFactory = new EmptyIncompatiblePlansIdentifierFactory();
 		}
 
 		// we do this here, as we need configurable objects

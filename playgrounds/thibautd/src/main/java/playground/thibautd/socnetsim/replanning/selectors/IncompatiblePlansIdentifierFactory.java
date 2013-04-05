@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LowestScoreSumSelector.java
+ * IncompatiblePlansIdentifierFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,40 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Plan;
-
 import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 /**
+ * Create instances of {@link IncompatiblePlansIdentifierFactory}
+ * for specific replanning groups.
+ * <br>
+ * It is safe to assume that the instances returned by this factory
+ * will always be called on plans from the group used at construction.
+ *
  * @author thibautd
  */
-public class LowestScoreSumSelectorForRemoval implements GroupLevelPlanSelector {
-	private final GroupLevelPlanSelector delegate;
-	
-	public LowestScoreSumSelectorForRemoval() {
-		delegate = new HighestWeightSelector( true ,
-				new WeightCalculator() {
-					@Override
-					public double getWeight(
-							final Plan indivPlan,
-							final ReplanningGroup group) {
-						Double score = indivPlan.getScore();
-						// if there is a plan without score, select it
-						return score == null ? Double.POSITIVE_INFINITY : -score;
-					}
-				});
-	}
-
-	@Override
-	public GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory factory,
-			final JointPlans jointPlans,
-			final ReplanningGroup group) {
-		return delegate.selectPlans( factory , jointPlans , group);
-	}
+public interface IncompatiblePlansIdentifierFactory {
+	public IncompatiblePlansIdentifier createIdentifier(JointPlans jointPlans, ReplanningGroup group);
 }
 
