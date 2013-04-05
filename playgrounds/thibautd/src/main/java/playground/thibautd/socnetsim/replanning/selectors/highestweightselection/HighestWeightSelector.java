@@ -90,11 +90,33 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final IncompatiblePlansIdentifierFactory incompFactory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		Map<Id, PersonRecord> personRecords = getPersonRecords( jointPlans , group );
+		final Map<Id, PersonRecord> personRecords = getPersonRecords( jointPlans , group );
+		final ForbidenCombinations forbiden = new ForbidenCombinations();
 
-		GroupPlans allocation = selectPlans( personRecords );
+		GroupPlans plans = null;
 
-		return allocation;
+		int count = 0;
+		do {
+			count++;
+			final PlanAllocation allocation = buildPlanString(
+					new KnownStates(),
+					forbiden,
+					new IncompatiblePlanRecords(
+						incompFactory.createIdentifier( jointPlans , group ),
+						personRecords ),
+					new ArrayList<PersonRecord>( personRecords.values() ),
+					new PlanAllocation(),
+					Double.NEGATIVE_INFINITY);
+
+			plans = allocation == null ? null : toGroupPlans( allocation );
+		} while (
+				plans != null &&
+				continueIterations( forbiden , personRecords , plans ) );
+
+		assert forbidBlockingCombinations || count == 1 : count;
+		assert plans == null || !forbiden.isForbidden( plans );
+
+		return plans;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -194,32 +216,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	// /////////////////////////////////////////////////////////////////////////
 	// "outer loop": search and forbid if blocking (if forbid blocking is true)
 	// /////////////////////////////////////////////////////////////////////////
-	private GroupPlans selectPlans( final Map<Id, PersonRecord> personRecords ) {
-		final ForbidenCombinations forbiden = new ForbidenCombinations();
-
-		GroupPlans plans = null;
-
-		int count = 0;
-		do {
-			count++;
-			final PlanAllocation allocation = buildPlanString(
-					new KnownStates(),
-					forbiden,
-					new IncompatiblePlanRecords(),
-					new ArrayList<PersonRecord>( personRecords.values() ),
-					new PlanAllocation(),
-					Double.NEGATIVE_INFINITY);
-
-			plans = allocation == null ? null : toGroupPlans( allocation );
-		} while (
-				plans != null &&
-				continueIterations( forbiden , personRecords , plans ) );
-
-		assert forbidBlockingCombinations || count == 1 : count;
-		assert plans == null || !forbiden.isForbidden( plans );
-
-		return plans;
-	}
 
 	private boolean continueIterations(
 			final ForbidenCombinations forbiden,
@@ -348,7 +344,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
 		final List<PlanRecord> records = new ArrayList<PlanRecord>();
-		for ( PlanRecord r : currentPerson.bestPlansPerJointStructure ) {
+		for ( PlanRecord r : currentPerson.plans ) {
 			assert !r.isStillFeasible == (r.jointPlan != null && intersects( r.jointPlan.getIndividualPlans().keySet() , currentAllocation ));
 			if ( r.isStillFeasible ) records.add( r );
 		}
@@ -546,7 +542,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			}
 		}
 
-		for (PlanRecord plan : record.bestPlansPerJointStructure ) {
+		for (PlanRecord plan : record.plans ) {
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
 

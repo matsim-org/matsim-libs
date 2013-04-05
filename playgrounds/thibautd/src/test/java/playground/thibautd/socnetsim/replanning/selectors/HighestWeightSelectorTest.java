@@ -60,18 +60,24 @@ public class HighestWeightSelectorTest {
 		final ReplanningGroup group;
 		final GroupPlans expectedSelectedPlans;
 		final GroupPlans expectedSelectedPlansWhenBlocking;
+		final GroupPlans expectedSelectedPlansWhenForbidding;
 		final JointPlans jointPlans;
+		final Collection<Plan> forbiddenPlans;
 
 		public Fixture(
 				final String name,
 				final ReplanningGroup group,
 				final GroupPlans expectedPlans,
 				final GroupPlans expectedSelectedPlansWhenBlocking,
+				final GroupPlans expectedSelectedPlansWhenForbidding,
+				final Collection<Plan> forbiddenPlans,
 				final JointPlans jointPlans) {
 			this.name = name;
 			this.group = group;
 			this.expectedSelectedPlans = expectedPlans;
 			this.expectedSelectedPlansWhenBlocking = expectedSelectedPlansWhenBlocking;
+			this.expectedSelectedPlansWhenForbidding = expectedSelectedPlansWhenForbidding;
+			this.forbiddenPlans = forbiddenPlans;
 			this.jointPlans = jointPlans;
 		}
 	}
@@ -107,13 +113,16 @@ public class HighestWeightSelectorTest {
 		ReplanningGroup group = new ReplanningGroup();
 
 		List<Plan> toBeSelected = new ArrayList<Plan>();
+		List<Plan> toBeSelectedIfForbid = new ArrayList<Plan>();
 
 		PersonImpl person = new PersonImpl( new IdImpl( "tintin" ) );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
 		plan.setScore( 1d );
+		toBeSelectedIfForbid.add( plan );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5d );
+		final Plan forbiddenPlan = plan;
 		toBeSelected.add( plan );
 
 		person = new PersonImpl( new IdImpl( "milou" ) );
@@ -123,6 +132,7 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5000d );
 		toBeSelected.add( plan );
+		toBeSelectedIfForbid.add( plan );
 
 		person = new PersonImpl( new IdImpl( "tim" ) );
 		group.addPerson( person );
@@ -131,6 +141,7 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5000d );
 		toBeSelected.add( plan );
+		toBeSelectedIfForbid.add( plan );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 
@@ -139,17 +150,21 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -10d );
 		toBeSelected.add( plan );
+		toBeSelectedIfForbid.add( plan );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 
-		GroupPlans exp = new GroupPlans( Collections.EMPTY_LIST , toBeSelected );
+		GroupPlans exp = new GroupPlans( Collections.<JointPlan>emptyList() , toBeSelected );
+		GroupPlans expForbid = new GroupPlans( Collections.<JointPlan>emptyList() , toBeSelectedIfForbid );
 		return new Fixture(
 				"all individual",
 				group,
 				exp,
 				exp,
+				expForbid,
+				Collections.singleton( forbiddenPlan ),
 				jointPlans);
 	}
 
@@ -222,12 +237,15 @@ public class HighestWeightSelectorTest {
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel ),
-					Collections.EMPTY_LIST );
+					Collections.<Plan>emptyList() );
 		return new Fixture(
 				"fully joint",
 				group,
 				expected,
 				expected,
+				// not much we can forbid...
+				expected,
+				Collections.<Plan>emptyList(),
 				jointPlans);
 	}
 
@@ -290,8 +308,8 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 
-		jointPlans.addJointPlan(
-				jointPlans.getFactory().createJointPlan( jp1 ) );
+		JointPlan selForbidding = jointPlans.getFactory().createJointPlan( jp1 );
+		jointPlans.addJointPlan( selForbidding );
 		JointPlan sel = jointPlans.getFactory().createJointPlan( jp2 );
 		jointPlans.addJointPlan( sel );
 		jointPlans.addJointPlan(
@@ -301,11 +319,17 @@ public class HighestWeightSelectorTest {
 					Arrays.asList( sel ),
 					toBeSelected );
 
+		GroupPlans expectedForbidding = new GroupPlans(
+					Arrays.asList( selForbidding ),
+					toBeSelected );
+
 		return new Fixture(
 				"partially joint, one selected joint plan",
 				group,
 				expected,
 				expected,
+				expectedForbidding,
+				jp2.values(),
 				jointPlans);
 
 	}
@@ -362,6 +386,7 @@ public class HighestWeightSelectorTest {
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -15d );
+		final Plan indivPlanIfForbid = plan;
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 		jp4.put( id , plan );
@@ -369,22 +394,27 @@ public class HighestWeightSelectorTest {
 		plan.setScore( -5000d );
 
 		jointPlans.addJointPlan(
-				jointPlans.getFactory().createJointPlan( jp1 ) );
+			jointPlans.getFactory().createJointPlan( jp1 ) );
 		JointPlan sel1 = jointPlans.getFactory().createJointPlan( jp2 );
 		jointPlans.addJointPlan( sel1 );
-		jointPlans.addJointPlan(
-				jointPlans.getFactory().createJointPlan( jp3 ) );
+		JointPlan selForbidding = jointPlans.getFactory().createJointPlan( jp3 );
+		jointPlans.addJointPlan( selForbidding );
 		JointPlan sel2 = jointPlans.getFactory().createJointPlan( jp4 );
 		jointPlans.addJointPlan( sel2 );
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel1 , sel2 ),
-					Collections.EMPTY_LIST );
+					Collections.<Plan>emptyList() );
+		GroupPlans expectedForbid = new GroupPlans(
+					Collections.singleton( selForbidding ),
+					Collections.singleton( indivPlanIfForbid ) );
 		return new Fixture(
 				"partially joint, two selected joint plans",
 				group,
 				expected,
 				expected,
+				expectedForbid,
+				jp2.values(),
 				jointPlans);
 	}
 
@@ -427,7 +457,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( -100d );
 		jp4.put( id , plan );
 		plan = person.createAndAddPlan( false );
-		plan.setScore( 500d );
+		plan.setScore( 7000d );
 		jp5.put( id , plan );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 200d );
@@ -466,7 +496,8 @@ public class HighestWeightSelectorTest {
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
-		plan.setScore( 500d );
+		plan.setScore( 1700d );
+		final Plan indivIfForbid = plan;
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5d );
 		jp3.put( id , plan );
@@ -476,8 +507,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 10d );
 		jp5.put( id , plan );
 
-		jointPlans.addJointPlan(
-				jointPlans.getFactory().createJointPlan( jp1 ) );
+		jointPlans.addJointPlan( jointPlans.getFactory().createJointPlan( jp1 ) );
 		jointPlans.addJointPlan(
 				jointPlans.getFactory().createJointPlan( jp2 ) );
 		jointPlans.addJointPlan(
@@ -488,19 +518,24 @@ public class HighestWeightSelectorTest {
 		jointPlans.addJointPlan( sel1 );
 		JointPlan sel2 = jointPlans.getFactory().createJointPlan( jp6 );
 		jointPlans.addJointPlan( sel2 );
-		jointPlans.addJointPlan(
-				jointPlans.getFactory().createJointPlan( jp7 ) );
-		jointPlans.addJointPlan(
-				jointPlans.getFactory().createJointPlan( jp8 ) );
+		JointPlan selF1 = jointPlans.getFactory().createJointPlan( jp7 );
+		jointPlans.addJointPlan( selF1 );
+		JointPlan selF2 = jointPlans.getFactory().createJointPlan( jp8 );
+		jointPlans.addJointPlan( selF2 );
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel1 , sel2 ),
-					Collections.EMPTY_LIST );
+					Collections.<Plan>emptyList() );
+		GroupPlans expectedForbid = new GroupPlans(
+					Arrays.asList( selF1 , selF2 ),
+					Collections.singleton( indivIfForbid ) );
 		return new Fixture(
 				"partially joint, multiple combinations",
 				group,
 				expected,
 				expected,
+				expectedForbid,
+				jp5.values(),
 				jointPlans);
 	}
 
@@ -549,13 +584,15 @@ public class HighestWeightSelectorTest {
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( sel ),
-					Collections.EMPTY_LIST );
+					Collections.<Plan>emptyList() );
 
 		return new Fixture(
 				"one big joint plan",
 				group,
 				expected,
 				null,
+				expected,
+				Collections.<Plan>emptyList(),
 				jointPlans);
 	}
 
@@ -653,7 +690,7 @@ public class HighestWeightSelectorTest {
 				jointPlans.getFactory().createJointPlan( jp4 ) );
 
 		GroupPlans expected = new GroupPlans(
-					Collections.EMPTY_LIST,
+					Collections.<JointPlan>emptyList(),
 					toBeSelected );
 
 		return new Fixture(
@@ -661,6 +698,9 @@ public class HighestWeightSelectorTest {
 				group,
 				expected,
 				expected,
+				//TODO: forbid something
+				expected,
+				Collections.<Plan>emptyList(),
 				jointPlans);
 	}
 
@@ -716,6 +756,9 @@ public class HighestWeightSelectorTest {
 				group,
 				expected,
 				null,
+				//TODO: forbid something
+				expected,
+				Collections.<Plan>emptyList(),
 				jointPlans);
 	}
 
@@ -773,6 +816,9 @@ public class HighestWeightSelectorTest {
 				group,
 				expected,
 				null,
+				//TODO: forbid something
+				expected,
+				Collections.<Plan>emptyList(),
 				jointPlans);
 	}
 
@@ -854,6 +900,9 @@ public class HighestWeightSelectorTest {
 				group,
 				expected,
 				expectedBlock,
+				//TODO: forbid something
+				expected,
+				Collections.<Plan>emptyList(),
 				jointPlans);
 	}
 
@@ -919,6 +968,9 @@ public class HighestWeightSelectorTest {
 				group,
 				expected,
 				expectedBlock,
+				//TODO: forbid something
+				expected,
+				Collections.<Plan>emptyList(),
 				jointPlans);
 	}
 
@@ -932,12 +984,17 @@ public class HighestWeightSelectorTest {
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
 	public void testSelectedPlansNonBlocking() throws Exception {
-		testSelectedPlans( false );
+		testSelectedPlans( false , false );
+	}
+
+	@Test
+	public void testSelectedPlansForbidding() throws Exception {
+		testSelectedPlans( false , true );
 	}
 
 	@Test
 	public void testSelectedPlansBlocking() throws Exception {
-		testSelectedPlans( true );
+		testSelectedPlans( true , false );
 	}
 
 	/**
@@ -972,12 +1029,32 @@ public class HighestWeightSelectorTest {
 		}
 	}
 
-	private void testSelectedPlans( final boolean blocking ) {
+	private void testSelectedPlans(
+			final boolean blocking,
+			final boolean forbidding) {
+		if ( blocking && forbidding ) throw new UnsupportedOperationException();
 		HighestScoreSumSelector selector = new HighestScoreSumSelector( blocking );
 		GroupPlans selected = null;
 		try {
 			selected = selector.selectPlans(
-					new EmptyIncompatiblePlansIdentifierFactory(),
+					forbidding ?
+						new IncompatiblePlansIdentifierFactory() {
+							@Override
+							public IncompatiblePlansIdentifier createIdentifier(
+									final JointPlans jointPlans,
+									final ReplanningGroup group) {
+								return new IncompatiblePlansIdentifier() {
+									@Override
+									public Collection<Plan> identifyIncompatiblePlans(
+											final Plan plan) {
+										return fixture.forbiddenPlans.contains( plan ) ?
+											nonForbiddenPlans( group , fixture.forbiddenPlans ) :
+											fixture.forbiddenPlans;
+									}
+								};
+							}
+						} :
+						new EmptyIncompatiblePlansIdentifierFactory(),
 					fixture.jointPlans,
 					fixture.group );
 		}
@@ -985,12 +1062,28 @@ public class HighestWeightSelectorTest {
 			throw new RuntimeException( "exception thrown for instance <<"+fixture.name+">>", e );
 		}
 
-		Assert.assertEquals(
-				"unexpected selected plan in test instance <<"+fixture.name+">> ",
+		final GroupPlans expected = 
 				blocking ?
 					fixture.expectedSelectedPlansWhenBlocking :
-					fixture.expectedSelectedPlans,
+					(forbidding ?
+					 	fixture.expectedSelectedPlansWhenForbidding :
+						fixture.expectedSelectedPlans);
+		Assert.assertEquals(
+				"unexpected selected plan in test instance <<"+fixture.name+">> ",
+				expected,
 				selected);
+	}
+
+	private static Collection<Plan> nonForbiddenPlans(
+			final ReplanningGroup group,
+			final Collection<Plan> forbiddenPlans) {
+		final Collection<Plan> nonForbidden = new ArrayList<Plan>();
+
+		for ( Person person : group.getPersons() ) nonForbidden.addAll( person.getPlans() );
+		nonForbidden.removeAll( forbiddenPlans );
+		if ( !Collections.disjoint( nonForbidden , forbiddenPlans ) ) throw new RuntimeException();
+
+		return nonForbidden;
 	}
 }
 

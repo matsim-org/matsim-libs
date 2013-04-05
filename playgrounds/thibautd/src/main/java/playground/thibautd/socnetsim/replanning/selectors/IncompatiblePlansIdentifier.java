@@ -44,6 +44,8 @@ public interface IncompatiblePlansIdentifier {
 	 * of the same agent are trivially mutually incompatible)
 	 * <li> the plans incompatible because of joint plans constraint do not have
 	 * to pertain to the collection.
+	 * <li> if a plan A pertains to the collection returned for a plan B,
+	 * the plan B must pertain to the collection returned for the plan A.
 	 * </ul>
 	 */
 	public Collection<Plan> identifyIncompatiblePlans(Plan plan);
