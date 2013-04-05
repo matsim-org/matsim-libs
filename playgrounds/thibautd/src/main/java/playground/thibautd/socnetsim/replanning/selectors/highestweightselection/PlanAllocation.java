@@ -31,7 +31,6 @@ final class PlanAllocation {
 	private final List<PlanRecord> plans = new ArrayList<PlanRecord>();
 	private final List<PlanRecord> immutable = Collections.unmodifiableList( plans );
 	private double weight = 0;
-	private boolean resultsFromBlockingConstraint = false;
 
 	public List<PlanRecord> getPlans() {
 		return immutable;
@@ -39,25 +38,6 @@ final class PlanAllocation {
 
 	public double getWeight() {
 		return weight;
-	}
-
-	/**
-	 * Determines if this instance is resultsFromBlockingConstraint.
-	 *
-	 * @return The resultsFromBlockingConstraint.
-	 */
-	public boolean isResultsFromBlockingConstraint() {
-		return this.resultsFromBlockingConstraint;
-	}
-
-	/**
-	 * Sets whether or not this instance is resultsFromBlockingConstraint.
-	 *
-	 * @param resultsFromBlockingConstraint The resultsFromBlockingConstraint.
-	 */
-	public void setResultsFromBlockingConstraint(
-			boolean resultsFromBlockingConstraint) {
-		this.resultsFromBlockingConstraint = resultsFromBlockingConstraint;
 	}
 
 	public void add(final PlanRecord p) {

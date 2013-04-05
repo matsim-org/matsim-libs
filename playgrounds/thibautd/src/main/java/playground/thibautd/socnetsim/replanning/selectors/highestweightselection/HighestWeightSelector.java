@@ -106,7 +106,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		final PlanAllocation allocation = buildPlanString(
 				new KnownFeasibleAllocations( 20 ),
-				new KnownStates(),
 				incompatibleRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
 				personRecords,
@@ -341,7 +340,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 */
 	private PlanAllocation buildPlanString(
 			final KnownFeasibleAllocations knownFeasibleAllocations,
-			final KnownStates knownStates,
 			final IncompatiblePlanRecords incompatibleRecords,
 			final List<PersonRecord> personsStillToAllocate,
 			final Map<Id, PersonRecord> allPersons,
@@ -349,30 +347,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final PlanAllocation currentAllocation,
 			final double minimalWeightToObtain) {
 		assert !intersectsRecords( personsStillToAllocate , currentAllocation );
-		if ( knownStates.isUnfeasible( personsStillToAllocate , minimalWeightToObtain ) ) {
-			return null;
-		}
 
-		PlanAllocation constructedString = knownStates.getCachedSolutionForRemainingAgents( personsStillToAllocate );
-		if ( constructedString != null ) {
-			assert constructedString.getPlans().size() == personsStillToAllocate.size() :
-				constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-			// due to the minimal weight to attain, the string can be null
-			// while there is a solution cached.
-			assert isNullOrEqual(
-					buildPlanString(
-						new KnownFeasibleAllocations(),
-						new KnownStates(),
-						incompatibleRecords,
-						personsStillToAllocate,
-						allPersons,
-						currentAllocation,
-						minimalWeightToObtain),
-					constructedString ) : personsStillToAllocate+" cached:"+constructedString ;
-			return constructedString;
-		}
-
-		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
 			new ArrayList<PersonRecord>( personsStillToAllocate );
@@ -386,6 +361,8 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		for ( PlanRecord r : currentPerson.bestPlansPerJointStructure ) {
 			if ( r.isStillFeasible ) records.add( r );
 		}
+
+		if ( records.isEmpty() ) return null;
 
 		weightPlanRecords(
 				incompatibleRecords,
@@ -412,8 +389,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// get the actual allocation, and stop when the allocation
 		// is better than the maximum possible in remaining plans
 		// or worst than the worst possible at a higher level
-		assert constructedString == null;
-
+		PlanAllocation constructedString = null;
 		final FeasibilityChanger localFeasibilityChanger = new FeasibilityChanger();
 		for (PlanRecord r : records) {
 			if ( constructedString != null &&
@@ -450,7 +426,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 				newString = buildPlanString(
 						knownFeasibleAllocations,
-						knownStates,
 						incompatibleRecords,
 						actuallyRemainingPersons,
 						allPersons,
@@ -482,7 +457,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 								allPersons,
 								toGroupPlans( merge( currentAllocation , newAllocation ) ) ) ) {
 						newString = null;
-					}
+				}
 			}
 
 			if ( newString == null || newString.getWeight() <= minimalWeightToObtain ) continue;
@@ -497,21 +472,9 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			}
 		}
 
-		feasibilityChanger.resetFeasibilities();
-
 		assert constructedString == null || constructedString.getPlans().size() == personsStillToAllocate.size() :
 			constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-		if ( !forbidBlockingCombinations ) {
-			knownStates.cacheSolution( personsStillToAllocate , constructedString , minimalWeightToObtain );
-		}
-
 		return constructedString;
-	}
-
-	private static boolean isNullOrEqual(
-			final PlanAllocation built,
-			final PlanAllocation cached) {
-		return built == null || built.equals( cached );
 	}
 
 	private static void tagIncompatiblePlansAsInfeasible(
