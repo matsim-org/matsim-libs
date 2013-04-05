@@ -224,7 +224,7 @@ public class WalkTravelTime implements TravelTime {
 			this.personFactorCache.set(personFactor);
 			this.personWalkSpeedCache.set(this.referenceWalkSpeed * personFactor);
 		}
-				
+		
 		double scatterFactor = 1.0;
 		double ageFactor = 1.0;
 		double genderFactor = 1.0;
@@ -251,7 +251,11 @@ public class WalkTravelTime implements TravelTime {
 			PersonImpl p = (PersonImpl) person;
 			
 			// get gender factor
-			if (p.getSex().equals("m")) genderFactor = maleScaleFactor;
+			if (p.getSex() == null) {
+				if (genderWarnCount.get() < 10) {
+					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
+				}
+			} else if (p.getSex().equals("m")) genderFactor = maleScaleFactor;
 			else if (p.getSex().equals("f")) genderFactor = femaleScaleFactor;
 			else {
 				if (genderWarnCount.get() < 10) {
