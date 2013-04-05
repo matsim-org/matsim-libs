@@ -244,13 +244,18 @@ public class GroupPlanStrategyFactory {
 						registry.getScenario().getConfig() ) ) );
 
 		// TODO: add an option to enable or disable this part?
-		strategy.addStrategyModule(
-				new AllocateVehicleToPlansInGroupPlanModule(
-					registry.getScenario().getConfig().global().getNumberOfThreads(),
-					registry.getScenario().getScenarioElement(
-						VehicleRessources.class ),
-					TransportMode.car,
-					true));
+		final VehicleRessources vehicles =
+				registry.getScenario().getScenarioElement(
+					VehicleRessources.class );
+		if ( vehicles != null ) {
+			strategy.addStrategyModule(
+					new AllocateVehicleToPlansInGroupPlanModule(
+						registry.getScenario().getConfig().global().getNumberOfThreads(),
+						registry.getScenario().getScenarioElement(
+							VehicleRessources.class ),
+						TransportMode.car,
+						true));
+		}
 
 		strategy.addStrategyModule(
 				createReRouteModule(
