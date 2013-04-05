@@ -157,18 +157,18 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_DISTANCE, this.betaBikeTravelDistance + "");
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_DISTANCE_POWER2, this.betaBikeTravelDistancePower2 + "");
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_DISTANCE, this.betaBikeLnTravelDistance + "");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_COST, this.betaBikeTravelCost + "");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_COST_POWER2, this.betaBikeTravelCostPower2+ "");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_COST, this.betaBikeLnTravelCost + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_MONETARY_COST, this.betaBikeTravelCost + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_MONETARY_COST_POWER2, this.betaBikeTravelCostPower2+ "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_MONETARY_COST, this.betaBikeLnTravelCost + "");
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_TIME, this.betaPtTravelTime + "");
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_TIME_POWER2, this.betaPtTravelTimePower2 + "");
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_TIME, this.betaPtLnTravelTime + "");
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_DISTANCE, this.betaPtTravelDistance + "");
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_DISTANCE_POWER2, this.betaPtTravelDistancePower2 + "");
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_DISTANCE, this.betaPtLnTravelDistance + "");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_COST, this.betaPtTravelCost + "");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_COST_POWER2, this.betaPtTravelCostPower2+ "");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_COST, this.betaPtLnTravelCost + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_MONETARY_COST, this.betaPtTravelCost + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_MONETARY_COST_POWER2, this.betaPtTravelCostPower2+ "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_MONETARY_COST, this.betaPtLnTravelCost + "");
 		
 		// changeLegMode module
 		Module changeLegModeModule = config.createModule(changeLegModeModuleName);

@@ -128,7 +128,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup() ;
 
 			// marginal utility of money (should usually be positive):
-			final double margUtlOfMoney = this.betaCarTC;
+			final double margUtlOfMoney = this.betaCarTMC;
 			cnScoringGroup.setMarginalUtilityOfMoney( margUtlOfMoney ) ; // (!!)
 			log.error("is the sign correct??") ; System.exit(-1) ;
 

@@ -330,7 +330,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		module.setMATSim4OpusTemp(matsim4OpusTemp);
 		module.setMATSim4OpusBackup(matsim4OpusBackup);
 		module.setTestParameter(testParameter);
-		module.setUseShapefileLocationDistribution(useShapefileLocationDistribution);
+		module.setUsingShapefileLocationDistribution(useShapefileLocationDistribution);
 		module.setUrbanSimZoneShapefileLocationDistribution(urbanSimZoneShapefileLocationDistribution);
 		module.setUrbanSimZoneRadiusLocationDistribution(randomLocationDistributionRadiusForUrbanSimZone);
 		module.setBackup(backupRunData);
@@ -357,7 +357,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
 		log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
 		log.info("(Custom) Test Parameter: " + module.getTestParameter() );
-		log.info("UseShapefileLocationDistribution:" + module.isUseShapefileLocationDistribution());
+		log.info("UseShapefileLocationDistribution:" + module.usingShapefileLocationDistribution());
 		log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
 		log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
 		log.info("Backing Up Run Data: " + module.isBackup() );
@@ -462,7 +462,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		module.setCellBasedAccessibilityShapeFile(computeCellbasedAccessibilityShapeFile);
 		module.setCellBasedAccessibilityNetwork(computeCellBasedAccessibilityNetwork);
 		module.setShapeFileCellBasedAccessibility(shapeFile);
-		module.setUseCustomBoundingBox(useCustomBoundingBox);
+		module.setUsingCustomBoundingBox(useCustomBoundingBox);
 		module.setBoundingBoxLeft(boundingBoxLeft);
 		module.setBoundingBoxBottom(boundingBoxBottom);
 		module.setBoundingBoxRight(boundingBoxRight);
@@ -480,7 +480,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
 		log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
 		log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
-		log.info("Use (Custom) Network Boundaries: " + module.isUseCustomBoundingBox() );
+		log.info("Use (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
 		log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
 		log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
 		log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
@@ -550,9 +550,9 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 			betaCarTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelDistance();
 			betaCarTDPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelDistancePower2();
 			betaCarLnTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelDistance();
-			betaCarTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelCost();
-			betaCarTCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelCostPower2();
-			betaCarLnTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelCost();
+			betaCarTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelMonetaryCost();
+			betaCarTCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelMonetaryCostPower2();
+			betaCarLnTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelMonetaryCost();
 		}
 		
 		if(useMATSimBikeParameter){
@@ -598,9 +598,9 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 			betaWalkTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistance();
 			betaWalkTDPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistancePower2();
 			betaWalkLnTD	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelDistance();
-			betaWalkTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelCost();
-			betaWalkTCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelCostPower2();
-			betaWalkLnTC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelCost();
+			betaWalkTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelMonetaryCost();
+			betaWalkTCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelMonetaryCostPower2();
+			betaWalkLnTC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelMonetaryCost();
 		}
 		
 		if(useMATSimPtParameter){
@@ -630,11 +630,11 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		// set parameter in module 
 		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
 		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
-		module.setUseLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
-		module.setUseRawSumsWithoutLn(useRawSum);
-		module.setUseCarParameterFromMATSim(useMATSimCarParameter);
-		module.setUseBikeParameterFromMATSim(useMATSimBikeParameter);
-		module.setUseWalkParameterFromMATSim(useMATSimWalkParameter);
+		module.setUsingLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
+		module.setUsingRawSumsWithoutLn(useRawSum);
+		module.setUsingCarParameterFromMATSim(useMATSimCarParameter);
+		module.setUsingBikeParameterFromMATSim(useMATSimBikeParameter);
+		module.setUsingWalkParameterFromMATSim(useMATSimWalkParameter);
 		module.setLogitScaleParameter(logitScaleParameter);
 		module.setBetaCarTravelTime(betaCarTT);
 		module.setBetaCarTravelTimePower2(betaCarTTPower);
@@ -642,44 +642,44 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		module.setBetaCarTravelDistance(betaCarTD);
 		module.setBetaCarTravelDistancePower2(betaCarTDPower);
 		module.setBetaCarLnTravelDistance(betaCarLnTD);
-		module.setBetaCarTravelCost(betaCarTC);
-		module.setBetaCarTravelCostPower2(betaCarTCPower);
-		module.setBetaCarLnTravelCost(betaCarLnTC);
+		module.setBetaCarTravelMonetaryCost(betaCarTC);
+		module.setBetaCarTravelMonetaryCostPower2(betaCarTCPower);
+		module.setBetaCarLnTravelMonetaryCost(betaCarLnTC);
 		module.setBetaBikeTravelTime(betaBikeTT);
 		module.setBetaBikeTravelTimePower2(betaBikeTTPower);
 		module.setBetaBikeLnTravelTime(betaBikeLnTT);
 		module.setBetaBikeTravelDistance(betaBikeTD);
 		module.setBetaBikeTravelDistancePower2(betaBikeTDPower);
 		module.setBetaBikeLnTravelDistance(betaBikeLnTD);
-		module.setBetaBikeTravelCost(betaBikeTC);
-		module.setBetaBikeTravelCostPower2(betaBikeTCPower);
-		module.setBetaBikeLnTravelCost(betaBikeLnTC);
+		module.setBetaBikeTravelMonetaryCost(betaBikeTC);
+		module.setBetaBikeTravelMonetaryCostPower2(betaBikeTCPower);
+		module.setBetaBikeLnTravelMonetaryCost(betaBikeLnTC);
 		module.setBetaWalkTravelTime(betaWalkTT);
 		module.setBetaWalkTravelTimePower2(betaWalkTTPower);
 		module.setBetaWalkLnTravelTime(betaWalkLnTT);
 		module.setBetaWalkTravelDistance(betaWalkTD);
 		module.setBetaWalkTravelDistancePower2(betaWalkTDPower);
 		module.setBetaWalkLnTravelDistance(betaWalkLnTD);
-		module.setBetaWalkTravelCost(betaWalkTC);
-		module.setBetaWalkTravelCostPower2(betaWalkTCPower);
-		module.setBetaWalkLnTravelCost(betaWalkLnTC);
+		module.setBetaWalkTravelMonetaryCost(betaWalkTC);
+		module.setBetaWalkTravelMonetaryCostPower2(betaWalkTCPower);
+		module.setBetaWalkLnTravelMonetaryCost(betaWalkLnTC);
 		module.setBetaPtTravelTime(betaPtTT);
 		module.setBetaPtTravelTimePower2(betaPtTTPower);
 		module.setBetaPtLnTravelTime(betaPtLnTT);
 		module.setBetaPtTravelDistance(betaPtTD);
 		module.setBetaPtTravelDistancePower2(betaPtTDPower);
 		module.setBetaPtLnTravelDistance(betaPtLnTD);
-		module.setBetaPtTravelCost(betaPtTC);
-		module.setBetaPtTravelCostPower2(betaPtTCPower);
-		module.setBetaPtLnTravelCost(betaPtLnTC);
+		module.setBetaPtTravelMonetaryCost(betaPtTC);
+		module.setBetaPtTravelMonetaryCostPower2(betaPtTCPower);
+		module.setBetaPtLnTravelMonetaryCost(betaPtLnTC);
 		
 		
 		// display results
 		log.info("AccessibilityParameter settings:");
 		
 		log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
-		log.info("Compute raw sum (not logsum): " + module.isUseRawSumsWithoutLn() );
-		log.info("Logit Scale Parameter: " + module.isUseLogitScaleParameterFromMATSim() ); 
+		log.info("Compute raw sum (not logsum): " + module.usingRawSumsWithoutLn() );
+		log.info("Logit Scale Parameter: " + module.usingLogitScaleParameterFromMATSim() ); 
 		
 		log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
 		log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );
@@ -687,9 +687,9 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		log.info("BETA_CAR_TRAVEL_DISTANCE: " + module.getBetaCarTravelDistance() );
 		log.info("BETA_CAR_TRAVEL_DISTANCE_POWER: " + module.getBetaCarTravelDistancePower2() );
 		log.info("BETA_CAR_LN_TRAVEL_DISTANCE: " + module.getBetaCarLnTravelDistance() );
-		log.info("BETA_CAR_TRAVEL_COSTS: " + module.getBetaCarTravelCost() );
-		log.info("BETA_CAR_TRAVEL_COSTS_POWER: " + module.getBetaCarTravelCostPower2() );
-		log.info("BETA_CAR_LN_TRAVEL_COSTS: " + module.getBetaCarLnTravelCost());
+		log.info("BETA_CAR_TRAVEL_COSTS: " + module.getBetaCarTravelMonetaryCost() );
+		log.info("BETA_CAR_TRAVEL_COSTS_POWER: " + module.getBetaCarTravelMonetaryCostPower2() );
+		log.info("BETA_CAR_LN_TRAVEL_COSTS: " + module.getBetaCarLnTravelMonetaryCost());
 		
 		log.info("BETA_BIKE_TRAVEL_TIMES: " + module.getBetaBikeTravelTime()  );
 		log.info("BETA_BIKE_TRAVEL_TIMES_POWER: " + module.getBetaBikeTravelTimePower2() );
@@ -697,9 +697,9 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		log.info("BETA_BIKE_TRAVEL_DISTANCE: " + module.getBetaBikeTravelDistance() );
 		log.info("BETA_BIKE_TRAVEL_DISTANCE_POWER: " + module.getBetaBikeTravelDistancePower2() );
 		log.info("BETA_BIKE_LN_TRAVEL_DISTANCE: " + module.getBetaBikeLnTravelDistance() );
-		log.info("BETA_BIKE_TRAVEL_COSTS: " + module.getBetaBikeTravelCost() );
-		log.info("BETA_BIKE_TRAVEL_COSTS_POWER: " + module.getBetaBikeTravelCostPower2() );
-		log.info("BETA_BIKE_LN_TRAVEL_COSTS: " + module.getBetaBikeLnTravelCost() );
+		log.info("BETA_BIKE_TRAVEL_COSTS: " + module.getBetaBikeTravelMonetaryCost() );
+		log.info("BETA_BIKE_TRAVEL_COSTS_POWER: " + module.getBetaBikeTravelMonetaryCostPower2() );
+		log.info("BETA_BIKE_LN_TRAVEL_COSTS: " + module.getBetaBikeLnTravelMonetaryCost() );
 		
 		log.info("BETA_WALK_TRAVEL_TIMES: " + module.getBetaWalkTravelTime()  );
 		log.info("BETA_WALK_TRAVEL_TIMES_POWER: " + module.getBetaWalkTravelTimePower2() );
@@ -707,9 +707,9 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		log.info("BETA_WALK_TRAVEL_DISTANCE: " + module.getBetaWalkTravelDistance() );
 		log.info("BETA_WALK_TRAVEL_DISTANCE_POWER: " + module.getBetaWalkTravelDistancePower2() );
 		log.info("BETA_WALK_LN_TRAVEL_DISTANCE: " + module.getBetaWalkLnTravelDistance() );
-		log.info("BETA_WALK_TRAVEL_COSTS: " + module.getBetaWalkTravelCost() );
-		log.info("BETA_WALK_TRAVEL_COSTS_POWER: " + module.getBetaWalkTravelCostPower2() );
-		log.info("BETA_WALK_LN_TRAVEL_COSTS: " + module.getBetaWalkLnTravelCost() );
+		log.info("BETA_WALK_TRAVEL_COSTS: " + module.getBetaWalkTravelMonetaryCost() );
+		log.info("BETA_WALK_TRAVEL_COSTS_POWER: " + module.getBetaWalkTravelMonetaryCostPower2() );
+		log.info("BETA_WALK_LN_TRAVEL_COSTS: " + module.getBetaWalkLnTravelMonetaryCost() );
 	}
 	
 	/**

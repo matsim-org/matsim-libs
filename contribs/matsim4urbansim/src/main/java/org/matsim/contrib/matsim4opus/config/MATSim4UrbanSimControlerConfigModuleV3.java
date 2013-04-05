@@ -47,7 +47,7 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
 
 	private String shapeFileCellBasedAccessibility;
 	
-	private boolean useCustomBoundingBox;
+	private boolean usingCustomBoundingBox;
 	
 	private double boundingBoxTop;
 	
@@ -144,12 +144,12 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
         this.shapeFileCellBasedAccessibility = value;
     }
 
-    public boolean isUseCustomBoundingBox() {
-        return this.useCustomBoundingBox;
+    public boolean usingCustomBoundingBox() {
+        return this.usingCustomBoundingBox;
     }
 
-    public void setUseCustomBoundingBox(boolean value) {
-        this.useCustomBoundingBox = value;
+    public void setUsingCustomBoundingBox(boolean value) {
+        this.usingCustomBoundingBox = value;
     }
 
     public double getBoundingBoxTop() {

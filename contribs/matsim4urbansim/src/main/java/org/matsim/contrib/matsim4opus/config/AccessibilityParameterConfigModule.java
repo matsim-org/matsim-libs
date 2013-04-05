@@ -27,15 +27,15 @@ public class AccessibilityParameterConfigModule extends Module{
 	
 	private double accessibilityDestinationSamplingRate;
 	
-	private boolean useLogitScaleParameterFromMATSim;
+	private boolean usingLogitScaleParameterFromMATSim;
 	
-	private boolean useCarParameterFromMATSim;
+	private boolean usingCarParameterFromMATSim;
 	
 	private boolean useBikeParameterFromMATSim;
 	
-	private boolean useWalkParameterFromMATSim;
+	private boolean usingWalkParameterFromMATSim;
     
-	private boolean useRawSumsWithoutLn;
+	private boolean usingRawSumsWithoutLn;
     
 	private double logitScaleParameter;
     
@@ -51,11 +51,11 @@ public class AccessibilityParameterConfigModule extends Module{
     
 	private double betaCarLnTravelDistance;
     
-	private double betaCarTravelCost;
+	private double betaCarTravelMonetaryCost;
     
-	private double betaCarTravelCostPower2;
+	private double betaCarTravelMonetaryCostPower2;
     
-	private double betaCarLnTravelCost;
+	private double betaCarLnTravelMonetaryCost;
 	
 	private double betaBikeTravelTime;
     
@@ -69,11 +69,11 @@ public class AccessibilityParameterConfigModule extends Module{
     
 	private double betaBikeLnTravelDistance;
     
-	private double betaBikeTravelCost;
+	private double betaBikeTravelMonetaryCost;
     
-	private double betaBikeTravelCostPower2;
+	private double betaBikeTravelMonetaryCostPower2;
     
-	private double betaBikeLnTravelCost;
+	private double betaBikeLnTravelMonetrayCost;
 	
 	private double betaWalkTravelTime;
     
@@ -87,11 +87,11 @@ public class AccessibilityParameterConfigModule extends Module{
     
 	private double betaWalkLnTravelDistance;
     
-	private double betaWalkTravelCost;
+	private double betaWalkTravelMonetaryCost;
     
-	private double betaWalkTravelCostPower2;
+	private double betaWalkTravelMonetrayCostPower2;
     
-	private double betaWalkLnTravelCost;
+	private double betaWalkLnTravelMonetrayCost;
 	
 	private double betaPtTravelTime;
     
@@ -105,11 +105,11 @@ public class AccessibilityParameterConfigModule extends Module{
     
 	private double betaPtLnTravelDistance;
     
-	private double betaPtTravelCost;
+	private double betaPtTravelMonetrayCost;
     
-	private double betaPtTravelCostPower2;
+	private double betaPtTravelMonetrayCostPower2;
     
-	private double betaPtLnTravelCost;
+	private double betaPtLnTravelMonetrayCost;
 	
 	
 	public AccessibilityParameterConfigModule(String name) {
@@ -124,44 +124,44 @@ public class AccessibilityParameterConfigModule extends Module{
 		this.accessibilityDestinationSamplingRate = sampleRate;
 	}
 
-    public boolean isUseLogitScaleParameterFromMATSim() {
-        return useLogitScaleParameterFromMATSim;
+    public boolean usingLogitScaleParameterFromMATSim() {
+        return usingLogitScaleParameterFromMATSim;
     }
 
-    public void setUseLogitScaleParameterFromMATSim(boolean value) {
-        this.useLogitScaleParameterFromMATSim = value;
+    public void setUsingLogitScaleParameterFromMATSim(boolean value) {
+        this.usingLogitScaleParameterFromMATSim = value;
     }
 
-    public boolean isUseCarParameterFromMATSim() {
-        return useCarParameterFromMATSim;
+    public boolean usingCarParameterFromMATSim() {
+        return usingCarParameterFromMATSim;
     }
 
-    public void setUseCarParameterFromMATSim(boolean value) {
-        this.useCarParameterFromMATSim = value;
+    public void setUsingCarParameterFromMATSim(boolean value) {
+        this.usingCarParameterFromMATSim = value;
     }
     
-    public boolean isUseBikeParameterFromMATSim() {
+    public boolean usingBikeParameterFromMATSim() {
         return useBikeParameterFromMATSim;
     }
 
-    public void setUseBikeParameterFromMATSim(boolean value) {
+    public void setUsingBikeParameterFromMATSim(boolean value) {
         this.useBikeParameterFromMATSim = value;
     }
     
-    public boolean isUseWalkParameterFromMATSim() {
-        return useWalkParameterFromMATSim;
+    public boolean usingWalkParameterFromMATSim() {
+        return usingWalkParameterFromMATSim;
     }
 
-    public void setUseWalkParameterFromMATSim(boolean value) {
-        this.useWalkParameterFromMATSim = value;
+    public void setUsingWalkParameterFromMATSim(boolean value) {
+        this.usingWalkParameterFromMATSim = value;
     }
 
-    public boolean isUseRawSumsWithoutLn() {
-        return useRawSumsWithoutLn;
+    public boolean usingRawSumsWithoutLn() {
+        return usingRawSumsWithoutLn;
     }
 
-    public void setUseRawSumsWithoutLn(boolean value) {
-        this.useRawSumsWithoutLn = value;
+    public void setUsingRawSumsWithoutLn(boolean value) {
+        this.usingRawSumsWithoutLn = value;
     }
 
     public double getLogitScaleParameter() {
@@ -220,28 +220,28 @@ public class AccessibilityParameterConfigModule extends Module{
         this.betaCarLnTravelDistance = value;
     }
 
-    public double getBetaCarTravelCost() {
-        return betaCarTravelCost;
+    public double getBetaCarTravelMonetaryCost() {
+        return betaCarTravelMonetaryCost;
     }
 
-    public void setBetaCarTravelCost(double value) {
-        this.betaCarTravelCost = value;
+    public void setBetaCarTravelMonetaryCost(double value) {
+        this.betaCarTravelMonetaryCost = value;
     }
 
-    public double getBetaCarTravelCostPower2() {
-        return betaCarTravelCostPower2;
+    public double getBetaCarTravelMonetaryCostPower2() {
+        return betaCarTravelMonetaryCostPower2;
     }
 
-    public void setBetaCarTravelCostPower2(double value) {
-        this.betaCarTravelCostPower2 = value;
+    public void setBetaCarTravelMonetaryCostPower2(double value) {
+        this.betaCarTravelMonetaryCostPower2 = value;
     }
 
-    public double getBetaCarLnTravelCost() {
-        return betaCarLnTravelCost;
+    public double getBetaCarLnTravelMonetaryCost() {
+        return betaCarLnTravelMonetaryCost;
     }
 
-    public void setBetaCarLnTravelCost(double value) {
-        this.betaCarLnTravelCost = value;
+    public void setBetaCarLnTravelMonetaryCost(double value) {
+        this.betaCarLnTravelMonetaryCost = value;
     }
     
     public double getBetaBikeTravelTime() {
@@ -292,28 +292,28 @@ public class AccessibilityParameterConfigModule extends Module{
         this.betaBikeLnTravelDistance = value;
     }
 
-    public double getBetaBikeTravelCost() {
-        return betaBikeTravelCost;
+    public double getBetaBikeTravelMonetaryCost() {
+        return betaBikeTravelMonetaryCost;
     }
 
-    public void setBetaBikeTravelCost(double value) {
-        this.betaBikeTravelCost = value;
+    public void setBetaBikeTravelMonetaryCost(double value) {
+        this.betaBikeTravelMonetaryCost = value;
     }
 
-    public double getBetaBikeTravelCostPower2() {
-        return betaBikeTravelCostPower2;
+    public double getBetaBikeTravelMonetaryCostPower2() {
+        return betaBikeTravelMonetaryCostPower2;
     }
 
-    public void setBetaBikeTravelCostPower2(double value) {
-        this.betaBikeTravelCostPower2 = value;
+    public void setBetaBikeTravelMonetaryCostPower2(double value) {
+        this.betaBikeTravelMonetaryCostPower2 = value;
     }
 
-    public double getBetaBikeLnTravelCost() {
-        return betaBikeLnTravelCost;
+    public double getBetaBikeLnTravelMonetaryCost() {
+        return betaBikeLnTravelMonetrayCost;
     }
 
-    public void setBetaBikeLnTravelCost(double value) {
-        this.betaBikeLnTravelCost = value;
+    public void setBetaBikeLnTravelMonetaryCost(double value) {
+        this.betaBikeLnTravelMonetrayCost = value;
     }
 
     public double getBetaWalkTravelTime() {
@@ -364,28 +364,28 @@ public class AccessibilityParameterConfigModule extends Module{
         this.betaWalkLnTravelDistance = value;
     }
 
-    public double getBetaWalkTravelCost() {
-        return betaWalkTravelCost;
+    public double getBetaWalkTravelMonetaryCost() {
+        return betaWalkTravelMonetaryCost;
     }
 
-    public void setBetaWalkTravelCost(double value) {
-        this.betaWalkTravelCost = value;
+    public void setBetaWalkTravelMonetaryCost(double value) {
+        this.betaWalkTravelMonetaryCost = value;
     }
 
-    public double getBetaWalkTravelCostPower2() {
-        return betaWalkTravelCostPower2;
+    public double getBetaWalkTravelMonetaryCostPower2() {
+        return betaWalkTravelMonetrayCostPower2;
     }
 
-    public void setBetaWalkTravelCostPower2(double value) {
-        this.betaWalkTravelCostPower2 = value;
+    public void setBetaWalkTravelMonetaryCostPower2(double value) {
+        this.betaWalkTravelMonetrayCostPower2 = value;
     }
 
-    public double getBetaWalkLnTravelCost() {
-        return betaWalkLnTravelCost;
+    public double getBetaWalkLnTravelMonetaryCost() {
+        return betaWalkLnTravelMonetrayCost;
     }
 
-    public void setBetaWalkLnTravelCost(double value) {
-        this.betaWalkLnTravelCost = value;
+    public void setBetaWalkLnTravelMonetaryCost(double value) {
+        this.betaWalkLnTravelMonetrayCost = value;
     }
     
     public double getBetaPtTravelTime() {
@@ -436,28 +436,28 @@ public class AccessibilityParameterConfigModule extends Module{
         this.betaPtLnTravelDistance = value;
     }
 
-    public double getBetaPtTravelCost() {
-        return betaPtTravelCost;
+    public double getBetaPtTravelMonetaryCost() {
+        return betaPtTravelMonetrayCost;
     }
 
-    public void setBetaPtTravelCost(double value) {
-        this.betaPtTravelCost = value;
+    public void setBetaPtTravelMonetaryCost(double value) {
+        this.betaPtTravelMonetrayCost = value;
     }
 
-    public double getBetaPtTravelCostPower2() {
-        return betaPtTravelCostPower2;
+    public double getBetaPtTravelMonetaryCostPower2() {
+        return betaPtTravelMonetrayCostPower2;
     }
 
-    public void setBetaPtTravelCostPower2(double value) {
-        this.betaPtTravelCostPower2 = value;
+    public void setBetaPtTravelMonetaryCostPower2(double value) {
+        this.betaPtTravelMonetrayCostPower2 = value;
     }
 
-    public double getBetaPtLnTravelCost() {
-        return betaPtLnTravelCost;
+    public double getBetaPtLnTravelMonetaryCost() {
+        return betaPtLnTravelMonetrayCost;
     }
 
-    public void setBetaPtLnTravelCost(double value) {
-        this.betaPtLnTravelCost = value;
+    public void setBetaPtLnTravelMonetaryCost(double value) {
+        this.betaPtLnTravelMonetrayCost = value;
     }
     
 }

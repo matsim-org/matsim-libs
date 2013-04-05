@@ -305,7 +305,7 @@ public class AccessibilityParameterType {
      * Gets the value of the betaCarTravelCost property.
      * 
      */
-    public double getBetaCarTravelCost() {
+    public double getBetaCarTravelMonetaryCost() {
         return betaCarTravelCost;
     }
 
@@ -321,7 +321,7 @@ public class AccessibilityParameterType {
      * Gets the value of the betaCarTravelCostPower2 property.
      * 
      */
-    public double getBetaCarTravelCostPower2() {
+    public double getBetaCarTravelMonetaryCostPower2() {
         return betaCarTravelCostPower2;
     }
 
@@ -337,7 +337,7 @@ public class AccessibilityParameterType {
      * Gets the value of the betaCarLnTravelCost property.
      * 
      */
-    public double getBetaCarLnTravelCost() {
+    public double getBetaCarLnTravelMonetaryCost() {
         return betaCarLnTravelCost;
     }
 
@@ -449,7 +449,7 @@ public class AccessibilityParameterType {
      * Gets the value of the betaWalkTravelCost property.
      * 
      */
-    public double getBetaWalkTravelCost() {
+    public double getBetaWalkTravelMonetaryCost() {
         return betaWalkTravelCost;
     }
 
@@ -465,7 +465,7 @@ public class AccessibilityParameterType {
      * Gets the value of the betaWalkTravelCostPower2 property.
      * 
      */
-    public double getBetaWalkTravelCostPower2() {
+    public double getBetaWalkTravelMonetaryCostPower2() {
         return betaWalkTravelCostPower2;
     }
 
@@ -481,7 +481,7 @@ public class AccessibilityParameterType {
      * Gets the value of the betaWalkLnTravelCost property.
      * 
      */
-    public double getBetaWalkLnTravelCost() {
+    public double getBetaWalkLnTravelMonetaryCost() {
         return betaWalkLnTravelCost;
     }
 

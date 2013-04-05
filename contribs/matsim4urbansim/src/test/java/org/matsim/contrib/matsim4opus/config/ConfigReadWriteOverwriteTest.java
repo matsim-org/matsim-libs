@@ -234,9 +234,9 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelDistance() == testExternalConfig.betaBikeTravelDistance );
 		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelDistancePower2() == testExternalConfig.betaBikeTravelDistancePower2 );
 		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelDistance()== testExternalConfig.betaBikeLnTravelDistance );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelCost()  	== testExternalConfig.betaBikeTravelCost );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelCostPower2() == testExternalConfig.betaBikeTravelCostPower2 );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelCost()  	== testExternalConfig.betaBikeLnTravelCost );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelMonetaryCost()  	== testExternalConfig.betaBikeTravelCost );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelMonetaryCostPower2() == testExternalConfig.betaBikeTravelCostPower2 );
+		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelMonetaryCost()  	== testExternalConfig.betaBikeLnTravelCost );
 		// pt parameter
 		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelTime() 		== testExternalConfig.betaPtTravelTime );
 		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelTimePower2() == testExternalConfig.betaPtTravelTimePower2 );
@@ -244,9 +244,9 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelDistance()  	== testExternalConfig.betaPtTravelDistance );
 		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelDistancePower2() == testExternalConfig.betaPtTravelDistancePower2 );
 		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelDistance() == testExternalConfig.betaPtLnTravelDistance );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelCost()  		== testExternalConfig.betaPtTravelCost );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelCostPower2() == testExternalConfig.betaPtTravelCostPower2 );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelCost()  	== testExternalConfig.betaPtLnTravelCost );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelMonetaryCost()  		== testExternalConfig.betaPtTravelCost );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelMonetaryCostPower2() == testExternalConfig.betaPtTravelCostPower2 );
+		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelMonetaryCost()  	== testExternalConfig.betaPtLnTravelCost );
 	}
 
 	/**

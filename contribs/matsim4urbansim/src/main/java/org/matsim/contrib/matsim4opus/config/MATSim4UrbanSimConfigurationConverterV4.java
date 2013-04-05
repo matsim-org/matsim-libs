@@ -65,8 +65,7 @@ import org.matsim.contrib.matsim4opus.utils.io.Paths;
  * 	2 processors were used even if there are more.
  * 
  * improvements feb'12:
- * - setting mutationrange = 2h for TimeAllocationMutator (this seems to 
- * shift the depature times ???)
+ * - setting mutationrange = 2h for TimeAllocationMutator (this shifts the departure times)
  * 
  * improvements march'12:
  * - extended the MATSim4UrbanSim configuration, e.g. a standard MATSim config can be loaded
@@ -122,18 +121,18 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	public static final String BETA_BIKE_TRAVEL_DISTANCE = "betaBikeTravelDistance";
 	public static final String BETA_BIKE_TRAVEL_DISTANCE_POWER2 = "betaBikeTravelDistancePower2";
 	public static final String BETA_BIKE_LN_TRAVEL_DISTANCE = "betaBikeLnTravelDistance";
-	public static final String BETA_BIKE_TRAVEL_COST = "betaBikeTravelCost";
-	public static final String BETA_BIKE_TRAVEL_COST_POWER2 = "betaBikeTravelCostPower2";
-	public static final String BETA_BIKE_LN_TRAVEL_COST = "betaBikeLnTravelCost";
+	public static final String BETA_BIKE_TRAVEL_MONETARY_COST = "betaBikeTravelCost";
+	public static final String BETA_BIKE_TRAVEL_MONETARY_COST_POWER2 = "betaBikeTravelCostPower2";
+	public static final String BETA_BIKE_LN_TRAVEL_MONETARY_COST = "betaBikeLnTravelCost";
 	public static final String BETA_PT_TRAVEL_TIME = "betaPtTravelTime";
 	public static final String BETA_PT_TRAVEL_TIME_POWER2 = "betaPtTravelTimePower2";
 	public static final String BETA_PT_LN_TRAVEL_TIME = "betaPtLnTravelTime";
 	public static final String BETA_PT_TRAVEL_DISTANCE = "betaPtTravelDistance";
 	public static final String BETA_PT_TRAVEL_DISTANCE_POWER2 = "betaPtTravelDistancePower2";
 	public static final String BETA_PT_LN_TRAVEL_DISTANCE = "betaPtLnTravelDistance";
-	public static final String BETA_PT_TRAVEL_COST = "betaPtTravelCost";
-	public static final String BETA_PT_TRAVEL_COST_POWER2 = "betaPtTravelCostPower2";
-	public static final String BETA_PT_LN_TRAVEL_COST = "betaPtLnTravelCost";
+	public static final String BETA_PT_TRAVEL_MONETARY_COST = "betaPtTravelCost";
+	public static final String BETA_PT_TRAVEL_MONETARY_COST_POWER2 = "betaPtTravelCostPower2";
+	public static final String BETA_PT_LN_TRAVEL_MONETARY_COST = "betaPtLnTravelCost";
 	
 	/**
 	 * constructor
@@ -400,7 +399,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		module.setMATSim4OpusTemp(matsim4OpusTemp);
 		module.setMATSim4OpusBackup(matsim4OpusBackup);
 		module.setTestParameter(testParameter);
-		module.setUseShapefileLocationDistribution(useShapefileLocationDistribution);
+		module.setUsingShapefileLocationDistribution(useShapefileLocationDistribution);
 		module.setUrbanSimZoneShapefileLocationDistribution(urbanSimZoneShapefileLocationDistribution);
 		module.setUrbanSimZoneRadiusLocationDistribution(randomLocationDistributionRadiusForUrbanSimZone);
 		module.setBackup(backupRunData);
@@ -517,7 +516,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		module.setCellBasedAccessibilityShapeFile(computeCellbasedAccessibilityShapeFile);
 		module.setCellBasedAccessibilityNetwork(computeCellBasedAccessibilityNetwork);
 		module.setShapeFileCellBasedAccessibility(shapeFile);
-		module.setUseCustomBoundingBox(useCustomBoundingBox);
+		module.setUsingCustomBoundingBox(useCustomBoundingBox);
 		module.setBoundingBoxLeft(boundingBoxLeft);
 		module.setBoundingBoxBottom(boundingBoxBottom);
 		module.setBoundingBoxRight(boundingBoxRight);
@@ -536,16 +535,16 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		double logitScaleParameter,
 		betaCarTT, betaCarTTPower, betaCarLnTT,		// car
 		betaCarTD, betaCarTDPower, betaCarLnTD,
-		betaCarTC, betaCarTCPower, betaCarLnTC,
+		betaCarTMC, betaCarTMCPower, betaCarLnTMC,
 		betaBikeTT, betaBikeTTPower, betaBikeLnTT,	// bike
 		betaBikeTD, betaBikeTDPower, betaBikeLnTD,
-		betaBikeTC, betaBikeTCPower, betaBikeLnTC,
+		betaBikeTMC, betaBikeTMCPower, betaBikeLnTMC,
 		betaWalkTT, betaWalkTTPower, betaWalkLnTT,	// walk
 		betaWalkTD, betaWalkTDPower, betaWalkLnTD,
-		betaWalkTC, betaWalkTCPower, betaWalkLnTC,
+		betaWalkTMC, betaWalkTMCPower, betaWalkLnTMC,
 		betaPtTT, betaPtTTPower, betaPtLnTT,		// pt
 		betaPtTD, betaPtTDPower, betaPtLnTD,
-		betaPtTC, betaPtTCPower, betaPtLnTC;
+		betaPtTMC, betaPtTMCPower, betaPtLnTMC;
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
 		
@@ -578,10 +577,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
 			betaCarTDPower	= 0.;																														// useful setting for MonetaryDistanceCostRateCar: 10cent/km (only fuel) or 
 			betaCarLnTD		= 0.;																														// 80cent/km (including taxes, insurance ...)
-			betaCarTC		= 0.;//planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money], (no computation of money in MATSim implemented yet)
+			betaCarTMC		= 0.;//planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money], (no computation of money in MATSim implemented yet)
 			log.error("marginal utility of money is NOT taken from matsim but set to zero") ;
-			betaCarTCPower	= 0.;
-			betaCarLnTC		= 0.;
+			betaCarTMCPower	= 0.;
+			betaCarLnTMC	= 0.;
 		}
 		else{
 			betaCarTT 	   	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelTime();
@@ -590,9 +589,11 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaCarTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelDistance();
 			betaCarTDPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelDistancePower2();
 			betaCarLnTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelDistance();
-			betaCarTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelCost();
-			betaCarTCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelCostPower2();
-			betaCarLnTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelCost();
+			betaCarTMC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelMonetaryCost();
+			betaCarTMCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelMonetaryCostPower2();
+			betaCarLnTMC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelMonetaryCost();
+			
+			stopMATSimForMixedAccessibilities(betaCarTT, betaCarTTPower, betaCarLnTT, betaCarTD, betaCarTDPower, betaCarLnTD, betaCarTMC, betaCarTMCPower, betaCarLnTMC);
 		}
 		
 		if(useMATSimBikeParameter){
@@ -601,11 +602,13 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaBikeTTPower	= 0.;
 			betaBikeLnTT	= 0.;
 			betaBikeTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtlOfDistanceBike(); // [utils/meter]
+			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
 			betaBikeTDPower	= 0.;												
 			betaBikeLnTD	= 0.;
-			betaBikeTC		= 0.;// [utils/money], not available in MATSim
-			betaBikeTCPower	= 0.;
-			betaBikeLnTC	= 0.;
+			betaBikeTMC		= 0.;// [utils/money], not available in MATSim
+			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaBikeTMCPower= 0.;
+			betaBikeLnTMC	= 0.;
 		}
 		else{
 			betaBikeTT		= getValueAsDouble(BETA_BIKE_TRAVEL_TIME);
@@ -614,9 +617,11 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaBikeTD		= getValueAsDouble(BETA_BIKE_TRAVEL_DISTANCE);
 			betaBikeTDPower	= getValueAsDouble(BETA_BIKE_TRAVEL_DISTANCE_POWER2);
 			betaBikeLnTD	= getValueAsDouble(BETA_BIKE_LN_TRAVEL_DISTANCE);
-			betaBikeTC		= getValueAsDouble(BETA_BIKE_TRAVEL_COST);
-			betaBikeTCPower	= getValueAsDouble(BETA_BIKE_TRAVEL_COST_POWER2);
-			betaBikeLnTC	= getValueAsDouble(BETA_BIKE_LN_TRAVEL_COST);
+			betaBikeTMC		= getValueAsDouble(BETA_BIKE_TRAVEL_MONETARY_COST);
+			betaBikeTMCPower= getValueAsDouble(BETA_BIKE_TRAVEL_MONETARY_COST_POWER2);
+			betaBikeLnTMC	= getValueAsDouble(BETA_BIKE_LN_TRAVEL_MONETARY_COST);
+			
+			stopMATSimForMixedAccessibilities(betaBikeTT, betaBikeTTPower, betaBikeLnTT, betaBikeTD, betaBikeTDPower, betaBikeLnTD, betaBikeTMC, betaBikeTMCPower, betaBikeLnTMC);
 		}
 		
 		if(useMATSimWalkParameter){
@@ -625,11 +630,13 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaWalkTTPower	= 0.;
 			betaWalkLnTT	= 0.;
 			betaWalkTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk(); // [utils/meter]
+			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
 			betaWalkTDPower	= 0.;												
 			betaWalkLnTD	= 0.;
-			betaWalkTC		= 0.;// [utils/money], not available in MATSim
-			betaWalkTCPower	= 0.;
-			betaWalkLnTC	= 0.;
+			betaWalkTMC		= 0.;// [utils/money], not available in MATSim
+			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaWalkTMCPower= 0.;
+			betaWalkLnTMC	= 0.;
 		}
 		else{
 			betaWalkTT		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelTime();
@@ -638,9 +645,11 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaWalkTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistance();
 			betaWalkTDPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistancePower2();
 			betaWalkLnTD	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelDistance();
-			betaWalkTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelCost();
-			betaWalkTCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelCostPower2();
-			betaWalkLnTC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelCost();
+			betaWalkTMC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelMonetaryCost();
+			betaWalkTMCPower= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelMonetaryCostPower2();
+			betaWalkLnTMC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelMonetaryCost();
+			
+			stopMATSimForMixedAccessibilities(betaWalkTT, betaWalkTTPower, betaWalkLnTT, betaWalkTD, betaWalkTDPower, betaWalkLnTD, betaWalkTMC, betaWalkTMCPower, betaWalkLnTMC);
 		}
 		
 		if(useMATSimPtParameter){
@@ -649,11 +658,13 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaPtTTPower	= 0.;
 			betaPtLnTT		= 0.;
 			betaPtTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtlOfDistanceBike(); // [utils/meter]
+			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
 			betaPtTDPower	= 0.;												
 			betaPtLnTD		= 0.;
-			betaPtTC		= 0.;// [utils/money], not available in MATSim
-			betaPtTCPower	= 0.;
-			betaPtLnTC		= 0.;
+			betaPtTMC		= 0.;// [utils/money], not available in MATSim
+			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaPtTMCPower	= 0.;
+			betaPtLnTMC		= 0.;
 		}
 		else{
 			betaPtTT		= getValueAsDouble(BETA_PT_TRAVEL_TIME);
@@ -662,19 +673,21 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaPtTD		= getValueAsDouble(BETA_PT_TRAVEL_DISTANCE);
 			betaPtTDPower	= getValueAsDouble(BETA_PT_TRAVEL_DISTANCE_POWER2);
 			betaPtLnTD		= getValueAsDouble(BETA_PT_LN_TRAVEL_DISTANCE);
-			betaPtTC		= getValueAsDouble(BETA_PT_TRAVEL_COST);
-			betaPtTCPower	= getValueAsDouble(BETA_PT_TRAVEL_COST_POWER2);
-			betaPtLnTC		= getValueAsDouble(BETA_PT_LN_TRAVEL_COST);
+			betaPtTMC		= getValueAsDouble(BETA_PT_TRAVEL_MONETARY_COST);
+			betaPtTMCPower	= getValueAsDouble(BETA_PT_TRAVEL_MONETARY_COST_POWER2);
+			betaPtLnTMC		= getValueAsDouble(BETA_PT_LN_TRAVEL_MONETARY_COST);
+			
+			stopMATSimForMixedAccessibilities(betaPtTT, betaPtTTPower, betaPtLnTT, betaPtTD, betaPtTDPower, betaPtLnTD, betaPtTMC, betaPtTMCPower, betaPtLnTMC);
 		}
 		
 		// set parameter in module 
 		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
 		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
-		module.setUseLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
-		module.setUseRawSumsWithoutLn(useRawSum);
-		module.setUseCarParameterFromMATSim(useMATSimCarParameter);
-		module.setUseBikeParameterFromMATSim(useMATSimBikeParameter);
-		module.setUseWalkParameterFromMATSim(useMATSimWalkParameter);
+		module.setUsingLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
+		module.setUsingRawSumsWithoutLn(useRawSum);
+		module.setUsingCarParameterFromMATSim(useMATSimCarParameter);
+		module.setUsingBikeParameterFromMATSim(useMATSimBikeParameter);
+		module.setUsingWalkParameterFromMATSim(useMATSimWalkParameter);
 		module.setLogitScaleParameter(logitScaleParameter);
 		module.setBetaCarTravelTime(betaCarTT);
 		module.setBetaCarTravelTimePower2(betaCarTTPower);
@@ -682,38 +695,59 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		module.setBetaCarTravelDistance(betaCarTD);
 		module.setBetaCarTravelDistancePower2(betaCarTDPower);
 		module.setBetaCarLnTravelDistance(betaCarLnTD);
-		module.setBetaCarTravelCost(betaCarTC);
-		module.setBetaCarTravelCostPower2(betaCarTCPower);
-		module.setBetaCarLnTravelCost(betaCarLnTC);
+		module.setBetaCarTravelMonetaryCost(betaCarTMC);
+		module.setBetaCarTravelMonetaryCostPower2(betaCarTMCPower);
+		module.setBetaCarLnTravelMonetaryCost(betaCarLnTMC);
 		module.setBetaBikeTravelTime(betaBikeTT);
 		module.setBetaBikeTravelTimePower2(betaBikeTTPower);
 		module.setBetaBikeLnTravelTime(betaBikeLnTT);
 		module.setBetaBikeTravelDistance(betaBikeTD);
 		module.setBetaBikeTravelDistancePower2(betaBikeTDPower);
 		module.setBetaBikeLnTravelDistance(betaBikeLnTD);
-		module.setBetaBikeTravelCost(betaBikeTC);
-		module.setBetaBikeTravelCostPower2(betaBikeTCPower);
-		module.setBetaBikeLnTravelCost(betaBikeLnTC);
+		module.setBetaBikeTravelMonetaryCost(betaBikeTMC);
+		module.setBetaBikeTravelMonetaryCostPower2(betaBikeTMCPower);
+		module.setBetaBikeLnTravelMonetaryCost(betaBikeLnTMC);
 		module.setBetaWalkTravelTime(betaWalkTT);
 		module.setBetaWalkTravelTimePower2(betaWalkTTPower);
 		module.setBetaWalkLnTravelTime(betaWalkLnTT);
 		module.setBetaWalkTravelDistance(betaWalkTD);
 		module.setBetaWalkTravelDistancePower2(betaWalkTDPower);
 		module.setBetaWalkLnTravelDistance(betaWalkLnTD);
-		module.setBetaWalkTravelCost(betaWalkTC);
-		module.setBetaWalkTravelCostPower2(betaWalkTCPower);
-		module.setBetaWalkLnTravelCost(betaWalkLnTC);
+		module.setBetaWalkTravelMonetaryCost(betaWalkTMC);
+		module.setBetaWalkTravelMonetaryCostPower2(betaWalkTMCPower);
+		module.setBetaWalkLnTravelMonetaryCost(betaWalkLnTMC);
 		module.setBetaPtTravelTime(betaPtTT);
 		module.setBetaPtTravelTimePower2(betaPtTTPower);
 		module.setBetaPtLnTravelTime(betaPtLnTT);
 		module.setBetaPtTravelDistance(betaPtTD);
 		module.setBetaPtTravelDistancePower2(betaPtTDPower);
 		module.setBetaPtLnTravelDistance(betaPtLnTD);
-		module.setBetaPtTravelCost(betaPtTC);
-		module.setBetaPtTravelCostPower2(betaPtTCPower);
-		module.setBetaPtLnTravelCost(betaPtLnTC);
+		module.setBetaPtTravelMonetaryCost(betaPtTMC);
+		module.setBetaPtTravelMonetaryCostPower2(betaPtTMCPower);
+		module.setBetaPtLnTravelMonetaryCost(betaPtLnTMC);
 		
 		printAccessibilityParameterSettings();
+	}
+	
+	/**
+	 * This terminates MATSim when time, distance and monetary cost parameter in accessibility calculation are set at the same time.
+	 */
+	void stopMATSimForMixedAccessibilities(double tt, double ttPower, double ttLn, double td, double tdPower, double tdLn, double tmc, double tmcPower, double tmcLn){
+		
+		int counter = 0;
+		
+		// check if time parameter are set
+		if( (tt != 0.) || (ttPower != 0.) || (ttLn != 0.) )
+			counter++;
+		if( (td != 0.) || (tdPower != 0.) || (tdLn != 0.) )
+			counter++;
+		if( (tmc != 0.) || (tmcPower != 0.) || (tmcLn != 0.) )
+			counter++;
+		
+		if( counter > 1 ){
+			log.error("Currently, the simulataineous calculation of travel times, distances and monetary costs in accessibility calculation is not implemented in a reasonable way!");
+			System.exit(0);
+		}
 	}
 	
 	/**
@@ -998,9 +1032,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 					matsim4UrbanSimModule.getValue(BETA_BIKE_TRAVEL_DISTANCE) != null ||
 					matsim4UrbanSimModule.getValue(BETA_BIKE_TRAVEL_DISTANCE_POWER2) != null ||
 					matsim4UrbanSimModule.getValue(BETA_BIKE_LN_TRAVEL_DISTANCE) != null ||
-					matsim4UrbanSimModule.getValue(BETA_BIKE_TRAVEL_COST) != null ||
-					matsim4UrbanSimModule.getValue(BETA_BIKE_TRAVEL_COST_POWER2) != null ||
-					matsim4UrbanSimModule.getValue(BETA_BIKE_LN_TRAVEL_COST) != null);
+					matsim4UrbanSimModule.getValue(BETA_BIKE_TRAVEL_MONETARY_COST) != null ||
+					matsim4UrbanSimModule.getValue(BETA_BIKE_TRAVEL_MONETARY_COST_POWER2) != null ||
+					matsim4UrbanSimModule.getValue(BETA_BIKE_LN_TRAVEL_MONETARY_COST) != null);
 		return false;
 	}
 	
@@ -1018,9 +1052,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_DISTANCE) != null ||
 					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_DISTANCE_POWER2) != null ||
 					matsim4UrbanSimModule.getValue(BETA_PT_LN_TRAVEL_DISTANCE) != null ||
-					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_COST) != null ||
-					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_COST_POWER2) != null ||
-					matsim4UrbanSimModule.getValue(BETA_PT_LN_TRAVEL_COST) != null);
+					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_MONETARY_COST) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_TRAVEL_MONETARY_COST_POWER2) != null ||
+					matsim4UrbanSimModule.getValue(BETA_PT_LN_TRAVEL_MONETARY_COST) != null);
 		return false;
 	}
 	
@@ -1105,7 +1139,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
 		log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
 		log.info("(Custom) Test Parameter: " + module.getTestParameter() );
-		log.info("UseShapefileLocationDistribution:" + module.isUseShapefileLocationDistribution());
+		log.info("UsingShapefileLocationDistribution:" + module.usingShapefileLocationDistribution());
 		log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
 		log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
 		log.info("Backing Up Run Data: " + module.isBackup() );
@@ -1127,7 +1161,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
 		log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
 		log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
-		log.info("Use (Custom) Network Boundaries: " + module.isUseCustomBoundingBox() );
+		log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
 		log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
 		log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
 		log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
@@ -1150,8 +1184,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		log.info("AccessibilityParameter settings:");
 		
 		log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
-		log.info("Compute raw sum (not logsum): " + module.isUseRawSumsWithoutLn() );
-		log.info("Logit Scale Parameter: " + module.isUseLogitScaleParameterFromMATSim() ); 
+		log.info("Compute raw sum (not logsum): " + module.usingRawSumsWithoutLn() );
+		log.info("Logit Scale Parameter: " + module.usingLogitScaleParameterFromMATSim() ); 
 		
 		log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
 		log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );
@@ -1159,9 +1193,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		log.info("BETA_CAR_TRAVEL_DISTANCE: " + module.getBetaCarTravelDistance() );
 		log.info("BETA_CAR_TRAVEL_DISTANCE_POWER: " + module.getBetaCarTravelDistancePower2() );
 		log.info("BETA_CAR_LN_TRAVEL_DISTANCE: " + module.getBetaCarLnTravelDistance() );
-		log.info("BETA_CAR_TRAVEL_COSTS: " + module.getBetaCarTravelCost() );
-		log.info("BETA_CAR_TRAVEL_COSTS_POWER: " + module.getBetaCarTravelCostPower2() );
-		log.info("BETA_CAR_LN_TRAVEL_COSTS: " + module.getBetaCarLnTravelCost());
+		log.info("BETA_CAR_TRAVEL_MONETARY_COSTS: " + module.getBetaCarTravelMonetaryCost() );
+		log.info("BETA_CAR_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaCarTravelMonetaryCostPower2() );
+		log.info("BETA_CAR_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaCarLnTravelMonetaryCost());
 		
 		log.info("BETA_PT_TRAVEL_TIMES: " + module.getBetaPtTravelTime()  );
 		log.info("BETA_PT_TRAVEL_TIMES_POWER: " + module.getBetaPtTravelTimePower2() );
@@ -1169,9 +1203,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		log.info("BETA_PT_TRAVEL_DISTANCE: " + module.getBetaPtTravelDistance() );
 		log.info("BETA_PT_TRAVEL_DISTANCE_POWER: " + module.getBetaPtTravelDistancePower2() );
 		log.info("BETA_PT_LN_TRAVEL_DISTANCE: " + module.getBetaPtLnTravelDistance() );
-		log.info("BETA_PT_TRAVEL_COSTS: " + module.getBetaPtTravelCost() );
-		log.info("BETA_PT_TRAVEL_COSTS_POWER: " + module.getBetaPtTravelCostPower2() );
-		log.info("BETA_PT_LN_TRAVEL_COSTS: " + module.getBetaPtLnTravelCost() );
+		log.info("BETA_PT_TRAVEL_MONETARY_COSTS: " + module.getBetaPtTravelMonetaryCost() );
+		log.info("BETA_PT_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaPtTravelMonetaryCostPower2() );
+		log.info("BETA_PT_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaPtLnTravelMonetaryCost() );
 		
 		log.info("BETA_BIKE_TRAVEL_TIMES: " + module.getBetaBikeTravelTime()  );
 		log.info("BETA_BIKE_TRAVEL_TIMES_POWER: " + module.getBetaBikeTravelTimePower2() );
@@ -1179,9 +1213,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		log.info("BETA_BIKE_TRAVEL_DISTANCE: " + module.getBetaBikeTravelDistance() );
 		log.info("BETA_BIKE_TRAVEL_DISTANCE_POWER: " + module.getBetaBikeTravelDistancePower2() );
 		log.info("BETA_BIKE_LN_TRAVEL_DISTANCE: " + module.getBetaBikeLnTravelDistance() );
-		log.info("BETA_BIKE_TRAVEL_COSTS: " + module.getBetaBikeTravelCost() );
-		log.info("BETA_BIKE_TRAVEL_COSTS_POWER: " + module.getBetaBikeTravelCostPower2() );
-		log.info("BETA_BIKE_LN_TRAVEL_COSTS: " + module.getBetaBikeLnTravelCost() );
+		log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeTravelMonetaryCost() );
+		log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaBikeTravelMonetaryCostPower2() );
+		log.info("BETA_BIKE_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeLnTravelMonetaryCost() );
 		
 		log.info("BETA_WALK_TRAVEL_TIMES: " + module.getBetaWalkTravelTime()  );
 		log.info("BETA_WALK_TRAVEL_TIMES_POWER: " + module.getBetaWalkTravelTimePower2() );
@@ -1189,9 +1223,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		log.info("BETA_WALK_TRAVEL_DISTANCE: " + module.getBetaWalkTravelDistance() );
 		log.info("BETA_WALK_TRAVEL_DISTANCE_POWER: " + module.getBetaWalkTravelDistancePower2() );
 		log.info("BETA_WALK_LN_TRAVEL_DISTANCE: " + module.getBetaWalkLnTravelDistance() );
-		log.info("BETA_WALK_TRAVEL_COSTS: " + module.getBetaWalkTravelCost() );
-		log.info("BETA_WALK_TRAVEL_COSTS_POWER: " + module.getBetaWalkTravelCostPower2() );
-		log.info("BETA_WALK_LN_TRAVEL_COSTS: " + module.getBetaWalkLnTravelCost() );
+		log.info("BETA_WALK_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkTravelMonetaryCost() );
+		log.info("BETA_WALK_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaWalkTravelMonetaryCostPower2() );
+		log.info("BETA_WALK_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkLnTravelMonetaryCost() );
 	}
 	
 	/**
@@ -1291,6 +1325,15 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	
 	// Testing fetch  factor calculation for storageCap 
 	public static void main(String[] args) {
+	
+//		MatsimConfigType mct = new MatsimConfigType();
+//		
+//		MATSim4UrbanSimConfigurationConverterV4 m = new MATSim4UrbanSimConfigurationConverterV4(mct);
+//		m.stopMATSimForMixedAccessibilities(0, 0, 0, 0, 0, 0, 0, 0, 0);
+//		m.stopMATSimForMixedAccessibilities(1, 1, 1, 0, 0, 0, 0, 0, 0);
+//		m.stopMATSimForMixedAccessibilities(0, 0, 0, 1, 1, 0, 0, 0, 0);
+//		m.stopMATSimForMixedAccessibilities(0, 0, 0, 0, 0, 0, 0, 1, 0);
+//		m.stopMATSimForMixedAccessibilities(0, 1, 0, 0, 0, 0, 0, 1, 0);
 		// testing calculation of storage capacity fetch factor
 		for(double sample = 0.01; sample <=1.; sample += 0.01){
 			

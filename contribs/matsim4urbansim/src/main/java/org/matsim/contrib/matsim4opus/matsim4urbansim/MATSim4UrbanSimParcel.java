@@ -203,7 +203,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 */
 	protected void readFromUrbanSim() {
 		// get the data from UrbanSim (parcels and persons)
-		if(getUrbanSimParameterConfig().isUseShapefileLocationDistribution()){
+		if(getUrbanSimParameterConfig().usingShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
 					  getUrbanSimParameterConfig().getUrbanSimZoneShapefileLocationDistribution(),
 					  getUrbanSimParameterConfig().getUrbanSimZoneRadiusLocationDistribution());
@@ -444,7 +444,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		this.nwBoundaryBox 				= new NetworkBoundaryBox();
 		if(Paths.pathExsits(this.shapeFile))						// using shape file for accessibility computation
 			log.info("Using shape file for accessibility computation.");		
-		else if(moduleMATSim4UrbanSim.isUseCustomBoundingBox()){	// using custom boundary box for accessibility computation
+		else if(moduleMATSim4UrbanSim.usingCustomBoundingBox()){	// using custom boundary box for accessibility computation
 			log.info("Using custon boundig box for accessibility computation.");
 			nwBoundaryBox.setCustomBoundaryBox(moduleMATSim4UrbanSim.getBoundingBoxLeft(), 
 													moduleMATSim4UrbanSim.getBoundingBoxBottom(), 

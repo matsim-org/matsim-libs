@@ -79,7 +79,7 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	
 	private boolean isTestRun;
 	
-	private boolean useShapefileLocationDistribution;
+	private boolean usingShapefileLocationDistribution;
 	
 	private String urbanSimZoneShapefileLocationDistribution;
 	
@@ -92,13 +92,6 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	public UrbanSimParameterConfigModuleV3(String name){
 		super(name);
 	}
-	
-//	public UrbanSimParameterConfigModule(Module urbansimParameter){
-//		super(GROUP_NAME);
-//		for (Entry<String, String> e : urbansimParameter.getParams().entrySet()) {
-//			addParam(e.getKey(), e.getValue());
-//		}
-//	}
 	
 	@Override
 	public void addParam(String param_name, String value) {
@@ -132,12 +125,12 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 		return this.populationSampleRate;
 	}
 	
-	public void setUseShapefileLocationDistribution(boolean useShapefileLocationDistribution){
-		this.useShapefileLocationDistribution = useShapefileLocationDistribution;
+	public void setUsingShapefileLocationDistribution(boolean useShapefileLocationDistribution){
+		this.usingShapefileLocationDistribution = useShapefileLocationDistribution;
 	}
 	
-	public boolean isUseShapefileLocationDistribution(){
-		return this.useShapefileLocationDistribution;
+	public boolean usingShapefileLocationDistribution(){
+		return this.usingShapefileLocationDistribution;
 	}
 	
 	public void setUrbanSimZoneShapefileLocationDistribution(String shapefile){
