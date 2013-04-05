@@ -37,7 +37,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 
 public class MyMultiNodeDijkstra extends Dijkstra {
 	
