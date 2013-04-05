@@ -33,10 +33,8 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -51,6 +49,8 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
+import playground.christoph.evacuation.trafficmonitoring.BikeTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.WalkTravelTime;
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
 import playground.christoph.parking.core.mobsim.InsertParkingActivities;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
@@ -66,7 +66,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 2;
+	protected int numReplanningThreads = 8;
 
 	/*
 	 * How many nodes should be checked when adapting an existing route
@@ -117,7 +117,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
 		Map<String, TravelTime> times = new HashMap<String, TravelTime>();
 		times.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
-		times.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute(), new WalkTravelTime(this.config.plansCalcRoute())));
+		times.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
 		times.put(TransportMode.ride, new RideTravelTime(this.getLinkTravelTimes(), new WalkTravelTime(this.config.plansCalcRoute())));
 		times.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), this.getLinkTravelTimes(), new WalkTravelTime(this.config.plansCalcRoute())));
 		times.put(TransportMode.car, super.getTravelTimeCollector());
@@ -139,7 +139,12 @@ public class WithinDayParkingController extends WithinDayController implements R
 	@Override
 	protected void setUp() {
 		super.setUp();
-				
+		
+		// replace travel time calculators for walk and bike
+		Map<String, TravelTime> times = this.getMultiModalTravelTimes();
+		times.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
+		times.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
+		
 		// connect facilities to network
 		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
 		
