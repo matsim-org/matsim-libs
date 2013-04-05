@@ -98,35 +98,21 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					incompatiblePlansIdentifier,
 					jointPlans,
 					group );
-		final ForbidenCombinations forbiden = new ForbidenCombinations();
 		final IncompatiblePlanRecords incompatibleRecords =
 			new IncompatiblePlanRecords(
 					incompatiblePlansIdentifier,
 					personRecords );
 		GroupPlans plans = null;
 
-		int count = 0;
-		do {
-			count++;
-			final PlanAllocation allocation = buildPlanString(
-					new KnownStates(),
-					forbiden,
-					incompatibleRecords,
-					new ArrayList<PersonRecord>( personRecords.values() ),
-					new PlanAllocation(),
-					Double.NEGATIVE_INFINITY);
+		final PlanAllocation allocation = buildPlanString(
+				new KnownStates(),
+				incompatibleRecords,
+				new ArrayList<PersonRecord>( personRecords.values() ),
+				personRecords,
+				new PlanAllocation(),
+				Double.NEGATIVE_INFINITY);
 
-			plans = allocation == null ? null : toGroupPlans( allocation );
-		} while (
-				plans != null &&
-				continueIterations(
-					incompatibleRecords,
-					forbiden,
-					personRecords,
-					plans ) );
-
-		assert forbidBlockingCombinations || count == 1 : count;
-		assert plans == null || !forbiden.isForbidden( plans );
+		plans = allocation == null ? null : toGroupPlans( allocation );
 
 		return plans;
 	}
@@ -226,51 +212,34 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		return map;
 	}
 
-	// /////////////////////////////////////////////////////////////////////////
-	// "outer loop": search and forbid if blocking (if forbid blocking is true)
-	// /////////////////////////////////////////////////////////////////////////
-
-	private boolean continueIterations(
-			final IncompatiblePlanRecords incompatibleRecords,
-			final ForbidenCombinations forbiden,
-			final Map<Id, PersonRecord> personRecords,
-			final GroupPlans allocation) {
-		if ( !forbidBlockingCombinations ) return false;
-
-		assert !forbiden.isForbidden( allocation ) : "forbidden combination was re-examined";
-
-		if (isBlocking( incompatibleRecords , personRecords , allocation )) {
-			forbiden.forbid( allocation );
-			return true;
-		}
-
-		return false;
-	}
-
 	private boolean isBlocking(
 			final IncompatiblePlanRecords incompatibleRecords,
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans groupPlan) {
-		final FeasibilityChanger feasibility = new FeasibilityChanger();
+		final FeasibilityChanger everybodyChanger = new FeasibilityChanger( true );
+		final FeasibilityChanger infeasibility = new FeasibilityChanger();
+
+		for ( PersonRecord person : personRecords.values() ) {
+			for ( PlanRecord plan : person.plans ) everybodyChanger.changeIfNecessary( plan );
+		}
 
 		for ( Plan p : groupPlan.getAllIndividualPlans() ) {
 			final PersonRecord person = personRecords.get( p.getPerson().getId() );
 			final PlanRecord plan = person.getRecord( p );
-			feasibility.markInfeasible( plan );
+			infeasibility.changeIfNecessary( plan );
 		}
 
 		final boolean isBlocking = !searchForCombinationsWithoutForbiddenPlans(
 				incompatibleRecords,
-				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ));
-		feasibility.resetFeasibilities();
+		infeasibility.resetFeasibilities();
+		everybodyChanger.resetFeasibilities();
 
 		return isBlocking;
 	}
 
 	private boolean searchForCombinationsWithoutForbiddenPlans(
 			final IncompatiblePlanRecords incompatibleRecords,
-			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate) {
 		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
@@ -288,21 +257,21 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 			}
 
-			tagIncompatiblePlansAsInfeasible(
-					r,
-					incompatibleRecords,
-					feasibilityChanger);
 
 			if ( !actuallyRemainingPersons.isEmpty() ) {
+				tagIncompatiblePlansAsInfeasible(
+						r,
+						incompatibleRecords,
+						feasibilityChanger);
+
 				final boolean found = searchForCombinationsWithoutForbiddenPlans(
 						incompatibleRecords,
-						allPersonsRecord,
 						actuallyRemainingPersons);
+
 				feasibilityChanger.resetFeasibilities();
 				if (found) return true;
 			}
 			else {
-				feasibilityChanger.resetFeasibilities();
 				return true;
 			}
 		}
@@ -324,9 +293,9 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 */
 	private PlanAllocation buildPlanString(
 			final KnownStates knownStates,
-			final ForbidenCombinations forbidenCombinations,
 			final IncompatiblePlanRecords incompatibleRecords,
 			final List<PersonRecord> personsStillToAllocate,
+			final Map<Id, PersonRecord> allPersons,
 			// needed to check whether a leave is forbidden or not
 			final PlanAllocation currentAllocation,
 			final double minimalWeightToObtain) {
@@ -342,9 +311,9 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			assert isNullOrEqual(
 					buildPlanString(
 						new KnownStates(),
-						forbidenCombinations,
 						incompatibleRecords,
 						personsStillToAllocate,
+						allPersons,
 						currentAllocation,
 						minimalWeightToObtain),
 					constructedString ) : personsStillToAllocate+" cached:"+constructedString ;
@@ -419,28 +388,31 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				assert actuallyRemainingPersons.size() + r.jointPlan.getIndividualPlans().size() == personsStillToAllocate.size();
 			}
 
-			tagIncompatiblePlansAsInfeasible(
-					r,
-					incompatibleRecords,
-					localFeasibilityChanger);
-
 			PlanAllocation newString = null;
 			/*scope*/ {
 				final PlanAllocation newCurrentAlloc = new PlanAllocation();
 				newCurrentAlloc.addAll( currentAllocation.getPlans() );
 				newCurrentAlloc.addAll( newAllocation.getPlans() );
 				if ( !actuallyRemainingPersons.isEmpty() ) {
+					tagIncompatiblePlansAsInfeasible(
+							r,
+							incompatibleRecords,
+							localFeasibilityChanger);
+
 					newString = buildPlanString(
 							knownStates,
-							forbidenCombinations,
 							incompatibleRecords,
 							actuallyRemainingPersons,
+							allPersons,
 							newCurrentAlloc,
 							Math.max(
 								minimalWeightToObtain,
 								constructedString != null ?
 									constructedString.getWeight() :
 									Double.NEGATIVE_INFINITY) - newAllocation.getWeight() );
+
+					localFeasibilityChanger.resetFeasibilities();
+
 					if ( newString != null ) {
 						assert newString.getPlans().size() == actuallyRemainingPersons.size() : newString.getPlans().size()+" plans for "+actuallyRemainingPersons.size()+" agents";
 						newString.addAll( newAllocation.getPlans() );
@@ -450,14 +422,15 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				else {
 					newString = newAllocation;
 					assert newString.getPlans().size() == personsStillToAllocate.size() : newString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-					if ( forbidenCombinations.isForbidden( newCurrentAlloc ) ) {
-						// we are on a leaf (ie a full plan).
-						// If some combinations are forbidden, check if this one is.
+
+					if ( forbidBlockingCombinations &&
+							// no need to check if blocking if it will not be returned anyway
+							(constructedString == null || newString.getWeight() > constructedString.getWeight()) &&
+							isBlocking( incompatibleRecords , allPersons , toGroupPlans( newCurrentAlloc ) ) ) {
 						newString = null;
 					}
 				}
 			}
-			localFeasibilityChanger.resetFeasibilities();
 
 			if ( newString == null || newString.getWeight() <= minimalWeightToObtain ) continue;
 
@@ -475,7 +448,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		assert constructedString == null || constructedString.getPlans().size() == personsStillToAllocate.size() :
 			constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-		if ( !forbidenCombinations.partialAllocationCanLeadToForbidden( currentAllocation ) ) {
+		if ( !forbidBlockingCombinations ) {
 			knownStates.cacheSolution( personsStillToAllocate , constructedString , minimalWeightToObtain );
 		}
 
@@ -493,7 +466,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final IncompatiblePlanRecords incompatibleRecords,
 			final FeasibilityChanger localFeasibilityChanger) {
 		for ( PlanRecord incompatible : incompatibleRecords.getIncompatiblePlans( r ) ) {
-			localFeasibilityChanger.markInfeasible( incompatible );
+			localFeasibilityChanger.changeIfNecessary( incompatible );
 		}
 	}
 

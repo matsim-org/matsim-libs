@@ -24,15 +24,28 @@ import java.util.List;
 
 
 final class FeasibilityChanger {
+	private final boolean changeTo;
 	private final List<PlanRecord> changedRecords = new ArrayList<PlanRecord>();
 
-	public void markInfeasible( final PlanRecord r ) {
-		if ( r.isStillFeasible ) changedRecords.add( r );
-		r.isStillFeasible = false;
+	public FeasibilityChanger() {
+		this( false );
+	}
+
+	public FeasibilityChanger(final boolean changeTo) {
+		this.changeTo = changeTo;
+	}
+
+	public void changeIfNecessary( final PlanRecord r ) {
+		if ( r.isStillFeasible != changeTo ) {
+			changedRecords.add( r );
+			r.isStillFeasible = changeTo;
+		}
 	}
 
 	public void resetFeasibilities() {
-		for ( PlanRecord r : changedRecords ) r.isStillFeasible = true;
+		for ( PlanRecord r : changedRecords ) {
+			r.isStillFeasible = !changeTo;
+		}
 		changedRecords.clear();
 	}
 }

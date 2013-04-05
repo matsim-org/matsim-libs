@@ -431,7 +431,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 				continue;
 			}
 			for ( PlanRecord p : pr.linkedPlans ) {
-				changer.markInfeasible( p );
+				changer.changeIfNecessary( p );
 			}
 		}
 	}
