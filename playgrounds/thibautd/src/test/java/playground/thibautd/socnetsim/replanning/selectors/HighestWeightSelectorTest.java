@@ -64,7 +64,7 @@ public class HighestWeightSelectorTest {
 		final GroupPlans expectedSelectedPlansWhenBlocking;
 		final GroupPlans expectedSelectedPlansWhenForbidding;
 		final JointPlans jointPlans;
-		final Set<Plan> forbiddenPlans;
+		final IncompatiblePlansIdentifierFactory forbidder;
 
 		public Fixture(
 				final String name,
@@ -72,14 +72,14 @@ public class HighestWeightSelectorTest {
 				final GroupPlans expectedPlans,
 				final GroupPlans expectedSelectedPlansWhenBlocking,
 				final GroupPlans expectedSelectedPlansWhenForbidding,
-				final Set<Plan> forbiddenPlans,
+				final IncompatiblePlansIdentifierFactory forbiddenPlans,
 				final JointPlans jointPlans) {
 			this.name = name;
 			this.group = group;
 			this.expectedSelectedPlans = expectedPlans;
 			this.expectedSelectedPlansWhenBlocking = expectedSelectedPlansWhenBlocking;
 			this.expectedSelectedPlansWhenForbidding = expectedSelectedPlansWhenForbidding;
-			this.forbiddenPlans = forbiddenPlans;
+			this.forbidder = forbiddenPlans;
 			this.jointPlans = jointPlans;
 		}
 	}
@@ -104,7 +104,8 @@ public class HighestWeightSelectorTest {
 				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgent2()},
 				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgentWithNullScores()},
 				new Fixture[]{createPlanWithDifferentSolutionIfBlocked()},
-				new Fixture[]{createPlanWithNoSolutionIfBlocked()});
+				new Fixture[]{createPlanWithNoSolutionIfBlocked()},
+				new Fixture[]{createIndividualPlansWithSpecialForbidder()});
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -166,7 +167,8 @@ public class HighestWeightSelectorTest {
 				exp,
 				exp,
 				expForbid,
-				Collections.singleton( forbiddenPlan ),
+				new CollectionBasedPlanForbidderFactory(
+					Collections.singleton( forbiddenPlan ) ),
 				jointPlans);
 	}
 
@@ -247,7 +249,8 @@ public class HighestWeightSelectorTest {
 				expected,
 				// not much we can forbid...
 				expected,
-				Collections.<Plan>emptySet(),
+				new CollectionBasedPlanForbidderFactory(
+					Collections.<Plan>emptySet() ),
 				jointPlans);
 	}
 
@@ -331,7 +334,8 @@ public class HighestWeightSelectorTest {
 				expected,
 				expected,
 				expectedForbidding,
-				new HashSet<Plan>(jp2.values()),
+				new CollectionBasedPlanForbidderFactory(
+					new HashSet<Plan>(jp2.values()) ),
 				jointPlans);
 
 	}
@@ -416,7 +420,8 @@ public class HighestWeightSelectorTest {
 				expected,
 				expected,
 				expectedForbid,
-				new HashSet<Plan>( jp2.values() ),
+				new CollectionBasedPlanForbidderFactory(
+					new HashSet<Plan>( jp2.values() ) ),
 				jointPlans);
 	}
 
@@ -537,7 +542,8 @@ public class HighestWeightSelectorTest {
 				expected,
 				expected,
 				expectedForbid,
-				new HashSet<Plan>( jp5.values() ),
+				new CollectionBasedPlanForbidderFactory(
+					new HashSet<Plan>( jp5.values() ) ),
 				jointPlans);
 	}
 
@@ -594,7 +600,8 @@ public class HighestWeightSelectorTest {
 				expected,
 				null,
 				expected,
-				Collections.<Plan>emptySet(),
+				new CollectionBasedPlanForbidderFactory(
+					Collections.<Plan>emptySet() ),
 				jointPlans);
 	}
 
@@ -702,7 +709,8 @@ public class HighestWeightSelectorTest {
 				expected,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptySet(),
+				new CollectionBasedPlanForbidderFactory(
+					Collections.<Plan>emptySet() ),
 				jointPlans);
 	}
 
@@ -760,7 +768,8 @@ public class HighestWeightSelectorTest {
 				null,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptySet(),
+				new CollectionBasedPlanForbidderFactory(
+					Collections.<Plan>emptySet() ),
 				jointPlans);
 	}
 
@@ -820,7 +829,8 @@ public class HighestWeightSelectorTest {
 				null,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptySet(),
+				new CollectionBasedPlanForbidderFactory(
+					Collections.<Plan>emptySet() ),
 				jointPlans);
 	}
 
@@ -904,7 +914,8 @@ public class HighestWeightSelectorTest {
 				expectedBlock,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptySet(),
+				new CollectionBasedPlanForbidderFactory(
+					Collections.<Plan>emptySet() ),
 				jointPlans);
 	}
 
@@ -972,7 +983,78 @@ public class HighestWeightSelectorTest {
 				expectedBlock,
 				//TODO: forbid something
 				expected,
-				Collections.<Plan>emptySet(),
+				new CollectionBasedPlanForbidderFactory(
+					Collections.<Plan>emptySet() ),
+				jointPlans);
+	}
+
+	public static Fixture createIndividualPlansWithSpecialForbidder() {
+		final JointPlans jointPlans = new JointPlans();
+		ReplanningGroup group = new ReplanningGroup();
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		final PlanImpl p11 = person.createAndAddPlan( false );
+		p11.setScore( 1000d );
+		final PlanImpl p12 = person.createAndAddPlan( false );
+		p12.setScore( 1d );
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		final PlanImpl p21 = person.createAndAddPlan( false );
+		p21.setScore( 1000d );
+		final PlanImpl p22 = person.createAndAddPlan( false );
+		p22.setScore( 0d );
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		final PlanImpl p31 = person.createAndAddPlan( false );
+		p31.setScore( 1000d );
+		final PlanImpl p32 = person.createAndAddPlan( false );
+		p32.setScore( 1d );
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		final PlanImpl p41 = person.createAndAddPlan( false );
+		p41.setScore( 1000d );
+		final PlanImpl p42 = person.createAndAddPlan( false );
+		p42.setScore( 0d );
+
+		final IncompatiblePlansIdentifierImpl identifier = new IncompatiblePlansIdentifierImpl();
+		identifier.put( p11 , Collections.<Plan>singleton( p21 ) );
+		identifier.put( p21 , Collections.<Plan>singleton( p11 ) );
+		identifier.put( p12 , Collections.<Plan>singleton( p22 ) );
+		identifier.put( p22 , Collections.<Plan>singleton( p12 ) );
+		identifier.put( p31 , Collections.<Plan>singleton( p41 ) );
+		identifier.put( p41 , Collections.<Plan>singleton( p31 ) );
+		identifier.put( p32 , Collections.<Plan>singleton( p42 ) );
+		identifier.put( p42 , Collections.<Plan>singleton( p32 ) );
+
+		GroupPlans expected = new GroupPlans(
+					Collections.EMPTY_LIST,
+					Arrays.<Plan>asList( p11 , p21 , p31 , p41 ) );
+		GroupPlans expectedForbid = new GroupPlans(
+					Collections.EMPTY_LIST,
+					Arrays.<Plan>asList( p12 , p21 , p32 , p41 ) );
+
+		return new Fixture(
+				"forbid couples",
+				group,
+				expected,
+				expected,
+				expectedForbid,
+				new IncompatiblePlansIdentifierFactory() {
+					@Override
+					public IncompatiblePlansIdentifier createIdentifier(
+							final JointPlans jps,
+							final ReplanningGroup g) {
+						return identifier;
+					}
+				},
 				jointPlans);
 	}
 
@@ -1040,22 +1122,7 @@ public class HighestWeightSelectorTest {
 		try {
 			selected = selector.selectPlans(
 					forbidding ?
-						new IncompatiblePlansIdentifierFactory() {
-							@Override
-							public IncompatiblePlansIdentifier createIdentifier(
-									final JointPlans jointPlans,
-									final ReplanningGroup group) {
-								return new IncompatiblePlansIdentifier() {
-									@Override
-									public Set<Plan> identifyIncompatiblePlans(
-											final Plan plan) {
-										return fixture.forbiddenPlans.contains( plan ) ?
-											nonForbiddenPlans( group , fixture.forbiddenPlans ) :
-											fixture.forbiddenPlans;
-									}
-								};
-							}
-						} :
+						fixture.forbidder :
 						new EmptyIncompatiblePlansIdentifierFactory(),
 					fixture.jointPlans,
 					fixture.group );
@@ -1074,6 +1141,29 @@ public class HighestWeightSelectorTest {
 				"unexpected selected plan in test instance <<"+fixture.name+">> ",
 				expected,
 				selected);
+	}
+
+	private static class CollectionBasedPlanForbidderFactory implements IncompatiblePlansIdentifierFactory {
+		private final Set<Plan> forbiddenPlans;
+		public CollectionBasedPlanForbidderFactory(
+				final Set<Plan> forbiddenPlans) {
+			this.forbiddenPlans = forbiddenPlans;
+		}
+
+		@Override
+		public IncompatiblePlansIdentifier createIdentifier(
+				final JointPlans jointPlans,
+				final ReplanningGroup group) {
+			return new IncompatiblePlansIdentifier() {
+				@Override
+				public Set<Plan> identifyIncompatiblePlans(
+						final Plan plan) {
+					return forbiddenPlans.contains( plan ) ?
+						nonForbiddenPlans( group , forbiddenPlans ) :
+						forbiddenPlans;
+				}
+			};
+		}
 	}
 
 	private static Set<Plan> nonForbiddenPlans(

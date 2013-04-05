@@ -56,6 +56,7 @@ final class PlanRecord {
 	public String toString() {
 		return "{PlanRecord: "+plan.getPerson().getId()+":"+plan.getScore()+
 			" linkedWith:"+(jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())+
-			" weight="+avgJointPlanWeight+"}";
+			" weight="+avgJointPlanWeight+
+			" isFeasible="+isStillFeasible+"}";
 	}
 }

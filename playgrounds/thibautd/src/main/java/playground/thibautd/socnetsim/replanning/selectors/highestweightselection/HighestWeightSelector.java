@@ -339,6 +339,15 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		if ( constructedString != null ) {
 			assert constructedString.getPlans().size() == personsStillToAllocate.size() :
 				constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
+			assert isNullOrEqual(
+					buildPlanString(
+						new KnownStates(),
+						forbidenCombinations,
+						incompatibleRecords,
+						personsStillToAllocate,
+						currentAllocation,
+						minimalWeightToObtain),
+					constructedString ) : personsStillToAllocate+" cached:"+constructedString ;
 			return constructedString;
 		}
 
@@ -354,7 +363,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// of the weight until now plus the upper bound
 		final List<PlanRecord> records = new ArrayList<PlanRecord>();
 		for ( PlanRecord r : currentPerson.bestPlansPerJointStructure ) {
-			assert !r.isStillFeasible == (r.jointPlan != null && intersects( r.jointPlan.getIndividualPlans().keySet() , currentAllocation ));
 			if ( r.isStillFeasible ) records.add( r );
 		}
 
@@ -442,7 +450,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				else {
 					newString = newAllocation;
 					assert newString.getPlans().size() == personsStillToAllocate.size() : newString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-					if ( forbidBlockingCombinations && forbidenCombinations.isForbidden( newCurrentAlloc ) ) {
+					if ( forbidenCombinations.isForbidden( newCurrentAlloc ) ) {
 						// we are on a leaf (ie a full plan).
 						// If some combinations are forbidden, check if this one is.
 						newString = null;
@@ -467,10 +475,17 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		assert constructedString == null || constructedString.getPlans().size() == personsStillToAllocate.size() :
 			constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
-		if ( !forbidBlockingCombinations || !forbidenCombinations.partialAllocationCanLeadToForbidden( currentAllocation ) ) {
+		if ( !forbidenCombinations.partialAllocationCanLeadToForbidden( currentAllocation ) ) {
 			knownStates.cacheSolution( personsStillToAllocate , constructedString , minimalWeightToObtain );
 		}
+
 		return constructedString;
+	}
+
+	private static boolean isNullOrEqual(
+			final PlanAllocation built,
+			final PlanAllocation cached) {
+		return built == null || built.equals( cached );
 	}
 
 	private static void tagIncompatiblePlansAsInfeasible(

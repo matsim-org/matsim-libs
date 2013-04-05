@@ -48,5 +48,20 @@ final class PlanAllocation {
 	public void addAll(final Collection<PlanRecord> ps) {
 		for ( PlanRecord p : ps ) add( p );
 	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return o instanceof PlanAllocation && ((PlanAllocation) o).plans.equals( plans );
+	}
+
+	@Override
+	public int hashCode() {
+		return plans.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "{PlanAllocation: plans="+plans+"}";
+	}
 }
 
