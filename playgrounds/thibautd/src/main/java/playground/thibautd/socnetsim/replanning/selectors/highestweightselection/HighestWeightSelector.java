@@ -109,7 +109,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				incompatibleRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
 				personRecords,
-				new PlanAllocation(),
+				forbidBlockingCombinations ? new PlanAllocation() : null,
 				Double.NEGATIVE_INFINITY);
 
 		plans = allocation == null ? null : toGroupPlans( allocation );
@@ -346,7 +346,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			// needed to check whether a leave is forbidden or not
 			final PlanAllocation currentAllocation,
 			final double minimalWeightToObtain) {
-		assert !intersectsRecords( personsStillToAllocate , currentAllocation );
+		assert currentAllocation == null || !intersectsRecords( personsStillToAllocate , currentAllocation );
 
 		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
@@ -407,7 +407,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			newAllocation.add( r );
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			if (r.jointPlan != null) {
-				assert !intersects( r.jointPlan.getIndividualPlans().keySet() , currentAllocation );
+				assert currentAllocation == null || !intersects( r.jointPlan.getIndividualPlans().keySet() , currentAllocation );
 				assert r.linkedPlans.size() == r.jointPlan.getIndividualPlans().size() -1;
 
 				newAllocation.addAll( r.linkedPlans );
@@ -424,7 +424,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 						incompatibleRecords,
 						localFeasibilityChanger);
 
-				currentAllocation.addAll( newAllocation.getPlans() );
+				if ( currentAllocation != null ) currentAllocation.addAll( newAllocation.getPlans() );
 				newString = buildPlanString(
 						knownFeasibleAllocations,
 						incompatibleRecords,
@@ -436,7 +436,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 							constructedString != null ?
 								constructedString.getWeight() :
 								Double.NEGATIVE_INFINITY) - newAllocation.getWeight() );
-				currentAllocation.removeAll( newAllocation.getPlans() );
+				if ( currentAllocation != null ) currentAllocation.removeAll( newAllocation.getPlans() );
 
 				localFeasibilityChanger.resetFeasibilities();
 
@@ -450,6 +450,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				newString = newAllocation;
 				assert newString.getPlans().size() == personsStillToAllocate.size() : newString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
 
+				assert !forbidBlockingCombinations || currentAllocation != null;
 				if ( forbidBlockingCombinations &&
 						// no need to check if blocking if it will not be returned anyway
 						(constructedString == null || newString.getWeight() > constructedString.getWeight()) &&
