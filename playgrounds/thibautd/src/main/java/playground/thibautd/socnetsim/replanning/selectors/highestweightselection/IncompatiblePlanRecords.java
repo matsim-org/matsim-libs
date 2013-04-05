@@ -32,12 +32,14 @@ import playground.thibautd.utils.MapUtils;
  * @author thibautd
  */
 class IncompatiblePlanRecords {
+	private final IncompatiblePlansIdentifier identifier;
 	private final Map<PlanRecord, Collection<PlanRecord>> cachedIncompatiblePlans =
 		new HashMap<PlanRecord, Collection<PlanRecord>>();
 
 	public IncompatiblePlanRecords(
 			final IncompatiblePlansIdentifier identifier,
 			final Map<Id, PersonRecord> personRecords) {
+		this.identifier = identifier;
 		final Map<Id, Collection<PlanRecord>> plansPerGroup = new HashMap<Id, Collection<PlanRecord>>();
 
 		for ( PersonRecord person : personRecords.values() ) {
@@ -111,6 +113,10 @@ class IncompatiblePlanRecords {
 		for ( PlanRecord otherRecord : person.plans ) {
 			incompatible.addAll( otherRecord.linkedPlans );
 		}
+	}
+
+	public IncompatiblePlansIdentifier getIncompatiblePlanIdentifier() {
+		return identifier;
 	}
 }
 

@@ -264,6 +264,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		final PersonRecord currentPerson = remainingPersons.remove(0);
 
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
+		final Set<Branch> exploredBranches = new HashSet<Branch>();
 		// examine plans from worst to best. This increases a lot the chances
 		// that the non-blocked plan found for a given leave is also non-blocked
 		// for the next leave
@@ -273,6 +274,17 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				r = i-- > 0 ? currentPerson.plans.get( i ) : null ) {
 			// skip forbidden plans
 			if ( !r.isStillFeasible ) continue;
+
+			final Set<Id> cotravs = r.jointPlan == null ?
+				Collections.<Id>emptySet() :
+				r.jointPlan.getIndividualPlans().keySet();
+
+			if ( !exploredBranches.add(
+						new Branch(
+							cotravs,
+							incompatibleRecords.getIncompatiblePlanIdentifier().identifyIncompatibilityGroups( r.plan ) ) ) ) {
+				continue;
+			}
 
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			if (r.jointPlan != null) {
