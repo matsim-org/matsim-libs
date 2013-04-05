@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.replanning.selectors;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 
 /**
@@ -35,19 +36,16 @@ import org.matsim.api.core.v01.population.Plan;
 public interface IncompatiblePlansIdentifier {
 	/**
 	 * @param plan the plan for which the incompatible plans are to identify
-	 * @return a collection containing all the incompatible plans.
+	 * @return a collection containing ids of "incompatibility groups".
+	 * Two plans are considered incompatible if they have at least one group
+	 * in common.
 	 * The general contract is that:
 	 * <ul>
-	 * <li> if a plan in the collection is part of a joint plan, all plans of
-	 * the joint plan should pertain to the collection.
-	 * <li> the plans in the list should be plans of other agents (the plans
-	 * of the same agent are trivially mutually incompatible)
+	 * <li> all plans of a joint plan should pertain to the same groups
 	 * <li> the plans incompatible because of joint plans constraint do not have
-	 * to pertain to the collection.
-	 * <li> if a plan A pertains to the collection returned for a plan B,
-	 * the plan B must pertain to the collection returned for the plan A.
+	 * to be identified as such here (but can)
 	 * </ul>
 	 */
-	public Set<Plan> identifyIncompatiblePlans(Plan plan);
+	public Set<Id> identifyIncompatibilityGroups(Plan plan);
 }
 

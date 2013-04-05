@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.replanning.selectors;
 import java.util.Collections;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -39,8 +40,8 @@ public class EmptyIncompatiblePlansIdentifierFactory implements IncompatiblePlan
 			final ReplanningGroup group) {
 		return new IncompatiblePlansIdentifier() {
 			@Override
-			public Set<Plan> identifyIncompatiblePlans(final Plan plan) {
-				return Collections.<Plan>emptySet();
+			public Set<Id> identifyIncompatibilityGroups(final Plan plan) {
+				return Collections.<Id>emptySet();
 			}
 		};
 	}

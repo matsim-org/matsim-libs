@@ -64,7 +64,7 @@ final class PersonRecord {
 
 		// TODO: pass this in the selector, as it is very linked to the way it works
 		bestPlansPerJointStructure = new ArrayList<PlanRecord>();
-		final Map<Set<Id>, Set<Set<Plan>>> knownIncompatiblePlans = new HashMap<Set<Id>, Set<Set<Plan>>>();
+		final Map<Set<Id>, Set<Set<Id>>> knownBranches = new HashMap<Set<Id>, Set<Set<Id>>>();
 		double lastRecordWeight = Double.POSITIVE_INFINITY;
 		for (PlanRecord r : this.plans) {
 			assert r.avgJointPlanWeight <= lastRecordWeight : this.plans;
@@ -75,7 +75,7 @@ final class PersonRecord {
 				r.jointPlan.getIndividualPlans().keySet();
 			// only consider the best plan of each structure for each set of
 			// incompatible plans.
-			if ( MapUtils.getSet( cotravs , knownIncompatiblePlans ).add( incompatiblePlans.identifyIncompatiblePlans( r.plan ) ) ) {
+			if ( MapUtils.getSet( cotravs , knownBranches ).add( incompatiblePlans.identifyIncompatibilityGroups( r.plan ) ) ) {
 				bestPlansPerJointStructure.add( r );
 			}
 		}

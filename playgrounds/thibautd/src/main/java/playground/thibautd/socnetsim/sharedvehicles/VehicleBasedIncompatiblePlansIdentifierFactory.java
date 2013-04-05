@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.sharedvehicles;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -34,7 +30,6 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierImpl;
-import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd
@@ -52,42 +47,14 @@ public class VehicleBasedIncompatiblePlansIdentifierFactory implements Incompati
 			final ReplanningGroup group) {
 		final IncompatiblePlansIdentifierImpl identifier = new IncompatiblePlansIdentifierImpl();
 
-		final Map<Id, Collection<Plan>> plansPerVehicle = new HashMap<Id, Collection<Plan>>();
-		final Map<Plan, Collection<Id>> vehiclesPerPlan = new HashMap<Plan, Collection<Id>>();
-
-		putVehicleInformationInMaps(
-				group,
-				plansPerVehicle,
-				vehiclesPerPlan );
-
-		for ( Map.Entry<Plan, Collection<Id>> entry : vehiclesPerPlan.entrySet() ) {
-			final Plan plan = entry.getKey();
-			final Collection<Id> vehs = entry.getValue();
-
-			final Set<Plan> incompatiblePlans = new HashSet<Plan>();
-			for ( Id v : vehs ) {
-				incompatiblePlans.addAll( plansPerVehicle.get( v ) );
-			}
-			incompatiblePlans.remove( plan );
-			identifier.put( plan , incompatiblePlans );
-		}
-
-		return identifier;
-	}
-
-	private void putVehicleInformationInMaps(
-			final ReplanningGroup group,
-			final Map<Id, Collection<Plan>> plansPerVehicle,
-			final Map<Plan, Collection<Id>> vehiclesPerPlan) {
 		for ( Person person : group.getPersons() ) {
 			for ( Plan plan : person.getPlans() ) {
-				final Collection<Id> vehicles = SharedVehicleUtils.getVehiclesInPlan( plan , mode );
-				vehiclesPerPlan.put( plan , vehicles );
-				for ( Id v : vehicles ) {
-					MapUtils.getCollection( v , plansPerVehicle ).add( plan );
-				}
+				final Set<Id> vehicles = SharedVehicleUtils.getVehiclesInPlan( plan , mode );
+				identifier.put( plan , vehicles );
 			}
 		}
+		
+		return identifier;
 	}
 
 

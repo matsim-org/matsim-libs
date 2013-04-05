@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 
 /**
@@ -32,17 +33,21 @@ import org.matsim.api.core.v01.population.Plan;
  * @author thibautd
  */
 public final class IncompatiblePlansIdentifierImpl implements IncompatiblePlansIdentifier {
-	private final Map<Plan, Set<Plan>> incompatiblePlansPerPlans =
-		new HashMap<Plan, Set<Plan>>();
+	private final Map<Plan, Set<Id>> incompatiblePlansPerPlans =
+		new HashMap<Plan, Set<Id>>();
 
 	@Override
-	public Set<Plan> identifyIncompatiblePlans(final Plan plan) {
-		final Set<Plan> plans = incompatiblePlansPerPlans.get( plan );
-		return plans != null ? plans : Collections.<Plan>emptySet();
+	public Set<Id> identifyIncompatibilityGroups(final Plan plan) {
+		final Set<Id> plans = incompatiblePlansPerPlans.get( plan );
+		return plans != null ? plans : Collections.<Id>emptySet();
 	}
 
-	public void put( final Plan plan , final Set<Plan> incompatiblePlans ) {
+	public void put( final Plan plan , final Set<Id> incompatiblePlans ) {
 		incompatiblePlansPerPlans.put( plan , incompatiblePlans );
+	}
+	
+	public void putAll( final Map<Plan, Set<Id>> incompatiblePlans ) {
+		incompatiblePlansPerPlans.putAll( incompatiblePlans );
 	}
 }
 
