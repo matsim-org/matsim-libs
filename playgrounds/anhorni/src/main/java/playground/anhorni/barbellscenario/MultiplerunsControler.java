@@ -39,22 +39,19 @@ public class MultiplerunsControler {
     public static void main (final String[] args) {  	
     	MultiplerunsControler runControler = new MultiplerunsControler();
     	String path = args[0];
-    	runControler.run(path);
+    	runControler.runVaryingSupply(path);
     }
                
-    public void run(String path) {
+    public void runVaryingSupply(String path) {
     	
-    	this.analyzer = new Analyzer(path);
+    	this.analyzer = new Analyzer(path, "300persons_varyingSupply_");
  	    	
     	String config[] = {""};
 		Controler controler;
 			
 		List<Double> caps = new Vector<Double>();
 		List<Double> bpr = new Vector<Double>();
-		
-		List<Double> bpr0 = new Vector<Double>();
-		List<Double> bpr1 = new Vector<Double>();
-					    	   	
+							    	   	
     	for (int runIndex = 0; runIndex < numberOfRuns; runIndex++) {     		
     		config[0] = path + "/config.xml";
 	    	controler = new Controler(config);
@@ -64,10 +61,7 @@ public class MultiplerunsControler {
 	    	
 	    	caps.add(flowCapFactor * capacity / 60.0);	    	
 	    	bpr.add(demand / (flowCapFactor * capacity));  
-	    	
-	    	bpr0.add(5 + Math.pow(demand / (flowCapFactor * capacity / 60.0), 5.0));
-	    	bpr1.add(5 + Math.pow(demand / (flowCapFactor * capacity / 60.0), 10.0));
-	    	
+	    		    	
 	    	controler.getConfig().setParam("qsim", "flowCapacityFactor", Double.toString(flowCapFactor));
 	    	controler.getConfig().setParam("controler", "runId", "run" + runIndex);
 	    	
@@ -85,7 +79,7 @@ public class MultiplerunsControler {
 	    	
     	}
     	log.info("Create analysis ...");   	
-    	analyzer.runBPR(Utils.convert(bpr), Utils.convert(bpr0), Utils.convert(bpr1));  
+    	analyzer.runBPR(Utils.convert(bpr));  
     	analyzer.runC(Utils.convert(caps)); 
     	log.info("All runs finished ******************************");
     }
