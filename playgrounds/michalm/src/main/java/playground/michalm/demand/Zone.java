@@ -19,28 +19,16 @@
 
 package playground.michalm.demand;
 
-import java.util.EnumMap;
+import java.io.IOException;
+import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.*;
 import org.opengis.feature.simple.SimpleFeature;
 
 
 public class Zone
     implements Identifiable
 {
-    public static enum Group
-    {
-        S, W, O
-    }
-
-
-    public static enum Act
-    {
-        S, W, L
-    }
-
-
     public static enum Type
     {
         INTERNAL, EXTERNAL, SPECIAL
@@ -50,10 +38,6 @@ public class Zone
     private Id id;
     private Type type;
     private SimpleFeature zonePolygon;
-
-    private EnumMap<Group, Integer> groupSizes = new EnumMap<Group, Integer>(Group.class);
-
-    private EnumMap<Act, Integer> actPlaces = new EnumMap<Act, Integer>(Act.class);
 
 
     public Zone(Id id, Type type)
@@ -88,38 +72,14 @@ public class Zone
     }
 
 
-    public void setGroupSize(Group group, Integer size)
+    public static Map<Id, Zone> readZones(Scenario scenario, String zonesXmlFile,
+            String zonesShpFile, String idField)
+        throws IOException
     {
-        groupSizes.put(group, size);
-    }
-
-
-    public void setActPlaces(Act act, Integer places)
-    {
-        actPlaces.put(act, places);
-    }
-
-
-    public Integer getGroupSize(Group group)
-    {
-        return groupSizes.get(group);
-    }
-
-
-    public Integer getActPlaces(Act act)
-    {
-        return actPlaces.get(act);
-    }
-
-
-    public EnumMap<Group, Integer> getGroupSizes()
-    {
-        return groupSizes;
-    }
-
-
-    public EnumMap<Act, Integer> getActPlaces()
-    {
-        return actPlaces;
+        ZoneXmlReader xmlReader = new ZoneXmlReader(scenario);
+        xmlReader.parse(zonesXmlFile);
+        Map<Id, Zone> zones = xmlReader.getZones();
+        ZoneShpReader.readZones(zonesShpFile, idField, scenario, zones);
+        return zones;
     }
 }

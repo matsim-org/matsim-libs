@@ -9,25 +9,8 @@
 
 <!ELEMENT zones (zone)*>
 
-<!ELEMENT zone (groups, activities)?>
+<!ELEMENT zone EMPTY>
 
 <!ATTLIST zone
 	id	CDATA	#REQUIRED
 	type (internal|external|special) "internal">
-
-<!ELEMENT groups (group)*>
-
-<!ELEMENT group EMPTY>
-
-<!ATTLIST group
-	type	CDATA	#REQUIRED
-	size	CDATA	#REQUIRED>
-	
-<!ELEMENT activities (activity)*>
-
-<!ELEMENT activity EMPTY>
-
-<!ATTLIST activity
-	type	CDATA	#REQUIRED
-	size	CDATA	#REQUIRED>
-

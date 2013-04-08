@@ -20,32 +20,19 @@
 package playground.michalm.demand;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 
 public class ZoneShpReader
 {
-    private Scenario scenario;
-    private Map<Id, Zone> zones;
-
-
-    public ZoneShpReader(Scenario scenario, Map<Id, Zone> zones)
-    {
-        this.scenario = scenario;
-        this.zones = zones;
-    }
-
-
-    public void readZones(String file, String idField)
+    public static void readZones(String file, String idField, Scenario scenario, Map<Id, Zone> zones)
         throws IOException
     {
-    	Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(file);
+        Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(file);
 
         if (features.size() != zones.size()) {
             throw new RuntimeException("Features: " + features.size() + "; zones: " + zones.size());

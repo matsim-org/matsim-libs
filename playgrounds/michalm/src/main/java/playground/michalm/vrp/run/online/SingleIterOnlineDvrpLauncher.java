@@ -23,6 +23,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jfree.chart.JFreeChart;
+import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
@@ -75,8 +76,13 @@ public class SingleIterOnlineDvrpLauncher
     String depotsFileName;
     String reqIdToVehIdFileName;
     String dbFileName;
+
     boolean vrpOutFiles;
     String vrpOutDirName;
+
+    boolean outputHistogram;
+    String histogramOutDirName;
+    LegHistogram legHistogram;
 
     AlgorithmConfig algorithmConfig;
     String eventsFileName;
@@ -131,6 +137,9 @@ public class SingleIterOnlineDvrpLauncher
 
         vrpOutFiles = !true;
         vrpOutDirName = dirName + "vrp_output";
+        
+        outputHistogram = true;
+        vrpOutDirName = dirName + "histograms";
 
         wal = false;
     }
@@ -290,6 +299,7 @@ public class SingleIterOnlineDvrpLauncher
     private RunningVehicleRegister rvr;
 
 
+    @SuppressWarnings("unused")
     void runSim()
     {
         if (scenario.getConfig().getQSimConfigGroup() == null) {
@@ -324,7 +334,7 @@ public class SingleIterOnlineDvrpLauncher
         qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
         qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
 
-        if (vrpOutFiles) {
+        if (false /*vrpOutFiles*/) {
             taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
                 @Override
                 public JFreeChart createChart(VrpData data)
@@ -350,16 +360,22 @@ public class SingleIterOnlineDvrpLauncher
 
         // events.addHandler(runningVehicleRegister = new RunningVehicleRegister());
 
+        if (outputHistogram) {
+            legHistogram = new LegHistogram(300);
+            events.addHandler(legHistogram);
+        }
+
         qSim.run();
 
         events.finishProcessing();
         // writer.closeFile();
+
     }
 
 
     // RunningVehicleRegister runningVehicleRegister;
 
-    void generateVrpOutput()
+    void generateOutput()
     {
         // DVRP-based evaluation (using schedules)
         TaxiEvaluation taxiEval = (TaxiEvaluation)new TaxiEvaluator()
@@ -377,6 +393,16 @@ public class SingleIterOnlineDvrpLauncher
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
         ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+
+        if (outputHistogram) {
+            new File(histogramOutDirName).mkdir();
+            legHistogram.write(histogramOutDirName + "legHistogram.txt");
+            legHistogram.writeGraphic(histogramOutDirName + "legHistogram_all.png");
+            for (String legMode : legHistogram.getLegModes()) {
+                legHistogram.writeGraphic(histogramOutDirName + "legHistogram_" + legMode + ".png",
+                        legMode);
+            }
+        }
     }
 
 
@@ -421,6 +447,6 @@ public class SingleIterOnlineDvrpLauncher
 
         launcher.prepareMatsimData();
         launcher.go();
-        launcher.generateVrpOutput();
+        launcher.generateOutput();
     }
 }

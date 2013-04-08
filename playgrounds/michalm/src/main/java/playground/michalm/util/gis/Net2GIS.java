@@ -41,7 +41,7 @@ public class Net2GIS
         String outFileNameN;
 
         if (args.length == 0) {// for testing
-            dirName = "D:\\PP-rad\\matsim-poznan\\";
+            dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
             netFileName = dirName + "network.xml";
             outFileNameLs = dirName + "GIS\\linksLs.shp";
             outFileNameP = dirName + "GIS\\linksP.shp";

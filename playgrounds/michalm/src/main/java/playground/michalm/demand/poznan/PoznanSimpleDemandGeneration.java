@@ -17,33 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand;
+package playground.michalm.demand.poznan;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.Map;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.*;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
 
-import cern.jet.random.engine.MersenneTwister;
+import pl.poznan.put.util.array2d.Array2DReader;
+import pl.poznan.put.util.random.RandomUtils;
+import playground.michalm.demand.*;
 
 
-public class PoznanDemandGenerator
+public class PoznanSimpleDemandGeneration
 {
     public static void main(String[] args)
         throws ConfigurationException, IOException, SAXException, ParserConfigurationException
     {
         String dirName = "D:\\eTaxi\\Poznan_MATSim\\";
-        String networkFileName = dirName + "network.xml";
-        String zonesXMLFileName = dirName + "zones.xml";
-        String zonesShpFileName = dirName + "GIS\\zones_with_no_zone.SHP";
-        String odMatrixFileNamePrefix = dirName + "odMatrices\\odMatrix";
-        String plansFileName = dirName + "plans.xml.gz";
-        String idField = "NO";
-        int randomSeed = MersenneTwister.DEFAULT_SEED; 
+        String networkFile = dirName + "network.xml";
+        String zonesXmlFile = dirName + "zones.xml";
+        String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
 
-        // String taxiFileName = dirName + "taxiCustomers_07_pc.txt";
+        String odMatrixFilePrefix = dirName + "odMatrices\\odMatrix";
+        String plansFile = dirName + "plans.xml.gz";
+        String idField = "NO";
+        int randomSeed = RandomUtils.DEFAULT_SEED;
+
+        // String taxiFile = dirName + "taxiCustomers_07_pc.txt";
 
         // double hours = 2;
         // double flowCoeff = 1;
@@ -53,20 +61,25 @@ public class PoznanDemandGenerator
         // double[] flowCoeff = { 0.2, 0.4, 0.8, 1.0, 0.6, 0.4, 0.2 };
         // double[] taxiProbability = { 0, 0, 0, 0, 0, 0, 0 };
 
-        ODDemandGenerator dg = new ODDemandGenerator(networkFileName, zonesXMLFileName,
-                zonesShpFileName, idField);
-        
-        dg.resetRandomEngine(randomSeed);
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario).readFile(networkFile);
+        Map<Id, Zone> zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
+
+        LocationGenerator lg = new DefualtLocationGenerator(scenario);
+        ODDemandGenerator dg = new ODDemandGenerator(scenario, lg, zones);
+
+        RandomUtils.reset(randomSeed);
 
         for (int i = 0; i < 24; i++) {
             String timePeriod = i + "-" + (i + 1);
             System.out.println("Generation for " + timePeriod);
-            String odMatrixFileName = odMatrixFileNamePrefix + timePeriod + ".dat";
-            double[][] odMatrix = dg.readODMatrix(odMatrixFileName);
-            dg.generateSinglePeriod(odMatrix, 1, 1, 0, i * 3600);
+            String odMatrixFile = odMatrixFilePrefix + timePeriod + ".dat";
+            double[][] odMatrix = Array2DReader
+                    .getDoubleArray(new File(odMatrixFile), zones.size());
+            dg.generateSinglePeriod(odMatrix, "dummy", "dummy", 1, 1, 0, i * 3600);
         }
 
-        dg.write(plansFileName);
-        // dg.writeTaxiCustomers(taxiFileName);
+        dg.write(plansFile);
+        // dg.writeTaxiCustomers(taxiFile);
     }
 }

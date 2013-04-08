@@ -21,18 +21,15 @@ package playground.michalm.util.gis;
 
 import java.io.IOException;
 
-import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.data.simple.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
+import com.google.common.base.*;
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.*;
 
 
 public class PolygonBasedFilter

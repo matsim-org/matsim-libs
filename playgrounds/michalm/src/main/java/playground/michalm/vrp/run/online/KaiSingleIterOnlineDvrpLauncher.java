@@ -57,6 +57,6 @@ public class KaiSingleIterOnlineDvrpLauncher
 
         launcher.prepareMatsimData();
         launcher.go();
-        launcher.generateVrpOutput();
+        launcher.generateOutput();
     }
 }

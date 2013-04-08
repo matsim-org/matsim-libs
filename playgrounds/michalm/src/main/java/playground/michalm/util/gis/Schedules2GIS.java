@@ -19,18 +19,12 @@
 
 package playground.michalm.util.gis;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.PolylineFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -41,8 +35,7 @@ import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.MatsimArc;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.*;
 
 
 public class Schedules2GIS

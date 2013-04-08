@@ -27,8 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import cern.jet.random.Uniform;
-import cern.jet.random.engine.MersenneTwister;
+import pl.poznan.put.util.random.*;
 
 
 public class DepotGenerator
@@ -43,7 +42,7 @@ public class DepotGenerator
 
         Set<Id> linkIdSet = scenario.getNetwork().getLinks().keySet();
         Id[] linkIds = linkIdSet.toArray(new Id[linkIdSet.size()]);
-        Uniform uniform = new Uniform(0, linkIds.length - 1, new MersenneTwister());
+        UniformRandom uniform = RandomUtils.getGlobalUniform();
 
         PrintWriter pw = new PrintWriter(new File(depotsFilename));
         pw.println("<?xml version=\"1.0\" ?>");
@@ -53,7 +52,7 @@ public class DepotGenerator
         pw.println("<depots>");
 
         for (int i = 0; i < count; i++) {
-            pw.printf("\t<depot linkId=\"%s\">", linkIds[uniform.nextInt()]);
+            pw.printf("\t<depot linkId=\"%s\">", linkIds[uniform.nextInt(0, linkIds.length - 1)]);
             pw.println();
 
             pw.println("\t\t<vehicles>");

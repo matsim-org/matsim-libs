@@ -32,7 +32,7 @@ public class SimLauncher
         String cfgFileName;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "d:\\PP-rad\\taxi\\mielec-morning-variable\\";
+            dirName = "d:\\PP-rad\\taxi\\mielec-2-peaks\\";
             cfgFileName = "siec-config.xml";
             // dirName = "d:\\PP-rad\\taxi\\poznan\\";
             // cfgFileName = "poznan-config.xml";

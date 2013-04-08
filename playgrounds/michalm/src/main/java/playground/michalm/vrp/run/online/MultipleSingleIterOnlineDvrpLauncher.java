@@ -21,7 +21,7 @@ package playground.michalm.vrp.run.online;
 
 import java.io.*;
 
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.core.gbl.MatsimRandom;
 
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;

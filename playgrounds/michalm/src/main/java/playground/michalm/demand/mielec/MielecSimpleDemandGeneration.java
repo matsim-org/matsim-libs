@@ -17,32 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand;
+package playground.michalm.demand.mielec;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.Map;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.*;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
 
-import pl.poznan.put.util.array2d.Array2DUtils;
+import pl.poznan.put.util.array2d.*;
+import playground.michalm.demand.*;
 
 
-public class MielecDemandGenerator
+public class MielecSimpleDemandGeneration
 {
     public static void main(String[] args)
         throws ConfigurationException, IOException, SAXException, ParserConfigurationException
     {
         String dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
-        String networkFileName = dirName + "network.xml";
-        String zonesXMLFileName = dirName + "zones.xml";
-        String zonesShpFileName = dirName + "GIS\\zones_with_no_zone.SHP";
-        String odMatrixFileName = dirName + "odMatrix.dat";
-        String plansFileName = dirName + "plans.xml";
+        String networkFile = dirName + "network.xml";
+        String zonesXmlFile = dirName + "zones.xml";
+        String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
+        String odMatrixFile = dirName + "odMatrix.dat";
+        String plansFile = dirName + "plans.xml";
         String idField = "NO";
 
-        String taxiFileName = dirName + "taxiCustomers_07_pc.txt";
+        String taxiFile = dirName + "taxiCustomers_07_pc.txt";
 
         // double hours = 2;
         // double flowCoeff = 1;
@@ -52,28 +58,33 @@ public class MielecDemandGenerator
         double[] flowCoeff = { 0.2, 0.2, 0.4, 0.8, 0.4, 0.2, 0.2 };
         double taxiProbability = 0.07;
 
-        ODDemandGenerator dg = new ODDemandGenerator(networkFileName, zonesXMLFileName,
-                zonesShpFileName, idField);
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(scenario).readFile(networkFile);
+        Map<Id, Zone> zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
 
-        double[][] odMatrix = dg.readODMatrix(odMatrixFileName);
+        LocationGenerator lg = new DefualtLocationGenerator(scenario);
+        ODDemandGenerator dg = new ODDemandGenerator(scenario, lg, zones);
+
+        double[][] odMatrix = Array2DReader.getDoubleArray(new File(odMatrixFile), zones.size());
         double[][] odMatrixTransposed = Array2DUtils.transponse(odMatrix);
 
         double startTime = 0;
-        
-        //morning peak
+
+        // morning peak
         for (int i = 0; i < flowCoeff.length; i++) {
-            dg.generateSinglePeriod(odMatrix, hours, flowCoeff[i], taxiProbability, startTime);
-            startTime += 3600 * hours;
-        }
-        
-        //symmetric evening peak
-        for (int i = 0; i < flowCoeff.length; i++) {
-            dg.generateSinglePeriod(odMatrixTransposed, hours, flowCoeff[i], taxiProbability,
-                    startTime);
+            dg.generateSinglePeriod(odMatrix, "dummy", "dummy", hours, flowCoeff[i],
+                    taxiProbability, startTime);
             startTime += 3600 * hours;
         }
 
-        dg.write(plansFileName);
-        dg.writeTaxiCustomers(taxiFileName);
+        // symmetric evening peak
+        for (int i = 0; i < flowCoeff.length; i++) {
+            dg.generateSinglePeriod(odMatrixTransposed, "dummy", "dummy", hours, flowCoeff[i],
+                    taxiProbability, startTime);
+            startTime += 3600 * hours;
+        }
+
+        dg.write(plansFile);
+        dg.writeTaxiCustomers(taxiFile);
     }
 }

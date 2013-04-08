@@ -20,15 +20,11 @@
 package playground.michalm.util.gis;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.PointFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -38,7 +34,6 @@ import pl.poznan.put.vrp.dynamic.data.model.Customer;
 import pl.poznan.put.vrp.dynamic.data.model.Localizable;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.network.VertexImpl;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 
