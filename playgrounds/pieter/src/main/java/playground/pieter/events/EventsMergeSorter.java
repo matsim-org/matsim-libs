@@ -39,20 +39,20 @@ public class EventsMergeSorter {
 
 
 
-	/**
-	 * @param inFileName
-	 * @param outfileName
-	 * <p> to do a  merge sort, we need to first addEventNumbers to each event.
-	 */
-	public void addEventNumbers(String inFileName, String outfileName){
-		this.events = EventsUtils.createEventsManager();
-		AddEventNumbers aev = new AddEventNumbers(outfileName);
-		events.addHandler(aev);
-		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.setValidating(false);
-		reader.parse(inFileName);
-		aev.closeFile();
-	}
+//	/**
+//	 * @param inFileName
+//	 * @param outfileName
+//	 * <p> to do a  merge sort, we need to first addEventNumbers to each event.
+//	 */
+//	public void addEventNumbers(String inFileName, String outfileName){
+//		this.events = EventsUtils.createEventsManager();
+//		AddEventNumbers aev = new AddEventNumbers(outfileName);
+//		events.addHandler(aev);
+//		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
+//		reader.setValidating(false);
+//		reader.parse(inFileName);
+//		aev.closeFile();
+//	}
 	
 	private void splitEventsToMultipleSortedFiles() {
 		this.events = EventsUtils.createEventsManager();
