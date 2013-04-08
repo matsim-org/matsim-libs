@@ -188,15 +188,15 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 	 * to the n first nodes of the route.
 	 */
 	private void updateStartOfCarRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle) {
-		this.parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle);
+		this.parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
 	}
 	
 	private void updateStartOfWalkRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle) {
-		this.parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle);
+		this.parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.walk);
 	}
 	
 	private void updateEndOfWalkRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle) {
-		this.parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle);
+		this.parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.walk);
 	}
 	
 	private void createNewWalkRoute(Activity fromActivity, Leg walkLeg, Activity toActivity, Person person) {

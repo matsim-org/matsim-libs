@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -54,23 +55,29 @@ public class ParkingRouter {
 	private static final Logger log = Logger.getLogger(ParkingRouter.class);
 	
 	private final Scenario scenario;
-	private final TravelTime travelTime;
+	private final Map<String, TravelTime> travelTimes;
 	private final TravelDisutility travelDisutility;
 	private final TripRouter tripRouter;
 	private final int nodesToCheck;
 	
-	private final MyMultiNodeDijkstra dijkstra;
+	private final Map<String, MyMultiNodeDijkstra> dijkstras;
 	
-	public ParkingRouter(Scenario scenario, TravelTime travelTime, TravelDisutility travelDisutility, TripRouter tripRouter, int nodesToCheck) {
+	public ParkingRouter(Scenario scenario, Map<String, TravelTime> travelTimes, TravelDisutility travelDisutility, TripRouter tripRouter, int nodesToCheck) {
 		this.scenario = scenario;
-		this.travelTime = travelTime;
+		this.travelTimes = travelTimes;
 		this.travelDisutility = travelDisutility;
 		this.tripRouter = tripRouter;
 		
 		if (nodesToCheck > 0) this.nodesToCheck = nodesToCheck;
 		else this.nodesToCheck = 1;
 		
-		this.dijkstra = (MyMultiNodeDijkstra) new MyFastDijkstraFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
+		this.dijkstras = new HashMap<String, MyMultiNodeDijkstra>();
+		for (Entry<String, TravelTime> entry : travelTimes.entrySet()) {
+			String mode = entry.getKey();
+			TravelTime travelTime = entry.getValue();
+			MyMultiNodeDijkstra modeDijsktra = (MyMultiNodeDijkstra) new MyFastDijkstraFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime); 
+			this.dijkstras.put(mode, modeDijsktra); 
+		}
 	}
 
 	/**
@@ -80,8 +87,13 @@ public class ParkingRouter {
 	 * @param time
 	 * @param person
 	 * @param vehicle
+	 * @param mode
 	 */
-	public void adaptStartOfRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle) {
+	public void adaptStartOfRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle, String mode) {
+		adaptStartOfRoute(route, startLinkId, time, person, vehicle, this.dijkstras.get(mode));
+	}
+	
+	private void adaptStartOfRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle, MyMultiNodeDijkstra dijkstra) {
 		
 		// check whether the start link has really changed
 		if (route.getStartLinkId().equals(startLinkId)) return;
@@ -89,36 +101,52 @@ public class ParkingRouter {
 		Link startLink = this.scenario.getNetwork().getLinks().get(startLinkId);
 		Node startNode = startLink.getToNode();
 		
-		List<Id> routeLinkIds = new ArrayList<Id>();
-		routeLinkIds.addAll(route.getLinkIds());
-		routeLinkIds.add(route.getEndLinkId());
-		
 		List<InitialNode> initialToNodes = new ArrayList<InitialNode>();
-		
-		/*
-		 * Define how many nodes of the route should be checked. By default,
-		 * this is limited by nodesToCheck. For short routes, it is limited
-		 * by the route's length.
-		 */
-		int n = Math.min(nodesToCheck, routeLinkIds.size());
-		
-		double postCosts = 0.0;
 		Map<Node, Integer> nodeIndices = new HashMap<Node, Integer>();
-		for (int i = n-1; i >= 0; i--) {
-			Id linkId = routeLinkIds.get(i);
-			Link link = this.scenario.getNetwork().getLinks().get(linkId);
-			Node fromNode = link.getFromNode();
-			InitialNode initialNode = new InitialNode(fromNode, postCosts, time);
-			initialToNodes.add(initialNode);
-			nodeIndices.put(fromNode, i);
+		List<Id> routeLinkIds = new ArrayList<Id>();
+		
+		// if the route does not start and end on the same link and is not a round-trip
+		if (!route.getStartLinkId().equals(route.getEndLinkId()) || route.getLinkIds().size() != 0) {
 			
-			// add costs of current link to previous node
-			postCosts += travelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
+			routeLinkIds.add(route.getStartLinkId());
+			routeLinkIds.addAll(route.getLinkIds());
+			routeLinkIds.add(route.getEndLinkId());
+				
+			/*
+			 * Define how many nodes of the route should be checked. By default,
+			 * this is limited by nodesToCheck. For short routes, it is limited
+			 * by the route's length.
+			 */
+			int n = Math.min(nodesToCheck, routeLinkIds.size());
+			
+			double postCosts = 0.0;
+			for (int i = n-1; i >= 0; i--) {
+				Id linkId = routeLinkIds.get(i);
+				Link link = this.scenario.getNetwork().getLinks().get(linkId);
+				Node fromNode = link.getFromNode();
+				InitialNode initialNode = new InitialNode(fromNode, postCosts, time);
+				initialToNodes.add(initialNode);
+				nodeIndices.put(fromNode, i);
+				
+				// add costs of current link to previous node
+				postCosts += travelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
+			}
 		}
+		// route starts on the same link as it ends and is not a round trip
+		else {
+			Id linkId = route.getStartLinkId();
+			Link link = this.scenario.getNetwork().getLinks().get(linkId);
+			Node toNode = link.getFromNode();
+			double postCosts = 0.0;
+			InitialNode initialNode = new InitialNode(toNode, postCosts, time);
+			initialToNodes.add(initialNode);
+			nodeIndices.put(toNode, 0);
+			routeLinkIds.add(startLinkId);
+		}
+				
+		Node toNode = dijkstra.createImaginaryNode(initialToNodes);
 		
-		Node toNode = this.dijkstra.createImaginaryNode(initialToNodes);
-		
-		Path path = this.dijkstra.calcLeastCostPath(startNode, toNode, time, person, vehicle);
+		Path path = dijkstra.calcLeastCostPath(startNode, toNode, time, person, vehicle);
 		
 		/*
 		 * Merge old and new route.
@@ -131,7 +159,7 @@ public class ParkingRouter {
 		// existing links
 		Node lastNode = path.nodes.get(path.nodes.size() - 1);
 		int mergeIndex = nodeIndices.get(lastNode);
-		linkIds.addAll(route.getLinkIds().subList(mergeIndex, route.getLinkIds().size()));
+		linkIds.addAll(routeLinkIds.subList(mergeIndex, routeLinkIds.size() - 1));
 		
 		route.setLinkIds(startLink.getId(), linkIds, route.getEndLinkId());
 	}
@@ -143,8 +171,13 @@ public class ParkingRouter {
 	 * @param time
 	 * @param person
 	 * @param vehicle
+	 * @param mode
 	 */
-	public void adaptEndOfRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle) {
+	public void adaptEndOfRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, String mode) {
+		adaptEndOfRoute(route, endLinkId, time, person, vehicle, this.dijkstras.get(mode));
+	}
+	
+	private void adaptEndOfRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, MyMultiNodeDijkstra dijkstra) {
 		
 		// check whether the end link has really changed
 		if (route.getEndLinkId().equals(endLinkId)) return;
@@ -156,8 +189,10 @@ public class ParkingRouter {
 		Map<Node, Integer> nodeIndices = new HashMap<Node, Integer>();
 		List<Id> routeLinkIds = new ArrayList<Id>();
 
-		if (!route.getStartLinkId().equals(route.getEndLinkId()) && route.getLinkIds().size() == 0) {
+		// if the route does not start and end on the same link and is not a round-trip
+		if (!route.getStartLinkId().equals(route.getEndLinkId()) || route.getLinkIds().size() != 0) {
 			
+			routeLinkIds.add(route.getStartLinkId());
 			routeLinkIds.addAll(route.getLinkIds());
 			routeLinkIds.add(route.getEndLinkId());
 
@@ -200,9 +235,9 @@ public class ParkingRouter {
 			nodeIndices.put(fromNode, 0);
 		}
 		
-		Node fromNode = this.dijkstra.createImaginaryNode(initialFromNodes);
+		Node fromNode = dijkstra.createImaginaryNode(initialFromNodes);
 		
-		Path path = this.dijkstra.calcLeastCostPath(fromNode, endNode, time, person, vehicle);
+		Path path = dijkstra.calcLeastCostPath(fromNode, endNode, time, person, vehicle);
 
 		/*
 		 * Merge old and new route.
@@ -212,7 +247,9 @@ public class ParkingRouter {
 		// existing links
 		Node firstNode = path.nodes.get(0);
 		int mergeIndex = nodeIndices.get(firstNode);
-		linkIds.addAll(routeLinkIds.subList(0, routeLinkIds.size() - mergeIndex));
+		if (routeLinkIds.size() > 1) {
+			linkIds.addAll(routeLinkIds.subList(1, routeLinkIds.size() - mergeIndex));			
+		}
 		
 		// new links
 		for (Link link : path.links) linkIds.add(link.getId());
@@ -228,19 +265,24 @@ public class ParkingRouter {
 	 * @param time
 	 * @param person
 	 * @param vehicle
+	 * @param mode
 	 */
-	public void adaptStartAndEndOfRoute(NetworkRoute route, Id startLinkId, Id endLinkId, double time, Person person, Vehicle vehicle) {
+	public void adaptStartAndEndOfRoute(NetworkRoute route, Id startLinkId, Id endLinkId, double time, Person person, Vehicle vehicle, String mode) {
+		adaptStartAndEndOfRoute(route, startLinkId, endLinkId, time, person, vehicle, this.dijkstras.get(mode));
+	}
+	
+	private void adaptStartAndEndOfRoute(NetworkRoute route, Id startLinkId, Id endLinkId, double time, Person person, Vehicle vehicle, MyMultiNodeDijkstra dijkstra) {
 		
 		// check whether the start and / or link have really changed
 		if (route.getStartLinkId().equals(startLinkId)) {
 			if (route.getEndLinkId().equals(endLinkId)) return;
 			else {
-				adaptEndOfRoute(route, endLinkId, time, person, vehicle);
+				adaptEndOfRoute(route, endLinkId, time, person, vehicle, dijkstra);
 				return;
 			}
 		} else {
 			if (route.getEndLinkId().equals(endLinkId)) {
-				adaptStartOfRoute(route, startLinkId, time, person, vehicle);
+				adaptStartOfRoute(route, startLinkId, time, person, vehicle, dijkstra);
 				return;
 			}
 		}
@@ -252,6 +294,7 @@ public class ParkingRouter {
 		Node endNode = endLink.getFromNode();
 		
 		List<Id> routeLinkIds = new ArrayList<Id>();
+		routeLinkIds.add(route.getStartLinkId());
 		routeLinkIds.addAll(route.getLinkIds());
 		routeLinkIds.add(route.getEndLinkId());
 		
@@ -260,15 +303,15 @@ public class ParkingRouter {
 		 * Otherwise, we can adapt the start and end of the route separated.
 		 */
 		if (routeLinkIds.size() + 1 <= 2 * nodesToCheck) {
-			Path path = this.dijkstra.calcLeastCostPath(startNode, endNode, time, person, vehicle);
+			Path path = dijkstra.calcLeastCostPath(startNode, endNode, time, person, vehicle);
 			
 			List<Id> linkIds = new ArrayList<Id>();
 			for (Link link : path.links) linkIds.add(link.getId());
 			
 			route.setLinkIds(startLinkId, linkIds, endLinkId);
 		} else {
-			adaptStartOfRoute(route, startLinkId, time, person, vehicle);
-			adaptEndOfRoute(route, endLinkId, time, person, vehicle);
+			adaptStartOfRoute(route, startLinkId, time, person, vehicle, dijkstra);
+			adaptEndOfRoute(route, endLinkId, time, person, vehicle, dijkstra);
 		}
 	}
 	
@@ -281,8 +324,13 @@ public class ParkingRouter {
 	 * @param time
 	 * @param person
 	 * @param vehicle
+	 * @param mode
 	 */
-	public void extendRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle) {
+	public void extendRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, String mode) {
+		extendRoute(route, endLinkId, time, person, vehicle, this.dijkstras.get(mode));
+	}
+	
+	private void extendRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, MyMultiNodeDijkstra dijkstra) {
 		
 		Link startLink = this.scenario.getNetwork().getLinks().get(route.getEndLinkId());
 		Node startNode = startLink.getToNode();
@@ -290,7 +338,7 @@ public class ParkingRouter {
 		Link endLink = this.scenario.getNetwork().getLinks().get(endLinkId);
 		Node endNode = endLink.getFromNode();
 		
-		Path path = this.dijkstra.calcLeastCostPath(startNode, endNode, time, person, vehicle);
+		Path path = dijkstra.calcLeastCostPath(startNode, endNode, time, person, vehicle);
 		
 		List<Id> mergedLinks = new ArrayList<Id>();
 		mergedLinks.addAll(route.getLinkIds());

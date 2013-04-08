@@ -117,7 +117,7 @@ public class UpdateRoutes implements PlanAlgorithm {
 		NetworkRoute route = (NetworkRoute) carLeg.getRoute();
 		Vehicle vehicle = null;
 		this.parkingRouter.adaptStartAndEndOfRoute(route, fromActivity.getLinkId(), toActivity.getLinkId(), 
-				carLeg.getDepartureTime(), person, vehicle);
+				carLeg.getDepartureTime(), person, vehicle, TransportMode.car);
 	}
 	
 	private void updateWalkLeg(Activity fromActivity, Leg walkLeg, Activity toActivity, Person person) {

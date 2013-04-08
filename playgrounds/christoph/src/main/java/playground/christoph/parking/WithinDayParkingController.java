@@ -127,7 +127,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, times, factory, routeFactory);
 
 		// Use a the TravelTimeCollector here for within-day routes replanning!
-		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, this.getTravelTimeCollector(), 
+		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
 				this.createTravelCostCalculator(), this.getTripRouterFactory(), nodesToCheck);
 		
 		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), router, 1.0, this.scenarioData, 
@@ -165,7 +165,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 		
-		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, this.travelTimeCalculator.getLinkTravelTimes(), 
+		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
 				this.createTravelCostCalculator(), this.getTripRouterFactory(), nodesToCheck);
 		
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, this.getWithinDayEngine());

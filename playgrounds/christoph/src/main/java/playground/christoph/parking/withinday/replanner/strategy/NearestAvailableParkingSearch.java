@@ -22,6 +22,7 @@ package playground.christoph.parking.withinday.replanner.strategy;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -62,6 +63,6 @@ public class NearestAvailableParkingSearch implements ParkingSearchStrategy {
 		
 		Person person = agent.getSelectedPlan().getPerson();
 		Vehicle vehicle = null;
-		parkingRouter.extendRoute(route, endLinkId, time, person, vehicle);
+		parkingRouter.extendRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
 	}
 }

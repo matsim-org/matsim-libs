@@ -20,6 +20,8 @@
 
 package playground.christoph.parking.withinday.utils;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -28,21 +30,21 @@ import org.matsim.core.router.util.TravelTime;
 public class ParkingRouterFactory {
 
 	private final Scenario scenario;
-	private final TravelTime travelTime;
+	private final Map<String, TravelTime> travelTimes;
 	private final TravelDisutility travelDisutility;
 	private final TripRouterFactory tripRouterFactory;
 	private final int nodesToCheck;
 
-	public ParkingRouterFactory(Scenario scenario, TravelTime travelTime, TravelDisutility travelDisutility,
+	public ParkingRouterFactory(Scenario scenario, Map<String, TravelTime> travelTimes, TravelDisutility travelDisutility,
 			TripRouterFactory tripRouterFactory, int nodesToCheck) {
 		this.scenario = scenario;
-		this.travelTime = travelTime;
+		this.travelTimes = travelTimes;
 		this.travelDisutility = travelDisutility;
 		this.tripRouterFactory = tripRouterFactory;
 		this.nodesToCheck = nodesToCheck;
 	}
 	
 	public ParkingRouter createParkingRouter() {
-		return new ParkingRouter(scenario, travelTime, travelDisutility, tripRouterFactory.createTripRouter(), nodesToCheck);
+		return new ParkingRouter(scenario, travelTimes, travelDisutility, tripRouterFactory.createTripRouter(), nodesToCheck);
 	}
 }
