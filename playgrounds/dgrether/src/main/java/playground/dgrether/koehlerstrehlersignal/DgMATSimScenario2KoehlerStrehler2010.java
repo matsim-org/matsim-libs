@@ -49,9 +49,10 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
+import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
-import playground.dgrether.signalsystems.cottbus.scripts.DgNetworkShrinker;
+import playground.dgrether.signalsystems.utils.DgNetworkShrinker;
 import playground.dgrether.signalsystems.utils.DgSignalsBoundingBox;
 import playground.dgrether.utils.DgGrid;
 import playground.dgrether.utils.DgGridUtils;
@@ -103,6 +104,7 @@ public class DgMATSimScenario2KoehlerStrehler2010 {
 		cleaner.run(smallNetwork);
 		
 		this.writeNetwork(smallNetwork, smallNetworkFile);
+		this.writeNetwork2Shape(fullScenario.getNetwork(), shapeFileDirectory + "network_full");
 		this.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small");
 
 //		String smallNetworkClean = outputDirectory + "network_small_clean.xml.gz";
@@ -116,9 +118,9 @@ public class DgMATSimScenario2KoehlerStrehler2010 {
 			new DgPopulationSampler().samplePopulation(fullScenario.getPopulation(), matsimPopSampleSize);
 		}
 		List<DgZone> cells = DgZonesUtils.createZonesFromGrid(grid);
-		cells = new DgMatsimPopulation2Zones().convert2Zones(this.fullScenario.getNetwork(), this.fullScenario.getPopulation(), cells,
+		cells = new DgMatsimPopulation2Zones().convert2Zones(this.fullScenario.getNetwork(), smallNetwork, this.fullScenario.getPopulation(), cells,
 				signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
-		DgZonesUtils.writePolygonZones2Shapefile(cells, crs, shapeFileDirectory + "grid_cells.shp");
+//		DgZonesUtils.writePolygonZones2Shapefile(cells, crs, shapeFileDirectory + "grid_cells.shp");
 		DgZonesUtils.writeLineStringOdPairsFromZones2Shapefile(cells, crs, shapeFileDirectory + "grid_od_pairs.shp");
 		Map<DgZone, Link> zones2LinkMap = DgZonesUtils.createZoneCenter2LinkMapping(cells, (NetworkImpl) smallNetwork);
 
@@ -131,7 +133,9 @@ public class DgMATSimScenario2KoehlerStrehler2010 {
 		smallScenario.addScenarioElement(this.fullScenario.getScenarioElement(SignalsData.class));
 		
 		DgKSNetwork ksNet = new DgMatsim2KoehlerStrehler2010NetworkConverter(idConverter).convertNetworkLanesAndSignals(smallScenario, startTimeSec, endTimeSec);
-
+		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
+		converter.convertAndWrite(ksNet, outputDirectory + "network_small.gexf");
+		
 		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap, idConverter);
 		DgCommodities commodities = demandConverter.convert(smallScenario, ksNet);
 		

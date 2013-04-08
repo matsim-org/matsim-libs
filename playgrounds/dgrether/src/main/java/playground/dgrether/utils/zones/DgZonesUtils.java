@@ -77,6 +77,9 @@ public class DgZonesUtils {
 	}
 
 
+	/**
+	 * Use with care
+	 */
 	public static void writePolygonZones2Shapefile(List<DgZone> cells, CoordinateReferenceSystem crs, String shapeFilename){
 		Collection<SimpleFeature> featureCollection = new ArrayList<SimpleFeature>();
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();

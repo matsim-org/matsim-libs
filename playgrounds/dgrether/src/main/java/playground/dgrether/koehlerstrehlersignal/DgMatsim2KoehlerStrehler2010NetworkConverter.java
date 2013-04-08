@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal;
 
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -33,6 +36,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -44,6 +48,7 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.vis.vecmathutils.VectorUtils;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
@@ -154,12 +159,21 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	
 	private void convertLinks2Streets(DgKSNetwork ksnet, Network net){
 		for (Link link : net.getLinks().values()){
-			DgCrossing fromNodeCrossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(link.getFromNode().getId()));
+			Node mFromNode = link.getFromNode();
+			Node mToNode = link.getToNode();
+			Tuple<Coord, Coord> startEnd = this.scaleLinkCoordinates(link.getLength(), mFromNode.getCoord(), mToNode.getCoord());
+
+			DgCrossing fromNodeCrossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(mFromNode.getId()));
 			DgCrossingNode fromNode = new DgCrossingNode(this.idConverter.convertLinkId2FromCrossingNodeId(link.getId()));
+			
+			fromNode.setCoordinate(startEnd.getFirst());
 			fromNodeCrossing.addNode(fromNode);
-			DgCrossing toNodeCrossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(link.getToNode().getId()));
+			
+			DgCrossing toNodeCrossing = ksnet.getCrossings().get(this.idConverter.convertNodeId2CrossingId(mToNode.getId()));
 			DgCrossingNode toNode = new DgCrossingNode(this.idConverter.convertLinkId2ToCrossingNodeId(link.getId()));
+			toNode.setCoordinate(startEnd.getSecond());
 			toNodeCrossing.addNode(toNode);
+			
 			DgStreet street = new DgStreet(this.idConverter.convertLinkId2StreetId(link.getId()), fromNode, toNode);
 			double fsd = link.getLength() / link.getFreespeed();
 			long fs = Math.round(fsd);
@@ -176,7 +190,42 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		}
 	}
 	
-
+	
+	private Tuple<Coord,Coord> scaleLinkCoordinates(double linkLength, Coord linkStartCoord, Coord linkEndCoord){
+		double nodeOffsetMeter = 20.0;
+		Point2D.Double linkStart = new Point2D.Double(linkStartCoord.getX(), linkStartCoord.getY());
+		Point2D.Double linkEnd =  new Point2D.Double(linkEndCoord.getX(), linkEndCoord.getY());
+		
+		//calculate length and normal
+		Point2D.Double deltaLink = new Point2D.Double(linkEnd.x - linkStart.x, linkEnd.y - linkStart.y);
+		double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);
+		//calculate the correction factor if real link length is different than euclidean distance
+		double linkLengthCorrectionFactor = euclideanLinkLength / linkLength;
+		Point2D.Double deltaLinkNorm = new Point2D.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
+		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
+		
+		//first calculate the scale of the link based on the node offset, i.e. the link will be shortened at the beginning and the end 
+		double linkScale = 1.0;
+		if ((euclideanLinkLength * 0.2) > (2.0 * nodeOffsetMeter)){ // 2* nodeoffset is more than 20%
+			linkScale = (euclideanLinkLength - (2.0 * nodeOffsetMeter)) / euclideanLinkLength;
+		}
+		else { // use 80 % as euclidean length
+			linkScale = euclideanLinkLength * 0.8 / euclideanLinkLength;
+		}
+		
+		//scale the link 
+		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
+		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
+		Point2D.Double scaledLinkStart = scaledLink.getFirst();
+		Coord start = new CoordImpl(scaledLinkStart.x, scaledLinkStart.y); 
+		Coord end = new CoordImpl(scaledLinkEnd.x, scaledLinkEnd.y);
+		return new Tuple<Coord, Coord>(start, end);
+	}
+	
+	private double calculateEuclideanLinkLength(Point2D.Double deltaLink) {
+  	return Math.sqrt(Math.pow(deltaLink.x, 2) + Math.pow(deltaLink.y, 2));
+  }
+	
 	private Tuple<SignalPlanData, SignalGroupSettingsData> getPlanAndSignalGroupSettings4Signal(Id signalSystemId, Id signalId, SignalsData signalsData){
 		SignalSystemControllerData controllData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(signalSystemId);
 		SignalPlanData signalPlan = controllData.getSignalPlanData().values().iterator().next();

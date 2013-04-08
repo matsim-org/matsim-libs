@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.utils.zones.DgZone;
@@ -49,34 +50,54 @@ public class DgMatsim2KoehlerStrehler2010Zones2Commodities implements
 		this.idConverter = idConverter;
 	}
 
-	private void addCommodity(DgCommodities coms, Id id, Id fromNodeId, Id toNodeId, Double flow ){
+	private void addCommodity(DgCommodities coms, Id id, Id fromNodeId, Id toNodeId, Double flow, DgKSNetwork net){
+		this.validateFromAndToNode(fromNodeId, toNodeId, net);
 		DgCommodity com = new DgCommodity(id);
 		coms.addCommodity(com);
 		com.addSourceNode(fromNodeId, flow);
 		com.addDrainNode(toNodeId);
 	}
 	
+	private void validateFromAndToNode(Id fromNode, Id toNode, DgKSNetwork net){
+		boolean foundFrom = false;
+		boolean foundTo = false;
+		for (DgCrossing crossing : net.getCrossings().values()){
+			if (crossing.getNodes().containsKey(fromNode)) {
+				foundFrom = true;
+			}
+			if (crossing.getNodes().containsKey(toNode)){
+				foundTo = true;
+			}
+		}
+		if (! foundFrom){
+			throw new IllegalStateException("From Node Id " + fromNode + " not found in Network. ");
+		}
+		if (! foundTo){
+			throw new IllegalStateException("To  Node Id " + toNode + " not found in Network. ");
+		}
+	}
 
 	
 	
 	@Override
-	public DgCommodities convert(Scenario sc, DgKSNetwork dgNetwork) {
+	public DgCommodities convert(Scenario sc, DgKSNetwork network) {
 		DgCommodities coms = new DgCommodities();
 		for (DgZone fromZone : this.zones2LinkMap.keySet()){
 			Link fromZoneLink = this.zones2LinkMap.get(fromZone);
 			Id fromNodeId = this.idConverter.convertLinkId2ToCrossingNodeId(fromZoneLink.getId());
+			
 			//zone 2 zone
 			for (Entry<DgZone, Double> entry : fromZone.getToZoneRelations().entrySet()){
 				Id id = this.idConverter.createFromZone2ToZoneId(fromZone.getId(), entry.getKey().getId());
 				Link toZoneLink = this.zones2LinkMap.get(entry.getKey());
 				Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(toZoneLink.getId());
-				this.addCommodity(coms, id, fromNodeId, toNodeId, entry.getValue());
+				this.addCommodity(coms, id, fromNodeId, toNodeId, entry.getValue(), network);
 			}
 			//zone 2 link
 			for (Entry<Link, Double> entry : fromZone.getToLinkRelations().entrySet()){
 				Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(entry.getKey().getId());
 				Id id = this.idConverter.createFrom2ToId(fromZone.getId(), entry.getKey().getId().toString());
-				this.addCommodity(coms, id, fromNodeId, toNodeId, entry.getValue());
+				this.addCommodity(coms, id, fromNodeId, toNodeId, entry.getValue(), network);
 			}
 			//link 2 x
 			for (DgZoneFromLink fromLink : fromZone.getFromLinks().values()){
@@ -86,13 +107,13 @@ public class DgMatsim2KoehlerStrehler2010Zones2Commodities implements
 					Id id = this.idConverter.createFrom2ToId(fromLink.getLink().getId().toString(), entry.getKey().getId());
 					Link toZoneLink = this.zones2LinkMap.get(entry.getKey());
 					Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(toZoneLink.getId());
-					this.addCommodity(coms, id, fromNodeId2, toNodeId, entry.getValue());
+					this.addCommodity(coms, id, fromNodeId2, toNodeId, entry.getValue(), network);
 				}
 				//link 2 link
 				for (Entry<Link, Double> entry : fromLink.getToLinkRelations().entrySet()){
 					Id id = this.idConverter.createFromLink2ToLinkId(fromLink.getLink().getId().toString(), entry.getKey().getId().toString());
 					Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(entry.getKey().getId());
-					this.addCommodity(coms, id, fromNodeId2, toNodeId, entry.getValue());
+					this.addCommodity(coms, id, fromNodeId2, toNodeId, entry.getValue(), network);
 				}
 			}			
 		}

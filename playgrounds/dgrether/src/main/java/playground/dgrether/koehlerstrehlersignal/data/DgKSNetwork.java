@@ -52,11 +52,24 @@ public class DgKSNetwork {
 		if (this.streets.containsKey(street.getId())) {
 			log.warn("Street Id " + street.getId() + " already exists and will be overwritten!");
 		}
+		this.warnIfEdgeExists(street);
 		this.streets.put(street.getId(), street);
 	}
 	
 	public Map<Id, DgStreet> getStreets(){
 		return this.streets;
+	}
+	
+	
+	private void warnIfEdgeExists(DgStreet street){
+		Id fromNodeId = street.getFromNode().getId();
+		Id toNodeId = street.getToNode().getId();
+		for (DgStreet s : this.streets.values()){
+			if (s.getFromNode().getId().equals(fromNodeId) && s.getToNode().getId().equals(toNodeId)) {
+				log.warn("duplicated street " + street.getId() + " from node " + fromNodeId + " to node " + toNodeId);
+				
+			}
+		}
 	}
 
 }
