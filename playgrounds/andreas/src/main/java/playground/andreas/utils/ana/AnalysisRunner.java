@@ -131,8 +131,13 @@ public class AnalysisRunner {
 		
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(shapeFile);
 		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
+		int i = 0;
 		for (SimpleFeature f: features){
-			zones.put((String)f.getAttribute(2), (Geometry) f.getAttribute(0));
+			if (f.getAttributes().size() < 3) {
+				zones.put(Integer.toString(i), (Geometry) f.getAttribute(0));
+			} else {
+				zones.put((String)f.getAttribute(2), (Geometry) f.getAttribute(0));
+			}
 		}
 		
 		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath(), dir.getIterationFilename(iteration, Controler.FILENAME_EVENTS_XML));
