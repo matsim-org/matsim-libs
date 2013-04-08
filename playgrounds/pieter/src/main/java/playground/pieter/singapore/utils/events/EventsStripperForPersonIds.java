@@ -19,27 +19,23 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.pieter.singapore.utils.Sample;
 import playground.pieter.singapore.utils.events.listeners.TrimEventsWithPersonIds;
 
-public class EventsStripper {
+public class EventsStripperForPersonIds {
 
 	
 	String[] choiceSet;
 	private EventsManager events;
 	Scenario scenario =  ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-	public EventsStripper(String plansFile, String networkFile) throws SQLException{
+	public EventsStripperForPersonIds(String networkFile, ArrayList<String> ids) throws SQLException{
 		
-		this.populateList(plansFile, networkFile);
+		this.populateList( networkFile, ids);
 	}
 	
 
 	
-	private void populateList(String plansFile, String networkFile) throws SQLException{
+	private void populateList( String networkFile, ArrayList<String> ids) throws SQLException{
 	
 		new MatsimNetworkReader(scenario).readFile(networkFile);
-		MatsimPopulationReader pn = new MatsimPopulationReader(scenario);
-		pn.readFile(plansFile);
-		ArrayList<Id> ids = new ArrayList<Id>();
-		CollectionUtils.addAll(ids, scenario.getPopulation().getPersons().keySet().iterator());
 		choiceSet = new String[ids.size()];
 		for(int i=0; i<choiceSet.length;i++){
 			choiceSet[i] = ids.get(i).toString();
@@ -69,8 +65,10 @@ public class EventsStripper {
 	
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
-		EventsStripper stripper = new EventsStripper(args[0], args[1]);
-		stripper.stripEvents(args[2], args[3], 1.0);
+		ArrayList<String> ids =new ArrayList<String>();
+		ids.add("1000257190");
+		EventsStripperForPersonIds stripper = new EventsStripperForPersonIds(args[0],  ids );
+		stripper.stripEvents(args[1], args[2], 1.0);
 	}
 
 

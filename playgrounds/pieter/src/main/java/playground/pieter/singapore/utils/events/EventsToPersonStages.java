@@ -59,26 +59,27 @@ public class EventsToPersonStages implements ActivityHandler, LegHandler {
 		if (agentRecords.get(agentId) != null)
 			agentRecords.get(agentId).addActivity(activity);
 	}
+	
 
 	public void writeExperiencedPlans(String tableName, DataBaseAdmin dba)
 			throws SQLException, NoConnectionException {
 		dba.executeStatement("DROP TABLE IF EXISTS matsim_stage_report");
 		dba.executeUpdate("CREATE TABLE matsim_stage_report(  person_id VARCHAR(255)," +
-				"plan_element_id INT, activity_id INT, trip_id  INT, " +
-				"stage_id INT, substage_id INT, plan_element_type VARCHAR(255), line VARCHAR(255)"
+				"plan_element_id INT, activity_id INT, journey_id  INT, " +
+				"trip_id INT, substage_id INT, plan_element_type VARCHAR(255), line VARCHAR(255)"
 							+ ", route VARCHAR(255), mode VARCHAR(255)" + ", distance double"
 							+ ", duration double" + ", start_time double"
 							+ ", end_time double,  id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY (id))");
 		for (Entry<Id, Plan> entry : agentRecords.entrySet()) {
 			String paxid = entry.getKey().toString();
 			List<PlanElement> planElements = entry.getValue().getPlanElements();
+			int journey_id = 0;
 			int trip_id = 0;
-			int stage_id = 0;
 			int substage_id = 0;
 			int activity_id = 0;
 			boolean incrementTripCheck = false;
 			String sqlString = "INSERT INTO matsim_stage_report (  " +
-					"person_id, plan_element_id , activity_id , trip_id  , stage_id , substage_id , " +
+					"person_id, plan_element_id , activity_id , journey_id  , trip_id , substage_id , " +
 					"plan_element_type , line, route, mode, " 
 					+ " distance , duration , start_time , end_time) VALUES( ";
 			for(int i=0; i<planElements.size();i++){
@@ -88,12 +89,12 @@ public class EventsToPersonStages implements ActivityHandler, LegHandler {
 					//activity
 					ActivityImpl act = (ActivityImpl) pe;
 					if(act.getType().equals("pt interaction")){
-						stage_id++;
+						trip_id++;
 						substage_id=0;
 					}else{
 						activity_id++;
 						incrementTripCheck = true;
-						stage_id = 0;
+						trip_id = 0;
 						substage_id = 0;
 						sqlString += String.format("(\'%s\',%d,%d,NULL,NULL,NULL,\'%s\',NULL,NULL,NULL,NULL,%f,%f,%f),", 
 								paxid,i,activity_id, "NULL","NULL","NULL",act.getType(),"NULL","NULL","NULL","NULL",

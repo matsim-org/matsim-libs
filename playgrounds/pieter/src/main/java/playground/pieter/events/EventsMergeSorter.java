@@ -17,7 +17,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.pieter.singapore.utils.events.TrimEventsWithIds;
+import playground.pieter.singapore.utils.events.listeners.TrimEventsWithPersonIds;
 
 public class EventsMergeSorter {
 	String inFileName;
