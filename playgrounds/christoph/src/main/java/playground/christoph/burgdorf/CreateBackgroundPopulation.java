@@ -21,9 +21,10 @@
 package playground.christoph.burgdorf;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -117,6 +118,7 @@ public class CreateBackgroundPopulation {
 	public static String networkFile = "../../matsim/mysimulations/burgdorf/input/network_burgdorf_cut.xml.gz";
 //	public static String facilitiesFile = "";
 	public static String populationFile = "../../matsim/mysimulations/burgdorf/input/plans_background.xml.gz";
+	public static String routesFile = "../../matsim/mysimulations/burgdorf/input/routes_background.xml.gz";
 	
 	public static boolean printRoutes = false;
 	private Map<String, Route> routes;
@@ -151,7 +153,7 @@ public class CreateBackgroundPopulation {
 		LeastCostPathCalculator router = new FastDijkstraFactory().createPathCalculator(scenario.getNetwork(), 
 				highwayTravelDisutility, travelTime);
 
-		routes = new HashMap<String, Route>();
+		routes = new LinkedHashMap<String, Route>();
 		
 		Random random = MatsimRandom.getRandom();
 		
@@ -186,6 +188,14 @@ public class CreateBackgroundPopulation {
 		}
 		
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(populationFile);
+		
+		/*
+		 * Write all routes to a population. Doing so allows checking them for errors.
+		 */
+		scenario.getPopulation().getPersons().clear();
+		createRoutePopulation(scenario);
+		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(routesFile);
 	}
 	
 	private void printRoute(Scenario scenario, Route route, String fromLink, String toLink) {
@@ -235,6 +245,24 @@ public class CreateBackgroundPopulation {
 				printRoute(scenario, route, startLinkIds[i], endLinkIds[j]);
 			}
 		}
+		
+		// fix bad routes
+		String routeString;
+		String[] links;
+		List<Id> linkIds;
+		NetworkRoute networkRoute;
+			
+		routeString = "17560000130806FT_17560000126838FT";
+		//17560000130806FT - start link 
+		//17560000126838FT - end link  
+		links = new String[]{"17560001813912FT", "17560001813913FT", "17560002100968FT", "17560000122288FT", "17560000122328FT",
+				"17560001368986TF", "17560001786482TF", "17560001862499FT", "17560000125722FT", "17560001812124FT", "17560002102719FT",
+				"17560001838515FT", "17560001984994FT", "17560001984995FT", "17560001812144FT", "17560001834645FT", "17560000126288FT",
+				"17560002102725FT", "17560002102726FT", "17560001368914FT", "17560001368915FT", "17560001846187FT"};
+		linkIds = new ArrayList<Id>();
+		for (String link : links) linkIds.add(scenario.createId(link));
+		networkRoute = (NetworkRoute) routes.get(routeString);
+		networkRoute.setLinkIds(networkRoute.getStartLinkId(), linkIds, networkRoute.getEndLinkId());
 	}
 	
 	/*
@@ -342,6 +370,51 @@ public class CreateBackgroundPopulation {
 			}
 		}
 
+		// fix bad intersection routes
+		String routeString;
+		String[] links;
+		List<Id> linkIds;
+		NetworkRoute networkRoute;
+		
+		routeString = "17560000130806FT_17560001247396FT";
+		//17560000130806FT - start link 
+		//17560001247396FT - end link
+		links = new String[]{"17560001813912FT", "17560001813913FT", "17560002100968FT", "17560000122288FT", "17560000122328FT",
+				"17560001368986TF", "17560001786482TF", "17560001368985TF", "17560002101148TF", "17560002101147TF", "17560000122366TF",
+				"17560000122386FT", "17560000122387FT", "17560000122400FT", "17560000122416FT", "17560001862503FT", "17560000122384FT",
+				"17560000122625FT", "17560000122410FT", "17560000122622FT", "17560000122674TF", "17560000122657TF", "17560000127847TF",
+				"17560001808872TF", "17560000124049TF", "17560001809109FT", "17560000127772FT", "17560000123464FT", "17560000128169FT"};
+		linkIds = new ArrayList<Id>();
+		for (String link : links) linkIds.add(scenario.createId(link));
+		networkRoute = (NetworkRoute) routes.get(routeString);
+		networkRoute.setLinkIds(networkRoute.getStartLinkId(), linkIds, networkRoute.getEndLinkId());
+		
+		routeString = "17560001247396TF_17560000126838FT";
+		//17560001247396TF - start link 
+		//17560000126838FT - end link
+		links = new String[]{"17560000127856FT", "17560000127544FT", "17560000127853FT", "17560000127891FT", "17560000127889FT",
+				"17560001862519FT", "17560002231593FT", "17560000122388TF", "17560000122388TF-1", "17560000122393TF", "17560001862502TF",
+				"17560000125722FT", "17560001812124FT", "17560002102719FT", "17560001838515FT", "17560001984994FT", "17560001984995FT",
+				"17560001812144FT", "17560001834645FT", "17560000126288FT", "17560002102725FT", "17560002102726FT", "17560001368914FT",
+				"17560001368915FT", "17560001846187FT"};
+		linkIds = new ArrayList<Id>();
+		for (String link : links) linkIds.add(scenario.createId(link));
+		networkRoute = (NetworkRoute) routes.get(routeString);
+		networkRoute.setLinkIds(networkRoute.getStartLinkId(), linkIds, networkRoute.getEndLinkId());
+		
+		routeString = "17560001814298FT_17560001247396FT";
+		//17560001814298FT - start link 
+		//17560001247396FT - end link
+		links = new String[]{"17560001368904FT", "17560001813063FT", "17560001813064FT", "17560001368906FT", "17560001368907FT",
+				"17560000126294FT", "17560001812171FT", "17560001834647FT", "17560002102722FT", "17560000125997TF", "17560000122613FT",
+				"17560000122383FT", "17560000122625FT", "17560000122410FT", "17560000122622FT", "17560000122674TF", "17560000122657TF",
+				"17560000127847TF", "17560001808872TF", "17560000124049TF", "17560001809109FT", "17560000127772FT", "17560000123464FT",
+				"17560000128169FT"};
+		linkIds = new ArrayList<Id>();
+		for (String link : links) linkIds.add(scenario.createId(link));
+		networkRoute = (NetworkRoute) routes.get(routeString);
+		networkRoute.setLinkIds(networkRoute.getStartLinkId(), linkIds, networkRoute.getEndLinkId());
+		 
 	}
 	
 	private void createBasicPopulation(Scenario scenario, Random random, int numOrigins) {
@@ -351,6 +424,8 @@ public class CreateBackgroundPopulation {
 			for (int t = 0; t < 24; t++) {
 				for (int pers = 0; pers < agentsPerOrigin[i] * scaleFactor; pers++) {
 					Person person = populationFactory.createPerson(scenario.createId(i + "_" + t + "_" + pers));
+					double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
+					
 					for (int j = 0; j < numOrigins; j++) {
 						Plan plan = populationFactory.createPlan();
 						Id fromLinkId = null;
@@ -362,7 +437,6 @@ public class CreateBackgroundPopulation {
 							fromLinkId = scenario.createId(startLinkIds[i]);
 							toLinkId = scenario.createId(endLinkIds[j]);
 						}
-						double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 
 						Activity fromActivity = populationFactory.createActivityFromLinkId("tta", fromLinkId);
 						fromActivity.setEndTime(departureTime);
@@ -440,13 +514,13 @@ public class CreateBackgroundPopulation {
 			for (int pers = 0; pers < Math.round(fromNorth[t] * scaleFactor); pers++) {
 				
 				Person person = populationFactory.createPerson(scenario.createId("NorthToBurgdorf_" + t + "_" + pers));
+				double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 				
 				// only origins 0 and 1 are located north of Burgdorf
 				Id toLinkId = scenario.createId(endLinkIdBurgdorf);
 				for (int i = 0; i < 2; i++) {
 					Plan plan = populationFactory.createPlan();
 					Id fromLinkId = scenario.createId(startLinkIds[i]);
-					double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 					
 					Activity fromActivity = populationFactory.createActivityFromLinkId("tta", fromLinkId);
 					fromActivity.setEndTime(departureTime);
@@ -472,13 +546,13 @@ public class CreateBackgroundPopulation {
 			for (int pers = 0; pers < Math.round(fromSouth[t] * scaleFactor); pers++) {
 				
 				Person person = populationFactory.createPerson(scenario.createId("SouthToBurgdorf_" + t + "_" + pers));
+				double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 				
 				// only origins 2, 3 and 4 are located south of Burgdorf
 				Id toLinkId = scenario.createId(endLinkIdBurgdorf);
 				for (int i = 2; i < 5; i++) {
 					Plan plan = populationFactory.createPlan();
 					Id fromLinkId = scenario.createId(startLinkIds[i]);
-					double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 					
 					Activity fromActivity = populationFactory.createActivityFromLinkId("tta", fromLinkId);
 					fromActivity.setEndTime(departureTime);
@@ -505,13 +579,13 @@ public class CreateBackgroundPopulation {
 			for (int pers = 0; pers < Math.round(toNorth[t] * scaleFactor); pers++) {
 				
 				Person person = populationFactory.createPerson(scenario.createId("BurgdorfToNorth_" + t + "_" + pers));
+				double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 				
 				// only origins 0 and 1 are located north of Burgdorf
 				Id fromLinkId = scenario.createId(startLinkIdBurgdorf);
 				for (int i = 0; i < 2; i++) {
 					Plan plan = populationFactory.createPlan();
 					Id toLinkId = scenario.createId(endLinkIds[i]);
-					double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 					
 					Activity fromActivity = populationFactory.createActivityFromLinkId("tta", fromLinkId);
 					fromActivity.setEndTime(departureTime);
@@ -537,13 +611,13 @@ public class CreateBackgroundPopulation {
 			for (int pers = 0; pers < Math.round(toSouth[t] * scaleFactor); pers++) {
 				
 				Person person = populationFactory.createPerson(scenario.createId("BurgdorfToSouth_" + t + "_" + pers));
+				double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 				
 				// only origins 2, 3 and 4 are located south of Burgdorf
 				Id fromLinkId = scenario.createId(startLinkIdBurgdorf);
 				for (int i = 2; i < 5; i++) {
 					Plan plan = populationFactory.createPlan();
 					Id toLinkId = scenario.createId(endLinkIds[i]);
-					double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 					
 					Activity fromActivity = populationFactory.createActivityFromLinkId("tta", fromLinkId);
 					fromActivity.setEndTime(departureTime);
@@ -594,12 +668,12 @@ public class CreateBackgroundPopulation {
 				if (delta > 0.0) {
 					for (int pers = 0; pers < delta * scaleFactor; pers++) {
 						Person person = populationFactory.createPerson(scenario.createId("leaveAtIntersection_" + i + "_" + t + "_" + pers));
+						double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
+						
 						for (int j = 0; j < numOrigins; j++) {
 							Plan plan = populationFactory.createPlan();
 							Id fromLinkId = scenario.createId(startLinkIds[j]);
 							Id toLinkId = scenario.createId(intersectionEndLinks[i]);
-
-							double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 							
 							Activity fromActivity = populationFactory.createActivityFromLinkId("tta", fromLinkId);
 							fromActivity.setEndTime(departureTime);
@@ -623,12 +697,12 @@ public class CreateBackgroundPopulation {
 				else {
 					for (int pers = 0; pers < delta * scaleFactor; pers++) {
 						Person person = populationFactory.createPerson(scenario.createId("enterAtIntersection_" + i + "_" + t + "_" + pers));
+						double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
+						
 						for (int j = 0; j < numOrigins; j++) {
 							Plan plan = populationFactory.createPlan();
 							Id fromLinkId = scenario.createId(intersectionStartLinks[i]);
 							Id toLinkId = scenario.createId(endLinkIds[j]);
-
-							double departureTime = t * 3600 + Math.round(random.nextDouble() * 3600.0);
 							
 							Activity fromActivity = populationFactory.createActivityFromLinkId("tta", fromLinkId);
 							fromActivity.setEndTime(departureTime);
@@ -650,6 +724,43 @@ public class CreateBackgroundPopulation {
 				}
 		
 			}				
+		}
+	}
+	
+	private void createRoutePopulation(Scenario scenario) {
+		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+		
+		int i = 0;
+		
+		for (Entry<String, Route> entry : this.routes.entrySet()) {
+			Id personId = scenario.createId(entry.getKey());
+			Route route = entry.getValue();
+			
+			Person person = populationFactory.createPerson(personId);
+
+			Plan plan = populationFactory.createPlan();
+			Id fromLinkId = route.getStartLinkId();
+			Id toLinkId = route.getEndLinkId();
+
+			double departureTime = i * 3600;
+			
+			Activity fromActivity = populationFactory.createActivityFromLinkId("tta", fromLinkId);
+			fromActivity.setEndTime(departureTime);
+			
+			Leg leg = populationFactory.createLeg(TransportMode.car);
+			leg.setDepartureTime(departureTime);
+			leg.setRoute(route);
+			
+			Activity toActivity = populationFactory.createActivityFromLinkId("tta", toLinkId);
+			
+			plan.addActivity(fromActivity);
+			plan.addLeg(leg);
+			plan.addActivity(toActivity);
+			
+			person.addPlan(plan);
+			scenario.getPopulation().addPerson(person);
+			
+			i++;
 		}
 	}
 	

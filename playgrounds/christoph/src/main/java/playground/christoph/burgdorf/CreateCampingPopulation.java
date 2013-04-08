@@ -46,8 +46,15 @@ public class CreateCampingPopulation extends BurgdorfRoutes {
 	
 	private static final Logger log = Logger.getLogger(CreateCampingPopulation.class);
 	
-	public static String networkFile = "../../matsim/mysimulations/burgdorf/input/network_burgdorf_cut.xml.gz";
-	public static String populationFile = "../../matsim/mysimulations/burgdorf/input/plans_camping_samstag.xml.gz";
+//	private String day = "freitag";
+	private String day = "samstag";
+//	private String day = "sonntag";
+	
+	private String direction = "to";
+//	private String direction = "from";
+	
+	public String networkFile = "../../matsim/mysimulations/burgdorf/input/network_burgdorf_cut.xml.gz";
+	public String populationFile = "../../matsim/mysimulations/burgdorf/input/plans_camping_" + day +  "_" + direction + "_burgdorf.xml.gz";
 
 	/*
 	 * The array below contain the expected arrival time but we have to set the departure times.
@@ -59,7 +66,7 @@ public class CreateCampingPopulation extends BurgdorfRoutes {
 //	48 entries - one for each 30 minutes
 	public static int binSize = 1800;
 	
-	// Samstag
+	// Samstag to Burgdorf
 	public static int[] from1CampingDepartures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 19, 19, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	public static int[] from2CampingDepartures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 19, 19, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	public static int[] from3CampingDepartures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 12, 12, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -71,6 +78,12 @@ public class CreateCampingPopulation extends BurgdorfRoutes {
 	private List<Id> routeFrom3ToCamping;
 	private List<Id> routeFrom4ToCamping;
 	private List<Id> routeFrom5ToCamping;
+	
+	private List<Id> routeFromCampingTo1;
+	private List<Id> routeFromCampingTo2;
+	private List<Id> routeFromCampingTo3;
+	private List<Id> routeFromCampingTo4;
+	private List<Id> routeFromCampingTo5;
 	
 	private int campingCounter = 0;
 	
@@ -102,34 +115,36 @@ public class CreateCampingPopulation extends BurgdorfRoutes {
 	
 	private void createRoutes(Scenario scenario) {
 
-		// Route is not defined yet.
-//		routeFrom1ToCamping = new ArrayList<Id>();
-//		for (String id : from1) routeFrom1ToCamping.add(scenario.createId(id));
-//		for (String id : highwayFromZurichCamping) routeFrom1ToCamping.add(scenario.createId(id));
-//
-//		routeFrom2ToCamping = new ArrayList<Id>();
-//		for (String id : from2) routeFrom2ToCamping.add(scenario.createId(id));
-//		for (String id : highwayFromZurichCamping) routeFrom2ToCamping.add(scenario.createId(id));
-
+		routeFrom1ToCamping = new ArrayList<Id>();
+		for (String id : from1Kriegstetten) routeFrom1ToCamping.add(scenario.createId(id));
+		for (String id : highwayFromZurichCamping) routeFrom1ToCamping.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFrom1ToCamping);
+		
+		routeFrom2ToCamping = new ArrayList<Id>();
+		for (String id : from2Kriegstetten) routeFrom2ToCamping.add(scenario.createId(id));
+		for (String id : highwayFromZurichCamping) routeFrom2ToCamping.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFrom1ToCamping);
+		
 		routeFrom3ToCamping = new ArrayList<Id>();
 		for (String id : from3) routeFrom3ToCamping.add(scenario.createId(id));
 		for (String id : highwayFromBernCamping) routeFrom3ToCamping.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFrom1ToCamping);
 		
 		routeFrom4ToCamping = new ArrayList<Id>();
 		for (String id : from4) routeFrom4ToCamping.add(scenario.createId(id));
 		for (String id : highwayFromBernCamping) routeFrom4ToCamping.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFrom1ToCamping);
 		
 		routeFrom5ToCamping = new ArrayList<Id>();
 		for (String id : from5) routeFrom5ToCamping.add(scenario.createId(id));
 		for (String id : highwayFromBernCamping) routeFrom5ToCamping.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFrom1ToCamping);
 	}
 	
 	private void createPopulation(Scenario scenario) {
 		
-		// Route is not defined yet.
-//		createRoutePopulation(scenario, 1, from1CampingDepartures, routeFrom1ToCamping);
-//		createRoutePopulation(scenario, 2, from2CampingDepartures, routeFrom2ToCamping);
-		
+		createRoutePopulation(scenario, 1, from1CampingDepartures, routeFrom1ToCamping);
+		createRoutePopulation(scenario, 2, from2CampingDepartures, routeFrom2ToCamping);
 		createRoutePopulation(scenario, 3, from3CampingDepartures, routeFrom3ToCamping);
 		createRoutePopulation(scenario, 4, from4CampingDepartures, routeFrom4ToCamping);
 		createRoutePopulation(scenario, 5, from5CampingDepartures, routeFrom5ToCamping);

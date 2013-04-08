@@ -56,7 +56,7 @@ public class PrepareBackgroundPopulation {
 	private static String configFile = "../../matsim/mysimulations/burgdorf/config_cadyts.xml";
 	private static String countsFile = "../../matsim/mysimulations/burgdorf/input/counts_burgdorf_" + day +".xml";
 	private static String populationFile = "../../matsim/mysimulations/burgdorf/output_cadyts_" + day + "_10pct/output_plans.xml.gz";
-	private static String outputDirectory = "../../matsim/mysimulations/burgdorf/output_cadyts_" + day + "_10pct_prepared";
+	private static String outputDirectory = "../../matsim/mysimulations/burgdorf/output_cadyts_" + day + "_prepared";
 	
 	public static void main(String[] args) {
 		

@@ -137,51 +137,61 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		routeFrom1ToParkings = new ArrayList<Id>();
 		for (String id : from1) routeFrom1ToParkings.add(scenario.createId(id));
 		for (String id : highwayFromZurich) routeFrom1ToParkings.add(scenario.createId(id));
-
+		checkRouteValidity(scenario, routeFrom1ToParkings);
+	
 		routeFrom2ToParkings = new ArrayList<Id>();
 		for (String id : from2) routeFrom2ToParkings.add(scenario.createId(id));
 		for (String id : highwayFromZurich) routeFrom2ToParkings.add(scenario.createId(id));
-
+		checkRouteValidity(scenario, routeFrom2ToParkings);
+		
 		routeFrom3ToParkings = new ArrayList<Id>();
 		for (String id : from3) routeFrom3ToParkings.add(scenario.createId(id));
 		for (String id : highwayFromBern) routeFrom3ToParkings.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFrom3ToParkings);
 		
 		routeFrom4ToParkings = new ArrayList<Id>();
 		for (String id : from4) routeFrom4ToParkings.add(scenario.createId(id));
 		for (String id : highwayFromBern) routeFrom4ToParkings.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFrom4ToParkings);
 		
 		routeFrom5ToParkings = new ArrayList<Id>();
 		for (String id : from5) routeFrom5ToParkings.add(scenario.createId(id));
 		for (String id : highwayFromBern) routeFrom5ToParkings.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFrom5ToParkings);
 		
 		// from parking routes
 		routeFromParkingsTo1 = new ArrayList<Id>();
 		for (String id : highwayToZurich) routeFromParkingsTo1.add(scenario.createId(id));
 		if (!this.viaKriegstetten) for (String id : to1) routeFromParkingsTo1.add(scenario.createId(id));
 		else {
-			for (String id : toKriegstetten) routeFromParkingsTo1.add(scenario.createId(id));
+			for (String id : alternativeToZurich) routeFromParkingsTo1.add(scenario.createId(id));
 			for (String id : to1FromKriegstetten) routeFromParkingsTo1.add(scenario.createId(id));
 		}
+		checkRouteValidity(scenario, routeFromParkingsTo1);
 
 		routeFromParkingsTo2 = new ArrayList<Id>();
 		for (String id : highwayToZurich) routeFromParkingsTo2.add(scenario.createId(id));
 		if (!this.viaKriegstetten) for (String id : to2) routeFromParkingsTo2.add(scenario.createId(id));
 		else {
-			for (String id : toKriegstetten) routeFromParkingsTo2.add(scenario.createId(id));
+			for (String id : alternativeToZurich) routeFromParkingsTo2.add(scenario.createId(id));
 			for (String id : to2FromKriegstetten) routeFromParkingsTo2.add(scenario.createId(id));
 		}
+		checkRouteValidity(scenario, routeFromParkingsTo2);
 
 		routeFromParkingsTo3 = new ArrayList<Id>();
 		for (String id : highwayToBern) routeFromParkingsTo3.add(scenario.createId(id));
 		for (String id : to3) routeFromParkingsTo3.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFromParkingsTo3);
 		
 		routeFromParkingsTo4 = new ArrayList<Id>();
 		for (String id : highwayToBern) routeFromParkingsTo4.add(scenario.createId(id));
 		for (String id : to4) routeFromParkingsTo4.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFromParkingsTo4);
 		
 		routeFromParkingsTo5 = new ArrayList<Id>();
 		for (String id : highwayToBern) routeFromParkingsTo5.add(scenario.createId(id));
 		for (String id : to5) routeFromParkingsTo5.add(scenario.createId(id));
+		checkRouteValidity(scenario, routeFromParkingsTo5);
 	}
 	
 	// to Burgdorf

@@ -55,8 +55,8 @@ import playground.christoph.burgdorf.withinday.replanners.ParkingReplannerFactor
  */
 public class BurgdorfController extends WithinDayController implements StartupListener {
 
-//	private static String runId = "SamstagToBurgdorf";
-	private static String runId = "SonntagFromBurgdorf";
+	private static String runId = "SamstagToBurgdorf";
+//	private static String runId = "SonntagFromBurgdorf";
 	
 	private DuringLegIdentifierFactory duringLegFactory;
 	private DuringLegIdentifier parkingIdentifier;

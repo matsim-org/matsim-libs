@@ -37,11 +37,19 @@ public class MergeBurgdorfPopulation {
 	private static final Logger log = Logger.getLogger(MergeBurgdorfPopulation.class);
 
 //	private String day = "freitag";
-//	private String day = "samstag";
-	private String day = "sonntag";
+	private String day = "samstag";
+//	private String day = "sonntag";
 	
-//	private String direction = "to";
-	private String direction = "from";
+	private String direction = "to";
+//	private String direction = "from";
+	
+//	boolean useVisitorPopulation = true;
+//	boolean useBackgroundPopulation = true;
+	boolean useCampingPopulation = true;
+
+	boolean useVisitorPopulation = false;
+	boolean useBackgroundPopulation = false;
+//	boolean useCampingPopulation = false;
 	
 	private String backgroundPopulationFile = "../../matsim/mysimulations/burgdorf/input/plans_background_samstag.xml.gz";
 	private String visitorPopulationFile = "../../matsim/mysimulations/burgdorf/input/plans_visitors_" + day + "_" + direction + "_burgdorf.xml.gz";
@@ -62,19 +70,25 @@ public class MergeBurgdorfPopulation {
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		log.info("done.");
 		
-		log.info("Read visitor population...");
-		new MatsimPopulationReader(scenario).readFile(visitorPopulationFile);
-		log.info("Found " + scenario.getPopulation().getPersons().size() + " visitor persons.");
-		popSize = scenario.getPopulation().getPersons().size();
+		if (useVisitorPopulation) {
+			log.info("Read visitor population...");
+			new MatsimPopulationReader(scenario).readFile(visitorPopulationFile);
+			log.info("Found " + scenario.getPopulation().getPersons().size() + " visitor persons.");
+			popSize = scenario.getPopulation().getPersons().size();			
+		}
 		
-//		log.info("Read camping population...");
-//		new MatsimPopulationReader(scenario).readFile(campingPopulationFile);
-//		log.info("Found " + (scenario.getPopulation().getPersons().size() - popSize) + " camping persons.");	
-//		popSize = scenario.getPopulation().getPersons().size();
+		if (useCampingPopulation) {
+			log.info("Read camping population...");
+			new MatsimPopulationReader(scenario).readFile(campingPopulationFile);
+			log.info("Found " + (scenario.getPopulation().getPersons().size() - popSize) + " camping persons.");	
+			popSize = scenario.getPopulation().getPersons().size();			
+		}
 		
-//		log.info("Read background population...");
-//		new MatsimPopulationReader(scenario).readFile(backgroundPopulationFile);
-//		log.info("Found " + (scenario.getPopulation().getPersons().size() - popSize) + " background persons.");
+		if (useBackgroundPopulation) {
+			log.info("Read background population...");
+			new MatsimPopulationReader(scenario).readFile(backgroundPopulationFile);
+			log.info("Found " + (scenario.getPopulation().getPersons().size() - popSize) + " background persons.");			
+		}
 		
 		log.info("Writing Burgdorf population to file...");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outFile);
