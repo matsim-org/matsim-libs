@@ -54,14 +54,14 @@ public class CsvReformatter implements VehicleTrajectoryHandler, Closeable {
 	@Override
 	public void handleVehicleTrajectory(VehicleTrajectory trajectory) {
 		try {
-			this.writer.write(Integer.toString(trajectory.getVehNr()));
-			this.writer.write(",");
 			int[] nodes = trajectory.getTravelledNodes();
-			this.writer.write(Integer.toString(nodes[0]));
+			this.writer.write(Integer.toString(trajectory.getVehNr()));
 			this.writer.write(",");
 			this.writer.write(Integer.toString(findZoneIndex(trajectory.getOrigZone())));
 			this.writer.write(",");
 			this.writer.write(Integer.toString(findZoneIndex(trajectory.getDestZone())));
+			this.writer.write(",");
+			this.writer.write(Integer.toString(trajectory.getUpstreamNode()));
 			this.writer.write(",");
 			this.writer.write(Integer.toString(nodes[nodes.length - 1]));
 			this.writer.write(",");

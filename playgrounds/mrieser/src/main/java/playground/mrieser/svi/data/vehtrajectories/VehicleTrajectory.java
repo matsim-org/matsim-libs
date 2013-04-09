@@ -30,6 +30,7 @@ public class VehicleTrajectory {
 	private final String destZ;
 	private final double startTime;
 	private final double travelTime;
+	private int upstreamNode = -1;
 	private int[] travelledNodes = null;
 	private double[] timeStamps = null;
 	private double[] travelledNodeTimes = null;
@@ -52,12 +53,17 @@ public class VehicleTrajectory {
 		this.travelTime = travelTime;
 	}
 
-	public void setTravelledNodes(final int[] nodes) {
+	public void setTravelledNodes(final int upstreamNode, final int[] nodes) {
+		this.upstreamNode = upstreamNode;
 		this.travelledNodes = nodes;
 	}
 
 	public int[] getTravelledNodes() {
 		return this.travelledNodes;
+	}
+	
+	public int getUpstreamNode() {
+		return this.upstreamNode;
 	}
 	
 	public void setTimeStamps(double[] timeStamps) {

@@ -87,6 +87,7 @@ public class VehicleTrajectoriesReader {
 
 		int vehNr = Integer.parseInt(header[2]);
 		int tag = Integer.parseInt(header[4]);
+		int upstreamNode = Integer.parseInt(header[12]);
 		int origZ = Integer.parseInt(header[6]);
 		int destZ = Integer.parseInt(header[8]);
 		double sTime = Double.parseDouble(header[18]) * 60.0; // convert minutes to seconds
@@ -164,7 +165,7 @@ public class VehicleTrajectoriesReader {
 		}
 
 		VehicleTrajectory traj = new VehicleTrajectory(vehNr, tag, this.zoneIdxToIdMapping[origZ], this.zoneIdxToIdMapping[destZ], sTime, travelTime);
-		traj.setTravelledNodes(nodes);
+		traj.setTravelledNodes(upstreamNode, nodes);
 		traj.setTimeStamps(timeStamps);
 		traj.setTravelledNodeTimes(travelTimes);
 		traj.setJamTimes(jamTimes);
