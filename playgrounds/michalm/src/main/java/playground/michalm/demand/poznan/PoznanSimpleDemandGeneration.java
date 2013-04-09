@@ -65,7 +65,7 @@ public class PoznanSimpleDemandGeneration
         new MatsimNetworkReader(scenario).readFile(networkFile);
         Map<Id, Zone> zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
 
-        LocationGenerator lg = new DefualtLocationGenerator(scenario);
+        ActivityGenerator lg = new DefaultActivityGenerator(scenario);
         ODDemandGenerator dg = new ODDemandGenerator(scenario, lg, zones);
 
         RandomUtils.reset(randomSeed);

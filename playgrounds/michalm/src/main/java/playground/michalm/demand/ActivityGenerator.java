@@ -19,14 +19,14 @@
 
 package playground.michalm.demand;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 
 
-public interface LocationGenerator
+public interface ActivityGenerator
 {
-    public abstract Link getRandomLinkInZone(Zone zone, String actType);
+    public abstract Activity createActivityInZone(Zone zone, String actType);
 
 
-    public abstract Link getRandomLinkInZone(Zone zone, String actType, Id bannedLinkId);
+    public abstract Activity createActivityInZone(Zone zone, String actType,
+            Activity perviousActivity);
 }

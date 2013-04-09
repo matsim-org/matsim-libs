@@ -26,7 +26,6 @@ import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -46,14 +45,14 @@ public class ODDemandGenerator
     private final UniformRandom uniform = RandomUtils.getGlobalUniform();
 
     private final Scenario scenario;
-    private final LocationGenerator lg;
+    private final ActivityGenerator lg;
     private final List<Zone> zones;
     private final PopulationFactory pf;
     private final List<Person> taxiCustomers = new ArrayList<Person>();
     private int curentAgentId = 0;
 
 
-    public ODDemandGenerator(Scenario scenario, LocationGenerator lg, Map<Id, Zone> zoneMap)
+    public ODDemandGenerator(Scenario scenario, ActivityGenerator lg, Map<Id, Zone> zoneMap)
     {
         this.scenario = scenario;
         this.lg = lg;
@@ -105,9 +104,7 @@ public class ODDemandGenerator
                     Plan plan = pf.createPlan();
 
                     // act 0
-                    Link oLink = lg.getRandomLinkInZone(oZone, fromActivityType);
-                    Activity startAct = pf
-                            .createActivityFromLinkId(fromActivityType, oLink.getId());
+                    Activity startAct = lg.createActivityInZone(oZone, fromActivityType);
                     startAct.setEndTime((int) (startTime + k * timeStep + uniform.nextDouble(0,
                             timeStep)));
                     plan.addActivity(startAct);
@@ -116,8 +113,7 @@ public class ODDemandGenerator
                     plan.addLeg(pf.createLeg(TransportMode.car));
 
                     // act1
-                    Link dLink = lg.getRandomLinkInZone(dZone, toActivityType, oLink.getId());
-                    Activity endAct = pf.createActivityFromLinkId(toActivityType, dLink.getId());
+                    Activity endAct = lg.createActivityInZone(dZone, toActivityType, startAct);
                     plan.addActivity(endAct);
 
                     createAndInitPerson(plan);
@@ -215,7 +211,7 @@ public class ODDemandGenerator
         new MatsimNetworkReader(scenario).readFile(networkFile);
         Map<Id, Zone> zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
 
-        LocationGenerator lg = new DefualtLocationGenerator(scenario);
+        ActivityGenerator lg = new DefaultActivityGenerator(scenario);
         ODDemandGenerator dg = new ODDemandGenerator(scenario, lg, zones);
 
         double[][] odMatrix = Array2DReader.getDoubleArray(new File(odMatrixFile), zones.size());

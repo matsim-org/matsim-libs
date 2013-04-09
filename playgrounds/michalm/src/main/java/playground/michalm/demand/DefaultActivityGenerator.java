@@ -21,7 +21,9 @@ package playground.michalm.demand;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import pl.poznan.put.util.random.*;
@@ -29,42 +31,44 @@ import pl.poznan.put.util.random.*;
 import com.vividsolutions.jts.geom.*;
 
 
-public class DefualtLocationGenerator
-    implements LocationGenerator
+public class DefaultActivityGenerator
+    implements ActivityGenerator
 {
     private final UniformRandom uniform = RandomUtils.getGlobalUniform();
     private final NetworkImpl network;
     private final Scenario scenario;
+    private final PopulationFactory pf;
 
     private GeometryProvider geometryProvider;
     private PointAcceptor pointAcceptor;
 
 
-    public DefualtLocationGenerator(Scenario scenario)
+    public DefaultActivityGenerator(Scenario scenario)
     {
         this(scenario, DEFAULT_GEOMETRY_PROVIDER, DEFAULT_POINT_ACCEPTOR);
     }
 
 
-    public DefualtLocationGenerator(Scenario scenario, GeometryProvider geometryProvider,
+    public DefaultActivityGenerator(Scenario scenario, GeometryProvider geometryProvider,
             PointAcceptor pointAcceptor)
     {
         this.scenario = scenario;
         this.network = (NetworkImpl)scenario.getNetwork();
+        this.pf = scenario.getPopulation().getFactory();
         this.geometryProvider = geometryProvider;
         this.pointAcceptor = pointAcceptor;
     }
 
 
     @Override
-    public Link getRandomLinkInZone(Zone zone, String actType)
+    public Activity createActivityInZone(Zone zone, String actType)
     {
-        return getRandomLinkInZone(zone, actType, null);
+        return createActivityInZone(zone, actType, null);
     }
 
 
     @Override
-    public Link getRandomLinkInZone(Zone zone, String actType, Id bannedLinkId)
+    public Activity createActivityInZone(Zone zone, String actType, Activity previousActivity)
     {
         Geometry geometry = geometryProvider.getGeometry(zone, actType);
         Envelope envelope = geometry.getEnvelopeInternal();
@@ -74,6 +78,7 @@ public class DefualtLocationGenerator
         double maxY = envelope.getMaxY();
 
         Point p = null;
+        Id bannedLinkId = previousActivity.getLinkId();
 
         for (;;) {
             double x = uniform.nextDouble(minX, maxX);
@@ -91,7 +96,9 @@ public class DefualtLocationGenerator
                 continue;
             }
 
-            return link;
+            ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+            activity.setLinkId(link.getId());
+            return activity;
         }
     }
 
