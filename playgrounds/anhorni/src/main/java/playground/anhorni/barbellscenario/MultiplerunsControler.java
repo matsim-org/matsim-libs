@@ -20,6 +20,7 @@
 package playground.anhorni.barbellscenario;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -34,7 +35,7 @@ import playground.anhorni.utils.Utils;
 public class MultiplerunsControler {
 	
 	private final static Logger log = Logger.getLogger(MultiplerunsControler.class);
-	private int numberOfRuns = 10;
+	private int numberOfRuns = 7;
 	private Analyzer analyzer = null;
 	private double initCapacity = 1000.0;
 		
@@ -90,7 +91,7 @@ public class MultiplerunsControler {
     	final BufferedWriter outNet = IOUtils.getBufferedWriter(path + "/out/0netsummary.txt"); 
     	try {
 	    	for (int runIndex = 1; runIndex <= numberOfRuns; runIndex++) {     			    	
-		    	double flowCapacityFactor = runIndex * 0.1; 
+		    	double flowCapacityFactor = 0.3 + runIndex * 0.1; 
 		    	Analyzer analyzer = this.runDemand(path, flowCapacityFactor);
 		    	
 		    	List<Double> linkTTs = analyzer.getAvgLinkTTs();
