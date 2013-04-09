@@ -46,7 +46,10 @@ public class ORCAAgentFactory implements Sim2DAgentFactory {
 	public Sim2DAgent buildAgent(QVehicle veh, double spawnX, double spawnY,PhysicalSim2DEnvironment pEnv) {
 		LinkSwitcher ls = new LinkSwitcher(this.sc, pEnv);
 		Sim2DAgent agent = new Sim2DAgent(this.sc,veh, spawnX, spawnY, ls, pEnv);
-		VelocityUpdater vu = new ORCAVelocityUpdater(new DesiredDirection(agent, ls), new Neighbors(agent, this.config), this.config, agent);
+		Neighbors nn = new Neighbors(agent, this.config);
+//		nn.setRangeAndMaxNrOfNeighbors(10, 5);
+//		nn.setUpdateInterval(1);
+		VelocityUpdater vu = new ORCAVelocityUpdater(new DesiredDirection(agent, ls), nn, this.config, agent);
 		agent.setVelocityUpdater(vu);
 		return agent;
 	}

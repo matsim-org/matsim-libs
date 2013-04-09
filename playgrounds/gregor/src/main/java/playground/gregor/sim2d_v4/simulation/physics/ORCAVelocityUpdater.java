@@ -48,7 +48,6 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 
 	private final double tau = 1.f;
-	private final double v0 = 1.f; //desired velocity
 
 	private PhysicalSim2DSection psec;
 
@@ -110,8 +109,10 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 
 		final double[] dir = this.dd.computeDesiredDirection();
-		dir[0] *= this.v0;
-		dir[1] *= this.v0;
+		
+		double v0 = this.agent.getV0();
+		dir[0] *= v0;
+		dir[1] *= v0;
 		double dx = dir[0] - v[0];
 		double dy = dir[1] - v[1];
 		double sqrDelta = (dx*dx+dy*dy);
@@ -126,7 +127,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 		}
 		
 		
-		this.solver.run(constr, dir, this.v0, new double []{0.,0.});
+		this.solver.run(constr, dir, v0, new double []{0.,0.});
 		
 		
 

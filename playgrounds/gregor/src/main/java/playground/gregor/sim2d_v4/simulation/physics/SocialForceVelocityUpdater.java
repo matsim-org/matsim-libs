@@ -41,7 +41,7 @@ import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
 public class SocialForceVelocityUpdater implements VelocityUpdater {
 
 	//Helbing constants
-	private final double v0 = 1.34f; //desired velocity
+//	private final double v0 = 1.34f; //desired velocity
 	private final double m = 70 + (MatsimRandom.getRandom().nextDouble()*20); //mass
 	private final double tau = .5f; //acceleration time
 	private final double A = 2000f; // ??
@@ -49,6 +49,7 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 	private final double k = 1.2f * 100000;
 	private final double kappa = 2.4f * 100000;
 //	private final double r
+	@Deprecated //move to Sim2DAgent [gl April'13]
 	private final double vmx = 1.5f;
 
 	//additional constants
@@ -79,10 +80,12 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors();
 		List<Segment> obstacles = this.ocalc.computeObstacles(this.agent);
 
+		double v0 = this.agent.getV0();
+		
 		double[] v = this.agent.getVelocity();
 		double[] e0 = this.dd.computeDesiredDirection();
-		double desiredDVx = this.v0 * e0[0] - v[0];
-		double desiredDVy = this.v0 * e0[1] - v[1];
+		double desiredDVx = v0 * e0[0] - v[0];
+		double desiredDVy = v0 * e0[1] - v[1];
 
 //		desiredDVx *= e0[2];
 //		desiredDVy *= e0[2];

@@ -36,7 +36,7 @@ import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
 
 public class Sim2DAgent implements TwoDObject {
 	
-	private double v0 = 1.f;
+	private double v0 = 1.34f;
 	
 	private final double [] pos = {0,0};
 	
@@ -144,6 +144,7 @@ public class Sim2DAgent implements TwoDObject {
 
 	public void notifyMoveOverNode(Id nextLinkId) {
 		this.driver.notifyMoveOverNode(nextLinkId);
+		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed();
 	}
 
 	public void debug(VisDebugger visDebugger) {
@@ -207,6 +208,10 @@ public class Sim2DAgent implements TwoDObject {
 			return getId().equals(((Sim2DAgent) obj).getId());
 		}
 		return false;
+	}
+
+	public double getV0() {
+		return this.v0;
 	}
 	
 }
