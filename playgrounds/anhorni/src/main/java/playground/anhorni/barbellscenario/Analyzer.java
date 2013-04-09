@@ -46,22 +46,20 @@ public class Analyzer {
 	}
 					
 	public void runBPR(double [] xs) {		
-		XYLineChart chart = new XYLineChart("avg link tt", "Demand/Capacity [-]", "avg tt", false);		
+		XYLineChart chart = new XYLineChart("avg link tt", "Demand/Capacity [-]", "avg tt [min]", false);		
 		chart.addSeries("avg link 3 tt [min]", xs, Utils.convert(this.avgLinkTTs));	
-		chart.saveAsPng(this.path + "/out/" + suffix + "linkTTBPR.png", 700, 500);
+		chart.saveAsPng(this.path + "/out/" + suffix + "_linkTTBPR.png", 700, 500);
 		
-		XYLineChart chart0 = new XYLineChart("avg network tt", "Demand/Capacity [-]", "avg tt", false);		
+		XYLineChart chart0 = new XYLineChart("avg network tt", "Demand/Capacity [-]", "avg tt [min]", false);		
 		chart0.addSeries("avg net tt [min]", xs, Utils.convert(this.avgNetTTs));	
-		chart0.saveAsPng(this.path + "/out/" + suffix + "netTTBPR.png", 700, 500);
+		chart0.saveAsPng(this.path + "/out/" + suffix + "_netTTBPR.png", 700, 500);
 	}
-	
-	public void runC(double [] xs) {		
-		XYLineChart chart = new XYLineChart("avg link tt", "Capacity [veh/min]", "avg tt", false);		
-		chart.addSeries("avg link 3 tt [min]", xs, Utils.convert(this.avgLinkTTs));
-		chart.saveAsPng(this.path + "/out/" + suffix + "linkTT.png", 700, 500);
-		
-		XYLineChart chart0 = new XYLineChart("avg network tt", "Capacity [veh/min]", "avg tt", false);		
-		chart0.addSeries("avg net tt [min]", xs, Utils.convert(this.avgNetTTs));	
-		chart0.saveAsPng(this.path + "/out/" + suffix + "netTT.png", 700, 500);
+
+	public List<Double> getAvgNetTTs() {
+		return avgNetTTs;
+	}
+
+	public List<Double> getAvgLinkTTs() {
+		return avgLinkTTs;
 	}
 }

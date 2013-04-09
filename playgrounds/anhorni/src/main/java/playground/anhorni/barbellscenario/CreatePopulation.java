@@ -36,34 +36,38 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class CreatePopulation {
 	private ScenarioImpl scenario = null;	
 	private final static Logger log = Logger.getLogger(CreatePopulation.class);	
+	public String pathStub;
 				
 	public static void main(final String[] args) {
 		String networkfilePath = args[0];
 		String facilitiesfilePath = args[1];
-		int nPersons = Integer.parseInt(args[2]);
-		String outpath = args[3];
+		String pathStub = args[2];
 	
 		CreatePopulation plansCreator = new CreatePopulation();
-		plansCreator.init(networkfilePath, facilitiesfilePath);
-		plansCreator.generatePlans(nPersons);
-		plansCreator.writePlans(outpath);
-		
+		plansCreator.init(networkfilePath, facilitiesfilePath, pathStub);
+		plansCreator.generateDemand();				
 		log.info("Creation finished -----------------------------------------");
 	}
 	
-	private void init(final String networkfilePath, final String facilitiesfilePath) {
+	private void init(final String networkfilePath, final String facilitiesfilePath, String pathStub) {
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(this.scenario).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesfilePath);
+		this.pathStub = pathStub;
 	}
 	
 	public void writePlans(String outpath) {
 		log.info("Writing plans ...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outpath + "/plans.xml");
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outpath + "plans.xml");
 	}
 	
+	public void generateDemand() {
+		for (int i = 100; i <= 1000; i=i+100) {
+			this.generatePlans(i, this.pathStub + i);
+		}
+	}
 	
-	public void generatePlans(int nPersons) {	
+	private void generatePlans(int nPersons, String path) {	
 		ActivityFacility homeFacility;
 		ActivityFacility workFacility;
 		
@@ -85,6 +89,8 @@ public class CreatePopulation {
 			this.scenario.getPopulation().addPerson(p);
 			this.generateWorkPlan(p, homeFacility, workFacility, timeOffset);
 		}
+		this.writePlans(path);
+		this.scenario.getPopulation().getPersons().clear();
 	}
 		
 	private void generateWorkPlan(PersonImpl p, ActivityFacility homeFacility, ActivityFacility workFacility, double timeOffset) {	
