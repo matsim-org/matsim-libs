@@ -36,7 +36,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
@@ -47,6 +46,11 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private Map<Id,Double> geometricLengths = new HashMap<Id,Double>();
 	private Map<Id,String> nodeTypes = new HashMap<Id,String>();
+	private List<Id> deadEndNodes = new ArrayList<Id>();
+	private List<Id> redundantNodes = new ArrayList<Id>();
+	private List<Id> exitRoadNodes = new ArrayList<Id>();
+	
+	private Map<String,Class<? extends Geometry>> filesForExportInQGisProject = new HashMap<String,Class<? extends Geometry>>();
 	
 	private List<Link> lengthBelowStorageCapacity = new ArrayList<Link>();
 	
@@ -59,7 +63,7 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private Geometry envelope;
 	
-	private String outputFolder = "./NetworkInspector.output";
+	private String outputFolder = "./NetworkInspector.output/";
 	
 	/**
 	 * 
@@ -89,6 +93,8 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private void run() {
 		
+		this.filesForExportInQGisProject.clear();
+		
 		if(isRoutable()){
 			
 			continueWithRoutableNetwork();
@@ -101,6 +107,12 @@ public class NetworkInspector {//TODO pfade ändern
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		this.filesForExportInQGisProject.put("envelope", Polygon.class);
+		
+		logger.info("writing QuantumGIS project file with generated layers...");
+		
+		QGisExport.main(this.filesForExportInQGisProject);
 				
 		logger.info("exiting NetworkInspector...");
 			
@@ -116,27 +128,6 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
 		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
-		
-		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-		typeBuilder.setName("shape");
-		typeBuilder.add("bbox",Polygon.class);
-		typeBuilder.add("area",Double.class);
-		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
-		
-		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
-		LinearRing shell = new GeometryFactory().createLinearRing(new Coordinate[]{new Coordinate(bbox.getXMin(),bbox.getYMin()),
-				new Coordinate(bbox.getXMax(),bbox.getYMin()),new Coordinate(bbox.getXMax(),bbox.getYMax()),
-				new Coordinate(bbox.getXMin(),bbox.getYMax()),new Coordinate(bbox.getXMin(),bbox.getYMin())});
-		
-		SimpleFeature feature = this.builder.buildFeature(null, new Object[]{
-				new GeometryFactory().createPolygon(shell, null),
-				shell.getArea()
-		});
-		
-		features.add(feature);
-	
-	ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/bbox.shp");
 		
 		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
 		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 50);
@@ -238,7 +229,11 @@ public class NetworkInspector {//TODO pfade ändern
 				
 			}
 			
-			ShapeFileWriter.writeGeometries(features, this.outputFolder+"/smallClusters.shp");
+			String destination = "smallClusters";
+			
+			this.filesForExportInQGisProject.put(destination,LineString.class);
+			
+			ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
 			
 		}
 		
@@ -265,7 +260,11 @@ public class NetworkInspector {//TODO pfade ändern
 			
 		}
 		
-		ShapeFileWriter.writeGeometries(features, this.outputFolder+"/network.shp");
+		String destination = "network";
+		
+		this.filesForExportInQGisProject.put(destination,LineString.class);
+		
+		ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
 	}
 	
 	//aus klasse NetworkCleaner
@@ -350,7 +349,7 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		createLinkStatisticsFile();
 		
-		File file = new File(this.outputFolder+"/lengthBelowStorageCapacity.txt");
+		File file = new File(this.outputFolder+"lengthBelowStorageCapacity.txt");
 		FileWriter writer;
 		
 		try {
@@ -386,12 +385,6 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		for(Node node : NetworkInspector.scenario.getNetwork().getNodes().values()){
 			
-			if(!this.envelope.contains(new Point(new CoordinateArraySequence(new Coordinate[]{
-					new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory()))){
-				this.nodeTypes.put(node.getId(), "exit");
-				exit++;
-				continue;
-			} else{
 				
 				if(node.getInLinks().size()>0&&node.getOutLinks().size()>0){
 					
@@ -401,7 +394,14 @@ public class NetworkInspector {//TODO pfade ändern
 						Link outLink = node.getOutLinks().values().iterator().next();
 					
 						if(inLink.getFromNode().equals(outLink.getToNode())){
-							
+							if(!this.envelope.contains(new Point(new CoordinateArraySequence(new Coordinate[]{
+									new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory()))){
+								this.exitRoadNodes.add(node.getId());
+								this.nodeTypes.put(node.getId(), "exit");
+								exit++;
+								continue;
+							} 
+							this.deadEndNodes.add(node.getId());
 							this.nodeTypes.put(node.getId(), "deadEnd");
 							de++;
 							
@@ -411,7 +411,7 @@ public class NetworkInspector {//TODO pfade ändern
 									inLink.getFreespeed()==outLink.getFreespeed()&&
 									inLink.getNumberOfLanes()==outLink.getNumberOfLanes()&&
 									inLink.getAllowedModes()==outLink.getAllowedModes()){
-								
+								this.redundantNodes.add(node.getId());
 								this.nodeTypes.put(node.getId(), "redundant");
 								red++;
 								
@@ -420,7 +420,6 @@ public class NetworkInspector {//TODO pfade ändern
 					}
 				}
 				
-			}
 			
 		}
 		
@@ -439,7 +438,7 @@ public class NetworkInspector {//TODO pfade ändern
 		
 	private void createLinkStatisticsFile(){
 		
-		File file = new File(this.outputFolder+"/linkStatistics.txt");
+		File file = new File(this.outputFolder+"linkStatistics.txt");
 		
 		try {
 			
@@ -470,7 +469,7 @@ public class NetworkInspector {//TODO pfade ändern
 	//eigene methode
 	private void createNodeStatisticsFile() {
 		
-		File file = new File(this.outputFolder+"/nodeStatistics.txt");
+		File file = new File(this.outputFolder+"nodeStatistics.txt");
 		FileWriter writer;
 		try {
 			writer = new FileWriter(file);
@@ -515,7 +514,11 @@ public class NetworkInspector {//TODO pfade ändern
 			
 		}
 		
-		ShapeFileWriter.writeGeometries(features, this.outputFolder+"/nodeTypes.shp");
+		String destination = "nodeTypes";
+		
+		this.filesForExportInQGisProject.put(destination,Point.class);
+		
+		ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
 		
 	}
 	

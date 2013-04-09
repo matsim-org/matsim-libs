@@ -80,9 +80,6 @@ public class MinimumEnvelope {
 				outerNodes.add(nodeId);
 			}
 		}
-		end=System.currentTimeMillis();
-		
-		System.out.println(end-start);		
 		
 		log.info("writing minimum envelope into ESRI shapefile...");
 		
@@ -115,7 +112,7 @@ public class MinimumEnvelope {
 		
 		features.add(feature);
 		
-		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Dropbox/bsc/output/mapping/envelope.shp");
+		ShapeFileWriter.writeGeometries(features, "NetworkInspector.output/envelope.shp");
 		
 		return (Geometry) poly;
 		
