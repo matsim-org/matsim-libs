@@ -57,6 +57,8 @@ public class LanduseByZoneUtils
             geometriesByZone.put(z.getId(), gList);
         }
 
+        //TODO check out if geometries overlay one another!!!
+        
         return geometriesByZone;
     }
 

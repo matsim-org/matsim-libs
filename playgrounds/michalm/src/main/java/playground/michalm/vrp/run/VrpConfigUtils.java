@@ -20,6 +20,7 @@
 package playground.michalm.vrp.run;
 
 import org.matsim.core.config.*;
+import org.matsim.core.config.groups.QSimConfigGroup;
 
 
 public class VrpConfigUtils
@@ -27,7 +28,9 @@ public class VrpConfigUtils
     public static Config createConfig()
     {
         Config config = ConfigUtils.createConfig();
-        config.getQSimConfigGroup().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+        QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+        qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+        config.addQSimConfigGroup(qSimConfigGroup);
         return config;
     }
 
@@ -35,10 +38,14 @@ public class VrpConfigUtils
     public static Config loadConfig(final String filename)
     {
         Config config = ConfigUtils.loadConfig(filename);
+        QSimConfigGroup qSimConfigGroup = config.getQSimConfigGroup();
 
-        if (!config.getQSimConfigGroup().isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
-            System.err.println("isInsertingWaitingVehiclesBeforeDrivingVehicles = false; "
-                    + "will be changed to true!");
+        if (qSimConfigGroup == null) {
+            qSimConfigGroup = new QSimConfigGroup();
+        }
+        else if (!qSimConfigGroup.isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
+            System.err.println("isInsertingWaitingVehiclesBeforeDrivingVehicles was FALSE; "
+                    + "has been changed to TRUE!");
         }
 
         config.getQSimConfigGroup().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
