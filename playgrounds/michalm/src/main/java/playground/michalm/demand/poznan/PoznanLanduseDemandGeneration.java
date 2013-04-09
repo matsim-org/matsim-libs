@@ -26,7 +26,6 @@ import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -37,6 +36,7 @@ import playground.michalm.demand.*;
 import playground.michalm.demand.DefualtLocationGenerator.GeometryProvider;
 import playground.michalm.demand.DefualtLocationGenerator.PointAcceptor;
 import playground.michalm.util.visum.VisumODMatrixReader;
+import playground.michalm.vrp.run.VrpConfigUtils;
 
 import com.vividsolutions.jts.geom.*;
 
@@ -130,7 +130,7 @@ public class PoznanLanduseDemandGeneration
 
         RandomUtils.reset(randomSeed);
 
-        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
         zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
 

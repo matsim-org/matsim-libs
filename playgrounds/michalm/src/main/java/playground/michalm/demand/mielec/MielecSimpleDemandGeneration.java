@@ -26,13 +26,13 @@ import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
 
 import pl.poznan.put.util.array2d.*;
 import playground.michalm.demand.*;
+import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 public class MielecSimpleDemandGeneration
@@ -58,7 +58,7 @@ public class MielecSimpleDemandGeneration
         double[] flowCoeff = { 0.2, 0.2, 0.4, 0.8, 0.4, 0.2, 0.2 };
         double taxiProbability = 0.07;
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
         Map<Id, Zone> zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
 

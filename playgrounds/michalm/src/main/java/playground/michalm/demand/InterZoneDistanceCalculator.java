@@ -33,6 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.michalm.vrp.data.network.router.*;
+import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 public class InterZoneDistanceCalculator
@@ -51,7 +52,7 @@ public class InterZoneDistanceCalculator
 
     private void readNetwork(String filename)
     {
-        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
         nr.readFile(filename);
     }

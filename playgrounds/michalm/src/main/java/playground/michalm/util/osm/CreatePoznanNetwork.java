@@ -3,12 +3,13 @@ package playground.michalm.util.osm;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.config.*;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
+
+import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 public class CreatePoznanNetwork
@@ -33,8 +34,7 @@ public class CreatePoznanNetwork
             throw new IllegalArgumentException();
         }
 
-        Config config = ConfigUtils.createConfig();
-        Scenario scenario = ScenarioUtils.createScenario(config);
+        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         Network network = scenario.getNetwork();
 
         CoordinateTransformation coordTrans = TransformationFactory.getCoordinateTransformation(

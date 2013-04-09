@@ -23,11 +23,12 @@ import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.matsim2esri.network.*;
+
+import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 public class Net2GIS
@@ -61,8 +62,7 @@ public class Net2GIS
 
         String coordSystem = TransformationFactory.WGS84_UTM33N;
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
+        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         scenario.getConfig().global().setCoordinateSystem(coordSystem);
 
         Network network = scenario.getNetwork();

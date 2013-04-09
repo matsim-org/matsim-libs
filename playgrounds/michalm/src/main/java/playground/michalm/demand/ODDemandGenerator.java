@@ -28,7 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
@@ -36,6 +35,7 @@ import org.xml.sax.SAXException;
 import pl.poznan.put.util.array2d.Array2DReader;
 import pl.poznan.put.util.random.*;
 import playground.michalm.demand.Zone.Type;
+import playground.michalm.vrp.run.VrpConfigUtils;
 
 import com.google.common.collect.Lists;
 
@@ -211,7 +211,7 @@ public class ODDemandGenerator
 
         String taxiFile = dirName + "taxiCustomers_" + ((int) (taxiProbability * 100)) + "_pc.txt";
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
         Map<Id, Zone> zones = Zone.readZones(scenario, zonesXmlFile, zonesShpFile, idField);
 

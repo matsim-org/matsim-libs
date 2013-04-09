@@ -24,10 +24,11 @@ import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 public class CombinePlansWithVrpSchedulePlans
@@ -72,7 +73,7 @@ public class CombinePlansWithVrpSchedulePlans
                     + Arrays.toString(args));
         }
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
 
         new MatsimNetworkReader(scenario).readFile(networkFileName);
 

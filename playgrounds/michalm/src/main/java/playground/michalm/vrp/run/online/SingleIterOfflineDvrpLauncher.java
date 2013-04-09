@@ -26,7 +26,6 @@ import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
@@ -53,6 +52,7 @@ import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
 import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
 import playground.michalm.vrp.driver.VrpSchedulePlan;
+import playground.michalm.vrp.run.VrpConfigUtils;
 import playground.michalm.vrp.run.online.AlgorithmConfig.AlgorithmType;
 import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
 
@@ -105,8 +105,7 @@ public class SingleIterOfflineDvrpLauncher
     private void prepareMatsimData()
         throws IOException
     {
-        Config config = ConfigUtils.createConfig();
-        scenario = ScenarioUtils.createScenario(config);
+        scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
 
         new MatsimNetworkReader(scenario).readFile(netFileName);
         new MatsimPopulationReader(scenario).readFile(plansFileName);

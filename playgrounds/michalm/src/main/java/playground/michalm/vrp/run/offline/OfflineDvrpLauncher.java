@@ -45,6 +45,7 @@ import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.MatsimVertexImpl;
 import playground.michalm.vrp.data.network.shortestpath.FullDiscreteMatsimArcIO;
 import playground.michalm.vrp.driver.VrpSchedulePlan;
+import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 public class OfflineDvrpLauncher
@@ -118,8 +119,9 @@ public class OfflineDvrpLauncher
                     + Arrays.toString(args));
         }
 
-        Config config = ConfigUtils.loadConfig(cfgFileName);
+        Config config = VrpConfigUtils.loadConfig(cfgFileName);
         Scenario scenario = ScenarioUtils.createScenario(config);
+
         MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
         nr.readFile(config.network().getInputFile());
 

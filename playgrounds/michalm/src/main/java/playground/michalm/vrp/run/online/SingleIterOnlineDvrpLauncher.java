@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.*;
@@ -62,6 +61,7 @@ import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.*;
 import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
+import playground.michalm.vrp.run.VrpConfigUtils;
 import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
 import playground.michalm.vrp.taxi.wal.WalTaxiSimEngine;
@@ -137,7 +137,7 @@ public class SingleIterOnlineDvrpLauncher
 
         vrpOutFiles = !true;
         vrpOutDirName = dirName + "vrp_output";
-        
+
         outputHistogram = true;
         vrpOutDirName = dirName + "histograms";
 
@@ -183,8 +183,7 @@ public class SingleIterOnlineDvrpLauncher
     void prepareMatsimData()
         throws IOException
     {
-        Config config = ConfigUtils.createConfig();
-        scenario = ScenarioUtils.createScenario(config);
+        scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
 
         new MatsimNetworkReader(scenario).readFile(netFileName);
         new MatsimPopulationReader(scenario).readFile(plansFileName);
