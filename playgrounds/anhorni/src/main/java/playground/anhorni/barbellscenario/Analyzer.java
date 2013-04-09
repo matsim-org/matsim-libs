@@ -46,12 +46,12 @@ public class Analyzer {
 	}
 					
 	public void runBPR(double [] xs) {		
-		XYLineChart chart = new XYLineChart("avg link tt", "Demand/Capacity [-]", "avg tt [min]", false);		
-		chart.addSeries("avg link 3 tt [min]", xs, Utils.convert(this.avgLinkTTs));	
+		XYLineChart chart = new XYLineChart("avg link tt", "V/C [-]", "avg tt [min]", false);		
+		chart.addSeries("", xs, Utils.convert(this.avgLinkTTs));	
 		chart.saveAsPng(this.path + "/out/" + suffix + "_linkTTBPR.png", 700, 500);
 		
-		XYLineChart chart0 = new XYLineChart("avg network tt", "Demand/Capacity [-]", "avg tt [min]", false);		
-		chart0.addSeries("avg net tt [min]", xs, Utils.convert(this.avgNetTTs));	
+		XYLineChart chart0 = new XYLineChart("avg network tt", "V/C [-]", "avg tt [min]", false);		
+		chart0.addSeries("", xs, Utils.convert(this.avgNetTTs));	
 		chart0.saveAsPng(this.path + "/out/" + suffix + "_netTTBPR.png", 700, 500);
 	}
 
