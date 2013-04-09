@@ -201,7 +201,7 @@ public class PtMatrix {
 				// get nearest network node
 				// Node destinationNode = network.getNearestNode(destinationCoord);
 				// get distance in meter
-				double distance = NetworkUtil.getEuclidianDistance(originCoord, destinationCoord);
+				double distance = NetworkUtil.getEuclidianDistance(originCoord, destinationCoord) * beelineDistanceFactor;
 				
 				// NodeData nd = lcpt.getTree().get( destinationNode.getId() );
 				// double distance = nd.getCost();
@@ -212,8 +212,8 @@ public class PtMatrix {
 				// else
 				// 	networkDistanceCounter++;
 				
-				// calculate time in seconds (distance * beelineDistanceFactor * 25kmh)
-				double travelTime = (distance * beelineDistanceFactor) / meterPerSecPtSpeed;
+				// calculate time in seconds (distance / 25kmh)
+				double travelTime = distance / meterPerSecPtSpeed;
 				
 				// create entry - travel times in seconds
 				travelTimeOD.createEntry(originStop.getId(), destinationStop.getId(), travelTime);			

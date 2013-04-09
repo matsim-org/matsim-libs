@@ -126,7 +126,7 @@ public class PtMatrixTest extends MatsimTestCase{
 					
 					// test pt travel distance and time
 					// in the test network the euclidean distance between neighboring pt stops always is 180 m
-					Assert.assertTrue(ptTravelDistance == 180.);
+					Assert.assertTrue(ptTravelDistance == 180.*beelineDistanceFactor);
 					Assert.assertTrue(ptTravelTime == (180./defaultPtSpeed)*beelineDistanceFactor);
 				}
 				
@@ -144,11 +144,11 @@ public class PtMatrixTest extends MatsimTestCase{
 					Assert.assertTrue(walkTravelTime == 100./defaultWalkSpeed);
 					
 					// test upper bounds for pt travel distance and time (as described above)
-					Assert.assertTrue(ptTravelDistance <= euclideanDistance);
+					Assert.assertTrue(ptTravelDistance <= euclideanDistance*beelineDistanceFactor);
 					Assert.assertTrue(ptTravelTime <= (euclideanDistance/defaultPtSpeed)*beelineDistanceFactor);
 					
 					// test lower bounds for pt travel distance and time (as described above)
-					Assert.assertTrue(ptTravelDistance >= 180.);
+					Assert.assertTrue(ptTravelDistance >= 180.*beelineDistanceFactor);
 					Assert.assertTrue(ptTravelTime >= (180./defaultPtSpeed)*beelineDistanceFactor);
 				}
 			}
