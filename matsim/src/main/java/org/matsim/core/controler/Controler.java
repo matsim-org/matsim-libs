@@ -853,7 +853,13 @@ public class Controler extends AbstractController {
 	 *         of plans with the default (= the current from the last or current
 	 *         iteration) travel costs and travel times. Only to be used by a
 	 *         single thread, use multiple instances for multiple threads!
+	 *         
+	 *  @deprecated Overriding this method will affect prepareForSim(), but not the iterations.  In particular, without further measures it
+	 *  will not affect ReRoute in the iterations. Also conceptually, the building block really is the TripRouter, which routes from
+	 *  one location to another.  Wrapping this into a PlanAlgorithm is useful as a strategy, but nowhere else.  In summary, there
+	 *  is neither a good reason (any more) to override this method nor to call it.  kai, apr'13
 	 */
+	@Deprecated
 	public PlanAlgorithm createRoutingAlgorithm() {
 		// yyyy can't make this final: overridden at about 20 locations.  kai, jan'13
 		
