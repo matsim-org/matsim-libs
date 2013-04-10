@@ -115,38 +115,46 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
 
 		// some ideas about how to use a more correct approach:
-		LeastCostPathTree lcptCar ;
-		
-		boolean usingMatsimParams = true ;
-		if ( usingMatsimParams ) {
-			lcptCar = new LeastCostPathTree( ttc, controler.createTravelCostCalculator() ) ; 
-			System.exit(-1) ;
-		} else {
-			TravelDisutilityFactory factory = controler.getTravelDisutilityFactory();
-			
-			// faking a scoring group with the urbansim params:
-			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup() ;
-
-			// marginal utility of money (should usually be positive):
-			final double margUtlOfMoney = this.betaCarTMC;
-			cnScoringGroup.setMarginalUtilityOfMoney( margUtlOfMoney ) ; // (!!)
-			log.error("is the sign correct??") ; System.exit(-1) ;
-
-			// marginal utility (should usually be negative):
-			cnScoringGroup.setTraveling_utils_hr( this.betaCarTT ) ; 
-			log.error("units of betaCarTT = ??") ; System.exit(-1) ;
-			log.error("need to add utl of perf?  probably not since this is matsim-indep (may be confusing??)") ;
-			
-			// monetaryDistanceCostRateCar (should usually be positive??? negative???):
-			double monetaryDistanceCostRateCar /* money/meter */ = this.betaCarTD /* utl/meter*/ / margUtlOfMoney /* utl/money */ ;
-			log.error("is the sign correct??") ; System.exit(-1) ;
-			cnScoringGroup.setMonetaryDistanceCostRateCar(monetaryDistanceCostRateCar) ;
-			
-			cnScoringGroup.setConstantCar(0.) ; // no information; not a problem as long as we compute mode-based accessibilities 
-			// separately
-			
-			lcptCar = new LeastCostPathTree( ttc, factory.createTravelDisutility(ttc, cnScoringGroup) ) ;
-		}
+//		LeastCostPathTree lcptCar ;
+//		
+//		boolean usingMatsimParams = true ;
+//		if ( usingMatsimParams ) {
+//			lcptCar = new LeastCostPathTree( ttc, controler.createTravelCostCalculator() ) ; 
+//			System.exit(-1) ;
+//		} else {
+//			// After some thinking, I am (again) of the opinion that also here we need to take the s.p. tree from the simulation.
+//			// Reason: Assume the simulation equilibrates according to travel time (as usual).  A short _distance_ path may be
+//			// available, but not have enough capacity.  If we run the accessibility on a distance-based s.p. tree, we get travel
+//			// disutilities which are unrealistic since they are not congested.
+//			// (However, need to be careful since someone may want walk accessibilities.  Those are not obtained by using the car s.p. tree
+//			// and then using distance.)
+//			// kai, apr'13
+//			
+//			TravelDisutilityFactory factory = controler.getTravelDisutilityFactory();
+//			
+//			// faking a scoring group with the urbansim params:
+//			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup() ;
+//
+//			// marginal utility of money (should usually be positive):
+//			final double margUtlOfMoney = this.betaCarTC;
+//			cnScoringGroup.setMarginalUtilityOfMoney( margUtlOfMoney ) ; // (!!)
+//			log.error("is the sign correct??") ; System.exit(-1) ;
+//
+//			// marginal utility (should usually be negative):
+//			cnScoringGroup.setTraveling_utils_hr( this.betaCarTT ) ; 
+//			log.error("units of betaCarTT = ??") ; System.exit(-1) ;
+//			log.error("need to add utl of perf?  probably not since this is matsim-indep (may be confusing??)") ;
+//			
+//			// monetaryDistanceCostRateCar (should usually be positive??? negative???):
+//			double monetaryDistanceCostRateCar /* money/meter */ = this.betaCarTD /* utl/meter*/ / margUtlOfMoney /* utl/money */ ;
+//			log.error("is the sign correct??") ; System.exit(-1) ;
+//			cnScoringGroup.setMonetaryDistanceCostRateCar(monetaryDistanceCostRateCar) ;
+//			
+//			cnScoringGroup.setConstantCar(0.) ; // no information; not a problem as long as we compute mode-based accessibilities 
+//			// separately
+//			
+//			lcptCar = new LeastCostPathTree( ttc, factory.createTravelDisutility(ttc, cnScoringGroup) ) ;
+//		}
 		
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
