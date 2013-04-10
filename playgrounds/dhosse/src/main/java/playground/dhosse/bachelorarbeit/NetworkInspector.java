@@ -50,6 +50,8 @@ public class NetworkInspector {//TODO pfade ändern
 	private List<Id> redundantNodes = new ArrayList<Id>();
 	private List<Id> exitRoadNodes = new ArrayList<Id>();
 	
+	private List<Id> nodesWithHighDegrees = new ArrayList<Id>();
+	
 	private Map<String,Class<? extends Geometry>> filesForExportInQGisProject = new HashMap<String,Class<? extends Geometry>>();
 	
 	private List<Link> lengthBelowStorageCapacity = new ArrayList<Link>();
@@ -385,6 +387,8 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		for(Node node : NetworkInspector.scenario.getNetwork().getNodes().values()){
 			
+			if(node.getInLinks().size()>5||node.getOutLinks().size()>5)
+				this.nodesWithHighDegrees.add(node.getId());
 				
 				if(node.getInLinks().size()>0&&node.getOutLinks().size()>0){
 					
@@ -519,6 +523,24 @@ public class NetworkInspector {//TODO pfade ändern
 		this.filesForExportInQGisProject.put(destination,Point.class);
 		
 		ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
+		
+		if(!(this.nodesWithHighDegrees.size()<1)){
+		features.clear();
+		
+		for(Id nodeId : this.nodesWithHighDegrees){
+			Point p = MGC.coord2Point(NetworkInspector.scenario.getNetwork().getNodes().get(nodeId).getCoord());
+			try {
+				features.add(this.builder.buildFeature(null, new Object[]{p,nodeId.toString(),this.nodeTypes.get(nodeId)}));
+			} catch (IllegalArgumentException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		destination = "highDegreeNodes";
+		
+		this.filesForExportInQGisProject.put(destination, Point.class);
+		ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
+		}
 		
 	}
 	
