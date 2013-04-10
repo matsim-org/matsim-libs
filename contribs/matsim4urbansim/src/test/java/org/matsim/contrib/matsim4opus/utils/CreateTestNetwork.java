@@ -202,4 +202,41 @@ public class CreateTestNetwork {
 		return facilityList;
 	}
 	
+	/**
+	 * creating a test network
+	 * the path 1,2,4 has a total length of 1000m with a free speed travel time of 10m/s
+	 * the second path 1,3,4 has a total length of 100m but only a free speed travel time of 0.1m/s
+	 */
+	public static NetworkImpl createTriangularNetwork() {
+		/*
+		 * 			(2)
+		 *         /   \
+		 *        /     \
+		 *(10m/s)/       \(10m/s)
+		 *(500m)/	      \(500m)
+		 *     /           \
+		 *    /             \
+		 *	 /               \
+		 *(1)-------(3)-------(4)
+		 *(50m,0.1m/s)(50m,0.1m/s) 			
+		 */
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		
+		// add nodes
+		Node node1 = network.createAndAddNode(new IdImpl(1), scenario.createCoord(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl(2), scenario.createCoord(50, 100));
+		Node node3 = network.createAndAddNode(new IdImpl(3), scenario.createCoord(50, 0));
+		Node node4 = network.createAndAddNode(new IdImpl(4), scenario.createCoord(100, 0));
+
+		// add links
+		network.createAndAddLink(new IdImpl(1), node1, node2, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl(2), node2, node4, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl(3), node1, node3, 50.0, 0.1, 3600.0, 1);
+		network.createAndAddLink(new IdImpl(4), node3, node4, 50.0, 0.1, 3600.0, 1);
+		
+		return network;
+	}
+	
 }
