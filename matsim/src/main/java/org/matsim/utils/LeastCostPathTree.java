@@ -181,11 +181,11 @@ public class LeastCostPathTree {
 			double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime, null, null);
 			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime, null, null);
 			
-			additionalComputationsHook( l, currTime ) ;
 			
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);
 				nnData.visit(n.getId(), visitCost, visitTime);
+				additionalComputationsHook( l, currTime ) ;
 				pendingNodes.add(nn);
 			}
 		}
