@@ -62,13 +62,13 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 
 	private static final Logger log = Logger.getLogger(ParkingSearchReplanner.class);
 	
-	private final ParkingAgentsTracker parkingAgentsTracker;
+	protected final ParkingAgentsTracker parkingAgentsTracker;
 	private final ParkingInfrastructure parkingInfrastructure;
 	private final ParkingRouter parkingRouter;
-	private final ParkingSearchStrategy randomParkingSearch;
-	private final ParkingSearchStrategy nearestAvailableParkingSearch;
+	protected final ParkingSearchStrategy randomParkingSearch;
+	protected final ParkingSearchStrategy nearestAvailableParkingSearch;
 	
-	ParkingSearchReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+	protected ParkingSearchReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
 			ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure, ParkingRouter parkingRouter) {
 		super(id, scenario, internalInterface);
 		this.parkingAgentsTracker = parkingAgentsTracker;
@@ -119,7 +119,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		return true;
 	}
 	
-	private void updateAgentsPlan(PlanBasedWithinDayAgent withinDayAgent, Id parkingFacilityId, NetworkRoute route, int routeIndex) {
+	protected void updateAgentsPlan(PlanBasedWithinDayAgent withinDayAgent, Id parkingFacilityId, NetworkRoute route, int routeIndex) {
 		
 		Plan plan = withinDayAgent.getSelectedPlan();
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();

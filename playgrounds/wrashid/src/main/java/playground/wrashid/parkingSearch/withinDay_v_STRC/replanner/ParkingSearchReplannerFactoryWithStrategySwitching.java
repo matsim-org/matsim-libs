@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParkingSearchReplannerFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,8 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.christoph.parking.withinday.replanner;
+package playground.wrashid.parkingSearch.withinDay_v_STRC.replanner;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -26,35 +24,32 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
+import playground.christoph.parking.withinday.replanner.ParkingSearchReplanner;
+import playground.christoph.parking.withinday.replanner.ParkingSearchReplannerFactory;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouter;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 
-public class ParkingSearchReplannerFactory extends WithinDayDuringLegReplannerFactory {
+public class ParkingSearchReplannerFactoryWithStrategySwitching extends ParkingSearchReplannerFactory {
 
-	protected final Scenario scenario;
-	protected final ParkingAgentsTracker parkingAgentsTracker;
-	protected final ParkingInfrastructure parkingInfrastructure;
-	protected final ParkingRouterFactory parkingRouterFactory;
-	
-	public ParkingSearchReplannerFactory(WithinDayEngine withindayDayEngine, AbstractMultithreadedModule abstractMultithreadedModule,
-			double replanningProbability, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker, 
-			ParkingInfrastructure parkingInfrastructure, ParkingRouterFactory parkingRouterFactory) {
-		super(withindayDayEngine, abstractMultithreadedModule, replanningProbability);
+	public ParkingSearchReplannerFactoryWithStrategySwitching(WithinDayEngine withindayDayEngine,
+			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability, Scenario scenario,
+			ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure,
+			ParkingRouterFactory parkingRouterFactory) {
+		super(withindayDayEngine, abstractMultithreadedModule, replanningProbability, scenario, parkingAgentsTracker,
+				parkingInfrastructure, parkingRouterFactory);
 		
-		this.scenario = scenario;
-		this.parkingAgentsTracker = parkingAgentsTracker;
-		this.parkingInfrastructure = parkingInfrastructure;
-		this.parkingRouterFactory = parkingRouterFactory;
 	}
 
 	@Override
 	public ParkingSearchReplanner createReplanner() {
 		ParkingRouter parkingRouter = this.parkingRouterFactory.createParkingRouter();
-		ParkingSearchReplanner replanner = new ParkingSearchReplanner(super.getId(), scenario, 
+		ParkingSearchReplanner replanner = new ParkingSearchReplannerWithStrategySwitching(super.getId(), scenario, 
 				this.getReplanningManager().getInternalInterface(), parkingAgentsTracker, parkingInfrastructure, parkingRouter);
 		super.initNewInstance(replanner);
 		return replanner;
 	}
 
+
 }
+
