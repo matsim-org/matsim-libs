@@ -28,8 +28,8 @@ import playground.gregor.sim2d_v4.simulation.physics.ORCAVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.VelocityUpdater;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.NearestPointAtTargetLine;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 
 public class ORCAAgentFactory implements Sim2DAgentFactory {
@@ -49,7 +49,7 @@ public class ORCAAgentFactory implements Sim2DAgentFactory {
 		Neighbors nn = new Neighbors(agent, this.config);
 //		nn.setRangeAndMaxNrOfNeighbors(10, 5);
 //		nn.setUpdateInterval(1);
-		VelocityUpdater vu = new ORCAVelocityUpdater(new DesiredDirection(agent, ls), nn, this.config, agent);
+		VelocityUpdater vu = new ORCAVelocityUpdater(new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
 		agent.setVelocityUpdater(vu);
 		return agent;
 	}

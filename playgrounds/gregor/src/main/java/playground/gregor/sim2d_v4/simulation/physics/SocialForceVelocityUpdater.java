@@ -28,7 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
 
@@ -58,12 +58,12 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 
 	private final Neighbors ncalc;
 	private final Obstacles ocalc = new Obstacles();
-	private DesiredDirection dd;
+	private DesiredDirectionCalculator dd;
 
 	private final double dT;
 	private final Sim2DAgent agent;
 	
-	public SocialForceVelocityUpdater(DesiredDirection dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
+	public SocialForceVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dd = dd;
 		this.agent = agent;
@@ -210,7 +210,7 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 
 	}
 	
-	public void setDesiredDirectionCalculator(DesiredDirection dd) {
+	public void setDesiredDirectionCalculator(DesiredDirectionCalculator dd) {
 		this.dd = dd;
 	}
 

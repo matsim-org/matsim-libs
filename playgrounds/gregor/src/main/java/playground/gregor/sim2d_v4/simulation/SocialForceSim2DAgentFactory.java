@@ -27,8 +27,8 @@ import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.SocialForceVelocityUpdater;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.NearestPointAtTargetLine;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 
 public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
@@ -47,8 +47,8 @@ public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
 		Sim2DAgent agent = new Sim2DAgent(this.sc,veh, spawnX, spawnY, ls, pEnv);
 		Neighbors nn = new Neighbors(agent, this.conf);
 		nn.setRangeAndMaxNrOfNeighbors(10, 5);
-		nn.setUpdateInterval(1);
-		SocialForceVelocityUpdater vu = new SocialForceVelocityUpdater(new DesiredDirection(agent, ls), nn, this.conf, agent);
+		nn.setUpdateInterval(.5);
+		SocialForceVelocityUpdater vu = new SocialForceVelocityUpdater(new NearestPointAtTargetLine(agent, ls), nn, this.conf, agent);
 		agent.setVelocityUpdater(vu);
 		return agent;
 	}

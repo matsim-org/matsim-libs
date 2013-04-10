@@ -38,9 +38,9 @@ import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segmen
 
 public class LinkSwitcher {// TODO more meaningful name for this class [gl April '13]
 
-	
+
 	private final Network net;
-	
+
 	private final Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
 
 	private final double offsetX;
@@ -56,14 +56,14 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		this.offsetY = s2dc.getOffsetY();
 		this.pEnv = pEnv;
 	}
-	
+
 	public boolean isSwitchLink(double [] pos, double dx, double dy, Id currentLinkId) {
 		final LinkInfo li = getLinkInfo(currentLinkId);
 		final double newXPosX = pos[0] + dx;
 		final double newXPosY = pos[1] + dy;
 		final Segment fl = li.finishLine;
 		double isLeftOfLine = CGAL.isLeftOfLine(newXPosX, newXPosY, fl.x0, fl.y0, fl.x1, fl.y1);
-		return isLeftOfLine > 0;
+		return isLeftOfLine >= 0;
 	}
 
 	public LinkInfo getLinkInfo(Id currentLinkId) {
@@ -95,27 +95,52 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		li.link = seg;
 		li.dx = dx;
 		li.dy = dy;
-		
+
 		PhysicalSim2DSection pSec = this.pEnv.getPhysicalSim2DSectionAssociatedWithLinkId(currentLinkId);
 		if (pSec == null) {
-			System.out.println(pSec);
+			System.out.println();
 		}
 		Segment fl = getTouchingSegment(seg, pSec.getOpenings());
-		if (fl == null) {
-			fl = new Segment();
-			fl.x0 = seg.x1;
-			fl.y0 = seg.y1;
+		Segment targetLine = null;
+		//all polygons are clockwise oriented so we rotate to the right here 
+		//TODO find intersections with pSec!! [gl April '13]
+		if (fl != null) {
+//				fdx /= w;
+//				fdy /= w;
+//				fdx *= 0.4;
+//				fdy *= 0.4;
+//				fl.x0 = fl.x0 + fdx;
+//				fl.y0 = fl.y0 + fdy;
+//				fl.x1 = fl.x1 - fdx;
+//				fl.y1 = fl.y1 - fdy;
+			
 
-			//all polygons are clockwise oriented so we rotate to the right here 
-			fl.x1 = fl.x0 + li.dy;
-			fl.y1 = fl.y0 - li.dx;
+			
+			double fdx = fl.x1-fl.x0;
+			double fdy = fl.y1-fl.y0;
+			double w = Math.sqrt(fdx*fdx + fdy*fdy)/2-.4; //TODO repair! (visibility intersection or something ??) [gl April '13] 
+			
+			targetLine = new Segment();
+			targetLine.x0 = seg.x1 - w*li.dy;
+			targetLine.y0 = seg.y1 + w*li.dx;
+			targetLine.x1 = seg.x1 + w*li.dy;
+			targetLine.y1 = seg.y1 - w*li.dx;			
+			
+		} else {
+			fl = new Segment();
+			fl.x0 = seg.x1 - 2*li.dy;
+			fl.y0 = seg.y1 + 2*li.dx;
+			fl.x1 = seg.x1 + 2*li.dy;
+			fl.y1 = seg.y1 - 2*li.dx;
+			targetLine = fl;
 		}
 		li.finishLine = fl;
 		li.width = 10; //TODO section width [gl Jan'13];
+		li.targetLine = targetLine;
 		return li;
 	}
-	
-	
+
+
 	private Segment getTouchingSegment(Segment seg, Segment[] openings) {
 
 		for (Segment opening : openings) {
@@ -134,7 +159,7 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		}
 		return null;
 	}
-	
+
 	public static final class LinkInfo {
 
 		public double width;
@@ -143,5 +168,6 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		public Segment link;
 		Segment fromOpening;
 		public Segment finishLine;
+		public Segment targetLine;
 	}
 }

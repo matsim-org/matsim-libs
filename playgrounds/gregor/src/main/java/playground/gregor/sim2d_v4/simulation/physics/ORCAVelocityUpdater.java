@@ -28,7 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirection;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
 import playground.gregor.sim2d_v4.simulation.physics.orca.ORCALine;
@@ -58,10 +58,10 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 	private final VisDebugger debugger = null;
 	private final double dT;
 	private final double maxDelta;
-	private final DesiredDirection dd;
+	private final DesiredDirectionCalculator dd;
 	private final Sim2DAgent agent;
 
-	public ORCAVelocityUpdater(DesiredDirection dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
+	public ORCAVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dT = conf.getTimeStepSize();
 		this.maxDelta =.25;// * dT;

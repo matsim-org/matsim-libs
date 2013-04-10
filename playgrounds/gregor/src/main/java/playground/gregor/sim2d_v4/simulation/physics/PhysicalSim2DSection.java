@@ -126,40 +126,25 @@ public class PhysicalSim2DSection {
 			double newXPosX = oldPos[0] + dx;
 			double newXPosY = oldPos[1] + dy;
 
-			boolean inSection = true;
-			for (int i = 0; i < this.numOpenings; i++) {
-				Segment opening = this.openings[i];
-				double leftOfOpening = CGAL.isLeftOfLine(newXPosX, newXPosY, opening.x0, opening.y0, opening.x1, opening.y1);
-				if (leftOfOpening > 0) {
-					//					double left1 = CGAL.isLeftOfLine(opening.x0, opening.y0, oldPos[0], oldPos[1], newXPosX, newXPosY);
-					//					double left2 = CGAL.isLeftOfLine(opening.x1, opening.y1, oldPos[0], oldPos[1], newXPosX, newXPosY);
-					//					if (left1 * left2 < 0) {
-					PhysicalSim2DSection nextSection = this.neighbors.get(opening);
-					if (nextSection == null) { //if null agent should leave 2Dsim now
-						if (agent.move(dx, dy,time)) {
-							if (!agent.hasLeft2DSim()){ //for now the physical transition is performed in the mental model of the agent (yeah sounds odd). 
-								//for that reason we have to check if everything went fine. [gl April' 13] 
-								log.warn("Agent:" + agent.getId() + " has left sim2d physically but not mentally. This should not happen!");
-								inSection = false;
-								break;
-							}
-							it.remove();
-							inSection = false;
-							break;
+			agent.move(dx, dy,time);
+			if (agent.hasLeft2DSim()) {
+				it.remove();
+			} else {
+				for (int i = 0; i < this.numOpenings; i++) {
+					Segment opening = this.openings[i];
+					double leftOfOpening = CGAL.isLeftOfLine(newXPosX, newXPosY, opening.x0, opening.y0, opening.x1, opening.y1);
+					if (leftOfOpening >= 0) {
+						PhysicalSim2DSection nextSection = this.neighbors.get(opening);
+						if (nextSection == null) {
+							break; //agent was pushed out of the sim2d environment
 						}
-					} else { //business as usual  
 						it.remove();
 						nextSection.addAgentToInBuffer(agent);
-						agent.move(dx, dy,time);
-						inSection = false;
 						break;
 					}
 				}
-				//				}
 			}
-			if (inSection) {
-				agent.move(dx, dy,time);
-			}
+			
 		}
 	}
 
@@ -376,7 +361,7 @@ public class PhysicalSim2DSection {
 				double length = Math.sqrt(dx*dx+dy*dy);
 				dx /=length;
 				dy /=length;
-				//				visDebugger.addTextStatic((float)((x1+x0)/2+dy/2), (float)((y1+y0)/2-dx/2), key.toString(),99);
+				visDebugger.addTextStatic((float)((x1+x0)/2+dy/2), (float)((y1+y0)/2-dx/2), key.toString(),99);
 
 			}
 
