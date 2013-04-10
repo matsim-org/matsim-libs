@@ -8,9 +8,21 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.matsim.contrib.matsim4opus.gis.GridUtils;
+import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.gis.Zone;
+import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
+import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
+import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
+import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
+import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
+import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
+import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -20,19 +32,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.LeastCostPathTree;
-
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.gis.GridUtils;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
-import org.matsim.contrib.matsim4opus.gis.Zone;
-import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
-import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
-import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
-import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
-import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
-import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
-import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 
 /**
  * improvements sep'11:
@@ -168,6 +167,25 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		Controler controler = event.getControler();
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		
+//		// TEST
+//		RoadPricingSchemeImpl scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
+//		if(scheme == null)
+//			System.out.println("null");
+//		else{
+//			Iterator<Link> links = network.getLinks().values().iterator();
+//			
+//			double overallToll = 0.;
+//			
+//			while(links.hasNext()){
+//				Link l = links.next();
+//				Cost cost = scheme.getLinkCostInfo(l.getId(), 7200., null);
+//				if(cost != null)
+//					overallToll += cost.amount;
+//			}
+//			System.out.println(overallToll);
+//		}
+//		// TEST
+		
 		this.aggregatedOpportunities = this.aggregatedOpportunities(this.parcels, this.main.getOpportunitySampleRate(), network, this.main.isParcelMode());
 		
 		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
@@ -211,12 +229,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 						+ this.benchmark.getDurationInSeconds(benchmarkID)
 						/ 60. + " minutes).");
 			}
-			// tnicolai: for debugging (remove for release)
-			//log.info("Euclidian vs Othogonal Distance:");
-			//log.info("Total Counter:" + NetworkUtil.totalCounter);
-			//log.info("Euclidian Counter:" + NetworkUtil.euclidianCounter);
-			//log.info("Othogonal Counter:" + NetworkUtil.othogonalCounter);
-			
+
 			AnalysisCellBasedAccessibilityCSVWriterV2.close(); 
 			writePlottingData();						// plotting data for visual analysis via R
 			writeInterpolatedParcelAccessibilities();	// UrbanSim input file with interpolated accessibilities on parcel level
@@ -276,35 +289,6 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 				+ PT_FILENAME + ptGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 
-//		// tnicolai: disabled google earth outputs for final release 
-//		GridUtils.writeKMZFiles(measuringPointsCell,								// car results for google earth
-//							freeSpeedGrid,
-//							InternalConstants.MATSIM_4_OPUS_TEMP
-//										+ "freeSpeedAccessibility_cellsize_"
-//										+ freeSpeedGrid.getResolution()
-//										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
-//										+ InternalConstants.FILE_TYPE_KMZ);
-//		GridUtils.writeKMZFiles(measuringPointsCell,								// car results for google earth
-//								carGrid,
-//								InternalConstants.MATSIM_4_OPUS_TEMP
-//										+ "carAccessibility_cellsize_"
-//										+ carGrid.getResolution()
-//										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
-//										+ InternalConstants.FILE_TYPE_KMZ);
-//		GridUtils.writeKMZFiles(measuringPointsCell,								// bike results for google earth
-//								bikeGrid,
-//								InternalConstants.MATSIM_4_OPUS_TEMP
-//										+ "bikeAccessibility_cellsize_"
-//										+ bikeGrid.getResolution()
-//										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
-//										+ InternalConstants.FILE_TYPE_KMZ);
-//		GridUtils.writeKMZFiles(measuringPointsCell,								// walk results for google earth
-//								walkGrid,
-//								InternalConstants.MATSIM_4_OPUS_TEMP
-//										+ "walkAccessibility_cellsize_"
-//										+ walkGrid.getResolution()
-//										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
-//										+ InternalConstants.FILE_TYPE_KMZ);
 		log.info("Writing plotting files done!");
 	}
 	

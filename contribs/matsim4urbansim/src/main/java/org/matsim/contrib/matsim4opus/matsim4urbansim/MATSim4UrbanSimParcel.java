@@ -44,14 +44,13 @@ import org.matsim.contrib.matsim4opus.utils.io.BackupMATSimOutput;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.RoadPricing; 
+import org.matsim.roadpricing.RoadPricing;
 
 import com.vividsolutions.jts.geom.Geometry;
 
