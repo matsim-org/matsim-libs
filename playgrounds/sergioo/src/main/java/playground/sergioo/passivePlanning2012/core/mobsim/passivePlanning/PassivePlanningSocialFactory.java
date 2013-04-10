@@ -9,7 +9,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -19,7 +18,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.TripRouter;
 import org.matsim.households.PersonHouseholdMapping;
 
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerSocialAgentFactory;
@@ -29,23 +28,23 @@ import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning
 public class PassivePlanningSocialFactory implements MobsimFactory {
 
 	//Constants
-	private final static Logger log = Logger.getLogger(QSimFactory.class);
+	private final static Logger log = Logger.getLogger(PassivePlanningSocialFactory.class);
 
 	//Attributes
 	private final PassivePlannerManager passivePlannerManager;
 	private final PersonHouseholdMapping personHouseholdMapping;
-	private final IntermodalLeastCostPathCalculator leastCostPathCalculator;
+	private final TripRouter tripRouter;
 	
 	//Constructors
 	/**
 	 * @param personHouseholdMapping
-	 * @param leastCostPathCalculator
+	 * @param tripRouter
 	 * @param passivePlannerManager
 	 */
-	public PassivePlanningSocialFactory(PassivePlannerManager passivePlannerManager, PersonHouseholdMapping personHouseholdMapping, IntermodalLeastCostPathCalculator leastCostPathCalculator) {
+	public PassivePlanningSocialFactory(PassivePlannerManager passivePlannerManager, PersonHouseholdMapping personHouseholdMapping, TripRouter tripRouter) {
 		this.passivePlannerManager = passivePlannerManager;
 		this.personHouseholdMapping = personHouseholdMapping;
-		this.leastCostPathCalculator = leastCostPathCalculator;
+		this.tripRouter = tripRouter;
 	}
 
 	//Methods
@@ -68,6 +67,9 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
             netsimEngFactory = new DefaultQSimEngineFactory();
         }
 		QSim qSim = new QSim(sc, eventsManager);
+		PlanningEngine planningEngine = new PlanningEngine(passivePlannerManager);
+		qSim.addMobsimEngine(planningEngine);
+		qSim.addDepartureHandler(planningEngine);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
@@ -77,23 +79,17 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory;
-		if (sc.getConfig().scenario().isUseTransit()) {
-			if(parallel)
-				agentFactory = new PassivePlannerTransitSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping, leastCostPathCalculator);
-			else
-				agentFactory = new PassivePlannerTransitSocialAgentFactory(qSim, personHouseholdMapping, leastCostPathCalculator);
+		if(sc.getConfig().scenario().isUseTransit()) {
+			agentFactory = new PassivePlannerTransitSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping, tripRouter);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setUseUmlaeufe(true);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);
 			qSim.addAgentSource(transitEngine);
 			qSim.addMobsimEngine(transitEngine);
-		} else {
-			if(parallel)
-				agentFactory = new PassivePlannerSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping, leastCostPathCalculator);
-			else
-				agentFactory = new PassivePlannerSocialAgentFactory(qSim, personHouseholdMapping, leastCostPathCalculator);
 		}
+		else
+			agentFactory = new PassivePlannerSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping, tripRouter);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;

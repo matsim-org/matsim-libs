@@ -22,7 +22,7 @@ public class ScenarioSimplerNetwork extends ScenarioImpl {
 	private final Map<String, Network> simplerNetworks = new HashMap<String, Network>();
 	
 	//Methods
-	protected ScenarioSimplerNetwork(Config config) {
+	public ScenarioSimplerNetwork(Config config) {
 		super(config);
 		Set<String> modes = new HashSet<String>();
 		modes.addAll(config.plansCalcRoute().getNetworkModes());

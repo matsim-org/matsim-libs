@@ -21,6 +21,7 @@ public class RouteTree {
 	//Attributes
 	private Map<String, Stop>[] activeStops;
 	private Set<Link>[] links;
+	private StopRoutes root;
 	private final Network network;
 	private final String stop;
 	
@@ -36,6 +37,7 @@ public class RouteTree {
 			links[i]=new HashSet<Link>();
 		}
 		links[0].add(network.getLinks().get(new IdImpl(stops.get(stop).getLinkId())));
+		this.root = new StopRoutes(network, null, stop, numTransfers,finishedTrips,stops,activeStops,links);
 		System.out.println();
 	}
 	public Set<Link>[] getLinks() {
@@ -50,6 +52,15 @@ public class RouteTree {
 			res[i]=new ArrayList<Coord>();
 			for(Stop stop:activeStops[i].values())
 				res[i].add(stop.getPoint());
+		}
+		return res;
+	}
+	public Set<Stop>[] getStops() {
+		Set<Stop>[] res = new Set[activeStops.length]; 
+		for(int i=0;i<activeStops.length;i++) {
+			res[i]=new HashSet<Stop>();
+			for(Stop stop:activeStops[i].values())
+				res[i].add(stop);
 		}
 		return res;
 	}

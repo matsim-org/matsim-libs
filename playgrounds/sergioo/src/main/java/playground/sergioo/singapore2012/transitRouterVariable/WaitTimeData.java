@@ -29,9 +29,9 @@ package playground.sergioo.singapore2012.transitRouterVariable;
 public interface WaitTimeData {
 
 	//Methods
-	public void resetWaitTimes();
-	public void addWaitTime(final int timeSlot, final double waitTime);
-	public double getWaitTime(final int timeSlot);
-	public int getNumData(final int timeSlot);
+	void resetWaitTimes();
+	void addWaitTime(final int timeSlot, final double waitTime);
+	double getWaitTime(final int timeSlot);
+	int getNumData(final int timeSlot);
 
 }

@@ -46,7 +46,7 @@ public final class Counter {
 		int i = this.counter.incrementAndGet();
 		int n = this.nextCounter.get();
 		if (i >= n) {
-			if (this.nextCounter.compareAndSet(n, n*2)) {
+			if (i>1 && this.nextCounter.compareAndSet(n, n*2)) {
 				log.info(this.prefix + n);
 			}
 		}
@@ -55,7 +55,7 @@ public final class Counter {
 		int i = this.counter.decrementAndGet();
 		int n = this.nextCounter.get();
 		if (i <= n/2) {
-			if (this.nextCounter.compareAndSet(n, n/2)) {
+			if (i>1 && this.nextCounter.compareAndSet(n, n/2)) {
 				log.info(this.prefix + n);
 			}
 		}

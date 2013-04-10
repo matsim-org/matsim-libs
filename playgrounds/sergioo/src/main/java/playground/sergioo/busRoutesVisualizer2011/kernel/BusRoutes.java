@@ -25,7 +25,7 @@ public class BusRoutes {
 	/**
 	 * Pre-processed information files
 	 */
-	private final static File[] PREFILES = {new File("./data/paths/fixedStops.txt"),new File("./data/paths/bases.txt"),new File("./data/paths/finishedTrips.txt")};
+	private final static File[] PREFILES = {new File("./data/paths/fixedStops2.txt"),new File("./data/paths/bases2.txt"),new File("./data/paths/finishedTrips2.txt")};
 	public static final File NEW_NETWORK_NODES_FILE = new File("./data/paths/newNetworkNodes.txt");
 	public static final File NEW_NETWORK_LINKS_FILE = new File("./data/paths/newNetworkLinks.txt");
 	
@@ -103,12 +103,13 @@ public class BusRoutes {
 	/**
 	 * 
 	 * @param args
-	 * @throws IOException 
+	 * 0 - Network file
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
-		matsimNetworkReader.readFile("./data/networks/singapore_initial.xml");
+		matsimNetworkReader.readFile(args[0]);
 		Network network = scenario.getNetwork();
 		BusRoutes busRoutes = new BusRoutes(network);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));

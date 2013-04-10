@@ -67,10 +67,8 @@ public class Window extends JFrame implements ActionListener {
 		}
 	}
 	//Constants
-	private static int GAPX = 50;
-	private static int GAPY = 120;
-	public static int MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width-GAPX;
-	public static int MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height-GAPY;
+	public static int MAX_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width;
+	public static int MAX_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	public static int MIN_WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width/2;
 	public static int MIN_HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height/3;
 	public static int FRAMESIZE = 20;
@@ -94,10 +92,9 @@ public class Window extends JFrame implements ActionListener {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.routeTree = routeTree;
 		this.setLocation(0,0);
-		this.setLayout(new BorderLayout());
 		option = Option.ZOOM;
 		panel = new PanelPathEditor(this);
-		this.setSize(width+GAPX, height+GAPY);
+		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new GridLayout(Option.values().length,1));
@@ -129,6 +126,7 @@ public class Window extends JFrame implements ActionListener {
 		coordsPanel.add(lblCoords[1]);
 		infoPanel.add(coordsPanel, BorderLayout.EAST);
 		this.add(infoPanel, BorderLayout.SOUTH);
+		this.setSize(MAX_WIDTH, MAX_HEIGHT);
 	}
 	public Option getOption() {
 		return option;
@@ -181,6 +179,11 @@ public class Window extends JFrame implements ActionListener {
 		nF.setMinimumFractionDigits(4);
 		lblCoords[0].setText(nF.format(x)+" ");
 		lblCoords[1].setText(" "+nF.format(y));
+	}
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		panel.calculateBoundaries();
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {

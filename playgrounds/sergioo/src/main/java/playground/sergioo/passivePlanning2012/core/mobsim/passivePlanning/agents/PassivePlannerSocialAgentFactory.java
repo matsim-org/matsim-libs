@@ -19,11 +19,14 @@
 
 package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.TripRouter;
 import org.matsim.households.PersonHouseholdMapping;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
@@ -35,23 +38,29 @@ public final class PassivePlannerSocialAgentFactory implements AgentFactory {
 	private final Netsim simulation;
 	private final PassivePlannerManager passivePlannerManager;
 	private final PersonHouseholdMapping personHouseholdMapping;
-	private final IntermodalLeastCostPathCalculator leastCostPathCalculator;
+	private final TripRouter tripRouter;
+	private Set<String> modes;
 
 	//Constructors
-	public PassivePlannerSocialAgentFactory(final Netsim simulation, final PersonHouseholdMapping personHouseholdMapping, final IntermodalLeastCostPathCalculator leastCostPathCalculator) {
-		this(simulation, null, personHouseholdMapping, leastCostPathCalculator);
+	public PassivePlannerSocialAgentFactory(final Netsim simulation, final PersonHouseholdMapping personHouseholdMapping, final TripRouter tripRouter) {
+		this(simulation, null, personHouseholdMapping, tripRouter);
 	}
-	public PassivePlannerSocialAgentFactory(final Netsim simulation, final PassivePlannerManager passivePlannerManager, final PersonHouseholdMapping personHouseholdMapping, final IntermodalLeastCostPathCalculator leastCostPathCalculator) {
+	public PassivePlannerSocialAgentFactory(final Netsim simulation, final PassivePlannerManager passivePlannerManager, final PersonHouseholdMapping personHouseholdMapping, final TripRouter tripRouter) {
 		this.simulation = simulation;
 		this.passivePlannerManager = passivePlannerManager;
 		this.personHouseholdMapping = personHouseholdMapping;
-		this.leastCostPathCalculator = leastCostPathCalculator;
+		this.tripRouter = tripRouter;
+		modes = new HashSet<String>();
+		modes.addAll(simulation.getScenario().getConfig().plansCalcRoute().getNetworkModes());
+		modes.addAll(simulation.getScenario().getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().keySet());
+		modes.addAll(simulation.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().keySet());
+		modes.remove("empty");
 	}
 
 	//Methods
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person person) {
-		PassivePlannerAgent agent = new PassivePlannerSocialAgent((BasePerson)person, simulation, passivePlannerManager, personHouseholdMapping.getHousehold(person.getId()), leastCostPathCalculator); 
+		PassivePlannerDriverAgent agent = new PassivePlannerSocialAgent((BasePerson)person, simulation, passivePlannerManager, personHouseholdMapping.getHousehold(person.getId()), tripRouter, modes); 
 		return agent;
 	}
 

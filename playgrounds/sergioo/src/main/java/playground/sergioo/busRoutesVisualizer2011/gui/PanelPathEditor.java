@@ -22,8 +22,10 @@ package playground.sergioo.busRoutesVisualizer2011.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.KeyEvent;
@@ -32,9 +34,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Coord;
@@ -57,10 +65,10 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private Color backgroundColor = Color.WHITE;
 	private Color selectedColor = Color.RED;
 	private Color nodeSelectedColor = Color.MAGENTA;
-	private Color networkColor = Color.DARK_GRAY;
-	private int pointsSize = 1;
-	private Stroke selectedStroke = new BasicStroke(2);
-	private Stroke networkStroke = new BasicStroke(0.5f);
+	private Color networkColor = Color.LIGHT_GRAY;
+	private int pointsSize = 4;
+	private Stroke selectedStroke = new BasicStroke(2.5f);
+	private Stroke networkStroke = new BasicStroke(1.5f);
 	private int iniX;
 	private int iniY;
 	private boolean withStops = true;
@@ -76,13 +84,12 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		this.window = window;
 		this.setBackground(backgroundColor);
 		camera = new Camera();
-		calculateBoundaries();
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
 		setFocusable(true);
 	}
-	private void calculateBoundaries() {
+	public void calculateBoundaries() {
 		xMin=Double.POSITIVE_INFINITY; yMin=Double.POSITIVE_INFINITY; xMax=Double.NEGATIVE_INFINITY; yMax=Double.NEGATIVE_INFINITY;
 		for(Set<Link> links:window.getLinks()) {
 			for(Link link:links)
@@ -108,7 +115,22 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		setBoundaries();
 	}
 	private void setBoundaries() {
-		camera.setBoundaries(xMin, yMin, xMax, yMax);
+		double aspectRatioPanel = camera.setAspectRatio(getWidth(), getHeight());
+		double aspectRatioWorld = (xMax-xMin)/(yMax-yMin);
+		double cXMin = xMin, cYMin = yMin, cXMax = xMax, cYMax = yMax;
+		if(aspectRatioWorld>aspectRatioPanel) {
+			cXMin=xMin;
+			cXMax=xMax;
+			cYMin=yMin+(yMax-yMin)/2-((xMax-xMin)/aspectRatioPanel)/2;
+			cYMax=yMax-(yMax-yMin)/2+((xMax-xMin)/aspectRatioPanel)/2;
+		}
+		else if(aspectRatioWorld<aspectRatioPanel){
+			cYMin=yMin;
+			cYMax=yMax;
+			cXMin=xMin+(xMax-xMin)/2-((yMax-yMin)*aspectRatioPanel)/2;
+			cXMax=xMax-(xMax-xMin)/2+((yMax-yMin)*aspectRatioPanel)/2;
+		}
+		camera.setBoundaries(cXMin, cYMin, cXMax, cYMax);
 	}
 	@Override
 	public void paintComponent(Graphics g) {
@@ -249,8 +271,26 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		case 'v':
 			setBoundaries();
 			break;
+		case 'i':
+			JFileChooser jFileChooser = new JFileChooser();
+			jFileChooser.showSaveDialog(this);
+			File file = jFileChooser.getSelectedFile();
+			saveImage(file.getName().split("\\.")[file.getName().split("\\.").length-1], file, Integer.parseInt(JOptionPane.showInputDialog("Width", "5760")),  Integer.parseInt(JOptionPane.showInputDialog("Height", "3024")));
+			break;
 		}
 		repaint();
+	}
+	protected void saveImage(String type, File file, int width, int height) {
+		Image windowImage = this.createImage(width, height);
+		this.setSize(new Dimension(width, height));
+		this.setBoundaries();
+		this.paintComponent(windowImage.getGraphics());
+		try {
+			ImageIO.write((RenderedImage) windowImage, type, file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Image saved");
 	}
 	@Override
 	public void keyPressed(KeyEvent e) {

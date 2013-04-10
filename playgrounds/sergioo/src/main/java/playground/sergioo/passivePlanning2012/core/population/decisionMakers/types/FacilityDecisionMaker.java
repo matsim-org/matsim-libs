@@ -1,11 +1,11 @@
 package playground.sergioo.passivePlanning2012.core.population.decisionMakers.types;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public interface FacilityDecisionMaker extends DecisionMaker {
 
 	//Methods
-	public void setTypeOfActivity(String typeOfActivity);
-	public ActivityFacility decideFacility();
+	public ActivityFacility decideFacility(double time, Coord location, String typeOfActivity);
 
 }

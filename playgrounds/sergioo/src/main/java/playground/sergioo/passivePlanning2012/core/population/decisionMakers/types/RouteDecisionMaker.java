@@ -1,14 +1,11 @@
 package playground.sergioo.passivePlanning2012.core.population.decisionMakers.types;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Route;
 
 public interface RouteDecisionMaker extends DecisionMaker {
 
 	//Methods
-	public void setLeg(Leg leg);
-	public void setStartLink(Link startLink);
-	public void setEndLink(Link endLink);
-	public Leg decideRoute();
+	public Route decideRoute(double time, Id startFacilityId, Id endFacilityId);
 
 }

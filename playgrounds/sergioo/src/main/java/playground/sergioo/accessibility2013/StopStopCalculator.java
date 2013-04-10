@@ -24,11 +24,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityVariableWW;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkNode;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeCalculator;
@@ -65,7 +66,7 @@ public class StopStopCalculator extends Thread{
 	}
 	private static final String S = ",";
 	private TransitRouterNetworkWW network;
-	private TransitRouterNetworkTravelTimeAndDisutilityVariableWW travelFunction;
+	private TransitRouterNetworkTravelTimeAndDisutilityWW travelFunction;
 	private PreProcessDijkstra preProcessDijkstra;
 	private int numberOfProcess;
 	private double startTime;
@@ -76,7 +77,7 @@ public class StopStopCalculator extends Thread{
 	private String fileName;
 	
 	public StopStopCalculator(TransitRouterNetworkWW network,
-			TransitRouterNetworkTravelTimeAndDisutilityVariableWW travelFunction,
+			TransitRouterNetworkTravelTimeAndDisutilityWW travelFunction,
 			PreProcessDijkstra preProcessDijkstra, int numberOfProcess,
 			double startTime, double endTime, int numProceses,
 			Scenario scenario, double binSize, String fileName) {
@@ -318,7 +319,7 @@ public class StopStopCalculator extends Thread{
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental());
 		TransitRouterNetworkWW network = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(), scenario.getTransitSchedule(), transitRouterConfig.beelineWalkConnectionDistance);
-		TransitRouterNetworkTravelTimeAndDisutilityVariableWW travelFunction = new TransitRouterNetworkTravelTimeAndDisutilityVariableWW(transitRouterConfig, scenario.getNetwork(), network, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), scenario.getConfig().travelTimeCalculator(), startTime, endTime);
+		TransitRouterNetworkTravelTimeAndDisutilityWW travelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWW(transitRouterConfig, scenario.getNetwork(), network, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), scenario.getConfig().travelTimeCalculator(), startTime, endTime, new PreparedTransitSchedule(scenario.getTransitSchedule()));
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		preProcessDijkstra.run(network);
 		for(int i=0; i<numProceses; i++)

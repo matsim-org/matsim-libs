@@ -2,9 +2,9 @@ package playground.sergioo.singapore2012.transitSubtourModeChoice;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -21,14 +21,14 @@ public class TransitSubtourModeChoiceStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
 	
-	public TransitSubtourModeChoiceStrategy(Controler controler) {
+	public TransitSubtourModeChoiceStrategy(Scenario scenario) {
 		delegate = new PlanStrategyImpl(new RandomPlanSelector());
-		delegate.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+		delegate.addStrategyModule(new TransitActsRemoverStrategy(scenario.getConfig()));
 		log.warn( "your stategy now uses vanilla SubtourModeChoice, not a hacked copy thereof" );
 		log.warn( "just set config.subtourModeChoice.considerCarAvailability to true in the config to get the same behavior" );
 		log.warn( "... but actually, you may just delete this strategy altogether, it does not provide anything matsim doesn't provide. td, 22. feb. 2013" );
-		delegate.addStrategyModule(new SubtourModeChoice(controler.getConfig()));
-		delegate.addStrategyModule(new ReRoute(controler.getScenario()));
+		delegate.addStrategyModule(new SubtourModeChoice(scenario.getConfig()));
+		delegate.addStrategyModule(new ReRoute(scenario));
 	}
 	
 	public void addStrategyModule(PlanStrategyModule module) {

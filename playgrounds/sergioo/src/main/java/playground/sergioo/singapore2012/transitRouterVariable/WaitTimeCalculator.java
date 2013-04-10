@@ -50,15 +50,13 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentStuckEventHandler {
 	
-	// , AdditionalTeleportationDepartureEventHandler
-	
 	//Constants
 	private final static String SEPARATOR = "===";
 
 	//Attributes
 	private final double timeSlot;
 	private final Map<String, WaitTimeData> waitTimes = new ConcurrentHashMap<String, WaitTimeData>();
-	private final Map<String, double[]> cacheScheduledWaitTimes = new ConcurrentHashMap<String, double[]>();
+	private final Map<String, double[]> scheduledWaitTimes = new ConcurrentHashMap<String, double[]>();
 	private final Map<Id, Double> agentsWaitingData = new ConcurrentHashMap<Id, Double>();
 	private final Map<Id, Integer> agentsCurrentLeg = new ConcurrentHashMap<Id, Integer>();
 	private final Population population;
@@ -75,7 +73,7 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 					sortedDepartures[d++] = departure.getDepartureTime();
 				Arrays.sort(sortedDepartures);
 				for(TransitRouteStop stop:route.getStops()) {
-					String key = "("+line.getId()+")["+route.getId()+"]"+stop.getStopFacility().getId();
+					String key = line.getId()+")["+route.getId()+"]"+stop.getStopFacility().getId();
 					waitTimes.put(key, new WaitTimeDataArray((int) (totalTime/timeSlot)+1));
 					double[] cacheWaitTimes = new double[(int) (totalTime/timeSlot)+1];
 					for(int i=0; i<cacheWaitTimes.length; i++) {
@@ -94,7 +92,7 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 						if(cacheWaitTimes[i]==Time.UNDEFINED_TIME)
 							cacheWaitTimes[i] = sortedDepartures[0]+24*3600+(stop.getArrivalOffset()!=Time.UNDEFINED_TIME?stop.getArrivalOffset():stop.getDepartureOffset())-endTime;
 					}
-					cacheScheduledWaitTimes.put(key, cacheWaitTimes);
+					scheduledWaitTimes.put(key, cacheWaitTimes);
 				}
 			}
 	}
@@ -111,11 +109,11 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 		};
 	}
 	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
-		String key = "("+lineId+")["+routeId+"]"+stopId;
+		String key = lineId.toString()+")["+routeId.toString()+"]"+stopId.toString();
 		WaitTimeData waitTimeData = waitTimes.get(key);
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
-			double[] cacheWaitTimes = cacheScheduledWaitTimes.get(key);
-			return cacheWaitTimes[(int) (time/timeSlot)<cacheWaitTimes.length?(int) (time/timeSlot):(cacheWaitTimes.length-1)];
+			double[] waitTimes = scheduledWaitTimes.get(key);
+			return waitTimes[(int) (time/timeSlot)<waitTimes.length?(int) (time/timeSlot):(waitTimes.length-1)];
 		}
 		else
 			return waitTimeData.getWaitTime((int) (time/timeSlot));
@@ -150,9 +148,9 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						String key = "("+leg[2]+")["+leg[3]+"]"+leg[1];
-						if(waitTimes.get(key)!=null)
-							waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+						WaitTimeData data = waitTimes.get(leg[2]+")["+leg[3]+"]"+leg[1]);
+						if(data!=null)
+							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
 					}
@@ -193,9 +191,9 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						String key = "("+leg[2]+")["+leg[3]+"]"+leg[1];
-						if(waitTimes.get(key)!=null)
-							waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+						WaitTimeData data = waitTimes.get(leg[2]+")["+leg[3]+"]"+leg[1]);
+						if(data!=null)
+							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
 					}

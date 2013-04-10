@@ -1,26 +1,35 @@
 package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.definitions;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.utils.collections.Tuple;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 
-import playground.sergioo.passivePlanning2012.api.population.EmptyActivity;
-import playground.sergioo.passivePlanning2012.core.population.EmptyActivityImpl;
-import playground.sergioo.passivePlanning2012.core.population.PlanImplV2;
+import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
+import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
+import playground.sergioo.passivePlanning2012.core.population.BasePersonImpl;
+import playground.sergioo.passivePlanning2012.core.population.EmptyTimeImpl;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.DecisionMaker;
 
 public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 
 	//Attributes
 	protected final DecisionMaker[] decisionMakers;
-	protected int currentElementIndex;
+	protected AtomicInteger currentElementIndex = new AtomicInteger();
 	protected final Plan plan;
-
+	private PassivePlannerDriverAgent agent;
+	
 	//Constructors
-	public SinglePlannerAgentImpl(DecisionMaker[] decisionMakers, Plan plan) {
+	public SinglePlannerAgentImpl(DecisionMaker[] decisionMakers, Plan plan, PassivePlannerDriverAgent agent) {
 		this.decisionMakers = decisionMakers;
 		this.plan = plan;
+		this.agent = agent;
 	}
 
 	//Methods
@@ -29,44 +38,67 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 		return plan;
 	}
 	@Override
-	public void setTime(double time) {
-		for(DecisionMaker decisionMaker:decisionMakers)
-			decisionMaker.setTime(time);
-		currentElementIndex = ((PlanImplV2)plan).getPlanElementIndex(time);
+	public int getPlanElementIndex() {
+		return currentElementIndex.get();
 	}
 	@Override
-	public boolean isPlanned() {
-		return !(plan.getPlanElements().get(currentElementIndex) instanceof EmptyActivity);
+	public void setPlanElementIndex(int index) {
+		currentElementIndex.set(index);
 	}
 	@Override
-	public boolean planLegActivity() {
-		Tuple<Leg, Activity> legAct = getLegActivity();
-		if(legAct == null)
+	public boolean planLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId) {
+		((BasePersonImpl)plan.getPerson()).startPlanning();
+		List<? extends PlanElement> legActLeg = getLegActivityLeg(startTime, startFacilityId, endTime, endFacilityId);
+		if(legActLeg == null || legActLeg.size()==0)
 			return false;
 		else {
-			double time = decisionMakers[0].getTime();
-			EmptyActivity old = (EmptyActivity) plan.getPlanElements().remove(currentElementIndex);
-			if(legAct.getFirst().getDepartureTime()>time+1) {
-				Activity empty = new EmptyActivityImpl();
-				empty.setStartTime(time+1);
-				empty.setEndTime(legAct.getFirst().getDepartureTime()-1);
-				plan.getPlanElements().add(currentElementIndex, empty);
-				currentElementIndex++;
+			Activity previous = (Activity) plan.getPlanElements().get(currentElementIndex.get()-1);
+			EmptyTime old = (EmptyTime) plan.getPlanElements().remove(currentElementIndex.get());
+			int index=currentElementIndex.get();
+			boolean emptySpace = false;
+			Leg empty = null;
+			if(startTime>previous.getEndTime()) {
+				empty = new EmptyTimeImpl(old.getRoute().getStartLinkId());
+				empty.setTravelTime(startTime-previous.getEndTime());
+				plan.getPlanElements().add(index++, empty);
+				emptySpace = true;
 			}
-			plan.getPlanElements().add(currentElementIndex, legAct.getFirst());
-			currentElementIndex++;
-			plan.getPlanElements().add(currentElementIndex, legAct.getSecond());
-			currentElementIndex++;
-			if(legAct.getSecond().getEndTime()<old.getEndTime()) {
-				Activity empty = new EmptyActivityImpl();
-				empty.setStartTime(legAct.getSecond().getEndTime()+1);
-				empty.setEndTime(old.getEndTime());
-				plan.getPlanElements().add(currentElementIndex, empty);
-				currentElementIndex++;
+			double finalTime = startTime, firstLegTime=0;
+			boolean firstLeg = true;
+			for(PlanElement planElement:legActLeg) {
+				if(planElement instanceof Activity && !((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
+					firstLeg = false;
+				if(!(firstLeg && emptySpace))
+					plan.getPlanElements().add(index++, planElement);
+				if(planElement instanceof Leg) {
+					finalTime += ((Leg)planElement).getTravelTime();
+					if(firstLeg && emptySpace)
+						firstLegTime += ((Leg)planElement).getTravelTime();
+				}
+				else
+					if(((Activity)planElement).getEndTime()!=Time.UNDEFINED_TIME)
+						finalTime = ((Activity)planElement).getEndTime();
+					else
+						finalTime += ((Activity)planElement).getMaximumDuration();
 			}
-			return true;
+			if(emptySpace)
+				empty.setTravelTime(empty.getTravelTime()+firstLegTime);
+			if(legActLeg.get(legActLeg.size()-1) instanceof Activity) {
+				Id finalLinkId = ((Activity)legActLeg.get(legActLeg.size()-1)).getLinkId();
+				empty = new EmptyTimeImpl(finalLinkId);
+				empty.setTravelTime(previous.getEndTime()+old.getTravelTime()-finalTime);
+				plan.getPlanElements().add(index, empty);
+				index++;
+			}
+			((BasePersonImpl)plan.getPerson()).finishPlanning();
+			return !emptySpace;
 		}
 	}
-	protected abstract Tuple<Leg, Activity> getLegActivity();
-	
+	protected abstract List<? extends PlanElement> getLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId);
+	@Override
+	public void advanceToNextActivity(double now) {
+		agent.advanceToNextActivity(now);
+		currentElementIndex.incrementAndGet();
+	}
+
 }

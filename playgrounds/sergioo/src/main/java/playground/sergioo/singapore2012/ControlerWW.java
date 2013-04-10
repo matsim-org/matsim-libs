@@ -20,18 +20,13 @@
 
 package playground.sergioo.singapore2012;
 
-
-//import java.util.HashSet;
-
-//import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.pt.router.TransitRouterConfig;
 
-//import playground.artemc.calibration.CalibrationStatsListener;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterVariableImplFactory;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWWImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeCalculator;
 
 
@@ -52,7 +47,9 @@ public class ControlerWW {
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(controler.getScenario().getConfig().planCalcScore(),
 				controler.getScenario().getConfig().plansCalcRoute(), controler.getScenario().getConfig().transitRouter(),
 				controler.getScenario().getConfig().vspExperimental());
-		controler.setTransitRouterFactory(new TransitRouterVariableImplFactory(transitRouterConfig, controler.getScenario(), controler.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes()));
+		TransitRouterWWImplFactory factory = new TransitRouterWWImplFactory(transitRouterConfig, controler, waitTimeCalculator.getWaitTimes());
+		controler.addControlerListener(factory);
+		controler.setTransitRouterFactory(factory);
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.run();
 	}

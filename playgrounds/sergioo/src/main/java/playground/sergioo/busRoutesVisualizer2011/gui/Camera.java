@@ -11,8 +11,15 @@ public class Camera {
 	//Attributes
 	private Point2D upLeftCorner;
 	private Vector2D size;
+	protected int width;
+	protected int height;
+	protected int frameSize=10;
 	
 	//Methods
+	public Camera() {
+		upLeftCorner = new Point2D(0, 1);
+		size = new Vector2D(upLeftCorner, new Point2D(1, 0));
+	}
 	public Point2D getCenter() {
 		return upLeftCorner.getTranslated(size.getScaled(0.5));
 	}
@@ -37,24 +44,27 @@ public class Camera {
 		size.scale(ZOOM_RATE);
 	}
 	public void setBoundaries(double xMin, double yMin, double xMax, double yMax) {
-		upLeftCorner = new Point2D(xMin, yMax);
-		size = new Vector2D(upLeftCorner, new Point2D(xMax, yMin));
-		double smallXSize = Window.MAX_HEIGHT*size.getX()/-size.getY();
-		double smallYSize = Window.MAX_WIDTH*-size.getY()/size.getX();
-		Window.width=(int) (size.getX()/-size.getY()>(double)Window.MAX_WIDTH/(double)Window.MAX_HEIGHT?Window.MAX_WIDTH:smallXSize<Window.MIN_WIDTH?Window.MIN_WIDTH:smallXSize);
-		Window.height=(int) (-size.getY()/size.getX()>(double)Window.MAX_HEIGHT/(double)Window.MAX_WIDTH?Window.MAX_HEIGHT:smallYSize<Window.MIN_HEIGHT?Window.MIN_HEIGHT:smallYSize);
+		this.upLeftCorner.setX(xMin);
+		this.upLeftCorner.setY(yMax);
+		this.size.setX(xMax-xMin);
+		this.size.setY(yMin-yMax);
 	}
 	public int getIntX(double x) {
-		return (int) ((x-upLeftCorner.getX())*(Window.width-2*Window.FRAMESIZE)/size.getX())+Window.FRAMESIZE;
+		return (int)((x-upLeftCorner.getX())*width/size.getX())+frameSize;
 	}
 	public int getIntY(double y) {
-		return (int) ((y-upLeftCorner.getY())*(Window.height-2*Window.FRAMESIZE)/size.getY())+Window.FRAMESIZE;
+		return (int)((y-upLeftCorner.getY())*height/size.getY())+frameSize;
 	}
 	public double getDoubleX(int x) {
-		return (x-Window.FRAMESIZE)*size.getX()/(Window.width-2*Window.FRAMESIZE)+upLeftCorner.getX();
+		return (x-frameSize)*size.getX()/width+upLeftCorner.getX();
 	}
 	public double getDoubleY(int y) {
-		return (y-Window.FRAMESIZE)*size.getY()/(Window.height-2*Window.FRAMESIZE)+upLeftCorner.getY();
+		return (y-frameSize)*size.getY()/height+upLeftCorner.getY();
+	}
+	public double setAspectRatio(int width, int height) {
+		this.width = width-2*frameSize;
+		this.height = height-2*frameSize;
+		return ((double)this.width)/((double)this.height);
 	}
 	public void move(int x, int ix, int y, int iy) {
 		Vector2D difCorners = new Vector2D(getDoubleX(ix)-getDoubleX(x),getDoubleX(y)-getDoubleX(iy));

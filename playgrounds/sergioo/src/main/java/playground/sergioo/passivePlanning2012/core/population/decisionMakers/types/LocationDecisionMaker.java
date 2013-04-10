@@ -5,6 +5,6 @@ import org.matsim.api.core.v01.Coord;
 public interface LocationDecisionMaker extends DecisionMaker {
 
 	//Methods
-	public Coord decideLocation();
+	public Coord decideLocation(double time);
 
 }

@@ -6,294 +6,204 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
-import org.matsim.vehicles.Vehicle;
 
-import playground.sergioo.passivePlanning2012.core.network.ComposedLink;
+import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.EndTimeDecisionMaker;
-import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.FacilityDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.ModeRouteDecisionMaker;
-import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.StartTimeDecisionMaker;
-import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.TypeOfActivityDecisionMaker;
+import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.TypeOfActivityFacilityDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
 
-public class SocialDecisionMaker implements TypeOfActivityDecisionMaker, StartTimeDecisionMaker, EndTimeDecisionMaker, FacilityDecisionMaker, ModeRouteDecisionMaker {
+public class SocialDecisionMaker implements EndTimeDecisionMaker, TypeOfActivityFacilityDecisionMaker, ModeRouteDecisionMaker {
 
 	//Classes
-	private class Period {
+	private enum Period {
 	
-		//Attributes
-		public final double startTime;
-		public final double endTime;
-		public final String name;
+		EARLY_MORNING(0, 7*3600-1),
+		MORNING_PEAK(7*3600, 10*3600-1),
+		BEFORE_LUNCH(10*3600, 13*3600-1),
+		AFTER_LUNCH(13*3600, 18*3600-1),
+		EVENING_PEAK(18*3600, 21*3600-1),
+		NIGHT(21*3600, 24*3600-1);
 		
+		//Constants
+		private static final double PERIODS_TIME = 24*3600;
+		
+		//Attributes
+		private final double startTime;
+		private final double endTime;
+	
 		//Constructors
-		public Period(double startTime, double endTime) {
-			this(startTime, endTime, null);
-		}
-		public Period(double startTime, double endTime, String name) {
-			super();
+		private Period(double startTime, double endTime) {
 			this.startTime = startTime;
 			this.endTime = endTime;
-			this.name = name;
+		}
+		private static Period getPeriod(double time) {
+			for(Period period:Period.values())
+				if(period.isPeriod(time))
+					return period;
+			return null;
+		}
+		private boolean isPeriod(double time) {
+			time = time%PERIODS_TIME;
+			if(startTime<=time && time<=endTime)
+				return true;
+			return false;
+		}
+		private double getInterval() {
+			return endTime-startTime;
 		}
 	
 	}
-	private class TravelMinCostSimplerNetwork implements TravelDisutility {
-	
+	private class KnownPlace {
+		
 		//Attributes
-		private String mode;
-	
-		//Methods
-		public void setMode(String mode) {
-			this.mode = mode;
+		public Id facilityId;
+		public List<Tuple<Period, String>> timeTypes = new ArrayList<Tuple<Period, String>>();
+		
+		//Constructors
+		public KnownPlace(Id facilityId) {
+			this.facilityId = facilityId;
 		}
-		@Override
-		public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-			time = time%periodsTime;
-			double sum = 0, tSum = 0;
-			for(int i=0; i<periods.length; i++) {
-				if(periods[i].startTime<=time && time<=periods[i].endTime)
-					return knownTravelTimes.get(mode).get(link.getId())[i];
-				double tTime = periods[i].endTime - periods[i].startTime;
-				sum += knownTravelTimes.get(mode).get(link.getId())[i]*tTime;
-				tSum += tTime;
-			}
-			return sum/tSum;
-		}
-		@Override
-		public double getLinkMinimumTravelDisutility(Link link) {
-			double min = Double.MAX_VALUE;
-			for(int i=0; i<periods.length; i++)
-				if(knownTravelTimes.get(mode).get(link.getId())[i]<min)
-					min = knownTravelTimes.get(mode).get(link.getId())[i];
-			return min;
-		}
-	
+		
 	}
-	private class TravelTimeSimplerNetwork implements TravelTime {
 	
-		//Attributes
-		private String mode;
+	//Constants
+	private static final double MAXIMUM_SEARCHING_DISTANCE = 3000;
 	
-		//Methods
-		public void setMode(String mode) {
-			this.mode = mode;
-		}
-
-		@Override
-		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-			time = time%periodsTime;
-			double sum = 0, tSum = 0;
-			for(int i=0; i<periods.length; i++) {
-				if(periods[i].startTime<=time && time<=periods[i].endTime)
-					return knownTravelTimes.get(mode).get(link.getId())[i];
-				double tTime = periods[i].endTime - periods[i].startTime;
-				sum += knownTravelTimes.get(mode).get(link.getId())[i]*tTime;
-				tSum += tTime;
-			}
-			return sum/tSum;
-		}
-	
-	}
-
 	//Attributes
 	private final ScenarioSimplerNetwork scenario;
 	private final Household household;
-	private final Set<Id> knownPeople = new HashSet<Id>();
-	private final Set<Id> knownPlaces = new HashSet<Id>();
-	private final Period[] periods;
-	private final double periodsTime;
+	private final Set<SocialDecisionMaker> knownPeople = new HashSet<SocialDecisionMaker>();
+	private final Map<Id, KnownPlace> knownPlaces = new ConcurrentHashMap<Id, KnownPlace>();
 	private final Map<String, Map<Id, Double[]>> knownTravelTimes = new HashMap<String, Map<Id, Double[]>>();
-	private final TravelMinCostSimplerNetwork travelMinCostSimple =  new TravelMinCostSimplerNetwork();
-	private final TravelTimeSimplerNetwork travelTimeSimple =  new TravelTimeSimplerNetwork();
-	private final IntermodalLeastCostPathCalculator leastCostPathCalculator;
-	private Link startLink;
-	private double time;
-	private String typeOfActivity;
-	private ActivityFacility facility;
-	private Leg leg;
-	private double minimumStartTime = time;
-	private double startTime;
-	private double maximumEndTime = Double.POSITIVE_INFINITY;
+	private final TripRouter tripRouter;
+	private Set<String> modes;
+	private boolean carAvailability;
 	
-	//Methods
-	public SocialDecisionMaker(ScenarioSimplerNetwork scenario, Household household, IntermodalLeastCostPathCalculator leastCostPathCalculator) {
+	//Constructors
+	public SocialDecisionMaker(ScenarioSimplerNetwork scenario, boolean carAvailability, Household household, TripRouter tripRouter, Set<String> modes) {
 		this.scenario = scenario;
-		if(household!=null)
-			this.household = household;
-		else
-			this.household = null;
-		this.leastCostPathCalculator = leastCostPathCalculator;
+		this.household = household;
+		this.tripRouter = tripRouter;
 		for(String mode:scenario.getConfig().plansCalcRoute().getNetworkModes())
 			knownTravelTimes.put(mode, new HashMap<Id, Double[]>());
-		periods = new Period[6];
-		periods[0] = new Period(0, 7*3600-1, "Early morning");
-		periods[1] = new Period(7*3600, 10*3600-1, "Morning peak");
-		periods[2] = new Period(10*3600, 13*3600-1, "Before lunch");
-		periods[3] = new Period(13*3600, 18*3600-1, "After lunch");
-		periods[4] = new Period(18*3600, 21*3600-1, "Evening peak");
-		periods[5] = new Period(21*3600, 24*3600-1, "Evening peak");
-		periodsTime = 24*3600;
+		this.carAvailability = carAvailability;
+		this.modes = modes;
 	}
+	
+	//Methods
 	public Household getHousehold() {
 		return household;
 	}
-	public Set<Id> getKnownPeople() {
+	public Set<SocialDecisionMaker> getKnownPeople() {
 		return knownPeople;
 	}
-	public void addKnownPerson(Id id) {
-		knownPeople.add(id);
+	public void addKnownPerson(SocialDecisionMaker socialDecisionMaker) {
+		knownPeople.add(socialDecisionMaker);
 	}
-	public Set<Id> getKnownPlaces() {
-		return knownPlaces;
-	}
-	public void addKnownPlace(Id id) {
-		knownPlaces.add(id);
+	public void addKnownPlace(Id facilityId, Double time, String typeOfActivity) {
+		KnownPlace knownPlace = knownPlaces.get(facilityId);
+		if(knownPlace==null) {
+			knownPlace = new KnownPlace(facilityId);
+			knownPlaces.put(facilityId, knownPlace);
+		}
+		knownPlace.timeTypes.add(new Tuple<Period, String>(Period.getPeriod(time), typeOfActivity));
 	}
 	public void setKnownTravelTime(double time, String mode, Id linkId, double travelTime) {
-		for(int i=0; i<periods.length; i++)
-			if(periods[i].startTime<=time && time<=periods[i].endTime)
-				knownTravelTimes.get(mode).get(linkId)[i] = travelTime;
+		for(Period period:Period.values())
+			if(period.isPeriod(time))
+				knownTravelTimes.get(mode).get(linkId)[period.ordinal()] = travelTime;
+	}
+	public ScenarioSimplerNetwork getScenario() {
+		return scenario;
 	}
 	@Override
-	public double getTime() {
-		return time;
-	}
-	@Override
-	public void setTime(double time) {
-		this.time = time;
-	}
-	@Override
-	public String decideTypeOfActivity() {
-		String typeOfActivity = null;
-		//TODO
-		this.typeOfActivity = typeOfActivity;
-		return typeOfActivity;
-	}
-	@Override
-	public void setTypeOfActivity(String typeOfActivity) {
-		this.typeOfActivity = typeOfActivity;
-	}
-	@Override
-	public ActivityFacility decideFacility() {
-		ActivityFacility facility = null;
-		//TODO
-		this.facility = facility;
-		return facility;
-	}
-	@Override
-	public void setFacility(ActivityFacility facility) {
-		this.facility = facility;
-	}
-	@Override
-	public void setLeg(Leg leg) {
-		this.leg = leg;
-	}
-	@Override
-	public void setStartLink(Link startLink) {
-		this.startLink = startLink;
-	}
-	@Override
-	public void setEndLink(Link link) {
-		((ActivityFacilityImpl)facility).setLinkId(link.getId());
-	}
-	@Override
-	public Leg decideModeRoute() {
-		Link endLink = scenario.getNetwork().getLinks().get(facility.getLinkId());
-		String bestMode = null;
-		List<Link> bestPath = null;
-		double minTime = Double.MAX_VALUE;
-		for(String mode:knownTravelTimes.keySet()) {
-			travelMinCostSimple.setMode(mode);
-			travelTimeSimple.setMode(mode);
-			LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
-			LeastCostPathCalculator leastCostPathCalculator = routerFactory.createPathCalculator(scenario.getSimplerNetwork(mode), travelMinCostSimple, travelTimeSimple); 
-			Path path = leastCostPathCalculator.calcLeastCostPath(((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(startLink.getCoord()).getFromNode(), ((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(endLink.getCoord()).getToNode(), time, null, null);
-			if(path.travelTime<minTime) {
-				minTime = path.travelTime;
-				bestPath = path.links;
-				bestMode = mode;
+	public Tuple<String, Id> decideTypeOfActivityFacility(double time, Id startFacilityId) {
+		Coord location = scenario.getActivityFacilities().getFacilities().get(startFacilityId).getCoord();
+		List<Tuple<String, Id>> options = new ArrayList<Tuple<String, Id>>();
+		double maximumDistance = MAXIMUM_SEARCHING_DISTANCE/2;
+		if(knownPlaces.size()>0)
+			//Known places
+			while(options.size()==0) {
+				for(KnownPlace knownPlace:knownPlaces.values()) {
+					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(knownPlace.facilityId);
+					if(CoordUtils.calcDistance(location, facility.getCoord())<maximumDistance)
+						for(Tuple<Period, String> types:knownPlace.timeTypes)
+							if(Period.getPeriod(time).equals(types.getFirst()))
+								options.add(new Tuple<String, Id>(types.getSecond(), knownPlace.facilityId));
+				}
+				maximumDistance *= 2;
+			}
+		else {
+			//Activities of the household
+			Period period = Period.getPeriod(time);
+			for(Id memberID:household.getMemberIds()) {
+				Person member = scenario.getPopulation().getPersons().get(memberID); 
+				if(member instanceof BasePerson && !((BasePerson)member).isPlanning())
+					for(Plan plan:member.getPlans())
+						for(PlanElement planElement:plan.getPlanElements())
+							if(planElement instanceof Activity && ((Activity)planElement).getEndTime()!=Time.UNDEFINED_TIME && Period.getPeriod(((Activity)planElement).getEndTime()).equals(period))
+								options.add(new Tuple<String, Id>(((Activity)planElement).getType(), ((Activity)planElement).getFacilityId()));
 			}
 		}
-		Set<String> mode = new HashSet<String>();
-		mode.add(bestMode);
-		leastCostPathCalculator.setModeRestriction(mode);
-		NetworkRoute networkRoute = getFullNetworkRoute(bestPath);
-		if(leg==null)
-			leg = new LegImpl(bestMode);
-		else
-			leg.setMode(bestMode);
-		leg.setRoute(networkRoute);
-		return leg;
-	}
-	private NetworkRoute getFullNetworkRoute(List<Link> bestPath) {
-		Link endLink = scenario.getNetwork().getLinks().get(facility.getLinkId());
-		NetworkRoute networkRoute = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId());
-		List<Id> links = new ArrayList<Id>();
-		Node prevNode = startLink.getToNode(), currNode = null;
-		for(Link link:bestPath) {
-			currNode = ((ComposedLink)link).getStartNode();
-			Path internalNodePath = leastCostPathCalculator.calcLeastCostPath(prevNode, currNode, time, null, null);
-			for(Link linkFull:internalNodePath.links)
-				links.add(linkFull.getId());
-			prevNode = ((ComposedLink)link).getEndNode();
-			Path path = leastCostPathCalculator.calcLeastCostPath(currNode, prevNode, time, null, null);
-			for(Link linkFull:path.links)
-				links.add(linkFull.getId());
-		}
-		Path path = leastCostPathCalculator.calcLeastCostPath(prevNode, endLink.getFromNode(), time, null, null);
-		for(Link linkFull:path.links)
-			links.add(linkFull.getId());
-		networkRoute.setLinkIds(startLink.getId(), links, endLink.getId());
-		return networkRoute;
+		return options.size()==0?null:options.get((int) (Math.random()*options.size()));
 	}
 	@Override
-	public void setMinimumStartTime(double minimumStartTime) {
-		this.minimumStartTime = minimumStartTime;
+	public List<? extends PlanElement> decideModeRoute(double time, Id startFacilityId, Id endFacilityId) {
+		List<? extends PlanElement> bestTrip = null;
+		double minTime = Double.MAX_VALUE;
+		ActivityFacility startFacility = scenario.getActivityFacilities().getFacilities().get(startFacilityId);
+		ActivityFacility endFacility = scenario.getActivityFacilities().getFacilities().get(endFacilityId);
+		for(String mode:modes)
+			if(carAvailability || !mode.equals("car")) {
+				List<? extends PlanElement> trip = tripRouter.calcRoute(mode, startFacility, endFacility, time, null);
+				double currTime = time;
+				for(PlanElement planElement:trip)
+					if(planElement instanceof Leg)
+						currTime += ((Leg)planElement).getTravelTime();
+					else if(((Activity)planElement).getEndTime()!=Time.UNDEFINED_TIME)
+						currTime = ((Activity)planElement).getEndTime();
+					else if(((Activity)planElement).getMaximumDuration()!=Time.UNDEFINED_TIME)
+						currTime += ((Activity)planElement).getMaximumDuration();
+					else
+						throw new RuntimeException("Plan element without time information");
+				if(minTime>currTime-time) {
+					minTime = currTime-time;
+					bestTrip = trip; 
+				}
+			}
+		return bestTrip;
 	}
 	@Override
-	public double decideStartTime() {
-		double startTime = minimumStartTime;
-		this.startTime = startTime;
-		return startTime;
-	}
-	@Override
-	public void setStartTime(double startTime) {
-		this.startTime = startTime;
-	}
-	@Override
-	public void setMaximumEndTime(double maximumEndTime) {
-		this.maximumEndTime = maximumEndTime;
-	}
-	@Override
-	public double decideEndTime() {
+	public double decideEndTime(double startTime, double maximumEndTime, String typeOfActivity, Id facilityId) {
 		OpeningTime startTimeOpeningTime = null;
-		for(OpeningTime openingTime:facility.getActivityOptions().get(typeOfActivity).getOpeningTimes(DayType.wkday))
-			if(openingTime.getStartTime()<=startTime && startTime<=openingTime.getEndTime())
-				startTimeOpeningTime = openingTime;
-		return Math.min(startTimeOpeningTime.getEndTime(), maximumEndTime);
+		ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(facilityId);
+		double maxFacilityTime= Time.MIDNIGHT;
+		if(facility.getActivityOptions().get(typeOfActivity).getOpeningTimes(DayType.wkday)!=null) {
+			for(OpeningTime openingTime:facility.getActivityOptions().get(typeOfActivity).getOpeningTimes(DayType.wkday))
+				if(openingTime.getStartTime()<=startTime && startTime<=openingTime.getEndTime())
+					startTimeOpeningTime = openingTime;
+			if(startTimeOpeningTime!=null)
+				maxFacilityTime = startTimeOpeningTime.getEndTime();
+		}
+		return Math.min(maxFacilityTime, maximumEndTime);
 	}
 
 }

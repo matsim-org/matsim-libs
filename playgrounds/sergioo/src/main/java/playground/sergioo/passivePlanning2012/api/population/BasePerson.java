@@ -6,5 +6,6 @@ public interface BasePerson extends Person {
 
 	//Methods
 	public BasePlan getBasePlan();
+	public boolean isPlanning();
 
 }

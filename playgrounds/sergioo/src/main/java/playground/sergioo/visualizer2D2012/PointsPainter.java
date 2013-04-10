@@ -12,15 +12,22 @@ import playground.sergioo.visualizer2D2012.Painter;
 
 public class PointsPainter extends Painter {
 	
+	//Enum
+	public enum TypePoint {
+		X,
+		O;
+	}
 	
 	//Attributes
 	private Collection<Coord> points = new ArrayList<Coord>();
 	private Coord selectedPoint;
-	private Color color = Color.BLACK;
+	private Color color;
+	private TypePoint type = TypePoint.X;
+	private double pointSize;
 	
 	//Methods
 	public PointsPainter() {
-		super();
+		this(Color.BLACK);
 	}
 	public PointsPainter(Color color) {
 		super();
@@ -35,10 +42,20 @@ public class PointsPainter extends Painter {
 	public void clearPoints() {
 		points.clear();
 	}
+	public void setType(TypePoint type) {
+		this.type = type;
+	}
+	public void setPointSize(double pointSize) {
+		this.pointSize = pointSize;
+	}
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
-		for(Coord point:points)
-			paintX(g2, layersPanel, point, 3, color);
+		if(type.equals(TypePoint.O))
+			for(Coord point:points)
+				paintCircle(g2, layersPanel, point, pointSize, color);
+		else
+			for(Coord point:points)
+				paintX(g2, layersPanel, point, pointSize, color);
 		if(selectedPoint!=null)
 			paintCircle(g2, layersPanel, selectedPoint, 4, Color.RED);
 	}

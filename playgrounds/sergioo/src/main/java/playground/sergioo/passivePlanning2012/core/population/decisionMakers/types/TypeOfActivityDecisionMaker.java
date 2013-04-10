@@ -3,6 +3,6 @@ package playground.sergioo.passivePlanning2012.core.population.decisionMakers.ty
 public interface TypeOfActivityDecisionMaker extends DecisionMaker {
 
 	//Methods
-	public String decideTypeOfActivity();
+	public String decideTypeOfActivity(double time);
 
 }
