@@ -180,12 +180,23 @@ public class LeastCostPathTree {
 			}
 			double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime, null, null);
 			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime, null, null);
+			
+			additionalComputationsHook( l, currTime ) ;
+			
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);
 				nnData.visit(n.getId(), visitCost, visitTime);
 				pendingNodes.add(nn);
 			}
 		}
+	}
+	
+	/**
+	 * @param link  
+	 * @param currTime 
+	 */
+	protected void additionalComputationsHook( Link link, double currTime ) {
+		// left empty for inheritance
 	}
 
 	// ////////////////////////////////////////////////////////////////////
