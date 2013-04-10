@@ -316,14 +316,14 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(TRAVELING_WALK, "[utils/hr] additional marginal utility offset of traveling by foot.  normally negative.  this " +
 				"comes on top of the opportunity cost of time.  also see marginalUtlOfDistanceWalk") ;
 		map.put(LATE_ARRIVAL, "[utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative") ;
-		map.put(EARLY_DEPARTURE, "[utils/hr] utility for departing early (i.e. before the earliest end time).  Probably " +
+		map.put(EARLY_DEPARTURE, "[utils/hr] utility for departing early (i.e. before the earliest end time).  Normally negative.  Probably " +
 				"implemented correctly, but not tested." );
-		map.put(WAITING, "[utils/hr] utility offset for waiting.  this comes on top of the opportunity cost of time.  Probably " +
+		map.put(WAITING, "[utils/hr] additional marginal utility for waiting. normally negative. this comes on top of the opportunity cost of time.  Probably " +
 		"implemented correctly, but not tested.") ;
-		map.put(WAITING_PT, "[utils/hr] utility offset for waiting for a pt vehicle.  this comes on top of the opportunity cost " +
+		map.put(WAITING_PT, "[utils/hr] additional marginal utility for waiting for a pt vehicle. normally negative. this comes on top of the opportunity cost " +
 				"of time. Default: if not set explicitly, it is equal to traveling_pt!!!" ) ;
 		map.put(BRAIN_EXP_BETA, "logit model scale parameter. default: 2.  Has name and default value for historical reasons " +
-				"(see Bryan Raney's phd thesis).  Should be in strategyConfigGroup.") ;
+				"(see Bryan Raney's phd thesis).") ;
 		map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates " +
 				"close to zero emulate score averaging, but slow down initial convergence") ;
 
