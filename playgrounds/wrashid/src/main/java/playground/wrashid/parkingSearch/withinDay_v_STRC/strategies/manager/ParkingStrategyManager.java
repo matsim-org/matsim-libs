@@ -87,7 +87,7 @@ public class ParkingStrategyManager {
 					
 					if (legIndexHashMap.size()==0){
 						// initialize 
-						legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(agent,i));
+						legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(agent,i,currentIterationNumber));
 					} else if (legIndexHashMap.size()==1){
 						Id linkIdInHM=null;
 						for (Id linkId:legIndexHashMap.keySet()){
@@ -109,12 +109,12 @@ public class ParkingStrategyManager {
 							}else {
 								// the activity location changed -> reset
 								legIndexHashMap.clear();
-								legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(agent,i));
+								legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(agent,i,currentIterationNumber));
 							}
 						} else {
 							// the activity location changed -> reset
 							legIndexHashMap.clear();
-							legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(agent,i));
+							legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(agent,i,currentIterationNumber));
 						}
 					} else {
 						DebugLib.stopSystemAndReportInconsistency("something went really wrong...");
@@ -129,8 +129,9 @@ public class ParkingStrategyManager {
 
 	// TODO: program this properly, such that a module can be fit in here to decide, which strategies should be used
 	//
-	private EvaluationContainer createEvaulationContainerForAgentAtLeg(PlanBasedWithinDayAgent agent, int i) {
+	private EvaluationContainer createEvaulationContainerForAgentAtLeg(PlanBasedWithinDayAgent agent, int legIndex, int iterationNumber) {
 		EvaluationContainer evaluationContainer=new EvaluationContainer(allStrategies);
+		evaluationContainer.setLastIterationContainerUsed(iterationNumber);
 		return evaluationContainer;
 	}
 
