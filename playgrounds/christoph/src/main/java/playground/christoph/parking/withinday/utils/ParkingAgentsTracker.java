@@ -74,7 +74,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 	private final Set<Id> linkEnteredAgents;
 	private final Set<Id> lastTimeStepsLinkEnteredAgents;
 	private final Map<Id, ActivityFacility> nextActivityFacilityMap;
-	private final Map<Id, PlanBasedWithinDayAgent> agents;
+	protected final Map<Id, PlanBasedWithinDayAgent> agents;
 	private final Map<Id, Id> selectedParkingsMap;
 	private final Set<Id> recentlyArrivedDrivers;
 	private final Map<Id, Id> recentlyDepartingDrivers;
