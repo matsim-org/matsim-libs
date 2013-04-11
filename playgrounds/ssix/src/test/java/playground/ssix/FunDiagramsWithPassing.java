@@ -100,10 +100,10 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	//private Map<Integer,Tuple<Integer,Double>> tourNumberSpeed_med;
 	private Map<Integer,Tuple<Integer,Double>> tourNumberSpeed_fast;
 	
-	private List<Integer> flowTable;//Flows on node 0 for the last 3600s (counted every second)
-	private List<Integer> flowTable_truck;
+	private List<Double> flowTable;//Flows on node 0 for the last 3600s (counted every second)
+	private List<Double> flowTable_truck;
 	//private List<Integer> flowTable_med;
-	private List<Integer> flowTable_fast;
+	private List<Double> flowTable_fast;
 	
 	private Double flowTime;
 	private Double flowTime_truck;
@@ -127,9 +127,9 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		this.endDensity = 0.;
 		this.endFlow = 0.;
 		this.endAverageVelocity = 0.;
-		this.flowTable = new LinkedList<Integer>();
+		this.flowTable = new LinkedList<Double>();
 		for (int i=0; i<3600; i++){
-			this.flowTable.add(0);
+			this.flowTable.add(0.);
 		}
 		this.flowTime = new Double(0.);
 		this.lastXFlows = new LinkedList<Double>();
@@ -159,18 +159,22 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		if (!(endRegime)){//If data is already extracted for that number of agents on the track
 		//it is just necessary to let them go home and carry on with their lives instead of running around.
 			Id personId = event.getPersonId();
+			double pcu_person=0.;
 			
 			//Disaggregated data updating methods
 			String transportMode = (String) scenario.getPopulation().getPersons().get(personId).getCustomAttributes().get("transportMode");
 			//System.out.println("transportMode: "+transportMode);
 			if (transportMode.equals("truck")){
 				handleEvent_truck(event);
+				pcu_person = DreieckStreckeSzenarioTest.PCU_TRUCK;
 			/*
 			} else if (transportMode.equals("med")) {
 				handleEvent_med(event);
+				pcu_person = DreieckStreckeSzenarioTest.PCU_MED;
 			*/
 			} else if (transportMode.equals("fast")) {
 				handleEvent_fast(event);
+				pcu_person = DreieckStreckeSzenarioTest.PCU_FAST;
 			} else {
 				while(true){
 					log.warn("No transport mode acquired in event handling, must be something wrong!");
@@ -184,23 +188,22 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 			
 			if (event.getLinkId().equals(studiedMeasuringPointLinkId)){	
 				
-				//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
+				//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId				
 				if (nowTime == this.flowTime.doubleValue()){//Still measuring the flow of the same second
-					Integer nowFlow = this.flowTable.get(0);
-					this.flowTable.set(0, nowFlow.intValue()+1);
+					Double nowFlow = this.flowTable.get(0);
+					this.flowTable.set(0, nowFlow.doubleValue()+pcu_person);
 				} else {//Need to offset the current data in order to update
 					int timeDifference = (int) (nowTime-this.flowTime.doubleValue());
-					//log.info("timeDifference is: "+timeDifference);
 					if (timeDifference<3600){
 						for (int i=3599-timeDifference; i>=0; i--){
-							this.flowTable.set(i+timeDifference, this.flowTable.get(i).intValue());
+							this.flowTable.set(i+timeDifference, this.flowTable.get(i).doubleValue());
 						}
 						if (timeDifference > 1){
 							for (int i = 1; i<timeDifference; i++){
-								this.flowTable.set(i, 0);
+								this.flowTable.set(i, 0.);
 							}
 						}
-						this.flowTable.set(0, 1);
+						this.flowTable.set(0, pcu_person);
 					} else {
 						flowTableReset();
 					}
@@ -210,12 +213,9 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				//Permanent Regime handling
 				if (permanentRegime){
 					tourNumber = this.personTour.get(personId);
-					
-					//System.out.println("Agent "+personId.toString()+" driving through.\n"+
-							//"Trying to update permanentGroupVariables from tourNumber "+tourNumber+".");
 					handlePermanentGroupDependentVariables(tourNumber);
 					
-					this.permanentFlow = getActualFlow();//veh/h
+					this.permanentFlow = getActualFlow();//PCU/h......PCU-correction is done beforehand when updating flow
 					//Updating lastXFlows
 					for (int j=FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS-2; j>=0; j--){
 						this.lastXFlows.set(j+1, this.lastXFlows.get(j).doubleValue());
@@ -223,12 +223,12 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 					this.lastXFlows.set(0, this.permanentFlow);
 					
 					if (tourNumber >= (this.permanentRegimeTour+2)){//Let the simulation go another turn around to eventually fill data gaps
-						//TODO: this is not enough. Need to wait until the slowest mode has reached and totally completed tour permanentRegimeTour.
-						//
+						//This condition is not enough. Need to wait until the slowest mode has reached and totally completed tour permanentRegimeTour.
+						//This is guaranteed in handleEvent_mode for each mode.
 						
 						int numberOfDrivingAgents = this.tourNumberSpeed.get(this.permanentRegimeTour).getFirst();
 						
-						this.permanentDensity = numberOfDrivingAgents/networkLength*1000;//veh/km
+						this.permanentDensity = this.permanentDensity_truck+this.permanentDensity_fast;//PCU/km
 					
 						this.permanentAverageVelocity = this.tourNumberSpeed.get(this.permanentRegimeTour).getSecond();//m/s
 	
@@ -361,11 +361,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 							n_fast_prt = 0;//means the NumberSpeed_fast for this tour hasn't been created => the mode needs to run around a little more
 						}
 						if ( (n_truck_prt+n_fast_prt) == this.scenario.getPopulation().getPersons().size()){
-						//if 
-						//TODO:make sure tourNumberSpeed_mode.get(PRT).getFirst() equals numberOfPeople for each mode (everyone has driven the PRT tour)
-						//then 
 							completedPRT = true;
-						//
 						}
 						if ((closeSpeeds) && (stableModes) && (completedPRT)){
 							this.permanentRegime=true;
@@ -403,21 +399,21 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 			
 			//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
 			if (nowTime == this.flowTime_truck.doubleValue()){//Still measuring the flow of the same second
-				Integer nowFlow = this.flowTable_truck.get(0);
-				this.flowTable_truck.set(0, nowFlow.intValue()+1);
+				Double nowFlow = this.flowTable_truck.get(0);
+				this.flowTable_truck.set(0, nowFlow.doubleValue()+DreieckStreckeSzenarioTest.PCU_TRUCK);
 			} else {//Need to offset the current data in order to update
 				int timeDifference = (int) (nowTime-this.flowTime_truck.doubleValue());
 				//log.info("timeDifference is: "+timeDifference);
 				if (timeDifference<3600){
 					for (int i=3599-timeDifference; i>=0; i--){
-						this.flowTable_truck.set(i+timeDifference, this.flowTable_truck.get(i).intValue());
+						this.flowTable_truck.set(i+timeDifference, this.flowTable_truck.get(i).doubleValue());
 					}
 					if (timeDifference > 1){
 						for (int i = 1; i<timeDifference; i++){
-							this.flowTable_truck.set(i, 0);
+							this.flowTable_truck.set(i, 0.);
 						}
 					}
-					this.flowTable_truck.set(0, 1);
+					this.flowTable_truck.set(0, DreieckStreckeSzenarioTest.PCU_TRUCK);
 				} else {
 					flowTableReset_truck();
 				}
@@ -427,7 +423,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	}
 	
 	/*
-	private void handleEvent_med(LinkEnterEvent event){
+	private void handleEvent_med(LinkEnterEvent event){//TODO: PCU-dependent things to fix here as in other methods
 		Id personId = event.getPersonId();
 		int tourNumber;
 		double nowTime = event.getTime();
@@ -652,10 +648,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 							n_fast_prt = 0;//means the NumberSpeed_fast for this tour hasn't been created => the mode needs to run around a little more
 						}
 						if ( (n_truck_prt+n_fast_prt) == this.scenario.getPopulation().getPersons().size()){
-						//make sure tourNumberSpeed_mode.get(PRT).getFirst() equals numberOfPeople for each mode (everyone has driven the PRT tour)
-						//TODO:make sure that works...
 							completedPRT = true;
-						//
 						}
 						if ((closeSpeeds) && (stableModes) && (completedPRT)){
 							this.permanentRegime=true;
@@ -693,21 +686,21 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 			
 			//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
 			if (nowTime == this.flowTime_fast.doubleValue()){//Still measuring the flow of the same second
-				Integer nowFlow = this.flowTable_fast.get(0);
-				this.flowTable_fast.set(0, nowFlow.intValue()+1);
+				Double nowFlow = this.flowTable_fast.get(0);
+				this.flowTable_fast.set(0, nowFlow.doubleValue()+DreieckStreckeSzenarioTest.PCU_FAST);
 			} else {//Need to offset the current data in order to update
 				int timeDifference = (int) (nowTime-this.flowTime_fast.doubleValue());
 				//log.info("timeDifference is: "+timeDifference);
 				if (timeDifference<3600){
 					for (int i=3599-timeDifference; i>=0; i--){
-						this.flowTable_fast.set(i+timeDifference, this.flowTable_fast.get(i).intValue());
+						this.flowTable_fast.set(i+timeDifference, this.flowTable_fast.get(i).doubleValue());
 					}
 					if (timeDifference > 1){
 						for (int i = 1; i<timeDifference; i++){
-							this.flowTable_fast.set(i, 0);
+							this.flowTable_fast.set(i, 0.);
 						}
 					}
-					this.flowTable_fast.set(0, 1);
+					this.flowTable_fast.set(0, DreieckStreckeSzenarioTest.PCU_FAST);
 				} else {
 					flowTableReset_fast();
 				}
@@ -718,35 +711,35 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 
 
  	private double getActualFlow(){
-		double flowOverLast3600s = 0;
+		double flowOverLast3600s = 0.;
 		for (int i=0; i<3600; i++){
-			flowOverLast3600s += this.flowTable.get(i).intValue();
+			flowOverLast3600s += this.flowTable.get(i).doubleValue();
 		}
 		return flowOverLast3600s;//extrapolated hour flow in veh/h
 	}
  	
 	private double getActualFlow_truck(){
-		double flowOverLast3600s = 0;
+		double flowOverLast3600s = 0.;
 		for (int i=0; i<3600; i++){
-			flowOverLast3600s += this.flowTable_truck.get(i).intValue();
+			flowOverLast3600s += this.flowTable_truck.get(i).doubleValue();
 		}
 		return flowOverLast3600s;//extrapolated hour flow in veh/h
 	}
 	
 	/*
 	private double getActualFlow_med(){
-		double flowOverLast3600s = 0;
+		double flowOverLast3600s = 0.;
 		for (int i=0; i<3600; i++){
-			flowOverLast3600s += this.flowTable_med.get(i).intValue();
+			flowOverLast3600s += this.flowTable_med.get(i).doubleValue();
 		}
 		return flowOverLast3600s;//extrapolated hour flow in veh/h
 	}
 	*/
 	
 	private double getActualFlow_fast(){
-		double flowOverLast3600s = 0;
+		double flowOverLast3600s = 0.;
 		for (int i=0; i<3600; i++){
-			flowOverLast3600s += this.flowTable_fast.get(i).intValue();
+			flowOverLast3600s += this.flowTable_fast.get(i).doubleValue();
 		}
 		return flowOverLast3600s;//extrapolated hour flow in veh/h
 	}
@@ -754,27 +747,27 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	
 	private void flowTableReset(){
 		for (int i=0; i<3600; i++){
-			this.flowTable.set(i, 0);
+			this.flowTable.set(i, 0.);
 		}
 	}
 	
 	private void flowTableReset_truck(){
 		for (int i=0; i<3600; i++){
-			this.flowTable_truck.set(i, 0);
+			this.flowTable_truck.set(i, 0.);
 		}
 	}
 	
 	/*
 	private void flowTableReset_med(){
 		for (int i=0; i<3600; i++){
-			this.flowTable_med.set(i, 0);
+			this.flowTable_med.set(i, 0.);
 		}
 	}
 	*/
 	
 	private void flowTableReset_fast(){
 		for (int i=0; i<3600; i++){
-			this.flowTable_fast.set(i, 0);
+			this.flowTable_fast.set(i, 0.);
 		}
 	}
 	
@@ -826,13 +819,13 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		//this.tourNumberSpeed_med = new TreeMap<Integer,Tuple<Integer,Double>>();
 		this.tourNumberSpeed_fast = new TreeMap<Integer,Tuple<Integer,Double>>();
 		
-		this.flowTable_truck = new LinkedList<Integer>();
-		//this.flowTable_med = new LinkedList<Integer>();
-		this.flowTable_fast = new LinkedList<Integer>();
+		this.flowTable_truck = new LinkedList<Double>();
+		//this.flowTable_med = new LinkedList<Double>();
+		this.flowTable_fast = new LinkedList<Double>();
 		for (int i=0; i<3600; i++){
-			this.flowTable_truck.add(0);
-			//this.flowTable_med.add(0);
-			this.flowTable_fast.add(0);
+			this.flowTable_truck.add(0.);
+			//this.flowTable_med.add(0.);
+			this.flowTable_fast.add(0.);
 		}
 		
 		this.flowTime_truck = new Double(0.);
@@ -890,7 +883,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		this.permanentFlow_fast = getActualFlow_fast();				
 		
 		if (tourNumber >= (this.permanentRegimeTour+3)){//Let the simulation go another turn around to eventually fill data gaps
-			//TODO: this is not enough. Need to wait until the slowest mode has reached and totally completed tour permanentRegimeTour.
+			//This condition is not enough. Need to wait until the slowest mode has reached and totally completed tour permanentRegimeTour.
+			//However, this is guaranteed in the methods handleEvent_mode when detecting permanentRegime
 			
 			int N_truck = 0; /*int N_med = 0;*/ int N_fast = 0;
 			
@@ -908,9 +902,9 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 
 			//as stated in the class attribute section, the following densities are PARTIAL densities, which means
 			//the saturation density will DEPEND on the chosen probabilities (and hence will not be the usual 148.33 veh/km for all modes)
-			this.permanentDensity_truck = N_truck/networkLength*1000;
-			//this.permanentDensity_med = N_med/networkLength*1000;
-			this.permanentDensity_fast = N_fast/networkLength*1000;
+			this.permanentDensity_truck = N_truck*DreieckStreckeSzenarioTest.PCU_TRUCK/networkLength*1000;
+			//this.permanentDensity_med = N_med*DreieckStreckeSzenarioTest.PCU_MED/networkLength*1000;
+			this.permanentDensity_fast = N_fast*DreieckStreckeSzenarioTest.PCU_FAST/networkLength*1000;
 			
 			if (this.tourNumberSpeed_truck.size() != 0){
 				this.permanentAverageVelocity_truck = this.tourNumberSpeed_truck.get(this.permanentRegimeTour).getSecond();//m/s

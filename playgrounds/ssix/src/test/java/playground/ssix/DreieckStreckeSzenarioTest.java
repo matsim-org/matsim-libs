@@ -200,15 +200,23 @@ public class DreieckStreckeSzenarioTest {
 
 	}
 	
+	//CONFIGURATION: static variables used for aggregating configuration options
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
 	public static double length = 166.67;//in m, length of one the triangle sides.
+	public static int NETWORK_CAPACITY = 2700;//in PCU/h
+	private static long NUMBER_OF_AGENTS = 270;
+	private static String OUTPUT_DIR = "./output/data_Patna_test_pcu_correction.txt";
 	
-	private static long NUMBER_OF_AGENTS = 250;
-	
-	private static double FREESPEED = 50.;//in km/h
+	private static double FREESPEED = 50.;//in km/h, maximum authorized velocity on the track
 	private static double P_TRUCK = 0.85;//no need to worry much about those, are normalized when choosing effective transport mode
 	//private static double P_MED = 2.;
 	private static double P_FAST = 0.15;
+	protected static double PCU_TRUCK = 0.25;//PCUs of the different possible modes
+	protected static double PCU_MED = 1.;
+	protected static double PCU_FAST = 1.;
+	protected static double VMAX_TRUCK = 5.56;//maximum velocities of the vehicle types
+	protected static double VMAX_MED = 12.;
+	protected static double VMAX_FAST = 13.88;
 	
 	private PrintStream writer;
 	
@@ -235,23 +243,23 @@ public class DreieckStreckeSzenarioTest {
 	}
 	
 	public static void main(String[] args) {
-		DreieckStreckeSzenarioTest dreieck = new DreieckStreckeSzenarioTest(2700);
+		DreieckStreckeSzenarioTest dreieck = new DreieckStreckeSzenarioTest(NETWORK_CAPACITY);
 		dreieck.fillNetworkData();
 		
-		String dir = "./output/data_Patna_all.txt";
-		dreieck.openFile(dir);
-		for (int number_cars = 0; number_cars < 81; number_cars+=5){//16
-			for (int number_bikes = 0; number_bikes < 330 - number_cars; number_bikes+=10){//33
+		dreieck.openFile(OUTPUT_DIR);
+		for (int number_cars = 0; number_cars < 81; number_cars+=10){//8
+			for (int number_bikes = 0; number_bikes < 281 - number_cars; number_bikes+=20){//14
 				dreieck.runParam(number_bikes,number_cars);
 			}
 		}
-		
-		
+		dreieck.closeFile();
+		/*
 		long number_of_iterations = NUMBER_OF_AGENTS + 1;//-10 if constantFastDensity... because 10 vehicles are already in the sim
 		for (long i = 0; i < number_of_iterations; i++){
 			dreieck.run(i, "constantModalSplit");
 		}
 		dreieck.closeFile();
+		*/
 	}
 	
 	private void runParam(int number_trucks, int number_fast){
@@ -265,25 +273,25 @@ public class DreieckStreckeSzenarioTest {
 		runqsim(events);
 		
 		//writer.doSomething
-		writer.format("%d\t\t", number_trucks);
-		writer.format("%d\t", number_fast);
+		writer.format("%d\t", number_trucks);
+		writer.format("%d\t\t", number_fast);
 		
 		log.info("Writing down data for "+number_trucks+number_fast+" people...");
 		
-		//writer.format("%.2f\t", fundi3.getEndDensity());
-		//writer.format("%.2f\t", fundi3.getEndDensity_truck());
+		writer.format("%.2f\t", fundi3.getEndDensity());
+		writer.format("%.2f\t", fundi3.getEndDensity_truck());
 		//writer.format("%.2f\t", fundi3.getEndDensity_med());
-		//writer.format("%.2f\t\t", fundi3.getEndDensity_fast());
+		writer.format("%.2f\t\t", fundi3.getEndDensity_fast());
 		
 		writer.format("%.2f\t", fundi3.getEndFlow());
-		//writer.format("%.2f\t", fundi3.getEndFlow_truck());
+		writer.format("%.2f\t", fundi3.getEndFlow_truck());
 		//writer.format("%.2f\t", fundi3.getEndFlow_med());
-		//writer.format("%.2f\t\t", fundi3.getEndFlow_fast());
+		writer.format("%.2f\t\t", fundi3.getEndFlow_fast());
 		
-		writer.format("%.2f\t\n", fundi3.getEndAverageVelocity());
-		//writer.format("%.2f\t", fundi3.getEndAverageVelocity_truck());
+		writer.format("%.2f\t", fundi3.getEndAverageVelocity());
+		writer.format("%.2f\t", fundi3.getEndAverageVelocity_truck());
 		//writer.format("%.2f\t", fundi3.getEndAverageVelocity_med());
-		//writer.format("%.2f\n", fundi3.getEndAverageVelocity_fast());
+		writer.format("%.2f\n", fundi3.getEndAverageVelocity_fast());
 		log.info("Done!");
 	}
 	
@@ -599,18 +607,7 @@ public class DreieckStreckeSzenarioTest {
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
-        /*//Using own netsimEngineFactory
-        // Get number of parallel Threads
-        int numOfThreads = conf.getNumberOfThreads();
-        QNetsimEngineFactory netsimEngFactory;
-        if (numOfThreads > 1) {
-            events = new SynchronizedEventsManagerImpl(events);
-            netsimEngFactory = new ParallelQNetsimEngineFactory();
-            //log.info("Using parallel QSim with " + numOfThreads + " threads.");
-        } else {
-            netsimEngFactory = new DefaultQSimEngineFactory();
-        }*/
-        
+        /**/
         QSim qSim = new QSim(sc, events);
         ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
@@ -657,20 +654,20 @@ public class DreieckStreckeSzenarioTest {
         //Third modification: Mobsim needs to know the different vehicle types (and their respective speeds)
         Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 		VehicleType truck = VehicleUtils.getFactory().createVehicleType(new IdImpl("truck"));
-		truck.setPcuEquivalents(0.25);
-		truck.setMaximumVelocity(5.56);
+		truck.setPcuEquivalents(PCU_TRUCK);
+		truck.setMaximumVelocity(VMAX_TRUCK);
 		VehicleCapacity cap = new VehicleCapacityImpl();
 		cap.setSeats(3);
 		truck.setCapacity(cap);
 		modeVehicleTypes.put("truck", truck);
 		VehicleType med = VehicleUtils.getFactory().createVehicleType(new IdImpl("med"));
-		med.setPcuEquivalents(1.0);
-		med.setMaximumVelocity(15.0);
+		med.setPcuEquivalents(PCU_MED);
+		med.setMaximumVelocity(VMAX_MED);
 		med.setCapacity(cap);
 		//modeVehicleTypes.put("med", med);
 		VehicleType fast = VehicleUtils.getFactory().createVehicleType(new IdImpl("fast"));
-		fast.setPcuEquivalents(1.0);
-		fast.setMaximumVelocity(13.88);
+		fast.setPcuEquivalents(PCU_FAST);
+		fast.setMaximumVelocity(VMAX_FAST);
 		fast.setCapacity(cap);
 		modeVehicleTypes.put("fast", fast);
 		
@@ -706,11 +703,11 @@ public class DreieckStreckeSzenarioTest {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		//writer.format("%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\n",	
-		//		      "n",  "k", "k_t","k_f", "rho","rho_t","rho_f","v","v_t","v_f");
+		writer.format("%s\t%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\n",	
+				     "n_t", "n_f",  "k", "k_t","k_f", "rho","rho_t","rho_f","v","v_t","v_f");
 		
-		writer.format("%s\t%s\t%s\t%s\n",
-					  "n_bikes","n_cars","flow","speed");
+		//writer.format("%s\t%s\t%s\t%s\n",
+		//			  "n_bikes","n_cars","flow","speed");
 	}
 	
 	private void closeFile() {
