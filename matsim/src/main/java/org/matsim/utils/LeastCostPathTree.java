@@ -29,9 +29,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -39,6 +41,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * Calculates a least-cost-path tree using Dijkstra's algorithm for calculating a shortest-path
@@ -58,6 +62,9 @@ public class LeastCostPathTree {
 	private final TravelTime ttFunction;
 	private final TravelDisutility tcFunction;
 	private HashMap<Id, NodeData> nodeData = null;
+	
+	private final Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(new IdImpl("theVehicle"), VehicleUtils.getDefaultVehicleType());
+	private final Person PERSON = new PersonImpl(new IdImpl("thePerson"));
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -178,8 +185,8 @@ public class LeastCostPathTree {
 				nnData = new NodeData();
 				this.nodeData.put(nn.getId(), nnData);
 			}
-			double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime, null, null);
-			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime, null, null);
+			double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime, PERSON, VEHICLE);
+			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime, PERSON, VEHICLE);
 			
 			
 			if (visitCost < nnData.getCost()) {
