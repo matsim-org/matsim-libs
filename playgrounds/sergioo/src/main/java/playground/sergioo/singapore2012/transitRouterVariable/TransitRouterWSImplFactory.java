@@ -21,7 +21,6 @@ package playground.sergioo.singapore2012.transitRouterVariable;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.Controler;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -38,16 +37,10 @@ public class TransitRouterWSImplFactory implements TransitRouterFactory {
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Network network;
 	private TransitRouterNetworkTravelTimeAndDisutilityWS transitRouterNetworkTravelTimeAndDisutilityWS;
-	private Scenario scenario;
-	private final WaitTime waitTime;
-	private final StopStopTime stopStopTime;
 	
 	public TransitRouterWSImplFactory(final TransitRouterConfig config, final Scenario scenario, final WaitTime waitTime, final StopStopTime stopStopTime) {
 		this.config = config;
 		this.network = scenario.getNetwork();
-		this.scenario = scenario;
-		this.waitTime = waitTime;
-		this.stopStopTime = stopStopTime;
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, scenario.getTransitSchedule(), this.config.beelineWalkConnectionDistance);
 		transitRouterNetworkTravelTimeAndDisutilityWS = new TransitRouterNetworkTravelTimeAndDisutilityWS(config, network, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(scenario.getTransitSchedule()));
 	}

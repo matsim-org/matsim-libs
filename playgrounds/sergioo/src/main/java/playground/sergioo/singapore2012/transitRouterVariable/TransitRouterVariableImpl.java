@@ -55,13 +55,13 @@ public class TransitRouterVariableImpl implements TransitRouter {
 
 	private final MultiNodeDijkstra dijkstra;
 	private final TransitRouterConfig config;
-	private final TransitRouterNetworkTravelTimeAndDisutilityWW ttCalculator;
+	private final TransitRouterNetworkTravelTimeAndDisutility ttCalculator;
 
 	public TransitRouterVariableImpl(final TransitRouterConfig config,
 			final TransitRouterNetworkTravelTimeAndDisutility ttCalculator, final TransitRouterNetworkWW routerNetwork, final Network network) {
 		this.config = config;
 		this.transitNetwork = routerNetwork;
-		this.ttCalculator = (TransitRouterNetworkTravelTimeAndDisutilityWW) ttCalculator;
+		this.ttCalculator = ttCalculator;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.ttCalculator, this.ttCalculator);
 	}
 	

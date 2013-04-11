@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra.InitialNode;
@@ -48,7 +49,7 @@ public class TransitRouterVariableImpl {
 	private final TransitRouterNetworkTravelTimeAndDisutilityWW ttCalculator;
 
 	public TransitRouterVariableImpl(final TransitRouterConfig config,
-			final TransitRouterNetworkTravelTimeAndDisutilityWW ttCalculator, final TransitRouterNetworkWW routerNetwork, final Network network) {
+			final TransitRouterNetworkTravelTimeAndDisutility ttCalculator, final TransitRouterNetworkWW routerNetwork, final Network network) {
 		this.config = config;
 		this.transitNetwork = routerNetwork;
 		this.ttCalculator = (TransitRouterNetworkTravelTimeAndDisutilityWW) ttCalculator;

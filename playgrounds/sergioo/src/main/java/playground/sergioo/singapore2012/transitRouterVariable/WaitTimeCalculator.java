@@ -55,8 +55,8 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 
 	//Attributes
 	private final double timeSlot;
-	private final Map<String, WaitTimeData> waitTimes = new ConcurrentHashMap<String, WaitTimeData>();
-	private final Map<String, double[]> scheduledWaitTimes = new ConcurrentHashMap<String, double[]>();
+	private final Map<String, WaitTimeData> waitTimes = new ConcurrentHashMap<String, WaitTimeData>(26883);
+	private final Map<String, double[]> scheduledWaitTimes = new ConcurrentHashMap<String, double[]>(26883);
 	private final Map<Id, Double> agentsWaitingData = new ConcurrentHashMap<Id, Double>();
 	private final Map<Id, Integer> agentsCurrentLeg = new ConcurrentHashMap<Id, Integer>();
 	private final Population population;
