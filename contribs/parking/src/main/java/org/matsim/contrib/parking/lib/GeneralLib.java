@@ -632,6 +632,24 @@ public class GeneralLib {
 
 		popWriter.writeEndPlans();
 	}
+	
+	/**
+	 * TODO: write test.
+	 * 
+	 * @param persons
+	 * @param outputPlansFileName
+	 * @param network
+	 */
+	public static void writePersons(Collection<? extends Person> persons, String outputPlansFileName, Network network, ScenarioImpl scenario) {
+		PopulationWriter popWriter = new PopulationWriter(new PopulationImpl(scenario), network);
+		popWriter.writeStartPlans(outputPlansFileName);
+
+		for (Person person : persons) {
+			popWriter.writePerson(person);
+		}
+
+		popWriter.writeEndPlans();
+	}	
 
 	/**
 	 * copy the person and the selected plan of the person

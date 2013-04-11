@@ -21,7 +21,11 @@ package org.matsim.contrib.parking.lib.obj;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 public class CollectionLib {
+
+	private static final Logger log = Logger.getLogger(CollectionLib.class);
 
 	/**
 	 * TODO: move method to approporaite place where the data structures are
@@ -38,5 +42,15 @@ public class CollectionLib {
 			}
 		}
 	}
-	
+
+	public static void logHashmap(HashMap hm) {
+		for (Object key : hm.keySet()) {
+			if (key == null) {
+				log.info("null" + "\t" + hm.get(key));
+			} else {
+				log.info(key.toString() + "\t" + hm.get(key));
+			}
+		}
+	}
+
 }
