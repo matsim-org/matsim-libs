@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.hsqldb.lib.ArrayUtil;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
