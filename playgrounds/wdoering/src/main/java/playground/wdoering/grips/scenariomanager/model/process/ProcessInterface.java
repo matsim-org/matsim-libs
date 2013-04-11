@@ -19,9 +19,8 @@
  * *********************************************************************** */
 
 
-package playground.wdoering.grips.scenariomanager.model;
+package playground.wdoering.grips.scenariomanager.model.process;
 
-import playground.wdoering.grips.scenariomanager.control.Controller;
 
 public interface ProcessInterface
 {

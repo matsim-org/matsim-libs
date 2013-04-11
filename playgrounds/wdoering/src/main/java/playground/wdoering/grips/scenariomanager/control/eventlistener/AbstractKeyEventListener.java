@@ -1,7 +1,9 @@
-package playground.wdoering.grips.scenariomanager.control;
+package playground.wdoering.grips.scenariomanager.control.eventlistener;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
+import playground.wdoering.grips.scenariomanager.control.Controller;
 
 public abstract class AbstractKeyEventListener implements KeyListener
 {

@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
+import playground.wdoering.grips.scenariomanager.model.action.AbstractAction;
 import playground.wdoering.grips.scenariomanager.model.locale.Locale;
 
 public class AbstractToolBox extends JPanel implements ActionListener

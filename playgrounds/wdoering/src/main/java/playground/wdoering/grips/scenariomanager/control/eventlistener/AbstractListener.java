@@ -1,4 +1,4 @@
-package playground.wdoering.grips.scenariomanager.control;
+package playground.wdoering.grips.scenariomanager.control.eventlistener;
 
 import java.awt.Cursor;
 import java.awt.Point;
@@ -12,6 +12,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import javax.swing.event.MouseInputListener;
+
+import playground.wdoering.grips.scenariomanager.control.Controller;
 
 public class AbstractListener implements KeyListener, MouseWheelListener, MouseInputListener
 {

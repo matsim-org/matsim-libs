@@ -10,8 +10,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import playground.wdoering.grips.scenariomanager.control.AbstractListener;
 import playground.wdoering.grips.scenariomanager.control.Controller;
+import playground.wdoering.grips.scenariomanager.control.eventlistener.AbstractListener;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 
 public class DefaultWindow extends JFrame

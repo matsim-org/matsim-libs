@@ -4,11 +4,11 @@ import java.awt.image.BufferedImage;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.AbstractModule;
-import playground.wdoering.grips.scenariomanager.model.AbstractProcess;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
-import playground.wdoering.grips.scenariomanager.model.BufferedImageContainer;
 import playground.wdoering.grips.scenariomanager.model.Constants;
-import playground.wdoering.grips.scenariomanager.model.ProcessInterface;
+import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
+import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
 
 public class MatsimScenarioGenerator extends AbstractModule

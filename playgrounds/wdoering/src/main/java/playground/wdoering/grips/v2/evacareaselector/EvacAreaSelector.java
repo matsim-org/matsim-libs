@@ -3,6 +3,9 @@ package playground.wdoering.grips.v2.evacareaselector;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
@@ -11,12 +14,13 @@ import javax.swing.SwingUtilities;
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.ShapeFactory;
 import playground.wdoering.grips.scenariomanager.model.AbstractModule;
-import playground.wdoering.grips.scenariomanager.model.AbstractProcess;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
-import playground.wdoering.grips.scenariomanager.model.BufferedImageContainer;
 import playground.wdoering.grips.scenariomanager.model.Constants;
-import playground.wdoering.grips.scenariomanager.model.ProcessInterface;
+import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
+import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.model.shape.BoxShape;
+import playground.wdoering.grips.scenariomanager.model.shape.CircleShape;
 import playground.wdoering.grips.scenariomanager.model.shape.ShapeStyle;
 import playground.wdoering.grips.scenariomanager.model.shape.Shape.DrawMode;
 import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
@@ -68,7 +72,10 @@ public class EvacAreaSelector extends AbstractModule
 	@Override
 	public AbstractToolBox getToolBox()
 	{
-		return new EvacToolBox(this, this.controller);
+		if (this.toolBox == null)
+			this.toolBox = new EvacToolBox(this, this.controller);
+		
+		return this.toolBox;
 	}
 	
 	@Override
@@ -142,6 +149,22 @@ public class EvacAreaSelector extends AbstractModule
 		}
 
 	}
+	
+	public Point getGeoPoint(Point mousePoint)
+	{
+		Rectangle viewPortBounds = this.controller.getViewportBounds();
+		return new Point(mousePoint.x+viewPortBounds.x-offsetX,mousePoint.y+viewPortBounds.y-offsetY);
+	}
+	
+	public void setEvacCircle(Point2D c0, Point2D c1)
+	{
+		CircleShape evacCircle = ShapeFactory.getEvacCircle(controller.getVisualizer().getPrimaryShapeRenderLayer().getId(), c0, c1);
+		controller.addShape(evacCircle);
+		this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(evacCircle);
+
+	}
+	
+	
 	
 	
 

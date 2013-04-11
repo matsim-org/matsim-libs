@@ -78,10 +78,10 @@ class EvacToolBox extends AbstractToolBox
 				Rectangle2D bbRect = controller.getBoundingBox();
 				controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, false));
 				
-				//deactivate circle shape
-				Shape circleShape = this.controller.getShapeById(Constants.ID_EVACAREAPOLY);
-				if (circleShape != null)
-					circleShape.setVisible(false);
+				//deactivate evacuation shape
+				Shape evacuationShape = this.controller.getShapeById(Constants.ID_EVACAREAPOLY);
+				if (evacuationShape != null)
+					evacuationShape.setVisible(false);
 				
 				this.controller.getVisualizer().getActiveMapRenderLayer().setPosition(this.controller.getCenterPosition());
 				this.saveButton.setEnabled(false);

@@ -6,9 +6,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 
-import playground.wdoering.grips.scenariomanager.control.AbstractListener;
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.ShapeFactory;
+import playground.wdoering.grips.scenariomanager.control.eventlistener.AbstractListener;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.shape.CircleShape;
 import playground.wdoering.grips.scenariomanager.model.shape.PolygonShape;
@@ -107,7 +107,7 @@ class EvacEventListener extends AbstractListener
 	
 	public void setEvacCircle(Point2D c0, Point2D c1)
 	{
-		CircleShape evacCircle = ShapeFactory.getEvacShape(controller.getVisualizer().getPrimaryShapeRenderLayer().getId(), c0, c1);
+		CircleShape evacCircle = ShapeFactory.getEvacCircle(controller.getVisualizer().getPrimaryShapeRenderLayer().getId(), c0, c1);
 		controller.addShape(evacCircle);
 		this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(evacCircle);
 

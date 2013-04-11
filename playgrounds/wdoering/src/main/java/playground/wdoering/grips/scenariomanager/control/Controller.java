@@ -64,11 +64,13 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.io.OsmNetworkReader;
 
+import playground.wdoering.grips.scenariomanager.control.eventlistener.AbstractListener;
+import playground.wdoering.grips.scenariomanager.control.io.ShapeIO;
 import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.Constants.ModuleType;
-import playground.wdoering.grips.scenariomanager.model.ImageContainerInterface;
+import playground.wdoering.grips.scenariomanager.model.imagecontainer.ImageContainerInterface;
 import playground.wdoering.grips.scenariomanager.model.locale.GermanLocale;
 import playground.wdoering.grips.scenariomanager.model.locale.Locale;
 import playground.wdoering.grips.scenariomanager.model.shape.LineShape;

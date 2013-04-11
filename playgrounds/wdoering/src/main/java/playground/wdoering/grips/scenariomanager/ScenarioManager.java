@@ -42,9 +42,9 @@ import javax.swing.event.MouseInputListener;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.AbstractModule;
-import playground.wdoering.grips.scenariomanager.model.BufferedImageContainer;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.Constants.ModuleType;
+import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
 import playground.wdoering.grips.scenariomanager.view.TabButton;
 import playground.wdoering.grips.v2.analysis.EvacuationAnalysis;

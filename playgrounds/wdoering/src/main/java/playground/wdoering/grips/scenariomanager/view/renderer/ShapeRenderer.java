@@ -11,7 +11,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
-import playground.wdoering.grips.scenariomanager.model.ImageContainerInterface;
+import playground.wdoering.grips.scenariomanager.model.imagecontainer.ImageContainerInterface;
 import playground.wdoering.grips.scenariomanager.model.shape.BoxShape;
 import playground.wdoering.grips.scenariomanager.model.shape.CircleShape;
 import playground.wdoering.grips.scenariomanager.model.shape.LineShape;
@@ -77,7 +77,10 @@ public class ShapeRenderer extends AbstractRenderLayer
 					int h = ((BoxShape)shape).getPixelBox().height;
 					
 					if (((BoxShape)shape).hasImage())
+					{
+						System.out.println(((BoxShape)shape).getImageFile());
 						this.imageContainer.drawImage(((BoxShape)shape).getImageFile(),x,y,w,h);
+					}
 					else
 					{
 	//					System.out.println("boxpixcoord:" + ((BoxShape)shape).getPixelBox());

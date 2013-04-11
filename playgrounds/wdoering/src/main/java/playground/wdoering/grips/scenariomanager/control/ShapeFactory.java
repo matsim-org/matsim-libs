@@ -34,7 +34,7 @@ public class ShapeFactory
 		return boundingBox;
 	}
 	
-	public static CircleShape getEvacShape(int shapeRendererId, Point2D c0, Point2D c1)
+	public static CircleShape getEvacCircle(int shapeRendererId, Point2D c0, Point2D c1)
 	{
 		//create circle shape, set id
 		CircleShape evacCircle = new CircleShape(shapeRendererId, c0, c1);

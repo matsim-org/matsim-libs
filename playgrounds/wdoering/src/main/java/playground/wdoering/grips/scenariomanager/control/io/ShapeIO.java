@@ -1,4 +1,4 @@
-package playground.wdoering.grips.scenariomanager.control;
+package playground.wdoering.grips.scenariomanager.control.io;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +16,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.shape.PolygonShape;
 import playground.wdoering.grips.scenariomanager.model.shape.ShapeStyle;

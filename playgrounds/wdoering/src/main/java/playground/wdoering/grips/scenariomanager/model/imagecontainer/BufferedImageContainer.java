@@ -1,4 +1,4 @@
-package playground.wdoering.grips.scenariomanager.model;
+package playground.wdoering.grips.scenariomanager.model.imagecontainer;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

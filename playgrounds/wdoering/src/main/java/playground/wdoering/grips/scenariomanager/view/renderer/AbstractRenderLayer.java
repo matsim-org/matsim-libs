@@ -3,7 +3,7 @@ package playground.wdoering.grips.scenariomanager.view.renderer;
 import java.util.List;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
-import playground.wdoering.grips.scenariomanager.model.ImageContainerInterface;
+import playground.wdoering.grips.scenariomanager.model.imagecontainer.ImageContainerInterface;
 
 public abstract class AbstractRenderLayer
 {

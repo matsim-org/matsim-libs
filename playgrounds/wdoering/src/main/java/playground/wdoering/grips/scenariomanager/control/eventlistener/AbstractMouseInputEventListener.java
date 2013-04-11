@@ -1,10 +1,12 @@
-package playground.wdoering.grips.scenariomanager.control;
+package playground.wdoering.grips.scenariomanager.control.eventlistener;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.event.MouseInputListener;
+
+import playground.wdoering.grips.scenariomanager.control.Controller;
 
 public abstract class AbstractMouseInputEventListener implements MouseInputListener
 {

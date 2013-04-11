@@ -17,7 +17,7 @@ import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.JXMap;
-import playground.wdoering.grips.scenariomanager.model.ImageContainerInterface;
+import playground.wdoering.grips.scenariomanager.model.imagecontainer.ImageContainerInterface;
 
 public class JXMapRenderer extends AbstractSlippyMapRenderLayer
 {

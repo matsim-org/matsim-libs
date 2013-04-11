@@ -139,7 +139,7 @@ public class Constants
 		return MatsimResource.getAsImage(imageName);
 	}
 	
-	public static String IMG_BUSSTOP = MatsimResource.getAsURL("grips/busstop.png").toString();
+	public static String IMG_BUSSTOP = MatsimResource.getAsURL("grips/busstop.png").getFile();
 	public static String IMG_ICON_EVACUATION = "EVACUATION.png";
 	public static String IMG_ICON_POPULATION = "POPULATION.png";
 	public static String IMG_ICON_GRIPSSCENARIO = "GRIPSSCENARIO.png";

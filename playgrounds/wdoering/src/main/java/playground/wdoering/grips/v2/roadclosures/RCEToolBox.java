@@ -41,9 +41,9 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 
-import playground.wdoering.grips.scenariomanager.control.ConfigIO;
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.ShapeFactory;
+import playground.wdoering.grips.scenariomanager.control.io.ConfigIO;
 import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;

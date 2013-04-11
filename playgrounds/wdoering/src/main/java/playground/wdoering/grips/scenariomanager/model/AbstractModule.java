@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.Constants.ModuleType;
+import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
 import playground.wdoering.grips.scenariomanager.view.Visualizer;
 
@@ -12,7 +13,8 @@ public abstract class AbstractModule
 {
 	protected static int width = 1024;
 	protected static int height = 768;
-	protected static int border = 30;	
+	protected static int border = 30;
+	
 	
 	protected ArrayList<ProcessInterface> processList;
 	protected Controller controller;
@@ -24,6 +26,11 @@ public abstract class AbstractModule
 	
 	protected ArrayList<ModuleType> nextModules;
 	private boolean enabled = false;
+	
+	protected AbstractToolBox toolBox;
+	
+	protected int offsetX;
+	protected int offsetY;
 	
 	public AbstractModule(String title, ModuleType moduleType, Controller controller)
 	{
@@ -48,6 +55,8 @@ public abstract class AbstractModule
 		processList.add(getInitProcess());
 		
 		this.controller.setActiveModuleType(this.moduleType);
+		
+		this.offsetX = this.offsetY = this.controller.getImageContainer().getBorderWidth();
 		
 	}
 	

@@ -1,9 +1,11 @@
-package playground.wdoering.grips.scenariomanager.model;
+package playground.wdoering.grips.scenariomanager.model.process;
 
 import javax.swing.JFileChooser;
 
-import playground.wdoering.grips.scenariomanager.control.AbstractListener;
 import playground.wdoering.grips.scenariomanager.control.Controller;
+import playground.wdoering.grips.scenariomanager.control.eventlistener.AbstractListener;
+import playground.wdoering.grips.scenariomanager.model.AbstractModule;
+import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.locale.Locale;
 import playground.wdoering.grips.scenariomanager.view.DefaultOpenDialog;
 import playground.wdoering.grips.scenariomanager.view.renderer.JXMapRenderer;

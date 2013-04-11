@@ -19,9 +19,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.wdoering.grips.scenariomanager.control.AbstractListener;
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.ShapeFactory;
+import playground.wdoering.grips.scenariomanager.control.eventlistener.AbstractListener;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.shape.LineShape;
 
