@@ -49,7 +49,7 @@ public class ParkingInfrastructure  {
 	private final QuadTree<ActivityFacility> allParkingFacilities;
 	private final QuadTree<ActivityFacility> availableParkingFacilities;
 	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
-	private final Map<Id, ParkingFacility> parkingFacilities;
+	protected final Map<Id, ParkingFacility> parkingFacilities;
 	private final ParkingCostCalculator parkingCostCalculator;
 	private final Scenario scenario;	
 	
@@ -272,7 +272,7 @@ public class ParkingInfrastructure  {
 		return person.getId();
 	}
 	
-	private static class ParkingFacility {
+	public static class ParkingFacility {
 		
 		private final Id facilityId;
 		private final Id linkId;
