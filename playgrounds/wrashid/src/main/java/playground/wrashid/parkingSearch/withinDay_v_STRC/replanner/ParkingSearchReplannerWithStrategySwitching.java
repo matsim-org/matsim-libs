@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.withinDay_v_STRC.replanner;
 
+import java.util.LinkedList;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,15 +30,22 @@ import org.matsim.core.population.routes.NetworkRoute;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.replanner.ParkingSearchReplanner;
 import playground.christoph.parking.withinday.replanner.strategy.NearestAvailableParkingSearch;
+import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchStrategy;
 import playground.christoph.parking.withinday.replanner.strategy.RandomParkingSearch;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouter;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 
 public class ParkingSearchReplannerWithStrategySwitching extends ParkingSearchReplanner {
 
+	private LinkedList<ParkingSearchStrategy> strategies;
+
 	public ParkingSearchReplannerWithStrategySwitching(Id id, Scenario scenario, InternalInterface internalInterface, 
-			ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure, ParkingRouter parkingRouter) {
+			ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure, ParkingRouter parkingRouter, LinkedList<ParkingSearchStrategy> strategies) {
 		super(id, scenario, internalInterface, parkingAgentsTracker,parkingInfrastructure,parkingRouter);
+		this.strategies = strategies;
 
 		// TODO: also get as input plans and try to assign plans to each car leg).
 		// instead of assigning a fixed category to each type of strategy,
@@ -54,6 +63,8 @@ public class ParkingSearchReplannerWithStrategySwitching extends ParkingSearchRe
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 		
+		ParkingAgentsTracker_v2 parkingAgentsTracker_v2= (ParkingAgentsTracker_v2) parkingAgentsTracker;
+		
 		/*
 		 * If a parking has been selected, set it as destination and adapt the
 		 * current leg, the next activity and the next leg. Otherwise just add
@@ -66,11 +77,18 @@ public class ParkingSearchReplannerWithStrategySwitching extends ParkingSearchRe
 //			this.randomParkingSearch.applySearchStrategy(withinDayAgent, this.time);
 //			this.nearestAvailableParkingSearch.applySearchStrategy(withinDayAgent, time);
 			
+			FullParkingSearchStrategy parkingStrategyForCurrentLeg = parkingAgentsTracker_v2.getParkingStrategyManager().getParkingStrategyForCurrentLeg(withinDayAgent);
+			
+			parkingStrategyForCurrentLeg.applySearchStrategy(withinDayAgent, time);
+			/*
 			if (withinDayAgent.getId().hashCode() % 2 == 0) {
-				this.randomParkingSearch.applySearchStrategy(withinDayAgent, this.time);
+				strategies.get(0).applySearchStrategy(withinDayAgent, this.time);
+			//	this.randomParkingSearch.applySearchStrategy(withinDayAgent, this.time);
 			} else {
-				this.nearestAvailableParkingSearch.applySearchStrategy(withinDayAgent, time);
+				strategies.get(1).applySearchStrategy(withinDayAgent, this.time);
+				//this.nearestAvailableParkingSearch.applySearchStrategy(withinDayAgent, time);
 			}
+			*/
 		}
 
 		/*

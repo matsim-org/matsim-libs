@@ -76,6 +76,10 @@ public class IntegerValueHashMap<KeyClass> {
 	public void printToConsole() {
 		CollectionLib.printHashmapToConsole(hm);
 	}
+	
+	public void addToLog() {
+		CollectionLib.logHashmap(hm);
+	}
 
 	
 }

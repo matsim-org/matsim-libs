@@ -22,7 +22,9 @@ package playground.wrashid.parkingSearch.withinDay_v_STRC;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,6 +47,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
@@ -58,10 +61,21 @@ import playground.christoph.parking.core.mobsim.ParkingQSimFactory;
 import playground.christoph.parking.core.utils.LegModeChecker;
 import playground.christoph.parking.withinday.identifier.ParkingSearchIdentifier;
 import playground.christoph.parking.withinday.replanner.ParkingSearchReplannerFactory;
+import playground.christoph.parking.withinday.replanner.strategy.NearestAvailableParkingSearch;
+import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchStrategy;
+import playground.christoph.parking.withinday.replanner.strategy.RandomParkingSearch;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.identifier.ParkingSearchIdentifier_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.replanner.ParkingSearchReplannerFactoryWithStrategySwitching;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GarageParkingStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GeneralParkingSearchStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.StreetParkingStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
+import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchStrategy;
 
 public class WithinDayParkingController extends WithinDayController implements ReplanningListener {
 
@@ -86,11 +100,11 @@ public class WithinDayParkingController extends WithinDayController implements R
 	 */
 	protected double searchRadius = 1.0;
 	
-	protected ParkingSearchIdentifier randomSearchIdentifier;
-	protected ParkingSearchReplannerFactory randomSearchReplannerFactory;
+	protected ParkingSearchIdentifier_v2 parkingSearchIdentifier;
+	protected ParkingSearchReplannerFactory searchReplannerFactory;
 
 	protected LegModeChecker legModeChecker;
-	protected ParkingAgentsTracker parkingAgentsTracker;
+	protected ParkingAgentsTracker_v2 parkingAgentsTracker;
 	protected InsertParkingActivities insertParkingActivities;
 	protected ParkingInfrastructure parkingInfrastructure;
 	
@@ -102,9 +116,10 @@ public class WithinDayParkingController extends WithinDayController implements R
 	}
 
 	protected void initIdentifiers() {
-
-		this.randomSearchIdentifier = new ParkingSearchIdentifier(parkingAgentsTracker, parkingInfrastructure); 
-		this.getFixedOrderSimulationListener().addSimulationListener(this.randomSearchIdentifier);
+ 
+		LinkedList<FullParkingSearchStrategy> linkedList = new LinkedList<FullParkingSearchStrategy>();
+		this.parkingSearchIdentifier = new ParkingSearchIdentifier_v2((ParkingAgentsTracker_v2) parkingAgentsTracker, parkingInfrastructure,linkedList); 
+		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingSearchIdentifier);
 	}
 	
 	/*
@@ -132,10 +147,23 @@ public class WithinDayParkingController extends WithinDayController implements R
 		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
 				this.createTravelCostCalculator(), this.getTripRouterFactory(), nodesToCheck);
 		
-		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactoryWithStrategySwitching(this.getWithinDayEngine(), router, 1.0, this.scenarioData, 
+		LinkedList<FullParkingSearchStrategy> allStrategies = getParkingStrategiesForScenario(parkingRouterFactory);
+		
+		
+		ParkingStrategyManager parkingStrategyManager=new ParkingStrategyManager(allStrategies);
+		parkingAgentsTracker.setParkingStrategyManager(parkingStrategyManager);
+		
+		this.searchReplannerFactory = new ParkingSearchReplannerFactoryWithStrategySwitching(this.getWithinDayEngine(), router, 1.0, this.scenarioData, 
 				parkingAgentsTracker, parkingInfrastructure, parkingRouterFactory);
-		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
-		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
+		this.searchReplannerFactory.addIdentifier(this.parkingSearchIdentifier);		
+		this.getWithinDayEngine().addDuringLegReplannerFactory(this.searchReplannerFactory);
+	}
+
+	private LinkedList<FullParkingSearchStrategy> getParkingStrategiesForScenario(ParkingRouterFactory parkingRouterFactory) {
+		LinkedList<FullParkingSearchStrategy> strategies=new LinkedList<FullParkingSearchStrategy>();
+		strategies.add(new GarageParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
+		strategies.add(new StreetParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
+		return strategies;
 	}
 	
 	@Override
@@ -162,11 +190,14 @@ public class WithinDayParkingController extends WithinDayController implements R
 		
 		ParkingCostCalculatorImpl parkingCostCalculator = new ParkingCostCalculatorImpl(this.initParkingTypes());
 		//TODO: this the parking type is not initialized here (give types to different parkings)
-		parkingInfrastructure = new ParkingInfrastructure_v2(this.scenarioData, parkingCostCalculator, new HashMap<Id, String>());
+		HashMap<Id, String> parkingTypes = getParkingTypesForScenario();
 		
-		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, parkingInfrastructure, searchRadius);
+		parkingInfrastructure = new ParkingInfrastructure_v2(this.scenarioData, parkingCostCalculator, parkingTypes);
+		
+		parkingAgentsTracker = new ParkingAgentsTracker_v2(this.scenarioData, parkingInfrastructure, searchRadius, this);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
+		this.addControlerListener(parkingAgentsTracker);
 		
 		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
 				this.createTravelCostCalculator(), this.getTripRouterFactory(), nodesToCheck);
@@ -176,6 +207,29 @@ public class WithinDayParkingController extends WithinDayController implements R
 		
 		this.initIdentifiers();
 		this.initReplanners();
+	}
+
+	private HashMap<Id, String> getParkingTypesForScenario() {
+		HashMap<Id, String> parkingTypes = new HashMap<Id, String>();
+		
+		Random random = MatsimRandom.getLocalInstance();
+		
+		for (ActivityFacility facility : ((ScenarioImpl) scenarioData).getActivityFacilities().getFacilities().values()) {
+			
+			ActivityOption parkingOption;
+
+			parkingOption = facility.getActivityOptions().get("parking");
+			
+			if (parkingOption != null) {
+				if (random.nextBoolean()){
+					parkingTypes.put(facility.getId(), "streetParking");
+				} else {
+					parkingTypes.put(facility.getId(), "garageParking");
+				}
+			}
+		}
+		
+		return parkingTypes;
 	}
 	
 	@Override
@@ -190,6 +244,8 @@ public class WithinDayParkingController extends WithinDayController implements R
 		}
 	}
 	
+	
+	// TODO: change this!!!!
 	private HashMap<String, HashSet<Id>> initParkingTypes() {
 		
 		HashMap<String, HashSet<Id>> parkingTypes = new HashMap<String, HashSet<Id>>();

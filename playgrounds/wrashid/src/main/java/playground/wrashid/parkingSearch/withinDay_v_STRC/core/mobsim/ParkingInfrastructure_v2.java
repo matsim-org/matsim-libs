@@ -42,11 +42,45 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
+import playground.christoph.parking.core.mobsim.ParkingInfrastructure.ParkingFacility;
 
 public class ParkingInfrastructure_v2 extends ParkingInfrastructure {
 
+	private HashMap<Id, String> parkingTypes;
+
 	public ParkingInfrastructure_v2(Scenario scenario, ParkingCostCalculator parkingCostCalculator, HashMap<Id, String> parkingTypes) {
 		super(scenario, parkingCostCalculator);
+		this.setParkingTypes(parkingTypes);
+	}
+
+	public List<Id> getFreeParkingFacilitiesOnLink(Id linkId) {
+
+		List<Id> parkings = new ArrayList<Id>();
+
+		List<Id> list = getParkingsOnLink(linkId);
+
+		// if no parkings are available on the link, return an empty list
+		if (list == null)
+			return parkings;
+
+		for (Id parkingId : list) {
+			ParkingFacility parkingFacility = this.parkingFacilities.get(parkingId);
+
+			// check free capacity
+			if (parkingFacility.getFreeCapacity() > 0)
+				parkings.add(parkingId);
+
+		}
+
+		return parkings;
+	}
+
+	public HashMap<Id, String> getParkingTypes() {
+		return parkingTypes;
+	}
+
+	public void setParkingTypes(HashMap<Id, String> parkingTypes) {
+		this.parkingTypes = parkingTypes;
 	}
 
 }
