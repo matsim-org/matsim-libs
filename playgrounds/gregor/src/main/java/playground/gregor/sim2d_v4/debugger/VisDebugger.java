@@ -120,9 +120,9 @@ public class VisDebugger extends PApplet {
 			this.omx= -262;
 			this.omy= 21;
 		} else {
-			this.scale = 18;
-			this.omx = 319;
-			this.omy = -266;
+			this.scale = 32.5f;
+			this.omx = 238;
+			this.omy = -29;
 		}
 
 		this.dT = dT;
@@ -139,7 +139,7 @@ public class VisDebugger extends PApplet {
 		} else if (this.sc == SC.evacuation) {
 			this.fr.setSize(1024,788);
 		} else {
-			this.fr.setSize(1024,768);
+			this.fr.setSize(1024,788);
 		}
 
 		JPanel compositePanel = new JPanel();
@@ -289,7 +289,7 @@ public class VisDebugger extends PApplet {
 	private void computeBGShift(){
 		this.bgYShift = (this.dragY+this.omy)/(256);
 		this.bgXShift = (-(VisDebugger.this.dragX +VisDebugger.this.omx))/(256);
-//		System.out.println("scale:" + this.scale + " omx:" + this.omx + " omy:" + this.omy + " width:" + getWidth() + " height:" + getHeight());
+		System.out.println("scale:" + this.scale + " omx:" + this.omx + " omy:" + this.omy + " width:" + getWidth() + " height:" + getHeight());
 	}
 
 	@Override
@@ -310,6 +310,7 @@ public class VisDebugger extends PApplet {
 		for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
 			d.draw(this);
 		}
+
 
 		synchronized(this.elementsStatic) {
 			Iterator<Object> it = this.elementsStatic.iterator();
@@ -344,13 +345,17 @@ public class VisDebugger extends PApplet {
 			}
 		}
 
+		
 		if(this.drawInfo) {
-			strokeWeight(2);
-			drawTime();
-			drawIteration();
-			drawAgentsCount(agents);
-			drawSpeedup();
+//			strokeWeight(2);
+//			drawTime();
+//			drawIteration();
+//			drawAgentsCount(agents);
+//			drawSpeedup();
+			drawInfo(agents);
 		}
+		
+		
 
 		if (recording) {
 			endRecord();
@@ -369,6 +374,8 @@ public class VisDebugger extends PApplet {
 			this.fs.saveFrame(this,this.it + "_" + this.time2);
 		}
 	}
+
+
 
 
 	private void drawBG() {
@@ -422,6 +429,32 @@ public class VisDebugger extends PApplet {
 		stroke(el.r,el.g,el.b,el.a);
 		fill(el.r,el.g,el.b,el.a);
 		text(el.text,scaleFlX(el.x),scaleFlY(el.y));
+	}
+	private void drawInfo(int agents) {
+		int ts = 20;
+		textSize(ts);
+		
+		float textWidth = textWidth("hybrid Queue/ORCA")+135;
+//		String strEvacTime;
+//		strEvacTime = Time.writeTime(evacTime, Time.TIMEFORMAT_HHMMSS);
+		
+		fill(222, 222, 222, 235);
+		strokeWeight(1);
+		stroke(255,255,255,255);
+		float height = 5 + 4*ts + 5;
+		float width = 5 + textWidth + 5;
+		float tx = 5;
+		float ty = 5;
+		rect(tx,ty,width,height,5);
+		fill(0);
+		text("",tx+5,ty+ts+5);
+		text("time:",tx+5,ty+ts+5+ts);
+		text(this.time2,tx+135,ty+ts+5+ts);
+		text("# 2D agents:",tx+5,ty+ts+5+ts+ts);
+		text(agents,tx+135,ty+ts+5+ts+ts);
+		text("accel:",tx+5,ty+ts+5+ts+ts+ts);
+		text(this.speedup,tx+135,ty+ts+5+ts+ts+ts);
+		
 	}
 
 	private void drawTime() {
@@ -714,7 +747,7 @@ public class VisDebugger extends PApplet {
 	static final class Text {
 		float x,y;
 		String text;
-		int r = 192, g = 192, b = 192, a = 222; 
+		int r = 0, g = 0, b = 0, a = 255; 
 		int minScale = 0;
 	}
 

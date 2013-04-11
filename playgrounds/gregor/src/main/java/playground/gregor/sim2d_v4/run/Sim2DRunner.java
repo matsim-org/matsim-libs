@@ -97,7 +97,7 @@ public class Sim2DRunner implements IterationStartsListener{
 //			runner.visDebugger.addAdditionalDrawer();
 //			runner.visDebugger.addAdditionalDrawer(new ScaleBarDrawer());
 //			runner.visDebugger.addAdditionalDrawer(new MousePositionDrawer());
-//			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 111);
+//			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 3);
 //			runner.visDebugger.setFrameSaver(fs);
 		}
 

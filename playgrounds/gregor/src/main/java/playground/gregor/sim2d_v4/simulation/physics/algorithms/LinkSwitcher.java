@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
@@ -127,11 +128,13 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 			targetLine.y1 = seg.y1 - w*li.dx;			
 			
 		} else {
+			double rX = MatsimRandom.getRandom().nextDouble()/10;
+			double rY = MatsimRandom.getRandom().nextDouble()/10;
 			fl = new Segment();
-			fl.x0 = seg.x1 - 2*li.dy;
-			fl.y0 = seg.y1 + 2*li.dx;
-			fl.x1 = seg.x1 + 2*li.dy;
-			fl.y1 = seg.y1 - 2*li.dx;
+			fl.x0 = seg.x1 - 4*li.dy + rX;
+			fl.y0 = seg.y1 + 4*li.dx + rY;
+			fl.x1 = seg.x1 + 4*li.dy + rY;
+			fl.y1 = seg.y1 - 4*li.dx + rX;
 			targetLine = fl;
 		}
 		li.finishLine = fl;

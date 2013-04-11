@@ -46,7 +46,9 @@ public class Sim2DAgent implements TwoDObject {
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
 
-	private final double r = MatsimRandom.getRandom().nextDouble()*.1 + 0.15; //radius
+	private final double r = 0.19 ; //MatsimRandom.getRandom().nextDouble()*.1 + 0.15; //radius
+	
+	private final double height = 1.72 + MatsimRandom.getRandom().nextGaussian()*0.1; //TODO find a meaningful value here [gl April '13]
 	
 //	private Id currentLinkId;
 //
@@ -139,7 +141,7 @@ public class Sim2DAgent implements TwoDObject {
 
 	public void notifyMoveOverNode(Id nextLinkId) {
 		this.driver.notifyMoveOverNode(nextLinkId);
-		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed();
+		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed()+(MatsimRandom.getRandom().nextDouble()*.1)-.05;
 	}
 
 	public void debug(VisDebugger visDebugger) {
@@ -165,6 +167,7 @@ public class Sim2DAgent implements TwoDObject {
 			}
 			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1], (float)this.r, r, g, b, 222,0,true);
 		}
+//		visDebugger.fill(0);
 		visDebugger.addText((float)this.getPos()[0],(float)this.getPos()[1], this.getId().toString(), 90);
 		
 		
@@ -209,4 +212,7 @@ public class Sim2DAgent implements TwoDObject {
 		return this.v0;
 	}
 	
+	public double getHeight() {
+		return this.height;
+	}
 }

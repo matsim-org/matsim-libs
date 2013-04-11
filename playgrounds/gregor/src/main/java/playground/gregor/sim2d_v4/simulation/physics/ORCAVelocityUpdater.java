@@ -23,8 +23,10 @@ package playground.gregor.sim2d_v4.simulation.physics;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
@@ -60,6 +62,13 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 	private final double maxDelta;
 	private final DesiredDirectionCalculator dd;
 	private final Sim2DAgent agent;
+	
+	private final double vmaxSqrt = StrictMath.sqrt(2); //what is vmax? [gl April '13]
+	
+	//Curtis constants
+	private final double alpha = 1.57 + MatsimRandom.getRandom().nextGaussian()*.15;
+	private final double normHeightDenom = 1.72;
+	private final double beta = .9 + MatsimRandom.getRandom().nextGaussian()*.2;
 
 	public ORCAVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
@@ -89,7 +98,8 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //				}
 //			}
 //		}
-		for (Tuple<Double, Sim2DAgent> neighbor : this.ncalc.getNeighbors()) {
+		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors();
+		for (Tuple<Double, Sim2DAgent> neighbor : neighbors) {
 //			if (this.debugger != null && ( getId().toString().equals("r876"))){//&& neighbor.getSecond().getId().toString().equals("r5")) {
 //				ORCALine ol = new ORCALineAgent(this, neighbor, this.tau,this.debugger);
 //				constr.add(ol);				
@@ -107,12 +117,20 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 		double[] v = this.agent.getVelocity();
 
-
+		
+		
 		final double[] dir = this.dd.computeDesiredDirection();
 		
 		double v0 = this.agent.getV0();
-		dir[0] *= v0;
-		dir[1] *= v0;
+		
+		double perceivedSpace = computePerceivedSpace(dir,neighbors);
+		double tmp = (perceivedSpace*this.alpha)/(this.agent.getHeight()/this.normHeightDenom *(1+this.beta));
+		double freeSpeed = tmp * tmp;
+		
+		double vS = StrictMath.min(v0, freeSpeed);
+		
+		dir[0] *= vS;
+		dir[1] *= vS;
 		double dx = dir[0] - v[0];
 		double dy = dir[1] - v[1];
 		double sqrDelta = (dx*dx+dy*dy);
@@ -127,7 +145,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 		}
 		
 		
-		this.solver.run(constr, dir, v0, new double []{0.,0.});
+		this.solver.run(constr, dir, vS, new double []{0.,0.});
 		
 		
 
@@ -145,6 +163,44 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //			System.out.println("debug!");
 //		}
 
+	}
+
+
+	private double computePerceivedSpace(double[] dir,
+			List<Tuple<Double, Sim2DAgent>> neighbors) {
+		double s = Double.POSITIVE_INFINITY;
+		
+		for (Tuple<Double, Sim2DAgent> n : neighbors) {
+			final Sim2DAgent nA = n.getSecond();
+			
+			final double dist = StrictMath.sqrt(n.getFirst());
+			double effectiveDist = dist;
+			
+			double normHeight = this.agent.getHeight()/this.normHeightDenom;
+			double dx = nA.getPos()[0] - this.agent.getPos()[0];
+			double dy = nA.getPos()[1] - this.agent.getPos()[1];
+			dx /= dist;
+			dy /= dist;
+
+			//directional penalty 
+			double delta = (1 + this.beta)*normHeight*this.vmaxSqrt/(2*this.alpha);
+			
+			double dotProd = CGAL.dot(dir[0], dir[1], dx, dy);
+			double directionalPenalty = .15*delta*(1-dotProd);
+			effectiveDist += directionalPenalty;
+			
+			//orientation penalty
+			double sqrSpeedNA = nA.getVelocity()[0]*nA.getVelocity()[0]+nA.getVelocity()[1]*nA.getVelocity()[1];
+			double sqrtSpeedNA = StrictMath.sqrt(StrictMath.sqrt(sqrSpeedNA));
+			double tmp = (normHeight*sqrtSpeedNA*(1+this.beta)*StrictMath.abs(CGAL.dot(dir[0], dir[1], -dx, -dy)))/(2*this.alpha);
+			double orientationPenalty = StrictMath.max(nA.getRadius(), tmp); //TODO check whether r_j denotes really the radius [gl April '13]
+			effectiveDist -= orientationPenalty;
+			
+			if (effectiveDist < s) {
+				s = effectiveDist;
+			}
+		}
+		return s;
 	}
 
 

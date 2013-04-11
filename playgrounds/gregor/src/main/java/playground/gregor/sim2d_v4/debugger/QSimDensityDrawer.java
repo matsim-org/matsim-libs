@@ -53,7 +53,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		double offsetX = sc.getScenarioElement(Sim2DScenario.class).getSim2DConfig().getOffsetX();
 		double offsetY = sc.getScenarioElement(Sim2DScenario.class).getSim2DConfig().getOffsetY();
 		for (Link l : sc.getNetwork().getLinks().values()) {
-			if (l.getAllowedModes().contains("walk2d")){
+			if (l.getAllowedModes().contains("walk2d") || l.getCapacity() == 2340){
 				continue;
 			}
 
@@ -112,7 +112,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			}
 		}
 		this.dens = 5.4*dens/cnt;
-		drawLegend(p);
+//		drawLegend(p);
 	}
 
 
