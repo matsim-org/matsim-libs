@@ -19,6 +19,7 @@
 package playground.wrashid.parkingSearch.withinDay_v_STRC.util;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -31,12 +32,13 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.WithinDayParkingController;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
 
 public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements AfterMobsimListener {
 
 	private ParkingStrategyManager parkingStrategyManager;
-	private WithinDayParkingController controler;
+	protected WithinDayParkingController controler;
 
 	public ParkingAgentsTracker_v2(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance, WithinDayParkingController controler) {
 		super(scenario, parkingInfrastructure, distance);

@@ -69,6 +69,7 @@ import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.identifier.ParkingSearchIdentifier_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.replanner.ParkingSearchReplannerFactoryWithStrategySwitching;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GarageParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GeneralParkingSearchStrategy;
@@ -194,7 +195,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		
 		parkingInfrastructure = new ParkingInfrastructure_v2(this.scenarioData, parkingCostCalculator, parkingTypes);
 		
-		parkingAgentsTracker = new ParkingAgentsTracker_v2(this.scenarioData, parkingInfrastructure, searchRadius, this);
+		parkingAgentsTracker = new ParkingScoreManager(this.scenarioData, parkingInfrastructure, searchRadius, this);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 		this.addControlerListener(parkingAgentsTracker);
