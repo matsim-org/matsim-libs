@@ -243,12 +243,12 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					if(freeSpeedTravelTime_min < 1.2)
 						freeSpeedTravelTime_min = 1.2;
 					
-					// get travel cost (marginal cost of time * travel time)
-					double travelCost_util = lcptExtCongestedCarTravelTime.getTree().get( toNode.getId() ).getCost();
+					// get travel cost 
+					double travelDisutility_util = lcptExtCongestedCarTravelTime.getTree().get( toNode.getId() ).getCost();
 					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
 					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
-					if(travelCost_util < 1.2)
-						travelCost_util = 1.2;
+					if(travelDisutility_util < 1.2)
+						travelDisutility_util = 1.2;
 					
 					// get congested arrival time
 					double arrivalTimeCC = lcptExtCongestedCarTravelTime.getTree().get( toNode.getId() ).getTime();
@@ -293,7 +293,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					travelDataWriter.write ( originZoneID.toString()			//origin zone id
 										+ "," + destinationZoneID.toString()	//destination zone id
 										+ "," + freeSpeedTravelTime_min			//free speed travel times
-										+ "," + travelCost_util 				//congested generalized cost
+										+ "," + travelDisutility_util 				//congested generalized cost
 										+ "," + congestedTravelTime_min 		//congested travel times
 										+ "," + bikeTravelTime_min				//bike travel times
 										+ "," + walkTravelTime_min				//walk travel times
