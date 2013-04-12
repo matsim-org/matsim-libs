@@ -38,21 +38,31 @@ import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDist
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeBasedTravelDisutility;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.utils.LeastCostPathTree;
 
+import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
+import org.matsim.contrib.matsim4opus.config.ConfigurationModule;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.ZoneUtil;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
+import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.ZoneObject;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
@@ -72,6 +82,9 @@ import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
  * 
  * improvements feb'13
  * - trip matrix is now sensitive for time of day
+ * 
+ * improvements april'13
+ * - trips are scaled up to 100%
  * 
  * @author nagel
  * @author thomas
@@ -106,6 +119,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		this.ptMatrix = ptMatrix;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
+		
 	}
 	
 	/**
@@ -123,25 +137,69 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		
-		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		AccessibilityParameterConfigModule moduleAPCM = ConfigurationModule.getAccessibilityParameterConfigModule((ScenarioImpl)sc);
+		boolean usingCarParameterFromMATSim = moduleAPCM.usingCarParameterFromMATSim();
+		double betaCarTT 	   	= moduleAPCM.getBetaCarTravelTime();
+		double betaCarTD		= moduleAPCM.getBetaCarTravelDistance();
+		double betaCarTMC		= moduleAPCM.getBetaCarTravelMonetaryCost();
+		
+		double samplingRate = ConfigurationModule.getUrbanSimParameterConfigModule((ScenarioImpl)sc).getPopulationSampleRate();
+		double inverseOfSamplingRate = 1/samplingRate;
+		
+		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.; // corresponds to 5 km/h
 		double bikeSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getBikeSpeed() * 60.; // corresponds to 15 km/h 
+		
+		// get road pricing scheme
+		RoadPricingSchemeImpl scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
 
 		// init least cost path tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getLinkTravelTimes();
 		// get the free-speed car travel times (in seconds)
-		LeastCostPathTree lcptFreeSpeedCarTravelTime = new LeastCostPathTree( ttc, new FreeSpeedTravelTimeCostCalculator() );
+		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = null;
 		// get the congested car travel time (in seconds)
-		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree(ttc,new TravelTimeBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = null;
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
 		// tnicolai: calculate "distance" as walk time -> add "am_walk_time_in_minutes:f4" to header
-		
-		
+
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = this.main.getTimeOfDay(); // 8.*3600;
 		
 		// od-trip matrix (zonal based)
 		Matrix originDestinationMatrix = new Matrix("tripMatrix", "Zone to Zone origin destination trip matrix");
+		
+		// init extended Least Cost Path Tree for car (free speed and congested) mode
+		if(usingCarParameterFromMATSim){
+
+			lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, controler.createTravelCostCalculator(), controler);
+			
+			if(scheme == null)	// no road pricing
+				lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore()), controler );
+			else{				// if road pricing is activated
+				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
+				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
+			}
+		}
+		else{					
+			TravelDisutilityFactory tdFactory = controler.getTravelDisutilityFactory();
+			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup();
+			cnScoringGroup.setMarginalUtilityOfMoney( betaCarTMC );
+			cnScoringGroup.setTraveling_utils_hr( betaCarTT );	
+			cnScoringGroup.setMonetaryDistanceCostRateCar( betaCarTD );
+			cnScoringGroup.setConstantCar(controler.getConfig().planCalcScore().getConstantCar());
+			
+			if(scheme == null){// no road pricing
+				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, tdFactory.createTravelDisutility(ttc, cnScoringGroup), controler);
+				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(cnScoringGroup), controler);
+			}
+			else{ 				// if road pricing is activated
+				TravelDisutility costCalculatorCongested = tdFactory.createTravelDisutility(ttc, cnScoringGroup); 
+				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
+				
+				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorCongested, scheme), controler);
+				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
+			}
+		}
 		
 		try {
 			BufferedWriter travelDataWriter = initZone2ZoneImpedaceWriter(); // creating zone-to-zone impedance matrix with header
@@ -167,8 +225,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 				Id originZoneID = zones[fromZoneIndex].getZoneID();
 				
 				// run dijksrtra for current node as origin
-				lcptCongestedTravelTime.calculate(network, fromNode, depatureTime);
-				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
+				lcptExtCongestedCarTravelTime.calculateExtended(network, fromNode, depatureTime);
+				lcptExtFreeSpeedCarTrvelTime.calculateExtended(network, fromNode, depatureTime);
 				lcptTravelDistance.calculate(network, fromNode, depatureTime);
 				
 				for(int toZoneIndex = 0; toZoneIndex < zones.length; toZoneIndex++){
@@ -178,17 +236,21 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					Id destinationZoneID = zones[toZoneIndex].getZoneID();
 					
 					// free speed car travel times in minutes
-					double freeSpeedTravelTime_min = (lcptFreeSpeedCarTravelTime.getTree().get( toNode.getId() ).getCost() / 60.);
-					if(freeSpeedTravelTime_min < 1.)
-						freeSpeedTravelTime_min = 1.;
+					double freeSpeedTravelTime_min = (lcptExtFreeSpeedCarTrvelTime.getTree().get( toNode.getId() ).getCost() / 60.);
+					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
+					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
+					if(freeSpeedTravelTime_min < 1.2)
+						freeSpeedTravelTime_min = 1.2;
 					
 					// get travel cost (marginal cost of time * travel time)
-					double travelCost_util = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getCost();
+					double travelCost_util = lcptExtCongestedCarTravelTime.getTree().get( toNode.getId() ).getCost();
+					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
+					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
 					if(travelCost_util < 1.2)
 						travelCost_util = 1.2;
 					
 					// get congested arrival time
-					double arrivalTime = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getTime();
+					double arrivalTime = lcptExtCongestedCarTravelTime.getTree().get( toNode.getId() ).getTime();
 					// congested car travel times in minutes
 					double congestedTravelTime_min = (arrivalTime - depatureTime) / 60.;
 					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
@@ -199,9 +261,13 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					// travel distance in meter
 					double travelDistance_meter = lcptTravelDistance.getTree().get( toNode.getId() ).getCost();
 					double bikeTravelTime_min = travelDistance_meter / bikeSpeedMeterPerMinute;
-					if(bikeTravelTime_min < 4.)
-						bikeTravelTime_min = 4.;
+					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
+					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
+					if(bikeTravelTime_min < 1.2)
+						bikeTravelTime_min = 1.2;
 					double walkTravelTime_min = travelDistance_meter / walkSpeedMeterPerMinute;
+					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
+					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
 					if(walkTravelTime_min < 12.)
 						walkTravelTime_min = 12.;
 					
@@ -209,15 +275,17 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					double ptTravelTime_min = -1.;
 					if(this.ptMatrix != null){
 						ptTravelTime_min = this.ptMatrix.getTotalTravelTime(fromNode.getCoord(), toNode.getCoord()) / 60.;
-						if(ptTravelTime_min < 10.)
-							ptTravelTime_min = 10.;
+						// we guess that any value less than 1.2 leads to errors on the UrbanSim side
+						// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
+						if(ptTravelTime_min < 1.2)
+							ptTravelTime_min = 1.2;
 					}
 
 					// query trips in OD Matrix
 					double trips = 0.0;
 					Entry e = originDestinationMatrix.getEntry( originZoneID, destinationZoneID );
-					if(e != null)
-						trips = e.getValue();
+					if(e != null) // trips are scaled up to 100%
+						trips = e.getValue() * inverseOfSamplingRate;
 					
 					// IMPORTANT: Do adapt the travel_data header in "initZone2ZoneImpedaceWriter"
 					// 			  when changing anything at this call.
@@ -230,7 +298,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 										+ "," + walkTravelTime_min				//walk travel times
 										+ "," + ptTravelTime_min				//pt travel times
 										+ "," + travelDistance_meter			//network distance
-										+ "," + trips);							//vehicle trips
+										+ "," + trips);							//vehicle trips (scaled up to 100%)
 					travelDataWriter.newLine();
 				}
 			}

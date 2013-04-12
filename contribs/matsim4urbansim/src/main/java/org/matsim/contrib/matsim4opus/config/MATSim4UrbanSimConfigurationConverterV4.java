@@ -573,12 +573,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
 			betaCarTTPower	= 0.;
 			betaCarLnTT		= 0.;
-			betaCarTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar(); 	// this is [utils/money * money/meter] = [utils/meter]
-			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar(); 	// this is [utils/money * money/meter] = [utils/meter]
 			betaCarTDPower	= 0.;																														// useful setting for MonetaryDistanceCostRateCar: 10cent/km (only fuel) or 
 			betaCarLnTD		= 0.;																														// 80cent/km (including taxes, insurance ...)
-			betaCarTMC		= 0.;//planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money], (no computation of money in MATSim implemented yet)
-			log.error("marginal utility of money is NOT taken from matsim but set to zero") ;
+			betaCarTMC		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaCarTMCPower	= 0.;
 			betaCarLnTMC	= 0.;
 		}
@@ -601,12 +599,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaBikeTT		= planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
 			betaBikeTTPower	= 0.;
 			betaBikeLnTT	= 0.;
-			betaBikeTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtlOfDistanceBike(); // [utils/meter]
-			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaBikeTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther(); // [utils/meter]
 			betaBikeTDPower	= 0.;												
 			betaBikeLnTD	= 0.;
-			betaBikeTMC		= 0.;// [utils/money], not available in MATSim
-			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaBikeTMC		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaBikeTMCPower= 0.;
 			betaBikeLnTMC	= 0.;
 		}
@@ -629,12 +625,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
 			betaWalkTTPower	= 0.;
 			betaWalkLnTT	= 0.;
-			betaWalkTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk(); // [utils/meter]
-			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk(); // [utils/meter]
 			betaWalkTDPower	= 0.;												
 			betaWalkLnTD	= 0.;
-			betaWalkTMC		= 0.;// [utils/money], not available in MATSim
-			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaWalkTMC		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaWalkTMCPower= 0.;
 			betaWalkLnTMC	= 0.;
 		}
@@ -657,12 +651,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
 			betaPtTTPower	= 0.;
 			betaPtLnTT		= 0.;
-			betaPtTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtlOfDistanceBike(); // [utils/meter]
-			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaPtTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther(); // [utils/meter]
 			betaPtTDPower	= 0.;												
 			betaPtLnTD		= 0.;
-			betaPtTMC		= 0.;// [utils/money], not available in MATSim
-			log.error("marginal utility of distance is NOT taken from matsim but set to zero") ;
+			betaPtTMC		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaPtTMCPower	= 0.;
 			betaPtLnTMC		= 0.;
 		}
@@ -688,6 +680,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		module.setUsingCarParameterFromMATSim(useMATSimCarParameter);
 		module.setUsingBikeParameterFromMATSim(useMATSimBikeParameter);
 		module.setUsingWalkParameterFromMATSim(useMATSimWalkParameter);
+		module.setUsingPtParameterFromMATSim(useMATSimPtParameter);
 		module.setLogitScaleParameter(logitScaleParameter);
 		module.setBetaCarTravelTime(betaCarTT);
 		module.setBetaCarTravelTimePower2(betaCarTTPower);

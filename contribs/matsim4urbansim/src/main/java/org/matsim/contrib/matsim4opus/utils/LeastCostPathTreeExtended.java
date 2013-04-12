@@ -30,8 +30,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
@@ -45,8 +49,10 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.utils.LeastCostPathTree;
 
 /**
+ * This extends the LeastCostPathTree by two additional attributes, distance and toll (monetary costs).
+ * 
  * @author thomas
- *
+ * 
  */
 public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	
@@ -55,18 +61,30 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	private HashMap<Id, NodeDataExtended> nodeDataExt = null;
 	private RoadPricingSchemeImpl scheme = null;
 	
-	public LeastCostPathTreeExtended(final TravelTime tt, final TravelDisutility tc, final Controler controler) {
-		super(tt, tc);
+	/**
+	 * constructor
+	 * @param controler Controler, to get the RoadPricingScheme if available
+	 */
+	public LeastCostPathTreeExtended(final TravelTime tt, final TravelDisutility td, final Controler controler) {
+		super(tt, td);
 		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
 	}
 
+	/**
+	 * 
+	 * @param network
+	 * @param origin
+	 * @param time
+	 */
 	public final void calculateExtended(final Network network, final Node origin, final double time) {
 		
 		this.nodeDataExt = new HashMap<Id, NodeDataExtended>((int) (network.getNodes().size() * 1.1), 0.95f);
-		NodeDataExtended nde = new NodeDataExtended();
-		nde.distance = 0.;
-		nde.toll 	 = 0.;
-		this.nodeDataExt.put(origin.getId(), nde);
+		if(this.nodeDataExt.get(origin.getId()) == null){
+			NodeDataExtended nde = new NodeDataExtended();
+			nde.distance = 0.;
+			nde.toll 	 = 0.;
+			this.nodeDataExt.put(origin.getId(), nde);
+		}
 		
 		calculate(network, origin, time);
 	}
@@ -84,6 +102,17 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		double currDistance = nde.getDistance();
 		double currToll = nde.getToll();
 		
+		if(currToll > 0)
+			System.out.println(currToll);
+		
+		if( (fromNode.getId() == new IdImpl(2748)) || (fromNode.getId() == new IdImpl(2754)) || 
+				(fromNode.getId() == new IdImpl(2741)) || (fromNode.getId() == new IdImpl(4303)) || 
+				(fromNode.getId() == new IdImpl(2596)) || (fromNode.getId() == new IdImpl(4256)) || 
+				(fromNode.getId() == new IdImpl(4304)) || (fromNode.getId() == new IdImpl(2740)) || 
+				(fromNode.getId() == new IdImpl(2808)) || (fromNode.getId() == new IdImpl(2739)) || 
+				(fromNode.getId() == new IdImpl(1572)) || (fromNode.getId() == new IdImpl(2738)))
+			System.out.println("XXXX");
+		
 		// query toll
 		double toll = 0.;
 		if(this.scheme != null){
@@ -97,11 +126,12 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		
 		// put new nodes into nodeDataExtended
 		Node toNode = link.getToNode();
-		NodeDataExtended ndeNew = new NodeDataExtended();
-		ndeNew.visit(fromNode.getId(), visitDistance, visitToll);
-		this.nodeDataExt.put( toNode.getId() , ndeNew );
-		
-		System.gc();
+		NodeDataExtended ndeNew = this.nodeDataExt.get( toNode.getId() );
+		if(ndeNew == null){
+			ndeNew = new NodeDataExtended();
+			this.nodeDataExt.put( toNode.getId(), ndeNew);
+		}
+		ndeNew.visit(visitDistance, visitToll);
 	}
 	
 	// ////////////////////////////////////////////////////////////////////
@@ -117,18 +147,15 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	// ////////////////////////////////////////////////////////////////////
 	
 	public static class NodeDataExtended {
-		private Id prevId = null;
-		private double distance = 0.;
+		private double distance = 0.;	// meter
 		private double toll 	= 0.; 	// money
 
 		/*package*/ void reset() {
-			this.prevId = null;
 			this.distance 	= 0.;
 			this.toll 		= 0.;
 		}
 
-		void visit(final Id comingFromNodeId, final double distance, final double toll) {
-			this.prevId 	= comingFromNodeId;
+		void visit(final double distance, final double toll) {
 			this.distance 	= distance;
 			this.toll 		= toll;
 		}
@@ -139,10 +166,6 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 
 		public double getToll() {
 			return this.toll;
-		}
-
-		public Id getPrevNodeId() {
-			return this.prevId;
 		}
 	}
 	
@@ -156,21 +179,24 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 */
 	public static void main(String args[]){
 		
+		// create temp output dir
+		String tmpOutputLocation = TempDirectoryUtil.createCustomTempDirectory("test");
+		
 		// create network
 		NetworkImpl network = LeastCostPathTreeExtended.createTriangularNetwork();
 		// create scenario
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		// set last iteration and output
+		ControlerConfigGroup controlerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
+		controlerCG.setLastIteration( 1 );
+		controlerCG.setOutputDirectory( tmpOutputLocation );
+		// set scenario
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario( config );
 		scenario.setNetwork( LeastCostPathTreeExtended.createTriangularNetwork() );
 		Controler controler = new Controler(scenario);
-		// create tt
-		TravelTimeCalculator travelTimeCalculator = controler.getTravelTimeCalculatorFactory().createTravelTimeCalculator(network,scenario.getConfig().travelTimeCalculator());
-		TravelTime tt = travelTimeCalculator.getLinkTravelTimes();
-		// create tc
-		PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup();
-		TravelDisutility tc = controler.getTravelDisutilityFactory().createTravelDisutility(tt, cnScoringGroup);
-		
+		controler.run();
 		// init lcpte
-		LeastCostPathTreeExtended lcpte = new LeastCostPathTreeExtended(tt, tc, controler);
+		LeastCostPathTreeExtended lcpte = new LeastCostPathTreeExtended(controler.getLinkTravelTimes(), controler.createTravelCostCalculator(), controler);
 		
 		// contains all network nodes
 		Map<Id, Node> networkNodesMap = network.getNodes();
@@ -187,6 +213,8 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		log.info("Disutility = " + disutility);		
 		log.info("Distance = " + distance );
 		log.info("Toll = " + toll);
+		
+		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
 	
 	/**

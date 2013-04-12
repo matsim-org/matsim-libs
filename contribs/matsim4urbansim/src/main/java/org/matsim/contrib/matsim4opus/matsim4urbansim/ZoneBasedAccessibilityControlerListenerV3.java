@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
@@ -15,15 +16,21 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.roadpricing.TravelDisutilityIncludingToll;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.utils.LeastCostPathTree;
 
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
+import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisZoneCSVWriterV2;
 import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
@@ -49,6 +56,10 @@ import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
  * 
  * improvements jan'13
  * - added pt for accessibility calculation
+ * 
+ * improvements april'13
+ * - congested car modes uses TravelDisutility from MATSim
+ * - including road pricing (toll)
  * 
  * @author thomas
  *
@@ -108,11 +119,65 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		TravelTime ttc = controler.getLinkTravelTimes();
 		// get the free-speed car travel times (in seconds)
-		LeastCostPathTree lcptFreeSpeedCarTravelTime = new LeastCostPathTree( ttc, new FreeSpeedTravelTimeCostCalculator() );
+		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = null;
 		// get the congested car travel time (in seconds)
-		LeastCostPathTree lcptCongestedCarTravelTime = new LeastCostPathTree( ttc, new TravelTimeCostCalculator(ttc) );
+		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = null;
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
+		
+		// get road pricing scheme
+		RoadPricingSchemeImpl scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
+		
+//		// TEST
+//		if(scheme == null)
+//			System.out.println("null");
+//		else{
+//			Iterator<Link> links = network.getLinks().values().iterator();
+//			
+//			double overallToll = 0.;
+//			
+//			while(links.hasNext()){
+//				Link l = links.next();
+//				Cost cost = scheme.getLinkCostInfo(l.getId(), 7200., null);
+//				if(cost != null)
+//					overallToll += cost.amount;
+//			}
+//			System.out.println(overallToll);
+//		}
+//		// TEST
+		
+		// init extended Least Cost Path Tree for car (free speed and congested) mode
+		if(usingCarParameterFromMATSim){
+
+			lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, controler.createTravelCostCalculator(), controler);
+			
+			if(scheme == null)	// no road pricing
+				lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore()), controler );
+			else{				// if road pricing is activated
+				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
+				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
+			}
+		}
+		else{					
+			TravelDisutilityFactory tdFactory = controler.getTravelDisutilityFactory();
+			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup();
+			cnScoringGroup.setMarginalUtilityOfMoney( this.betaCarTMC );
+			cnScoringGroup.setTraveling_utils_hr( this.betaCarTT );	
+			cnScoringGroup.setMonetaryDistanceCostRateCar( this.betaCarTD );
+			cnScoringGroup.setConstantCar(controler.getConfig().planCalcScore().getConstantCar());
+			
+			if(scheme == null){// no road pricing
+				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, tdFactory.createTravelDisutility(ttc, cnScoringGroup), controler);
+				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(cnScoringGroup), controler);
+			}
+			else{ 				// if road pricing is activated
+				TravelDisutility costCalculatorCongested = tdFactory.createTravelDisutility(ttc, cnScoringGroup); 
+				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
+				
+				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorCongested, scheme), controler);
+				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
+			}
+		}
 
 		// some ideas about how to use a more correct approach:
 //		LeastCostPathTree lcptCar ;
@@ -163,9 +228,14 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			Iterator<Zone<Id>> measuringPointIterator = measuringPointsZone.getZones().iterator();
 			log.info(measuringPointsZone.getZones().size() + "  measurement points are now processing ...");
 			
-			accessibilityComputation(ttc, lcptFreeSpeedCarTravelTime,
-					lcptCongestedCarTravelTime, lcptTravelDistance, ptMatrix, network,
-					measuringPointIterator, measuringPointsZone.getZones().size(),
+			accessibilityComputation(ttc, 
+					lcptExtFreeSpeedCarTrvelTime,
+					lcptExtCongestedCarTravelTime, 
+					lcptTravelDistance, 
+					ptMatrix, 
+					network,
+					measuringPointIterator, 
+					measuringPointsZone.getZones().size(),
 					ZONE_BASED);
 			
 			System.out.println();

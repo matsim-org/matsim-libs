@@ -31,9 +31,11 @@ public class AccessibilityParameterConfigModule extends Module{
 	
 	private boolean usingCarParameterFromMATSim;
 	
-	private boolean useBikeParameterFromMATSim;
+	private boolean usingBikeParameterFromMATSim;
 	
 	private boolean usingWalkParameterFromMATSim;
+	
+	private boolean usingPtParameterFromMATSim;
     
 	private boolean usingRawSumsWithoutLn;
     
@@ -141,11 +143,11 @@ public class AccessibilityParameterConfigModule extends Module{
     }
     
     public boolean usingBikeParameterFromMATSim() {
-        return useBikeParameterFromMATSim;
+        return usingBikeParameterFromMATSim;
     }
 
     public void setUsingBikeParameterFromMATSim(boolean value) {
-        this.useBikeParameterFromMATSim = value;
+        this.usingBikeParameterFromMATSim = value;
     }
     
     public boolean usingWalkParameterFromMATSim() {
@@ -154,6 +156,14 @@ public class AccessibilityParameterConfigModule extends Module{
 
     public void setUsingWalkParameterFromMATSim(boolean value) {
         this.usingWalkParameterFromMATSim = value;
+    }
+    
+    public boolean usingPtParameterFromMATSim() {
+        return usingPtParameterFromMATSim;
+    }
+
+    public void setUsingPtParameterFromMATSim(boolean value) {
+        this.usingPtParameterFromMATSim = value;
     }
 
     public boolean usingRawSumsWithoutLn() {
