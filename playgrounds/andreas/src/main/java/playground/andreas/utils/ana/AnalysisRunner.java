@@ -47,6 +47,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.VehicleReaderV1;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
@@ -57,6 +58,7 @@ import playground.vsp.analysis.modules.boardingAlightingCount.BoardingAlightingC
 import playground.vsp.analysis.modules.ptAccessibility.PtAccessibility;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesAnalyzer;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesHandler;
+import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.PtRoutes2PaxAnalysis;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
 import playground.vsp.analysis.modules.stuckAgents.GetStuckEventsAndPlans;
 import playground.vsp.analysis.modules.transitSchedule2Shp.TransitSchedule2Shp;
@@ -97,6 +99,7 @@ public class AnalysisRunner {
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().scenario().setUseVehicles(true);
 		
 //		String targetCoordinateSystem = TransformationFactory.WGS84_UTM35S; // Gauteng
 //		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
@@ -105,6 +108,7 @@ public class AnalysisRunner {
 		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(outputDir + "/" + runId + "/", runId, true, true);
 		
 		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(iteration, "transitSchedule.xml.gz"));
+		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(dir.getIterationFilename(iteration, "vehicles.xml.gz"));
 		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
 		new MatsimFacilitiesReader((ScenarioImpl) sc).readFile(dir.getOutputFilename("output_facilities.xml.gz"));
 		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(iteration, "plans.xml.gz"));
@@ -140,7 +144,7 @@ public class AnalysisRunner {
 			}
 		}
 		
-		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath(), dir.getIterationFilename(iteration, Controler.FILENAME_EVENTS_XML));
+		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath() + "_ana/", dir.getIterationFilename(iteration, Controler.FILENAME_EVENTS_XML));
 		
 		// works
 		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, quadrantSegments, activityCluster, targetCoordinateSystem, gridSize);
@@ -166,10 +170,13 @@ public class AnalysisRunner {
 		
 		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = new BoardingAlightingCountAnalyzer(sc, 3600, targetCoordinateSystem);
 		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, gridSize);
-		
 		analyzer.addAnalysisModule(boardingAlightingCountAnalyzes);
+
 		analyzer.addAnalysisModule(new MyPtCount());
 
+		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
+		analyzer.addAnalysisModule(ptRoutes2PaxAnalysis);
+		
 		analyzer.run();
 		
 		System.out.println("Setting java tmpDir from " + newJavaIoTempDir + " to " + oldJavaIoTempDir);
