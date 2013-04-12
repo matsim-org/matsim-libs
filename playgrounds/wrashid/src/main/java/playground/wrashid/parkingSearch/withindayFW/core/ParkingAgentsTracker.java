@@ -642,7 +642,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		
 		parkingCostLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingCost));
 		
-		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime,parkingInfrastructure);
+		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime,parkingInfrastructure.getFacilityCapacities().get(parkingFacilityId));
 	
 		
 	}
@@ -768,7 +768,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		log.info("parking capacity constraint violations:" + parkingOccupancy.getNumberOfMaximumParkingCapacitConstraintViolations());
 		
 		if (getParkingAnalysisHandler()!=null){
-			getParkingAnalysisHandler().updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure, event.getIteration());
+			getParkingAnalysisHandler().updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure.getFacilityCapacities(), event.getIteration());
 			getParkingAnalysisHandler().processParkingWalkTimes(parkingWalkTimesLog, event.getIteration());
 			getParkingAnalysisHandler().processParkingSearchTimes(parkingSearchTimesLog, event.getIteration());
 			getParkingAnalysisHandler().processParkingCost(parkingCostLog, event.getIteration());
@@ -840,7 +840,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		
 		//double firstDepartureTimeOfDay=durationOfLastParkingOfDay.getFirstDepartureTimeOfDay(personId);
 		
-		parkingOccupancy.updateParkingOccupancy(lastParkingFacilityIdOfDay, parkingArrivalTime, parkingArrivalTime+lastParkingActivityDurationOfDay, parkingInfrastructure);
+		parkingOccupancy.updateParkingOccupancy(lastParkingFacilityIdOfDay, parkingArrivalTime, parkingArrivalTime+lastParkingActivityDurationOfDay, parkingInfrastructure.getFacilityCapacities().get(lastParkingFacilityIdOfDay));
 	}
 
 	private void forSettingBreakPoint(Id parkingFacilityId, Double parkingCost) {

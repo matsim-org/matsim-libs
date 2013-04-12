@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
@@ -31,8 +32,8 @@ public abstract class ParkingAnalysisHandler {
 
 	protected Controler controler;
 	
-	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure, int iteration){
-		parkingOccupancy.writeOutParkingOccupanciesTxt(controler,parkingInfrastructure, iteration);
+	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy, IntegerValueHashMap<Id> facilityCapacities, int iteration){
+		parkingOccupancy.writeOutParkingOccupanciesTxt(controler,facilityCapacities, iteration);
 		parkingOccupancy.writeOutParkingOccupancySumPng(controler, iteration);
 	}
 	

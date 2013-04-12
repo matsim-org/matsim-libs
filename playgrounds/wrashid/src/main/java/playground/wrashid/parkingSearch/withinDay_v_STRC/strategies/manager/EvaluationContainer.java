@@ -66,6 +66,10 @@ public class EvaluationContainer {
 		evaluations.remove(last);
 		evaluations.addFirst(last);
 	}
+	
+	public void updateScoreOfSelectedStrategy(double score){
+		evaluations.get(0).score=score;
+	}
 
 }
 

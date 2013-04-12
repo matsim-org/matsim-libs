@@ -215,8 +215,8 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 	@Override
 	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy,
-			ParkingInfrastructure parkingInfrastructure, int iteration) {
-		super.updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure, iteration);
+			IntegerValueHashMap<Id> facilityCapacities, int iteration) {
+		super.updateParkingOccupancyStatistics(parkingOccupancy, facilityCapacities, iteration);
 		writeOutGraphComparingSumOfSelectedParkingsToCounts(parkingOccupancy, parkingInfrastructure, iteration);
 		writeOutGraphParkingTypeOccupancies(parkingOccupancy, iteration);
 

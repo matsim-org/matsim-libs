@@ -49,6 +49,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -139,7 +140,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 	protected void startUpFinishing() {
 		
 		
-		HashMap<Id, Double> houseHoldIncome = getHouseHoldIncomeCantonZH();
+		HashMap<Id, Double> houseHoldIncome = getHouseHoldIncomeCantonZH(this.scenarioData);
 		
 		writeoutHouseholdIncome(houseHoldIncome);
 		
@@ -229,10 +230,10 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		GeneralLib.writeHashMapToFile(houseHoldIncome,"personId\tIncome",fileName);
 	}
 
-	private HashMap<Id, Double> getHouseHoldIncomeCantonZH() {
+	public static HashMap<Id, Double> getHouseHoldIncomeCantonZH(ScenarioImpl scenario) {
 		HashMap<Id, Double> houseHoldIncome=new HashMap<Id, Double>();
 		
-		for (Id personId : this.scenarioData.getPopulation().getPersons().keySet()) {
+		for (Id personId : scenario.getPopulation().getPersons().keySet()) {
 			double rand = MatsimRandom.getRandom().nextDouble();
 			if (rand<0.032) {
 				houseHoldIncome.put(personId, 1000+MatsimRandom.getRandom().nextDouble()*1000);

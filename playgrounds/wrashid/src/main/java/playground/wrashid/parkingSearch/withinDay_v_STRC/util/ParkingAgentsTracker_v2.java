@@ -37,7 +37,7 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.Park
 
 public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements AfterMobsimListener {
 
-	private ParkingStrategyManager parkingStrategyManager;
+	protected ParkingStrategyManager parkingStrategyManager;
 	protected WithinDayParkingController controler;
 
 	public ParkingAgentsTracker_v2(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance, WithinDayParkingController controler) {

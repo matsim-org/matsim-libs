@@ -127,6 +127,17 @@ public class ParkingStrategyManager {
 		
 	}
 
+	public void updateScore(Id personId, int legIndex, double score){
+		HashMap<Id, EvaluationContainer> legIndexHashMap = strategyEvaluations.get(personId).get(legIndex);
+		Id linkIdInHM=null;
+		for (Id linkId:legIndexHashMap.keySet()){
+			linkIdInHM=linkId;
+		}
+		legIndexHashMap.get(linkIdInHM).updateScoreOfSelectedStrategy(score);
+	}
+	
+	
+	
 	// TODO: program this properly, such that a module can be fit in here to decide, which strategies should be used
 	//
 	private EvaluationContainer createEvaulationContainerForAgentAtLeg(PlanBasedWithinDayAgent agent, int legIndex, int iterationNumber) {

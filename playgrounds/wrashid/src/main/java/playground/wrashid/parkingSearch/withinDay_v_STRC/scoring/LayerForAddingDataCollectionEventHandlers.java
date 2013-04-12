@@ -54,30 +54,32 @@ import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateLastPar
 
 public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTracker_v2 {
 
-	private HashMap<Id, Double> mostRecentDepartureTime;
+	protected HashMap<Id, Double> mostRecentDepartureTime;
 
-	private HashMap<Id, Id> lastParkingFacilityIdOfDay;
+	protected HashMap<Id, Id> lastParkingFacilityIdOfDay;
 
-	private HashMap<Id, Double> firstParkingWalkTimeOfDay;
-	private HashMap<Id, Double> lastParkingWalkTimeOfDay;
+	protected HashMap<Id, Double> firstParkingWalkTimeOfDay;
+	protected HashMap<Id, Double> lastParkingWalkTimeOfDay;
 
-	private HashMap<Id, Double> firstParkingDepartureTimeOfDay;
-	private HashMap<Id, Double> lastParkingArrivalTimeOfDay;
+	protected HashMap<Id, Double> firstParkingDepartureTimeOfDay;
+	protected HashMap<Id, Double> lastParkingArrivalTimeOfDay;
 
-	private HashMap<Id, Double> endTimeOfFirstActivityOfDay;
-	private HashMap<Id, Double> startTimeOfLastActivityOfDay;
+	protected HashMap<Id, Double> endTimeOfFirstActivityOfDay;
+	protected HashMap<Id, Double> startTimeOfLastActivityOfDay;
 
-	private HashMap<Id, Double> walkDurationFromParking;
-	private HashMap<Id, Double> walkDurationToParking;
+	protected HashMap<Id, Double> walkDurationFromParking;
+	protected HashMap<Id, Double> walkDurationToParking;
 
-	private HashMap<Id, Double> parkingArrivalTime;
-	private HashMap<Id, Double> parkingDepartureTime;
+	protected HashMap<Id, Double> parkingArrivalTime;
+	protected HashMap<Id, Double> parkingDepartureTime;
 
-	private HashMap<Id, Double> startTimeOfFirstActivityAfterParkingCar;
-	private HashMap<Id, Double> endTimeOfLastActivityBeforeLeavingWithCar;
+	protected HashMap<Id, Double> startTimeOfFirstActivityAfterParkingCar;
+	protected HashMap<Id, Double> endTimeOfLastActivityBeforeLeavingWithCar;
 
-	private Map<Id, Integer> firstParkingActivityPlanElemIndex;
-	private Map<Id, Integer> lastParkingActivityPlanElemIndex;
+	protected Map<Id, Integer> firstParkingActivityPlanElemIndex;
+	protected Map<Id, Integer> lastParkingActivityPlanElemIndex;
+	
+	private HashMap<Id, Double> parkingSearchStartTime;
 
 	public LayerForAddingDataCollectionEventHandlers(Scenario scenario, ParkingInfrastructure parkingInfrastructure,
 			double distance, WithinDayParkingController controler) {
@@ -95,6 +97,8 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 
 	@Override
 	public void reset(int iter) {
+		super.reset(iter);
+		
 		lastParkingFacilityIdOfDay = new HashMap<Id, Id>();
 
 		mostRecentDepartureTime = new HashMap<Id, Double>();
@@ -118,6 +122,8 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 
 		firstParkingActivityPlanElemIndex = new HashMap<Id, Integer>();
 		lastParkingActivityPlanElemIndex = new HashMap<Id, Integer>();
+		
+		parkingSearchStartTime=new HashMap<Id, Double>();
 	}
 
 	@Override
@@ -145,7 +151,9 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		double arrivalTime = event.getTime();
 		Id personId = event.getPersonId();
 		
-		if (event.getLegMode().equals(TransportMode.walk) && (previousActivityIsParking(personId) || nextActivityIsParking(personId))) {
+		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
+		
+		if (event.getLegMode().equals(TransportMode.walk)) {
 			if (previousActivityIsParking(personId)){
 				walkDurationFromParking.put(personId, arrivalTime-mostRecentDepartureTime.get(personId));
 				
@@ -174,7 +182,7 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 
 	private boolean previousActivityIsParking(Id personId) {
 		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
-		ActivityImpl activityImpl = (ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex+1);
+		ActivityImpl activityImpl = (ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex-1);
 		return activityImpl.getType().equalsIgnoreCase("parking");
 	}
 
@@ -259,6 +267,10 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 				}
 			}
 		}
+	}
+
+	public HashMap<Id, Double> getParkingSearchStartTime() {
+		return parkingSearchStartTime;
 	}
 
 }

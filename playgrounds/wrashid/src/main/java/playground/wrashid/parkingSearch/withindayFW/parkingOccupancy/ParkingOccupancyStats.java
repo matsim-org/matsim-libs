@@ -27,6 +27,7 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
@@ -35,7 +36,7 @@ public class ParkingOccupancyStats {
 	private int numberOfMaximumParkingCapacitConstraintViolations=0;
 	public HashMap<Id, ParkingOccupancyBins> parkingOccupancies = new HashMap<Id, ParkingOccupancyBins>();
 	
-	public void updateParkingOccupancy(Id parkingFacilityId, Double arrivalTime, Double departureTime, ParkingInfrastructure parkingInfrastructure) {
+	public void updateParkingOccupancy(Id parkingFacilityId, Double arrivalTime, Double departureTime, int parkingCapacity) {
 		if (!parkingOccupancies.containsKey(parkingFacilityId)) {
 			parkingOccupancies.put(parkingFacilityId, new ParkingOccupancyBins());
 		}
@@ -43,8 +44,7 @@ public class ParkingOccupancyStats {
 		ParkingOccupancyBins parkingOccupancyBins = parkingOccupancies.get(parkingFacilityId);
 		parkingOccupancyBins.inrementParkingOccupancy(arrivalTime, departureTime);
 		
-		int parkingCapacity = parkingInfrastructure.getFacilityCapacities().get(parkingFacilityId);
-		//parkingOccupancyBins.removeBlurErrors(parkingCapacity);
+
 		
 		if (parkingOccupancyBins.isMaximumCapacityConstraintViolated(parkingCapacity)){
 			DebugLib.emptyFunctionForSettingBreakPoint();
@@ -54,7 +54,7 @@ public class ParkingOccupancyStats {
 	}
 	
 	
-	public void writeOutParkingOccupanciesTxt(Controler controler, ParkingInfrastructure parkingInfrastructure, int iteration) {
+	public void writeOutParkingOccupanciesTxt(Controler controler, IntegerValueHashMap<Id> facilityCapacities, int iteration) {
 		String iterationFilename = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancy.txt");
 
@@ -77,7 +77,7 @@ public class ParkingOccupancyStats {
 			row = new StringBuffer(parkingFacilityId.toString());
 
 			row.append("\t");
-			row.append(parkingInfrastructure.getFacilityCapacities().get(parkingFacilityId));
+			row.append(facilityCapacities.get(parkingFacilityId));
 			
 			for (int i = 0; i < 96; i++) {
 				row.append("\t");

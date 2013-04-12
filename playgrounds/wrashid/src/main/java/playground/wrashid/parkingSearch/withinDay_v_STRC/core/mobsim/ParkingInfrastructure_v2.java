@@ -43,6 +43,7 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure.ParkingFacility;
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 
 public class ParkingInfrastructure_v2 extends ParkingInfrastructure {
 
@@ -81,6 +82,20 @@ public class ParkingInfrastructure_v2 extends ParkingInfrastructure {
 
 	public void setParkingTypes(HashMap<Id, String> parkingTypes) {
 		this.parkingTypes = parkingTypes;
+	}
+	
+	public int getParkingCapacity(Id parkingFacilityId){
+		return parkingFacilities.get(parkingFacilityId).getCapacity();
+	}
+
+	public IntegerValueHashMap<Id> getParkingFacilityCapacities() {
+		IntegerValueHashMap<Id> hm=new IntegerValueHashMap<Id>();
+		
+		for (ParkingFacility pf:parkingFacilities.values()){
+			hm.set(pf.getFaciltyId(), getParkingCapacity(pf.getFaciltyId()));
+		}
+		
+		return hm;
 	}
 
 }

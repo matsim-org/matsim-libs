@@ -39,6 +39,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.*;
 
@@ -71,6 +72,13 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 			 * If the agent has not selected a parking facility yet.
 			 */
 			if (requiresReplanning(agent)) {
+				// say, that search time has started
+				// TODO: allow adding here custom code per strategy!!!!
+				HashMap<Id, Double> parkingSearchStartTime = ((ParkingScoreManager) this.parkingAgentsTracker).getParkingSearchStartTime();
+				if (!parkingSearchStartTime.containsKey(agentId)){
+					parkingSearchStartTime.put(agentId, time);
+				} 
+				
 				Id linkId = agent.getCurrentLinkId();
 				List<Id> facilityIds = parkingInfrastructure.getFreeParkingFacilitiesOnLink(linkId);
 				if (facilityIds != null && facilityIds.size() > 0) {

@@ -66,6 +66,7 @@ import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchSt
 import playground.christoph.parking.withinday.replanner.strategy.RandomParkingSearch;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.analysis.ParkingAnalysisHandlerChessBoard;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.identifier.ParkingSearchIdentifier_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.replanner.ParkingSearchReplannerFactoryWithStrategySwitching;
@@ -76,6 +77,8 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GeneralParki
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.StreetParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
+import playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh;
+import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchStrategy;
 
 public class WithinDayParkingController extends WithinDayController implements ReplanningListener {
@@ -105,9 +108,9 @@ public class WithinDayParkingController extends WithinDayController implements R
 	protected ParkingSearchReplannerFactory searchReplannerFactory;
 
 	protected LegModeChecker legModeChecker;
-	protected ParkingAgentsTracker_v2 parkingAgentsTracker;
+	protected ParkingScoreManager parkingAgentsTracker;
 	protected InsertParkingActivities insertParkingActivities;
-	protected ParkingInfrastructure parkingInfrastructure;
+	protected ParkingInfrastructure_v2 parkingInfrastructure;
 	
 	public WithinDayParkingController(String[] args) {
 		super(args);
@@ -195,7 +198,10 @@ public class WithinDayParkingController extends WithinDayController implements R
 		
 		parkingInfrastructure = new ParkingInfrastructure_v2(this.scenarioData, parkingCostCalculator, parkingTypes);
 		
-		parkingAgentsTracker = new ParkingScoreManager(this.scenarioData, parkingInfrastructure, searchRadius, this);
+		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.scenarioData, HUPCControllerKTIzh.getHouseHoldIncomeCantonZH(this.scenarioData));
+		parkingAgentsTracker = new ParkingScoreManager(this.scenarioData, parkingInfrastructure, searchRadius, this, parkingPersonalBetas);
+		parkingAgentsTracker.setParkingAnalysisHandler(new ParkingAnalysisHandlerChessBoard(this, parkingInfrastructure));
+		
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 		this.addControlerListener(parkingAgentsTracker);
