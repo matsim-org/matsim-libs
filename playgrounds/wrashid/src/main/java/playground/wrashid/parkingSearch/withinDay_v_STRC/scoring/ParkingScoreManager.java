@@ -99,19 +99,16 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 	}
 
 	private boolean isDuringDayParkingActivity(PlanBasedWithinDayAgent planBasedWithinDayAgent) {
-		return firstParkingActivityPlanElemIndex.get(planBasedWithinDayAgent.getId()) < planBasedWithinDayAgent
-				.getCurrentPlanElementIndex()
-				&& lastParkingActivityPlanElemIndex.get(planBasedWithinDayAgent.getId()) > planBasedWithinDayAgent
-						.getCurrentPlanElementIndex();
+		return firstParkingActivityPlanElemIndex.get(planBasedWithinDayAgent.getId()) < currentPlanElementIndex
+				&& lastParkingActivityPlanElemIndex.get(planBasedWithinDayAgent.getId()) > currentPlanElementIndex;
 	}
 
 	private boolean isNextLegFirstCarDepartureOfDay(PlanBasedWithinDayAgent planBasedWithinDayAgent) {
-		return firstParkingActivityPlanElemIndex.get(planBasedWithinDayAgent.getId()) == planBasedWithinDayAgent
-				.getCurrentPlanElementIndex();
+		return firstParkingActivityPlanElemIndex.get(planBasedWithinDayAgent.getId()) == currentPlanElementIndex;
 	}
 
 	private boolean isAgentNextDrivingAwayFromParking(PlanBasedWithinDayAgent planBasedWithinDayAgent) {
-		LegImpl leg = (LegImpl) planBasedWithinDayAgent.getNextPlanElement();
+		LegImpl leg = (LegImpl) planBasedWithinDayAgent.getSelectedPlan().getPlanElements().get(currentPlanElementIndex+1);
 		return leg.getMode().equals(TransportMode.car);
 	}
 
@@ -120,6 +117,12 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 
 		Id personId = event.getPersonId();
 
+		PlanElement currentPlanElement = agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex);
+		
+		if (!this.parkingArrivalTime.containsKey(personId)){
+			System.out.println();
+		}
+		
 		double parkingArrivalTime = this.parkingArrivalTime.get(personId);
 		double parkingDepartureTime = event.getTime();
 		double parkingDuration = GeneralLib.getIntervalDuration(parkingArrivalTime, parkingDepartureTime);
@@ -172,9 +175,8 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 	private Integer getIndexOfPreviousCarLeg(Id personId) {
 		PlanBasedWithinDayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
 
-		for (int i = planElementIndex; i > 0; i--) {
+		for (int i = currentPlanElementIndex; i > 0; i--) {
 			List<PlanElement> planElements = executedPlan.getPlanElements();
 			if (planElements.get(i) instanceof Leg) {
 				Leg leg = (Leg) planElements.get(i);

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -81,7 +82,9 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 	protected Map<Id, Integer> firstParkingActivityPlanElemIndex;
 	protected Map<Id, Integer> lastParkingActivityPlanElemIndex;
 	
-	private HashMap<Id, Double> parkingSearchStartTime;
+	protected HashMap<Id, Double> parkingSearchStartTime;
+	
+	protected Integer currentPlanElementIndex;
 
 	public LayerForAddingDataCollectionEventHandlers(Scenario scenario, ParkingInfrastructure parkingInfrastructure,
 			double distance, WithinDayParkingController controler) {
@@ -133,10 +136,13 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		super.handleEvent(event);
 
 		Id personId = event.getPersonId();
+		correctCurrentPlanElementIndexIfWrongForLeg(personId,event.getLegMode());
+		
+		
 		double departureTime = event.getTime();
 		mostRecentDepartureTime.put(personId, departureTime);
 		
-		if (firstParkingActivityPlanElemIndex.get(personId)+1==agents.get(personId).getCurrentPlanElementIndex()){
+		if (firstParkingActivityPlanElemIndex.get(personId)+1==currentPlanElementIndex){
 			firstParkingDepartureTimeOfDay.put(personId, departureTime);
 		}
 		
@@ -153,25 +159,25 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		double arrivalTime = event.getTime();
 		Id personId = event.getPersonId();
 		
-		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
+		correctCurrentPlanElementIndexIfWrongForLeg(personId,event.getLegMode());
 		
 		if (event.getLegMode().equals(TransportMode.walk)) {
 			if (previousActivityIsParking(personId)){
 				walkDurationFromParking.put(personId, arrivalTime-mostRecentDepartureTime.get(personId));
 				
-				if (lastParkingActivityPlanElemIndex.get(personId) < agents.get(personId).getCurrentPlanElementIndex()) {
+				if (lastParkingActivityPlanElemIndex.get(personId) < currentPlanElementIndex) {
 					lastParkingWalkTimeOfDay.put(personId, arrivalTime-mostRecentDepartureTime.get(personId));
 				}
 			} else if (nextActivityIsParking(personId)){
 				walkDurationToParking.put(personId, arrivalTime-mostRecentDepartureTime.get(personId));
 				
-				if (firstParkingActivityPlanElemIndex.get(personId) > agents.get(personId).getCurrentPlanElementIndex()) {
+				if (firstParkingActivityPlanElemIndex.get(personId) > currentPlanElementIndex) {
 					firstParkingWalkTimeOfDay.put(personId, arrivalTime-mostRecentDepartureTime.get(personId));
 				}
 			}
 		}
 		
-		if (lastParkingActivityPlanElemIndex.get(personId)-1==agents.get(personId).getCurrentPlanElementIndex()){
+		if (lastParkingActivityPlanElemIndex.get(personId)-1==currentPlanElementIndex){
 			lastParkingArrivalTimeOfDay.put(personId, event.getTime());
 		}
 		
@@ -182,14 +188,31 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		
 	}
 
+	private void correctCurrentPlanElementIndexIfWrongForLeg(Id personId, String legMode) {
+		currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
+		List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
+
+		if (planElements.get(currentPlanElementIndex) instanceof ActivityImpl){
+			LegImpl prevLeg = (LegImpl) planElements.get(currentPlanElementIndex-1);
+			LegImpl nextLeg = (LegImpl) planElements.get(currentPlanElementIndex+1);
+		
+			if (legMode.equals(prevLeg.getMode())) {
+				currentPlanElementIndex--;
+			} else if (legMode.equals(nextLeg.getMode())){
+				currentPlanElementIndex++;
+			} else {
+				DebugLib.stopSystemAndReportInconsistency();
+			}
+		}
+	}
+
 	private boolean previousActivityIsParking(Id personId) {
-		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
 		ActivityImpl activityImpl = (ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex-1);
 		return activityImpl.getType().equalsIgnoreCase("parking");
 	}
 
 	private boolean nextActivityIsParking(Id personId) {
-		ActivityImpl activityImpl = (ActivityImpl) agents.get(personId).getNextPlanElement();
+		ActivityImpl activityImpl = (ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex+1);
 		return activityImpl.getType().equalsIgnoreCase("parking");
 	}
 
@@ -197,9 +220,10 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 	public void handleEvent(ActivityStartEvent event) {
 		super.handleEvent(event);
 		Id personId = event.getPersonId();
-		double time = event.getTime();
-		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
 		
+		correctCurrentPlanElementIndexIfWrongForActivity(personId,event.getActType());
+		
+		double time = event.getTime();
 		
 		if (event.getActType().equalsIgnoreCase("parking")) {
 			lastParkingFacilityIdOfDay.put(personId, event.getFacilityId());
@@ -218,27 +242,45 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		
 
 	}
+	
+	
+	private void correctCurrentPlanElementIndexIfWrongForActivity(Id personId, String actType) {
+		currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
+		List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
+
+		if (planElements.get(currentPlanElementIndex) instanceof LegImpl){
+			ActivityImpl prevAct = (ActivityImpl) planElements.get(currentPlanElementIndex-1);
+			ActivityImpl nextAct = (ActivityImpl) planElements.get(currentPlanElementIndex+1);
+		
+			if (actType.equals(prevAct.getType())) {
+				currentPlanElementIndex--;
+			} else if (actType.equals(nextAct.getType())){
+				currentPlanElementIndex++;
+			} else {
+				DebugLib.stopSystemAndReportInconsistency();
+			}
+		}
+	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		super.handleEvent(event);
 		double time = event.getTime();
 		Id personId = event.getPersonId();
+		
+		correctCurrentPlanElementIndexIfWrongForActivity(personId,event.getActType());
 
-		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
+		PlanBasedWithinDayAgent planBasedWithinDayAgent = agents.get(personId);
 		if (firstParkingActivityPlanElemIndex.get(personId)-2==currentPlanElementIndex){
 			endTimeOfFirstActivityOfDay.put(personId, event.getTime());
 		}
 		
 		if (lastParkingActivityPlanElemIndex.get(personId)>currentPlanElementIndex){
-			List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
-			PlanElement planElement = planElements.get(currentPlanElementIndex+2);
+			List<PlanElement> planElements = planBasedWithinDayAgent.getSelectedPlan().getPlanElements();
 			
-			if (planElement instanceof LegImpl){
-				System.out.println();
-			}
 			
-			if (((ActivityImpl) planElement).getType().equalsIgnoreCase("parking")){
+			
+			if (event.getActType().equalsIgnoreCase("parking")){
 				endTimeOfLastActivityBeforeLeavingWithCar.put(personId, time);
 			}
 		}
