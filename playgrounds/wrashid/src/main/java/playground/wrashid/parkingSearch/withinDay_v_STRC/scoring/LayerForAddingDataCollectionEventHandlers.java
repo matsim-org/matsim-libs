@@ -19,6 +19,7 @@
 package playground.wrashid.parkingSearch.withinDay_v_STRC.scoring;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -38,6 +39,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -229,7 +231,14 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		}
 		
 		if (lastParkingActivityPlanElemIndex.get(personId)>currentPlanElementIndex){
-			if (((ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex+2)).getType().equalsIgnoreCase("parking")){
+			List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
+			PlanElement planElement = planElements.get(currentPlanElementIndex+2);
+			
+			if (planElement instanceof LegImpl){
+				System.out.println();
+			}
+			
+			if (((ActivityImpl) planElement).getType().equalsIgnoreCase("parking")){
 				endTimeOfLastActivityBeforeLeavingWithCar.put(personId, time);
 			}
 		}

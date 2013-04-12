@@ -86,7 +86,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 8;
+	protected int numReplanningThreads = 1;
 
 	/*
 	 * How many nodes should be checked when adapting an existing route
