@@ -75,7 +75,7 @@ public class EventsExtractedForSelectedLinks {
 		events = null;
 		this.events = EventsUtils.createEventsManager();
 		TrimEventsWithPersonIds trimmer = new TrimEventsWithPersonIds(
-				outfileName, sampledIds);
+				outfileName, sampledIds,false);
 		events.addHandler(trimmer);
 		reader = new EventsReaderXMLv1(events);
 		reader.parse(inFileName);

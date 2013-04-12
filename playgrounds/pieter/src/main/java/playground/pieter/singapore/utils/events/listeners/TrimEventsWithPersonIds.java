@@ -28,7 +28,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.*;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -37,6 +39,8 @@ import org.matsim.core.utils.io.IOUtils;
 public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 	private BufferedWriter out = null;
 	private HashSet<String> sampledIds;
+	private HashSet<String> transitVehicleIds;
+	private boolean listenForTransitDrivers = false;
 
 	public void reset(int iteration) {
 		closeFile();
@@ -59,7 +63,12 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 		String personId = attr.get("person");
 
 		if (sampledIds.contains(personId)) {
-
+			if(listenForTransitDrivers= true && attr.get("vehicle") != null && attr.get("vehicle").startsWith("tr_")){
+				if(transitVehicleIds ==null){
+					transitVehicleIds = new HashSet<String>();
+				}
+				transitVehicleIds.add(attr.get("vehicle"));
+			}
 			eventXML.append("\t<event ");
 			for (Map.Entry<String, String> entry : attr.entrySet()) {
 				eventXML.append(entry.getKey());
@@ -75,10 +84,11 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 			}
 		}
 	}
-
-	public TrimEventsWithPersonIds(final String filename, HashSet<String> sampledIds) {
+	
+	public TrimEventsWithPersonIds(final String filename, HashSet<String> sampledIds, boolean listenForTransitDrivers) {
 		init(filename);
 		this.sampledIds = sampledIds;
+		this.listenForTransitDrivers = listenForTransitDrivers;
 	}
 
 	public void init(final String outfilename) {
@@ -93,5 +103,11 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 	public static void main(String[] args){
 		
 	}
+
+	public HashSet<String> getTransitVehicleIds() {
+		return transitVehicleIds;
+	}
+
+
 
 }
