@@ -332,6 +332,10 @@ public class ParkingInfrastructure  {
 			this.reserved.clear();
 			this.occupied.clear();
 		}
+		
+		public int getCapacity(){
+			return this.capacity;
+		}
 	}
 	
 }

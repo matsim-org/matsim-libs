@@ -66,7 +66,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 	// TODO: allow each agent to decided whether starting its parking search or not
 	
 	private final Scenario scenario;
-	private final ParkingInfrastructure parkingInfrastructure;
+	protected final ParkingInfrastructure parkingInfrastructure;
 	private final double distance;
 
 	private final Set<Id> carLegAgents;
