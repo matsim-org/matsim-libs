@@ -236,7 +236,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					Id destinationZoneID = zones[toZoneIndex].getZoneID();
 					
 					// free speed car travel times in minutes
-					double freeSpeedTravelTime_min = (lcptExtFreeSpeedCarTrvelTime.getTree().get( toNode.getId() ).getCost() / 60.);
+					double arrivalTimeFS = lcptExtFreeSpeedCarTrvelTime.getTree().get( toNode.getId() ).getTime();
+					double freeSpeedTravelTime_min = (arrivalTimeFS - depatureTime) / 60.;
 					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
 					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
 					if(freeSpeedTravelTime_min < 1.2)
@@ -250,9 +251,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 						travelCost_util = 1.2;
 					
 					// get congested arrival time
-					double arrivalTime = lcptExtCongestedCarTravelTime.getTree().get( toNode.getId() ).getTime();
+					double arrivalTimeCC = lcptExtCongestedCarTravelTime.getTree().get( toNode.getId() ).getTime();
 					// congested car travel times in minutes
-					double congestedTravelTime_min = (arrivalTime - depatureTime) / 60.;
+					double congestedTravelTime_min = (arrivalTimeCC - depatureTime) / 60.;
 					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
 					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
 					if(congestedTravelTime_min < 1.2)
