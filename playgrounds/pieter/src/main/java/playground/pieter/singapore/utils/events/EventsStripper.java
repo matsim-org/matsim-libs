@@ -140,7 +140,7 @@ public class EventsStripper {
 		ids.add("4101962"); //transit user
 		ids.add("77878"); //car user
 		EventsStripper stripper = new EventsStripper(ids);
-		stripper.stripEvents(args[1], args[2], 1.0, true);
+		stripper.stripEvents(args[0], args[1], 1.0, true);
 	}
 
 }
