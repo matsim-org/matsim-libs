@@ -163,11 +163,6 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		
 	}
 
-	private void correctCurrentPlanElementIndexIfWrongForDepartureLeg(Id personId, String legMode, Id linkId) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		super.handleEvent(event);
@@ -201,28 +196,6 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		}
 		
 		
-	}
-
-	private void correctCurrentPlanElementIndexIfWrongForArrivalLeg(Id personId, String legMode, Id linkId) {
-		currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
-		List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
-
-		if (planElements.get(currentPlanElementIndex) instanceof ActivityImpl){
-			LegImpl prevLeg = (LegImpl) planElements.get(currentPlanElementIndex-1);
-			LegImpl nextLeg = (LegImpl) planElements.get(currentPlanElementIndex+1);
-		
-			if (legMode.equals(prevLeg.getMode()) && prevLeg.getRoute().getEndLinkId()==linkId) {
-				currentPlanElementIndex--;
-			} else if (legMode.equals(nextLeg.getMode()) && nextLeg.getRoute().getEndLinkId()==linkId){
-				currentPlanElementIndex++;
-			} else {
-				DebugLib.stopSystemAndReportInconsistency();
-			}
-			
-			if (legMode.equals(prevLeg.getMode()) && legMode.equals(nextLeg.getMode()) && prevLeg.getRoute().getEndLinkId()==nextLeg.getRoute().getEndLinkId()){
-				DebugLib.stopSystemAndReportInconsistency("resolve ambiguity, e.g. through link id?");
-			}
-		}
 	}
 
 	private boolean previousActivityIsParking(Id personId) {
@@ -265,28 +238,6 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 
 	}
 	
-	
-	private void correctCurrentPlanElementIndexIfWrongForActivity(Id personId, String actType, Id linkId) {
-		currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
-		List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
-
-		if (planElements.get(currentPlanElementIndex) instanceof LegImpl){
-			ActivityImpl prevAct = (ActivityImpl) planElements.get(currentPlanElementIndex-1);
-			ActivityImpl nextAct = (ActivityImpl) planElements.get(currentPlanElementIndex+1);
-		
-			if (actType.equals(prevAct.getType()) && linkId==prevAct.getLinkId()) {
-				currentPlanElementIndex--;
-			} else if (actType.equals(nextAct.getType()) && linkId==nextAct.getLinkId()){
-				currentPlanElementIndex++;
-			} else {
-				DebugLib.stopSystemAndReportInconsistency();
-			}
-			
-			if (actType.equals(prevAct.getType()) && actType.equals(nextAct.getType()) && nextAct.getLinkId()==prevAct.getLinkId()){
-				DebugLib.stopSystemAndReportInconsistency("resolve ambiguity, e.g. through link id?");
-			}
-		}
-	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
