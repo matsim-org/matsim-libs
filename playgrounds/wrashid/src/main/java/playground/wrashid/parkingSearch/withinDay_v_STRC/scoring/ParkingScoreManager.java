@@ -33,6 +33,7 @@ import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
@@ -85,7 +86,7 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 
 			if (isAgentNextDrivingAwayFromParking(planBasedWithinDayAgent)) {
 				if (isDuringDayParkingActivity(planBasedWithinDayAgent)) {
-//					updateParkingScoreDuringDay(event);
+					updateParkingScoreDuringDay(event);
 				}
 			}
 
@@ -105,6 +106,10 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 		Plan plan = planBasedWithinDayAgent.getSelectedPlan();
 		// check whether there is a next leg
 		if (plan.getPlanElements().size() > currentPlanElementIndex + 1) {
+			if (plan.getPlanElements().get(currentPlanElementIndex+1) instanceof ActivityImpl){
+				System.out.println();
+			}
+			
 			LegImpl leg = (LegImpl) plan.getPlanElements().get(currentPlanElementIndex+1);
 			return leg.getMode().equals(TransportMode.car);			
 		} else return false;
@@ -139,7 +144,7 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 		parkingScore += costScore;
 
 		// parking walk time
-
+		
 		double walkingTimeTotalInMinutes = (walkDurationFromParking.get(personId) + walkDurationToParking.get(personId)) / 60.0;
 		double walkScore = getWalkScore(personId, activityDuration, walkingTimeTotalInMinutes);
 		parkingScore += walkScore;
