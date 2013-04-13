@@ -31,10 +31,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -44,11 +41,8 @@ import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 import playground.wrashid.parkingSearch.withindayFW.analysis.ParkingAnalysisHandler;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureParkingWalkTimesDuringDay;
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
@@ -91,7 +85,7 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 
 			if (isAgentNextDrivingAwayFromParking(planBasedWithinDayAgent)) {
 				if (isDuringDayParkingActivity(planBasedWithinDayAgent)) {
-					updateParkingScoreDuringDay(event);
+//					updateParkingScoreDuringDay(event);
 				}
 			}
 
@@ -108,8 +102,12 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 	}
 
 	private boolean isAgentNextDrivingAwayFromParking(PlanBasedWithinDayAgent planBasedWithinDayAgent) {
-		LegImpl leg = (LegImpl) planBasedWithinDayAgent.getSelectedPlan().getPlanElements().get(currentPlanElementIndex+1);
-		return leg.getMode().equals(TransportMode.car);
+		Plan plan = planBasedWithinDayAgent.getSelectedPlan();
+		// check whether there is a next leg
+		if (plan.getPlanElements().size() > currentPlanElementIndex + 1) {
+			LegImpl leg = (LegImpl) plan.getPlanElements().get(currentPlanElementIndex+1);
+			return leg.getMode().equals(TransportMode.car);			
+		} else return false;
 	}
 
 	private void updateParkingScoreDuringDay(ActivityEndEvent event) {

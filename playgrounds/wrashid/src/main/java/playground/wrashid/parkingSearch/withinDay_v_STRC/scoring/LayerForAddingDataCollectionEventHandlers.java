@@ -136,7 +136,7 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		super.handleEvent(event);
 
 		Id personId = event.getPersonId();
-		correctCurrentPlanElementIndexIfWrongForLeg(personId,event.getLegMode());
+//		correctCurrentPlanElementIndexIfWrongForLeg(personId,event.getLegMode());
 		
 		
 		double departureTime = event.getTime();
@@ -159,7 +159,7 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		double arrivalTime = event.getTime();
 		Id personId = event.getPersonId();
 		
-		correctCurrentPlanElementIndexIfWrongForLeg(personId,event.getLegMode());
+//		correctCurrentPlanElementIndexIfWrongForLeg(personId,event.getLegMode());
 		
 		if (event.getLegMode().equals(TransportMode.walk)) {
 			if (previousActivityIsParking(personId)){
@@ -207,13 +207,16 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 	}
 
 	private boolean previousActivityIsParking(Id personId) {
-		ActivityImpl activityImpl = (ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex-1);
+		ActivityImpl activityImpl = (ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex);
 		return activityImpl.getType().equalsIgnoreCase("parking");
 	}
 
 	private boolean nextActivityIsParking(Id personId) {
-		ActivityImpl activityImpl = (ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex+1);
-		return activityImpl.getType().equalsIgnoreCase("parking");
+		Plan plan = agents.get(personId).getSelectedPlan();
+		if (plan.getPlanElements().size() > currentPlanElementIndex + 2) {
+			ActivityImpl activityImpl = (ActivityImpl) plan.getPlanElements().get(currentPlanElementIndex+2);
+			return activityImpl.getType().equalsIgnoreCase("parking");			
+		} else return false;
 	}
 
 	@Override
