@@ -80,7 +80,7 @@ import others.sergioo.util.dataBase.DataBaseAdmin;
 
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra;
 import playground.sergioo.hitsRouter2013.TransitRouterVariableImpl;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityVariableWW;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeCalculator;
@@ -119,7 +119,7 @@ public class HITSAnalyser {
 	private static TransitRouterVariableImpl transitRouter;
 	private static TransitRouterImpl transitScheduleRouter;
 	private static Scenario scenario;
-	private static TransitRouterNetworkTravelTimeAndDisutilityVariableWW transitTravelFunction;
+	private static TransitRouterNetworkTravelTimeAndDisutilityWW transitTravelFunction;
 	private static TransitRouterNetworkWW transitRouterNetwork;
 	private static MyTransitRouterConfig transitRouterConfig;
 	private static HashSet<TransitLine> mrtLines;
@@ -157,16 +157,11 @@ public class HITSAnalyser {
 				scenario.getNetwork(), scenario.getTransitSchedule(),
 				transitRouterConfig.beelineWalkConnectionDistance);
 		TransitRouterNetwork transitScheduleRouterNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), transitRouterConfig.beelineWalkConnectionDistance);
-		transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityVariableWW(
-				transitRouterConfig, scenario.getNetwork(),
-				transitRouterNetwork,
-				travelTimeCalculator.getLinkTravelTimes(),
-				waitTimeCalculator.getWaitTimes(), scenario.getConfig()
-						.travelTimeCalculator(), startTime, endTime);
+		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
+		transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWW(transitRouterConfig, scenario.getNetwork(), transitRouterNetwork, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), scenario.getConfig().travelTimeCalculator(), startTime, endTime, preparedTransitSchedule);
 		transitRouter = new TransitRouterVariableImpl(transitRouterConfig,
 				transitTravelFunction, transitRouterNetwork,
 				scenario.getNetwork());
-		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
 		TransitRouterNetworkTravelTimeAndDisutility routerNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(transitRouterConfig, preparedTransitSchedule);
 		transitScheduleRouter = new TransitRouterImpl(transitRouterConfig, preparedTransitSchedule, 
 				transitScheduleRouterNetwork, routerNetworkTravelTimeAndDisutility, 

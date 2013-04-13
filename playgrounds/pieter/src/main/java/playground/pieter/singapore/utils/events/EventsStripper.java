@@ -137,7 +137,8 @@ public class EventsStripper {
 		// TODO Auto-generated method stub
 
 		ArrayList<String> ids = new ArrayList<String>();
-		ids.add("801060");
+		ids.add("4101962"); //transit user
+		ids.add("77878"); //car user
 		EventsStripper stripper = new EventsStripper(ids);
 		stripper.stripEvents(args[1], args[2], 1.0, true);
 	}
