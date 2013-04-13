@@ -92,7 +92,7 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 	}
 
 	public void init(final String outfilename) {
-		closeFile();
+		
 		try {
 			this.out = IOUtils.getBufferedWriter(outfilename);
 			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
