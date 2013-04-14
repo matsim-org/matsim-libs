@@ -29,13 +29,14 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
-import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
-import org.openstreetmap.osmosis.core.filter.v0_6.UsedNodeFilter;
 import org.openstreetmap.osmosis.core.merge.common.ConflictResolutionMethod;
-import org.openstreetmap.osmosis.core.merge.v0_6.EntityMerger;
 import org.openstreetmap.osmosis.core.progress.v0_6.EntityProgressLogger;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
+import org.openstreetmap.osmosis.set.v0_6.BoundRemovedAction;
+import org.openstreetmap.osmosis.set.v0_6.EntityMerger;
+import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
+import org.openstreetmap.osmosis.tagfilter.v0_6.UsedNodeFilter;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.v0_6.XmlWriter;
 
 public class OsmPrepare {
 	
@@ -69,16 +70,16 @@ public class OsmPrepare {
 		
 		JOSMTolerantFastXMLReader reader = new JOSMTolerantFastXMLReader(new File(filename), true, CompressionMethod.None);		
 		UsedNodeFilter usedNodeFilter = new UsedNodeFilter(IdTrackerType.BitSet);
-		EntityProgressLogger logger= new EntityProgressLogger(10);
+		EntityProgressLogger logger= new EntityProgressLogger(10, "1");
 		
 		JOSMTolerantFastXMLReader reader2 = new JOSMTolerantFastXMLReader(new File(filename), true, CompressionMethod.None);		
-		EntityProgressLogger logger2= new EntityProgressLogger(10);
+		EntityProgressLogger logger2= new EntityProgressLogger(10, "2");
 				
 		TagFilter streetTagFilter = createStreetFilter(this.streetFilter);		
 		TagFilter transitTagFilter = createTransitFilter(this.transitFilter);
 		UsedNodeAndWayFilter usedFilter = new UsedNodeAndWayFilter(IdTrackerType.BitSet);
 		
-		EntityMerger entityMerger = new EntityMerger(ConflictResolutionMethod.LatestSource, 20);
+		EntityMerger entityMerger = new EntityMerger(ConflictResolutionMethod.LatestSource, 20, BoundRemovedAction.Fail);
 		
 		XmlWriter writer = new XmlWriter(new File(targetFilename), CompressionMethod.None);
 		

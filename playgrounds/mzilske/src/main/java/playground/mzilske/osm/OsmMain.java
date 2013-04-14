@@ -34,35 +34,40 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.vis.otfvis.utils.WGS84ToMercator;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
-import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
+import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.v0_6.FastXmlReader;
 
 public class OsmMain {
 	
 	public static void main(String[] args) {
 		Scenario scenario = createScenario();
 		new NetworkCleaner().run(scenario.getNetwork());
-		new NetworkWriter(scenario.getNetwork()).write("/Users/zilske/d4d/output/network.xml");
+		new NetworkWriter(scenario.getNetwork()).write("output/network-tertiary-myown.xml");
 	}
 
 	private static Scenario createScenario() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
-		tagKeyValues.put("highway", new HashSet<String>(Arrays.asList("motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","minor","unclassified","residential","living_street")));
-		String filename = "/Users/zilske/d4d/ivory_coast.osm";
+		// tagKeyValues.put("highway", new HashSet<String>(Arrays.asList("motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","minor","unclassified","residential","living_street")));
+		// String filename = "/Users/zilske/d4d/ivory_coast.osm";
+		tagKeyValues.put("highway", new HashSet<String>(Arrays.asList("motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary")));
+		
+		String filename = "/Users/vspuser/workspaces/kurs-workspace/mein-projekt/input/zurich.osm.xml";
+		
 		Set<String> tagKeys = Collections.emptySet();
 		TagFilter tagFilter = new TagFilter("accept-way", tagKeys, tagKeyValues);
 		
 		FastXmlReader reader = new FastXmlReader(new File(filename ), true, CompressionMethod.None);
 		
-		SimplifyTask simplify = new SimplifyTask(IdTrackerType.BitSet);
+		SimplifyTask simplify = new SimplifyTask(IdTrackerType.Dynamic);
 		
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
+		// CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
+		
 		NetworkSink sink = new NetworkSink(scenario.getNetwork(), coordinateTransformation);
 		sink.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
 		sink.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);
@@ -94,6 +99,11 @@ public class OsmMain {
 
 			@Override
 			public void release() {
+				
+			}
+
+			@Override
+			public void initialize(Map<String, Object> arg0) {
 				
 			}
 			

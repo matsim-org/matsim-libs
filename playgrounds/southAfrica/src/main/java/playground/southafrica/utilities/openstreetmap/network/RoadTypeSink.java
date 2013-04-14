@@ -116,5 +116,11 @@ public class RoadTypeSink implements Sink {
 		return new TreeMap<Long, String>(this.highwayTypeMap);
 	}
 
+	@Override
+	public void initialize(Map<String, Object> metaData) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
 

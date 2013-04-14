@@ -31,7 +31,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 
 public class OsmTransitMain {
 	

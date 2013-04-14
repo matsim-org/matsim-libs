@@ -27,9 +27,9 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
-import org.openstreetmap.osmosis.core.xml.common.XmlTimestampFormat;
-import org.openstreetmap.osmosis.core.xml.v0_6.impl.MemberTypeParser;
-import org.openstreetmap.osmosis.core.xml.v0_6.impl.XmlConstants;
+import org.openstreetmap.osmosis.xml.common.XmlTimestampFormat;
+import org.openstreetmap.osmosis.xml.v0_6.impl.MemberTypeParser;
+import org.openstreetmap.osmosis.xml.v0_6.impl.XmlConstants;
 
 
 /**

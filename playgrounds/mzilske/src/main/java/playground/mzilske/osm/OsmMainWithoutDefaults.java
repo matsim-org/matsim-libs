@@ -34,9 +34,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
-import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
+import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.v0_6.FastXmlReader;
 
 import uk.co.randomjunk.osmosis.transform.v0_6.TransformTask;
 

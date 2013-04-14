@@ -32,8 +32,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -617,6 +617,13 @@ public class MyAmenitySink implements Sink {
 
 		Id id = new IdImpl(level);
 		educationLevelMap.put(id, educationLevelMap.get(id)+1);
+	}
+
+
+	@Override
+	public void initialize(Map<String, Object> metaData) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

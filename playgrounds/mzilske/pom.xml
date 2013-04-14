@@ -11,10 +11,6 @@
 	<name>mzilske</name>
 	<repositories>
 		<repository>
-			<id>openstreetmap-snapshots</id>
-			<url>http://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
-		</repository>
-		<repository>
 			<id>geotools</id>
 			<name>Geotools repository</name>
 			<url>http://download.osgeo.org/webdav/geotools</url>
@@ -85,13 +81,28 @@
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
-			<artifactId>osmosis</artifactId>
-			<version>0.32.1-SNAPSHOT</version>
+			<artifactId>osmosis-core</artifactId>
+			<version>0.43-RELEASE</version>
 		</dependency>
 		<dependency>
-			<groupId>org.openstreetmap</groupId>
-			<artifactId>jmapviewer</artifactId>
-			<version>0.1-20110219</version>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-xml</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-tagfilter</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-areafilter</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-set</artifactId>
+			<version>0.43-RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.swinglabs</groupId>

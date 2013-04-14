@@ -397,4 +397,10 @@ public class TransitNetworkSink implements Sink {
 		return this.transitModes;
 	}
 
+	@Override
+	public void initialize(Map<String, Object> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

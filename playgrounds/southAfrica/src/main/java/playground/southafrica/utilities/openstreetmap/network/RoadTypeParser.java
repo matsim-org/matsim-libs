@@ -25,8 +25,8 @@ import java.io.FileNotFoundException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.XmlReader;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
 
 public class RoadTypeParser {
 	private final Logger log = Logger.getLogger(RoadTypeParser.class);

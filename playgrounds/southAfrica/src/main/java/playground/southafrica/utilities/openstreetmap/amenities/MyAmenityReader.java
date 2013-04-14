@@ -46,8 +46,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.XmlReader;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
 
 import playground.southafrica.utilities.Header;
 

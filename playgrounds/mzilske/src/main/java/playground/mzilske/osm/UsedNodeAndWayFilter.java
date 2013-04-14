@@ -1,6 +1,8 @@
 // This software is released into the Public Domain.  See copying.txt for details.
 package playground.mzilske.osm;
 
+import java.util.Map;
+
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityProcessor;
@@ -188,5 +190,12 @@ public class UsedNodeAndWayFilter implements SinkSource, EntityProcessor {
 	 */
 	public void setSink(Sink sink) {
 		this.sink = sink;
+	}
+
+
+	@Override
+	public void initialize(Map<String, Object> arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
