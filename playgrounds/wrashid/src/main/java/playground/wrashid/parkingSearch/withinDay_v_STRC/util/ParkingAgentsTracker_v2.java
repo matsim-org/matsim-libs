@@ -21,7 +21,9 @@ package playground.wrashid.parkingSearch.withinDay_v_STRC.util;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -35,7 +37,7 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.WithinDayParkingControl
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
 
-public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements AfterMobsimListener {
+public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements IterationEndsListener {
 
 	protected ParkingStrategyManager parkingStrategyManager;
 	protected WithinDayParkingController controler;
@@ -62,7 +64,7 @@ public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements Aft
 	}
 
 	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
+	public void notifyIterationEnds(IterationEndsEvent event) {
 		parkingStrategyManager.printStrategyStatistics();
 	}
 
