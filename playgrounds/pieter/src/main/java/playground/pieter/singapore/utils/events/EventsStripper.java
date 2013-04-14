@@ -47,6 +47,8 @@ public class EventsStripper {
 
 		@Override
 		public void handleEvent(PersonEntersVehicleEvent event) {
+			if(!event.getPersonId().toString().startsWith("pt_"))
+				return;
 			String driver = event.getPersonId().toString();
 			String car = event.getVehicleId().toString();
 			for (String vehId : transitVehicleIds) {
@@ -143,8 +145,8 @@ public class EventsStripper {
 //		ids.add("4101962"); //transit user
 //		ids.add("77878"); //car user
 		try{
-		EventsStripper stripper = new EventsStripper(args[5].split(","));
-		stripper.stripEvents(args[0], args[1], Double.parseDouble(args[3]), Boolean.parseBoolean(args[4]));
+		EventsStripper stripper = new EventsStripper(args[4].split(","));
+		stripper.stripEvents(args[0], args[1], Double.parseDouble(args[2]), Boolean.parseBoolean(args[3]));
 		}catch(ArrayIndexOutOfBoundsException e){
 			System.out.println("Strips events file to a target events file.\n" +
 					"Arguments:\n" +
