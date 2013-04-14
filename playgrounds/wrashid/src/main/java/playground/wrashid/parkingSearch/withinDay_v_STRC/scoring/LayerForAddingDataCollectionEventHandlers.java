@@ -187,6 +187,11 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 			}
 		}
 		
+		List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
+		if (personId.toString().equalsIgnoreCase("267") && currentPlanElementIndex>14){
+			System.out.println(currentPlanElementIndex);
+		}
+		
 		if (lastParkingActivityPlanElemIndex.get(personId)-1==currentPlanElementIndex){
 			lastParkingArrivalTimeOfDay.put(personId, event.getTime());
 		}

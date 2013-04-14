@@ -32,6 +32,10 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -47,7 +51,7 @@ import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccu
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
-public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandlers {
+public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandlers implements ScoringListener {
 
 	private final ParkingPersonalBetas parkingPersonalBetas;
 
@@ -236,8 +240,11 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 	}
 
 	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		super.notifyAfterMobsim(event);
+	//public void notifyAfterMobsim(AfterMobsimEvent event) {
+	public void notifyScoring(ScoringEvent event) {
+	//public void notifyIterationEnds(IterationEndsEvent event) {
+		//super.notifyIterationEnds(event);
+		//super.notifyAfterMobsim(event);
 		for (Id personId : this.parkingIterationScoreSum.keySet()) {
 			processScoreOfLastParking(personId);
 
@@ -281,9 +288,12 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 		double parkingScore = 0.0;
 
 		Double parkingArrivalTime = lastParkingArrivalTimeOfDay.get(personId);
+		
 		double lastParkingActivityDurationOfDay = GeneralLib.getIntervalDuration(parkingArrivalTime,
 				firstParkingDepartureTimeOfDay.get(personId));
 
+		
+		
 		// parking cost scoring
 
 		Id lastParkingFacilityIdOfDay = this.lastParkingFacilityIdOfDay.get(personId);
@@ -341,5 +351,7 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 	public void setParkingAnalysisHandler(ParkingAnalysisHandler parkingAnalysisHandler) {
 		this.parkingAnalysisHandler = parkingAnalysisHandler;
 	}
+
+	
 
 }

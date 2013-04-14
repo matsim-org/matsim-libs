@@ -29,7 +29,9 @@ public class IntegerValueHashMap<KeyClass> {
 		return hm.values();
 	}
 	
-	
+	public boolean containsKey(KeyClass id){
+		return hm.containsKey(id);
+	}
 	
 	public IntegerValueHashMap(int defaultStartValue) {
 		this.defaultStartValue=defaultStartValue;
