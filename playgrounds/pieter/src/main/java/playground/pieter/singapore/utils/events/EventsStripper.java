@@ -71,6 +71,10 @@ public class EventsStripper {
 
 		this.populateList(ids);
 	}
+	public EventsStripper(String[] ids) {
+		choiceSet = ids;
+		
+	}
 
 	public EventsStripper(String plansFile) {
 		this.populateList(plansFile);
@@ -121,7 +125,6 @@ public class EventsStripper {
 			events.addHandler(transitDriverFinder);
 			reader = new EventsReaderXMLv1(events);
 			reader.parse(inFileName);
-
 			sampledIds.addAll(transitDriverFinder.transitDriverIds);
 			events = EventsUtils.createEventsManager();
 			filteredWriter = new TrimEventsWithPersonIds(outfileName,
@@ -135,12 +138,19 @@ public class EventsStripper {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
-		ArrayList<String> ids = new ArrayList<String>();
-		ids.add("4101962"); //transit user
-		ids.add("77878"); //car user
-		EventsStripper stripper = new EventsStripper(ids);
-		stripper.stripEvents(args[0], args[1], 1.0, true);
+//
+//		ArrayList<String> ids = new ArrayList<String>();
+//		ids.add("4101962"); //transit user
+//		ids.add("77878"); //car user
+		try{
+		EventsStripper stripper = new EventsStripper(args[5].split(","));
+		stripper.stripEvents(args[0], args[1], Double.parseDouble(args[3]), Boolean.parseBoolean(args[4]));
+		}catch(ArrayIndexOutOfBoundsException e){
+			System.out.println("Strips events file to a target events file.\n" +
+					"Arguments:\n" +
+					"inFileName (events file) outfileName (events file) frequency (0-1, i.e. fraction of ids to actually use)\n" +
+					"extracttransitDriverEvents(true/false) ids (comma-separated list of person ids, no spaces");
+		}
 	}
 
 }
