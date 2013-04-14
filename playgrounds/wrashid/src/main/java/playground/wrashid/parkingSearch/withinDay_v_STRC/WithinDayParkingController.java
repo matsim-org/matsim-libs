@@ -56,15 +56,9 @@ import playground.christoph.evacuation.trafficmonitoring.BikeTravelTime;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTime;
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
 import playground.christoph.parking.core.mobsim.InsertParkingActivities;
-import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.core.mobsim.ParkingQSimFactory;
 import playground.christoph.parking.core.utils.LegModeChecker;
-import playground.christoph.parking.withinday.identifier.ParkingSearchIdentifier;
 import playground.christoph.parking.withinday.replanner.ParkingSearchReplannerFactory;
-import playground.christoph.parking.withinday.replanner.strategy.NearestAvailableParkingSearch;
-import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchStrategy;
-import playground.christoph.parking.withinday.replanner.strategy.RandomParkingSearch;
-import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.analysis.ParkingAnalysisHandlerChessBoard;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
@@ -73,20 +67,18 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.replanner.ParkingSearch
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GarageParkingStrategy;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GeneralParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.StreetParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 import playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
-import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchStrategy;
 
 public class WithinDayParkingController extends WithinDayController implements ReplanningListener {
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 1;
+	protected int numReplanningThreads = 6;
 
 	/*
 	 * How many nodes should be checked when adapting an existing route

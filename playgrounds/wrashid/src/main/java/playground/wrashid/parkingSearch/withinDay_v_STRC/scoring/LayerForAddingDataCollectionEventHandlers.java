@@ -28,32 +28,18 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureDurationOfLastParkingOfDay;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureFirstCarDepartureTimeOfDay;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureLastActivityDurationOfDay;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureParkingWalkTimesDuringDay;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CapturePreviousActivityDurationDuringDay;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureWalkDurationOfFirstAndLastOfDay;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateEndTimeOfPreviousActivity;
-import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateLastParkingArrivalTime;
 
 public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTracker_v2 {
 
@@ -185,11 +171,6 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 					firstParkingWalkTimeOfDay.put(personId, arrivalTime-mostRecentDepartureTime.get(personId));
 				}
 			}
-		}
-		
-		List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
-		if (personId.toString().equalsIgnoreCase("267") && currentPlanElementIndex>14){
-			System.out.println(currentPlanElementIndex);
 		}
 		
 		if (lastParkingActivityPlanElemIndex.get(personId)-1==currentPlanElementIndex){

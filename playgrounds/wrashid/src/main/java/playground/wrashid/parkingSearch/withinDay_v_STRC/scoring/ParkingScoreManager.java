@@ -31,10 +31,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
@@ -309,7 +306,7 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 		parkingScore += costScore;
 
 		// parking walk time
-
+		
 		double walkingTimeTotalInMinutes = (firstParkingWalkTimeOfDay.get(personId) + lastParkingWalkTimeOfDay.get(personId)) / 60.0;
 		double walkScore = getWalkScore(personId, lastParkingActivityDurationOfDay, walkingTimeTotalInMinutes);
 		parkingScore += walkScore;
