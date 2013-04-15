@@ -72,7 +72,9 @@ final class SelectorUtils {
 		if ( !isBlocking ) {
 			// if the plan found here remains feasible,
 			// no need to re-do the search.
-			assert nonBlockingPlan.getAllIndividualPlans().size() == groupPlan.getAllIndividualPlans().size();
+			assert nonBlockingPlan.getAllIndividualPlans().size() == groupPlan.getAllIndividualPlans().size() :
+				"nonBlockingGroupPlanSize="+nonBlockingPlan.getAllIndividualPlans().size()+
+				 " testedGroupPlanSize="+groupPlan.getAllIndividualPlans().size();
 			knownFeasibleAllocations.addFeasibleAllocation( nonBlockingPlan );
 		}
 
@@ -244,6 +246,28 @@ final class SelectorUtils {
 		}
 
 		return new GroupPlans( jointPlans , individualPlans );
+	}
+
+	public static void addToGroupPlans(
+			final GroupPlans groupPlans,
+			final PlanAllocation allocation) {
+		final Set<JointPlan> knownJointPlans = new HashSet<JointPlan>();
+		for ( PlanRecord p : allocation.getPlans() ) {
+			if ( p.jointPlan != null ) {
+				if ( knownJointPlans.add( p.jointPlan ) ) {
+					groupPlans.addJointPlan( p.jointPlan );
+				}
+			}
+			else {
+				groupPlans.addIndividualPlan( p.plan );
+			}
+		}
+	}
+
+	public static PlanAllocation copy(final PlanAllocation allocation) {
+		final PlanAllocation copy = new PlanAllocation();
+		copy.addAll( allocation.getPlans() );
+		return copy;
 	}
 }
 

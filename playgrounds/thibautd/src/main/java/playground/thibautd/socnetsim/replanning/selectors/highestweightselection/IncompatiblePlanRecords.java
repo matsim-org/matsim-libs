@@ -20,9 +20,11 @@
 package playground.thibautd.socnetsim.replanning.selectors.highestweightselection;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
@@ -31,7 +33,8 @@ import playground.thibautd.utils.MapUtils;
 /**
  * @author thibautd
  */
-class IncompatiblePlanRecords {
+final class IncompatiblePlanRecords {
+	private final Set<Id> allIncompatibilityGroupIds;
 	private final IncompatiblePlansIdentifier identifier;
 	private final Map<PlanRecord, Collection<PlanRecord>> cachedIncompatiblePlans =
 		new HashMap<PlanRecord, Collection<PlanRecord>>();
@@ -42,10 +45,13 @@ class IncompatiblePlanRecords {
 		this.identifier = identifier;
 		final Map<Id, Collection<PlanRecord>> plansPerGroup = new HashMap<Id, Collection<PlanRecord>>();
 
+		final HashSet<Id> ids = new HashSet<Id>();
+		this.allIncompatibilityGroupIds = Collections.unmodifiableSet( ids );
 		for ( PersonRecord person : personRecords.values() ) {
 			for ( PlanRecord plan : person.plans ) {
 				for ( Id group : identifier.identifyIncompatibilityGroups( plan.plan ) ) {
 					MapUtils.getCollection( group , plansPerGroup ).add( plan );
+					ids.add( group );
 				}
 			}
 		}
@@ -60,6 +66,10 @@ class IncompatiblePlanRecords {
 							plan));
 			}
 		}
+	}
+
+	public Set<Id> getAllIncompatibilityGroupIds() {
+		return allIncompatibilityGroupIds;
 	}
 
 	public Collection<PlanRecord> getIncompatiblePlans( final PlanRecord record ) {

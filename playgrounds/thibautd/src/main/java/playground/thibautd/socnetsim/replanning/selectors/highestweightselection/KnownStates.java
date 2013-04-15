@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MapUtils.java
+ * KnownStates.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,72 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
+package playground.thibautd.socnetsim.replanning.selectors.highestweightselection;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
+
+import playground.thibautd.utils.MapUtils;
+
 /**
  * @author thibautd
  */
-public class MapUtils {
-	private MapUtils() {}
+final class KnownStates {
+	private final Map<List<PersonRecord>, Map<Set<Id>, PlanAllocation>> cache =
+			new HashMap<List<PersonRecord>, Map<Set<Id>, PlanAllocation>>();
 
-	public static <K,V> Collection<V> getCollection(
-			final K key,
-			final Map<K, Collection<V>> map) {
-		Collection<V> coll = map.get( key );
+	public void cache(
+			final List<PersonRecord> personsToAllocate,
+			final Set<Id> allowedIncompatibilityGroups,
+			final PlanAllocation allocation) {
+		if ( allocation == null ) return;
 
-		if ( coll == null ) {
-			coll = new ArrayList<V>();
-			map.put( key , coll );
-		}
+		assert personsToAllocate.size() == allocation.getPlans().size() :
+			personsToAllocate.size()+" != "+allocation.getPlans().size();
 
-		return coll;
+		MapUtils.getMap( personsToAllocate , cache ).put(
+				allowedIncompatibilityGroups,
+				SelectorUtils.copy( allocation ) );
 	}
 
-	public static <K,V> List<V> getList(
-			final K key,
-			final Map<K, List<V>> map) {
-		List<V> coll = map.get( key );
+	public PlanAllocation getCached(
+			final List<PersonRecord> personsToAllocate,
+			final Set<Id> allowedIncompatibilityGroups) {
+		final PlanAllocation cached = 
+			MapUtils.getMap( personsToAllocate , cache ).get(
+				allowedIncompatibilityGroups );
 
-		if ( coll == null ) {
-			coll = new ArrayList<V>();
-			map.put( key , coll );
-		}
+		if ( cached == null ) return null;
+		assert personsToAllocate.size() == cached.getPlans().size() :
+			personsToAllocate.size()+" != "+cached.getPlans().size();
 
-		return coll;
-	}
-
-	public static <K,V> Set<V> getSet(
-			final K key,
-			final Map<K, Set<V>> map) {
-		Set<V> coll = map.get( key );
-
-		if ( coll == null ) {
-			coll = new HashSet<V>();
-			map.put( key , coll );
-		}
-
-		return coll;
-	}
-
-	public static <K,C,V> Map<C,V> getMap(
-			final K key,
-			final Map<K, Map<C,V>> map) {
-		Map<C,V> coll = map.get( key );
-
-		if ( coll == null ) {
-			coll = new HashMap<C,V>();
-			map.put( key , coll );
-		}
-
-		return coll;
+		return SelectorUtils.copy( cached );
 	}
 }
 

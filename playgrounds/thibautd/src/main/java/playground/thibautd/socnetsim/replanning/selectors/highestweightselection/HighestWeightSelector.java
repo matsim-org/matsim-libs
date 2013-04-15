@@ -29,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -104,12 +103,17 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					personRecords );
 
 		final PlanAllocation allocation = buildPlanString(
+				new KnownStates(),
 				new KnownFeasibleAllocations( 20 ),
 				incompatibleRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
 				personRecords,
 				forbidBlockingCombinations ? new PlanAllocation() : null,
+				incompatibleRecords.getAllIncompatibilityGroupIds(),
 				Double.NEGATIVE_INFINITY);
+
+		assert allocation == null || allocation.getPlans().size() == group.getPersons().size() :
+				allocation.getPlans().size()+" != "+group.getPersons().size();
 
 		final GroupPlans plans = allocation == null ? null : SelectorUtils.toGroupPlans( allocation );
 
@@ -209,15 +213,45 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	 * @param str the PlanString of the plan constructed until now
 	 */
 	private PlanAllocation buildPlanString(
+			final KnownStates knownStates,
 			final KnownFeasibleAllocations knownFeasibleAllocations,
 			final IncompatiblePlanRecords incompatibleRecords,
 			final List<PersonRecord> personsStillToAllocate,
 			final Map<Id, PersonRecord> allPersons,
 			// needed to check whether a leave is forbidden or not
 			final PlanAllocation currentAllocation,
+			final Set<Id> allowedIncompatibilityGroups,
 			final double minimalWeightToObtain) {
-		assert currentAllocation == null ||
-				!SelectorUtils.intersectsRecords( personsStillToAllocate , currentAllocation );
+		/*scope of cachedAlloc*/ {
+			final PlanAllocation cachedAlloc = knownStates == null ? null :
+				knownStates.getCached(
+					personsStillToAllocate,
+					allowedIncompatibilityGroups );
+
+			if ( cachedAlloc != null ) {
+				if ( !forbidBlockingCombinations ||
+						!SelectorUtils.isBlocking(
+								knownFeasibleAllocations,
+								incompatibleRecords,
+								allPersons,
+								SelectorUtils.toGroupPlans(
+									SelectorUtils.merge(
+										currentAllocation,
+										cachedAlloc ) ) ) ) {
+					assert cachedAlloc.equals(
+							buildPlanString(
+								null,
+								new KnownFeasibleAllocations( 0 ),
+								incompatibleRecords,
+								personsStillToAllocate,
+								allPersons,
+								currentAllocation,
+								allowedIncompatibilityGroups,
+								Double.NEGATIVE_INFINITY) );
+					return cachedAlloc;
+				}
+			}
+		}
 
 		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
@@ -298,11 +332,16 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 				if ( currentAllocation != null ) currentAllocation.addAll( newAllocation.getPlans() );
 				newString = buildPlanString(
+						knownStates,
 						knownFeasibleAllocations,
 						incompatibleRecords,
 						actuallyRemainingPersons,
 						allPersons,
 						currentAllocation,
+						newIncompatibilityGroups(
+							incompatibleRecords,
+							allowedIncompatibilityGroups,
+							r ),
 						Math.max(
 							minimalWeightToObtain,
 							constructedString != null ?
@@ -330,8 +369,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 								knownFeasibleAllocations,
 								incompatibleRecords,
 								allPersons,
-								SelectorUtils.toGroupPlans( SelectorUtils.merge( currentAllocation , newAllocation ) ) ) ) {
-						newString = null;
+								SelectorUtils.toGroupPlans(
+									SelectorUtils.merge(
+										currentAllocation,
+										newAllocation ) ) ) ) {
+					newString = null;
 				}
 			}
 
@@ -349,7 +391,29 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 
 		assert constructedString == null || constructedString.getPlans().size() == personsStillToAllocate.size() :
 			constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
+
+		if ( knownStates != null ) {
+			knownStates.cache(
+					personsStillToAllocate,
+					allowedIncompatibilityGroups,
+					constructedString );
+		}
+
 		return constructedString;
+	}
+
+	private static Set<Id> newIncompatibilityGroups(
+			final IncompatiblePlanRecords incompatibleRecords,
+			final Set<Id> allowedIncompatibilityGroups,
+			final PlanRecord r ) {
+		final Set<Id> forbid = incompatibleRecords.getIncompatiblePlanIdentifier().identifyIncompatibilityGroups( r.plan );
+
+		if ( forbid.isEmpty() ) return allowedIncompatibilityGroups;
+
+		final Set<Id> newSet = new HashSet<Id>( allowedIncompatibilityGroups );
+		newSet.removeAll( forbid );
+
+		return newSet;
 	}
 
 	private static void weightPlanRecords(
