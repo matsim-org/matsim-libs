@@ -31,6 +31,7 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private double vehicleAllocation = -1;
 	private double planVehicleAllocation = -1;
 	private boolean jtmOptimizes = true;
+	private boolean doSynchronize = true;
 
 	public WeightsConfigGroup() {
 		super( GROUP_NAME );
@@ -123,4 +124,15 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	public void setJtmOptimizes(final boolean v) {
 		this.jtmOptimizes = v;
 	}
+
+	@StringGetter( "doSynchronize" )
+	public boolean getDoSynchronize() {
+		return doSynchronize;
+	}
+
+	@StringSetter( "doSynchronize" )
+	public void setDoSynchronize(final boolean v) {
+		this.doSynchronize = v;
+	}
+
 }

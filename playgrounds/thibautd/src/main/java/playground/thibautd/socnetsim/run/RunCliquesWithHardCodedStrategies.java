@@ -93,6 +93,8 @@ public class RunCliquesWithHardCodedStrategies {
 		final Config config = scenario.getConfig();
 		final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
 					config.getModule( CliquesConfigGroup.GROUP_NAME );
+		final WeightsConfigGroup weights = (WeightsConfigGroup)
+					config.getModule( WeightsConfigGroup.GROUP_NAME );
 
 		final FixedGroupsIdentifier cliques = 
 			config.scenario().isUseHouseholds() ?
@@ -102,7 +104,16 @@ public class RunCliquesWithHardCodedStrategies {
 					cliquesConf.getInputFile() );
 
 		final PlanLinkIdentifier planLinkIdentifier =
-			new DefaultPlanLinkIdentifier();
+			weights.getDoSynchronize() ?
+				new DefaultPlanLinkIdentifier() :
+				new PlanLinkIdentifier() {
+					@Override
+					public boolean areLinked(
+							final Plan p1,
+							final Plan p2) {
+						return false;
+					}
+				};
 
 		final GenericPlanAlgorithm<ReplanningGroup> additionalPrepareAlgo =
 			scenario.getScenarioElement( VehicleRessources.class ) != null ?
@@ -129,6 +140,7 @@ public class RunCliquesWithHardCodedStrategies {
 					.withAdditionalPrepareForSimAlgorithms(
 							additionalPrepareAlgo )
 					.withIncompatiblePlansIdentifierFactory(
+						weights.getDoSynchronize() &&
 						scenario.getScenarioElement( VehicleRessources.class ) != null ?
 							new VehicleBasedIncompatiblePlansIdentifierFactory( TransportMode.car ) :
 							new EmptyIncompatiblePlansIdentifierFactory() )
@@ -157,7 +169,11 @@ public class RunCliquesWithHardCodedStrategies {
 			RunUtils.loadDefaultAnalysis( cliques , controller );
 		}
 
-		RunUtils.addConsistencyCheckingListeners( controller );
+		if ( weights.getDoSynchronize() ) {
+			// those listenners check the coordination behavior:
+			// do not ad if not used
+			RunUtils.addConsistencyCheckingListeners( controller );
+		}
 
 		// run it
 		controller.run();
