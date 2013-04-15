@@ -29,10 +29,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 public class FilteredScoreStats extends AbstractPlanAnalyzerPerGroup {
 
 	public FilteredScoreStats(
+			final int graphWriteInterval,
 			final OutputDirectoryHierarchy controlerIO,
 			final Scenario scenario,
 			final GroupIdentifier groupIdentifier) {
-		super(controlerIO, scenario, groupIdentifier);
+		super(graphWriteInterval, controlerIO, scenario, groupIdentifier);
 	}
 
 	@Override

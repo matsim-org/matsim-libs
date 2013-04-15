@@ -33,10 +33,11 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 public class JointTripsStats extends AbstractPlanAnalyzerPerGroup {
 
 	public JointTripsStats(
+			final int graphWriteInterval,
 			final OutputDirectoryHierarchy controlerIO,
 			final Scenario scenario,
 			final GroupIdentifier groupIdentifier) {
-		super(controlerIO, scenario, groupIdentifier);
+		super(graphWriteInterval, controlerIO, scenario, groupIdentifier);
 	}
 
 	@Override

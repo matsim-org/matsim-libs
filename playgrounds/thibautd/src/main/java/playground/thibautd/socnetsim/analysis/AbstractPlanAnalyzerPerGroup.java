@@ -57,6 +57,7 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 		public Iterable<Id> getGroups(Person person);
 	}
 
+	private final int graphWriteInterval;
 	private final Scenario scenario;
 	private final GroupIdentifier groupIdentifier;
 	private final String fileName;
@@ -65,9 +66,11 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 	private final HistoryPerGroup historyPerGroup = new HistoryPerGroup();
 
 	public AbstractPlanAnalyzerPerGroup(
+			final int graphWriteInterval,
 			final OutputDirectoryHierarchy controlerIO,
 			final Scenario scenario,
 			final GroupIdentifier groupIdentifier) {
+		this.graphWriteInterval = graphWriteInterval;
 		this.scenario = scenario;
 		this.groupIdentifier = groupIdentifier;
 		fileName = controlerIO.getOutputFilename( getStatName()+"Stats" );
@@ -106,7 +109,9 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 			final Id groupId = entry.getKey();
 			final History history = entry.getValue();
 			dropDataFile( groupId , history );
-			dropChart( groupId , history );
+			if ( graphWriteInterval < 1 || event.getIteration() % graphWriteInterval == 0 ) {
+				dropChart( groupId , history );
+			}
 		}
 
 		try {

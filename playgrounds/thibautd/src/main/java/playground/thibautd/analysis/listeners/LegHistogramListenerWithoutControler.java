@@ -33,15 +33,17 @@ import org.matsim.core.controler.listener.IterationStartsListener;
  * @author thibautd
  */
 public class LegHistogramListenerWithoutControler implements IterationEndsListener, IterationStartsListener {
-
+	private final int writeGraphicInterval;
 	private final LegHistogram histogram;
 	private final OutputDirectoryHierarchy controlerIO;
 
 	static private final Logger log = Logger.getLogger(LegHistogramListenerWithoutControler.class);
 
 	public LegHistogramListenerWithoutControler(
+			final int writeGraphicInterval,
 			final EventsManager events,
 			final OutputDirectoryHierarchy io) {
+		this.writeGraphicInterval = writeGraphicInterval;
 		this.histogram = new LegHistogram(300);
 		events.addHandler( histogram );
 		this.controlerIO = io;
@@ -57,9 +59,11 @@ public class LegHistogramListenerWithoutControler implements IterationEndsListen
 		this.histogram.write( controlerIO.getIterationFilename(event.getIteration(), "legHistogram.txt") );
 		this.printStats();
 
-		this.histogram.writeGraphic( controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
-		for (String legMode : this.histogram.getLegModes()) {
-			this.histogram.writeGraphic(controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
+		if ( writeGraphicInterval < 1 || event.getIteration() % writeGraphicInterval == 0 ) {
+			this.histogram.writeGraphic( controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
+			for (String legMode : this.histogram.getLegModes()) {
+				this.histogram.writeGraphic(controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
+			}
 		}
 	}
 

@@ -55,6 +55,7 @@ import playground.thibautd.utils.charts.WrapperChartUtil;
  * @author thibautd
  */
 public class TripModeShares implements IterationEndsListener, ShutdownListener {
+	private final int graphWriteInterval;
 	private final String pngFileName;
 	private final Scenario scenario;
 	private final MainModeIdentifier mainModeIdentifier;
@@ -64,10 +65,12 @@ public class TripModeShares implements IterationEndsListener, ShutdownListener {
 	private final History history = new History();
 
 	public TripModeShares(
+			final int graphWriteInterval,
 			final OutputDirectoryHierarchy outputDirectoryHierarchy,
 			final Scenario scenario,
 			final MainModeIdentifier mainModeIdentifier,
 			final StageActivityTypes stageActivityTypes) {
+		this.graphWriteInterval = graphWriteInterval;
 		this.scenario = scenario;
 		this.mainModeIdentifier = mainModeIdentifier;
 		this.stageActivityTypes = stageActivityTypes;
@@ -89,7 +92,9 @@ public class TripModeShares implements IterationEndsListener, ShutdownListener {
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		recordHistory( event.getIteration() );
 		writeDataFile( event.getIteration() );
-		writePng( );
+		if ( graphWriteInterval < 1 || event.getIteration() % graphWriteInterval == 1 ) {
+			writePng( );
+		}
 	}
 
 	private void writePng() {

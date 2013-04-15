@@ -44,7 +44,6 @@ import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
-import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.analysis.listeners.TripModeShares;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
@@ -69,6 +68,7 @@ import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 public class RunUtils {
 	private static final Logger log =
 		Logger.getLogger(RunUtils.class);
+	private static final int GRAPH_WRITE_INTERVAL = 100;
 
 	private RunUtils() {}
 
@@ -133,6 +133,7 @@ public class RunUtils {
 			final ImmutableJointController controller) {
 		controller.addControlerListener(
 				new LegHistogramListenerWithoutControler(
+					GRAPH_WRITE_INTERVAL,
 					controller.getRegistry().getEvents(),
 					controller.getControlerIO() ));
 
@@ -142,12 +143,14 @@ public class RunUtils {
 
 		controller.addControlerListener(
 				new FilteredScoreStats(
+					GRAPH_WRITE_INTERVAL,
 					controller.getControlerIO(),
 					controller.getRegistry().getScenario(),
 					groupIdentifier));
 
 		controller.addControlerListener(
 				new JointPlanSizeStats(
+					GRAPH_WRITE_INTERVAL,
 					controller.getControlerIO(),
 					controller.getRegistry().getScenario(),
 					groupIdentifier));
@@ -160,6 +163,7 @@ public class RunUtils {
 		if ( weights.getJointTripMutationWeight() > 0 ) {
 			controller.addControlerListener(
 					new JointTripsStats(
+						GRAPH_WRITE_INTERVAL,
 						controller.getControlerIO(),
 						controller.getRegistry().getScenario(),
 						groupIdentifier));
@@ -171,6 +175,7 @@ public class RunUtils {
 		actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 		controller.addControlerListener(
 				new TripModeShares(
+					GRAPH_WRITE_INTERVAL,
 					controller.getControlerIO(),
 					controller.getRegistry().getScenario(),
 					new MainModeIdentifier() {
@@ -192,8 +197,6 @@ public class RunUtils {
 						}
 					},
 					actTypesForAnalysis));
-
-		controller.getRegistry().getEvents().addHandler( new ModeAnalysis( true ) );
 	}
 
 	public static void addConsistencyCheckingListeners(final ImmutableJointController controller) {
