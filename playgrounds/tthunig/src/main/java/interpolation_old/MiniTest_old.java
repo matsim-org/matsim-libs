@@ -1,6 +1,5 @@
-package interpolation.test;
+package interpolation_old;
 
-import interpolation.Interpolation;
 
 import java.io.File;
 import java.io.FileWriter;

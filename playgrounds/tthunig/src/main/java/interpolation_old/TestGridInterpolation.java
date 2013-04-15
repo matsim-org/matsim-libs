@@ -1,6 +1,5 @@
 package interpolation_old;
 
-import interpolation.Interpolation;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
