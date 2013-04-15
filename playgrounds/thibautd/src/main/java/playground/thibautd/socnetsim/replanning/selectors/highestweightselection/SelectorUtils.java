@@ -233,11 +233,11 @@ final class SelectorUtils {
 	}
 
 	public static PlanAllocation merge(
-			final PlanAllocation currentAllocation,
-			final PlanAllocation constructedString) {
+			final PlanAllocation a1,
+			final PlanAllocation a2) {
 		final PlanAllocation merged = new PlanAllocation();
-		merged.addAll( currentAllocation.getPlans() );
-		merged.addAll( constructedString.getPlans() );
+		if ( a1 != null ) merged.addAll( a1.getPlans() );
+		if ( a2 != null ) merged.addAll( a2.getPlans() );
 		return merged;
 	}
 

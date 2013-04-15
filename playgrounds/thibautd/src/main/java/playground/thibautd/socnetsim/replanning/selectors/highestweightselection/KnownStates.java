@@ -34,13 +34,50 @@ import playground.thibautd.utils.MapUtils;
 final class KnownStates {
 	private final Map<List<PersonRecord>, Map<Set<Id>, PlanAllocation>> cache =
 			new HashMap<List<PersonRecord>, Map<Set<Id>, PlanAllocation>>();
+	private final Map<List<PersonRecord>, Map<Set<Id>, DecreasingDouble>> unfeasible =
+			new HashMap<List<PersonRecord>, Map<Set<Id>, DecreasingDouble>>();
 
 	public void cache(
 			final List<PersonRecord> personsToAllocate,
 			final Set<Id> allowedIncompatibilityGroups,
-			final PlanAllocation allocation) {
-		if ( allocation == null ) return;
+			final PlanAllocation allocation,
+			final double minimalWeight) {
+		if ( allocation == null ) {
+			cacheUnfeasible(
+					personsToAllocate,
+					allowedIncompatibilityGroups,
+					minimalWeight);
+		}
+		else {
+			cacheFeasible(
+					personsToAllocate,
+					allowedIncompatibilityGroups,
+					allocation);
+		}
+	}
 
+	private void cacheUnfeasible(
+			final List<PersonRecord> personsToAllocate,
+			final Set<Id> allowedIncompatibilityGroups,
+			final double minimalWeight) {
+		final Map<Set<Id>, DecreasingDouble> map =
+			MapUtils.getMap( personsToAllocate , unfeasible );
+		DecreasingDouble cachedWeight = map.get(
+					allowedIncompatibilityGroups );
+
+		if ( cachedWeight == null ) {
+			cachedWeight = new DecreasingDouble();
+			map.put( allowedIncompatibilityGroups , cachedWeight );
+		}
+
+		cachedWeight.set( minimalWeight );
+	}
+
+	private void cacheFeasible(
+			final List<PersonRecord> personsToAllocate,
+			final Set<Id> allowedIncompatibilityGroups,
+			final PlanAllocation allocation) {
+		assert allocation != null;
 		assert personsToAllocate.size() == allocation.getPlans().size() :
 			personsToAllocate.size()+" != "+allocation.getPlans().size();
 
@@ -62,5 +99,32 @@ final class KnownStates {
 
 		return SelectorUtils.copy( cached );
 	}
+
+	public boolean isUnfeasible(
+			final List<PersonRecord> personsToAllocate,
+			final Set<Id> allowedIncompatibilityGroups,
+			final double minWeightToObtain) {
+		final Map<Set<Id>, DecreasingDouble> map =
+			unfeasible.get( personsToAllocate );
+
+		if ( map == null ) return false;
+
+		final DecreasingDouble cachedWeight = map.get(
+					allowedIncompatibilityGroups );
+
+		if ( cachedWeight == null ) return false;
+		return minWeightToObtain >= cachedWeight.get();
+	}
 }
 
+final class DecreasingDouble {
+	private double v = Double.POSITIVE_INFINITY;
+
+	public void set(final double newV) {
+		if ( newV < v ) v = newV;
+	}
+
+	public double get() {
+		return v;
+	}
+}
