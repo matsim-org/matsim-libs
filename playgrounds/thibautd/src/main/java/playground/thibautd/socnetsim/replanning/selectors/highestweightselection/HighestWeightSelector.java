@@ -247,7 +247,18 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 								allPersons,
 								currentAllocation,
 								allowedIncompatibilityGroups,
-								Double.NEGATIVE_INFINITY) );
+								Double.NEGATIVE_INFINITY) ) :
+						"cachedWeight="+cachedAlloc.getWeight()+
+						 " searchWeight="+
+							buildPlanString(
+								null,
+								new KnownFeasibleAllocations( 0 ),
+								incompatibleRecords,
+								personsStillToAllocate,
+								allPersons,
+								currentAllocation,
+								allowedIncompatibilityGroups,
+								Double.NEGATIVE_INFINITY).getWeight();
 					return cachedAlloc;
 				}
 			}
@@ -392,7 +403,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		assert constructedString == null || constructedString.getPlans().size() == personsStillToAllocate.size() :
 			constructedString.getPlans().size()+" plans for "+personsStillToAllocate.size()+" agents";
 
-		if ( knownStates != null ) {
+		if ( knownStates != null &&
+				(!forbidBlockingCombinations ||
+				 !SelectorUtils.searchForBlockableCombinations(
+					 incompatibleRecords,
+					 personsStillToAllocate)) ) {
 			knownStates.cache(
 					personsStillToAllocate,
 					allowedIncompatibilityGroups,

@@ -81,7 +81,30 @@ final class SelectorUtils {
 		return isBlocking;
 	}
 
+
 	public static boolean searchForCombinationsWithoutForbiddenPlans(
+			final IncompatiblePlanRecords incompatibleRecords,
+			final GroupPlans constructedPlan,
+			final List<PersonRecord> personsStillToAllocate) {
+		return searchForCombinationsWithoutForbiddenPlans(
+			false,
+			incompatibleRecords,
+			constructedPlan,
+			personsStillToAllocate);
+	}
+
+	public static boolean searchForBlockableCombinations(
+			final IncompatiblePlanRecords incompatibleRecords,
+			final List<PersonRecord> personsStillToAllocate) {
+		return searchForCombinationsWithoutForbiddenPlans(
+			true,
+			incompatibleRecords,
+			null,
+			personsStillToAllocate);
+	}
+
+	private static boolean searchForCombinationsWithoutForbiddenPlans(
+			final boolean valueIfNothing,
 			final IncompatiblePlanRecords incompatibleRecords,
 			final GroupPlans constructedPlan,
 			final List<PersonRecord> personsStillToAllocate) {
@@ -120,7 +143,7 @@ final class SelectorUtils {
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 			}
 
-			boolean found = true;
+			boolean found = !valueIfNothing;
 			if ( !actuallyRemainingPersons.isEmpty() ) {
 				tagIncompatiblePlansAsInfeasible(
 						r,
@@ -136,12 +159,12 @@ final class SelectorUtils {
 			}
 
 			if (found) {
-				add( constructedPlan , r );
+				if ( constructedPlan != null ) add( constructedPlan , r );
 				return true;
 			}
 		}
 
-		return false;
+		return valueIfNothing;
 	}
 
 	private static void add(
