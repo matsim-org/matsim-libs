@@ -208,7 +208,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
 		
 		// get road pricing scheme
-		RoadPricingSchemeImpl scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
+		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
 
 		// init extended Least Cost Path Tree for car (free speed and congested) mode
 		if(usingCarParameterFromMATSim){
@@ -222,7 +222,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
 			}
 		}
-		else{					
+		else{ // this can be removed when external parameters are not considered anymore
 			TravelDisutilityFactory tdFactory = controler.getTravelDisutilityFactory();
 			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup();
 			cnScoringGroup.setMarginalUtilityOfMoney( this.betaCarTMC );
@@ -258,7 +258,8 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 									 network,
 									 measuringPointIterator, 
 									 measuringPointsCell.getZones().size(),
-									 PARCEL_BASED);
+									 PARCEL_BASED,
+									 controler);
 			
 			System.out.println();
 

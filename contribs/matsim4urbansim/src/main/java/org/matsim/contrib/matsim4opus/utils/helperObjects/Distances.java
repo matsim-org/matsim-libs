@@ -67,7 +67,7 @@ public class Distances{
 	 * point and the nearest node
 	 * @return
 	 */
-	public double getDisatancePoint2Road(){
+	public double getDistancePoint2Road(){
 		return this.distancePoint2Road;
 	}
 	

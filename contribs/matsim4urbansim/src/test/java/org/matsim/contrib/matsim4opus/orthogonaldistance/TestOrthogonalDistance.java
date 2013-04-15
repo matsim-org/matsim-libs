@@ -106,11 +106,11 @@ public class TestOrthogonalDistance extends MatsimTestCase{
 		Distances distanceFromNode5ToNode1_Link1 = NetworkUtil.getDistance2Node(network.getLinks().get(new IdImpl(1)), network.getNodes().get(new IdImpl(5)).getCoord(), network.getNodes().get(new IdImpl(1)));
 		
 		//sum up the two parts of the distance for all calculated values
-		double doubleDistanceFromNode2ToNode2_Link1 = distanceFromNode2ToNode2_Link1.getDisatancePoint2Road() + distanceFromNode2ToNode2_Link1.getDistanceRoad2Node();
-		double doubleDistanceFromNode2ToNode1_Link2 = distanceFromNode2ToNode1_Link2.getDisatancePoint2Road() + distanceFromNode2ToNode1_Link2.getDistanceRoad2Node();
-		double doubleDistanceFromNode2ToNode4_Link5 = distanceFromNode2ToNode4_Link5.getDisatancePoint2Road() + distanceFromNode2ToNode4_Link5.getDistanceRoad2Node();
-		double doubleDistanceFromNode2ToNode1_Link4 = distanceFromNode2ToNode1_Link4.getDisatancePoint2Road() + distanceFromNode2ToNode1_Link4.getDistanceRoad2Node();
-		double doubleDistanceFromNode5ToNode1_Link1 = distanceFromNode5ToNode1_Link1.getDisatancePoint2Road() + distanceFromNode5ToNode1_Link1.getDistanceRoad2Node();
+		double doubleDistanceFromNode2ToNode2_Link1 = distanceFromNode2ToNode2_Link1.getDistancePoint2Road() + distanceFromNode2ToNode2_Link1.getDistanceRoad2Node();
+		double doubleDistanceFromNode2ToNode1_Link2 = distanceFromNode2ToNode1_Link2.getDistancePoint2Road() + distanceFromNode2ToNode1_Link2.getDistanceRoad2Node();
+		double doubleDistanceFromNode2ToNode4_Link5 = distanceFromNode2ToNode4_Link5.getDistancePoint2Road() + distanceFromNode2ToNode4_Link5.getDistanceRoad2Node();
+		double doubleDistanceFromNode2ToNode1_Link4 = distanceFromNode2ToNode1_Link4.getDistancePoint2Road() + distanceFromNode2ToNode1_Link4.getDistanceRoad2Node();
+		double doubleDistanceFromNode5ToNode1_Link1 = distanceFromNode5ToNode1_Link1.getDistancePoint2Road() + distanceFromNode5ToNode1_Link1.getDistanceRoad2Node();
 				
 		log.info("distance from node 2 to node 2 with link 1: " + doubleDistanceFromNode2ToNode2_Link1 );
 		log.info("distance from node 2 to node 1 with link 2: " + doubleDistanceFromNode2ToNode1_Link2 );

@@ -101,18 +101,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		NodeDataExtended nde = nodeDataExt.get( fromNode.getId() );
 		double currDistance = nde.getDistance();
 		double currToll = nde.getToll();
-		
-		if(currToll > 0)
-			System.out.println(currToll);
-		
-		if( (fromNode.getId() == new IdImpl(2748)) || (fromNode.getId() == new IdImpl(2754)) || 
-				(fromNode.getId() == new IdImpl(2741)) || (fromNode.getId() == new IdImpl(4303)) || 
-				(fromNode.getId() == new IdImpl(2596)) || (fromNode.getId() == new IdImpl(4256)) || 
-				(fromNode.getId() == new IdImpl(4304)) || (fromNode.getId() == new IdImpl(2740)) || 
-				(fromNode.getId() == new IdImpl(2808)) || (fromNode.getId() == new IdImpl(2739)) || 
-				(fromNode.getId() == new IdImpl(1572)) || (fromNode.getId() == new IdImpl(2738)))
-			System.out.println("XXXX");
-		
+
 		// query toll
 		double toll = 0.;
 		if(this.scheme != null){

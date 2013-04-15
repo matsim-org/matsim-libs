@@ -576,7 +576,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar(); 	// this is [utils/money * money/meter] = [utils/meter]
 			betaCarTDPower	= 0.;																														// useful setting for MonetaryDistanceCostRateCar: 10cent/km (only fuel) or 
 			betaCarLnTD		= 0.;																														// 80cent/km (including taxes, insurance ...)
-			betaCarTMC		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
+			betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaCarTMCPower	= 0.;
 			betaCarLnTMC	= 0.;
 		}
@@ -602,7 +602,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaBikeTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther(); // [utils/meter]
 			betaBikeTDPower	= 0.;												
 			betaBikeLnTD	= 0.;
-			betaBikeTMC		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
+			betaBikeTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaBikeTMCPower= 0.;
 			betaBikeLnTMC	= 0.;
 		}
@@ -628,7 +628,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk(); // [utils/meter]
 			betaWalkTDPower	= 0.;												
 			betaWalkLnTD	= 0.;
-			betaWalkTMC		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
+			betaWalkTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaWalkTMCPower= 0.;
 			betaWalkLnTMC	= 0.;
 		}
@@ -651,10 +651,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
 			betaPtTTPower	= 0.;
 			betaPtLnTT		= 0.;
-			betaPtTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther(); // [utils/meter]
+			betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt(); // [utils/meter]
 			betaPtTDPower	= 0.;												
 			betaPtLnTD		= 0.;
-			betaPtTMC		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
+			betaPtTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
 			betaPtTMCPower	= 0.;
 			betaPtLnTMC		= 0.;
 		}

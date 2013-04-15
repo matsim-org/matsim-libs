@@ -391,15 +391,15 @@ public class NetworkUtil {
 		LinkImpl link4 = (LinkImpl) network.createAndAddLink(new IdImpl("4"), node4, node5, 2800, 1, 3600, 1);
 
 		Distances distance1 = NetworkUtil.getDistance2Node(link1, new CoordImpl(100, 0), node1);
-		log.info(distance1.getDisatancePoint2Road() + distance1.getDistanceRoad2Node() + " distance1");
+		log.info(distance1.getDistancePoint2Road() + distance1.getDistanceRoad2Node() + " distance1");
 		
 		Distances distance2 = NetworkUtil.getDistance2Node(link1, new CoordImpl(100, -10), node1);
-		log.info(distance2.getDisatancePoint2Road() + distance2.getDistanceRoad2Node() + " distance2");
+		log.info(distance2.getDistancePoint2Road() + distance2.getDistanceRoad2Node() + " distance2");
 		
 		Distances distance3 = NetworkUtil.getDistance2Node(link2, new CoordImpl(100, 1000), node2);
-		log.info(distance3.getDisatancePoint2Road() + distance3.getDistanceRoad2Node() + " distance3");
+		log.info(distance3.getDistancePoint2Road() + distance3.getDistanceRoad2Node() + " distance3");
 		
 		Distances distance4 = NetworkUtil.getDistance2Node(link2, new CoordImpl(-100, 1000), node2);
-		log.info(distance4.getDisatancePoint2Road() + distance4.getDistanceRoad2Node() + " distance4");
+		log.info(distance4.getDistancePoint2Road() + distance4.getDistanceRoad2Node() + " distance4");
 	}
 }

@@ -236,7 +236,8 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 					network,
 					measuringPointIterator, 
 					measuringPointsZone.getZones().size(),
-					ZONE_BASED);
+					ZONE_BASED,
+					controler);
 			
 			System.out.println();
 			// finalizing/closing csv file containing accessibility measures
