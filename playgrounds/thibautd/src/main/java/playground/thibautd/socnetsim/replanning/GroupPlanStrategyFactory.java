@@ -178,19 +178,21 @@ public class GroupPlanStrategyFactory {
 					registry.getPlanRoutingAlgorithmFactory(),
 					registry.getTripRouterFactory() ) );
 
-		// split immediately after insertion/removal,
-		// to make optimisation easier.
-		strategy.addStrategyModule(
-				createRecomposeJointPlansModule(
-					config,
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier()));
-
 		if (optimize) {
 			final DepartureDelayAverageCalculator delay =
 				new DepartureDelayAverageCalculator(
 					registry.getScenario().getNetwork(),
 					registry.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+
+			// split immediately after insertion/removal,
+			// to make optimisation easier.
+			strategy.addStrategyModule(
+					createRecomposeJointPlansModule(
+						config,
+						registry.getJointPlans().getFactory(),
+						// XXX use the default, to allow stupid simulations
+						// without joint plans. This is rather ugly.
+						new DefaultPlanLinkIdentifier() ) );
 
 			strategy.addStrategyModule(
 					new JointPlanBasedGroupStrategyModule(
@@ -216,6 +218,12 @@ public class GroupPlanStrategyFactory {
 						config,
 						registry.getTripRouterFactory()) );
 		}
+
+		strategy.addStrategyModule(
+				createRecomposeJointPlansModule(
+					config,
+					registry.getJointPlans().getFactory(),
+					registry.getPlanLinkIdentifier() ) );
 
 		return strategy;
 	}

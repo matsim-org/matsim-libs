@@ -31,7 +31,11 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private double vehicleAllocation = -1;
 	private double planVehicleAllocation = -1;
 	private boolean jtmOptimizes = true;
-	private boolean doSynchronize = true;
+	private Synchro doSynchronize = Synchro.dynamic;
+
+	public static enum Synchro {
+		dynamic, none, all;
+	}
 
 	public WeightsConfigGroup() {
 		super( GROUP_NAME );
@@ -126,13 +130,13 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	}
 
 	@StringGetter( "doSynchronize" )
-	public boolean getDoSynchronize() {
+	public Synchro getSynchronize() {
 		return doSynchronize;
 	}
 
 	@StringSetter( "doSynchronize" )
-	public void setDoSynchronize(final boolean v) {
-		this.doSynchronize = v;
+	public void setSynchronize(final String v) {
+		this.doSynchronize = Synchro.valueOf( v.toLowerCase() );
 	}
 
 }

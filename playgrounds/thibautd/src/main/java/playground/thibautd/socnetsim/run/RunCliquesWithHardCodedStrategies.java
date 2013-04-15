@@ -51,6 +51,7 @@ import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgori
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.run.WeightsConfigGroup.Synchro;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
@@ -104,16 +105,7 @@ public class RunCliquesWithHardCodedStrategies {
 					cliquesConf.getInputFile() );
 
 		final PlanLinkIdentifier planLinkIdentifier =
-			weights.getDoSynchronize() ?
-				new DefaultPlanLinkIdentifier() :
-				new PlanLinkIdentifier() {
-					@Override
-					public boolean areLinked(
-							final Plan p1,
-							final Plan p2) {
-						return false;
-					}
-				};
+			linkIdentifier( weights.getSynchronize() );
 
 		final GenericPlanAlgorithm<ReplanningGroup> additionalPrepareAlgo =
 			scenario.getScenarioElement( VehicleRessources.class ) != null ?
@@ -140,7 +132,7 @@ public class RunCliquesWithHardCodedStrategies {
 					.withAdditionalPrepareForSimAlgorithms(
 							additionalPrepareAlgo )
 					.withIncompatiblePlansIdentifierFactory(
-						weights.getDoSynchronize() &&
+						!weights.getSynchronize().equals( Synchro.none ) &&
 						scenario.getScenarioElement( VehicleRessources.class ) != null ?
 							new VehicleBasedIncompatiblePlansIdentifierFactory( TransportMode.car ) :
 							new EmptyIncompatiblePlansIdentifierFactory() )
@@ -169,7 +161,7 @@ public class RunCliquesWithHardCodedStrategies {
 			RunUtils.loadDefaultAnalysis( cliques , controller );
 		}
 
-		if ( weights.getDoSynchronize() ) {
+		if ( !weights.getSynchronize().equals( Synchro.none ) ) {
 			// those listenners check the coordination behavior:
 			// do not ad if not used
 			RunUtils.addConsistencyCheckingListeners( controller );
@@ -177,6 +169,33 @@ public class RunCliquesWithHardCodedStrategies {
 
 		// run it
 		controller.run();
+	}
+
+	private static PlanLinkIdentifier linkIdentifier(final Synchro synchro) {
+		switch ( synchro ) {
+			case all:
+				return new PlanLinkIdentifier() {
+					@Override
+					public boolean areLinked(
+							final Plan p1,
+							final Plan p2) {
+						return true;
+					}
+				};
+			case dynamic:
+				return new DefaultPlanLinkIdentifier();
+			case none:
+				return new PlanLinkIdentifier() {
+					@Override
+					public boolean areLinked(
+							final Plan p1,
+							final Plan p2) {
+						return false; 
+					}
+				};
+			default:
+				throw new IllegalArgumentException( synchro.toString() );
+		}
 	}
 
 	public static void main(final String[] args) {
