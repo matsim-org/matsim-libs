@@ -46,10 +46,6 @@ public class MinimumEnvelope {
 		
 		log.info("creating minimum envelope for given network...");
 		
-		long start,end;
-		
-		start=System.currentTimeMillis();
-		
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
 		bbox.setDefaultBoundaryBox(this.net);
 		

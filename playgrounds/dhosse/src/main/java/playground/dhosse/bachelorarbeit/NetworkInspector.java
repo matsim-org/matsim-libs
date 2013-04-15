@@ -25,6 +25,7 @@ import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -46,9 +47,6 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	private Map<Id,Double> geometricLengths = new HashMap<Id,Double>();
 	private Map<Id,String> nodeTypes = new HashMap<Id,String>();
-	private List<Id> deadEndNodes = new ArrayList<Id>();
-	private List<Id> redundantNodes = new ArrayList<Id>();
-	private List<Id> exitRoadNodes = new ArrayList<Id>();
 	
 	private List<Id> nodesWithHighDegrees = new ArrayList<Id>();
 	
@@ -105,37 +103,18 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		try {
 			logger.info("creating r statistics...");
-			Runtime.getRuntime().exec("C:/Program Files/R/R-2.15.2/bin/Rscript " + "C:/Users/Daniel/Dropbox/bsc/R/createStatistics.R");
+			Runtime.getRuntime().exec("C:/Program Files/R/R-2.15.2/bin/Rscript " + "./R/createStatistics.R");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		this.filesForExportInQGisProject.put("envelope", Polygon.class);
 		
-		logger.info("writing QuantumGIS project file with generated layers...");
+		logger.info("writing QuantumGIS project file (*.qgs) with generated layers...");
 		
-		QGisExport.main(this.filesForExportInQGisProject);
+		new QGisExport(this.filesForExportInQGisProject).write("networkInspectorOutput.qgs");
 				
 		logger.info("exiting NetworkInspector...");
-			
-	}
-
-	private void continueWithRoutableNetwork() {
-		
-		checkNodeAttributes();
-		checkLinkAttributes();
-		
-		if(!(this.nodeTypes.size()<1))
-			exportNodesToShape();
-		
-		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
-		
-		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
-		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 50);
-		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
-		
-		new AccessibilityCalcV2(measuringPoints, freeSpeedGrid, sc, this.outputFolder).runAccessibilityComputation();
 		
 	}
 
@@ -145,7 +124,6 @@ public class NetworkInspector {//TODO pfade ändern
 		final Map<Id,Node> visitedNodes = new TreeMap<Id,Node>();
 		Map<Id,Node> biggestCluster = new TreeMap<Id,Node>();
 		
-		Map<Id,Node> smallClusterNodes = new TreeMap<Id,Node>();
 		Map<Id,Link> smallClusterLinks = new TreeMap<Id,Link>();
 		
 		logger.info("  checking " + NetworkInspector.scenario.getNetwork().getNodes().size() + " nodes and " +
@@ -160,14 +138,16 @@ public class NetworkInspector {//TODO pfade ändern
 				visitedNodes.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
-				} else {
-					smallClusterNodes.putAll(cluster); //eigener teil
 				}
+				//eigener teil
 				if(biggestCluster.size()==NetworkInspector.scenario.getNetwork().getNodes().size()){
 					logger.info("size of the biggest cluster equals network size...");
 					logger.info("network is routable.");
 					writeClustersAndNetwork2ESRIShape(smallClusterLinks);
 					return true;
+				}
+				if (biggestCluster.size() >= (NetworkInspector.scenario.getNetwork().getNodes().size() - visitedNodes.size())) {
+					stillSearching = false;
 				}
 			}
 		}
@@ -177,13 +157,15 @@ public class NetworkInspector {//TODO pfade ändern
 				" but network contains " + NetworkInspector.scenario.getNetwork().getNodes().size() + " nodes...");
 		logger.warn("network is not routable. run " + NetworkCleaner.class.getName() + " first.");
 		
-		for(Id nodeId : smallClusterNodes.keySet()){
+		for(Id nodeId : NetworkInspector.scenario.getNetwork().getNodes().keySet()){
 			
-			Node node = NetworkInspector.scenario.getNetwork().getNodes().get(nodeId);
-			
-			for(Link l : node.getOutLinks().values()){
-				if(!smallClusterLinks.containsKey(l.getId()))
-					smallClusterLinks.put(l.getId(), l);
+			if(!biggestCluster.containsKey(nodeId)){
+				Node node = NetworkInspector.scenario.getNetwork().getNodes().get(nodeId);
+				for(Link l : node.getOutLinks().values()){
+					if(!smallClusterLinks.containsKey(l.getId())){
+						smallClusterLinks.put(l.getId(), l);
+					}
+				}
 			}
 			
 		}
@@ -192,81 +174,6 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		return false;
 		
-	}
-
-	private void writeClustersAndNetwork2ESRIShape(
-			Map<Id, Link> smallClusterLinks) {
-		
-		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-		typeBuilder.setName("shape");
-		typeBuilder.add("link",LineString.class);
-		typeBuilder.add("ID",String.class);
-		typeBuilder.add("length",Double.class);
-		typeBuilder.add("freespeed",Double.class);
-		typeBuilder.add("capacity",Double.class);
-		typeBuilder.add("nlanes", String.class);
-		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
-		
-		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
-		if(smallClusterLinks.size()>0){
-			
-			logger.info("writing small clusters into ESRI shapefile...");
-			
-			for(Link link : smallClusterLinks.values()){
-				
-				SimpleFeature feature = this.builder.buildFeature(null, new Object[]{
-						new GeometryFactory().createLineString(new Coordinate[]{
-								new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()),
-								new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY())
-						}),
-						link.getId(),
-						link.getLength(),
-						link.getFreespeed(),
-						link.getCapacity(),
-						link.getNumberOfLanes()
-				});
-				
-				features.add(feature);
-				
-			}
-			
-			String destination = "smallClusters";
-			
-			this.filesForExportInQGisProject.put(destination,LineString.class);
-			
-			ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
-			
-		}
-		
-		logger.info("writing network into ESRI shapefile...");
-		
-		features.clear();
-		
-		for(Link link : NetworkInspector.scenario.getNetwork().getLinks().values()){
-			
-			SimpleFeature feature = this.builder.buildFeature(null, new Object[]{
-				new GeometryFactory().createLineString(new Coordinate[]{
-							new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()),
-							new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY())
-				}),
-				link.getId(),
-				link.getLength(),
-				link.getFreespeed(),
-				link.getCapacity(),
-				link.getNumberOfLanes()
-				
-			});
-			
-			features.add(feature);
-			
-		}
-		
-		String destination = "network";
-		
-		this.filesForExportInQGisProject.put(destination,LineString.class);
-		
-		ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
 	}
 	
 	//aus klasse NetworkCleaner
@@ -317,6 +224,100 @@ public class NetworkInspector {//TODO pfade ändern
 
 		return clusterNodes;
 	}
+
+	private void writeClustersAndNetwork2ESRIShape(
+			Map<Id, Link> smallClusterLinks) {
+		
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName("shape");
+		typeBuilder.add("link",LineString.class);
+		typeBuilder.add("ID",String.class);
+		typeBuilder.add("length",Double.class);
+		typeBuilder.add("freespeed",Double.class);
+		typeBuilder.add("capacity",Double.class);
+		typeBuilder.add("nlanes", String.class);
+		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
+		
+		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		logger.info("writing network into ESRI shapefile...");
+		
+		for(Link link : NetworkInspector.scenario.getNetwork().getLinks().values()){
+			
+			SimpleFeature feature = this.builder.buildFeature(null, new Object[]{
+				new GeometryFactory().createLineString(new Coordinate[]{
+							new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()),
+							new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY())
+				}),
+				link.getId(),
+				link.getLength(),
+				link.getFreespeed(),
+				link.getCapacity(),
+				link.getNumberOfLanes()
+				
+			});
+			
+			features.add(feature);
+			
+		}
+		
+		String destination = "network";
+		
+		this.filesForExportInQGisProject.put(destination,LineString.class);
+		
+		ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
+		
+		if(smallClusterLinks.size()>0){
+			
+			features.clear();
+			
+			logger.info("writing small clusters into ESRI shapefile...");
+			
+			for(Link link : smallClusterLinks.values()){
+				
+				SimpleFeature feature = this.builder.buildFeature(null, new Object[]{
+						new GeometryFactory().createLineString(new Coordinate[]{
+								new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()),
+								new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY())
+						}),
+						link.getId(),
+						link.getLength(),
+						link.getFreespeed(),
+						link.getCapacity(),
+						link.getNumberOfLanes()
+				});
+				
+				features.add(feature);
+				
+			}
+			
+			destination = "smallClusters";
+			
+			this.filesForExportInQGisProject.put(destination,LineString.class);
+			
+			ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
+			
+		}
+	}
+	
+	private void continueWithRoutableNetwork() {
+		
+		checkNodeAttributes();
+		checkLinkAttributes();
+		
+		if(!(this.nodeTypes.size()<1))
+			exportNodesToShape();
+		
+		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
+		
+		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
+		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 50);
+		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
+		
+		new AccessibilityCalcV2(measuringPoints, freeSpeedGrid, sc, this.outputFolder).runAccessibilityComputation();
+		
+	}
 	
 	//eigene methode
 	private void checkLinkAttributes() {
@@ -324,7 +325,7 @@ public class NetworkInspector {//TODO pfade ändern
 		logger.info("checking link attributes...");
 		
 		int writerIndex = 0;
-		
+		double cellWidth = ((NetworkImpl)NetworkInspector.scenario.getNetwork()).getEffectiveCellSize();
 		for(Link link : NetworkInspector.scenario.getNetwork().getLinks().values()){
 			double geometricLength = 
 					Math.sqrt(Math.pow(link.getToNode().getCoord().getX() -
@@ -336,8 +337,7 @@ public class NetworkInspector {//TODO pfade ändern
 			
 			this.totalLength += link.getLength();
 			this.totalGLength += geometricLength;
-			
-			if(link.getLength()<7||geometricLength<7){
+			if(link.getLength()<cellWidth){
 				this.lengthBelowStorageCapacity.add(link);
 				writerIndex++;
 			}
@@ -346,8 +346,6 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		
 		logger.info("done.");
-		
-		logger.info("writing link statistics files...");
 		
 		createLinkStatisticsFile();
 		
@@ -359,7 +357,7 @@ public class NetworkInspector {//TODO pfade ändern
 			writer = new FileWriter(file);
 			for(Link link : this.lengthBelowStorageCapacity){
 				writer.write("length of link " + link.getId() + " below min length for storage capacity of one vehicle (" +
-						link.getLength() + "m instead of 7 m)\n");
+						link.getLength() + "m instead of "+ cellWidth +" m)\n");
 			}
 			writer.close();
 						
@@ -386,52 +384,46 @@ public class NetworkInspector {//TODO pfade ändern
 		int exit = 0, red = 0, de = 0;
 		
 		for(Node node : NetworkInspector.scenario.getNetwork().getNodes().values()){
-			
-			if(node.getInLinks().size()>5||node.getOutLinks().size()>5)
-				this.nodesWithHighDegrees.add(node.getId());
+
+			if(node.getInLinks().size()>0&&node.getOutLinks().size()>0){
 				
-				if(node.getInLinks().size()>0&&node.getOutLinks().size()>0){
+				if(node.getInLinks().size()>5||node.getOutLinks().size()>5)
+					this.nodesWithHighDegrees.add(node.getId());
 					
-					if(node.getInLinks().size()==1&&node.getOutLinks().size()==1){
+				if(node.getInLinks().size()==1&&node.getOutLinks().size()==1){
 					
-						Link inLink = node.getInLinks().values().iterator().next();
-						Link outLink = node.getOutLinks().values().iterator().next();
+					Link inLink = node.getInLinks().values().iterator().next();
+					Link outLink = node.getOutLinks().values().iterator().next();
 					
-						if(inLink.getFromNode().equals(outLink.getToNode())){
-							if(!this.envelope.contains(new Point(new CoordinateArraySequence(new Coordinate[]{
-									new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory()))){
-								this.exitRoadNodes.add(node.getId());
-								this.nodeTypes.put(node.getId(), "exit");
-								exit++;
-								continue;
-							} 
-							this.deadEndNodes.add(node.getId());
-							this.nodeTypes.put(node.getId(), "deadEnd");
-							de++;
-							
-						} else{
-							
-							if(inLink.getCapacity()==outLink.getCapacity()&&
-									inLink.getFreespeed()==outLink.getFreespeed()&&
-									inLink.getNumberOfLanes()==outLink.getNumberOfLanes()&&
-									inLink.getAllowedModes()==outLink.getAllowedModes()){
-								this.redundantNodes.add(node.getId());
-								this.nodeTypes.put(node.getId(), "redundant");
-								red++;
+					if(inLink.getFromNode().equals(outLink.getToNode())){
+						if(!this.envelope.contains(new Point(new CoordinateArraySequence(new Coordinate[]{
+								new Coordinate(node.getCoord().getX(),node.getCoord().getY())}),new GeometryFactory()))){
+							this.nodeTypes.put(node.getId(), "exit");
+							exit++;
+							continue;
+						}
+						this.nodeTypes.put(node.getId(), "deadEnd");
+						de++;
+						
+					} else{
+						
+						if(inLink.getCapacity()==outLink.getCapacity()&&
+								inLink.getFreespeed()==outLink.getFreespeed()&&
+								inLink.getNumberOfLanes()==outLink.getNumberOfLanes()&&
+								inLink.getAllowedModes()==outLink.getAllowedModes()){
+							this.nodeTypes.put(node.getId(), "redundant");
+							red++;
 								
-							}
 						}
 					}
 				}
-				
+			}
 			
 		}
 		
 		logger.info("done.");
 		
 		logger.info(de + " dead end nodes, " + exit + " exit road nodes and " + red + " redundant nodes found.");
-		
-		logger.info("writing node statistics files...");
 		
 		
 		createNodeStatisticsFile();
@@ -441,6 +433,8 @@ public class NetworkInspector {//TODO pfade ändern
 	}
 		
 	private void createLinkStatisticsFile(){
+		
+		logger.info("writing link statistics...");
 		
 		File file = new File(this.outputFolder+"linkStatistics.txt");
 		
@@ -472,6 +466,8 @@ public class NetworkInspector {//TODO pfade ändern
 	
 	//eigene methode
 	private void createNodeStatisticsFile() {
+		
+		logger.info("writing node statistics...");
 		
 		File file = new File(this.outputFolder+"nodeStatistics.txt");
 		FileWriter writer;
@@ -525,25 +521,36 @@ public class NetworkInspector {//TODO pfade ändern
 		ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
 		
 		if(!(this.nodesWithHighDegrees.size()<1)){
-		features.clear();
+			features.clear();
 		
-		for(Id nodeId : this.nodesWithHighDegrees){
-			Point p = MGC.coord2Point(NetworkInspector.scenario.getNetwork().getNodes().get(nodeId).getCoord());
-			try {
-				features.add(this.builder.buildFeature(null, new Object[]{p,nodeId.toString(),this.nodeTypes.get(nodeId)}));
-			} catch (IllegalArgumentException e) {
-				throw new RuntimeException(e);
+			for(Id nodeId : this.nodesWithHighDegrees){
+			
+				typeBuilder.setName("node");
+				typeBuilder.add("location",Point.class);
+				typeBuilder.add("ID",String.class);
+				typeBuilder.add("in-degree",Integer.class);
+				typeBuilder.add("out-degree",Integer.class);
+				this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
+			
+				Point p = MGC.coord2Point(NetworkInspector.scenario.getNetwork().getNodes().get(nodeId).getCoord());
+				try {
+					features.add(this.builder.buildFeature(null, new Object[]{p,nodeId.toString(),
+							NetworkInspector.scenario.getNetwork().getNodes().get(nodeId).getInLinks().size(),
+							NetworkInspector.scenario.getNetwork().getNodes().get(nodeId).getOutLinks().size()}));
+				} catch (IllegalArgumentException e) {
+					throw new RuntimeException(e);
+				}
 			}
-		}
 		
-		destination = "highDegreeNodes";
+			destination = "highDegreeNodes";
 		
-		this.filesForExportInQGisProject.put(destination, Point.class);
-		ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
+			this.filesForExportInQGisProject.put(destination, Point.class);
+			ShapeFileWriter.writeGeometries(features, this.outputFolder+destination+".shp");
 		}
 		
 	}
 	
+	//aus klasse networkcleaner
 	private static DoubleFlagRole getDoubleFlag(final Node n, final Map<Node, DoubleFlagRole> nodeRoles) {
 		DoubleFlagRole r = nodeRoles.get(n);
 		if (null == r) {
@@ -551,6 +558,12 @@ public class NetworkInspector {//TODO pfade ändern
 			nodeRoles.put(n, r);
 		}
 		return r;
+	}
+	
+	//aus klasse networkcleaner
+	static class DoubleFlagRole {
+		protected boolean forwardFlag = false;
+		protected boolean backwardFlag = false;
 	}
 	
 	public Geometry getArea() {
@@ -561,9 +574,4 @@ public class NetworkInspector {//TODO pfade ändern
 		this.envelope = area;
 	}
 
-	static class DoubleFlagRole {
-		protected boolean forwardFlag = false;
-		protected boolean backwardFlag = false;
-	}
-	
 }
