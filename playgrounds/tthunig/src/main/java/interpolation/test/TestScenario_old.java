@@ -16,9 +16,9 @@ import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
  * @author tthunig
  *
  */
-public class TestScenario {
+public class TestScenario_old {
 
-	private static final Logger log = Logger.getLogger(TestScenario.class);
+	private static final Logger log = Logger.getLogger(TestScenario_old.class);
 	
 	//information about the given data
 //	private static String filename_data100 = "zurich_carAccessibility_grid_cellsize_100m_SF";
@@ -49,6 +49,8 @@ public class TestScenario {
 		
 		try {
 			out= new FileWriter(outputFile);
+//			out.write("interpolation method \t\t\t\t interp. time \t sum of abs. differences \t rel. abs. difference \t sum of quadr. differences \t rel. quadr. difference\n");
+//			out.write("----------------------------------------------------------------------------------------------------------------------------------------------------\n");
 			out.write("interpolation method \t\t\t\t interp. time \t sum of abs. differences \t rel. difference \n");
 			out.write("-----------------------------------------------------------------------------------------\n");
 		} catch (IOException e) {
@@ -56,10 +58,10 @@ public class TestScenario {
 		}
 		
 		log.info("Start interpolation of file " + filename_data200 + " with the different interpolation methods:");
-		testOneMethod(Interpolation.BILINEAR, Double.NaN);
-		testOneMethod(Interpolation.BICUBIC, Double.NaN);		
+		testOneMethod(Interpolation.BILINEAR, true, Double.NaN);
+		testOneMethod(Interpolation.BICUBIC, true, Double.NaN);		
 		for (int e=1; e<=12; e++){
-			testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, e);
+			testOneMethod(Interpolation.INVERSE_DISTANCE_WEIGHTING, false, e);
 		}
 		
 		try {
@@ -72,10 +74,16 @@ public class TestScenario {
 		log.info("interpolation test done");
 	}
 	
-	private static void testOneMethod(int interpolationMethod, double exponent){
+	private static void testOneMethod(int interpolationMethod, boolean allNeighbors, double exponent){
+		String neighbors;
+		if (allNeighbors)
+			neighbors= "all";
+		else
+			neighbors= "four";
 		
 		log.info("Interpolate file " + filename_data200 + " with interpolation method " + interpolationMethod +":");
 		long startTime= System.currentTimeMillis();
+//		Interpolation interpolation = new Interpolation(sg200, interpolationMethod, allNeighbors, exponent);
 		Interpolation interpolation = new Interpolation(sg200, interpolationMethod, exponent);
 		SpatialGrid interp_sg = new SpatialGrid(sg200.getXmin(), sg200.getYmin(), sg200.getXmax(), sg200.getYmax(), sg200.getResolution() / 2);
 		// calculate new values for higher resolution
@@ -88,7 +96,7 @@ public class TestScenario {
 		
 		log.info("Writing interpolated data...");
 		if (interpolationMethod == 2)
-			interp_sg.writeToFile(path + filename_data200 + "_" + interpolationMethod + "_exp" + exponent + ".txt"); //TODO in resources speichern
+			interp_sg.writeToFile(path + filename_data200 + "_" + interpolationMethod + "_" + neighbors + "_exp" + exponent + ".txt"); //TODO in resources speichern
 		else
 			interp_sg.writeToFile(path + filename_data200 + "_" + interpolationMethod + ".txt"); //TODO in resources speichern
 		
@@ -99,7 +107,7 @@ public class TestScenario {
 		switch (interpolationMethod){
 			case 0: evalMethod= "bilinear interpolation \t\t\t"; break;
 			case 1: evalMethod= "bicubic spline interpolation \t"; break;
-			case 2: evalMethod= "idw with exp " + exponent;
+			case 2: evalMethod= "idw with " + neighbors + " neighbors and exp " + exponent;
 		}
 		String eval= evalMethod +  "\t\t" + interpolationTime + " ms \t\t\t" + Math.round(difference[0]*100)/100. + "\t\t\t\t\t\t" + Math.round((difference[0]/difference[1])*10000)/10000.;// + "\t\t\t\t\t" + Math.round(difference[1]*100)/100. + "\t\t\t\t\t\t" + Math.round((difference[1]/difference[2])*10000)/10000.;
 		System.out.println("Evaluation: " + eval);
@@ -120,23 +128,22 @@ public class TestScenario {
 	 */
 	private static double[] differenceComputation(SpatialGrid sg100, SpatialGrid sg200_interpolated){
 		double differenceToOriginalSG = 0;
+//		double quadDiffToOriginalSG = 0;
 		int numberOfIntpValues = 0;
-		
 		//sum difference at all coordinates where interpolated values are known
 		for (double y = sg200_interpolated.getYmin(); y <= sg200_interpolated.getYmax(); y += sg200_interpolated.getResolution()){
 			for (double x = sg200_interpolated.getXmin(); x <= sg200_interpolated.getXmax(); x += sg200_interpolated.getResolution()){
-				
 				double value100= sg100.getValue(x, y);
 				double value200= sg200_interpolated.getValue(x, y);
-				
 				//calculate difference only in the zurich area
 				if(!Double.isNaN(value100) && !Double.isNaN(value200)){
-					
 					differenceToOriginalSG += Math.abs(value100 - value200);
+//					quadDiffToOriginalSG += (value100 - value200)*(value100 - value200);
 					numberOfIntpValues++;
 				}
 			}
 		}
+//		double[] differences= {differenceToOriginalSG, quadDiffToOriginalSG, numberOfIntpValues};
 		double[] differences= {differenceToOriginalSG, numberOfIntpValues};
 		return differences;
 	}

@@ -1,12 +1,13 @@
 package interpolation.test;
 
+import interpolation.Interpolation;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
-import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -21,9 +22,9 @@ import com.vividsolutions.jts.geom.Point;
  * @author tthunig
  *
  */
-public class MiniTest {
+public class MiniTest_old {
 	
-	private static final Logger logger = Logger.getLogger(MiniTest.class);	
+	private static final Logger logger = Logger.getLogger(MiniTest_old.class);	
 	
 	private SpatialGrid sg= null;
 	private SpatialGrid interpolatedSG= null;
@@ -31,8 +32,16 @@ public class MiniTest {
 	private boolean interpolationUseful= true;
 	private double interpolationTime= Double.MAX_VALUE;
 	
-	private static String path = "Z:/WinHome/Docs/Interpolation/MiniTest/";
-	private static File outputFile= new File(path + "Evaluation.txt");  //TODO in resources speichern
+//	private static double interpTime_bilinear1x2= Double.MAX_VALUE;
+//	private static double interpTime_bilinear3x3= Double.MAX_VALUE;
+//	private static double interpTime_bilinear10x10= Double.MAX_VALUE;
+//	private static double interpTime_bicubic3x3= Double.MAX_VALUE;
+//	private static double interpTime_bicubic10x10= Double.MAX_VALUE;
+//	private static double interpTime_idw1x2= Double.MAX_VALUE;
+//	private static double interpTime_idw3x3= Double.MAX_VALUE;
+//	private static double interpTime_idw10x10= Double.MAX_VALUE;
+	
+	private static File outputFile= new File("Z:/WinHome/Docs/Interpolation/MiniTest/BiCubicTest/Evaluation.txt");
 	private static FileWriter out;
 	
 	/**
@@ -45,7 +54,10 @@ public class MiniTest {
 	 * @param allNeighbors sets, whether the inverse distance weighting with all or four neighbors should be used. only necessary if interpolation method is inverse distance weighting.
 	 * @param exponent the exponent for weights. only necessary if interpolation method is inverse distance weighting.
 	 */
-	public MiniTest(int interpolationMethod, int numberOfRows, int numberOfColumns, double exponent){
+	public MiniTest_old(int interpolationMethod, int numberOfRows, int numberOfColumns, boolean allNeighbors, double exponent){
+		String neighbors;
+		if (allNeighbors) neighbors= "all";
+		else neighbors= "four";
 		
 		//initialize the SpatialGrid
 		double[] boundingBox = initBoundingBox(numberOfRows,numberOfColumns);
@@ -63,7 +75,7 @@ public class MiniTest {
 		System.out.println("SpatialGrid for testing:");
 		printSG(this.sg);
 		long startTime= System.currentTimeMillis();
-		this.interpolation = new Interpolation(this.sg, interpolationMethod, exponent);
+		this.interpolation = new Interpolation(this.sg, interpolationMethod, allNeighbors, exponent);
 		this.interpolateSG();
 		this.interpolationTime= System.currentTimeMillis()-startTime;
 		
@@ -71,10 +83,12 @@ public class MiniTest {
 		System.out.println("interpolated SpatialGrid:");
 		printSG(this.interpolatedSG);
 		if (interpolationMethod == 2)
-			this.interpolatedSG.writeToFile(path + interpolationMethod + "_exp" + exponent + "_" + numberOfRows + "x" + numberOfColumns + ".txt"); //TODO in resources speichern
+			this.interpolatedSG.writeToFile("Z:/WinHome/Docs/Interpolation/MiniTest/BiCubicTest/" + interpolationMethod + "_" + neighbors + "_exp" + exponent + "_" + numberOfRows + "x" + numberOfColumns + ".txt"); //TODO in resources speichern
 		else
-			this.interpolatedSG.writeToFile(path + interpolationMethod + "_" + numberOfRows + "x" + numberOfColumns + ".txt"); //TODO in resources speichern
-			
+			this.interpolatedSG.writeToFile("Z:/WinHome/Docs/Interpolation/MiniTest/BiCubicTest/" + interpolationMethod + "_" + numberOfRows + "x" + numberOfColumns + ".txt"); //TODO in resources speichern
+		
+
+		
 	}
 	
 	/**
@@ -250,7 +264,26 @@ public class MiniTest {
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
+		
+//		logger.info("Comparison of the interpolation times of the different methods:");
+//		System.out.println("interpolation method \t\t" + "1*2 grid \t" + "3*3 grid \t" + "10*10 grid");
+//		System.out.println("-----------------------------------------------------------------------------------------------------");
+//		System.out.println("bilinear interpolation \t\t" + interpTime_bilinear1x2 + " ms \t\t" + interpTime_bilinear3x3 + " ms \t\t" + interpTime_bilinear10x10 + " ms \t\t\t");
+//		System.out.println("bicubic interpolation \t\t" + "  - \t\t" + interpTime_bicubic3x3 + " ms \t" + interpTime_bicubic10x10 + " ms \t\t");
+//		System.out.println("inverse distance weighting \t" + interpTime_idw1x2 + " ms \t\t" + interpTime_idw3x3 + " ms \t\t" +  interpTime_idw10x10 + " ms \t\t\t");
+//	
+//		try {
+//			out= new FileWriter(outputFile);
+//			out.write("Comparison of the interpolation times of the different methods:\n\n");
+//			out.write("interpolation method \t\t" + "1*2 grid \t" + "3*3 grid \t" + "10*10 grid\n");
+//			out.write("-----------------------------------------------------------------------------------------------------");
+//			out.write("bilinear interpolation \t\t" + interpTime_bilinear1x2 + " ms \t\t" + interpTime_bilinear3x3 + " ms \t\t" + interpTime_bilinear10x10 + " ms \t\t\t");
+//			out.write("bicubic interpolation \t\t" + "  - \t\t" + interpTime_bicubic3x3 + " ms \t" + interpTime_bicubic10x10 + " ms \t\t");
+//			out.write("inverse distance weighting \t" + interpTime_idw1x2 + " ms \t\t" + interpTime_idw3x3 + " ms \t\t" +  interpTime_idw10x10 + " ms \t\t\t");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}		
 	}
 	
 	/**
@@ -265,9 +298,9 @@ public class MiniTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
-		interpolationTest(Interpolation.BILINEAR,1,2, Double.NaN);
-		interpolationTest(Interpolation.BILINEAR,3,3, Double.NaN);
-		interpolationTest(Interpolation.BILINEAR,10,10, Double.NaN);
+		interpolationTest(Interpolation.BILINEAR,1,2, false, Double.NaN);
+		interpolationTest(Interpolation.BILINEAR,3,3, false, Double.NaN);
+		interpolationTest(Interpolation.BILINEAR,10,10, false, Double.NaN);
 	}
 	
 	/**
@@ -282,8 +315,8 @@ public class MiniTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
-		interpolationTest(Interpolation.BICUBIC,3,3, Double.NaN);
-		interpolationTest(Interpolation.BICUBIC,10,10, Double.NaN);
+		interpolationTest(Interpolation.BICUBIC,3,3, false, Double.NaN);
+		interpolationTest(Interpolation.BICUBIC,10,10, false, Double.NaN);
 	}
 	
 	/**
@@ -293,16 +326,28 @@ public class MiniTest {
 		System.out.println("");
 		logger.info("-----Test of the inverse distance weighting method for interpolation-----");
 		
-		for (int exp=1; exp<=10; exp++){
+//		for (int exp=1; exp<=7; exp++){
+		for (int exp=2; exp<=10; exp+=8){
 			try{
 				out.write("\nidw with four neighbors and exp " + exp + "\t");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,1,2, exp);
-			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,3,3, exp);
-			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,10,10, exp);
+			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,1,2, false, exp);
+			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,3,3, false, exp);
+			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,10,10, false, exp);
 		}
+		
+//		for (int exp=1; exp<=7; exp++){
+//			try{
+//				out.write("\nidw with all neighbors and exp " + exp + "\t");
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,1,2, true, exp);
+//			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,3,3, true, exp);
+//			interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,10,10, true, exp);
+//		}
 	}
 
 	
@@ -317,22 +362,25 @@ public class MiniTest {
 	 * @param numberOfColumns
 	 * @return true if the interpolation test was successful; false otherwise
 	 */
-	static void interpolationTest(int interpolationMethod, int numberOfRows, int numberOfColumns, double exp){
-				
+	static void interpolationTest(int interpolationMethod, int numberOfRows, int numberOfColumns, boolean allNeighbors, double exp){
+		String neighbors;
+		if (allNeighbors) neighbors= "all";
+		else neighbors= "four";
+		
 		System.out.println("");
 		switch (interpolationMethod){
 		case 0: logger.info("Interpolation test for bilinear interpolation on a "+ numberOfRows +"*"+ numberOfColumns +" grid..."); break;
 		case 1: logger.info("Interpolation test for bicubic spline interpolation on a "+ numberOfRows +"*"+ numberOfColumns +" grid..."); break;
-		case 2: logger.info("Interpolation test for inverse distance weigthing on a " + numberOfRows +"*"+ numberOfColumns +" grid with an exponent of " + exp + "...");
+		case 2: logger.info("Interpolation test for inverse distance weigthing on a " + numberOfRows +"*"+ numberOfColumns +" grid with consideration of " + neighbors + " neigbors and an exponent of " + exp + "...");
 		}
 		
-		MiniTest testScenario= new MiniTest(interpolationMethod, numberOfRows, numberOfColumns, exp);
+		MiniTest_old testScenario= new MiniTest_old(interpolationMethod, numberOfRows, numberOfColumns, allNeighbors, exp);
 		
 		testScenario.testKnownValues(3);
 		testScenario.testSpecificValues();
 		testScenario.testRangeOfValues();
 		
-		logger.info("Interpolation time: " + testScenario.getInterpolationTime() + " ms.");
+		logger.info("The interpolation needed a calculation time of " + testScenario.getInterpolationTime() + " ms.");
 		try{
 			out.write(testScenario.getInterpolationTime() + " ms \t\t");
 		} catch (IOException e) {
@@ -343,9 +391,29 @@ public class MiniTest {
 			switch (interpolationMethod){
 			case 0: logger.warn("The bilinear interpolation test on a "+ numberOfRows +"*"+ numberOfColumns +" grid was not successful!"); break;
 			case 1: logger.warn("The bicubic spline interpolation test on a "+ numberOfRows +"*"+ numberOfColumns +" grid was not successful!"); break;
-			case 2: logger.warn("The interpolation test for the inverse distance weighting method on a "+ numberOfRows +"*"+ numberOfColumns +" grid with an exponent of " + exp + ", was not successful!");
+			case 2: logger.warn("The interpolation test for the inverse distance weighting method on a "+ numberOfRows +"*"+ numberOfColumns +" grid with consideration of " + neighbors + " neigbors and an exponent of " + exp + ", was not successful!");
 			}
 		}
+//			else
+//		switch (interpolationMethod){
+//		case 0: logger.info("The bilinear interpolation test on a "+ numberOfRows +"*"+ numberOfColumns +" grid was successful!");
+//				switch (numberOfRows){
+//				case 1: interpTime_bilinear1x2= testScenario.getInterpolationTime(); break;
+//				case 3: interpTime_bilinear3x3= testScenario.getInterpolationTime(); break;
+//				case 10: interpTime_bilinear10x10= testScenario.getInterpolationTime();
+//				} break;
+//		case 1: logger.info("The bicubic spline interpolation test on a "+ numberOfRows +"*"+ numberOfColumns +" grid was successful!");
+//				switch (numberOfRows){
+//				case 3: interpTime_bicubic3x3= testScenario.getInterpolationTime(); break;
+//				case 10: interpTime_bicubic10x10= testScenario.getInterpolationTime();
+//				} break;
+//		case 2: logger.info("The interpolation test for the inverse distance weighting method on a "+ numberOfRows +"*"+ numberOfColumns +" grid was successful!");
+//				switch (numberOfRows){
+//				case 1: interpTime_idw1x2= testScenario.getInterpolationTime(); break;
+//				case 3: interpTime_idw3x3= testScenario.getInterpolationTime(); break;
+//				case 10: interpTime_idw10x10= testScenario.getInterpolationTime();
+//				} 
+//		}
 	}
 	
 
