@@ -60,13 +60,23 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 	public void handleEvent(Event event) {
 		StringBuilder eventXML = new StringBuilder(180);
 		Map<String, String> attr = event.getAttributes();
-		String personId = attr.get("person");
+		String person = attr.get("person");
 		String driverId = attr.get("driverId");
-		String vehId = attr.get("vehicleId");
+		String vehicleId = attr.get("vehicleId");
 		String vehicle = attr.get("vehicle");
-		if (sampledIds.contains(personId)||sampledIds.contains(driverId) || sampledIds.contains(vehId) || sampledIds.contains(vehicle)) {
-			if(listenForTransitDrivers= true && attr.get("vehicle") != null && attr.get("vehicle").startsWith("tr_")){
-				if(transitVehicleIds ==null){
+		boolean copyEvent = false;
+		if (sampledIds.contains(person) || sampledIds.contains(driverId))
+			copyEvent = true;
+		else if (sampledIds.contains(vehicle) && attr.get("type").startsWith("Vehicle"))
+			copyEvent = true;
+		else if (sampledIds.contains(vehicle) && person.startsWith("pt"))
+			copyEvent = true;
+		else if(sampledIds.contains(vehicleId) && driverId.startsWith("pt"))
+			copyEvent = true;
+		if (copyEvent) {
+			if (listenForTransitDrivers = true && attr.get("vehicle") != null
+					&& attr.get("vehicle").startsWith("tr_")) {
+				if (transitVehicleIds == null) {
 					transitVehicleIds = new HashSet<String>();
 				}
 				transitVehicleIds.add(attr.get("vehicle"));
@@ -86,15 +96,16 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 			}
 		}
 	}
-	
-	public TrimEventsWithPersonIds(final String filename, HashSet<String> sampledIds, boolean listenForTransitDrivers) {
+
+	public TrimEventsWithPersonIds(final String filename,
+			HashSet<String> sampledIds, boolean listenForTransitDrivers) {
 		init(filename);
 		this.sampledIds = sampledIds;
 		this.listenForTransitDrivers = listenForTransitDrivers;
 	}
 
 	public void init(final String outfilename) {
-		
+
 		try {
 			this.out = IOUtils.getBufferedWriter(outfilename);
 			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
@@ -102,14 +113,10 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 			e.printStackTrace();
 		}
 	}
-	public static void main(String[] args){
-		
-	}
+
 
 	public HashSet<String> getTransitVehicleIds() {
 		return transitVehicleIds;
 	}
-
-
 
 }

@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		boolean in = false;
 		private Map<Id, Double> passengers = new HashMap<Id, Double>();
 		private double distance;
-
+		Id lastStop;
 		// Constructors
 		public PTVehicle(Id transitLineId, Id transitRouteId) {
 			this.transitLineId = transitLineId;
@@ -102,69 +102,83 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	private class PlanElement {
 
-		int planElementID = -1;
-		int activityID = -1;
-		int journeyID = -1;
-		int tripID = -1;
-		int transferID = -1;
-		String planElementType;
-		Coord orig;
-		Coord dest;
-		Id origFacility;
-		Id destFacility;
-		String mode;
-		Id line;
-		Id route;
-		double distance;
 		double duration;
 		double startTime;
 		double endTime;
-
+	}
+	private class Activity extends PlanElement{		
+		Id facility;
+		Coord coord;
+		String type;
 		public String toString(){
-			return String.format("%3d %5d %6d %6d %6d %6.1f %6.1f %6.1f %6.1f %12s %12s %9s %11s %12s %6.1f %6.1f %7.1f %5.1f\n"
-					, planElementID,activityID,journeyID,
-					tripID,transferID, orig.getX(),orig.getY(),dest.getX(),dest.getY(),origFacility,destFacility,
-					mode,line!=null?line.toString():"null",route!=null?route.toString():"null",distance,duration, startTime,endTime);
+			return type;
+		}
+	}
+	
+	private class Journey extends PlanElement{
+		Activity fromAct;
+		Activity toAct;
+		LinkedList<Trip> trips = new LinkedList<EventsToPlanElements.Trip>();
+		LinkedList<Transfer> transfers = new LinkedList<EventsToPlanElements.Transfer>();
+		Coord orig;
+		Coord dest;		
+		double distance;
+		double accessWalkDistance;
+		double accessWalkTime;
+		double accessWaitTime;
+		double egressWalkDistance;
+		double egressWalkTime;
+		public String toString(){
+			return String.format("start: %f end: %f distance: %f", startTime, endTime, distance);
+		}
+		
+	}
+	
+	private class Trip extends PlanElement{
+		Journey journey;
+		String mode;
+		Id line;
+		Id route;
+		Coord orig;
+		Coord dest;		
+		Id boardingStop;
+		Id alightingStop;		
+		double distance;
+		public String toString(){
+			return String.format("start: %f end: %f distance: %f", startTime, endTime, distance);
+		}
+	}
+	
+	private class Transfer extends PlanElement{
+		Journey journey;
+		Trip fromTrip;
+		Trip toTrip;
+		double walkTime;
+		double walkDistance;
+		double waitTime;
+		public String toString(){
+			return String.format("start: %f end: %f walkTime: %f", startTime, endTime, walkTime);
 		}
 	}
 
-	private class TravellerChain extends PlanElement {
+
+	private class TravellerChain {
 
 		Coord lastCoord;
-		ArrayList<PlanElement> planElements = new ArrayList<EventsToPlanElements.PlanElement>();
+		//use linked lists so I can use the getlast method
+		LinkedList<PlanElement> planElements = new LinkedList<EventsToPlanElements.PlanElement>();
+		LinkedList<Activity> acts = new LinkedList<EventsToPlanElements.Activity>();
+		LinkedList<Journey> journeys = new LinkedList<EventsToPlanElements.Journey>();
+		LinkedList<Trip> trips = new LinkedList<EventsToPlanElements.Trip>();
+		LinkedList<Transfer> transfers = new LinkedList<EventsToPlanElements.Transfer>();
 		double lastTime = 0;
 		boolean inPT = false;
-		boolean walk = false;
-		boolean traveledVehicle = false;
-		public void addCurrentStateToPlanElements() {
-			PlanElement p = new PlanElement();
-			planElements.add(p);
-			p.activityID = activityID;
-			p.dest = dest;
-			p.destFacility = destFacility;
-			p.distance = distance;
-			p.duration = duration;
-			p.endTime = endTime;
-			p.journeyID = journeyID;
-			p.line = line;
-			p.mode = mode;
-			p.orig = orig;
-			p.origFacility = origFacility;
-			p.planElementID = planElementID;
-			p.planElementType = planElementType;
-			p.route = route;
-			p.startTime = startTime;
-			p.transferID = transferID;
-			p.tripID = tripID;
-		}
-		public String toString(){
-			return String.format("--------------------------\n" +
-					"pID actID jrnyID tripID xferID              orig             dest  origFacility destFacility      mode        line        route distance duration startTime endTime\n" +
-					"%3d %5d %6d %6d %6d %6.1f %6.1f %6.1f %6.1f %12s %12s %9s %11s %12s %6.1f %6.1f %7.1f %5.1f\n" +
-					"--------------------------", planElementID,activityID,journeyID,
-					tripID,transferID, orig.getX(),orig.getY(),dest.getX(),dest.getY(),origFacility,destFacility,
-					mode,line!=null?line.toString():"null",route!=null?route.toString():"null",distance,duration, startTime,endTime);
-		}
+		boolean walking = false;
+		boolean traveling=false;
+		public boolean inCar;
+		public boolean traveledVehicle;
+
+
 	}
 
 	// Attributes
@@ -208,42 +222,28 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		if (event.getPersonId().toString().startsWith("pt_tr"))
 			return;
 		TravellerChain chain = chains.get(event.getPersonId());
-		if (!event.getPersonId().toString().startsWith("pt_tr"))
 			locations.put(event.getPersonId(),
 					network.getLinks().get(event.getLinkId()).getCoord());
-		if (!event.getPersonId().toString().startsWith("pt_tr")
-				&& chain == null) {
+		if (chain == null) {
 			chain = new TravellerChain();
 			chains.put(event.getPersonId(), chain);
-			chain.activityID++;
-			chain.dest = network.getLinks().get(event.getLinkId()).getCoord();
-			chain.destFacility = event.getFacilityId();
-			chain.distance = 0.0;
-			chain.duration = event.getTime();
-			chain.endTime = event.getTime();
-			chain.journeyID = -1;
-			chain.line = null;
-			chain.mode = null;
-			chain.orig = chain.dest;
-			chain.origFacility = chain.destFacility;
-			chain.planElementID++;
-			chain.planElementType = event.getActType();
-			chain.route = null;
-			chain.startTime = 0.0;
-			chain.transferID = -1;
-			chain.tripID = -1;
-			chain.lastCoord = chain.dest;
-			chain.lastTime = event.getTime();
-			chain.dest = chain.orig;
-			chain.addCurrentStateToPlanElements();			
-		}else if (!event.getPersonId().toString().startsWith("pt_tr")
-				&& !event.getActType()
+			chain.acts.add(new Activity());
+			Activity act = chain.acts.getLast();
+			act.coord = chain.lastCoord;
+			act.duration = chain.lastTime;
+			act.endTime = chain.lastTime;
+			act.facility = event.getFacilityId();
+			act.startTime = 0.0;
+			act.type = event.getActType();
+		
+		}else if ( !event.getActType()
 						.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-			chain.duration = event.getTime() - chain.startTime;
-			chain.endTime = event.getTime();
-			chain.lastTime = event.getTime();
-			chain.addCurrentStateToPlanElements();
+			Activity act = chain.acts.getLast();
+			act.duration = event.getTime() - act.startTime;
+			act.endTime = event.getTime();
 		}
+		chain.lastTime = event.getTime();
+		chain.lastCoord = network.getLinks().get(event.getLinkId()).getCoord();
 		if (event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 			
 
@@ -255,29 +255,69 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			return;
 		TravellerChain chain = chains.get(event.getPersonId());
 		boolean beforeInPT = chain.inPT;
-		chain.dest = network.getLinks().get(event.getLinkId()).getCoord();
 		if (event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 			chain.inPT = true;
 
 		} else {
+			chain.walking = false;
 			chain.inPT = false;
-			chain.activityID++;
-			chain.destFacility = event.getFacilityId();
-			chain.distance = 0.0;
-			chain.duration = -1;
-			chain.endTime = -1;
-			chain.lastCoord = chain.dest;
-			chain.line = null;
-			chain.mode = null;
-			chain.orig = chain.dest;
-			chain.origFacility = chain.destFacility;
-			chain.planElementType = event.getActType();
-			chain.route = null;
-			chain.startTime = event.getTime();
-			chain.planElementID++;
+			chain.acts.add(new Activity());
+			Activity act = chain.acts.getLast();
+			act.coord = chain.lastCoord;
+			act.facility = event.getFacilityId();
+			act.startTime  = chain.lastTime;
+			act.type = event.getActType();
+			chain.journeys.getLast().toAct=act;
+			chain.traveling =false;
 		}
 		chain.lastTime = event.getTime();
+		chain.lastCoord = network.getLinks().get(event.getLinkId()).getCoord();
 	}
+	
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+		if (event.getPersonId().toString().startsWith("pt_tr"))
+			return;
+		TravellerChain chain = chains.get(event.getPersonId());
+	
+		if (event.getLegMode().equals("transit_walk")){
+			chain.walking = true;
+			if(!chain.traveling){
+				chain.journeys.add(new Journey());
+				Journey journey = chain.journeys.getLast();
+				journey.orig = network.getLinks().get(event.getLinkId()).getCoord();
+				journey.fromAct = chain.acts.getLast();
+				journey.startTime = event.getTime();
+			}
+		}
+		else if(event.getLegMode().equals("car")){
+			chain.inCar = true;
+			chain.journeys.add(new Journey());
+			Journey journey = chain.journeys.getLast();
+			journey.orig = network.getLinks().get(event.getLinkId()).getCoord();
+			journey.fromAct = chain.acts.getLast();
+			journey.startTime = event.getTime();
+		}
+			chain.walking = false;
+		
+
+		chain.lastTime = event.getTime();
+		chain.lastCoord = network.getLinks().get(event.getLinkId()).getCoord();
+	}
+
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		if (event.getPersonId().toString().startsWith("pt_tr"))
+			return;
+		TravellerChain chain = chains.get(event.getPersonId());
+		if(chain.inCar){
+			Journey journey = chain.journeys.getLast();
+			journey.dest =  network.getLinks().get(event.getLinkId()).getCoord();
+			journey.duration = event.getTime() - journey.startTime;
+			chain.inCar=false;
+		}
+	}
+
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (!event.getPersonId().toString().startsWith("pt_tr"))
@@ -285,8 +325,14 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				TravellerChain chain = chains.get(event.getPersonId());
 				ptVehicles.get(event.getVehicleId()).addPassenger(
 						event.getPersonId());
-				chain.line = ptVehicles.get(event.getVehicleId()).transitLineId;
-				chain.route = ptVehicles.get(event.getVehicleId()).transitRouteId;
+				chain.trips.add(new Trip());
+				Trip trip = chain.trips.getLast();
+				chain.journeys.getLast().trips.add(trip);
+				trip.boardingStop = ptVehicles.get(event.getVehicleId()).lastStop;
+				trip.line = ptVehicles.get(event.getVehicleId()).transitLineId;
+				trip.orig =  chain.lastCoord;
+				trip.route = ptVehicles.get(event.getVehicleId()).transitRouteId;
+				trip.startTime = event.getTime();
 			}
 	}
 	@Override
@@ -298,7 +344,11 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
 				double stageDistance = vehicle.removePassenger(event
 						.getPersonId());
-				chain.distance = stageDistance;
+				Trip trip = chain.trips.getLast();
+				trip.alightingStop = ptVehicles.get(event.getVehicleId()).lastStop;
+				trip.dest = chain.lastCoord;
+				trip.endTime = event.getTime();
+				trip.duration = trip.endTime - trip.startTime;
 			}
 		}
 	}
@@ -306,8 +356,6 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	public void handleEvent(LinkEnterEvent event) {
 		if (event.getVehicleId().toString().startsWith("tr"))
 			ptVehicles.get(event.getVehicleId()).in = true;
-		else
-			chains.get(event.getPersonId()).inPT = true;
 		
 	}
 	@Override
@@ -320,46 +368,9 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 					.getLength());
 		} else {
 			TravellerChain chain = chains.get(event.getPersonId());
-		}
-	}
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		if (event.getPersonId().toString().startsWith("pt_tr"))
-			return;
-		TravellerChain chain = chains.get(event.getPersonId());
-
-		if (event.getLegMode().equals("transit_walk"))
-			chain.walk = true;
-		else
-			chain.walk = false;
-		if(!chain.inPT){
-			//start of a chain
-			chain.journeyID++;
-			chain.tripID = 0;
-		}else{
-			chain.tripID++;
-		}
-		chain.dest=null;
-		chain.destFacility=null;
-		chain.distance=0.0;
-		chain.duration = 0.0;
-		chain.endTime = -1;
-		chain.mode = event.getLegMode();
-		chain.lastTime = event.getTime();
-	}
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		if (event.getPersonId().toString().startsWith("pt_tr"))
-			return;
-		TravellerChain chain = chains.get(event.getPersonId());
-		if(!chain.inPT){
-			//car trip ends
-			chain.dest = network.getLinks().get(event.getLinkId()).getCoord();
-			chain.endTime = event.getTime();
-			chain.addCurrentStateToPlanElements();
-		}else{
-			chain.tripID++;
-			chain.addCurrentStateToPlanElements();
+			if(chain.inCar){
+				chain.journeys.getLast().distance+=network.getLinks().get(event.getLinkId()).getLength();
+			}
 		}
 	}
 	@Override
@@ -393,11 +404,11 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		new MatsimNetworkReader(scenario).readFile(args[1]);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EventsToPlanElements timeDistribution = new EventsToPlanElements(
+		EventsToPlanElements test = new EventsToPlanElements(
 				scenario.getTransitSchedule(), scenario.getNetwork());
-		eventsManager.addHandler(timeDistribution);
+		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(args[2]);
-		System.out.println(timeDistribution.chains.get(new org.matsim.core.basic.v01.IdImpl("4101962")));
+		System.out.println(test.chains.get(new org.matsim.core.basic.v01.IdImpl("801060")));
 	}
 
 }
