@@ -397,7 +397,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				scenario.getTransitSchedule(), scenario.getNetwork());
 		eventsManager.addHandler(timeDistribution);
 		new MatsimEventsReader(eventsManager).readFile(args[2]);
-		System.out.println(timeDistribution.chains.get(new org.matsim.core.basic.v01.IdImpl("801060")));
+		System.out.println(timeDistribution.chains.get(new org.matsim.core.basic.v01.IdImpl("4101962")));
 	}
 
 }

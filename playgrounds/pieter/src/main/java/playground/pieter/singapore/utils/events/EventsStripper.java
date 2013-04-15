@@ -30,7 +30,7 @@ import playground.pieter.singapore.utils.events.listeners.TrimEventsWithPersonId
 public class EventsStripper {
 
 	private class FindTransitDriverIdsFromVehicleIds implements
-			PersonEntersVehicleEventHandler {
+			TransitDriverStartsEventHandler {
 		HashSet<String> transitDriverIds = new HashSet<String>();
 		HashSet<String> transitVehicleIds;
 
@@ -46,10 +46,9 @@ public class EventsStripper {
 		}
 
 		@Override
-		public void handleEvent(PersonEntersVehicleEvent event) {
-			if(!event.getPersonId().toString().startsWith("pt_"))
-				return;
-			String driver = event.getPersonId().toString();
+		public void handleEvent(TransitDriverStartsEvent event) {
+			String driver =event.getDriverId().toString();
+
 			String car = event.getVehicleId().toString();
 			for (String vehId : transitVehicleIds) {
 				if (car.equals(vehId))
@@ -62,6 +61,8 @@ public class EventsStripper {
 		public HashSet<String> getTransitDriverIds() {
 			return transitDriverIds;
 		}
+
+
 	}
 
 	String[] choiceSet;
