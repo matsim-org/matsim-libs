@@ -10,11 +10,6 @@
 	<artifactId>pieter</artifactId>
 	<name>pieter</name>
 	<dependencies>
-		<dependency>
-			<groupId>playground</groupId>
-			<artifactId>balmermi</artifactId>
-			<version>0.5.0-SNAPSHOT</version>
-		</dependency>
 
 		<dependency>
 			<groupId>colt</groupId>
@@ -27,11 +22,6 @@
 			<version>0.5.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>playground</groupId>
-			<artifactId>johannes</artifactId>
-			<version>0.5.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>9.0-801.jdbc4</version>
@@ -40,6 +30,11 @@
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
 			<version>1.7-beta-1</version>
+		</dependency>
+		<dependency>
+			<groupId>playground</groupId>
+			<artifactId>balmermi</artifactId>
+			<version>0.5.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
