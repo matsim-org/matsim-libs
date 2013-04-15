@@ -129,6 +129,7 @@ public class EventsStripper {
 			reader = new EventsReaderXMLv1(events);
 			reader.parse(inFileName);
 			sampledIds.addAll(transitDriverFinder.transitDriverIds);
+			sampledIds.addAll(filteredWriter.getTransitVehicleIds());
 			events = EventsUtils.createEventsManager();
 			filteredWriter = new TrimEventsWithPersonIds(outfileName,
 					sampledIds, false);

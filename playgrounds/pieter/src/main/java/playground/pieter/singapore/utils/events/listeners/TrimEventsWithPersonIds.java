@@ -62,8 +62,9 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 		Map<String, String> attr = event.getAttributes();
 		String personId = attr.get("person");
 		String driverId = attr.get("driverId");
+		String vehId = attr.get("vehicleId");
 
-		if (sampledIds.contains(personId)||sampledIds.contains(driverId)) {
+		if (sampledIds.contains(personId)||sampledIds.contains(driverId) || sampledIds.contains(vehId)) {
 			if(listenForTransitDrivers= true && attr.get("vehicle") != null && attr.get("vehicle").startsWith("tr_")){
 				if(transitVehicleIds ==null){
 					transitVehicleIds = new HashSet<String>();
