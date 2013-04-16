@@ -69,7 +69,8 @@ public class SpaceTimeProbability {
 	Controler controler;
 	
 	Integer lastIteration = 10;
-	String tollLinksFile = "./input/tollLinksFile.xml";
+	String workingDirectory = "../../runs-svn/spacetimeGeo/";
+	String tollLinksFile = workingDirectory + "input/tollLinksFile.xml";
 
 	private void run() {
 		this.config = ConfigUtils.createConfig();
@@ -111,6 +112,7 @@ public class SpaceTimeProbability {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setFirstIteration(0);
 		ccg.setLastIteration(this.lastIteration);
+		ccg.setOutputDirectory(workingDirectory + "output/");
 		ccg.setMobsim(MobsimType.qsim.toString());
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
