@@ -10,7 +10,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-
 import com.vividsolutions.jts.geom.Point;
 
 public class NetworkUtil {

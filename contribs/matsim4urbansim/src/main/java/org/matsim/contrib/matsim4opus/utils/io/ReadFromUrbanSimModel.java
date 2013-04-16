@@ -23,6 +23,14 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.matsim.contrib.matsim4opus.utils.CreateHomeWorkHomePlan;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.SpatialReferenceObject;
+import org.matsim.contrib.matsim4opus.utils.ids.ZoneId;
+import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisPopulationCSVWriter;
+import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
+import org.matsim.contrib.matsim4opus.utils.misc.RandomLocationDistributor;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -38,16 +46,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.utils.CreateHomeWorkHomePlan;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.SpatialReferenceObject;
-import org.matsim.contrib.matsim4opus.utils.ids.ZoneId;
-import org.matsim.contrib.matsim4opus.utils.io.HeaderParser;
-import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisPopulationCSVWriter;
-import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
-import org.matsim.contrib.matsim4opus.utils.misc.RandomLocationDistributor;
 
 /**
  * improvements aug'12

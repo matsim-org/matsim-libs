@@ -27,13 +27,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
-
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.AccessibilityStorage;
 
 public class FixedSizeGrid {
 	

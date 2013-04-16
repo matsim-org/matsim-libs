@@ -29,13 +29,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
+import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
+import org.matsim.contrib.matsim4opus.config.ConfigurationModule;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.matsim.contrib.matsim4opus.gis.ZoneUtil;
+import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
+import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeBasedTravelDisutility;
+import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.ZoneObject;
+import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -56,17 +63,6 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.utils.LeastCostPathTree;
 
-import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
-import org.matsim.contrib.matsim4opus.config.ConfigurationModule;
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.gis.ZoneUtil;
-import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
-import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
-import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.ZoneObject;
-import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
-
 /**
  * This controller version is designed for the sustaincity mile stone (Month 18).
  * 
@@ -85,6 +81,8 @@ import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
  * 
  * improvements april'13
  * - trips are scaled up to 100%
+ * - taking disutilites directly from MATSim (controler.createTravelCostCalculator()), this 
+ * also activates road pricing ...
  * 
  * @author nagel
  * @author thomas
@@ -148,9 +146,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		
 		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.; // corresponds to 5 km/h
 		double bikeSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getBikeSpeed() * 60.; // corresponds to 15 km/h 
-		
-		// get road pricing scheme
-		RoadPricingSchemeImpl scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
 
 		// init least cost path tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getLinkTravelTimes();
@@ -160,7 +155,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = null;
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
-		// tnicolai: calculate "distance" as walk time -> add "am_walk_time_in_minutes:f4" to header
 
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = this.main.getTimeOfDay(); // 8.*3600;
@@ -168,6 +162,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		// od-trip matrix (zonal based)
 		Matrix originDestinationMatrix = new Matrix("tripMatrix", "Zone to Zone origin destination trip matrix");
 		
+		// get road pricing scheme
+		RoadPricingSchemeImpl scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
+
 		// init extended Least Cost Path Tree for car (free speed and congested) mode
 		if(usingCarParameterFromMATSim){
 
@@ -243,12 +240,12 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					if(freeSpeedTravelTime_min < 1.2)
 						freeSpeedTravelTime_min = 1.2;
 					
-					// get travel cost 
+					// get generalized travel cost 
 					double travelDisutility_util = lcptExtCongestedCarTravelTime.getTree().get( toNode.getId() ).getCost();
 					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
 					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
-					if(travelDisutility_util < 1.2)
-						travelDisutility_util = 1.2;
+					// if(travelDisutility_util < 1.2)
+					// 	travelDisutility_util = 1.2;
 					
 					// get congested arrival time
 					double arrivalTimeCC = lcptExtCongestedCarTravelTime.getTree().get( toNode.getId() ).getTime();
@@ -275,7 +272,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					// pt travel times in minutes
 					double ptTravelTime_min = -1.;
 					if(this.ptMatrix != null){
-						ptTravelTime_min = this.ptMatrix.getTotalTravelTime(fromNode.getCoord(), toNode.getCoord()) / 60.;
+						ptTravelTime_min = this.ptMatrix.getTotalTravelTime_seconds(fromNode.getCoord(), toNode.getCoord()) / 60.;
 						// we guess that any value less than 1.2 leads to errors on the UrbanSim side
 						// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
 						if(ptTravelTime_min < 1.2)
@@ -293,7 +290,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					travelDataWriter.write ( originZoneID.toString()			//origin zone id
 										+ "," + destinationZoneID.toString()	//destination zone id
 										+ "," + freeSpeedTravelTime_min			//free speed travel times
-										+ "," + travelDisutility_util 				//congested generalized cost
+										+ "," + travelDisutility_util 			//congested generalized cost
 										+ "," + congestedTravelTime_min 		//congested travel times
 										+ "," + bikeTravelTime_min				//bike travel times
 										+ "," + walkTravelTime_min				//walk travel times

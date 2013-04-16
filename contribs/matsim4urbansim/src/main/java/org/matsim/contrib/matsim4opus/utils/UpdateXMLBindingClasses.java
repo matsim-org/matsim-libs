@@ -33,7 +33,6 @@ import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.contrib.matsim4opus.utils.securityManager.ExitException;
 import org.matsim.contrib.matsim4opus.utils.securityManager.NoExitSecurityManager;
 
-
 import com.sun.tools.xjc.XJCFacade;
 
 

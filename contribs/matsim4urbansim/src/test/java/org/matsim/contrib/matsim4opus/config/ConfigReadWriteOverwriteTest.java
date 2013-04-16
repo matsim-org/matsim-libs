@@ -36,9 +36,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.testcases.MatsimTestCase;
 

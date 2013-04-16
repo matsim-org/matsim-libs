@@ -32,6 +32,8 @@ import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.MatsimConfigType;
+import org.matsim.contrib.matsim4opus.utils.ids.IdFactory;
+import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -47,9 +49,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.utils.io.UncheckedIOException;
-
-import org.matsim.contrib.matsim4opus.utils.ids.IdFactory;
-import org.matsim.contrib.matsim4opus.utils.io.Paths;
 
 /**
  * @author thomas

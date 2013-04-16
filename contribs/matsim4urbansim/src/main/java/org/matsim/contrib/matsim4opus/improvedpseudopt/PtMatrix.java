@@ -203,15 +203,6 @@ public class PtMatrix {
 				// get distance in meter
 				double distance = NetworkUtil.getEuclidianDistance(originCoord, destinationCoord) * beelineDistanceFactor;
 				
-				// NodeData nd = lcpt.getTree().get( destinationNode.getId() );
-				// double distance = nd.getCost();
-				// if(distance == 0){
-				// 	euclidianDistanceCounter++;
-				// 	distance = NetworkUtil.getEuclidianDistance(originCoord, destinationCoord);
-				// }
-				// else
-				// 	networkDistanceCounter++;
-				
 				// calculate time in seconds (distance / 25kmh)
 				double travelTime = distance / meterPerSecPtSpeed;
 				
@@ -384,41 +375,17 @@ public class PtMatrix {
 	 * @param toFacilityCoord
 	 * @return
 	 */
-	public double getTotalTravelTime(Coord fromFacilityCoord, Coord toFacilityCoord){
-		
-//		// get nearest network nodes
-//		Node fromFacilityNode = network.getNearestNode(fromFacilityCoord);
-//		Node toFacilityNode = network.getNearestNode(toFacilityCoord);
-//		Node fromPtStopNode = network.getNearestNode(fromPtStop.getCoord());
-//		Node toPtStopNode = network.getNearestNode(toPtStop.getCoord());
-//		
-//		// get the paths between facility and pt stop
-//		Path pathFromFacility2FromPtStop = lcpc.calcLeastCostPath(fromFacilityNode, fromPtStopNode, departureTime, null, null);
-//		Path pathToPtStop2ToFacility = lcpc.calcLeastCostPath(toPtStopNode, toFacilityNode, departureTime, null, null);
-//		
-//		// get the travel times
-//		double walkDistanceFromFacility2Node = NetworkUtil.getEuclidianDistance(fromFacilityCoord, fromFacilityNode.getCoord());
-//		double walkDistanceNode2ToFacility   = NetworkUtil.getEuclidianDistance(toFacilityNode.getCoord(), toFacilityCoord);
-//		double walkTimeFromFacility2Node	 = walkDistanceFromFacility2Node / this.meterPerSecWalkSpeed;
-//		double walkTimeNode2ToFacility		 = walkDistanceNode2ToFacility / this.meterPerSecWalkSpeed;
-//		
-//		double walkTimeFromFacility2FromPtStop = pathFromFacility2FromPtStop.travelCost;
-//		double walkTimeToPtStop2ToFacility = pathToPtStop2ToFacility.travelCost;
-		
-		
-		// old version
-//		double walkTravelTimeFromFacility2FromPtStop = NetworkUtil.getEuclidianDistance(fromFacilityCoord, fromPtStop.getCoord()) / meterPerSecWalkSpeed;
-//		double walkTravelTimeToPtStop2ToFacility = NetworkUtil.getEuclidianDistance(toPtStop.getCoord(), toFacilityCoord) / meterPerSecWalkSpeed;
-		
-		double totalWalkTravelTime = getTotalWalkTravelTime(fromFacilityCoord, toFacilityCoord);
-		double ptTravelTime = getPtTravelTime(fromFacilityCoord, toFacilityCoord);
+	public double getTotalTravelTime_seconds(Coord fromFacilityCoord, Coord toFacilityCoord){
+				
+		double totalWalkTravelTime = getTotalWalkTravelTime_seconds(fromFacilityCoord, toFacilityCoord);
+		double ptTravelTime = getPtTravelTime_seconds(fromFacilityCoord, toFacilityCoord);
 		
 		double totalTravelTime = totalWalkTravelTime + ptTravelTime;
 		return totalTravelTime;
 	}
 	
 	/**
-	 * returns the total walk travel times including
+	 * returns the total walk travel times in seconds including
 	 * - walk travel time from given coordinate to next pt stop
 	 * - walk travel time from destination pt stop to given destination coordinate
 	 * 
@@ -426,7 +393,7 @@ public class PtMatrix {
 	 * @param toFacilityCoord
 	 * @return
 	 */
-	public double getTotalWalkTravelTime(Coord fromFacilityCoord, Coord toFacilityCoord){
+	public double getTotalWalkTravelTime_seconds(Coord fromFacilityCoord, Coord toFacilityCoord){
 		
 		// get pt stops
 		PtStop fromPtStop = this.qTree.get(fromFacilityCoord.getX(), fromFacilityCoord.getY());
@@ -446,7 +413,7 @@ public class PtMatrix {
 		return totalWalkTravelTime;
 	}
 	
-	public double getPtTravelTime(Coord fromFacilityCoord, Coord toFacilityCoord){
+	public double getPtTravelTime_seconds(Coord fromFacilityCoord, Coord toFacilityCoord){
 		
 		// get pt stops
 		PtStop fromPtStop = this.qTree.get(fromFacilityCoord.getX(), fromFacilityCoord.getY());
@@ -482,10 +449,10 @@ public class PtMatrix {
 	 * @param toFacilityCoord
 	 * @return
 	 */
-	public double getTotalTravelDistance(Coord fromFacilityCoord, Coord toFacilityCoord){
+	public double getTotalTravelDistance_meter(Coord fromFacilityCoord, Coord toFacilityCoord){
 		
-		double totalWalkTravelDistance = getTotalWalkTravelDistance(fromFacilityCoord, toFacilityCoord);
-		double ptTravelDistance = getPtTravelDistance(fromFacilityCoord, toFacilityCoord); 
+		double totalWalkTravelDistance = getTotalWalkTravelDistance_meter(fromFacilityCoord, toFacilityCoord);
+		double ptTravelDistance = getPtTravelDistance_meter(fromFacilityCoord, toFacilityCoord); 
 			
 		double totalTravelDistance = totalWalkTravelDistance + ptTravelDistance;
 		return totalTravelDistance;
@@ -497,7 +464,7 @@ public class PtMatrix {
 	 * @param toFacilityCoord
 	 * @return
 	 */
-	public double getTotalWalkTravelDistance(Coord fromFacilityCoord, Coord toFacilityCoord){
+	public double getTotalWalkTravelDistance_meter(Coord fromFacilityCoord, Coord toFacilityCoord){
 		
 		PtStop fromPtStop = this.qTree.get(fromFacilityCoord.getX(), fromFacilityCoord.getY());
 		PtStop toPtStop   = this.qTree.get(toFacilityCoord.getX(), toFacilityCoord.getY());
@@ -514,7 +481,6 @@ public class PtMatrix {
 		
 		double totalWalkTravelDistance = walkTravelDistanceFromFacility2FromPtStop + walkTravelDistanceToPtStop2ToFacility;
 		return totalWalkTravelDistance;
-		
 	}
 	
 	/**
@@ -523,7 +489,7 @@ public class PtMatrix {
 	 * @param toFacilityCoord
 	 * @return
 	 */
-	public double getPtTravelDistance(Coord fromFacilityCoord, Coord toFacilityCoord){
+	public double getPtTravelDistance_meter(Coord fromFacilityCoord, Coord toFacilityCoord){
 		
 		PtStop fromPtStop = this.qTree.get(fromFacilityCoord.getX(), fromFacilityCoord.getY());
 		PtStop toPtStop   = this.qTree.get(toFacilityCoord.getX(), toFacilityCoord.getY());
@@ -608,8 +574,8 @@ public class PtMatrix {
 				PtStop fromLocation = ptStopIds[origin];
 				PtStop toLocation = ptStopIds[destination];
 				
-				double travelTime = ptm.getTotalTravelTime(fromLocation.getCoord(), toLocation.getCoord());
-				double travelDistance= ptm.getTotalTravelDistance(fromLocation.getCoord(), toLocation.getCoord());
+				double travelTime = ptm.getTotalTravelTime_seconds(fromLocation.getCoord(), toLocation.getCoord());
+				double travelDistance= ptm.getTotalTravelDistance_meter(fromLocation.getCoord(), toLocation.getCoord());
 				log.info("From: " + fromLocation.getId() + ", To: " + toLocation.getId() + ", TravelTime: " + travelTime + ", Travel Distance: " + travelDistance);
 			}
 		}

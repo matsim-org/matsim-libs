@@ -97,14 +97,14 @@ public class PtMatrixTest extends MatsimTestCase{
 			for(int destination = 0; destination < facilityList.size(); destination++){
 				
 				// calculate travel times
-				double totalTravelTime = ptm.getTotalTravelTime(facilityList.get( origin ), facilityList.get( destination ));
-				double walkTravelTime = ptm.getTotalWalkTravelTime(facilityList.get( origin ), facilityList.get( destination ));
-				double ptTravelTime = ptm.getPtTravelTime(facilityList.get( origin ), facilityList.get( destination ));
+				double totalTravelTime = ptm.getTotalTravelTime_seconds(facilityList.get( origin ), facilityList.get( destination ));
+				double walkTravelTime = ptm.getTotalWalkTravelTime_seconds(facilityList.get( origin ), facilityList.get( destination ));
+				double ptTravelTime = ptm.getPtTravelTime_seconds(facilityList.get( origin ), facilityList.get( destination ));
 				
 				// calculate travel distances
-				double totalTravelDistance= ptm.getTotalTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
-				double walkTravelDistance = ptm.getTotalWalkTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
-				double ptTravelDistance = ptm.getPtTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
+				double totalTravelDistance= ptm.getTotalTravelDistance_meter(facilityList.get( origin ), facilityList.get( destination ));
+				double walkTravelDistance = ptm.getTotalWalkTravelDistance_meter(facilityList.get( origin ), facilityList.get( destination ));
+				double ptTravelDistance = ptm.getPtTravelDistance_meter(facilityList.get( origin ), facilityList.get( destination ));
 				
 				log.info("From: " + facilityList.get( origin ).getX()+":"+facilityList.get( origin ).getY() + ", To: " + facilityList.get( destination ).getX()+":"+facilityList.get( destination ).getY()  + ", TravelTime: " + totalTravelTime + ", Travel Distance: " + totalTravelDistance);
 				
@@ -198,14 +198,14 @@ public class PtMatrixTest extends MatsimTestCase{
 			for(int destination = 0; destination < facilityList.size(); destination++){
 				
 				// calculate travel times
-				double totalTravelTime = ptm.getTotalTravelTime(facilityList.get( origin ), facilityList.get( destination ));
-				double walkTravelTime = ptm.getTotalWalkTravelTime(facilityList.get( origin ), facilityList.get( destination ));
-				double ptTravelTime = ptm.getPtTravelTime(facilityList.get( origin ), facilityList.get( destination ));
+				double totalTravelTime = ptm.getTotalTravelTime_seconds(facilityList.get( origin ), facilityList.get( destination ));
+				double walkTravelTime = ptm.getTotalWalkTravelTime_seconds(facilityList.get( origin ), facilityList.get( destination ));
+				double ptTravelTime = ptm.getPtTravelTime_seconds(facilityList.get( origin ), facilityList.get( destination ));
 				
 				// calculate travel distances
-				double totalTravelDistance= ptm.getTotalTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
-				double walkTravelDistance = ptm.getTotalWalkTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
-				double ptTravelDistance = ptm.getPtTravelDistance(facilityList.get( origin ), facilityList.get( destination ));
+				double totalTravelDistance= ptm.getTotalTravelDistance_meter(facilityList.get( origin ), facilityList.get( destination ));
+				double walkTravelDistance = ptm.getTotalWalkTravelDistance_meter(facilityList.get( origin ), facilityList.get( destination ));
+				double ptTravelDistance = ptm.getPtTravelDistance_meter(facilityList.get( origin ), facilityList.get( destination ));
 				
 				log.info("From: " + facilityList.get( origin ).getX()+":"+facilityList.get( origin ).getY() + ", To: " + facilityList.get( destination ).getX()+":"+facilityList.get( destination ).getY()  + ", TravelTime: " + totalTravelTime + ", Travel Distance: " + totalTravelDistance);
 				

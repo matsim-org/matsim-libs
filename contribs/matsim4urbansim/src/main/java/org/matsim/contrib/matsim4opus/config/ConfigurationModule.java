@@ -22,10 +22,6 @@ package org.matsim.contrib.matsim4opus.config;
 import org.matsim.core.config.Module;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
-import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
-
 public class ConfigurationModule {
 	
 	public static AccessibilityParameterConfigModule getAccessibilityParameterConfigModule(ScenarioImpl scenario){

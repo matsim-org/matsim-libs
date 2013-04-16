@@ -27,11 +27,10 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.ZoneObject;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
-
-import org.matsim.contrib.matsim4opus.utils.helperObjects.ZoneObject;
 
 
 /**

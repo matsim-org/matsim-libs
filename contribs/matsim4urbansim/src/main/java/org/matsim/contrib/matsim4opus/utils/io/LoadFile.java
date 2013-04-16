@@ -33,7 +33,6 @@ import java.net.URL;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.xml.sax.InputSource;
 
 
 

@@ -16,9 +16,7 @@ import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
@@ -112,7 +110,8 @@ import org.matsim.utils.LeastCostPathTree;
  * 
  * improvements april'13
  * - congested car modes uses TravelDisutility from MATSim
- * - including road pricing (toll)
+ * - taking disutilites directly from MATSim (controler.createTravelCostCalculator()), this 
+ * also activates road pricing ...
  * 
  * @author thomas
  * 
@@ -175,25 +174,6 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
-		
-//		// TEST
-//		RoadPricingSchemeImpl scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
-//		if(scheme == null)
-//			System.out.println("null");
-//		else{
-//			Iterator<Link> links = network.getLinks().values().iterator();
-//			
-//			double overallToll = 0.;
-//			
-//			while(links.hasNext()){
-//				Link l = links.next();
-//				Cost cost = scheme.getLinkCostInfo(l.getId(), 7200., null);
-//				if(cost != null)
-//					overallToll += cost.amount;
-//			}
-//			System.out.println(overallToll);
-//		}
-//		// TEST
 		
 		this.aggregatedOpportunities = this.aggregatedOpportunities(this.parcels, this.main.getOpportunitySampleRate(), network, this.main.isParcelMode());
 		

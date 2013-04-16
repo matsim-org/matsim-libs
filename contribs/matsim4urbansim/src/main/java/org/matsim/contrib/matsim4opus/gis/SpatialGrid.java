@@ -27,9 +27,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
-
 import org.matsim.contrib.matsim4opus.utils.io.writer.SpatialGridTableWriter;
+import org.matsim.core.utils.io.IOUtils;
 
 import com.vividsolutions.jts.geom.Point;
 

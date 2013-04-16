@@ -5,11 +5,16 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
+import org.matsim.contrib.matsim4opus.gis.Zone;
+import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
+import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
+import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
+import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
+import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
+import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisZoneCSVWriterV2;
+import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -23,17 +28,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.TravelDisutilityIncludingToll;
-import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.utils.LeastCostPathTree;
-
-import org.matsim.contrib.matsim4opus.gis.Zone;
-import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
-import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
-import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
-import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
-import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisZoneCSVWriterV2;
-import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
 
 /**
  *  improvements feb'12
@@ -59,7 +54,8 @@ import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
  * 
  * improvements april'13
  * - congested car modes uses TravelDisutility from MATSim
- * - including road pricing (toll)
+ * - taking disutilites directly from MATSim (controler.createTravelCostCalculator()), this 
+ * also activates road pricing ...
  * 
  * @author thomas
  *
@@ -127,25 +123,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		// get road pricing scheme
 		RoadPricingSchemeImpl scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
-		
-//		// TEST
-//		if(scheme == null)
-//			System.out.println("null");
-//		else{
-//			Iterator<Link> links = network.getLinks().values().iterator();
-//			
-//			double overallToll = 0.;
-//			
-//			while(links.hasNext()){
-//				Link l = links.next();
-//				Cost cost = scheme.getLinkCostInfo(l.getId(), 7200., null);
-//				if(cost != null)
-//					overallToll += cost.amount;
-//			}
-//			System.out.println(overallToll);
-//		}
-//		// TEST
-		
+
 		// init extended Least Cost Path Tree for car (free speed and congested) mode
 		if(usingCarParameterFromMATSim){
 
