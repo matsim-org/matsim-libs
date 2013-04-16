@@ -1,0 +1,109 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.michalm.demand.poznan;
+
+import java.io.*;
+import java.lang.reflect.Array;
+import java.util.EnumMap;
+
+import playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityPair;
+import playground.michalm.util.visum.VisumODMatrixReader;
+
+
+public class PoznanODMatrixAdder
+{
+    private static String dirName = "D:\\eTaxi\\Poznan_MATSim\\";
+    private static String odMatrixFilePrefix = dirName + "odMatricesByType\\";
+    private static String put2PrtRatiosFile = dirName + "PuT_PrT_ratios";
+
+    private static EnumMap<ActivityPair, Double> prtCoeffs;
+    private static double[][][] totalODMatrices;
+
+
+    public static void main(String[] args)
+        throws IOException
+    {
+        prtCoeffs = PoznanLanduseDemandGeneration.readPrtCoeffs(put2PrtRatiosFile);
+
+        totalODMatrices = new double[24][][];
+
+        for (ActivityPair ap : ActivityPair.values()) {
+            readMatrix(odMatrixFilePrefix, ap);
+        }
+
+        writeMatricesByHour(odMatrixFilePrefix);
+    }
+
+
+    private static void readMatrix(String filePrefix, ActivityPair actPair)
+        throws FileNotFoundException
+    {
+        double flowCoeff = prtCoeffs.get(actPair);
+
+        for (int i = 0; i < 24; i++) {
+            String odMatrixFile = filePrefix + actPair.name() + "_" + i + "-" + (i + 1);
+
+            System.out.println("readMatrix: " + odMatrixFile);
+
+            double[][] odMatrix = VisumODMatrixReader.readMatrixFile(new File(odMatrixFile));
+
+            if (totalODMatrices[i] == null) {
+                totalODMatrices[i] = (double[][])Array.newInstance(//
+                        double.class, odMatrix.length, odMatrix[0].length);
+            }
+
+            for (int j = 0; j < odMatrix.length; j++) {
+                for (int k = 0; k < odMatrix[j].length; k++) {
+                    totalODMatrices[i][j][k] += flowCoeff * odMatrix[j][k];
+                }
+            }
+        }
+    }
+
+
+    private static void writeMatricesByHour(String filePrefix)
+        throws IOException
+    {
+        for (int i = 0; i < 24; i++) {
+            String odMatrixFile = filePrefix + "_" + i + "-" + (i + 1);
+
+            System.out.println("writeMatrix: " + odMatrixFile);
+
+            writeMatrix(totalODMatrices[i], odMatrixFile);
+        }
+    }
+
+
+    private static void writeMatrix(double[][] array, String file)
+        throws IOException
+    {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[i].length; j++) {
+                writer.write(array[i][j] + "\t");
+            }
+
+            writer.newLine();
+        }
+
+        writer.close();
+    }
+}

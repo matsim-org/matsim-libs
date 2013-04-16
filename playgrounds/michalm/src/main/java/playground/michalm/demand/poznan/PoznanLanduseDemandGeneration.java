@@ -43,13 +43,13 @@ import com.vividsolutions.jts.geom.*;
 
 public class PoznanLanduseDemandGeneration
 {
-    private static enum ActivityType
+    static enum ActivityType
     {
         HOME, WORK, EDUCATION, SHOPPING, OTHER;
     }
 
 
-    private static enum ActivityPair
+    static enum ActivityPair
     {
         D_I(ActivityType.HOME, ActivityType.OTHER), //
         D_N(ActivityType.HOME, ActivityType.EDUCATION), //
@@ -64,7 +64,7 @@ public class PoznanLanduseDemandGeneration
         // However, for PoznanLanduseDemandGeneration generator this simplification is OK
         // because location of Other is not constrained in any way
 
-        private final ActivityType from, to;
+        final ActivityType from, to;
 
 
         private ActivityPair(ActivityType from, ActivityType to)
@@ -75,6 +75,7 @@ public class PoznanLanduseDemandGeneration
     }
 
 
+    private static final double PEOPLE_PER_VEHICLE = 1.2;
     private static final double RESIDENTIAL_TO_INDUSTRIAL_WORK = 0.33;
     private static final double RESIDENTIAL_TO_SHOP_SHOPPING = 0.1;
 
@@ -90,7 +91,7 @@ public class PoznanLanduseDemandGeneration
             if (activityType != ActivityType.OTHER && validatedZones.contains(zone.getId())) {
                 Geometry geometry = selectionByZoneByActType.get(activityType).get(zone.getId())
                         .select();
-                
+
                 if (geometry != null) {
                     return geometry;
                 }
@@ -123,7 +124,7 @@ public class PoznanLanduseDemandGeneration
     private Scenario scenario;
     private Map<Id, Zone> zones;
     private Set<Id> validatedZones;
-    private EnumMap<ActivityPair, Double> put2PrtRatios;
+    private EnumMap<ActivityPair, Double> prtCoeffs;
     private EnumMap<ActivityType, Map<Id, WeightedRandomSelection<Geometry>>> selectionByZoneByActType;
     private Map<Id, List<Geometry>> forestByZone;
     private ODDemandGenerator dg;
@@ -209,7 +210,7 @@ public class PoznanLanduseDemandGeneration
             }
         }
 
-        readPut2PrtRatios(put2PrtRatiosFile);
+        prtCoeffs = readPrtCoeffs(put2PrtRatiosFile);
 
         LanduseLocationGeneratorStrategy strategy = new LanduseLocationGeneratorStrategy();
         ActivityGenerator lg = new DefaultActivityGenerator(scenario, strategy, strategy);
@@ -227,7 +228,7 @@ public class PoznanLanduseDemandGeneration
     private void generate(String filePrefix, ActivityPair actPair)
         throws FileNotFoundException
     {
-        double flowCoeff = put2PrtRatios.get(actPair);
+        double flowCoeff = prtCoeffs.get(actPair);
         String actTypeFrom = actPair.from.name();
         String actTypeTo = actPair.to.name();
 
@@ -254,28 +255,31 @@ public class PoznanLanduseDemandGeneration
     }
 
 
-    private void readPut2PrtRatios(String put2PrtRatiosFile)
+    static EnumMap<ActivityPair, Double> readPrtCoeffs(String put2PrtRatiosFile)
         throws FileNotFoundException
     {
-        put2PrtRatios = new EnumMap<ActivityPair, Double>(ActivityPair.class);
+        EnumMap<ActivityPair, Double> prtCoeffs = new EnumMap<ActivityPair, Double>(
+                ActivityPair.class);
         Scanner scanner = new Scanner(new File(put2PrtRatiosFile));
 
         while (scanner.hasNext()) {
             ActivityPair pair = ActivityPair.valueOf(scanner.next());
             double putShare = scanner.nextDouble();
             double prtShare = scanner.nextDouble();
-            double ratio = putShare / (putShare + prtShare);
+            double coeff = prtShare / (putShare + prtShare) / PEOPLE_PER_VEHICLE;
 
-            if (put2PrtRatios.put(pair, ratio) != null) {
+            if (prtCoeffs.put(pair, coeff) != null) {
                 throw new RuntimeException("Pair respecified: " + pair);
             }
         }
 
         scanner.close();
 
-        if (put2PrtRatios.size() != ActivityPair.values().length) {
+        if (prtCoeffs.size() != ActivityPair.values().length) {
             throw new RuntimeException("Not all pairs have been specified");
         }
+
+        return prtCoeffs;
     }
 
 
