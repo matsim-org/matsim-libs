@@ -312,16 +312,16 @@ public class AccessibilityControlerListenerImpl{
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 			
 			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;
-			double VjkWalkPowerTravelTime=this.betaWalkTTPower * (walkTravelTime_h * walkTravelTime_h);
-			double VjkWalkLnTravelTime	= this.betaWalkLnTT * Math.log(walkTravelTime_h);
+			double VjkWalkPowerTravelTime=0.; // this.betaWalkTTPower * (walkTravelTime_h * walkTravelTime_h);
+			double VjkWalkLnTravelTime	= 0.; // this.betaWalkLnTT * Math.log(walkTravelTime_h);
 			
 			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
-			double VjkWalkPowerDistnace	= this.betaWalkTDPower * (distance_meter * distance_meter);
-			double VjkWalkLnDistance 	= this.betaWalkLnTD * Math.log(distance_meter);
+			double VjkWalkPowerDistnace	= 0.; //this.betaWalkTDPower * (distance_meter * distance_meter);
+			double VjkWalkLnDistance 	= 0.; //this.betaWalkLnTD * Math.log(distance_meter);
 			
 			double VjkWalkMoney			= this.betaWalkTMC * 0.; 		// no monetary costs for walking
-			double VjkWalkPowerMoney	= this.betaWalkTDPower * 0.; 	// no monetary costs for walking
-			double VjkWalkLnMoney		= this.betaWalkLnTMC *0.; 		// no monetary costs for walking
+			double VjkWalkPowerMoney	= 0.; //this.betaWalkTDPower * 0.; 	// no monetary costs for walking
+			double VjkWalkLnMoney		= 0.; //this.betaWalkLnTMC *0.; 		// no monetary costs for walking
 
 			double Vjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkPowerTravelTime + VjkWalkLnTravelTime +
 																			   VjkWalkDistance   + VjkWalkPowerDistnace   + VjkWalkLnDistance +
