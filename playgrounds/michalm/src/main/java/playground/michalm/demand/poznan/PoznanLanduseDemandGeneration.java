@@ -45,15 +45,7 @@ public class PoznanLanduseDemandGeneration
 {
     private static enum ActivityType
     {
-        HOME("H"), WORK("W"), EDUCATION("E"), SHOPPING("S"), OTHER("O");
-
-        private final String id;
-
-
-        private ActivityType(String id)
-        {
-            this.id = id;
-        }
+        HOME, WORK, EDUCATION, SHOPPING, OTHER;
     }
 
 
@@ -87,30 +79,21 @@ public class PoznanLanduseDemandGeneration
     private static final double RESIDENTIAL_TO_SHOP_SHOPPING = 0.1;
 
 
-    public static class LanduseLocationGeneratorStrategy
+    public class LanduseLocationGeneratorStrategy
         implements GeometryProvider, PointAcceptor
     {
-        private final Map<String, Map<Id, WeightedRandomSelection<Geometry>>> selectionByZoneByActType;
-        private final Map<Id, List<Geometry>> forestByZone;
-        private final Set<Id> validatedZones;
-
-
-        public LanduseLocationGeneratorStrategy(
-                Map<String, Map<Id, WeightedRandomSelection<Geometry>>> selectionByZoneByActType,
-                Map<Id, List<Geometry>> forestByZone, Set<Id> validatedZones)
-        {
-            this.selectionByZoneByActType = selectionByZoneByActType;
-            this.forestByZone = forestByZone;
-            this.validatedZones = validatedZones;
-        }
-
-
         @Override
         public Geometry getGeometry(Zone zone, String actType)
         {
-            if (ActivityType.valueOf(actType) != ActivityType.OTHER
-                    && validatedZones.contains(zone.getId())) {
-                return selectionByZoneByActType.get(actType).get(zone.getId()).select();
+            ActivityType activityType = ActivityType.valueOf(actType);
+
+            if (activityType != ActivityType.OTHER && validatedZones.contains(zone.getId())) {
+                Geometry geometry = selectionByZoneByActType.get(activityType).get(zone.getId())
+                        .select();
+                
+                if (geometry != null) {
+                    return geometry;
+                }
             }
 
             return (Geometry)zone.getZonePolygon().getDefaultGeometry();
@@ -120,7 +103,9 @@ public class PoznanLanduseDemandGeneration
         @Override
         public boolean acceptPoint(Zone zone, String actType, Point point)
         {
-            if (ActivityType.valueOf(actType) == ActivityType.OTHER) {
+            ActivityType activityType = ActivityType.valueOf(actType);
+
+            if (activityType == ActivityType.OTHER || validatedZones.contains(zone.getId())) {
                 return true;
             }
 
@@ -139,14 +124,15 @@ public class PoznanLanduseDemandGeneration
     private Map<Id, Zone> zones;
     private Set<Id> validatedZones;
     private EnumMap<ActivityPair, Double> put2PrtRatios;
-    private Map<String, Map<Id, WeightedRandomSelection<Geometry>>> selectionByZoneByActType;
+    private EnumMap<ActivityType, Map<Id, WeightedRandomSelection<Geometry>>> selectionByZoneByActType;
+    private Map<Id, List<Geometry>> forestByZone;
     private ODDemandGenerator dg;
 
 
     public void generate()
         throws ConfigurationException, SAXException, ParserConfigurationException, IOException
     {
-        String dirName = "D:\\eTaxi\\Poznan_MATSim\\";
+        String dirName = "D:\\michalm\\eTaxi\\Poznan_MATSim\\";
         String networkFile = dirName + "network.xml";
         String zonesXmlFile = dirName + "zones.xml";
         String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
@@ -175,7 +161,7 @@ public class PoznanLanduseDemandGeneration
         readValidatedZones(validatedZonesFile);
 
         System.out.println("getLanduseByZone(forestShpFile)");
-        Map<Id, List<Geometry>> forestByZone = getLanduseByZone(forestShpFile);
+        forestByZone = getLanduseByZone(forestShpFile);
         System.out.println("getLanduseByZone(industrialShpFile)");
         Map<Id, List<Geometry>> industrialByZone = getLanduseByZone(industrialShpFile);
         System.out.println("getLanduseByZone(residentialShpFile)");
@@ -185,7 +171,8 @@ public class PoznanLanduseDemandGeneration
         System.out.println("getLanduseByZone(shopShpFile)");
         Map<Id, List<Geometry>> shopByZone = getLanduseByZone(shopShpFile);
 
-        selectionByZoneByActType = new HashMap<String, Map<Id, WeightedRandomSelection<Geometry>>>();
+        selectionByZoneByActType = new EnumMap<ActivityType, Map<Id, WeightedRandomSelection<Geometry>>>(
+                ActivityType.class);
 
         Map<Id, WeightedRandomSelection<Geometry>> homeSelectionByZone = initSelectionByZone(ActivityType.HOME);
         Map<Id, WeightedRandomSelection<Geometry>> workSelectionByZone = initSelectionByZone(ActivityType.WORK);
@@ -224,8 +211,7 @@ public class PoznanLanduseDemandGeneration
 
         readPut2PrtRatios(put2PrtRatiosFile);
 
-        LanduseLocationGeneratorStrategy strategy = new LanduseLocationGeneratorStrategy(
-                selectionByZoneByActType, forestByZone, validatedZones);
+        LanduseLocationGeneratorStrategy strategy = new LanduseLocationGeneratorStrategy();
         ActivityGenerator lg = new DefaultActivityGenerator(scenario, strategy, strategy);
         dg = new ODDemandGenerator(scenario, lg, zones);
 
@@ -242,8 +228,8 @@ public class PoznanLanduseDemandGeneration
         throws FileNotFoundException
     {
         double flowCoeff = put2PrtRatios.get(actPair);
-        String actTypeFrom = actPair.from.id;
-        String actTypeTo = actPair.to.id;
+        String actTypeFrom = actPair.from.name();
+        String actTypeTo = actPair.to.name();
 
         for (int i = 0; i < 24; i++) {
             String odMatrixFile = filePrefix + actPair.name() + "_" + i + "-" + (i + 1);
@@ -280,7 +266,7 @@ public class PoznanLanduseDemandGeneration
             double prtShare = scanner.nextDouble();
             double ratio = putShare / (putShare + prtShare);
 
-            if (put2PrtRatios.put(pair, ratio) == null) {
+            if (put2PrtRatios.put(pair, ratio) != null) {
                 throw new RuntimeException("Pair respecified: " + pair);
             }
         }
@@ -305,7 +291,7 @@ public class PoznanLanduseDemandGeneration
     private Map<Id, WeightedRandomSelection<Geometry>> initSelectionByZone(ActivityType actType)
     {
         Map<Id, WeightedRandomSelection<Geometry>> selectionByZone = new HashMap<Id, WeightedRandomSelection<Geometry>>();
-        selectionByZoneByActType.put(actType.id, selectionByZone);
+        selectionByZoneByActType.put(actType, selectionByZone);
         return selectionByZone;
     }
 

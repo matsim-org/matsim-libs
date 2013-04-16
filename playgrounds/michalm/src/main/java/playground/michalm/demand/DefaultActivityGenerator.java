@@ -19,12 +19,18 @@
 
 package playground.michalm.demand;
 
+import java.util.*;
+
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.*;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import pl.poznan.put.util.random.*;
 
@@ -78,12 +84,25 @@ public class DefaultActivityGenerator
         double maxY = envelope.getMaxY();
 
         Point p = null;
-        Id bannedLinkId = previousActivity.getLinkId();
+        Id bannedLinkId = previousActivity != null ? previousActivity.getLinkId() : null;
 
-        for (;;) {
+        for (int i = 0;; i++) {
             double x = uniform.nextDouble(minX, maxX);
             double y = uniform.nextDouble(minY, maxY);
             p = MGC.xy2Point(x, y);
+
+            if (i == 1000) {
+                CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
+                PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().setCrs(crs)
+                        .setName("PolygonFeatureType").create();
+                SimpleFeature feature = factory.createPolygon((Polygon)geometry,
+                        Collections.<String, Object> emptyMap(), null);
+                Set<SimpleFeature> featureSet = new HashSet<SimpleFeature>();
+                featureSet.add(feature);
+                ShapeFileWriter.writeGeometries(featureSet, "d:\\looped_zoneId_" + zone.getId() + "_actType_" + actType + ".shp");
+
+                System.out.println("Got stuck at zoneId=" + zone.getId() + " actType=" + actType);
+            }
 
             if (!geometry.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p)) {
                 continue;
