@@ -259,18 +259,18 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 			// If the parking facility was not relocated, we do not have to adapt anything here.
 			else return false;
 			
-			// The next car leg can be removed if it starts and ends on the same link.
 			boolean removeNextCarLeg = (nextParkingActivity.getLinkId().equals(nextNextparkingActivity.getLinkId()));
+			// The next car leg can be removed if it starts and ends on the same link.
 			if (removeNextCarLeg) {				
-				plan.getPlanElements().remove(walkLegToNextParkingActivity);
-				plan.getPlanElements().remove(nextParkingActivity);
-				plan.getPlanElements().remove(nextCarLeg);
-				plan.getPlanElements().remove(nextNextparkingActivity);
-				
 				// create a new walk leg
 				Activity previousActivity = (Activity) plan.getPlanElements().get(nextCarLegIndex - 3);
 				Activity nextActivity = (Activity) plan.getPlanElements().get(nextCarLegIndex + 3);
 				createNewWalkRoute(previousActivity, walkLegFromNextParkingActivity, nextActivity, plan.getPerson());
+
+				plan.getPlanElements().remove(walkLegToNextParkingActivity);
+				plan.getPlanElements().remove(nextParkingActivity);
+				plan.getPlanElements().remove(nextCarLeg);
+				plan.getPlanElements().remove(nextNextparkingActivity);
 
 				return true;
 			}
