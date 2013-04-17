@@ -66,7 +66,7 @@ public class CompareLogsumFormulas extends MatsimTestCase{
 		double cik3TD= cijTD + cjk3TD;
 		
 		double Ai = computeLogsum(betaWalkTT, betaWalkTD, cik1TT, cik2TT, cik3TT, cik1TD, cik2TD, cik3TD);
-		double Ai2 =computeTranspformedLogsum(betaWalkTT, betaWalkTD, cijTT, cjk1TT, cjk2TT, cjk3TT, cijTD, cjk1TD, cjk2TD, cjk3TD);
+		double Ai2 =computeTransformedLogsum(betaWalkTT, betaWalkTD, cijTT, cjk1TT, cjk2TT, cjk3TT, cijTD, cjk1TD, cjk2TD, cjk3TD);
 		
 		Assert.assertTrue( Ai == Ai2 );
 	}
@@ -88,7 +88,7 @@ public class CompareLogsumFormulas extends MatsimTestCase{
 	 * @param cjk2TD
 	 * @param cjk3TD
 	 */
-	private double computeTranspformedLogsum(double betaWalkTT,
+	private double computeTransformedLogsum(double betaWalkTT,
 			double betaWalkTD, double cijTT, double cjk1TT, double cjk2TT,
 			double cjk3TT, double cijTD, double cjk1TD, double cjk2TD,
 			double cjk3TD) {
