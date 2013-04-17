@@ -55,21 +55,20 @@ public class TransitScheduleAnalyserToCSVandTEX {
 	
 	public static void transitScheduleAnalyser (TransitSchedule ts, Network net, String outputDirectory){
 		
-		int numberOfLines = 0;
-		int numberOfRoutes = 0;
 		Date date = new Date();
 		String filenameTEX = outputDirectory + "\\transitScheduleAnalyse_" + date.getHours() + "_" + date.getMinutes() +  ".tex";
 		String filenameCSV = outputDirectory + "\\transitScheduleAnalyse_" + date.getHours() + "_" + date.getMinutes() +  ".csv";
 		
+		List <TransitScheduleAnalyserElement> allInformations = new ArrayList<TransitScheduleAnalyserElement>();
+		
 		Map <Id, TransitLine> transitLinesMap = ts.getTransitLines();
 		
 		for (Entry <Id, TransitLine> lineEntry : transitLinesMap.entrySet()) { 
-		numberOfLines++;
-		List <String> allInformations = new ArrayList<String>();	
+	
+			
 		String lineId = String.valueOf(lineEntry.getKey());
 		String routeId;
 			Map <Id, TransitRoute> transitRoutesMap = transitLinesMap.get(lineEntry.getKey()).getRoutes();
-			numberOfRoutes++;
 			for (Entry <Id, TransitRoute> routeEntry : transitRoutesMap.entrySet()){
 				
 				TransitRoute route = transitRoutesMap.get(routeEntry.getKey());
@@ -138,39 +137,23 @@ public class TransitScheduleAnalyserToCSVandTEX {
 //				printing the results
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////				
 				
-				allInformations.add(lineId);
-				allInformations.add(routeId);
-				allInformations.add(firstDeparture);
-				allInformations.add(lastDeparture);
-				allInformations.add(tourlengthTime);
-				allInformations.add(tourLengthDistance);
-				allInformations.add(averageHeadway);
-				allInformations.add(numberOfVehicles);
+				TransitScheduleAnalyserElement temp = new TransitScheduleAnalyserElement(lineId, routeId, firstDeparture, lastDeparture, tourlengthTime, tourLengthDistance, averageHeadway, numberOfVehicles);
+				
+				allInformations.add(temp);
 
 //				for *.csv File
-
+			}}
 
 				try {
-					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filenameCSV),true));
-					if (numberOfLines ==1){
+					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filenameCSV),false));
 						writer.write("# lineID; routeID; first Departure; last Departure; tourlength time; tourlength distance; average headway; number of vehicles" );
 						writer.newLine();
 						for (int i = 0; i < allInformations.size(); i++) {
-							if(i!=allInformations.size()-1){
-								writer.write(allInformations.get(i) + "; ");
-							}else{
-								writer.write(allInformations.get(i));
-							}
-					}
-					}else{
-						for (int i = 0; i < allInformations.size(); i++) {
-							if(i!=allInformations.size()-1){
-								writer.write(allInformations.get(i) + "; ");
-							}else{
-								writer.write(allInformations.get(i));
-							}
-					}	
-					}
+							writer.write(allInformations.get(i).lineId + "; " + allInformations.get(i).routeId + "; " + allInformations.get(i).firstDeparture + "; " + allInformations.get(i).lastDeparture + "; " + allInformations.get(i).tourLengthTime + "; " + allInformations.get(i).tourLengthDistance + "; " +   allInformations.get(i).averageHeadway + "; " + allInformations.get(i).numberOfVehicles);
+							writer.newLine();
+						}
+	
+					
 					
 					writer.newLine();
 					writer.flush();
@@ -183,8 +166,7 @@ public class TransitScheduleAnalyserToCSVandTEX {
 //				for *.tex File
 				
 				try {
-					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filenameTEX),true));
-					if (numberOfLines ==1){
+					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filenameTEX),false));
 //						writer.write("\\documentclass[a4paper, 12pt]{article}" );
 //						writer.newLine();
 //						writer.write("\\usepackage[utf8]{inputenc}" );
@@ -221,77 +203,51 @@ public class TransitScheduleAnalyserToCSVandTEX {
 						writer.newLine();
 						writer.newLine();
 						
-						
 						for (int i = 0; i < allInformations.size(); i++) {
-							if(i!=allInformations.size()-1){
-								String temp = allInformations.get(i);
-								temp = temp.replace("_", "\\_");
-								writer.write(temp + " & ");
-							}else{
-								String temp = allInformations.get(i);
-								temp = temp.replace("_", "\\_");
-								writer.write(temp + " \\tabularnewline " );
-							}
-					}
-					}else{
-						for (int i = 0; i < allInformations.size(); i++) {
-							if(i!=allInformations.size()-1){
-								String temp = allInformations.get(i);
-								temp = temp.replace("_", "\\_");
-								writer.write(temp + " & ");
-							}else{
-								String temp = allInformations.get(i);
-								temp = temp.replace("_", "\\_");
-								writer.write(temp + " \\tabularnewline " );
-							}
-					}	
-					}
-					
-					writer.newLine();
+							String line = allInformations.get(i).lineId;
+							line = line.replace("_", "\\_");
+							String route = allInformations.get(i).routeId;
+							route = route.replace("_", "\\_");
+							writer.write(allInformations.get(i).lineId + " & " + allInformations.get(i).routeId + " & " + allInformations.get(i).firstDeparture + " & " + allInformations.get(i).lastDeparture + " & " + allInformations.get(i).lastDeparture + " & " + allInformations.get(i).tourLengthTime + " & " + allInformations.get(i).tourLengthDistance +  " & " +  allInformations.get(i).averageHeadway + " & " + allInformations.get(i).numberOfVehicles + " \\tabularnewline "  );
+							writer.newLine();
+						}
+						writer.newLine();
+						writer.write("% \\tabularnewline");
+						writer.newLine();
+						writer.write("%\\bottomrule");
+						writer.newLine();
+						writer.write("\\end{longtable}");
+						writer.newLine();
+						writer.newLine();
+//						writer.write("\\end{document}");
+//						writer.newLine();
+						writer.flush();
+						writer.close();
 					
 					
-					writer.flush();
-					writer.close();	
+					
+					
+
 				}catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
 				
-			}
 
-		}
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filenameTEX),true));
-			writer.newLine();
-			writer.write("% \\tabularnewline");
-			writer.newLine();
-			writer.write("%\\bottomrule");
-			writer.newLine();
-			writer.write("\\end{longtable}");
-			writer.newLine();
-			writer.newLine();
-//			writer.write("\\end{document}");
-//			writer.newLine();
-			writer.flush();
-			writer.close();	
 
-		}catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		log.info("Die Datei wurde nach " + filenameTEX + " geschrieben.");
 		log.info("Die Datei wurde nach " + filenameCSV + " geschrieben.");
 		
-	}
+		}
 	
 	public static void main(String[] args) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
-		(new NetworkReaderMatsimV1(sc)).parse("F:/temp/network.final.xml.gz");
-		(new TransitScheduleReaderV1(sc)).parse("F:/temp/transitSchedule_basecase.xml.gz");
+		(new NetworkReaderMatsimV1(sc)).parse("C:\\Users\\Marie\\workspace_MATsim_d\\playgrounds\\mkillat\\input\\PT_Ana\\tut_10min_0.output_network.xml.gz");
+		(new TransitScheduleReaderV1(sc)).parse("C:\\Users\\Marie\\workspace_MATsim_d\\playgrounds\\mkillat\\input\\PT_Ana\\tut_10min_0.output_transitSchedule.xml.gz");
 		
-		TransitScheduleAnalyserToCSVandTEX.transitScheduleAnalyser(sc.getTransitSchedule(), sc.getNetwork(), "F:/temp");
+		TransitScheduleAnalyserToCSVandTEX.transitScheduleAnalyser(sc.getTransitSchedule(), sc.getNetwork(), "C:\\Users\\Marie\\workspace_MATsim_d\\playgrounds\\mkillat\\input\\PT_Ana");
 	}
 }
