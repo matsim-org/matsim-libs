@@ -56,8 +56,8 @@ public class TransitScheduleAnalyserToCSVandTEX {
 	public static void transitScheduleAnalyser (TransitSchedule ts, Network net, String outputDirectory){
 		
 		Date date = new Date();
-		String filenameTEX = outputDirectory + "\\transitScheduleAnalyse_" + date.getHours() + "_" + date.getMinutes() +  ".tex";
-		String filenameCSV = outputDirectory + "\\transitScheduleAnalyse_" + date.getHours() + "_" + date.getMinutes() +  ".csv";
+		String filenameTEX = outputDirectory + "\\transitScheduleAnalyser_" + date.getHours() + "_" + date.getMinutes() +  ".tex";
+		String filenameCSV = outputDirectory + "\\transitScheduleAnalyser_" + date.getHours() + "_" + date.getMinutes() +  ".csv";
 		
 		List <TransitScheduleAnalyserElement> allInformations = new ArrayList<TransitScheduleAnalyserElement>();
 		
@@ -167,22 +167,22 @@ public class TransitScheduleAnalyserToCSVandTEX {
 				
 				try {
 					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filenameTEX),false));
-//						writer.write("\\documentclass[a4paper, 12pt]{article}" );
-//						writer.newLine();
-//						writer.write("\\usepackage[utf8]{inputenc}" );
-//						writer.newLine();
-//						writer.write("\\usepackage{booktabs}" );
-//						writer.newLine();
-//						writer.write("\\usepackage{textcomp}" );
-//						writer.newLine();
-//						writer.write("\\usepackage{array}" );
-//						writer.newLine();
-//						writer.write("\\usepackage{longtable}" );
-//						writer.newLine();
+						writer.write("\\documentclass[a4paper, 12pt]{article}" );
+						writer.newLine();
+						writer.write("\\usepackage[utf8]{inputenc}" );
+						writer.newLine();
+						writer.write("\\usepackage{booktabs}" );
+						writer.newLine();
+						writer.write("\\usepackage{textcomp}" );
+						writer.newLine();
+						writer.write("\\usepackage{array}" );
+						writer.newLine();
+						writer.write("\\usepackage{longtable}" );
+						writer.newLine();
 						writer.write("\\begin{document}" );
 						writer.newLine();
 						writer.newLine();
-						writer.write("\\begin{longtable}{>{\\raggedleft}p{15mm} l >{\\raggedleft}p{18mm} >{\\raggedleft}p{10mm} l >{\\raggedleft}p{10mm} >{\\raggedleft}p{15mm} >{\\raggedleft}p{10mm}}" );
+						writer.write("\\begin{longtable}{>{\\raggedleft}p{15mm} >{\\raggedleft}p{15mm} >{\\raggedleft}p{18mm} >{\\raggedleft}p{18mm} >{\\raggedleft}p{18mm} >{\\raggedleft}p{10mm} >{\\raggedleft}p{15mm} >{\\raggedleft}p{10mm}}" );
 						writer.newLine();
 						writer.write("\\caption{\\label{tab:LABEL}Results of Transitschedule Analyser} \\tabularnewline \\addlinespace[1.0em]" );
 						writer.newLine();
@@ -208,7 +208,7 @@ public class TransitScheduleAnalyserToCSVandTEX {
 							line = line.replace("_", "\\_");
 							String route = allInformations.get(i).routeId;
 							route = route.replace("_", "\\_");
-							writer.write(allInformations.get(i).lineId + " & " + allInformations.get(i).routeId + " & " + allInformations.get(i).firstDeparture + " & " + allInformations.get(i).lastDeparture + " & " + allInformations.get(i).lastDeparture + " & " + allInformations.get(i).tourLengthTime + " & " + allInformations.get(i).tourLengthDistance +  " & " +  allInformations.get(i).averageHeadway + " & " + allInformations.get(i).numberOfVehicles + " \\tabularnewline "  );
+							writer.write(line + " & " + route + " & " + allInformations.get(i).firstDeparture + " & " + allInformations.get(i).lastDeparture + " & " + allInformations.get(i).tourLengthTime + " & " + allInformations.get(i).tourLengthDistance +  " & " +  allInformations.get(i).averageHeadway + " & " + allInformations.get(i).numberOfVehicles + " \\tabularnewline "  );
 							writer.newLine();
 						}
 						writer.newLine();
@@ -219,8 +219,8 @@ public class TransitScheduleAnalyserToCSVandTEX {
 						writer.write("\\end{longtable}");
 						writer.newLine();
 						writer.newLine();
-//						writer.write("\\end{document}");
-//						writer.newLine();
+						writer.write("\\end{document}");
+						writer.newLine();
 						writer.flush();
 						writer.close();
 					
@@ -245,9 +245,9 @@ public class TransitScheduleAnalyserToCSVandTEX {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
-		(new NetworkReaderMatsimV1(sc)).parse("C:\\Users\\Marie\\workspace_MATsim_d\\playgrounds\\mkillat\\input\\PT_Ana\\tut_10min_0.output_network.xml.gz");
-		(new TransitScheduleReaderV1(sc)).parse("C:\\Users\\Marie\\workspace_MATsim_d\\playgrounds\\mkillat\\input\\PT_Ana\\tut_10min_0.output_transitSchedule.xml.gz");
+		(new NetworkReaderMatsimV1(sc)).parse("F:/temp/network.final.xml.gz");
+		(new TransitScheduleReaderV1(sc)).parse("F:/temp/transitSchedule_basecase.xml.gz");
 		
-		TransitScheduleAnalyserToCSVandTEX.transitScheduleAnalyser(sc.getTransitSchedule(), sc.getNetwork(), "C:\\Users\\Marie\\workspace_MATsim_d\\playgrounds\\mkillat\\input\\PT_Ana");
+		TransitScheduleAnalyserToCSVandTEX.transitScheduleAnalyser(sc.getTransitSchedule(), sc.getNetwork(), "F:/temp");
 	}
 }
