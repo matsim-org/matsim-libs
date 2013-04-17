@@ -23,10 +23,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -40,29 +42,29 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 public class travelStatsAnalyzer extends AbstractAnalyisModule {
 
 	private final static Logger log = Logger.getLogger(travelStatsAnalyzer.class);
-	private ScenarioImpl scenario;
+	private Scenario scenario;
+	private travelStatsHandler handler;
 	
-	private travelStatsHandler travelStatsHandler;
-	
-	public travelStatsAnalyzer(String name) {
-		super(name);
+	public travelStatsAnalyzer(Scenario scenario, Double interval) {
+		super(travelStatsAnalyzer.class.getSimpleName());
+		this.scenario = scenario;
+		this.handler = new travelStatsHandler(scenario, interval);
 	}
 
 	@Override
 	public List<EventHandler> getEventHandler() {
-		// TODO Auto-generated method stub
-		return null;
+		List<EventHandler> handler = new ArrayList<EventHandler>();
+		handler.add(this.handler);
+		return handler;
 	}
 
 	@Override
 	public void preProcessData() {
-		// TODO Auto-generated method stub
-		
+//		nothing to be pre-processed
 	}
 
 	@Override
 	public void postProcessData() {
-		// TODO Auto-generated method stub
 		
 	}
 
