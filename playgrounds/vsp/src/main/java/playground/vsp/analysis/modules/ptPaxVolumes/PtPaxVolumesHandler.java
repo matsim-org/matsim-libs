@@ -56,7 +56,7 @@ public class PtPaxVolumesHandler implements LinkEnterEventHandler,
 
 	private Map<Id, CountVehicle> transitVehicles;
 
-	private Integer maxSlice = Integer.MIN_VALUE;;
+	private Integer maxSlice = 24;;
 
 	private Double interval;
 
