@@ -217,7 +217,7 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 		double parkingSearchDurationInSeconds = getParkingSearchDurationInMinutes(carLegToFirstParking, parkingArrivalTime) * 60.0;
 
 		ParkingActivityAttributes parkingActivityAttributes = new ParkingActivityAttributes(personId, parkingFacilityId, parkingArrivalTime, parkingDuration, activityDuration, parkingSearchDurationInSeconds, walkLegFromParking.getTravelTime(), walkLegToParking.getTravelTime());
-		double parkingScore = parkingScoreEvaluator.getParkingScore(parkingActivityAttributes);
+		double parkingScore = getParkingScoreEvaluator().getParkingScore(parkingActivityAttributes);
 		
 		// parking cost scoring
 		//Double parkingCost = getParkingCost(parkingArrivalTime, parkingDuration, parkingFacilityId);
@@ -252,7 +252,7 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingActivityAttributes.getTotalWalkDurationInSeconds()/60.0));
 		parkingSearchTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingSearchDurationInSeconds));
 
-		parkingCostLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingScoreEvaluator.getParkingCost(parkingActivityAttributes)));
+		parkingCostLog.put(personId, new Pair<Id, Double>(parkingFacilityId, getParkingScoreEvaluator().getParkingCost(parkingActivityAttributes)));
 
 		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime,
 				((ParkingInfrastructure_v2) parkingInfrastructure).getParkingCapacity(parkingFacilityId));
@@ -401,7 +401,7 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 
 		double activityDuration=GeneralLib.getIntervalDuration(firstEveningNonParkingActivity.getStartTime(), lastMorningNonParkingActivity.getEndTime());
 		ParkingActivityAttributes parkingActivityAttributes = new ParkingActivityAttributes(personId, lastParkingFacilityIdOfDay, lastParkingArrivalTime, lastParkingActivityDurationOfDay, activityDuration, parkingSearchDurationInSeconds, walkLegFromLastParkingActivity.getTravelTime(), walkLegToFirstParkingActivity.getTravelTime());
-		double parkingScore = parkingScoreEvaluator.getParkingScore(parkingActivityAttributes);
+		double parkingScore = getParkingScoreEvaluator().getParkingScore(parkingActivityAttributes);
 		
 		
 		
@@ -444,7 +444,7 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingActivityAttributes.getTotalWalkDurationInSeconds()/60.0));
 		parkingSearchTimesLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingActivityAttributes.getParkingSearchDurationInSeconds()));
 
-		parkingCostLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingScoreEvaluator.getParkingCost(parkingActivityAttributes)));
+		parkingCostLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, getParkingScoreEvaluator().getParkingCost(parkingActivityAttributes)));
 
 		parkingOccupancy.updateParkingOccupancy(lastParkingFacilityIdOfDay, lastParkingArrivalTime, lastParkingArrivalTime
 				+ lastParkingActivityDurationOfDay,
@@ -478,6 +478,10 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 	@Override
 	public void handleActivity(Id agentId, Activity activity) {
 		this.planElementMap.get(agentId).add(activity);
+	}
+
+	public ParkingScoreEvaluator getParkingScoreEvaluator() {
+		return parkingScoreEvaluator;
 	}
 
 }

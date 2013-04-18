@@ -41,6 +41,7 @@ import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.events.ParkingSearchEvent;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.OptimalParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 
 public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements MobsimInitializedListener {
@@ -80,8 +81,22 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 //				HashMap<Id, Double> parkingSearchStartTime = ((ParkingScoreManager) this.parkingAgentsTracker).getParkingSearchStartTime();
 //				if (!parkingSearchStartTime.containsKey(agentId)){
 //					parkingSearchStartTime.put(agentId, time);
-//				} 
-				this.eventsManager.processEvent(new ParkingSearchEvent(time, agent.getId(), getParkingStrategyForCurrentLeg(agent).getStrategyName()));
+//				}
+				
+				
+				
+				FullParkingSearchStrategy parkingStrategyForCurrentLeg = getParkingStrategyForCurrentLeg(agent);
+				this.eventsManager.processEvent(new ParkingSearchEvent(time, agent.getId(), parkingStrategyForCurrentLeg.getStrategyName()));
+				
+				if (parkingStrategyForCurrentLeg instanceof OptimalParkingStrategy){
+					Id facilityId = ((OptimalParkingStrategy) parkingStrategyForCurrentLeg).reserveBestParking(agent, parkingAgentsTracker, time);
+					
+					if (facilityId != null) {
+						parkingAgentsTracker.setSelectedParking(agentId, facilityId);
+						identifiedAgents.add(agent);
+						continue;
+					}
+				}
 				
 				Id linkId = agent.getCurrentLinkId();
 				List<Id> facilityIds = parkingInfrastructure.getFreeParkingFacilitiesOnLink(linkId);

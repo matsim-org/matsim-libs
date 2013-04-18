@@ -53,6 +53,10 @@ public class ParkingInfrastructure_v2 extends ParkingInfrastructure {
 		super(scenario, parkingCostCalculator);
 		this.setParkingTypes(parkingTypes);
 	}
+	
+	public Id getParkingFacilityLinkId(Id parkingFacility){
+		return parkingFacilities.get(parkingFacility).getLinkId();
+	}
 
 	public List<Id> getFreeParkingFacilitiesOnLink(Id linkId) {
 

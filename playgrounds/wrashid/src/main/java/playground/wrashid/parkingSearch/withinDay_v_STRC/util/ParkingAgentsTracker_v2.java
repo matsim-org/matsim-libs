@@ -18,8 +18,12 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.withinDay_v_STRC.util;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -34,6 +38,7 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.WithinDayParkingController;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
 
@@ -41,10 +46,23 @@ public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements Ite
 
 	protected ParkingStrategyManager parkingStrategyManager;
 	protected WithinDayParkingController controler;
+	private DoubleValueHashMap<Id> firstCarDepartureTimeOfDay;
+	
+	
 
 	public ParkingAgentsTracker_v2(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance, WithinDayParkingController controler) {
 		super(scenario, parkingInfrastructure, distance);
 		this.controler = controler;
+	}
+	
+	public ParkingInfrastructure_v2 getInfrastructure_v2(){
+		return (ParkingInfrastructure_v2) parkingInfrastructure;
+	}
+	
+	@Override
+	public void reset(int iteration) {
+		super.reset(iteration);
+		firstCarDepartureTimeOfDay=new DoubleValueHashMap<Id>();
 	}
 
 	@Override
@@ -67,6 +85,20 @@ public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements Ite
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		parkingStrategyManager.printStrategyStatistics();
 	}
+
+	public DoubleValueHashMap<Id> getFirstCarDepartureTimeOfDay() {
+		return firstCarDepartureTimeOfDay;
+	}
+	
+	@Override
+    public void handleEvent(AgentDepartureEvent event) {
+    	super.handleEvent(event);
+    	
+    	Id personId = event.getPersonId();
+		if (!firstCarDepartureTimeOfDay.containsKey(personId) && event.getLegMode().equals(TransportMode.car)){
+    		firstCarDepartureTimeOfDay.put(personId, event.getTime());
+    	}
+    }
 
 }
 

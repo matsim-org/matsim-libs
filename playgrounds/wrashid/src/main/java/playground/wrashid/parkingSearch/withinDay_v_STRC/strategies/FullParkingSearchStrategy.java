@@ -23,6 +23,7 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 
 public interface FullParkingSearchStrategy {
 
+	// in case parking not yet found
 	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time);
 
 	public boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId);

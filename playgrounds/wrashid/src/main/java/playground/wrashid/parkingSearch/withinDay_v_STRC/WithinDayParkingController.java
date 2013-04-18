@@ -29,6 +29,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
@@ -68,6 +69,7 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreMan
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GarageParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.StreetParkingStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.OptimalParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 import playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh;
@@ -160,6 +162,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		LinkedList<FullParkingSearchStrategy> strategies=new LinkedList<FullParkingSearchStrategy>();
 		strategies.add(new GarageParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
 		strategies.add(new StreetParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
+		strategies.add(new OptimalParkingStrategy(parkingRouterFactory.createParkingRouter(), this.scenarioData, parkingAgentsTracker,  parkingInfrastructure));
 		return strategies;
 	}
 	
@@ -288,6 +291,8 @@ public class WithinDayParkingController extends WithinDayController implements R
 		}
 		final WithinDayParkingController controller = new WithinDayParkingController(args);
 		controller.setOverwriteFiles(true);
+		
+		GeneralLib.controler=controller;
 		
 		controller.run();
 		
