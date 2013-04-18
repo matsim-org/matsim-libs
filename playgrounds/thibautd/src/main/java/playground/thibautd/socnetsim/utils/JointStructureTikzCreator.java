@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
@@ -54,7 +55,7 @@ public class JointStructureTikzCreator {
 
 	private static final String LEGEND_ANCHOR = "legend-anchor";
 
-	private final Set<Property> properties = new HashSet<Property>();
+	private final Set<Property> properties = new TreeSet<Property>();
 
 	private final Map<String, AgentPlanInfo> agentInfos = new LinkedHashMap<String,AgentPlanInfo>();
 	private final List<PlanLinkInfo> linkInfos = new ArrayList<PlanLinkInfo>();
@@ -394,7 +395,7 @@ public class JointStructureTikzCreator {
 	}
 }
 
-class Property {
+class Property implements Comparable<Property> {
 	private final String s;
 
 	public Property(final String s) {
@@ -415,6 +416,11 @@ class Property {
 	@Override
 	public String toString() {
 		return s;
+	}
+
+	@Override
+	public int compareTo(final Property o) {
+		return s.compareTo( o.s );
 	}
 }
 
