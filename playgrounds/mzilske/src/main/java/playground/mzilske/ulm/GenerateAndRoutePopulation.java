@@ -1,4 +1,4 @@
-package playground.mzilske.vbb;
+package playground.mzilske.ulm;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,12 +24,14 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
+
+import playground.mzilske.vbb.OTPTripRouterFactory;
 
 public class GenerateAndRoutePopulation {
 
@@ -56,12 +58,12 @@ public class GenerateAndRoutePopulation {
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
-		config.transit().setTransitScheduleFile("/Users/zilske/gtfs-bvg/transit-schedule.xml");
-		config.transit().setVehiclesFile("/Users/zilske/gtfs-bvg/transit-vehicles.xml");
-		config.network().setInputFile("/Users/zilske/gtfs-bvg/network.xml");
+		config.transit().setTransitScheduleFile("/Users/vspuser/gtfs-ulm/transit-schedule.xml");
+		config.transit().setVehiclesFile("/Users/vspuser/gtfs-ulm/transit-vehicles.xml");
+		config.network().setInputFile("/Users/vspuser/gtfs-ulm/network.xml");
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
-		new MatsimNetworkReader(scenario).readFile("/Users/zilske/gtfs-bvg/network.xml");
+		new MatsimNetworkReader(scenario).readFile("/Users/vspuser/gtfs-ulm/network.xml");
 		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(config.transit().getVehiclesFile());
 		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 
@@ -72,10 +74,11 @@ public class GenerateAndRoutePopulation {
 		//	new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("/Users/zilske/gtfs-bvg/transit-schedule.xml");
 		//	new VehicleWriterV1(((ScenarioImpl) scenario).getVehicles()).writeFile("/Users/zilske/gtfs-bvg/transit-vehicles.xml");
 
-		double minX=13.1949;
-		double maxX=13.5657;
-		double minY=52.3926;
-		double maxY=52.6341;
+
+		double minX =	-765708.6;
+		double minY =	1.5495247E7;
+		double maxX =	-750429.56;
+		double maxY =	1.5507663E7;
 
 
 		population = scenario.getPopulation();
@@ -100,10 +103,10 @@ public class GenerateAndRoutePopulation {
 			population.addPerson(person);
 		}
 
-		final OTPTripRouterFactory trf = new OTPTripRouterFactory(scenario.getTransitSchedule(), new IdentityTransformation());
+		final OTPTripRouterFactory trf = new OTPTripRouterFactory(scenario.getTransitSchedule(), TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84));
 
 		// make sure all routes are calculated.
-		ParallelPersonAlgorithmRunner.run(population, config.global().getNumberOfThreads(),
+		ParallelPersonAlgorithmRunner.run(population, 1,
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
@@ -113,7 +116,7 @@ public class GenerateAndRoutePopulation {
 			}
 		});
 
-		new PopulationWriter(population, scenario.getNetwork()).writeV5("/Users/zilske/gtfs-bvg/population.xml");
+		new PopulationWriter(population, scenario.getNetwork()).writeV5("/Users/vspuser/gtfs-ulm/population.xml");
 
 	}
 

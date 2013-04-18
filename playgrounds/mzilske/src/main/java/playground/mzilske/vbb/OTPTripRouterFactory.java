@@ -5,22 +5,25 @@ import java.io.IOException;
 
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 
-final class OTPTripRouterFactory implements
+public final class OTPTripRouterFactory implements
 		TripRouterFactory {
 	
 	
 	private Graph graph;
 
+	private CoordinateTransformation ct;
+
 	
 
-	public OTPTripRouterFactory(TransitSchedule transitSchedule) {
-		File path = new File("/tmp/graph-bundle/Graph.obj");
+	public OTPTripRouterFactory(TransitSchedule transitSchedule, CoordinateTransformation ct) {
+		File path = new File("/Users/vspuser/gtfs-ulm/Graph.obj");
 		try {
 			graph = Graph.load(path, Graph.LoadLevel.DEBUG);
 		} catch (IOException e) {
@@ -31,6 +34,7 @@ final class OTPTripRouterFactory implements
 		pathservice.setGraphService(graphservice);
 		pathservice.setSptService(sptService);
 		this.transitSchedule = transitSchedule;
+		this.ct = ct;
 	}
 
 	private GraphServiceImpl graphservice = new GraphServiceImpl() {
@@ -46,7 +50,7 @@ final class OTPTripRouterFactory implements
 	@Override
 	public TripRouter createTripRouter() {
 		TripRouter tripRouter = new TripRouter();
-		tripRouter.setRoutingModule("pt", new OTPRoutingModule(pathservice, transitSchedule));
+		tripRouter.setRoutingModule("pt", new OTPRoutingModule(pathservice, transitSchedule, ct));
 		return tripRouter;
 	}
 }

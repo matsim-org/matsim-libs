@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -19,6 +20,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -34,12 +36,15 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
 public class OTPRoutingModule implements RoutingModule {
@@ -56,9 +61,12 @@ public class OTPRoutingModule implements RoutingModule {
 
 	private TransitSchedule transitSchedule;
 
-	public OTPRoutingModule(PathService pathservice, TransitSchedule transitSchedule) {
+	private CoordinateTransformation ct;
+
+	public OTPRoutingModule(PathService pathservice, TransitSchedule transitSchedule, CoordinateTransformation ct) {
 		this.pathservice = pathservice;
 		this.transitSchedule = transitSchedule;
+		this.ct = ct;
 	}
 
 	@Override
@@ -92,15 +100,17 @@ public class OTPRoutingModule implements RoutingModule {
 
 		Date when = null;
 		try {
-			when = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse("2011-10-15 10:00:00");
+			when = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse("2013-08-24 10:00:00");
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		options.setDateTime(when);
 
-		options.from =  fromFacility.getCoord().getY() +"," +fromFacility.getCoord().getX();
-		options.to   =  toFacility.getCoord().getY()+ "," +  toFacility.getCoord().getX();
+		Coord fromCoord = ct.transform(fromFacility.getCoord());
+		Coord toCoord = ct.transform(toFacility.getCoord());
+		options.from =  fromCoord.getY() +"," +fromCoord.getX();
+		options.to   =  toCoord.getY()+ "," +  toCoord.getX();
 		options.numItineraries = 1;
 		System.out.println("--------");
 		System.out.println("Path from " + options.from + " to " + options.to + " at " + when);
@@ -124,52 +134,69 @@ public class OTPRoutingModule implements RoutingModule {
 			for (State state : path.states) {
 				Edge backEdge = state.getBackEdge();
 				if (backEdge != null) {
-					System.out.print(backEdge.getName());
-					Trip backTrip = state.getBackTrip();
-					if (backTrip != null) {
-						System.out.println(" +++ " + backTrip + " +++ " + backEdge.getClass());
-						if (backEdge instanceof TransitBoardAlight) {
-							if (!onBoard) {
-								stop = ((TransitVertex) state.getVertex()).getStopId().getId();
-								onBoard = true;
-								time = state.getElapsedTime();
-								TransitStopFacility accessFacility = transitSchedule.getFacilities().get(new IdImpl(stop));
-								if(!currentLinkId.equals(accessFacility.getLinkId())) {
-									throw new RuntimeException();
+					if (backEdge instanceof TransitBoardAlight) {
+						Trip backTrip = state.getBackTrip();
+						if (!onBoard) {
+							stop = ((TransitVertex) state.getVertex()).getStopId().getId();
+							onBoard = true;
+							time = state.getElapsedTime();
+							TransitStopFacility accessFacility = transitSchedule.getFacilities().get(new IdImpl(stop));
+							if(!currentLinkId.equals(accessFacility.getLinkId())) {
+								throw new RuntimeException();
+							}
+						} else {
+							Leg leg = new LegImpl(TransportMode.pt);
+							String newStop = ((TransitVertex) state.getVertex()).getStopId().getId();
+							TransitStopFacility accessFacility = transitSchedule.getFacilities().get(new IdImpl(stop));
+							TransitStopFacility egressFacility = transitSchedule.getFacilities().get(new IdImpl(newStop));
+							leg.setRoute(new ExperimentalTransitRoute(accessFacility, createLine(backTrip), createRoute(), egressFacility));
+							leg.setTravelTime(state.getElapsedTime() - time);
+							legs.add(leg);
+							onBoard = false;
+							time = state.getElapsedTime();
+							stop = newStop;
+							currentLinkId = egressFacility.getLinkId();
+						}
+					} else if (backEdge instanceof FreeEdge || backEdge instanceof TransferEdge || backEdge instanceof PlainStreetEdge) {
+						Leg leg = new LegImpl(TransportMode.transit_walk);
+						if (state.getVertex() instanceof TransitVertex) {
+							String newStop = ((TransitVertex) state.getVertex()).getStopId().getId();
+							if (!newStop.equals(stop)) {
+								Id startLinkId;
+								if (stop == null) {
+									startLinkId = fromFacility.getLinkId();
+								} else {
+									startLinkId = transitSchedule.getFacilities().get(new IdImpl(stop)).getLinkId();
 								}
-							} else {
-								Leg leg = new LegImpl(TransportMode.pt);
-								String newStop = ((TransitVertex) state.getVertex()).getStopId().getId();
-								TransitStopFacility accessFacility = transitSchedule.getFacilities().get(new IdImpl(stop));
-								TransitStopFacility egressFacility = transitSchedule.getFacilities().get(new IdImpl(newStop));
-								leg.setRoute(new ExperimentalTransitRoute(accessFacility, createLine(backTrip), createRoute(), egressFacility));
+								Id endLinkId = transitSchedule.getFacilities().get(new IdImpl(newStop)).getLinkId();
+								GenericRouteWithStartEndLinkId route = new GenericRouteWithStartEndLinkId(startLinkId, endLinkId);
+								leg.setRoute(route);
 								leg.setTravelTime(state.getElapsedTime() - time);
 								legs.add(leg);
-								onBoard = false;
 								time = state.getElapsedTime();
 								stop = newStop;
-								currentLinkId = egressFacility.getLinkId();
+								currentLinkId = endLinkId;
 							}
-						}
-					} else if (backEdge instanceof FreeEdge || backEdge instanceof TransferEdge) {
-						Leg leg = new LegImpl(TransportMode.transit_walk);
-						String newStop = ((TransitVertex) state.getVertex()).getStopId().getId();
-						Id startLinkId;
-						if (stop == null) {
-							startLinkId = fromFacility.getLinkId();
+						} else if (state.getVertex() instanceof StreetLocation) {
+							System.out.println("Wir sind da.");
+							GenericRouteWithStartEndLinkId route = new GenericRouteWithStartEndLinkId(currentLinkId, toFacility.getLinkId());
+							leg.setRoute(route);
+							leg.setTravelTime(state.getElapsedTime() - time);
+							legs.add(leg);
+							time = state.getElapsedTime();
+							currentLinkId = toFacility.getLinkId();
+						} else if (state.getVertex() instanceof IntersectionVertex) {
+
 						} else {
-							startLinkId = transitSchedule.getFacilities().get(new IdImpl(stop)).getLinkId();
-							
+							throw new RuntimeException("Unexpected vertex: " + state.getVertex().getClass());
 						}
-						System.out.println(newStop);
-						Id endLinkId = transitSchedule.getFacilities().get(new IdImpl(newStop)).getLinkId();
-						GenericRouteWithStartEndLinkId route = new GenericRouteWithStartEndLinkId(startLinkId, endLinkId);
-						leg.setRoute(route);
-						legs.add(leg);
-						stop = newStop;
-						currentLinkId = endLinkId;
+
 					} 
 				}
+
+			}
+			if (!currentLinkId.equals(toFacility.getLinkId())) {
+				throw new RuntimeException();
 			}
 
 		} else {
@@ -178,10 +205,7 @@ public class OTPRoutingModule implements RoutingModule {
 		System.out.println("---------" + npersons++);
 
 		if (!currentLinkId.equals(toFacility.getLinkId())) {
-			Leg leg = new LegImpl(TransportMode.transit_walk);
-			GenericRouteWithStartEndLinkId route = new GenericRouteWithStartEndLinkId(currentLinkId, toFacility.getLinkId());
-			leg.setRoute(route);
-			legs.add(leg);
+
 		}
 		return legs;
 	}

@@ -119,6 +119,11 @@
 			<artifactId>opentripplanner-routing</artifactId>
 			<version>0.9.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.opentripplanner</groupId>
+			<artifactId>opentripplanner-graph-builder</artifactId>
+			<version>0.9.1</version>
+		</dependency>
 
 		<dependency>
             <groupId>joda-time</groupId>

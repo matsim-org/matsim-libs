@@ -145,7 +145,8 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 						 * But don't set all of them to "used", as we still want to do some network-thinning.
 						 * I decided to use sqrt(.)-many nodes in between...
 						 */
-						double increment = Math.sqrt(i - prevRealNodeIndex);
+						// double increment = Math.sqrt(i - prevRealNodeIndex);
+						double increment = 1;
 						double nextNodeToKeep = prevRealNodeIndex + increment;
 						for (double j = nextNodeToKeep; j < i; j += increment) {
 							int index = (int) Math.floor(j);

@@ -46,7 +46,7 @@ public class OsmMain {
 	public static void main(String[] args) {
 		Scenario scenario = createScenario();
 		new NetworkCleaner().run(scenario.getNetwork());
-		new NetworkWriter(scenario.getNetwork()).write("output/network-tertiary-myown.xml");
+		new NetworkWriter(scenario.getNetwork()).write("output/network-tertiary-myown-loop.xml");
 	}
 
 	private static Scenario createScenario() {
