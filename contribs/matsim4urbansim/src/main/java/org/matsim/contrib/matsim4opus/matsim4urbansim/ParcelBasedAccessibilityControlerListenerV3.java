@@ -34,6 +34,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.utils.LeastCostPathTree;
@@ -179,49 +180,57 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		
 		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
 		
-		TravelTime ttc = controler.getLinkTravelTimes();
+
 		// get the free-speed car travel times (in seconds)
-		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = null;
+		TravelTime ttf = new FreeSpeedTravelTime() ;
+		TravelDisutility tdFree = controler.getTravelDisutilityFactory().createTravelDisutility(ttf, controler.getConfig().planCalcScore() ) ;
+		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttf, tdFree, controler ) ;
+
 		// get the congested car travel time (in seconds)
-		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = null;
+		TravelTime ttc = controler.getLinkTravelTimes(); // congested
+//		TravelDisutility tdCongested = controler.createTravelCostCalculator() ; // congested
+		// alternative
+		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
+		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, controler) ;
+
 		// get travel distance (in meter)
-		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
+		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new TravelDistanceCalculator());
 		
-		// get road pricing scheme
-		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
-
-		// init extended Least Cost Path Tree for car (free speed and congested) mode
-		if(usingCarParameterFromMATSim){
-
-			lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, controler.createTravelCostCalculator(), controler);
-			
-			if(scheme == null)	// no road pricing
-				lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore()), controler );
-			else{				// if road pricing is activated
-				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
-				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
-			}
-		}
-		else{ // this can be removed when external parameters are not considered anymore
-			TravelDisutilityFactory tdFactory = controler.getTravelDisutilityFactory();
-			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup();
-			cnScoringGroup.setMarginalUtilityOfMoney( this.betaCarTMC );
-			cnScoringGroup.setTraveling_utils_hr( this.betaCarTT );	
-			cnScoringGroup.setMonetaryDistanceCostRateCar( this.betaCarTD );
-			cnScoringGroup.setConstantCar(controler.getConfig().planCalcScore().getConstantCar());
-			
-			if(scheme == null){// no road pricing
-				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, tdFactory.createTravelDisutility(ttc, cnScoringGroup), controler);
-				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(cnScoringGroup), controler);
-			}
-			else{ 				// if road pricing is activated
-				TravelDisutility costCalculatorCongested = tdFactory.createTravelDisutility(ttc, cnScoringGroup); 
-				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
-				
-				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorCongested, scheme), controler);
-				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
-			}
-		}
+//		// get road pricing scheme
+//		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
+//
+//		// init extended Least Cost Path Tree for car (free speed and congested) mode
+//		if(usingCarParameterFromMATSim){
+//
+//			lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, controler.createTravelCostCalculator(), controler);
+//			
+//			if(scheme == null)	// no road pricing
+//				lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore()), controler );
+//			else{				// if road pricing is activated
+//				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
+//				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
+//			}
+//		}
+//		else{ // this can be removed when external parameters are not considered anymore
+//			TravelDisutilityFactory tdFactory = controler.getTravelDisutilityFactory();
+//			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup();
+//			cnScoringGroup.setMarginalUtilityOfMoney( this.betaCarTMC );
+//			cnScoringGroup.setTraveling_utils_hr( this.betaCarTT );	
+//			cnScoringGroup.setMonetaryDistanceCostRateCar( this.betaCarTD );
+//			cnScoringGroup.setConstantCar(controler.getConfig().planCalcScore().getConstantCar());
+//			
+//			if(scheme == null){// no road pricing
+//				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, tdFactory.createTravelDisutility(ttc, cnScoringGroup), controler);
+//				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(cnScoringGroup), controler);
+//			}
+//			else{ 				// if road pricing is activated
+//				TravelDisutility costCalculatorCongested = tdFactory.createTravelDisutility(ttc, cnScoringGroup); 
+//				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
+//				
+//				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorCongested, scheme), controler);
+//				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
+//			}
+//		}
 		
 		try{
 			log.info("Computing and writing cell based accessibility measures ...");
