@@ -133,7 +133,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 
 	private double allocateVehicles(
 			final List<SubtourRecord> toursToAllocate,
-			final double maxOverlap) {
+			final double minimumAtteinableElsewhere) {
 		if ( toursToAllocate.isEmpty() ) return 0;
 		final List<SubtourRecord> remainingSubtours = new ArrayList<SubtourRecord>( toursToAllocate );
 		final SubtourRecord currentSubtour = remainingSubtours.remove( 0 );
@@ -168,20 +168,20 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 
 			currentVehicle.availableFrom = currentSubtour.endTime;
 
-			final double maxRemainingOverlap = getScoreOfFeasibleSolution( remainingSubtours );
+			final double minRemainingOverlap = getLowerBoundOnOverlap( remainingSubtours );
 
 			final double currentOverlap = Math.max(
 					initialAvail - currentSubtour.startTime,
 					0);
 
 			currentVehicle.nAllocs++;
-			final double newMax = Math.min( maxOverlap , currentBestOverlap );
+			final double bestFoundOverlap = Math.min( minimumAtteinableElsewhere , currentBestOverlap );
 			final double nextOverlap =
-				currentOverlap + maxRemainingOverlap < newMax ?
+				currentOverlap + minRemainingOverlap < bestFoundOverlap ?
 				currentOverlap +
 				allocateVehicles(
 						remainingSubtours,
-						newMax - currentOverlap ) :
+						bestFoundOverlap - currentOverlap ) :
 				// cut-off
 				Double.POSITIVE_INFINITY;
 
@@ -199,9 +199,8 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		return currentBestOverlap;
 	}
 
-	private double getScoreOfFeasibleSolution(
+	private double getLowerBoundOnOverlap(
 			final List<SubtourRecord> toursToAllocate) {
-		// greedily search for a solution and return is overlap
 		if ( toursToAllocate.isEmpty() ) return 0;
 		final List<SubtourRecord> remainingSubtours = new ArrayList<SubtourRecord>( toursToAllocate );
 		final SubtourRecord currentSubtour = remainingSubtours.remove( 0 );
@@ -220,19 +219,11 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 					}
 				});
 
-		final double initialAvail = firstAvailableVehicle.availableFrom;
-
-		firstAvailableVehicle.availableFrom = currentSubtour.endTime;
-
 		final double currentOverlap = Math.max(
-				initialAvail - currentSubtour.startTime,
+				firstAvailableVehicle.availableFrom - currentSubtour.startTime,
 				0);
 
-		final double nextOverlap = getScoreOfFeasibleSolution( remainingSubtours );
-
-		firstAvailableVehicle.availableFrom = initialAvail;
-
-		return currentOverlap + nextOverlap;
+		return currentOverlap + getLowerBoundOnOverlap( remainingSubtours );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
