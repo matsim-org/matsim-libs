@@ -20,7 +20,9 @@
 package playground.thibautd.scripts;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -54,7 +56,7 @@ public class CreateTikzFigureOfJpStructure {
 		final JointStructureTikzCreator tikzCreator =
 			new JointStructureTikzCreator();
 		log.info( "load plan infos" );
-		parsePlanInfos( plansFile , tikzCreator , personIds );
+		parsePlanInfos( true , plansFile , tikzCreator , personIds );
 		log.info( "load joint plan infos" );
 		parsePlanLinkInfo( jointPlansFile , tikzCreator , personIds );
 
@@ -62,6 +64,7 @@ public class CreateTikzFigureOfJpStructure {
 	}
 
 	private static void parsePlanInfos(
+			final boolean lookAtVehicles,
 			final String plansFile,
 			final JointStructureTikzCreator tikzCreator,
 			final List<String> personIds) {
@@ -69,6 +72,7 @@ public class CreateTikzFigureOfJpStructure {
 			private String id = null;
 			private int count = 0;
 			private int selected = -1;
+			private final Map<Integer, String> vehicles = new LinkedHashMap<Integer, String>();
 			@Override
 			public void startTag(
 					final String name,
@@ -86,6 +90,12 @@ public class CreateTikzFigureOfJpStructure {
 					}
 					count++;
 				}
+				if ( name.equals( "route" ) ) {
+					final String v = atts.getValue( "vehicleRefId" );
+					if ( v != null ) {
+						vehicles.put( count -1 , v );
+					}
+				}
 			}
 
 			@Override
@@ -95,7 +105,16 @@ public class CreateTikzFigureOfJpStructure {
 					final Stack<String> context) {
 				if ( name.equals( "person" ) && personIds.contains( id ) ) {
 					tikzCreator.addAgentInfo( id , count );
-					tikzCreator.setPlanProperty( id , selected , "selected" );
+					if ( !lookAtVehicles ) {
+						tikzCreator.setPlanProperty( id , selected , "selected" );
+						return;
+					}
+
+					for ( Map.Entry<Integer, String> e : vehicles.entrySet() ) {
+						final int plan = e.getKey();
+						final String vehicle = e.getValue();
+						tikzCreator.setPlanProperty( id , plan , vehicle );
+					}
 				}
 			}
 		}.parse( plansFile );
