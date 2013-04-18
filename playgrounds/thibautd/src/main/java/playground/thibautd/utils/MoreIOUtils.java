@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * Defines some useful i/o related methods, which are not part of the
@@ -119,5 +121,18 @@ public class MoreIOUtils {
 		app.close();
 	}
 
+	public static void writeLines(
+			final BufferedWriter writer,
+			final String... lines) {
+		try {
+			for ( String l : lines ) {
+				writer.write( l );
+				writer.newLine();
+			}
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException( e );
+		}
+	}
 }
 

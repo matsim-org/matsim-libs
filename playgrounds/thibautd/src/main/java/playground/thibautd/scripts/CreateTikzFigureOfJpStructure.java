@@ -37,6 +37,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import playground.thibautd.utils.MoreIOUtils;
+
 /**
  * @author thibautd
  */
@@ -78,7 +80,7 @@ public class CreateTikzFigureOfJpStructure {
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
 		writeBeginning( writer );
 		writePlans( writer , planInfos );
-		writeJointPlans( writer , planLinkInfo );
+		writeJointPlans( writer , planInfos , planLinkInfo );
 		writeEnd( writer );
 		writer.close();
 	}
@@ -175,31 +177,25 @@ public class CreateTikzFigureOfJpStructure {
 	}
 
 	private static void writeBeginning(
-			final BufferedWriter writer) throws IOException {
-		writer.write( "\\documentclass{article}" );
-		writer.newLine();
-		writer.write( "\\usepackage{tikz}" );
-		writer.write( "\\usepackage[landscape]{geometry}" );
-		writer.newLine();
-		writer.newLine();
-		writer.write( "\\begin{document}" );
-		writer.write( "\\begin{figure}" );
-		writer.write( "\\begin{center}" );
-		writer.newLine();
-		writer.write( "% cut here -----------------------------------------------" );
-		writer.newLine();
-		writer.newLine();
-
-		writer.write( "\\begin{tikzpicture}" );
-		writer.newLine();
-		writer.write( "\\tikzstyle{"+AGENT_STYLE+"}=[rotate=45,anchor=south west]" );
-		writer.newLine();
-		writer.write( "\\tikzstyle{"+PLAN_STYLE+"}=[rectangle,draw]" );
-		writer.newLine();
-		writer.write( "\\tikzstyle{"+SELECTED_PLAN_STYLE+"}=[rectangle,fill=green,draw]" );
-		writer.newLine();
-		writer.write( "\\tikzstyle{"+LINK_STYLE+"}=[]" );
-		writer.newLine();
+			final BufferedWriter writer) {
+		MoreIOUtils.writeLines(
+				writer,
+				"\\documentclass{article}",
+				"\\usepackage{tikz}",
+				"\\usepackage[landscape]{geometry}",
+				"\\pgfdeclarelayer{bg}",
+				"\\pgfsetlayers{bg,main} % put a bg layer under the main layer",
+				"",
+				"\\begin{document}",
+				"\\begin{figure}",
+				"\\begin{center}",
+				"% cut here -----------------------------------------------",
+				"",
+				"\\begin{tikzpicture}",
+				"\\tikzstyle{"+AGENT_STYLE+"}=[rotate=45,anchor=south west]",
+				"\\tikzstyle{"+PLAN_STYLE+"}=[rectangle,fill=white,draw]",
+				"\\tikzstyle{"+SELECTED_PLAN_STYLE+"}=[rectangle,fill=green,draw]",
+				"\\tikzstyle{"+LINK_STYLE+"}=[]");
 	}
 
 	private static void writePlans(
@@ -211,16 +207,19 @@ public class CreateTikzFigureOfJpStructure {
 			writer.newLine();
 			final String pos = last == null ? "" : "[right of="+last+"]";
 			last = info.id;
-			writer.write( "\\node ("+last+") "+pos+" {};" );
-			writer.write( "\\node "+pos+" ["+AGENT_STYLE+"] {"+info.id+"};" );
+			MoreIOUtils.writeLines(
+				writer,
+				"\\node ("+last+") "+pos+" {};",
+				"\\node "+pos+" ["+AGENT_STYLE+"] {"+info.id+"};" );
 			writer.newLine();
 			String lastPlan = last;
 			for ( int i=0; i < info.nPlans; i++ ) {
 				final String style = i == info.selectedPlan ? SELECTED_PLAN_STYLE : PLAN_STYLE;
 				final String planPos = "[below of="+lastPlan+"]";
 				lastPlan = planId( last , i );
-				writer.write( "\\node ("+lastPlan+") "+planPos+" ["+style+"] {};" );
-				writer.newLine();
+				MoreIOUtils.writeLines(
+						writer,
+						"\\node ("+lastPlan+") "+planPos+" ["+style+"] {};" );
 			}
 		}
 	}
@@ -231,27 +230,51 @@ public class CreateTikzFigureOfJpStructure {
 
 	private static void writeJointPlans(
 			final BufferedWriter writer,
+			final List<AgentPlanInfo> agentPlanInfo,
 			final List<PlanLinkInfo> linkInfo) throws IOException {
 		writer.newLine();
+		MoreIOUtils.writeLines(
+				writer,
+				"% write links \"under\" the nodes, otherwise parabolas do not look nice",
+				"\\begin{pgfonlayer}{bg}" );
 		for ( PlanLinkInfo info : linkInfo ) {
 			final String start = planId( info.id1 , info.plan1 );
 			final String end = planId( info.id2 , info.plan2 );
-			//writer.write( "\\draw ["+LINK_STYLE+"] ("+start+") to [out=90,in=90] ("+end+");" );
-			writer.write( "\\draw ["+LINK_STYLE+"] ("+start+") .. controls +(up:4mm) and +(up:4mm) .. ("+end+");" );
-			writer.newLine();
+			final String curve = areContinguous( info.id1 , info.id2 , agentPlanInfo ) ?
+				"to[out=0,in=180]" : "parabola[parabola height=6mm]";
+			MoreIOUtils.writeLines(
+					writer,
+					"\\draw ["+LINK_STYLE+"] ("+start+") "+curve+" ("+end+");" );
 		}
+		MoreIOUtils.writeLines(
+				writer,
+				"\\end{pgfonlayer}{bg}" );
+	}
+
+	private static boolean areContinguous(
+			final String id1,
+			final String id2,
+			final List<AgentPlanInfo> agentPlanInfo) {
+		boolean foundOne = false;
+		for (AgentPlanInfo info : agentPlanInfo) {
+			if ( foundOne ) {
+				return info.id.equals( id1 ) || info.id.equals( id2 );
+			}
+			if ( info.id.equals( id1 ) || info.id.equals( id2 ) ) foundOne = true;
+		}
+		return false;
 	}
 
 	private static void writeEnd(
-			final BufferedWriter writer) throws IOException {
-		writer.write( "\\end{tikzpicture}" );
-		writer.newLine();
-		writer.newLine();
-		writer.write( "% cut here -----------------------------------------------" );
-		writer.newLine();
-		writer.write( "\\end{center}" );
-		writer.write( "\\end{figure}" );
-		writer.write( "\\end{document}" );
+			final BufferedWriter writer) {
+		MoreIOUtils.writeLines(
+				writer,
+				"\\end{tikzpicture}",
+				"",
+				"% cut here -----------------------------------------------",
+				"\\end{center}",
+				"\\end{figure}",
+				"\\end{document}");
 	}
 
 	private static List<AgentPlanInfo> parsePlanInfos(
