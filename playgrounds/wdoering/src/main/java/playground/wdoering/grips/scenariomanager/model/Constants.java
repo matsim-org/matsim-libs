@@ -20,8 +20,10 @@ public class Constants
 
 
 	public static String DEFAULT_MATSIM_CONFIG_DESTINATION = "/output/config.xml";
+	public static final String DEFAULT_MATSIM_CONFIG_FILE = "config.xml";
 
 	public static final String COLOR_PREFIX = "color_";
+
 	
 	public static String DESC_OSM_BOUNDINGBOX = "osm bounding box"; 
 	
@@ -139,7 +141,7 @@ public class Constants
 		return MatsimResource.getAsImage(imageName);
 	}
 	
-	public static String IMG_BUSSTOP = MatsimResource.getAsURL("grips/busstop.png").getFile();
+	public static Image IMG_BUSSTOP = MatsimResource.getAsImage("grips/busstop.png");
 	public static String IMG_ICON_EVACUATION = "EVACUATION.png";
 	public static String IMG_ICON_POPULATION = "POPULATION.png";
 	public static String IMG_ICON_GRIPSSCENARIO = "GRIPSSCENARIO.png";

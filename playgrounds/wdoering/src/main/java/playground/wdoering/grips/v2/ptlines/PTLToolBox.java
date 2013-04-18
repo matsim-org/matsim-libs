@@ -167,7 +167,7 @@ public class PTLToolBox extends AbstractToolBox
 
 				int secondaryLayerID = PTLToolBox.this.controller.getVisualizer().getSecondaryShapeRenderLayer().getId();
 
-				BoxShape shape = ShapeFactory.getBusStopShape(Constants.IMG_BUSSTOP, currentBusStop.id.toString(), secondaryLayerID, linkPos);
+				BoxShape shape = ShapeFactory.getBusStopShape(currentBusStop.id.toString(), secondaryLayerID, linkPos);
 				shape.setVisible(true);
 				PTLToolBox.this.controller.addShape(shape);
 				PTLToolBox.this.controller.getVisualizer().getSecondaryShapeRenderLayer().updatePixelCoordinates(shape);

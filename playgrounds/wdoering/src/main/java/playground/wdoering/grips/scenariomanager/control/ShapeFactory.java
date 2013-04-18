@@ -3,6 +3,9 @@ package playground.wdoering.grips.scenariomanager.control;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+
+import org.matsim.core.gbl.MatsimResource;
 
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.shape.BoxShape;
@@ -128,12 +131,13 @@ public class ShapeFactory
 		return hoverLine;
 	}
 	
-	public static BoxShape getBusStopShape(String fileName, String linkID, int shapeRendererId, Point2D pos)
+	public static BoxShape getBusStopShape(String linkID, int shapeRendererId, Point2D pos)
 	{
 		
 		BoxShape busStop = new BoxShape(shapeRendererId, pos);
 		busStop.setId(Constants.ID_BUSSTOP_PREFIX + linkID);
-		busStop.setImageFile(fileName);
+//		busStop.setImageFile(Constants.IMG_BUSSTOP.);
+		busStop.setImage(Constants.IMG_BUSSTOP);
 		busStop.setFixedSize(80,40);
 		busStop.setOffset(0,-40);
 		

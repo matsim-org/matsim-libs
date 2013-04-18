@@ -177,5 +177,11 @@ public class BufferedImageContainer implements ImageContainerInterface
 		
 	}
 	
+	@Override
+	public void drawImage(BufferedImage image, int x, int y, int w, int h)
+	{
+		this.imageGraphics.drawImage(image, x, y, w, h, null);
+	}
+	
 
 }

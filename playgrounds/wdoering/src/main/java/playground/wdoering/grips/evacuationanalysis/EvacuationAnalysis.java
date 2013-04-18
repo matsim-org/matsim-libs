@@ -20,7 +20,6 @@
 
 package playground.wdoering.grips.evacuationanalysis;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -30,7 +29,6 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
-import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -43,20 +41,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -77,21 +68,14 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
@@ -100,12 +84,9 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
-import playground.wdoering.debugvisualization.controller.XYVxVyEventThread;
-import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
 import playground.wdoering.grips.evacuationanalysis.control.EventHandler;
 import playground.wdoering.grips.evacuationanalysis.control.EventReaderThread;
 import playground.wdoering.grips.evacuationanalysis.control.TiffExporter;
@@ -321,7 +302,7 @@ public class EvacuationAnalysis implements ActionListener{
 		
 		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		this.gridSizeSlider = new JSlider(JSlider.HORIZONTAL, 100, 600, (int)this.cellSize);
+		this.gridSizeSlider = new JSlider(SwingConstants.HORIZONTAL, 100, 600, (int)this.cellSize);
 		this.gridSizeSlider.setMinorTickSpacing(20);
 		this.gridSizeSlider.setPaintTicks(true);
 		this.gridSizeSlider.setSnapToTicks(true);
@@ -379,11 +360,11 @@ public class EvacuationAnalysis implements ActionListener{
 		
 		JPanel transparencySliderPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		transparencySliderPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		transparencySlider = new JSlider(JSlider.HORIZONTAL, 1, 100, 50);
+		transparencySlider = new JSlider(SwingConstants.HORIZONTAL, 1, 100, 50);
 		transparencySlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				updateTransparency((float)(((JSlider)e.getSource()).getValue())/100f);
+				updateTransparency((((JSlider)e.getSource()).getValue())/100f);
 			}
 		});
 		transparencySlider.addMouseListener(new MouseListener() {
@@ -837,7 +818,7 @@ public class EvacuationAnalysis implements ActionListener{
 	{
 		this.eventHandler = null;
 		EventsManager e = EventsUtils.createEventsManager();
-		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(e);
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(e);
 		this.readerThread = new Thread(new EventReaderThread(reader,eventFile.toString()), "readerthread");
 		this.eventHandler = new EventHandler(eventFile.getName(), this.sc, this.getGridSize(), this.readerThread);
 		e.addHandler(this.eventHandler);

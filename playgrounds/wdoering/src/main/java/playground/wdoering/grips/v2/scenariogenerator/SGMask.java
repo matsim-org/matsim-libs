@@ -103,9 +103,10 @@ public class SGMask extends JPanel
 							String path = SGMask.this.controller.getScenarioPath();
 							
 							SGMask.this.root.removeAppender(SGMask.this.logAppender);
+							
 
 							if (!SGMask.this.controller.isStandAlone())
-								SGMask.this.controller.openMastimConfig(new File(path + Constants.DEFAULT_MATSIM_CONFIG_DESTINATION));
+								SGMask.this.controller.openMastimConfig(new File(SGMask.this.controller.getGripsConfigModule().getOutputDir() + Constants.DEFAULT_MATSIM_CONFIG_FILE));
 							
 
 						}

@@ -60,7 +60,7 @@ public class EvacuationAnalysis extends AbstractModule
 	private File currentEventFile;
 	private EventHandler eventHandler;
 	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED;
-	private float cellTransparency = 1f;
+	private float cellTransparency = 0.6f;
 	private int k = 5;
 	private GridRenderer gridRenderer;
 	private int gridRendererID;
@@ -196,7 +196,10 @@ public class EvacuationAnalysis extends AbstractModule
 			readEvents();
 			
 			//finally: enable all layers
-			controller.enableAllRenderLayers();
+//			controller.enableAllRenderLayers();
+			controller.enableMapRenderer();
+			gridRenderer.setEnabled(true);
+//			controller.getVisualizer().getPrimaryShapeRenderLayer().setEnabled(false);
 		}
 
 		private void addGridRenderer()

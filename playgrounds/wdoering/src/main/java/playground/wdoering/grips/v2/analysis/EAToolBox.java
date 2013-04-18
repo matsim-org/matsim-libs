@@ -393,6 +393,7 @@ public class EAToolBox extends AbstractToolBox
 		this.cellSize = (double)value;
 		System.out.println("value: " + value + " | cellsize: " + this.cellSize);
 		this.gridSizeLabel.setText(cellSizeText + value + "m* ");
+		this.module.setGridSize(value);
 
 	}
 	

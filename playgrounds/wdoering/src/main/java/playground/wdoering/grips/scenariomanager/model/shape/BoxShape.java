@@ -1,9 +1,11 @@
 package playground.wdoering.grips.scenariomanager.model.shape;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 public class BoxShape extends Shape
 {
@@ -16,6 +18,7 @@ public class BoxShape extends Shape
 	private int fixedHeight;
 	private int offsetX;
 	private int offsetY;
+	private BufferedImage image;
 	
 	public BoxShape(int layerID, double x, double y, double w, double h)
 	{
@@ -126,5 +129,24 @@ public class BoxShape extends Shape
 		this.offsetY = j;
 		
 	}
+	
+	public BufferedImage getImage()
+	{
+		return image;
+	}
+	
+	public void setImage(BufferedImage image)
+	{
+		this.image = image;
+		
+		if (this.image!=null)
+			hasImage = true;
+	}
+
+	public void setImage(Image image)
+	{
+		this.setImage((BufferedImage)image);
+	}
+
 
 }

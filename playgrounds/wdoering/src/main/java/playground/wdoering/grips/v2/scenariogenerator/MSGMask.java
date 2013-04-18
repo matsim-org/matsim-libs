@@ -162,8 +162,6 @@ public class MSGMask extends JPanel
 	
 								//Controler(final String configFileName, final Config config, final Scenario scenario) {
 								
-								String matsimConfigFile = MSGMask.this.controller.getMatsimConfigFile();
-								Scenario scenario = MSGMask.this.controller.getScenario();
 //								Controler matsimController = new Controler(MSGMask.this.controller.getMatsimConfigFile());
 								Controler matsimController = new Controler(config);
 								matsimController.run();

@@ -78,8 +78,8 @@ public class ShapeRenderer extends AbstractRenderLayer
 					
 					if (((BoxShape)shape).hasImage())
 					{
-						System.out.println(((BoxShape)shape).getImageFile());
-						this.imageContainer.drawImage(((BoxShape)shape).getImageFile(),x,y,w,h);
+//						System.out.println(((BoxShape)shape).getImageFile());
+						this.imageContainer.drawImage(((BoxShape)shape).getImage(),x,y,w,h);
 					}
 					else
 					{

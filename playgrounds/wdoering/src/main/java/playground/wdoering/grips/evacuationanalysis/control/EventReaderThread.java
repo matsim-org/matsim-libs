@@ -1,14 +1,15 @@
 package playground.wdoering.grips.evacuationanalysis.control;
 
-import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import org.matsim.core.events.EventsReaderXMLv1;
+
 
 
 public class EventReaderThread implements Runnable
 {
-	private final XYVxVyEventsFileReader reader; 
+	private final EventsReaderXMLv1 reader; 
 	private final String eventFile;
 
-	public EventReaderThread(XYVxVyEventsFileReader reader, String eventFile)
+	public EventReaderThread(EventsReaderXMLv1 reader, String eventFile)
 	{
 		this.reader = reader;
 		this.eventFile = eventFile;

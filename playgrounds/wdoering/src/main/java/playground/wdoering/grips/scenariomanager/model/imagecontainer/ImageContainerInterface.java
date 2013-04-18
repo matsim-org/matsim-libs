@@ -38,6 +38,7 @@ public interface ImageContainerInterface
 	public void scale(double sx, double sy);
 	public void drawLine(Point c0, Point c1);
 	public void drawImage(String imageFile, int x, int y, int w, int h);
+	public void drawImage(BufferedImage image, int x, int y, int w, int h);
 	
 	
 }

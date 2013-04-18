@@ -444,7 +444,7 @@ public class Controller
 
 	public File getCurrentWorkingDirectory()
 	{
-		return new File("C:/temp/!matsimfiles/fostercityca/");
+		return new File(System.getProperty("user.home"));
 	}
 
 	public GripsConfigModule getGripsConfigModule()
@@ -729,6 +729,12 @@ public class Controller
 				layer.setEnabled(true);
 	}
 
+	public void enableMapRenderer()
+	{
+		if (this.visualizer.getActiveMapRenderLayer() != null)
+			this.visualizer.getActiveMapRenderLayer().setEnabled(true);
+	}
+	
 	public void disableAllRenderLayers()
 	{
 		if (this.visualizer.getRenderLayers() != null)
