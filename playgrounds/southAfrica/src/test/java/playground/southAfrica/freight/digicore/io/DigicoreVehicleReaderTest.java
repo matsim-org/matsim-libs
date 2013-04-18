@@ -43,8 +43,15 @@ public class DigicoreVehicleReaderTest extends MatsimTestCase {
 	public void testReadVehicle(){
 		DigicoreVehicle v1 = createVehicle();
 		LOG.info(" --> Id: " + v1.getId());
-		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter(v1);
-		dvw.write(getOutputDirectory() + "tmp.xml");
+		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
+		
+		try{
+			dvw.write(getOutputDirectory() + "tmp.xml");
+			fail();
+		} catch(IllegalArgumentException e){
+			/* Pass. */
+		}
+		dvw.write(getOutputDirectory() + "tmp.xml", v1);
 		
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 		DigicoreVehicle v2 = dvr.parseDigicoreVehicle(getOutputDirectory() + "tmp.xml");

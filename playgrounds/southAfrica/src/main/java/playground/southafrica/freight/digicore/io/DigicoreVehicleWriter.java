@@ -33,23 +33,30 @@ import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 
 public class DigicoreVehicleWriter extends MatsimXmlWriter implements MatsimWriter{
 	private final static Logger LOG = Logger.getLogger(DigicoreVehicleWriter.class);
-	private final DigicoreVehicle vehicle;
 
-	public DigicoreVehicleWriter(final DigicoreVehicle vehicle) {
+		
+	public DigicoreVehicleWriter(){
 		super();
-		this.vehicle = vehicle;
 	}
 
+	
 	@Override
-	public void write(final String filename) {
-		LOG.info("Writing Digicore vehicle");
-		writeV1(filename);
-		LOG.info("Done.");
+	public void write(final String filename){
+		LOG.error("Cannot write Digicore vehicle without the vehicle being passed.");
+		LOG.error("Rather use the method write(filename, vehicle)");
+		throw new IllegalArgumentException();
+	}
+	
+	
+	public void write(final String filename, DigicoreVehicle vehicle) {
+//		LOG.info("Writing Digicore vehicle");
+		writeV1(filename, vehicle);
+//		LOG.info("Done.");
 	}
 	
 	
 	
-	public void writeV1(final String filename){
+	public void writeV1(final String filename, DigicoreVehicle vehicle){
 		String dtd = "http://matsim.org/files/dtd/digicoreVehicle_v1.dtd";
 		DigicoreVehicleWriterHandler handler = new DigicoreVehicleWriterHandlerImpl_v1();
 		

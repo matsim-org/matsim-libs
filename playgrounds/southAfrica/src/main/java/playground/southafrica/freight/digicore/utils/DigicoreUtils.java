@@ -13,6 +13,8 @@ import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+
 /**
  * A class with various static methods that are frequently used in Digicore
  * analysis.
@@ -81,33 +83,5 @@ public class DigicoreUtils {
 		}
 		return list;
 	}
-	
-	
-	/**
-	 * Reads in a {@link DigicoreVehicle} from a given {@link File}.
-	 * @param vehicleFile
-	 * @return {@link DigicoreVehicle}
-	 * @throws IOException
-	 * 
-	 * FIXME I have to relook at how vehicle files are read in!! (jwj 201304)
-	 */
-//	public static DigicoreVehicle readDigicoreVehicle(File vehicleFile){
-//		synchronized (vehicleFile) {
-//			if(!vehicleFile.exists() || !vehicleFile.canRead()){
-//				LOG.warn("Cannot read DigicoreVehicle from " + vehicleFile.getAbsolutePath());
-//				LOG.warn("Returning null.");
-//			}
-//			MyXmlConverter mxc = new MyXmlConverter(true);
-//			Object o = mxc.readObjectFromFile(vehicleFile.getAbsolutePath());
-//			if(o instanceof DigicoreVehicle){
-//				return (DigicoreVehicle) o;
-//			} else{
-//				LOG.warn("Object is not of type DigicoreVehicle.");
-//			}			
-//		}
-//		return null;
-//	}
-
-
 	
 }

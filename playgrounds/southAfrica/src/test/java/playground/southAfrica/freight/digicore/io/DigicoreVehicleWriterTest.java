@@ -37,9 +37,8 @@ public class DigicoreVehicleWriterTest extends MatsimTestCase {
 	
 	public void testWriteVehicle(){
 		DigicoreVehicle v = createVehicle();
-		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter(v);
-		dvw.write(getOutputDirectory() + "tmp.xml");
-		
+		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
+		dvw.write(getOutputDirectory() + "tmp.xml", v);
 	}
 
 	

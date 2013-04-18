@@ -1,6 +1,7 @@
 package playground.southafrica.utilities;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,6 +54,26 @@ public class FileUtils {
 		} else{
 			folder.delete();
 		}
+	}
+	
+	
+	/**
+	 * Creates a file filter based on the filename extension.
+	 * @param extension
+	 * @return
+	 */
+	public static FileFilter getFileFilter(final String extension){
+		FileFilter filter = new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				if(pathname.getName().endsWith(extension)){
+					return true;
+				} else{
+					return false;
+				}
+			}
+		};
+		return filter;
 	}
 
 
