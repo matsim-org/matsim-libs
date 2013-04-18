@@ -32,6 +32,8 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -59,6 +61,7 @@ import playground.vsp.analysis.modules.ptAccessibility.PtAccessibility;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesAnalyzer;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesHandler;
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.PtRoutes2PaxAnalysis;
+import playground.vsp.analysis.modules.ptTravelStats.travelStatsAnalyzer;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
 import playground.vsp.analysis.modules.stuckAgents.GetStuckEventsAndPlans;
 import playground.vsp.analysis.modules.transitSchedule2Shp.TransitSchedule2Shp;
@@ -172,10 +175,13 @@ public class AnalysisRunner {
 		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, gridSize);
 		analyzer.addAnalysisModule(boardingAlightingCountAnalyzes);
 
-		analyzer.addAnalysisModule(new MyPtCount());
+		analyzer.addAnalysisModule(new MyPtCount(sc.getNetwork()));
 
 		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
 		analyzer.addAnalysisModule(ptRoutes2PaxAnalysis);
+		
+		travelStatsAnalyzer travelStatsAnalyzer = new travelStatsAnalyzer(sc, 3600.0);
+		analyzer.addAnalysisModule(travelStatsAnalyzer);
 		
 		analyzer.run();
 		
@@ -188,12 +194,16 @@ class MyPtCount extends AbstractAnalyisModule{
 
 	PtPaxVolumesHandler handler;
 	private ArrayList<Id> links;
+	private Network network;
 	/**
+	 * @param zones 
+	 * @param network 
 	 * @param name
 	 */
-	public MyPtCount() {
+	public MyPtCount(Network network) {
 		super(MyPtCount.class.getSimpleName());
-		this.handler = new PtPaxVolumesHandler(3600.); 
+		this.handler = new PtPaxVolumesHandler(3600.);
+		this.network = network;
 	}
 
 	@Override
@@ -206,20 +216,10 @@ class MyPtCount extends AbstractAnalyisModule{
 	@Override
 	public void preProcessData() {
 		this.links = new ArrayList<Id>();
-		links.add(new IdImpl("90409-90411-90413-90415-90417-90419"));
-		links.add(new IdImpl("90420-90418-90416-90414-90412-90410"));
-		links.add(new IdImpl("20706-20707"));
-		links.add(new IdImpl("72219-72220-72221"));
-		links.add(new IdImpl("72241-72242-72243-72244"));
-		links.add(new IdImpl("20726-20727-20728"));
-		links.add(new IdImpl("24360-24361-24362-24363-24364"));
-		links.add(new IdImpl("218-219-220-221-222"));
-		links.add(new IdImpl("34580-34581-34582-34583-34584"));
-		links.add(new IdImpl("73503-73504"));
-		links.add(new IdImpl("53096-53097-53098"));
-		links.add(new IdImpl("78332-78333-78334"));
-		links.add(new IdImpl("18607-18605-18603-18601-18599-18597-18595-18593-18591-18589-18587-18585-18583-18581-18579-18577"));
-		links.add(new IdImpl("18576-18578-18580-18582-18584-18586-18588-18590-18592-18594-18596-18598-18600-18602-18604"));
+		for (Link link : this.network.getLinks().values()) {
+			links.add(link.getId());
+		}
+		this.network = null;
 	}
 
 	@Override
