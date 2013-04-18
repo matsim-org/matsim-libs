@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -72,29 +73,34 @@ import org.postgresql.copy.CopyManager;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import playground.pieter.singapore.utils.events.PostgresqlColumnDefinition.PostgresType;
+
 /**
  * 
  * @author sergioo
  * 
  */
 class PlanElement {
-	
+
 	public double getDuration() {
 		return endTime - startTime;
 	}
-	private static int id=0; //for enumeration
-	
+
+	private static int id = 0; // for enumeration
+
 	double startTime;
-	double endTime = 30*3600;
+	double endTime = 30 * 3600;
 
 	private int elementId;
-	public PlanElement(){
+
+	public PlanElement() {
 		elementId = id++;
 	}
+
 	public int getElementId() {
 		return elementId;
 	}
 }
+
 public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 		AgentDepartureEventHandler, AgentArrivalEventHandler,
@@ -134,7 +140,6 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	}
 
-
 	private class Activity extends PlanElement {
 		Id facility;
 		Coord coord;
@@ -151,7 +156,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	private class Journey extends PlanElement {
 		Activity fromAct;
 		Activity toAct;
-		boolean carJourney=false;
+		boolean carJourney = false;
 		LinkedList<Trip> trips = new LinkedList<EventsToPlanElements.Trip>();
 		LinkedList<Transfer> transfers = new LinkedList<EventsToPlanElements.Transfer>();
 		LinkedList<Wait> waits = new LinkedList<EventsToPlanElements.Wait>();
@@ -168,7 +173,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 		public Wait addWait() {
 			Wait wait = new Wait();
-			wait.journey=this;
+			wait.journey = this;
 			waits.add(wait);
 			planElements.add(wait);
 			return wait;
@@ -176,14 +181,14 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 		public Walk addWalk() {
 			Walk walk = new Walk();
-			walk.journey=this;
+			walk.journey = this;
 			walks.add(walk);
 			planElements.add(walk);
 			return walk;
 		}
 
 		public void addTransfer(Transfer xfer) {
-			xfer.journey=this;
+			xfer.journey = this;
 			transfers.add(xfer);
 			planElements.add(xfer);
 		}
@@ -194,120 +199,138 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		private double carDistance;
 
 		public String toString() {
-			return String.format(
-					"JOURNEY: start: %6.0f end: %6.0f dur: %6.0f invehDist: %6.0f walkDist: %6.0f \n %s",
-					startTime, endTime, getDuration(), getInVehDistance(),getWalkDistance(),
-					planElements.toString());
+			return String
+					.format("JOURNEY: start: %6.0f end: %6.0f dur: %6.0f invehDist: %6.0f walkDist: %6.0f \n %s",
+							startTime, endTime, getDuration(),
+							getInVehDistance(), getWalkDistance(),
+							planElements.toString());
 		}
 
 		private double getInVehDistance() {
-			if(!carJourney){
-				double distance=0;
-				for(Trip t:trips){
+			if (!carJourney) {
+				double distance = 0;
+				for (Trip t : trips) {
 					distance += t.distance;
 				}
-				return distance;				
+				return distance;
 			}
 			return carDistance;
 		}
 
 		private double getWalkDistance() {
-			if(!carJourney){
+			if (!carJourney) {
 				double distance = 0;
-				for(Walk w:walks){
+				for (Walk w : walks) {
 					distance += w.distance;
 				}
-				return distance;		
+				return distance;
 			}
 			return 0;
 		}
+
 		private double getInVehTime() {
-			if(!carJourney){
-				double time=0;
-				for(Trip t:trips){
+			if (!carJourney) {
+				double time = 0;
+				for (Trip t : trips) {
 					time += t.getDuration();
 				}
-				return time;			
+				return time;
 			}
 			return getDuration();
 		}
 
 		private double getWalkTime() {
-			if(!carJourney){
+			if (!carJourney) {
 				double time = 0;
-				for(Walk w:walks){
+				for (Walk w : walks) {
 					time += w.getDuration();
 				}
-				return time;				
+				return time;
 			}
 			return 0;
 		}
+
 		private double getWaitTime() {
-			if(!carJourney){
+			if (!carJourney) {
 				double time = 0;
-				for(Wait w:waits){
+				for (Wait w : waits) {
 					time += w.getDuration();
 				}
-				return time;				
+				return time;
 			}
 			return 0;
 		}
-		private String getMainMode(){
-			if(carJourney){
+
+		private String getMainMode() {
+			if (carJourney) {
 				return "car";
 			}
-			Trip longestTrip = trips.getFirst();
-			if(trips.size()>1){
-				for(int i=1; i<trips.size();i++){
-					if(trips.get(i).distance > longestTrip.distance){
-						longestTrip =trips.get(i);								
+			try {
+				Trip longestTrip = trips.getFirst();
+				if (trips.size() > 1) {
+					for (int i = 1; i < trips.size(); i++) {
+						if (trips.get(i).distance > longestTrip.distance) {
+							longestTrip = trips.get(i);
+						}
 					}
 				}
+				return longestTrip.mode;
+
+			} catch (NoSuchElementException e) {
+				return "walk";
+
 			}
-			return longestTrip.mode;
 		}
 
 		public double getDistance() {
-			
-			return getInVehDistance()+getWalkDistance();
+
+			return getInVehDistance() + getWalkDistance();
 		}
 
 		public double getAccessWalkDistance() {
-			if(!carJourney){
-				return walks.getFirst().distance;		
+			if (!carJourney) {
+				return walks.getFirst().distance;
 			}
 			return 0;
 		}
+
 		public double getAccessWalkTime() {
-			if(!carJourney){
-				return walks.getFirst().getDuration();		
+			if (!carJourney) {
+				return walks.getFirst().getDuration();
 			}
 			return 0;
 		}
+
 		public double getAccessWaitTime() {
-			if(!carJourney){
-				return waits.getFirst().getDuration();		
+			if (!carJourney) {
+				try {
+					return waits.getFirst().getDuration();
+
+				} catch (NoSuchElementException e) {
+
+				}
 			}
 			return 0;
 		}
+
 		public double getEgressWalkDistance() {
-			if(!carJourney){
-				for(Walk w:walks){
-					if(w.egressWalk)
+			if (!carJourney) {
+				for (Walk w : walks) {
+					if (w.egressWalk)
 						return w.distance;
-				}		
+				}
 			}
 			return 0;
 		}
 
 		public double getEgressWalkTime() {
-			if(!carJourney){
-				for(Walk w:walks){
-					if(w.egressWalk)
+			if (!carJourney) {
+				for (Walk w : walks) {
+					if (w.egressWalk)
 						return w.getDuration();
-				}		
+				}
 			}
-			
+
 			return 0;
 		}
 	}
@@ -324,19 +347,21 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		double distance;
 
 		public String toString() {
-			return String.format(
-					"\tTRIP: mode: %s start: %6.0f end: %6.0f distance: %6.0f \n", mode,
-					startTime, endTime, distance);
+			return String
+					.format("\tTRIP: mode: %s start: %6.0f end: %6.0f distance: %6.0f \n",
+							mode, startTime, endTime, distance);
 		}
 	}
 
 	private class Wait extends PlanElement {
 		public Journey journey;
 		Coord coord;
-		boolean accessWait=false;
+		boolean accessWait = false;
+
 		public String toString() {
-			return String.format("\tWAIT: start: %6.0f end: %6.0f dur: %6.0f \n",
-					startTime, endTime, endTime - startTime);
+			return String.format(
+					"\tWAIT: start: %6.0f end: %6.0f dur: %6.0f \n", startTime,
+					endTime, endTime - startTime);
 		}
 	}
 
@@ -345,11 +370,12 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		Coord orig;
 		Coord dest;
 		double distance;
-		boolean accessWalk=false;
+		boolean accessWalk = false;
 		boolean egressWalk = false;
 
 		public String toString() {
-			return String.format("\tWALK: start: %6.0f end: %6.0f distance: %6.0f \n",
+			return String.format(
+					"\tWALK: start: %6.0f end: %6.0f distance: %6.0f \n",
 					startTime, endTime, distance);
 		}
 	}
@@ -392,6 +418,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			}
 			return 0;
 		}
+
 		private double getWalkDistance() {
 			try {
 				double walkDist = 0;
@@ -519,7 +546,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			journey.endTime = event.getTime();
 			journey.toAct = act;
 			if (beforeInPT)
-				journey.walks.getLast().egressWalk=true;
+				journey.walks.getLast().egressWalk = true;
 		}
 	}
 
@@ -538,13 +565,13 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				journey.fromAct = chain.acts.getLast();
 				journey.startTime = event.getTime();
 				Walk walk = journey.addWalk();
-				walk.accessWalk=true;
+				walk.accessWalk = true;
 				walk.startTime = event.getTime();
 				walk.orig = journey.orig;
-			}else{
+			} else {
 				journey = chain.journeys.getLast();
 				Walk walk = journey.addWalk();
-				walk.startTime=event.getTime();
+				walk.startTime = event.getTime();
 				walk.orig = network.getLinks().get(event.getLinkId())
 						.getCoord();
 				journey.possibleTransfer.walks.add(walk);
@@ -564,7 +591,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				wait.accessWait = true;
 			wait.startTime = event.getTime();
 			wait.coord = network.getLinks().get(event.getLinkId()).getCoord();
-			if(!wait.accessWait){
+			if (!wait.accessWait) {
 				journey.possibleTransfer.waits.add(wait);
 			}
 		}
@@ -701,137 +728,169 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		ptVehicles.get(event.getVehicleId()).lastStop = event.getFacilityId();
 	}
-	public void writeSimulationResultsToSQL(File connectionProperties) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException {
-		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
-		String formattedDate = df.format(new Date()); 
-		// start with activities
-		String actTableName = "m_calibration.matsim_activities_" +formattedDate;
-		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("activity_id",PostgresType.INT,"primary key"));
-		columns.add(new PostgresqlColumnDefinition("person_id",PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("facility_id",PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("type",PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("start_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("end_time",PostgresType.INT));
-		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
-		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS",actTableName, actDBA, 10000, columns);
 
-		
-		String journeyTableName = "m_calibration.matsim_journeys_" +formattedDate;
+	public void writeSimulationResultsToSQL(File connectionProperties)
+			throws InstantiationException, IllegalAccessException,
+			ClassNotFoundException, IOException, SQLException, NoConnectionException {
+		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
+		String formattedDate = df.format(new Date());
+		// start with activities
+		String actTableName = "m_calibration.matsim_activities_"
+				+ formattedDate;
+		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns.add(new PostgresqlColumnDefinition("activity_id",
+				PostgresType.INT, "primary key"));
+		columns.add(new PostgresqlColumnDefinition("person_id",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("facility_id",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("type", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("start_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
+		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
+		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS",
+				actTableName, actDBA, 10000, columns);
+
+		String journeyTableName = "m_calibration.matsim_journeys_"
+				+ formattedDate;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("journey_id",PostgresType.INT, "primary key"));
-		columns.add(new PostgresqlColumnDefinition("person_id",PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("start_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("end_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("distance",PostgresType.FLOAT8));
-		columns.add(new PostgresqlColumnDefinition("main_mode",PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("from_act",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("to_act",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("in_vehicle_distance",PostgresType.FLOAT8));
-		columns.add(new PostgresqlColumnDefinition("in_vehicle_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("access_walk_distance",PostgresType.FLOAT8));
-		columns.add(new PostgresqlColumnDefinition("access_walk_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("access_wait_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("egress_walk_distance",PostgresType.FLOAT8));
-		columns.add(new PostgresqlColumnDefinition("egress_walk_time",PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("journey_id",
+				PostgresType.INT, "primary key"));
+		columns.add(new PostgresqlColumnDefinition("person_id",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("start_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("main_mode",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("from_act", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("to_act", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("in_vehicle_distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("in_vehicle_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("access_walk_distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("access_walk_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("access_wait_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("egress_walk_distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("egress_walk_time",
+				PostgresType.INT));
 		DataBaseAdmin journeyDBA = new DataBaseAdmin(connectionProperties);
-		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",journeyTableName, journeyDBA, 5000, columns);
-		
-		
-		String tripTableName = "m_calibration.matsim_trips_" +formattedDate;
+		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",
+				journeyTableName, journeyDBA, 5000, columns);
+
+		String tripTableName = "m_calibration.matsim_trips_" + formattedDate;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("trip_id",PostgresType.INT, "primary key"));
-		columns.add(new PostgresqlColumnDefinition("journey_id",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("start_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("end_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("distance",PostgresType.FLOAT8));		
-		columns.add(new PostgresqlColumnDefinition("mode",PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("line",PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("route",PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("boarding_stop",PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("alighting_stop",PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT,
+				"primary key"));
+		columns.add(new PostgresqlColumnDefinition("journey_id",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("start_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("mode", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("line", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("route", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("boarding_stop",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("alighting_stop",
+				PostgresType.TEXT));
 		DataBaseAdmin tripDBA = new DataBaseAdmin(connectionProperties);
-		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS",tripTableName, tripDBA, 10000, columns);
-		
-		String transferTableName = "m_calibration.matsim_transfers_" +formattedDate;
+		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS",
+				tripTableName, tripDBA, 10000, columns);
+
+		String transferTableName = "m_calibration.matsim_transfers_"
+				+ formattedDate;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("transfer_id",PostgresType.INT, "primary key"));
-		columns.add(new PostgresqlColumnDefinition("journey_id",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("start_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("end_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("from_trip",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("to_trip",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("walk_distance",PostgresType.FLOAT8));
-		columns.add(new PostgresqlColumnDefinition("walk_time",PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("wait_time",PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("transfer_id",
+				PostgresType.INT, "primary key"));
+		columns.add(new PostgresqlColumnDefinition("journey_id",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("start_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("from_trip",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("to_trip", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("walk_distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("walk_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("wait_time",
+				PostgresType.INT));
 		DataBaseAdmin transferDBA = new DataBaseAdmin(connectionProperties);
-		PostgresqlCSVWriter transferWriter = new PostgresqlCSVWriter("TRANSFERS",transferTableName, transferDBA, 1000, columns);
-		
-		for(Entry<Id, TravellerChain> entry:chains.entrySet()){
+		PostgresqlCSVWriter transferWriter = new PostgresqlCSVWriter(
+				"TRANSFERS", transferTableName, transferDBA, 1000, columns);
+
+		for (Entry<Id, TravellerChain> entry : chains.entrySet()) {
 			String pax_id = entry.getKey().toString();
 			TravellerChain chain = entry.getValue();
-			for(Activity act:chain.acts){
-				Object[] args = {
-						new Integer(act.getElementId()),
-						pax_id,
-						act.facility,
-						act.type,
+			for (Activity act : chain.acts) {
+				Object[] args = { new Integer(act.getElementId()), pax_id,
+						act.facility, act.type,
 						new Integer((int) act.startTime),
-						new Integer((int) act.endTime)
-				};
+						new Integer((int) act.endTime) };
 				activityWriter.addLine(args);
 			}
-			for(Journey journey:chain.journeys){
-				Object[] journeyArgs = {
-						new Integer(journey.getElementId()),
-						pax_id,
-						new Integer((int) journey.startTime),
-						new Integer((int) journey.endTime),
-						new Double( journey.getDistance()),
-						journey.getMainMode(),
-						new Integer(journey.fromAct.getElementId()),
-						new Integer(journey.toAct.getElementId()),
-						new Double(journey.getInVehDistance()),
-						new Integer((int) journey.getInVehTime()),
-						new Double(journey.getAccessWalkDistance()),
-						new Integer((int) journey.getAccessWalkTime()),
-						new Integer((int) journey.getAccessWaitTime()),
-						new Double(journey.getEgressWalkDistance()),
-						new Integer((int) journey.getEgressWalkTime())
-						
-						
-				};
-				journeyWriter.addLine(journeyArgs);
-				if(!journey.carJourney){
-					for(Trip trip:journey.trips){
-						Object[] tripArgs = {
-								new Integer(trip.getElementId()),
-								new Integer(journey.getElementId()),
-								new Integer((int) trip.startTime),
-								new Integer((int) trip.endTime),
-								new Double(trip.distance),
-								trip.mode,
-								trip.line,
-								trip.route,
-								trip.boardingStop,
-								trip.alightingStop
-						};						
-						tripWriter.addLine(tripArgs);
+			for (Journey journey : chain.journeys) {
+				try {
+
+					Object[] journeyArgs = {
+							new Integer(journey.getElementId()), pax_id,
+							new Integer((int) journey.startTime),
+							new Integer((int) journey.endTime),
+							new Double(journey.getDistance()),
+							journey.getMainMode(),
+							new Integer(journey.fromAct.getElementId()),
+							new Integer(journey.toAct.getElementId()),
+							new Double(journey.getInVehDistance()),
+							new Integer((int) journey.getInVehTime()),
+							new Double(journey.getAccessWalkDistance()),
+							new Integer((int) journey.getAccessWalkTime()),
+							new Integer((int) journey.getAccessWaitTime()),
+							new Double(journey.getEgressWalkDistance()),
+							new Integer((int) journey.getEgressWalkTime())
+
+					};
+					journeyWriter.addLine(journeyArgs);
+					if (!journey.carJourney) {
+						for (Trip trip : journey.trips) {
+							Object[] tripArgs = {
+									new Integer(trip.getElementId()),
+									new Integer(journey.getElementId()),
+									new Integer((int) trip.startTime),
+									new Integer((int) trip.endTime),
+									new Double(trip.distance), trip.mode,
+									trip.line, trip.route, trip.boardingStop,
+									trip.alightingStop };
+							tripWriter.addLine(tripArgs);
+						}
+						for (Transfer transfer : journey.transfers) {
+							Object[] transferArgs = {
+									new Integer(transfer.getElementId()),
+									new Integer(journey.getElementId()),
+									new Integer((int) transfer.startTime),
+									new Integer((int) transfer.endTime),
+									new Integer(
+											transfer.fromTrip.getElementId()),
+									new Integer(transfer.toTrip.getElementId()),
+									new Double(transfer.getWalkDistance()),
+									new Integer((int) transfer.getWalkTime()),
+									new Integer((int) transfer.getWaitTime()) };
+							transferWriter.addLine(transferArgs);
+						}
 					}
-					for(Transfer transfer:journey.transfers){
-						Object[] transferArgs = {
-								new Integer(transfer.getElementId()),
-								new Integer(journey.getElementId()),
-								new Integer((int) transfer.startTime),
-								new Integer((int) transfer.endTime),
-								new Integer(transfer.fromTrip.getElementId()),
-								new Integer(transfer.toTrip.getElementId()),
-								new Double(transfer.getWalkDistance()),
-								new Integer((int) transfer.getWalkTime()),
-								new Integer((int) transfer.getWaitTime())
-						};
-						transferWriter.addLine(transferArgs);
-					}
+				} catch (NullPointerException e) {
+					stuck++;
 				}
 			}
 
@@ -840,15 +899,45 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		journeyWriter.finish();
 		tripWriter.finish();
 		transferWriter.finish();
+		String indexName = actTableName.substring(14);
+		String indexStatement = "CREATE INDEX " + indexName +"_paxidx ON "+ actTableName + "(person_id);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_facidx ON "+ actTableName + "(facility_id);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_type ON "+ actTableName + "(type);\n";		
+		DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
+		dba.executeStatement(indexStatement);
+		System.out.println(indexStatement);
 		
-		
-		
+		indexName = journeyTableName.substring(14);
+		indexStatement = "CREATE INDEX " + indexName +"_paxidx ON "+ journeyTableName + "(person_id);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_from_act ON "+ journeyTableName + "(from_act);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_to_act ON "+ journeyTableName + "(to_act);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_mainmode ON "+ journeyTableName + "(main_mode);\n";
+		dba.executeStatement(indexStatement);
+		System.out.println(indexStatement);
+
+		indexName = tripTableName.substring(14);
+		indexStatement = "CREATE INDEX " + indexName +"_journey_id ON "+ tripTableName + "(journey_id);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_mode ON "+ tripTableName + "(mode);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_line ON "+ tripTableName + "(line);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_route ON "+ tripTableName + "(route);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_board ON "+ tripTableName + "(boarding_stop);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_alight ON "+ tripTableName + "(alighting_stop);\n";
+		dba.executeStatement(indexStatement);
+		System.out.println(indexStatement);
+
+		indexName = transferTableName.substring(14);
+		indexStatement = "CREATE INDEX " + indexName +"_journey_id ON "+ transferTableName + "(journey_id);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_from_trip ON "+ transferTableName + "(from_trip);\n";
+		indexStatement += "CREATE INDEX " + indexName +"_to_trip ON "+ transferTableName + "(to_trip);\n";
+		dba.executeStatement(indexStatement);
+		System.out.println(indexStatement);
+
 		
 	}
-	
-	
 
-	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
+	public static void main(String[] args) throws IOException,
+			InstantiationException, IllegalAccessException,
+			ClassNotFoundException, SQLException, NoConnectionException {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[3]));
 		scenario.getConfig().scenario().setUseTransit(true);
@@ -861,46 +950,56 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				scenario.getConfig());
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(args[2]);
-//		TravellerChain chain = test.chains
-//				.get(new org.matsim.core.basic.v01.IdImpl("4101962"));
-//		System.out.println(chain.planElements);
-//
-//		chain = test.chains
-//				.get(new org.matsim.core.basic.v01.IdImpl("77878"));
-//		System.out.println(chain.planElements);
+		// TravellerChain chain = test.chains
+		// .get(new org.matsim.core.basic.v01.IdImpl("4101962"));
+		// System.out.println(chain.planElements);
+		//
+		// chain = test.chains
+		// .get(new org.matsim.core.basic.v01.IdImpl("77878"));
+		// System.out.println(chain.planElements);
 		File properties = new File("data/matsim2postgres.properties");
 		test.writeSimulationResultsToSQL(properties);
+		System.out.println(test.stuck);
 	}
-
 
 }
-class PostgresqlColumnDefinition{
-	enum PostgresType{
-		FLOAT8(8), INT(4), TEXT(500), BOOLEAN(1);
+
+class PostgresqlColumnDefinition {
+	enum PostgresType {
+		FLOAT8(64), INT(32), TEXT(500), BOOLEAN(4);
 		private final int size;
-		PostgresType(int size){
-			this.size=size;
+
+		PostgresType(int size) {
+			this.size = size;
 		}
-		public int size() {return size;}
+
+		public int size() {
+			return size;
+		}
 	}
-	public PostgresqlColumnDefinition(String name, PostgresType type, String extraParams) {
+
+	public PostgresqlColumnDefinition(String name, PostgresType type,
+			String extraParams) {
 		super();
 		this.name = name;
 		this.type = type;
 		this.extraParams = extraParams;
 	}
+
 	public PostgresqlColumnDefinition(String name, PostgresType type) {
 		super();
 		this.name = name;
 		this.type = type;
 		this.extraParams = "";
 	}
+
 	String extraParams;
 	String name;
 	PostgresType type;
 }
-class PostgresqlCSVWriter{
-	String myName="";
+
+class PostgresqlCSVWriter {
+	String myName = "";
 	String tableName;
 	DataBaseAdmin dba;
 	int modfactor = 1;
@@ -911,47 +1010,48 @@ class PostgresqlCSVWriter{
 	CopyManager cpManager;
 	List<PostgresqlColumnDefinition> columns;
 	private PushbackReader reader;
-	
+
 	public PostgresqlCSVWriter(String tableName, DataBaseAdmin dba,
-			int batchSize,
-			List<PostgresqlColumnDefinition> columns) {
+			int batchSize, List<PostgresqlColumnDefinition> columns) {
 		super();
 		this.tableName = tableName;
 		this.dba = dba;
 		this.batchSize = batchSize;
 		this.columns = columns;
 		this.pushBackSize = 0;
-		for(PostgresqlColumnDefinition col:columns){
+		for (PostgresqlColumnDefinition col : columns) {
 			pushBackSize += col.type.size();
 		}
 		pushBackSize *= batchSize;
 		init();
 	}
-	public PostgresqlCSVWriter(String myName, String tableName, DataBaseAdmin dba,
-			int batchSize,
+
+	public PostgresqlCSVWriter(String myName, String tableName,
+			DataBaseAdmin dba, int batchSize,
 			List<PostgresqlColumnDefinition> columns) {
-		this(tableName,dba,batchSize,columns);
+		this(tableName, dba, batchSize, columns);
 		this.myName = myName;
 	}
-	public void init(){
+
+	public void init() {
 		try {
 			dba.executeStatement(String.format("DROP TABLE IF EXISTS %s;",
 					tableName));
-			StringBuilder createString = new StringBuilder(String.format("CREATE TABLE %s(",tableName));
-			for(int i=0; i<columns.size(); i++){
+			StringBuilder createString = new StringBuilder(String.format(
+					"CREATE TABLE %s(", tableName));
+			for (int i = 0; i < columns.size(); i++) {
 				PostgresqlColumnDefinition col = columns.get(i);
 
-					
-					createString.append(col.name + " " + col.type + " "+col.extraParams+ " ,");
-				
+				createString.append(col.name + " " + col.type + " "
+						+ col.extraParams + " ,");
+
 			}
-//			drop the last comma
-			createString.deleteCharAt(createString.length()-1);
+			// drop the last comma
+			createString.deleteCharAt(createString.length() - 1);
 			createString.append(");");
 			dba.executeStatement(createString.toString());
 			cpManager = ((PGConnection) dba.getConnection()).getCopyAPI();
-			reader = new PushbackReader(new StringReader(""),
-					pushBackSize);
+			reader = new PushbackReader(new StringReader(""), pushBackSize);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -969,17 +1069,17 @@ class PostgresqlCSVWriter{
 						"not the same number of parameters sent as there are columns in the table");
 			}
 			String sqlInserter = "";
-			for(int i=0; i<args.length;i++){
-//				if(columns.get(i).type != PostgresType.TEXT){
-//					sqlInserter += args[i].toString()+",";
-//				}else{
-//					sqlInserter += "\'"+args[i].toString()+"\',";
-//				}
-				sqlInserter += args[i].toString()+",";
+			for (int i = 0; i < args.length; i++) {
+				// if(columns.get(i).type != PostgresType.TEXT){
+				// sqlInserter += args[i].toString()+",";
+				// }else{
+				// sqlInserter += "\'"+args[i].toString()+"\',";
+				// }
+				sqlInserter += args[i].toString() + ",";
 			}
-//			trim the last comma, add a newline
+			// trim the last comma, add a newline
 			sb.append(sqlInserter);
-			sb.deleteCharAt(sb.length()-1);
+			sb.deleteCharAt(sb.length() - 1);
 			sb.append("\n");
 			if (lineCounter % batchSize == 0) {
 				reader.unread(sb.toString().toCharArray());
@@ -988,10 +1088,10 @@ class PostgresqlCSVWriter{
 				sb.delete(0, sb.length());
 			}
 			if (lineCounter >= modfactor && lineCounter % modfactor == 0) {
-				System.out.println(myName+": Processed line no " + lineCounter);
+				System.out.println(myName + ": Processed line no "
+						+ lineCounter);
 				modfactor = lineCounter;
 			}
-
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -1001,12 +1101,13 @@ class PostgresqlCSVWriter{
 			e.printStackTrace();
 		}
 	}
-	public void finish(){
+
+	public void finish() {
 		// write out the rest
 		try {
 			reader.unread(sb.toString().toCharArray());
-		cpManager.copyIn("COPY " + tableName + " FROM STDIN WITH CSV",
-				reader);
+			cpManager.copyIn("COPY " + tableName + " FROM STDIN WITH CSV",
+					reader);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1015,8 +1116,6 @@ class PostgresqlCSVWriter{
 			e.printStackTrace();
 		}
 		sb.delete(0, sb.length());
-		System.out.println(myName+": Processed line no " + lineCounter);
+		System.out.println(myName + ": Processed line no " + lineCounter);
 	}
 }
-	
-
