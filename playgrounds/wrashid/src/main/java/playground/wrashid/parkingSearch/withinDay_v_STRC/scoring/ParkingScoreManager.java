@@ -95,6 +95,8 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 	
 	private ParkingAnalysisHandler parkingAnalysisHandler;
 
+	private ParkingScoreEvaluator parkingScoreEvaluator;
+
 	public ParkingScoreManager(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance,
 			WithinDayParkingController controler, ParkingPersonalBetas parkingPersonalBetas) {
 		super(scenario, parkingInfrastructure, distance, controler);
@@ -113,6 +115,8 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 		this.stuckAgents = new HashSet<Id>();
 		this.searchingAgentStartTimes = new HashMap<Id, Double>();
 		this.parkingSearchStartTimes = new HashMap<Leg, Double>();
+		
+		this.parkingScoreEvaluator=new ParkingScoreEvaluator((ParkingInfrastructure_v2) parkingInfrastructure,parkingPersonalBetas);
 	}
 	
 	@Override
@@ -191,7 +195,7 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 	private void updateParkingScoreDuringDay(Id personId, List<PlanElement> planElements, int firstParkingActivityIndex,
 			int secondParkingActivityIndex) {
 			
-		double parkingScore = 0.0;
+		
 
 		Activity firstParkingActivity = (Activity) planElements.get(firstParkingActivityIndex);
 		Activity secondParkingActivity = (Activity) planElements.get(secondParkingActivityIndex);
@@ -210,27 +214,30 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 		double activityDuration = GeneralLib.getIntervalDuration(firstActivity.getStartTime(), lastActivity.getEndTime());
 		
 		Id parkingFacilityId = firstParkingActivity.getFacilityId();
+		double parkingSearchDurationInSeconds = getParkingSearchDurationInMinutes(carLegToFirstParking, parkingArrivalTime) * 60.0;
 
+		ParkingActivityAttributes parkingActivityAttributes = new ParkingActivityAttributes(personId, parkingFacilityId, parkingArrivalTime, parkingDuration, activityDuration, parkingSearchDurationInSeconds, walkLegFromParking.getTravelTime(), walkLegToParking.getTravelTime());
+		double parkingScore = parkingScoreEvaluator.getParkingScore(parkingActivityAttributes);
+		
 		// parking cost scoring
-		Double parkingCost = getParkingCost(parkingArrivalTime, parkingDuration, parkingFacilityId);
+		//Double parkingCost = getParkingCost(parkingArrivalTime, parkingDuration, parkingFacilityId);
 
-		if (parkingCost == null) {
-			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
-		}
+		//if (parkingCost == null) {
+		//	DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
+		//}
 
-		double costScore = getParkingCostScore(personId, parkingCost);
-		parkingScore += costScore;
+		//double costScore = getParkingCostScore(personId, parkingCost);
+		//parkingScore += costScore;
 
 		// parking walk time
-		double walkingTimeTotalInMinutes = (walkLegFromParking.getTravelTime() + walkLegToParking.getTravelTime()) / 60.0;
-		double walkScore = getWalkScore(personId, activityDuration, walkingTimeTotalInMinutes);
-		parkingScore += walkScore;
+		//double walkingTimeTotalInMinutes = (walkLegFromParking.getTravelTime() + walkLegToParking.getTravelTime()) / 60.0;
+		//double walkScore = getWalkScore(personId, activityDuration, walkingTimeTotalInMinutes);
+		//parkingScore += walkScore;
 
 		// parking search time
-		double parkingSearchDurationInMinutes = getParkingSearchDurationInMinutes(carLegToFirstParking, parkingArrivalTime);
 
-		double searchTimeScore = getSearchTimeScore(personId, activityDuration, parkingSearchDurationInMinutes);
-		parkingScore += searchTimeScore;
+		//double searchTimeScore = getSearchTimeScore(personId, activityDuration, parkingSearchDurationInSeconds);
+		//parkingScore += searchTimeScore;
 
 		parkingIterationScoreSum.incrementBy(personId, parkingScore);
 
@@ -242,43 +249,20 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 		// reset search time
 //		this.parkingSearchStartTime.remove(personId);
 
-		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, walkingTimeTotalInMinutes));
-		parkingSearchTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingSearchDurationInMinutes));
+		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingActivityAttributes.getTotalWalkDurationInSeconds()/60.0));
+		parkingSearchTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingSearchDurationInSeconds));
 
-		parkingCostLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingCost));
+		parkingCostLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingScoreEvaluator.getParkingCost(parkingActivityAttributes)));
 
 		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime,
 				((ParkingInfrastructure_v2) parkingInfrastructure).getParkingCapacity(parkingFacilityId));
 	}
 
-	private Double getParkingCost(double parkingArrivalTime, double parkingDuration, Id facilityId) {
-		return parkingInfrastructure.getParkingCostCalculator().getParkingCost(facilityId, null, null, parkingArrivalTime,
-				parkingDuration);
-	}
+	
 
-	public double getParkingCostScore(Id personId, double parkingArrivalTime, double parkingDuration, Id facilityId) {
-		Double parkingCost = getParkingCost(parkingArrivalTime, parkingDuration, facilityId);
 
-		// forSettingBreakPoint(facilityId, parkingCost);
 
-		if (parkingCost == null) {
-			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
-		}
-
-		return getParkingCostScore(personId, parkingCost);
-	}
-
-	public double getParkingCostScore(Id personId, Double parkingCost) {
-		if (parkingCost == null) {
-			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
-		}
-
-		return parkingPersonalBetas.getParkingCostBeta(personId) * parkingCost;
-	}
-
-	public double getWalkScore(Id personId, double activityDuration, double walkingTimeTotalInMinutes) {
-		return parkingPersonalBetas.getParkingWalkTimeBeta(personId, activityDuration) * walkingTimeTotalInMinutes;
-	}
+	
 
 	private double getParkingSearchDurationInMinutes(Leg carLeg, double parkingArrivalTime) {
 		double parkingSearchDurationInMinutes = 0;
@@ -294,9 +278,6 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 		else return parkingSearchStartTime;
 	}
 	
-	public double getSearchTimeScore(Id personId, double activityDuration, double parkingSearchTimeInMinutes) {
-		return parkingPersonalBetas.getParkingSearchTimeBeta(personId, activityDuration) * parkingSearchTimeInMinutes;
-	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
@@ -381,15 +362,18 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 
 	private void processScoreOfLastParking(Id personId, List<PlanElement> planElements, int firstParkingIndex, int lastParkingIndex) {
 		
-		double parkingScore = 0.0;
-
 		Activity firstParkingActivity = (Activity) planElements.get(firstParkingIndex);
 		Activity lastParkingActivity = (Activity) planElements.get(lastParkingIndex);
+		
+		Activity lastMorningNonParkingActivity= (Activity) planElements.get(firstParkingIndex-2);
+		Activity firstEveningNonParkingActivity= (Activity) planElements.get(firstParkingIndex+2);
 		
 		Leg walkLegToFirstParkingActivity = (Leg) planElements.get(firstParkingIndex - 1);
 		Leg walkLegFromLastParkingActivity = (Leg) planElements.get(lastParkingIndex + 1);
 		
 		Leg carLegToLastParkingActivity = (Leg) planElements.get(lastParkingIndex - 1);
+		
+		
 		
 		if (!walkLegToFirstParkingActivity.getMode().equals(TransportMode.walk)) {
 			throw new RuntimeException("Expected a walk leg to the first parking acivity but found a " + 
@@ -413,31 +397,43 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 		
 		// parking cost scoring
 		Id lastParkingFacilityIdOfDay = lastParkingActivity.getFacilityId();
+		double parkingSearchDurationInSeconds = getParkingSearchDurationInMinutes(carLegToLastParkingActivity, lastParkingArrivalTime);
 
-		Double parkingCost = getParkingCost(lastParkingArrivalTime, lastParkingActivityDurationOfDay, lastParkingFacilityIdOfDay);
+		double activityDuration=GeneralLib.getIntervalDuration(firstEveningNonParkingActivity.getStartTime(), lastMorningNonParkingActivity.getEndTime());
+		ParkingActivityAttributes parkingActivityAttributes = new ParkingActivityAttributes(personId, lastParkingFacilityIdOfDay, lastParkingArrivalTime, lastParkingActivityDurationOfDay, activityDuration, parkingSearchDurationInSeconds, walkLegFromLastParkingActivity.getTravelTime(), walkLegToFirstParkingActivity.getTravelTime());
+		double parkingScore = parkingScoreEvaluator.getParkingScore(parkingActivityAttributes);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		//Double parkingCost = getParkingCost(lastParkingArrivalTime, lastParkingActivityDurationOfDay, lastParkingFacilityIdOfDay);
 
-		if (parkingCost == null) {
-			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
-		}
+		//if (parkingCost == null) {
+		//	DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
+		//}
 
-		double costScore = getParkingCostScore(personId, parkingCost);
+		//double costScore = getParkingCostScore(personId, parkingCost);
 
-		parkingScore += costScore;
+		//parkingScore += costScore;
 
 		// parking walk time
-		double walkingTimeTotalInMinutes = (walkLegToFirstParkingActivity.getTravelTime() + walkLegFromLastParkingActivity.getTravelTime()) / 60.0;
-		double walkScore = getWalkScore(personId, lastParkingActivityDurationOfDay, walkingTimeTotalInMinutes);
-		parkingScore += walkScore;
+		//double walkingTimeTotalInMinutes = (walkLegToFirstParkingActivity.getTravelTime() + walkLegFromLastParkingActivity.getTravelTime()) / 60.0;
+		//double walkScore = getWalkScore(personId, lastParkingActivityDurationOfDay, walkingTimeTotalInMinutes);
+		//parkingScore += walkScore;
 
 		// parking search time
-		double parkingSearchTimeInMinutes = getParkingSearchDurationInMinutes(carLegToLastParkingActivity, lastParkingArrivalTime);
 
-		double searchTimeScore = getSearchTimeScore(personId, lastParkingActivityDurationOfDay, parkingSearchTimeInMinutes);
-		parkingScore += searchTimeScore;
+		//double searchTimeScore = getSearchTimeScore(personId, lastParkingActivityDurationOfDay, parkingSearchTimeInSeconds);
+		//parkingScore += searchTimeScore;
 
-		if (walkScore > 0 || costScore > 0 || searchTimeScore > 0) {
-			DebugLib.stopSystemAndReportInconsistency();
-		}
+		//if (walkScore > 0 || costScore > 0 || searchTimeScore > 0) {
+		//	DebugLib.stopSystemAndReportInconsistency();
+		//}
 
 		parkingIterationScoreSum.incrementBy(personId, parkingScore);
 
@@ -445,10 +441,10 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 
 		parkingStrategyManager.updateScore(personId, lastCarLegIndexOfDay, parkingScore);
 
-		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, walkingTimeTotalInMinutes));
-		parkingSearchTimesLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingSearchTimeInMinutes));
+		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingActivityAttributes.getTotalWalkDurationInSeconds()/60.0));
+		parkingSearchTimesLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingActivityAttributes.getParkingSearchDurationInSeconds()));
 
-		parkingCostLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingCost));
+		parkingCostLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingScoreEvaluator.getParkingCost(parkingActivityAttributes)));
 
 		parkingOccupancy.updateParkingOccupancy(lastParkingFacilityIdOfDay, lastParkingArrivalTime, lastParkingArrivalTime
 				+ lastParkingActivityDurationOfDay,
