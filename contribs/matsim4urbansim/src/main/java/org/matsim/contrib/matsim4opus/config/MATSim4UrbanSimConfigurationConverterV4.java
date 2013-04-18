@@ -966,6 +966,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		if(set4thStrategyModule){
 			// to be consistent, setting the same iteration number as in the strategies above 
 			changeLegMode.setDisableAfter(disableStrategyAfterIteration);
+			log.warn("setting disableStrategyAfterIteration for ChangeLegMode to " + disableStrategyAfterIteration + "; possibly overriding config settings!");
 			// check if other modes are set
 			Module changelegMode = config.getModule("changeLegMode");
 			if(changelegMode != null && changelegMode.getValue("modes") != null)
