@@ -1,0 +1,387 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * OptimizeVehicleAllocationAtTourLevel.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.thibautd.socnetsim.sharedvehicles.replanning;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Subtour;
+import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.misc.Time;
+
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
+
+/**
+ * Optimizes vehicle allocation at the tour level, by minimizing the estimated
+ * waiting times.
+ * It assumes all persons in the group start and end their plans at the same location ("home"),
+ * and get the vehicles at the "home" location (ie household-like).
+ * If those assumptions are not verified, the algorithm falls back to random allocation.
+ *
+ * <br>
+ * It also assumes departure times are determined by activity end times and routes
+ * (or legs) contain good estimation of the travel time.
+ * @author thibautd
+ */
+public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
+	private final GenericPlanAlgorithm<GroupPlans> randomAllocator;
+	private final StageActivityTypes stageActs;
+	private final String vehicularMode;
+	private final boolean allowNullRoutes;
+	private final VehicleRessources vehicleRessources;
+
+	private boolean anchorAtFacilities = false;
+
+	public OptimizeVehicleAllocationAtTourLevelAlgorithm(
+			final StageActivityTypes stageActivitiesForSubtourDetection,
+			final Random random,
+			final VehicleRessources vehicleRessources,
+			final String mode,
+			final boolean allowNullRoutes) {
+		this.randomAllocator = new AllocateVehicleToPlansInGroupPlanAlgorithm(
+			random,
+			vehicleRessources,
+			mode,
+			allowNullRoutes);
+		this.vehicularMode = mode;
+		this.allowNullRoutes = allowNullRoutes;
+		this.stageActs = stageActivitiesForSubtourDetection;
+		this.vehicleRessources = vehicleRessources;
+	}
+
+	@Override
+	public void run(final GroupPlans plan) {
+		final List<SubtourRecord> vehicularTours = getVehicularTours( plan );
+		if ( vehicularTours == null ) {
+			randomAllocator.run( plan );
+			return;
+		}
+
+		// sort the tours by increasing departure time
+		Collections.sort(
+				vehicularTours,
+				new Comparator<SubtourRecord>() {
+					@Override
+					public int compare(
+							final SubtourRecord o1,
+							final SubtourRecord o2) {
+						return Double.compare( o1.startTime , o2.startTime );
+					}
+				});
+
+		allocateVehicles(
+				vehicularTours,
+				Double.POSITIVE_INFINITY);
+
+		processAllocation( vehicularTours );
+	}
+
+	private void processAllocation(final List<SubtourRecord> vehicularTours) {
+		for ( SubtourRecord r : vehicularTours ) {
+			for ( Trip t : r.subtour.getTrips() ) {
+				for ( Leg leg : t.getLegsOnly() ) {
+					if ( !vehicularMode.equals( leg.getMode() ) ) continue;
+
+					if ( allowNullRoutes && leg.getRoute() == null ) {
+						// this is not so nice...
+						leg.setRoute( new VehicleOnlyNetworkRoute() );
+					}
+
+					if ( !( leg.getRoute() instanceof NetworkRoute ) ) {
+						throw new RuntimeException( "route for mode "+vehicularMode+" has non-network route "+leg.getRoute() );
+					}
+
+					((NetworkRoute) leg.getRoute()).setVehicleId( r.allocatedVehicle );
+				}
+			}
+		}
+	}
+
+	private double allocateVehicles(
+			final List<SubtourRecord> toursToAllocate,
+			final double maxOverlap) {
+		if ( toursToAllocate.isEmpty() ) return 0;
+		final List<SubtourRecord> remainingSubtours = new ArrayList<SubtourRecord>( toursToAllocate );
+		final SubtourRecord currentSubtour = remainingSubtours.remove( 0 );
+
+		Collections.sort(
+				currentSubtour.possibleVehicles,
+				new Comparator<VehicleRecord>() {
+					@Override
+					public int compare(
+							final VehicleRecord o1,
+							final VehicleRecord o2) {
+						final int timeComp = Double.compare(
+							o1.availableFrom,
+							o2.availableFrom );
+						return timeComp != 0 ? timeComp :
+							o1.nAllocs -
+							o2.nAllocs;
+					}
+				});
+
+		double currentBestOverlap = Double.POSITIVE_INFINITY;
+		double lastInitialAvail = Double.NaN;
+		for ( VehicleRecord currentVehicle : currentSubtour.possibleVehicles ) {
+			final double initialAvail = currentVehicle.availableFrom;
+
+			// without the "==", infinite values are never equal
+			if ( initialAvail == lastInitialAvail || Math.abs( initialAvail - lastInitialAvail ) < 1E-7 ) {
+				// no need to check, equivalent to previous branch
+				continue;
+			}
+			lastInitialAvail = initialAvail;
+
+			currentVehicle.availableFrom = currentSubtour.endTime;
+
+			final double maxRemainingOverlap = getScoreOfFeasibleSolution( remainingSubtours );
+
+			final double currentOverlap = Math.max(
+					initialAvail - currentSubtour.startTime,
+					0);
+
+			currentVehicle.nAllocs++;
+			final double newMax = Math.min( maxOverlap , currentBestOverlap );
+			final double nextOverlap =
+				currentOverlap + maxRemainingOverlap < newMax ?
+				currentOverlap +
+				allocateVehicles(
+						remainingSubtours,
+						newMax - currentOverlap ) :
+				// cut-off
+				Double.POSITIVE_INFINITY;
+
+			if ( nextOverlap < currentBestOverlap ) {
+				currentBestOverlap = nextOverlap;
+				currentSubtour.allocatedVehicle = currentVehicle.id;
+			}
+
+			currentVehicle.availableFrom = initialAvail;
+			currentVehicle.nAllocs--;
+		}
+
+		assert currentSubtour.allocatedVehicle != null;
+
+		return currentBestOverlap;
+	}
+
+	private double getScoreOfFeasibleSolution(
+			final List<SubtourRecord> toursToAllocate) {
+		// greedily search for a solution and return is overlap
+		if ( toursToAllocate.isEmpty() ) return 0;
+		final List<SubtourRecord> remainingSubtours = new ArrayList<SubtourRecord>( toursToAllocate );
+		final SubtourRecord currentSubtour = remainingSubtours.remove( 0 );
+
+		final VehicleRecord firstAvailableVehicle =
+			Collections.min(
+				currentSubtour.possibleVehicles,
+				new Comparator<VehicleRecord>() {
+					@Override
+					public int compare(
+							final VehicleRecord o1,
+							final VehicleRecord o2) {
+						return Double.compare(
+							o1.availableFrom,
+							o2.availableFrom );
+					}
+				});
+
+		final double initialAvail = firstAvailableVehicle.availableFrom;
+
+		firstAvailableVehicle.availableFrom = currentSubtour.endTime;
+
+		final double currentOverlap = Math.max(
+				initialAvail - currentSubtour.startTime,
+				0);
+
+		final double nextOverlap = getScoreOfFeasibleSolution( remainingSubtours );
+
+		firstAvailableVehicle.availableFrom = initialAvail;
+
+		return currentOverlap + nextOverlap;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// subtour-related methods
+	// /////////////////////////////////////////////////////////////////////////
+	private List<SubtourRecord> getVehicularTours(final GroupPlans plans) {
+		final List<SubtourRecord> vehicularTours = new ArrayList<SubtourRecord>();
+		final VehicleRecordFactory factory = new VehicleRecordFactory();
+
+		for ( Plan p : plans.getAllIndividualPlans() ) {
+			final Collection<Subtour> subtours =
+				TripStructureUtils.getSubtours(
+						p,
+						stageActs,
+						anchorAtFacilities );
+			for ( Subtour s : subtours ) {
+				if ( s.getParent() != null ) continue; // is not a root tour
+				boolean isFirstTrip = true;
+				for ( Trip t : s.getTrips() ) {
+					// TODO: check that the sequence of vehicular movements come back to origin
+					if ( isFirstTrip && isVehicular( t ) ) {
+						vehicularTours.add(
+								new SubtourRecord(
+									s,
+									factory.getRecords(
+										vehicleRessources.identifyVehiclesUsableForAgent(
+											p.getPerson().getId() ))) );
+						break;
+					}
+					if ( !isFirstTrip && isVehicular( t ) ) {
+						// invalid structure
+						return null;
+					}
+					isFirstTrip = false;
+				}
+			}
+		}
+
+		// check validity
+		Id homeLoc = null;
+		for ( SubtourRecord record : vehicularTours ) {
+			final Subtour s = record.subtour;
+			assert s.getParent() == null;
+			final Id anchor = anchorAtFacilities ?
+				s.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
+				s.getTrips().get( 0 ).getOriginActivity().getLinkId();
+
+			if ( anchor == null ) throw new NullPointerException( "null anchor location" );
+			if ( homeLoc == null ) {
+				homeLoc = anchor;
+			}
+			else if ( !homeLoc.equals( anchor ) ) {
+				// invalid
+				return null;
+			}
+		}
+
+		return vehicularTours;
+	}
+
+	private boolean isVehicular(final Trip t) {
+		final List<Leg> legs = t.getLegsOnly();
+		if ( legs.isEmpty() ) return false;
+
+		// XXX what to do if several legs???
+		final Leg l = legs.get( 0 );
+		if ( !vehicularMode.equals( l.getMode() ) ) return false;
+		if ( !allowNullRoutes && l.getRoute() == null ) return false;
+		if ( l.getRoute() != null && !(l.getRoute() instanceof NetworkRoute) ) return false; 
+		return true;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// classes
+	// /////////////////////////////////////////////////////////////////////////
+	private static class SubtourRecord {
+		public final double startTime, endTime;
+		public final List<VehicleRecord> possibleVehicles;
+		public final Subtour subtour;
+		public Id allocatedVehicle = null;
+
+		public SubtourRecord(
+				final Subtour subtour,
+				final List<VehicleRecord> possibleVehicles) {
+			this.possibleVehicles = possibleVehicles; 
+			this.subtour = subtour;
+			
+			final Trip firstTrip = subtour.getTrips().get( 0 );
+			this.startTime = firstTrip.getOriginActivity().getEndTime();
+			if ( startTime == Time.UNDEFINED_TIME ) throw new RuntimeException( "no end time in "+firstTrip.getOriginActivity() );
+
+			final Trip lastTrip = subtour.getTrips().get( subtour.getTrips().size() - 1 );
+			this.endTime = calcArrivalTime( lastTrip );
+		}
+	}
+
+	private static class VehicleRecord {
+		public final Id id;
+		public int nAllocs = 0;
+		public double availableFrom = Double.NEGATIVE_INFINITY;
+
+		public VehicleRecord(final Id id) {
+			this.id = id;
+		}
+	}
+
+	private static class VehicleRecordFactory {
+		private final Map<Id, VehicleRecord> records = new HashMap<Id, VehicleRecord>();
+
+		public List<VehicleRecord> getRecords(final Collection<Id> ids) {
+			final List<VehicleRecord> list = new ArrayList<VehicleRecord>();
+
+			for ( Id id : ids ) {
+				VehicleRecord r = records.get( id );
+
+				if ( r == null ) {
+					r = new VehicleRecord( id );
+					records.put( id , r );
+				}
+
+				list.add( r );
+			}
+
+			return list;
+		}
+	}
+
+	private static double calcArrivalTime(final Trip trip) {
+		double now = trip.getOriginActivity().getEndTime();
+		for ( PlanElement pe : trip.getTripElements() ) {
+			if ( pe instanceof Activity ) {
+				final double end = ((Activity) pe).getEndTime();
+				now = end != Time.UNDEFINED_TIME ? end : now + ((Activity) pe).getMaximumDuration();
+				// TODO: do not fail *that* badly, but just revert to random alloc
+				if ( now == Time.UNDEFINED_TIME ) throw new RuntimeException( "could not get time from "+pe );
+			}
+			else if ( pe instanceof Leg ) {
+				final Route r = ((Leg) pe).getRoute();
+				if ( r != null && r.getTravelTime() != Time.UNDEFINED_TIME ) {
+					now += r.getTravelTime();
+				}
+				else {
+					now += ((Leg) pe).getTravelTime() != Time.UNDEFINED_TIME ?
+							((Leg) pe).getTravelTime() :
+							0; // no info: just assume instantaneous. This will give poor results!
+				}
+			}
+		}
+		return now;
+	}
+}
+

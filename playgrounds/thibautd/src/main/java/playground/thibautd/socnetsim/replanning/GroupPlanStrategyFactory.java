@@ -48,8 +48,8 @@ import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
-import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToSubtourModule;
+import playground.thibautd.socnetsim.sharedvehicles.replanning.OptimizeVehicleAllocationAtTourLevelModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 /**
@@ -256,9 +256,13 @@ public class GroupPlanStrategyFactory {
 				registry.getScenario().getScenarioElement(
 					VehicleRessources.class );
 		if ( vehicles != null ) {
+			final CompositeStageActivityTypes stageActs = new CompositeStageActivityTypes();
+			stageActs.addActivityTypes( registry.getTripRouterFactory().createTripRouter().getStageActivityTypes() );
+			stageActs.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 			strategy.addStrategyModule(
-					new AllocateVehicleToPlansInGroupPlanModule(
+				new OptimizeVehicleAllocationAtTourLevelModule(
 						registry.getScenario().getConfig().global().getNumberOfThreads(),
+						stageActs,
 						registry.getScenario().getScenarioElement(
 							VehicleRessources.class ),
 						TransportMode.car,
@@ -316,13 +320,25 @@ public class GroupPlanStrategyFactory {
 			final ControllerRegistry registry) {
 		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
 
+		//strategy.addStrategyModule(
+		//		new AllocateVehicleToPlansInGroupPlanModule(
+		//			registry.getScenario().getConfig().global().getNumberOfThreads(),
+		//			registry.getScenario().getScenarioElement(
+		//				VehicleRessources.class ),
+		//			TransportMode.car,
+		//			false));
+		final CompositeStageActivityTypes stageActs = new CompositeStageActivityTypes();
+		stageActs.addActivityTypes( registry.getTripRouterFactory().createTripRouter().getStageActivityTypes() );
+		stageActs.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 		strategy.addStrategyModule(
-				new AllocateVehicleToPlansInGroupPlanModule(
-					registry.getScenario().getConfig().global().getNumberOfThreads(),
-					registry.getScenario().getScenarioElement(
-						VehicleRessources.class ),
-					TransportMode.car,
-					false));
+				//new AllocateVehicleToPlansInGroupPlanModule(
+				new OptimizeVehicleAllocationAtTourLevelModule(
+						registry.getScenario().getConfig().global().getNumberOfThreads(),
+						stageActs,
+						registry.getScenario().getScenarioElement(
+							VehicleRessources.class ),
+						TransportMode.car,
+						true));
 
 		strategy.addStrategyModule(
 				createRecomposeJointPlansModule(
