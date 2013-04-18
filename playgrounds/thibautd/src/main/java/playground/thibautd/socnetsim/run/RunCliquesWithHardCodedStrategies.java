@@ -161,7 +161,7 @@ public class RunCliquesWithHardCodedStrategies {
 			RunUtils.loadDefaultAnalysis( cliques , controller );
 		}
 
-		if ( !weights.getSynchronize().equals( Synchro.none ) ) {
+		if ( weights.getCheckConsistency() ) {
 			// those listenners check the coordination behavior:
 			// do not ad if not used
 			RunUtils.addConsistencyCheckingListeners( controller );

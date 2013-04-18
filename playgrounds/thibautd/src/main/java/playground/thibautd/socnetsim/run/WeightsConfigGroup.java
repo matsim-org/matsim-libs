@@ -32,6 +32,7 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private double planVehicleAllocation = -1;
 	private boolean jtmOptimizes = true;
 	private Synchro doSynchronize = Synchro.dynamic;
+	private boolean checkConsistency = false;
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -139,4 +140,13 @@ public class WeightsConfigGroup extends ReflectiveModule {
 		this.doSynchronize = Synchro.valueOf( v.toLowerCase() );
 	}
 
+	@StringGetter( "checkConsistency" )
+	public boolean getCheckConsistency() {
+		return checkConsistency;
+	}
+
+	@StringSetter( "checkConsistency" )
+	public void setCheckConsistency(final boolean b) {
+		this.checkConsistency = b;
+	}
 }
