@@ -177,11 +177,11 @@ public class IatbrPlanBuilder {
 			ActivityFacilityImpl  af = (ActivityFacilityImpl) facilities.getFacilities().get(id);
 			for(String ao : af.getActivityOptions().keySet()){
 				if(ao.equalsIgnoreCase("h")){ h++;
-				} else if(ao.equalsIgnoreCase("w")){ w++;
+				} else if(ao.startsWith("w")){ w++;
 				} else if(ao.startsWith("e")){ e++;
-				} else if(ao.equalsIgnoreCase("s")){ s++;
-				} else if(ao.equalsIgnoreCase("l")){ l++;
-				} else if(ao.equalsIgnoreCase("t")){ o++;
+				} else if(ao.startsWith("s")){ s++;
+				} else if(ao.startsWith("l")){ l++;
+				} else if(ao.startsWith("t")){ o++;
 				}
 			}
 		}
@@ -237,7 +237,7 @@ public class IatbrPlanBuilder {
 			PersonImpl person = (PersonImpl) population.getPersons().get(id);
 			ActivityImpl firstActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0));
 			ActivityImpl lastActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1));
-			if(firstActivity.getType().equalsIgnoreCase("h") && lastActivity.getType().equalsIgnoreCase("h")){
+			if(firstActivity.getType().startsWith("h") && lastActivity.getType().startsWith("h")){
 
 				/* Check for home activity */
 				ActivityFacilityImpl home = null;
@@ -264,9 +264,9 @@ public class IatbrPlanBuilder {
 					PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
 					if(pe instanceof Activity){
 						ActivityImpl act = (ActivityImpl) pe;
-						if(act.getType().equalsIgnoreCase("h")){
+						if(act.getType().startsWith("h")){
 							act.setFacilityId(home.getId());
-						} else if(act.getType().equalsIgnoreCase("w")){
+						} else if(act.getType().startsWith("w")){
 							/* Check for work activity */
 							ActivityFacilityImpl closestMall = sacscQT.get(act.getCoord().getX(), act.getCoord().getY());
 							/* First check closest mall, and choose if it is within the threshold. */
@@ -301,12 +301,12 @@ public class IatbrPlanBuilder {
 							ActivityFacilityImpl closestSchool = educationQT.get(act.getCoord().getX(), act.getCoord().getY());
 							act.setFacilityId(closestSchool.getId());
 							act.setCoord(closestSchool.getCoord());
-						} else if(act.getType().equalsIgnoreCase("s")){
+						} else if(act.getType().startsWith("s")){
 							/* Pick the closest shopping facility */
 							ActivityFacilityImpl closestShop = shoppingQT.get(act.getCoord().getX(), act.getCoord().getY());
 							act.setFacilityId(closestShop.getId());
 							act.setCoord(closestShop.getCoord());			
-						} else if(act.getType().equalsIgnoreCase("l")){
+						} else if(act.getType().startsWith("l")){
 							/* Pick the closest leisure facility. */
 							ActivityFacilityImpl closestLeisure = leisureQT.get(act.getCoord().getX(), act.getCoord().getY());
 							act.setFacilityId(closestLeisure.getId());
@@ -326,7 +326,7 @@ public class IatbrPlanBuilder {
 				agentsToRemove.add(person.getId());
 			} 
 		}
-		LOG.info("   Removing " + agentsToRemove.size() + " agents whose plans do not start with `h'");
+		LOG.info("   Removing " + agentsToRemove.size() + " agents whose plans do not start AND end with `h..'");
 		for(Id id : agentsToRemove){
 			population.getPersons().remove(id);
 		}

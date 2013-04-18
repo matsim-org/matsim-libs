@@ -1,11 +1,10 @@
-package playground.southAfrica;
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * DigicoreWriterHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,19 +18,29 @@ package playground.southAfrica;
  *                                                                         *
  * *********************************************************************** */
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package playground.southafrica.freight.digicore.io;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 
-public class AllTests {
+import playground.southafrica.freight.digicore.containers.DigicoreActivity;
+import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+
+public interface DigicoreVehicleWriterHandler {
+
+	/* <vehicle> ... </vehicle> */
+	public void startVehicle(final DigicoreVehicle vehicle, final BufferedWriter out) throws IOException;
+	public void endVehicle(final BufferedWriter out) throws IOException;
 	
-	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica");
-		
-		suite.addTest(playground.southAfrica.freight.AllTests.suite());
-		suite.addTest(playground.southAfrica.utilities.AllTests.suite());
-
-		return suite;
-	}
-
+	/* <chain> ... </chain> */
+	public void startChain(final BufferedWriter out) throws IOException;
+	public void endChain(final BufferedWriter out) throws IOException;
+	
+	/* <activity> ... </activity> */
+	public void startActivity(final DigicoreActivity activity, final BufferedWriter out) throws IOException;
+	public void endActivity(final BufferedWriter out) throws IOException;
+	
+	public void writeSeparator(final BufferedWriter out) throws IOException;
+	
 }
+

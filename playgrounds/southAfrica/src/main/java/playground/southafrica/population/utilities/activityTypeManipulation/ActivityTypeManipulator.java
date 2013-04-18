@@ -1,18 +1,41 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * NmbmSurveyParser.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.southafrica.population.utilities.activityTypeManipulation;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 
 /**
@@ -25,9 +48,11 @@ import org.matsim.core.utils.misc.Counter;
  * @author jwjoubert
  */
 public abstract class ActivityTypeManipulator {
-	private Logger log = Logger.getLogger(ActivityTypeManipulator.class);
-	private Scenario sc;
-	
+	protected final static Logger LOG = Logger.getLogger(ActivityTypeManipulator.class);
+	protected Scenario sc;
+	protected Map<String, TreeMap<String, Tuple<String, String>>> deciles
+		= new TreeMap<String, TreeMap<String, Tuple<String,String>>>();
+
 	
 	protected void parsePopulation(String population, String network){
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -40,8 +65,8 @@ public abstract class ActivityTypeManipulator {
 		MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
 		mnr.readFile(network);		
 		
-		log.info("Population: " + sc.getPopulation().getPersons().size());
-		log.info("Network: " + sc.getNetwork().getNodes().size() + " nodes; " 
+		LOG.info("Population: " + sc.getPopulation().getPersons().size());
+		LOG.info("Network: " + sc.getNetwork().getNodes().size() + " nodes; " 
 				+ sc.getNetwork().getLinks().size() + " links");
 	}
 	
@@ -52,7 +77,7 @@ public abstract class ActivityTypeManipulator {
 	 * implementation of {@link #getAdaptedActivityType(String, double)} method.
 	 */
 	protected void run(){
-		log.info("Start manipulating person plans...");
+		LOG.info("Start manipulating person plans...");
 		Counter counter = new Counter("  person # ");
 		if(sc == null){
 			throw new RuntimeException("Cannot process the population if it has " +
@@ -60,7 +85,7 @@ public abstract class ActivityTypeManipulator {
 		} else{
 			for(Person person : sc.getPopulation().getPersons().values()){
 				if(person.getPlans().size() > 1){
-					log.warn("Person " + person.getId() + " has multiple plans. " +
+					LOG.warn("Person " + person.getId() + " has multiple plans. " +
 							"Only the selected plan will be adapted.");
 				}
 				this.adaptActivityTypes(person.getSelectedPlan());
@@ -68,7 +93,7 @@ public abstract class ActivityTypeManipulator {
 			}
 		}
 		counter.printCounter();
-		log.info("Done manipulating plans.");
+		LOG.info("Done manipulating plans.");
 	}
 	
 	protected Scenario getScenario(){
@@ -76,5 +101,7 @@ public abstract class ActivityTypeManipulator {
 	}
 	
 	abstract protected void adaptActivityTypes(Plan plan);
+	
+	abstract protected void parseDecileFile(String filename);
 
 }

@@ -1,4 +1,4 @@
-package playground.southAfrica;
+package playground.southAfrica.freight.digicore.utils;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,11 +26,8 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica");
+		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.utils");
 		
-		suite.addTest(playground.southAfrica.freight.AllTests.suite());
-		suite.addTest(playground.southAfrica.utilities.AllTests.suite());
-
 		return suite;
 	}
 
