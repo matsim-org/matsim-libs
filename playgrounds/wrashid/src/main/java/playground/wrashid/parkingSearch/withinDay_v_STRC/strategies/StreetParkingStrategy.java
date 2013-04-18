@@ -41,7 +41,12 @@ public class StreetParkingStrategy extends GarageParkingStrategy{
 			}
 	}
 
-	
+	@Override
+	public String getStrategyName() {
+		// TODO Auto-generated method stub
+		return "StreetParkingStrategy";
+	}
+
 
 }
 

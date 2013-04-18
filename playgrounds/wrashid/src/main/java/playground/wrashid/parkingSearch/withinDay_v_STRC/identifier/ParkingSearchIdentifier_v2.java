@@ -81,7 +81,7 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 //				if (!parkingSearchStartTime.containsKey(agentId)){
 //					parkingSearchStartTime.put(agentId, time);
 //				} 
-				this.eventsManager.processEvent(new ParkingSearchEvent(time, agent.getId(), "SearchStrategy"));
+				this.eventsManager.processEvent(new ParkingSearchEvent(time, agent.getId(), getParkingStrategyForCurrentLeg(agent).getStrategyName()));
 				
 				Id linkId = agent.getCurrentLinkId();
 				List<Id> facilityIds = parkingInfrastructure.getFreeParkingFacilitiesOnLink(linkId);
@@ -105,8 +105,12 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 	}
 	
 	private boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
-		this.parkingAgentsTracker.getParkingStrategyManager().getParkingStrategyForCurrentLeg(agent).acceptParking(agent, facilityId);
+		getParkingStrategyForCurrentLeg(agent).acceptParking(agent, facilityId);
 		return true;
+	}
+
+	private FullParkingSearchStrategy getParkingStrategyForCurrentLeg(PlanBasedWithinDayAgent agent) {
+		return this.parkingAgentsTracker.getParkingStrategyManager().getParkingStrategyForCurrentLeg(agent);
 	}
 	
 	/*

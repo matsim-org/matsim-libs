@@ -23,10 +23,10 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 
 public interface FullParkingSearchStrategy {
 
-	public abstract void applySearchStrategy(PlanBasedWithinDayAgent agent, double time);
+	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time);
 
-	public abstract boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId);
+	public boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId);
 	
-	
+	public String getStrategyName(); 
 
 }

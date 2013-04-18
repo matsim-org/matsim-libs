@@ -16,47 +16,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies;
+package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.christoph.parking.withinday.replanner.strategy.RandomParkingSearch;
-import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 
-public class GarageParkingStrategy implements FullParkingSearchStrategy{
-
-	protected ParkingInfrastructure_v2 parkingInfrastructure;
-	private RandomParkingSearch randomParkingSearch;
-
-	public GarageParkingStrategy(ParkingInfrastructure_v2 parkingInfrastructure, ScenarioImpl scenarioData){
-		this.parkingInfrastructure = parkingInfrastructure;
-		
-		randomParkingSearch = new RandomParkingSearch(scenarioData.getNetwork());
-	}
+public class OptimalParkingStrategy implements FullParkingSearchStrategy{
 
 	@Override
 	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time) {
-		randomParkingSearch.applySearchStrategy(agent, time);
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
-		String parkingType = parkingInfrastructure.getParkingTypes().get(facilityId);
-		
-		if (parkingType.equalsIgnoreCase("garageParking")){
-			return true;
-		} else {
-			return false;
-		}
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
 	public String getStrategyName() {
 		// TODO Auto-generated method stub
-		return "GarageParkingStrategy";
+		return "OptimalParkingStrategy";
 	}
 
 }
