@@ -56,6 +56,10 @@ public class GroupStrategyManager {
 	private final GroupLevelPlanSelector selectorForRemoval;
 	private final int maxPlanPerAgent;
 	private final Random random;
+	private RemovedPlanListener removalListener = new RemovedPlanListener() {
+		@Override
+		public void notifyPlanRemovedForAgent(Plan plan, Person person) {}
+	};
 
 	public GroupStrategyManager(
 			final GroupStrategyRegistry registry,
@@ -153,8 +157,9 @@ public class GroupStrategyManager {
 			}
 
 			for (Plan plan : toRemove( jointPlans , person , toRemove )) {
-				if (log.isTraceEnabled()) log.trace( "removing plan "+plan+" for person "+person );
 				final Person personToHandle = plan.getPerson();
+				if (log.isTraceEnabled()) log.trace( "removing plan "+plan+" for person "+personToHandle );
+				removalListener.notifyPlanRemovedForAgent( plan , personToHandle );
 
 				if ( personToHandle != person ) {
 					final boolean removed = personsToHandle.remove( personToHandle );
@@ -195,6 +200,9 @@ public class GroupStrategyManager {
 		throw new IllegalArgumentException();
 	}
 
+	public void setRemovedPlanListener(final RemovedPlanListener l) {
+		this.removalListener = l;
+	}
 
 	private static void logAlloc(
 			final ReplanningGroup g,
@@ -205,6 +213,10 @@ public class GroupStrategyManager {
 		for (Person p : g.getPersons()) ids.add( p.getId() );
 
 		log.trace( "group "+ids+" gets strategy "+strategy );
+	}
+
+	public static interface RemovedPlanListener {
+		public void notifyPlanRemovedForAgent(Plan plan, Person person);
 	}
 }
 

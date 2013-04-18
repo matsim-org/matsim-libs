@@ -158,7 +158,7 @@ public class RunCliquesWithHardCodedStrategies {
 						strategyManager));
 
 		if (produceAnalysis) {
-			RunUtils.loadDefaultAnalysis( cliques , controller );
+			RunUtils.loadDefaultAnalysis( cliques , strategyManager , controller );
 		}
 
 		if ( weights.getCheckConsistency() ) {
