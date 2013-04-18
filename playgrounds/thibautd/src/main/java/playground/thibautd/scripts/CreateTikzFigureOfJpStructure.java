@@ -94,7 +94,8 @@ public class CreateTikzFigureOfJpStructure {
 					final String content,
 					final Stack<String> context) {
 				if ( name.equals( "person" ) && personIds.contains( id ) ) {
-					tikzCreator.addAgentInfo( id , count , selected );
+					tikzCreator.addAgentInfo( id , count );
+					tikzCreator.setPlanProperty( id , selected , "selected" );
 				}
 			}
 		}.parse( plansFile );

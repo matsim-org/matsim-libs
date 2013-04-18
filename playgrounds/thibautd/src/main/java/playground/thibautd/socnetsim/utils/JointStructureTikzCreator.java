@@ -23,11 +23,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -46,17 +50,38 @@ public class JointStructureTikzCreator {
 
 	private static final String AGENT_STYLE = "agent";
 	private static final String PLAN_STYLE = "plan";
-	private static final String SELECTED_PLAN_STYLE = "selectedplan";
 	private static final String LINK_STYLE = "link";
 
-	private final List<AgentPlanInfo> agentInfos = new ArrayList<AgentPlanInfo>();
+	private final Set<Property> properties = new HashSet<Property>();
+
+	private final Map<String, AgentPlanInfo> agentInfos = new LinkedHashMap<String,AgentPlanInfo>();
 	private final List<PlanLinkInfo> linkInfos = new ArrayList<PlanLinkInfo>();
 
 	public void addAgentInfo(
 			final String id,
-			final int nPlans,
-			final int selectedPlan) {
-		this.agentInfos.add( new AgentPlanInfo( id , nPlans , selectedPlan ) );
+			final int nPlans) {
+		this.agentInfos.put( id , new AgentPlanInfo( id , nPlans ) );
+	}
+
+	public Property overridePlanProperty(
+			final String id,
+			final int planIndex,
+			final String propertyName) {
+		final AgentPlanInfo a = this.agentInfos.get( id );
+		if ( a == null ) throw new IllegalStateException( "unkown agent "+id );
+
+		final Property property = new Property( propertyName );
+		final Property old = a.planProperties.put( planIndex , property );
+		properties.add( property );
+		return old;
+	}
+
+	public void setPlanProperty(
+			final String id,
+			final int planIndex,
+			final String propertyName) {
+		final Property old = overridePlanProperty( id , planIndex , propertyName );
+		if ( old != null )  throw new IllegalStateException( "cannot replace property "+old+" with "+propertyName+" for "+id );
 	}
 
 	public void addPlanLinkInfo(
@@ -69,16 +94,17 @@ public class JointStructureTikzCreator {
 		
 	public void writeTexFile( final String outFile ) {
 		log.info( "clean info for visual appeal" );
-		sortPersons( agentInfos , linkInfos );
+		final List<AgentPlanInfo> agentList = new ArrayList<AgentPlanInfo>( agentInfos.values() );
+		sortPersons( agentList , linkInfos );
 		final List<PlanLinkInfo> cleanLinks = new ArrayList<PlanLinkInfo>( linkInfos );
-		cleanLinks( agentInfos , cleanLinks );
+		cleanLinks( agentList , cleanLinks );
 
 		try {
 			log.info( "write tex file" );
 			final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
-			writeBeginning( writer );
-			writePlans( writer , agentInfos );
-			writeJointPlans( writer , agentInfos , cleanLinks );
+			writeBeginning( writer , properties );
+			writePlans( writer , agentList );
+			writeJointPlans( writer , agentList , cleanLinks );
 			writeEnd( writer );
 			writer.close();
 		}
@@ -179,7 +205,8 @@ public class JointStructureTikzCreator {
 	}
 
 	private static void writeBeginning(
-			final BufferedWriter writer) {
+			final BufferedWriter writer,
+			final Collection<Property> properties) {
 		MoreIOUtils.writeLines(
 				writer,
 				"\\documentclass{article}",
@@ -187,7 +214,13 @@ public class JointStructureTikzCreator {
 				"\\usepackage[landscape]{geometry}",
 				"\\pgfdeclarelayer{bg}",
 				"\\pgfsetlayers{bg,main} % put a bg layer under the main layer",
-				"",
+				"");
+		MoreIOUtils.writeLines(
+				writer,
+				createColorDefs( properties ) );
+
+		MoreIOUtils.writeLines(
+				writer,
 				"\\begin{document}",
 				"\\begin{figure}",
 				"\\begin{center}",
@@ -196,8 +229,11 @@ public class JointStructureTikzCreator {
 				"\\begin{tikzpicture}",
 				"\\tikzstyle{"+AGENT_STYLE+"}=[rotate=45,anchor=south west]",
 				"\\tikzstyle{"+PLAN_STYLE+"}=[rectangle,fill=white,draw]",
-				"\\tikzstyle{"+SELECTED_PLAN_STYLE+"}=[rectangle,fill=green,draw]",
 				"\\tikzstyle{"+LINK_STYLE+"}=[]");
+
+		MoreIOUtils.writeLines(
+				writer,
+				createStyleLinesForProperties( properties ) );
 	}
 
 	private static void writePlans(
@@ -216,7 +252,11 @@ public class JointStructureTikzCreator {
 			writer.newLine();
 			String lastPlan = last;
 			for ( int i=0; i < info.nPlans; i++ ) {
-				final String style = i == info.selectedPlan ? SELECTED_PLAN_STYLE : PLAN_STYLE;
+				final Property planProperty = info.planProperties.get( i );
+				final String style =
+					planProperty != null ?
+						styleName( planProperty ) :
+						PLAN_STYLE;
 				final String planPos = "[below of="+lastPlan+"]";
 				lastPlan = planString( last , i );
 				MoreIOUtils.writeLines(
@@ -278,19 +318,80 @@ public class JointStructureTikzCreator {
 				"\\end{figure}",
 				"\\end{document}");
 	}
+
+	private static String styleName( final Property p ) {
+		return p.toString();
+	}
+
+	private static String[] createStyleLinesForProperties(
+			final Collection<Property> ps) {
+		final List<String> lines = new ArrayList<String>();
+
+		for ( Property p : ps ) {
+			lines.add( "\\tikzstyle{"+styleName( p )+"}=[rectangle,fill="+colorName( p )+",draw]" );
+		}
+
+		return lines.toArray( new String[0] );
+	}
+
+	private static String colorName(final Property p) {
+		return "mycolor-"+p;
+	}
+
+	private static String[] createColorDefs(final Collection<Property> properties) {
+		final List<String> list = new ArrayList<String>();
+
+		final double step = 6. / properties.size();
+		double col = 0;
+		for ( Property prop : properties ) {
+			final double g = col < 1 ? 1 : col < 2 ? 2 - col : col < 4 ? 1 : col < 5 ? col - 4 : 1;
+			final double r = col < 1 ? col : col < 3 ? 1 : col < 4 ? 5 - col : 0;
+			final double b = col < 2 ? 0 : col < 3 ? col - 2 : col < 5 ? 1 : 5 - col;
+
+			list.add( "\\definecolor{"+colorName( prop )+"}{rgb}{"+r+","+g+","+b+"}" );
+			col += step;
+		}
+
+		assert Math.abs( col - 6. ) < 1E-7;
+		assert list.size() == properties.size();
+
+		return list.toArray(new String[0] );
+	}
+}
+
+class Property {
+	private final String s;
+
+	public Property(final String s) {
+		this.s = s;
+	}
+
+	@Override
+	public boolean equals(Object anObject) {
+		return s.equals(anObject);
+	}
+
+	@Override
+	public int hashCode() {
+		return s.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return s;
+	}
 }
 
 class AgentPlanInfo {
 	public final String id;
-	public final int nPlans, selectedPlan;
+	public final int nPlans;
+	public final Map<Integer, Property> planProperties = new HashMap<Integer, Property>();
 
 	public AgentPlanInfo(
 			final String id,
-			final int nPlans,
-			final int selectedPlan) {
+			final int nPlans) {
 		this.id = id;
 		this.nPlans = nPlans;
-		this.selectedPlan = selectedPlan;
 	}
 }
 
