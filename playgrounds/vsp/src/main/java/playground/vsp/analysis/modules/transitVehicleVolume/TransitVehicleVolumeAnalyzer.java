@@ -36,6 +36,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -164,6 +165,9 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 			ShapeFileWriter.writeGeometries(features, file);
 		}catch(ServiceConfigurationError e){
 			e.printStackTrace();
+		} catch (UncheckedIOException e) {
+			e.printStackTrace();
+			log.info("No entries for " + name + ". Thus, no file written to " + file);
 		}
 	}
 }
