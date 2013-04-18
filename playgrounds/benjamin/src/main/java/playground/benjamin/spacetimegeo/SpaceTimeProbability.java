@@ -19,9 +19,15 @@
  * *********************************************************************** */
 package playground.benjamin.spacetimegeo;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -33,6 +39,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -64,55 +71,102 @@ import org.matsim.roadpricing.RoadPricing;
 public class SpaceTimeProbability {
 	private static Logger logger = Logger.getLogger(SpaceTimeProbability.class);
 	
-	Config config;
-	Scenario scenario;
-	Controler controler;
+	Map<Integer, ScenarioParams> scenarioId2Params;
+
+	Integer scenarioBundleId = 1;
+	Integer lastIteration = 99;
 	
-	Integer lastIteration = 10;
 	String workingDirectory = "../../runs-svn/spacetimeGeo/";
 	String tollLinksFile = workingDirectory + "input/tollLinksFile.xml";
 
 	private void run() {
-		this.config = ConfigUtils.createConfig();
-		this.config.addCoreModules();
-		this.scenario = ScenarioUtils.createScenario(this.config);
+		ScenarioBundleSelector sbs = new ScenarioBundleSelector();
+		sbs.selectScenarioBundle(scenarioBundleId, workingDirectory);
+		scenarioId2Params = sbs.getScenarioId2Params();
 		
-		createNetwork();
-		createAgent();
-		
-		this.controler = new Controler(this.scenario);
-		specifyControler();
-		
-		final LinkLeaveCountHandler handler = new LinkLeaveCountHandler(this.controler);
-		StartupListener startupListener = new StartupListener() {
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(handler);
-			}
-		};
-		this.controler.addControlerListener(startupListener);
-		this.controler.addControlerListener(new RoadPricing()); 
-		this.controler.run();
-		
-		System.out.println("");
-		logger.info("The agent in average payed " + handler.getTollPaid() / handler.getLink3Counter() + " EUR when using link 3");
-		System.out.println("");
-		logger.info("Link 3 was used in " + handler.getLink3Counter() + " cases of " + (this.controler.getLastIteration() + 1) + " iterations");
-		logger.info("Link 9 was used in " + handler.getLink9Counter() + " cases of " + (this.controler.getLastIteration() + 1) + " iterations");
-		logger.info("Link 11 was used in " + handler.getLink11Counter() + " cases of " + (this.controler.getLastIteration() + 1) + " iterations");
-		System.out.println("\n");
-	}
-	
-	private void specifyControler() {
-		// controler settings	
-		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
+		String fileName = this.workingDirectory + "output/analysis" + scenarioBundleId + ".txt";
+		File file = new File(fileName);
 
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.append("Scenario Nr. \t Route 3 (score) \t Route 9 (score) \t Route 11 (score) \n");
+
+			for(Entry<Integer, ScenarioParams> entry: scenarioId2Params.entrySet()){
+
+				Config config = specifyConfig(entry);
+
+				Scenario scenario = ScenarioUtils.createScenario(config);
+
+				createNetwork(scenario);
+				createAgent(scenario);
+
+				Controler controler = new Controler(scenario);
+				controler.setOverwriteFiles(true);
+				controler.setCreateGraphs(false);
+
+
+				final LinkLeaveCountHandler handler = new LinkLeaveCountHandler();
+				StartupListener startupListener = new StartupListener() {
+					@Override
+					public void notifyStartup(StartupEvent event) {
+						event.getControler().getEvents().addHandler(handler);
+					}
+				};
+				controler.addControlerListener(startupListener);
+				controler.addControlerListener(new RoadPricing()); 
+				controler.run();
+				
+				Double link3Score = null;
+				Double link9Score = null;
+				Double link11Score = null;
+				
+				Person worker = scenario.getPopulation().getPersons().get(new IdImpl("worker"));
+				for(Plan plan : worker.getPlans()){
+					for(PlanElement pe : plan.getPlanElements()){
+						if(pe instanceof Leg){
+							NetworkRoute route = (NetworkRoute) ((Leg) pe).getRoute();
+							for(Id id : route.getLinkIds()){
+								if(id.equals(new IdImpl(3))){
+									link3Score = plan.getScore();
+								} else if(id.equals(new IdImpl(9))){
+									link9Score = plan.getScore();
+								} else if(id.equals(new IdImpl(11))){
+									link11Score = plan.getScore();
+								}
+							}
+						}
+					}
+				}
+				
+				Double link3Fraction = handler.getLink3Counter() / (controler.getLastIteration() + 1);
+				Double link9Fraction = handler.getLink9Counter() / (controler.getLastIteration() + 1);
+				Double link11Fraction = handler.getLink11Counter() / (controler.getLastIteration() + 1);
+				
+				bw.append(entry.getKey().toString());
+				bw.append("\t");
+				bw.append(link3Fraction.toString() + " (" + link3Score.toString() + ")");
+				bw.append("\t");
+				bw.append(link9Fraction.toString() + " (" + link9Score.toString() + ")");
+				bw.append("\t");
+				bw.append(link11Fraction.toString() + " (" + link11Score.toString() + ")");
+				bw.newLine();
+			}
+			bw.close();
+			logger.info("Finished writing output to " + fileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Config specifyConfig(Entry<Integer, ScenarioParams> entry) {
+		
+		Config config = ConfigUtils.createConfig();
+		
 		// controlerConfigGroup
-		ControlerConfigGroup ccg = controler.getConfig().controler();
+		ControlerConfigGroup ccg = config.controler();
 		ccg.setFirstIteration(0);
 		ccg.setLastIteration(this.lastIteration);
-		ccg.setOutputDirectory(workingDirectory + "output/");
+		ccg.setOutputDirectory(workingDirectory + "output/scenario" + entry.getKey() + "/");
 		ccg.setMobsim(MobsimType.qsim.toString());
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
@@ -130,10 +184,10 @@ public class SpaceTimeProbability {
 		qcg.setStorageCapFactor(1);
 		qcg.setNumberOfThreads(1);
 		qcg.setRemoveStuckVehicles(false);
-		controler.getConfig().addQSimConfigGroup(qcg);
+		config.addQSimConfigGroup(qcg);
 
 		// planCalcScoreConfigGroup
-		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
+		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
 
 		ActivityParams act1Params = new ActivityParams("home");
 		act1Params.setTypicalDuration(16 * 3600);
@@ -144,23 +198,18 @@ public class SpaceTimeProbability {
 		act2Params.setTypicalDuration(8 * 3600);
 		pcs.addActivityParams(act2Params);
 
-		pcs.setBrainExpBeta(1.0);
-//		pcs.setPerforming_utils_hr(0.0);
-		pcs.setPerforming_utils_hr(6.0);
-//		pcs.setTraveling_utils_hr(-0.0);
-		pcs.setTraveling_utils_hr(-6.0);
-		pcs.setMarginalUtilityOfMoney(1.2);
-		pcs.setMonetaryDistanceCostRateCar(-0.0);
-//		pcs.setMonetaryDistanceCostRateCar(-0.0001);
-		pcs.setLateArrival_utils_hr(-0.0);
-//		pcs.setLateArrival_utils_hr(-60.0);
+		pcs.setBrainExpBeta(entry.getValue().getMu());
+		pcs.setPerforming_utils_hr(entry.getValue().getBetaPerf());
+		pcs.setTraveling_utils_hr(entry.getValue().getBetaTraveling());
+		pcs.setMarginalUtilityOfMoney(entry.getValue().getBetaCost());
+		pcs.setLateArrival_utils_hr(entry.getValue().getBetaLate());
+//		pcs.setMonetaryDistanceCostRateCar(-0.0);
 
 		// strategyConfigGroup
-		StrategyConfigGroup scg = controler.getConfig().strategy();
+		StrategyConfigGroup scg = config.strategy();
 
 		StrategySettings changePlan = new StrategySettings(new IdImpl("1"));
-//		changePlan.setModuleName("SelectRandom");
-		changePlan.setModuleName("ChangeExpBeta");
+		changePlan.setModuleName(entry.getValue().getChoiceModule());
 		changePlan.setProbability(1.0);
 
 //		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
@@ -174,21 +223,22 @@ public class SpaceTimeProbability {
 //		scg.addStrategySettings(reRoute);
 		
 		// scenarioConfigGroup
-		ScenarioConfigGroup sccg = controler.getConfig().scenario();
+		ScenarioConfigGroup sccg = config.scenario();
 		sccg.setUseRoadpricing(true);
 
 		// roadPricingConfigGroup
-		RoadPricingConfigGroup rpc = controler.getConfig().roadpricing();
+		RoadPricingConfigGroup rpc = config.roadpricing();
 		rpc.setTollLinksFile(this.tollLinksFile);
 		
+		return config;
 	}
 
-	private void createAgent() {
-		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) this.scenario.getPopulation().getFactory();
-		Person person = pFactory.createPerson(this.scenario.createId("worker"));
+	private void createAgent(Scenario scenario) {
+		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		Person person = pFactory.createPerson(scenario.createId("worker"));
 		
-		Id homeLinkId = this.scenario.createId("1");
-		Id workLinkId = this.scenario.createId("4");
+		Id homeLinkId = scenario.createId("1");
+		Id workLinkId = scenario.createId("4");
 		
 		for(int i=0; i<3; i++){
 			Plan plan = pFactory.createPlan();
@@ -201,21 +251,21 @@ public class SpaceTimeProbability {
 			
 			List<Id> routeLinkIds = new LinkedList<Id>();
 			if(i == 0){
-				Id id2 = this.scenario.createId("2");
-				Id id3 = this.scenario.createId("3");
+				Id id2 = scenario.createId("2");
+				Id id3 = scenario.createId("3");
 				routeLinkIds.add(id2);
 				routeLinkIds.add(id3);
 			} else if(i == 1){
-				Id id2 = this.scenario.createId("2");
-				Id id8 = this.scenario.createId("8");
-				Id id9 = this.scenario.createId("9");
+				Id id2 = scenario.createId("2");
+				Id id8 = scenario.createId("8");
+				Id id9 = scenario.createId("9");
 				routeLinkIds.add(id2);
 				routeLinkIds.add(id8);
 				routeLinkIds.add(id9);
 			} else if(i == 2){
-				Id id2 = this.scenario.createId("2");
-				Id id10 = this.scenario.createId("10");
-				Id id11 = this.scenario.createId("11");
+				Id id2 = scenario.createId("2");
+				Id id10 = scenario.createId("10");
+				Id id11 = scenario.createId("11");
 				routeLinkIds.add(id2);
 				routeLinkIds.add(id10);
 				routeLinkIds.add(id11);
@@ -236,9 +286,9 @@ public class SpaceTimeProbability {
 			Leg leg2 = pFactory.createLeg(TransportMode.car);
 			
 			List<Id> routeLinkIds2 = new LinkedList<Id>();
-			Id id5 = this.scenario.createId("5");
-			Id id6 = this.scenario.createId("6");
-			Id id7 = this.scenario.createId("7");
+			Id id5 = scenario.createId("5");
+			Id id6 = scenario.createId("6");
+			Id id7 = scenario.createId("7");
 			routeLinkIds2.add(id5);
 			routeLinkIds2.add(id6);
 			routeLinkIds2.add(id7);
@@ -253,42 +303,42 @@ public class SpaceTimeProbability {
 			plan.setScore(1000.0);
 			person.addPlan(plan);
 		}
-		this.scenario.getPopulation().addPerson(person);
+		scenario.getPopulation().addPerson(person);
 	}
 
-	private void createNetwork() {
-		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+	private void createNetwork(Scenario scenario) {
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(this.scenario.createId("1"), this.scenario.createCoord(-26000.0,     0.0));
-		Node node2 = network.createAndAddNode(this.scenario.createId("2"), this.scenario.createCoord(-25000.0,     0.0));
-		Node node3 = network.createAndAddNode(this.scenario.createId("3"), this.scenario.createCoord(-21000.0,     0.0));
-		Node node4 = network.createAndAddNode(this.scenario.createId("4"), this.scenario.createCoord( -1000.0,     0.0));
-		Node node5 = network.createAndAddNode(this.scenario.createId("5"), this.scenario.createCoord(     0.0,     0.0));
-		Node node6 = network.createAndAddNode(this.scenario.createId("6"), this.scenario.createCoord( -6500.0, -5000.0));
-		Node node7 = network.createAndAddNode(this.scenario.createId("7"), this.scenario.createCoord(-19500.0, -5000.0));
-		Node node8 = network.createAndAddNode(this.scenario.createId("8"), this.scenario.createCoord(-11000.0,  2500.0));
-		Node node9 = network.createAndAddNode(this.scenario.createId("9"), this.scenario.createCoord(-11000.0, -2500.0));
+		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(-26000.0,     0.0));
+		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(-25000.0,     0.0));
+		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(-21000.0,     0.0));
+		Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord( -1000.0,     0.0));
+		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(     0.0,     0.0));
+		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord( -6500.0, -5000.0));
+		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(-19500.0, -5000.0));
+		Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord(-11000.0,  2500.0));
+		Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord(-11000.0, -2500.0));
 		
 		//base distance to work 5km; travel time 6min
-		network.createAndAddLink(this.scenario.createId("2"), node2, node3, 4000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(this.scenario.createId("4"), node4, node5, 1000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("2"), node2, node3, 4000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("4"), node4, node5, 1000, 13.89, 3600, 1, null, null);
 
 		//additional distance to work 20km; travel time 24min
-		network.createAndAddLink(this.scenario.createId("3"), node3, node4, 20000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("3"), node3, node4, 20000, 13.89, 3600, 1, null, null);
 		
 		//additional distance to work 45km; travel time 54min
-		network.createAndAddLink(this.scenario.createId("8"), node3, node8, 22500, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(this.scenario.createId("9"), node8, node4, 22500, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("8"), node3, node8, 22500, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("9"), node8, node4, 22500, 13.89, 3600, 1, null, null);
 		
 		//additional distance to work 70km; travel time 84min
-		network.createAndAddLink(this.scenario.createId("10"), node3, node9, 35000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(this.scenario.createId("11"), node9, node4, 35000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("10"), node3, node9, 35000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("11"), node9, node4, 35000, 13.89, 3600, 1, null, null);
 		
 		//distance from work 5km; travel time 6min
-		network.createAndAddLink(this.scenario.createId("5"), node5, node6, 1000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(this.scenario.createId("6"), node6, node7, 2000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(this.scenario.createId("7"), node7, node1, 1000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(this.scenario.createId("1"), node1, node2, 1, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("5"), node5, node6, 1000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("6"), node6, node7, 2000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("7"), node7, node1, 1000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(scenario.createId("1"), node1, node2, 1, 13.89, 3600, 1, null, null);
 	}
 
 	public static void main(String[] args) {

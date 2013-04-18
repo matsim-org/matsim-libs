@@ -26,16 +26,17 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 
 /**
  * @author benjamin
  *
  */
-public class LinkLeaveCountHandler implements LinkLeaveEventHandler, AgentMoneyEventHandler {
+public class LinkLeaveCountHandler implements IterationStartsListener, LinkLeaveEventHandler, AgentMoneyEventHandler {
 	private static Logger logger = Logger.getLogger(LinkLeaveCountHandler.class);
 	
-	Controler controler;
+	int iterationNo;
 
 	double link3Counter = 0.0;
 	double link9Counter = 0.0;
@@ -44,10 +45,11 @@ public class LinkLeaveCountHandler implements LinkLeaveEventHandler, AgentMoneyE
 	double tollPaid = 0.0;
 
 
-	public LinkLeaveCountHandler(Controler controler) {
-		this.controler = controler;
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		this.iterationNo = event.getIteration();
 	}
-
+	
 	@Override
 	public void reset(int iteration) {
 	}
@@ -57,13 +59,13 @@ public class LinkLeaveCountHandler implements LinkLeaveEventHandler, AgentMoneyE
 		Id linkId = event.getLinkId();
 		
 		if(linkId.equals(new IdImpl("3"))){
-			logger.info("The agent is chosing route 3 in iteration " + this.controler.getIterationNumber());
+			logger.info("The agent is chosing route 3 in iteration " + this.iterationNo);
 			link3Counter++;
 		} else if(linkId.equals(new IdImpl("9"))){
-			logger.info("The agent is chosing route 9 in iteration " + this.controler.getIterationNumber());
+			logger.info("The agent is chosing route 9 in iteration " + this.iterationNo);
 			link9Counter++;
 		} else if(linkId.equals(new IdImpl("11"))){
-			logger.info("The agent is chosing route 11 in iteration " + this.controler.getIterationNumber());
+			logger.info("The agent is chosing route 11 in iteration " + this.iterationNo);
 			link11Counter++;
 		} else {
 			// do nothing
