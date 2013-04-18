@@ -85,27 +85,13 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 
 	@Override
 	public void run(final GroupPlans plan) {
-		final List<SubtourRecord> vehicularTours = getVehicularTours( plan );
+		final List<SubtourRecord> vehicularTours = getVehicularToursSortedByStartTime( plan );
 		if ( vehicularTours == null ) {
 			randomAllocator.run( plan );
 			return;
 		}
 
-		// sort the tours by increasing departure time
-		Collections.sort(
-				vehicularTours,
-				new Comparator<SubtourRecord>() {
-					@Override
-					public int compare(
-							final SubtourRecord o1,
-							final SubtourRecord o2) {
-						return Double.compare( o1.startTime , o2.startTime );
-					}
-				});
-
-		allocateVehicles(
-				vehicularTours,
-				Double.POSITIVE_INFINITY);
+		allocateVehicles( vehicularTours );
 
 		processAllocation( vehicularTours );
 	}
@@ -131,77 +117,10 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		}
 	}
 
-	private double allocateVehicles(
-			final List<SubtourRecord> toursToAllocate,
-			final double minimumAtteinableElsewhere) {
-		if ( toursToAllocate.isEmpty() ) return 0;
-		final List<SubtourRecord> remainingSubtours = new ArrayList<SubtourRecord>( toursToAllocate );
-		final SubtourRecord currentSubtour = remainingSubtours.remove( 0 );
-
-		Collections.sort(
-				currentSubtour.possibleVehicles,
-				new Comparator<VehicleRecord>() {
-					@Override
-					public int compare(
-							final VehicleRecord o1,
-							final VehicleRecord o2) {
-						final int timeComp = Double.compare(
-							o1.availableFrom,
-							o2.availableFrom );
-						return timeComp != 0 ? timeComp :
-							o1.nAllocs -
-							o2.nAllocs;
-					}
-				});
-
-		double currentBestOverlap = Double.POSITIVE_INFINITY;
-		double lastInitialAvail = Double.NaN;
-		for ( VehicleRecord currentVehicle : currentSubtour.possibleVehicles ) {
-			final double initialAvail = currentVehicle.availableFrom;
-
-			// without the "==", infinite values are never equal
-			if ( initialAvail == lastInitialAvail || Math.abs( initialAvail - lastInitialAvail ) < 1E-7 ) {
-				// no need to check, equivalent to previous branch
-				continue;
-			}
-			lastInitialAvail = initialAvail;
-
-			currentVehicle.availableFrom = currentSubtour.endTime;
-
-			final double minRemainingOverlap = getLowerBoundOnOverlap( remainingSubtours );
-
-			final double currentOverlap = Math.max(
-					initialAvail - currentSubtour.startTime,
-					0);
-
-			currentVehicle.nAllocs++;
-			final double bestFoundOverlap = Math.min( minimumAtteinableElsewhere , currentBestOverlap );
-			final double nextOverlap =
-				currentOverlap + minRemainingOverlap < bestFoundOverlap ?
-				currentOverlap +
-				allocateVehicles(
-						remainingSubtours,
-						bestFoundOverlap - currentOverlap ) :
-				// cut-off
-				Double.POSITIVE_INFINITY;
-
-			if ( nextOverlap < currentBestOverlap ) {
-				currentBestOverlap = nextOverlap;
-				currentSubtour.allocatedVehicle = currentVehicle.id;
-			}
-
-			currentVehicle.availableFrom = initialAvail;
-			currentVehicle.nAllocs--;
-		}
-
-		assert currentSubtour.allocatedVehicle != null;
-
-		return currentBestOverlap;
-	}
-
-	private double getLowerBoundOnOverlap(
+	private void allocateVehicles(
 			final List<SubtourRecord> toursToAllocate) {
-		if ( toursToAllocate.isEmpty() ) return 0;
+		// greedy algo. Should be ok, but didn't formally prove it
+		if ( toursToAllocate.isEmpty() ) return;
 		final List<SubtourRecord> remainingSubtours = new ArrayList<SubtourRecord>( toursToAllocate );
 		final SubtourRecord currentSubtour = remainingSubtours.remove( 0 );
 
@@ -213,23 +132,52 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 					public int compare(
 							final VehicleRecord o1,
 							final VehicleRecord o2) {
-						return Double.compare(
+						final int timeComp = Double.compare(
 							o1.availableFrom,
 							o2.availableFrom );
+						return timeComp != 0 ? timeComp :
+							o1.nAllocs - o2.nAllocs;
 					}
 				});
 
-		final double currentOverlap = Math.max(
-				firstAvailableVehicle.availableFrom - currentSubtour.startTime,
-				0);
+		if ( firstAvailableVehicle.availableFrom < currentSubtour.endTime ) {
+			firstAvailableVehicle.availableFrom = currentSubtour.endTime;
+		}
+		firstAvailableVehicle.nAllocs++;
+		currentSubtour.allocatedVehicle = firstAvailableVehicle.id;
 
-		return currentOverlap + getLowerBoundOnOverlap( remainingSubtours );
+		allocateVehicles( remainingSubtours );
+	}
+
+	/*for tests*/ double calcOverlap(final GroupPlans gps) {
+		final List<SubtourRecord> tours = getVehicularToursSortedByStartTime( gps );
+
+		double overlap = 0;
+		for ( SubtourRecord tour : tours ) {
+			Id veh = null;
+			for ( Trip t : tour.subtour.getTrips() ) {
+				veh = getVehicle( t );
+				if ( veh != null ) break;
+			}
+			
+			for ( VehicleRecord vr : tour.possibleVehicles ) {
+				if ( vr.id.equals( veh ) ) {
+					overlap += Math.max( 0 , vr.availableFrom - tour.startTime );
+					if ( vr.availableFrom < tour.endTime ) {
+						vr.availableFrom = tour.endTime;
+					}
+					break;
+				}
+			}
+		}
+
+		return overlap;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// subtour-related methods
 	// /////////////////////////////////////////////////////////////////////////
-	private List<SubtourRecord> getVehicularTours(final GroupPlans plans) {
+	private List<SubtourRecord> getVehicularToursSortedByStartTime(final GroupPlans plans) {
 		final List<SubtourRecord> vehicularTours = new ArrayList<SubtourRecord>();
 		final VehicleRecordFactory factory = new VehicleRecordFactory();
 
@@ -281,10 +229,24 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			}
 		}
 
+		Collections.sort(
+				vehicularTours,
+				new Comparator<SubtourRecord>() {
+					@Override
+					public int compare(
+							final SubtourRecord o1,
+							final SubtourRecord o2) {
+						return Double.compare( o1.startTime , o2.startTime );
+					}
+				});
+
+
 		return vehicularTours;
 	}
 
 	private boolean isVehicular(final Trip t) {
+		// note: checking that getVehicle returns null doen't work
+		// when allowing for null routes. Hence the duplication of the logic...
 		final List<Leg> legs = t.getLegsOnly();
 		if ( legs.isEmpty() ) return false;
 
@@ -294,6 +256,18 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		if ( !allowNullRoutes && l.getRoute() == null ) return false;
 		if ( l.getRoute() != null && !(l.getRoute() instanceof NetworkRoute) ) return false; 
 		return true;
+	}
+
+	private Id getVehicle( final Trip t ) {
+		final List<Leg> legs = t.getLegsOnly();
+		if ( legs.isEmpty() ) return null;
+
+		// XXX what to do if several legs???
+		final Leg l = legs.get( 0 );
+		if ( !vehicularMode.equals( l.getMode() ) ) return null;
+		if ( !allowNullRoutes && l.getRoute() == null ) return null;
+		if ( l.getRoute() != null && !(l.getRoute() instanceof NetworkRoute) ) return null; 
+		return ((NetworkRoute) l.getRoute()).getVehicleId();
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
