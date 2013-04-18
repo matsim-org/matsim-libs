@@ -82,6 +82,7 @@ public class CreateTikzFigureOfJpStructure {
 					id = atts.getValue( "id" );
 					count = 0;
 					selected = -1;
+					vehicles.clear();
 				}
 				if ( name.equals( "plan" ) ) {
 					if ( atts.getValue( "selected" ).equals( "yes" ) ) {
