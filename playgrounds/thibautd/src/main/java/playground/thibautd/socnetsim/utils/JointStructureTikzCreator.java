@@ -52,6 +52,8 @@ public class JointStructureTikzCreator {
 	private static final String PLAN_STYLE = "plan";
 	private static final String LINK_STYLE = "link";
 
+	private static final String LEGEND_ANCHOR = "legend-anchor";
+
 	private final Set<Property> properties = new HashSet<Property>();
 
 	private final Map<String, AgentPlanInfo> agentInfos = new LinkedHashMap<String,AgentPlanInfo>();
@@ -105,6 +107,7 @@ public class JointStructureTikzCreator {
 			writeBeginning( writer , properties );
 			writePlans( writer , agentList );
 			writeJointPlans( writer , agentList , cleanLinks );
+			writeLegend( writer , properties );
 			writeEnd( writer );
 			writer.close();
 		}
@@ -241,10 +244,15 @@ public class JointStructureTikzCreator {
 			final List<AgentPlanInfo> agentPlanInfo) throws IOException {
 		writer.newLine();
 		String last = null;
+		String leftmost = null;
+		String downmost = null;
+		int downsize = -1;
 		for ( AgentPlanInfo info : agentPlanInfo ) {
 			writer.newLine();
 			final String pos = last == null ? "" : "[right of="+last+"]";
 			last = ""+info.id;
+			if ( leftmost == null ) leftmost = last;
+
 			MoreIOUtils.writeLines(
 				writer,
 				"\\node ("+last+") "+pos+" {};",
@@ -263,6 +271,33 @@ public class JointStructureTikzCreator {
 						writer,
 						"\\node ("+lastPlan+") "+planPos+" ["+style+"] {};" );
 			}
+
+			if ( info.nPlans > downsize ) {
+				downmost = lastPlan;
+				downsize = info.nPlans;
+			}
+		}
+
+		assert leftmost != null;
+		assert downmost != null;
+		MoreIOUtils.writeLines(
+				writer,
+				"\\node ("+LEGEND_ANCHOR+") at ("+leftmost+" |- "+downmost+") {};" );
+	}
+
+	private static void writeLegend(
+			final BufferedWriter writer,
+			final Collection<Property> properties) {
+		String anchor = LEGEND_ANCHOR;
+
+		int c = 0;
+		for ( Property p : properties ) {
+			final String nodeName = "leg-"+(c++);
+			MoreIOUtils.writeLines(
+					writer,
+					"\\node ("+nodeName+") [below of="+anchor+",rectangle,draw,fill="+colorName( p )+"] {};",
+					"\\node [right of="+nodeName+",anchor=west] {"+p+"};");
+			anchor = nodeName;
 		}
 	}
 
@@ -341,10 +376,10 @@ public class JointStructureTikzCreator {
 	private static String[] createColorDefs(final Collection<Property> properties) {
 		final List<String> list = new ArrayList<String>();
 
-		final double step = 6. / properties.size();
+		final double step = 6. / (properties.size() + 1);
 		double col = 0;
 		for ( Property prop : properties ) {
-			final double g = col < 1 ? 1 : col < 2 ? 2 - col : col < 4 ? 1 : col < 5 ? col - 4 : 1;
+			final double g = col < 1 ? 1 : col < 2 ? 2 - col : col < 4 ? 0 : col < 5 ? col - 4 : 1;
 			final double r = col < 1 ? col : col < 3 ? 1 : col < 4 ? 5 - col : 0;
 			final double b = col < 2 ? 0 : col < 3 ? col - 2 : col < 5 ? 1 : 5 - col;
 
@@ -352,7 +387,7 @@ public class JointStructureTikzCreator {
 			col += step;
 		}
 
-		assert Math.abs( col - 6. ) < 1E-7;
+		assert Math.abs( col - (6. - step) ) < 1E-7;
 		assert list.size() == properties.size();
 
 		return list.toArray(new String[0] );
@@ -367,8 +402,9 @@ class Property {
 	}
 
 	@Override
-	public boolean equals(Object anObject) {
-		return s.equals(anObject);
+	public boolean equals(final Object o) {
+		return o instanceof Property &&
+			((Property) o).s.equals( s );
 	}
 
 	@Override
