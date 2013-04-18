@@ -19,25 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.thibautd.utils.MoreIOUtils;
+import playground.thibautd.socnetsim.utils.JointStructureTikzCreator;
 
 /**
  * @author thibautd
@@ -46,12 +37,7 @@ public class CreateTikzFigureOfJpStructure {
 	private static final Logger log =
 		Logger.getLogger(CreateTikzFigureOfJpStructure.class);
 
-	private static final String AGENT_STYLE = "agent";
-	private static final String PLAN_STYLE = "plan";
-	private static final String SELECTED_PLAN_STYLE = "selectedplan";
-	private static final String LINK_STYLE = "link";
-
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) {
 		final String plansFile = args[ 0 ];
 		final String jointPlansFile = args[ 1 ];
 		final String outFile = args[ 2 ];
@@ -65,223 +51,20 @@ public class CreateTikzFigureOfJpStructure {
 		log.info( "out file: "+outFile );
 		log.info( "person ids: "+personIds );
 
+		final JointStructureTikzCreator tikzCreator =
+			new JointStructureTikzCreator();
 		log.info( "load plan infos" );
-		final List<AgentPlanInfo> planInfos =
-			parsePlanInfos( plansFile , personIds );
+		parsePlanInfos( plansFile , tikzCreator , personIds );
 		log.info( "load joint plan infos" );
-		final List<PlanLinkInfo> planLinkInfo =
-			parsePlanLinkInfo( jointPlansFile , personIds );
+		parsePlanLinkInfo( jointPlansFile , tikzCreator , personIds );
 
-		log.info( "clean info for visual appeal" );
-		sortPersons( planInfos , planLinkInfo );
-		cleanLinks( planInfos , planLinkInfo );
-		
-		log.info( "write tex file" );
-		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
-		writeBeginning( writer );
-		writePlans( writer , planInfos );
-		writeJointPlans( writer , planInfos , planLinkInfo );
-		writeEnd( writer );
-		writer.close();
+		tikzCreator.writeTexFile( outFile );
 	}
 
-	private static void sortPersons(
-			final List<AgentPlanInfo> planInfos,
-			final List<PlanLinkInfo> planLinkInfo) {
-		final List<AgentPlanInfo> sortedPersons = new ArrayList<AgentPlanInfo>();
-		sortedPersons.add( planInfos.remove( 0 ) );
-
-		while ( !planInfos.isEmpty() ) {
-			final AgentPlanInfo last = sortedPersons.get( sortedPersons.size() - 1 );
-			final AgentPlanInfo closest =
-				Collections.max(
-						planInfos,
-						new Comparator<AgentPlanInfo>() {
-							@Override
-							public int compare(
-									final AgentPlanInfo o1,
-									final AgentPlanInfo o2) {
-								final int n1 = countCommonJointPlans( last , o1 , planLinkInfo );
-								final int n2 = countCommonJointPlans( last , o2 , planLinkInfo );
-								return n1 - n2;
-							}
-						});
-			planInfos.remove( closest );
-			sortedPersons.add( closest );
-		}
-
-		assert planInfos.isEmpty();
-		planInfos.addAll( sortedPersons );
-	}
-
-	private static int countCommonJointPlans(
-			final AgentPlanInfo a1,
-			final AgentPlanInfo a2,
-			final List<PlanLinkInfo> planLinkInfo) {
-		int c = 0;
-		for ( PlanLinkInfo i : planLinkInfo ) {
-			if ( (i.id1.equals( a1.id ) && i.id2.equals( a2.id )) ||
-					(i.id2.equals( a1.id ) && i.id1.equals( a2.id )) ) {
-				c++;
-			}
-		}
-		assert c % 2 == 0;
-		return c / 2;
-	}
-
-	private static void cleanLinks(
-			final List<AgentPlanInfo> planInfos,
-			final List<PlanLinkInfo> planLinkInfo) {
-		{
-			final Iterator<PlanLinkInfo> iterator = planLinkInfo.iterator();
-			// remove all "back pointing" links
-			while ( iterator.hasNext() ) {
-				final PlanLinkInfo info = iterator.next();
-				if ( pointsBackwards( info , planInfos ) ) iterator.remove();
-			}
-		}
-
-		// sort by order of "to" link
-		Collections.sort(
-				planLinkInfo,
-				new Comparator<PlanLinkInfo>() {
-					@Override
-					public int compare(
-							final PlanLinkInfo l1,
-							final PlanLinkInfo l2) {
-						for ( AgentPlanInfo agent : planInfos ) {
-							if ( l1.id2.equals( agent.id ) ) return -1;
-							if ( l2.id2.equals( agent.id ) ) return 1;
-						}
-						return 0;
-					}
-				});
-
-		// only keep the first link leaving each plan
-		final Set<String> knownPlans = new HashSet<String>();
-		final Iterator<PlanLinkInfo> iterator = planLinkInfo.iterator();
-		while ( iterator.hasNext() ) {
-			final PlanLinkInfo curr = iterator.next();
-			if ( !knownPlans.add( planId( curr.id1 , curr.plan1 ) ) ) iterator.remove();
-		}
-	}
-
-	private static boolean pointsBackwards(
-			final PlanLinkInfo info,
-			final List<AgentPlanInfo> planInfos) {
-		for ( AgentPlanInfo agent : planInfos ) {
-			if ( agent.id.equals( info.id1 ) ) return false;
-			if ( agent.id.equals( info.id2 ) ) return true;
-		}
-		throw new RuntimeException();
-	}
-
-	private static void writeBeginning(
-			final BufferedWriter writer) {
-		MoreIOUtils.writeLines(
-				writer,
-				"\\documentclass{article}",
-				"\\usepackage{tikz}",
-				"\\usepackage[landscape]{geometry}",
-				"\\pgfdeclarelayer{bg}",
-				"\\pgfsetlayers{bg,main} % put a bg layer under the main layer",
-				"",
-				"\\begin{document}",
-				"\\begin{figure}",
-				"\\begin{center}",
-				"% cut here -----------------------------------------------",
-				"",
-				"\\begin{tikzpicture}",
-				"\\tikzstyle{"+AGENT_STYLE+"}=[rotate=45,anchor=south west]",
-				"\\tikzstyle{"+PLAN_STYLE+"}=[rectangle,fill=white,draw]",
-				"\\tikzstyle{"+SELECTED_PLAN_STYLE+"}=[rectangle,fill=green,draw]",
-				"\\tikzstyle{"+LINK_STYLE+"}=[]");
-	}
-
-	private static void writePlans(
-			final BufferedWriter writer,
-			final List<AgentPlanInfo> agentPlanInfo) throws IOException {
-		writer.newLine();
-		String last = null;
-		for ( AgentPlanInfo info : agentPlanInfo ) {
-			writer.newLine();
-			final String pos = last == null ? "" : "[right of="+last+"]";
-			last = info.id;
-			MoreIOUtils.writeLines(
-				writer,
-				"\\node ("+last+") "+pos+" {};",
-				"\\node "+pos+" ["+AGENT_STYLE+"] {"+info.id+"};" );
-			writer.newLine();
-			String lastPlan = last;
-			for ( int i=0; i < info.nPlans; i++ ) {
-				final String style = i == info.selectedPlan ? SELECTED_PLAN_STYLE : PLAN_STYLE;
-				final String planPos = "[below of="+lastPlan+"]";
-				lastPlan = planId( last , i );
-				MoreIOUtils.writeLines(
-						writer,
-						"\\node ("+lastPlan+") "+planPos+" ["+style+"] {};" );
-			}
-		}
-	}
-
-	private static String planId(final String personId, final int plan) {
-		return personId+"-plan-"+plan;
-	}
-
-	private static void writeJointPlans(
-			final BufferedWriter writer,
-			final List<AgentPlanInfo> agentPlanInfo,
-			final List<PlanLinkInfo> linkInfo) throws IOException {
-		writer.newLine();
-		MoreIOUtils.writeLines(
-				writer,
-				"% write links \"under\" the nodes, otherwise parabolas do not look nice",
-				"\\begin{pgfonlayer}{bg}" );
-		for ( PlanLinkInfo info : linkInfo ) {
-			final String start = planId( info.id1 , info.plan1 );
-			final String end = planId( info.id2 , info.plan2 );
-			final String curve = areContinguous( info.id1 , info.id2 , agentPlanInfo ) ?
-				"to[out=0,in=180]" : "parabola[parabola height=6mm]";
-			MoreIOUtils.writeLines(
-					writer,
-					"\\draw ["+LINK_STYLE+"] ("+start+") "+curve+" ("+end+");" );
-		}
-		MoreIOUtils.writeLines(
-				writer,
-				"\\end{pgfonlayer}{bg}" );
-	}
-
-	private static boolean areContinguous(
-			final String id1,
-			final String id2,
-			final List<AgentPlanInfo> agentPlanInfo) {
-		boolean foundOne = false;
-		for (AgentPlanInfo info : agentPlanInfo) {
-			if ( foundOne ) {
-				return info.id.equals( id1 ) || info.id.equals( id2 );
-			}
-			if ( info.id.equals( id1 ) || info.id.equals( id2 ) ) foundOne = true;
-		}
-		return false;
-	}
-
-	private static void writeEnd(
-			final BufferedWriter writer) {
-		MoreIOUtils.writeLines(
-				writer,
-				"\\end{tikzpicture}",
-				"",
-				"% cut here -----------------------------------------------",
-				"\\end{center}",
-				"\\end{figure}",
-				"\\end{document}");
-	}
-
-	private static List<AgentPlanInfo> parsePlanInfos(
+	private static void parsePlanInfos(
 			final String plansFile,
+			final JointStructureTikzCreator tikzCreator,
 			final List<String> personIds) {
-		final List<AgentPlanInfo> infos = new ArrayList<AgentPlanInfo>();
-
 		new MatsimXmlParser() {
 			private String id = null;
 			private int count = 0;
@@ -311,18 +94,16 @@ public class CreateTikzFigureOfJpStructure {
 					final String content,
 					final Stack<String> context) {
 				if ( name.equals( "person" ) && personIds.contains( id ) ) {
-					infos.add( new AgentPlanInfo( id , count , selected ) );
+					tikzCreator.addAgentInfo( id , count , selected );
 				}
 			}
 		}.parse( plansFile );
-		return infos;
 	}
 
-	private static List<PlanLinkInfo> parsePlanLinkInfo(
+	private static void parsePlanLinkInfo(
 			final String jointPlansFile,
+			final JointStructureTikzCreator tikzCreator,
 			final List<String> personIdsToConsider) {
-		final List<PlanLinkInfo> infos = new ArrayList<PlanLinkInfo>();
-
 		new MatsimXmlParser( false ) {
 			final List<String> personIds = new ArrayList<String>();
 			final List<Integer> planNrs = new ArrayList<Integer>();
@@ -357,15 +138,13 @@ public class CreateTikzFigureOfJpStructure {
 								if ( i == j ) continue;
 								final String id2 = personIds.get( j );
 								final int plan2 = planNrs.get( j );
-								infos.add( new PlanLinkInfo( id1 , plan1 , id2 , plan2 ) );
+								tikzCreator.addPlanLinkInfo( id1 , plan1 , id2 , plan2 );
 							}
 						}
 					}
 				}			
 			}
 		}.parse( jointPlansFile );
-
-		return infos;
 	}
 
 	private static boolean consider(
@@ -384,35 +163,5 @@ public class CreateTikzFigureOfJpStructure {
 			}
 		}
 		return foundConsidered;
-	}
-}
-
-class AgentPlanInfo {
-	public final String id;
-	public final int nPlans, selectedPlan;
-
-	public AgentPlanInfo(
-			final String id,
-			final int nPlans,
-			final int selectedPlan) {
-		this.id = id;
-		this.nPlans = nPlans;
-		this.selectedPlan = selectedPlan;
-	}
-}
-
-class PlanLinkInfo {
-	public final String id1, id2;
-	public final int plan1, plan2;
-
-	public PlanLinkInfo(
-			final String id1,
-			final int plan1,
-			final String id2,
-			final int plan2) {
-		this.id1 = id1;
-		this.plan1 = plan1;
-		this.id2 = id2;
-		this.plan2 = plan2;
 	}
 }
