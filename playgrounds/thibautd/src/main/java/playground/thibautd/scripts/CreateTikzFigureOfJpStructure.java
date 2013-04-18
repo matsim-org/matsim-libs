@@ -23,6 +23,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
 
@@ -64,6 +66,10 @@ public class CreateTikzFigureOfJpStructure {
 		log.info( "load joint plan infos" );
 		final List<PlanLinkInfo> planLinkInfo =
 			parsePlanLinkInfo( jointPlansFile , personIds );
+
+		log.info( "clean info for visual appeal" );
+		sortPersons( planInfos , planLinkInfo );
+		cleanLinks( planInfos , planLinkInfo );
 		
 		log.info( "write tex file" );
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
@@ -72,6 +78,57 @@ public class CreateTikzFigureOfJpStructure {
 		writeJointPlans( writer , planLinkInfo );
 		writeEnd( writer );
 		writer.close();
+	}
+
+	private static void sortPersons(
+			final List<AgentPlanInfo> planInfos,
+			final List<PlanLinkInfo> planLinkInfo) {
+		final List<AgentPlanInfo> sortedPersons = new ArrayList<AgentPlanInfo>();
+		sortedPersons.add( planInfos.remove( 0 ) );
+
+		while ( !planInfos.isEmpty() ) {
+			final AgentPlanInfo last = sortedPersons.get( sortedPersons.size() - 1 );
+			final AgentPlanInfo closest =
+				Collections.max(
+						planInfos,
+						new Comparator<AgentPlanInfo>() {
+							@Override
+							public int compare(
+									final AgentPlanInfo o1,
+									final AgentPlanInfo o2) {
+								final int n1 = countCommonJointPlans( last , o1 , planLinkInfo );
+								final int n2 = countCommonJointPlans( last , o2 , planLinkInfo );
+								return n1 - n2;
+							}
+						});
+			planInfos.remove( closest );
+			sortedPersons.add( closest );
+		}
+
+		assert planInfos.isEmpty();
+		planInfos.addAll( sortedPersons );
+	}
+
+	private static int countCommonJointPlans(
+			final AgentPlanInfo a1,
+			final AgentPlanInfo a2,
+			final List<PlanLinkInfo> planLinkInfo) {
+		int c = 0;
+		for ( PlanLinkInfo i : planLinkInfo ) {
+			if ( (i.id1.equals( a1.id ) && i.id2.equals( a2.id )) ||
+					(i.id2.equals( a1.id ) && i.id1.equals( a2.id )) ) {
+				c++;
+			}
+		}
+		assert c % 2 == 0;
+		return c / 2;
+	}
+
+	private static void cleanLinks(
+			final List<AgentPlanInfo> planInfos,
+			final List<PlanLinkInfo> planLinkInfo) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private static void writeBeginning(
