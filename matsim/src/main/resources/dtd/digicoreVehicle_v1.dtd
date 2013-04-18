@@ -19,19 +19,22 @@
 
 <!-- ============================================================ -->
 
-<!ELEMENT vehicle					(chain)+>
-<!ATTLIST vehicle
+<!ELEMENT digicoreVehicle					(chain)+>
+<!ATTLIST digicoreVehicle
 		  id			CDATA		#REQUIRED
 		  timezone		CDATA		#REQUIRED
+		  locale		CDATA		#REQUIRED
 		  type			CDATA		#IMPLIED>
 
 <!ELEMENT chain						(activity)+>
 
 <!ELEMENT activity						EMPTY>
 <!ATTLIST activity
+		  type			CDATA		#REQUIRED
+		  x				CDATA		#REQUIRED
+		  y				CDATA		#REQUIRED
 		  start			CDATA		#REQUIRED
 		  end			CDATA		#REQUIRED
-		  type			CDATA		#REQUIRED
 		  facility		CDATA		#IMPLIED
 		  link			CDATA		#IMPLIED
 >
