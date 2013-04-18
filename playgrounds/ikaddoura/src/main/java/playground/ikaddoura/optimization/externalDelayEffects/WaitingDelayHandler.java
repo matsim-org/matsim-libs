@@ -70,7 +70,7 @@ import org.matsim.core.scenario.ScenarioImpl;
  * @author Ihab
  *
  */
-public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
+public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, AgentWaitingForPtEventHandler {
 	private final static Logger log = Logger.getLogger(WaitingDelayHandler.class);
 
 	// extra delay for a bus before and after agents are entering or leaving a public vehicle
@@ -87,6 +87,10 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 	private final List<ExtEffectWaitingDelay> boardingDelayEffects = new ArrayList<ExtEffectWaitingDelay>();
 	private final List<ExtEffectWaitingDelay> alightingDelayEffects = new ArrayList<ExtEffectWaitingDelay>();
 	private final List<ExtEffectWaitingDelay> extraDelayEffects = new ArrayList<ExtEffectWaitingDelay>();
+	
+	private final Map<Id, Double> personId2startWaitingForPt = new HashMap<Id, Double>();
+	private final Map<Id, Double> vehicleId2delay = new HashMap<Id, Double>();
+	private final Map<Id, Boolean> vehicleId2isFirstTransfer = new HashMap<Id, Boolean>();
 
 	public WaitingDelayHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -101,6 +105,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 		this.alightingDelayEffects.clear();
 		this.extraDelayEffects.clear();
 		this.vehId2agentsTransferingAtThisStop.clear();
+		this.personId2startWaitingForPt.clear();
 	}
 
 	@Override
@@ -135,32 +140,54 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 				}
 			}
 			
+			
+//			double waitingTime = event.getTime() - this.personId2startWaitingForPt.get(event.getPersonId()) - 1.0; // TODO!
+			
+			double waitingTime = event.getTime() - this.personId2startWaitingForPt.get(event.getPersonId());
+			double vehicleDelay = this.vehicleId2delay.get(event.getVehicleId());
+			
 //			System.out.println("++++ AgentId: " + event.getPersonId());
 //			System.out.println("WaitingTime: " + waitingTime);
 //			System.out.println("VehicleDelay: " + vehicleDelay);
 			
-		
+			double affectedAgentUnits = 0;
+			if (vehicleDelay <= waitingTime){
+				// standard case
+				affectedAgentUnits = 1.0;
+				
+			} else {
+				// waitingTime below vehicleDelay
+				// calculate the affectedAgentUnits
+				affectedAgentUnits = waitingTime / vehicleDelay;
+				
+				System.out.println("++++ AgentId: " + event.getPersonId());
+				System.out.println("WaitingTime: " + waitingTime);
+				System.out.println("VehicleDelay: " + vehicleDelay);
+				System.out.println("affectedAgentUnits: " + affectedAgentUnits);
+
+			}
+			
 			// the person entering the busX right now was delayed by other agents boarding or alighting before.
-			// Therefore, go through all agents that are currently being tracked, check who was delaying that busX before and update the number of affected agents.
+			// Therefore, go through all agents that are currently being tracked, check who was delaying that busX before and update the number of affected agent units.
 			for (ExtEffectWaitingDelay delay : this.boardingDelayEffects){
 				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					int affectedAgents = delay.getAffectedAgents();
-					delay.setAffectedAgents(affectedAgents + 1);
+					double affectedAgentUnitsSoFar = delay.getAffectedAgents();
+					delay.setAffectedAgents(affectedAgentUnitsSoFar + affectedAgentUnits);
 				}
 			}
 			for (ExtEffectWaitingDelay delay : this.alightingDelayEffects){
 				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					int affectedAgents = delay.getAffectedAgents();
-					delay.setAffectedAgents(affectedAgents + 1);
+					double affectedAgentUnitsSoFar = delay.getAffectedAgents();
+					delay.setAffectedAgents(affectedAgentUnitsSoFar + affectedAgentUnits);
 				}
 			}
 			for (ExtEffectWaitingDelay delay : this.extraDelayEffects){
 				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					int affectedAgents = delay.getAffectedAgents();
-					delay.setAffectedAgents(affectedAgents + 1);
+					double affectedAgentUnitsSoFar = delay.getAffectedAgents();
+					delay.setAffectedAgents(affectedAgentUnitsSoFar + affectedAgentUnits);
 				}
 			}
-			
+						
 			// remember who was boarding and alighting at this stop.
 			List<Id> agentsTransferingAtThisStop;
 			if (this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null){
@@ -175,6 +202,14 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 			double transferTime = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
 			ExtEffectWaitingDelay delayEffect = startTrackingDelayEffect(event.getVehicleId(), event.getPersonId(), transferTime);
 			this.boardingDelayEffects.add(delayEffect);
+			
+			// update the vehicle delay
+			double delay = this.vehicleId2delay.get(event.getVehicleId()) + this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
+			if (this.vehicleId2isFirstTransfer.get(event.getVehicleId())) {
+				delay = delay + this.doorOpeningTime;
+				this.vehicleId2isFirstTransfer.put(event.getVehicleId(), false);
+			}
+			this.vehicleId2delay.put(event.getVehicleId(), delay);
 		}
 	}
 
@@ -232,7 +267,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 							"Handling of this specific occurence is not implemented. ");
 				}
 			}
-			
+						
 			// remember who was boarding and alighting at this stop.
 			List<Id> agentsTransferingAtThisStop;
 			if (this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null){
@@ -247,6 +282,14 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 			double transferTime = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
 			ExtEffectWaitingDelay delayEffect = startTrackingDelayEffect(event.getVehicleId(), event.getPersonId(), transferTime);
 			this.alightingDelayEffects.add(delayEffect);
+			
+			// update the vehicle delay
+			double delay = this.vehicleId2delay.get(event.getVehicleId()) + this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
+			if (this.vehicleId2isFirstTransfer.get(event.getVehicleId())) {
+				delay = delay + this.doorOpeningTime;
+				this.vehicleId2isFirstTransfer.put(event.getVehicleId(), false);
+			}
+			this.vehicleId2delay.put(event.getVehicleId(), delay);
 		}
 	}
 	
@@ -265,6 +308,8 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		this.vehId2agentsTransferingAtThisStop.remove(event.getVehicleId());
+		this.vehicleId2delay.put(event.getVehicleId(), event.getDelay());
+		this.vehicleId2isFirstTransfer.put(event.getVehicleId(), true);
 	}
 
 	@Override
@@ -284,6 +329,11 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 				}
 			}
 		}	
+	}
+
+	@Override
+	public void handleEvent(AgentWaitingForPtEvent event) {
+		this.personId2startWaitingForPt.put(event.getPersonId(), event.getTime());
 	}
 
 }

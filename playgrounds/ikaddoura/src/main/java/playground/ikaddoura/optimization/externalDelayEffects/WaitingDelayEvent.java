@@ -42,14 +42,14 @@ public final class WaitingDelayEvent extends Event implements HasPersonId {
 	
 	private final Id vehicleId;
 	private final Id personId;
-	private final int affectedAgents;
+	private final double affectedAgentUnits;
 	private final double delay;
 
-	public WaitingDelayEvent(Id personId, Id vehicleId, double time, int delayedPassengers, double externalDelay) {
+	public WaitingDelayEvent(Id personId, Id vehicleId, double time, double delayedPassengers, double externalDelay) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.personId = personId;
-		this.affectedAgents = delayedPassengers;
+		this.affectedAgentUnits = delayedPassengers;
 		this.delay = externalDelay;
 	}
 
@@ -62,8 +62,8 @@ public final class WaitingDelayEvent extends Event implements HasPersonId {
 		return this.vehicleId;
 	}
 
-	public int getAffectedAgents() {
-		return this.affectedAgents;
+	public double getAffectedAgentUnits() {
+		return this.affectedAgentUnits;
 	}
 	
 	public double getDelay() {
@@ -80,7 +80,7 @@ public final class WaitingDelayEvent extends Event implements HasPersonId {
 		Map<String, String> attrs = super.getAttributes();
 		attrs.put(ATTRIBUTE_PERSON, this.personId.toString());
 		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attrs.put(ATTRIBUTE_AFFECTED_AGENTS, Integer.toString(this.affectedAgents));
+		attrs.put(ATTRIBUTE_AFFECTED_AGENTS, Double.toString(this.affectedAgentUnits));
 		attrs.put(ATTRIBUTE_DELAY, Double.toString(this.delay));
 		return attrs;
 	}

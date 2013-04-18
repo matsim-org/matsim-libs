@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.Id;
 public class ExtEffectWaitingDelay {
 	
 	private Id personId;
-	private int affectedAgents;
+	private double affectedAgents;
 	private Id affectedVehicle;
 	private double transferDelay;
 	
@@ -52,11 +52,11 @@ public class ExtEffectWaitingDelay {
 	public void setAffectedVehicle(Id affectedVehicle) {
 		this.affectedVehicle = affectedVehicle;
 	}
-	public int getAffectedAgents() {
+	public double getAffectedAgents() {
 		return affectedAgents;
 	}
-	public void setAffectedAgents(int affectedAgents) {
-		this.affectedAgents = affectedAgents;
+	public void setAffectedAgents(double d) {
+		this.affectedAgents = d;
 	}
 	public Id getPersonId() {
 		return personId;

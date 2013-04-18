@@ -68,7 +68,7 @@ public class MarginalCostPricingHandler implements InVehicleDelayEventHandler, W
 
 	@Override
 	public void handleEvent(WaitingDelayEvent event) {
-		double amount = (event.getDelay() * event.getAffectedAgents() / 3600 ) * this.vtts_waiting;
+		double amount = (event.getDelay() * event.getAffectedAgentUnits() / 3600 ) * this.vtts_waiting;
 		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), amount);
 		this.events.processEvent(moneyEvent);		
 	}

@@ -215,7 +215,7 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 				
 				int affectedAgents = 0;
 				if (!(this.vehId2agentsInBusBeforeStop.get(event.getVehicleId()) == null)){
-					affectedAgents = this.vehId2agentsInBusBeforeStop.get(event.getVehicleId());
+					affectedAgents = this.vehId2agentsInBusBeforeStop.get(event.getVehicleId()) - numberOfAgentsAlighting;
 				}
 				
 				for (Id personId : agentsBoardingAtThisStop){
@@ -232,7 +232,7 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 				
 				int affectedAgents = 0;
 				if (!(this.vehId2passengers.get(event.getVehicleId()) == null)){
-					affectedAgents = this.vehId2passengers.get(event.getVehicleId());
+					affectedAgents = this.vehId2passengers.get(event.getVehicleId()) - numberOfAgentsBoarding;
 				}
 				
 				for (Id personId : agentsAlightingAtThisStop){
