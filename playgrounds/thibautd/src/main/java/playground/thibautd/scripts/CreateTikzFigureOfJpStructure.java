@@ -176,6 +176,20 @@ public class CreateTikzFigureOfJpStructure {
 
 	private static void writeBeginning(
 			final BufferedWriter writer) throws IOException {
+		writer.write( "\\documentclass{article}" );
+		writer.newLine();
+		writer.write( "\\usepackage{tikz}" );
+		writer.write( "\\usepackage[landscape]{geometry}" );
+		writer.newLine();
+		writer.newLine();
+		writer.write( "\\begin{document}" );
+		writer.write( "\\begin{figure}" );
+		writer.write( "\\begin{center}" );
+		writer.newLine();
+		writer.write( "% cut here -----------------------------------------------" );
+		writer.newLine();
+		writer.newLine();
+
 		writer.write( "\\begin{tikzpicture}" );
 		writer.newLine();
 		writer.write( "\\tikzstyle{"+AGENT_STYLE+"}=[rotate=45,anchor=south west]" );
@@ -231,6 +245,13 @@ public class CreateTikzFigureOfJpStructure {
 	private static void writeEnd(
 			final BufferedWriter writer) throws IOException {
 		writer.write( "\\end{tikzpicture}" );
+		writer.newLine();
+		writer.newLine();
+		writer.write( "% cut here -----------------------------------------------" );
+		writer.newLine();
+		writer.write( "\\end{center}" );
+		writer.write( "\\end{figure}" );
+		writer.write( "\\end{document}" );
 	}
 
 	private static List<AgentPlanInfo> parsePlanInfos(
