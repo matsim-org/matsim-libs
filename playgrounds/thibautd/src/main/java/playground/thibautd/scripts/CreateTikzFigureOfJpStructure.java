@@ -178,7 +178,7 @@ public class CreateTikzFigureOfJpStructure {
 			final BufferedWriter writer) throws IOException {
 		writer.write( "\\begin{tikzpicture}" );
 		writer.newLine();
-		writer.write( "\\tikzstyle{"+AGENT_STYLE+"}=[]" );
+		writer.write( "\\tikzstyle{"+AGENT_STYLE+"}=[rotate=45,anchor=south west]" );
 		writer.newLine();
 		writer.write( "\\tikzstyle{"+PLAN_STYLE+"}=[rectangle,draw]" );
 		writer.newLine();
@@ -197,7 +197,8 @@ public class CreateTikzFigureOfJpStructure {
 			writer.newLine();
 			final String pos = last == null ? "" : "[right of="+last+"]";
 			last = info.id;
-			writer.write( "\\node ("+last+") "+pos+" ["+AGENT_STYLE+"] {"+info.id+"};" );
+			writer.write( "\\node ("+last+") "+pos+" {};" );
+			writer.write( "\\node "+pos+" ["+AGENT_STYLE+"] {"+info.id+"};" );
 			writer.newLine();
 			String lastPlan = last;
 			for ( int i=0; i < info.nPlans; i++ ) {
