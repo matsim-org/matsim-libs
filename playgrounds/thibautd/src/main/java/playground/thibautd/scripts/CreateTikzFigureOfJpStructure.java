@@ -25,7 +25,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -127,8 +130,48 @@ public class CreateTikzFigureOfJpStructure {
 	private static void cleanLinks(
 			final List<AgentPlanInfo> planInfos,
 			final List<PlanLinkInfo> planLinkInfo) {
-		// TODO Auto-generated method stub
-		
+		{
+			final Iterator<PlanLinkInfo> iterator = planLinkInfo.iterator();
+			// remove all "back pointing" links
+			while ( iterator.hasNext() ) {
+				final PlanLinkInfo info = iterator.next();
+				if ( pointsBackwards( info , planInfos ) ) iterator.remove();
+			}
+		}
+
+		// sort by order of "to" link
+		Collections.sort(
+				planLinkInfo,
+				new Comparator<PlanLinkInfo>() {
+					@Override
+					public int compare(
+							final PlanLinkInfo l1,
+							final PlanLinkInfo l2) {
+						for ( AgentPlanInfo agent : planInfos ) {
+							if ( l1.id2.equals( agent.id ) ) return -1;
+							if ( l2.id2.equals( agent.id ) ) return 1;
+						}
+						return 0;
+					}
+				});
+
+		// only keep the first link leaving each plan
+		final Set<String> knownPlans = new HashSet<String>();
+		final Iterator<PlanLinkInfo> iterator = planLinkInfo.iterator();
+		while ( iterator.hasNext() ) {
+			final PlanLinkInfo curr = iterator.next();
+			if ( !knownPlans.add( planId( curr.id1 , curr.plan1 ) ) ) iterator.remove();
+		}
+	}
+
+	private static boolean pointsBackwards(
+			final PlanLinkInfo info,
+			final List<AgentPlanInfo> planInfos) {
+		for ( AgentPlanInfo agent : planInfos ) {
+			if ( agent.id.equals( info.id1 ) ) return false;
+			if ( agent.id.equals( info.id2 ) ) return true;
+		}
+		throw new RuntimeException();
 	}
 
 	private static void writeBeginning(
