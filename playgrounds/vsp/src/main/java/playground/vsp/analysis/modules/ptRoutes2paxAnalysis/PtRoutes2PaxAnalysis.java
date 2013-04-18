@@ -125,20 +125,20 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 		Volume v;
 		try {
 			//create header
-			w.write("index;stopId;name;");
+			w.write("index;stopId;name");
 			for(int i = 0; i < (maxSlice + 1); i++){
-				w.write(String.valueOf(i) + ";");
+				w.write(";" + String.valueOf(i));
 			}
 			w.write("\n");
 			// write numbers for stops in the correct order
 			for(int i = 0; i < transitRoute.getStops().size(); i++){
 				stopId = new IdImpl(i);
 				c = counts.getCount(stopId);
-				w.write(String.valueOf(i) + ";" + c.getCsId() + ";" + transitRoute.getStops().get(i).getStopFacility().getName() + ";");
+				w.write(String.valueOf(i) + ";" + c.getCsId() + ";" + transitRoute.getStops().get(i).getStopFacility().getName());
 				for(int j = 0; j < (maxSlice + 1); j++){
 					v = c.getVolume(j);
 					String value = (v == null) ? "--" : String.valueOf(v.getValue());
-					w.write(value + ";");
+					w.write(";" + value);
 				}
 				w.write("\n");
 			}

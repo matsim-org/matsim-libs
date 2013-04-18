@@ -96,9 +96,9 @@ public class CreateRscript {
 			w.write("pdf(\"" + lineId.toString() + "--" + routeId.toString() + ".pdf\")\n\n");
 			w.write(readAndPlotSingleFile(outDir, lineId.toString() + "--" + routeId.toString(), "boarding"));
 			w.write(readAndPlotSingleFile(outDir, lineId.toString() + "--" + routeId.toString(), "alighting"));
-			w.write(readAndPlotSingleFile(outDir, lineId.toString() + "--" + routeId.toString(), "capacity"));
 			w.write(readAndPlotSingleFile(outDir, lineId.toString() + "--" + routeId.toString(), "totalPax"));
 			w.write(readAndPlotSingleFile(outDir, lineId.toString() + "--" + routeId.toString(), "occupancy"));
+			w.write(readAndPlotSingleFile(outDir, lineId.toString() + "--" + routeId.toString(), "capacity"));
 			w.write("dev.off()");
 			w.flush();
 			w.close();

@@ -50,7 +50,7 @@ public class AnalysisVehicle {
 	public void personBoards(){
 		this.seatsOccupied++;
 		if(this.seatsOccupied > this.capacity){
-			log.warn("vehicle " + this.id + ", the number of seats occupied is bigger than the capacity!");
+			log.warn("vehicle " + this.id + ", the number of seats occupied (" + this.seatsOccupied + ") is bigger than the capacity (" + this.capacity + ")!");
 		}
 	}
 	
