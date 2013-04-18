@@ -31,12 +31,15 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -48,7 +51,7 @@ import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccu
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
-public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandlers implements ScoringListener {
+public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandlers implements ScoringListener, AgentStuckEventHandler {
 
 	private final ParkingPersonalBetas parkingPersonalBetas;
 
@@ -286,6 +289,11 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 
 		Double parkingArrivalTime = lastParkingArrivalTimeOfDay.get(personId);
 		
+		if (parkingArrivalTime==null || firstParkingDepartureTimeOfDay.get(personId)==null){
+			PlanBasedWithinDayAgent planBasedWithinDayAgent = agents.get(personId);
+			//System.out.println();
+		}
+		
 		double lastParkingActivityDurationOfDay = GeneralLib.getIntervalDuration(parkingArrivalTime,
 				firstParkingDepartureTimeOfDay.get(personId));
 
@@ -348,6 +356,14 @@ public class ParkingScoreManager extends LayerForAddingDataCollectionEventHandle
 	public void setParkingAnalysisHandler(ParkingAnalysisHandler parkingAnalysisHandler) {
 		this.parkingAnalysisHandler = parkingAnalysisHandler;
 	}
+
+	@Override
+	public void handleEvent(AgentStuckEvent event) {
+		System.out.println();
+		
+	}
+
+
 
 	
 

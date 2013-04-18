@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -203,6 +204,14 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		Id personId = event.getPersonId();
 		
 		updateCurrentPlanElementIndex(personId);
+		
+		if (agents.get(personId).getCurrentPlanElement() instanceof ActivityImpl){
+			//DebugLib.emptyFunctionForSettingBreakPoint();
+		}else {
+			//DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
+		
 		
 		double time = event.getTime();
 		
