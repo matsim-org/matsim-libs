@@ -114,7 +114,8 @@ public class WithinDayParkingController extends WithinDayController implements R
 	protected void initIdentifiers() {
  
 		LinkedList<FullParkingSearchStrategy> linkedList = new LinkedList<FullParkingSearchStrategy>();
-		this.parkingSearchIdentifier = new ParkingSearchIdentifier_v2((ParkingAgentsTracker_v2) parkingAgentsTracker, parkingInfrastructure,linkedList); 
+		this.parkingSearchIdentifier = new ParkingSearchIdentifier_v2((ParkingAgentsTracker_v2) parkingAgentsTracker, parkingInfrastructure, 
+				linkedList, this.getEvents()); 
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingSearchIdentifier);
 	}
 	

@@ -29,7 +29,6 @@ import org.matsim.core.controler.Controler;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 public class ParkingOccupancyStats {
 
