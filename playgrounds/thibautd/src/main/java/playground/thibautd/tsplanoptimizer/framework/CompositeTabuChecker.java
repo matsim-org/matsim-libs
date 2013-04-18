@@ -27,24 +27,24 @@ import java.util.List;
  * A move is tabu if it is tabu for a least one registered TabuChecker.
  * @author thibautd
  */
-public class CompositeTabuChecker implements TabuChecker {
-	private final List<TabuChecker> checkers = new ArrayList<TabuChecker>();
+public class CompositeTabuChecker<T> implements TabuChecker<T> {
+	private final List<TabuChecker<T>> checkers = new ArrayList<TabuChecker<T>>();
 
 	@Override
 	public void notifyMove(
-			final Solution solution,
+			final Solution<? extends T> solution,
 			final Move move,
 			final double score) {
-		for (TabuChecker checker : checkers) {
+		for (TabuChecker<T> checker : checkers) {
 			checker.notifyMove( solution , move , score );
 		}
 	}
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<? extends T> solution,
 			final Move move) {
-		for (TabuChecker checker : checkers) {
+		for (TabuChecker<T> checker : checkers) {
 			if (checker.isTabu( solution , move )) {
 				return true;
 			}
@@ -52,7 +52,7 @@ public class CompositeTabuChecker implements TabuChecker {
 		return false;
 	}
 
-	public void add(final TabuChecker checker) {
+	public void add(final TabuChecker<T> checker) {
 		checkers.add( checker );
 	}
 }

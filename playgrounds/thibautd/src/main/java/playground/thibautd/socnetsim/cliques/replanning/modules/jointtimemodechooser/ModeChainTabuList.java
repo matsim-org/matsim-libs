@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtimemodechooser.JointTimeModeChooserSolution.SubtourValue;
+import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.tsplanoptimizer.framework.Move;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
@@ -32,7 +33,7 @@ import playground.thibautd.tsplanoptimizer.framework.Value;
 /**
  * @author thibautd
  */
-public class ModeChainTabuList implements TabuChecker {
+public class ModeChainTabuList implements TabuChecker<JointPlan> {
 	private final LinkedList<List<Value>> tabuChains = new LinkedList<List<Value>>();
 	private final int size;
 
@@ -42,11 +43,11 @@ public class ModeChainTabuList implements TabuChecker {
 
 	@Override
 	public void notifyMove(
-			final Solution currentSolution,
+			final Solution<? extends JointPlan> currentSolution,
 			final Move toApply,
 			final double resultingFitness) {
 		if (toApply instanceof SubtourAndParentsModeMove) {
-			Solution newSolution = toApply.apply( currentSolution );
+			Solution<? extends JointPlan> newSolution = toApply.apply( currentSolution );
 			tabuChains.add( getChain( newSolution ) );
 		}
 		else {
@@ -58,10 +59,10 @@ public class ModeChainTabuList implements TabuChecker {
 		}
 	}
 
-	private final static List<Value> getChain(final Solution sol) {
+	private final static List<Value> getChain(final Solution<? extends JointPlan> sol) {
 		final List<Value> subtourValues = new ArrayList<Value>();
 
-		for (Value val : sol.getRepresentation()) {
+		for (Value val : sol.getGenotype()) {
 			if (val instanceof SubtourValue) {
 				subtourValues.add( val.createClone() );
 			}
@@ -72,7 +73,7 @@ public class ModeChainTabuList implements TabuChecker {
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<? extends JointPlan> solution,
 			final Move move) {
 		if (move instanceof SubtourAndParentsModeMove) {
 			// only forbid *mode* moves creating a tabu mode chain

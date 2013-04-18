@@ -28,7 +28,7 @@ import java.util.LinkedList;
  *
  * @author thibautd
  */
-public class MoveTabuList implements TabuChecker {
+public class MoveTabuList<T> implements TabuChecker<T> {
 	private final LinkedList<Move> tabuMoves = new LinkedList<Move>();
 	private final int capacity;
 
@@ -42,7 +42,7 @@ public class MoveTabuList implements TabuChecker {
 
 	@Override
 	public void notifyMove(
-			final Solution solution,
+			final Solution<? extends T> solution,
 			final Move move,
 			final double newFitness) {
 		while (tabuMoves.size() >= capacity) {
@@ -58,7 +58,7 @@ public class MoveTabuList implements TabuChecker {
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<? extends T> solution,
 			final Move move) {
 		return tabuMoves.contains( move );
 	}

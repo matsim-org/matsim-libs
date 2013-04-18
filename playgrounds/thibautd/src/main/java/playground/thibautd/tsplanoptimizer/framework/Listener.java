@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointInvalidValueChecker.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,44 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.cliques.replanning.modules.jointtimemodechooser;
 
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.tsplanoptimizer.framework.Move;
-import playground.thibautd.tsplanoptimizer.framework.Solution;
-import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
-import playground.thibautd.tsplanoptimizer.framework.Value;
+package playground.thibautd.tsplanoptimizer.framework;
 
 /**
+ * marker interface
  * @author thibautd
+ *
  */
-public class JointInvalidValueChecker implements TabuChecker<JointPlan> {
-
-	@Override
-	public void notifyMove(
-			final Solution<? extends JointPlan> solution,
-			final Move move,
-			final double newScore) {
-		// nothing to do
-	}
-
-	@Override
-	public boolean isTabu(
-			final Solution<? extends JointPlan> solution,
-			final Move move) {
-		JointTimeModeChooserSolution result =
-			(JointTimeModeChooserSolution) move.apply( solution );
-		for (Value val : result.getGenotype()) {
-			Object value = val.getValue();
-
-			if (value instanceof Integer) {
-				if (((Integer) value) < 0) {
-					return true;
-				}
-			}
-		}
-
-		return !result.respectsModeConstraints() || !result.fitsInScenarioDuration();
-	}
+public interface Listener<T> {
 }
 

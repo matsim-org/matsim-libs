@@ -60,8 +60,8 @@ public class TimeModeChooserSolutionTest {
 	public void testClone() throws Exception {
 		for (Plan p : testPlans) {
 			TimeModeChooserSolution sol = new TimeModeChooserSolution( p , new TripRouter() );
-			Iterator<? extends Value> cloned = sol.getRepresentation().iterator();
-			Iterator<? extends Value> clone = sol.createClone().getRepresentation().iterator();
+			Iterator<? extends Value> cloned = sol.getGenotype().iterator();
+			Iterator<? extends Value> clone = sol.createClone().getGenotype().iterator();
 
 			while (cloned.hasNext()) {
 				assertTrue(

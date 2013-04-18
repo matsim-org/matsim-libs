@@ -61,7 +61,7 @@ import playground.thibautd.utils.RoutingUtils;
  *
  * @author thibautd
  */
-public class JointTimeModeChooserSolution implements Solution {
+public class JointTimeModeChooserSolution implements Solution<JointPlan> {
 	private static final Logger log =
 		Logger.getLogger(JointTimeModeChooserSolution.class);
 
@@ -110,7 +110,7 @@ public class JointTimeModeChooserSolution implements Solution {
 	}
 
 	@Override
-	public List<? extends Value> getRepresentation() {
+	public List<? extends Value> getGenotype() {
 		return values.flattenValues();
 	}
 
@@ -149,7 +149,7 @@ public class JointTimeModeChooserSolution implements Solution {
 					}
 					if (chainBasedModes.contains( val.getValue() )) {
 						int parent = ((SubtourValue) val).getParentSubtourValueIndex();
-						List<? extends Value> representation = getRepresentation();
+						List<? extends Value> representation = getGenotype();
 						while (parent >= 0) {
 							SubtourValue parVal = (SubtourValue) representation.get( parent );
 							if ( !parVal.getValue().equals( val.getValue() ) ) {
@@ -186,11 +186,7 @@ public class JointTimeModeChooserSolution implements Solution {
 	}
 
 	@Override
-	public Plan getRepresentedPlan() {
-		throw new UnsupportedOperationException( "use getRepresentedJointPlan()" );
-	}
-
-	public JointPlan getRepresentedJointPlan() {
+	public JointPlan getPhenotype() {
 		//log.warn( "TODO: synchronisation! (do it in a joint router?)" );
 		Iterator<List<Value>> individualValues = values.values.iterator();
 		Iterator<List<PlanElement>> individualElements =  values.associatedPlanElements.iterator();
@@ -233,7 +229,7 @@ public class JointTimeModeChooserSolution implements Solution {
 	}
 
 	@Override
-	public Solution createClone() {
+	public JointTimeModeChooserSolution createClone() {
 		List<List<Value>> newValues = new ArrayList<List<Value>>();
 
 		for (List<Value> individualValues : values.values) {

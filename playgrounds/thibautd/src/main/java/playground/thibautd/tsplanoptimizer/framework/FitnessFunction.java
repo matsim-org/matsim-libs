@@ -23,12 +23,12 @@ package playground.thibautd.tsplanoptimizer.framework;
  * Scores a solution
  * @author thibautd
  */
-public interface FitnessFunction {
+public interface FitnessFunction<T> extends Listener<T> {
 	/**
 	 * Computes the score
 	 * @param solution the solution to score
 	 * @return the score
 	 */
-	public double computeFitnessValue( Solution solution );
+	public double computeFitnessValue( Solution<? extends T> solution );
 }
 

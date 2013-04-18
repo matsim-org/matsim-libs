@@ -48,7 +48,7 @@ import playground.thibautd.utils.RoutingUtils;
  *
  * @author thibautd
  */
-public class TimeModeChooserSolution implements Solution {
+public class TimeModeChooserSolution implements Solution<Plan> {
 	private final Plan plan;
 	private final PlanRouter planRouter;
 	private final MainModeIdentifier mainModeIdentifier;
@@ -89,12 +89,12 @@ public class TimeModeChooserSolution implements Solution {
 	}
 
 	@Override
-	public List<? extends Value> getRepresentation() {
+	public List<? extends Value> getGenotype() {
 		return values.values;
 	}
 
 	@Override
-	public Plan getRepresentedPlan() {
+	public Plan getPhenotype() {
 		Iterator<Value> valuesIter = values.values.iterator();
 		Iterator<PlanElement> elementsIter = values.associatedPlanElements.iterator();
 
@@ -126,7 +126,7 @@ public class TimeModeChooserSolution implements Solution {
 	}
 
 	@Override
-	public Solution createClone() {
+	public TimeModeChooserSolution createClone() {
 		List<Value> newValues = new ArrayList<Value>();
 
 		for (Value val : values.values) {

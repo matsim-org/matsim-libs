@@ -41,14 +41,14 @@ public class SubtourAndParentsModeMoveGenerator implements MoveGenerator {
 
 	public SubtourAndParentsModeMoveGenerator(
 			final Random random,
-			final Solution initialSolution,
+			final Solution<?> initialSolution,
 			final Collection<String> modes,
 			final double fraction) {
 		this.random = random;
 		List<Move> movesList = new ArrayList<Move>();
 
 		int i=0;
-		for (Value value : initialSolution.getRepresentation()) {
+		for (Value value : initialSolution.getGenotype()) {
 			if (value instanceof SubtourValue) {
 				for (String mode : modes) {
 					movesList.add( new SubtourAndParentsModeMove( i , mode ) );

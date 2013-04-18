@@ -31,7 +31,7 @@ import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
  *
  * @author thibautd
  */
-public class DirectionTabuList implements TabuChecker {
+public class DirectionTabuList<T> implements TabuChecker<T> {
 	private final LinkedList<Direction> tabuList = new LinkedList<Direction>();
 	private final int capacity;
 
@@ -41,7 +41,7 @@ public class DirectionTabuList implements TabuChecker {
 
 	@Override
 	public void notifyMove(
-			final Solution solution,
+			final Solution<? extends T> solution,
 			final Move move,
 			final double newFitness) {
 		if (move != null && move instanceof IntegerValueChanger) {
@@ -59,7 +59,7 @@ public class DirectionTabuList implements TabuChecker {
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<? extends T> solution,
 			final Move move) {
 		if (move instanceof IntegerValueChanger) {
 			return tabuList.contains( new Direction( move ) );

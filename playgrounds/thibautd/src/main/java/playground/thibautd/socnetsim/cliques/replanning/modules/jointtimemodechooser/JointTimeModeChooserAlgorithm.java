@@ -116,8 +116,8 @@ public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<Joint
 					//config.isDebugMode() ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
 
 		// first run without synchro
-		TabuSearchConfiguration configuration = new TabuSearchConfiguration();
-		Solution initialSolution = new JointTimeModeChooserSolution(
+		TabuSearchConfiguration<JointPlan> configuration = new TabuSearchConfiguration<JointPlan>();
+		Solution<JointPlan> initialSolution = new JointTimeModeChooserSolution(
 						jointPlan,
 						new JointPlanRouterFactory( ((ScenarioImpl) scenario).getActivityFacilities()),
 						estimatorRouterFactory.createTripRouter());
@@ -125,11 +125,11 @@ public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<Joint
 				false,
 				initialSolution,
 				configuration );
-		Solution bestSolution = runTabuSearch( configuration , initialSolution );
+		Solution<JointPlan> bestSolution = runTabuSearch( configuration , initialSolution );
 
 		if (jointPlan.getIndividualPlans().size() > 1) {
 			// then start at the found solution and synchronize
-			configuration = new TabuSearchConfiguration();
+			configuration = new TabuSearchConfiguration<JointPlan>();
 			builder.buildConfiguration(
 					true,
 					bestSolution,
@@ -140,7 +140,7 @@ public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<Joint
 		// two goals here:
 		// 1- the side effect: getRepresentedPlan sets the plan to the represented state
 		// 2- the obvious check
-		if (((JointTimeModeChooserSolution) bestSolution).getRepresentedJointPlan() != jointPlan) {
+		if ( bestSolution.getPhenotype() != jointPlan) {
 			throw new RuntimeException( "the returned plan is not the input plan" );
 		}
 	}

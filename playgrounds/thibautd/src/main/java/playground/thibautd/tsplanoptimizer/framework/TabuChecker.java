@@ -24,13 +24,13 @@ package playground.thibautd.tsplanoptimizer.framework;
  * any criterion to mark a move as tabu.
  * @author thibautd
  */
-public interface TabuChecker extends AppliedMoveListener {
+public interface TabuChecker<T> extends AppliedMoveListener<T> {
 	/**
 	 * Says if a move is tabu.
 	 * @param solution the solution before the move
 	 * @param move the to apply
 	 * @return true if the move is tabu, false otherwise
 	 */
-	public boolean isTabu( Solution solution , Move move );
+	public boolean isTabu( Solution<? extends T> solution , Move move );
 }
 

@@ -32,7 +32,7 @@ public interface Move {
 	 * @param solution the solution to start from. The instance must not be modified!
 	 * @return a <b>new</b> instance representing the modified solution.
 	 */
-	public Solution apply( Solution solution );
+	public <T> Solution<T> apply( Solution<T> solution );
 
 	/**
 	 * Gives access to the reverse move. The reverse move <tt>-m</tt> for a given move

@@ -23,12 +23,12 @@ package playground.thibautd.tsplanoptimizer.framework;
  * An interface for objects needing to be notified of the start of the iterations.
  * @author thibautd
  */
-public interface StartListener {
+public interface StartListener<T> extends Listener<T> {
 	/**
 	 * called before the search process starts.
 	 * @param startSolution the initial solution
 	 * @param startScore the fitness of the initial solution
 	 */
-	public void notifyStart( final Solution startSolution , final double startScore );
+	public void notifyStart( final Solution<? extends T> startSolution , final double startScore );
 }
 

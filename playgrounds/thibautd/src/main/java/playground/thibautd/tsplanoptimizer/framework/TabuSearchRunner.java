@@ -22,13 +22,6 @@ package playground.thibautd.tsplanoptimizer.framework;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.NetworkRoute;
-
 /**
  * Class responsible for running the tabu search defined by tuning
  * a {@link TabuSearchConfiguration}.
@@ -39,28 +32,25 @@ import org.matsim.core.population.routes.NetworkRoute;
  * @author thibautd
  */
 public final class TabuSearchRunner {
-	private static final Logger log =
-		Logger.getLogger(TabuSearchRunner.class);
-
 	private TabuSearchRunner() {}
 
-	public static Solution runTabuSearch(
-			final TabuSearchConfiguration configuration,
-			final Solution initialSolution ) {
+	public static <T> Solution<T> runTabuSearch(
+			final TabuSearchConfiguration<T> configuration,
+			final Solution<T> initialSolution ) {
 		// get the elements
 		// -----------------------------------------------------------
-		EvolutionMonitor monitor = configuration.getEvolutionMonitor();
+		EvolutionMonitor<T> monitor = configuration.getEvolutionMonitor();
 		MoveGenerator moveGenerator = configuration.getMoveGenerator();
-		TabuChecker tabu = configuration.getTabuChecker();
-		FitnessFunction fitness = configuration.getFitnessFunction();
-		List<AppliedMoveListener> listeners = configuration.getAppliedMoveListeners();
+		TabuChecker<T> tabu = configuration.getTabuChecker();
+		FitnessFunction<T> fitness = configuration.getFitnessFunction();
+		List<AppliedMoveListener<T>> listeners = configuration.getAppliedMoveListeners();
 
-		Solution currentSolution = initialSolution;
+		Solution<T> currentSolution = initialSolution;
 
-		Solution currentBestSolution = currentSolution.createClone();
+		Solution<T> currentBestSolution = currentSolution.createClone();
 		double currentBestScore = fitness.computeFitnessValue( currentBestSolution );
 
-		for (StartListener listener : configuration.getStartListeners()) {
+		for (StartListener<T> listener : configuration.getStartListeners()) {
 			listener.notifyStart( currentSolution , currentBestScore );
 		}
 
@@ -70,7 +60,7 @@ public final class TabuSearchRunner {
 			iteration++;
 			double iterationBestScore = Double.NEGATIVE_INFINITY;
 			Move iterationBestMove = null;
-			Solution iterationBestSolution = null;
+			Solution<T> iterationBestSolution = null;
 			Collection<Move> moves = moveGenerator.generateMoves();
 			
 			// for each move, if not tabu, generate the solution, and cache the
@@ -78,7 +68,7 @@ public final class TabuSearchRunner {
 			// -----------------------------------------------------------------
 			for (Move move : moves) {
 				if (!tabu.isTabu( currentSolution , move )) {
-					Solution newSolution = move.apply( currentSolution );
+					Solution<T> newSolution = move.apply( currentSolution );
 					double newScore = fitness.computeFitnessValue( newSolution );
 
 					if (newScore > iterationBestScore) {
@@ -87,7 +77,6 @@ public final class TabuSearchRunner {
 						iterationBestScore = newScore;
 					}
 					else if (Double.isNaN( newScore ) || Double.isInfinite( newScore )) {
-						logInvalidSolution( newSolution );
 						throw new RuntimeException( "got invalid score: "+newScore );
 					}
 				}
@@ -96,7 +85,7 @@ public final class TabuSearchRunner {
 			// now, we know the move to apply: notify it to all registered
 			// listeners
 			// -----------------------------------------------------------------
-			for (AppliedMoveListener listener : listeners) {
+			for (AppliedMoveListener<T> listener : listeners) {
 				// this includes the tabu checker.
 				listener.notifyMove( currentSolution , iterationBestMove , iterationBestScore );
 			}
@@ -115,31 +104,11 @@ public final class TabuSearchRunner {
 		}
 		while ( monitor.continueIterations( iteration , currentBestSolution , currentBestScore ) );
 
-		for (EndListener listener : configuration.getEndListeners()) {
+		for (EndListener<T> listener : configuration.getEndListeners()) {
 			listener.notifyEnd( currentSolution , currentBestScore , iteration );
 		}
 
 		return currentBestSolution;
-	}
-
-	/**
-	 * Helps debuging: logs all plan elements of a plan getting an incorrect score.
-	 */
-	private static void logInvalidSolution(final Solution newSolution) {
-		log.error( "INVALID SOLUTION!" );
-		int i=0;
-		for (PlanElement pe : newSolution.getRepresentedPlan().getPlanElements()) {
-			log.error( (++i)+": "+pe );
-			if (pe instanceof Leg) {
-				Route route = ((Leg) pe).getRoute();
-				if (route instanceof GenericRoute) {
-					log.error( "     "+((GenericRoute) route).getRouteType()+" from "+route.getStartLinkId()+" to "+route.getEndLinkId()+": "+((GenericRoute) route).getRouteDescription() );
-				}
-				else if (route instanceof NetworkRoute) {
-					log.error( "     "+route.getClass().getSimpleName()+" from "+route.getStartLinkId()+" to "+route.getEndLinkId()+": "+((NetworkRoute) route).getLinkIds() );
-				}
-			}
-		}
 	}
 }
 

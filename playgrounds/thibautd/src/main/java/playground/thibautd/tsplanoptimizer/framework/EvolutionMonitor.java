@@ -24,7 +24,7 @@ package playground.thibautd.tsplanoptimizer.framework;
  * or not.
  * @author thibautd
  */
-public interface EvolutionMonitor {
+public interface EvolutionMonitor<T> extends Listener<T> {
 	/**
 	 * Method called after each iteration
 	 * @param iteration the number of the iteration which just finishes (starts at 0)
@@ -34,7 +34,7 @@ public interface EvolutionMonitor {
 	 */
 	public boolean continueIterations(
 			final int iteration,
-			final Solution currentBest,
+			final Solution<? extends T> currentBest,
 			final double currentBestScore);
 }
 

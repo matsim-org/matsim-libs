@@ -23,14 +23,14 @@ package playground.thibautd.tsplanoptimizer.framework;
  * Inteface to implement to be notified of the state at the end of the optimisation.
  * @author thibautd
  */
-public interface EndListener {
+public interface EndListener<T> extends Listener<T> {
 	/**
 	 * @param bestSolution the best solution found in the search
 	 * @param bestScore the score of the solution
 	 * @param nIterations the number of iterations after which the search was stopped
 	 */
 	public void notifyEnd(
-			final Solution bestSolution,
+			final Solution<? extends T> bestSolution,
 			final double bestScore,
 			final int nIterations);
 }

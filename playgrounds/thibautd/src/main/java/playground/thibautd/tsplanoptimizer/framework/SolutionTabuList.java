@@ -22,13 +22,13 @@ package playground.thibautd.tsplanoptimizer.framework;
 import java.util.LinkedList;
 
 /**
- * The most basic tabu list, which forbids to come bach to an already examined
+ * The most basic tabu list, which forbids to come back to an already examined
  * solution.
  *
  * @author thibautd
  */
-public class SolutionTabuList implements TabuChecker {
-	private final LinkedList<Solution> tabuList = new LinkedList<Solution>();
+public class SolutionTabuList implements TabuChecker<Object> {
+	private final LinkedList<Solution<?>> tabuList = new LinkedList<Solution<?>>();
 	private final int capacity;
 
 	/**
@@ -41,7 +41,7 @@ public class SolutionTabuList implements TabuChecker {
 
 	@Override
 	public void notifyMove(
-			final Solution solution,
+			final Solution<?> solution,
 			final Move move,
 			final double newFitness) {
 		while (tabuList.size() >= capacity) {
@@ -54,7 +54,7 @@ public class SolutionTabuList implements TabuChecker {
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<?> solution,
 			final Move move) {
 		return tabuList.contains( move.apply( solution ) );
 	}

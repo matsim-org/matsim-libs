@@ -26,7 +26,7 @@ package playground.thibautd.tsplanoptimizer.framework;
  *
  * @author thibautd
  */
-public interface AppliedMoveListener {
+public interface AppliedMoveListener<T> extends Listener<T> {
 	/**
 	 * Notifies the application of a move.
 	 * @param currentSolution the solution before application of the move
@@ -34,6 +34,6 @@ public interface AppliedMoveListener {
 	 * if the whole neighborhood is tabu.
 	 * @param resultingFitness the fitness resulting from the move
 	 */
-	public void notifyMove( Solution currentSolution , Move toApply , double resultingFitness );
+	public void notifyMove( Solution<? extends T> currentSolution , Move toApply , double resultingFitness );
 }
 

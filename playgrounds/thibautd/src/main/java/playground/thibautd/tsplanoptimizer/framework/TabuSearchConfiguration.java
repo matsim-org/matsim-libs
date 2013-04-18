@@ -29,16 +29,15 @@ import java.util.Random;
  * this class is just a container.
  * @author thibautd
  */
-public final class TabuSearchConfiguration {
-	private List<AppliedMoveListener> appliedMoveListeners = new ArrayList<AppliedMoveListener>();
-	private List<StartListener> startListeners = new ArrayList<StartListener>();
-	private List<EndListener> endListeners = new ArrayList<EndListener>();
+public final class TabuSearchConfiguration<T> {
+	private List<AppliedMoveListener<T>> appliedMoveListeners = new ArrayList<AppliedMoveListener<T>>();
+	private List<StartListener<T>> startListeners = new ArrayList<StartListener<T>>();
+	private List<EndListener<T>> endListeners = new ArrayList<EndListener<T>>();
 	private Random random = null;
 	private MoveGenerator moveGenerator = null;
-	private TabuChecker tabuChecker = null;
-	private FitnessFunction fitnessFunction = null;
-	private Solution initialSolution = null;
-	private EvolutionMonitor evolutionMonitor = null;
+	private TabuChecker<T> tabuChecker = null;
+	private FitnessFunction<T> fitnessFunction = null;
+	private EvolutionMonitor<T> evolutionMonitor = null;
 
 	private boolean locked = false;
 
@@ -66,26 +65,26 @@ public final class TabuSearchConfiguration {
 		return old;
 	}
 
-	public TabuChecker getTabuChecker() {
+	public TabuChecker<T> getTabuChecker() {
 		lock();
 		return tabuChecker;
 	}
 
-	public TabuChecker setTabuChecker(final TabuChecker tabuChecker) {
+	public TabuChecker<T> setTabuChecker(final TabuChecker<T> tabuChecker) {
 		checkLock();
-		TabuChecker old = this.tabuChecker;
+		TabuChecker<T> old = this.tabuChecker;
 		this.tabuChecker = tabuChecker;
 		return old;
 	}
 
-	public FitnessFunction getFitnessFunction() {
+	public FitnessFunction<T> getFitnessFunction() {
 		lock();
 		return fitnessFunction;
 	}
 
-	public FitnessFunction setFitnessFunction(final FitnessFunction fitnessFunction) {
+	public FitnessFunction<T> setFitnessFunction(final FitnessFunction<T> fitnessFunction) {
 		checkLock();
-		FitnessFunction old = this.fitnessFunction;
+		FitnessFunction<T> old = this.fitnessFunction;
 		this.fitnessFunction = fitnessFunction;
 		return old;
 	}
@@ -97,43 +96,43 @@ public final class TabuSearchConfiguration {
 	 * This method is called automatically on all fields at locking.
 	 * @param listener
 	 */
-	public void addListener(final Object listener) {
+	public void addListener(final Listener<T> listener) {
 		checkLock();
 		if (listener instanceof AppliedMoveListener) {
-			appliedMoveListeners.add( (AppliedMoveListener) listener );
+			appliedMoveListeners.add( (AppliedMoveListener<T>) listener );
 		}
 		if (listener instanceof StartListener) {
-			startListeners.add( (StartListener) listener );
+			startListeners.add( (StartListener<T>) listener );
 		}
 		if (listener instanceof EndListener) {
-			endListeners.add( (EndListener) listener );
+			endListeners.add( (EndListener<T>) listener );
 		}
 	}
 
-	public List<AppliedMoveListener> getAppliedMoveListeners() {
+	public List<AppliedMoveListener<T>> getAppliedMoveListeners() {
 		lock();
 		return appliedMoveListeners;
 	}
 
-	public List<StartListener> getStartListeners() {
+	public List<StartListener<T>> getStartListeners() {
 		lock();
 		return startListeners;
 	}
 
-	public List<EndListener> getEndListeners() {
+	public List<EndListener<T>> getEndListeners() {
 		lock();
 		return endListeners;
 	}
 
-	public EvolutionMonitor setEvolutionMonitor(
-			final EvolutionMonitor evolutionMonitor) {
+	public EvolutionMonitor<T> setEvolutionMonitor(
+			final EvolutionMonitor<T> evolutionMonitor) {
 		checkLock();
-		EvolutionMonitor old = this.evolutionMonitor;
+		EvolutionMonitor<T> old = this.evolutionMonitor;
 		this.evolutionMonitor = evolutionMonitor;
 		return old;
 	}
 
-	public EvolutionMonitor getEvolutionMonitor() {
+	public EvolutionMonitor<T> getEvolutionMonitor() {
 		lock();
 		return evolutionMonitor;
 	}
@@ -146,11 +145,11 @@ public final class TabuSearchConfiguration {
 		if (!locked) {
 			// add all registered field to the listener list.
 			// this is safe, as they cannot be modified from now on.
-			addListener( random );
+			//addListener( random );
 			addListener( tabuChecker );
-			addListener( moveGenerator );
+			//addListener( moveGenerator );
 			addListener( fitnessFunction );
-			addListener( initialSolution );
+			//addListener( initialSolution );
 			addListener( evolutionMonitor );
 
 			locked = true;

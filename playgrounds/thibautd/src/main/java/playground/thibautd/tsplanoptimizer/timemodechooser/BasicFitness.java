@@ -36,7 +36,7 @@ import playground.thibautd.tsplanoptimizer.framework.Solution;
  *
  * @author thibautd
  */
-public class BasicFitness implements FitnessFunction {
+public class BasicFitness implements FitnessFunction<Plan> {
 	private static final Logger log =
 		Logger.getLogger(BasicFitness.class);
 
@@ -52,10 +52,10 @@ public class BasicFitness implements FitnessFunction {
 	}
 
 	@Override
-	public double computeFitnessValue(final Solution solution) {
+	public double computeFitnessValue(final Solution<? extends Plan> solution) {
 		double score;
 
-		Plan plan = solution.getRepresentedPlan();
+		Plan plan = solution.getPhenotype();
 
 		ScoringFunction scoringFunction = factory.createNewScoringFunction( plan );
 

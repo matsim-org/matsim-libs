@@ -89,17 +89,17 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 		//			DEBUG ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
 
 		// tune the configuration
-		TabuSearchConfiguration configuration = new TabuSearchConfiguration();
-		Solution initialSolution =
+		TabuSearchConfiguration<Plan> configuration = new TabuSearchConfiguration<Plan>();
+		Solution<Plan> initialSolution =
 			new TimeModeChooserSolution(
 					plan,
 					tripRouterFactory.createTripRouter() );
 
-		FitnessFunction fitness = new BasicFitness( scoringFunctionFactory );
+		FitnessFunction<Plan> fitness = new BasicFitness( scoringFunctionFactory );
 		configuration.setFitnessFunction( fitness );
 
 		configuration.setEvolutionMonitor(
-				new ImprovementDelayMonitor(
+				new ImprovementDelayMonitor<Plan>(
 					IMPROVEMENT_DELAY,
 					N_ITER ));
 
@@ -113,27 +113,27 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 					POSSIBLE_MODES) );
 		configuration.setMoveGenerator( generator );
 
-		CompositeTabuChecker tabuChecker = new CompositeTabuChecker();
-		tabuChecker.add( new DirectionTabuList( N_TABU_DIRECTION ) );
+		CompositeTabuChecker<Plan> tabuChecker = new CompositeTabuChecker<Plan>();
+		tabuChecker.add( new DirectionTabuList<Plan>( N_TABU_DIRECTION ) );
 		tabuChecker.add( new InvalidSolutionsTabuList() );
 		tabuChecker.add( new ModeMovesTabuList( N_TABU_MODE ) );
 		configuration.setTabuChecker( tabuChecker );
 
 		if ( DEBUG ) {
 			configuration.addListener(
-					new EvolutionPlotter(
+					new EvolutionPlotter<Plan>(
 						"score evolution, agent "+plan.getPerson().getId(),
 						controler.getControlerIO().getIterationPath( controler.getIterationNumber() )
 						+"/"+plan.getPerson().getId()+"-fitness.png" ) );
 		}
 
 		// run the algo
-		Solution bestSolution = runTabuSearch( configuration , initialSolution );
+		Solution<Plan> bestSolution = runTabuSearch( configuration , initialSolution );
 
 		// two goals here:
 		// 1- the side effect: getRepresentedPlan sets the plan to the represented state
 		// 2- the obvious check
-		if (bestSolution.getRepresentedPlan() != plan) {
+		if (bestSolution.getPhenotype() != plan) {
 			throw new RuntimeException( "the returned plan is not the input plan" );
 		}
 	}

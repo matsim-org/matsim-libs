@@ -21,6 +21,7 @@ package playground.thibautd.tsplanoptimizer.timemodechooser;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.tsplanoptimizer.framework.Move;
@@ -35,7 +36,7 @@ import playground.thibautd.tsplanoptimizer.framework.Value;
  *
  * @author thibautd
  */
-public class ModeMovesTabuList implements TabuChecker {
+public class ModeMovesTabuList implements TabuChecker<Plan> {
 	private final LinkedList<Tuple<Integer, String>> tabuList = new LinkedList<Tuple<Integer, String>>();
 	private final int length;
 
@@ -46,12 +47,12 @@ public class ModeMovesTabuList implements TabuChecker {
 
 	@Override
 	public void notifyMove(
-			final Solution currentSolution,
+			final Solution<? extends Plan> currentSolution,
 			final Move toApply,
 			final double resultingFitness) {
 		if (toApply != null && toApply instanceof ModeMove) {
 			ModeMove modeMove = (ModeMove) toApply;
-			Value toChange = currentSolution.getRepresentation().get( modeMove.getIndex() );
+			Value toChange = currentSolution.getGenotype().get( modeMove.getIndex() );
 			tabuList.addLast(
 					new Tuple<Integer, String>(
 						modeMove.getIndex(),
@@ -68,11 +69,11 @@ public class ModeMovesTabuList implements TabuChecker {
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<? extends Plan> solution,
 			final Move move) {
 		if (move instanceof ModeMove) {
 			ModeMove modeMove = (ModeMove) move;
-			Value toChange = solution.getRepresentation().get( modeMove.getIndex() );
+			Value toChange = solution.getGenotype().get( modeMove.getIndex() );
 
 			if (toChange.getValue().equals( modeMove.getMode() )) {
 				// prevent "identity" moves

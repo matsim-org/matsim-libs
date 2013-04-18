@@ -25,7 +25,7 @@ package playground.thibautd.tsplanoptimizer.framework;
  *
  * @author thibautd
  */
-public class ImprovementDelayMonitor implements EvolutionMonitor, StartListener {
+public class ImprovementDelayMonitor<T> implements EvolutionMonitor<T>, StartListener<T> {
 	private final int maxIters;
 	private final int delay;
 	private double lastBestScore = Double.NEGATIVE_INFINITY;
@@ -41,7 +41,7 @@ public class ImprovementDelayMonitor implements EvolutionMonitor, StartListener 
 	@Override
 	public boolean continueIterations(
 			final int iteration,
-			final Solution newBest,
+			final Solution<? extends T> newBest,
 			final double newBestScore) {
 		if (iteration >= maxIters) {
 			return false;
@@ -57,7 +57,7 @@ public class ImprovementDelayMonitor implements EvolutionMonitor, StartListener 
 
 	@Override
 	public void notifyStart(
-			final Solution startSolution,
+			final Solution<? extends T> startSolution,
 			final double startScore) {
 		lastBestScore = startScore;
 	}

@@ -41,10 +41,10 @@ public class SubtourAndParentsModeMove implements Move {
 	}
 
 	@Override
-	public Solution apply(final Solution solution) {
-		Solution newSolution = solution.createClone();
+	public <T> Solution<T> apply(final Solution<T> solution) {
+		Solution<T> newSolution = solution.createClone();
 
-		List<? extends Value> values = newSolution.getRepresentation();
+		List<? extends Value> values = newSolution.getGenotype();
 		SubtourValue value = (SubtourValue) values.get( index );
 
 		while (value != null) {

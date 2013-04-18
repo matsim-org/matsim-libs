@@ -37,10 +37,10 @@ public class ModeMove implements Move {
 	}
 
 	@Override
-	public Solution apply(final Solution solution) {
-		Solution newSolution = solution.createClone();
+	public <T> Solution<T> apply(final Solution<T> solution) {
+		Solution<T> newSolution = solution.createClone();
 
-		newSolution.getRepresentation().get( index ).setValue( newMode );
+		newSolution.getGenotype().get( index ).setValue( newMode );
 
 		return newSolution;
 	}

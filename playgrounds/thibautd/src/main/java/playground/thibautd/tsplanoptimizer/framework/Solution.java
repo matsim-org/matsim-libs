@@ -21,17 +21,15 @@ package playground.thibautd.tsplanoptimizer.framework;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.population.Plan;
-
 /**
- * Represents a plan, under the form of an Array of values,
- * and a plan.
+ * Represents an object to optimize (usually a plan),
+ * under the form of a sequence of values.
  * The clone method must copy the representation.
  * <br>
  * It must implement equals and hashCode
  * @author thibautd
  */
-public interface Solution {
+public interface Solution<T> {
 	/**
 	 * Gives access to the representation, under the form of an ordered
 	 * list of values. The values must be internal references (modifying
@@ -40,7 +38,7 @@ public interface Solution {
 	 *
 	 * @return the internal representation.
 	 */
-	public List<? extends Value> getRepresentation();
+	public List<? extends Value> getGenotype();
 
 	/**
 	 * Returns the plan represented by this solution.
@@ -56,13 +54,13 @@ public interface Solution {
 	 * of a plan used at initialisation (in both case, it should be indicated in
 	 * the documentation)
 	 */
-	public Plan getRepresentedPlan();
+	public T getPhenotype();
 
 	/**
 	 * Clones the solution.
 	 * @return a deep copy (i.e. modifying the copy should not affect the copied
 	 * in any sense)
 	 */
-	public Solution createClone();
+	public Solution<T> createClone();
 }
 

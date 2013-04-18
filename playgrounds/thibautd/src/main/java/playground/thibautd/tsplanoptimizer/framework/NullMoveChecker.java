@@ -26,11 +26,11 @@ import java.util.Iterator;
  *
  * @author thibautd
  */
-public class NullMoveChecker implements TabuChecker {
+public class NullMoveChecker<T> implements TabuChecker<T> {
 
 	@Override
 	public void notifyMove(
-			final Solution currentSolution,
+			final Solution<? extends T> currentSolution,
 			final Move toApply,
 			final double resultingFitness) {
 		// do nothing
@@ -38,12 +38,12 @@ public class NullMoveChecker implements TabuChecker {
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<? extends T> solution,
 			final Move move) {
-		Solution newSolution = move.apply( solution );
+		Solution<?> newSolution = move.apply( solution );
 
-		Iterator<? extends Value> oldIt = solution.getRepresentation().iterator();
-		Iterator<? extends Value> newIt = newSolution.getRepresentation().iterator();
+		Iterator<? extends Value> oldIt = solution.getGenotype().iterator();
+		Iterator<? extends Value> newIt = newSolution.getGenotype().iterator();
 
 		while (oldIt.hasNext()) {
 			if (!oldIt.next().getValue().equals( newIt.next().getValue() )) {

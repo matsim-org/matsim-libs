@@ -33,21 +33,21 @@ import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
 /**
  * @author thibautd
  */
-public class CarAvailabilityTabuChecker implements TabuChecker {
+public class CarAvailabilityTabuChecker implements TabuChecker<JointPlan> {
 
 	@Override
 	public void notifyMove(
-			final Solution currentSolution,
+			final Solution<? extends JointPlan> currentSolution,
 			final Move toApply,
 			final double resultingFitness) {
 	}
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<? extends JointPlan> solution,
 			final Move move) {
-		final Solution resultingSol = move.apply( solution );
-		final JointPlan resultingJointPlan = ((JointTimeModeChooserSolution) resultingSol).getRepresentedJointPlan();
+		final Solution<? extends JointPlan> resultingSol = move.apply( solution );
+		final JointPlan resultingJointPlan = resultingSol.getPhenotype();
 
 		for (Plan plan : resultingJointPlan.getIndividualPlans().values()) {
 			final PersonImpl person = (PersonImpl) plan.getPerson();

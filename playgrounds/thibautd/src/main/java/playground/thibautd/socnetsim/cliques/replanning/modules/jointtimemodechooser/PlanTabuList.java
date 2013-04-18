@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.tsplanoptimizer.framework.Move;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
@@ -33,7 +34,7 @@ import playground.thibautd.tsplanoptimizer.timemodechooser.ModeMove;
  * A tabu list that makes plans alternatively modified.
  * @author thibautd
  */
-public class PlanTabuList implements TabuChecker {
+public class PlanTabuList implements TabuChecker<JointPlan> {
 	private final int size;
 	private final List<Integer> lastIndexPerPlan;
 	private final LinkedList<Integer> tabuPlans = new LinkedList<Integer>();
@@ -46,7 +47,7 @@ public class PlanTabuList implements TabuChecker {
 
 	@Override
 	public void notifyMove(
-			final Solution currentSolution,
+			final Solution<? extends JointPlan> currentSolution,
 			final Move toApply,
 			final double resultingFitness) {
 		tabuPlans.add( getPlanId( toApply ) );
@@ -58,7 +59,7 @@ public class PlanTabuList implements TabuChecker {
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<? extends JointPlan> solution,
 			final Move move) {
 		return tabuPlans.contains( getPlanId( move ) );
 	}

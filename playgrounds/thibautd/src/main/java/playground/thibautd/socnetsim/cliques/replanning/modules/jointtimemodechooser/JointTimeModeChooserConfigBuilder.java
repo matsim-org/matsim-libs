@@ -26,6 +26,7 @@ import java.util.Random;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.socnetsim.cliques.config.JointTimeModeChooserConfigGroup;
+import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;
 import playground.thibautd.tsplanoptimizer.framework.CompositeTabuChecker;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
@@ -75,19 +76,19 @@ class JointTimeModeChooserConfigBuilder {
 
 	public void buildConfiguration(
 			final boolean penalizeUnsynchro,
-			final Solution initialSolution,
-			final TabuSearchConfiguration configuration) {
+			final Solution<JointPlan> initialSolution,
+			final TabuSearchConfiguration<JointPlan> configuration) {
 		// different parameters depending on whether we optimise
 		// with or without synchro, as mode is not optimised when
 		// synchro (thus structure of the tabu list is different),
 		// and we mainly want hill-climbing.
 		int nTabu = penalizeUnsynchro ?
 			1 :
-			initialSolution.getRepresentation().size();
+			initialSolution.getGenotype().size();
 		if (nTabu < 1) nTabu = 1;
 		int improvementDelay = penalizeUnsynchro ? 3 : nTabu;
 
-		FitnessFunction fitness =
+		FitnessFunction<JointPlan> fitness =
 			new JointTimeModeChooserFitness(
 					config.getNegativeDurationPenalty(),
 					penalizeUnsynchro ? config.getUnsynchronizedPenalty() : 0,
@@ -95,7 +96,7 @@ class JointTimeModeChooserConfigBuilder {
 		configuration.setFitnessFunction( fitness );
 
 		configuration.setEvolutionMonitor(
-				new ImprovementDelayMonitor(
+				new ImprovementDelayMonitor<JointPlan>(
 					improvementDelay,
 					N_ITER ));
 
@@ -116,11 +117,11 @@ class JointTimeModeChooserConfigBuilder {
 		}
 		configuration.setMoveGenerator( generator );
 
-		CompositeTabuChecker tabuChecker = new CompositeTabuChecker();
-		tabuChecker.add( new DirectionTabuList( nTabu ) );
+		CompositeTabuChecker<JointPlan> tabuChecker = new CompositeTabuChecker<JointPlan>();
+		tabuChecker.add( new DirectionTabuList<JointPlan>( nTabu ) );
 		tabuChecker.add( new JointInvalidValueChecker() );
 		tabuChecker.add( new ModeChainTabuList( nTabu ) );
-		tabuChecker.add( new NullMoveChecker() );
+		tabuChecker.add( new NullMoveChecker<JointPlan>() );
 		tabuChecker.add( new CarAvailabilityTabuChecker() );
 		configuration.setTabuChecker( tabuChecker );
 

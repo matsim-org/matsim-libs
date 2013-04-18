@@ -23,7 +23,7 @@ package playground.thibautd.tsplanoptimizer.framework;
  * A simple {@link EvolutionMonitor} which uses a fixed number of iterations.
  * @author thibautd
  */
-public class IterationNumberMonitor implements EvolutionMonitor {
+public class IterationNumberMonitor implements EvolutionMonitor<Object> {
 	private final int n;
 
 	public IterationNumberMonitor(final int numberOfIterations) {
@@ -33,7 +33,7 @@ public class IterationNumberMonitor implements EvolutionMonitor {
 	@Override
 	public boolean continueIterations(
 			final int iteration,
-			final Solution newBest,
+			final Solution<?> newBest,
 			final double newBestScore) {
 		return iteration <= n;
 	}

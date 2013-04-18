@@ -38,7 +38,7 @@ public class FixedStepsIntegerMovesGenerator implements MoveGenerator {
 	private final boolean switchSubsequentValues;
 
 	public FixedStepsIntegerMovesGenerator(
-			final Solution initialSolution,
+			final Solution<?> initialSolution,
 			final List<Integer> steps,
 			final boolean switchSubsequentValues) {
 		this.steps = steps;
@@ -47,7 +47,7 @@ public class FixedStepsIntegerMovesGenerator implements MoveGenerator {
 		integerIndices = new ArrayList<Integer>();
 
 		int i = 0;
-		for (Value value : initialSolution.getRepresentation()) {
+		for (Value value : initialSolution.getGenotype()) {
 			if (value.getValue() instanceof Integer) {
 				integerIndices.add( i );
 			}

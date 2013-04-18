@@ -56,16 +56,16 @@ public class IntegerValueChanger implements Move {
 	 * integer {@link Value}
 	 */
 	@Override
-	public Solution apply(final Solution solution) {
-		Solution newSolution = solution.createClone();
+	public <T> Solution<T> apply(final Solution<T> solution) {
+		Solution<T> newSolution = solution.createClone();
 
-		Value val = newSolution.getRepresentation().get( index );
+		Value val = newSolution.getGenotype().get( index );
 		val.setValue( ((Integer) val.getValue()).intValue() + amount );
 
 		if (durationEncoding) {
 			// emulate a duration-based encoding by modifying all subsequent end times.
-			for (int i=index+1; i < newSolution.getRepresentation().size(); i++) {
-				val = newSolution.getRepresentation().get( index );
+			for (int i=index+1; i < newSolution.getGenotype().size(); i++) {
+				val = newSolution.getGenotype().get( index );
 				val.setValue( ((Integer) val.getValue()).intValue() + amount );
 			}
 		}

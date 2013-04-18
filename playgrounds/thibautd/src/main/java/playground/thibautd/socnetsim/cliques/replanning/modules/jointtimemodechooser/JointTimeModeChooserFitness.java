@@ -47,7 +47,7 @@ import playground.thibautd.tsplanoptimizer.framework.Solution;
 /**
  * @author thibautd
  */
-public class JointTimeModeChooserFitness implements FitnessFunction {
+public class JointTimeModeChooserFitness implements FitnessFunction<JointPlan> {
 	private static final Logger log =
 		Logger.getLogger(JointTimeModeChooserFitness.class);
 
@@ -76,8 +76,8 @@ public class JointTimeModeChooserFitness implements FitnessFunction {
 	}
 
 	@Override
-	public double computeFitnessValue(final Solution solution) {
-		JointPlan plan = ((JointTimeModeChooserSolution) solution).getRepresentedJointPlan();
+	public double computeFitnessValue(final Solution<? extends JointPlan> solution) {
+		JointPlan plan = solution.getPhenotype();
 
 		if (DEBUG) log.debug( "start scoring" );
 

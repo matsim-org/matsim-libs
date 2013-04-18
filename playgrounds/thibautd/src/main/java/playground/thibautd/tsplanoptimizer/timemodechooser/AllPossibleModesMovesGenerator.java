@@ -35,10 +35,10 @@ public class AllPossibleModesMovesGenerator implements MoveGenerator {
 	private final List<Move> moves = new ArrayList<Move>();
 
 	public AllPossibleModesMovesGenerator(
-			final Solution initialSolution,
+			final Solution<?> initialSolution,
 			final Collection<String> possibleModes) {
 		int i = 0;
-		for (Value value : initialSolution.getRepresentation()) {
+		for (Value value : initialSolution.getGenotype()) {
 			if (value.getValue() instanceof String) {
 				for (String mode : possibleModes) {
 					moves.add( new ModeMove( i , mode ) );

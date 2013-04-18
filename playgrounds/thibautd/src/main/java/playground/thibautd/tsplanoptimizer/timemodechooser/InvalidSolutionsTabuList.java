@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
+import org.matsim.api.core.v01.population.Plan;
+
 import playground.thibautd.tsplanoptimizer.framework.Move;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuChecker;
@@ -27,11 +29,11 @@ import playground.thibautd.tsplanoptimizer.framework.Value;
 /**
  * @author thibautd
  */
-public class InvalidSolutionsTabuList implements TabuChecker {
+public class InvalidSolutionsTabuList implements TabuChecker<Plan> {
 
 	@Override
 	public void notifyMove(
-			final Solution solution,
+			final Solution<? extends Plan> solution,
 			final Move move,
 			final double newScore) {
 		// nothing to do
@@ -39,13 +41,13 @@ public class InvalidSolutionsTabuList implements TabuChecker {
 
 	@Override
 	public boolean isTabu(
-			final Solution solution,
+			final Solution<? extends Plan> solution,
 			final Move move) {
 		if (move instanceof IntegerValueChanger) {
-			Solution result = move.apply( solution );
+			Solution<? extends Plan> result = move.apply( solution );
 
 			int now = 0;
-			for (Value val : result.getRepresentation()) {
+			for (Value val : result.getGenotype()) {
 				Object value = val.getValue();
 
 				if (value instanceof Integer) {

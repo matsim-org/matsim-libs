@@ -30,7 +30,7 @@ import org.matsim.core.utils.charts.XYLineChart;
  *
  * @author thibautd
  */
-public class EvolutionPlotter implements AppliedMoveListener , StartListener , EndListener {
+public class EvolutionPlotter<T> implements AppliedMoveListener<T> , StartListener<T> , EndListener<T> {
 	private final String outputFile;
 	private final String title;
 	private final List<Double> values = new ArrayList<Double>();
@@ -47,7 +47,7 @@ public class EvolutionPlotter implements AppliedMoveListener , StartListener , E
 
 	@Override
 	public void notifyMove(
-			final Solution currentSolution,
+			final Solution<? extends T> currentSolution,
 			final Move toApply,
 			final double newFitness) {
 		values.add( toApply != null ? newFitness : Double.NaN );
@@ -55,7 +55,7 @@ public class EvolutionPlotter implements AppliedMoveListener , StartListener , E
 
 	@Override
 	public void notifyEnd(
-			final Solution bestSolution,
+			final Solution<? extends T> bestSolution,
 			final double bestScore,
 			final int nIterations) {
 		double[] iterationNumbers = new double[ values.size() ];
@@ -75,7 +75,7 @@ public class EvolutionPlotter implements AppliedMoveListener , StartListener , E
 
 	@Override
 	public void notifyStart(
-			final Solution startSolution,
+			final Solution<? extends T> startSolution,
 			final double startScore) {
 		values.add( startScore );
 	}
