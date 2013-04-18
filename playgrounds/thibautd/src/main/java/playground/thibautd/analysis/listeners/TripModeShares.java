@@ -92,7 +92,7 @@ public class TripModeShares implements IterationEndsListener, ShutdownListener {
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		recordHistory( event.getIteration() );
 		writeDataFile( event.getIteration() );
-		if ( graphWriteInterval < 1 || event.getIteration() % graphWriteInterval == 1 ) {
+		if ( graphWriteInterval < 1 || event.getIteration() % graphWriteInterval == 0 ) {
 			writePng( );
 		}
 	}
@@ -154,6 +154,7 @@ public class TripModeShares implements IterationEndsListener, ShutdownListener {
 
 	@Override
 	public void notifyShutdown(final ShutdownEvent event) {
+		writePng();
 		try {
 			writer.close();
 		} catch (IOException e) {
