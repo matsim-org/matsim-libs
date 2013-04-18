@@ -160,10 +160,10 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 				// calculate the affectedAgentUnits
 				affectedAgentUnits = waitingTime / vehicleDelay;
 				
-				System.out.println("++++ AgentId: " + event.getPersonId());
-				System.out.println("WaitingTime: " + waitingTime);
-				System.out.println("VehicleDelay: " + vehicleDelay);
-				System.out.println("affectedAgentUnits: " + affectedAgentUnits);
+//				System.out.println("++++ AgentId: " + event.getPersonId());
+//				System.out.println("WaitingTime: " + waitingTime);
+//				System.out.println("VehicleDelay: " + vehicleDelay);
+//				System.out.println("affectedAgentUnits: " + affectedAgentUnits);
 
 			}
 			
