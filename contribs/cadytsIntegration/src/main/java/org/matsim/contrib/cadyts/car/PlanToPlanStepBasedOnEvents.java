@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.burgdorf.cadyts;
+package org.matsim.contrib.cadyts.car;
 
 import java.util.HashSet;
 import java.util.Set;

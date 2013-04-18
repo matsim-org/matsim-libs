@@ -21,6 +21,8 @@
 package playground.christoph.burgdorf;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.cadyts.car.CadytsContext;
+import org.matsim.contrib.cadyts.car.CadytsPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -29,8 +31,6 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 
-import playground.christoph.burgdorf.cadyts.CadytsContext;
-import playground.christoph.burgdorf.cadyts.CadytsPlanChanger;
 
 public class CadytsController {
 

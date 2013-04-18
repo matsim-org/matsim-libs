@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.burgdorf.cadyts;
+package org.matsim.contrib.cadyts.car;
 
 import java.io.IOException;
 import java.util.Set;
@@ -123,7 +123,7 @@ public class CadytsContext implements StartupListener, IterationEndsListener {
 		// write some output
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsLinkCostOffsetsXMLFileIO(event.getControler().getScenario()).write(filename, this.calibrator.getLinkCostOffsets());
+			new CadytsLinkCostOffsetsXMLFileIO(event.getControler().getScenario().getNetwork()).write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
 		}

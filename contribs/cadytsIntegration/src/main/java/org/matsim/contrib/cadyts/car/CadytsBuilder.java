@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.burgdorf.cadyts;
+package org.matsim.contrib.cadyts.car;
 
 import java.util.Map;
 
@@ -50,7 +50,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		//get timeBinSize_s and validate it
 		int timeBinSize_s = cadytsPtConfig.getTimeBinSize();
 		if ((Time.MIDNIGHT % timeBinSize_s)!= 0 ){
-			throw new RuntimeException("Cadyts requieres a divisor of 86400 as time bin size value .");
+			throw new RuntimeException("Cadyts requires a divisor of 86400 as time bin size value .");
 		}
 		if ( (timeBinSize_s % 3600) != 0 ) {
 			throw new RuntimeException("At this point, time bin sizes need to be multiples of 3600.  This is not a restriction " +
@@ -73,11 +73,9 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		matsimCalibrator.setBruteForce(cadytsPtConfig.useBruteForce());
 		matsimCalibrator.setStatisticsFile(sc.getConfig().controler().getOutputDirectory() + "/calibration-stats.txt");
 
-		//int arStartTime_s = 3600*cadytsPtConfig.getStartTime()-3600 ;
-		//int arEndTime_s = 3600*cadytsPtConfig.getEndTime()-1 ;
-		// yyyy would be better to fix this; see email to balmermi and rieser 23/jul/2012 by kai & manuel
-		int arStartTime_s = cadytsPtConfig.getStartTime(); // this version gets directly the startTime and endTime directly in seconds from the cadytsPtConfig 
+		int arStartTime_s = cadytsPtConfig.getStartTime(); 
 		int arEndTime_s = cadytsPtConfig.getEndTime() ;
+		// (this version gets directly the startTime and endTime directly in seconds from the cadytsPtConfig)
 		
 		int multiple = timeBinSize_s / 3600 ; // e.g. "3" when timeBinSize_s = 3*3600 = 10800
 

@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CadytsLinkCostOffsetsXMLFileIO.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,10 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.burgdorf.cadyts;
+package org.matsim.contrib.cadyts.car;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 
 import utilities.misc.DynamicDataXMLFileIO;
 
@@ -31,16 +31,16 @@ import utilities.misc.DynamicDataXMLFileIO;
 public class CadytsLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<Link> {
 
 	private static final long serialVersionUID = 1L;
-	private final Scenario scenario;
+	private final Network network;
 
-	public CadytsLinkCostOffsetsXMLFileIO(final Scenario scenario) {
+	public CadytsLinkCostOffsetsXMLFileIO(final Network network) {
 		super();
-		this.scenario = scenario;
+		this.network = network;
 	}
 
 	@Override
 	protected Link attrValue2key(final String linkIdString) {
-		Link link = this.scenario.getNetwork().getLinks().get(scenario.createId(linkIdString));
+		Link link = this.network.getLinks().get(new IdImpl(linkIdString));
 		return link;
 	}
 

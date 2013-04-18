@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.burgdorf.cadyts;
+package org.matsim.contrib.cadyts.utils;
 
 import java.util.Map;
 import java.util.TreeMap;

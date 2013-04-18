@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.cadyts.pt.utils;
+package org.matsim.contrib.cadyts.utils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -55,6 +55,5 @@ public class CalibrationStatReaderTest {
 		Assert.assertEquals("differrent Plan_lambda_min", "0.03929357905359915" , statData6.getPlan_lambda_min() );
 		Assert.assertEquals("differrent Plan_lambda_stddev", "0.004200662608832472" , statData6.getPlan_lambda_stddev());
 		Assert.assertEquals("differrent Total_ll", "-1.546875", statData6.getTotal_ll() );
-
 	}
 }

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.burgdorf.cadyts;
+package org.matsim.contrib.cadyts.car;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -85,10 +85,8 @@ public class CadytsCarConfigGroup extends Module {
 		} else if (WRITE_ANALYSIS_FILE.equals(paramName)) {
 			setWriteAnalysisFile(Boolean.parseBoolean(value));
 		} else if (START_TIME.equals(paramName)) {
-			//setStartTime(Integer.parseInt(value));	//original
 			setStartTime((int)Time.parseTime(value));   //The "hh:mm:ss" format is converted here to seconds after midnight
 		} else if (END_TIME.equals(paramName)) {
-			//setEndTime(Integer.parseInt(value));		//original
 			setEndTime((int)Time.parseTime(value));		//The "hh:mm:ss" format is converted here to seconds after midnight
 		} else if ( TIME_BIN_SIZE.equals(paramName)) {
 			setTimeBinSize(Integer.parseInt(value)) ;

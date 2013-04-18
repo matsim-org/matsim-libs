@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CadytsPlanChanger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.burgdorf.cadyts;
+package org.matsim.contrib.cadyts.car;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -75,12 +74,10 @@ public class CadytsPlanChanger implements PlanSelector {
 		AnalyticalCalibrator<Link> matsimCalibrator = cadytsContext.getAnalyticalCalibrator();
 		
 		cadyts.demand.Plan<Link> currentPlanSteps = planToPlanStep.getPlanSteps(currentPlan);
-//		double currentPlanCadytsCorrection = matsimCalibrator.getUtilityCorrection(currentPlanSteps) / this.beta;
 		double currentPlanCadytsCorrection = matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
 		double currentScore = currentPlan.getScore().doubleValue() + this.cadytsWeight * currentPlanCadytsCorrection;
 
 		cadyts.demand.Plan<Link> otherPlanSteps = planToPlanStep.getPlanSteps(otherPlan);
-//		double otherPlanCadytsCorrection = matsimCalibrator.getUtilityCorrection(otherPlanSteps) / this.beta;
 		double otherPlanCadytsCorrection = matsimCalibrator.calcLinearPlanEffect(otherPlanSteps) / this.beta;
 		double otherScore = otherPlan.getScore().doubleValue() + this.cadytsWeight * otherPlanCadytsCorrection;
 
@@ -102,10 +99,6 @@ public class CadytsPlanChanger implements PlanSelector {
 			selectedPlanSteps = otherPlanSteps;
 		}
 
-		// sampler.enforceNextAccept();
-		// sampler.isAccepted(this.ptPlanToPlanStep.getPlanSteps(selectedPlan));
-
-//		matsimCalibrator.registerChoice(selectedPlanSteps);
 		matsimCalibrator.addToDemand(selectedPlanSteps);
 
 		return selectedPlan;

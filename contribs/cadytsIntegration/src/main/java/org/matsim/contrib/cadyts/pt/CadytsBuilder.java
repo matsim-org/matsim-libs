@@ -21,7 +21,6 @@ package org.matsim.contrib.cadyts.pt;
 
 import java.util.Map;
 
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
@@ -52,7 +51,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		//get timeBinSize_s and validate it
 		int timeBinSize_s = cadytsPtConfig.getTimeBinSize();
 		if ((Time.MIDNIGHT % timeBinSize_s)!= 0 ){
-			throw new RuntimeException("Cadyts requieres a divisor of 86400 as time bin size value .");
+			throw new RuntimeException("Cadyts requires a divisor of 86400 as time bin size value .");
 		}
 		if ( (timeBinSize_s % 3600) != 0 ) {
 			throw new RuntimeException("At this point, time bin sizes need to be multiples of 3600.  This is not a restriction " +
