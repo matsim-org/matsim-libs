@@ -19,8 +19,7 @@
 package playground.vsp.analysis;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -40,7 +39,7 @@ public class VspAnalyzer {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(VspAnalyzer.class);
 	private String outdir;
-	private List<AbstractAnalyisModule> modules;
+	private LinkedList<AbstractAnalyisModule> modules;
 	private String eventsFile;
 
 	/**
@@ -55,7 +54,7 @@ public class VspAnalyzer {
 	 */
 	public VspAnalyzer(String outdir, String eventsFile) {
 		this.outdir = outdir;
-		this.modules = new ArrayList<AbstractAnalyisModule>();
+		this.modules = new LinkedList<AbstractAnalyisModule>();
 		this.eventsFile = eventsFile;
 	}
 	
@@ -71,7 +70,7 @@ public class VspAnalyzer {
 	 */
 	public VspAnalyzer(String outdir) {
 		this.outdir = outdir;
-		this.modules = new ArrayList<AbstractAnalyisModule>();
+		this.modules = new LinkedList<AbstractAnalyisModule>();
 		this.eventsFile = null;
 	}
 	
@@ -91,8 +90,11 @@ public class VspAnalyzer {
 				log.warn("can not handle events, because the specified file does not exist!");
 			}
 		}
-		this.postProcess();
-		this.writeResults();
+		
+		this.combinedPostProcessAndWriteResults();
+		
+//		this.postProcess();
+//		this.writeResults();
 		log.info("finished " + VspAnalyzer.class.getSimpleName());
 	}
 
@@ -155,6 +157,29 @@ public class VspAnalyzer {
 			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 		}
 		log.info("writing finished...");
+	}
+
+	private void combinedPostProcessAndWriteResults() {
+		log.info("combinedPostProcessAndWriteResults for all modules...");
+		
+		String outdir;
+		while (!this.modules.isEmpty()) {
+			AbstractAnalyisModule module = this.modules.removeFirst();
+			
+			log.info("postprocessing " + module.getName());
+			module.postProcessData();
+			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
+//			log.info("post-processing finished...");
+			
+			outdir = this.outdir + "/" + module.getName() + "/";
+			log.info("writing output for " + module.getName() + " to " + outdir);
+			if(!new File(outdir).exists()){
+				new File(outdir).mkdirs();
+			}
+			module.writeResults(outdir);
+			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
+		}
+		log.info("combinedPostProcessAndWriteResults for all modules finished...");
 	}
 }
 
