@@ -229,7 +229,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 //		configFile = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/config.xml";
 //		evacuationConfigFile = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/config_evacuation_run_33.xml";
 //		outputPath = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/";
-			
+		
 		if (args.length != 3) return;
 		else {
 			configFile = args[0];
@@ -671,7 +671,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					if (returnsHome) {
 						B11.add(personId);
 						B111.add(personId);
-						
+							
 						/*
 						 * Split "returning home" and "evacuate from home" trips.
 						 */
@@ -713,7 +713,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						 * Otherwise we do not set them since this would end up in a situation where evacuation
 						 * modes are defined but no evacuation time is known.
 						 */
-						if (this.evacuateFromHomeTimes.containsKey(personId)) {
+//						if (this.evacuateFromHomeTimes.containsKey(personId)) {
+						if (this.leftEvacuationAreaTime.containsKey(personId)) {
 							modesString = CollectionUtils.setToString(modesEvacuate);
 							this.evacuateFromHomeModes.put(personId, modesString);
 							count = evacuationModesB111Evacuate.get(modesString);
@@ -963,7 +964,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						 * Otherwise we do not set them since this would end up in a situation where evacuation
 						 * modes are defined but no evacuation time is known.
 						 */
-						if (this.evacuateFromHomeTimes.containsKey(personId)) {
+//						if (this.evacuateFromHomeTimes.containsKey(personId)) {
+						if (this.leftEvacuationAreaTime.containsKey(personId)) {
 							modesString = CollectionUtils.setToString(modesEvacuate);
 							this.evacuateFromHomeModes.put(personId, modesString);
 							count = evacuationModesC111Evacuate.get(modesString);
