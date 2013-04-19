@@ -501,237 +501,312 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (event.getPersonId().toString().startsWith("pt_tr"))
-			return;
-		TravellerChain chain = chains.get(event.getPersonId());
-		locations.put(event.getPersonId(),
-				network.getLinks().get(event.getLinkId()).getCoord());
-		if (chain == null) {
-			chain = new TravellerChain();
-			chains.put(event.getPersonId(), chain);
-			Activity act = chain.addActivity();
-			act.coord = network.getLinks().get(event.getLinkId()).getCoord();
-			act.endTime = event.getTime();
-			act.facility = event.getFacilityId();
-			act.startTime = 0.0;
-			act.type = event.getActType();
+		try {
+			if (event.getPersonId().toString().startsWith("pt_tr"))
+				return;
+			TravellerChain chain = chains.get(event.getPersonId());
+			locations.put(event.getPersonId(),
+					network.getLinks().get(event.getLinkId()).getCoord());
+			if (chain == null) {
+				chain = new TravellerChain();
+				chains.put(event.getPersonId(), chain);
+				Activity act = chain.addActivity();
+				act.coord = network.getLinks().get(event.getLinkId())
+						.getCoord();
+				act.endTime = event.getTime();
+				act.facility = event.getFacilityId();
+				act.startTime = 0.0;
+				act.type = event.getActType();
 
-		} else if (!event.getActType()
-				.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-			Activity act = chain.acts.getLast();
-			act.endTime = event.getTime();
+			} else if (!event.getActType().equals(
+					PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+				Activity act = chain.acts.getLast();
+				act.endTime = event.getTime();
+			}
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (event.getPersonId().toString().startsWith("pt_tr"))
-			return;
-		TravellerChain chain = chains.get(event.getPersonId());
-		boolean beforeInPT = chain.inPT;
-		if (event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-			chain.inPT = true;
+		try {
+			if (event.getPersonId().toString().startsWith("pt_tr"))
+				return;
+			TravellerChain chain = chains.get(event.getPersonId());
+			boolean beforeInPT = chain.inPT;
+			if (event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+				chain.inPT = true;
 
-		} else {
-			chain.inPT = false;
-			chain.traveling = false;
-			Activity act = chain.addActivity();
-			act.coord = network.getLinks().get(event.getLinkId()).getCoord();
-			act.facility = event.getFacilityId();
-			act.startTime = event.getTime();
-			act.type = event.getActType();
-			// end the preceding journey
-			Journey journey = chain.journeys.getLast();
-			journey.dest = act.coord;
-			journey.endTime = event.getTime();
-			journey.toAct = act;
-			if (beforeInPT)
-				journey.walks.getLast().egressWalk = true;
+			} else {
+				chain.inPT = false;
+				chain.traveling = false;
+				Activity act = chain.addActivity();
+				act.coord = network.getLinks().get(event.getLinkId()).getCoord();
+				act.facility = event.getFacilityId();
+				act.startTime = event.getTime();
+				act.type = event.getActType();
+				// end the preceding journey
+				Journey journey = chain.journeys.getLast();
+				journey.dest = act.coord;
+				journey.endTime = event.getTime();
+				journey.toAct = act;
+				if (beforeInPT)
+					journey.walks.getLast().egressWalk = true;
+			}
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (event.getPersonId().toString().startsWith("pt_tr"))
-			return;
-		TravellerChain chain = chains.get(event.getPersonId());
-		Journey journey;
-		if (event.getLegMode().equals("transit_walk")) {
-			if (!chain.traveling) {
-				chain.traveling = true;
+		try {
+			if (event.getPersonId().toString().startsWith("pt_tr"))
+				return;
+			TravellerChain chain = chains.get(event.getPersonId());
+			Journey journey;
+			if (event.getLegMode().equals("transit_walk")) {
+				if (!chain.traveling) {
+					chain.traveling = true;
+					journey = chain.addJourney();
+					journey.orig = network.getLinks().get(event.getLinkId())
+							.getCoord();
+					journey.fromAct = chain.acts.getLast();
+					journey.startTime = event.getTime();
+					Walk walk = journey.addWalk();
+					walk.accessWalk = true;
+					walk.startTime = event.getTime();
+					walk.orig = journey.orig;
+				} else {
+					journey = chain.journeys.getLast();
+					Walk walk = journey.addWalk();
+					walk.startTime = event.getTime();
+					walk.orig = network.getLinks().get(event.getLinkId())
+							.getCoord();
+					journey.possibleTransfer.walks.add(walk);
+				}
+			} else if (event.getLegMode().equals("car")) {
+				chain.inCar = true;
 				journey = chain.addJourney();
-				journey.orig = network.getLinks().get(event.getLinkId())
-						.getCoord();
+				journey.carJourney = true;
+				journey.orig = network.getLinks().get(event.getLinkId()).getCoord();
 				journey.fromAct = chain.acts.getLast();
 				journey.startTime = event.getTime();
-				Walk walk = journey.addWalk();
-				walk.accessWalk = true;
-				walk.startTime = event.getTime();
-				walk.orig = journey.orig;
-			} else {
+			} else if (event.getLegMode().equals("pt")) {
+				// person waits till they enter the vehicle
 				journey = chain.journeys.getLast();
-				Walk walk = journey.addWalk();
-				walk.startTime = event.getTime();
-				walk.orig = network.getLinks().get(event.getLinkId())
-						.getCoord();
-				journey.possibleTransfer.walks.add(walk);
+				Wait wait = journey.addWait();
+				if (journey.waits.size() == 1)
+					wait.accessWait = true;
+				wait.startTime = event.getTime();
+				wait.coord = network.getLinks().get(event.getLinkId()).getCoord();
+				if (!wait.accessWait) {
+					journey.possibleTransfer.waits.add(wait);
+				}
 			}
-		} else if (event.getLegMode().equals("car")) {
-			chain.inCar = true;
-			journey = chain.addJourney();
-			journey.carJourney = true;
-			journey.orig = network.getLinks().get(event.getLinkId()).getCoord();
-			journey.fromAct = chain.acts.getLast();
-			journey.startTime = event.getTime();
-		} else if (event.getLegMode().equals("pt")) {
-			// person waits till they enter the vehicle
-			journey = chain.journeys.getLast();
-			Wait wait = journey.addWait();
-			if (journey.waits.size() == 1)
-				wait.accessWait = true;
-			wait.startTime = event.getTime();
-			wait.coord = network.getLinks().get(event.getLinkId()).getCoord();
-			if (!wait.accessWait) {
-				journey.possibleTransfer.waits.add(wait);
-			}
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		if (event.getPersonId().toString().startsWith("pt_tr"))
-			return;
-		TravellerChain chain = chains.get(event.getPersonId());
-		if (event.getLegMode().equals("car")) {
-			Journey journey = chain.journeys.getLast();
-			journey.dest = network.getLinks().get(event.getLinkId()).getCoord();
-			journey.endTime = event.getTime();
-			chain.inCar = false;
-		} else if (event.getLegMode().equals("transit_walk")) {
-			Journey journey = chain.journeys.getLast();
-			Walk walk = journey.walks.getLast();
-			walk.dest = network.getLinks().get(event.getLinkId()).getCoord();
-			walk.endTime = event.getTime();
-			walk.distance = walk.getDuration() * walkSpeed;
-		} else if (event.getLegMode().equals("pt")) {
-			Journey journey = chain.journeys.getLast();
-			Trip trip = journey.trips.getLast();
-			trip.dest = network.getLinks().get(event.getLinkId()).getCoord();
-			trip.endTime = event.getTime();
-			journey.possibleTransfer = new Transfer();
-			journey.possibleTransfer.startTime = event.getTime();
-			journey.possibleTransfer.fromTrip = trip;
+		try {
+			if (event.getPersonId().toString().startsWith("pt_tr"))
+				return;
+			TravellerChain chain = chains.get(event.getPersonId());
+			if (event.getLegMode().equals("car")) {
+				Journey journey = chain.journeys.getLast();
+				journey.dest = network.getLinks().get(event.getLinkId()).getCoord();
+				journey.endTime = event.getTime();
+				chain.inCar = false;
+			} else if (event.getLegMode().equals("transit_walk")) {
+				Journey journey = chain.journeys.getLast();
+				Walk walk = journey.walks.getLast();
+				walk.dest = network.getLinks().get(event.getLinkId()).getCoord();
+				walk.endTime = event.getTime();
+				walk.distance = walk.getDuration() * walkSpeed;
+			} else if (event.getLegMode().equals("pt")) {
+				Journey journey = chain.journeys.getLast();
+				Trip trip = journey.trips.getLast();
+				trip.dest = network.getLinks().get(event.getLinkId()).getCoord();
+				trip.endTime = event.getTime();
+				journey.possibleTransfer = new Transfer();
+				journey.possibleTransfer.startTime = event.getTime();
+				journey.possibleTransfer.fromTrip = trip;
+			}
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (event.getPersonId().toString().startsWith("pt_tr"))
-			return;
-		if (event.getVehicleId().toString().startsWith("tr")) {
-			TravellerChain chain = chains.get(event.getPersonId());
-			Journey journey = chain.journeys.getLast();
-			// first, handle the end of the wait
-			journey.waits.getLast().endTime = event.getTime();
-			// now, create a new trip
-			ptVehicles.get(event.getVehicleId()).addPassenger(
-					event.getPersonId());
-			Trip trip = journey.addTrip();
-			PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
-			trip.line = vehicle.transitLineId;
-			trip.mode = getMode(
-					transitSchedule.getTransitLines()
-							.get(vehicle.transitLineId).getRoutes()
-							.get(vehicle.transitRouteId).getTransportMode(),
-					vehicle.transitLineId);
-			trip.boardingStop = vehicle.lastStop;
-			trip.orig = journey.waits.getLast().coord;
-			trip.route = ptVehicles.get(event.getVehicleId()).transitRouteId;
-			trip.startTime = event.getTime();
-			// check for the end of a transfer
-			if (journey.possibleTransfer != null) {
-				journey.possibleTransfer.toTrip = trip;
-				journey.possibleTransfer.endTime = event.getTime();
-				journey.addTransfer(journey.possibleTransfer);
-				journey.possibleTransfer = null;
+		try {
+			if (event.getPersonId().toString().startsWith("pt_tr"))
+				return;
+			if (event.getVehicleId().toString().startsWith("tr")) {
+				TravellerChain chain = chains.get(event.getPersonId());
+				Journey journey = chain.journeys.getLast();
+				// first, handle the end of the wait
+				journey.waits.getLast().endTime = event.getTime();
+				// now, create a new trip
+				ptVehicles.get(event.getVehicleId()).addPassenger(
+						event.getPersonId());
+				Trip trip = journey.addTrip();
+				PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
+				trip.line = vehicle.transitLineId;
+				trip.mode = getMode(
+						transitSchedule.getTransitLines()
+								.get(vehicle.transitLineId).getRoutes()
+								.get(vehicle.transitRouteId).getTransportMode(),
+						vehicle.transitLineId);
+				trip.boardingStop = vehicle.lastStop;
+				trip.orig = journey.waits.getLast().coord;
+				trip.route = ptVehicles.get(event.getVehicleId()).transitRouteId;
+				trip.startTime = event.getTime();
+				// check for the end of a transfer
+				if (journey.possibleTransfer != null) {
+					journey.possibleTransfer.toTrip = trip;
+					journey.possibleTransfer.endTime = event.getTime();
+					journey.addTransfer(journey.possibleTransfer);
+					journey.possibleTransfer = null;
+				}
 			}
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if (!event.getPersonId().toString().startsWith("pt_tr")) {
-			if (event.getVehicleId().toString().startsWith("tr")) {
-				TravellerChain chain = chains.get(event.getPersonId());
-				chain.traveledVehicle = true;
-				PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
-				double stageDistance = vehicle.removePassenger(event
-						.getPersonId());
-				Trip trip = chain.journeys.getLast().trips.getLast();
-				trip.distance = stageDistance;
-				trip.alightingStop = vehicle.lastStop;
+		try {
+			if (!event.getPersonId().toString().startsWith("pt_tr")) {
+				if (event.getVehicleId().toString().startsWith("tr")) {
+					TravellerChain chain = chains.get(event.getPersonId());
+					chain.traveledVehicle = true;
+					PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
+					double stageDistance = vehicle.removePassenger(event
+							.getPersonId());
+					Trip trip = chain.journeys.getLast().trips.getLast();
+					trip.distance = stageDistance;
+					trip.alightingStop = vehicle.lastStop;
+				}
 			}
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getVehicleId().toString().startsWith("tr"))
-			ptVehicles.get(event.getVehicleId()).in = true;
+		try {
+			if (event.getVehicleId().toString().startsWith("tr"))
+				ptVehicles.get(event.getVehicleId()).in = true;
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
+		}
 
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (event.getVehicleId().toString().startsWith("tr")) {
-			PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
-			if (vehicle.in)
-				vehicle.in = false;
-			vehicle.incDistance(network.getLinks().get(event.getLinkId())
-					.getLength());
-		} else {
-			TravellerChain chain = chains.get(event.getPersonId());
-			if (chain.inCar) {
-				chain.journeys.getLast().carDistance += network.getLinks()
-						.get(event.getLinkId()).getLength();
+		try {
+			if (event.getVehicleId().toString().startsWith("tr")) {
+				PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
+				if (vehicle.in)
+					vehicle.in = false;
+				vehicle.incDistance(network.getLinks().get(event.getLinkId())
+						.getLength());
+			} else {
+				TravellerChain chain = chains.get(event.getPersonId());
+				if (chain.inCar) {
+					chain.journeys.getLast().carDistance += network.getLinks()
+							.get(event.getLinkId()).getLength();
+				}
 			}
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		if (!event.getPersonId().toString().startsWith("pt_tr")) {
-			TravellerChain chain = chains.get(event.getPersonId());
-			stuck++;
-			chain.journeys.removeLast();
+		try {
+			if (!event.getPersonId().toString().startsWith("pt_tr")) {
+				TravellerChain chain = chains.get(event.getPersonId());
+				stuck++;
+				if (chain.journeys.size() > 0)
+					chain.journeys.removeLast();
+			}
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(TravelledEvent event) {
-		if (event.getPersonId().toString().startsWith("pt_tr"))
-			return;
-		TravellerChain chain = chains.get(event.getPersonId());
-		if (chain.traveledVehicle)
-			chain.traveledVehicle = false;
+		try {
+			if (event.getPersonId().toString().startsWith("pt_tr"))
+				return;
+			TravellerChain chain = chains.get(event.getPersonId());
+			if (chain.traveledVehicle)
+				chain.traveledVehicle = false;
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
+		}
 	}
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		ptVehicles.put(
-				event.getVehicleId(),
-				new PTVehicle(event.getTransitLineId(), event
-						.getTransitRouteId()));
+		try {
+			ptVehicles.put(
+					event.getVehicleId(),
+					new PTVehicle(event.getTransitLineId(), event
+							.getTransitRouteId()));
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
+		}
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		ptVehicles.get(event.getVehicleId()).lastStop = event.getFacilityId();
+		try {
+			ptVehicles.get(event.getVehicleId()).lastStop = event.getFacilityId();
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
+		}
 	}
 
 	public void writeSimulationResultsToSQL(File connectionProperties)
 			throws InstantiationException, IllegalAccessException,
-			ClassNotFoundException, IOException, SQLException, NoConnectionException {
+			ClassNotFoundException, IOException, SQLException,
+			NoConnectionException {
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		String formattedDate = df.format(new Date());
 		// start with activities
@@ -900,39 +975,54 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		tripWriter.finish();
 		transferWriter.finish();
 		String indexName = actTableName.substring(14);
-		String indexStatement = "CREATE INDEX " + indexName +"_paxidx ON "+ actTableName + "(person_id);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_facidx ON "+ actTableName + "(facility_id);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_type ON "+ actTableName + "(type);\n";		
+		String indexStatement = "CREATE INDEX " + indexName + "_paxidx ON "
+				+ actTableName + "(person_id);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_facidx ON "
+				+ actTableName + "(facility_id);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_type ON "
+				+ actTableName + "(type);\n";
 		DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
 		dba.executeStatement(indexStatement);
 		System.out.println(indexStatement);
-		
+
 		indexName = journeyTableName.substring(14);
-		indexStatement = "CREATE INDEX " + indexName +"_paxidx ON "+ journeyTableName + "(person_id);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_from_act ON "+ journeyTableName + "(from_act);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_to_act ON "+ journeyTableName + "(to_act);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_mainmode ON "+ journeyTableName + "(main_mode);\n";
+		indexStatement = "CREATE INDEX " + indexName + "_paxidx ON "
+				+ journeyTableName + "(person_id);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_from_act ON "
+				+ journeyTableName + "(from_act);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_to_act ON "
+				+ journeyTableName + "(to_act);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_mainmode ON "
+				+ journeyTableName + "(main_mode);\n";
 		dba.executeStatement(indexStatement);
 		System.out.println(indexStatement);
 
 		indexName = tripTableName.substring(14);
-		indexStatement = "CREATE INDEX " + indexName +"_journey_id ON "+ tripTableName + "(journey_id);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_mode ON "+ tripTableName + "(mode);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_line ON "+ tripTableName + "(line);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_route ON "+ tripTableName + "(route);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_board ON "+ tripTableName + "(boarding_stop);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_alight ON "+ tripTableName + "(alighting_stop);\n";
+		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
+				+ tripTableName + "(journey_id);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_mode ON "
+				+ tripTableName + "(mode);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_line ON "
+				+ tripTableName + "(line);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_route ON "
+				+ tripTableName + "(route);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_board ON "
+				+ tripTableName + "(boarding_stop);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_alight ON "
+				+ tripTableName + "(alighting_stop);\n";
 		dba.executeStatement(indexStatement);
 		System.out.println(indexStatement);
 
 		indexName = transferTableName.substring(14);
-		indexStatement = "CREATE INDEX " + indexName +"_journey_id ON "+ transferTableName + "(journey_id);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_from_trip ON "+ transferTableName + "(from_trip);\n";
-		indexStatement += "CREATE INDEX " + indexName +"_to_trip ON "+ transferTableName + "(to_trip);\n";
+		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
+				+ transferTableName + "(journey_id);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_from_trip ON "
+				+ transferTableName + "(from_trip);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_to_trip ON "
+				+ transferTableName + "(to_trip);\n";
 		dba.executeStatement(indexStatement);
 		System.out.println(indexStatement);
 
-		
 	}
 
 	public static void main(String[] args) throws IOException,
