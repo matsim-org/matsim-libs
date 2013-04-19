@@ -66,6 +66,9 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 
 	@Override
 	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time) {
+		
+		
+		
 		Id currentLinkId = agent.getCurrentLinkId();
 
 		Leg leg = agent.getCurrentLeg();

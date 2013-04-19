@@ -16,24 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies;
+package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 
-import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 
-public class GeneralParkingSearchStrategy implements ParkingSearchStrategy {
+public class FakeStrategy implements FullParkingSearchStrategy {
 
-	private FullParkingSearchStrategy fullParkingSearchStrategy;
-
-	public GeneralParkingSearchStrategy(FullParkingSearchStrategy fullParkingSearchStrategy){
-		this.fullParkingSearchStrategy = fullParkingSearchStrategy;
-	}
-	
 	@Override
 	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time) {
-		fullParkingSearchStrategy.applySearchStrategy(agent, time);
+		// TODO Auto-generated method stub
+		
 	}
+
+	@Override
+	public boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String getStrategyName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 
 }
 

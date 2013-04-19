@@ -69,6 +69,7 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreMan
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GarageParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.StreetParkingStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.FakeStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.OptimalParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
@@ -96,7 +97,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 	 * The distance to the agent's destination when an agent starts
 	 * its parking search.
 	 */
-	protected double searchRadius = 1.0;
+	protected double searchRadius = 1000;
 	
 	protected ParkingSearchIdentifier_v2 parkingSearchIdentifier;
 	protected ParkingSearchReplannerFactory searchReplannerFactory;
@@ -160,9 +161,10 @@ public class WithinDayParkingController extends WithinDayController implements R
 
 	private LinkedList<FullParkingSearchStrategy> getParkingStrategiesForScenario(ParkingRouterFactory parkingRouterFactory) {
 		LinkedList<FullParkingSearchStrategy> strategies=new LinkedList<FullParkingSearchStrategy>();
-		strategies.add(new GarageParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
-		strategies.add(new StreetParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
+		//strategies.add(new GarageParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
+		//strategies.add(new StreetParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
 		strategies.add(new OptimalParkingStrategy(parkingRouterFactory.createParkingRouter(), this.scenarioData, parkingAgentsTracker,  parkingInfrastructure));
+		//strategies.add(new FakeStrategy());
 		return strategies;
 	}
 	
