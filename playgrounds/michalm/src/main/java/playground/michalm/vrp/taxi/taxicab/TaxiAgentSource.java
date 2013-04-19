@@ -33,7 +33,6 @@ import playground.michalm.vrp.data.model.DynAgentVehicle;
 import playground.michalm.vrp.data.network.MatsimVertex;
 import playground.michalm.vrp.driver.VrpSchedulePlanFactory;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
-import playground.michalm.vrp.taxi.wal.*;
 
 
 public class TaxiAgentSource
@@ -65,15 +64,7 @@ public class TaxiAgentSource
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
         for (Vehicle vrpVeh : vehicles) {
-            TaxiAgentLogic taxiAgentLogic;
-
-            if (taxiSimEngine instanceof WalTaxiSimEngine) {// TODO (temporarily, to be removed)
-                taxiAgentLogic = new WalTaxiAgentLogic(vrpVeh, (WalTaxiSimEngine)taxiSimEngine);
-            }
-            else {
-                taxiAgentLogic = new TaxiAgentLogic(vrpVeh, taxiSimEngine);
-            }
-
+            TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(vrpVeh, taxiSimEngine);
             taxiSimEngine.addAgentLogic(taxiAgentLogic);
 
             ((DynAgentVehicle)vrpVeh).setAgentLogic(taxiAgentLogic);

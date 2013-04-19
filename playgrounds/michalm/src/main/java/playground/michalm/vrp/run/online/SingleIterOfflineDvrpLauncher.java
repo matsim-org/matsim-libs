@@ -202,12 +202,12 @@ public class SingleIterOfflineDvrpLauncher
     {
         switch (algorithmType) {
             case ONE_TIME_SCHEDULING:
-                optimizerFactory = TaxiOptimizerWithoutReassignment
+                optimizerFactory = OTSTaxiOptimizer
                         .createFactory(optimizationPolicy);
                 break;
 
             case RE_SCHEDULING:
-                optimizerFactory = TaxiOptimizerWithReassignment.createFactory(optimizationPolicy);
+                optimizerFactory = RESTaxiOptimizer.createFactory(optimizationPolicy);
                 break;
 
             default:

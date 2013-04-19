@@ -39,7 +39,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
@@ -60,11 +60,10 @@ import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.*;
 import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
-import playground.michalm.vrp.otfvis.VrpOTFClientLive;
+import playground.michalm.vrp.otfvis.OTFLiveUtils;
 import playground.michalm.vrp.run.VrpConfigUtils;
 import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
-import playground.michalm.vrp.taxi.wal.WalTaxiSimEngine;
 
 
 public class SingleIterOnlineDvrpLauncher
@@ -75,7 +74,6 @@ public class SingleIterOnlineDvrpLauncher
     String taxiCustomersFileName;
     String depotsFileName;
     String reqIdToVehIdFileName;
-    String dbFileName;
 
     boolean vrpOutFiles;
     String vrpOutDirName;
@@ -93,14 +91,13 @@ public class SingleIterOnlineDvrpLauncher
     TaxiOptimizerFactory optimizerFactory;
 
     boolean otfVis;
+
+
     // public static OTFQueryControl queryControl;
-
-    boolean wal;
-
 
     void defaultArgs()
     {
-        dirName = "D:\\PP-rad\\taxi\\mielec-morning-variable\\";
+        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
         netFileName = dirName + "network.xml";
 
         plansFileName = dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
@@ -140,8 +137,6 @@ public class SingleIterOnlineDvrpLauncher
 
         outputHistogram = true;
         vrpOutDirName = dirName + "histograms";
-
-        wal = false;
     }
 
 
@@ -175,8 +170,6 @@ public class SingleIterOnlineDvrpLauncher
         vrpOutFiles = Boolean.valueOf(params.get("vrpOutFiles"));
 
         vrpOutDirName = dirName + params.get("vrpOutDirName");
-
-        wal = false;
     }
 
 
@@ -258,18 +251,18 @@ public class SingleIterOnlineDvrpLauncher
     {
         switch (algorithmConfig.algorithmType) {
             case NO_SCHEDULING:
-                optimizerFactory = IdleTaxiDispatcher.createFactory(
+                optimizerFactory = NOSTaxiOptimizer.createFactory(
                         algorithmConfig == AlgorithmConfig.NOS_STRAIGHT_LINE,
                         algorithmConfig.optimizationPolicy);
                 break;
 
             case ONE_TIME_SCHEDULING:
-                optimizerFactory = TaxiOptimizerWithoutReassignment
+                optimizerFactory = OTSTaxiOptimizer
                         .createFactory(algorithmConfig.optimizationPolicy);
                 break;
 
             case RE_SCHEDULING:
-                optimizerFactory = TaxiOptimizerWithReassignment
+                optimizerFactory = RESTaxiOptimizer
                         .createFactory(algorithmConfig.optimizationPolicy);
                 break;
 
@@ -325,16 +318,32 @@ public class SingleIterOnlineDvrpLauncher
         TeleportationEngine teleportationEngine = new TeleportationEngine();
         qSim.addMobsimEngine(teleportationEngine);
 
-        TaxiSimEngine taxiSimEngine = wal ? new WalTaxiSimEngine(qSim, data, optimizerFactory,
-                dbFileName) : new TaxiSimEngine(qSim, data, optimizerFactory);
+        // // taken from SimEngine
+
+        final VrpData vrpData = data.getVrpData();
+        TaxiOptimizer optimizer = optimizerFactory.create(vrpData);
+        TaxiOptimizationPolicy optimizationPolicy = optimizerFactory.getOptimizationPolicy();
+
+        //
+        //
+        //
+
+        TaxiSimEngine taxiSimEngine = new TaxiSimEngine(qSim, data, optimizer, optimizationPolicy);
+
+        //
+        //
+        //
+
         qSim.addMobsimEngine(taxiSimEngine);
         qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
                 new DefaultAgentFactory(qSim), qSim));
         qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
         qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
 
+        OTFLiveUtils.initQueryHandler(qSim, vrpData);
+
         if (false /*vrpOutFiles*/) {
-            taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
+            optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
                 @Override
                 public JFreeChart createChart(VrpData data)
                 {
@@ -342,7 +351,7 @@ public class SingleIterOnlineDvrpLauncher
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
 
-            taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
+            optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
                 @Override
                 public JFreeChart createChart(VrpData data)
                 {
@@ -354,7 +363,7 @@ public class SingleIterOnlineDvrpLauncher
         if (otfVis) { // OFTVis visualization
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
-            VrpOTFClientLive.run(scenario.getConfig(), server);
+            OTFClientLive.run(scenario.getConfig(), server);
         }
 
         // events.addHandler(runningVehicleRegister = new RunningVehicleRegister());

@@ -21,19 +21,14 @@ package playground.michalm.vrp.taxi;
 
 import java.util.*;
 
-import javax.swing.SwingUtilities;
-
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
-import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizerFactory;
-import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 
 
@@ -42,13 +37,11 @@ public class TaxiSimEngine
 {
     private final VrpData vrpData;
     private final Netsim netsim;
-    private final VrpOptimizerFactory optimizerFactory;
+    private final MobsimTimer simTimer;
 
-    // ////////// begin: TO BE MOVED TO TAXI_OPTIMIZER?
     private TaxiOptimizer optimizer;
-    private final TaxiOptimizationPolicy optimizePolicy;
-    private final TaxiEvaluator taxiEvaluator = new TaxiEvaluator();
-    private final List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
+    // ////////// begin: TO BE MOVED TO TAXI_OPTIMIZER?
+    private final TaxiOptimizationPolicy optimizationPolicy;
     // ////////// end: TO BE MOVED TO TAXI_OPTIMIZER?
 
     private final List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
@@ -56,13 +49,15 @@ public class TaxiSimEngine
     private InternalInterface internalInterface;
 
 
-    public TaxiSimEngine(Netsim netsim, MatsimVrpData data, TaxiOptimizerFactory optimizerFactory)
+    public TaxiSimEngine(Netsim netsim, MatsimVrpData data, TaxiOptimizer optimizer,
+            TaxiOptimizationPolicy optimizationPolicy)
     {
         this.netsim = netsim;
-        this.optimizerFactory = optimizerFactory;
+        this.simTimer = netsim.getSimTimer();
+        this.optimizer = optimizer;
+        this.optimizationPolicy = optimizationPolicy;
 
         vrpData = data.getVrpData();
-        optimizePolicy = optimizerFactory.getOptimizationPolicy();
     }
 
 
@@ -99,65 +94,33 @@ public class TaxiSimEngine
     @Override
     public void onPrepareSim()
     {
-        vrpData.setTime(0);
-        // Reset schedules
-        for (Vehicle v : vrpData.getVehicles()) {
-            v.resetSchedule();
-        }
+        // important: in some cases one may need to decrease simTimer.time
+        vrpData.setTime((int)simTimer.getTimeOfDay());
 
-        // remove all existing requests
-        vrpData.getRequests().clear();
-
-        optimizer = (TaxiOptimizer)optimizerFactory.create(vrpData);
-
-        optimize(0);// "0" should not be hard-coded
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run()
-            {
-                if (VrpOTFClientLive.queryControl != null) {
-                    for (Vehicle v : vrpData.getVehicles()) {
-                        QueryAgentPlan query = new QueryAgentPlan();
-                        query.setId(v.getName());
-                        VrpOTFClientLive.queryControl.createQuery(query);
-                    }
-                }
-            }
-        });
+        optimize();
     }
 
 
-    protected boolean update(Vehicle vrpVehicle)
-    {
-        return optimizer.updateSchedule(vrpVehicle);
-    }
-
-
-    protected void optimize(double now)
+    private void optimize()
     {
         optimizer.optimize();
-        // System.err.println("Optimization @simTime=" + vrpData.getTime());
-
         notifyAgents();
-        notifyOptimizerListeners(new OptimizerEvent((int)now, vrpData,
-                taxiEvaluator.evaluateVrp(vrpData)));
     }
 
 
     public void updateAndOptimizeBeforeNextTask(Vehicle vrpVehicle, double now)
     {
-        boolean scheduleChanged = update(vrpVehicle);
+        boolean scheduleChanged = optimizer.updateSchedule(vrpVehicle);
 
-        if (scheduleChanged && optimizePolicy.shouldOptimize(vrpVehicle.getSchedule())) {
-            optimize(now);
+        if (scheduleChanged && optimizationPolicy.shouldOptimize(vrpVehicle.getSchedule())) {
+            optimize();
         }
     }
 
 
     public void taxiRequestSubmitted(Request request, double now)
     {
-        optimize(now);
+        optimize();
     }
 
 
@@ -167,7 +130,7 @@ public class TaxiSimEngine
     @Override
     public void doSimStep(double time)
     {
-        // this happens at the end of QSim.doSimStep() therefore "time+1"
+        // this is executed at the end of QSim.doSimStep() therefore "time+1"
         // this value will be used throughout the next QSim.doSimStep() call
         vrpData.setTime((int)time + 1); // this can be moved to Before/AfterSimStepListener
     }
@@ -195,28 +158,8 @@ public class TaxiSimEngine
     }
 
 
-    public void removeAgent(TaxiAgentLogic agent)
+    public void removeAgentLogic(TaxiAgentLogic agentLogic)
     {
-        agentLogics.remove(agent);
-    }
-
-
-    private void notifyOptimizerListeners(OptimizerEvent event)
-    {
-        for (OptimizerListener l : optimizerListeners) {
-            l.optimizationPerformed(event);
-        }
-    }
-
-
-    public void addListener(OptimizerListener listener)
-    {
-        optimizerListeners.add(listener);
-    }
-
-
-    public void removeListener(OptimizerListener listener)
-    {
-        optimizerListeners.remove(listener);
+        agentLogics.remove(agentLogic);
     }
 }

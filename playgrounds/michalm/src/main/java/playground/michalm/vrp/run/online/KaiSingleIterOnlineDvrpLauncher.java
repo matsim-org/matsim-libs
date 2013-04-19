@@ -43,8 +43,6 @@ public class KaiSingleIterOnlineDvrpLauncher
 
         launcher.vrpOutFiles = !true;
         launcher.vrpOutDirName = launcher.dirName + "vrp_output";
-
-        launcher.wal = false;
     }
 
 

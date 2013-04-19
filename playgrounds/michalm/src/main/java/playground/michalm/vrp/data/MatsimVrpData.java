@@ -28,10 +28,10 @@ import playground.michalm.vrp.data.network.MatsimVrpGraph;
 
 public class MatsimVrpData
 {
-    private VrpData vrpData;
-    private Scenario scenario;
+    private final VrpData vrpData;
+    private final Scenario scenario;
 
-    private String coordSystem;
+    private final String coordSystem;
 
 
     public MatsimVrpData(VrpData vrpData, Scenario scenario)

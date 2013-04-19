@@ -21,6 +21,7 @@ package playground.michalm.demand.poznan;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -75,6 +76,20 @@ public class PoznanLanduseDemandGeneration
     }
 
 
+    private static class ZoneLanduseValidation
+    {
+        private final boolean residential;
+        private final boolean industrial;
+
+
+        private ZoneLanduseValidation(boolean residential, boolean industrial)
+        {
+            this.residential = residential;
+            this.industrial = industrial;
+        }
+    }
+
+
     private static final double PEOPLE_PER_VEHICLE = 1.2;
     private static final double RESIDENTIAL_TO_INDUSTRIAL_WORK = 0.33;
     private static final double RESIDENTIAL_TO_SHOP_SHOPPING = 0.1;
@@ -88,16 +103,18 @@ public class PoznanLanduseDemandGeneration
         {
             ActivityType activityType = ActivityType.valueOf(actType);
 
-            if (activityType != ActivityType.OTHER && validatedZones.contains(zone.getId())) {
-                Geometry geometry = selectionByZoneByActType.get(activityType).get(zone.getId())
-                        .select();
-
-                if (geometry != null) {
-                    return geometry;
-                }
+            if (activityType == ActivityType.OTHER) {
+                return (Geometry)zone.getZonePolygon().getDefaultGeometry(); // whole zone
             }
 
-            return (Geometry)zone.getZonePolygon().getDefaultGeometry();
+            Geometry geometry = selectionByZoneByActType.get(activityType).get(zone.getId())
+                    .select();
+
+            if (geometry != null) {
+                return geometry; // randomly selected subzone
+            }
+
+            return (Geometry)zone.getZonePolygon().getDefaultGeometry(); // whole zone
         }
 
 
@@ -106,8 +123,15 @@ public class PoznanLanduseDemandGeneration
         {
             ActivityType activityType = ActivityType.valueOf(actType);
 
-            if (activityType == ActivityType.OTHER || validatedZones.contains(zone.getId())) {
-                return true;
+            if (activityType == ActivityType.OTHER) {
+                return true; // whole zone
+            }
+
+            WeightedRandomSelection<Geometry> selection = selectionByZoneByActType
+                    .get(activityType).get(zone.getId());
+
+            if (selection.size() > 0) {
+                return true; // randomly selected subzone
             }
 
             for (Geometry g : forestByZone.get(zone.getId())) {
@@ -116,14 +140,14 @@ public class PoznanLanduseDemandGeneration
                 }
             }
 
-            return true;// outside forest
+            return true; // whole zone except forest
         }
     }
 
 
     private Scenario scenario;
     private Map<Id, Zone> zones;
-    private Set<Id> validatedZones;
+    private Map<Id, ZoneLanduseValidation> zoneLanduseValidation;
     private EnumMap<ActivityPair, Double> prtCoeffs;
     private EnumMap<ActivityType, Map<Id, WeightedRandomSelection<Geometry>>> selectionByZoneByActType;
     private Map<Id, List<Geometry>> forestByZone;
@@ -180,7 +204,12 @@ public class PoznanLanduseDemandGeneration
         Map<Id, WeightedRandomSelection<Geometry>> educationSelectionByZone = initSelectionByZone(ActivityType.EDUCATION);
         Map<Id, WeightedRandomSelection<Geometry>> shoppingSelectionByZone = initSelectionByZone(ActivityType.SHOPPING);
 
-        for (Id zoneId : validatedZones) {
+        for (Entry<Id, ZoneLanduseValidation> e : zoneLanduseValidation.entrySet()) {
+            Id zoneId = e.getKey();
+            Zone zone = zones.get(zoneId);
+            ZoneLanduseValidation validation = e.getValue();
+            Geometry zoneGeometry = (Geometry)zone.getZonePolygon().getDefaultGeometry();
+
             WeightedRandomSelection<Geometry> homeSelection = initSelection(zoneId,
                     homeSelectionByZone);
             WeightedRandomSelection<Geometry> workSelection = initSelection(zoneId,
@@ -190,15 +219,28 @@ public class PoznanLanduseDemandGeneration
             WeightedRandomSelection<Geometry> shoppingSelection = initSelection(zoneId,
                     shoppingSelectionByZone);
 
-            for (Geometry g : industrialByZone.get(zoneId)) {
-                workSelection.add(g, g.getArea());
+            if (validation.industrial) {
+                for (Geometry g : industrialByZone.get(zoneId)) {
+                    workSelection.add(g, g.getArea());
+                }
+            }
+            else {
+                workSelection.add(zoneGeometry, zoneGeometry.getArea());
             }
 
-            for (Geometry g : residentialByZone.get(zoneId)) {
-                double area = g.getArea();
-                homeSelection.add(g, area);
-                workSelection.add(g, RESIDENTIAL_TO_INDUSTRIAL_WORK * area);
-                shoppingSelection.add(g, RESIDENTIAL_TO_SHOP_SHOPPING * area);
+            if (validation.residential) {
+                for (Geometry g : residentialByZone.get(zoneId)) {
+                    double area = g.getArea();
+                    homeSelection.add(g, area);
+                    workSelection.add(g, RESIDENTIAL_TO_INDUSTRIAL_WORK * area);
+                    shoppingSelection.add(g, RESIDENTIAL_TO_SHOP_SHOPPING * area);
+                }
+            }
+            else {
+                double area = zoneGeometry.getArea();
+                homeSelection.add(zoneGeometry, area);
+                workSelection.add(zoneGeometry, RESIDENTIAL_TO_INDUSTRIAL_WORK * area);
+                shoppingSelection.add(zoneGeometry, RESIDENTIAL_TO_SHOP_SHOPPING * area);
             }
 
             for (Geometry g : schoolByZone.get(zoneId)) {
@@ -244,11 +286,15 @@ public class PoznanLanduseDemandGeneration
     private void readValidatedZones(String validatedZonesFile)
         throws FileNotFoundException
     {
-        validatedZones = new HashSet<Id>();
+        zoneLanduseValidation = new HashMap<Id, ZoneLanduseValidation>();
         Scanner scanner = new Scanner(new File(validatedZonesFile));
 
         while (scanner.hasNext()) {
-            validatedZones.add(scenario.createId(scanner.next()));
+            Id zoneId = scenario.createId(scanner.next());
+            boolean residential = scanner.nextInt() != 0;
+            boolean industrial = scanner.nextInt() != 0;
+
+            zoneLanduseValidation.put(zoneId, new ZoneLanduseValidation(residential, industrial));
         }
 
         scanner.close();
