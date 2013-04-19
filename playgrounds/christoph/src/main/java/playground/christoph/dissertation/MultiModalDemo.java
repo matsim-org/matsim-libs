@@ -115,7 +115,7 @@ public class MultiModalDemo {
 	
 	private static int numIterations = 100;
 	private static int numPersonsPerHour = 2500;
-	private static int hours = 2;
+	private static int hours = 4;
 	private static boolean createPlansForAllModes = false;
 	private static String randomMode = "RANDOM";
 	
@@ -128,7 +128,7 @@ public class MultiModalDemo {
 	/*package*/ static String legModes = TransportMode.car + "," + TransportMode.walk;
 	
 //	private static double capacity = Double.MAX_VALUE;
-	private static double capacity = 2500.0;
+	static double capacity = 2500.0;
 
 	private static double referenceCarSpeed = 50.0/3.6;
 	
@@ -139,6 +139,7 @@ public class MultiModalDemo {
 	 * If you have to adapt this, then something seems to be wrong! 
 	 */
 	private static final double expectedReferenceTravelTime = 1406.0;	// walk, m, 50
+//	private static final double expectedReferenceTravelTime = 1408.0;	// walk, m, 50, no random term
 	
 	public static void main(String[] args) {
 		
@@ -148,7 +149,7 @@ public class MultiModalDemo {
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
 		qSimConfigGroup.setNumberOfThreads(1);
 		qSimConfigGroup.setStartTime(0.0);
-		qSimConfigGroup.setEndTime(2*86400.0);
+		qSimConfigGroup.setEndTime(3*86400.0);
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setRemoveStuckVehicles(false);
 		qSimConfigGroup.setStorageCapFactor(1.0);
