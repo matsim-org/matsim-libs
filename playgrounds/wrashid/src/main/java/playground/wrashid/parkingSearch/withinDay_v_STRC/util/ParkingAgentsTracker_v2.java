@@ -49,7 +49,10 @@ public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements Ite
 	private DoubleValueHashMap<Id> firstCarDepartureTimeOfDay;
 	
 	
-
+	public Scenario getScenario(){
+		return scenario;
+	}
+	
 	public ParkingAgentsTracker_v2(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance, WithinDayParkingController controler) {
 		super(scenario, parkingInfrastructure, distance);
 		this.controler = controler;

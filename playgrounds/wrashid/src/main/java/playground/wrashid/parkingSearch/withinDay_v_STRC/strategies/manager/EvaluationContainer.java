@@ -19,11 +19,18 @@
 package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager;
 
 import java.util.LinkedList;
+import java.util.Random;
 
+import org.apache.log4j.Logger;
+import org.matsim.core.gbl.MatsimRandom;
+
+import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 
 public class EvaluationContainer {
 
+	private static final Logger log = Logger.getLogger(EvaluationContainer.class);
+	
 	LinkedList<StrategyEvaluation> evaluations;
 	
 	// this is super important, because if a parking container is not used in an iteration
@@ -44,6 +51,10 @@ public class EvaluationContainer {
 		for (FullParkingSearchStrategy fullStrat:allStrategies){
 			evaluations.add(new StrategyEvaluation(fullStrat));
 		}
+		
+		Random rand = MatsimRandom.getLocalInstance();
+		StrategyEvaluation randomSelectedEvaluationStrategy = evaluations.remove(rand.nextInt(evaluations.size()));
+		evaluations.addFirst(randomSelectedEvaluationStrategy);
 	}
 	
 	public StrategyEvaluation getCurrentSelectedStrategy(){
@@ -69,6 +80,12 @@ public class EvaluationContainer {
 	
 	public void updateScoreOfSelectedStrategy(double score){
 		evaluations.get(0).score=score;
+	}
+	
+	public void printAllScores(){
+		for (StrategyEvaluation strategyEvaluation:evaluations){
+			log.info(strategyEvaluation.strategy.getStrategyName() + "-> score: " + strategyEvaluation.score);
+		}
 	}
 
 }

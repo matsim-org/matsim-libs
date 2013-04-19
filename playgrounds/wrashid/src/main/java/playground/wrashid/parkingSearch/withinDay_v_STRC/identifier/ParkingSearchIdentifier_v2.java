@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -42,6 +44,7 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfr
 import playground.wrashid.parkingSearch.withinDay_v_STRC.events.ParkingSearchEvent;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.OptimalParkingStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.ParkAgentPaperStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 
 public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements MobsimInitializedListener {
@@ -97,6 +100,35 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 						continue;
 					}
 				}
+				
+				if (parkingStrategyForCurrentLeg instanceof ParkAgentPaperStrategy){
+					
+					ParkAgentPaperStrategy parkAgentPaperStrategy = (ParkAgentPaperStrategy) parkingStrategyForCurrentLeg;
+					
+					Link currentLink = parkingAgentsTracker.getScenario().getNetwork().getLinks().get(agent.getCurrentLinkId());
+					Link destinationLink = parkingAgentsTracker.getScenario().getNetwork().getLinks().get(agent.getCurrentLeg().getRoute().getEndLinkId());
+					
+					
+					if (GeneralLib.getDistance(currentLink.getCoord(), destinationLink.getCoord()) <1000){
+						
+					}
+					
+					//parkAgentPaperStrategy.startDawarenessMode();
+					//parkAgentPaperStrategy.registerNumberOfFreeParkingOnLink();
+					
+					
+					//Id facilityId = parkAgentPaperStrategy.reserveBestParking(agent, parkingAgentsTracker, time);
+					
+					
+					
+					//if (facilityId != null) {
+					//	parkingAgentsTracker.setSelectedParking(agentId, facilityId);
+					//	identifiedAgents.add(agent);
+					//	continue;
+					//}
+				}
+				
+				
 				
 				Id linkId = agent.getCurrentLinkId();
 				List<Id> facilityIds = parkingInfrastructure.getFreeParkingFacilitiesOnLink(linkId);

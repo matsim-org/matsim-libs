@@ -161,8 +161,8 @@ public class WithinDayParkingController extends WithinDayController implements R
 
 	private LinkedList<FullParkingSearchStrategy> getParkingStrategiesForScenario(ParkingRouterFactory parkingRouterFactory) {
 		LinkedList<FullParkingSearchStrategy> strategies=new LinkedList<FullParkingSearchStrategy>();
-		//strategies.add(new GarageParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
-		//strategies.add(new StreetParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
+		strategies.add(new GarageParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
+		strategies.add(new StreetParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
 		strategies.add(new OptimalParkingStrategy(parkingRouterFactory.createParkingRouter(), this.scenarioData, parkingAgentsTracker,  parkingInfrastructure));
 		//strategies.add(new FakeStrategy());
 		return strategies;
