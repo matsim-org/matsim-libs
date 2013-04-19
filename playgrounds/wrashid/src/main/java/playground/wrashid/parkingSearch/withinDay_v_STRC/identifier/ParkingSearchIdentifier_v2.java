@@ -95,7 +95,7 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 					Id facilityId = ((OptimalParkingStrategy) parkingStrategyForCurrentLeg).reserveBestParking(agent, parkingAgentsTracker, time);
 					
 					if (facilityId != null) {
-						parkingAgentsTracker.setSelectedParking(agentId, facilityId);
+						parkingAgentsTracker.setSelectedParking(agentId, facilityId, false);
 						identifiedAgents.add(agent);
 						continue;
 					}
@@ -140,7 +140,7 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 					 * The parkingAgentsTracker then reserves the parking lot.
 					 */
 					if (acceptParking(agent, facilityId)) { 
-						this.parkingAgentsTracker.setSelectedParking(agentId, facilityId);						
+						this.parkingAgentsTracker.setSelectedParking(agentId, facilityId, false);						
 					}
 				}
 				

@@ -72,7 +72,7 @@ public class ParkingInfrastructure_v2 extends ParkingInfrastructure {
 			ParkingFacility parkingFacility = this.parkingFacilities.get(parkingId);
 
 			// check free capacity
-			if (parkingFacility.getFreeCapacity() > 0)
+			if (parkingFacility.getFreeParkingCapacity() > 0)
 				parkings.add(parkingId);
 
 		}
@@ -89,7 +89,7 @@ public class ParkingInfrastructure_v2 extends ParkingInfrastructure {
 	}
 	
 	public int getParkingCapacity(Id parkingFacilityId){
-		return parkingFacilities.get(parkingFacilityId).getCapacity();
+		return parkingFacilities.get(parkingFacilityId).getParkingCapacity();
 	}
 
 	public IntegerValueHashMap<Id> getParkingFacilityCapacities() {

@@ -68,7 +68,10 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier implements Mobs
 			 * If the agent has not selected a parking facility yet.
 			 */
 			if (requiresReplanning(agent)) {
+				
 				Id linkId = agent.getCurrentLinkId();
+				boolean foundParking = false;
+				
 				List<Id> facilityIds = parkingInfrastructure.getFreeParkingFacilitiesOnLink(linkId, "streetParking");
 				if (facilityIds != null && facilityIds.size() > 0) {
 					Id facilityId = facilityIds.get(0);
@@ -78,9 +81,29 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier implements Mobs
 					 * The parkingAgentsTracker then reserves the parking lot.
 					 */
 					if (acceptParking(agent, facilityId)) { 
-						this.parkingAgentsTracker.setSelectedParking(agentId, facilityId);						
+						this.parkingAgentsTracker.setSelectedParking(agentId, facilityId, false);
+						foundParking = true;
 					}
 				}
+				
+				// else: check whether the agent is also willing to wait for a free parking
+				
+				if (!foundParking) {
+					facilityIds = parkingInfrastructure.getFreeWaitingFacilitiesOnLink(linkId, "streetParking");
+					if (facilityIds != null && facilityIds.size() > 0) {
+						Id facilityId = facilityIds.get(0);
+
+						/*
+						 * If the agent accepts the parking, select it.
+						 * The parkingAgentsTracker then reserves the parking lot.
+						 */
+						if (acceptParking(agent, facilityId) && isWillingToWaitForParking(agent, facilityId)) { 
+							this.parkingAgentsTracker.setSelectedParking(agentId, facilityId, true);
+							foundParking = true;
+						}
+					}
+				}
+
 				
 				identifiedAgents.add(agent);
 			}
@@ -92,6 +115,11 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier implements Mobs
 	private boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
 		// TODO: allow the agent to refuse the parking
 		return true;
+	}
+	
+	private boolean isWillingToWaitForParking(PlanBasedWithinDayAgent agent, Id facilityId) {
+		// TODO: add a behavioural model, that e.g. takes the facilities capacity into account
+		return false;
 	}
 	
 	/*

@@ -119,6 +119,9 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		lastTimeStepsLinkEnteredAgents.clear();
 		lastTimeStepsLinkEnteredAgents.addAll(linkEnteredAgents);
 		linkEnteredAgents.clear();
+		
+		// try moving waiting vehicles to free parkings
+		this.parkingInfrastructure.waitingToParking();
 	}
 
 	/*
@@ -128,7 +131,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		return lastTimeStepsLinkEnteredAgents;
 	}
 
-	public void setSelectedParking(Id agentId, Id parkingFacilityId) {
+	public void setSelectedParking(Id agentId, Id parkingFacilityId, boolean isWaiting) {
 		
 //		log.info("Select parking facility " + parkingFacilityId + " for agent " + agentId);
 		
@@ -136,7 +139,12 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		
 //		Id vehicleId = this.parkingInfrastructure.getVehicleId(agents.get(agentId).getSelectedPlan().getPerson());
 		Id vehicleId = agentId;	// so far, this is true...
-		this.parkingInfrastructure.reserveParking(vehicleId, parkingFacilityId);
+		
+		if (!isWaiting) {
+			this.parkingInfrastructure.reserveParking(vehicleId, parkingFacilityId);			
+		} else {
+			this.parkingInfrastructure.reserveWaiting(vehicleId, parkingFacilityId);
+		}
 	}
 
 	public Id getSelectedParking(Id agentId) {
