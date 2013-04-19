@@ -37,11 +37,6 @@ public class Convert {
 		scenario.getConfig().otfVis().setColoringScheme(ColoringScheme.gtfs);
 		scenario.getConfig().otfVis().setDrawTransitFacilities(false);
 		scenario.getConfig().transitRouter().setMaxBeelineWalkConnectionDistance(1.0);
-//		for (TransitStopFacility facility : scenario.getTransitSchedule().getFacilities().values()) {
-//			if (scenario.getNetwork().getLinks().get(facility.getId()) == null) {
-//				throw new RuntimeException();
-//			}
-//		}
 		new NetworkWriter(scenario.getNetwork()).write("/Users/vspuser/gtfs-ulm/network.xml");
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("/Users/vspuser/gtfs-ulm/transit-schedule.xml");
 		new VehicleWriterV1(((ScenarioImpl) scenario).getVehicles()).writeFile("/Users/vspuser/gtfs-ulm/transit-vehicles.xml");		
@@ -56,13 +51,6 @@ public class Convert {
 		config.scenario().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		GtfsConverter gtfs = new GtfsConverter("/Users/vspuser/gtfs-ulm", scenario, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S));
-//		GtfsConverter gtfs = new GtfsConverter("/Users/vspuser/gtfs-ulm", scenario, new CoordinateTransformation() {
-//			
-//			@Override
-//			public Coord transform(Coord coord) {
-//				return coord;
-//			}
-//		});
 		gtfs.setCreateShapedNetwork(false); // Shaped network doesn't work yet.
 		gtfs.setDate(20130824);
 		gtfs.convert();

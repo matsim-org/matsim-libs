@@ -20,12 +20,14 @@ public final class OTPTripRouterFactory implements
 
 	private CoordinateTransformation ct;
 
+	private String day;
+
 	
 
-	public OTPTripRouterFactory(TransitSchedule transitSchedule, CoordinateTransformation ct) {
+	public OTPTripRouterFactory(TransitSchedule transitSchedule, CoordinateTransformation ct, String day) {
 		File path = new File("/Users/vspuser/gtfs-ulm/Graph.obj");
 		try {
-			graph = Graph.load(path, Graph.LoadLevel.DEBUG);
+			graph = Graph.load(path, Graph.LoadLevel.FULL);
 		} catch (IOException e) {
 			throw new RuntimeException();
 		} catch (ClassNotFoundException e) {
@@ -35,6 +37,7 @@ public final class OTPTripRouterFactory implements
 		pathservice.setSptService(sptService);
 		this.transitSchedule = transitSchedule;
 		this.ct = ct;
+		this.day = day;
 	}
 
 	private GraphServiceImpl graphservice = new GraphServiceImpl() {
@@ -50,7 +53,7 @@ public final class OTPTripRouterFactory implements
 	@Override
 	public TripRouter createTripRouter() {
 		TripRouter tripRouter = new TripRouter();
-		tripRouter.setRoutingModule("pt", new OTPRoutingModule(pathservice, transitSchedule, ct));
+		tripRouter.setRoutingModule("pt", new OTPRoutingModule(pathservice, transitSchedule, day, ct));
 		return tripRouter;
 	}
 }

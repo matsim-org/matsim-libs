@@ -2,7 +2,10 @@ package playground.mzilske.ulm;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -42,7 +45,11 @@ public class GenerateAndRoutePopulation {
 	private NetworkImpl network;
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
-		new GenerateAndRoutePopulation().convert();
+		long fourCores = new GenerateAndRoutePopulation().convert(4);
+		long oneCore = new GenerateAndRoutePopulation().convert(0);
+		
+		System.out.println(oneCore);
+		System.out.println(fourCores);
 	}
 
 
@@ -53,7 +60,7 @@ public class GenerateAndRoutePopulation {
 
 
 
-	private void convert() {
+	private long convert(int nCores) {
 		// final Scenario scenario = readScenario();
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseVehicles(true);
@@ -83,7 +90,7 @@ public class GenerateAndRoutePopulation {
 
 		population = scenario.getPopulation();
 		network = (NetworkImpl) scenario.getNetwork();
-		for (int i=0; i<10; ++i) {
+		for (int i=0; i<500; ++i) {
 			Coord source = new CoordImpl(minX + Math.random() * (maxX - minX), minY + Math.random() * (maxY - minY));
 			Coord sink = new CoordImpl(minX + Math.random() * (maxX - minX), minY + Math.random() * (maxY - minY));
 			Person person = population.getFactory().createPerson(new IdImpl(Integer.toString(i)));
@@ -103,20 +110,27 @@ public class GenerateAndRoutePopulation {
 			population.addPerson(person);
 		}
 
-		final OTPTripRouterFactory trf = new OTPTripRouterFactory(scenario.getTransitSchedule(), TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84));
+//		final OTPTripRouterFactory trf = new OTPTripRouterFactory(scenario.getTransitSchedule(), TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84), "2013-08-24");
 
+		Date begin = new Date();
+		
 		// make sure all routes are calculated.
-		ParallelPersonAlgorithmRunner.run(population, 1,
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			@Override
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(new PlanRouter(
-						trf.createTripRouter(),
-						((ScenarioImpl)scenario).getActivityFacilities()), scenario);
-			}
-		});
+//		ParallelPersonAlgorithmRunner.run(population, nCores,
+//				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+//			@Override
+//			public AbstractPersonAlgorithm getPersonAlgorithm() {
+//				return new PersonPrepareForSim(new PlanRouter(
+//						trf.createTripRouter(),
+//						((ScenarioImpl)scenario).getActivityFacilities()), scenario);
+//			}
+//		});
 
+		Date end = new Date();
+		
+		
 		new PopulationWriter(population, scenario.getNetwork()).writeV5("/Users/vspuser/gtfs-ulm/population.xml");
+
+		return (end.getTime() - begin.getTime()) / 1000;
 
 	}
 

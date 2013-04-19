@@ -70,7 +70,7 @@ public class Run {
 			}
 			
 		});
-		controler.setTripRouterFactory(new OTPTripRouterFactory(scenario.getTransitSchedule(), new IdentityTransformation()));
+		controler.setTripRouterFactory(new OTPTripRouterFactory(scenario.getTransitSchedule(), new IdentityTransformation(), "2013-08-24"));
 		
 		controler.run();
 

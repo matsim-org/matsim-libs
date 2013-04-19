@@ -3,6 +3,7 @@ package playground.mzilske.vbb;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -63,17 +64,23 @@ public class OTPRoutingModule implements RoutingModule {
 
 	private CoordinateTransformation ct;
 
-	public OTPRoutingModule(PathService pathservice, TransitSchedule transitSchedule, CoordinateTransformation ct) {
+	private Date day;
+
+	public OTPRoutingModule(PathService pathservice, TransitSchedule transitSchedule, String date, CoordinateTransformation ct) {
 		this.pathservice = pathservice;
 		this.transitSchedule = transitSchedule;
 		this.ct = ct;
+		try {
+			this.day = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-		LinkedList<Leg> baseTrip = routeLeg(fromFacility, toFacility);
+		LinkedList<Leg> baseTrip = routeLeg(fromFacility, toFacility, departureTime);
 		return baseTrip;
-		//	return fillWithActivities(baseTrip, fromFacility, toFacility);
 	}
 
 	@Override
@@ -81,31 +88,27 @@ public class OTPRoutingModule implements RoutingModule {
 		return new StageActivityTypesImpl( Arrays.asList( PtConstants.TRANSIT_ACTIVITY_TYPE ) );
 	}
 
-	private LinkedList<Leg> routeLeg(Facility fromFacility, Facility toFacility) {
+	private LinkedList<Leg> routeLeg(Facility fromFacility, Facility toFacility, double departureTime) {
 		LinkedList<Leg> legs = new LinkedList<Leg>();
 		TraverseModeSet modeSet = new TraverseModeSet();
 		modeSet.setWalk(true);
-		modeSet.setBicycle(true);
-		modeSet.setFerry(true);
-		modeSet.setTrainish(true);
-		modeSet.setBusish(true);
+//		modeSet.setBicycle(false);
+//		modeSet.setFerry(true);
+//		modeSet.setTrainish(true);
+//		modeSet.setBusish(true);
 		modeSet.setTransit(true);
+		modeSet.setCar(false);
 		RoutingRequest options = new RoutingRequest(modeSet);
 		options.setWalkBoardCost(3 * 60); // override low 2-4 minute values
-		// TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
 		options.setBikeBoardCost(3 * 60 * 2);
-		// there should be a ui element for walk distance and optimize type
 		options.setOptimize(OptimizeType.QUICK);
 		options.setMaxWalkDistance(Double.MAX_VALUE);
-
-		Date when = null;
-		try {
-			when = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse("2013-08-24 10:00:00");
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		options.setDateTime(when);
+		 
+		Calendar when = Calendar.getInstance();
+		when.setTime(day);
+		when.add(Calendar.SECOND, (int) departureTime);
+		
+		options.setDateTime(when.getTime());
 
 		Coord fromCoord = ct.transform(fromFacility.getCoord());
 		Coord toCoord = ct.transform(toFacility.getCoord());
@@ -127,7 +130,7 @@ public class OTPRoutingModule implements RoutingModule {
 		Id currentLinkId = fromFacility.getLinkId();
 		if (paths != null) {
 			GraphPath path = paths.get(0);
-			path.dump();
+		//	path.dump();
 			boolean onBoard = false;
 			String stop = null;
 			long time = 0;
