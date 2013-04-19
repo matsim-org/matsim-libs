@@ -497,8 +497,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 					}
 					else{
 						log.error("The parameter 'useTravelTimesAndDistances' is set TRUE but either no pt travel time or distance input file found! Both files needs to be set to use precomputed pt times and distances.");
-						log.error("Given input file for 'ptTravelTimes' = " + ptTravelTimes);
-						log.error("Given input file for 'ptTravelDistances' = " + ptTravelDistances);
+						log.error("Given input file name for 'ptTravelTimes' = " + ptTravelTimes);
+						log.error("Given input file name for 'ptTravelDistances' = " + ptTravelDistances);
+						log.error("At least one of these two files was not found.  Aborting ...") ;
 						System.exit(InternalConstants.FILE_NOT_FOUND);
 					}
 				}
