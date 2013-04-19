@@ -29,14 +29,13 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -54,12 +53,12 @@ import playground.vsp.analysis.modules.ptOperator.TransitEventHandler;
  * @author julia
  */
 
-//TODO Variablennamen vs Werte
 //TODO explain  which cases are covered/tested
 //not covered: link not in network
 //TODO departure ohne arrival?
-//TODO do i need to test the reset? no
-//(so far) no need to test getVehicleIds, getVehicleKm
+//do i need to test the reset? no
+// writeOutput is not tested
+//TODO no need to test getVehicleIds, getVehicleKm
 
 
 
@@ -68,7 +67,7 @@ public class TestTransitEventHandler extends TestCase{
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	private long time;
 	private String pt = "pt"; //name for public transport mode
-	private String car = "car"; //other mode. no need to be implemented - TODO try null, "", "abcde"
+	private String car = "cr"; //other mode
 	
 	protected void setUp(){
 		System.out.println("Starting " + super.getName());
@@ -91,8 +90,9 @@ public class TestTransitEventHandler extends TestCase{
 		NetworkImpl network = (NetworkImpl) sc.getNetwork();
 		Node node1 = network.createAndAddNode(sc.createId("node 1"), sc.createCoord(-20000.0,     0.0));
 		Node node2 = network.createAndAddNode(sc.createId("node 2"), sc.createCoord(-17500.0,     0.0));
-		network.createAndAddLink(sc.createId(link1N), node1, node2, 1000, 27.78, 3600, 1, null, null); //link type was "22" but is probably not needed here
-		network.createAndAddLink(sc.createId(link2N), node1, node2, 1000, 27.78, 3600, 1, null, ""); //link type was "22" but is probably not needed here
+		Double linklength1 = 1000., linklength2 = 1007.;
+		network.createAndAddLink(sc.createId(link1N), node1, node2, linklength1, 27.78, 3600, 1, null, null); //link type was "22" but is probably not needed here
+		network.createAndAddLink(sc.createId(link2N), node1, node2, linklength2, 27.78, 3600, 1, null, ""); //link type was "22" but is probably not needed here
 		network.createAndAddLink(sc.createId(link3N), node2, node1, 0, 30, 4000, 1); //TODO zero length! shall we test this? -> Ihab
 
 		//not using a config or controler 
@@ -105,16 +105,21 @@ public class TestTransitEventHandler extends TestCase{
 		LinkedList<AgentArrivalEvent> arrivalEvents = new LinkedList<AgentArrivalEvent>();
 		LinkedList<AgentDepartureEvent> departureEvents = new LinkedList<AgentDepartureEvent>();
 		LinkedList<TransitDriverStartsEvent> transitEvents = new LinkedList<TransitDriverStartsEvent>();
+		LinkedList<LinkLeaveEvent> leaveEvents = new LinkedList<LinkLeaveEvent>(); //TODO -> Ihab Vehicle km werden nur gezählt, wenn
+		//Links verlassen werden. falls links bis zum ende der sim. nicht verlassen wurden, verfällt alles
+		//beim verlassen des Links wird die gesammte Linklaenge gezaehlt
 		
 		createArrivalEvents(arrivalEvents);
 		createDepartureEvents(departureEvents);
 		createTransitEvents(transitEvents);
+		createLinkLeaveEvents(leaveEvents);
 				
 		//handle events
 		PtDriverIdHandler pdih = new PtDriverIdHandler();
 		pdih.reset(0);
 		
-		//init is not part of the abstract analysis module //TODO set link!
+		//init is not part of the abstract analysis module
+		// @link playground.vsp.analyis.modules.AbstractAnalysisModule
 		//therefore it is tested here - empty initialization, double initialization
 		//TODO ask Andreas about it - AbstractAnalysisModule is his
 		//other methods are inherited from the abstract module -> not tested here
@@ -135,8 +140,8 @@ public class TestTransitEventHandler extends TestCase{
 		
 		for(TransitDriverStartsEvent e: transitEvents){
 			pdih.handleEvent(e);
-		//	Assert.assertTrue("this event should be a pt event", ptDriverIdAnalyzer.isPtDriver(e.getDriverId()));
-			
+			Assert.assertTrue("this event should be a pt event", ptDriverIdAnalyzer.isPtDriver(e.getDriverId()));
+			teh.handleEvent(e);
 		}
 		
 		for(AgentDepartureEvent e: departureEvents){
@@ -147,12 +152,13 @@ public class TestTransitEventHandler extends TestCase{
 			teh.handleEvent(e);
 		}
 		
-
-
+		for(LinkLeaveEvent e: leaveEvents){
+			teh.handleEvent(e);
+		}
 		
+
+		//create a list of all pt events manually to check 'isPtDriverMethod'	
 		LinkedList<String> ptList = new LinkedList<String>();
-		
-		//create manually a list of all pt events to check 'isPtDriverMethod'
 		ptList.add(aeN);ptList.add(noDN);//ptList.add(negDN); //TODO
 		ptList.add(norN);
 		ptList.add(difLinks1N); //ptList.add(difPer1N); ptList.add(difPer2N); //TODO
@@ -164,7 +170,9 @@ public class TestTransitEventHandler extends TestCase{
 			if(!ptDriverIdAnalyzer.isPtDriver(new IdImpl(id))){
 				System.out.println(id + " should be in the ptList but is not. Failure at ptDriverIdAnalyzer.isPtDriver" );
 			}
+			Assert.assertTrue(pdih.getPtDriverIDs().contains(new IdImpl(id))); //maybe this should be outsourced to a ptdriveridhandler test?
 		}
+		
 		//hat der ptDriverAnalyzer mehr ptevents als er haben sollte?
 		//muessen nur noch laenge vergleichen mit dem test oben sind ja alle drin, die drin sein sollen
 		//waeren falsche elemete drin, muesste die liste also laenger sein
@@ -175,19 +183,33 @@ public class TestTransitEventHandler extends TestCase{
 		
 		//test TransitEventHandler.getVehicleHours
 		//manually calculate the expected value
-		Double exp= .0 + aeTa-aeTd + noDTa-noDTd+ norTa-norTd 
-				//'bycar' should not be counted since it is not pt
+		Double expectedVehicleTime= .0 + aeTa-aeTd + noDTa-noDTd+ norTa-norTd 
+		//'bycar' should not be counted since it is not pt
 		+ difLinks2Ta - difLinks2Td
 		// + difLinks1Ta-difLinks1Td //this would  be for the second 'diffentent links' event but it doesnt count. why?
 		//is this link initialized? //TODO look at this
 		+ difPer1Ta-difPer1Td+ difPer2Ta-difPer2Td;
-		exp= exp/3600.0; //seconds to hours
+		expectedVehicleTime= expectedVehicleTime/3600.0; //seconds to hours
+			
+		Assert.assertEquals("total duration should be"+expectedVehicleTime, expectedVehicleTime, teh.getVehicleHours(), MatsimTestUtils.EPSILON);
 		
-		Assert.assertEquals("total duration should be"+exp, exp, teh.getVehicleHours(), MatsimTestUtils.EPSILON);
-	
+		//test TransitEventHandler.getVehicleIDs
+		Assert.assertTrue("vehicle 1 should be in the list of (used) public transport vehicles", teh.getVehicleIDs().contains(new IdImpl(veh1N)));
+		Assert.assertTrue("vehicle 2 should be in the list of (used) public transport vehicles", teh.getVehicleIDs().contains(new IdImpl(veh1N)));
+		Assert.assertEquals(2, teh.getVehicleIDs().size()); //there should be exactly two vehicles that were used
+		
+		//test TransitEventHandler.getVehicleKm
+		//vehicle kilometers are calculated from linkleaveevents!
+		//manually calculate the expected value
+		Double expectedVehicleKm= 
+				6*linklength1 + linklength2; // six pt-events on first link, one pt-event on second link
+			//das muss mit der negativen dauer ggf angepasst werden
+		expectedVehicleKm = expectedVehicleKm/1000.; //meter -> kilometer
+
+		Assert.assertEquals("expected and calculated vehicle kilometers did not match",expectedVehicleKm, teh.getVehicleKm(), MatsimTestUtils.EPSILON);
+
 
 	}
-	
 
 	
 	//TODO -> Ihab: gleiche Strings oder gleiche IdImpl verwenden?
@@ -244,7 +266,6 @@ public class TestTransitEventHandler extends TestCase{
 	}
 	
 
-	
 	private void createDepartureEvents(LinkedList<AgentDepartureEvent> departureEvents) {
 		IdImpl link1 = new IdImpl(link1N), link2 = new IdImpl(link2N), link3 = new IdImpl(link3N); 
 		
@@ -267,12 +288,13 @@ public class TestTransitEventHandler extends TestCase{
 		departureEvents.add(difLinks2);departureEvents.add(difPer1);departureEvents.add(difPer2);
 		
 	}	
+	
+	
 	private void createTransitEvents(LinkedList<TransitDriverStartsEvent> transitEvents) {
-		//TODO different vehicles
-		IdImpl veh1 = new IdImpl(veh1N);
+		IdImpl veh1 = new IdImpl(veh1N), veh2 = new IdImpl(veh2N);
 		
 		//create transit events (time, driverId, vehicleId, transitLineId, transitRouteId, departureId)
-		TransitDriverStartsEvent ae = new TransitDriverStartsEvent(aeTs, new IdImpl(aeN), veh1, null, null, null);
+		TransitDriverStartsEvent ae = new TransitDriverStartsEvent(aeTs, new IdImpl(aeN), veh2, null, null, null);
 		TransitDriverStartsEvent noD = new TransitDriverStartsEvent(noDTs, new IdImpl(noDN), veh1, null, null, null);
 		TransitDriverStartsEvent negD = new TransitDriverStartsEvent(negDTs, new IdImpl(negDN), veh1, null, null, null);
 		TransitDriverStartsEvent nor = new TransitDriverStartsEvent(norTs, new IdImpl(norN), veh1, null, null, null);
@@ -290,6 +312,35 @@ public class TestTransitEventHandler extends TestCase{
 		transitEvents.add(difPer1); transitEvents.add(difPer2); 
 		
 	}
+	
+	private void createLinkLeaveEvents(LinkedList<LinkLeaveEvent> leaveEvents){
+		IdImpl veh1 = new IdImpl(veh1N), veh2 = new IdImpl(veh2N), vehcar = new IdImpl(car);
+		IdImpl link1 = new IdImpl(link1N), link2 = new IdImpl(link2N), link3 = new IdImpl(link3N);
+		
+		//create linkleaveEvents
+		//TODO benutze arrivaltime=linkleavetime ist das ok?
+		// these events are consistent with transit and arrival events. other cases not (yet?) tested
+		LinkLeaveEvent ae = new LinkLeaveEvent(aeTa, new IdImpl(aeN), new IdImpl(link1N), new IdImpl(veh2N));
+		LinkLeaveEvent noD = new LinkLeaveEvent(noDTa, new IdImpl(noDN), link1, veh1);
+		LinkLeaveEvent negD = new LinkLeaveEvent(negDTa, new IdImpl(negDN), link1, veh1);
+		LinkLeaveEvent nor = new LinkLeaveEvent(norTa, new IdImpl(norN), link1, veh1);
+		LinkLeaveEvent bycar = new LinkLeaveEvent(bycarTa, new IdImpl(bycarN), link1, vehcar);
+		LinkLeaveEvent difLinks1 = new LinkLeaveEvent(difLinks1Ta, new IdImpl(difLinks1N), link1, veh1);
+		LinkLeaveEvent difLinks2 = new LinkLeaveEvent(difLinks2Ta, new IdImpl(difLinks2N), link2, veh1);
+		LinkLeaveEvent difPer1 = new LinkLeaveEvent(difPer1Ta, new IdImpl(difPer1N), link1, veh1);
+		LinkLeaveEvent difPer2 = new LinkLeaveEvent(difPer2Ta, new IdImpl(difPer2N), link1, veh1);
+		
+		//add events to list
+		leaveEvents.add(ae); 
+		leaveEvents.add(noD); 
+		//leaveEvents.add(negD); //TODO -> Ihab bisher wird das auch nicht bei den veh. km gezaehlt 
+		leaveEvents.add(nor); 
+		leaveEvents.add(bycar); 
+		leaveEvents.add(difLinks1);
+		leaveEvents.add(difLinks2); leaveEvents.add(difPer1); leaveEvents.add(difPer2);
+	}
+	
+	//TODO doku, warum diese methoden nicht explizit getested wurden
 	/*
 	@Test @Ignore
 	public final void testHandleEventAgentDeparture(){
@@ -307,14 +358,6 @@ public class TestTransitEventHandler extends TestCase{
 	public final void testGetVehicleHours(){
 		
 	}
-	*/
-	/*
- * AgentArrivalEvent aae = new AgentArrivalEvent(360, new IdImpl("50"), new IdImpl("13"), pt);
-		//LinkLeaveEvent lle = new LinkLeaveEvent(70, new IdImpl("50"), new IdImpl("13"), new IdImpl("vehicle1"));
-		//needed to test for vehicle hours
-		AgentDepartureEvent ade = new AgentDepartureEvent(00, new IdImpl("50"), new IdImpl("13"), pt);
-		
- * 
- * */
+*/
 }
 
