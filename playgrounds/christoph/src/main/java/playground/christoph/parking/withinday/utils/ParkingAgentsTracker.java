@@ -203,6 +203,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		
 		boolean wasCarTrip = this.recentlyArrivedDrivers.remove(event.getPersonId());
 		if (wasCarTrip) {
 			Id vehicleId = event.getPersonId(); // so far, this is true...

@@ -129,9 +129,6 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		
 		int currentPlanElementIndex = withinDayAgent.getCurrentPlanElementIndex();
 		
-		// remove parts of the route that have not been passed by the agent yet
-		cutRoute(route, routeIndex);
-		
 		// check whether the walk leg from the parking to the actual facility has to be updated
 		boolean parkingFacilityWasChanged = false;
 		boolean parkingLinkWasChanged = false;
@@ -145,9 +142,17 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		 * If the parking was relocated to another link
 		 */
 		if (parkingLinkWasChanged) {
-			Leg walkLegToNextActivity = (Leg) plan.getPlanElements().get(currentPlanElementIndex + 2);
 			
+			// relocate parking activity to its new location
 			relocateParkingActivity(parkingActivity, parkingFacility);
+			
+			// remove parts of the route that have not been passed by the agent yet
+			cutRoute(route, routeIndex);
+			
+			// extend route if it does not end at the agent's selected parking facility
+			extendRoute(route, parkingActivity.getLinkId(),  plan.getPerson(), null);
+			
+			Leg walkLegToNextActivity = (Leg) plan.getPlanElements().get(currentPlanElementIndex + 2);
 			
 			updateStartOfWalkRoute((NetworkRoute) walkLegToNextActivity.getRoute(), parkingFacility.getLinkId(), 
 					walkLegToNextActivity.getDepartureTime(), plan.getPerson(), null);
@@ -212,6 +217,14 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		if (length >= routeIndex) {
 			List<Id> linkIds = new ArrayList<Id>(route.getLinkIds().subList(0, routeIndex - 1));
 			route.setLinkIds(route.getStartLinkId(), linkIds, route.getLinkIds().get(routeIndex - 1));
+		}
+	}
+	
+	// extend route if the route does not end at the agent's selected parking facility
+	private void extendRoute(NetworkRoute route, Id parkingLinkId, Person person, Vehicle vehicle) {
+		
+		if (!route.getEndLinkId().equals(parkingLinkId)) {
+			this.parkingRouter.extendRoute(route, parkingLinkId, time, person, vehicle, TransportMode.car);			
 		}
 	}
 	
