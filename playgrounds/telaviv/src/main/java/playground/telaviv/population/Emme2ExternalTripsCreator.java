@@ -72,11 +72,16 @@ public class Emme2ExternalTripsCreator {
 	 * We got Trips per Hour in the input file.
 	 * The Period lasts from 06:00 to 09:00 therefore
 	 * we have to multiply the number of trips by 3.
+	 * 
+	 * Edit:
+	 * We do not use the periods' durations but the pick hour factors.
 	 */
-//	private double periodDuration = 3;
-	private double periodDurationAM = 3.0;
+//	private double periodDurationAM = 3.0;
+//	private double periodDurationOP = 6.0;
+//	private double periodDurationPM = 5.0;
+	private double periodDurationAM = 2.3;
 	private double periodDurationOP = 6.0;
-	private double periodDurationPM = 5.0;
+	private double periodDurationPM = 4.3;
 	
 	/*
 	 * We use a 10% Scenario therefore we have to reduce
@@ -273,26 +278,6 @@ public class Emme2ExternalTripsCreator {
 	private ActivityFacility getActivityFacilityByLinkId(Id id) {	
 		return activityFacilities.getFacilities().get(id);
 	}
-	
-//	private double getDepartureTime() {
-//		double d = random.nextDouble();
-//		
-////		d = d * 12;
-////		
-////		if (d < 1)       return 6.0 * 3600 + Math.round(d * 30 * 60);
-////		else if (d < 3)  return 6.5 * 3600 + Math.round((d - 1)/2 * 30 * 60);
-////		else if (d < 6)  return 7.0 * 3600 + Math.round((d - 3)/3 * 30 * 60);
-////		else if (d < 9)  return 7.5 * 3600 + Math.round((d - 6)/3 * 30 * 60);
-////		else if (d < 11) return 8.0 * 3600 + Math.round((d - 9)/2 * 30 * 60);
-////		else             return 8.5 * 3600 + Math.round((d - 11)/2 * 30 * 60);	// shouldn't that be (d - 11) * 30 * 60???
-//		
-//		d = d * 6;
-//		
-//		if (d < 1)       return 6.5 * 3600 + Math.round(d * 30 * 60);
-//		else if (d < 3)  return 7.0 * 3600 + Math.round((d - 1)/2 * 30 * 60);
-//		else if (d < 5)  return 7.5 * 3600 + Math.round((d - 3)/2 * 30 * 60);
-//		else             return 8.0 * 3600 + Math.round((d - 5) * 30 * 60);
-//	}
 
 	private static interface DepartureTimeCalculator {
 		
