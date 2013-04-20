@@ -102,16 +102,19 @@ public class PoznanLanduseDemandGeneration
         public Geometry getGeometry(Zone zone, String actType)
         {
             ActivityType activityType = ActivityType.valueOf(actType);
+            Geometry geometry = null;
 
-            if (activityType == ActivityType.OTHER) {
-                return (Geometry)zone.getZonePolygon().getDefaultGeometry(); // whole zone
-            }
+            if (activityType != ActivityType.OTHER) {
+                WeightedRandomSelection<Geometry> selection = selectionByZoneByActType.get(
+                        activityType).get(zone.getId());
 
-            Geometry geometry = selectionByZoneByActType.get(activityType).get(zone.getId())
-                    .select();
+                if (selection != null) {
+                    geometry = selection.select();
 
-            if (geometry != null) {
-                return geometry; // randomly selected subzone
+                    if (geometry != null) {
+                        return geometry; // randomly selected subzone
+                    }
+                }
             }
 
             return (Geometry)zone.getZonePolygon().getDefaultGeometry(); // whole zone
@@ -123,24 +126,23 @@ public class PoznanLanduseDemandGeneration
         {
             ActivityType activityType = ActivityType.valueOf(actType);
 
-            if (activityType == ActivityType.OTHER) {
-                return true; // whole zone
-            }
+            if (activityType != ActivityType.OTHER) {
+                WeightedRandomSelection<Geometry> selection = selectionByZoneByActType.get(
+                        activityType).get(zone.getId());
 
-            WeightedRandomSelection<Geometry> selection = selectionByZoneByActType
-                    .get(activityType).get(zone.getId());
-
-            if (selection.size() > 0) {
-                return true; // randomly selected subzone
-            }
-
-            for (Geometry g : forestByZone.get(zone.getId())) {
-                if (g.contains(point)) {
-                    return false; // inside forest
+                if (selection != null && selection.size() > 0) {
+                    return true;
                 }
+
+                for (Geometry g : forestByZone.get(zone.getId())) {
+                    if (g.contains(point)) {
+                        return false; // inside forest
+                    }
+                }
+
             }
 
-            return true; // whole zone except forest
+            return true;
         }
     }
 
@@ -288,6 +290,8 @@ public class PoznanLanduseDemandGeneration
     {
         zoneLanduseValidation = new HashMap<Id, ZoneLanduseValidation>();
         Scanner scanner = new Scanner(new File(validatedZonesFile));
+
+        scanner.nextLine();// skip the header
 
         while (scanner.hasNext()) {
             Id zoneId = scenario.createId(scanner.next());
