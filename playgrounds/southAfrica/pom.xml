@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
@@ -12,12 +12,12 @@
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>kai</artifactId>
-  		<version>0.5.0-SNAPSHOT</version>
+  		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>roadpricing</artifactId>
-  		<version>0.5.0-SNAPSHOT</version>
+  		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
 		<dependency>
   			<groupId>net.sf.jung</groupId>
