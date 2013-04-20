@@ -101,5 +101,9 @@ public class ParkingInfrastructure_v2 extends ParkingInfrastructure {
 		
 		return hm;
 	}
+	
+	public ParkingFacility getParkingFacility(Id parkingFacilityId){
+		return parkingFacilities.get(parkingFacilityId);
+	}
 
 }
