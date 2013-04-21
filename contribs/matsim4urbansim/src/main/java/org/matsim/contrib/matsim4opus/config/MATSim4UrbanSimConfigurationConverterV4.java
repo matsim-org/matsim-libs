@@ -532,19 +532,46 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	private void initAccessibilityParameter(Matsim4UrbansimType matsim4UrbanSimParameter){
 		
 		// these are all parameter for the accessibility computation
-		double logitScaleParameter,
-		betaCarTT, betaCarTTPower, betaCarLnTT,		// car
-		betaCarTD, betaCarTDPower, betaCarLnTD,
-		betaCarTMC, betaCarTMCPower, betaCarLnTMC,
-		betaBikeTT, betaBikeTTPower, betaBikeLnTT,	// bike
-		betaBikeTD, betaBikeTDPower, betaBikeLnTD,
-		betaBikeTMC, betaBikeTMCPower, betaBikeLnTMC,
-		betaWalkTT, betaWalkTTPower, betaWalkLnTT,	// walk
-		betaWalkTD, betaWalkTDPower, betaWalkLnTD,
-		betaWalkTMC, betaWalkTMCPower, betaWalkLnTMC,
-		betaPtTT, betaPtTTPower, betaPtLnTT,		// pt
-		betaPtTD, betaPtTDPower, betaPtLnTD,
-		betaPtTMC, betaPtTMCPower, betaPtLnTMC;
+		double logitScaleParameter;	
+		double betaCarTT = 0.;		// Car
+		double betaCarTTPower = 0.; // Car
+		double betaCarLnTT = 0.;	// Car
+		double betaCarTD = 0.; 		// Car
+		double betaCarTDPower = 0.;	// Car
+		double betaCarLnTD = 0.;	// Car
+		double betaCarTMC = 0.;		// Car
+		double betaCarTMCPower = 0.;// Car 
+		double betaCarLnTMC = 0.;	// Car
+		
+		double betaBikeTT = 0.;		// Bike
+		double betaBikeTTPower = 0.; // Bike
+		double betaBikeLnTT = 0.;	// Bike
+		double betaBikeTD = 0.; 	// Bike
+		double betaBikeTDPower = 0.;// Bike
+		double betaBikeLnTD = 0.;	// Bike
+		double betaBikeTMC = 0.;	// Bike
+		double betaBikeTMCPower = 0.;// Bike 
+		double betaBikeLnTMC = 0.;	// Bike
+
+		double betaWalkTT = 0.;		// Walk
+		double betaWalkTTPower = 0.; // Walk
+		double betaWalkLnTT = 0.;	// Walk
+		double betaWalkTD = 0.; 	// Walk
+		double betaWalkTDPower = 0.;// Walk
+		double betaWalkLnTD = 0.;	// Walk
+		double betaWalkTMC = 0.;	// Walk
+		double betaWalkTMCPower = 0.;// Walk 
+		double betaWalkLnTMC = 0.;	// Walk
+
+		double betaPtTT = 0.;		// Pt
+		double betaPtTTPower = 0.; 	// Pt
+		double betaPtLnTT = 0.;		// Pt
+		double betaPtTD = 0.; 		// Pt
+		double betaPtTDPower = 0.;	// Pt
+		double betaPtLnTD = 0.;		// Pt
+		double betaPtTMC = 0.;		// Pt
+		double betaPtTMCPower = 0.;	// Pt 
+		double betaPtLnTMC = 0.;	// Pt
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
 		
@@ -581,17 +608,17 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaCarLnTMC	= 0.;
 		}
 		else{
-			betaCarTT 	   	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelTime();
-			betaCarTTPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelTimePower2();
-			betaCarLnTT		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelTime();
-			betaCarTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelDistance();
-			betaCarTDPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelDistancePower2();
-			betaCarLnTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelDistance();
-			betaCarTMC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelMonetaryCost();
-			betaCarTMCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelMonetaryCostPower2();
-			betaCarLnTMC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelMonetaryCost();
-			
-			stopMATSimForMixedAccessibilities(betaCarTT, betaCarTTPower, betaCarLnTT, betaCarTD, betaCarTDPower, betaCarLnTD, betaCarTMC, betaCarTMCPower, betaCarLnTMC);
+			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaCarTT\" etc. anymore. Please let us know if this causes serious problems.");
+			System.exit(-1);
+//			betaCarTT 	   	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelTime();
+//			betaCarTTPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelTimePower2();
+//			betaCarLnTT		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelTime();
+//			betaCarTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelDistance();
+//			betaCarTDPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelDistancePower2();
+//			betaCarLnTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelDistance();
+//			betaCarTMC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelMonetaryCost();
+//			betaCarTMCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelMonetaryCostPower2();
+//			betaCarLnTMC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelMonetaryCost();
 		}
 		
 		if(useMATSimBikeParameter){
@@ -607,17 +634,17 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaBikeLnTMC	= 0.;
 		}
 		else{
-			betaBikeTT		= getValueAsDouble(BETA_BIKE_TRAVEL_TIME);
-			betaBikeTTPower	= getValueAsDouble(BETA_BIKE_TRAVEL_TIME_POWER2);
-			betaBikeLnTT	= getValueAsDouble(BETA_BIKE_LN_TRAVEL_TIME);
-			betaBikeTD		= getValueAsDouble(BETA_BIKE_TRAVEL_DISTANCE);
-			betaBikeTDPower	= getValueAsDouble(BETA_BIKE_TRAVEL_DISTANCE_POWER2);
-			betaBikeLnTD	= getValueAsDouble(BETA_BIKE_LN_TRAVEL_DISTANCE);
-			betaBikeTMC		= getValueAsDouble(BETA_BIKE_TRAVEL_MONETARY_COST);
-			betaBikeTMCPower= getValueAsDouble(BETA_BIKE_TRAVEL_MONETARY_COST_POWER2);
-			betaBikeLnTMC	= getValueAsDouble(BETA_BIKE_LN_TRAVEL_MONETARY_COST);
-			
-			stopMATSimForMixedAccessibilities(betaBikeTT, betaBikeTTPower, betaBikeLnTT, betaBikeTD, betaBikeTDPower, betaBikeLnTD, betaBikeTMC, betaBikeTMCPower, betaBikeLnTMC);
+			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaCarTT\" etc. anymore. Please let us know if this causes serious problems.");
+			System.exit(-1);
+//			betaBikeTT		= getValueAsDouble(BETA_BIKE_TRAVEL_TIME);
+//			betaBikeTTPower	= getValueAsDouble(BETA_BIKE_TRAVEL_TIME_POWER2);
+//			betaBikeLnTT	= getValueAsDouble(BETA_BIKE_LN_TRAVEL_TIME);
+//			betaBikeTD		= getValueAsDouble(BETA_BIKE_TRAVEL_DISTANCE);
+//			betaBikeTDPower	= getValueAsDouble(BETA_BIKE_TRAVEL_DISTANCE_POWER2);
+//			betaBikeLnTD	= getValueAsDouble(BETA_BIKE_LN_TRAVEL_DISTANCE);
+//			betaBikeTMC		= getValueAsDouble(BETA_BIKE_TRAVEL_MONETARY_COST);
+//			betaBikeTMCPower= getValueAsDouble(BETA_BIKE_TRAVEL_MONETARY_COST_POWER2);
+//			betaBikeLnTMC	= getValueAsDouble(BETA_BIKE_LN_TRAVEL_MONETARY_COST);
 		}
 		
 		if(useMATSimWalkParameter){
@@ -633,17 +660,17 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaWalkLnTMC	= 0.;
 		}
 		else{
-			betaWalkTT		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelTime();
-			betaWalkTTPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelTimePower2();
-			betaWalkLnTT	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelTime();
-			betaWalkTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistance();
-			betaWalkTDPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistancePower2();
-			betaWalkLnTD	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelDistance();
-			betaWalkTMC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelMonetaryCost();
-			betaWalkTMCPower= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelMonetaryCostPower2();
-			betaWalkLnTMC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelMonetaryCost();
-			
-			stopMATSimForMixedAccessibilities(betaWalkTT, betaWalkTTPower, betaWalkLnTT, betaWalkTD, betaWalkTDPower, betaWalkLnTD, betaWalkTMC, betaWalkTMCPower, betaWalkLnTMC);
+			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaCarTT\" etc. anymore. Please let us know if this causes serious problems.");
+			System.exit(-1);
+//			betaWalkTT		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelTime();
+//			betaWalkTTPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelTimePower2();
+//			betaWalkLnTT	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelTime();
+//			betaWalkTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistance();
+//			betaWalkTDPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistancePower2();
+//			betaWalkLnTD	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelDistance();
+//			betaWalkTMC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelMonetaryCost();
+//			betaWalkTMCPower= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelMonetaryCostPower2();
+//			betaWalkLnTMC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelMonetaryCost();
 		}
 		
 		if(useMATSimPtParameter){
@@ -659,17 +686,17 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaPtLnTMC		= 0.;
 		}
 		else{
-			betaPtTT		= getValueAsDouble(BETA_PT_TRAVEL_TIME);
-			betaPtTTPower	= getValueAsDouble(BETA_PT_TRAVEL_TIME_POWER2);
-			betaPtLnTT		= getValueAsDouble(BETA_PT_LN_TRAVEL_TIME);
-			betaPtTD		= getValueAsDouble(BETA_PT_TRAVEL_DISTANCE);
-			betaPtTDPower	= getValueAsDouble(BETA_PT_TRAVEL_DISTANCE_POWER2);
-			betaPtLnTD		= getValueAsDouble(BETA_PT_LN_TRAVEL_DISTANCE);
-			betaPtTMC		= getValueAsDouble(BETA_PT_TRAVEL_MONETARY_COST);
-			betaPtTMCPower	= getValueAsDouble(BETA_PT_TRAVEL_MONETARY_COST_POWER2);
-			betaPtLnTMC		= getValueAsDouble(BETA_PT_LN_TRAVEL_MONETARY_COST);
-			
-			stopMATSimForMixedAccessibilities(betaPtTT, betaPtTTPower, betaPtLnTT, betaPtTD, betaPtTDPower, betaPtLnTD, betaPtTMC, betaPtTMCPower, betaPtLnTMC);
+			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaCarTT\" etc. anymore. Please let us know if this causes serious problems.");
+			System.exit(-1);
+//			betaPtTT		= getValueAsDouble(BETA_PT_TRAVEL_TIME);
+//			betaPtTTPower	= getValueAsDouble(BETA_PT_TRAVEL_TIME_POWER2);
+//			betaPtLnTT		= getValueAsDouble(BETA_PT_LN_TRAVEL_TIME);
+//			betaPtTD		= getValueAsDouble(BETA_PT_TRAVEL_DISTANCE);
+//			betaPtTDPower	= getValueAsDouble(BETA_PT_TRAVEL_DISTANCE_POWER2);
+//			betaPtLnTD		= getValueAsDouble(BETA_PT_LN_TRAVEL_DISTANCE);
+//			betaPtTMC		= getValueAsDouble(BETA_PT_TRAVEL_MONETARY_COST);
+//			betaPtTMCPower	= getValueAsDouble(BETA_PT_TRAVEL_MONETARY_COST_POWER2);
+//			betaPtLnTMC		= getValueAsDouble(BETA_PT_LN_TRAVEL_MONETARY_COST);
 		}
 		
 		// set parameter in module 
@@ -720,27 +747,6 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		module.setBetaPtLnTravelMonetaryCost(betaPtLnTMC);
 		
 		printAccessibilityParameterSettings();
-	}
-	
-	/**
-	 * This terminates MATSim when time, distance and monetary cost parameter in accessibility calculation are set at the same time.
-	 */
-	void stopMATSimForMixedAccessibilities(double tt, double ttPower, double ttLn, double td, double tdPower, double tdLn, double tmc, double tmcPower, double tmcLn){
-		
-		int counter = 0;
-		
-		// check if time parameter are set
-		if( (tt != 0.) || (ttPower != 0.) || (ttLn != 0.) )
-			counter++;
-		if( (td != 0.) || (tdPower != 0.) || (tdLn != 0.) )
-			counter++;
-		if( (tmc != 0.) || (tmcPower != 0.) || (tmcLn != 0.) )
-			counter++;
-		
-		if( counter > 1 ){
-			log.error("Currently, the simulataineous calculation of travel times, distances and monetary costs in accessibility calculation is not implemented in a reasonable way!");
-			System.exit(0);
-		}
 	}
 	
 	/**
