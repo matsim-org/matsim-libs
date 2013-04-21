@@ -21,9 +21,11 @@ package playground.johannes.sna.graph.spatial.io;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.johannes.sna.TestCaseUtils;
 import playground.johannes.sna.graph.spatial.SpatialGraph;
@@ -33,19 +35,23 @@ import playground.johannes.sna.graph.spatial.SpatialGraph;
  * @author illenberger
  *
  */
-public class SpatialGraphMLIoTest extends TestCase {
+public class SpatialGraphMLIoTest  {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final String INPUT_FILE = TestCaseUtils.getPackageInputDirecoty(SpatialGraphMLIoTest.class) + "SpatialGraph.k7.graphml.gz";
 	
-	private static final String OUTPUT_FILE = TestCaseUtils.getOutputDirectory() + "tmpgraph.graphml";
+//	private static final String OUTPUT_FILE = TestCaseUtils.getOutputDirectory() + "tmpgraph.graphml";
 	
+	@Test
 	public void test() {
+		 final String OUTPUT_FILE = utils.getOutputDirectory() + "tmpgraph.graphml";
+
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		
 		SpatialGraph graph = reader.readGraph(INPUT_FILE);
 		
-		assertEquals(7187, graph.getVertices().size());
-		assertEquals(25680, graph.getEdges().size());
+		Assert.assertEquals(7187, graph.getVertices().size(),0.00001);
+		Assert.assertEquals(25680, graph.getEdges().size(),0.00001);
 		
 		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
 		try {
@@ -54,9 +60,9 @@ public class SpatialGraphMLIoTest extends TestCase {
 			e.printStackTrace();
 		}
 		
-		double reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
-		double actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
+		long reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
+		long actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
 		
-		assertEquals(reference, actual);
+		Assert.assertEquals(reference, actual);
 	}
 }
