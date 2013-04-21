@@ -23,20 +23,15 @@ import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibi
 import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.utils.LeastCostPathTree;
 
 /**
