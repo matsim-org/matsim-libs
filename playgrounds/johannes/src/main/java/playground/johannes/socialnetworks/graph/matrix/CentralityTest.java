@@ -46,12 +46,12 @@ public class CentralityTest extends TestCase {
 		MatrixCentrality c = new MatrixCentrality();
 		c.run(y);
 		
-		assertEquals(0, c.getVertexBetweenness()[0]);
-		assertEquals(0, c.getVertexBetweenness()[1]);
-		assertEquals(14, c.getVertexBetweenness()[2]);
-		assertEquals(14, c.getVertexBetweenness()[3]);
-		assertEquals(0, c.getVertexBetweenness()[4]);
-		assertEquals(0, c.getVertexBetweenness()[5]);
+		assertEquals(0.0, c.getVertexBetweenness()[0]);
+		assertEquals(0.0, c.getVertexBetweenness()[1]);
+		assertEquals(14.0, c.getVertexBetweenness()[2]);
+		assertEquals(14.0, c.getVertexBetweenness()[3]);
+		assertEquals(0.0, c.getVertexBetweenness()[4]);
+		assertEquals(0.0, c.getVertexBetweenness()[5]);
 		
 		assertEquals(2.2, c.getVertexCloseness()[0]);
 		assertEquals(2.2, c.getVertexCloseness()[1]);
@@ -61,10 +61,10 @@ public class CentralityTest extends TestCase {
 		assertEquals(2.2, c.getVertexCloseness()[5]);
 		assertEquals(true, Double.isInfinite(c.getVertexCloseness()[6]));
 		
-		assertEquals(10, c.getEdgeBetweenness()[0].get(2));
-		assertEquals(10, c.getEdgeBetweenness()[1].get(2));
-		assertEquals(18, c.getEdgeBetweenness()[2].get(3));
-		assertEquals(10, c.getEdgeBetweenness()[3].get(4));
-		assertEquals(10, c.getEdgeBetweenness()[3].get(5));
+		assertEquals(10., c.getEdgeBetweenness()[0].get(2));
+		assertEquals(10., c.getEdgeBetweenness()[1].get(2));
+		assertEquals(18., c.getEdgeBetweenness()[2].get(3));
+		assertEquals(10., c.getEdgeBetweenness()[3].get(4));
+		assertEquals(10., c.getEdgeBetweenness()[3].get(5));
 	}
 }
