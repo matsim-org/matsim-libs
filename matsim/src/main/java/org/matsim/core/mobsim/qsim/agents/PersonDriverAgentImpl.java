@@ -282,6 +282,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 * on the Results of the Simulation!
 	 */
 	void resetCaches() {
+		
 		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
 		// known best.  kai, oct'10
 		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
@@ -298,18 +299,21 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		if (currentPlanElement instanceof Leg) {
 			this.currentLeg  = ((Leg) currentPlanElement);
 			this.cachedRouteLinkIds = null;
-		}
 
-		Route route = currentLeg.getRoute();
-		if (route == null) {
-			log.error("The agent " + this.getId() + " has no route in its leg. Removing the agent from the simulation." );
-			//			"          (But as far as I can tell, this will not truly remove the agent???  kai, nov'11)");
-			//			this.simulation.getAgentCounter().decLiving();
-			//			this.simulation.getAgentCounter().incLost();
-			this.state = MobsimAgent.State.ABORT ;
-			return;
+			Route route = currentLeg.getRoute();
+			if (route == null) {
+				log.error("The agent " + this.getId() + " has no route in its leg. Removing the agent from the simulation." );
+				//			"          (But as far as I can tell, this will not truly remove the agent???  kai, nov'11)");
+				//			this.simulation.getAgentCounter().decLiving();
+				//			this.simulation.getAgentCounter().incLost();
+				this.state = MobsimAgent.State.ABORT ;
+				return;
+			}
+			this.cachedDestinationLinkId = route.getEndLinkId();
+		} else {			
+			// If an activity is performed, update its current activity.
+			this.calculateAndSetDepartureTime((Activity) this.getCurrentPlanElement());
 		}
-		this.cachedDestinationLinkId = route.getEndLinkId();
 	}
 
 	/**
