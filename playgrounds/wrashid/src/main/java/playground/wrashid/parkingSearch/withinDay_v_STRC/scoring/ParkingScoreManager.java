@@ -58,13 +58,13 @@ import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
 import org.matsim.core.scoring.ScoringFunction;
 
+import playground.christoph.parking.core.events.ParkingSearchEvent;
+import playground.christoph.parking.core.events.handler.ParkingSearchEventHandler;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.events.ParkingSearchEvent;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.events.handler.ParkingSearchEventHandler;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 import playground.wrashid.parkingSearch.withindayFW.analysis.ParkingAnalysisHandler;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;

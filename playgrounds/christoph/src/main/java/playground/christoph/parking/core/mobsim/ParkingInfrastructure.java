@@ -22,6 +22,7 @@ package playground.christoph.parking.core.mobsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -165,6 +166,10 @@ public class ParkingInfrastructure {
 		list.add(facilityId);
 	}
 
+	public Map<Id, ParkingFacility> getParkingFacilities() {
+		return Collections.unmodifiableMap(this.parkingFacilities);
+	}
+	
 	public int getFreeParkingCapacity(Id facilityId) {
 		int freeCapacity = this.parkingFacilities.get(facilityId).getFreeParkingCapacity();
 
@@ -229,15 +234,22 @@ public class ParkingInfrastructure {
 		return parkingFacility.unReserveWaiting(vehicleId);
 	}
 	
+	/**
+	 * 
+	 * @param vehicleId
+	 * @param facilityId
+	 * @returns <b>true</b> if the vehicle was parked or<br>
+	 * 		<b>false</b> if the agent has to wait until a parking spot becomes available.
+	 */
 	public boolean parkVehicle(Id vehicleId, Id facilityId) {
-
+		
 		ParkingFacility parkingFacility = this.parkingFacilities.get(facilityId);
 		boolean waiting = false;
-				
+		
 		// try to park the vehicle in the parking facility
 		boolean parked = parkingFacility.reservedToOccupied(vehicleId);
 		if (parked) {
-			// nothing to do here
+			return true;
 		} 
 		// else: check whether the agent was registered as waiting for free parking
 		else {
@@ -245,10 +257,13 @@ public class ParkingInfrastructure {
 			if (waiting) {
 				// maybe now a free parking is available
 				if (parkingFacility.getFreeParkingCapacity() > 0) {
+					parkingFacility.unReserveWaiting(vehicleId);
 					parkingFacility.reserveParking(vehicleId);
 					parkingFacility.reservedToOccupied(vehicleId);
+					return true;
 				} else {
 					this.parkingFacilitiesWithWaitingAgents.add(facilityId);
+					return false;
 				}
 			} 	
 		}		
@@ -257,8 +272,8 @@ public class ParkingInfrastructure {
 			throw new RuntimeException("Could not park vehicle " + vehicleId.toString() + 
 					" at parking facility " + facilityId.toString());			
 		}
-
-		return parked;
+		
+		return false;
 	}
 	
 	public void unParkVehicle(Id vehicleId, Id facilityId) {
@@ -276,18 +291,30 @@ public class ParkingInfrastructure {
 		}
 	}
 
-	public void waitingToParking() {
+	// returns a collection containing all agent Ids which have been moved from waiting to parking
+	public Collection<Id> waitingToParking() {
 		
-		for (Id parkingFacilityId : this.parkingFacilitiesWithWaitingAgents) {
+		List<Id> parkedAgentIds = new ArrayList<Id>();
+		
+		Iterator<Id> iter = this.parkingFacilitiesWithWaitingAgents.iterator();
+		while (iter.hasNext()) {
+			Id parkingFacilityId = iter.next();
 			
 			ParkingFacility parkingFacility = this.parkingFacilities.get(parkingFacilityId);
 
 			int freeParkingCapacity = parkingFacility.getFreeParkingCapacity();
 			for (int i = 0; i < freeParkingCapacity; i++) {
-				boolean parked = parkingFacility.nextWaitingToOccupied();
-				if (!parked) break;
+				Id parkedAgentId = parkingFacility.nextWaitingToOccupied(); 
+				if (parkedAgentId == null) break;
+				else parkedAgentIds.add(parkedAgentId);				
+			}
+			
+			// remove facility from list if no more agents are waiting
+			if (parkingFacility.getWaitingCapacity() == parkingFacility.getFreeWaitingCapacity()) {
+				iter.remove();
 			}
 		}
+		return parkedAgentIds;
 	}
 	
 	private void markFacilityAsFull(Id facilityId) {
@@ -432,13 +459,19 @@ public class ParkingInfrastructure {
 				return false;
 		}
 
-		public boolean nextWaitingToOccupied() {
+		/*
+		 * Returns the id of the agent which was moved from waiting to occupied or
+		 * null if no agent was moved.
+		 */
+		public Id nextWaitingToOccupied() {
 			Iterator<Id> iter = this.waiting.iterator();
 			if (iter.hasNext()) {
-				Id id = iter.next();
-				iter.remove();
-				return this.occupied.add(id);
-			} else return false;
+				Id id = iter.next(); 
+				if (this.occupied.add(id)) {
+					iter.remove();
+					return id;
+				} else return null;
+			} else return null;
 		}
 		
 		public boolean release(Id id) {
@@ -476,7 +509,7 @@ public class ParkingInfrastructure {
 		}
 			
 		public int getFreeWaitingCapacity() {
-			return this.waitingCapacity - waiting.size();
+			return this.waitingCapacity - (this.reservedWaiting.size() +  this.waiting.size());
 		}
 		
 		public int getFreeParkingCapacity() {

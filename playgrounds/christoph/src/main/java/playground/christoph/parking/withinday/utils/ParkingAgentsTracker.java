@@ -20,6 +20,7 @@
 
 package playground.christoph.parking.withinday.utils;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,16 +51,21 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
+import playground.christoph.parking.core.mobsim.ParkingInfrastructure.ParkingFacility;
 
 public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler,
-		ActivityStartEventHandler, ActivityEndEventHandler, MobsimInitializedListener, MobsimAfterSimStepListener {
+		ActivityStartEventHandler, ActivityEndEventHandler, MobsimInitializedListener, MobsimAfterSimStepListener,
+		MobsimEngine {
 
 	private static final Logger log = Logger.getLogger(ParkingAgentsTracker.class);
 	
@@ -78,6 +84,9 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 	private final Map<Id, Id> selectedParkingsMap;
 	private final Set<Id> recentlyArrivedDrivers;
 	private final Map<Id, Id> recentlyDepartingDrivers;
+	private final Set<Id> recentlyWaitingDrivers;
+
+	protected InternalInterface internalIterface;
 	
 	/**
 	 * Tracks agents' car legs and check whether they have to start their parking search.
@@ -100,6 +109,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		this.nextActivityFacilityMap = new HashMap<Id, ActivityFacility>();
 		this.recentlyArrivedDrivers = new HashSet<Id>();
 		this.recentlyDepartingDrivers = new HashMap<Id, Id>();
+		this.recentlyWaitingDrivers = new HashSet<Id>();
 		this.agents = new HashMap<Id, PlanBasedWithinDayAgent>();
 	}
 
@@ -114,14 +124,47 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		}
 	}
 
+	/*
+	 * The code could probably be moved to the doSimStep(...) method if it is ensured
+	 * that it registered after QNetsimEnding and MultiModalEngine in the QSim.
+	 * However, think also about race conditions (not all events from the current time step
+	 * may have been processed when the doSimStep(...) method is called.
+	 */
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		lastTimeStepsLinkEnteredAgents.clear();
 		lastTimeStepsLinkEnteredAgents.addAll(linkEnteredAgents);
 		linkEnteredAgents.clear();
 		
-		// try moving waiting vehicles to free parkings
-		this.parkingInfrastructure.waitingToParking();
+		/*
+		 * If parked is false, the agent waits for a parking spot to become available.
+		 * For those agents, the duration and end time of the parking activity is set 
+		 * to Time.UNDEFINED_TIME. As a result, the agent should not end the activity
+		 * anymore.
+		 */
+		for (Id agentId : this.recentlyWaitingDrivers) {
+			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
+			Activity parkingActivity = (Activity) agent.getCurrentPlanElement();
+			parkingActivity.setEndTime(Time.UNDEFINED_TIME);
+			parkingActivity.setMaximumDuration(Time.UNDEFINED_TIME);
+			agent.resetCaches();
+			this.internalIterface.rescheduleActivityEnd(agent);
+		}
+		this.recentlyWaitingDrivers.clear();
+		
+		/*
+		 * Move waiting vehicles to free parkings.
+		 * Update the waiting agents' activity end times.
+		 */
+		Collection<Id> parkedAgentIds = this.parkingInfrastructure.waitingToParking();
+		for (Id agentId : parkedAgentIds) {
+			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
+			Activity parkingActivity = (Activity) this.agents.get(agentId).getCurrentPlanElement();
+			parkingActivity.setEndTime(e.getSimulationTime() + 180);
+			parkingActivity.setMaximumDuration(parkingActivity.getEndTime() - parkingActivity.getStartTime());
+			agent.resetCaches();
+			this.internalIterface.rescheduleActivityEnd(agent);
+		}
 	}
 
 	/*
@@ -131,16 +174,14 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		return lastTimeStepsLinkEnteredAgents;
 	}
 
-	public void setSelectedParking(Id agentId, Id parkingFacilityId, boolean isWaiting) {
-		
-//		log.info("Select parking facility " + parkingFacilityId + " for agent " + agentId);
+	public void setSelectedParking(Id agentId, Id parkingFacilityId, boolean reserveAsWaiting) {
 		
 		selectedParkingsMap.put(agentId, parkingFacilityId);
 		
 //		Id vehicleId = this.parkingInfrastructure.getVehicleId(agents.get(agentId).getSelectedPlan().getPerson());
 		Id vehicleId = agentId;	// so far, this is true...
 		
-		if (!isWaiting) {
+		if (!reserveAsWaiting) {
 			this.parkingInfrastructure.reserveParking(vehicleId, parkingFacilityId);			
 		} else {
 			this.parkingInfrastructure.reserveWaiting(vehicleId, parkingFacilityId);
@@ -215,7 +256,15 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		boolean wasCarTrip = this.recentlyArrivedDrivers.remove(event.getPersonId());
 		if (wasCarTrip) {
 			Id vehicleId = event.getPersonId(); // so far, this is true...
-			this.parkingInfrastructure.parkVehicle(vehicleId, event.getFacilityId());
+			boolean parked = this.parkingInfrastructure.parkVehicle(vehicleId, event.getFacilityId());
+			
+			/*
+			 * If parked is false, the agent waits for a parking spot to become available.
+			 * For those agents, the end time of the parking activity is set to Double.MAX_VALUE
+			 */
+			if (!parked) {
+				this.recentlyWaitingDrivers.add(vehicleId);
+			}
 		}
 	}
 	
@@ -273,6 +322,29 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		this.lastTimeStepsLinkEnteredAgents.clear();
 		this.recentlyArrivedDrivers.clear();
 		this.recentlyDepartingDrivers.clear();		
+	}
+
+	/*
+	 * MobsimEngine Methods
+	 */
+	@Override
+	public void doSimStep(double time) {
+		// nothing to do here...
+	}
+
+	@Override
+	public void onPrepareSim() {
+		// nothing to do here...
+	}
+
+	@Override
+	public void afterSim() {
+		// nothing to do here...
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalIterface = internalInterface;
 	}
 
 }

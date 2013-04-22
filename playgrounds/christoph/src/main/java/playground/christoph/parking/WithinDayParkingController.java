@@ -168,7 +168,8 @@ public class WithinDayParkingController extends WithinDayController implements R
 		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
 				this.createTravelCostCalculator(), this.getTripRouterFactory(), nodesToCheck);
 		
-		MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, this.getWithinDayEngine());
+		MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, this.getWithinDayEngine(),
+				this.parkingAgentsTracker);
 		this.setMobsimFactory(mobsimFactory);
 		
 		this.initIdentifiers();

@@ -103,7 +103,6 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier implements Mobs
 						}
 					}
 				}
-
 				
 				identifiedAgents.add(agent);
 			}
@@ -119,7 +118,7 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier implements Mobs
 	
 	private boolean isWillingToWaitForParking(PlanBasedWithinDayAgent agent, Id facilityId) {
 		// TODO: add a behavioural model, that e.g. takes the facilities capacity into account
-		return false;
+		return true;
 	}
 	
 	/*

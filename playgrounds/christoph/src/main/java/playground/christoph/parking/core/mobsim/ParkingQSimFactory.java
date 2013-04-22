@@ -41,6 +41,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
 import playground.christoph.parking.core.mobsim.agents.ParkingAgentSource;
+import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 
 /**
@@ -57,12 +58,14 @@ public class ParkingQSimFactory implements MobsimFactory {
     private final ParkingInfrastructure parkingInfrastructure;
     private final ParkingRouterFactory parkingRouterFactory;
     private final WithinDayEngine withinDayEngine;
+    private final ParkingAgentsTracker parkingAgentsTracker; 
     
     public ParkingQSimFactory(ParkingInfrastructure parkingInfrastructure, ParkingRouterFactory parkingRouterFactory, 
-    		WithinDayEngine withinDayEngine) {
+    		WithinDayEngine withinDayEngine, ParkingAgentsTracker parkingAgentsTracker) {
     	this.parkingInfrastructure = parkingInfrastructure;
     	this.parkingRouterFactory = parkingRouterFactory;
     	this.withinDayEngine = withinDayEngine;
+    	this.parkingAgentsTracker = parkingAgentsTracker;
     }
     
     @Override
@@ -98,6 +101,7 @@ public class ParkingQSimFactory implements MobsimFactory {
 		}
 		
 		qSim.addMobsimEngine(this.withinDayEngine);
+		qSim.addMobsimEngine(this.parkingAgentsTracker);
 		
 		AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
 		

@@ -39,9 +39,9 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
+import playground.christoph.parking.core.events.ParkingSearchEvent;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.events.ParkingSearchEvent;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.OptimalParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.ParkAgentPaperStrategy;
