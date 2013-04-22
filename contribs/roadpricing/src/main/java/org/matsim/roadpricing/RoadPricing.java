@@ -94,7 +94,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		log.info("The sum of all paid tolls : " + this.tollCalc.getAllAgentsToll() + " Euro.");
-		log.info("The number of people, who paid toll : " + this.tollCalc.getDraweesNr());
+		log.info("The number of people who paid toll : " + this.tollCalc.getDraweesNr());
 		log.info("The average paid trip length : " + this.cattl.getAverageTripLength() + " m.");
 	}
 
