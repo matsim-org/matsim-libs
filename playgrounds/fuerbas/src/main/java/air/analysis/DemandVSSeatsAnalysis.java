@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CreateSeatsODTable
+ * DemandVSSeatsAnalysis
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,27 +19,23 @@
  * *********************************************************************** */
 package air.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import playground.dgrether.events.EventsFilterManager;
 import playground.dgrether.events.EventsFilterManagerImpl;
-import air.demand.DgDemandWriter;
+import air.demand.DgDemandReader;
+import air.demand.DgDemandUtils;
 import air.demand.FlightODRelation;
 
 
@@ -47,66 +43,11 @@ import air.demand.FlightODRelation;
  * @author dgrether
  *
  */
-public class CreateSeatsODTable implements
-VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
+public class DemandVSSeatsAnalysis {
 
-	private SortedMap<String, SortedMap<String, FlightODRelation>> fromAirport2FlightOdRelMap;
-	private Vehicles vehicles;
-	private Map<Id, VehicleDepartsAtFacilityEvent> vehDepartsEventsByVehicleId = new HashMap<Id, VehicleDepartsAtFacilityEvent>();
-	
-	public CreateSeatsODTable(Vehicles vehicles){
-		this.vehicles = vehicles;
-		this.reset(0);
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		this.fromAirport2FlightOdRelMap = new TreeMap<String, SortedMap<String, FlightODRelation>>();
-		this.vehDepartsEventsByVehicleId.clear();
-	}
-
-	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		this.vehDepartsEventsByVehicleId.put(event.getVehicleId(), event);
-	}
-
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		VehicleDepartsAtFacilityEvent departureEvent = this.vehDepartsEventsByVehicleId.get(event.getVehicleId());
-		if (departureEvent != null){
-			Vehicle vehicle = this.vehicles.getVehicles().get(event.getVehicleId());
-			int seats = vehicle.getType().getCapacity().getSeats() - 1;
-			this.addSeats(departureEvent.getFacilityId().toString(), event.getFacilityId().toString(), seats);
-		}
-	}
-	
-	private void addSeats(String from, String to, int seats){
-		SortedMap<String, FlightODRelation> m = this.fromAirport2FlightOdRelMap.get(from);
-		if (m == null){
-			m = new TreeMap<String, FlightODRelation>();
-			this.fromAirport2FlightOdRelMap.put(from, m);
-		}
-		FlightODRelation odRel = m.get(to);
-		if (odRel == null){
-			odRel = new FlightODRelation(from, to, (double) seats);
-			m.put(to, odRel);
-		}
-		else {
-			odRel.setNumberOfTrips(odRel.getNumberOfTrips() + seats);
-		}
-	}
-
-	public SortedMap<String, SortedMap<String, FlightODRelation>> getODSeats() {
-		return this.fromAirport2FlightOdRelMap;
-	}
-
-	
-	/**
-	 * @param args
-	 * @throws Exception 
-	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException {
 		String baseDirectory = "/media/data/work/repos/";
+		String odDemand22 = "/media/data/work/repos/shared-svn/studies/countries/de/flight/demand/destatis/2011_september/demand_september_2011_tabelle_2.2.2.csv";
 		Tuple[] runs = { new Tuple<String, Integer>("1836", 600)
 //				,
 //				new Tuple<String, Integer>("1837", 600), new Tuple<String, Integer>("1838", 600),
@@ -117,7 +58,6 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
 		Vehicles veh = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 vreader = new VehicleReaderV1(veh);
 		vreader.readFile(vehiclesFile);
-		DgDemandWriter writer = new DgDemandWriter();
 
 		for (int i = 0; i < runs.length; i++) {
 			String runId = (String) runs[i].getFirst();
@@ -125,20 +65,48 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
 			String rundir = baseDirectory + "runs-svn/run" + runId + "/";
 			OutputDirectoryHierarchy out = new OutputDirectoryHierarchy(rundir, runId, false, false);
 			String eventsFilename = out.getIterationFilename(it, "events.xml.gz");
-			String seatsOdOutputFile = out.getOutputFilename("seats_by_od_pair.csv");
+			String demandVsSeatsFile = out.getOutputFilename("demand_vs_seats_by_od_pair.csv");
 			
 			EventsFilterManager eventsManager = new EventsFilterManagerImpl();
 			CreateSeatsODTable seatsODTable = new CreateSeatsODTable(veh);
 			eventsManager.addHandler(seatsODTable);
 			MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 			reader.readFile(eventsFilename);
-			writer.writeFlightODRelations(seatsOdOutputFile, seatsODTable.getODSeats());
+			
+			List<FlightODRelation> demandList = new DgDemandReader().readFile(odDemand22);
+			DgDemandUtils.convertToDailyDemand(demandList);
+			BufferedWriter bw = IOUtils.getBufferedWriter(demandVsSeatsFile);
+			bw.write("From;To;Demand;Seats");
+			bw.newLine();
+			for (FlightODRelation rel : demandList) {
+				bw.write(rel.getFromAirportCode());
+				bw.write(";");
+				bw.write(rel.getToAirportCode());
+				bw.write(";");
+				Double trips = rel.getNumberOfTrips();
+				if (trips != null){
+					bw.write(Double.toString(Math.floor(trips)));
+				}
+				else {
+					bw.write("-");
+				}
+				bw.write(";");
+				SortedMap<String, FlightODRelation> toMap = seatsODTable.getODSeats().get(rel.getFromAirportCode());
+				FlightODRelation seatsOd = null;
+				if (toMap != null){
+					seatsOd = toMap.get(rel.getToAirportCode());
+				}
+				if (seatsOd != null) {
+					bw.write(Double.toString( seatsOd.getNumberOfTrips()));
+				}
+				else {
+					bw.write("-");
+				}
+				bw.newLine();
+			}
+			bw.close();
 		}
-		
-		
+
 	}
-
-
-
 
 }

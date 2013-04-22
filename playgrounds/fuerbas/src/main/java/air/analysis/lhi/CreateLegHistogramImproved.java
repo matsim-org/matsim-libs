@@ -54,10 +54,21 @@ public class CreateLegHistogramImproved {
 
 	public static void main(String[] args) {
 		String baseDirectory = "/media/data/work/repos/";
-		Tuple[] runs = { new Tuple<String, Integer>("1836", 600),
-				new Tuple<String, Integer>("1837", 600), new Tuple<String, Integer>("1838", 600),
-				new Tuple<String, Integer>("1839", 600), new Tuple<String, Integer>("1840", 600),
-				new Tuple<String, Integer>("1841", 600) };
+		Tuple[] runs = { 
+				new Tuple<String, Integer>("1836", 600),
+//				new Tuple<String, Integer>("1837", 600), 
+//				new Tuple<String, Integer>("1838", 600),
+//				new Tuple<String, Integer>("1839", 600), 
+//				new Tuple<String, Integer>("1840", 600),
+//				new Tuple<String, Integer>("1841", 600) 
+//				new Tuple<String, Integer>("1848", 600),
+//				new Tuple<String, Integer>("1849", 600), 
+//				new Tuple<String, Integer>("1850", 600),
+//				new Tuple<String, Integer>("1851", 600), 
+//				new Tuple<String, Integer>("1852", 600),
+//				new Tuple<String, Integer>("1853", 600) 
+
+		};
 
 		String vehiclesFile = "/home/dgrether/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/flight_transit_vehicles.xml";
 		Vehicles veh = VehicleUtils.createVehiclesContainer();

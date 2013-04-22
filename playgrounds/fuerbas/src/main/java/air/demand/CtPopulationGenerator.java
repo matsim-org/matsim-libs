@@ -19,8 +19,10 @@
 package air.demand;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -107,20 +109,23 @@ public class CtPopulationGenerator {
 		Network network = sc.getNetwork();
 		Population population = sc.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
-		int personid_zaehler = 1;
-		String missingFromAirports = "";
+		int personIdCounter = 1;
+		int removedTripsCounter = 0;
+		Set<String> missingOriginAirports = new HashSet<String>();
+		Set<String> missingDestinationAirports = new HashSet<String>();
 		String missingOdPais = "";
 		for (FlightODRelation od : airportdaten){	
+			if (od.getNumberOfTrips() == null){
+				continue;
+			}
+
 			String fromLinkIdString = od.getFromAirportCode();
 			Id fromLinkId = sc.createId(fromLinkIdString);
 			Link fromLink = sc.getNetwork().getLinks().get(fromLinkId);
 			if (fromLink == null) {
 				log.warn("Link id " + fromLinkIdString + " not found in network!");
-				missingFromAirports = missingFromAirports + " " + fromLinkIdString;
-				continue;
-			}
-
-			if (od.getNumberOfTrips() == null){
+				missingOriginAirports.add(fromLinkIdString);
+				removedTripsCounter += od.getNumberOfTrips();
 				continue;
 			}
 			
@@ -128,18 +133,20 @@ public class CtPopulationGenerator {
 				String toLinkIdString = od.getToAirportCode();
 				Id toLinkId = sc.createId(toLinkIdString);
 				if (fromLinkIdString.compareTo(toLinkIdString) == 0) {
+					removedTripsCounter += od.getNumberOfTrips();
 					continue;
 				}
 				Link destinationLink = sc.getNetwork().getLinks().get(toLinkId);
 				if (destinationLink == null) {	// abfangen von Flughäfen die in den Passagierdaten von DeStatis vorkommen, allerdings nicht im verwendeten Flugnetzwerk vorkommen
 					log.warn("Link id " + toLinkIdString + " not found in network!");
 					missingOdPais = missingOdPais + "; " + fromLinkIdString + " -> " + toLinkIdString; 
+					missingDestinationAirports.add(toLinkIdString);
 					continue;
 				}
-				Person person = populationFactory.createPerson(sc.createId(String.valueOf(personid_zaehler)));	// ID für aktuellen Passagier
+				Person person = populationFactory.createPerson(sc.createId(String.valueOf(personIdCounter)));	// ID für aktuellen Passagier
 				Plan plan = populationFactory.createPlan();
 				person.addPlan(plan);
-				personid_zaehler++;
+				personIdCounter++;
 				population.addPerson(person);
 
 				ActivityImpl activity1 = (ActivityImpl) populationFactory.createActivityFromLinkId("home", fromLink.getId());
@@ -158,8 +165,11 @@ public class CtPopulationGenerator {
 		}
 		MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
 		popWriter.write(outputPopulation);
-		log.info(missingFromAirports);
-		log.info(missingOdPais);
+		log.info("# Persons created: " + (personIdCounter - 1));
+		log.info("# trips removed " + removedTripsCounter);
+		log.info("missing origin airports: " + missingOriginAirports);
+		log.info("missing destination airports: " + missingDestinationAirports);
+		log.info("missing od pairs: " + missingOdPais);
 	}
 	
 	

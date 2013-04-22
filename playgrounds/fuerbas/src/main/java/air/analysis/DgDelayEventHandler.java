@@ -38,7 +38,6 @@ import air.scenario.DgOagFlightsData;
 
 /**
  * @author dgrether
- *
  */
 public class DgDelayEventHandler implements TransitDriverStartsEventHandler, 
 	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonLeavesVehicleEventHandler {
