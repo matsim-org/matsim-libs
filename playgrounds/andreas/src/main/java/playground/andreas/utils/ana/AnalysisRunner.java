@@ -61,7 +61,7 @@ import playground.vsp.analysis.modules.ptAccessibility.PtAccessibility;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesAnalyzer;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesHandler;
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.PtRoutes2PaxAnalysis;
-import playground.vsp.analysis.modules.ptTravelStats.travelStatsAnalyzer;
+import playground.vsp.analysis.modules.ptTravelStats.TravelStatsAnalyzer;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
 import playground.vsp.analysis.modules.stuckAgents.GetStuckEventsAndPlans;
 import playground.vsp.analysis.modules.transitSchedule2Shp.TransitSchedule2Shp;
@@ -180,7 +180,7 @@ public class AnalysisRunner {
 		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
 		analyzer.addAnalysisModule(ptRoutes2PaxAnalysis);
 		
-		travelStatsAnalyzer travelStatsAnalyzer = new travelStatsAnalyzer(sc, 3600.0);
+		TravelStatsAnalyzer travelStatsAnalyzer = new TravelStatsAnalyzer(sc, 3600.0);
 		analyzer.addAnalysisModule(travelStatsAnalyzer);
 		
 		analyzer.run();

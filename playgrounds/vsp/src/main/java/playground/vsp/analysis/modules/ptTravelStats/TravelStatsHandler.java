@@ -48,9 +48,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  *
  */
 
-public class travelStatsHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 	
-	private static final Logger log = Logger.getLogger(travelStatsHandler.class);
+	private static final Logger log = Logger.getLogger(TravelStatsHandler.class);
 	
 	private final ScenarioImpl scenario;
 	private final Double interval;
@@ -67,7 +67,7 @@ public class travelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 	
 	private Integer maxSlice = 0;
 	
-	public travelStatsHandler(Scenario scenario, Double interval) {
+	public TravelStatsHandler(Scenario scenario, Double interval) {
 		this.scenario = (ScenarioImpl) scenario;
 		this.interval = interval;
 

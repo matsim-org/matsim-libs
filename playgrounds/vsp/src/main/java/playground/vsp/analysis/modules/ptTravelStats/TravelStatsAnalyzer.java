@@ -42,17 +42,17 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 /**
  * @author aneumann, sfuerbas
  */
-public class travelStatsAnalyzer extends AbstractAnalyisModule {
+public class TravelStatsAnalyzer extends AbstractAnalyisModule {
 
-	private final static Logger log = Logger.getLogger(travelStatsAnalyzer.class);
+	private final static Logger log = Logger.getLogger(TravelStatsAnalyzer.class);
 	private final String separator = "\t";
 	private Scenario scenario;
-	private travelStatsHandler handler;
+	private TravelStatsHandler handler;
 	
-	public travelStatsAnalyzer(Scenario scenario, Double interval) {
-		super(travelStatsAnalyzer.class.getSimpleName());
+	public TravelStatsAnalyzer(Scenario scenario, Double interval) {
+		super(TravelStatsAnalyzer.class.getSimpleName());
 		this.scenario = scenario;
-		this.handler = new travelStatsHandler(scenario, interval);
+		this.handler = new TravelStatsHandler(scenario, interval);
 	}
 
 	@Override
