@@ -13,6 +13,9 @@ public class AreaTollControler extends Controler {
 	public AreaTollControler(Config config) {
 		super(config);
 		this.addControlerListener(new RoadPricing());
+		throw new RuntimeException("This will very most likely not work since overwriting createRoutingAlgorithm() " +
+				"affects only the initialization (prepareForSim) but not the routing _during_ the iterations.  Aborting since " +
+				"this is most probably not what anybody wants.  kai, apr'13") ;
 	}
 
 	@Override
