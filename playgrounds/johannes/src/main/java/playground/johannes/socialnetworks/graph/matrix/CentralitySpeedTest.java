@@ -22,9 +22,6 @@ package playground.johannes.socialnetworks.graph.matrix;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
 
 import playground.johannes.sna.graph.SparseVertex;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
@@ -37,11 +34,11 @@ import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
  *
  */
 public class CentralitySpeedTest extends TestCase {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+//	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final Logger logger = Logger.getLogger(CentralitySpeedTest.class);
 	
-	@Test
+//	@Test
 	public void test() {
 //		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
 //		logger.info("Generating grah...");
