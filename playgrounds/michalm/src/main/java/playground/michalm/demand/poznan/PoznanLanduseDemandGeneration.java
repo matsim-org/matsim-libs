@@ -156,10 +156,9 @@ public class PoznanLanduseDemandGeneration
     private ODDemandGenerator dg;
 
 
-    public void generate()
+    public void generate(String dirName)
         throws ConfigurationException, SAXException, ParserConfigurationException, IOException
     {
-        String dirName = "D:\\michalm\\eTaxi\\Poznan_MATSim\\";
         String networkFile = dirName + "network.xml";
         String zonesXmlFile = dirName + "zones.xml";
         String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
@@ -359,6 +358,6 @@ public class PoznanLanduseDemandGeneration
     public static void main(String[] args)
         throws ConfigurationException, IOException, SAXException, ParserConfigurationException
     {
-        new PoznanLanduseDemandGeneration().generate();
+        new PoznanLanduseDemandGeneration().generate("d:\\michalm\\eTaxi\\Poznan_MATSim\\");
     }
 }
