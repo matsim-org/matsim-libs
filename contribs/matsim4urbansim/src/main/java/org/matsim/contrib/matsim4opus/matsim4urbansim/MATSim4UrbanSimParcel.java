@@ -320,7 +320,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																					  benchmark) );
 		if(computeAgentPerformance)
 			// creates a persons.csv output for UrbanSim
-			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark));
+			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix));
 		
 		if(computeZoneBasedAccessibilities){
 			

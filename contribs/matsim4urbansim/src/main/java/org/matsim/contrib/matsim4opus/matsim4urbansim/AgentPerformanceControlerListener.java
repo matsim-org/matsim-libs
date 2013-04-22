@@ -3,6 +3,7 @@ package org.matsim.contrib.matsim4opus.matsim4urbansim;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -13,6 +14,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimPersonCSVWriter;
 import org.matsim.core.controler.Controler;
@@ -35,9 +37,11 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 	private static final Logger log = Logger.getLogger(AgentPerformanceControlerListener.class);
 	
 	private Benchmark benchmark;
+	private PtMatrix ptMatrix = null;
 	
-	public AgentPerformanceControlerListener(Benchmark benchmark){
+	public AgentPerformanceControlerListener(Benchmark benchmark, PtMatrix ptMatrix){
 		this.benchmark = benchmark;
+		this.ptMatrix = ptMatrix;
 		// writing agent performances continuously into "persons.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES INPUT FOR URBANSIM 
@@ -89,6 +93,9 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 				continue;
 			}
 			
+			Coord homeCoord = getActivityLocation(plan, InternalConstants.ACT_HOME);
+			Coord workCoord = getActivityLocation(plan, InternalConstants.ACT_WORK);
+
 			for ( PlanElement pe : plan.getPlanElements() ) {
 				if ( pe instanceof Activity ) {
 					Activity activity = (Activity) pe;
@@ -110,6 +117,11 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 						distance = RouteUtils.calcDistance(
 								(NetworkRoute) route, network);
 					}
+					else if(mode.equalsIgnoreCase(TransportMode.pt)){
+						if(homeCoord != null && workCoord != null && ptMatrix != null)
+							distance = ptMatrix.getTotalTravelDistance_meter(homeCoord, workCoord);
+					}
+					
 					if (isHomeActivity) {
 						distance_home_work_meter = distance;
 						// to get minutes in time format mm:ss use
@@ -165,6 +177,17 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 					+ this.benchmark.getDurationInSeconds(benchmarkID) / 60.
 					+ " minutes).");
 		}
+	}
+	
+	private Coord getActivityLocation(Plan plan,String activityType){
+		for( PlanElement pe : plan.getPlanElements() ) {
+			if ( pe instanceof Activity ) {
+				Activity activity = (Activity) pe;
+				if(activity.getType().endsWith( activityType ))
+					return activity.getCoord();
+			}
+		}
+		return null;
 	}
 	
 	/**
