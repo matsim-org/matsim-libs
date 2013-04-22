@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgCommodity
+ * DgDijkstra
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,51 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal.data;
+package playground.dgrether.koehlerstrehlersignal;
+
+import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgCommodity {
+public class DgDijkstra {
 
-	private Id id;
-	private Id sourceNode; 
-	private Id drainNodes;
-	private Double flow;
+	private Network network;
+
+	public DgDijkstra(Network network) {
+		this.network = network;
+	}
 	
-	public DgCommodity(Id id){
-		this.id = id;
+	public void calcLeastCostPath(Id fromNodeId, Id toNodeId, double startTime, TravelDisutility travelDisutility, TravelTime travelTime) {
+		Node fromNode = this.network.getNodes().get(fromNodeId);
+		PriorityQueue<Node> queue = new PriorityQueue<Node>();
+		
 	}
 
-	public Id getId() {
-		return this.id;
-	}
-
-
-	public void setSourceNode(Id fromNodeId, Double flow) {
-		this.sourceNode = fromNodeId;
-		this.flow = flow;
-	}
-	
-	public void setDrainNode(Id toNodeId){
-		this.drainNodes = toNodeId;
-	}
-	
-	
-	public Id getDrainNodeId(){
-		return this.drainNodes;
-	}
-	
-	public Id getSourceNode(){
-		return this.sourceNode;
-	}
-	
-	public double getFlow(){
-		return this.flow;
-	}
-	
 }

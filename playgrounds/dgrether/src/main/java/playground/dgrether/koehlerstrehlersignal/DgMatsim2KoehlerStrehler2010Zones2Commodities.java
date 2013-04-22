@@ -54,8 +54,8 @@ public class DgMatsim2KoehlerStrehler2010Zones2Commodities implements
 		this.validateFromAndToNode(fromNodeId, toNodeId, net);
 		DgCommodity com = new DgCommodity(id);
 		coms.addCommodity(com);
-		com.addSourceNode(fromNodeId, flow);
-		com.addDrainNode(toNodeId);
+		com.setSourceNode(fromNodeId, flow);
+		com.setDrainNode(toNodeId);
 	}
 	
 	private void validateFromAndToNode(Id fromNode, Id toNode, DgKSNetwork net){

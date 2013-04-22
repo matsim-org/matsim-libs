@@ -82,8 +82,8 @@ public class DgMatsim2KoehlerStrehler2010SimpleDemandConverter implements DgMats
 			Id coId = new IdImpl(comId);
 			DgCommodity co = new DgCommodity(coId);
 			coms.addCommodity(co);
-			co.addSourceNode(index.getFirst(), fromNodeToNodeCountMap.get(index));
-			co.addDrainNode(index.getSecond());
+			co.setSourceNode(index.getFirst(), fromNodeToNodeCountMap.get(index));
+			co.setDrainNode(index.getSecond());
 		}
 		
 		return coms;

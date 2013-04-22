@@ -20,7 +20,6 @@
 package playground.dgrether.koehlerstrehlersignal;
 
 import java.io.Writer;
-import java.util.Map.Entry;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -30,7 +29,6 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -203,22 +201,22 @@ public class DgKoehlerStrehler2010ModelWriter {
 			hd.startElement("", "", COMMODITY, atts);
 			atts.clear();
 			hd.startElement("", "", SOURCES, atts);
-			for (Entry<Id, Double> e : co.getSourceNodesFlowMap().entrySet()) {
-				atts.clear();
-				atts.addAttribute("", "", ID, CDATA, e.getKey().toString());
-				atts.addAttribute("", "", FLOW, CDATA, Double.toString(e.getValue()));
-				hd.startElement("", "", NODE, atts);
-				hd.endElement("", "", NODE);
-			}
+
+			atts.clear();
+			atts.addAttribute("", "", ID, CDATA, co.getSourceNode().toString());
+			atts.addAttribute("", "", FLOW, CDATA, Double.toString(co.getFlow()));
+			hd.startElement("", "", NODE, atts);
+			hd.endElement("", "", NODE);
+
 			hd.endElement("", "", SOURCES);
 			atts.clear();
 			hd.startElement("", "", DRAINS, atts);
-			for (Id drainNodeId : co.getDrainNodes()) {
-				atts.clear();
-				atts.addAttribute("", "", ID, CDATA, drainNodeId.toString());
-				hd.startElement("", "", NODE, atts);
-				hd.endElement("", "", NODE);
-			}
+
+			atts.clear();
+			atts.addAttribute("", "", ID, CDATA, co.getDrainNodeId().toString());
+			hd.startElement("", "", NODE, atts);
+			hd.endElement("", "", NODE);
+
 			hd.endElement("", "", DRAINS);
 			hd.endElement("", "", COMMODITY);
 		}

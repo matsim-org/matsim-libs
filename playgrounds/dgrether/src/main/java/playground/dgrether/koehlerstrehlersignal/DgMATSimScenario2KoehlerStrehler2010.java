@@ -21,7 +21,6 @@ package playground.dgrether.koehlerstrehlersignal;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +47,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
+import playground.dgrether.koehlerstrehlersignal.data.DgKSNet2MatsimNet;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
@@ -141,17 +141,25 @@ public class DgMATSimScenario2KoehlerStrehler2010 {
 		
 		if (ksModelCommoditySampleSize != 1.0){
 			for (DgCommodity com : commodities.getCommodities().values()) {
-				List<Id> ids = new ArrayList<Id>();
-				ids.addAll(com.getSourceNodesFlowMap().keySet());
-				for (Id id : ids){
-					Double flow = com.getSourceNodesFlowMap().get(id);
-					com.getSourceNodesFlowMap().put(id, flow * ksModelCommoditySampleSize);
-				}
+				double flow = com.getFlow() * ksModelCommoditySampleSize;
+				com.setSourceNode(com.getSourceNode(), flow);
 			}
 		}
 		
 		String description = "offset: " + boundingBoxOffset + "cellsX: " + cellsX + " cellsY: " + cellsY + " startTimeSec: " + startTimeSec + " endTimeSec: " + endTimeSec;
 		description += "matsimPopsampleSize: " + this.matsimPopSampleSize + " ksModelCommoditySampleSize: " + this.ksModelCommoditySampleSize;
+
+		Network newMatsimNetwork = new DgKSNet2MatsimNet().convertNetwork(ksNet);
+		DgKoehlerStrehler2010Router router = new DgKoehlerStrehler2010Router();
+		List<Id> invalidCommodities = router.routeCommodities(newMatsimNetwork, commodities);
+		for (Id id : invalidCommodities) {
+			commodities.getCommodities().remove(id);
+		}
+		log.info("testing routing again...");
+		router.routeCommodities(newMatsimNetwork, commodities);
+		
+		this.writeNetwork(newMatsimNetwork, outputDirectory + "matsimNetworkKsModel.xml.gz");
+		this.writeNetwork2Shape(newMatsimNetwork, shapeFileDirectory + "matsimNetworkKsModel.shp");
 		
 		new DgKoehlerStrehler2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + modelOutfile);
 		writeStats(cellsX, cellsY, boundingBoxOffset, startTimeSec, endTimeSec, ksNet, commodities);
