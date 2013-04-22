@@ -66,6 +66,13 @@ public class PtMatrix {
 	// walk speed
 	private double meterPerSecWalkSpeed;
 	
+	private long wrnCnt = 0;
+	private long wrnCntParam = 0;
+	private long wrnCntId = 0;
+	private long wrnCntFormat = 0;
+	private long wrnCntSkip = 0;
+	private long wrnCntParse = 0;
+	
 	public PtMatrix(Network network, double meterPerSecWalkSpeed, double meterPerSecPtSpeed, double beelineDistanceFactor, MATSim4UrbanSimControlerConfigModuleV3 m4uccm){
 
 		// get the locations for ptStops, travel times and distances from controler
@@ -131,7 +138,13 @@ public class PtMatrix {
 				parts = line.split(separator);
 				
 				if(parts.length < idIDX || parts.length < xCoordIDX || parts.length < yCoordIDX){
-					log.warn("Could not parse line: " + line);
+				
+					if(wrnCntParse < 20){
+						log.warn("Could not parse line: " + line);
+						wrnCntParse++;
+					}
+					else if(wrnCntParse == 20)
+						log.error( "Found " + wrnCntParse + " warnings of type 'could nor parse line'. There is probably something seriously wrong. Please check. Reasons for this error may be that attributes like the pt sto id and/or x and y coordinates are missing.");
 					continue;
 				}
 				
@@ -146,7 +159,11 @@ public class PtMatrix {
 									   qTree.getMaxNorthing() >= ptStopCoord.getY() && 
 									   qTree.getMinNorthing() <= ptStopCoord.getY();
 				if(!isInBoundary){
-					log.warn("Pt stop " + id + " lies outside the network boundary and will be skipped!");
+					if(wrnCntSkip < 20)
+						log.warn("Pt stop " + id + " lies outside the network boundary and will be skipped!");
+					else if(wrnCntSkip == 20)
+						log.error("Found " + wrnCntParse + " warnings of type 'pt stop lies outside the network boundary'. Reasons for this error is that the network defines the boundary for the quad tree that determines the nearest pt station for a given origin/destination location.");
+					wrnCntSkip++;
 					continue;
 				}
 				
@@ -278,15 +295,18 @@ public class PtMatrix {
 		String line 				= null;		// line from input file
 		String parts[] 				= null;		// values accessible via array
 		
-		int wrnCnt = 0;
-		
 		while ( (line = br.readLine()) != null ) {
 			
 			line = line.trim().replaceAll("\\s+", SEPARATOR);
 			parts = line.split(SEPARATOR);
 			
 			if(parts.length != 3){
-				log.warn("Could not parse line: " + line);
+				
+				if(wrnCnt < 20)
+					log.warn("Could not parse line: " + line);
+				else if(wrnCnt == 20)
+					log.error( "Found " + wrnCnt + " warnings of type 'could nor parse line'. There is probably something seriously wrong. Please check. Reasons for this error may be that attributes like the pt sto id and/or x and y coordinates are missing.");
+				wrnCnt++;
 				continue;
 			}
 			
@@ -299,7 +319,11 @@ public class PtMatrix {
 					value = value * 60.; 	// convert value from minutes into seconds
 				
 				if(value == EMPTY_ENTRY){
-					log.warn("No parameter set: " + line);
+					if(wrnCntParam < 20)
+						log.warn("No parameter set: " + line);
+					else if(wrnCntParam == 20)
+						log.error("Found " + wrnCntParam + " warnings of type 'no parameter set'. This means that the VISUM model does not provide any travel times or distances. This message is not shown any further.");
+					wrnCntParam++;
 					continue;
 				}
 				
@@ -315,22 +339,24 @@ public class PtMatrix {
 					odMatrix.createEntry(originPtStopID, destinationPtStopID, value);
 				}
 				else{
-					if(wrnCnt > 20){
-						log.error( "Found " + wrnCnt + " warnings of type pt stop id not found. There is probably something seriously wrong. Please check. Reasons for this error may be:");
+					if(wrnCntId == 20){
+						log.error( "Found " + wrnCntId + " warnings of type 'pt stop id not found'. There is probably something seriously wrong. Please check. Reasons for this error may be:");
 						log.error( "The list of pt stops is incomplete or the stop ids of the VISUM files do not match the ids from the pt stop file.");
 					}
-					else if(! ptStopHashMap.containsKey(originPtStopID)){
+					else if(! ptStopHashMap.containsKey(originPtStopID) && wrnCntId < 20)
 						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + originPtStopID);
-						wrnCnt++;
-					}
-					else if(! ptStopHashMap.containsKey(destinationPtStopID)){
+					else if(! ptStopHashMap.containsKey(destinationPtStopID) && wrnCntId < 20)
 						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + destinationPtStopID);
-						wrnCnt++;
-					}
+
+					wrnCntId++;
 					continue;
 				}
 			} catch(NumberFormatException nfe){
-				log.warn("Could not convert values into integer: " + line);
+				if(wrnCntFormat < 20)
+					log.warn("Could not convert values into integer: " + line);
+				else if(wrnCntFormat == 20)
+					log.error("Found " + wrnCntFormat + " warnings of type 'pt stop id not found'. There is probably something seriously wrong. Please check if id's are provided as 'long' type and travel values (times, distances) as 'double' type.");
+				wrnCntFormat++;
 				continue;
 			}
 		}
