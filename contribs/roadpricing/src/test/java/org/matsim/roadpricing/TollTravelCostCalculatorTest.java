@@ -66,7 +66,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Population population = scenario.getPopulation();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 
@@ -121,7 +121,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Population population = scenario.getPopulation();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 
@@ -176,7 +176,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Population population = scenario.getPopulation();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 

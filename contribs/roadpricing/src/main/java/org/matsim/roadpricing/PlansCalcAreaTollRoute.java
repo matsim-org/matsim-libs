@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -36,10 +37,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -62,13 +63,14 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param timeCalculator
 	 * @param factory
 	 * @param scheme
+	 * @param config TODO
 	 */
 	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelDisutility costCalculator, final TravelTime timeCalculator,
-			LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final RoadPricingSchemeImpl scheme) {
+			LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final RoadPricingSchemeImpl scheme, Config config) {
 		super(configGroup, network, costCalculator, timeCalculator, factory, routeFactory);
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;
-		this.tollRouter =	factory.createPathCalculator(network, new TravelDisutilityIncludingToll(costCalculator, scheme), timeCalculator);
+		this.tollRouter =	factory.createPathCalculator(network, new TravelDisutilityIncludingToll(costCalculator, scheme, config), timeCalculator);
 	}
 
 	@Override

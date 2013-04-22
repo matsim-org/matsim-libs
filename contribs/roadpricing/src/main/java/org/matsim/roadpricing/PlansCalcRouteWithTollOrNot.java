@@ -67,7 +67,7 @@ public class PlansCalcRouteWithTollOrNot extends AbstractPersonAlgorithm impleme
 	private void handlePlan(Person person, Plan plan) {
 		new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, (TravelTime) timeCostCalc, factory, routeFactory).run(plan);
 		double routeCostWithAreaToll = sumNetworkModeCosts(plan) + scheme.getCosts().iterator().next().amount;
-		new PlansCalcRoute(config.plansCalcRoute(), network, new TravelDisutilityIncludingToll(timeCostCalc, scheme), timeCalculator, factory, routeFactory).run(plan);
+		new PlansCalcRoute(config.plansCalcRoute(), network, new TravelDisutilityIncludingToll(timeCostCalc, scheme, config), timeCalculator, factory, routeFactory).run(plan);
 		double routeCostWithoutAreaToll = sumNetworkModeCosts(plan);
 		if (routeCostWithAreaToll < routeCostWithoutAreaToll) {
 			// Change the plan back to the one without toll

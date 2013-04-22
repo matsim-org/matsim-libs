@@ -68,15 +68,15 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
 			final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
 			// area-toll requires a regular TravelCost, no toll-specific one.
-			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 
+			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 				@Override
 				public TravelDisutility createTravelDisutility(
 						TravelTime timeCalculator,
 						PlanCalcScoreConfigGroup cnScoringGroup) {
-					return new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), RoadPricing.this.scheme);
+					return new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), 
+							RoadPricing.this.scheme, controler.getConfig() );
 				}
-				
 			};
 			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
 		}

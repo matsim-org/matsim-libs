@@ -133,7 +133,8 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 				lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore()), controler );
 			else{				// if road pricing is activated
 				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
-				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
+				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( 
+						ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme, controler.getConfig() ), controler );
 			}
 		}
 		else{					
@@ -152,8 +153,10 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 				TravelDisutility costCalculatorCongested = tdFactory.createTravelDisutility(ttc, cnScoringGroup); 
 				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
 				
-				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorCongested, scheme), controler);
-				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
+				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( 
+						ttc, new TravelDisutilityIncludingToll(costCalculatorCongested, scheme, controler.getConfig() ), controler);
+				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( 
+						ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme, controler.getConfig() ), controler );
 			}
 		}
 

@@ -21,10 +21,11 @@ package playground.benjamin.scoring.income.old;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.households.Income;
-import org.matsim.households.Income.IncomePeriod;
 import org.matsim.households.PersonHouseholdMapping;
+import org.matsim.households.Income.IncomePeriod;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.vehicles.Vehicle;
@@ -63,10 +64,10 @@ public class IncomeTollTravelCostCalculator implements TravelDisutility {
 	private TravelDisutilityIncludingToll tollTravelCostCalculator;
 	
 	
-	public IncomeTollTravelCostCalculator(PersonHouseholdMapping hhdb, RoadPricingScheme scheme) {
+	public IncomeTollTravelCostCalculator(PersonHouseholdMapping hhdb, RoadPricingScheme scheme, Config config) {
 		this.hhdb = hhdb;
 		TravelDisutility nullTravelCostCalculator = new NullTravelCostCalculator();
-		this.tollTravelCostCalculator = new TravelDisutilityIncludingToll(nullTravelCostCalculator, scheme);
+		this.tollTravelCostCalculator = new TravelDisutilityIncludingToll(nullTravelCostCalculator, scheme, config);
 	}
 
 	//calculating additional generalized toll costs

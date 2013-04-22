@@ -23,6 +23,7 @@ package org.matsim.roadpricing;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
@@ -36,15 +37,18 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
-	private final TravelDisutility costHandler;
+	private final TravelDisutility normalTravelDisutility;
+	private double marginalUtilityOfMoney;
 
-	public TravelDisutilityIncludingToll(final TravelDisutility costCalculator, final RoadPricingScheme scheme) {
+	public TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config) {
 		this.scheme = scheme;
-		this.costHandler = costCalculator;
+		this.normalTravelDisutility = normalTravelDisutility;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
 			this.tollCostHandler = new DistanceTollCostBehaviour();
 		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
 			this.tollCostHandler = new AreaTollCostBehaviour();
+			Logger.getLogger(this.getClass()).warn("area pricing is (even) more brittle than the other toll schemes; " +
+					"make sure you know what you are doing.  kai, apr'13") ;
 		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) {
 			this.tollCostHandler = new CordonTollCostBehaviour();
 		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_LINK) {
@@ -52,25 +56,24 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 		} else {
 			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
 		}
+		this.marginalUtilityOfMoney = config.planCalcScore().getMarginalUtilityOfMoney() ;
+		if ( this.marginalUtilityOfMoney != 1. ) {
+			Logger.getLogger(this.getClass()).warn("There are no test cases for marginalUtilityOfMoney != 1.  Please write one " +
+					"and delete this message.  kai, apr'13 ") ;
+		}
 	}
 	
-	private static int wrnCnt = 0 ;
-
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		double baseCost = this.costHandler.getLinkTravelDisutility(link, time, person, vehicle);
+		double normalTravelDisutilityForLink = this.normalTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
 		double tollCost = this.tollCostHandler.getTollCost(link, time, person);
-		if ( wrnCnt < 1 ) {
-			wrnCnt++ ;
-			Logger.getLogger(this.getClass()).warn("this package assumes a utility of money equal to one.  " +
-					"Make sure you are using that.  Should be fixed.  kai, mar'11") ;
-		}
-		return baseCost + tollCost;
+		return normalTravelDisutilityForLink + tollCost*this.marginalUtilityOfMoney ;
+		// sign convention: these are all costs (= disutilities), so they are all normally positive.  tollCost is positive, marginalUtilityOfMoney as well.
 	}
 	
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		return this.costHandler.getLinkMinimumTravelDisutility(link);
+		return this.normalTravelDisutility.getLinkMinimumTravelDisutility(link);
 	}
 
 	private interface TollRouterBehaviour {

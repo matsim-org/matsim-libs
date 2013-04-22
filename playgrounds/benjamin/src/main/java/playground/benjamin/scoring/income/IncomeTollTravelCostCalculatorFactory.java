@@ -22,6 +22,7 @@ package playground.benjamin.scoring.income;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -41,19 +42,22 @@ public class IncomeTollTravelCostCalculatorFactory implements TravelDisutilityFa
 	
 	private RoadPricingScheme scheme;
 
-	public IncomeTollTravelCostCalculatorFactory(PersonHouseholdMapping personHouseholdMapping, RoadPricingScheme roadPricingScheme) {
+	private final Config config;
+
+	public IncomeTollTravelCostCalculatorFactory(PersonHouseholdMapping personHouseholdMapping, RoadPricingScheme roadPricingScheme, Config config) {
 		this.personHouseholdMapping = personHouseholdMapping;
 		this.scheme = roadPricingScheme;
 		Logger.getLogger(this.getClass()).warn("Unfortunately, I think that with this setup, toll is added twice to the router:\n" +
 				"                     * Once in this class (income-dependent).\n" +
 				"                     * Once by the standard roadpricing setup (using a utility of money of one).\n" +
 				"                     I may be wrong; please let me know if you ever find out (one way or the other. kai, mar'12") ;
+		this.config = config ;
 	}
 	
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
-		final IncomeTollTravelCostCalculator incomeTollTravelCostCalculator = new IncomeTollTravelCostCalculator(personHouseholdMapping, scheme);
+		final IncomeTollTravelCostCalculator incomeTollTravelCostCalculator = new IncomeTollTravelCostCalculator(personHouseholdMapping, scheme, config);
 		
 		return new TravelDisutility() {
 
