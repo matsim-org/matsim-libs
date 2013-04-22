@@ -278,6 +278,8 @@ public class PtMatrix {
 		String line 				= null;		// line from input file
 		String parts[] 				= null;		// values accessible via array
 		
+		int wrnCnt = 0;
+		
 		while ( (line = br.readLine()) != null ) {
 			
 			line = line.trim().replaceAll("\\s+", SEPARATOR);
@@ -313,10 +315,18 @@ public class PtMatrix {
 					odMatrix.createEntry(originPtStopID, destinationPtStopID, value);
 				}
 				else{
-					if(! ptStopHashMap.containsKey(originPtStopID))
+					if(wrnCnt > 20){
+						log.error( "Found " + wrnCnt + " warnings of type pt stop id not found. There is probably something seriously wrong. Please check. Reasons for this error may be:");
+						log.error( "The list of pt stops is incomplete or the stop ids of the VISUM files do not match the ids from the pt stop file.");
+					}
+					else if(! ptStopHashMap.containsKey(originPtStopID)){
 						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + originPtStopID);
-					if(! ptStopHashMap.containsKey(destinationPtStopID))
+						wrnCnt++;
+					}
+					else if(! ptStopHashMap.containsKey(destinationPtStopID)){
 						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + destinationPtStopID);
+						wrnCnt++;
+					}
 					continue;
 				}
 			} catch(NumberFormatException nfe){
