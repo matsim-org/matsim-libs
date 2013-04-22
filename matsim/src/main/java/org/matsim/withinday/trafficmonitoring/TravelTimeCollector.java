@@ -50,9 +50,11 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
@@ -76,7 +78,8 @@ import org.matsim.vehicles.Vehicle;
 public class TravelTimeCollector implements TravelTime,
 		LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler,
 		AgentArrivalEventHandler, AgentDepartureEventHandler,
-		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
+		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
+		MobsimBeforeCleanupListener {
 
 	private static final Logger log = Logger.getLogger(TravelTimeCollector.class);
 
@@ -94,7 +97,8 @@ public class TravelTimeCollector implements TravelTime,
 	 */
 	private CyclicBarrier startBarrier;
 	private CyclicBarrier endBarrier;
-	private UpdateMeanTravelTimesThread[] updateMeanTravelTimesThreads;
+	private Thread[] threads;
+	private UpdateMeanTravelTimesRunnable[] updateMeanTravelTimesRunnables;
 	private final int numOfThreads;
 
 	private final int infoTimeStep = 3600;
@@ -300,11 +304,37 @@ public class TravelTimeCollector implements TravelTime,
 		printInfo(e.getSimulationTime());
 	}
 
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+		
+		/*
+		 * Calling the afterSim Method of the Threads will set their 
+		 * simulationRunning flag to false.
+		 */
+		for (UpdateMeanTravelTimesRunnable runnable : this.updateMeanTravelTimesRunnables) {
+			runnable.afterSim();
+		}
+
+		/*
+		 * Triggering the startBarrier of the UpdateMeanTravelTimesRunnables.
+		 * They will check whether the Simulation is still running.
+		 * It is not, so the Threads will terminate.
+		 */
+		try {
+			this.startBarrier.await();
+		} catch (InterruptedException ex) {
+			Gbl.errorMsg(ex);
+		} catch (BrokenBarrierException ex) {
+			Gbl.errorMsg(ex);
+		}
+	}
+	
 	private void printInfo(double time) {
 		if (time >= this.nextInfoTime) {
 			int activeLinks = 0;
-			for (UpdateMeanTravelTimesThread thread : this.updateMeanTravelTimesThreads) {
-				activeLinks += thread.getActiveLinksCount();
+			for (UpdateMeanTravelTimesRunnable runnable : this.updateMeanTravelTimesRunnables) {
+				activeLinks += runnable.getActiveLinksCount();
 			}
 
 			log.info("TravelTimeCollector at " + Time.writeTime(time) + " #links=" + activeLinks);
@@ -320,7 +350,7 @@ public class TravelTimeCollector implements TravelTime,
 
 	private static class TravelTimeInfo {
 
-		UpdateMeanTravelTimesThread thread;
+		UpdateMeanTravelTimesRunnable runnable;
 		List<TripBin> tripBins = new ArrayList<TripBin>();
 
 		boolean isActive = false;
@@ -345,7 +375,7 @@ public class TravelTimeCollector implements TravelTime,
 		/*package*/ void checkActiveState() {
 			if (!isActive) {
 				this.isActive = true;
-				thread.addTravelTimeInfo(this);
+				runnable.addTravelTimeInfo(this);
 			}
 		}
 
@@ -378,8 +408,8 @@ public class TravelTimeCollector implements TravelTime,
 
 		try {
 			// set current Time
-			for (UpdateMeanTravelTimesThread updateMeanTravelTimesThread : updateMeanTravelTimesThreads) {
-				updateMeanTravelTimesThread.setTime(time);
+			for (UpdateMeanTravelTimesRunnable updateMeanTravelTimesRunnable : updateMeanTravelTimesRunnables) {
+				updateMeanTravelTimesRunnable.setTime(time);
 			}
 
 			this.startBarrier.await();
@@ -397,20 +427,22 @@ public class TravelTimeCollector implements TravelTime,
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
 
-		// TravelTimeInfo[][] parallelArrays = createArrays();
-
-		updateMeanTravelTimesThreads = new UpdateMeanTravelTimesThread[numOfThreads];
+		this.threads = new Thread[numOfThreads];
+		this.updateMeanTravelTimesRunnables = new UpdateMeanTravelTimesRunnable[numOfThreads];
 
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) {
-			UpdateMeanTravelTimesThread updateMeanTravelTimesThread = new UpdateMeanTravelTimesThread();
-			updateMeanTravelTimesThread.setName("UpdateMeanTravelTimes" + i);
-			updateMeanTravelTimesThread.setStartBarrier(this.startBarrier);
-			updateMeanTravelTimesThread.setEndBarrier(this.endBarrier);
-			updateMeanTravelTimesThread.setDaemon(true); // make the Thread demons so they will terminate automatically
-			updateMeanTravelTimesThreads[i] = updateMeanTravelTimesThread;
-
-			updateMeanTravelTimesThread.start();
+			UpdateMeanTravelTimesRunnable updateMeanTravelTimesRunnable = new UpdateMeanTravelTimesRunnable();
+			updateMeanTravelTimesRunnable.setStartBarrier(this.startBarrier);
+			updateMeanTravelTimesRunnable.setEndBarrier(this.endBarrier);
+			updateMeanTravelTimesRunnables[i] = updateMeanTravelTimesRunnable;
+			
+			Thread thread = new Thread(updateMeanTravelTimesRunnable);
+			thread.setName("UpdateMeanTravelTimes" + i);
+			thread.setDaemon(true); // make the Thread demons so they will terminate automatically
+			this.threads[i] = thread;
+			
+			thread.start();
 		}
 
 		/*
@@ -418,7 +450,7 @@ public class TravelTimeCollector implements TravelTime,
 		 */
 		int roundRobin = 0;
 		for (TravelTimeInfo travelTimeInfo : this.travelTimeInfos.values()) {
-			travelTimeInfo.thread = updateMeanTravelTimesThreads[roundRobin % numOfThreads];
+			travelTimeInfo.runnable = updateMeanTravelTimesRunnables[roundRobin % numOfThreads];
 			roundRobin++;
 		}
 
@@ -437,17 +469,19 @@ public class TravelTimeCollector implements TravelTime,
 	}
 
 	/*
-	 * The thread class that updates the Mean Travel Times in the MyLinksImpls.
+	 * The thread class that updates the mean travel times.
 	 */
-	private static class UpdateMeanTravelTimesThread extends Thread {
+	private static class UpdateMeanTravelTimesRunnable implements Runnable {
 
+		private volatile boolean simulationRunning = true;
+		
 		private CyclicBarrier startBarrier = null;
 		private CyclicBarrier endBarrier = null;
-
-		private double time = 0.0;
+		
+		private double time = Time.UNDEFINED_TIME;
 		private Collection<TravelTimeInfo> activeTravelTimeInfos;
 
-		public UpdateMeanTravelTimesThread() {
+		public UpdateMeanTravelTimesRunnable() {
 			activeTravelTimeInfos = new ArrayList<TravelTimeInfo>();
 		}
 
@@ -458,10 +492,6 @@ public class TravelTimeCollector implements TravelTime,
 		public void setEndBarrier(CyclicBarrier cyclicBarrier) {
 			this.endBarrier = cyclicBarrier;
 		}
-
-		// public void setTravelTimeInfos(TravelTimeInfo[] travelTimeInfos) {
-		// this.travelTimeInfos = travelTimeInfos;
-		// }
 
 		public void setTime(final double t) {
 			time = t;
@@ -475,6 +505,10 @@ public class TravelTimeCollector implements TravelTime,
 			return this.activeTravelTimeInfos.size();
 		}
 
+		public void afterSim() {
+			this.simulationRunning = false;
+		}
+		
 		@Override
 		public void run() {
 
@@ -493,6 +527,15 @@ public class TravelTimeCollector implements TravelTime,
 
 					startBarrier.await();
 
+					/*
+					 * Check if Simulation is still running.
+					 * Otherwise print CPU usage and end Thread.
+					 */
+					if (!simulationRunning) {
+						Gbl.printCurrentThreadCpuTime();
+						return;
+					}
+					
 					Iterator<TravelTimeInfo> iter = activeTravelTimeInfos.iterator();
 					while (iter.hasNext()) {
 						TravelTimeInfo travelTimeInfo = iter.next();
@@ -558,6 +601,6 @@ public class TravelTimeCollector implements TravelTime,
 			} else travelTimeInfo.travelTime = meanTravelTime;
 		}
 
-	} // ReplannerThread
+	} // ReplannerRunnable
 
 }

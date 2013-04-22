@@ -96,9 +96,7 @@ public class WithinDayController extends Controler {
 		}
 		if (travelTimeCollector == null) {
 			travelTimeCollector = travelTimeCollectorFactory.createTravelTimeCollector(this.scenarioData, analyzedModes);
-			fosl.addSimulationInitializedListener(travelTimeCollector);
-			fosl.addSimulationBeforeSimStepListener(travelTimeCollector);
-			fosl.addSimulationAfterSimStepListener(travelTimeCollector);
+			fosl.addSimulationListener(travelTimeCollector);
 			this.events.addHandler(travelTimeCollector);
 		}
 	}
