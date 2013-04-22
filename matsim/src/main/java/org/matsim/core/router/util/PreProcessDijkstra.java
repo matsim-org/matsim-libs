@@ -68,52 +68,52 @@ public class PreProcessDijkstra {
 		 */
 		this.nodeData = new ConcurrentHashMap<Node, DeadEndData>(network.getNodes().size());
 
-		DeadEndData role;
+		DeadEndData deadEndData;
 		for (Node node : network.getNodes().values()) {
-			role = getNodeData(node);
+			deadEndData = getNodeData(node);
 
 			Map<Id, Node> incidentNodes = getIncidentNodes(node);
 			if (incidentNodes.size() == 1) {
 				ArrayList<Node> deadEndNodes = new ArrayList<Node>();
 
-				while (role.getInDeadEndCount() == incidentNodes.size() - 1) {
+				while (deadEndData.getInDeadEndCount() == incidentNodes.size() - 1) {
 
 					deadEndNodes.add(node);
-					deadEndNodes.addAll(role.getDeadEndNodes());
-					role.getDeadEndNodes().clear();
+					deadEndNodes.addAll(deadEndData.getDeadEndNodes());
+					deadEndData.getDeadEndNodes().clear();
 
 					// Just set a dummy DeadEndEntryNode, such that is
 					// isn't null. We use this as a flag to determine
 					// whether we already processed this node.
-					role.setDeadEndEntryNode(node);
+					deadEndData.setDeadEndEntryNode(node);
 
 					Iterator<? extends Node> it = incidentNodes.values().iterator();
-					while (role.getDeadEndEntryNode() != null && it.hasNext()) {
+					while (deadEndData.getDeadEndEntryNode() != null && it.hasNext()) {
 						node = it.next();
-						role = getNodeData(node);
+						deadEndData = getNodeData(node);
 					}
-					if (role.getDeadEndEntryNode() == null) {
-						role.incrementInDeadEndCount();
+					if (deadEndData.getDeadEndEntryNode() == null) {
+						deadEndData.incrementInDeadEndCount();
 						incidentNodes = getIncidentNodes(node);
 					} else {
 						log.error("All " + incidentNodes.size() + " incident nodes of node " + node.getId() + " are dead ends!");
 						return;
 					}
 				}
-				role.getDeadEndNodes().addAll(deadEndNodes);
+				deadEndData.getDeadEndNodes().addAll(deadEndNodes);
 			}
 		}
 
 		// Now set the proper deadEndEntryNode for each node
 		int deadEndNodeCount = 0;
 		for (Node node : network.getNodes().values()) {
-			role = getNodeData(node);
-			for (Node n : role.getDeadEndNodes()) {
+			deadEndData = getNodeData(node);
+			for (Node n : deadEndData.getDeadEndNodes()) {
 				DeadEndData r = getNodeData(n);
 				r.setDeadEndEntryNode(node);
 				deadEndNodeCount++;
 			}
-			role.getDeadEndNodes().clear();
+			deadEndData.getDeadEndNodes().clear();
 		}
 		log.info("nodes in dead ends: " + deadEndNodeCount
 				+ " (total nodes: " + network.getNodes().size() + "). Done in "
