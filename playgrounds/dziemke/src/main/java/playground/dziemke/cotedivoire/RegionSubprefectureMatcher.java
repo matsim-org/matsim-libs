@@ -38,7 +38,7 @@ public class RegionSubprefectureMatcher implements Runnable{
 				if (regions.get(n).getGeometry().contains(point)) {
 					//System.out.println(point.toString());
 					System.out.println("Die Subpräfektur mit der ID " + subprefectures.get(i).getId() + " befindet sich in der Region " +
-							regions.get(n).getName());
+							regions.get(n).getName() + ", welche ein Bevoelkerung von " + regions.get(n).getPopulation() + " hat.");
 					counter++;
 				}
 			}
