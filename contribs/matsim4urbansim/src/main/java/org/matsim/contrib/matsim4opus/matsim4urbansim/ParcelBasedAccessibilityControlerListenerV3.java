@@ -32,6 +32,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.LeastCostPathTree;
 
 /**
@@ -179,14 +180,12 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		// get the free-speed car travel times (in seconds)
 		TravelTime ttf = new FreeSpeedTravelTime() ;
 		TravelDisutility tdFree = controler.getTravelDisutilityFactory().createTravelDisutility(ttf, controler.getConfig().planCalcScore() ) ;
-		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttf, tdFree, controler ) ;
+		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttf, tdFree, controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class) ) ;
 
 		// get the congested car travel time (in seconds)
 		TravelTime ttc = controler.getLinkTravelTimes(); // congested
-//		TravelDisutility tdCongested = controler.createTravelCostCalculator() ; // congested
-		// alternative
 		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
-		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, controler) ;
+		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class) ) ;
 
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new TravelDistanceCalculator());

@@ -481,7 +481,7 @@ public class AccessibilityControlerListenerImpl{
 					double congestedCarDisutility = - lcptExtCongestedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility congested car on road network (including toll)
 					double freeSpeedCarDisutility = - lcptExtFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility free speed car on road network (including toll)
 					double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost(); 				// travel link distances on road network for bicycle and walk
-					
+
 					// travel times and distances for pseudo pt
 					double ptTravelTime_h		= Double.MAX_VALUE;	// travel time with pt
 					double ptTotalWalkTime_h	= Double.MAX_VALUE;	// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location
