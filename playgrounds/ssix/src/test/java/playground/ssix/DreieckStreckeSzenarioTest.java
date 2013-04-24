@@ -204,14 +204,14 @@ public class DreieckStreckeSzenarioTest {
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
 	public static double length = 166.67;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
-	private static long NUMBER_OF_AGENTS = 270;
-	private static String OUTPUT_DIR = "./output/data_Patna_test_pcu_correction.txt";
+	private static long NUMBER_OF_AGENTS = 160;
+	private static String OUTPUT_DIR = "./output/data_Patna_test_pcu_0.5_only_trucks.txt";
 	
 	private static double FREESPEED = 50.;//in km/h, maximum authorized velocity on the track
 	private static double P_TRUCK = 0.85;//no need to worry much about those, are normalized when choosing effective transport mode
 	//private static double P_MED = 2.;
 	private static double P_FAST = 0.15;
-	protected static double PCU_TRUCK = 0.25;//PCUs of the different possible modes
+	protected static double PCU_TRUCK = 0.5;//PCUs of the different possible modes
 	protected static double PCU_MED = 1.;
 	protected static double PCU_FAST = 1.;
 	protected static double VMAX_TRUCK = 5.56;//maximum velocities of the vehicle types
@@ -247,19 +247,21 @@ public class DreieckStreckeSzenarioTest {
 		dreieck.fillNetworkData();
 		
 		dreieck.openFile(OUTPUT_DIR);
+		/*
 		for (int number_cars = 0; number_cars < 81; number_cars+=10){//8
-			for (int number_bikes = 0; number_bikes < 281 - number_cars; number_bikes+=20){//14
+			for (int number_bikes = 0;
+ number_bikes < 321 - number_cars; number_bikes+=20){//14
 				dreieck.runParam(number_bikes,number_cars);
 			}
 		}
-		dreieck.closeFile();
-		/*
+		dreieck.closeFile();*/
+		///*
 		long number_of_iterations = NUMBER_OF_AGENTS + 1;//-10 if constantFastDensity... because 10 vehicles are already in the sim
-		for (long i = 0; i < number_of_iterations; i++){
-			dreieck.run(i, "constantModalSplit");
+		for (long i = 0; i < number_of_iterations; i+=10){
+			dreieck.run(i, "onlyTruck");
 		}
 		dreieck.closeFile();
-		*/
+		//*/
 	}
 	
 	private void runParam(int number_trucks, int number_fast){
@@ -454,7 +456,7 @@ public class DreieckStreckeSzenarioTest {
 	
 	private void createRandomPopulation(long numberOfPeople, int sekundenFrequenz){
 		Population population = scenario.getPopulation();
-		//population.clear()......????
+		//population.clear()......?No need seen so far.
 		Random rand = MatsimRandom.getRandom();//for more randomness use new Random()
 		// other option get MatsimRandom(), is then more deterministic and allows introduction of a new person
 		// without changing previous modal split
@@ -546,7 +548,6 @@ public class DreieckStreckeSzenarioTest {
 			//following modification goes with the modification in the prepareForSim method
 			final Id startLinkId = new IdImpl(-1);
 			final Id endLinkId = new IdImpl(3*DreieckStreckeSzenarioTest.subdivisionFactor);
-			//NetworkRoute route = new CompressedNetworkRouteImpl();
 			List<Id> routeDescription = new ArrayList<Id>();
 			for (long j=0; j<3*DreieckStreckeSzenarioTest.subdivisionFactor;j++){
 				routeDescription.add(new IdImpl(j));
@@ -583,8 +584,7 @@ public class DreieckStreckeSzenarioTest {
 	private void prepareForSim() {
 		// make sure all routes are calculated.
 		//Calculating routes this way will make them direct. On the contrary we want the drivers to go all the way around
-		// 	-> All routes
- are now implemented in the createPopulation method while creating legs
+		// 	-> All routes are now implemented in the createPopulation method while creating legs
 		
 		
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), scenario.getConfig().global().getNumberOfThreads(),
@@ -704,7 +704,7 @@ public class DreieckStreckeSzenarioTest {
 			throw new RuntimeException(e);
 		}
 		writer.format("%s\t%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\n",	
-				     "n_t", "n_f",  "k", "k_t","k_f", "rho","rho_t","rho_f","v","v_t","v_f");
+				     "n_t", "n_f",  "k", "k_t","k_f", "q","q_t","q_f","v","v_t","v_f");
 		
 		//writer.format("%s\t%s\t%s\t%s\n",
 		//			  "n_bikes","n_cars","flow","speed");
