@@ -62,9 +62,9 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 * constructor
 	 * @param controler Controler, to get the RoadPricingScheme if available
 	 */
-	public LeastCostPathTreeExtended(final TravelTime tt, final TravelDisutility td, final Controler controler) {
+	public LeastCostPathTreeExtended(final TravelTime tt, final TravelDisutility td, final RoadPricingSchemeImpl scheme) {
 		super(tt, td);
-		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
+		this.scheme = scheme;
 	}
 
 	/**
@@ -182,7 +182,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		Controler controler = new Controler(scenario);
 		controler.run();
 		// init lcpte
-		LeastCostPathTreeExtended lcpte = new LeastCostPathTreeExtended(controler.getLinkTravelTimes(), controler.createTravelCostCalculator(), controler);
+		LeastCostPathTreeExtended lcpte = new LeastCostPathTreeExtended(controler.getLinkTravelTimes(), controler.createTravelCostCalculator(), controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class));
 		
 		// contains all network nodes
 		Map<Id, Node> networkNodesMap = network.getNodes();
