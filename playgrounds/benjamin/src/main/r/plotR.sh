@@ -1,7 +1,7 @@
 #!/bin/bash
 
 dataDir=`pwd`
-cd /media/data/2_Eclipse/Workspace_MATSim_2.0/playgrounds/benjamin/src/main/r
+cd /media/data/2_Workspaces/matsim/playgrounds/benjamin/src/main/r
 #cd /home/me/MATSim/workspace/playgrounds/benjamin/src/main/r
 
 R --slave $dataDir $dataDir < plotA.R

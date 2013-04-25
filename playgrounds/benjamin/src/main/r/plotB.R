@@ -10,7 +10,7 @@ directory <- getwd()
 baseFile <- file.path(directory,"emissionInformation_baseCase_ctd.txt")
 z30File <- file.path(directory, "emissionInformation_policyCase_zone30.txt")
 priFile <- file.path(directory, "emissionInformation_policyCase_pricing.txt")
-outFile <- file.path(directory, "plotB.pdf")
+outFile <- file.path(directory, "PlotB.pdf")
 
 #read files
 basecase <- read.table(file=baseFile, header = T, sep = "\t")
