@@ -13,24 +13,24 @@ groupColors<- c("yellow","mediumblue","red")
 
 #input
 directory <- commandArgs()[3]
-baseFile <- file.path(directory, "welfareTollInformation_1.txt")
-z30File <- file.path(directory, "welfareTollInformation_16.txt")
-priFile <- file.path(directory, "welfareTollInformation_20.txt")
+baseFile <- file.path(directory, "welfareTollInformation_baseCase_ctd_newCode.txt")
+priFile <- file.path(directory, "welfareTollInformation_policyCase_pricing_newCode.txt")
+z30File <- file.path(directory, "welfareTollInformation_policyCase_zone30.txt")
 
 outFile <- file.path(commandArgs()[4], "PlotE.pdf")
 basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
-z30case <- read.table(file=z30File, header = T, sep = "\t", comment.char="")
 pricase <- read.table(file=priFile, header = T, sep = "\t", comment.char="")
+z30case <- read.table(file=z30File, header = T, sep = "\t", comment.char="")
 
 #rownames
 rownames(basecase)<-basecase$user.group
-rownames(z30case)<-z30case$user.group
 rownames(pricase)<-pricase$user.group
+rownames(z30case)<-z30case$user.group
 
 #sort all matrices by user groups
 basecase$user.group <- ordered(basecase$user.group, levels = groupOrder)
-z30case$user.group <- ordered(z30case$user.group, levels = groupOrder)
 pricase$user.group <- ordered(pricase$user.group, levels = groupOrder)
+z30case$user.group <- ordered(z30case$user.group, levels = groupOrder)
 
 pridata <- matrix(ncol=3, nrow=length(groupOrder))
 colnames(pridata)<-c("changeinuserlogsum","changeintollpayments","sum")
@@ -41,12 +41,13 @@ rownames(z30data)<-groupOrder
 
 for(i in groupOrder){
 
-		z30data[i,"changeinuserlogsum"]<- z30case[i, "user.logsum..EUR."]- basecase[i, "user.logsum..EUR."]
-		z30data[i,"changeintollpayments"]<-z30case[i, "toll.payments..EUR."]-basecase[i, "toll.payments..EUR."]
-		z30data[i,"sum"]<- z30data[i,"changeinuserlogsum"]+z30data[i,"changeintollpayments"]
 		pridata[i,"changeinuserlogsum"]<- pricase[i, "user.logsum..EUR."]-basecase[i, "user.logsum..EUR."]
 		pridata[i,"changeintollpayments"]<-pricase[i, "toll.payments..EUR."]-basecase[i, "toll.payments..EUR."]
 		pridata[i,"sum"]<- pridata[i,"changeinuserlogsum"]+pridata[i,"changeintollpayments"]
+		z30data[i,"changeinuserlogsum"]<- z30case[i, "user.logsum..EUR."]- basecase[i, "user.logsum..EUR."]
+		z30data[i,"changeintollpayments"]<-z30case[i, "toll.payments..EUR."]-basecase[i, "toll.payments..EUR."]
+		z30data[i,"sum"]<- z30data[i,"changeinuserlogsum"]+z30data[i,"changeintollpayments"]
+
 
 }
 
@@ -72,7 +73,7 @@ barL<-barplot(t(z30data), beside=T, ylim=ylimits, col=groupColors, axes=F, names
 par(srt=90)
 text(x=barL, y=27000, label=glabels, pos=4)
 par(srt=0, font=2)
-text(x=7, y=60000, label="Factor 20")
+text(x=7, y=60000, label="zone 30")
 par(font=1)
 axis(2, at=seq(-25000,25000,by=10000), labels=seq(-25000,25000,by=10000), tick=TRUE)
 mtext("EUR", outer=F, side=2, at= -29000, cex=1.7, adj=1)
@@ -80,7 +81,7 @@ barR<-barplot(t(pridata), beside=T, ylim=ylimits, col=groupColors, axes =F, name
 par(srt=90)
 text(x=barR, y=27000, label=glabels, pos=4)
 par(srt=0, font=2)
-text(x=7, y=60000, label="Factor 40")
+text(x=7, y=60000, label="internalization")
 par(font=1)
 par(mar=c(0,0,0,0));plot.new(); 
 legend(0.0,0.8, c("change in user logsum","change in toll payments","sum"), fill=groupColors, cex=1.2, bty="n", y.intersp=2, horiz =TRUE)

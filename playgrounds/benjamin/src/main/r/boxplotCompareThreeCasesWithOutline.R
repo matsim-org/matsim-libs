@@ -9,9 +9,9 @@ meanColor <- c("darkgrey","black","green")
 
 directory <- commandArgs()[3]
 #read files and set directories
-distInfoBaCFile <- file.path(directory,"detailedCarDistanceInformation_1.txt")
-distInfoZ30File <- file.path(directory,"detailedCarDistanceInformation_16.txt")
-distInfoPriFile <- file.path(directory,"detailedCarDistanceInformation_20.txt")
+distInfoBaCFile <- file.path(directory,"detailedCarDistanceInformation_baseCase_ctd_newCode.txt")
+distInfoPriFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing_newCode.txt")
+distInfoZ30File <- file.path(directory,"detailedCarDistanceInformation_policyCase_zone30.txt")
 
 distInfoBaC <- read.table(file = distInfoBaCFile, header=T, sep = "\t", comment.char="")
 distInfoZ30 <- read.table(file = distInfoZ30File, header=T, sep = "\t", comment.char="")
@@ -33,7 +33,7 @@ boxplot(distInfoBaCgroup$total.car.distance..km., notch = T, outline = T, boxwex
 main= paste("Car distance for", group), ylab="Distance in km", at=1:1-0.3, ylimits=c(0, ylimitmax))
 boxplot(distInfoZ30group$total.car.distance..km., notch = T, outline = T, boxwex = 0.3, col=groupColors[2], add=T, at=1:1+0.0)
 boxplot(distInfoPrigroup$total.car.distance..km., notch = T, outline = T, boxwex = 0.3, col=groupColors[3], add=T, at=1:1+0.3)
-axis(1, c(0.7,1,1.3), labels=c("Base Case","Factor 20","Factor 40"), tick=F)
+axis(1, c(0.7,1,1.3), labels=c("Base Case","Zone 30","Pricing"), tick=F)
 
 #means
 aline <- tapply(distInfoBaCgroup$total.car.distance..km., distInfoBaCgroup$user.group==group ,mean)

@@ -12,8 +12,8 @@ groups<-c("URBAN","COMMUTER","REV_COMMUTER","FREIGHT")
 
 #read files and set directories
 directory <- commandArgs()[3]
-z30File <- file.path(directory,"detailedCarDistanceInformation_16-1.txt")
-priFile <- file.path(directory,"detailedCarDistanceInformation_20-1.txt")
+priFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing_newCode-baseCase_ctd_newCode.txt")
+z30File <- file.path(directory,"detailedCarDistanceInformation_policyCase_zone30-baseCase_ctd_newCode.txt")
 z30 <- read.table(file = z30File, header=T, sep = "\t", comment.char="")
 pri <- read.table(file = priFile, header=T, sep = "\t", comment.char="")
 outFile <- file.path(commandArgs()[4], "distanceDifference.pdf")
@@ -34,7 +34,7 @@ bline <- mean(pri[,"total.car.distance..km."])
 #draw means as lines
 segments(seq(along = aline) - 0.4, aline, seq(along = aline) - 0.2, aline, lwd = 2, col = meanColor[1]) 
 segments(seq(along = bline) + 0.2, bline, seq(along = bline) + 0.4, bline, lwd = 2, col = meanColor[2]) 
-axis(1, c(0.7,1.3), labels=c("Factor 20","Factor 40"), tick=F)
+axis(1, c(0.7,1.3), labels=c("Zone 30","Pricing"), tick=F)
 
 #second plot with outline
 boxplot(z30[,"total.car.distance..km."], notch=T, outline=T, boxwex = 0.3, col=groupColors[1], 
@@ -44,7 +44,7 @@ boxplot(pri[,"total.car.distance..km."], notch=T, outline=T, boxwex = 0.3, col=g
 #draw means as lines
 segments(seq(along = aline) - 0.4, aline, seq(along = aline) - 0.2, aline, lwd = 2, col = meanColor[1]) 
 segments(seq(along = bline) + 0.2, bline, seq(along = bline) + 0.4, bline, lwd = 2, col = meanColor[2]) 
-axis(1, c(0.7,1.3), labels=c("Factor 20","Factor 40"), tick=F)
+axis(1, c(0.7,1.3), labels=c("Zone 30","Pricing"), tick=F)
 
 #for each group
 for (i in groups){
@@ -65,7 +65,7 @@ bline <- mean(groupPri[,"total.car.distance..km."])
 #draw means as lines
 segments(seq(along = aline) - 0.4, aline, seq(along = aline) - 0.2, aline, lwd = 2, col = meanColor[1]) 
 segments(seq(along = bline) + 0.2, bline, seq(along = bline) + 0.4, bline, lwd = 2, col = meanColor[2]) 
-axis(1, c(0.7,1.3), labels=c("Factor 1","Factor 20"), tick=F)
+axis(1, c(0.7,1.3), labels=c("Zone 30","Pricing"), tick=F)
 
 #second plot with outline
 boxplot(groupZ30[,"total.car.distance..km."], notch=T, outline=T, boxwex = 0.3, col=groupColors[1], 
@@ -75,7 +75,7 @@ boxplot(groupPri[,"total.car.distance..km."], notch=T, outline=T, boxwex = 0.3, 
 #draw means as lines
 segments(seq(along = aline) - 0.4, aline, seq(along = aline) - 0.2, aline, lwd = 2, col = meanColor[1]) 
 segments(seq(along = bline) + 0.2, bline, seq(along = bline) + 0.4, bline, lwd = 2, col = meanColor[2]) 
-axis(1, c(0.7,1.3), labels=c("Factor 1","Factor 20"), tick=F) 
+axis(1, c(0.7,1.3), labels=c("Zone 30","Pricing"), tick=F) 
 
 }
 

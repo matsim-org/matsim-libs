@@ -12,7 +12,7 @@ groupOrder <- c("URBAN", "COMMUTER","REV_COMMUTER","FREIGHT") #one plot for each
 groupColors<- c("mediumblue","mediumblue","mediumblue","mediumblue")
 
 directory <- commandArgs()[3]
-baseFile <- file.path(directory, "welfareTollInformation_1.txt")
+baseFile <- file.path(directory, "welfareTollInformation_baseCase_ctd_newCode.txt")
 outFile <- file.path(commandArgs()[4], "PlotD.pdf")
 basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
 

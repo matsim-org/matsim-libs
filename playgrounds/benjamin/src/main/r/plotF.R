@@ -14,15 +14,15 @@ emissions <- c("CO","CO2_TOTAL","FC","HC","NMHC","NO2","NOX","PM","SO2")
 #input
 directory <- commandArgs()[3]
 
-baseFile <- file.path(directory, "emissionInformation_1.txt")
-z30File <- file.path(directory, "emissionInformation_16.txt")
-priFile <- file.path(directory, "emissionInformation_20.txt")
+baseFile <- file.path(directory, "emissionInformation_baseCase_ctd_newCode.txt")
+priFile <- file.path(directory, "emissionInformation_policyCase_pricing_newCode.txt")
+z30File <- file.path(directory, "emissionInformation_policyCase_zone30.txt")
 
 outFile <- file.path(commandArgs()[4], "PlotF.pdf")
 
 basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
-z30case <- read.table(file=z30File, header = T, sep = "\t", comment.char="")
 pricase <- read.table(file=priFile, header = T, sep = "\t", comment.char="")
+z30case <- read.table(file=z30File, header = T, sep = "\t", comment.char="")
 
 #CO	CO2_TOTAL	FC	HC	NMHC	NO2	NOX	PM	SO2
 emissionc<- matrix(nrow=1, ncol=(ncol(basecase)-1))
@@ -39,13 +39,13 @@ emissionc[1,"SO2"]<-11000/1000/1000
 
 #rownames
 rownames(basecase)<-basecase$user.group
-rownames(z30case)<-z30case$user.group
 rownames(pricase)<-pricase$user.group
+rownames(z30case)<-z30case$user.group
 
 #sort all matrices by user groups
 basecase$user.group <- ordered(basecase$user.group, levels = groupOrder)
-z30case$user.group <- ordered(z30case$user.group, levels = groupOrder)
 pricase$user.group <- ordered(pricase$user.group, levels = groupOrder)
+z30case$user.group <- ordered(z30case$user.group, levels = groupOrder)
 
 pridata <- matrix(ncol=1, nrow=length(groupOrder))
 colnames(pridata)<-c("change")
@@ -59,11 +59,11 @@ for(i in groupOrder){
 	z30temp<-0
 	for(j in emissions){
 		#+= costs of actual emission * amount of actual emission
-		z30temp<-z30temp+ emissionc[1,j]*(z30case[i, j]-basecase[i,j])
 		pritemp<-pritemp+ emissionc[1,j]*(pricase[i, j]-basecase[i,j])
+		z30temp<-z30temp+ emissionc[1,j]*(z30case[i, j]-basecase[i,j])
 		}
-		z30data[i,"change"]<- z30temp 
 		pridata[i,"change"]<- pritemp
+		z30data[i,"change"]<- z30temp 
 
 }
 
@@ -76,12 +76,12 @@ ylimits<-c(yminimum-5,ymaximum+5)
 z30colors<-rep(plotColors[1], length(groupOrder))
 pricolors<-rep(plotColors[1], length(groupOrder))
 for(i in 1 : length(groupOrder)){
-		if(z30data[groupOrder[i],"change"]>0){
-		z30colors[i]<-"red"
-		}	
-		if(pridata[(groupOrder[i]), "change"]>0){
+	if(pridata[(groupOrder[i]), "change"]>0){
 		pricolors[i]<-"red"
-		}
+	}
+	if(z30data[groupOrder[i],"change"]>0){
+		z30colors[i]<-"red"
+	}
 }
 
 #grafic parameters
@@ -94,7 +94,7 @@ barL<-barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, col=z30
 par(srt=90)
 text(x=barL, y=60, label=groupOrder, pos=4)
 par(srt=0, font=2)
-text(x=2.5, y=230, label="Factor 20")
+text(x=2.5, y=230, label="zone 30")
 par(font=1)
 axis(2, at=seq(-150,50,by=20), labels=seq(-150,50,by=20), tick=TRUE)
 mtext("EUR", outer=F, side=2, at= 70, cex=1.7, adj=1)
@@ -102,6 +102,6 @@ barR<-barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, col=pri
 par(srt=90)
 text(x=barR, y=60, label=groupOrder, pos=4)
 par(srt=0, font=2)
-text(x=2.5, y=230, label="Factor 40")
+text(x=2.5, y=230, label="internalization")
 par(font=1)
 dev.off()
