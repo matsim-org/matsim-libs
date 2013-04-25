@@ -584,9 +584,12 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		boolean useMATSimPtParameter			= !useCustomMarginalUtilitiesPt();	 // true if relevant settings in the external MATSim config are found
 		boolean useRawSum						= matsim4UrbanSimParameter.getAccessibilityParameter().isUseRawSumsWithoutLn();
 		
-		if(useMATSimLogitScaleParameter)
+		if(useMATSimLogitScaleParameter) {
 			logitScaleParameter = 1.;
-		else
+			if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
+				throw new RuntimeException("the code claims that it uses the matsim logit scale parameter, but in fact it sets it silently to one.  aborting ...") ;
+			}
+		} else
 			logitScaleParameter = matsim4UrbanSimParameter.getAccessibilityParameter().getLogitScaleParameter();
 		// tnicolai nov'12: decided with Kai that beta_brain (the accessibility scale parameter) should be 1 because of the pre-factor of the logsum term
 		if(logitScaleParameter != 1.0){
