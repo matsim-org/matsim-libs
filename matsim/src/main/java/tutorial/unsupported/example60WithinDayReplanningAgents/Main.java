@@ -41,7 +41,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
-class Main {
+public class Main {
 
 	public static void main(String[] args) {
 		
