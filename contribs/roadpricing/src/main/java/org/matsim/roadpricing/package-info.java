@@ -46,9 +46,10 @@
  * non-tolled link. The roadpricing type in the file has to be set to "cordon". The links listed in the
  * roadpricing file are the "tolled links". There are two possibilities to specify the tolled links:
  * <ul>
- *   <li><b>All the links in the area enclosed by the cordon are listed.</b> In this case, agents only pay
+ *   <li><strike><b>All the links in the area enclosed by the cordon are listed.</b> In this case, agents only pay
  *   the toll when entering the cordon from the outside, but not when driving from the inside to the outside.
- *   This has the advantage that the listed links are the same as for an area toll within the same area.</li>
+ *   This has the advantage that the listed links are the same as for an area toll within the same area.  DOES NOT WORK CORRECTLY 
+ *   (in the router).  kai, apr'13 </strike></li>
  *   <li><b>Only the links that build the cordon are listed.</b> In this case, agents have to pay each time
  *   they cross the cordon, no matter if from the outside or from the inside (assuming both links, incoming and
  *   outgoing links are listed).</li>
