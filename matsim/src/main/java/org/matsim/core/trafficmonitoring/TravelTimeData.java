@@ -37,7 +37,11 @@ public interface TravelTimeData {
 	 * <li> yy It does not make sense to me that both "timeSlot" and "now" are needed.  I guess that historically it was
 	 * "timeSlot", and then "now" was needed for the time-dependent network.  But I would think that the conversion
 	 * from "now" to "timeSlot" should be done inside the data class (implementation hiding) and so the "timeSlot" 
-	 * argument should be removed.  kai, may'2011
+	 * argument should be removed.  kai, may'2011 </li>
+	 * <li>Indead, this doesn't make sense at a quick glance. This is an optimization that saves lots of memory. For each
+	 * link of the network a TravelTimeData Object is created. Each of these objects would need one (Map implementation) 
+	 * or two (Array implementation) additional fields that hold the information that is required to calculate the time slot
+	 * from the time of day. dg, april'2013. </li>
 	 * </ul> 
 	 */
 	abstract double getTravelTime(final int timeSlot, final double now);
