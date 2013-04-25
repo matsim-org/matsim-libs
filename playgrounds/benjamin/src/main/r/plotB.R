@@ -14,21 +14,21 @@ priFile <- file.path(inputDir, "emissionInformation_policyCase_pricing_newCode.t
 outFile <- file.path(outputDir, "PlotB.pdf")
 
 #read files
-basecase <- read.table(file=baseFile, header = T, sep = "\t")
-policycasez30 <- read.table(file=z30File, header = T, sep = "\t")
-policycasePri <- read.table(file=priFile, header = T, sep = "\t")
+basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
+policycasez30 <- read.table(file=z30File, header = T, sep = "\t", comment.char="")
+policycasePri <- read.table(file=priFile, header = T, sep = "\t", comment.char="")
 
 #initiate matrices with same row and column names 
 basecase.mat <- as.matrix(basecase)[,2:10]
-rownames(basecase.mat) <- basecase$usergroup
+rownames(basecase.mat) <- basecase$user.group
 colnames(basecase.mat) <- names(basecase)[2:10]
 
 policycasez30.mat <- as.matrix(policycasez30)[,2:10]
-rownames(policycasez30.mat) <- policycasez30$usergroup
+rownames(policycasez30.mat) <- policycasez30$user.group
 colnames(policycasez30.mat) <- names(policycasez30)[2:10]
 
 policycasePri.mat <- as.matrix(policycasePri)[,2:10]
-rownames(policycasePri.mat) <- policycasePri$usergroup
+rownames(policycasePri.mat) <- policycasePri$user.group
 colnames(policycasePri.mat) <- names(policycasePri)[2:10]
 
 sumbasecase<- matrix(nrow=1, ncol=length(emissions))
@@ -58,8 +58,9 @@ for(i in emissions){
 
 #graphic parameters
 #dev.new(width=14, height=7)
-pdf(outFile, width=10, height=7)
-par(mfrow=c(1,3), xpd=T, cex=1.2) #three figures side by side
+pdf(outFile, width=15, height=7)
+layout(matrix(c(1,1,1,1,2,2,2,2,3),1,9))
+par(xpd=T, cex=1.7, oma=c(0,4,0,0), mar=c(2,0,1,0), las=2)
 
 #ylimits for the plot depending on matrix entries
 #this works fine if there is at least on value greater 1 or less than -1
@@ -68,11 +69,11 @@ ymaximum<-ceiling(max(relPri, relZ30)) #rounded up maximum
 ylimits<-c(yminimum,ymaximum)
 
 #plots
-barplot(t(relZ30), legend=F, col=emissioncolors, ylim=ylimits, xlab="Zone 30", beside=T)
-barplot(t(relPri), legend=F, col=emissioncolors, ylim=ylimits, axes=F, xlab="Pricing", beside=T) #use main="title" to add a title here 
-
-emissionsLegend <- emissions
+barplot(t(relZ30), legend=F, col=emissioncolors, ylim=ylimits, axes=F, main="Factor 20",beside=T, cex.names=1.2)
+axis(2, at=c(-3,-2.5,-2,-1.5,-1,-0.5,0,0.5), labels=c("-3.00%", "-2.50%", "-2.00%", "-1.50%","-1.00%", "-0.50%","0.00%", "0.50%"), tick=TRUE)
+barplot(t(relPri), legend=F, col=emissioncolors, ylim=ylimits, axes=F, main="Factor 40", beside=T, cex.names=1.2) #use main="title" to add a title here 
 plot.new()
-legend(-0.2,0.8, emissions, fill = emissioncolors, title = "Emissions")
+emissions<-sub("_TOTAL","", emissions, fixed=T)
+legend(-0.1,0.8, emissions, fill = emissioncolors, cex=1, bty="n", y.intersp=2)
 
 dev.off()
