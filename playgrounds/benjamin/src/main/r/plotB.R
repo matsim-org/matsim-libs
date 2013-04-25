@@ -6,11 +6,12 @@ emissions <- c("CO2_TOTAL","NMHC","NOX","PM","SO2")
 emissioncolors<- c("black", "mediumblue", "limegreen", "yellow", "red")
 
 #relative paths
-directory <- getwd()
-baseFile <- file.path(directory,"emissionInformation_baseCase_ctd.txt")
-z30File <- file.path(directory, "emissionInformation_policyCase_zone30.txt")
-priFile <- file.path(directory, "emissionInformation_policyCase_pricing.txt")
-outFile <- file.path(directory, "PlotB.pdf")
+inputDir <- commandArgs()[3]
+outputDir <- commandArgs()[4]
+baseFile <- file.path(inputDir,"emissionInformation_baseCase_ctd_newCode.txt")
+z30File <- file.path(inputDir, "emissionInformation_policyCase_zone30.txt")
+priFile <- file.path(inputDir, "emissionInformation_policyCase_pricing_newCode.txt")
+outFile <- file.path(outputDir, "PlotB.pdf")
 
 #read files
 basecase <- read.table(file=baseFile, header = T, sep = "\t")

@@ -1,0 +1,108 @@
+r-plots
+
+allgemein
+- Methoden auslagern? welche?
+- wie viel Dokumentation in welcher Form?
+- was soll für die anderen (anders als Emissionen) Module dargestellt werden? 
+- wie den Aufruf der R-Skripte regeln? Bash, R, Java? (xml-)config für die Parameter?
+
+alle skripte
+- komplette inputdateien übergeben, nicht vorhandene dateien auffangen
+- anleitung/hilfetext, Quellen, Autoren
+- komplette outputdateien übergeben
+- bashskript anpassen
+- (basecase + ein) oder (basecase + zwei) Inputcases, alternativ beliebig viele oder nur basecase
+- cases umbennen (statt pri und zone30)
+- bisher ist "" commentarchar
+- Fehler/fehlende Tabellenwerte auffangen, zBsp = 0 oder NA setzen?
+- fehlende Tabellenheader auffangen?
+- umbennen nach Funktion
+- output benennen
+- wie viele Outputdateien? zusammenfassen?
+- Test der R-Skripte? 
+
+plotA
+- Liste der Farben evtl an variable Inputanzahl anpassen
+- Liste der Emissionen: soll die so bleiben?
+- Skript evtl nicht nur für den Basecase sondern für alle Fälle aufrufen -> intern oder extern?
+
+plotB
+- genereller Kommentar
+- ungleich zwei files: read files ändern
+- im Moment werden die Tabellen ab der zweiten Spalte ausgelesen -> von headern abhängig machen?
+- bei mehr als zwei cases: seitenlayout 'layout(matrix)' ändern
+- ungleich zwei cases: pdf-größe und/oder Seitenränder ändern, positionen der texte relativieren
+- ungleich zwei cases: berechnung von yminimum, ymaximum und ylimits anpassen
+- labels aus dem Wertebereich erzeugen
+
+plotC
+- genereller Kommentar
+- ungleich zwei files: read files ändern
+- matrixnamen ändern
+- im Moment werden die Tabellen ab der zweiten Spalte ausgelesen -> von headern abhängig machen?
+- im Moment werden vier Zeilen ausgelesen
+- Kommentare an die neue Bennung anpassen
+- ungleich zwei cases: pdf-größe und/oder Seitenränder ändern, positionen der texte relativieren
+- ungleich zwei cases: berechnung von yminimum, ymaximum und ylimits anpassen
+
+plotD
+- generellen Kommentar ändern
+- soll die Gruppenaufteilung so bleiben? 
+- Variable des Barplots in den Inputargumenten mit übergeben
+- Faktor für den Barplot mit übergeben oder Wertebereich festlegen und in der Legende ausgeben
+
+plotE
+- ungleich zwei files: read files ändern
+- ungleich zwei files: Rownames, sort all matrices anpassen 
+- soll die Gruppenaufteilung so bleiben? 
+- evtl generellen Kommentar an neuen Input anpassen
+- ungleich zwei cases: pdf-größe und/oder Seitenränder ändern, positionen der texte relativieren
+- ungleich zwei cases: berechnung von yminimum, ymaximum und ylimits anpassen
+- Labels neu erzeugen
+- Legende aus den Tabellen erzeugen
+
+plotF
+- ungleich zwei files: generellen Kommentar ändern
+- sollen die Emissionen so bleiben?
+- Emissionskosten in einer Configdatei uebergeben?
+- ungleich zwei files: Rownames, sort all matrices anpassen
+- ungleich zwei cases: pdf-größe und/oder Seitenränder ändern, positionen der texte relativieren
+- ungleich zwei cases: berechnung von yminimum, ymaximum und ylimits anpassen
+- plots and legend genau(er) kommentieren
+- Label aus den Tabellen auslesen
+
+boxplotCompareThreeCasesNoOutline / boxplotCompareThreeCasesWithOutline
+- zu einem Skript zusammenfassen, Outline -> boolean oder beides ausgeben
+- genereller Kommentar
+- ungleich zwei cases: pdf-größe und/oder Seitenränder ändern
+- ungleich zwei cases: berechnung von Durchschnitten und Segments ändern
+
+modalsplitbygroups
+- generellen Kommentar neu schreiben
+- caseOrder variabel machen? -> liste
+- organise needed data ggf aus der liste konstruieren
+- ungleich zwei Files: pdf-Größe und/oder Seitenränder ändern
+- ungleich zwei Files: Layout der Matrix ändern
+- Cases in der Datenaufbereitung 'data[mode, case, group]' variabel machen
+- Legend: variable Labels benutzen, ggf Position von der Caseanzahl abhängig machen
+
+modalsplit
+- generellen Kommentar schreiben
+- caseOrder machen
+- ungleich zwei Cases: Daten neu einlesen
+- ungleich zwei Cases: neues Matrixlayout
+- ungleich zwei Cases: Plots variabel machen - weiterhin alles mit Basecase vergleichen?
+- Kommentare aufräumen/löschen
+- Group-Argument variabel machen bzw aus den Tabellen auslesen, Fehler auffangen, falls die Tabellen der verschiedenen Cases nciht kompatibel sind
+
+
+
+
+
+compareDistance
+- Kommentar Englisch
+- mehr als zwei Cases: Min und Max neu berechnen
+- mehr als zwei Cases: Mittelwerte neu berechnen
+- mehr als zwei Cases: pdf-Größe und/oder Seitenränder ändern, Plots aus Liste erzeugen, Segmente neu zeichnen
+
+TODO: wann ist es sinnvoll mehrfach das gleiche r-skript mit verschiedenen eingabedaten aufzurufen, wann soll das lieber intern gemacht und zbsp eine liste der inputdateien durchlaufen werden?

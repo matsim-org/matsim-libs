@@ -9,17 +9,18 @@ groupOrder<- c("URBAN", "COMMUTER", "REV_COMMUTER", "FREIGHT")
 caseOrder<- c("BaseCase", "Internalization", "Zone30")
 
 #read files and set directories
-directory <- commandArgs()[3]
+inputDir <- commandArgs()[3]
+outputDir <- commandArgs()[4]
 
-BaCFile <- file.path(directory,"avgTTInformation_baseCase_ctd_newCode.txt")
-PriFile <- file.path(directory,"avgTTInformation_policyCase_pricing_newCode.txt")
-Z30File <- file.path(directory,"avgTTInformation_policyCase_zone30.txt")
+BaCFile <- file.path(inputDir,"avgTTInformation_baseCase_ctd_newCode.txt")
+PriFile <- file.path(inputDir,"avgTTInformation_policyCase_pricing_newCode.txt")
+Z30File <- file.path(inputDir,"avgTTInformation_policyCase_zone30.txt")
 
 BaC <- read.table(file = BaCFile, header=T, sep = "\t", comment.char="")
 Z30 <- read.table(file = Z30File, header=T, sep = "\t", comment.char="")
 Pri <- read.table(file = PriFile, header=T, sep = "\t", comment.char="")
 
-outputFile <- file.path(commandArgs()[4], "ModalSplitByGroups.pdf")
+outputFile <- file.path(outputDir, "ModalSplitByGroups.pdf")
 rownames(BaC)<-paste(BaC[,"mode"], BaC[,"user.group"])
 rownames(Pri)<-paste(Pri[,"mode"], Pri[,"user.group"])
 rownames(Z30)<-paste(Z30[,"mode"], Z30[,"user.group"])

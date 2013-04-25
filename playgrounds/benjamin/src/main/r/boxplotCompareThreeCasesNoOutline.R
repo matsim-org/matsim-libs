@@ -6,17 +6,19 @@ groupOrder <- c("URBAN", "COMMUTER","REV_COMMUTER","FREIGHT") #one plot for each
 groupColors <- c("yellow","red","lightgreen","darkgreen") #base case, z30, pricing
 meanColor <- c("darkgrey","black","green") 
 
-directory <- commandArgs()[3]
 #read files and set directories
-distInfoBaCFile <- file.path(directory,"detailedCarDistanceInformation_baseCase_ctd_newCode.txt")
-distInfoPriFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing_newCode.txt")
-distInfoZ30File <- file.path(directory,"detailedCarDistanceInformation_policyCase_zone30.txt")
+inputDir <- commandArgs()[3]
+outputDir <- commandArgs()[4]
+
+distInfoBaCFile <- file.path(inputDir,"detailedCarDistanceInformation_baseCase_ctd_newCode.txt")
+distInfoPriFile <- file.path(inputDir,"detailedCarDistanceInformation_policyCase_pricing_newCode.txt")
+distInfoZ30File <- file.path(inputDir,"detailedCarDistanceInformation_policyCase_zone30.txt")
 
 distInfoBaC <- read.table(file = distInfoBaCFile, header=T, sep = "\t", comment.char="")
 distInfoZ30 <- read.table(file = distInfoZ30File, header=T, sep = "\t", comment.char="")
 distInfoPri <- read.table(file = distInfoPriFile, header=T, sep = "\t", comment.char="")
 
-outFileUrban <- file.path(commandArgs()[4], "plotDetailedCarTripDistance_withoutOutline.pdf")
+outFileUrban <- file.path(outputDir, "plotDetailedCarTripDistance_withoutOutline.pdf")
 
 pdf(outFileUrban, width=7, height=7)
 

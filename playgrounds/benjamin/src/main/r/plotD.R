@@ -11,9 +11,10 @@ graphics.off()		# Close graphics windows
 groupOrder <- c("URBAN", "COMMUTER","REV_COMMUTER","FREIGHT") #one plot for each grop
 groupColors<- c("mediumblue","mediumblue","mediumblue","mediumblue")
 
-directory <- commandArgs()[3]
-baseFile <- file.path(directory, "welfareTollInformation_baseCase_ctd_newCode.txt")
-outFile <- file.path(commandArgs()[4], "PlotD.pdf")
+inputDir <- commandArgs()[3]
+outputDir <- commandArgs()[4]
+baseFile <- file.path(inputDir, "welfareTollInformation_baseCase_ctd_newCode.txt")
+outFile <- file.path(outputDir, "PlotD.pdf")
 basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
 
 #sort basecase by user group 

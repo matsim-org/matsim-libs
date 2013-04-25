@@ -12,13 +12,14 @@ plotColors<- c("green","red") #1. color used if difference to base case is negat
 emissions <- c("CO","CO2_TOTAL","FC","HC","NMHC","NO2","NOX","PM","SO2")
 
 #input
-directory <- commandArgs()[3]
+inputDir <- commandArgs()[3]
+outputDir <- commandArgs()[4]
 
-baseFile <- file.path(directory, "emissionInformation_baseCase_ctd_newCode.txt")
-priFile <- file.path(directory, "emissionInformation_policyCase_pricing_newCode.txt")
-z30File <- file.path(directory, "emissionInformation_policyCase_zone30.txt")
+baseFile <- file.path(inputDir, "emissionInformation_baseCase_ctd_newCode.txt")
+priFile <- file.path(inputDir, "emissionInformation_policyCase_pricing_newCode.txt")
+z30File <- file.path(inputDir, "emissionInformation_policyCase_zone30.txt")
 
-outFile <- file.path(commandArgs()[4], "PlotF.pdf")
+outFile <- file.path(outputDir, "PlotF.pdf")
 
 basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
 pricase <- read.table(file=priFile, header = T, sep = "\t", comment.char="")

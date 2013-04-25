@@ -11,12 +11,15 @@ userGroupColors<-c("orange1", "orange2", "orange3","orange4")
 groups<-c("URBAN","COMMUTER","REV_COMMUTER","FREIGHT")
 
 #read files and set directories
-directory <- commandArgs()[3]
-priFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing_newCode-baseCase_ctd_newCode.txt")
-z30File <- file.path(directory,"detailedCarDistanceInformation_policyCase_zone30-baseCase_ctd_newCode.txt")
+inputDir <- commandArgs()[3]
+outputDir <- commandArgs()[4]
+
+priFile <- file.path(inputDir,"detailedCarDistanceInformation_policyCase_pricing_newCode-baseCase_ctd_newCode.txt")
+z30File <- file.path(inputDir,"detailedCarDistanceInformation_policyCase_zone30-baseCase_ctd_newCode.txt")
+
 z30 <- read.table(file = z30File, header=T, sep = "\t", comment.char="")
 pri <- read.table(file = priFile, header=T, sep = "\t", comment.char="")
-outFile <- file.path(commandArgs()[4], "distanceDifference.pdf")
+outFile <- file.path(outputDir, "distanceDifference.pdf")
 
 maximum<-max(z30[,"total.car.distance..km."],pri[,"total.car.distance..km."])
 minimum<-min(z30[,"total.car.distance..km."],pri[,"total.car.distance..km."])
