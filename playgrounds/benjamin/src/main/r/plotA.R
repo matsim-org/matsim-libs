@@ -62,7 +62,6 @@ for(i in 1: length(emissions)){
 	#
 	print(emissions[i])
 	emissionsLegend[i]<-paste(emissionsLegend[i]," [ g x ",relativmatrix[1,emissions[i]], "]") #this works now
-	#	emissionsLegend[i]<-paste(emissionsLegend[i]," [ g x ",relativmatrix[1,i], "]") #use this line to map random emissions to other scalings 
 }
 
 plot.new()
@@ -71,7 +70,7 @@ text(0.1,0, paste(emissionsLegend[1],emissionsLegend[2]), cex=1, adj=0)
 text(0.25,0,paste(emissionsLegend[3],emissionsLegend[4]), cex=1, adj=0)
 text(0.40,0,paste(emissionsLegend[5]), cex=1, adj=0)
 par(srt=0)
-barplot(t(basecase.mat), legend=F, col = emissioncolors, cex.axis=1, cex.names=1, xlab= "base case")
+barplot(t(basecase.mat), legend=F, col = emissioncolors, cex.axis=1, cex.names=1)
 plot.new()
 par(las=0)
 legend(-0.0,0.8, sub("_TOTAL","", emissions, fixed=T), fill = emissioncolors, cex=1, bty="n", y.intersp=2)

@@ -90,7 +90,7 @@ barL<-barplot(t(changematrixZ30), legend=F, col=emissioncolors, ylim=ylimits, ax
 par(srt=90)
 text(x=barL, y=1.5, label=glabels, pos=4)
 par(srt=0, font=2)
-text(x=13, y=6.5, label="Factor 20")
+text(x=13, y=6.5, label="Zone 30")
 par(font=1)
 axis(2, at=c(-7:2), labels=c("-7.00%", "-6.00%", "-5.00%", "-4.00%","-3.00%", "-2.00%","-1.00%", "0.00%","1.00%","2.00%"), tick=TRUE)
 
@@ -98,7 +98,7 @@ barR<-barplot(t(changematrixPri), legend=F, col=emissioncolors, ylim=ylimits, ax
 par(srt=90)
 text(x=barR, y=1.5, label=glabels, pos=4)
 par(srt=0, font=2)
-text(x=15, y=6.5, label="Factor 40")
+text(x=15, y=6.5, label="Internalization")
 par(font=1)
 plot.new()
 emissions<-sub("_TOTAL","", emissions, fixed=T)
