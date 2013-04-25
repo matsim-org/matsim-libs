@@ -1,43 +1,43 @@
 rm(list = ls())		# Clear all variables  
 graphics.off()		# Close graphics windows
 
-emissions<-c("CO2_TOTAL","NMHC","NOX","PM","SO2")
 emissioncolors <- c("black", "mediumblue", "limegreen", "yellow", "red")
 
 #relative paths
-directory <- commandArgs()[3]
-baseFile <- file.path(directory,"emissionInformation_1.txt")
-z30File <- file.path(directory, "emissionInformation_16.txt")
-priFile <- file.path(directory, "emissionInformation_20.txt")
-outFile <- file.path(commandArgs()[4], "PlotC.pdf")
+#directory <- file.path(getwd(),"rFiles/plots/analyse")
+directory <- getwd()
+baseFile <- file.path(directory,"emissionInformation_baseCase_ctd.txt")
+z30File <- file.path(directory, "emissionInformation_policyCase_zone30.txt")
+priFile <- file.path(directory, "emissionInformation_policyCase_pricing.txt")
+outFile <- file.path(directory, "plotC.pdf")
 
-#read tables
-basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
-policycasez30 <- read.table(file=z30File, header = T, sep = "\t", comment.char="")
-policycasePri <- read.table(file=priFile, header = T, sep = "\t", comment.char="")
+#read files
+basecase <- read.table(file=baseFile, header = T, sep = "\t")
+policycasez30 <- read.table(file=z30File, header = T, sep = "\t")
+policycasePri <- read.table(file=priFile, header = T, sep = "\t")
 
 #initiate matrices with same row and column names 
 basecase.mat <- as.matrix(basecase)[,2:10]
-rownames(basecase.mat) <- basecase$user.group
+rownames(basecase.mat) <- basecase$usergroup
 colnames(basecase.mat) <- names(basecase)[2:10]
 
 policycasez30.mat <- as.matrix(policycasez30)[,2:10]
-rownames(policycasez30.mat) <- policycasez30$user.group
+rownames(policycasez30.mat) <- policycasez30$usergroup
 colnames(policycasez30.mat) <- names(policycasez30)[2:10]
 
 policycasePri.mat <- as.matrix(policycasePri)[,2:10]
-rownames(policycasePri.mat) <- policycasePri$user.group
+rownames(policycasePri.mat) <- policycasePri$usergroup
 colnames(policycasePri.mat) <- names(policycasePri)[2:10]
 
 numberCol <- 9
 numberRow <- 4
 
 changematrixZ30 <- matrix(ncol=numberCol, nrow=numberRow)
-rownames(changematrixZ30) <- basecase$user.group
+rownames(changematrixZ30) <- basecase$usergroup
 colnames(changematrixZ30) <- names(basecase)[2:10]
 
 changematrixPri <- matrix(ncol=numberCol, nrow=numberRow)
-rownames(changematrixPri) <- basecase$user.group
+rownames(changematrixPri) <- basecase$usergroup
 colnames(changematrixPri) <- names(basecase)[2:10]
 
 #for all entries of the basecase matrix
@@ -61,13 +61,16 @@ for(i in 1:numberRow){
 }
 
 #delete unwanted rows/columns in matrices
+emissions<-c("CO2_TOTAL","NMHC","NOX","PM","SO2")
 changematrixZ30 <- changematrixZ30[, colnames(changematrixZ30) %in% emissions]
 changematrixPri <- changematrixPri[, colnames(changematrixPri) %in% emissions] 
 
 #graphic parameters
-pdf(outFile, width=15, height=10) #height was 7 as in plotB, plotF
-layout(matrix(c(1,1,1,1,2,2,2,2,3),1,9))
-par(xpd=T, cex=1.7, oma=c(0,4,0,0), mar=c(0,0,9,0), las=2)
+#dev.new(width=14, height=7) 
+pdf(outFile, width=14, height=7)
+par(mfrow=c(1,3), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,0,0,0)) #three figures side by side
+#pdf(outFile, width=10, height=7)
+#par(mfrow=c(1,3), xpd=T, cex=1.2) #three figures side by side
 
 #ylimits for the plot depending on matrix entries
 #this works fine if there is at least on value greater 1 or less than -1
@@ -75,29 +78,11 @@ yminimum<-floor(min(changematrixPri,changematrixZ30)) #rounded down minimum
 ymaximum<-ceiling(max(changematrixPri, changematrixZ30)) #rounded up maximum
 ylimits<-c(yminimum-1,ymaximum+1)
 
-#labels for the plot
-glabels<- rep("", times=length(emissions)*nrow(basecase.mat))
-glabels[2]<-rownames(changematrixZ30)[1]
-glabels[7]<-rownames(changematrixZ30)[2]
-glabels[12]<-rownames(changematrixZ30)[3]
-glabels[17]<-rownames(changematrixZ30)[4]
-
 #plots
-barL<-barplot(t(changematrixZ30), legend=F, col=emissioncolors, ylim=ylimits, axes=F,beside=T, cex.names=1.2)
-par(srt=90)
-text(x=barL, y=1.5, label=glabels, pos=4)
-par(srt=0, font=2)
-text(x=13, y=6.5, label="Factor 20")
-par(font=1)
-axis(2, at=c(-7:2), labels=c("-7.00%", "-6.00%", "-5.00%", "-4.00%","-3.00%", "-2.00%","-1.00%", "0.00%","1.00%","2.00%"), tick=TRUE)
+barplot(t(changematrixZ30), legend=F, col=emissioncolors, ylim=ylimits, xlab="Zone 30", beside=T, cex.names=0.6)
 
-barR<-barplot(t(changematrixPri), legend=F, col=emissioncolors, ylim=ylimits, axes=F, beside=T)
-par(srt=90)
-text(x=barR, y=1.5, label=glabels, pos=4)
-par(srt=0, font=2)
-text(x=15, y=6.5, label="Factor 40")
-par(font=1)
+barplot(t(changematrixPri), legend=F, col=emissioncolors, ylim=ylimits, axes=F, xlab="Pricing", beside=T, cex.names=0.6)
 plot.new()
-emissions<-sub("_TOTAL","", emissions, fixed=T)
-legend(-0.1,0.9, emissions, fill = emissioncolors, cex=1, bty="n", y.intersp=2)
+emissionsLegend <- emissions
+legend(0.1,0.9, emissionsLegend, fill = emissioncolors, title = "Emissions")
 dev.off()
