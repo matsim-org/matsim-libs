@@ -205,7 +205,12 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 			if (cost != null) {
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
+					// (the agent is not yet "registered"):
+					
+					// generate a "registration object":
 					info = new AgentTollInfo();
+					
+					// register it:
 					CalcPaidToll.this.agents.put(event.getPersonId(), info);
 				}
 				info.toll += cost.amount;
@@ -228,8 +233,15 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 			if (cost != null) {
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
+					// (the agent is not yet "registered")
+					
+					// generate a "registration object":
 					info = new AgentTollInfo();
+					
+					// register it:
 					CalcPaidToll.this.agents.put(event.getPersonId(), info);
+					
+					// the toll amount comes from the current link, but should be the same for all links:
 					info.toll = cost.amount;
 				}
 			}
@@ -251,13 +263,21 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 				// the cordon toll is charged.  kai, mar'12]]
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
-					// no information about this agent, so it did not yet pay the toll
+					// (the agent is not yet "registered")
 					// [[yyyy this would refer to any toll, so if we have two cordons, it does not work.  kai, mar'12]]
+
+					// generate a "registration object":
 					info = new AgentTollInfo();
+					
+					// register it:
 					CalcPaidToll.this.agents.put(event.getPersonId(), info);
-					info.toll = 0.0; // we start in the area, do not toll
+					
+					 // we start in the area, do not toll:
+					info.toll = 0.0;
+
 					// info.insideCordonArea is implicitly initialized with `true'. kai, mar'12
 				} else if (!info.insideCordonArea) {
+					// (info is != null, and insideCordonArea is false)
 					// agent was outside before, now inside the toll area --> agent has to pay
 					info.insideCordonArea = true;
 					info.toll += cost.amount;
@@ -267,9 +287,15 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 				// this is a link outside the toll area; just need to memorize that the agent is outside the toll area.
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
+					// (the agent is not yet "registered")
+
+					// generate a "registration object":
 					info = new AgentTollInfo();
+
+					// register it:
 					CalcPaidToll.this.agents.put(event.getPersonId(), info);
 				}
+				// memorize that agent is outside toll area:
 				info.insideCordonArea = false;
 			}
 		}
