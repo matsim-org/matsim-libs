@@ -20,9 +20,9 @@
 
 package org.matsim.core.trafficmonitoring;
 
-public interface TravelTimeGetter {
+interface TravelTimeGetter {
 
 	public void setTravelTimeAggregator(AbstractTravelTimeAggregator travelTimeAggregator);
 	
-	public double getTravelTime(TravelTimeData travelTimeRole, double time);
+	public double getTravelTime(TravelTimeData travelTimeData, double time);
 }
