@@ -51,8 +51,12 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 
 		if ( config.planCalcScore().getMonetaryDistanceCostRatePt() > 0 ) {
 			problem = true ;
-			log.warn("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +
+			log.error("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +
 					"This is a bug and may be changed eventually.  kai, jun'11") ;
+		}
+		if ( config.planCalcScore().getMarginalUtilityOfMoney() < 0. ) {
+			problem = true ;
+			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. " ) ;
 		}
 		
 		if ( config.getQSimConfigGroup()!=null && config.getQSimConfigGroup().isRemoveStuckVehicles() ) {

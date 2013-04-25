@@ -334,7 +334,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, "[utils/m] utility of walking per m, normally negative.  this is " +
 				"on top of the time (dis)utility.") ;
 
-		map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils" ) ;
+		map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils. Normall positive (i.e. toll/cost/fare are processed as negative amounts of money)." ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_CAR, "[unit_of_money/m] conversion of car distance into money. Probably needs to be negative to work." ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_PT, "[unit_of_money/m] conversion of pt distance into money. Probably needs to be negative to work." );
 		
