@@ -39,14 +39,14 @@ public class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
 	}
 	
 	@Override
-	public double getTravelTime(TravelTimeData travelTimeRole, double time) {
+	public double getTravelTime(TravelTimeData travelTimeData, double time) {
 		final int timeSlot = travelTimeAggregator.getTimeSlotIndex(time);
 		
 		// if time is in the first half of the first slot we do not interpolate
-		if (time <= halfBinSize) return travelTimeRole.getTravelTime(timeSlot, time);
+		if (time <= halfBinSize) return travelTimeData.getTravelTime(timeSlot, time);
 		
 		// if time is in the second half of the last slot we do not interpolate
-		else if (time >= numSlots * travelTimeBinSize - halfBinSize) return travelTimeRole.getTravelTime(timeSlot, time);
+		else if (time >= numSlots * travelTimeBinSize - halfBinSize) return travelTimeData.getTravelTime(timeSlot, time);
 		
 		
 		// time is inbetween, therefore we interpolate
@@ -63,8 +63,8 @@ public class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
 		}
 
 		// calculate travel times for both time slots
-		double firstTravelTime = travelTimeRole.getTravelTime(firstSlot, time); 
-		double secondTravelTime = travelTimeRole.getTravelTime(secondSlot, time);
+		double firstTravelTime = travelTimeData.getTravelTime(firstSlot, time); 
+		double secondTravelTime = travelTimeData.getTravelTime(secondSlot, time);
 		
 		// interpolate travel time
 		double dx = time - (firstSlot * travelTimeBinSize + halfBinSize); 
