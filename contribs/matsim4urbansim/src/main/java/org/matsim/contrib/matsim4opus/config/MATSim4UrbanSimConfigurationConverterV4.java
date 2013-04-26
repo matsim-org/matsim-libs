@@ -585,7 +585,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		boolean useRawSum						= matsim4UrbanSimParameter.getAccessibilityParameter().isUseRawSumsWithoutLn();
 		
 		if(useMATSimLogitScaleParameter) {
-			logitScaleParameter = 1.;
+			logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
 //			if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
 //				throw new RuntimeException("the code claims that it uses the matsim logit scale parameter, but in fact it sets it silently to one.  aborting ...") ;
 //			}
