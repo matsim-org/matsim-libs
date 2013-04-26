@@ -491,6 +491,8 @@ public class Convert4Gnuplot {
 		// into two unsorted arrays with the followg structure: [-1, 2018, 2019, 2012]
 		for(int i = 0; i < parts.length; i++){
 			int index = parts[i].indexOf(":");
+			if(index == -1)
+				index = parts[i].length();
 			parts[i] = parts[i].substring(0, index);
 			
 			String key[] = parts[i].split("_");
