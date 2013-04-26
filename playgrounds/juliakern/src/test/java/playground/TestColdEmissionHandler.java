@@ -41,7 +41,7 @@ public class TestColdEmissionHandler {
 	@Test
 	public final void testEmissionPerPersonColdEventHandler(){
 		
-		//vehicle=person? this handler counts the cold emission events per vehicle id
+		//vehicle=person. this handler counts the cold emission events per vehicle id
 		EmissionsPerPersonColdEventHandler handler = new EmissionsPerPersonColdEventHandler();
 		
 		//create vehicles
@@ -85,7 +85,7 @@ public class TestColdEmissionHandler {
 				
 		Map<Id, Map<ColdPollutant, Double>> cepp = handler.getColdEmissionsPerPerson(); 
 		Double actualCO1 =0.0, actualNOX1 =0.0, actualPM1=0.0, actualCO2=.0, actualNOX2=.0, actualPM2 =0.0;
-		//TODO ist das klug, dass mit 0 zu initialisieren? kann ich dann ueerhaupt leere variablen uberpfruefen? was waere bei welchem im echten prog?
+		//leere variablen uberpfruefen? nicht hier
 		if(cepp.get(new IdImpl("v1")).containsKey(ColdPollutant.CO))actualCO1 = cepp.get(new IdImpl("v1")).get(ColdPollutant.CO);  
 		if(cepp.get(new IdImpl("v1")).containsKey(ColdPollutant.NOX))actualNOX1 = cepp.get(new IdImpl("v1")).get(ColdPollutant.NOX); 
 		if(cepp.get(new IdImpl("v1")).containsKey(ColdPollutant.PM))actualPM1 = cepp.get(new IdImpl("v1")).get(ColdPollutant.PM); 
