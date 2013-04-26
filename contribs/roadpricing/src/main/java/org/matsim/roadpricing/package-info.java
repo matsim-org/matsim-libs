@@ -94,8 +94,9 @@
  *  &lt;/links>
  * </pre></blockquote>
  * 
- * <h4>Area Toll</h4>
- * In the case of an area toll, agents have to pay a fixed amount when they drive on one of the tolled links,
+ * <h4><strike>Area Toll</strike></h4>
+ * [[Area toll currently does not work.  The reason is that the AreaTollControler (see below) currently does not work.  kn, apr'13]]
+ * <strike>In the case of an area toll, agents have to pay a fixed amount when they drive on one of the tolled links,
  * but they have to pay the amount at most once during the simulation. The type must be set to "area" in the
  * roadpricing file. The links listed in the file are the tolled links. The time an agent enters a link is
  * determining if the agent has to be or not.
@@ -125,9 +126,9 @@
  *
  * &lt;/roadpricing>
  * </pre></blockquote>
+ * </strike>
  *
- *
- * <h3><a name="controler">Use RoadPricing with the Controler</a></h3>
+ * <h3><a name="controler"> RoadPricing with the Controler</a></h3>
  * To simulate road pricing with the default MATSim {@link org.matsim.core.controler.Controler}, prepare the
  * road pricing XML file (more details and examples can be found with the description of each
  * <a href="#schemes">supported toll scheme</a>). Then add the following part to your configuration:
@@ -151,7 +152,7 @@
  * </pre>
  * </code>
  * 
- * 
+ * [[AreaTollControler is broken.  kn, apr'13]]<strike>
  * If area tolls are used, start MATSim by calling
  * <code><pre>
  * public static void main(String[] args) {
@@ -159,8 +160,11 @@
  *		c.run();
  * }
  * </pre></code>
+ * </strike>
  *
- * <h3><a name="no-controler">Use RoadPricing without the Controler</a></h3>
+ * <h3><a name="no-controler"><strike>Use RoadPricing without the Controler</strike></a></h3>
+ * [[this is not supported.  The following hints may help, but they may be out of data and/or are probably incomplete.  kn, apr'13]]
+ * <strike>
  * If you plan to use the provided road pricing functionality outside of the Controler, please
  * carefully read the following remarks to correctly setup your road pricing scenario:
  * <ul>
@@ -171,6 +175,7 @@
  * </ul>
  * The {@link org.matsim.core.controler.Controler} takes care of all of these details, so you only have to care about
  * this if you're not using (or are using a modified version of) the {@link org.matsim.core.controler.Controler}.
+ *</strike>
  *
  * <h3><a name="limitations">Limitations</a></h3>
  * Currently, the package has the following limitations:
