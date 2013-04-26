@@ -225,28 +225,28 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 		// shape file for population distribution (zone)
 		Assert.assertTrue( Paths.checkPathEnding( urbansimParameterConfigModule.getUrbanSimZoneShapefileLocationDistribution() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.urbanSimZoneShapefileLocationDistribution )));
 		
-		// Accessibility Parameter Config Module settings
-		AccessibilityParameterConfigModule accessibilityParameterModule = testExternalConfig.getAccessibilityParameterConfig(config);
-		// bike parameter
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelTime() 	== testExternalConfig.betaBikeTravelTime );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelTimePower2()== testExternalConfig.betaBikeTravelTimePower2 );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelTime()  	== testExternalConfig.betaBikeLnTravelTime );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelDistance() == testExternalConfig.betaBikeTravelDistance );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelDistancePower2() == testExternalConfig.betaBikeTravelDistancePower2 );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelDistance()== testExternalConfig.betaBikeLnTravelDistance );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelMonetaryCost()  	== testExternalConfig.betaBikeTravelCost );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelMonetaryCostPower2() == testExternalConfig.betaBikeTravelCostPower2 );
-		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelMonetaryCost()  	== testExternalConfig.betaBikeLnTravelCost );
-		// pt parameter
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelTime() 		== testExternalConfig.betaPtTravelTime );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelTimePower2() == testExternalConfig.betaPtTravelTimePower2 );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelTime()  	== testExternalConfig.betaPtLnTravelTime );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelDistance()  	== testExternalConfig.betaPtTravelDistance );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelDistancePower2() == testExternalConfig.betaPtTravelDistancePower2 );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelDistance() == testExternalConfig.betaPtLnTravelDistance );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelMonetaryCost()  		== testExternalConfig.betaPtTravelCost );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelMonetaryCostPower2() == testExternalConfig.betaPtTravelCostPower2 );
-		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelMonetaryCost()  	== testExternalConfig.betaPtLnTravelCost );
+//		// Accessibility Parameter Config Module settings
+//		AccessibilityParameterConfigModule accessibilityParameterModule = testExternalConfig.getAccessibilityParameterConfig(config);
+//		// bike parameter
+//		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelTime() 	== testExternalConfig.betaBikeTravelTime );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelTimePower2()== testExternalConfig.betaBikeTravelTimePower2 );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelTime()  	== testExternalConfig.betaBikeLnTravelTime );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelDistance() == testExternalConfig.betaBikeTravelDistance );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelDistancePower2() == testExternalConfig.betaBikeTravelDistancePower2 );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelDistance()== testExternalConfig.betaBikeLnTravelDistance );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelMonetaryCost()  	== testExternalConfig.betaBikeTravelCost );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaBikeTravelMonetaryCostPower2() == testExternalConfig.betaBikeTravelCostPower2 );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaBikeLnTravelMonetaryCost()  	== testExternalConfig.betaBikeLnTravelCost );
+//		// pt parameter
+//		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelTime() 		== testExternalConfig.betaPtTravelTime );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelTimePower2() == testExternalConfig.betaPtTravelTimePower2 );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelTime()  	== testExternalConfig.betaPtLnTravelTime );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelDistance()  	== testExternalConfig.betaPtTravelDistance );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelDistancePower2() == testExternalConfig.betaPtTravelDistancePower2 );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelDistance() == testExternalConfig.betaPtLnTravelDistance );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelMonetaryCost()  		== testExternalConfig.betaPtTravelCost );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaPtTravelMonetaryCostPower2() == testExternalConfig.betaPtTravelCostPower2 );
+//		Assert.assertTrue( accessibilityParameterModule.getBetaPtLnTravelMonetaryCost()  	== testExternalConfig.betaPtLnTravelCost );
 	}
 
 	/**
