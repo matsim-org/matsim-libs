@@ -166,6 +166,30 @@ public class CreateTestMATSimConfig {
 	/**
 	 * constructor
 	 * 
+	 * this is makes parameter settings for MATSim4UrbanSimTestRun. Here, the test run parameter is set
+	 * 
+	 * @param startMode distinguishes between cold, warm and hot start
+	 * @param path gives the path, were the generated config (and other files) should be stored
+	 */
+	public CreateTestMATSimConfig(final int startMode, String path, boolean testrun){
+		this.startMode 			= startMode;
+		this.dummyPath 			= path;
+		this.networkInputFile 	= path + DUMMY_FILE;
+		this.inputPlansFile		= path + DUMMY_FILE;
+		this.hotstartPlansFile	= path + DUMMY_FILE;
+		this.opusHome			= path;
+		this.opusDataPath		= path;
+		this.matsim4opus		= path;
+		this.matsim4opusConfig	= path;
+		this.matsim4opusOutput	= path;
+		this.matsim4opusTemp	= path;
+		this.matsimConfigInputFile = "";
+		this.isTestRun			= testrun;
+	}
+	
+	/**
+	 * constructor
+	 * 
 	 * this is makes parameter settings for ConfigLoadTest, 
 	 * create another constructor for another test#
 	 * 
