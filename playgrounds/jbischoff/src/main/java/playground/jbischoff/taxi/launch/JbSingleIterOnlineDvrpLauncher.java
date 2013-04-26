@@ -67,7 +67,7 @@ import playground.michalm.vrp.data.network.router.*;
 import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
 import playground.michalm.vrp.otfvis.OTFLiveUtils;
 import playground.michalm.vrp.run.VrpConfigUtils;
-import playground.michalm.vrp.run.online.AlgorithmConfig;
+import playground.jbischoff.taxi.launch.AlgorithmConfig;
 import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
 
