@@ -20,20 +20,8 @@
 
 package playground;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
-import org.junit.Ignore;
-
 import org.junit.Test;
-//import org.matsim.testcases.MatsimTestUtils;
-
-
-//import playground.julia.emission.types.HbefaVehicleAttributes;
-//import playground.julia.emission.types.HbefaColdEmissionFactorKey;
-//import playground.vsp.emissions.types.ColdPollutant;
-//import playground.vsp.emissions.types.HbefaVehicleCategory;
 
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.HbefaColdEmissionFactorKey;
@@ -44,101 +32,139 @@ import playground.vsp.emissions.types.HbefaVehicleCategory;
 
 public class TestHbefaColdEmissionFactorKey {
 	
-	@Ignore
 	@Test
 	public final void testEquals(){
 
-		//default case
-		HbefaColdEmissionFactorKey normal = new HbefaColdEmissionFactorKey();
-		HbefaColdEmissionFactorKey hcefk2 = new HbefaColdEmissionFactorKey();
-		
+		boolean equalErr = false;
+
 		//TODO equals funktioniert nicht auf leeren Objekten weil getHbefaVehicleCat 'null' ... 
-		//falls das ok ist: alle (anderen), default gesetzten parameter vergleichen? 
-		// oder equals umschreiben, so dass 'null' und 'null' gleich sind?
-		
-		//Assert.assertTrue(hcefk1.equals(hcefk2));	
-		
-		//default constructor
-		//TODO doku: kein default-konstruktor -> kein entspr. test
-		
+		//in die eine richtung!!!
+		// vollstaendigeDaten.equals(unvollstaendigeDaten) -> Nullpointer
+		// unvollstaendigeDaten.equals(vollstaendigeDaten) -> laeuft, Rueckgabe false
+		// dass das so ist, wird jetzt getestet!
 		
 		//test with content
-		//TODO die HbefaColdEmissionFactorKey hat keinen schoenen Konstruktor... ergaenzt ... uebernehmen?
+
+		//normal HbefaColdEmissionFactorKey	- default case
+		HbefaColdEmissionFactorKey normal = new HbefaColdEmissionFactorKey();
 		normal.setHbefaComponent(ColdPollutant.FC);
 		normal.setHbefaDistance(4);
 		normal.setHbefaParkingTime(5);
-		HbefaVehicleAttributes abc = new HbefaVehicleAttributes("a","b","c");
-		normal.setHbefaVehicleAttributes(abc);
+		HbefaVehicleAttributes attForNormal = new HbefaVehicleAttributes("a","b","c");
+		normal.setHbefaVehicleAttributes(attForNormal);
 		normal.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+		
 
-		HbefaColdEmissionFactorKey hcefk4 = new HbefaColdEmissionFactorKey();
+		//another HbefaColdEmissionFactorKey, copy of normal
+		HbefaColdEmissionFactorKey second = new HbefaColdEmissionFactorKey();
+		second.setHbefaComponent(ColdPollutant.FC);
+		second.setHbefaDistance(4);
+		second.setHbefaParkingTime(5);
+		HbefaVehicleAttributes attForSecond = new HbefaVehicleAttributes();
+		attForSecond.setHbefaEmConcept("c");
+		attForSecond.setHbefaSizeClass("b");
+		attForSecond.setHbefaTechnology("a");
+		second.setHbefaVehicleAttributes(attForSecond);
+		second.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 		
-		hcefk4.setHbefaComponent(ColdPollutant.FC);
-		hcefk4.setHbefaDistance(4);
-		hcefk4.setHbefaParkingTime(5);
-		HbefaVehicleAttributes attForHcefk4 = new HbefaVehicleAttributes();
-		attForHcefk4.setHbefaEmConcept("c");
-		attForHcefk4.setHbefaSizeClass("b");
-		attForHcefk4.setHbefaTechnology("a");
-		hcefk4.setHbefaVehicleAttributes(abc);
-		hcefk4.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+		Assert.assertTrue(normal.equals(second));
+		Assert.assertTrue(second.equals(normal));
 		
-		//Assert.assertTrue(hcefk4.toString(),hcefk1.equals(hcefk4));
+		//third HbefaColdEmissionFactorKey, does not equal 'normal'
+		HbefaColdEmissionFactorKey third = new HbefaColdEmissionFactorKey();
+		third.setHbefaComponent(ColdPollutant.FC);
+		third.setHbefaDistance(4);
+		third.setHbefaParkingTime(5);
+		HbefaVehicleAttributes attForThird = new HbefaVehicleAttributes("att","att", "att");
+		third.setHbefaVehicleAttributes(attForThird);
+		third.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+		
+		Assert.assertFalse(normal.equals(third));
+		Assert.assertFalse(third.equals(normal));
+		
+		//empty HbefaColdEmissionFactorKey
+		HbefaColdEmissionFactorKey emptyKey = new HbefaColdEmissionFactorKey();
+		equalErr = false;
+		try{
+			emptyKey.equals(normal);
+		}
+		catch(NullPointerException e){
+			equalErr = true;
+		}
+		Assert.assertTrue(equalErr);
+		Assert.assertFalse(normal.equals(emptyKey)); 
+						
 		
 		//wenn eins der 'ersten' vier Attribute fehlt, soll equal fehlschlagen
 		//HbefaVehicleCategory hbefaVehicleCategory; ColdPollutant hbefaComponent;Integer hbefaParkingTime;Integer hbefaDistance;
 		
-		//sollte das im Folgenden lieber alles gleich sein zum Normalfall? natuerlich bis auf den testwert
-		
-		//no vehicle category
+		//no vehicle category set
 		HbefaColdEmissionFactorKey noVehCat = new HbefaColdEmissionFactorKey();
-		noVehCat.setHbefaComponent(ColdPollutant.CO);
-		noVehCat.setHbefaDistance(40);
-		noVehCat.setHbefaParkingTime(20);
-
+		noVehCat.setHbefaComponent(ColdPollutant.FC);
+		noVehCat.setHbefaDistance(4);
+		noVehCat.setHbefaParkingTime(5);
+			
+		equalErr = false;	
 		try{
-			boolean uu = normal.equals(noVehCat);
-			//TODO message
-			//TODO korrigieren! das wirft im moment fehler!!!! sollte aber nicht so sein
-
-		//	Assert.fail();
+			noVehCat.equals(normal);
 		}
 		catch(NullPointerException e){
-		}			//no failure	
-
+			equalErr = true;
+		}	
+		Assert.assertTrue(equalErr);
+		Assert.assertFalse(normal.equals(noVehCat));
 
 		//no pollutant set
 		HbefaColdEmissionFactorKey noColdPollutant = new HbefaColdEmissionFactorKey();
-		noColdPollutant.setHbefaDistance(11);
-		noColdPollutant.setHbefaParkingTime(13);
-		noColdPollutant.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		noColdPollutant.setHbefaDistance(4);
+		noColdPollutant.setHbefaParkingTime(5);
+		noColdPollutant.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+		noColdPollutant.setHbefaVehicleAttributes(attForNormal);
 		
-		try{
-			normal.equals(noColdPollutant);
-			//TODO message
-			//Assert.fail();
+		equalErr = false;	
+		try{	
+			noColdPollutant.equals(normal);
 		}
-		catch(NullPointerException e){}			//no failure	
-				
+		catch(NullPointerException e){
+			equalErr = true;
+		}	
+		Assert.assertTrue(equalErr);
+		Assert.assertFalse(normal.equals(noColdPollutant));
+
+
+		//no parking time set
 		HbefaColdEmissionFactorKey noParkingTime = new HbefaColdEmissionFactorKey();
-		noParkingTime.setHbefaComponent(ColdPollutant.PM);
-		noParkingTime.setHbefaDistance(17);
-		noParkingTime.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+		noParkingTime.setHbefaComponent(ColdPollutant.FC);
+		noParkingTime.setHbefaDistance(4);
+		noParkingTime.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);	
+		noParkingTime.setHbefaVehicleAttributes(attForNormal);
+		
+		equalErr = false;	
 		try{
-			normal.equals(noParkingTime);
-			//TODO message
-			//Assert.fail();
+			noParkingTime.equals(normal);
 		}
-		catch(NullPointerException e){}			//no failure	
-				HbefaColdEmissionFactorKey noDistanc = new HbefaColdEmissionFactorKey();
-		/*
-		noVehCat.setHbefaComponent(hbefaComponent);
-		noVehCat.setHbefaDistance(hbefaDistance);
-		noVehCat.setHbefaParkingTime(hbefaParkingTime);
-		noVehCat.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		noVehCat.setHbefaVehicleCategory(hbefaVehicleCategory);*/
+		catch(NullPointerException e){
+			equalErr = true;
+		}
+		Assert.assertTrue(equalErr);
+		Assert.assertFalse(normal.equals(noParkingTime));
 		
+		//no distance set
+		HbefaColdEmissionFactorKey noDistance = new HbefaColdEmissionFactorKey();
+		noDistance.setHbefaComponent(ColdPollutant.FC);
+		noDistance.setHbefaParkingTime(5);
+		noDistance.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+		noDistance.setHbefaVehicleAttributes(attForNormal);
 		
+		equalErr = false;
+		try{	
+			noDistance.equals(normal);
+		}
+		catch(NullPointerException e){
+			equalErr = true;
+		}	
+		Assert.assertTrue(equalErr);
+		Assert.assertFalse(normal.equals(noDistance));
 	}
 	
 }
