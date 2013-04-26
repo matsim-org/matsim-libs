@@ -47,6 +47,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -129,11 +130,12 @@ public class HITSAnalyser {
 	private static HashMap<String, Coord> mrtCoords;
 	private static HashMap<String, Coord> lrtCoords;
 
-	static void createRouters(String[] args) {
+	static void createRouters(String[] args, boolean freeSpeedRouting) {
 		scenario = ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario)).readFile(args[1]);
-		(new MatsimPopulationReader(scenario)).readFile(args[2]);
+		if (!freeSpeedRouting)
+			(new MatsimPopulationReader(scenario)).readFile(args[2]);
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		double startTime = new Double(args[5]), endTime = new Double(args[6]), binSize = new Double(
 				args[7]);
@@ -144,11 +146,13 @@ public class HITSAnalyser {
 				.createTravelTimeCalculator(scenario.getNetwork(), scenario
 						.getConfig().travelTimeCalculator());
 		System.out.println("Loading events");
-		 EventsManager eventsManager =
-		 EventsUtils.createEventsManager(scenario.getConfig());
-		 eventsManager.addHandler(waitTimeCalculator);
-		 eventsManager.addHandler(travelTimeCalculator);
-		 (new EventsReaderXMLv1(eventsManager)).parse(args[4]);
+		if(!freeSpeedRouting){
+			EventsManager eventsManager =
+					EventsUtils.createEventsManager(scenario.getConfig());
+			eventsManager.addHandler(waitTimeCalculator);
+			eventsManager.addHandler(travelTimeCalculator);
+			(new MatsimEventsReader(eventsManager)).readFile(args[4]);			
+		}
 		transitRouterConfig = new MyTransitRouterConfig(scenario.getConfig()
 				.planCalcScore(), scenario.getConfig().plansCalcRoute(),
 				scenario.getConfig().transitRouter(), scenario.getConfig()
@@ -493,6 +497,7 @@ public class HITSAnalyser {
 
 				}
 				ArrayList<HITSPerson> persons = this.getHitsData().getPersons();
+				Logger.getLogger(MultiNodeDijkstra.class).setLevel(Level.INFO);
 				PERSONS: for (HITSPerson p : persons) {
 
 					String insertString = String
@@ -556,10 +561,10 @@ public class HITSAnalyser {
 											destCoord);
 							congestedCarDistance = HITSAnalyser
 									.getCarCongestedShortestPathDistance(
-											origCoord, destCoord, startTime).distance;
+											origCoord, destCoord, Math.max(0, startTime)).distance;
 							congestedCarTime = HITSAnalyser
 									.getCarCongestedShortestPathDistance(
-											origCoord, destCoord, startTime).time;
+											origCoord, destCoord, Math.max(0, startTime)).time;
 							
 							// route transit-only trips using the transit router
 							
@@ -695,7 +700,7 @@ public class HITSAnalyser {
 										try{
 											path = transitRouter.calcPathRoute(
 													ts.orig, ts.dest,
-													linkStartTime, null);
+													Math.max(0,linkStartTime), null);
 										}catch(NullPointerException e){
 											
 										}
@@ -803,7 +808,7 @@ public class HITSAnalyser {
 											double linkTime = transitTravelFunction
 													.getLinkTravelTime(
 															transitLink,
-															linkStartTime,
+															Math.max(0, linkStartTime),
 															null, null);
 											insertString2 += String
 													.format("(\'%s\', \'%s\', %d, %d, \'%s\',"
@@ -897,7 +902,7 @@ public class HITSAnalyser {
 											double linkTime = transitTravelFunction
 													.getLinkTravelTime(
 															transitLink,
-															linkStartTime,
+															Math.max(0, linkStartTime),
 															null, null);
 											insertString2 += String
 													.format("(\'%s\', \'%s\', %d, %d, \'%s\',"
@@ -1366,7 +1371,7 @@ public class HITSAnalyser {
 	}
 
 	public static void main(String[] args) throws Exception {
-		HITSAnalyser.createRouters(Arrays.copyOfRange(args, 2, 10));
+		HITSAnalyser.createRouters(Arrays.copyOfRange(args, 2, 10),true);
 		System.out.println(new java.util.Date());
 		HITSAnalyser hp;
 		System.out.println(args[0].equals("sql"));
