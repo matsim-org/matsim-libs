@@ -619,7 +619,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaCarLnTMC	= 0.;
 		}
 		else{
-			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaCarTT\" etc. anymore. Please let us know if this causes serious problems.");
+			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaBikeTravelTime\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config file (bike and pt)). Please let us know if this causes serious problems.");
+			log.error("To avoid the error message please : 1) select \"use_car_parameter_from_MATSim\" and \"use_walk_parameter_from_MATSim\" in the UrbanSim GUI and 2) remove all beta parameters for bike and pt (such as \"<param name=\"betaBikeTravelTime\" value=\"-12.\" />\") from your external MATSim config file.");
 			System.exit(-1);
 //			betaCarTT 	   	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelTime();
 //			betaCarTTPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarTravelTimePower2();
@@ -645,7 +646,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaBikeLnTMC	= 0.;
 		}
 		else{
-			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaCarTT\" etc. anymore. Please let us know if this causes serious problems.");
+			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaBikeTravelTime\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config file (bike and pt)). Please let us know if this causes serious problems.");
+			log.error("To avoid the error message please : 1) select \"use_car_parameter_from_MATSim\" and \"use_walk_parameter_from_MATSim\" in the UrbanSim GUI and 2) remove all beta parameters for bike and pt (such as \"<param name=\"betaBikeTravelTime\" value=\"-12.\" />\") from your external MATSim config file.");
 			System.exit(-1);
 //			betaBikeTT		= getValueAsDouble(BETA_BIKE_TRAVEL_TIME);
 //			betaBikeTTPower	= getValueAsDouble(BETA_BIKE_TRAVEL_TIME_POWER2);
@@ -671,7 +673,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaWalkLnTMC	= 0.;
 		}
 		else{
-			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaCarTT\" etc. anymore. Please let us know if this causes serious problems.");
+			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaBikeTravelTime\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config file (bike and pt)). Please let us know if this causes serious problems.");
+			log.error("To avoid the error message please : 1) select \"use_car_parameter_from_MATSim\" and \"use_walk_parameter_from_MATSim\" in the UrbanSim GUI and 2) remove all beta parameters for bike and pt (such as \"<param name=\"betaBikeTravelTime\" value=\"-12.\" />\") from your external MATSim config file.");
 			System.exit(-1);
 //			betaWalkTT		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelTime();
 //			betaWalkTTPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelTimePower2();
@@ -697,7 +700,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			betaPtLnTMC		= 0.;
 		}
 		else{
-			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaCarTT\" etc. anymore. Please let us know if this causes serious problems.");
+			log.error("This MATSim4UrbanSim version does not support custom beta parameters such as \"betaCarTT\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config file (bike and pt)). Please let us know if this causes serious problems.");
+			log.error("To avoid the error message please : 1) select \"use_car_parameter_from_MATSim\" and \"use_walk_parameter_from_MATSim\" in the UrbanSim GUI and 2) remove all beta parameters for bike and pt (such as \"<param name=\"betaBikeTravelTime\" value=\"-12.\" />\") from your external MATSim config file.");
 			System.exit(-1);
 //			betaPtTT		= getValueAsDouble(BETA_PT_TRAVEL_TIME);
 //			betaPtTTPower	= getValueAsDouble(BETA_PT_TRAVEL_TIME_POWER2);
