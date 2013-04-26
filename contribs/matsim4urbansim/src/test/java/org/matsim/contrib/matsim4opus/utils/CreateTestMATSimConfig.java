@@ -464,13 +464,12 @@ public class CreateTestMATSimConfig {
 			
 		} catch (JAXBException e) {
 			e.printStackTrace();
+			Assert.assertFalse(true) ; // otherwise the test neither returns "good" nor "bad" when there is an exception.  kai, apr'13
 		} catch (SAXException e) {
 			e.printStackTrace();
+			Assert.assertFalse(true) ; // otherwise the test neither returns "good" nor "bad" when there is an exception.  kai, apr'13
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		} finally {
 			Assert.assertFalse(true) ; // otherwise the test neither returns "good" nor "bad" when there is an exception.  kai, apr'13
 		}
 		return null;
