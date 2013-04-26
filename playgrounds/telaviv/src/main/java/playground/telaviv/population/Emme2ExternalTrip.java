@@ -27,6 +27,6 @@ public class Emme2ExternalTrip {
 	
 	int originNodeId;
 	int destinationNodeId;
-	int numOfTrips;
+	double numOfTrips;
 	
 }

@@ -37,7 +37,9 @@ import playground.telaviv.config.TelAvivConfig;
 public class MergePopulation {
 	
 	private String internalPopulationFile = TelAvivConfig.basePath + "/population/internal_plans_10.xml.gz";
-	private String externalPopulationFile = TelAvivConfig.basePath + "/population/external_plans_10.xml.gz";
+	private String externalCarPopulationFile = TelAvivConfig.basePath + "/population/external_plans_car_10.xml.gz";
+	private String externalTruckPopulationFile = TelAvivConfig.basePath + "/population/external_plans_truck_10.xml.gz";
+	private String externalCommercialPopulationFile = TelAvivConfig.basePath + "/population/external_plans_commercial_10.xml.gz";
 	private String outFile = TelAvivConfig.basePath + "/population/plans_10.xml.gz";
 	
 	private static final Logger log = Logger.getLogger(MergePopulation.class);
@@ -50,16 +52,28 @@ public class MergePopulation {
 		log.info("Loading internal population...");
 		Scenario internalScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(internalScenario).readFile(internalPopulationFile);
-		log.info("Found " + internalScenario.getPopulation().getPersons().size() + " internal Persons.");
+		log.info("Found " + internalScenario.getPopulation().getPersons().size() + " internal persons.");
 		
-		log.info("Loading external population...");
-		Scenario externalScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(externalScenario).readFile(externalPopulationFile);
-		log.info("Found " + externalScenario.getPopulation().getPersons().size() + " external Persons.");
+		log.info("Loading external car population...");
+		Scenario externalCarScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimPopulationReader(externalCarScenario).readFile(externalCarPopulationFile);
+		log.info("Found " + externalCarScenario.getPopulation().getPersons().size() + " external car persons.");
+		
+		log.info("Loading external truck population...");
+		Scenario externalTruckScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimPopulationReader(externalTruckScenario).readFile(externalTruckPopulationFile);
+		log.info("Found " + externalTruckScenario.getPopulation().getPersons().size() + " external truck persons.");
+		
+		log.info("Loading external commercial population...");
+		Scenario externalCommercialScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimPopulationReader(externalCommercialScenario).readFile(externalCommercialPopulationFile);
+		log.info("Found " + externalCommercialScenario.getPopulation().getPersons().size() + " external commercial persons.");
 		
 		log.info("Creating MATSim population...");		
 		for (Person person : internalScenario.getPopulation().getPersons().values()) scenario.getPopulation().addPerson(person);
-		for (Person person : externalScenario.getPopulation().getPersons().values()) scenario.getPopulation().addPerson(person);
+		for (Person person : externalCarScenario.getPopulation().getPersons().values()) scenario.getPopulation().addPerson(person);
+		for (Person person : externalTruckScenario.getPopulation().getPersons().values()) scenario.getPopulation().addPerson(person);
+		for (Person person : externalCommercialScenario.getPopulation().getPersons().values()) scenario.getPopulation().addPerson(person);
 		
 		log.info("Writing MATSim population to file...");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outFile);

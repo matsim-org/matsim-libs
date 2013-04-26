@@ -56,11 +56,23 @@ public class Emme2ExternalTripsCreator {
 	private String networkFile = TelAvivConfig.basePath + "/network/network.xml";
 	private String facilitiesFile = TelAvivConfig.basePath + "/facilities/facilities.xml";
 //	private String externalTripsFile = TelAvivConfig.basePath + "/population/external_trips.csv";
-	private String externalAMTripsFile = TelAvivConfig.basePath + "/population/car_ext_AM.csv";
-	private String externalOPTripsFile = TelAvivConfig.basePath + "/population/car_ext_OP.csv";
-	private String externalPMTripsFile = TelAvivConfig.basePath + "/population/car_ext_PM.csv";
 	
-	private String outFile = TelAvivConfig.basePath + "/population/external_plans_10.xml.gz";
+//	private String type = "car";
+//	private String externalAMTripsFile = TelAvivConfig.basePath + "/population/car_ext_AM.csv";
+//	private String externalOPTripsFile = TelAvivConfig.basePath + "/population/car_ext_OP.csv";
+//	private String externalPMTripsFile = TelAvivConfig.basePath + "/population/car_ext_PM.csv";
+
+//	private String type = "truck";
+//	private String externalAMTripsFile = TelAvivConfig.basePath + "/population/truck_AM.csv";
+//	private String externalOPTripsFile = TelAvivConfig.basePath + "/population/truck_OP.csv";
+//	private String externalPMTripsFile = TelAvivConfig.basePath + "/population/truck_PM.csv";
+	
+	private String type = "commercial";
+	private String externalAMTripsFile = TelAvivConfig.basePath + "/population/commercial_AM.csv";
+	private String externalOPTripsFile = TelAvivConfig.basePath + "/population/commercial_OP.csv";
+	private String externalPMTripsFile = TelAvivConfig.basePath + "/population/commercial_PM.csv";
+	
+	private String outFile = TelAvivConfig.basePath + "/population/external_plans_" + type + "_10.xml.gz";
 	
 	private Scenario scenario;
 //	private ZoneMapping zoneMapping;
@@ -133,12 +145,19 @@ public class Emme2ExternalTripsCreator {
 		
 		log.info("\tCreating MATSim external Trips...");
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
-		
+				
 		for (Emme2ExternalTrip externalTrip : externalTrips) {
-			int numOfTrips = (int)(periodDuration * Double.valueOf(externalTrip.numOfTrips));
 			
+//			int numOfTrips = (int)(periodDuration * Double.valueOf(externalTrip.numOfTrips));
+			
+			double value = periodDuration * Double.valueOf(externalTrip.numOfTrips);
+			int numOfTrips = (int) value;	// returns the floored value!
+			double decimal = value - Math.floor(value);
+			double rand = random.nextDouble();
+			if (rand < decimal) numOfTrips ++;
+						
 			for (int i = 0; i < numOfTrips; i++) {
-				Id id = scenario.createId("tta_" + String.valueOf(counter.getCounter()));
+				Id id = scenario.createId("tta_" + type + "_" + String.valueOf(counter.getCounter()));
 				PersonImpl person = (PersonImpl)populationFactory.createPerson(id);
 				
 				setBasicParameters(person);		
@@ -211,7 +230,7 @@ public class Emme2ExternalTripsCreator {
 		activity.setCoord(activityFacility.getCoord());
 		plan.addActivity(activity);
 		
-		leg = (LegImpl)populationFactory.createLeg(TransportMode.car);
+		leg = (LegImpl) populationFactory.createLeg(TransportMode.car);
 		leg.setDepartureTime(departureTime);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(departureTime);

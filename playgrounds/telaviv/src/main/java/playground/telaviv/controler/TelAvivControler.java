@@ -28,14 +28,13 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
+import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;
 import playground.telaviv.replanning.TTAStrategyManager;
 
 public class TelAvivControler extends Controler {
 
 	public TelAvivControler(final String[] args) {
 		super(args);
-				
-		
 	}
 	
 	/*
@@ -76,6 +75,10 @@ public class TelAvivControler extends Controler {
 			System.out.println();
 		} else {
 			final Controler controler = new TelAvivControler(args);
+			
+			// use an adapted MobsimFactory
+			controler.setMobsimFactory(new TTAQSimFactory());
+			
 			controler.run();
 		}
 		System.exit(0);
