@@ -72,6 +72,8 @@ public class CreateTestMATSimConfig {
 	private int startMode;
 	protected String dummyPath;
 	
+	// yy why is all of this public?  could you please write a comment why that design decision was made?  thx.  kai, apr'13
+	
 	public String matsimConfigInputFile 				= "";
 	public String networkInputFile 	 					= "";
 	public String inputPlansFile 						= "";
