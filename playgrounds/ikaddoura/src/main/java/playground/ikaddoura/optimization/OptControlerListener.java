@@ -47,12 +47,16 @@ public class OptControlerListener implements StartupListener {
 	private final double fare;
 	private final PtLegHandler ptScoringHandler;
 	private final ScenarioImpl scenario;
-	private boolean marginalCostPricing;
+	private final boolean calculate_inVehicleTimeDelayEffects;
+	private final boolean calculate_waitingTimeDelayEffects;
+	private final boolean marginalCostPricing;
 
-	public OptControlerListener(double fare, PtLegHandler ptLegHandler, ScenarioImpl scenario, boolean marginalCostPricing){
+	public OptControlerListener(double fare, PtLegHandler ptLegHandler, ScenarioImpl scenario, boolean calculate_inVehicleTimeDelayEffects, boolean calculate_waitingTimeDelayEffects, boolean marginalCostPricing){
 		this.fare = fare;
 		this.ptScoringHandler = ptLegHandler;
 		this.scenario = scenario;
+		this.calculate_inVehicleTimeDelayEffects = calculate_inVehicleTimeDelayEffects;
+		this.calculate_waitingTimeDelayEffects = calculate_waitingTimeDelayEffects;
 		this.marginalCostPricing = marginalCostPricing;
 	}
 	
@@ -60,10 +64,16 @@ public class OptControlerListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		
 		EventsManager eventsManager = event.getControler().getEvents();
+
+		if (this.calculate_inVehicleTimeDelayEffects) {
+			event.getControler().getEvents().addHandler(new InVehicleDelayHandler(eventsManager, scenario));
+		}
+		
+		if (this.calculate_waitingTimeDelayEffects) {
+			event.getControler().getEvents().addHandler(new WaitingDelayHandler(eventsManager, scenario));
+		}
 		
 		if (this.marginalCostPricing) {
-			event.getControler().getEvents().addHandler(new InVehicleDelayHandler(eventsManager, scenario));
-			event.getControler().getEvents().addHandler(new WaitingDelayHandler(eventsManager, scenario));
 			event.getControler().getEvents().addHandler(new MarginalCostPricingHandler(eventsManager, scenario));
 		}
 		

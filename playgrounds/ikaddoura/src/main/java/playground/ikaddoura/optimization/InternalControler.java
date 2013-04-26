@@ -44,7 +44,9 @@ public class InternalControler {
 	private final static Logger log = Logger.getLogger(InternalControler.class);
 
 	private PtLegHandler ptScoringHandler;
-	private boolean marginalCostPricing;
+	private final boolean marginalCostPricing;
+	private final boolean calculate_inVehicleTimeDelayEffects;
+	private final boolean calculate_waitingTimeDelayEffects;
 	
 	private final ScenarioImpl scenario;
 	private final double fare;
@@ -72,11 +74,13 @@ public class InternalControler {
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
 
-	public InternalControler(ScenarioImpl scenario, double fare, boolean marginalCostPricing) {
+	public InternalControler(ScenarioImpl scenario, double fare, boolean calculate_inVehicleTimeDelayEffects, boolean calculate_waitingTimeDelayEffects, boolean marginalCostPricing) {
+		this.calculate_inVehicleTimeDelayEffects = calculate_inVehicleTimeDelayEffects;
+		this.calculate_waitingTimeDelayEffects = calculate_waitingTimeDelayEffects;
+		this.marginalCostPricing = marginalCostPricing;
 		this.scenario = scenario;
 		this.fare = fare;
 		this.ptScoringHandler = new PtLegHandler();
-		this.marginalCostPricing = marginalCostPricing;
 
 		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt();
 		log.info("Pt constant set to " + this.CONSTANT_PT);
@@ -94,7 +98,7 @@ public class InternalControler {
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler, this.scenario, this.marginalCostPricing));
+		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler, this.scenario, this.calculate_inVehicleTimeDelayEffects, this.calculate_waitingTimeDelayEffects, this.marginalCostPricing));
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		if (controlerConfGroup.getLastIteration() == 0) {

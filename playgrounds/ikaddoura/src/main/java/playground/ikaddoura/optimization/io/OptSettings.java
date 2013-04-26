@@ -45,6 +45,8 @@ public class OptSettings {
 	private String randomSeedsFile = null;
 	private boolean usePopulationPathsFile = false;
 	private String populationPathsFile = null;
+	private boolean calculate_inVehicleTimeDelayEffects = false;
+	private boolean calculate_waitingTimeDelayEffects = false;
 	private boolean marginalCostPricing = false;
 
 	public double getIncrHeadway() {
@@ -143,10 +145,23 @@ public class OptSettings {
 	public void setPopulationPathsFile(String populationPathsFile) {
 		this.populationPathsFile = populationPathsFile;
 	}
+	public boolean isCalculating_inVehicleTimeDelayEffects() {
+		return calculate_inVehicleTimeDelayEffects;
+	}
+	public void setCalculating_inVehicleTimeDelayEffects(boolean marginalCostPricing_inVehicleTimeDelayEffects) {
+		this.calculate_inVehicleTimeDelayEffects = marginalCostPricing_inVehicleTimeDelayEffects;
+	}
+	public boolean isCalculating_waitingTimeDelayEffects() {
+		return calculate_waitingTimeDelayEffects;
+	}
+	public void setCalculating_waitingTimeDelayEffects(boolean marginalCostPricing_waitingTimeDelayEffects) {
+		this.calculate_waitingTimeDelayEffects = marginalCostPricing_waitingTimeDelayEffects;
+	}
 	public boolean isMarginalCostPricing() {
 		return marginalCostPricing;
 	}
 	public void setMarginalCostPricing(boolean marginalCostPricing) {
 		this.marginalCostPricing = marginalCostPricing;
 	}
+	
 }

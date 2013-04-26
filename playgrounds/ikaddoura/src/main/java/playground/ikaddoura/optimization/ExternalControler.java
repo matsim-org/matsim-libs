@@ -75,6 +75,8 @@ class ExternalControler {
 	
 	static boolean useRandomSeedsFile;
 	static boolean usePopulationPathsFile;
+	static boolean calculate_inVehicleTimeDelayEffects;
+	static boolean calculate_waitingTimeDelayEffects;
 	static boolean marginalCostPricing;
 
 	static long randomSeed;
@@ -137,7 +139,10 @@ class ExternalControler {
 		
 		useRandomSeedsFile = settings.isUseRandomSeedsFile();
 		usePopulationPathsFile = settings.isUsePopulationPathsFile();
-		marginalCostPricing = settings.isMarginalCostPricing();
+		
+		calculate_inVehicleTimeDelayEffects = settings.isCalculating_inVehicleTimeDelayEffects();
+		calculate_waitingTimeDelayEffects = settings.isCalculating_waitingTimeDelayEffects();
+		marginalCostPricing = settings.isMarginalCostPricing();		
 		
 		if (useRandomSeedsFile){
 			String randomSeedsFile = settings.getRandomSeedsFile();
@@ -161,12 +166,6 @@ class ExternalControler {
 			log.info("Population file will be set via config.");
 		}
 		
-		if (marginalCostPricing){
-			log.info("Marginal cost pricing is enabled.");
-		} else {
-			log.info("Marginal cost pricing is disabled.");
-		}
-		
 		log.info("Setting parameters... Done.");
 		
 		ExternalControler externalControler = new ExternalControler();
@@ -175,7 +174,7 @@ class ExternalControler {
 
 	private void run() throws IOException {
 		
-		checkConsitency();
+		checkSettings();
 		createInputFiles();
 		
 		int iterationCounter = 0;
@@ -200,7 +199,7 @@ class ExternalControler {
 						log.info("###################################################");
 						log.info("### EXTERNAL ITERATION " + iterationCounter + " BEGINS");
 					
-						runInternalIteration(iterationCounter, demand, headway, capacity, fare, marginalCostPricing);
+						runInternalIteration(iterationCounter, demand, headway, capacity, fare);
 						
 						log.info("### EXTERNAL ITERATION " + iterationCounter + " ENDS");
 						log.info("###################################################");
@@ -228,7 +227,7 @@ class ExternalControler {
 		}
 	}
 	
-	private void runInternalIteration(int iterationCounter, int demand, double headway, int capacity, double fare, boolean marginalCostPricing) throws IOException {
+	private void runInternalIteration(int iterationCounter, int demand, double headway, int capacity, double fare) throws IOException {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
 
@@ -270,7 +269,7 @@ class ExternalControler {
 			scenario.getConfig().global().setRandomSeed(randomSeed);
 		}
 		
-		InternalControler internalControler = new InternalControler(scenario, fare, marginalCostPricing);
+		InternalControler internalControler = new InternalControler(scenario, fare, calculate_inVehicleTimeDelayEffects, calculate_waitingTimeDelayEffects, marginalCostPricing);
 		internalControler.run();
 		
 		deleteUnnecessaryInternalIterations(scenario); 
@@ -356,11 +355,6 @@ class ExternalControler {
 		double headway = startHeadway;
 		for (int headwayStep = 0; headwayStep <= stepsHeadway ; headwayStep++){
 			
-			// remove the bus at a transit stop: 1 sec delay (e.g. opening the doors)
-			// handle transfers: 1 sec OR: number of agents boarding or alighting * boarding or alighting time
-			// insert the bus at a transit stop: 1 sec delay (e.g. closing the doors)
-			// = 3 sec delay if a bus stops at a transit stop!
-			
 			log.info("Writing transitSchedule...");
 			TransitSchedule schedule;
 			String scheduleFile = dir + "transitSchedule_headway" + headway + ".xml";
@@ -385,7 +379,7 @@ class ExternalControler {
 				Vehicles vehicles;
 				String vehiclesFile = dir + "transitVehicles_headway" + headway + "_capacity" + capacity + ".xml";
 				
-				double length = (0.1184 * capacity + 5.2152);	// see linear regression analysis in "BusCostsEstimations.xls"
+				double length = (0.1184 * capacity + 5.2152);	// Data from Australian Transport Council
 				int busSeats = (int) (capacity * 1.) + 1; // plus one seat because a seat for the driver is expected
 				int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 				
@@ -437,7 +431,27 @@ class ExternalControler {
 	  path.delete();
 	}
 
-	private void checkConsitency() {
+	private void checkSettings() {
+		
+
+		if (calculate_inVehicleTimeDelayEffects){
+			log.info("Calculating inVehicleTimeDelayEffects enabled.");
+		} else {
+			log.info("Calculating inVehicleTimeDelayEffects disabled.");
+		}
+		
+		if (calculate_waitingTimeDelayEffects){
+			log.info("Calculating waitingTimeDelayEffects enabled.");
+		} else {
+			log.info("Calculating waitingTimeDelayEffects disabled.");
+		}
+		
+		if (marginalCostPricing){
+			log.info("Marginal cost pricing enabled.");
+		} else {
+			log.info("Marginal cost pricing disabled.");
+		}
+		
 		
 		if (usePopulationPathsFile){
 			incrDemand = 0;

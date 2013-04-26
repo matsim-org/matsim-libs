@@ -106,9 +106,15 @@ public class OptSettingsReader {
 	                	} else if (parts[0].equals("populationPathsFile")){
 	                		this.optSettings.setPopulationPathsFile(parts[1]);
 	                		
-	                	} else if (parts[0].equals("marginalCostPricing")){
-	                		this.optSettings.setMarginalCostPricing(Boolean.parseBoolean(parts[1]));
+	                	} else if (parts[0].equals("calculate_inVehicleTimeDelayEffects")){
+	                		this.optSettings.setCalculating_inVehicleTimeDelayEffects(Boolean.parseBoolean(parts[1]));
 	                		
+	                	} else if (parts[0].equals("calculate_waitingTimeDelayEffects")){
+	                		this.optSettings.setCalculating_waitingTimeDelayEffects(Boolean.parseBoolean(parts[1]));
+	                	
+	                	} else if (parts[0].equals("marginalCostPricing")){
+	                		this.optSettings.setMarginalCostPricing(Boolean.parseBoolean(parts[1]));	
+	                	
 	            		} else {
 	            			throw new RuntimeException(parts[0] +" is an unknown parameter in the optimization settings file. Aborting...");
 	            		}
