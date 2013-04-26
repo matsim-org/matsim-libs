@@ -28,6 +28,10 @@ import org.matsim.core.router.util.TravelTime;
  * Design remark(s):<ul>
  * <li> These need to be factories since, at least for threads, we may need multiple
  * instances.  (If nothing else, each may set its own person.) kai, mar'12
+ * <li> In principle, the above statement is probably no longer correct, since the person is (now) contained 
+ * in the getLinkTravelDisutility(...) call.  However, there is a danger that someone memorizes the person in a class-global 
+ * (= private) field ... and then the class is no longer thread safe.  Thus, we may be safer by having one instance of
+ * of TravelDisutility per router thread.  kai/michaelz/dgrether, apr'13
  * </ul>
  * 
  * @author dgrether
