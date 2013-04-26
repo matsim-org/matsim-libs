@@ -53,7 +53,7 @@ import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 import playground.michalm.vrp.taxi.taxicab.TaxiLeg;
-import playground.michalm.vrp.taxi.taxicab.TaxiTaskActivity;
+//import playground.michalm.vrp.taxi.taxicab.TaxiTaskActivity;
 
 
 public class JbTaxiAgentLogic{
