@@ -586,17 +586,25 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		
 		if(useMATSimLogitScaleParameter) {
 			logitScaleParameter = 1.;
-			if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
-				throw new RuntimeException("the code claims that it uses the matsim logit scale parameter, but in fact it sets it silently to one.  aborting ...") ;
-			}
-		} else
+//			if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
+//				throw new RuntimeException("the code claims that it uses the matsim logit scale parameter, but in fact it sets it silently to one.  aborting ...") ;
+//			}
+			// yyyyyy I don't know any more how to fix the above without increasing the confusion.  kai, apr'13
+			//
+		} else {
 			logitScaleParameter = matsim4UrbanSimParameter.getAccessibilityParameter().getLogitScaleParameter();
+		}
 		// tnicolai nov'12: decided with Kai that beta_brain (the accessibility scale parameter) should be 1 because of the pre-factor of the logsum term
 		if(logitScaleParameter != 1.0){
 			log.error("You are using a logit scale parameter != 1! The default is 1.");
 			log.error("The accessibility calulation proceeds with a logit scale parameter = " + logitScaleParameter);
 		}
-		log.info("The logit scale parameter is used for accessibility computation only. It does not set scale parameter (beta brain) inside MATSim that is used for the traffic simulation!");
+
+		log.info("The logit scale parameter used for the accessibility computation is now set to " + logitScaleParameter );
+		log.info("The logit scale parameter used inside the behavioral model for the traffic simulation is now set to " + config.planCalcScore().getBrainExpBeta() ) ;
+		if ( logitScaleParameter != 1.0 || config.planCalcScore().getBrainExpBeta()!= 1.0 ) {
+			log.info("It is best to have both of them at 1.0, but changing them means that you have to re-estimate urbansim models.") ;
+		}
 		
 		if(useMATSimCarParameter){
 			// usually travelling_utils are negative
