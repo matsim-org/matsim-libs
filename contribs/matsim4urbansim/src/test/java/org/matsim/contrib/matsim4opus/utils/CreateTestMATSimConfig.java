@@ -36,6 +36,7 @@ import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.junit.Assert;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.AccessibilityParameterType;
@@ -306,6 +307,125 @@ public class CreateTestMATSimConfig {
 		
 		return writeConfigFile(matsimConfigType);
 	}
+	/**
+	 * generates a minimal matsim4urbansim config
+	 */
+	public String generateMinimalConfig(){
+		
+		ObjectFactory of = new ObjectFactory();	
+		
+		// create MATSim4UrbanSim xml hierarchy
+		
+		// Config Type
+		FileType matsim_config = of.createFileType();
+		matsim_config.setInputFile( this.matsimConfigInputFile );
+		FileType network = of.createFileType();
+		network.setInputFile( this.networkInputFile );
+		InputPlansFileType inputPlansFileType = of.createInputPlansFileType();
+		if(this.startMode == CreateTestMATSimConfig.COLD_START)
+			inputPlansFileType.setInputFile( "" );
+		else if(this.startMode == CreateTestMATSimConfig.WARRM_START)
+			inputPlansFileType.setInputFile( this.inputPlansFile );
+		InputPlansFileType hotStratPlansFile = of.createInputPlansFileType();
+		if(this.startMode == CreateTestMATSimConfig.HOT_START)
+			hotStratPlansFile.setInputFile( this.hotstartPlansFile );
+		else
+			hotStratPlansFile.setInputFile( "" );
+		ControlerType controler = of.createControlerType();
+		controler.setFirstIteration( this.firstIteration );
+		controler.setLastIteration(  this.lastIteration );
+		PlanCalcScoreType planCalcScore = of.createPlanCalcScoreType();
+		planCalcScore.setActivityType0( this.activityType_0 );
+		planCalcScore.setActivityType1( this.activityType_1 );
+		planCalcScore.setHomeActivityTypicalDuration( this.homeActivityTypicalDuration );
+		planCalcScore.setWorkActivityTypicalDuration( this.workActivityTypicalDuration );
+		planCalcScore.setWorkActivityOpeningTime( this.workActivityOpeningTime );
+		planCalcScore.setWorkActivityLatestStartTime( this.workActivityLatestStartTime );
+		StrategyType strategy = of.createStrategyType();
+		strategy.setMaxAgentPlanMemorySize( this.maxAgentPlanMemorySize );
+		strategy.setTimeAllocationMutatorProbability( this.timeAllocationMutatorProbability );
+		strategy.setChangeExpBetaProbability( this.changeExpBetaProbability );
+		strategy.setReRouteDijkstraProbability( this.reRouteDijkstraProbability );
+		
+		ConfigType configType = of.createConfigType();
+		configType.setMatsimConfig(matsim_config);
+		configType.setNetwork(network);
+		configType.setInputPlansFile(inputPlansFileType);
+		configType.setHotStartPlansFile(hotStratPlansFile);
+		configType.setControler(controler);
+		configType.setPlanCalcScore(planCalcScore);
+		configType.setStrategy(strategy);
+		
+		// UrbanSimParameterType
+		UrbansimParameterType ubansimParameterType = of.createUrbansimParameterType();
+		ubansimParameterType.setPopulationSamplingRate( this.populationSamplingRate );
+		ubansimParameterType.setYear( this.year );
+		ubansimParameterType.setOpusHome( this.opusHome );
+		ubansimParameterType.setOpusDataPath( this.opusDataPath );
+		ubansimParameterType.setMatsim4Opus( this.matsim4opus );
+		ubansimParameterType.setMatsim4OpusConfig( this.matsim4opusConfig );
+		ubansimParameterType.setMatsim4OpusOutput( this.matsim4opusOutput );
+		ubansimParameterType.setMatsim4OpusTemp( this.matsim4opusTemp );
+		ubansimParameterType.setIsTestRun( this.isTestRun );
+		ubansimParameterType.setRandomLocationDistributionRadiusForUrbanSimZone( this.randomLocationDistributionRadiusForUrbanSimZone );
+		ubansimParameterType.setTestParameter( this.testParameter );
+		ubansimParameterType.setBackupRunData( this.backupRunData );
+		
+		// matsim4UrbanSimControlerType
+		Matsim4UrbansimContolerType matsim4UrbanSimControlerType = of.createMatsim4UrbansimContolerType();
+		matsim4UrbanSimControlerType.setZone2ZoneImpedance( this.zone2zoneImpedance );
+		matsim4UrbanSimControlerType.setAgentPerformance( this.agentPerformance );
+		matsim4UrbanSimControlerType.setZoneBasedAccessibility( this.zoneBasedAccessibility );
+		matsim4UrbanSimControlerType.setCellBasedAccessibility( this.cellBasedAccessibility );
+		matsim4UrbanSimControlerType.setCellSizeCellBasedAccessibility( this.cellSizeCellBasedAccessibility );
+		FileType shapeFile = of.createFileType();
+		shapeFile.setInputFile( this.shapeFileCellBasedAccessibilityInputFile );
+		matsim4UrbanSimControlerType.setShapeFileCellBasedAccessibility( shapeFile );
+		matsim4UrbanSimControlerType.setUseCustomBoundingBox( this.useCustomBoundingBox );
+		matsim4UrbanSimControlerType.setBoundingBoxBottom( this.boundingBoxTop );
+		matsim4UrbanSimControlerType.setBoundingBoxLeft( this.boundingBoxLeft );
+		matsim4UrbanSimControlerType.setBoundingBoxRight( this.boundingBoxRight );
+		matsim4UrbanSimControlerType.setBoundingBoxTop( this.boundingBoxBottom );
+		
+		// accessibilityParameterType
+		AccessibilityParameterType accessibilityParameterType = of.createAccessibilityParameterType();
+		accessibilityParameterType.setAccessibilityDestinationSamplingRate( this.accessibilityDestinationSamplingRate );
+		accessibilityParameterType.setUseLogitScaleParameterFromMATSim( this.useLogitScaleParameterFromMATSim );
+		accessibilityParameterType.setUseCarParameterFromMATSim( this.useCarParameterFromMATSim );
+		accessibilityParameterType.setUseWalkParameterFromMATSim( this.useWalkParameterFromMATSim );
+		accessibilityParameterType.setUseRawSumsWithoutLn( this.useRawSumsWithoutLn );
+		accessibilityParameterType.setBetaCarTravelTime( this.betaCarTravelTime );
+		accessibilityParameterType.setBetaCarTravelTimePower2( this.betaCarTravelTimePower2 );
+		accessibilityParameterType.setBetaCarLnTravelTime( this.betaCarLnTravelTime );
+		accessibilityParameterType.setBetaCarTravelDistance( this.betaCarTravelDistance );
+		accessibilityParameterType.setBetaCarTravelDistancePower2( this.betaCarTravelDistancePower2 );
+		accessibilityParameterType.setBetaCarLnTravelDistance( this.betaCarLnTravelDistance );
+		accessibilityParameterType.setBetaCarTravelCost( this.betaCarTravelCost );
+		accessibilityParameterType.setBetaCarTravelCostPower2( this.betaCarTravelCostPower2 );
+		accessibilityParameterType.setBetaCarLnTravelCost( this.betaCarLnTravelCost );
+		accessibilityParameterType.setBetaWalkTravelTime( this.betaWalkTravelTime );
+		accessibilityParameterType.setBetaWalkTravelTimePower2( this.betaWalkTravelTimePower2 );
+		accessibilityParameterType.setBetaWalkLnTravelTime( this.betaWalkLnTravelTime );
+		accessibilityParameterType.setBetaWalkTravelDistance( this.betaWalkTravelDistance );
+		accessibilityParameterType.setBetaWalkTravelDistancePower2( this.betaWalkTravelDistancePower2 );
+		accessibilityParameterType.setBetaWalkLnTravelDistance( this.betaWalkLnTravelDistance );
+		accessibilityParameterType.setBetaWalkTravelCost( this.betaWalkTravelCost );
+		accessibilityParameterType.setBetaWalkTravelCostPower2( this.betaWalkTravelCostPower2 );
+		accessibilityParameterType.setBetaWalkLnTravelCost( this.betaWalkLnTravelCost );
+		
+		// matsim4urbansimtype
+		Matsim4UrbansimType matsim4UrbanSimType = of.createMatsim4UrbansimType();
+		matsim4UrbanSimType.setUrbansimParameter(ubansimParameterType);
+		matsim4UrbanSimType.setMatsim4UrbansimContoler(matsim4UrbanSimControlerType);
+		matsim4UrbanSimType.setAccessibilityParameter(accessibilityParameterType);
+		
+		// MatsimConfigType
+		MatsimConfigType matsimConfigType = of.createMatsimConfigType();
+		matsimConfigType.setConfig(configType);
+		matsimConfigType.setMatsim4Urbansim(matsim4UrbanSimType);
+		
+		return writeConfigFile(matsimConfigType);
+	}
 
 	/**
 	 * writes the MATSim4UrbanSim confing at the specified place using JAXB
@@ -348,6 +468,10 @@ public class CreateTestMATSimConfig {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		} finally {
+			Assert.assertFalse(true) ; // otherwise the test neither returns "good" nor "bad" when there is an exception.  kai, apr'13
 		}
 		return null;
 	}
