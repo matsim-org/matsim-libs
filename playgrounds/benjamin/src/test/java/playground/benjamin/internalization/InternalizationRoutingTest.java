@@ -46,9 +46,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
@@ -203,7 +201,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		//set to one iteration, use "ccg.setLastIteration(9)" for ten iterations
 		ccg.setLastIteration(0);
 		ccg.setMobsim("qsim");
-		Set set = new HashSet();
+		Set<EventsFileFormat> set = new HashSet<EventsFileFormat>();
 		set.add(EventsFileFormat.xml);
 		ccg.setEventsFileFormats(set);
 		//		ccg.setRunId("321");
@@ -262,20 +260,22 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	}
 
 	private void createPassiveAgents() {
-		// TODO: make code homogeneous by using factories!
-		for(int i=0; i<10; i++){
-			PersonImpl person = new PersonImpl (new IdImpl(i));
-			PlanImpl plan = person.createAndAddPlan(true);
+		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		
+		Id homeLinkId = scenario.createId("11");
+		
+		for(Integer i=0; i<10; i++){
+			Person person = pFactory.createPerson(scenario.createId(i.toString())); //new PersonImpl (new IdImpl(i));
+			Plan plan = pFactory.createPlan(); //person.createAndAddPlan(true);
 
-			ActivityImpl home = plan.createAndAddActivity("home", scenario.createId("11"));
+			Activity home = pFactory.createActivityFromLinkId("home", homeLinkId); //plan.createAndAddActivity("home", scenario.createId("11"));
 			home.setEndTime(6 * 3600);
-			home.setCoord(scenario.createCoord(0.0, 0.0));
+			Leg leg = pFactory.createLeg(TransportMode.walk);
+			Activity home2 = pFactory.createActivityFromLinkId("home", homeLinkId);
 
-			plan.createAndAddLeg(TransportMode.walk);
-
-			ActivityImpl home2 = plan.createAndAddActivity("home", scenario.createId("11"));
-			home2.setCoord(scenario.createCoord(0.0, 0.0));
-
+			plan.addActivity(home);
+			plan.addLeg(leg);
+			plan.addActivity(home2);
 			scenario.getPopulation().addPerson(person);
 		}
 	}
