@@ -168,7 +168,7 @@ public class SpaceTimeProbability {
 		ccg.setLastIteration(this.lastIteration);
 		ccg.setOutputDirectory(workingDirectory + "output/scenario" + entry.getKey() + "/");
 		ccg.setMobsim(MobsimType.qsim.toString());
-		Set set = new HashSet();
+		Set<EventsFileFormat> set = new HashSet<EventsFileFormat>();
 		set.add(EventsFileFormat.xml);
 		ccg.setEventsFileFormats(set);
 		ccg.setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
