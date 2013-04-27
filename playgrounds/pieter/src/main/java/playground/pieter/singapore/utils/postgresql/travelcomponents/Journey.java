@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import org.matsim.api.core.v01.Coord;
 
 public class Journey extends TravelComponent {
+	private String mainmode;
 	private Activity fromAct;
 	private Activity toAct;
 	private boolean carJourney = false;
@@ -266,5 +267,13 @@ public class Journey extends TravelComponent {
 
 	public void setWaits(LinkedList<Wait> waits) {
 		this.waits = waits;
+	}
+
+	public String getMainmode() {
+		return mainmode;
+	}
+
+	public void setMainmode(String mainmode) {
+		this.mainmode = mainmode;
 	}
 }

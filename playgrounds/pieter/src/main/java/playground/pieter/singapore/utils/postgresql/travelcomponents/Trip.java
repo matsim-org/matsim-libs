@@ -83,4 +83,14 @@ public 	 class Trip extends TravelComponent {
 	public void setOrig(Coord orig) {
 		this.orig = orig;
 	}
+
+	public void incrementDistance(double linkLength) {
+		this.distance += linkLength;
+		
+	}
+
+	public void incrementTime(double linkTime) {
+		this.setEndTime(this.getEndTime()+linkTime);
+		
+	}
 }

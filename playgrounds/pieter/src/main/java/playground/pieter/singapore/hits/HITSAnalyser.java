@@ -1428,31 +1428,5 @@ public class HITSAnalyser {
 	}
 }
 
-class TimeAndDistance {
-	double time;
-	double distance;
 
-	public TimeAndDistance(double time, double distance) {
-		super();
-		this.time = time;
-		this.distance = distance;
-	}
 
-}
-
-class TransitStageRoutingInput {
-	Coord orig;
-
-	public TransitStageRoutingInput(Coord orig, Coord dest,
-			Set<TransitLine> lines, boolean busStage) {
-		super();
-		this.orig = orig;
-		this.dest = dest;
-		this.lines = lines;
-		this.busStage = busStage;
-	}
-
-	Coord dest;
-	boolean busStage;
-	Set<TransitLine> lines;
-}
