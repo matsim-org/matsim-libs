@@ -151,6 +151,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES, this.ptTravelTimes);
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+		// tnicolai: this are no default parameters anymore.
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME, this.betaBikeTravelTime + "");
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME_POWER2, this.betaBikeTravelTimePower2 + "");
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_LN_TRAVEL_TIME, this.betaBikeLnTravelTime + "");
