@@ -23,7 +23,8 @@ import static pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizationPolicy.*;
 import static playground.michalm.vrp.run.online.AlgorithmConfig.AlgorithmType.*;
 import static playground.michalm.vrp.run.online.AlgorithmConfig.TravelCostSource.*;
 import static playground.michalm.vrp.run.online.AlgorithmConfig.TravelTimeSource.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizationPolicy;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 
 
 public class AlgorithmConfig
@@ -198,4 +199,27 @@ public class AlgorithmConfig
         this.algorithmType = algorithmType;
         this.optimizationPolicy = optimizationPolicy;
     }
+
+
+    public TaxiOptimizer createTaxiOptimizer(VrpData data)
+    {
+        switch (algorithmType) {
+            case NO_SCHEDULING:
+                return new NOSTaxiOptimizer(data, optimizationPolicy, this == NOS_STRAIGHT_LINE);
+
+            case ONE_TIME_SCHEDULING:
+                return new OTSTaxiOptimizer(data, optimizationPolicy);
+
+            case RE_SCHEDULING:
+                return new RESTaxiOptimizer(data, optimizationPolicy);
+
+                // case PRE_ASSIGNMENT:
+                // return TaxiOptimizerWithPreassignment.createOptimizer(data.getVrpData(),
+                // algorithmConfig.optimizationPolicy, reqIdToVehIdFile);
+
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
 }

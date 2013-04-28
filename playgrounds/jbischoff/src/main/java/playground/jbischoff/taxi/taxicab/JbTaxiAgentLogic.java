@@ -51,8 +51,8 @@ import playground.michalm.vrp.data.network.MatsimArc;
 import playground.michalm.vrp.data.network.MatsimVertex;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
-import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
-import playground.michalm.vrp.taxi.taxicab.TaxiLeg;
+import playground.michalm.vrp.taxi.TaxiAgentLogic;
+import playground.michalm.vrp.taxi.TaxiLeg;
 //import playground.michalm.vrp.taxi.taxicab.TaxiTaskActivity;
 
 

@@ -31,7 +31,7 @@ import playground.jbischoff.taxi.optimizer.RankTaxiOptimizer;
 import playground.michalm.dynamic.DynAgentLogic;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
-import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
+import playground.michalm.vrp.taxi.TaxiAgentLogic;
 
 public class JBTaxiSimEngine 
 	extends TaxiSimEngine
@@ -55,7 +55,7 @@ public class JBTaxiSimEngine
 	    public JBTaxiSimEngine(Netsim netsim, MatsimVrpData data, TaxiOptimizer optimizer,
 	            TaxiOptimizationPolicy optimizationPolicy, RankTaxiOptimizer rto)
 	    {
-	    	super(netsim,data,optimizer,optimizationPolicy);
+	    	super(netsim,data,optimizer);
 	        this.netsim = netsim;
 	        this.simTimer = netsim.getSimTimer();
 	        this.optimizer = rto;

@@ -30,8 +30,6 @@ public class KaiSingleIterOnlineDvrpLauncher
         launcher.netFileName = launcher.dirName + "network.xml";
         launcher.plansFileName = launcher.dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
 
-        launcher.reqIdToVehIdFileName = launcher.dirName + "reqIdToVehId";
-
         launcher.depotsFileName = launcher.dirName + "depots-5_taxis-15.xml";
         launcher.taxiCustomersFileName = launcher.dirName + "taxiCustomers_1_pc.txt";
 

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.taxi.taxicab;
+package playground.michalm.vrp.taxi;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.dynamic.DynActivity;

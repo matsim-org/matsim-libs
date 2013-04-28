@@ -63,7 +63,6 @@ import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
 import playground.michalm.vrp.otfvis.OTFLiveUtils;
 import playground.michalm.vrp.run.VrpConfigUtils;
 import playground.michalm.vrp.taxi.*;
-import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
 
 
 public class SingleIterOnlineDvrpLauncher
@@ -73,7 +72,6 @@ public class SingleIterOnlineDvrpLauncher
     String plansFileName;
     String taxiCustomersFileName;
     String depotsFileName;
-    String reqIdToVehIdFileName;
 
     boolean vrpOutFiles;
     String vrpOutDirName;
@@ -87,8 +85,6 @@ public class SingleIterOnlineDvrpLauncher
 
     Scenario scenario;
     MatsimVrpData data;
-
-    TaxiOptimizerFactory optimizerFactory;
 
     boolean otfVis;
 
@@ -246,51 +242,6 @@ public class SingleIterOnlineDvrpLauncher
     }
 
 
-    void initOptimizerFactory()
-        throws IOException
-    {
-        switch (algorithmConfig.algorithmType) {
-            case NO_SCHEDULING:
-                optimizerFactory = NOSTaxiOptimizer.createFactory(
-                        algorithmConfig == AlgorithmConfig.NOS_STRAIGHT_LINE,
-                        algorithmConfig.optimizationPolicy);
-                break;
-
-            case ONE_TIME_SCHEDULING:
-                optimizerFactory = OTSTaxiOptimizer
-                        .createFactory(algorithmConfig.optimizationPolicy);
-                break;
-
-            case RE_SCHEDULING:
-                optimizerFactory = RESTaxiOptimizer
-                        .createFactory(algorithmConfig.optimizationPolicy);
-                break;
-
-            case PRE_ASSIGNMENT:
-                File reqIdToVehIdFile = new File(reqIdToVehIdFileName);
-                Scanner scanner = new Scanner(reqIdToVehIdFile);
-
-                List<Vehicle> vehicles = data.getVrpData().getVehicles();
-                Vehicle[] reqIdToVehMapping = new Vehicle[scanner.nextInt()];
-
-                for (int i = 0; i < reqIdToVehMapping.length; i++) {
-                    reqIdToVehMapping[i] = vehicles.get(scanner.nextInt());
-                }
-
-                optimizerFactory = TaxiOptimizerWithPreassignment.createFactory(reqIdToVehMapping,
-                        algorithmConfig.optimizationPolicy);
-                break;
-
-            default:
-                throw new IllegalStateException();
-        }
-    }
-
-
-    // just for debugging
-    private RunningVehicleRegister rvr;
-
-
     @SuppressWarnings("unused")
     void runSim()
     {
@@ -302,10 +253,10 @@ public class SingleIterOnlineDvrpLauncher
         }
 
         EventsManager events = EventsUtils.createEventsManager();
-        // EventWriter writer = new EventWriterXML(dirName + "events.xml.gz");
-        // events.addHandler(writer);
+        // EventWriter eventWriter = new EventWriterXML(dirName + "events.xml.gz");
+        // events.addHandler(eventWriter);
 
-        rvr = new RunningVehicleRegister();
+        RunningVehicleRegister rvr = new RunningVehicleRegister();
         events.addHandler(rvr);
 
         QSim qSim = new QSim(scenario, events);
@@ -318,21 +269,9 @@ public class SingleIterOnlineDvrpLauncher
         TeleportationEngine teleportationEngine = new TeleportationEngine();
         qSim.addMobsimEngine(teleportationEngine);
 
-        // // taken from SimEngine
-
-        final VrpData vrpData = data.getVrpData();
-        TaxiOptimizer optimizer = optimizerFactory.create(vrpData);
-        TaxiOptimizationPolicy optimizationPolicy = optimizerFactory.getOptimizationPolicy();
-
-        //
-        //
-        //
-
-        TaxiSimEngine taxiSimEngine = new TaxiSimEngine(qSim, data, optimizer, optimizationPolicy);
-
-        //
-        //
-        //
+        VrpData vrpData = data.getVrpData();
+        TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(vrpData);
+        TaxiSimEngine taxiSimEngine = new TaxiSimEngine(qSim, data, optimizer);
 
         qSim.addMobsimEngine(taxiSimEngine);
         qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
@@ -366,8 +305,6 @@ public class SingleIterOnlineDvrpLauncher
             OTFClientLive.run(scenario.getConfig(), server);
         }
 
-        // events.addHandler(runningVehicleRegister = new RunningVehicleRegister());
-
         if (outputHistogram) {
             legHistogram = new LegHistogram(300);
             events.addHandler(legHistogram);
@@ -376,7 +313,7 @@ public class SingleIterOnlineDvrpLauncher
         qSim.run();
 
         events.finishProcessing();
-        // writer.closeFile();
+        //eventWriter.closeFile();
 
     }
 
@@ -418,7 +355,6 @@ public class SingleIterOnlineDvrpLauncher
         throws IOException
     {
         initMatsimVrpData();
-        initOptimizerFactory();
         runSim();
 
         // check

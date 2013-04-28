@@ -51,7 +51,9 @@ public class RunningVehicleRegister
     @Override
     public void handleEvent(AgentStuckEvent event)
     {
-        throw new RuntimeException();
+        //throw new RuntimeException();
+        System.err.println("AgentStuckEvent:");
+        System.err.println(event);
     }
 
 

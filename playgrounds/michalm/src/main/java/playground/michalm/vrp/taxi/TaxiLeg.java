@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.taxi.taxicab;
+package playground.michalm.vrp.taxi;
 
 import org.matsim.api.core.v01.Id;
 

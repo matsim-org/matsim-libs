@@ -138,35 +138,9 @@ public class MultipleSingleIterOnlineDvrpLauncher
         pw.println();
 
         if (runs > 0) {
-            pw2.println(configIdx + " ==============================");
 
-            pw2.println("pickupDelayStats");
-            pw2.println(TaxiOptimizer.pickupDelayStats);
-            pw2.println("pickupSpeedUpStats");
-            pw2.println(TaxiOptimizer.pickupSpeedupStats);
-            pw2.println("deliveryDelayStats");
-            pw2.println(TaxiOptimizer.deliveryDelayStats);
-            pw2.println("deliverySpeedUpStats");
-            pw2.println(TaxiOptimizer.deliverySpeedupStats);
-            pw2.println("waitDelayStats");
-            pw2.println(TaxiOptimizer.waitDelayStats);
-            pw2.println("waitSpeedUpStats");
-            pw2.println(TaxiOptimizer.waitSpeedupStats);
-            pw2.println("serveDelayStats");
-            pw2.println(TaxiOptimizer.serveDelayStats);
-            pw2.println("serveSpeedUpStats");
-            pw2.println(TaxiOptimizer.serveSpeedupStats);
-
-            pw2.println();
-
-            TaxiOptimizer.pickupDelayStats.clear();
-            TaxiOptimizer.pickupSpeedupStats.clear();
-            TaxiOptimizer.deliveryDelayStats.clear();
-            TaxiOptimizer.deliverySpeedupStats.clear();
-            TaxiOptimizer.waitDelayStats.clear();
-            TaxiOptimizer.waitSpeedupStats.clear();
-            TaxiOptimizer.serveDelayStats.clear();
-            TaxiOptimizer.serveSpeedupStats.clear();
+            TaxiOptimizerImpl.delaySpeedupStats.printStats(pw2, configIdx + "");
+            TaxiOptimizerImpl.delaySpeedupStats.clearStats();
         }
     }
 

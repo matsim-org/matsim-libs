@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.taxi.taxicab;
+package playground.michalm.vrp.taxi;
 
 import java.util.List;
 
@@ -32,7 +32,6 @@ import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.model.DynAgentVehicle;
 import playground.michalm.vrp.data.network.MatsimVertex;
 import playground.michalm.vrp.driver.VrpSchedulePlanFactory;
-import playground.michalm.vrp.taxi.TaxiSimEngine;
 
 
 public class TaxiAgentSource
@@ -60,7 +59,7 @@ public class TaxiAgentSource
     @Override
     public void insertAgentsIntoMobsim()
     {
-        QSim qSim = (QSim)taxiSimEngine.getMobsim();
+        QSim qSim = (QSim)taxiSimEngine.getInternalInterface().getMobsim();
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
         for (Vehicle vrpVeh : vehicles) {

@@ -69,7 +69,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 import playground.michalm.vrp.run.VrpConfigUtils;
 import playground.jbischoff.taxi.launch.AlgorithmConfig;
 import playground.michalm.vrp.taxi.*;
-import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
+import playground.michalm.vrp.taxi.TaxiAgentSource;
 
 
 public class JbSingleIterOnlineDvrpLauncher

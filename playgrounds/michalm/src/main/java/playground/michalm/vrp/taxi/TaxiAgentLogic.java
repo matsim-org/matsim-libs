@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.taxi.taxicab;
+package playground.michalm.vrp.taxi;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.*;
@@ -26,11 +26,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.schedule.TaxiDriveTask;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.model.TaxiCustomer;
 import playground.michalm.vrp.data.network.MatsimArc;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
-import playground.michalm.vrp.taxi.TaxiSimEngine;
 
 
 public class TaxiAgentLogic
@@ -40,8 +40,6 @@ public class TaxiAgentLogic
 
     private final Vehicle vrpVehicle;
     private DynAgent agent;
-
-    private Request currentRequest;
 
 
     public TaxiAgentLogic(Vehicle vrpVehicle, TaxiSimEngine taxiSimEngine)
@@ -96,43 +94,37 @@ public class TaxiAgentLogic
         if (status == ScheduleStatus.UNPLANNED) {
             return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
         }
+        // else: PLANNED or STARTED
 
         int time = (int)now;
 
         if (status == ScheduleStatus.STARTED) {// TODO: should also be called if PLANNED???????
-            taxiSimEngine.updateAndOptimizeBeforeNextTask(vrpVehicle, now);
+            //currently I assume that there are no delays (or "speedups") in starting the first task
+            //i.e. PLANNED=>STARTED, therefore "updateAndOptimize" function is called only for
+            //the already started schedules
+            taxiSimEngine.taskEnded(vrpVehicle, time);
         }
 
         Task task = schedule.nextTask();
-        status = schedule.getStatus();// REFRESH status!!!
+        status = schedule.getStatus();// REFRESH status (after schedule.nextTask)!!!
 
-        if (status == ScheduleStatus.COMPLETED) {
+        if (status == ScheduleStatus.COMPLETED) {// this happens as a result of nextTask() call
             return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
-        }
-
-        if (task.getSchedule().getVehicle().getId() == printVehId) {
-            System.err.println("NEXT TASK: " + task + " time=" + now);
         }
 
         switch (task.getType()) {
             case DRIVE: // driving both with and without passengers
-                // ======DEBUG PRINTOUTS======
-                // DriveTask dt = (DriveTask)task;
-                // Id fromLinkId = ((MATSimVertex)dt.getFromVertex()).getLink().getId();
-                // Id toLinkId = ((MATSimVertex)dt.getToVertex()).getLink().getId();
-                //
-                // System.err.println("************");
-                // System.err.println("Drive task: " + task + " for Veh: " + vrpVehicle.getId()
-                // + " agent: " + agent.getId());
-                // System.err.println("fromLink" + fromLinkId + " toLink: " + toLinkId);
+                TaxiDriveTask tdt = (TaxiDriveTask)task;
 
-                if (currentRequest != null) {
-                    DynLeg leg = createLegWithPassenger((DriveTask)task, time, currentRequest);
-                    currentRequest = null;
-                    return leg;
-                }
-                else {
-                    return createLeg((DriveTask)task, time);
+                switch (tdt.getDriveType()) {
+                    case PICKUP:
+                        return createLeg((DriveTask)task, time);
+
+                    case DELIVERY:
+                        return createLegWithPassenger(tdt, time);
+
+                    default:
+                        throw new IllegalStateException("Not supported enum type");
                 }
 
             case SERVE: // pick up passenger
@@ -145,9 +137,6 @@ public class TaxiAgentLogic
                 throw new IllegalStateException();
         }
     }
-
-
-    private final int printVehId = -13;
 
 
     // ========================================================================================
@@ -187,10 +176,8 @@ public class TaxiAgentLogic
     // picking-up a passenger
     private TaxiTaskActivity createServeActivity(ServeTask task, double now)
     {
-        currentRequest = task.getRequest();
-
         // serve the customer
-        MobsimAgent passenger = ((TaxiCustomer)currentRequest.getCustomer()).getPassenger();
+        MobsimAgent passenger = ((TaxiCustomer)task.getRequest().getCustomer()).getPassenger();
         Id currentLinkId = passenger.getCurrentLinkId();
 
         if (currentLinkId != agent.getCurrentLinkId()) {
@@ -207,7 +194,7 @@ public class TaxiAgentLogic
         }
 
         // event handling
-        EventsManager events = taxiSimEngine.getMobsim().getEventsManager();
+        EventsManager events = taxiSimEngine.getInternalInterface().getMobsim().getEventsManager();
         EventsFactory evFac = (EventsFactory)events.getFactory();
         events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(),
                 agent.getId()));
@@ -218,8 +205,7 @@ public class TaxiAgentLogic
 
     // ========================================================================================
 
-    private TaxiLeg createLegWithPassenger(DriveTask driveTask, int realDepartTime,
-            final Request request)
+    private TaxiLeg createLegWithPassenger(final TaxiDriveTask driveTask, int realDepartTime)
     {
         MatsimArc arc = (MatsimArc)driveTask.getArc();
         ShortestPath path = arc.getShortestPath(realDepartTime);
@@ -232,10 +218,12 @@ public class TaxiAgentLogic
                 // following line only works if PassengerAgent can indeed be cast into MobsimAgent
                 // ...
                 // ... but that makes sense for what the current system is constructed. kai, sep'12
-                MobsimAgent passenger = ((TaxiCustomer)request.getCustomer()).getPassenger();
+                MobsimAgent passenger = ((TaxiCustomer)driveTask.getRequest().getCustomer())
+                        .getPassenger();
 
                 // deliver the passenger
-                EventsManager events = taxiSimEngine.getMobsim().getEventsManager();
+                EventsManager events = taxiSimEngine.getInternalInterface().getMobsim()
+                        .getEventsManager();
                 EventsFactory evFac = (EventsFactory)events.getFactory();
                 events.processEvent(evFac.createPersonLeavesVehicleEvent(now, passenger.getId(),
                         agent.getId()));

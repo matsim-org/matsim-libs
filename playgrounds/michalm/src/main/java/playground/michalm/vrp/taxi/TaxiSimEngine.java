@@ -22,57 +22,46 @@ package playground.michalm.vrp.taxi;
 import java.util.*;
 
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 
 
 public class TaxiSimEngine
-    implements MobsimEngine
+    implements MobsimEngine, MobsimBeforeSimStepListener
 {
     private final VrpData vrpData;
-    private final Netsim netsim;
     private final MobsimTimer simTimer;
 
-    private TaxiOptimizer optimizer;
-    // ////////// begin: TO BE MOVED TO TAXI_OPTIMIZER?
-    private final TaxiOptimizationPolicy optimizationPolicy;
-    // ////////// end: TO BE MOVED TO TAXI_OPTIMIZER?
+    private final TaxiOptimizer optimizer;
 
     private final List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
 
     private InternalInterface internalInterface;
 
 
-    public TaxiSimEngine(Netsim netsim, MatsimVrpData data, TaxiOptimizer optimizer,
-            TaxiOptimizationPolicy optimizationPolicy)
+    public TaxiSimEngine(Netsim netsim, MatsimVrpData data, TaxiOptimizer optimizer)
     {
-        this.netsim = netsim;
         this.simTimer = netsim.getSimTimer();
         this.optimizer = optimizer;
-        this.optimizationPolicy = optimizationPolicy;
-
-        vrpData = data.getVrpData();
+        this.vrpData = data.getVrpData();
+        netsim.addQueueSimulationListeners(this);
     }
 
 
-    // TODO should not be PUBLIC!!!
-    // probably all actions on InternalInterface should be carried out via TaxiSimEngine...
-    // but for now, let it be public...
-    //
-    // yyyy yes, definitely should not be public. One compromise is to make it "default", and have
-    // everything that
-    // needs access inside the same package. kai, sep'12
-    //
-    // Currently, all objects that need access to InternalInterface and only these objects
-    // have access to TaxiSimEngine, therefore I will keep TaxiSimEngine.getInternalInterface()
-    // public to avoid passing too many arguments through the code. michalm, sep'12
-    public InternalInterface getInternalInterface()
+    /*package*/TaxiOptimizer getOptimizer()
+    {
+        return optimizer;
+    }
+
+
+    /*package*/InternalInterface getInternalInterface()
     {
         return internalInterface;
     }
@@ -85,42 +74,36 @@ public class TaxiSimEngine
     }
 
 
-    public Netsim getMobsim()
-    {
-        return netsim;
-    }
-
-
     @Override
     public void onPrepareSim()
     {
         // important: in some cases one may need to decrease simTimer.time
+        int time = (int)simTimer.getTimeOfDay();
+        vrpData.setTime(time);
+
+        optimizer.init();
+        notifyAgentLogics();
+    }
+
+
+    @Override
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
+    {
         vrpData.setTime((int)simTimer.getTimeOfDay());
-
-        optimize();
-    }
-
-
-    private void optimize()
-    {
-        optimizer.optimize();
-        notifyAgents();
-    }
-
-
-    public void updateAndOptimizeBeforeNextTask(Vehicle vrpVehicle, double now)
-    {
-        boolean scheduleChanged = optimizer.updateSchedule(vrpVehicle);
-
-        if (scheduleChanged && optimizationPolicy.shouldOptimize(vrpVehicle.getSchedule())) {
-            optimize();
-        }
     }
 
 
     public void taxiRequestSubmitted(Request request, double now)
     {
-        optimize();
+        optimizer.taxiRequestSubmitted(request, (int)now);
+        notifyAgentLogics();
+    }
+
+
+    public void taskEnded(Vehicle vrpVehicle, int time)
+    {
+        optimizer.beforeNextTask(vrpVehicle, time);
+        notifyAgentLogics();
     }
 
 
@@ -129,22 +112,15 @@ public class TaxiSimEngine
      */
     @Override
     public void doSimStep(double time)
-    {
-        // this is executed at the end of QSim.doSimStep() therefore "time+1"
-        // this value will be used throughout the next QSim.doSimStep() call
-        vrpData.setTime((int)time + 1); // this can be moved to Before/AfterSimStepListener
-    }
+    {}
 
 
     @Override
     public void afterSim()
-    {
-        // analyze requests that have not been served
-        // calculate some scorings here
-    }
+    {}
 
 
-    private void notifyAgents()
+    private void notifyAgentLogics()
     {
         for (TaxiAgentLogic a : agentLogics) {
             a.schedulePossiblyChanged();
