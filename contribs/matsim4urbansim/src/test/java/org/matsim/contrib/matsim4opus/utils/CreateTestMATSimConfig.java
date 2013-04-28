@@ -80,7 +80,7 @@ public class CreateTestMATSimConfig {
 	public String inputPlansFile 						= "";
 	public String hotstartPlansFile						= "";
 	public BigInteger firstIteration					= new BigInteger("0");
-	public BigInteger lastIteration						= new BigInteger("0");
+	public BigInteger lastIteration						= new BigInteger("1");
 	public String activityType_0						= "home";
 	public String activityType_1						= "work";
 	public BigInteger homeActivityTypicalDuration		= new BigInteger("43200");	
@@ -333,6 +333,12 @@ public class CreateTestMATSimConfig {
 	}
 	/**
 	 * generates a minimal matsim4urbansim config
+	 * 
+	 * tnicolai: the resulting config has the same structure, i.e. the number of entries,
+	 * as the outcome of the above mehtod "generate()". The difference is that some parameters
+	 * are set zero instead of using the above defined parameters , e.g.
+	 * timeAllocationMutatorProbability, changeExpBetaProbability, reRouteDijkstraProbability, 
+	 * populationSamplingRate, etc..
 	 */
 	public String generateMinimalConfig(){
 		
