@@ -45,7 +45,7 @@ public class InitDefaultConfigTest extends MatsimTestCase{
 	 * correctly converted into standard MATSim format and that all values are recognized correctly
 	 */
 	@Test
-	public void testLoadMATSim4UrbanSimConfigOnly(){
+	public void testLoadDefaultMATSim4UrbanSimWithExternalConfigFile(){
 		
 		// MATSim4UrbanSim configuration converter
 		MATSim4UrbanSimConfigurationConverterV4 connector = null;
