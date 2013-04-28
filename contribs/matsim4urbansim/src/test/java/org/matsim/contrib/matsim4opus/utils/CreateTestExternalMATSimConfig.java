@@ -28,6 +28,7 @@ import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
+import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -48,24 +49,24 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 	public static final String DUMMY_FILE_2 = "/dummy2.xml";
 	
 	public final int timeOfDay 						= 10000;
-	public final double betaBikeTravelTime 			= -12.;
-	public final double betaBikeTravelTimePower2 	= 0.;
-	public final double betaBikeLnTravelTime		= 0.;
-	public final double betaBikeTravelDistance		= 0.;
-	public final double betaBikeTravelDistancePower2= 0.;
-	public final double betaBikeLnTravelDistance	= 0.;
-	public final double betaBikeTravelCost			= 0.;
-	public final double betaBikeTravelCostPower2	= 0.;
-	public final double betaBikeLnTravelCost		= 0.;
-	public final double betaPtTravelTime			= -12.;
-	public final double betaPtTravelTimePower2		= 0.;
-	public final double betaPtLnTravelTime			= 0.;
-	public final double betaPtTravelDistance		= 0.;
-	public final double betaPtTravelDistancePower2	= 0.;
-	public final double betaPtLnTravelDistance		= 0.;
-	public final double betaPtTravelCost			= 0.;
-	public final double betaPtTravelCostPower2		= 0.;
-	public final double betaPtLnTravelCost			= 0.;
+//	public final double betaBikeTravelTime 			= -12.;
+//	public final double betaBikeTravelTimePower2 	= 0.;
+//	public final double betaBikeLnTravelTime		= 0.;
+//	public final double betaBikeTravelDistance		= 0.;
+//	public final double betaBikeTravelDistancePower2= 0.;
+//	public final double betaBikeLnTravelDistance	= 0.;
+//	public final double betaBikeTravelCost			= 0.;
+//	public final double betaBikeTravelCostPower2	= 0.;
+//	public final double betaBikeLnTravelCost		= 0.;
+//	public final double betaPtTravelTime			= -12.;
+//	public final double betaPtTravelTimePower2		= 0.;
+//	public final double betaPtLnTravelTime			= 0.;
+//	public final double betaPtTravelDistance		= 0.;
+//	public final double betaPtTravelDistancePower2	= 0.;
+//	public final double betaPtLnTravelDistance		= 0.;
+//	public final double betaPtTravelCost			= 0.;
+//	public final double betaPtTravelCostPower2		= 0.;
+//	public final double betaPtLnTravelCost			= 0.;
 	public final String urbanSimZoneShapefileLocationDistribution;
 	public final String ptStops;
 	public final String usePtStops;
@@ -223,6 +224,33 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 	}
 	
 	/**
+	 * generates the external MATSim config file with the specified parameter settings
+	 */
+	@Override
+	public String generateMinimalConfig(){
+		
+		// creating an empty MASim config
+		Config config = new Config();
+		
+		// matsim4urbansimParameter module
+		Module matsim4UrbanSimModule = config.createModule( MATSim4UrbanSimConfigurationConverterV4.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_STOPS_SWITCH, "True");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_STOPS, this.ptStops);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+		
+		// changeLegMode module
+		Module changeLegModeModule = config.createModule(changeLegModeModuleName);
+		changeLegModeModule.addParam(changeLegModeParamName, changeLegModeValue);
+		
+		// strategy module
+		Module strategyModule = config.createModule(strategyModuleName);
+		strategyModule.addParam(startegyModuleProbabilityPramName, startegyModuleProbabilityValue + "");
+		strategyModule.addParam(startegyModule4ParamName, startegyModule4Value);
+		
+		return writeConfigFile(config);
+	}
+	
+	/**
 	 * writes the external MATSim confing at the specified place
 	 * 
 	 * @param config in MATSim format
@@ -271,6 +299,21 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
 		return upcm;
+	}
+	
+	
+	/**
+	 * for quick tests
+	 * @param args
+	 */
+	public static void main(String args[]){
+		
+		String tmpPath = TempDirectoryUtil.createCustomTempDirectory("tmp");
+		
+		CreateTestExternalMATSimConfig configGenerator = new CreateTestExternalMATSimConfig(CreateTestExternalMATSimConfig.COLD_START, tmpPath);
+		System.out.println("Config stored at: " + configGenerator.generateMinimalConfig() );
+		
+		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
 
 }
