@@ -55,6 +55,43 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 	 * correctly converted into standard MATSim format and that all values are recognized correctly
 	 */
 	@Test
+	public void testLoadMATSim4UrbanSimMinimalConfig(){
+		
+		// MATSim4UrbanSim configuration converter
+		MATSim4UrbanSimConfigurationConverterV4 connector = null;
+		
+		try{
+			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
+			
+			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
+			
+			CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(CreateTestMATSimConfig.COLD_START, path);
+			String configLocation = testConfig.generateMinimalConfig();
+			
+			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
+			if( !(connector = new MATSim4UrbanSimConfigurationConverterV4( configLocation )).init() ){
+				log.error("An error occured while initializing MATSim scenario ...");
+				Assert.assertTrue(false);
+			}
+			
+			log.info("Getting config settings in matsim format");
+			Config config = connector.getConfig();
+			
+			checkCoreModuleSettings(testConfig, config);
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			Assert.assertTrue(false);
+		}
+//		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		log.info("done") ;
+	}
+	
+	/**
+	 * This test makes sure that the MATSim4UrbanSim config file will be correctly written, 
+	 * correctly converted into standard MATSim format and that all values are recognized correctly
+	 */
+	@Test
 	public void testLoadMATSim4UrbanSimConfigOnly(){
 		
 		// MATSim4UrbanSim configuration converter

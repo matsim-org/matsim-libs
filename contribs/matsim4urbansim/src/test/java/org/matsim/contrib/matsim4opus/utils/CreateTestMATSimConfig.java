@@ -367,9 +367,33 @@ public class CreateTestMATSimConfig {
 		planCalcScore.setWorkActivityLatestStartTime( this.workActivityLatestStartTime );
 		StrategyType strategy = of.createStrategyType();
 		strategy.setMaxAgentPlanMemorySize( this.maxAgentPlanMemorySize );
-		strategy.setTimeAllocationMutatorProbability( this.timeAllocationMutatorProbability );
-		strategy.setChangeExpBetaProbability( this.changeExpBetaProbability );
-		strategy.setReRouteDijkstraProbability( this.reRouteDijkstraProbability );
+		
+		// UrbanSimParameterType
+		UrbansimParameterType ubansimParameterType = of.createUrbansimParameterType();
+		ubansimParameterType.setYear( this.year );
+		ubansimParameterType.setOpusHome( this.opusHome );
+		ubansimParameterType.setOpusDataPath( this.opusDataPath );
+		ubansimParameterType.setMatsim4Opus( this.matsim4opus );
+		ubansimParameterType.setMatsim4OpusConfig( this.matsim4opusConfig );
+		ubansimParameterType.setMatsim4OpusOutput( this.matsim4opusOutput );
+		ubansimParameterType.setMatsim4OpusTemp( this.matsim4opusTemp );
+		ubansimParameterType.setTestParameter( this.testParameter );
+		
+		// matsim4UrbanSimControlerType
+		Matsim4UrbansimContolerType matsim4UrbanSimControlerType = of.createMatsim4UrbansimContolerType();
+		matsim4UrbanSimControlerType.setCellSizeCellBasedAccessibility( this.cellSizeCellBasedAccessibility );
+		FileType shapeFile = of.createFileType();
+		shapeFile.setInputFile( this.shapeFileCellBasedAccessibilityInputFile );
+		matsim4UrbanSimControlerType.setShapeFileCellBasedAccessibility( shapeFile );
+
+		// accessibilityParameterType
+		AccessibilityParameterType accessibilityParameterType = of.createAccessibilityParameterType();
+		// for the following, ``false'' is currently not supported, thus I prefer setting it to true here. kai, apr'13
+		accessibilityParameterType.setUseLogitScaleParameterFromMATSim( true );
+		accessibilityParameterType.setUseCarParameterFromMATSim( true );
+		accessibilityParameterType.setUseWalkParameterFromMATSim( true );
+		
+		// === below here are no parameters, but just "plugging together"
 		
 		ConfigType configType = of.createConfigType();
 		configType.setMatsimConfig(matsim_config);
@@ -379,63 +403,6 @@ public class CreateTestMATSimConfig {
 		configType.setControler(controler);
 		configType.setPlanCalcScore(planCalcScore);
 		configType.setStrategy(strategy);
-		
-		// UrbanSimParameterType
-		UrbansimParameterType ubansimParameterType = of.createUrbansimParameterType();
-		ubansimParameterType.setPopulationSamplingRate( this.populationSamplingRate );
-		ubansimParameterType.setYear( this.year );
-		ubansimParameterType.setOpusHome( this.opusHome );
-		ubansimParameterType.setOpusDataPath( this.opusDataPath );
-		ubansimParameterType.setMatsim4Opus( this.matsim4opus );
-		ubansimParameterType.setMatsim4OpusConfig( this.matsim4opusConfig );
-		ubansimParameterType.setMatsim4OpusOutput( this.matsim4opusOutput );
-		ubansimParameterType.setMatsim4OpusTemp( this.matsim4opusTemp );
-		ubansimParameterType.setIsTestRun( this.isTestRun );
-		ubansimParameterType.setRandomLocationDistributionRadiusForUrbanSimZone( this.randomLocationDistributionRadiusForUrbanSimZone );
-		ubansimParameterType.setTestParameter( this.testParameter );
-		ubansimParameterType.setBackupRunData( this.backupRunData );
-		
-		// matsim4UrbanSimControlerType
-		Matsim4UrbansimContolerType matsim4UrbanSimControlerType = of.createMatsim4UrbansimContolerType();
-		matsim4UrbanSimControlerType.setZone2ZoneImpedance( this.zone2zoneImpedance );
-		matsim4UrbanSimControlerType.setAgentPerformance( this.agentPerformance );
-		matsim4UrbanSimControlerType.setZoneBasedAccessibility( this.zoneBasedAccessibility );
-		matsim4UrbanSimControlerType.setCellBasedAccessibility( this.cellBasedAccessibility );
-		matsim4UrbanSimControlerType.setCellSizeCellBasedAccessibility( this.cellSizeCellBasedAccessibility );
-		FileType shapeFile = of.createFileType();
-		shapeFile.setInputFile( this.shapeFileCellBasedAccessibilityInputFile );
-		matsim4UrbanSimControlerType.setShapeFileCellBasedAccessibility( shapeFile );
-		matsim4UrbanSimControlerType.setUseCustomBoundingBox( this.useCustomBoundingBox );
-		matsim4UrbanSimControlerType.setBoundingBoxBottom( this.boundingBoxTop );
-		matsim4UrbanSimControlerType.setBoundingBoxLeft( this.boundingBoxLeft );
-		matsim4UrbanSimControlerType.setBoundingBoxRight( this.boundingBoxRight );
-		matsim4UrbanSimControlerType.setBoundingBoxTop( this.boundingBoxBottom );
-		
-		// accessibilityParameterType
-		AccessibilityParameterType accessibilityParameterType = of.createAccessibilityParameterType();
-		accessibilityParameterType.setAccessibilityDestinationSamplingRate( this.accessibilityDestinationSamplingRate );
-		accessibilityParameterType.setUseLogitScaleParameterFromMATSim( this.useLogitScaleParameterFromMATSim );
-		accessibilityParameterType.setUseCarParameterFromMATSim( this.useCarParameterFromMATSim );
-		accessibilityParameterType.setUseWalkParameterFromMATSim( this.useWalkParameterFromMATSim );
-		accessibilityParameterType.setUseRawSumsWithoutLn( this.useRawSumsWithoutLn );
-		accessibilityParameterType.setBetaCarTravelTime( this.betaCarTravelTime );
-		accessibilityParameterType.setBetaCarTravelTimePower2( this.betaCarTravelTimePower2 );
-		accessibilityParameterType.setBetaCarLnTravelTime( this.betaCarLnTravelTime );
-		accessibilityParameterType.setBetaCarTravelDistance( this.betaCarTravelDistance );
-		accessibilityParameterType.setBetaCarTravelDistancePower2( this.betaCarTravelDistancePower2 );
-		accessibilityParameterType.setBetaCarLnTravelDistance( this.betaCarLnTravelDistance );
-		accessibilityParameterType.setBetaCarTravelCost( this.betaCarTravelCost );
-		accessibilityParameterType.setBetaCarTravelCostPower2( this.betaCarTravelCostPower2 );
-		accessibilityParameterType.setBetaCarLnTravelCost( this.betaCarLnTravelCost );
-		accessibilityParameterType.setBetaWalkTravelTime( this.betaWalkTravelTime );
-		accessibilityParameterType.setBetaWalkTravelTimePower2( this.betaWalkTravelTimePower2 );
-		accessibilityParameterType.setBetaWalkLnTravelTime( this.betaWalkLnTravelTime );
-		accessibilityParameterType.setBetaWalkTravelDistance( this.betaWalkTravelDistance );
-		accessibilityParameterType.setBetaWalkTravelDistancePower2( this.betaWalkTravelDistancePower2 );
-		accessibilityParameterType.setBetaWalkLnTravelDistance( this.betaWalkLnTravelDistance );
-		accessibilityParameterType.setBetaWalkTravelCost( this.betaWalkTravelCost );
-		accessibilityParameterType.setBetaWalkTravelCostPower2( this.betaWalkTravelCostPower2 );
-		accessibilityParameterType.setBetaWalkLnTravelCost( this.betaWalkLnTravelCost );
 		
 		// matsim4urbansimtype
 		Matsim4UrbansimType matsim4UrbanSimType = of.createMatsim4UrbansimType();
