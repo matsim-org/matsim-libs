@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.config.Config;
@@ -54,13 +55,18 @@ public class InitDefaultConfigTest extends MatsimTestCase{
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
-			CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(CreateTestMATSimConfig.COLD_START, path, true);
+			// this creates a default external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
+			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestExternalMATSimConfig.COLD_START, path);
+			String externalConfigLocation = testExternalConfig.generate();
+			
+			// this creates a default MATSim4UrbanSim configuration including an external config
+			CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(CreateTestMATSimConfig.COLD_START, path, externalConfigLocation);
 			String configLocation = testConfig.generate();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
 			if( !(connector = new MATSim4UrbanSimConfigurationConverterV4( configLocation )).init() ){
 				log.error("An error occured while initializing MATSim scenario ...");
-				Assert.assertTrue(false);
+				Assert.assertFalse(true);
 			}
 			
 			log.info("Getting config settings in matsim format");
@@ -71,7 +77,7 @@ public class InitDefaultConfigTest extends MatsimTestCase{
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			Assert.assertTrue(false);
+			Assert.assertFalse(true);
 		}
 		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
