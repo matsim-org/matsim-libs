@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import org.matsim.api.core.v01.Coord;
 
 public class Journey extends TravelComponent {
+	private String trip_idx;
 	private String mainmode;
 	private Activity fromAct;
 	private Activity toAct;
@@ -49,7 +50,7 @@ public class Journey extends TravelComponent {
 	private Coord orig;
 	private Coord dest;
 	private Transfer possibleTransfer;
-	 double carDistance;
+	private double carDistance;
 	 public void incrementCarDistance(double increment){
 		 carDistance += increment;
 	 }
@@ -138,7 +139,7 @@ public class Journey extends TravelComponent {
 	}
 
 	public double getDistance() {
-
+		
 		return getInVehDistance() + getWalkDistance();
 	}
 
@@ -275,5 +276,21 @@ public class Journey extends TravelComponent {
 
 	public void setMainmode(String mainmode) {
 		this.mainmode = mainmode;
+	}
+
+	public String getTrip_idx() {
+		return trip_idx;
+	}
+
+	public void setTrip_idx(String trip_idx) {
+		this.trip_idx = trip_idx;
+	}
+
+	public double getCarDistance() {
+		return carDistance;
+	}
+
+	public void setCarDistance(double carDistance) {
+		this.carDistance = carDistance;
 	}
 }

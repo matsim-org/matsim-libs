@@ -27,9 +27,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.management.timer.Timer;
 
@@ -78,7 +80,11 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
 
+import playground.pieter.singapore.utils.postgresql.PostgresType;
+import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
+import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
 import playground.pieter.singapore.utils.postgresql.travelcomponents.Activity;
 import playground.pieter.singapore.utils.postgresql.travelcomponents.Journey;
 import playground.pieter.singapore.utils.postgresql.travelcomponents.Transfer;
@@ -280,7 +286,244 @@ public class HITSAnalyserPostgresqlSummary {
 				travelMinCost, timeFunction, preProcessData);
 		xY2Links = new XY2Links(carFreeSpeedNetwork, null);
 	}
+	public void writeSimulationResultsToSQL(File connectionProperties)
+			throws InstantiationException, IllegalAccessException,
+			ClassNotFoundException, IOException, SQLException,
+			NoConnectionException {
+		System.out.println("starting summary");
+		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
+		String formattedDate = df.format(new Date());
+		// start with activities
+		String actTableName = "m_calibration.hits_activities_"
+				+ formattedDate;
+		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns.add(new PostgresqlColumnDefinition("activity_id",
+				PostgresType.INT, "primary key"));
+		columns.add(new PostgresqlColumnDefinition("person_id",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("pcode",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("type", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("start_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
+		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
+		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS",
+				actTableName, actDBA, 10000, columns);
 
+		String journeyTableName = "m_calibration.hits_journeys_"
+				+ formattedDate;
+		columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns.add(new PostgresqlColumnDefinition("journey_id",
+				PostgresType.INT, "primary key"));
+		columns.add(new PostgresqlColumnDefinition("pax_idx_hits",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("trip_idx_hits",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("start_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("main_mode",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("from_act", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("to_act", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("in_vehicle_distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("in_vehicle_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("access_walk_distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("access_walk_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("access_wait_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("egress_walk_distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("egress_walk_time",
+				PostgresType.INT));
+		DataBaseAdmin journeyDBA = new DataBaseAdmin(connectionProperties);
+		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",
+				journeyTableName, journeyDBA, 5000, columns);
+
+		String tripTableName = "m_calibration.hits_trips_" + formattedDate;
+		columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT,
+				"primary key"));
+		columns.add(new PostgresqlColumnDefinition("journey_id",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("start_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("mode", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("line", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("route", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("boarding_stop",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("alighting_stop",
+				PostgresType.TEXT));
+		DataBaseAdmin tripDBA = new DataBaseAdmin(connectionProperties);
+		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS",
+				tripTableName, tripDBA, 10000, columns);
+
+		String transferTableName = "m_calibration.hits_transfers_"
+				+ formattedDate;
+		columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns.add(new PostgresqlColumnDefinition("transfer_id",
+				PostgresType.INT, "primary key"));
+		columns.add(new PostgresqlColumnDefinition("journey_id",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("start_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("from_trip",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("to_trip", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("walk_distance",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("walk_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("wait_time",
+				PostgresType.INT));
+		DataBaseAdmin transferDBA = new DataBaseAdmin(connectionProperties);
+		PostgresqlCSVWriter transferWriter = new PostgresqlCSVWriter(
+				"TRANSFERS", transferTableName, transferDBA, 1000, columns);
+
+		for (Entry<String, TravellerChain> entry : chains.entrySet()) {
+			String pax_id = entry.getKey().toString();
+			TravellerChain chain = entry.getValue();
+			for (Activity act : chain.getActs()) {
+				Object[] args = { new Integer(act.getElementId()), pax_id,
+						act.getFacility(), act.getType(),
+						new Integer((int) act.getStartTime()),
+						new Integer((int) act.getEndTime()) };
+				activityWriter.addLine(args);
+			}
+			for (Journey journey : chain.getJourneys()) {
+				try {
+
+					Object[] journeyArgs = {
+							new Integer(journey.getElementId()), pax_id,journey.getTrip_idx(),
+							new Integer((int) journey.getStartTime()),
+							new Integer((int) journey.getEndTime()),
+							new Double(journey.getDistance()),
+							journey.getMainMode(),
+							new Integer(journey.getFromAct().getElementId()),
+							new Integer(journey.getToAct().getElementId()),
+							new Double(journey.getInVehDistance()),
+							new Integer((int) journey.getInVehTime()),
+							new Double(journey.getAccessWalkDistance()),
+							new Integer((int) journey.getAccessWalkTime()),
+							new Integer((int) journey.getAccessWaitTime()),
+							new Double(journey.getEgressWalkDistance()),
+							new Integer((int) journey.getEgressWalkTime())
+
+					};
+					journeyWriter.addLine(journeyArgs);
+					if (!journey.isCarJourney()) {
+						for (Trip trip : journey.getTrips()) {
+							Object[] tripArgs = {
+									new Integer(trip.getElementId()),
+									new Integer(journey.getElementId()),
+									new Integer((int) trip.getStartTime()),
+									new Integer((int) trip.getEndTime()),
+									new Double(trip.getDistance()), trip.getMode(),
+									trip.getLine(), trip.getRoute(), trip.getBoardingStop(),
+									trip.getAlightingStop() };
+							tripWriter.addLine(tripArgs);
+						}
+						for (Transfer transfer : journey.getTransfers()) {
+							Object[] transferArgs = {
+									new Integer(transfer.getElementId()),
+									new Integer(journey.getElementId()),
+									new Integer((int) transfer.getStartTime()),
+									new Integer((int) transfer.getEndTime()),
+									new Integer(
+											transfer.getFromTrip().getElementId()),
+									new Integer(transfer.getToTrip().getElementId()),
+									new Double(transfer.getWalkDistance()),
+									new Integer((int) transfer.getWalkTime()),
+									new Integer((int) transfer.getWaitTime()) };
+							transferWriter.addLine(transferArgs);
+						}
+					}else{
+						for (Trip trip : journey.getTrips()) {
+							Object[] tripArgs = {
+									new Integer(trip.getElementId()),
+									new Integer(journey.getElementId()),
+									new Integer((int) trip.getStartTime()),
+									new Integer((int) trip.getEndTime()),
+									new Double(trip.getDistance()), trip.getMode(),
+									"null", "null", "null",
+									"null" };
+							tripWriter.addLine(tripArgs);
+						}
+					}
+				} catch (Exception e) {
+					
+				}
+			}
+
+		}
+		activityWriter.finish();
+		journeyWriter.finish();
+		tripWriter.finish();
+		transferWriter.finish();
+		String indexName = actTableName.substring(14);
+		String indexStatement = "CREATE INDEX " + indexName + "_paxidx ON "
+				+ actTableName + "(person_id);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_pcode ON "
+				+ actTableName + "(pcode);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_type ON "
+				+ actTableName + "(type);\n";
+		DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
+		dba.executeStatement(indexStatement);
+		System.out.println(indexStatement);
+
+		indexName = journeyTableName.substring(14);
+		indexStatement = "CREATE INDEX " + indexName + "_paxidx ON "
+				+ journeyTableName + "(pax_idx_hits);\n";
+		indexStatement = "CREATE INDEX " + indexName + "_tripidx ON "
+				+ journeyTableName + "(trip_idx_hits);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_from_act ON "
+				+ journeyTableName + "(from_act);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_to_act ON "
+				+ journeyTableName + "(to_act);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_mainmode ON "
+				+ journeyTableName + "(main_mode);\n";
+		dba.executeStatement(indexStatement);
+		System.out.println(indexStatement);
+
+		indexName = tripTableName.substring(14);
+		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
+				+ tripTableName + "(journey_id);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_mode ON "
+				+ tripTableName + "(mode);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_line ON "
+				+ tripTableName + "(line);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_route ON "
+				+ tripTableName + "(route);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_board ON "
+				+ tripTableName + "(boarding_stop);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_alight ON "
+				+ tripTableName + "(alighting_stop);\n";
+		dba.executeStatement(indexStatement);
+		System.out.println(indexStatement);
+
+		indexName = transferTableName.substring(14);
+		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
+				+ transferTableName + "(journey_id);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_from_trip ON "
+				+ transferTableName + "(from_trip);\n";
+		indexStatement += "CREATE INDEX " + indexName + "_to_trip ON "
+				+ transferTableName + "(to_trip);\n";
+		dba.executeStatement(indexStatement);
+		System.out.println(indexStatement);
+
+	}
 	public HITSAnalyserPostgresqlSummary() throws ParseException {
 
 		DateFormat outdfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -479,13 +722,17 @@ public class HITSAnalyserPostgresqlSummary {
 	private void compileTravellerChains(double busSearchradius,
 			double mrtSearchRadius) {
 		
-			boolean again = true;
-			while (again) {
+
+
 				System.out
 						.println("Starting summary : " + new java.util.Date());
 				ArrayList<HITSPerson> persons = this.getHitsData().getPersons();
 				this.chains = new HashMap<String, TravellerChain>();
+				int counter = 0;
 				PERSONS: for (HITSPerson p : persons) {
+					counter++;
+					if( counter > 100)
+							return;
 					TravellerChain chain = new TravellerChain();
 					this.chains.put(p.pax_idx, chain);
 					ArrayList<HITSTrip> trips = p.getTrips();
@@ -532,10 +779,11 @@ public class HITSAnalyserPostgresqlSummary {
 //							continue;
 						Journey journey = chain.addJourney();
 						try{
-							journey.setCarJourney(t.mainmode.equals("carDrv"));							
+							journey.setCarJourney(t.mainmode.equals("carDrv"));
 						}catch(NullPointerException ne){
 							
 						}
+						journey.setTrip_idx(t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id);
 						journey.setStartTime(startTime);
 						journey.setFromAct(chain.getActs().getLast());
 						journey.setEndTime(endTime);
@@ -546,13 +794,15 @@ public class HITSAnalyserPostgresqlSummary {
 						act.setType(t.t6_purpose);
 						journey.setToAct(act);
 						if(journey.isCarJourney()){
-							TimeAndDistance carTimeDistance = HITSAnalyser
+							TimeAndDistance carTimeDistance = HITSAnalyserPostgresqlSummary
 							.getCarCongestedShortestPathDistance(
 									origCoord, destCoord, Math.max(0, startTime));
 							Trip trip = journey.addTrip();
 							trip.setStartTime(startTime);
 							trip.setEndTime(startTime+carTimeDistance.time);
 							trip.setDistance(carTimeDistance.distance);
+							journey.setCarDistance(carTimeDistance.distance);
+							trip.setMode("car");
 							
 						}
 						// route transit-only trips using the transit router
@@ -853,26 +1103,9 @@ public class HITSAnalyserPostgresqlSummary {
 
 
 					}
+					
+				}
 
-				}
-			}
-			
-				// freezes program for debugging
-				BufferedReader lilRead = new BufferedReader(
-						new InputStreamReader(System.in));
-				System.out.println("Done : " + new java.util.Date());
-				System.out.print("EXIT? : ");
-				String exiter;
-				try {
-					exiter = lilRead.readLine();
-					if (exiter == "n")
-						again = true;
-					else
-						again = false;
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			
 
 
@@ -881,7 +1114,7 @@ public class HITSAnalyserPostgresqlSummary {
 
 	public static void main(String[] args) throws Exception {
 		HITSAnalyserPostgresqlSummary.createRouters(
-				Arrays.copyOfRange(args, 2, 10), true);
+				Arrays.copyOfRange(args, 2, 10), false);
 		System.out.println(new java.util.Date());
 		HITSAnalyserPostgresqlSummary hp;
 		System.out.println(args[0].equals("sql"));
@@ -929,8 +1162,8 @@ public class HITSAnalyserPostgresqlSummary {
 		// System.out.println("wrote trip summary");
 		// hp.jointTripSummary();
 		// System.out.println("wrote joint trip summary");
-		hp.compileTravellerChains(50, 50);
-
+		hp.compileTravellerChains(100, 100);
+		hp.writeSimulationResultsToSQL(new File("data/matsim2postgres.properties"));
 		System.out.println("exiting...");
 		System.out.println(new java.util.Date());
 	}

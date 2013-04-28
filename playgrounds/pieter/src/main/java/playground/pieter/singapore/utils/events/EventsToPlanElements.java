@@ -79,27 +79,7 @@ import playground.pieter.singapore.utils.postgresql.travelcomponents.*;
  * @author sergioo, pieterfourie
  * 
  */
-class PlanElement {
 
-	public double getDuration() {
-		return endTime - startTime;
-	}
-
-	private static int id = 0; // for enumeration
-
-	double startTime;
-	double endTime = 30 * 3600;
-
-	private int elementId;
-
-	public PlanElement() {
-		elementId = id++;
-	}
-
-	public int getElementId() {
-		return elementId;
-	}
-}
 
 public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
@@ -279,6 +259,9 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				journey.setOrig(network.getLinks().get(event.getLinkId()).getCoord());
 				journey.setFromAct(chain.getActs().getLast());
 				journey.setStartTime(event.getTime());
+				Trip trip = journey.addTrip();
+				trip.setMode("car");
+				trip.setStartTime(event.getTime());
 			} else if (event.getLegMode().equals("pt")) {
 				// person waits till they enter the vehicle
 				journey = chain.getJourneys().getLast();
@@ -418,8 +401,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			} else {
 				TravellerChain chain = chains.get(event.getPersonId());
 				if (chain.inCar) {
-					chain.getJourneys().getLast().incrementCarDistance( network.getLinks()
+					Journey journey = chain.getJourneys().getLast();
+					journey.incrementCarDistance( network.getLinks()
 							.get(event.getLinkId()).getLength());
+					journey.getTrips().getLast().setDistance(journey.getDistance());
 				}
 			}
 		} catch (Exception e) {
