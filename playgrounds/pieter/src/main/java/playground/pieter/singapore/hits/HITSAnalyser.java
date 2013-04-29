@@ -537,6 +537,13 @@ public class HITSAnalyser {
 						double startTime = ((double) (t.t3_starttime_24h
 								.getTime() - this.referenceDate.getTime()))
 								/ (double) Timer.ONE_SECOND;
+						while(startTime<0 || startTime>24*3600){
+							if(startTime<0){
+								startTime = 24*3600+startTime;
+							}else if(startTime>24*3600){
+								startTime = startTime-24*3600;
+							}							
+						}
 						
 							origCoord = HITSAnalyser.zip2Coord
 									.get(t.p13d_origpcode);

@@ -143,8 +143,10 @@ public class HITSAnalyserPostgresqlSummary {
 	private static String[] LRT_LINES;
 	private static HashMap<String, Coord> mrtCoords;
 	private static HashMap<String, Coord> lrtCoords;
+	public static boolean freeSpeedRouting;
 
-	static void createRouters(String[] args, boolean freeSpeedRouting) {
+	static void createRouters(String[] args, boolean fSR) {
+		freeSpeedRouting = fSR;
 		scenario = ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario)).readFile(args[1]);
@@ -291,11 +293,11 @@ public class HITSAnalyserPostgresqlSummary {
 			ClassNotFoundException, IOException, SQLException,
 			NoConnectionException {
 		System.out.println("starting summary");
-		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
-		String formattedDate = df.format(new Date());
+		DateFormat df = new SimpleDateFormat("yyyy_MM_dd") ;
+		String postScript = df.format(new Date())+ (freeSpeedRouting?"freespeedrouted":"");
 		// start with activities
 		String actTableName = "m_calibration.hits_activities_"
-				+ formattedDate;
+				+ postScript;
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("activity_id",
 				PostgresType.INT, "primary key"));
@@ -312,7 +314,7 @@ public class HITSAnalyserPostgresqlSummary {
 				actTableName, actDBA, 10000, columns);
 
 		String journeyTableName = "m_calibration.hits_journeys_"
-				+ formattedDate;
+				+ postScript;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT, "primary key"));
@@ -347,7 +349,7 @@ public class HITSAnalyserPostgresqlSummary {
 		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",
 				journeyTableName, journeyDBA, 5000, columns);
 
-		String tripTableName = "m_calibration.hits_trips_" + formattedDate;
+		String tripTableName = "m_calibration.hits_trips_" + postScript;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT,
 				"primary key"));
@@ -370,7 +372,7 @@ public class HITSAnalyserPostgresqlSummary {
 				tripTableName, tripDBA, 10000, columns);
 
 		String transferTableName = "m_calibration.hits_transfers_"
-				+ formattedDate;
+				+ postScript;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("transfer_id",
 				PostgresType.INT, "primary key"));
@@ -721,400 +723,370 @@ public class HITSAnalyserPostgresqlSummary {
 
 	private void compileTravellerChains(double busSearchradius,
 			double mrtSearchRadius) {
-		
-
-
-				System.out
-						.println("Starting summary : " + new java.util.Date());
-				ArrayList<HITSPerson> persons = this.getHitsData().getPersons();
-				this.chains = new HashMap<String, TravellerChain>();
-				int counter = 0;
-				PERSONS: for (HITSPerson p : persons) {
-					counter++;
-					if( counter > 100)
-							return;
-					TravellerChain chain = new TravellerChain();
-					this.chains.put(p.pax_idx, chain);
-					ArrayList<HITSTrip> trips = p.getTrips();
-					int tripcount = trips.size();
-					for (HITSTrip t : trips) {
-						Coord origCoord;
-						Coord destCoord;						
-						double startTime = ((double) (t.t3_starttime_24h
-								.getTime() - this.referenceDate.getTime()))
-								/ (double) Timer.ONE_SECOND;
-						double endTime = ((double) (t.t4_endtime_24h.getTime() - this.referenceDate
-								.getTime())) / (double) Timer.ONE_SECOND;
-
-						origCoord = HITSAnalyserPostgresqlSummary.zip2Coord
-								.get(t.p13d_origpcode);
-						destCoord = HITSAnalyserPostgresqlSummary.zip2Coord
-								.get(t.t2_destpcode);
-						if (origCoord == null) {
-							System.out.println("Problem ZIP : "
-									+ t.p13d_origpcode);
-							continue PERSONS;
-						} else if (destCoord == null) {
-							System.out.println("Problem ZIP : "
-									+ t.t2_destpcode);
-							continue PERSONS;
-						}
-						if (t.trip_id == 1) {
-							Activity home = chain.addActivity();
-							home.setEndTime(startTime);
-							home.setFacility(new IdImpl(t.p13d_origpcode));
-							home.setStartTime(Math.min(startTime, 0));
-							home.setType("home");
-						} else {
-							// get the last activity created
-							Activity activity = chain.getActs().getLast();
-							activity.setEndTime(startTime);
-						}
-						// add the journey
-						
-//						if (!(t.mainmode.equals("publBus")
-//								|| t.mainmode.equals("mrt")
-//								|| t.mainmode.equals("lrt") || t.mainmode
-//								.equals("carDrv")))
-//							continue;
-						Journey journey = chain.addJourney();
-						try{
-							journey.setCarJourney(t.mainmode.equals("carDrv"));
-						}catch(NullPointerException ne){
-							
-						}
-						journey.setTrip_idx(t.h1_hhid+"_"+t.pax_id+"_"+t.trip_id);
-						journey.setStartTime(startTime);
-						journey.setFromAct(chain.getActs().getLast());
-						journey.setEndTime(endTime);
-						// create the next activity
-						Activity act = chain.addActivity();
-						act.setFacility(new IdImpl(t.t2_destpcode));
-						act.setStartTime(endTime);
-						act.setType(t.t6_purpose);
-						journey.setToAct(act);
-						if(journey.isCarJourney()){
-							TimeAndDistance carTimeDistance = HITSAnalyserPostgresqlSummary
-							.getCarCongestedShortestPathDistance(
-									origCoord, destCoord, Math.max(0, startTime));
-							Trip trip = journey.addTrip();
-							trip.setStartTime(startTime);
-							trip.setEndTime(startTime+carTimeDistance.time);
-							trip.setDistance(carTimeDistance.distance);
-							journey.setCarDistance(carTimeDistance.distance);
-							trip.setMode("car");
-							
-						}
-						// route transit-only trips using the transit router
-						if (t.stageChainSimple.equals(t.stageChainTransit)) {
-							Set<TransitLine> lines = new HashSet<TransitLine>();
-							Coord orig = origCoord;
-							Coord dest = destCoord;
-							Coord interimOrig = orig;
-							Coord interimDest = dest;
-							Path path = null;
-							// deal with the 7 most common cases for now
-							HITSStage stage = t.getStages().get(0);
-							boolean busCheck = stage.t10_mode.equals("publBus");
-							boolean mrtCheck = stage.t10_mode.equals("mrt");
-							boolean lrtCheck = stage.t10_mode.equals("lrt");
-							List<TransitStageRoutingInput> transitStages = new ArrayList<TransitStageRoutingInput>();
-							boolean doneCompilingTransitStages = false;
-							STAGES: while (!doneCompilingTransitStages) {
-								// System.out.println(p.pax_idx + "_"
-								// + t.trip_id);
-								if (busCheck) {
-									lines.add(HITSAnalyserPostgresqlSummary.scenario
-											.getTransitSchedule()
-											.getTransitLines()
-											.get(new IdImpl(
-													stage.t11_boardsvcstn)));
-									if (stage.nextStage != null) {
-										if (stage.nextStage.t10_mode
-												.equals("publBus")) {
-											stage = stage.nextStage;
-											continue STAGES;
-										} else {
-
-											// going to an lrt or mrt
-											// station
-											busCheck = false;
-											mrtCheck = stage.nextStage.t10_mode
-													.equals("mrt");
-											lrtCheck = stage.nextStage.t10_mode
-													.equals("lrt");
-											interimDest = mrtCheck ? mrtCoords
-													.get(stage.nextStage.t11_boardsvcstn)
-													: lrtCoords
-															.get(stage.nextStage.t11_boardsvcstn);
-										}
-										transitStages
-												.add(new TransitStageRoutingInput(
-														interimOrig,
-														interimDest, lines,
-														true));
-										lines = new HashSet<TransitLine>();
-										interimOrig = interimDest;
-										interimDest = dest;
-										stage = stage.nextStage;
-										continue STAGES;
-									}// next stage is null
-									transitStages
-											.add(new TransitStageRoutingInput(
-													interimOrig, interimDest,
-													lines, true));
-									doneCompilingTransitStages = true;
-								}// end of bus stage chain check
-								if (mrtCheck || lrtCheck) {
-									HashMap<String, Coord> theCoords = mrtCheck ? mrtCoords
-											: lrtCoords;
-									lines = mrtCheck ? mrtLines : lrtLines;
-									interimOrig = theCoords
-											.get(stage.t11_boardsvcstn);
-									interimDest = theCoords
-											.get(stage.t12_alightstn);
-									transitStages
-											.add(new TransitStageRoutingInput(
-													interimOrig, interimDest,
-													lines, false));
-									if (stage.nextStage != null) {
-										busCheck = stage.nextStage.t10_mode
-												.equals("publBus");
-										mrtCheck = stage.nextStage.t10_mode
-												.equals("mrt");
-										lrtCheck = stage.nextStage.t10_mode
-												.equals("lrt");
-										lines = new HashSet<TransitLine>();
-										interimOrig = interimDest;
-										interimDest = dest;
-										stage = stage.nextStage;
-										continue STAGES;
-									} else {
-										doneCompilingTransitStages = true;
-
-									}
-								}
-							}
-
-							// traverse the list of transitStages and
-							// generate paths
-							double linkStartTime = startTime;
-							Coord walkOrigin = orig;
-
-							int stage_id = 0;
-							PATHS: for (int i = 0; i < transitStages.size(); i++) {
-								stage_id++;
-								int substage_id = 0;
-								TransitStageRoutingInput ts = transitStages
-										.get(i);
-								transitRouter.setAllowedLines(ts.lines);
-								// transitScheduleRouter.setA
-								double[] radiusFactors = { 1.0, 1.1, 1.25, 1.5,
-										2, 2.5, 3, 5, 10, 25 };
-								int radiusIdx = 0;
-								path = null;
-								while (path == null
-										&& radiusIdx < radiusFactors.length) {
-									if (ts.busStage) {
-										HITSAnalyserPostgresqlSummary.transitRouterConfig
-												.setSearchradius(busSearchradius
-														* radiusFactors[radiusIdx]);
-									} else {
-										HITSAnalyserPostgresqlSummary.transitRouterConfig
-												.setSearchradius(mrtSearchRadius
-														* radiusFactors[radiusIdx]);
-									}
-									try {
-										path = transitRouter.calcPathRoute(
-												ts.orig, ts.dest,
-												Math.max(0, linkStartTime),
-												null);
-									} catch (NullPointerException e) {
-
-									}
-									radiusIdx++;
-
-								}
-								if (path == null) {
-									System.out.println("Cannot route "
-											+ t.h1_hhid + "_" + t.pax_id + "_"
-											+ t.trip_id + "\t" + orig + "\t"
-											+ dest + "\t line: " + lines);
-									break PATHS;
-								}
-
-								if (i == 0) {
-									Walk walk = journey.addWalk();
-									Coord boardCoord = path.nodes.get(0)
-											.getCoord();
-									double walkDistanceAccessFromRouter = CoordUtils
-											.calcDistance(orig, boardCoord);
-
-									double walkTimeAccessFromRouter = walkDistanceAccessFromRouter
-											/ transitRouterConfig
-													.getBeelineWalkSpeed();
-									walk.setStartTime(linkStartTime);
-									linkStartTime += walkTimeAccessFromRouter;
-									walk.setEndTime(linkStartTime);
-									walk.setDistance(walkDistanceAccessFromRouter);
-									walk.setAccessWalk(true);
-									substage_id++;
-
-								}
-								if (i > 0) {// in-between transitStage
-									Coord boardCoord = path.nodes.get(0)
-											.getCoord();
-									double interModalTransferDistance = CoordUtils
-											.calcDistance(walkOrigin,
-													boardCoord);
-									double interModalTransferTime = interModalTransferDistance
-											/ transitRouterConfig
-													.getBeelineWalkSpeed();
-									Walk walk = journey.addWalk();
-									walk.setStartTime(linkStartTime);
-									walk.setDistance(interModalTransferDistance);
-									substage_id++;
-									linkStartTime += interModalTransferTime;
-									walk.setEndTime(linkStartTime);
-								}
-								walkOrigin = path.nodes.get(
-										path.nodes.size() - 1).getCoord();
-								boolean inVehicle = false;
-
-								for (int j = 0; j < path.links.size(); j++) {
-									Link l = path.links.get(j);
-									TransitRouterNetworkWW.TransitRouterNetworkLink transitLink = (TransitRouterNetworkLink) l;
-									if (transitLink.getRoute() != null) {
-										// in line link
-										if (!inVehicle) {
-											inVehicle = true;
-											Trip trip = journey.addTrip();
-											trip.setStartTime(linkStartTime);
-											trip.setBoardingStop(transitLink
-													.getFromNode().getId());
-											trip.setLine(transitLink.getLine()
-													.getId());
-											trip.setRoute(transitLink
-													.getRoute().getId());
-											trip.setMode(getMode(ts.busStage,
-													trip.getLine()));
-											trip.setEndTime(linkStartTime);
-											trip.setDistance(0);
-											if (journey.getPossibleTransfer() != null) {
-												Transfer transfer = journey
-														.getPossibleTransfer();
-												transfer.setToTrip(trip);
-												transfer.setEndTime(linkStartTime);
-												journey.addTransfer(transfer);
-												journey.setPossibleTransfer(null);
-											}
-											substage_id++;
-										}
-										Trip trip = journey.getTrips()
-												.getLast();
-										double linkLength = transitLink
-												.getLength();
-										trip.incrementDistance(linkLength);
-										double linkTime = transitTravelFunction
-												.getLinkTravelTime(transitLink,
-														Math.max(0,
-																linkStartTime),
-														null, null);
-										trip.incrementTime(linkTime);
-										linkStartTime += linkTime;
-									} else if (transitLink.toNode.route == null) {
-										// transfer link
-										double linkLength = transitLink
-												.getLength();
-										double linkTime = transitTravelFunction
-												.getLinkTravelTime(transitLink,
-														linkStartTime, null,
-														null);
-										Walk walk;
-										if(substage_id>1){
-											Trip trip = journey.getTrips()
-													.getLast();
-											trip.setAlightingStop(transitLink
-													.getFromNode().getId());											
-											Transfer transfer = new Transfer();
-											journey.setPossibleTransfer(transfer);
-											transfer.setFromTrip(trip);
-											transfer.setStartTime(linkStartTime);
-											walk = journey.addWalk();
-											walk.setStartTime(linkStartTime);
-											walk.setDistance(linkLength);
-											transfer.getWalks().add(walk);
-										}else{
-											//this is still part of the access walk
-											walk = journey.getWalks().getLast();
-											walk.setDistance(walk.getDistance()+linkLength);
-										}
-										if (j + 2 <= path.links.size()) {
-											stage_id++;
-											substage_id = 1;
-										} else {
-											substage_id++;
-										}
-										inVehicle = false;
-										linkStartTime += linkTime;
-										walk.setEndTime(linkStartTime);
-
-									} else if (transitLink.fromNode.route == null) {
-										// wait link
-										substage_id++;
-										double linkTime = transitTravelFunction
-												.getLinkTravelTime(transitLink,
-														Math.max(0,
-																linkStartTime),
-														null, null);
-
-										Wait wait = journey.addWait();
-										wait.setStartTime(linkStartTime);
-										linkStartTime += linkTime;
-										wait.setEndTime(linkStartTime);
-										if (i == 0 && j == 0) {
-											wait.setAccessWait(true);
-										} 
-
-									} else
-										throw new RuntimeException(
-												"Bad transit router link");
-								}// end path traversal
-								if (i + 1 == transitStages.size()) {
-									Coord alightCoord = path.nodes.get(
-											path.nodes.size() - 1).getCoord();
-									substage_id++;
-
-									double walkDistanceEgressFromRouter = CoordUtils
-											.calcDistance(alightCoord, dest);
-									double walkTimeEgressFromRouter = walkDistanceEgressFromRouter
-											/ transitRouterConfig
-													.getBeelineWalkSpeed();
-									Walk walk = journey.addWalk();
-									walk.setStartTime(linkStartTime);
-									walk.setEndTime(linkStartTime+walkTimeEgressFromRouter);
-									walk.setDistance(walkDistanceEgressFromRouter);
-									walk.setEgressWalk(true);
-								}
-							}
-
-
-						}
-
-
+		System.out.println("Starting summary : " + new java.util.Date());
+		ArrayList<HITSPerson> persons = this.getHitsData().getPersons();
+		this.chains = new HashMap<String, TravellerChain>();
+		int counter = 0;
+		PERSONS: for (HITSPerson p : persons) {
+			counter++;
+			// if( counter > 100)
+			// return;
+			TravellerChain chain = new TravellerChain();
+			this.chains.put(p.pax_idx, chain);
+			ArrayList<HITSTrip> trips = p.getTrips();
+			int tripcount = trips.size();
+			for (HITSTrip t : trips) {
+				Coord origCoord;
+				Coord destCoord;
+				double startTime = ((double) (t.t3_starttime_24h.getTime() - this.referenceDate
+						.getTime())) / (double) Timer.ONE_SECOND;
+				while (startTime < 0 || startTime > 24 * 3600) {
+					if (startTime < 0) {
+						startTime = 24 * 3600 + startTime;
+					} else if (startTime > 24 * 3600) {
+						startTime = startTime - 24 * 3600;
 					}
-					
+				}
+				double endTime = ((double) (t.t4_endtime_24h.getTime() - this.referenceDate
+						.getTime())) / (double) Timer.ONE_SECOND;
+				while (endTime < 0 || endTime > 24 * 3600) {
+					if (endTime < 0) {
+						endTime = 24 * 3600 + endTime;
+					} else if (endTime > 24 * 3600) {
+						endTime = endTime - 24 * 3600;
+					}
 				}
 
-			
+				origCoord = HITSAnalyserPostgresqlSummary.zip2Coord
+						.get(t.p13d_origpcode);
+				destCoord = HITSAnalyserPostgresqlSummary.zip2Coord
+						.get(t.t2_destpcode);
+				if (origCoord == null) {
+					System.out.println("Problem ZIP : " + t.p13d_origpcode);
+					continue PERSONS;
+				} else if (destCoord == null) {
+					System.out.println("Problem ZIP : " + t.t2_destpcode);
+					continue PERSONS;
+				}
+				if (t.trip_id == 1) {
+					Activity home = chain.addActivity();
+					home.setEndTime(startTime);
+					home.setFacility(new IdImpl(t.p13d_origpcode));
+					home.setStartTime(Math.min(startTime, 0));
+					home.setType("home");
+				} else {
+					// get the last activity created
+					Activity activity = chain.getActs().getLast();
+					activity.setEndTime(startTime);
+				}
+				// add the journey
 
+				// if (!(t.mainmode.equals("publBus")
+				// || t.mainmode.equals("mrt")
+				// || t.mainmode.equals("lrt") || t.mainmode
+				// .equals("carDrv")))
+				// continue;
+				Journey journey = chain.addJourney();
+				try {
+					journey.setCarJourney(t.mainmode.equals("carDrv"));
+				} catch (NullPointerException ne) {
 
+				}
+				journey.setTrip_idx(t.h1_hhid + "_" + t.pax_id + "_"
+						+ t.trip_id);
+				journey.setStartTime(startTime);
+				journey.setFromAct(chain.getActs().getLast());
+				journey.setEndTime(endTime);
+				// create the next activity
+				Activity act = chain.addActivity();
+				act.setFacility(new IdImpl(t.t2_destpcode));
+				act.setStartTime(endTime);
+				act.setType(t.t6_purpose);
+				journey.setToAct(act);
+				if (journey.isCarJourney()) {
+					TimeAndDistance carTimeDistance = HITSAnalyserPostgresqlSummary
+							.getCarCongestedShortestPathDistance(origCoord,
+									destCoord, Math.max(0, startTime));
+					Trip trip = journey.addTrip();
+					trip.setStartTime(startTime);
+					trip.setEndTime(startTime + carTimeDistance.time);
+					trip.setDistance(carTimeDistance.distance);
+					journey.setCarDistance(carTimeDistance.distance);
+					trip.setMode("car");
 
+				}
+				// route transit-only trips using the transit router
+				if (t.stageChainSimple.equals(t.stageChainTransit)) {
+					Set<TransitLine> lines = new HashSet<TransitLine>();
+					Coord orig = origCoord;
+					Coord dest = destCoord;
+					Coord interimOrig = orig;
+					Coord interimDest = dest;
+					Path path = null;
+					// deal with the 7 most common cases for now
+					HITSStage stage = t.getStages().get(0);
+					boolean busCheck = stage.t10_mode.equals("publBus");
+					boolean mrtCheck = stage.t10_mode.equals("mrt");
+					boolean lrtCheck = stage.t10_mode.equals("lrt");
+					List<TransitStageRoutingInput> transitStages = new ArrayList<TransitStageRoutingInput>();
+					boolean doneCompilingTransitStages = false;
+					STAGES: while (!doneCompilingTransitStages) {
+						// System.out.println(p.pax_idx + "_"
+						// + t.trip_id);
+						if (busCheck) {
+							lines.add(HITSAnalyserPostgresqlSummary.scenario
+									.getTransitSchedule().getTransitLines()
+									.get(new IdImpl(stage.t11_boardsvcstn)));
+							if (stage.nextStage != null) {
+								if (stage.nextStage.t10_mode.equals("publBus")) {
+									stage = stage.nextStage;
+									continue STAGES;
+								} else {
+
+									// going to an lrt or mrt
+									// station
+									busCheck = false;
+									mrtCheck = stage.nextStage.t10_mode
+											.equals("mrt");
+									lrtCheck = stage.nextStage.t10_mode
+											.equals("lrt");
+									interimDest = mrtCheck ? mrtCoords
+											.get(stage.nextStage.t11_boardsvcstn)
+											: lrtCoords
+													.get(stage.nextStage.t11_boardsvcstn);
+								}
+								transitStages.add(new TransitStageRoutingInput(
+										interimOrig, interimDest, lines, true));
+								lines = new HashSet<TransitLine>();
+								interimOrig = interimDest;
+								interimDest = dest;
+								stage = stage.nextStage;
+								continue STAGES;
+							}// next stage is null
+							transitStages.add(new TransitStageRoutingInput(
+									interimOrig, interimDest, lines, true));
+							doneCompilingTransitStages = true;
+						}// end of bus stage chain check
+						if (mrtCheck || lrtCheck) {
+							HashMap<String, Coord> theCoords = mrtCheck ? mrtCoords
+									: lrtCoords;
+							lines = mrtCheck ? mrtLines : lrtLines;
+							interimOrig = theCoords.get(stage.t11_boardsvcstn);
+							interimDest = theCoords.get(stage.t12_alightstn);
+							transitStages.add(new TransitStageRoutingInput(
+									interimOrig, interimDest, lines, false));
+							if (stage.nextStage != null) {
+								busCheck = stage.nextStage.t10_mode
+										.equals("publBus");
+								mrtCheck = stage.nextStage.t10_mode
+										.equals("mrt");
+								lrtCheck = stage.nextStage.t10_mode
+										.equals("lrt");
+								lines = new HashSet<TransitLine>();
+								interimOrig = interimDest;
+								interimDest = dest;
+								stage = stage.nextStage;
+								continue STAGES;
+							} else {
+								doneCompilingTransitStages = true;
+
+							}
+						}
+					}
+
+					// traverse the list of transitStages and
+					// generate paths
+					double linkStartTime = startTime;
+					Coord walkOrigin = orig;
+
+					int stage_id = 0;
+					PATHS: for (int i = 0; i < transitStages.size(); i++) {
+						stage_id++;
+						int substage_id = 0;
+						TransitStageRoutingInput ts = transitStages.get(i);
+						transitRouter.setAllowedLines(ts.lines);
+						// transitScheduleRouter.setA
+						double[] radiusFactors = { 1.0, 1.1, 1.25, 1.5, 2, 2.5,
+								3, 5, 10, 25 };
+						int radiusIdx = 0;
+						path = null;
+						while (path == null && radiusIdx < radiusFactors.length) {
+							if (ts.busStage) {
+								HITSAnalyserPostgresqlSummary.transitRouterConfig
+										.setSearchradius(busSearchradius
+												* radiusFactors[radiusIdx]);
+							} else {
+								HITSAnalyserPostgresqlSummary.transitRouterConfig
+										.setSearchradius(mrtSearchRadius
+												* radiusFactors[radiusIdx]);
+							}
+							try {
+								path = transitRouter.calcPathRoute(ts.orig,
+										ts.dest, Math.max(0, linkStartTime),
+										null);
+							} catch (NullPointerException e) {
+
+							}
+							radiusIdx++;
+
+						}
+						if (path == null) {
+							System.out.println("Cannot route " + t.h1_hhid
+									+ "_" + t.pax_id + "_" + t.trip_id + "\t"
+									+ orig + "\t" + dest + "\t line: " + lines);
+							break PATHS;
+						}
+
+						if (i == 0) {
+							Walk walk = journey.addWalk();
+							Coord boardCoord = path.nodes.get(0).getCoord();
+							double walkDistanceAccessFromRouter = CoordUtils
+									.calcDistance(orig, boardCoord);
+
+							double walkTimeAccessFromRouter = walkDistanceAccessFromRouter
+									/ transitRouterConfig.getBeelineWalkSpeed();
+							walk.setStartTime(linkStartTime);
+							linkStartTime += walkTimeAccessFromRouter;
+							walk.setEndTime(linkStartTime);
+							walk.setDistance(walkDistanceAccessFromRouter);
+							walk.setAccessWalk(true);
+							substage_id++;
+
+						}
+						if (i > 0) {// in-between transitStage
+							Coord boardCoord = path.nodes.get(0).getCoord();
+							double interModalTransferDistance = CoordUtils
+									.calcDistance(walkOrigin, boardCoord);
+							double interModalTransferTime = interModalTransferDistance
+									/ transitRouterConfig.getBeelineWalkSpeed();
+							Walk walk = journey.addWalk();
+							walk.setStartTime(linkStartTime);
+							walk.setDistance(interModalTransferDistance);
+							substage_id++;
+							linkStartTime += interModalTransferTime;
+							walk.setEndTime(linkStartTime);
+						}
+						walkOrigin = path.nodes.get(path.nodes.size() - 1)
+								.getCoord();
+						boolean inVehicle = false;
+
+						for (int j = 0; j < path.links.size(); j++) {
+							Link l = path.links.get(j);
+							TransitRouterNetworkWW.TransitRouterNetworkLink transitLink = (TransitRouterNetworkLink) l;
+							if (transitLink.getRoute() != null) {
+								// in line link
+								if (!inVehicle) {
+									inVehicle = true;
+									Trip trip = journey.addTrip();
+									trip.setStartTime(linkStartTime);
+									trip.setBoardingStop(transitLink
+											.getFromNode().getId());
+									trip.setLine(transitLink.getLine().getId());
+									trip.setRoute(transitLink.getRoute()
+											.getId());
+									trip.setMode(getMode(ts.busStage,
+											trip.getLine()));
+									trip.setEndTime(linkStartTime);
+									trip.setDistance(0);
+									if (journey.getPossibleTransfer() != null) {
+										Transfer transfer = journey
+												.getPossibleTransfer();
+										transfer.setToTrip(trip);
+										transfer.setEndTime(linkStartTime);
+										journey.addTransfer(transfer);
+										journey.setPossibleTransfer(null);
+									}
+									substage_id++;
+								}
+								Trip trip = journey.getTrips().getLast();
+								double linkLength = transitLink.getLength();
+								trip.incrementDistance(linkLength);
+								double linkTime = transitTravelFunction
+										.getLinkTravelTime(transitLink,
+												Math.max(0, linkStartTime),
+												null, null);
+								trip.incrementTime(linkTime);
+								linkStartTime += linkTime;
+							} else if (transitLink.toNode.route == null) {
+								// transfer link
+								double linkLength = transitLink.getLength();
+								double linkTime = transitTravelFunction
+										.getLinkTravelTime(transitLink,
+												linkStartTime, null, null);
+								Walk walk;
+								if (substage_id > 1) {
+									Trip trip = journey.getTrips().getLast();
+									trip.setAlightingStop(transitLink
+											.getFromNode().getId());
+									Transfer transfer = new Transfer();
+									journey.setPossibleTransfer(transfer);
+									transfer.setFromTrip(trip);
+									transfer.setStartTime(linkStartTime);
+									walk = journey.addWalk();
+									walk.setStartTime(linkStartTime);
+									walk.setDistance(linkLength);
+									transfer.getWalks().add(walk);
+								} else {
+									// this is still part of the access walk
+									walk = journey.getWalks().getLast();
+									walk.setDistance(walk.getDistance()
+											+ linkLength);
+								}
+								if (j + 2 <= path.links.size()) {
+									stage_id++;
+									substage_id = 1;
+								} else {
+									substage_id++;
+								}
+								inVehicle = false;
+								linkStartTime += linkTime;
+								walk.setEndTime(linkStartTime);
+
+							} else if (transitLink.fromNode.route == null) {
+								// wait link
+								substage_id++;
+								double linkTime = transitTravelFunction
+										.getLinkTravelTime(transitLink,
+												Math.max(0, linkStartTime),
+												null, null);
+
+								Wait wait = journey.addWait();
+								wait.setStartTime(linkStartTime);
+								linkStartTime += linkTime;
+								wait.setEndTime(linkStartTime);
+								if (i == 0 && j == 0) {
+									wait.setAccessWait(true);
+								}
+
+							} else
+								throw new RuntimeException(
+										"Bad transit router link");
+						}// end path traversal
+						if (i + 1 == transitStages.size()) {
+							Coord alightCoord = path.nodes.get(
+									path.nodes.size() - 1).getCoord();
+							substage_id++;
+
+							double walkDistanceEgressFromRouter = CoordUtils
+									.calcDistance(alightCoord, dest);
+							double walkTimeEgressFromRouter = walkDistanceEgressFromRouter
+									/ transitRouterConfig.getBeelineWalkSpeed();
+							Walk walk = journey.addWalk();
+							walk.setStartTime(linkStartTime);
+							walk.setEndTime(linkStartTime
+									+ walkTimeEgressFromRouter);
+							walk.setDistance(walkDistanceEgressFromRouter);
+							walk.setEgressWalk(true);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
 		HITSAnalyserPostgresqlSummary.createRouters(
-				Arrays.copyOfRange(args, 2, 10), false);
+				Arrays.copyOfRange(args, 3, 11), Boolean.parseBoolean(args[2]));
 		System.out.println(new java.util.Date());
 		HITSAnalyserPostgresqlSummary hp;
 		System.out.println(args[0].equals("sql"));
