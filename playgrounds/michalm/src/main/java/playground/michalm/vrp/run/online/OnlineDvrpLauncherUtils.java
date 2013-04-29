@@ -47,14 +47,14 @@ public class OnlineDvrpLauncherUtils
         EVENTS_24_H(24 * 60 * 60), // based on eventsFileName, with 24-hour time interval
         EVENTS_15_MIN(15 * 60); // based on eventsFileName, with 15-minute time interval
 
-        /*package*/ final int travelTimeBinSize;
-        /*package*/ final int numSlots;
+        /*package*/final int travelTimeBinSize;
+        /*package*/final int numSlots;
 
 
         private TravelTimeSource(int travelTimeBinSize)
         {
             this.travelTimeBinSize = travelTimeBinSize;
-            this.numSlots = 24 * 60 * 60 / travelTimeBinSize;//to cover 24 hours
+            this.numSlots = 24 * 60 * 60 / travelTimeBinSize;// to cover 24 hours
         }
     }
 
@@ -66,6 +66,9 @@ public class OnlineDvrpLauncherUtils
     }
 
 
+    /**
+     * Mandatory
+     */
     public static Scenario initMatsimData(String netFileName, String plansFileName,
             String taxiCustomersFileName)
     {
@@ -92,6 +95,9 @@ public class OnlineDvrpLauncherUtils
     }
 
 
+    /**
+     * Mandatory
+     */
     public static MatsimVrpData initMatsimVrpData(Scenario scenario, TravelTimeSource ttimeSource,
             TravelCostSource tcostSource, String eventsFileName, String depotsFileName)
     {
@@ -152,40 +158,43 @@ public class OnlineDvrpLauncherUtils
 
         return new MatsimVrpData(vrpData, scenario);
     }
-    
-    
+
+
+    /**
+     * Mandatory
+     */
     public static QSim initQSim(MatsimVrpData data, TaxiOptimizer optimizer)
     {
         Scenario scenario = data.getScenario();
-        
+
         QSimConfigGroup qSimConfig = scenario.getConfig().getQSimConfigGroup();
-        
+
         if (qSimConfig == null) {
             qSimConfig = new QSimConfigGroup();
             scenario.getConfig().addQSimConfigGroup(qSimConfig);
         }
-        
+
         qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
         qSimConfig.setRemoveStuckVehicles(false);
 
         EventsManager events = EventsUtils.createEventsManager();
-        
+
         QSim qSim = new QSim(scenario, events);
-        
+
         ActivityEngine activityEngine = new ActivityEngine();
         qSim.addMobsimEngine(activityEngine);
         qSim.addActivityHandler(activityEngine);
-        
+
         QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim);
         qSim.addMobsimEngine(netsimEngine);
         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-        
+
         TeleportationEngine teleportationEngine = new TeleportationEngine();
         qSim.addMobsimEngine(teleportationEngine);
-        
+
         TaxiSimEngine taxiSimEngine = new TaxiSimEngine(qSim, data, optimizer);
         qSim.addMobsimEngine(taxiSimEngine);
-        
+
         qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
                 new DefaultAgentFactory(qSim), qSim));
         qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
@@ -194,6 +203,10 @@ public class OnlineDvrpLauncherUtils
         return qSim;
     }
 
+
+    /**
+     * Optional
+     */
     public static void addChartFileOptimizerListeners(VrpOptimizer optimizer, String vrpOutDirName)
     {
         optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
@@ -214,6 +227,9 @@ public class OnlineDvrpLauncherUtils
     }
 
 
+    /**
+     * Optional
+     */
     public static void writeHistograms(LegHistogram legHistogram, String histogramOutDirName)
     {
         new File(histogramOutDirName).mkdir();
