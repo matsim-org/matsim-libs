@@ -70,7 +70,6 @@ import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 public class RunUtils {
 	private static final Logger log =
 		Logger.getLogger(RunUtils.class);
-	private static final int GRAPH_WRITE_INTERVAL = 100;
 
 	private RunUtils() {}
 
@@ -131,12 +130,13 @@ public class RunUtils {
 	}
 
 	public static void loadDefaultAnalysis(
+			final int graphWriteInterval,
 			final FixedGroupsIdentifier cliques,
 			final GroupStrategyManager strategyManager,
 			final ImmutableJointController controller) {
 		controller.addControlerListener(
 				new LegHistogramListenerWithoutControler(
-					GRAPH_WRITE_INTERVAL,
+					graphWriteInterval,
 					controller.getRegistry().getEvents(),
 					controller.getControlerIO() ));
 
@@ -146,14 +146,14 @@ public class RunUtils {
 
 		controller.addControlerListener(
 				new FilteredScoreStats(
-					GRAPH_WRITE_INTERVAL,
+					graphWriteInterval,
 					controller.getControlerIO(),
 					controller.getRegistry().getScenario(),
 					groupIdentifier));
 
 		controller.addControlerListener(
 				new JointPlanSizeStats(
-					GRAPH_WRITE_INTERVAL,
+					graphWriteInterval,
 					controller.getControlerIO(),
 					controller.getRegistry().getScenario(),
 					groupIdentifier));
@@ -166,7 +166,7 @@ public class RunUtils {
 		if ( weights.getJointTripMutationWeight() > 0 ) {
 			controller.addControlerListener(
 					new JointTripsStats(
-						GRAPH_WRITE_INTERVAL,
+						graphWriteInterval,
 						controller.getControlerIO(),
 						controller.getRegistry().getScenario(),
 						groupIdentifier));
@@ -178,7 +178,7 @@ public class RunUtils {
 		actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 		controller.addControlerListener(
 				new TripModeShares(
-					GRAPH_WRITE_INTERVAL,
+					graphWriteInterval,
 					controller.getControlerIO(),
 					controller.getRegistry().getScenario(),
 					new MainModeIdentifier() {

@@ -158,7 +158,11 @@ public class RunCliquesWithHardCodedStrategies {
 						strategyManager));
 
 		if (produceAnalysis) {
-			RunUtils.loadDefaultAnalysis( cliques , strategyManager , controller );
+			RunUtils.loadDefaultAnalysis(
+					weights.getGraphWriteInterval(),
+					cliques,
+					strategyManager,
+					controller );
 		}
 
 		if ( weights.getCheckConsistency() ) {

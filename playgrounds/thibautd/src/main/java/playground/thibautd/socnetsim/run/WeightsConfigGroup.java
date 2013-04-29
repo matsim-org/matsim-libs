@@ -33,6 +33,7 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private boolean jtmOptimizes = true;
 	private Synchro doSynchronize = Synchro.dynamic;
 	private boolean checkConsistency = false;
+	private int graphWriteInterval = 25;
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -148,5 +149,15 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	@StringSetter( "checkConsistency" )
 	public void setCheckConsistency(final boolean b) {
 		this.checkConsistency = b;
+	}
+
+	@StringSetter( "graphWriteInterval" )
+	public void setGraphWriteInterval(final int i) {
+		this.graphWriteInterval = i;
+	}
+
+	@StringGetter( "graphWriteInterval" )
+	public int getGraphWriteInterval() {
+		return this.graphWriteInterval;
 	}
 }
