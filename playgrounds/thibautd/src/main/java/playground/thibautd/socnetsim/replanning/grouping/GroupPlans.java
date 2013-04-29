@@ -83,12 +83,20 @@ public class GroupPlans {
 		jointPlans.add( jp );
 	}
 
+	public void removeJointPlan(final JointPlan jp) {
+		jointPlans.remove( jp );
+	}
+
 	public void addJointPlans(final Collection<JointPlan> jps) {
 		jointPlans.addAll( jps );
 	}
 
 	public void addIndividualPlan(final Plan p) {
 		individualPlans.add( p );
+	}
+
+	public void removeIndividualPlan(final Plan p) {
+		individualPlans.remove( p );
 	}
 
 	public void addIndividualPlans(final Collection<Plan> ps) {
