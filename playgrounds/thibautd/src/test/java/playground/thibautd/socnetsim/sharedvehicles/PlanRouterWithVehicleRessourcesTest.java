@@ -55,52 +55,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class PlanRouterWithVehicleRessourcesTest {
 
 	@Test
-	public void testVehicleIdsAreInsertedIfNothing() throws Exception {
-		final PopulationFactory factory = new PopulationFactoryImpl( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
-
-		final Id linkId = new IdImpl( "the_link" );
-		final Id personId = new IdImpl( "somebody" );
-		final Person person = factory.createPerson( personId );
-		final Plan plan = factory.createPlan();
-		person.addPlan( plan );
-		plan.setPerson( person );
-
-		final Activity firstAct = factory.createActivityFromLinkId( "first" , linkId );
-		plan.addActivity( firstAct );
-		firstAct.setEndTime( 223 );
-
-		plan.addLeg( factory.createLeg( TransportMode.car ) );
-
-		final Activity secondAct = factory.createActivityFromLinkId( "second" , linkId );
-		plan.addActivity( secondAct );
-		secondAct.setEndTime( 2012 );
-
-		final Leg secondLeg = factory.createLeg( TransportMode.car );
-		plan.addLeg( secondLeg );
-		secondLeg.setRoute( new LinkNetworkRouteImpl( linkId , Collections.<Id>emptyList(), linkId ) );
-
-		plan.addActivity( factory.createActivityFromLinkId( "third" , linkId ) );
-
-		final TripRouter tripRouter = createTripRouter( factory );
-
-		final PlanRouterWithVehicleRessources router =
-			new PlanRouterWithVehicleRessources(
-				new UnrestrictedVehicleRessources(),
-				new PlanRouter( tripRouter ) );
-
-		router.run( plan );
-
-		for ( Trip trip : TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() ) ) {
-			for (Leg l : trip.getLegsOnly()) {
-				assertEquals(
-					"unexpected vehicle id in "+trip,
-					personId,
-					((NetworkRoute) l.getRoute()).getVehicleId());
-			}
-		}
-	}
-
-	@Test
 	public void testVehicleIdsAreKeptIfSomething() throws Exception {
 		final PopulationFactory factory = new PopulationFactoryImpl( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 
@@ -128,7 +82,6 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 		final PlanRouterWithVehicleRessources router =
 			new PlanRouterWithVehicleRessources(
-				new UnrestrictedVehicleRessources(),
 				new PlanRouter( tripRouter ) );
 
 		router.run( plan );

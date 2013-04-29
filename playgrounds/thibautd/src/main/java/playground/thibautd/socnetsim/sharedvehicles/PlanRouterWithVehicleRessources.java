@@ -21,13 +21,9 @@ package playground.thibautd.socnetsim.sharedvehicles;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -41,16 +37,11 @@ import playground.thibautd.socnetsim.router.JointPlanRouter;
  * @author thibautd
  */
 public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
-	private final Random random;
 	private final PlanAlgorithm delegate;
-	private final VehicleRessources ressources;
 
 	PlanRouterWithVehicleRessources(
-			final VehicleRessources ressources,
 			final PlanAlgorithm delegate) {
-		this.ressources = ressources;
 		this.delegate = delegate;
-		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	@Override
@@ -62,8 +53,6 @@ public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
 
 		delegate.run( plan );
 
-		final Set<Id> vehicles = ressources.identifyVehiclesUsableForAgent( plan.getPerson().getId() );
-
 		final List<Trip> newTrips =
 			TripStructureUtils.getTrips(
 					plan,
@@ -72,47 +61,9 @@ public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
 		transmitVehicleInformation(
 				oldTrips,
 				newTrips);
-
-		// TODO: do this intelligently, ie knowing the vehicles allocated
-		// to other persons in the joint plan, if any.
-		// XXX: this does not consider the type of vehicle, ie if the simulation
-		// is run with motorcycle, bikes and car ressources, a car trip could
-		// be allocated a bicycle...
-		randomlyAllocateMissingVehicleFields( vehicles , newTrips );
 	}
 
-	private void randomlyAllocateMissingVehicleFields(
-			final Set<Id> vehicles,
-			final List<Trip> trips) {
-		final Id vehicleId = getRandomVehicle( vehicles );
-
-		for (Trip t : trips) {
-			for (Leg l : t.getLegsOnly()) {
-				if ( !(l.getRoute() instanceof NetworkRoute) ) continue;
-				final NetworkRoute r = (NetworkRoute) l.getRoute();
-				if ( r.getVehicleId() == null ) {
-					if ( vehicleId == null ) {
-						throw new RuntimeException( "no vehicle could be found. Make sure you do not create vehicle-based trips for agents without a vehicle!" );
-					}
-					r.setVehicleId( vehicleId );
-				}
-			}
-		}
-	}
-
-	private Id getRandomVehicle(final Set<Id> vehicles) {
-		if ( vehicles.isEmpty() ) return null;
-		final int choice = random.nextInt( vehicles.size() );
-		int curr = 0;
-
-		for (Id id : vehicles) {
-			if ( curr++ == choice ) return id;
-		}
-
-		throw new RuntimeException();
-	}
-
-	private void transmitVehicleInformation(
+	private static void transmitVehicleInformation(
 			final List<Trip> oldTrips,
 			final List<Trip> newTrips) {
 		assert oldTrips.size() == newTrips.size();

@@ -29,19 +29,15 @@ import playground.thibautd.router.PlanRoutingAlgorithmFactory;
  */
 public class PlanRouterWithVehicleRessourcesFactory implements PlanRoutingAlgorithmFactory {
 	private final PlanRoutingAlgorithmFactory delegate;
-	private final VehicleRessources ressources;
 
 	public PlanRouterWithVehicleRessourcesFactory(
-			final VehicleRessources ressources,
 			final PlanRoutingAlgorithmFactory delegate) {
-		this.ressources = ressources;
 		this.delegate = delegate;
 	}
 
 	@Override
 	public PlanAlgorithm createPlanRoutingAlgorithm(final TripRouter tripRouter) {
 		return new PlanRouterWithVehicleRessources(
-				ressources,
 				delegate.createPlanRoutingAlgorithm(
 					tripRouter ));
 	}

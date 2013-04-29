@@ -62,7 +62,6 @@ import playground.thibautd.socnetsim.replanning.RankOfRemovedPlanListener;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
-import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 /**
  * @author thibautd
@@ -78,12 +77,8 @@ public class RunUtils {
 		final PlanRoutingAlgorithmFactory jointRouterFactory =
 					new JointPlanRouterFactory(
 							((ScenarioImpl) scenario).getActivityFacilities() );
-		final VehicleRessources vehicleRessources = scenario.getScenarioElement( VehicleRessources.class );
-		return vehicleRessources != null ?
-			new PlanRouterWithVehicleRessourcesFactory(
-					vehicleRessources,
-					jointRouterFactory ) :
-			jointRouterFactory;
+		return new PlanRouterWithVehicleRessourcesFactory(
+					jointRouterFactory );
 	}
 
 	public static void loadStrategyRegistry(
