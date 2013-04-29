@@ -190,6 +190,8 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new TravelDistanceCalculator());
 		
+		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
+		
 //		// get road pricing scheme
 //		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
 //

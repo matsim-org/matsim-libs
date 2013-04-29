@@ -34,6 +34,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.utils.LeastCostPathTree;
@@ -468,6 +469,13 @@ public class AccessibilityControlerListenerImpl{
 				double road2NodeWalkTime_h					= distanceRoad2Node_meter / this.walkSpeedMeterPerHour;
 				double road2NodeToll_money 					= getToll(nearestLink); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
 				
+				// this contains the current toll based on the toll scheme
+				double toll_money 							= 0.;
+				if(this.scheme != null && RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType()))
+					toll_money = road2NodeToll_money;
+				else if(this.scheme != null && RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()))
+					toll_money = road2NodeToll_money * distanceRoad2Node_meter;
+				
 				gcs.reset();
 
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate the accessibility
@@ -502,13 +510,13 @@ public class AccessibilityControlerListenerImpl{
 					double sumExpVjkWalk = aggregatedOpportunities[i].getSumVjk();
 					
 					// total disutility congested car
-					double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD); // tnicolai: add toll
+					double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC); 
 					double expVijCongestedCar = Math.exp(this.logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) );
 					double expVhkCongestedCar = expVhiWalk * expVijCongestedCar * sumExpVjkWalk;
 					gcs.addCongestedCarCost( expVhkCongestedCar );
 					
 					// total disutility free speed car
-					double freeSpeedCarDisutilityRoad2Node = (road2NodeFreeSpeedTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD); // tnicolai: add toll
+					double freeSpeedCarDisutilityRoad2Node = (road2NodeFreeSpeedTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC); 
 					double expVijFreeSpeedCar = Math.exp(this.logitScaleParameter * (constCar + freeSpeedCarDisutilityRoad2Node + freeSpeedCarDisutility) );
 					double expVhkFreeSpeedCar = expVhiWalk * expVijFreeSpeedCar * sumExpVjkWalk;
 					gcs.addFreeSpeedCost( expVhkFreeSpeedCar );

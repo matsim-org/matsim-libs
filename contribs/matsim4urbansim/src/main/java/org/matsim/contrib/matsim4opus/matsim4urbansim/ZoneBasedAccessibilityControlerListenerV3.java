@@ -123,6 +123,8 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new TravelDistanceCalculator());
+		
+		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
 
 		// some ideas about how to use a more correct approach:
 //		LeastCostPathTree lcptCar ;
