@@ -131,6 +131,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 						new Random( j ),
 						vehs,
 						MODE,
+						false,
 						false).run( randomized );
 				 final double randomizedOverlap = algo.calcOverlap( randomized );
 				 Assert.assertTrue(

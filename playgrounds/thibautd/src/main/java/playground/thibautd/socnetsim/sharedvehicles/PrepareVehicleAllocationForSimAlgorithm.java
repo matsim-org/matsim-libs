@@ -57,6 +57,7 @@ public class PrepareVehicleAllocationForSimAlgorithm implements GenericPlanAlgor
 					random,
 					vehicles,
 					TransportMode.car,
+					true,
 					true);
 
 		this.recomposeJointPlansAlgo =

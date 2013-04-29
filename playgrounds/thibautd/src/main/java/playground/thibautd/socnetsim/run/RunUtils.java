@@ -122,6 +122,10 @@ public class RunUtils {
 				GroupPlanStrategyFactory.createGroupPlanVehicleAllocation(
 					controllerRegistry ),
 				weights.getPlanLevelReallocateVehicleWeight() );
+		strategyRegistry.addStrategy(
+				GroupPlanStrategyFactory.createOptimizingTourVehicleAllocation(
+					controllerRegistry ),
+				weights.getTourLevelOptimizeVehicleWeight() );
 	}
 
 	public static void loadDefaultAnalysis(

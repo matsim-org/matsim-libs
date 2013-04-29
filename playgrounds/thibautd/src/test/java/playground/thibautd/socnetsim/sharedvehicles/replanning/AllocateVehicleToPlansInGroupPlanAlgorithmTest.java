@@ -132,6 +132,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 						random,
 						vehs,
 						MODE,
+						false,
 						false);
 			algo.run( testPlan );
 
@@ -159,6 +160,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 						random,
 						vehs,
 						MODE,
+						false,
 						false);
 			algo.run( testPlan );
 
@@ -193,6 +195,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 						random,
 						vehs,
 						MODE,
+						false,
 						false);
 			algo.run( testPlan );
 
@@ -231,6 +234,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 						new Random( 1432 ),
 						vehs,
 						MODE,
+						false,
 						false);
 			algo.run( testPlan );
 

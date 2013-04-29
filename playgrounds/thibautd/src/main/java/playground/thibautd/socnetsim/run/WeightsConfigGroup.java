@@ -30,6 +30,7 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private double logitSelection = -1;
 	private double vehicleAllocation = -1;
 	private double planVehicleAllocation = -1;
+	private double optimizedVehicleAllocation = -1;
 	private boolean jtmOptimizes = true;
 	private Synchro doSynchronize = Synchro.dynamic;
 	private boolean checkConsistency = false;
@@ -62,6 +63,17 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	public void setTourLevelReallocateVehicleWeight(final double v) {
 		this.vehicleAllocation = v;
 	}
+
+	@StringGetter( "optimizeVehicleTour" )
+	public double getTourLevelOptimizeVehicleWeight() {
+		return optimizedVehicleAllocation;
+	}
+
+	@StringSetter( "optimizeVehicleTour" )
+	public void setTourLevelOptimizeVehicleWeight(final double v) {
+		this.optimizedVehicleAllocation = v;
+	}
+
 
 	@StringGetter( "reRoute" )
 	public double getReRouteWeight() {

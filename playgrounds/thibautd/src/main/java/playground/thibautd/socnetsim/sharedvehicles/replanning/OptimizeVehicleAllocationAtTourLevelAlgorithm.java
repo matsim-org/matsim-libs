@@ -76,7 +76,8 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			random,
 			vehicleRessources,
 			mode,
-			allowNullRoutes);
+			allowNullRoutes,
+			false);
 		this.vehicularMode = mode;
 		this.allowNullRoutes = allowNullRoutes;
 		this.stageActs = stageActivitiesForSubtourDetection;

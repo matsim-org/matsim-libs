@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -38,6 +39,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 /**
@@ -55,6 +57,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 	private final VehicleRessources vehicleRessources;
 	private final String mode;
 	private final boolean allowNullRoutes;
+	private final boolean preserveVehicleAllocations;
 
 	/**
 	 * @param random the random generator to use
@@ -69,48 +72,80 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 			final Random random,
 			final VehicleRessources vehicleRessources,
 			final String mode,
-			final boolean allowNullRoutes) {
+			final boolean allowNullRoutes,
+			final boolean preserveVehicleAllocations) {
 		this.random = random;
 		this.vehicleRessources = vehicleRessources;
 		this.mode = mode;
 		this.allowNullRoutes = allowNullRoutes;
+		this.preserveVehicleAllocations = preserveVehicleAllocations;
 	}
 
 	@Override
 	public void run(final GroupPlans plan) {
-		final List<Plan> plansWithVehicles = getPlansWithVehicles( plan );
+		final Map<Id, Integer> preservedVehiclesCounts = new HashMap<Id, Integer>();
+		final List<Plan> plansWithVehicles =
+			getPlansWithVehicles(
+					preservedVehiclesCounts,
+					plan );
 
-		allocateOneVehiclePerPlan( plansWithVehicles );
+		allocateOneVehiclePerPlan( plansWithVehicles , preservedVehiclesCounts );
 	}
 
-	private List<Plan> getPlansWithVehicles(final GroupPlans groupPlan) {
+	private List<Plan> getPlansWithVehicles(
+			final Map<Id, Integer> preservedVehiclesCounts,
+			final GroupPlans groupPlan) {
 		final List<Plan> plans = new ArrayList<Plan>();
+		final List<Plan> preservedPlans = new ArrayList<Plan>();
 
 		for ( Plan p : groupPlan.getAllIndividualPlans() ) {
-			for ( PlanElement pe : p.getPlanElements() ) {
-				if ( !(pe instanceof Leg) ) continue;
-				final Leg leg = (Leg) pe;
+			if ( hasVehicle( p ) ) plans.add( p );
+			else preservedPlans.add( p );
+		}
 
-				if ( !mode.equals( leg.getMode() ) ) continue;
-				if ( !( ( allowNullRoutes && leg.getRoute() == null ) ||
-						( leg.getRoute() instanceof NetworkRoute ) ) ) {
-					throw new RuntimeException( "route for mode "+mode+" has non-network route "+leg.getRoute() );
+		if ( preserveVehicleAllocations ) {
+			for ( Plan p : preservedPlans ) {
+				final Set<Id> vs = SharedVehicleUtils.getVehiclesInPlan( p , mode );
+				for ( Id v : vs ) {
+					final Integer c = preservedVehiclesCounts.get( v );
+					preservedVehiclesCounts.put(
+							v,
+							c == null ? 1 : c + 1 );
 				}
-				plans.add( p );
-				break;
 			}
 		}
 
 		return plans;
 	}
 
-	private void allocateOneVehiclePerPlan(final List<Plan> plansWithVehicles) {
+	private boolean hasVehicle(final Plan p) {
+		for ( PlanElement pe : p.getPlanElements() ) {
+			if ( !(pe instanceof Leg) ) continue;
+			final Leg leg = (Leg) pe;
+
+			if ( !mode.equals( leg.getMode() ) ) continue;
+			if ( !( ( allowNullRoutes && leg.getRoute() == null ) ||
+					( leg.getRoute() instanceof NetworkRoute ) ) ) {
+				throw new RuntimeException( "route for mode "+mode+" has non-network route "+leg.getRoute() );
+			}
+			if ( !preserveVehicleAllocations ||
+					leg.getRoute() == null ||
+					((NetworkRoute) leg.getRoute()).getVehicleId() == null ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void allocateOneVehiclePerPlan(
+			final List<Plan> plansWithVehicles,
+			final Map<Id, Integer> preservedVehiclesCounts) {
 		// make the allocation random by shuffling the order in which the plans
 		// are examined
 		Collections.shuffle( plansWithVehicles , random );
 
 		final Map<Id, Id> allocation = new LinkedHashMap<Id, Id>();
-		allocate( plansWithVehicles , allocation );
+		allocate( plansWithVehicles , allocation , preservedVehiclesCounts );
 
 		for ( Plan p : plansWithVehicles ) {
 			final Id v = allocation.get( p.getPerson().getId() );
@@ -138,7 +173,8 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 
 	private void allocate(
 			final List<Plan> remainingPlans,
-			final Map<Id, Id> allocation) {
+			final Map<Id, Id> allocation,
+			final Map<Id, Integer> preservedVehiclesCounts) {
 		if ( remainingPlans.isEmpty() ) return;
 
 		final Plan currentPlan = remainingPlans.get( 0 );
@@ -172,22 +208,28 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 		// if all vehicles are allocated, allocate (one of) the
 		// least used vehicle(s)
 		if ( !foundVehicle ) {
-			final Id v = findLeastUsedVehicle( allocation.values() , possibleVehicles );
+			final Id v = findLeastUsedVehicle(
+					allocation.values(),
+					possibleVehicles,
+					preservedVehiclesCounts );
 			if (log.isTraceEnabled() ) {
 				log.trace( "allocate used vehicle "+v+" for person "+currentPersonId );
 			}
 			allocation.put( currentPersonId , v );
 		}
 
-		allocate( newRemainingPlans , allocation );
+		allocate( newRemainingPlans , allocation , preservedVehiclesCounts );
 	}
 
 	private Id findLeastUsedVehicle(
 			final Collection<Id> usedVehicles,
-			final List<Id> possibleVehicles) {
+			final List<Id> possibleVehicles,
+			final Map<Id, Integer> preservedCounts) {
 		if ( possibleVehicles.isEmpty() ) return null;
-		final Map<Id, Integer> counts = new HashMap<Id, Integer>();
-		for ( Id v : possibleVehicles ) counts.put( v , 0 ); 
+		final Map<Id, Integer> counts = new HashMap<Id, Integer>( preservedCounts );
+		for ( Id v : possibleVehicles ) {
+			if ( !counts.containsKey( v ) ) counts.put( v , 0 ); 
+		}
 
 		for ( Id v : usedVehicles ) {
 			final int c = counts.get( v );
@@ -195,16 +237,11 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 		}
 
 		final List<Id> leastUsedVehicles = new ArrayList<Id>();
-		int minUses = Integer.MAX_VALUE;
+		int minUses = Collections.min( counts.values() );
 
 		for ( Map.Entry<Id, Integer> e : counts.entrySet() ) {
 			final Id v = e.getKey();
 			final int c = e.getValue();
-
-			if ( c < minUses ) {
-				minUses = c;
-				leastUsedVehicles.clear();
-			}
 
 			assert c >= minUses;
 			if ( c == minUses ) {

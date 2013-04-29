@@ -33,16 +33,19 @@ public class AllocateVehicleToPlansInGroupPlanModule extends AbstractMultithread
 	private final VehicleRessources vehicleRessources;
 	private final String mode;
 	private final boolean allowNullRoutes;
+	private final boolean preserveAllocations;
 
 	public AllocateVehicleToPlansInGroupPlanModule(
 			final int nThreads,
 			final VehicleRessources vehicleRessources,
 			final String mode,
-			final boolean allowNullRoutes) {
+			final boolean allowNullRoutes,
+			final boolean preserveAllocations) {
 		super( nThreads );
 		this.vehicleRessources = vehicleRessources;
 		this.mode = mode;
 		this.allowNullRoutes = allowNullRoutes;
+		this.preserveAllocations = preserveAllocations;
 	}
 
 	@Override
@@ -51,7 +54,8 @@ public class AllocateVehicleToPlansInGroupPlanModule extends AbstractMultithread
 				MatsimRandom.getLocalInstance(),
 				vehicleRessources,
 				mode,
-				allowNullRoutes);
+				allowNullRoutes,
+				preserveAllocations);
 	}
 }
 
