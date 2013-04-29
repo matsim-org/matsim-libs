@@ -458,8 +458,7 @@ public class HITSAnalyser {
 			double mrtSearchRadius, boolean writeTransitCoords) {
 		// arb code for summary generation
 		try {
-			boolean again = true;
-			while (again) {
+
 				System.out
 						.println("Starting summary : " + new java.util.Date());
 				Statement s = conn.createStatement();
@@ -1050,25 +1049,12 @@ public class HITSAnalyser {
 					}
 
 				}
-				// freezes program for debugging
-				BufferedReader lilRead = new BufferedReader(
-						new InputStreamReader(System.in));
-				System.out.println("Done : " + new java.util.Date());
-				System.out.print("EXIT? : ");
-				String exiter = lilRead.readLine();
-				if (exiter == "n")
-					again = true;
-				else
-					again = false;
-			}
+
 
 		} catch (SQLException e) {
 
 			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}
+		} 
 
 	}
 
