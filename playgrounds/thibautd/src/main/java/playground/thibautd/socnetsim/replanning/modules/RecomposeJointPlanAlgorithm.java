@@ -67,8 +67,6 @@ public class RecomposeJointPlanAlgorithm implements GenericPlanAlgorithm<GroupPl
 				groupPlans.addIndividualPlan( plan );
 			}
 		}
-
-
 	}
 
 	private Map<Id, Plan> getPlansMap(final GroupPlans groupPlans) {
@@ -89,18 +87,18 @@ public class RecomposeJointPlanAlgorithm implements GenericPlanAlgorithm<GroupPl
 			final Plan plan,
 			final Map<Id, Plan> dependantPlans,
 			final Map<Id, Plan> plansToLook) {
-		final List<Plan> dependentPlans = new ArrayList<Plan>();
+		final List<Plan> dependentPlansList = new ArrayList<Plan>();
 
 		final Iterator<Plan> toLookIt = plansToLook.values().iterator();
 		while ( toLookIt.hasNext() ) {
 			final Plan toLook = toLookIt.next();
 			if ( linkIdentifier.areLinked( plan , toLook ) ) {
-				dependentPlans.add( toLook );
+				dependentPlansList.add( toLook );
 				toLookIt.remove();
 			}
 		}
 
-		for (Plan depPlan : dependentPlans) {
+		for (Plan depPlan : dependentPlansList) {
 			dependantPlans.put( depPlan.getPerson().getId() , depPlan );
 			findDependentPlans(
 					depPlan,
