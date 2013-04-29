@@ -182,7 +182,7 @@ public class OfflineDvrpLauncher
         if (VRP_OUT_FILES) {
             List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
-            new Schedules2GIS(vehicles, data, vrpOutDirName + "\\route_").write();
+            new Schedules2GIS(vehicles, data).write(vrpOutDirName);
 
             Population popul = scenario.getPopulation();
             PopulationFactory pf = popul.getFactory();

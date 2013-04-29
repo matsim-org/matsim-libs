@@ -400,8 +400,8 @@ public class JbSingleIterOnlineDvrpLauncher
 
         if (vrpOutFiles) {
             new File(vrpOutDirName).mkdir();
-            new Schedules2GIS(data.getVrpData().getVehicles(), data, vrpOutDirName + "\\route_")
-                    .write();
+            new Schedules2GIS(data.getVrpData().getVehicles(), data)
+                    .write(vrpOutDirName);
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));

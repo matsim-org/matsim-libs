@@ -19,6 +19,7 @@
 
 package playground.michalm.util.gis;
 
+import java.io.File;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
@@ -26,40 +27,44 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedules;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.MatsimArc;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 public class Schedules2GIS
 {
-    private List<Vehicle> vehicles;
-    private String filename;
-    private GeometryFactory geofac;
-    private MatsimVrpData data;
-    private Collection<SimpleFeature> features;
-		private PolylineFeatureFactory factory;
+    private final List<Vehicle> vehicles;
+    private final MatsimVrpData data;
+    private final PolylineFeatureFactory factory;
 
-    public Schedules2GIS(List<Vehicle> vehicles, MatsimVrpData data, String filename)
+
+    public Schedules2GIS(List<Vehicle> vehicles, MatsimVrpData data)
     {
         this.vehicles = vehicles;
         this.data = data;
-        this.filename = filename;
 
-        geofac = new GeometryFactory();
-        initFeatureType(data.getCoordSystem());
+        factory = new PolylineFeatureFactory.Builder().//
+                setCrs(MGC.getCRS(data.getCoordSystem())).//
+                setName("vrp_route").//
+                addAttribute("VEH_ID", Integer.class).//
+                addAttribute("VEH_NAME", String.class).//
+                addAttribute("ROUTE_ID", Integer.class).//
+                addAttribute("ARC_IDX", Integer.class).//
+                create();
     }
 
 
-    public void write()
+    public void write(String vrpOutDirName)
     {
+        new File(vrpOutDirName).mkdir();
+        String filename = vrpOutDirName + "\\route_";
+
         for (Vehicle v : vehicles) {
             Iterator<DriveTask> driveIter = Schedules.createDriveTaskIter(v.getSchedule());
 
@@ -67,15 +72,16 @@ public class Schedules2GIS
                 continue;
             }
 
-            features = new ArrayList<SimpleFeature>();
+            Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 
             while (driveIter.hasNext()) {
                 DriveTask drive = driveIter.next();
                 Coordinate[] coords = createLineString(drive);
 
                 if (coords != null) {
-                        features.add(this.factory.createPolyline(coords, new Object[] { v.getId(), v.getName(),
-                                v.getId(), drive.getTaskIdx() }, null));
+                    features.add(this.factory.createPolyline(coords,
+                            new Object[] { v.getId(), v.getName(), v.getId(), drive.getTaskIdx() },
+                            null));
                 }
             }
 
@@ -109,20 +115,5 @@ public class Schedules2GIS
         }
 
         return coordList.toArray(new Coordinate[coordList.size()]);
-    }
-
-
-    private void initFeatureType(final String coordinateSystem)
-    {
-        CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
-        
-        this.factory = new PolylineFeatureFactory.Builder().
-        		setCrs(crs).
-        		setName("vrp_route").
-        		addAttribute("VEH_ID", Integer.class).
-        		addAttribute("VEH_NAME", String.class).
-        		addAttribute("ROUTE_ID", Integer.class).
-        		addAttribute("ARC_IDX", Integer.class).
-        		create();
     }
 }

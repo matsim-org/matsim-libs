@@ -22,76 +22,53 @@ package playground.michalm.vrp.run.online;
 import java.io.*;
 import java.util.*;
 
-import org.jfree.chart.JFreeChart;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.*;
-import org.matsim.core.mobsim.qsim.agents.*;
-import org.matsim.core.mobsim.qsim.qnetsimengine.*;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.util.*;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.events.algorithms.*;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.*;
 
-import pl.poznan.put.util.jfreechart.*;
-import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
-import pl.poznan.put.util.lang.TimeDiscretizer;
-import pl.poznan.put.vrp.dynamic.chart.*;
-import pl.poznan.put.vrp.dynamic.data.VrpData;
+import pl.poznan.put.util.jfreechart.ChartUtils;
+import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
-import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
-import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.RunningVehicleRegister;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.file.DepotReader;
-import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.router.*;
-import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
 import playground.michalm.vrp.otfvis.OTFLiveUtils;
-import playground.michalm.vrp.run.VrpConfigUtils;
-import playground.michalm.vrp.taxi.*;
 
 
-public class SingleIterOnlineDvrpLauncher
+/*package*/class SingleIterOnlineDvrpLauncher
 {
-    String dirName;
-    String netFileName;
-    String plansFileName;
-    String taxiCustomersFileName;
-    String depotsFileName;
+    /*package*/final String dirName;
+    /*package*/final String netFileName;
+    /*package*/final String plansFileName;
+    /*package*/final String taxiCustomersFileName;
+    /*package*/final String depotsFileName;
 
-    boolean vrpOutFiles;
-    String vrpOutDirName;
+    /*package*/final boolean vrpOutFiles;
+    /*package*/final String vrpOutDirName;
 
-    boolean outputHistogram;
-    String histogramOutDirName;
-    LegHistogram legHistogram;
+    /*package*/final boolean outHistogram;
+    /*package*/final String histogramOutDirName;
 
-    AlgorithmConfig algorithmConfig;
-    String eventsFileName;
+    /*package*/final boolean otfVis;
 
-    Scenario scenario;
-    MatsimVrpData data;
+    /*package*/final boolean writeSimEvents;
+    /*package*/final String eventsFileName;
 
-    boolean otfVis;
+    /*package*/final Scenario scenario;
+
+    /*package*/MatsimVrpData data;
+    /*package*/AlgorithmConfig algorithmConfig;
+    /*package*/LegHistogram legHistogram;
 
 
-    // public static OTFQueryControl queryControl;
 
-    void defaultArgs()
+    /*package*/SingleIterOnlineDvrpLauncher()
     {
         dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
         netFileName = dirName + "network.xml";
@@ -131,15 +108,26 @@ public class SingleIterOnlineDvrpLauncher
         vrpOutFiles = !true;
         vrpOutDirName = dirName + "vrp_output";
 
-        outputHistogram = true;
-        vrpOutDirName = dirName + "histograms";
+        outHistogram = true;
+        histogramOutDirName = dirName + "histograms";
+
+        writeSimEvents = !true;
+
+        scenario = OnlineDvrpLauncherUtils.initMatsimData(netFileName, plansFileName,
+                taxiCustomersFileName);
     }
 
 
-    void readArgs(String paramFile)
-        throws FileNotFoundException
+    /*package*/SingleIterOnlineDvrpLauncher(String paramFile)
     {
-        Scanner scanner = new Scanner(new BufferedReader(new FileReader(paramFile)));
+        Scanner scanner;
+        try {
+            scanner = new Scanner(new BufferedReader(new FileReader(paramFile)));
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         Map<String, String> params = new HashMap<String, String>();
 
         while (scanner.hasNext()) {
@@ -164,200 +152,65 @@ public class SingleIterOnlineDvrpLauncher
         otfVis = Boolean.valueOf(params.get("otfVis"));
 
         vrpOutFiles = Boolean.valueOf(params.get("vrpOutFiles"));
-
         vrpOutDirName = dirName + params.get("vrpOutDirName");
+
+        outHistogram = Boolean.valueOf(params.get("outHistogram"));
+        histogramOutDirName = dirName + params.get("histogramOutDirName");
+
+        writeSimEvents = Boolean.valueOf(params.get("writeSimEvents"));
+
+        scenario = OnlineDvrpLauncherUtils.initMatsimData(netFileName, plansFileName,
+                taxiCustomersFileName);
     }
 
 
-    void prepareMatsimData()
-        throws IOException
+    /**
+     * Can be called several times (1 call == 1 simulation)
+     */
+    /*package*/void go()
     {
-        scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        data = OnlineDvrpLauncherUtils.initMatsimVrpData(scenario, algorithmConfig.ttimeSource,
+                algorithmConfig.tcostSource, eventsFileName, depotsFileName);
 
-        new MatsimNetworkReader(scenario).readFile(netFileName);
-        new MatsimPopulationReader(scenario).readFile(plansFileName);
+        TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(data.getVrpData());
 
-        List<String> taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
+        QSim qSim = OnlineDvrpLauncherUtils.initQSim(data, optimizer);
+        EventsManager events = qSim.getEventsManager();
 
-        for (String id : taxiCustomerIds) {
-            Person person = scenario.getPopulation().getPersons().get(scenario.createId(id));
-            Leg leg = (Leg)person.getSelectedPlan().getPlanElements().get(1);
-            leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
+        EventWriter eventWriter = null;
+        if (writeSimEvents) {
+            eventWriter = new EventWriterXML(dirName + "events.xml.gz");
+            events.addHandler(eventWriter);
         }
-    }
-
-
-    void initMatsimVrpData()
-        throws IOException
-    {
-        int travelTimeBinSize = algorithmConfig.ttimeSource.travelTimeBinSize;
-        int numSlots = algorithmConfig.ttimeSource.numSlots;
-
-        scenario.getConfig().travelTimeCalculator().setTraveltimeBinSize(travelTimeBinSize);
-
-        TravelTime ttimeCalc;
-        TravelDisutility tcostCalc;
-
-        switch (algorithmConfig.ttimeSource) {
-            case FREE_FLOW_SPEED:
-                ttimeCalc = new FreeSpeedTravelTime();
-                break;
-
-            case EVENTS_15_MIN:
-            case EVENTS_24_H:
-                ttimeCalc = TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
-                        scenario);
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-
-        switch (algorithmConfig.tcostSource) {
-            case DISTANCE:
-                tcostCalc = new DistanceAsTravelDisutility();
-                break;
-
-            case TIME:
-                tcostCalc = new TimeAsTravelDisutility(ttimeCalc);
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-
-        Network network = scenario.getNetwork();
-        TimeDiscretizer timeDiscretizer = new TimeDiscretizer(travelTimeBinSize, numSlots);
-        ArcFactory arcFactory = MatsimArcFactories.createArcFactory(network, ttimeCalc, tcostCalc,
-                timeDiscretizer, false);
-        MatsimVrpGraph graph = MatsimVrpGraphCreator.create(network, arcFactory, false);
-
-        VrpData vrpData = new VrpData();
-        vrpData.setVrpGraph(graph);
-        vrpData.setCustomers(new ArrayList<Customer>());
-        vrpData.setRequests(new ArrayList<Request>());
-        new DepotReader(scenario, vrpData).readFile(depotsFileName);
-
-        data = new MatsimVrpData(vrpData, scenario);
-    }
-
-
-    @SuppressWarnings("unused")
-    void runSim()
-    {
-        if (scenario.getConfig().getQSimConfigGroup() == null) {
-            QSimConfigGroup qSimConfig = new QSimConfigGroup();
-            qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-            qSimConfig.setRemoveStuckVehicles(false);
-            scenario.getConfig().addQSimConfigGroup(qSimConfig);
-        }
-
-        EventsManager events = EventsUtils.createEventsManager();
-        // EventWriter eventWriter = new EventWriterXML(dirName + "events.xml.gz");
-        // events.addHandler(eventWriter);
 
         RunningVehicleRegister rvr = new RunningVehicleRegister();
         events.addHandler(rvr);
 
-        QSim qSim = new QSim(scenario, events);
-        ActivityEngine activityEngine = new ActivityEngine();
-        qSim.addMobsimEngine(activityEngine);
-        qSim.addActivityHandler(activityEngine);
-        QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim);
-        qSim.addMobsimEngine(netsimEngine);
-        qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-        TeleportationEngine teleportationEngine = new TeleportationEngine();
-        qSim.addMobsimEngine(teleportationEngine);
-
-        VrpData vrpData = data.getVrpData();
-        TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(vrpData);
-        TaxiSimEngine taxiSimEngine = new TaxiSimEngine(qSim, data, optimizer);
-
-        qSim.addMobsimEngine(taxiSimEngine);
-        qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
-                new DefaultAgentFactory(qSim), qSim));
-        qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
-        qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
-
-        OTFLiveUtils.initQueryHandler(qSim, vrpData);
-
-        if (false /*vrpOutFiles*/) {
-            optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                @Override
-                public JFreeChart createChart(VrpData data)
-                {
-                    return RouteChartUtils.chartRoutesByStatus(data);
-                }
-            }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
-
-            optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                @Override
-                public JFreeChart createChart(VrpData data)
-                {
-                    return ScheduleChartUtils.chartSchedule(data);
-                }
-            }, OutputType.PNG, vrpOutDirName + "\\schedules_", 1200, 800));
+        // if (vrpOutFiles) {
+        if (Boolean.FALSE) {// <-- never
+            OnlineDvrpLauncherUtils.addChartFileOptimizerListeners(optimizer, vrpOutDirName);
         }
 
         if (otfVis) { // OFTVis visualization
+            OTFLiveUtils.initQueryHandler(qSim, data.getVrpData());
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);
         }
 
-        if (outputHistogram) {
-            legHistogram = new LegHistogram(300);
-            events.addHandler(legHistogram);
+        if (outHistogram) {
+            events.addHandler(legHistogram = new LegHistogram(300));
         }
 
         qSim.run();
 
         events.finishProcessing();
-        //eventWriter.closeFile();
 
-    }
-
-
-    // RunningVehicleRegister runningVehicleRegister;
-
-    void generateOutput()
-    {
-        // DVRP-based evaluation (using schedules)
-        TaxiEvaluation taxiEval = (TaxiEvaluation)new TaxiEvaluator()
-                .evaluateVrp(data.getVrpData());
-        System.out.println(TaxiEvaluation.HEADER);
-        System.out.println(taxiEval.toString());
-
-        // MATSim-based evaluation (using events)
-
-        if (vrpOutFiles) {
-            new File(vrpOutDirName).mkdir();
-            new Schedules2GIS(data.getVrpData().getVehicles(), data, vrpOutDirName + "\\route_")
-                    .write();
+        if (writeSimEvents) {
+            eventWriter.closeFile();
         }
 
-        // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
-
-        if (outputHistogram) {
-            new File(histogramOutDirName).mkdir();
-            legHistogram.write(histogramOutDirName + "legHistogram.txt");
-            legHistogram.writeGraphic(histogramOutDirName + "legHistogram_all.png");
-            for (String legMode : legHistogram.getLegModes()) {
-                legHistogram.writeGraphic(histogramOutDirName + "legHistogram_" + legMode + ".png",
-                        legMode);
-            }
-        }
-    }
-
-
-    void go()
-        throws IOException
-    {
-        initMatsimVrpData();
-        runSim();
-
-        // check
+        // check if all reqs have been served
         for (Request r : data.getVrpData().getRequests()) {
             if (r.getStatus() != ReqStatus.PERFORMED) {
                 throw new IllegalStateException();
@@ -366,30 +219,36 @@ public class SingleIterOnlineDvrpLauncher
     }
 
 
-    public static void main(String... args)
-        throws IOException
+    /*package*/void generateOutput()
     {
-        String paramFile;
+        new TaxiEvaluator().evaluateVrp(data.getVrpData()).print(new PrintWriter(System.out));
+
+        if (vrpOutFiles) {
+            new Schedules2GIS(data.getVrpData().getVehicles(), data).write(vrpOutDirName);
+        }
+
+        // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
+        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+
+        if (outHistogram) {
+            OnlineDvrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
+        }
+    }
+
+
+    public static void main(String... args)
+    {
+        SingleIterOnlineDvrpLauncher launcher;
         if (args.length == 0) {
-            paramFile = null;
+            launcher = new SingleIterOnlineDvrpLauncher();
         }
         else if (args.length == 1) {
-            paramFile = args[0];
+            launcher = new SingleIterOnlineDvrpLauncher(args[0]);
         }
         else {
             throw new RuntimeException();
         }
 
-        SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher();
-
-        if (paramFile == null) {
-            launcher.defaultArgs();
-        }
-        else {
-            launcher.readArgs(paramFile);
-        }
-
-        launcher.prepareMatsimData();
         launcher.go();
         launcher.generateOutput();
     }

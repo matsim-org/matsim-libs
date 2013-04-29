@@ -98,7 +98,6 @@
 			<artifactId>util</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
-
 			<exclusions>
 				<exclusion>
 					<groupId>*</groupId>

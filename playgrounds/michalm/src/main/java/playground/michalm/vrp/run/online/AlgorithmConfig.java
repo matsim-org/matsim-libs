@@ -21,151 +21,127 @@ package playground.michalm.vrp.run.online;
 
 import static pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizationPolicy.*;
 import static playground.michalm.vrp.run.online.AlgorithmConfig.AlgorithmType.*;
-import static playground.michalm.vrp.run.online.AlgorithmConfig.TravelCostSource.*;
-import static playground.michalm.vrp.run.online.AlgorithmConfig.TravelTimeSource.*;
+import static playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelCostSource.*;
+import static playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelTimeSource.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelCostSource;
+import playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelTimeSource;
 
 
-public class AlgorithmConfig
+/*package*/class AlgorithmConfig
 {
-    public enum TravelTimeSource
-    {
-        FREE_FLOW_SPEED(24 * 60 * 60, 1), // no eventsFileName
-        EVENTS_24_H(24 * 60 * 60, 1), // based on eventsFileName, with 24-hour time interval
-        EVENTS_15_MIN(15 * 60, 24 * 4); // based on eventsFileName, with 15-minute time interval
-
-        final int travelTimeBinSize;
-        final int numSlots;
-
-
-        private TravelTimeSource(int travelTimeBinSize, int numSlots)
-        {
-            this.travelTimeBinSize = travelTimeBinSize;
-            this.numSlots = numSlots;
-        }
-    }
-
-
-    public enum TravelCostSource
-    {
-        TIME, // travel time
-        DISTANCE; // travel distance
-    }
-
-
-    public static enum AlgorithmType
+    /*package*/static enum AlgorithmType
     {
         NO_SCHEDULING, // only idle vehicles
         ONE_TIME_SCHEDULING, // formerly "optimistic"
-        RE_SCHEDULING, // formerly "pessimistic"
-        PRE_ASSIGNMENT; // according to the "offline" mode
+        RE_SCHEDULING; // formerly "pessimistic"
     }
 
 
-    public static final AlgorithmConfig NOS_STRAIGHT_LINE = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig NOS_STRAIGHT_LINE = new AlgorithmConfig(//
             FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
             DISTANCE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig NOS_TRAVEL_DISTANCE = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig NOS_TRAVEL_DISTANCE = new AlgorithmConfig(//
             FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
             DISTANCE, //
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig NOS_FREE_FLOW = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig NOS_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig NOS_24_H = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig NOS_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig NOS_15_MIN = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig NOS_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig OTS_REQ_FREE_FLOW = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig OTS_REQ_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig OTS_REQ_24_H = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig OTS_REQ_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig OTS_REQ_15_MIN = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig OTS_REQ_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig OTS_DRV_FREE_FLOW = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig OTS_DRV_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static final AlgorithmConfig OTS_DRV_24_H = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig OTS_DRV_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static final AlgorithmConfig OTS_DRV_15_MIN = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig OTS_DRV_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static final AlgorithmConfig RES_REQ_FREE_FLOW = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig RES_REQ_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig RES_REQ_24_H = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig RES_REQ_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig RES_REQ_15_MIN = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig RES_REQ_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static final AlgorithmConfig RES_DRV_FREE_FLOW = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig RES_DRV_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static final AlgorithmConfig RES_DRV_24_H = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig RES_DRV_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static final AlgorithmConfig RES_DRV_15_MIN = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig RES_DRV_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static final AlgorithmConfig[] ALL = {//
+    /*package*/static final AlgorithmConfig[] ALL = {//
     NOS_STRAIGHT_LINE,//
             NOS_TRAVEL_DISTANCE,//
             NOS_FREE_FLOW,//
@@ -185,13 +161,13 @@ public class AlgorithmConfig
             RES_DRV_15_MIN //
     };
 
-    final TravelTimeSource ttimeSource;
-    final TravelCostSource tcostSource;
-    final AlgorithmType algorithmType;
-    final TaxiOptimizationPolicy optimizationPolicy;
+    /*package*/final TravelTimeSource ttimeSource;
+    /*package*/final TravelCostSource tcostSource;
+    /*package*/final AlgorithmType algorithmType;
+    /*package*/final TaxiOptimizationPolicy optimizationPolicy;
 
 
-    public AlgorithmConfig(TravelTimeSource ttimeSource, TravelCostSource tcostSource,
+    /*package*/AlgorithmConfig(TravelTimeSource ttimeSource, TravelCostSource tcostSource,
             AlgorithmType algorithmType, TaxiOptimizationPolicy optimizationPolicy)
     {
         this.ttimeSource = ttimeSource;
@@ -201,7 +177,7 @@ public class AlgorithmConfig
     }
 
 
-    public TaxiOptimizer createTaxiOptimizer(VrpData data)
+    /*package*/TaxiOptimizer createTaxiOptimizer(VrpData data)
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
@@ -213,13 +189,8 @@ public class AlgorithmConfig
             case RE_SCHEDULING:
                 return new RESTaxiOptimizer(data, optimizationPolicy);
 
-                // case PRE_ASSIGNMENT:
-                // return TaxiOptimizerWithPreassignment.createOptimizer(data.getVrpData(),
-                // algorithmConfig.optimizationPolicy, reqIdToVehIdFile);
-
             default:
                 throw new IllegalStateException();
         }
     }
-
 }

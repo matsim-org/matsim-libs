@@ -28,7 +28,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
 
 
-public class MultipleSingleIterOnlineDvrpLauncher
+/*package*/class MultipleSingleIterOnlineDvrpLauncher
 {
     private static final int[] RANDOM_SEEDS = { 463, 467, 479, 487, 491, 499, 503, 509, 521, 523,
             541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641,
@@ -37,17 +37,13 @@ public class MultipleSingleIterOnlineDvrpLauncher
     private SingleIterOnlineDvrpLauncher launcher;
 
 
-    public MultipleSingleIterOnlineDvrpLauncher(String paramFile)
-        throws IOException
+    /*package*/MultipleSingleIterOnlineDvrpLauncher(String paramFile)
     {
-        launcher = new SingleIterOnlineDvrpLauncher();
-        launcher.readArgs(paramFile);
-        launcher.prepareMatsimData();
+        launcher = new SingleIterOnlineDvrpLauncher(paramFile);
     }
 
 
-    public void run(int configIdx, int runs, PrintWriter pw, PrintWriter pw2)
-        throws IOException
+    /*package*/void run(int configIdx, int runs, PrintWriter pw, PrintWriter pw2)
     {
         launcher.algorithmConfig = AlgorithmConfig.ALL[configIdx];
 
@@ -147,7 +143,7 @@ public class MultipleSingleIterOnlineDvrpLauncher
 
     // args: configIdx runs
     public static void main(String... args)
-        throws IOException
+        throws FileNotFoundException
     {
         String paramFile;
         if (args.length == 2) {

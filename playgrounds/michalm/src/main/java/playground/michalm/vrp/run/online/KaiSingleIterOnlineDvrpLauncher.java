@@ -19,39 +19,12 @@
 
 package playground.michalm.vrp.run.online;
 
-import java.io.IOException;
-
-
-public class KaiSingleIterOnlineDvrpLauncher
+/*package*/class KaiSingleIterOnlineDvrpLauncher
 {
-    private static void processArgs(SingleIterOnlineDvrpLauncher launcher, String dir)
-    {
-        launcher.dirName = dir + "\\";
-        launcher.netFileName = launcher.dirName + "network.xml";
-        launcher.plansFileName = launcher.dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
-
-        launcher.depotsFileName = launcher.dirName + "depots-5_taxis-15.xml";
-        launcher.taxiCustomersFileName = launcher.dirName + "taxiCustomers_1_pc.txt";
-
-        launcher.eventsFileName = launcher.dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
-
-        launcher.algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
-
-        launcher.otfVis = true;
-
-        launcher.vrpOutFiles = !true;
-        launcher.vrpOutDirName = launcher.dirName + "vrp_output";
-    }
-
-
     public static void main(String... args)
-        throws IOException
     {
-        String dir = "D:\\PP-rad\\taxi\\mielec\\";
-        SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher();
-        processArgs(launcher, dir);
-
-        launcher.prepareMatsimData();
+        String file = "shared-svn/projects/maciejewski/input/mielec-2-peaks/params.in";
+        SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher(file);
         launcher.go();
         launcher.generateOutput();
     }
