@@ -444,7 +444,16 @@ public class HITSAnalyser {
 			return null;
 		}
 	}
-
+	private double getValidStartTime(double startTime){
+		while(startTime<0 || startTime>24*3600){
+			if(startTime<0){
+				startTime = 24*3600+startTime;
+			}else if(startTime>24*3600){
+				startTime = startTime-24*3600;
+			}
+		}
+		return startTime;
+	}
 	private void createSQLSummary(Connection conn, double busSearchradius,
 			double mrtSearchRadius, boolean writeTransitCoords) {
 		// arb code for summary generation
@@ -537,13 +546,7 @@ public class HITSAnalyser {
 						double startTime = ((double) (t.t3_starttime_24h
 								.getTime() - this.referenceDate.getTime()))
 								/ (double) Timer.ONE_SECOND;
-						while(startTime<0 || startTime>24*3600){
-							if(startTime<0){
-								startTime = 24*3600+startTime;
-							}else if(startTime>24*3600){
-								startTime = startTime-24*3600;
-							}							
-						}
+
 						
 							origCoord = HITSAnalyser.zip2Coord
 									.get(t.p13d_origpcode);
@@ -568,10 +571,10 @@ public class HITSAnalyser {
 											destCoord);
 							congestedCarDistance = HITSAnalyser
 									.getCarCongestedShortestPathDistance(
-											origCoord, destCoord, Math.max(0, startTime)).distance;
+											origCoord, destCoord, getValidStartTime(startTime)).distance;
 							congestedCarTime = HITSAnalyser
 									.getCarCongestedShortestPathDistance(
-											origCoord, destCoord, Math.max(0, startTime)).time;
+											origCoord, destCoord, getValidStartTime(startTime)).time;
 							
 							// route transit-only trips using the transit router
 							
@@ -693,6 +696,7 @@ public class HITSAnalyser {
 											1.5, 2, 2.5, 3, 5, 10, 25 };
 									int radiusIdx = 0;
 									path = null;
+									linkStartTime=getValidStartTime(linkStartTime);
 									while (path == null
 											&& radiusIdx < radiusFactors.length) {
 										double searchRadius = 100;
@@ -704,10 +708,11 @@ public class HITSAnalyser {
 										HITSAnalyser.transitRouterConfig
 										.setSearchradius(searchRadius);
 										try{
-											System.out.println(ts.lines+ " orig: "+ ts.orig + " dest: " + ts.dest + " time:" + Math.max(0,linkStartTime) + " searchRadius:" + searchRadius);
+											System.out.println(ts.lines+ " orig: "+ ts.orig + " dest: " + ts.dest + " time:" + 
+										linkStartTime + " searchRadius:" + searchRadius);
 											path = transitRouter.calcPathRoute(
 													ts.orig, ts.dest,
-													Math.max(0,linkStartTime), null);
+													linkStartTime, null);
 										}catch(NullPointerException e){
 											
 										}
@@ -815,7 +820,7 @@ public class HITSAnalyser {
 											double linkTime = transitTravelFunction
 													.getLinkTravelTime(
 															transitLink,
-															Math.max(0, linkStartTime),
+															linkStartTime,
 															null, null);
 											insertString2 += String
 													.format("(\'%s\', \'%s\', %d, %d, \'%s\',"
@@ -909,7 +914,7 @@ public class HITSAnalyser {
 											double linkTime = transitTravelFunction
 													.getLinkTravelTime(
 															transitLink,
-															Math.max(0, linkStartTime),
+															 linkStartTime,
 															null, null);
 											insertString2 += String
 													.format("(\'%s\', \'%s\', %d, %d, \'%s\',"

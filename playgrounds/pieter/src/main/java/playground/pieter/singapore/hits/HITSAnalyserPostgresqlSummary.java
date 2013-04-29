@@ -720,7 +720,16 @@ public class HITSAnalyserPostgresqlSummary {
 			return null;
 		}
 	}
-
+	private double getValidStartTime(double startTime){
+		while(startTime<0 || startTime>24*3600){
+			if(startTime<0){
+				startTime = 24*3600+startTime;
+			}else if(startTime>24*3600){
+				startTime = startTime-24*3600;
+			}
+		}
+		return startTime;
+	}
 	private void compileTravellerChains(double busSearchradius,
 			double mrtSearchRadius) {
 		System.out.println("Starting summary : " + new java.util.Date());
@@ -740,22 +749,10 @@ public class HITSAnalyserPostgresqlSummary {
 				Coord destCoord;
 				double startTime = ((double) (t.t3_starttime_24h.getTime() - this.referenceDate
 						.getTime())) / (double) Timer.ONE_SECOND;
-				while (startTime < 0 || startTime > 24 * 3600) {
-					if (startTime < 0) {
-						startTime = 24 * 3600 + startTime;
-					} else if (startTime > 24 * 3600) {
-						startTime = startTime - 24 * 3600;
-					}
-				}
+
 				double endTime = ((double) (t.t4_endtime_24h.getTime() - this.referenceDate
 						.getTime())) / (double) Timer.ONE_SECOND;
-				while (endTime < 0 || endTime > 24 * 3600) {
-					if (endTime < 0) {
-						endTime = 24 * 3600 + endTime;
-					} else if (endTime > 24 * 3600) {
-						endTime = endTime - 24 * 3600;
-					}
-				}
+
 
 				origCoord = HITSAnalyserPostgresqlSummary.zip2Coord
 						.get(t.p13d_origpcode);
@@ -806,7 +803,7 @@ public class HITSAnalyserPostgresqlSummary {
 				if (journey.isCarJourney()) {
 					TimeAndDistance carTimeDistance = HITSAnalyserPostgresqlSummary
 							.getCarCongestedShortestPathDistance(origCoord,
-									destCoord, Math.max(0, startTime));
+									destCoord, getValidStartTime(startTime));
 					Trip trip = journey.addTrip();
 					trip.setStartTime(startTime);
 					trip.setEndTime(startTime + carTimeDistance.time);
@@ -910,6 +907,7 @@ public class HITSAnalyserPostgresqlSummary {
 								3, 5, 10, 25 };
 						int radiusIdx = 0;
 						path = null;
+						linkStartTime=getValidStartTime(linkStartTime);
 						while (path == null && radiusIdx < radiusFactors.length) {
 							if (ts.busStage) {
 								HITSAnalyserPostgresqlSummary.transitRouterConfig
@@ -922,7 +920,7 @@ public class HITSAnalyserPostgresqlSummary {
 							}
 							try {
 								path = transitRouter.calcPathRoute(ts.orig,
-										ts.dest, Math.max(0, linkStartTime),
+										ts.dest, linkStartTime,
 										null);
 							} catch (NullPointerException e) {
 
@@ -1003,7 +1001,7 @@ public class HITSAnalyserPostgresqlSummary {
 								trip.incrementDistance(linkLength);
 								double linkTime = transitTravelFunction
 										.getLinkTravelTime(transitLink,
-												Math.max(0, linkStartTime),
+												linkStartTime,
 												null, null);
 								trip.incrementTime(linkTime);
 								linkStartTime += linkTime;
@@ -1047,7 +1045,7 @@ public class HITSAnalyserPostgresqlSummary {
 								substage_id++;
 								double linkTime = transitTravelFunction
 										.getLinkTravelTime(transitLink,
-												Math.max(0, linkStartTime),
+												linkStartTime,
 												null, null);
 
 								Wait wait = journey.addWait();
