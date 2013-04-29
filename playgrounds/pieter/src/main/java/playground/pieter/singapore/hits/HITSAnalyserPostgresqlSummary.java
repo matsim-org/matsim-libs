@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -773,8 +774,12 @@ public class HITSAnalyserPostgresqlSummary {
 					home.setType("home");
 				} else {
 					// get the last activity created
+					try{
 					Activity activity = chain.getActs().getLast();
 					activity.setEndTime(startTime);
+					}catch(NoSuchElementException n){
+						continue PERSONS;
+					}
 				}
 				// add the journey
 
