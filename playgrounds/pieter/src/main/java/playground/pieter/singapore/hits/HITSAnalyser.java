@@ -454,8 +454,8 @@ public class HITSAnalyser {
 				System.out
 						.println("Starting summary : " + new java.util.Date());
 				Statement s = conn.createStatement();
-				s.execute("DROP TABLE IF EXISTS trip_summary_routed;");
-				s.execute("CREATE TABLE trip_summary_routed (pax_idx VARCHAR(45), trip_idx VARCHAR(45),    "
+				s.execute("DROP TABLE IF EXISTS trip_summary_routed_refactored;");
+				s.execute("CREATE TABLE trip_summary_routed_refactored (pax_idx VARCHAR(45), trip_idx VARCHAR(45),    "
 						+ ""
 						+ "totalWalkTime int,  totalTravelTime int, estTravelTime int, tripcount int, "
 						+ "invehtime int, freeCarDistance double, calcEstTripTime double, mainmode varchar(20), "
@@ -480,8 +480,8 @@ public class HITSAnalyser {
 						+ "totalWalkTimePax double, actMainModeChainPax  varchar(512), actStageChainPax  varchar(512), "
 						+ "actChainPax varchar(255))");
 				if (writeTransitCoords) {
-					s.execute("DROP TABLE IF EXISTS transit_coords;");
-					s.execute("CREATE TABLE transit_coords ("
+					s.execute("DROP TABLE IF EXISTS transit_coords_refactored;");
+					s.execute("CREATE TABLE transit_coords_refactored ("
 							+ "  id INT NOT NULL AUTO_INCREMENT"
 							+ ", pax_idx VARCHAR(45)"
 							+ ", trip_idx VARCHAR(45)" + ", stage_id int"
@@ -666,7 +666,7 @@ public class HITSAnalyser {
 								double linkStartTime = startTime;
 								Coord walkOrigin = orig;
 
-								String insertString2 = "INSERT INTO transit_coords"
+								String insertString2 = "INSERT INTO transit_coords_refactored"
 										+ "(pax_idx, trip_idx, stage_id, substage_id,"
 										+ " plan_element_type, "
 										+ "x_utm48n_orig, y_utm48n_orig, "
@@ -688,16 +688,16 @@ public class HITSAnalyser {
 									path = null;
 									while (path == null
 											&& radiusIdx < radiusFactors.length) {
+										double searchRadius = 100;
 										if (ts.busStage) {
-											HITSAnalyser.transitRouterConfig
-													.setSearchradius(busSearchradius
-															* radiusFactors[radiusIdx]);
+											searchRadius = busSearchradius * radiusFactors[radiusIdx];
 										} else {
-											HITSAnalyser.transitRouterConfig
-													.setSearchradius(mrtSearchRadius
-															* radiusFactors[radiusIdx]);
+											searchRadius = mrtSearchRadius * radiusFactors[radiusIdx];
 										}
+										HITSAnalyser.transitRouterConfig
+										.setSearchradius(searchRadius);
 										try{
+											System.out.println(ts.lines+ " orig: "+ ts.orig + " dest: " + ts.dest + " time:" + Math.max(0,linkStartTime) + " searchRadius:" + searchRadius);
 											path = transitRouter.calcPathRoute(
 													ts.orig, ts.dest,
 													Math.max(0,linkStartTime), null);
@@ -1012,7 +1012,7 @@ public class HITSAnalyser {
 							timeperiod = "PM";
 
 						insertString = String
-								.format("INSERT INTO trip_summary_routed VALUES(\'%s\',\'%s\',%d,%d,%d,%d,%d,%f,%f,\'%s\',\'%s\',%f,%f,%f,%f,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,\'%s\');",
+								.format("INSERT INTO trip_summary_routed_refactored VALUES(\'%s\',\'%s\',%d,%d,%d,%d,%d,%f,%f,\'%s\',\'%s\',%f,%f,%f,%f,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,\'%s\');",
 										pax_idx, trip_idx, t.totalWalkTimeTrip,
 										t.calculatedJourneyTime,
 										t.estimatedJourneyTime, tripcount,
@@ -1371,7 +1371,7 @@ public class HITSAnalyser {
 	}
 
 	public static void main(String[] args) throws Exception {
-		HITSAnalyser.createRouters(Arrays.copyOfRange(args, 2, 10),true);
+		HITSAnalyser.createRouters(Arrays.copyOfRange(args, 3, 11),Boolean.parseBoolean(args[2]));
 		System.out.println(new java.util.Date());
 		HITSAnalyser hp;
 		System.out.println(args[0].equals("sql"));
