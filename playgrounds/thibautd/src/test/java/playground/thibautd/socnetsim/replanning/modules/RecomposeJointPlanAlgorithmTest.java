@@ -138,7 +138,6 @@ public class RecomposeJointPlanAlgorithmTest {
 			final Id id = new IdImpl( i );
 			final Person person = new PersonImpl( id );
 			final Plan plan = new PlanImpl( person );
-			plans.add( plan );
 			jointPlan.put( id , plan );
 
 			if (random.nextDouble() < 0.2) {
@@ -158,6 +157,51 @@ public class RecomposeJointPlanAlgorithmTest {
 				jointPlansToExpect);
 	}
 
+	private Fixture createRandomFixtureWithJointAndIndividualPlans(final Random random) {
+		final JointPlanFactory factory = new JointPlanFactory();
+		Map<Id, Plan> currentJointPlan = new HashMap<Id, Plan>();
+		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
+		final List<Plan> plans = new ArrayList<Plan>();
+		Set<Id> currentExpectedJointPlan = new HashSet<Id>();
+		final List<Set<Id>> jointPlansToExpect = new ArrayList<Set<Id>>();
+		jointPlansToExpect.add( currentExpectedJointPlan );
+
+		for (int i=0; i < 100; i++) {
+			final Id id = new IdImpl( i );
+			final Person person = new PersonImpl( id );
+			final Plan plan = new PlanImpl( person );
+			if ( random.nextDouble() < 0.2 ) {
+				plans.add( plan );
+			}
+			else {
+				if ( random.nextDouble() < 0.4 ) {
+					final JointPlan jp = factory.createJointPlan( currentJointPlan );
+					jointPlans.add( jp );
+					currentJointPlan = new HashMap<Id, Plan>();
+				}
+				currentJointPlan.put( id , plan );
+			}
+
+			if (random.nextDouble() < 0.2) {
+				currentExpectedJointPlan = new HashSet<Id>();
+				jointPlansToExpect.add( currentExpectedJointPlan );
+			}
+
+			currentExpectedJointPlan.add( id );
+		}
+
+		if ( !currentJointPlan.isEmpty() ) {
+			final JointPlan jp = factory.createJointPlan( currentJointPlan );
+			jointPlans.add( jp );
+		}
+
+		return new Fixture(
+				new GroupPlans(
+					jointPlans,
+					plans),
+				jointPlansToExpect);
+	}
+
 	@Test
 	public void testIndividualPlans() throws Exception {
 		test( createRandomFixtureWithIndividualPlans( new Random( 1234 ) ) );
@@ -166,6 +210,11 @@ public class RecomposeJointPlanAlgorithmTest {
 	@Test
 	public void testUniqueJointPlan() throws Exception {
 		test( createRandomFixtureWithOneBigJointPlan( new Random( 1234 ) ) );
+	}
+
+	@Test
+	public void testJointAndIndividualPlans() throws Exception {
+		test( createRandomFixtureWithJointAndIndividualPlans( new Random( 1234 ) ) );
 	}
 
 	private static void test( final Fixture fixture ) {

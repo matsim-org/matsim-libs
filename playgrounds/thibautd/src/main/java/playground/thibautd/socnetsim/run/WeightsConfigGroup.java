@@ -31,6 +31,7 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private double vehicleAllocation = -1;
 	private double planVehicleAllocation = -1;
 	private double optimizedVehicleAllocation = -1;
+	private double recomposeJointPlans = -1;
 	private boolean jtmOptimizes = true;
 	private Synchro doSynchronize = Synchro.dynamic;
 	private boolean checkConsistency = false;
@@ -142,6 +143,17 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	public void setJtmOptimizes(final boolean v) {
 		this.jtmOptimizes = v;
 	}
+
+	@StringGetter( "recomposeJointPlansRandom" )
+	public double getRecomposeJointPlansRandomlyWeight() {
+		return recomposeJointPlans;
+	}
+
+	@StringSetter( "recomposeJointPlansRandom" )
+	public void setRecomposeJointPlansRandomlyWeight(final double v) {
+		this.recomposeJointPlans = v;
+	}
+
 
 	@StringGetter( "doSynchronize" )
 	public Synchro getSynchronize() {

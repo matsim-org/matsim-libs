@@ -126,6 +126,10 @@ public class RunUtils {
 				GroupPlanStrategyFactory.createOptimizingTourVehicleAllocation(
 					controllerRegistry ),
 				weights.getTourLevelOptimizeVehicleWeight() );
+		strategyRegistry.addStrategy(
+				GroupPlanStrategyFactory.createRandomJointPlansRecomposer(
+					controllerRegistry ),
+				weights.getRecomposeJointPlansRandomlyWeight() );
 	}
 
 	public static void loadDefaultAnalysis(
