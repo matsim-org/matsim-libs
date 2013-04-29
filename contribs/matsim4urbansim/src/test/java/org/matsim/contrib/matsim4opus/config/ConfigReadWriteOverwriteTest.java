@@ -34,6 +34,7 @@ import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -116,11 +117,15 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 			
 			checkCoreModuleSettings(testConfig, config);
 			
+			config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl() ) ;
+			config.checkConsistency() ;
+			
 		} catch(Exception e){
 			e.printStackTrace();
 			Assert.assertTrue(false);
 		}
 		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		log.info("done") ;
 	}
 	
 	/**
