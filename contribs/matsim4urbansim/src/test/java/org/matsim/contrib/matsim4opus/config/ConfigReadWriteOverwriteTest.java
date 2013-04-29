@@ -191,24 +191,17 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 			CreateTestExternalMATSimConfig testExternalConfig,
 			CreateTestMATSimConfig testConfig, Config config) {
 		
-		///////////////////////////////////////////////////
-		// Testing overlapping parameter settings (these settings must be equal to the settings in "testExternalConfig" 
-		///////////////////////////////////////////////////
-		ControlerConfigGroup contolerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
-		Assert.assertTrue(contolerCG.getFirstIteration() == testExternalConfig.firstIteration.intValue());
-		Assert.assertTrue(contolerCG.getLastIteration() == testExternalConfig.lastIteration.intValue());
-		Assert.assertTrue( Paths.checkPathEnding( contolerCG.getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.matsim4opusOutput ) ));
+		Assert.assertTrue(config.controler().getFirstIteration() == testExternalConfig.firstIteration.intValue());
+		Assert.assertTrue(config.controler().getLastIteration() == testExternalConfig.lastIteration.intValue());
+		Assert.assertTrue( Paths.checkPathEnding( config.controler().getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.matsim4opusOutput ) ));
 		
-		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
-		Assert.assertTrue( Paths.checkPathEnding( networkCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.networkInputFile ) ));
+		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.networkInputFile ) ));
 		
 		if(testConfig.getStartMode() != testExternalConfig.COLD_START){
-			PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
-			Assert.assertTrue( Paths.checkPathEnding( plansCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.inputPlansFile ) ));
+			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.inputPlansFile ) ));
 		}
 		
-		StrategyConfigGroup strategyCG = (StrategyConfigGroup) config.getModule(StrategyConfigGroup.GROUP_NAME);
-		Iterator<StrategySettings> iteratorStrategyCG = strategyCG.getStrategySettings().iterator();
+		Iterator<StrategySettings> iteratorStrategyCG = config.strategy().getStrategySettings().iterator();
 		while(iteratorStrategyCG.hasNext()){
 			StrategySettings strategySettings = iteratorStrategyCG.next();
 			
