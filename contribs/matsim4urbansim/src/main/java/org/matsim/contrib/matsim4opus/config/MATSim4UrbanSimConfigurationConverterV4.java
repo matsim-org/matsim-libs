@@ -23,18 +23,19 @@
  */
 package org.matsim.contrib.matsim4opus.config;
 
+<<<<<<< HEAD
 import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
+=======
+>>>>>>> made more methods static and moved them to the ...Utils class
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.MatsimConfigType;
-import org.matsim.contrib.matsim4opus.utils.ids.IdFactory;
-import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.core.config.Config;
+<<<<<<< HEAD
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
@@ -48,6 +49,9 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.utils.io.UncheckedIOException;
+=======
+import org.matsim.core.config.Module;
+>>>>>>> made more methods static and moved them to the ...Utils class
 
 /**
  * @author thomas
@@ -91,8 +95,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
  *   made in the MATSim4UrbanSim config (see also test cases in "ConfigLoadingTest")
  */
 public class MATSim4UrbanSimConfigurationConverterV4 {
-	public static final boolean AFTER_END_OF_CASE_STUDIES = false ;
-	
 	// logger
 	static final Logger log = Logger.getLogger(MATSim4UrbanSimConfigurationConverterV4.class);
 	
@@ -101,37 +103,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	// JAXB representation of matsim4urbansim config
 	private MatsimConfigType matsim4urbansimConfig = null;
 	// MATSim4UrbanSim module from external MATSim config
-	private Module matsim4UrbanSimModule = null;
+	private Module matsim4urbansimModule = null;
 	
-	
-	// module and param names for matsim4urbansim settings stored in an external MATSim config file
-	public static final String MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG = "matsim4urbansimParameter";// module
-	// parameter names in matsim4urbansimParameter module
-	public static final String TIME_OF_DAY = "timeOfDay";								
-	public static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
-	public static final String PT_STOPS = "ptStops";
-	public static final String PT_STOPS_SWITCH = "usePtStops";
-	public static final String PT_TRAVEL_TIMES = "ptTravelTimes";
-	public static final String PT_TRAVEL_DISTANCES = "ptTravelDistances";
-	public static final String PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH = "useTravelTimesAndDistances";
-	public static final String BETA_BIKE_TRAVEL_TIME = "betaBikeTravelTime";
-	public static final String BETA_BIKE_TRAVEL_TIME_POWER2 = "betaBikeTravelTimePower2";
-	public static final String BETA_BIKE_LN_TRAVEL_TIME = "betaBikeLnTravelTime";
-	public static final String BETA_BIKE_TRAVEL_DISTANCE = "betaBikeTravelDistance";
-	public static final String BETA_BIKE_TRAVEL_DISTANCE_POWER2 = "betaBikeTravelDistancePower2";
-	public static final String BETA_BIKE_LN_TRAVEL_DISTANCE = "betaBikeLnTravelDistance";
-	public static final String BETA_BIKE_TRAVEL_MONETARY_COST = "betaBikeTravelCost";
-	public static final String BETA_BIKE_TRAVEL_MONETARY_COST_POWER2 = "betaBikeTravelCostPower2";
-	public static final String BETA_BIKE_LN_TRAVEL_MONETARY_COST = "betaBikeLnTravelCost";
-	public static final String BETA_PT_TRAVEL_TIME = "betaPtTravelTime";
-	public static final String BETA_PT_TRAVEL_TIME_POWER2 = "betaPtTravelTimePower2";
-	public static final String BETA_PT_LN_TRAVEL_TIME = "betaPtLnTravelTime";
-	public static final String BETA_PT_TRAVEL_DISTANCE = "betaPtTravelDistance";
-	public static final String BETA_PT_TRAVEL_DISTANCE_POWER2 = "betaPtTravelDistancePower2";
-	public static final String BETA_PT_LN_TRAVEL_DISTANCE = "betaPtLnTravelDistance";
-	public static final String BETA_PT_TRAVEL_MONETARY_COST = "betaPtTravelCost";
-	public static final String BETA_PT_TRAVEL_MONETARY_COST_POWER2 = "betaPtTravelCostPower2";
-	public static final String BETA_PT_LN_TRAVEL_MONETARY_COST = "betaPtLnTravelCost";
 	
 	/**
 	 * constructor
@@ -152,27 +125,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	 */
 	public MATSim4UrbanSimConfigurationConverterV4(final String matsim4urbansimConfigFilename){
 		this.config = null;
-		this.matsim4urbansimConfig = unmarschal(matsim4urbansimConfigFilename); // loading and initializing MATSim config		
-	}
-	
-	/**
-	 * loading, validating and initializing MATSim config.
-	 */
-	MatsimConfigType unmarschal(String matsim4urbansimConfigFilename){
-		
-		// JAXBUnmaschal reads the UrbanSim generated MATSim config, validates it against
-		// the current xsd (checks e.g. the presents and data type of parameter) and generates
-		// an Java object representing the config file.
-		JAXBUnmaschalV2 unmarschal = new JAXBUnmaschalV2( matsim4urbansimConfigFilename );
-		
-		MatsimConfigType matsim4urbansimConfig = null;
-		
-		// binding the parameter from the MATSim Config into the JAXB data structure
-		if( (matsim4urbansimConfig = unmarschal.unmaschalMATSimConfig()) == null){
-			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
-			System.exit(InternalConstants.UNMARSCHALLING_FAILED);
-		}
-		return matsim4urbansimConfig;
+		this.matsim4urbansimConfig = MATSim4UrbanSimConfigUtils.unmarschal(matsim4urbansimConfigFilename); // loading and initializing MATSim config		
 	}
 	
 	/**
@@ -185,35 +138,39 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			// get root elements from JAXB matsim4urbansim config object
 			ConfigType matsim4urbansimConfigPart1 = matsim4urbansimConfig.getConfig();
 			Matsim4UrbansimType matsim4urbansimConfigPart2 = matsim4urbansimConfig.getMatsim4Urbansim();
+			
+			// yyyyyy I really need to check if _all_ external settings are copied, or only some of them.  kai, apr'13
 
 			// creates an empty config to be filled by settings from the MATSim4UrbanSim
 			// and external config file
-			createEmptyConfigWithVSPExperimentalAbort(matsim4urbansimConfigPart1);
+			this.config = MATSim4UrbanSimConfigUtils.createEmptyConfigWithVSPExperimentalAbort(matsim4urbansimConfigPart1);
+
 			// loads the external MATSim config separately (to get additional MATSim 4UrbanSim parameters)
-			initMATSim4UrbanSimModule(matsim4urbansimConfigPart1);
+			this.matsim4urbansimModule = MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimModule(matsim4urbansimConfigPart1);
 			
 			// initializing config with MATSim4UrbanSim parameter
-			initGlobalSettings();
+			MATSim4UrbanSimConfigUtils.initGlobalSettings( config );
 			
-			initUrbanSimParameter(matsim4urbansimConfigPart2);
-			initMATSim4UrbanSimControler(matsim4urbansimConfigPart2);
-			initAccessibilityParameter(matsim4urbansimConfigPart2);
+			MATSim4UrbanSimConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimModule, config);
+			MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimModule, config);
+			MATSim4UrbanSimConfigUtils.initAccessibilityParameter(matsim4urbansimConfigPart2, matsim4urbansimModule, config);
 			
-			initNetwork(matsim4urbansimConfigPart1);
-			initInputPlansFile(matsim4urbansimConfigPart1);
-			initControler(matsim4urbansimConfigPart1);
-			initPlanCalcScore(matsim4urbansimConfigPart1);
-			initStrategy(matsim4urbansimConfigPart1);
+			MATSim4UrbanSimConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
+			MATSim4UrbanSimConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
+			MATSim4UrbanSimConfigUtils.initControler(matsim4urbansimConfigPart1, config);
+			MATSim4UrbanSimConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
+			MATSim4UrbanSimConfigUtils.initStrategy(matsim4urbansimConfigPart1, config);
 
-			initPlanCalcRoute();
-			initQSim();
+			MATSim4UrbanSimConfigUtils.initPlanCalcRoute(config);
+			MATSim4UrbanSimConfigUtils.initQSim(matsim4urbansimConfig, config);
 			
 			// loading the external MATSim config in to the initialized config
 			// overlapping parameter settings (in MATSim4UrbanSim and external MATSim config)
 			// are overwritten by the external MATSim settings
-			loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1);
+			MATSim4UrbanSimConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
 			
 			// show final settings
+<<<<<<< HEAD
 //			printGlobalConfigGroupSettings();
 			Utils.printUrbanSimParameterSettings( log, this.getUrbanSimParameterConfig() );
 			Utils.printMATSim4UrbanSimControlerSettings( log, getMATSim4UrbaSimControlerConfig() );
@@ -227,6 +184,13 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 //			printPlanCalcRouteGroupSettings();
 			
 			Utils.checkConfigConsistencyAndWriteToLog(config, "At the end of the matsim4urbansim config converter:") ;
+=======
+			MATSim4UrbanSimConfigUtils.printUrbanSimParameterSettings( MATSim4UrbanSimConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
+			MATSim4UrbanSimConfigUtils.printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
+			MATSim4UrbanSimConfigUtils.printAccessibilityParameterSettings( MATSim4UrbanSimConfigUtils.getAccessibilityParameterConfigAndPossiblyConvert(config) );
+			
+			MATSim4UrbanSimConfigUtils.checkConfigConsistencyAndWriteToLog(config, "At the end of the matsim4urbansim config converter:") ;
+>>>>>>> made more methods static and moved them to the ...Utils class
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -235,6 +199,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		return true;
 	}
 
+<<<<<<< HEAD
 	/**
 	 * @param matsim4urbansimConfigPart1
 	 * @throws UncheckedIOException
@@ -1092,10 +1057,13 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		return 0.;
 	}
 	
+=======
+>>>>>>> made more methods static and moved them to the ...Utils class
 	public Config getConfig(){
 			return this.config;
 	}
 	
+<<<<<<< HEAD
 	public AccessibilityParameterConfigModule getAccessibilityParameterConfig() {
 		Module m = this.config.getModule(AccessibilityParameterConfigModule.GROUP_NAME);
 		if (m instanceof AccessibilityParameterConfigModule) {
@@ -1127,6 +1095,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	}
 	
 	// Testing fetch  factor calculation for storageCap 
+=======
+	 // Testing fetch  factor calculation for storageCap 
+>>>>>>> made more methods static and moved them to the ...Utils class
 	public static void main(String[] args) {
 	
 //		MatsimConfigType mct = new MatsimConfigType();

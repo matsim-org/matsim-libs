@@ -234,7 +234,7 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 		// Here, additional parameters from the external config, that are not overlapping, are tested!
 		///////////////////////////////////////////////////
 		
-		Module matsim4UrbanSimModule = config.getModule(MATSim4UrbanSimConfigurationConverterV4.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+		Module matsim4UrbanSimModule = config.getModule(MATSim4UrbanSimConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
 		
 		///////////////////////////////////////////////////
 		// MATSim4UrbanSim Controler Config Module Settings
@@ -243,13 +243,13 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 		// time of day
 		Assert.assertTrue( matsim4UrbanSimControlerModule.getTimeOfDay() == testExternalConfig.timeOfDay );
 		// use pt stops flag
-		boolean usePtStopsFlagFromConfig = matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigurationConverterV4.PT_STOPS_SWITCH ) != null && matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigurationConverterV4.PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE");
+		boolean usePtStopsFlagFromConfig = matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigUtils.PT_STOPS_SWITCH ) != null && matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigUtils.PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE");
 		Assert.assertTrue( usePtStopsFlagFromConfig == testExternalConfig.usePtStops.equalsIgnoreCase("TRUE") );
 		// pt stops
 		if(testExternalConfig.usePtStops.equalsIgnoreCase("TRUE"))
 			Assert.assertTrue( Paths.checkPathEnding( matsim4UrbanSimControlerModule.getPtStopsInputFile()  ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.ptStops ) ));
 		// use pt travel times and distances
-		boolean usePtTimesAndDiastances = matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null && matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase("TRUE");
+		boolean usePtTimesAndDiastances = matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null && matsim4UrbanSimModule.getValue( MATSim4UrbanSimConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase("TRUE");
 		Assert.assertTrue( usePtTimesAndDiastances == testExternalConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") );
 		
 		if( testExternalConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") ){

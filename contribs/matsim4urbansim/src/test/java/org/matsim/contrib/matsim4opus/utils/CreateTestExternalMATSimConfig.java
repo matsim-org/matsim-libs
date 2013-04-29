@@ -25,7 +25,7 @@ package org.matsim.contrib.matsim4opus.utils;
 import java.math.BigInteger;
 
 import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigUtils;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
@@ -144,14 +144,14 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		Config config = new Config();
 		
 		// matsim4urbansimParameter module
-		Module matsim4UrbanSimModule = config.createModule( MATSim4UrbanSimConfigurationConverterV4.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.TIME_OF_DAY, this.timeOfDay + "");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_STOPS, this.ptStops);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_STOPS_SWITCH, this.usePtStops);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES, this.ptTravelTimes);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+		Module matsim4UrbanSimModule = config.createModule( MATSim4UrbanSimConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.TIME_OF_DAY, this.timeOfDay + "");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS, this.ptStops);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS_SWITCH, this.usePtStops);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_TRAVEL_TIMES, this.ptTravelTimes);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 		// tnicolai: this are no default parameters anymore.
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME, this.betaBikeTravelTime + "");
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME_POWER2, this.betaBikeTravelTimePower2 + "");
@@ -233,10 +233,10 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		Config config = new Config();
 		
 		// matsim4urbansimParameter module
-		Module matsim4UrbanSimModule = config.createModule( MATSim4UrbanSimConfigurationConverterV4.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_STOPS_SWITCH, "True");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_STOPS, this.ptStops);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+		Module matsim4UrbanSimModule = config.createModule( MATSim4UrbanSimConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS_SWITCH, "True");
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS, this.ptStops);
+		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 		
 		// changeLegMode module
 		Module changeLegModeModule = config.createModule(changeLegModeModuleName);
