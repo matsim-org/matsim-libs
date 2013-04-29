@@ -39,6 +39,8 @@ public class CreateTikzFigureOfJpStructure {
 	private static final Logger log =
 		Logger.getLogger(CreateTikzFigureOfJpStructure.class);
 
+	private static final boolean VEHICLES = true;
+
 	public static void main(final String[] args) {
 		final String plansFile = args[ 0 ];
 		final String jointPlansFile = args[ 1 ];
@@ -56,7 +58,7 @@ public class CreateTikzFigureOfJpStructure {
 		final JointStructureTikzCreator tikzCreator =
 			new JointStructureTikzCreator();
 		log.info( "load plan infos" );
-		parsePlanInfos( true , plansFile , tikzCreator , personIds );
+		parsePlanInfos( VEHICLES , plansFile , tikzCreator , personIds );
 		log.info( "load joint plan infos" );
 		parsePlanLinkInfo( jointPlansFile , tikzCreator , personIds );
 
