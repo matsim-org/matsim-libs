@@ -41,7 +41,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -49,7 +48,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
@@ -77,22 +76,13 @@ public class MATSim4UrbanSimConfigUtils {
 	 * @param matsim4urbansimModule TODO
 	 * @param config TODO
 	 */
-	static void initMATSim4UrbanSimControler(Matsim4UrbansimType matsim4UrbanSimParameter, Module matsim4urbansimModule, Config config){
+	static void initMATSim4UrbanSimControler(Matsim4UrbansimType matsim4UrbanSimParameter, 
+			Module matsim4urbansimModule, Config config){
 		
-		// get every single matsim4urbansim/matsim4urbansimContoler parameter
-		boolean computeZone2ZoneImpedance 		= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance();
-		boolean computeAgentPerformanceFeedback	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance();
-		boolean computeZoneBasedAccessibility 	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility();
 		boolean computeCellBasedAccessibility	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility();
 		boolean computeCellBasedAccessibilityNetwork   = false;
 		boolean computeCellbasedAccessibilityShapeFile = false;
 		
-		int cellSize 							= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getCellSizeCellBasedAccessibility().intValue();
-		boolean useCustomBoundingBox			= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox();
-		double boundingBoxLeft					= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxLeft();
-		double boundingBoxBottom				= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxBottom();
-		double boundingBoxRight					= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxRight();
-		double boundingBoxTop					= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxTop();
 		String shapeFile						= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getShapeFileCellBasedAccessibility().getInputFile();
 	
 		// if cell-based accessibility is enabled, check whether a shapefile is given 
@@ -106,6 +96,8 @@ public class MATSim4UrbanSimConfigUtils {
 				computeCellbasedAccessibilityShapeFile = true;
 			}
 		}
+		
+		// ===
 		
 		double timeOfDay						= 8 * 3600.; // default value
 		String ptStops							= null;
@@ -150,7 +142,8 @@ public class MATSim4UrbanSimConfigUtils {
 						log.info("Found pt travel distance input file: " + ptTravelDistances);
 					}
 					else{
-						log.error("The parameter 'useTravelTimesAndDistances' is set TRUE but either no pt travel time or distance input file found! Both files needs to be set to use precomputed pt times and distances.");
+						log.error("The parameter 'useTravelTimesAndDistances' is set TRUE but either no pt travel time or distance input file found! " +
+								"Both files needs to be set to use precomputed pt times and distances.");
 						log.error("Given input file name for 'ptTravelTimes' = " + ptTravelTimes);
 						log.error("Given input file name for 'ptTravelDistances' = " + ptTravelDistances);
 						log.error("At least one of these two files was not found.  Aborting ...") ;
@@ -160,21 +153,23 @@ public class MATSim4UrbanSimConfigUtils {
 			}
 		}
 		
+		// ===
+		
 		// set parameter in module 
 		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
-		module.setAgentPerformance(computeAgentPerformanceFeedback);
-		module.setZone2ZoneImpedance(computeZone2ZoneImpedance);
-		module.setZoneBasedAccessibility(computeZoneBasedAccessibility);
+		module.setAgentPerformance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance());
+		module.setZone2ZoneImpedance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance());
+		module.setZoneBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility());
 		module.setCellBasedAccessibility(computeCellBasedAccessibility);
-		module.setCellSizeCellBasedAccessibility(cellSize);
+		module.setCellSizeCellBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getCellSizeCellBasedAccessibility().intValue());
 		module.setCellBasedAccessibilityShapeFile(computeCellbasedAccessibilityShapeFile);
 		module.setCellBasedAccessibilityNetwork(computeCellBasedAccessibilityNetwork);
 		module.setShapeFileCellBasedAccessibility(shapeFile);
-		module.setUsingCustomBoundingBox(useCustomBoundingBox);
-		module.setBoundingBoxLeft(boundingBoxLeft);
-		module.setBoundingBoxBottom(boundingBoxBottom);
-		module.setBoundingBoxRight(boundingBoxRight);
-		module.setBoundingBoxTop(boundingBoxTop);
+		module.setUsingCustomBoundingBox(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox());
+		module.setBoundingBoxLeft(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxLeft());
+		module.setBoundingBoxBottom(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxBottom());
+		module.setBoundingBoxRight(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxRight());
+		module.setBoundingBoxTop(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxTop());
 		module.setTimeOfDay(timeOfDay);
 		module.setPtStopsInputFile(ptStops);
 		module.setPtTravelTimesInputFile(ptTravelTimes);
@@ -260,21 +255,29 @@ public class MATSim4UrbanSimConfigUtils {
 		 * @param matsim4urbansimConfigPart1
 		 * @throws UncheckedIOException
 		 */
-		static Module initMATSim4UrbanSimModule(ConfigType matsim4urbansimConfigPart1) throws UncheckedIOException {
+		static Module initMATSim4UrbanSimModule(String externalMATSimConfigFilename) throws UncheckedIOException {
 			
-			String externalMATSimConfigFilename = matsim4urbansimConfigPart1.getMatsimConfig().getInputFile();
 			if(externalMATSimConfigFilename != null && Paths.pathExsits(externalMATSimConfigFilename)){
 				Config tempConfig = ConfigUtils.loadConfig( externalMATSimConfigFilename.trim() );
+				
+				//"materialize" the local config groups:
+//				tempConfig.addModule(UrbanSimParameterConfigModuleV3.GROUP_NAME, 
+//						new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME) ) ;
+//				tempConfig.addModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME,
+//						new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME));
+//				tempConfig.addModule(AccessibilityParameterConfigModule.GROUP_NAME,
+//						new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME)) ;
+
+				
 				// loading additional matsim4urbansim parameter settings from external config file
 				Module module = tempConfig.getModule(MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
 				if(module == null)
-					MATSim4UrbanSimConfigurationConverterV4.log.info("No \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings found in " + externalMATSimConfigFilename);
+					log.info("No \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings found in " + externalMATSimConfigFilename);
 				else
-					MATSim4UrbanSimConfigurationConverterV4.log.info("Found \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings in " + externalMATSimConfigFilename);
+					log.info("Found \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings in " + externalMATSimConfigFilename);
 	//			matsim4UrbanSimModule = module;
 				return module ;
 			}
-			// yy this is what I found; originally, it would just NOT set the field variable. kai, apr'13
 			return null ;
 		}
 
@@ -307,7 +310,7 @@ public class MATSim4UrbanSimConfigUtils {
 	 * @param config TODO
 	 */
 	static void initInputPlansFile(ConfigType matsimParameter, Config config){
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Checking for warm or hot start...");
+		log.info("Checking for warm or hot start...");
 		// get plans file for hot start
 		String hotStart = matsimParameter.getHotStartPlansFile().getInputFile();
 		// get plans file for warm start 
@@ -318,24 +321,24 @@ public class MATSim4UrbanSimConfigUtils {
 		// setting plans file as input
 		if( !hotStart.equals("") &&
 		  (new File(hotStart)).exists() ){
-			MATSim4UrbanSimConfigurationConverterV4.log.info("Hot Start detcted!");
+			log.info("Hot Start detcted!");
 			setPlansFile( hotStart, config );
 			module.setHotStart(true);
 		}
 		else if( !warmStart.equals("") ){
-			MATSim4UrbanSimConfigurationConverterV4.log.info("Warm Start detcted!");
+			log.info("Warm Start detcted!");
 			setPlansFile( warmStart, config );
 			module.setWarmStart(true);
 		}
 		else{
-			MATSim4UrbanSimConfigurationConverterV4.log.info("Cold Start (no plans file) detected!");
+			log.info("Cold Start (no plans file) detected!");
 			module.setColdStart(true);
 		}
 		
 		// setting target location for hot start plans file
 		if(!hotStart.equals("")){
-			MATSim4UrbanSimConfigurationConverterV4.log.info("The resulting plans file after this MATSim run is stored at a specified place to enable hot start for the following MATSim run.");
-			MATSim4UrbanSimConfigurationConverterV4.log.info("The specified place is : " + hotStart);
+			log.info("The resulting plans file after this MATSim run is stored at a specified place to enable hot start for the following MATSim run.");
+			log.info("The specified place is : " + hotStart);
 			module.setHotStartTargetLocation(hotStart);
 		}
 		else
@@ -348,7 +351,7 @@ public class MATSim4UrbanSimConfigUtils {
 	 */
 	static void setPlansFile(String plansFile, Config config) {
 		
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Setting PlansConfigGroup to config...");
+		log.info("Setting PlansConfigGroup to config...");
 		PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
 		// set input plans file
 		plansCG.setInputFile( plansFile );
@@ -502,7 +505,7 @@ public class MATSim4UrbanSimConfigUtils {
 	 * @param config TODO
 	 */
 	static void initStrategy(ConfigType matsim4urbansimConfig, Config config){
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Setting StrategyConfigGroup to config...");
+		log.info("Setting StrategyConfigGroup to config...");
 		
 		// some modules are disables after 80% of overall iterations, 
 		// last iteration for them determined here tnicolai feb'12
@@ -538,11 +541,11 @@ public class MATSim4UrbanSimConfigUtils {
 		if(set4thStrategyModule){
 			// to be consistent, setting the same iteration number as in the strategies above 
 			changeLegMode.setDisableAfter(disableStrategyAfterIteration);
-			MATSim4UrbanSimConfigurationConverterV4.log.warn("setting disableStrategyAfterIteration for ChangeLegMode to " + disableStrategyAfterIteration + "; possibly overriding config settings!");
+			log.warn("setting disableStrategyAfterIteration for ChangeLegMode to " + disableStrategyAfterIteration + "; possibly overriding config settings!");
 			// check if other modes are set
 			Module changelegMode = config.getModule("changeLegMode");
 			if(changelegMode != null && changelegMode.getValue("modes") != null)
-				MATSim4UrbanSimConfigurationConverterV4.log.info("Following modes are found: " + changelegMode.getValue("modes"));
+				log.info("Following modes are found: " + changelegMode.getValue("modes"));
 		}
 		log.info("...done!");
 	}
@@ -561,24 +564,32 @@ public class MATSim4UrbanSimConfigUtils {
 		String externalMATSimConfig = matsimParameter.getMatsimConfig().getInputFile();
 		if(externalMATSimConfig != null && Paths.pathExsits(externalMATSimConfig)){
 			
-			MATSim4UrbanSimConfigurationConverterV4.log.info("Loading settings from external MATSim config: " + externalMATSimConfig);
-			MATSim4UrbanSimConfigurationConverterV4.log.warn("NOTE: MATSim4UrbanSim settings will be overwritten by settings in the external config! Make sure that this is what you intended!");
+			log.info("Loading settings from external MATSim config: " + externalMATSimConfig);
+			log.warn("NOTE: MATSim4UrbanSim settings will be overwritten by settings in the external config! Make sure that this is what you intended!");
 			new MatsimConfigReader(config).parse(externalMATSimConfig);
-			MATSim4UrbanSimConfigurationConverterV4.log.info("... loading settings done!");
+			log.info("... loading settings done!");
 		}
 	}
 
 	/**
 	 * creates an empty MATSim config to be filled by MATSim4UrbanSim + external MATSim config settings
 	 */
-	static Config createEmptyConfigWithVSPExperimentalAbort(ConfigType matsimParameter) {
+	static Config createEmptyConfigWithVSPExperimentalAbort() {
 		log.info("Creating an empty MATSim scenario.");
 		Config config = ConfigUtils.createConfig();
 		
-		// changing checking level to ABORT for vsp defaults means 
-		// that MATSim will stop if any parameter settings differ from that defaults
-		Module vsp = config.getModule("vspExperimental");
-		vsp.addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT);
+		//"materialize" the local config groups:
+		config.addModule(UrbanSimParameterConfigModuleV3.GROUP_NAME, 
+				new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME) ) ;
+		config.addModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME,
+				new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME));
+		config.addModule(AccessibilityParameterConfigModule.GROUP_NAME,
+				new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME)) ;
+		
+		// set "vsp abort":
+		VspExperimentalConfigGroup vsp = config.vspExperimental();
+		vsp.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
+
 		return config ;
 	}
 
@@ -596,7 +607,7 @@ public class MATSim4UrbanSimConfigUtils {
 		
 		// binding the parameter from the MATSim Config into the JAXB data structure
 		if( (matsim4urbansimConfig = unmarschal.unmaschalMATSimConfig()) == null){
-			MATSim4UrbanSimConfigurationConverterV4.log.error("Unmarschalling failed. SHUTDOWN MATSim!");
+			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
 			System.exit(InternalConstants.UNMARSCHALLING_FAILED);
 		}
 		return matsim4urbansimConfig;
@@ -1098,15 +1109,15 @@ public class MATSim4UrbanSimConfigUtils {
 //	}
 //
 	static final void checkConfigConsistencyAndWriteToLog(Config config, final String message) {
-		MATSim4UrbanSimConfigurationConverterV4.log.info(message);
+		log.info(message);
 		String newline = System.getProperty("line.separator");// use native line endings for logfile
 		StringWriter writer = new StringWriter();
 		new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
-		MATSim4UrbanSimConfigurationConverterV4.log.info(newline + newline + writer.getBuffer().toString());
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Complete config dump done.");
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Checking consistency of config...");
+		log.info(newline + newline + writer.getBuffer().toString());
+		log.info("Complete config dump done.");
+		log.info("Checking consistency of config...");
 		config.checkConsistency();
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Checking consistency of config done.");
+		log.info("Checking consistency of config done.");
 	}
 //
 //	/**

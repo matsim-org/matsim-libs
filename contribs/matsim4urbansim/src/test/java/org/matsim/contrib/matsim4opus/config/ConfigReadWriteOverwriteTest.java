@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.matsim4opus.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
@@ -33,23 +34,27 @@ import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thomas
  *
  */
-public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
+public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	
 	private static final Logger log = Logger.getLogger(ConfigReadWriteOverwriteTest.class);
+	
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	/**
 	 * This test makes sure that the MATSim4UrbanSim config file will be correctly written, 
@@ -140,12 +145,12 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 	public void testExternalMATSimConfig(){
 		
 		// MATSim4UrbanSim configuration converter
-		MATSim4UrbanSimConfigurationConverterV4 connector = null;
+		MATSim4UrbanSimConfigurationConverterV4 converter = null;
 		
 		try{
 			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
 			
-			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
+			log.info("Creating a matsim4urbansim config file and writing it on hard disk");
 			
 			// this creates an external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
 			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestExternalMATSimConfig.COLD_START, path);
@@ -159,16 +164,28 @@ public class ConfigReadWriteOverwriteTest extends MatsimTestCase{
 			// i.e. puts the settings into the MATSim config groups or adds new MATSim modules
 			// An important task is that settings from the external config file are overwriting the settings from MATSim4UrbanSim
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
-			if( !(connector = new MATSim4UrbanSimConfigurationConverterV4( configLocation )).init() ){
+			if( !(converter = new MATSim4UrbanSimConfigurationConverterV4( configLocation )).init() ){
 				log.error("An error occured while initializing MATSim scenario ...");
 				Assert.assertTrue(false);
 			}
 			
 			log.info("Getting config settings in matsim format");
-			Config config = connector.getConfig();
+			Config config = converter.getConfig();
 
 			// checking if overlapping parameter settings are overwritten by the external config
 			checkCoreModulesAndExternalConfigSettings(testExternalConfig, testConfig, config);
+			
+			String outConfigFilename = utils.getOutputDirectory()+"/config.xml"  ;
+			System.err.println( "out: " + outConfigFilename ) ;
+			new ConfigWriter(config).write( outConfigFilename ) ;
+			
+			String cmpConfigFilename = utils.getClassInputDirectory()+"/config.xml" ;
+			System.err.println( "cmp: " + cmpConfigFilename ) ;
+			
+			// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
+			Assert.assertEquals( "config files are different", CRCChecksum.getCRCFromFile(cmpConfigFilename) , 
+					CRCChecksum.getCRCFromFile(outConfigFilename) ) ;
+			
 			
 		} catch(Exception e){
 			e.printStackTrace();

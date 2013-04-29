@@ -32,45 +32,25 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
 	public static final String GROUP_NAME = "matsim4urbansimControler";
 	
 	private boolean zone2ZoneImpedance;
-	
 	private boolean agentPerformance;
-	
 	private boolean zoneBasedAccessibility;
-	
 	private boolean cellBasedAccessibility;
-	
 	private int cellSizeCellBasedAccessibility;
-	
 	private boolean isCellBasedAccessibilityNetwork;
-	
 	private boolean isCellbasedAccessibilityShapeFile;
-
 	private String shapeFileCellBasedAccessibility;
-	
 	private boolean usingCustomBoundingBox;
-	
 	private double boundingBoxTop;
-	
 	private double boundingBoxLeft;
-	
     private double boundingBoxRight;
-    
     private double boundingBoxBottom;
-    
     private double timeOfDay;
-    
     private String ptStopsInputFile;
-    
     private String ptTravelTimesInputFile;
-    
     private String ptTravelDistancesInputFile;
-    
     private boolean isColdStart;
-    
     private boolean isWarmStart;
-    
     private Boolean isHotStart;
-    
     private String hotStartTargetLocation;
 
 	public MATSim4UrbanSimControlerConfigModuleV3(String name) {

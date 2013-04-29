@@ -24,69 +24,38 @@ import org.matsim.core.config.Module;
 public class UrbanSimParameterConfigModuleV3 extends Module{
 	
 	public static final String GROUP_NAME = "urbansimParameter";
-	
 	public static final String PROJECT_NAME = "projectName";
-	
 	public static final String IS_PARCEL_MODE = "isParcelMode";
-	
 	public static final String POPULATION_SAMPLING_RATE = "populationSampleRate";
-	
 	public static final String YEAR = "year";
-	
 	public static final String OPUS_HOME = "opusHome";
-	
 	public static final String OPUS_DATA_PATH = "opusDataPath";
-	
 	public static final String MATSIM4OPUS = "matsim4Opus";
-	
 	public static final String MATSIM4OPUS_OUTPUT = "matsim4OpusOutput";
-	
 	public static final String MATSIM4OPUS_TEMP = "matsim4OpusTemp";
-	
 	public static final String IS_TEST_RUN = "isTestRun";
-	
 	public static final String USE_SHAPEFILE_LOCATION_DISTRIBUTION = "useShapefileLocationDistribution";
-	
 	public static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
-	
 	public static final String URBANSIM_ZONE_RADIUS_LOCATION_DISTRIBUTION = "urbanSimZoneRadiusLocationDistribution";
-	
 	public static final String TEST_PARAMETER = "testParameter";
-	
 	public static final String IS_BACKUP_RUN_DATA = "isBackup";
 	
 	private String projectName;
-	
 	private boolean isParcel;
-	
 	private double populationSampleRate;
-	
 	private int year;
-	
 	private String opusHome;
-	
 	private String opusDataPath;
-	
 	private String matsim4Opus;
-	
 	private String matsim4OpusConfig;
-	
 	private String matsim4OpusOutput;
-	
 	private String matsim4OpusTemp;
-	
 	private String matsim4OpusBackup;
-	
 	private boolean isTestRun;
-	
 	private boolean usingShapefileLocationDistribution;
-	
 	private String urbanSimZoneShapefileLocationDistribution;
-	
 	private double urbanSimZoneRadiusLocationDistribution;
-	
 	private String testParameter;
-	
 	private boolean isBackup;
 	
 	public UrbanSimParameterConfigModuleV3(String name){
