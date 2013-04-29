@@ -168,6 +168,9 @@ public class GroupStrategyManager {
 
 				final boolean removed = personToHandle.getPlans().remove( plan );
 				if ( !removed ) throw new RuntimeException( "could not remove plan "+plan+" of person "+personToHandle );
+
+				final JointPlan jpToRemove = jointPlans.getJointPlan( plan );
+				if ( jpToRemove != null ) jointPlans.removeJointPlan( jpToRemove );
 			}
 
 			if (!stillSomethingToRemove && person.getPlans().size() > maxPlanPerAgent) {
