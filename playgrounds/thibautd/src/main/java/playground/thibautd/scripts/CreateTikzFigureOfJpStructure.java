@@ -94,7 +94,10 @@ public class CreateTikzFigureOfJpStructure {
 				if ( name.equals( "route" ) ) {
 					final String v = atts.getValue( "vehicleRefId" );
 					if ( v != null ) {
-						vehicles.put( count -1 , v );
+						final String old = vehicles.put( count -1 , v );
+						if ( old != null && !old.equals( v ) ) {
+							log.warn( "cannot handle plans with several vehicles. only the last vehicle will be kept for plan "+(count-1)+" of person "+id );
+						}
 					}
 				}
 			}
