@@ -99,9 +99,9 @@ public class MATSim4UrbanSimConfigUtils {
 		if(computeCellBasedAccessibility){ 
 			if(!Paths.pathExsits(shapeFile)){ // since no shape file found, accessibility computation is applied on the area covering the network
 				computeCellBasedAccessibilityNetwork   = true;
-				MATSim4UrbanSimConfigurationConverterV4.log.warn("No shape-file given or shape-file not found:" + shapeFile);
-				MATSim4UrbanSimConfigurationConverterV4.log.warn("Instead the boundary of the road network is used to determine the area for which the accessibility computation is applied.");
-				MATSim4UrbanSimConfigurationConverterV4.log.warn("This may be ok of that was your intention.") ;
+				log.warn("No shape-file given or shape-file not found:" + shapeFile);
+				log.warn("Instead the boundary of the road network is used to determine the area for which the accessibility computation is applied.");
+				log.warn("This may be ok of that was your intention.") ;
 			} else {
 				computeCellbasedAccessibilityShapeFile = true;
 			}
@@ -114,15 +114,15 @@ public class MATSim4UrbanSimConfigUtils {
 		if(matsim4urbansimModule != null){
 			try{
 				double tmp = Double.parseDouble( matsim4urbansimModule.getValue(TIME_OF_DAY) );
-				MATSim4UrbanSimConfigurationConverterV4.log.info("Found custom time of day for accessibility calculation: " + tmp );
+				log.info("Found custom time of day for accessibility calculation: " + tmp );
 				timeOfDay = tmp;
 			} catch(Exception e){
-				MATSim4UrbanSimConfigurationConverterV4.log.info("No time of day for accessibility calulation given or given time has wrong format.");
-				MATSim4UrbanSimConfigurationConverterV4.log.info("By default, MATSim calulates accessibilities for the following time of day: " + timeOfDay );
-				MATSim4UrbanSimConfigurationConverterV4.log.info("In order to use another time of day enter it in the external MATSim config file as follows:");
-				MATSim4UrbanSimConfigurationConverterV4.log.info("<module name=\"matsim4urbansimParameter\" >");
-				MATSim4UrbanSimConfigurationConverterV4.log.info("<param name=\"timeOfDay\" value=\"28800\" />");
-				MATSim4UrbanSimConfigurationConverterV4.log.info("</module>");
+				log.info("No time of day for accessibility calulation given or given time has wrong format.");
+				log.info("By default, MATSim calulates accessibilities for the following time of day: " + timeOfDay );
+				log.info("In order to use another time of day enter it in the external MATSim config file as follows:");
+				log.info("<module name=\"matsim4urbansimParameter\" >");
+				log.info("<param name=\"timeOfDay\" value=\"28800\" />");
+				log.info("</module>");
 			}
 			
 			// check if pseudo pt should be used
@@ -132,12 +132,10 @@ public class MATSim4UrbanSimConfigUtils {
 				// check if pt stops input file is given and existing
 				ptStops = matsim4urbansimModule.getValue(PT_STOPS);
 				if( ptStops != null && Paths.pathExsits(ptStops))
-					MATSim4UrbanSimConfigurationConverterV4.log.info("Found pt stop input file: " + ptStops);
-				else{
-					MATSim4UrbanSimConfigurationConverterV4.log.error("The parameter 'usePtStop' is set TRUE, but no pt stop input file found!!!");
-					MATSim4UrbanSimConfigurationConverterV4.log.error("Given input file for 'ptStop' = " + ptStops);
-					System.exit(InternalConstants.FILE_NOT_FOUND);
-				}
+					log.info("Found pt stop input file: " + ptStops);
+				else
+					throw new RuntimeException("The parameter 'usePtStop' is set TRUE, but no pt stop input file found!!! Given input file for 'ptStop' = " + ptStops);
+				
 				
 				// check if input files for pt travel times and distances are set
 				if( matsim4urbansimModule.getValue( PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null &&
@@ -148,15 +146,15 @@ public class MATSim4UrbanSimConfigUtils {
 					
 					if( ptTravelTimes != null && Paths.pathExsits(ptTravelTimes) && 
 						ptTravelDistances != null && Paths.pathExsits(ptTravelDistances)){
-						MATSim4UrbanSimConfigurationConverterV4.log.info("Found pt travel time input file: " + ptTravelTimes);
-						MATSim4UrbanSimConfigurationConverterV4.log.info("Found pt travel distance input file: " + ptTravelDistances);
+						log.info("Found pt travel time input file: " + ptTravelTimes);
+						log.info("Found pt travel distance input file: " + ptTravelDistances);
 					}
 					else{
-						MATSim4UrbanSimConfigurationConverterV4.log.error("The parameter 'useTravelTimesAndDistances' is set TRUE but either no pt travel time or distance input file found! Both files needs to be set to use precomputed pt times and distances.");
-						MATSim4UrbanSimConfigurationConverterV4.log.error("Given input file name for 'ptTravelTimes' = " + ptTravelTimes);
-						MATSim4UrbanSimConfigurationConverterV4.log.error("Given input file name for 'ptTravelDistances' = " + ptTravelDistances);
-						MATSim4UrbanSimConfigurationConverterV4.log.error("At least one of these two files was not found.  Aborting ...") ;
-						System.exit(InternalConstants.FILE_NOT_FOUND);
+						log.error("The parameter 'useTravelTimesAndDistances' is set TRUE but either no pt travel time or distance input file found! Both files needs to be set to use precomputed pt times and distances.");
+						log.error("Given input file name for 'ptTravelTimes' = " + ptTravelTimes);
+						log.error("Given input file name for 'ptTravelDistances' = " + ptTravelDistances);
+						log.error("At least one of these two files was not found.  Aborting ...") ;
+						throw new RuntimeException("Parameter not found!");
 					}
 				}
 			}
@@ -181,8 +179,6 @@ public class MATSim4UrbanSimConfigUtils {
 		module.setPtStopsInputFile(ptStops);
 		module.setPtTravelTimesInputFile(ptTravelTimes);
 		module.setPtTravelDistancesInputFile(ptTravelDistances);
-		
-		printMATSim4UrbanSimControlerSettings( getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
 	}
 
 	/**
@@ -205,18 +201,18 @@ public class MATSim4UrbanSimConfigUtils {
 		
 		if(matsim4urbansimModule != null)
 			urbanSimZoneShapefileLocationDistribution = matsim4urbansimModule.getValue(URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION);
-		MATSim4UrbanSimConfigurationConverterV4.log.info("This message affects UrbanSim ZONE applications only:");
+		log.info("This message affects UrbanSim ZONE applications only:");
 		if(urbanSimZoneShapefileLocationDistribution != null && Paths.pathExsits(urbanSimZoneShapefileLocationDistribution)){
 			useShapefileLocationDistribution = true;
-			MATSim4UrbanSimConfigurationConverterV4.log.info("Found a zone shape file: " + urbanSimZoneShapefileLocationDistribution);
-			MATSim4UrbanSimConfigurationConverterV4.log.info("This activates the distribution of persons within a zone using the zone boundaries of this shape file."); 
+			log.info("Found a zone shape file: " + urbanSimZoneShapefileLocationDistribution);
+			log.info("This activates the distribution of persons within a zone using the zone boundaries of this shape file."); 
 		}
 		else{
-			MATSim4UrbanSimConfigurationConverterV4.log.info("Persons are distributed within a zone using the zone centroid and a radius of " + randomLocationDistributionRadiusForUrbanSimZone + " meter.");
-			MATSim4UrbanSimConfigurationConverterV4.log.info("In order to use exact zone boundaries for your sceanrio provide a zone shape file and enter the file location in the external MATSim config file as follows:");
-			MATSim4UrbanSimConfigurationConverterV4.log.info("<module name=\"matsim4urbansimParameter\" >");
-			MATSim4UrbanSimConfigurationConverterV4.log.info("<param name=\"urbanSimZoneShapefileLocationDistribution\" value=\"/path/to/shapeFile\" />");
-			MATSim4UrbanSimConfigurationConverterV4.log.info("</module>");
+			log.info("Persons are distributed within a zone using the zone centroid and a radius of " + randomLocationDistributionRadiusForUrbanSimZone + " meter.");
+			log.info("In order to use exact zone boundaries for your sceanrio provide a zone shape file and enter the file location in the external MATSim config file as follows:");
+			log.info("<module name=\"matsim4urbansimParameter\" >");
+			log.info("<param name=\"urbanSimZoneShapefileLocationDistribution\" value=\"/path/to/shapeFile\" />");
+			log.info("</module>");
 		}
 	
 		String opusHome 		= Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome() );
@@ -258,8 +254,6 @@ public class MATSim4UrbanSimConfigUtils {
 		InternalConstants.MATSIM_4_OPUS_OUTPUT = module.getMATSim4OpusOutput();
 		InternalConstants.MATSIM_4_OPUS_TEMP = module.getMATSim4OpusTemp();
 		InternalConstants.MATSIM_4_OPUS_BACKUP = module.getMATSim4OpusBackup();
-		
-		printUrbanSimParameterSettings( getUrbanSimParameterConfigAndPossiblyConvert(config) );
 	}
 
 	/**
@@ -297,17 +291,13 @@ public class MATSim4UrbanSimConfigUtils {
 		log.info("Setting NetworkConfigGroup to config...");
 		String networkFile = matsimParameter.getNetwork().getInputFile();
 		NetworkConfigGroup networkCG = config.network() ;
-		if( !networkFile.isEmpty() ) { // the MATSim4UrbanSim config contains a network file
+		if( !networkFile.isEmpty() )  // the MATSim4UrbanSim config contains a network file
 			networkCG.setInputFile( networkFile );
-		}
-		else{ // if (networkCG.getInputFile() == null || networkCG.getInputFile().isEmpty()){
-			MATSim4UrbanSimConfigurationConverterV4.log.error("Missing MATSim network! The network must be specified either directly in the " +
+		else
+			throw new RuntimeException("Missing MATSim network! The network must be specified either directly in the " +
 					"MATSim4UrbanSim configuration or in an external MATSim configuration.");
-			System.exit( InternalConstants.NO_MATSIM_NETWORK );
-		}
-	
-//		printNetworkConfigGroupSettings(config);
-		MATSim4UrbanSimConfigurationConverterV4.log.info("...done!");
+
+		log.info("...done!");
 	}
 
 	/**
@@ -362,9 +352,8 @@ public class MATSim4UrbanSimConfigUtils {
 		PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
 		// set input plans file
 		plansCG.setInputFile( plansFile );
-		
-		printPlansConfigGroupSettings(config);
-		MATSim4UrbanSimConfigurationConverterV4.log.info("...done!");
+
+		log.info("...done!");
 	}
 
 	/**
@@ -374,7 +363,7 @@ public class MATSim4UrbanSimConfigUtils {
 	 * @param config TODO
 	 */
 	static void initControler(ConfigType matsimParameter, Config config){
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Setting ControlerConfigGroup to config...");
+		log.info("Setting ControlerConfigGroup to config...");
 		int firstIteration = matsimParameter.getControler().getFirstIteration().intValue();
 		int lastIteration = matsimParameter.getControler().getLastIteration().intValue();
 		ControlerConfigGroup controlerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
@@ -388,9 +377,8 @@ public class MATSim4UrbanSimConfigUtils {
 		
 		// set Qsim
 		controlerCG.setMobsim(QSimConfigGroup.GROUP_NAME);
-		
-		printControlerConfigGroupSetting(config);
-		MATSim4UrbanSimConfigurationConverterV4.log.info("...done!");
+
+		log.info("...done!");
 	}
 
 	/**
@@ -400,7 +388,7 @@ public class MATSim4UrbanSimConfigUtils {
 	 * @param config TODO
 	 */
 	static void initPlanCalcScore(ConfigType matsimParameter, Config config){
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Setting PlanCalcScore to config...");
+		log.info("Setting PlanCalcScore to config...");
 		String activityType_0 = matsimParameter.getPlanCalcScore().getActivityType0();
 		String activityType_1 = matsimParameter.getPlanCalcScore().getActivityType1();
 		
@@ -413,9 +401,8 @@ public class MATSim4UrbanSimConfigUtils {
 		workActivity.setLatestStartTime( matsimParameter.getPlanCalcScore().getWorkActivityLatestStartTime().intValue() );	// should be something like 9*60*60
 		config.planCalcScore().addActivityParams( homeActivity );
 		config.planCalcScore().addActivityParams( workActivity );
-	
-		printPlanCalcScoreSettings(config);
-		MATSim4UrbanSimConfigurationConverterV4.log.info("...done!");
+
+		log.info("...done!");
 	}
 
 	/**
@@ -440,7 +427,7 @@ public class MATSim4UrbanSimConfigUtils {
 	 * @param config TODO
 	 */
 	static void initQSim(MatsimConfigType matsim4urbansimConfig, Config config){
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Setting QSimConfigGroup to config...");
+		log.info("Setting QSimConfigGroup to config...");
 		
 		QSimConfigGroup qsimCG = config.getQSimConfigGroup();
 		if( qsimCG == null){		
@@ -450,11 +437,11 @@ public class MATSim4UrbanSimConfigUtils {
 		
 		// setting number of threads
 		qsimCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
-		MATSim4UrbanSimConfigurationConverterV4.log.error("setting qsim number of threads automagically; this is almost certainly not good; fix") ;
+		log.error("setting qsim number of threads automagically; this is almost certainly not good; fix") ;
 		// yyyy
 		
 		double popSampling = matsim4urbansimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
-		MATSim4UrbanSimConfigurationConverterV4.log.info("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
+		log.info("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
 		// setting FlowCapFactor == population sampling rate (no correction factor needed here)
 		qsimCG.setFlowCapFactor( popSampling );	
 		
@@ -472,7 +459,7 @@ public class MATSim4UrbanSimConfigUtils {
 			// yyyyyy if this has happend, it is plausible that the flow cap factor is NOT corrected??? kai, apr'13
 			double popSamplingBefore = popSampling ;
 			popSampling = 0.01;
-			MATSim4UrbanSimConfigurationConverterV4.log.warn("Raised popSampling rate from " + popSamplingBefore + 
+			log.warn("Raised popSampling rate from " + popSamplingBefore + 
 					" to " + popSampling + " to to avoid errors while calulating the correction fetch factor ...");
 		}
 		// tnicolai dec'11
@@ -484,9 +471,8 @@ public class MATSim4UrbanSimConfigUtils {
 		qsimCG.setRemoveStuckVehicles( removeStuckVehicles );
 		qsimCG.setStuckTime(10.);
 		qsimCG.setEndTime(30.*3600.); // 30h
-		
-		printQSimConfigGroupSettings(config);
-		MATSim4UrbanSimConfigurationConverterV4.log.info("...done!");
+
+		log.info("...done!");
 	}
 
 	/**
@@ -494,22 +480,21 @@ public class MATSim4UrbanSimConfigUtils {
 	 * @param config TODO
 	 */
 	static void initPlanCalcRoute(Config config){
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Setting PlanCalcRouteGroup to config...");
+		log.info("Setting PlanCalcRouteGroup to config...");
 		
 		double defaultWalkSpeed = 1.38888889; 	// 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
 		double defaultBicycleSpeed = 4.16666666;// 4.16666666m/s corresponds to 15 km/h
 		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
 		
-		MATSim4UrbanSimConfigurationConverterV4.log.error( "ignoring any external default speeds for walk/bicycle/pt and using internal values.  fix!!" ) ;
+		log.error( "ignoring any external default speeds for walk/bicycle/pt and using internal values.  fix!!" ) ;
 		// yyyyyy
 		
 		// setting teleportation speeds in router
 		config.plansCalcRoute().setWalkSpeed( defaultWalkSpeed ); 
 		config.plansCalcRoute().setBikeSpeed( defaultBicycleSpeed );
 		config.plansCalcRoute().setPtSpeed( defaultPtSpeed );
-	
-		printPlanCalcRouteGroupSettings(config);
-		MATSim4UrbanSimConfigurationConverterV4.log.info("...done!");
+
+		log.info("...done!");
 	}
 
 	/**
@@ -559,9 +544,7 @@ public class MATSim4UrbanSimConfigUtils {
 			if(changelegMode != null && changelegMode.getValue("modes") != null)
 				MATSim4UrbanSimConfigurationConverterV4.log.info("Following modes are found: " + changelegMode.getValue("modes"));
 		}
-		
-		printStrategyConfigGroupSettings(config);
-		MATSim4UrbanSimConfigurationConverterV4.log.info("...done!");
+		log.info("...done!");
 	}
 
 	/**
@@ -586,24 +569,10 @@ public class MATSim4UrbanSimConfigUtils {
 	}
 
 	/**
-	 * Determines and sets available processors into MATSim config
-	 */
-	static void initGlobalSettings( Config config ){
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Setting GlobalConfigGroup to config...");
-		GlobalConfigGroup globalCG = (GlobalConfigGroup) config.getModule(GlobalConfigGroup.GROUP_NAME);
-	
-		globalCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
-		// yyyyyy this is dangerous and possibly slow.  kai, apr'13
-		
-		printGlobalConfigGroupSettings(config);
-		MATSim4UrbanSimConfigurationConverterV4.log.info("...done!");
-	}
-
-	/**
 	 * creates an empty MATSim config to be filled by MATSim4UrbanSim + external MATSim config settings
 	 */
 	static Config createEmptyConfigWithVSPExperimentalAbort(ConfigType matsimParameter) {
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Creating an empty MATSim scenario.");
+		log.info("Creating an empty MATSim scenario.");
 		Config config = ConfigUtils.createConfig();
 		
 		// changing checking level to ABORT for vsp defaults means 
@@ -700,15 +669,15 @@ public class MATSim4UrbanSimConfigUtils {
 			}
 			// tnicolai nov'12: decided with Kai that beta_brain (the accessibility scale parameter) should be 1 because of the pre-factor of the logsum term
 			if(logitScaleParameter != 1.0){
-				MATSim4UrbanSimConfigurationConverterV4.log.error("You are using a logit scale parameter != 1! The default is 1.");
-				MATSim4UrbanSimConfigurationConverterV4.log.error("The accessibility calulation proceeds with a logit scale parameter = " + logitScaleParameter);
-				MATSim4UrbanSimConfigurationConverterV4.log.error("This is ok for the sustaincity case studies but needs to be changed afterwards.") ;
+				log.error("You are using a logit scale parameter != 1! The default is 1.");
+				log.error("The accessibility calulation proceeds with a logit scale parameter = " + logitScaleParameter);
+				log.error("This is ok for the sustaincity case studies but needs to be changed afterwards.") ;
 			}
 	
-			MATSim4UrbanSimConfigurationConverterV4.log.info("The logit scale parameter used for the accessibility computation is now set to " + logitScaleParameter );
-			MATSim4UrbanSimConfigurationConverterV4.log.info("The logit scale parameter used inside the behavioral model for the traffic simulation is now set to " + config.planCalcScore().getBrainExpBeta() ) ;
+			log.info("The logit scale parameter used for the accessibility computation is now set to " + logitScaleParameter );
+			log.info("The logit scale parameter used inside the behavioral model for the traffic simulation is now set to " + config.planCalcScore().getBrainExpBeta() ) ;
 			if ( logitScaleParameter != 1.0 || config.planCalcScore().getBrainExpBeta()!= 1.0 ) {
-				MATSim4UrbanSimConfigurationConverterV4.log.info("It is best to have both of them at 1.0, but changing them means that you have to re-estimate urbansim models.") ;
+				log.info("It is best to have both of them at 1.0, but changing them means that you have to re-estimate urbansim models.") ;
 			}
 			
 			final String noSeparateBetasMessage = "This MATSim4UrbanSim version does not support custom beta parameters such as \"betaBikeTravelTime\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config file (bike and pt)). Please let us know if this causes serious problems." +
@@ -823,8 +792,6 @@ public class MATSim4UrbanSimConfigUtils {
 			module.setBetaPtTravelMonetaryCost(betaPtTMC);
 			module.setBetaPtTravelMonetaryCostPower2(betaPtTMCPower);
 			module.setBetaPtLnTravelMonetaryCost(betaPtLnTMC);
-			
-			printAccessibilityParameterSettings(getAccessibilityParameterConfigAndPossiblyConvert(config) );
 		}
 
 	static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigAndPossiblyConvert(Config config) {
@@ -875,8 +842,8 @@ public class MATSim4UrbanSimConfigUtils {
 					matsim4UrbanSimModule.getValue("betaBikeTravelCostPower2") != null ||
 					matsim4UrbanSimModule.getValue("betaBikeLnTravelCost") != null);
 			if ( used ) {
-				MATSim4UrbanSimConfigurationConverterV4.log.warn( "At least one of tyour betaBike parameters (matsim4urbansim section in external matsim config) is different from zero; this will probably fail later.") ;
-				MATSim4UrbanSimConfigurationConverterV4.log.warn( "The current recommendation is to remove all betaBike parameters.") ;
+				log.warn( "At least one of tyour betaBike parameters (matsim4urbansim section in external matsim config) is different from zero; this will probably fail later.") ;
+				log.warn( "The current recommendation is to remove all betaBike parameters.") ;
 			}
 			return used ;
 		}
@@ -918,218 +885,218 @@ public class MATSim4UrbanSimConfigUtils {
 					matsim4UrbanSimModule.getValue("betaPtTravelCostPower2") != null ||
 					matsim4UrbanSimModule.getValue("betaPtLnTravelCost") != null);
 			if ( used ) {
-				MATSim4UrbanSimConfigurationConverterV4.log.warn( "At least one of tyour betaPt parameters (matsim4urbansim section in external matsim config) is different from zero; this will probably fail later.") ;
-				MATSim4UrbanSimConfigurationConverterV4.log.warn( "The current recommendation is to remove all betaBike parameters.") ;
+				log.warn( "At least one of tyour betaPt parameters (matsim4urbansim section in external matsim config) is different from zero; this will probably fail later.") ;
+				log.warn( "The current recommendation is to remove all betaBike parameters.") ;
 			}
 			return used ;
 		}
 		return false;
 	}
 
-	/**
-	 * printing GlobalConfigGroupSettings
-	 * @param config TODO
-	 */
-	static void printGlobalConfigGroupSettings(Config config) {
-		GlobalConfigGroup globalCG = (GlobalConfigGroup) config.getModule(GlobalConfigGroup.GROUP_NAME);
-		
-		log.info("GlobalConfigGroup settings:");
-		log.info("Number of Threads: " + globalCG.getNumberOfThreads() + " ...");
-	}
-
-	/**
-		 * printing UrbanSimParameterSettings
-		 */
-		static void printUrbanSimParameterSettings( UrbanSimParameterConfigModuleV3 module) {
-			
-	//		UrbanSimParameterConfigModuleV3 module = this.getUrbanSimParameterConfig();
-			
-			log.info("UrbanSimParameter settings:");
-			log.info("ProjectName: " + module.getProjectName() );
-			log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
-			log.info("Year: " + module.getYear() ); 
-			log.info("OPUS_HOME: " + InternalConstants.OPUS_HOME );
-			log.info("OPUS_DATA_PATH: " + InternalConstants.OPUS_DATA_PATH );
-			log.info("MATSIM_4_OPUS: " + InternalConstants.MATSIM_4_OPUS );
-			log.info("MATSIM_4_OPUS_CONIG: " + InternalConstants.MATSIM_4_OPUS_CONFIG );
-			log.info("MATSIM_4_OPUS_OUTPUT: " + InternalConstants.MATSIM_4_OPUS_OUTPUT );
-			log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
-			log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
-			log.info("(Custom) Test Parameter: " + module.getTestParameter() );
-			log.info("UsingShapefileLocationDistribution:" + module.usingShapefileLocationDistribution());
-			log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
-			log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
-			log.info("Backing Up Run Data: " + module.isBackup() );
-			log.info("Is Test Run: " + module.isTestRun() );
-		}
-
-	/**
-		 * printing MATSim4UrbanSimControlerSettings
-		 */
-		static void printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimControlerConfigModuleV3 module ) {
-			
-	//		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
-			
-			// view results
-			log.info("MATSim4UrbanSimControler settings:");
-			log.info("Compute Agent-performance: " + module.isAgentPerformance() );
-			log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
-			log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
-			log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
-			log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
-			log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
-			log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
-			log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
-			log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
-			log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
-			log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
-			log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
-			log.info("Time of day: " + module.getTimeOfDay() );
-			log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
-			log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
-			log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
-		}
-
-	/**
-		 * printing AccessibilityParameterSettings
-		 */
-		static void printAccessibilityParameterSettings(AccessibilityParameterConfigModule module) {
-			
-	//		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
-			
-			// display results
-			log.info("AccessibilityParameter settings:");
-			
-			log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
-			log.info("Compute raw sum (not logsum): " + module.usingRawSumsWithoutLn() );
-			log.info("Logit Scale Parameter: " + module.usingLogitScaleParameterFromMATSim() ); 
-			
-			log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
-			log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );
-			log.info("BETA_CAR_LN_TRAVEL_TIMES: " + module.getBetaCarLnTravelTime());
-			log.info("BETA_CAR_TRAVEL_DISTANCE: " + module.getBetaCarTravelDistance() );
-			log.info("BETA_CAR_TRAVEL_DISTANCE_POWER: " + module.getBetaCarTravelDistancePower2() );
-			log.info("BETA_CAR_LN_TRAVEL_DISTANCE: " + module.getBetaCarLnTravelDistance() );
-			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS: " + module.getBetaCarTravelMonetaryCost() );
-			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaCarTravelMonetaryCostPower2() );
-			log.info("BETA_CAR_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaCarLnTravelMonetaryCost());
-			
-			log.info("BETA_PT_TRAVEL_TIMES: " + module.getBetaPtTravelTime()  );
-			log.info("BETA_PT_TRAVEL_TIMES_POWER: " + module.getBetaPtTravelTimePower2() );
-			log.info("BETA_PT_LN_TRAVEL_TIMES: " + module.getBetaPtLnTravelTime() );
-			log.info("BETA_PT_TRAVEL_DISTANCE: " + module.getBetaPtTravelDistance() );
-			log.info("BETA_PT_TRAVEL_DISTANCE_POWER: " + module.getBetaPtTravelDistancePower2() );
-			log.info("BETA_PT_LN_TRAVEL_DISTANCE: " + module.getBetaPtLnTravelDistance() );
-			log.info("BETA_PT_TRAVEL_MONETARY_COSTS: " + module.getBetaPtTravelMonetaryCost() );
-			log.info("BETA_PT_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaPtTravelMonetaryCostPower2() );
-			log.info("BETA_PT_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaPtLnTravelMonetaryCost() );
-			
-			log.info("BETA_BIKE_TRAVEL_TIMES: " + module.getBetaBikeTravelTime()  );
-			log.info("BETA_BIKE_TRAVEL_TIMES_POWER: " + module.getBetaBikeTravelTimePower2() );
-			log.info("BETA_BIKE_LN_TRAVEL_TIMES: " + module.getBetaBikeLnTravelTime() );
-			log.info("BETA_BIKE_TRAVEL_DISTANCE: " + module.getBetaBikeTravelDistance() );
-			log.info("BETA_BIKE_TRAVEL_DISTANCE_POWER: " + module.getBetaBikeTravelDistancePower2() );
-			log.info("BETA_BIKE_LN_TRAVEL_DISTANCE: " + module.getBetaBikeLnTravelDistance() );
-			log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeTravelMonetaryCost() );
-			log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaBikeTravelMonetaryCostPower2() );
-			log.info("BETA_BIKE_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeLnTravelMonetaryCost() );
-			
-			log.info("BETA_WALK_TRAVEL_TIMES: " + module.getBetaWalkTravelTime()  );
-			log.info("BETA_WALK_TRAVEL_TIMES_POWER: " + module.getBetaWalkTravelTimePower2() );
-			log.info("BETA_WALK_LN_TRAVEL_TIMES: " + module.getBetaWalkLnTravelTime() );
-			log.info("BETA_WALK_TRAVEL_DISTANCE: " + module.getBetaWalkTravelDistance() );
-			log.info("BETA_WALK_TRAVEL_DISTANCE_POWER: " + module.getBetaWalkTravelDistancePower2() );
-			log.info("BETA_WALK_LN_TRAVEL_DISTANCE: " + module.getBetaWalkLnTravelDistance() );
-			log.info("BETA_WALK_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkTravelMonetaryCost() );
-			log.info("BETA_WALK_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaWalkTravelMonetaryCostPower2() );
-			log.info("BETA_WALK_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkLnTravelMonetaryCost() );
-		}
-
-	/**
-	 * printing NetworkConfigGroupSettings
-	 * @param config TODO
-	 */
-	static void printNetworkConfigGroupSettings(Config config) {
-		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
-
-		log.info("Some NetworkConfigGroup settings:");
-		log.info("Network: " + networkCG.getInputFile());
-	}
-
-	/**
-	 * printing PlansConfigGroupSettings
-	 * @param config TODO
-	 */
-	static void printPlansConfigGroupSettings(Config config) {
-		PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
-		
-		log.info("Some PlansConfigGroup setting:");
-		log.info("Input plans file set to: " + plansCG.getInputFile());
-	}
-
-	/**
-	 * printing StrategyConfigGroupSettings
-	 * @param config TODO
-	 */
-	static void printStrategyConfigGroupSettings(Config config) {
-		
-		StrategyConfigGroup strategyCG = (StrategyConfigGroup) config.getModule(StrategyConfigGroup.GROUP_NAME);
-		
-		log.info("Some StrategyConfigGroup settings:");
-		Iterator<StrategySettings> iteratorStrategyCG = strategyCG.getStrategySettings().iterator();
-		while(iteratorStrategyCG.hasNext()){
-			StrategySettings strategySettings = iteratorStrategyCG.next();
-			log.info("Strategy_"+strategySettings.getId()+ ":" + strategySettings.getModuleName() + " Probability: " + strategySettings.getProbability() + " Disable After Itereation: " + strategySettings.getDisableAfter() ); 
-		}
-		log.info("Max agent plan memory size: " + strategyCG.getMaxAgentPlanMemorySize());
-	}
-
-	/**
-	 * printing ControlerConfigGroupSetting
-	 * @param config TODO
-	 */
-	static void printControlerConfigGroupSetting(Config config) {
-		ControlerConfigGroup controlerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
-		
-		log.info("Some ControlerConfigGroup settings:");
-		log.info("FirstIteration: " + controlerCG.getFirstIteration());
-		log.info("LastIteration: " + controlerCG.getLastIteration());
-		log.info("MATSim output directory: " +  controlerCG.getOutputDirectory());
-		log.info("Mobsim: " + controlerCG.getMobsim());
-	}
-
-	/**
-	 * printing PlanCalcScoreSettings
-	 * @param config TODO
-	 */
-	static void printPlanCalcScoreSettings(Config config) {
-		
-		ActivityParams homeActivity = config.planCalcScore().getActivityParams("home");
-		ActivityParams workActivity = config.planCalcScore().getActivityParams("work");
-		
-		log.info("Some PlanCalcScore settings:");
-		log.info("Activity_Type_0: " + homeActivity.getType() + " Typical Duration Activity_Type_0: " + homeActivity.getTypicalDuration());
-		log.info("Activity_Type_1: " + workActivity.getType() + " Typical Duration Activity_Type_1: " + workActivity.getTypicalDuration());
-		log.info("Opening Time Activity_Type_1: " + workActivity.getOpeningTime()); 
-		log.info("Latest Start Time Activity_Type_1: " + workActivity.getLatestStartTime());
-	}
-
-	/**
-	 * printing QSimConfigGroupSettings
-	 * @param config TODO
-	 */
-	static void printQSimConfigGroupSettings(Config config) {
-		QSimConfigGroup qsimCG = config.getQSimConfigGroup();
-		
-		log.info("QSimConfigGroup settings:");
-		log.info("Number of Threads: " + qsimCG.getNumberOfThreads());
-		log.info("FlowCapFactor (= population sampling rate): "+ config.getQSimConfigGroup().getFlowCapFactor());
-		log.info("StorageCapFactor: " + config.getQSimConfigGroup().getStorageCapFactor() );//+ " (with correction factor = " + storageCapCorrectionFactor + ")" );
-		// log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
-		log.info("StuckTime: " + config.getQSimConfigGroup().getStuckTime());
-		log.info("End Time: " + qsimCG.getEndTime());
-	}
-
+//	/**
+//	 * printing GlobalConfigGroupSettings
+//	 * @param config TODO
+//	 */
+//	static void printGlobalConfigGroupSettings(Config config) {
+//		GlobalConfigGroup globalCG = (GlobalConfigGroup) config.getModule(GlobalConfigGroup.GROUP_NAME);
+//		
+//		log.info("GlobalConfigGroup settings:");
+//		log.info("Number of Threads: " + globalCG.getNumberOfThreads() + " ...");
+//	}
+//
+//	/**
+//		 * printing UrbanSimParameterSettings
+//		 */
+//		static void printUrbanSimParameterSettings( UrbanSimParameterConfigModuleV3 module) {
+//			
+//	//		UrbanSimParameterConfigModuleV3 module = this.getUrbanSimParameterConfig();
+//			
+//			log.info("UrbanSimParameter settings:");
+//			log.info("ProjectName: " + module.getProjectName() );
+//			log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
+//			log.info("Year: " + module.getYear() ); 
+//			log.info("OPUS_HOME: " + InternalConstants.OPUS_HOME );
+//			log.info("OPUS_DATA_PATH: " + InternalConstants.OPUS_DATA_PATH );
+//			log.info("MATSIM_4_OPUS: " + InternalConstants.MATSIM_4_OPUS );
+//			log.info("MATSIM_4_OPUS_CONIG: " + InternalConstants.MATSIM_4_OPUS_CONFIG );
+//			log.info("MATSIM_4_OPUS_OUTPUT: " + InternalConstants.MATSIM_4_OPUS_OUTPUT );
+//			log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
+//			log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
+//			log.info("(Custom) Test Parameter: " + module.getTestParameter() );
+//			log.info("UsingShapefileLocationDistribution:" + module.usingShapefileLocationDistribution());
+//			log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
+//			log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
+//			log.info("Backing Up Run Data: " + module.isBackup() );
+//			log.info("Is Test Run: " + module.isTestRun() );
+//		}
+//
+//	/**
+//		 * printing MATSim4UrbanSimControlerSettings
+//		 */
+//		static void printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimControlerConfigModuleV3 module ) {
+//			
+//	//		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
+//			
+//			// view results
+//			log.info("MATSim4UrbanSimControler settings:");
+//			log.info("Compute Agent-performance: " + module.isAgentPerformance() );
+//			log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
+//			log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
+//			log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
+//			log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
+//			log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
+//			log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
+//			log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
+//			log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
+//			log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
+//			log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
+//			log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
+//			log.info("Time of day: " + module.getTimeOfDay() );
+//			log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
+//			log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
+//			log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
+//		}
+//
+//	/**
+//		 * printing AccessibilityParameterSettings
+//		 */
+//		static void printAccessibilityParameterSettings(AccessibilityParameterConfigModule module) {
+//			
+//	//		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
+//			
+//			// display results
+//			log.info("AccessibilityParameter settings:");
+//			
+//			log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
+//			log.info("Compute raw sum (not logsum): " + module.usingRawSumsWithoutLn() );
+//			log.info("Logit Scale Parameter: " + module.usingLogitScaleParameterFromMATSim() ); 
+//			
+//			log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
+//			log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );
+//			log.info("BETA_CAR_LN_TRAVEL_TIMES: " + module.getBetaCarLnTravelTime());
+//			log.info("BETA_CAR_TRAVEL_DISTANCE: " + module.getBetaCarTravelDistance() );
+//			log.info("BETA_CAR_TRAVEL_DISTANCE_POWER: " + module.getBetaCarTravelDistancePower2() );
+//			log.info("BETA_CAR_LN_TRAVEL_DISTANCE: " + module.getBetaCarLnTravelDistance() );
+//			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS: " + module.getBetaCarTravelMonetaryCost() );
+//			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaCarTravelMonetaryCostPower2() );
+//			log.info("BETA_CAR_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaCarLnTravelMonetaryCost());
+//			
+//			log.info("BETA_PT_TRAVEL_TIMES: " + module.getBetaPtTravelTime()  );
+//			log.info("BETA_PT_TRAVEL_TIMES_POWER: " + module.getBetaPtTravelTimePower2() );
+//			log.info("BETA_PT_LN_TRAVEL_TIMES: " + module.getBetaPtLnTravelTime() );
+//			log.info("BETA_PT_TRAVEL_DISTANCE: " + module.getBetaPtTravelDistance() );
+//			log.info("BETA_PT_TRAVEL_DISTANCE_POWER: " + module.getBetaPtTravelDistancePower2() );
+//			log.info("BETA_PT_LN_TRAVEL_DISTANCE: " + module.getBetaPtLnTravelDistance() );
+//			log.info("BETA_PT_TRAVEL_MONETARY_COSTS: " + module.getBetaPtTravelMonetaryCost() );
+//			log.info("BETA_PT_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaPtTravelMonetaryCostPower2() );
+//			log.info("BETA_PT_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaPtLnTravelMonetaryCost() );
+//			
+//			log.info("BETA_BIKE_TRAVEL_TIMES: " + module.getBetaBikeTravelTime()  );
+//			log.info("BETA_BIKE_TRAVEL_TIMES_POWER: " + module.getBetaBikeTravelTimePower2() );
+//			log.info("BETA_BIKE_LN_TRAVEL_TIMES: " + module.getBetaBikeLnTravelTime() );
+//			log.info("BETA_BIKE_TRAVEL_DISTANCE: " + module.getBetaBikeTravelDistance() );
+//			log.info("BETA_BIKE_TRAVEL_DISTANCE_POWER: " + module.getBetaBikeTravelDistancePower2() );
+//			log.info("BETA_BIKE_LN_TRAVEL_DISTANCE: " + module.getBetaBikeLnTravelDistance() );
+//			log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeTravelMonetaryCost() );
+//			log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaBikeTravelMonetaryCostPower2() );
+//			log.info("BETA_BIKE_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeLnTravelMonetaryCost() );
+//			
+//			log.info("BETA_WALK_TRAVEL_TIMES: " + module.getBetaWalkTravelTime()  );
+//			log.info("BETA_WALK_TRAVEL_TIMES_POWER: " + module.getBetaWalkTravelTimePower2() );
+//			log.info("BETA_WALK_LN_TRAVEL_TIMES: " + module.getBetaWalkLnTravelTime() );
+//			log.info("BETA_WALK_TRAVEL_DISTANCE: " + module.getBetaWalkTravelDistance() );
+//			log.info("BETA_WALK_TRAVEL_DISTANCE_POWER: " + module.getBetaWalkTravelDistancePower2() );
+//			log.info("BETA_WALK_LN_TRAVEL_DISTANCE: " + module.getBetaWalkLnTravelDistance() );
+//			log.info("BETA_WALK_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkTravelMonetaryCost() );
+//			log.info("BETA_WALK_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaWalkTravelMonetaryCostPower2() );
+//			log.info("BETA_WALK_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkLnTravelMonetaryCost() );
+//		}
+//
+//	/**
+//	 * printing NetworkConfigGroupSettings
+//	 * @param config TODO
+//	 */
+//	static void printNetworkConfigGroupSettings(Config config) {
+//		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
+//
+//		log.info("Some NetworkConfigGroup settings:");
+//		log.info("Network: " + networkCG.getInputFile());
+//	}
+//
+//	/**
+//	 * printing PlansConfigGroupSettings
+//	 * @param config TODO
+//	 */
+//	static void printPlansConfigGroupSettings(Config config) {
+//		PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
+//		
+//		log.info("Some PlansConfigGroup setting:");
+//		log.info("Input plans file set to: " + plansCG.getInputFile());
+//	}
+//
+//	/**
+//	 * printing StrategyConfigGroupSettings
+//	 * @param config TODO
+//	 */
+//	static void printStrategyConfigGroupSettings(Config config) {
+//		
+//		StrategyConfigGroup strategyCG = (StrategyConfigGroup) config.getModule(StrategyConfigGroup.GROUP_NAME);
+//		
+//		log.info("Some StrategyConfigGroup settings:");
+//		Iterator<StrategySettings> iteratorStrategyCG = strategyCG.getStrategySettings().iterator();
+//		while(iteratorStrategyCG.hasNext()){
+//			StrategySettings strategySettings = iteratorStrategyCG.next();
+//			log.info("Strategy_"+strategySettings.getId()+ ":" + strategySettings.getModuleName() + " Probability: " + strategySettings.getProbability() + " Disable After Itereation: " + strategySettings.getDisableAfter() ); 
+//		}
+//		log.info("Max agent plan memory size: " + strategyCG.getMaxAgentPlanMemorySize());
+//	}
+//
+//	/**
+//	 * printing ControlerConfigGroupSetting
+//	 * @param config TODO
+//	 */
+//	static void printControlerConfigGroupSetting(Config config) {
+//		ControlerConfigGroup controlerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
+//		
+//		log.info("Some ControlerConfigGroup settings:");
+//		log.info("FirstIteration: " + controlerCG.getFirstIteration());
+//		log.info("LastIteration: " + controlerCG.getLastIteration());
+//		log.info("MATSim output directory: " +  controlerCG.getOutputDirectory());
+//		log.info("Mobsim: " + controlerCG.getMobsim());
+//	}
+//
+//	/**
+//	 * printing PlanCalcScoreSettings
+//	 * @param config TODO
+//	 */
+//	static void printPlanCalcScoreSettings(Config config) {
+//		
+//		ActivityParams homeActivity = config.planCalcScore().getActivityParams("home");
+//		ActivityParams workActivity = config.planCalcScore().getActivityParams("work");
+//		
+//		log.info("Some PlanCalcScore settings:");
+//		log.info("Activity_Type_0: " + homeActivity.getType() + " Typical Duration Activity_Type_0: " + homeActivity.getTypicalDuration());
+//		log.info("Activity_Type_1: " + workActivity.getType() + " Typical Duration Activity_Type_1: " + workActivity.getTypicalDuration());
+//		log.info("Opening Time Activity_Type_1: " + workActivity.getOpeningTime()); 
+//		log.info("Latest Start Time Activity_Type_1: " + workActivity.getLatestStartTime());
+//	}
+//
+//	/**
+//	 * printing QSimConfigGroupSettings
+//	 * @param config TODO
+//	 */
+//	static void printQSimConfigGroupSettings(Config config) {
+//		QSimConfigGroup qsimCG = config.getQSimConfigGroup();
+//		
+//		log.info("QSimConfigGroup settings:");
+//		log.info("Number of Threads: " + qsimCG.getNumberOfThreads());
+//		log.info("FlowCapFactor (= population sampling rate): "+ config.getQSimConfigGroup().getFlowCapFactor());
+//		log.info("StorageCapFactor: " + config.getQSimConfigGroup().getStorageCapFactor() );//+ " (with correction factor = " + storageCapCorrectionFactor + ")" );
+//		// log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
+//		log.info("StuckTime: " + config.getQSimConfigGroup().getStuckTime());
+//		log.info("End Time: " + qsimCG.getEndTime());
+//	}
+//
 	static final void checkConfigConsistencyAndWriteToLog(Config config, final String message) {
 		MATSim4UrbanSimConfigurationConverterV4.log.info(message);
 		String newline = System.getProperty("line.separator");// use native line endings for logfile
@@ -1141,17 +1108,17 @@ public class MATSim4UrbanSimConfigUtils {
 		config.checkConsistency();
 		MATSim4UrbanSimConfigurationConverterV4.log.info("Checking consistency of config done.");
 	}
-
-	/**
-	 * printing PlanCalcRouteGroupSettings
-	 * @param config TODO
-	 */
-	static void printPlanCalcRouteGroupSettings(Config config) {
-		log.info("PlanCalcRouteGroup settings:");							 
-		log.info("Walk Speed: " + config.plansCalcRoute().getWalkSpeed() );
-		log.info("Bike Speed: " + config.plansCalcRoute().getBikeSpeed() );
-		log.info("Pt Speed: " + config.plansCalcRoute().getPtSpeed() );
-		log.info("Beeline Distance Factor: " + config.plansCalcRoute().getBeelineDistanceFactor() );
-	}
+//
+//	/**
+//	 * printing PlanCalcRouteGroupSettings
+//	 * @param config TODO
+//	 */
+//	static void printPlanCalcRouteGroupSettings(Config config) {
+//		log.info("PlanCalcRouteGroup settings:");							 
+//		log.info("Walk Speed: " + config.plansCalcRoute().getWalkSpeed() );
+//		log.info("Bike Speed: " + config.plansCalcRoute().getBikeSpeed() );
+//		log.info("Pt Speed: " + config.plansCalcRoute().getPtSpeed() );
+//		log.info("Beeline Distance Factor: " + config.plansCalcRoute().getBeelineDistanceFactor() );
+//	}
 
 }

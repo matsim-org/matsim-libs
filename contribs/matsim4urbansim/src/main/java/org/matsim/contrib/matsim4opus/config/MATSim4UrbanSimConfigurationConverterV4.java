@@ -124,9 +124,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 
 			// loads the external MATSim config separately (to get additional MATSim 4UrbanSim parameters)
 			this.matsim4urbansimModule = MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimModule(matsim4urbansimConfigPart1);
-			
-			// initializing config with MATSim4UrbanSim parameter
-			MATSim4UrbanSimConfigUtils.initGlobalSettings( config );
+
 			
 			MATSim4UrbanSimConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimModule, config);
 			MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimModule, config);
@@ -146,10 +144,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			// are overwritten by the external MATSim settings
 			MATSim4UrbanSimConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
 			
-			// show final settings
-			MATSim4UrbanSimConfigUtils.printUrbanSimParameterSettings( MATSim4UrbanSimConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
-			MATSim4UrbanSimConfigUtils.printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
-			MATSim4UrbanSimConfigUtils.printAccessibilityParameterSettings( MATSim4UrbanSimConfigUtils.getAccessibilityParameterConfigAndPossiblyConvert(config) );
+//			// show final settings
+//			MATSim4UrbanSimConfigUtils.printUrbanSimParameterSettings( MATSim4UrbanSimConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
+//			MATSim4UrbanSimConfigUtils.printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
+//			MATSim4UrbanSimConfigUtils.printAccessibilityParameterSettings( MATSim4UrbanSimConfigUtils.getAccessibilityParameterConfigAndPossiblyConvert(config) );
 			
 			MATSim4UrbanSimConfigUtils.checkConfigConsistencyAndWriteToLog(config, "At the end of the matsim4urbansim config converter:") ;
 			
