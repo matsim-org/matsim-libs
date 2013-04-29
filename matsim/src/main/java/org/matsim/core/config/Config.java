@@ -257,27 +257,39 @@ public class Config {
 	/**
 	 * Adds the specified module / config-group with the specified name to the
 	 * configuration.
+	 * <p/>
+	 * This is the typical way to "materialize" material that, so far, exists only as Map, into a specialized module.
 	 *
 	 * @param name
-	 * @param module
+	 * @param specializedConfigModule
 	 *
 	 * @throws IllegalArgumentException
 	 *             if a config-group with the specified name already exists.
 	 */
-	public final void addModule(final String name, final Module module) {
+	public final void addModule(final String name, final Module specializedConfigModule) {
+		// The logic is as follows: 
+		// (1) assume that module is some SpecializedConfigModule that extends Module
+		
+		// (2) it is presumably found her from parsing, but as a general Module: 
 		Module m = this.modules.get(name);
+		
 		if (m != null) {
-			if (m.getClass() == Module.class && module.getClass() != Module.class) {
-				// default module, replace it with custom group implementation
+			// (3) this is the corresponding test: m is general, module is specialized:
+			if (m.getClass() == Module.class && specializedConfigModule.getClass() != Module.class) {
+
+				// (4) go through everything in m (from parsing) and add it to module:
 				for (Map.Entry<String, String> e : m.getParams().entrySet()) {
-					module.addParam(e.getKey(), e.getValue());
+					specializedConfigModule.addParam(e.getKey(), e.getValue());
 				}
-				this.modules.put(name, module);
+				
+				// (5) register the resulting module under "name" (which will over-write m):
+				this.modules.put(name, specializedConfigModule);
+				
 			} else {
 				throw new IllegalArgumentException("Module " + name + " exists already.");
 			}
 		}
-		this.modules.put(name, module);
+		this.modules.put(name, specializedConfigModule);
 	}
 
 	/**
