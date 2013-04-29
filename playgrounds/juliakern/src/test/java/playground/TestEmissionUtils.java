@@ -190,15 +190,15 @@ public class TestEmissionUtils {
 		double a1so = sums.get(new IdImpl("id1")).get("SO2");
 		
 		//actual numbers of person2
-		double a2co = sums.get(new IdImpl("id1")).get("CO");
-		double a2c2 = sums.get(new IdImpl("id1")).get("CO2_TOTAL");
-		double a2fc = sums.get(new IdImpl("id1")).get("FC");
-		double a2hc = sums.get(new IdImpl("id1")).get("HC");
-		double a2nm = sums.get(new IdImpl("id1")).get("NMHC");
-		double a2n2 = sums.get(new IdImpl("id1")).get("NO2");
-		double a2nx = sums.get(new IdImpl("id1")).get("NOX");
-		double a2pm = sums.get(new IdImpl("id1")).get("PM");
-		double a2so = sums.get(new IdImpl("id1")).get("SO2");
+		double a2co = sums.get(new IdImpl("id2")).get("CO");
+		double a2c2 = sums.get(new IdImpl("id2")).get("CO2_TOTAL");
+		double a2fc = sums.get(new IdImpl("id2")).get("FC");
+		double a2hc = sums.get(new IdImpl("id2")).get("HC");
+		double a2nm = sums.get(new IdImpl("id2")).get("NMHC");
+		double a2n2 = sums.get(new IdImpl("id2")).get("NO2");
+		double a2nx = sums.get(new IdImpl("id2")).get("NOX");
+		double a2pm = sums.get(new IdImpl("id2")).get("PM");
+		double a2so = sums.get(new IdImpl("id2")).get("SO2");
 		
 		//stellt auch sicher, dass die Personen korrekt auseinander gehalten werden
 		Assert.assertEquals("CO value of person 1 should be" +e1co +"but is ", e1co, a1co, MatsimTestUtils.EPSILON);
