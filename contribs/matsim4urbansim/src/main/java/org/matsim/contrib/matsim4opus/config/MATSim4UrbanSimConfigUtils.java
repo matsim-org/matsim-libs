@@ -294,26 +294,19 @@ public class MATSim4UrbanSimConfigUtils {
 	 * @param config TODO
 	 */
 	static void initNetwork(ConfigType matsimParameter, Config config){
-		MATSim4UrbanSimConfigurationConverterV4.log.info("Setting NetworkConfigGroup to config...");
+		log.info("Setting NetworkConfigGroup to config...");
 		String networkFile = matsimParameter.getNetwork().getInputFile();
-		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
-		// the MATSim4UrbanSim config contains a network file
-		if(!networkFile.isEmpty()){
-			// check if a network was already set by an external matsim config.
-			//if(networkCG.getInputFile() != null && !networkCG.getInputFile().isEmpty()){
-			//	log.warn("A network file is already set by an external matsim config: " + networkCG.getInputFile());
-			//	log.warn("It will be replaced by the MATSim4UrbanSim network file: " + networkFile);
-			//	log.warn("To avoid this, keep the network parameter in MATSim4UrbanSim empty!");
-			//}
-			// set MATSim4UrbanSim network
+		NetworkConfigGroup networkCG = config.network() ;
+		if( !networkFile.isEmpty() ) { // the MATSim4UrbanSim config contains a network file
 			networkCG.setInputFile( networkFile );
 		}
 		else{ // if (networkCG.getInputFile() == null || networkCG.getInputFile().isEmpty()){
-			MATSim4UrbanSimConfigurationConverterV4.log.error("Missing MATSim network! The network must be specified either directly in the MATSim4UrbanSim configuration or in an external MATSim configuration.");
+			MATSim4UrbanSimConfigurationConverterV4.log.error("Missing MATSim network! The network must be specified either directly in the " +
+					"MATSim4UrbanSim configuration or in an external MATSim configuration.");
 			System.exit( InternalConstants.NO_MATSIM_NETWORK );
 		}
 	
-		printNetworkConfigGroupSettings(config);
+//		printNetworkConfigGroupSettings(config);
 		MATSim4UrbanSimConfigurationConverterV4.log.info("...done!");
 	}
 
