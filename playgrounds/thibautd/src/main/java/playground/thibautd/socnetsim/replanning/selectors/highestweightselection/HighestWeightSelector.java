@@ -409,8 +409,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 								SelectorUtils.toGroupPlans(
 										currentAllocation ) ) ) {
 						// early cuttoff if this branch is always blocking.
-						// we check only if a blocking combination has been found and
-						// no non-blocking was, for efficiency
 						return new AllocationRecord( null , true );
 					}
 				}
@@ -441,8 +439,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 								SelectorUtils.toGroupPlans(
 										currentAllocation ) ) ) {
 						// early cuttoff if this branch is always blocking
-						// we check only if a blocking combination has been found and
-						// no non-blocking was, for efficiency
 						return new AllocationRecord( null , true );
 					}
 				}

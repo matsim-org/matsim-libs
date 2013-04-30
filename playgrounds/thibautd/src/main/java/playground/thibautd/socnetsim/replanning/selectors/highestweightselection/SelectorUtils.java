@@ -107,7 +107,6 @@ final class SelectorUtils {
 			new ArrayList<PersonRecord>( personsStillToAllocate );
 		final PersonRecord currentPerson = remainingPersons.remove(0);
 
-		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 		final Set<Branch> exploredBranches = new HashSet<Branch>();
 		// examine plans from worst to best. This increases a lot the chances
 		// that the non-blocked plan found for a given leave is also non-blocked
@@ -148,6 +147,7 @@ final class SelectorUtils {
 
 			boolean found = true;
 			if ( !actuallyRemainingPersons.isEmpty() ) {
+				final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 				tagIncompatiblePlansAsInfeasible(
 						r,
 						incompatibleRecords,
