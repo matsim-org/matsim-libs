@@ -21,7 +21,7 @@ package playground.thibautd.socnetsim.replanning.selectors.highestweightselectio
 
 import java.util.ArrayDeque;
 import java.util.Collections;
-import java.util.Deque;
+import java.util.Queue;
 
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
@@ -29,7 +29,7 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
  * @author thibautd
  */
 final class KnownFeasibleAllocations {
-	private final Deque<GroupPlans> cache = new ArrayDeque<GroupPlans>();
+	private final Queue<GroupPlans> cache = new ArrayDeque<GroupPlans>();
 	// limits both memory and computation time. No need to remember too much,
 	// as similar plans allow similar combinations.
 	private final int capacity;
@@ -45,7 +45,7 @@ final class KnownFeasibleAllocations {
 
 	public void addFeasibleAllocation(final GroupPlans plans) {
 		cache.add( plans );
-		if ( cache.size() > capacity ) cache.pollFirst();
+		if ( cache.size() > capacity ) cache.poll();
 		assert cache.size() <= capacity;
 	}
 
