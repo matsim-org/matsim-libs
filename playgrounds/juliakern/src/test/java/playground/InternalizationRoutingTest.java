@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 package playground;
-
+/*
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -84,6 +84,7 @@ import playground.vsp.emissions.types.HbefaVehicleCategory;
 //mit Benjamins version vergleichen. hier veraltete konstrukte, 
 //TODO nach testColdEmission* migrieren, diese Klasse loeschen
 
+/*
 public class InternalizationRoutingTest extends MatsimTestCase{
 
 	static boolean isUsingDetailedEmissionCalculation = false;
@@ -97,7 +98,6 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 
 	@Test
-	@Ignore
 	public void testCalculateColdEmissionsAndThrowEvent() {
 		this.config = new Config();
 		this.config.addCoreModules();
@@ -366,3 +366,4 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		network.createAndAddLink(scenario.createId("13"), node10, node4, 3750, 20.80, 3600, 1, null, "22");
 	}
 }
+*/
