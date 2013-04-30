@@ -47,6 +47,10 @@ final class SelectorUtils {
 		final FeasibilityChanger everybodyChanger = new FeasibilityChanger( true );
 		final FeasibilityChanger infeasibility = new FeasibilityChanger();
 
+		if ( knownFeasibleAllocations.isKownAsBlocking( groupPlan ) ) {
+			return true;
+		}
+
 		if ( !knownFeasibleAllocations.blocksAllKnownAllocations( groupPlan ) ) {
 			return false;
 		}
@@ -58,18 +62,29 @@ final class SelectorUtils {
 		for ( Plan p : groupPlan.getAllIndividualPlans() ) {
 			final PersonRecord person = personRecords.get( p.getPerson().getId() );
 			final PlanRecord plan = person.getRecord( p );
+			assert plan.isStillFeasible;
 			infeasibility.changeIfNecessary( plan );
 		}
 
+		final GroupPlans relevantForbiddenPlans = new GroupPlans();
 		final GroupPlans nonBlockingPlan = new GroupPlans();
 		final boolean isBlocking = !searchForCombinationsWithoutForbiddenPlans(
 				incompatibleRecords,
+				relevantForbiddenPlans,
 				nonBlockingPlan,
 				new ArrayList<PersonRecord>( personRecords.values() ));
 		infeasibility.resetFeasibilities();
 		everybodyChanger.resetFeasibilities();
 
-		if ( !isBlocking ) {
+		if ( isBlocking ) {
+			// only consider the plans of the group plan
+			final List<Plan> ps = new ArrayList<Plan>( groupPlan.getIndividualPlans() );
+			final List<JointPlan> jps = new ArrayList<JointPlan>( groupPlan.getJointPlans() );
+			ps.retainAll( relevantForbiddenPlans.getIndividualPlans() );
+			jps.retainAll( relevantForbiddenPlans.getJointPlans() );
+			knownFeasibleAllocations.setKownBlockingCombination( new GroupPlans( jps , ps ) );
+		}
+		else {
 			// if the plan found here remains feasible,
 			// no need to re-do the search.
 			assert nonBlockingPlan.getAllIndividualPlans().size() == personRecords.size() :
@@ -81,31 +96,9 @@ final class SelectorUtils {
 		return isBlocking;
 	}
 
-
-	public static boolean searchForCombinationsWithoutForbiddenPlans(
-			final IncompatiblePlanRecords incompatibleRecords,
-			final GroupPlans constructedPlan,
-			final List<PersonRecord> personsStillToAllocate) {
-		return searchForCombinationsWithoutForbiddenPlans(
-			false,
-			incompatibleRecords,
-			constructedPlan,
-			personsStillToAllocate);
-	}
-
-	public static boolean searchForBlockableCombinations(
-			final IncompatiblePlanRecords incompatibleRecords,
-			final List<PersonRecord> personsStillToAllocate) {
-		return searchForCombinationsWithoutForbiddenPlans(
-			true,
-			incompatibleRecords,
-			null,
-			personsStillToAllocate);
-	}
-
 	private static boolean searchForCombinationsWithoutForbiddenPlans(
-			final boolean valueIfNothing,
 			final IncompatiblePlanRecords incompatibleRecords,
+			final GroupPlans relevantForbiddenPlans,
 			final GroupPlans constructedPlan,
 			final List<PersonRecord> personsStillToAllocate) {
 		//if ( !remainsFeasible( personsStillToAllocate ) ) return false;
@@ -124,7 +117,17 @@ final class SelectorUtils {
 				r != null;
 				r = i-- > 0 ? currentPerson.plans.get( i ) : null ) {
 			// skip forbidden plans
-			if ( !r.isStillFeasible ) continue;
+			if ( !r.isStillFeasible ) {
+				// remember that this plan was used for determining if blocking
+				// or not
+				if ( r.jointPlan == null ) {
+					relevantForbiddenPlans.addIndividualPlan( r.plan );
+				}
+				else {
+					relevantForbiddenPlans.addJointPlan( r.jointPlan );
+				}
+				continue;
+			}
 
 			final Set<Id> cotravs = r.jointPlan == null ?
 				Collections.<Id>emptySet() :
@@ -143,7 +146,7 @@ final class SelectorUtils {
 				actuallyRemainingPersons = filter( remainingPersons , r.jointPlan );
 			}
 
-			boolean found = !valueIfNothing;
+			boolean found = true;
 			if ( !actuallyRemainingPersons.isEmpty() ) {
 				tagIncompatiblePlansAsInfeasible(
 						r,
@@ -152,6 +155,7 @@ final class SelectorUtils {
 
 				found = searchForCombinationsWithoutForbiddenPlans(
 						incompatibleRecords,
+						relevantForbiddenPlans,
 						constructedPlan,
 						actuallyRemainingPersons);
 
@@ -164,7 +168,7 @@ final class SelectorUtils {
 			}
 		}
 
-		return valueIfNothing;
+		return false;
 	}
 
 	private static void add(

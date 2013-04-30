@@ -34,6 +34,15 @@ final class KnownFeasibleAllocations {
 	// as similar plans allow similar combinations.
 	private final int capacity;
 
+	// represents the last known "actually blocking" combination (the plans
+	// which were actually used to determine that a combination is blocking).
+	// This allows to discard bloking brnches at no cost when a leave is found
+	// blocking.
+	private GroupPlans knownForbiddingPlans = null;
+
+	// /////////////////////////////////////////////////////////////////////////
+	// init
+	// /////////////////////////////////////////////////////////////////////////
 	public KnownFeasibleAllocations() {
 		this( Integer.MAX_VALUE );
 	}
@@ -43,6 +52,9 @@ final class KnownFeasibleAllocations {
 		this.capacity = capacity;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// feasible
+	// /////////////////////////////////////////////////////////////////////////
 	public void addFeasibleAllocation(final GroupPlans plans) {
 		cache.add( plans );
 		if ( cache.size() > capacity ) cache.poll();
@@ -58,6 +70,20 @@ final class KnownFeasibleAllocations {
 			}
 		}
 		return true;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// known infeasible
+	// /////////////////////////////////////////////////////////////////////////
+	public boolean isKownAsBlocking(final GroupPlans plan) {
+		// known as blocking if contains the known blocking
+		return knownForbiddingPlans != null &&
+			plan.getJointPlans().containsAll( knownForbiddingPlans.getJointPlans() ) &&
+			plan.getIndividualPlans().containsAll( knownForbiddingPlans.getIndividualPlans() );
+	}
+
+	public void setKownBlockingCombination(final GroupPlans plan) {
+		this.knownForbiddingPlans = plan;
 	}
 }
 

@@ -387,10 +387,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					assert forbidBlockingCombinations;
 					if ( record.allocation == null &&
 							constructedString == null &&
-							SelectorUtils.isBlocking(
-								knownFeasibleAllocations,
-								incompatibleRecords,
-								allPersons,
+							knownFeasibleAllocations.isKownAsBlocking(
 								SelectorUtils.toGroupPlans(
 										currentAllocation ) ) ) {
 						// early cuttoff if this branch is always blocking.
@@ -422,10 +419,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					resultsFromBlocking = true;
 
 					if ( constructedString == null &&
-							SelectorUtils.isBlocking(
-								knownFeasibleAllocations,
-								incompatibleRecords,
-								allPersons,
+							knownFeasibleAllocations.isKownAsBlocking(
 								SelectorUtils.toGroupPlans(
 										currentAllocation ) ) ) {
 						// early cuttoff if this branch is always blocking
