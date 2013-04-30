@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -78,6 +80,10 @@ import playground.vsp.emissions.types.HbefaVehicleCategory;
  * @author benjamin
  *
  */
+
+//mit Benjamins version vergleichen. hier veraltete konstrukte, 
+//TODO nach testColdEmission* migrieren, diese Klasse loeschen
+
 public class InternalizationRoutingTest extends MatsimTestCase{
 
 	static boolean isUsingDetailedEmissionCalculation = false;
@@ -90,6 +96,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private EmissionCostModule emissionCostModule;
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 
+	@Test
+	@Ignore
 	public void testCalculateColdEmissionsAndThrowEvent() {
 		this.config = new Config();
 		this.config.addCoreModules();
@@ -158,6 +166,9 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 	}
 	
+
+	@Test
+	@Ignore
 	public void calculateColdEmissionsTest(){
 		this.config = new Config();
 		this.config.addCoreModules();
