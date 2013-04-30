@@ -36,6 +36,8 @@ import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.junit.Assert;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
@@ -63,6 +65,7 @@ import org.xml.sax.SAXException;
  *
  */
 public class CreateTestMATSimConfig {
+	private static final Logger log = Logger.getLogger(CreateTestMATSimConfig.class) ;
 	
 	public static final int COLD_START = 0;
 	public static final int WARRM_START = 1;
@@ -440,10 +443,10 @@ public class CreateTestMATSimConfig {
 			LoadFile loadFile = new LoadFile(InternalConstants.V2_MATSIM_4_URBANSIM_XSD_MATSIMORG, xsdPath, InternalConstants.V2_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			if(file2XSD == null || !file2XSD.exists()){
-				System.err.println("Did not find xml schema!");
+				log.error("Did not find xml schema!");
 				System.exit(1);
 			}
-			System.out.println("Using following xsd schema: " + file2XSD.getCanonicalPath());
+			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
 			
 			// crate a schema factory ...
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
@@ -454,7 +457,8 @@ public class CreateTestMATSimConfig {
 			Marshaller m = jaxbContext.createMarshaller();
 			m.setSchema(schema);
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			JAXBElement elem = new JAXBElement( new QName("","matsim_config"), MatsimConfigType.class, matsimConfigType); // this is because there is no XMLRootElemet annotation
+			JAXBElement elem = new JAXBElement( new QName("","matsim_config"), MatsimConfigType.class, matsimConfigType); 
+			// (this is because there is no XMLRootElemet annotation)
 			m.marshal(elem, bw );
 			
 			return destination;
