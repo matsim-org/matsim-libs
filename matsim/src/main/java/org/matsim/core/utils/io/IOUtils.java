@@ -385,11 +385,12 @@ public class IOUtils {
 	 * 
 	 * @author kai nagel
 	 */
-	public static void createDirectory(final String dirName) {
+	public static File createDirectory(final String dirName) {
 		File tmpDir = new File(dirName);
 		if ( !tmpDir.mkdir() && !tmpDir.exists() ) {
 			throw new RuntimeException("The tmp directory " + dirName + " could not be created.");
 		}
+		return tmpDir ;
 	}
 	
 	/**

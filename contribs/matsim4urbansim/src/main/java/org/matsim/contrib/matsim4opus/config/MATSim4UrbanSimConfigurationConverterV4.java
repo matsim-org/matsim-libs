@@ -147,7 +147,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() ) ;
 			config.addConfigConsistencyChecker( new MATSim4UrbanSimConfigConsistencyChecker() ) ;
 			
-			MATSim4UrbanSimConfigUtils.checkConfigConsistencyAndWriteToLog(config, "At the end of the matsim4urbansim config converter:") ;
+			MATSim4UrbanSimConfigUtils.checkConfigConsistencyAndWriteToLog(config, "at the end of the matsim4urbansim config converter") ;
 			
 		}catch(Exception e){
 			e.printStackTrace();

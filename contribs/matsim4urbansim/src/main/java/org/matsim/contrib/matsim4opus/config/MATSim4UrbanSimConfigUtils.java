@@ -1106,7 +1106,7 @@ public class MATSim4UrbanSimConfigUtils {
 //
 	static final void checkConfigConsistencyAndWriteToLog(Config config, final String message) {
 		String newline = System.getProperty("line.separator");// use native line endings for logfile
-		log.info(newline + newline + message);
+		log.info(newline + newline + message + ":");
 		StringWriter writer = new StringWriter();
 		new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
 		log.info(newline + "Complete config dump:" + newline + writer.getBuffer().toString());

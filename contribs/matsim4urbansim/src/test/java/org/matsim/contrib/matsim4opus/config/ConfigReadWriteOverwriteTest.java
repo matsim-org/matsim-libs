@@ -48,6 +48,7 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -157,7 +158,9 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		MATSim4UrbanSimConfigurationConverterV4 converter = null;
 		
 		try{
-			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
+//			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
+			String path = utils.getOutputDirectory() + "/tmp" ;
+			IOUtils.createDirectory(path) ;
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hard disk");
 			
@@ -199,7 +202,10 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 				Patch patch = DiffUtils.diff(original, revised);
 
 				for (Delta delta: patch.getDeltas()) {
-					System.out.println(delta);
+					System.out.flush() ;
+					System.err.println(delta.getOriginal());
+					System.err.println(delta.getRevised());
+					System.err.flush() ;
 				}
 
 			}
