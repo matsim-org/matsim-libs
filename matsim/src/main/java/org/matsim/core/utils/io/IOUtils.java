@@ -379,13 +379,27 @@ public class IOUtils {
 	}
 
 	/**
+	 * Method to create a directory.  Taken from OutputDirectoryHierarchy.  I am no expert on this so this may be wrong or incomplete.
+	 * 
+	 * @param dirName
+	 * 
+	 * @author kai nagel
+	 */
+	public static void createDirectory(final String dirName) {
+		File tmpDir = new File(dirName);
+		if ( !tmpDir.mkdir() && !tmpDir.exists() ) {
+			throw new RuntimeException("The tmp directory " + dirName + " could not be created.");
+		}
+	}
+	
+	/**
 	 * This method recursively deletes the directory and all its contents. This
 	 * method will not follow symbolic links, i.e. if the directory or one of the
 	 * sub-directories contains a symbolic link, it will not delete this link. Thus
-	 * the directory cannot be deleted, too.
+	 * the directory can then not be deleted, too.
 	 *
 	 * @param dir
-	 *          File which must represent a directory, files or symbolic links are
+	 *          File which must represent a directory; files or symbolic links are
 	 *          not permitted as arguments
 	 *
 	 * @author dgrether
