@@ -308,7 +308,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 * @param parcels
 	 * @param controler
 	 */
-	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler, PtMatrix ptMatrix) {
+	final void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler, PtMatrix ptMatrix) {
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
