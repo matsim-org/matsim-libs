@@ -67,6 +67,10 @@ public abstract class ChartUtil {
 			ChartUtilities.saveChartAsPNG(new File(filename), getChart(), width, height, null, true, 9);
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch ( Exception e ) {
+			e.printStackTrace() ;
+			// I just had an out of bounds error inside the method; don't know what that means but does not feel like a reason 
+			// to not continue.  kai, apr'30
 		}
 	}
 
@@ -74,9 +78,15 @@ public abstract class ChartUtil {
 	 * Adds the MATSim Logo in the lower right corner of the chart.
 	 */
 	public void addMatsimLogo() {
-		Image image = MatsimResource.getAsImage("matsim_logo_transparent_small.png");
-		Title subtitle = new ImageTitle(image, RectangleEdge.BOTTOM, HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM);
-		this.chart.addSubtitle(subtitle);
+		try {
+			Image image = MatsimResource.getAsImage("matsim_logo_transparent_small.png");
+			Title subtitle = new ImageTitle(image, RectangleEdge.BOTTOM, HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM);
+			this.chart.addSubtitle(subtitle);
+		} catch ( Exception e ) {
+			e.printStackTrace() ;
+			// I just had a resource-not-found error inside the method; don't know what that means but does not feel like a reason 
+			// to not continue.  kai, apr'30
+		}
 	}
 
 	/**
