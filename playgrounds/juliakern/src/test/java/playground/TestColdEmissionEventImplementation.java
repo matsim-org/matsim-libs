@@ -59,7 +59,10 @@ public class TestColdEmissionEventImplementation {
 		coldEmissionMap3.put(ColdPollutant.NO2, 33.3);
 		
 		Assert.assertEquals(ceei2.getAttributes()+" does not match " + ceei3.getAttributes(), ceei2.getAttributes(), ceei3.getAttributes());
-		//java.lang.AssertionError: {time=2.0, type=coldEmissionEvent, linkId=5, vehicleId=veh1, NO2=33.3, NOX=44.4} does not match {time=500.0, type=coldEmissionEvent, linkId=7, vehicleId=vehicle2, NO2=33.3, NOX=44.4} expected:<{time=2.0, type=coldEmissionEvent, linkId=5, vehicleId=veh1, NO2=33.3, NOX=44.4}> but was:<{time=500.0, type=coldEmissionEvent, linkId=7, vehicleId=vehicle2, NO2=33.3, NOX=44.4}>
+		//java.lang.AssertionError: {time=2.0, type=coldEmissionEvent, linkId=5, vehicleId=veh1, NO2=33.3, NOX=44.4} 
+		// does not match {time=500.0, type=coldEmissionEvent, linkId=7, vehicleId=vehicle2, NO2=33.3, NOX=44.4} 
+		// expected:<{time=2.0, type=coldEmissionEvent, linkId=5, vehicleId=veh1, NO2=33.3, NOX=44.4}> 
+		// but was:<{time=500.0, type=coldEmissionEvent, linkId=7, vehicleId=vehicle2, NO2=33.3, NOX=44.4}>
 			}
 	
 }
