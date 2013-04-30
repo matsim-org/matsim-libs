@@ -183,18 +183,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				pr.linkedPlans.addAll( recordsPerJp.get( pr.jointPlan ) );
 				pr.linkedPlans.remove( pr );
 			}
-
-			Collections.sort(
-					personRecord.plans,
-					new Comparator<PlanRecord>() {
-						@Override
-						public int compare(
-								final PlanRecord o1,
-								final PlanRecord o2) {
-							// sort in DECREASING order
-							return -Double.compare( o1.avgJointPlanWeight , o2.avgJointPlanWeight );
-						}
-					});
 		}
 
 		return map;
