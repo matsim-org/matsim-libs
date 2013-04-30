@@ -72,7 +72,7 @@ final class SelectorUtils {
 		if ( !isBlocking ) {
 			// if the plan found here remains feasible,
 			// no need to re-do the search.
-			assert nonBlockingPlan.getAllIndividualPlans().size() == groupPlan.getAllIndividualPlans().size() :
+			assert nonBlockingPlan.getAllIndividualPlans().size() == personRecords.size() :
 				"nonBlockingGroupPlanSize="+nonBlockingPlan.getAllIndividualPlans().size()+
 				 " testedGroupPlanSize="+groupPlan.getAllIndividualPlans().size();
 			knownFeasibleAllocations.addFeasibleAllocation( nonBlockingPlan );
