@@ -21,8 +21,8 @@
 package org.matsim.core.router;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -51,11 +51,11 @@ public class MyMultiNodeDijkstra extends Dijkstra {
 		super(network, costFunction, timeFunction, preProcessData);
 	}
 	
-	public ImaginaryNode createImaginaryNode(List<InitialNode> nodes) {
+	public ImaginaryNode createImaginaryNode(Collection<InitialNode> nodes) {
 		return new ImaginaryNode(nodes);
 	}
 	
-	public ImaginaryNode createImaginaryNode(List<InitialNode> nodes, Coord coord) {
+	public ImaginaryNode createImaginaryNode(Collection<InitialNode> nodes, Coord coord) {
 		return new ImaginaryNode(nodes, coord);
 	}
 	
@@ -67,7 +67,7 @@ public class MyMultiNodeDijkstra extends Dijkstra {
 			
 			Map<Id, InitialNode> endNodes = new HashMap<Id, InitialNode>();
 			
-			List<InitialNode> initialNodes = ((ImaginaryNode) toNode).initialNodes;
+			Collection<InitialNode> initialNodes = ((ImaginaryNode) toNode).initialNodes;
 			for (InitialNode initialNode : initialNodes) endNodes.put(initialNode.node.getId(), initialNode);
 
 			// find out which one is the cheapest end node
@@ -189,15 +189,15 @@ public class MyMultiNodeDijkstra extends Dijkstra {
 	
 	/*package*/ static class ImaginaryNode implements Node {
 
-		/*package*/ final List<InitialNode> initialNodes;
+		/*package*/ final Collection<InitialNode> initialNodes;
 		/*package*/ final Coord coord;
 		
-		public ImaginaryNode(List<InitialNode> initialNodes, Coord coord) {
+		public ImaginaryNode(Collection<InitialNode> initialNodes, Coord coord) {
 			this.initialNodes = initialNodes;
 			this.coord = coord;
 		}
 		
-		public ImaginaryNode(List<InitialNode> initialNodes) {
+		public ImaginaryNode(Collection<InitialNode> initialNodes) {
 			this.initialNodes = initialNodes;
 			
 			double sumX = 0.0;

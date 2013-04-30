@@ -20,7 +20,7 @@
 
 package org.matsim.core.router;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -82,13 +82,13 @@ public class MyFastDijkstra extends MyMultiNodeDijkstra {
 		Node routingNetworkToNode;
 		
 		if (fromNode instanceof ImaginaryNode) {
-			List<InitialNode> initialNodes = ((ImaginaryNode) fromNode).initialNodes;
+			Collection<InitialNode> initialNodes = ((ImaginaryNode) fromNode).initialNodes;
 			for (InitialNode initialNode : initialNodes) initialNode.node = routingNetwork.getNodes().get(initialNode.node.getId());
 			routingNetworkFromNode = fromNode;
 		} else routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());
 
 		if (toNode instanceof ImaginaryNode) {
-			List<InitialNode> initialNodes = ((ImaginaryNode) toNode).initialNodes;
+			Collection<InitialNode> initialNodes = ((ImaginaryNode) toNode).initialNodes;
 			for (InitialNode initialNode : initialNodes) initialNode.node = routingNetwork.getNodes().get(initialNode.node.getId());
 			routingNetworkToNode = toNode;
 		} else routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
