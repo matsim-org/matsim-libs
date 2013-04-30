@@ -39,6 +39,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 
 /**
@@ -80,21 +81,6 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 		public double getWeight(
 				final Plan indivPlan,
 				final ReplanningGroup replanningGroup);
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	// interface and abstract method
-	// /////////////////////////////////////////////////////////////////////////
-	@Override
-	public final GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory factory,
-			final JointPlans jointPlans,
-			final ReplanningGroup group) {
-		final Map<Id, PersonRecord> personRecords = getPersonRecords( jointPlans , group );
-
-		GroupPlans allocation = selectPlans( personRecords );
-
-		return allocation;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -195,8 +181,15 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	// /////////////////////////////////////////////////////////////////////////
 	// "outer loop": search and forbid if blocking (if forbid blocking is true)
 	// /////////////////////////////////////////////////////////////////////////
-	private GroupPlans selectPlans( final Map<Id, PersonRecord> personRecords ) {
+	@Override
+	public final GroupPlans selectPlans(
+			final IncompatiblePlansIdentifierFactory factory,
+			final JointPlans jointPlans,
+			final ReplanningGroup group) {
+		final Map<Id, PersonRecord> personRecords = getPersonRecords( jointPlans , group );
 		final ForbidenPlanStrings forbiden = new ForbidenPlanStrings();
+		final IncompatiblePlansIdentifier incompatiblePlans =
+			factory.createIdentifier( jointPlans , group );
 
 		GroupPlans plans = null;
 
@@ -204,15 +197,17 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 		do {
 			count++;
 			final PlanString allocation = buildPlanString(
-				forbiden,
-				new ArrayList<PersonRecord>( personRecords.values() ),
-				null,
-				Double.NEGATIVE_INFINITY);
+					incompatiblePlans,
+					forbiden,
+					new ArrayList<PersonRecord>( personRecords.values() ),
+					Collections.<Id>emptySet(),
+					null,
+					Double.NEGATIVE_INFINITY);
 
 			plans = allocation == null ? null : toGroupPlans( allocation );
 		} while (
 				plans != null &&
-				continueIterations( forbiden , personRecords , plans ) );
+				continueIterations( incompatiblePlans , forbiden , personRecords , plans ) );
 
 		assert forbidBlockingCombinations || count == 1 : count;
 		assert plans == null || !forbiden.isForbidden( plans );
@@ -221,6 +216,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	}
 
 	private boolean continueIterations(
+			final IncompatiblePlansIdentifier incompatiblePlans,
 			final ForbidenPlanStrings forbiden,
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans allocation) {
@@ -228,7 +224,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 
 		assert !forbiden.isForbidden( allocation ) : "forbidden combination was re-examined";
 
-		if (isBlocking( personRecords, allocation )) {
+		if (isBlocking( incompatiblePlans , personRecords, allocation )) {
 			forbiden.forbid( allocation );
 			return true;
 		}
@@ -237,19 +233,24 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	}
 
 	private boolean isBlocking(
+			final IncompatiblePlansIdentifier incompatiblePlans,
 			final Map<Id, PersonRecord> personRecords,
 			final GroupPlans groupPlan) {
 		return !searchForCombinationsWithoutForbiddenPlans(
+				incompatiblePlans,
 				groupPlan,
 				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
+				Collections.<Id> emptySet(),
 				Collections.<Id> emptySet());
 	}
 
 	private boolean searchForCombinationsWithoutForbiddenPlans(
+			final IncompatiblePlansIdentifier incompatiblePlans,
 			final GroupPlans forbidenPlans,
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate,
+			final Set<Id> allocatedIncompatibilityGroups,
 			final Set<Id> alreadyAllocatedPersons) {
 		final PersonRecord currentPerson = personsStillToAllocate.get(0);
 
@@ -273,11 +274,20 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 				continue;
 			}
 
-			final Set<Id> cotravelers = r.jointPlan == null ? null : r.jointPlan.getIndividualPlans().keySet();
-			if ( knownBranches.isExplored( cotravelers ) ) continue;
+			final Set<Id> incomp = incompatiblePlans.identifyIncompatibilityGroups( r.plan );
+			if ( !Collections.disjoint(
+						allocatedIncompatibilityGroups,
+						incomp) ) {
+				continue;
+			}
+
+			final Set<Id> cotravelers = r.jointPlan == null ?
+				Collections.<Id>emptySet() :
+				r.jointPlan.getIndividualPlans().keySet();
+			if ( knownBranches.isExplored( cotravelers , incomp ) ) continue;
 			// if we do not find anything here, it is impossible to find allowed
 			// plans with the remaining agents. No need to re-explore.
-			knownBranches.tagAsExplored( cotravelers );
+			knownBranches.tagAsExplored( cotravelers , incomp );
 
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
 			Set<Id> actuallyAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
@@ -289,10 +299,15 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 			}
 
 			if ( !actuallyRemainingPersons.isEmpty() ) {
-				final boolean found = searchForCombinationsWithoutForbiddenPlans(
+				final Set<Id> newIncomp = new HashSet<Id>( allocatedIncompatibilityGroups );
+				newIncomp.addAll( incomp );
+				final boolean found =
+					searchForCombinationsWithoutForbiddenPlans(
+						incompatiblePlans,
 						forbidenPlans,
 						allPersonsRecord,
 						actuallyRemainingPersons,
+						newIncomp,
 						actuallyAllocatedPersons);
 				if (found) return true;
 			}
@@ -317,8 +332,10 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	 * @param str the PlanString of the plan constructed until now
 	 */
 	private PlanString buildPlanString(
+			final IncompatiblePlansIdentifier incompatiblePlans,
 			final ForbidenPlanStrings forbidenCombinations,
 			final List<PersonRecord> personsStillToAllocate,
+			final Set<Id> allocatedIncompatibilityGroups,
 			final PlanString str,
 			final double minimalWeightToObtain) {
 		final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
@@ -360,14 +377,23 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 				continue;
 			}
 
-			final Set<Id> cotravelers = r.jointPlan == null ? null : r.jointPlan.getIndividualPlans().keySet();
-			if ( knownBranches.isExplored( cotravelers ) ) continue;
+			final Set<Id> incomp = incompatiblePlans.identifyIncompatibilityGroups( r.plan );
+			if ( !Collections.disjoint(
+						allocatedIncompatibilityGroups,
+						incomp) ) {
+				continue;
+			}
+
+			final Set<Id> cotravelers = r.jointPlan == null ?
+				Collections.<Id>emptySet() :
+				r.jointPlan.getIndividualPlans().keySet();
+			if ( knownBranches.isExplored( cotravelers , incomp ) ) continue;
 			// if we find something, it is the best given the joint structure
 			// (plans are sorted by avg joint plan weight): do not search more
 			// for this particular structure.
 			// If we do not find anything, trying again with the same structure
 			// will not change anything.
-			knownBranches.tagAsExplored( cotravelers );
+			knownBranches.tagAsExplored( cotravelers , incomp );
 
 			PlanString tail = str;
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
@@ -389,9 +415,13 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 
 			PlanString newString;
 			if ( !actuallyRemainingPersons.isEmpty() ) {
+				final Set<Id> newIncomp = new HashSet<Id>( allocatedIncompatibilityGroups );
+				newIncomp.addAll( incomp );
 				newString = buildPlanString(
+						incompatiblePlans,
 						forbidenCombinations,
 						actuallyRemainingPersons,
+						newIncomp,
 						new PlanString( r , tail ),
 						Math.max(
 							minimalWeightToObtain,

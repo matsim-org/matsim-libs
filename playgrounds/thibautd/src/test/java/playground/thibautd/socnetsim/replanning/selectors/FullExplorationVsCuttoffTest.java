@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Assert;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -59,16 +63,34 @@ public class FullExplorationVsCuttoffTest {
 	@Test
 	public void testFullExplorationVsCuttoffNonBlocking() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffNonBlocking()" );
-		testFullExplorationVsCuttoff( false );
+		testFullExplorationVsCuttoff( new EmptyIncompatiblePlansIdentifierFactory() , false );
 	}
 
 	@Test
 	public void testFullExplorationVsCuttoffBlocking() throws Exception {
 		log.info( "test: testFullExplorationVsCuttoffBlocking()" );
-		testFullExplorationVsCuttoff( true );
+		testFullExplorationVsCuttoff( new EmptyIncompatiblePlansIdentifierFactory() , true );
 	}
 
-	private void testFullExplorationVsCuttoff(final boolean blocking) throws Exception {
+	@Test
+	public void testFullExplorationVsCuttoffIncompatibility() throws Exception {
+		log.info( "test: testFullExplorationVsCuttoffIncompatibility()" );
+		testFullExplorationVsCuttoff(
+				new FewGroupsIncompatibilityFactory(),
+				false );
+	}
+
+	@Test
+	public void testFullExplorationVsCuttoffIncompatibilityBlocking() throws Exception {
+		log.info( "test: testFullExplorationVsCuttoffIncompatibilityBlocking()" );
+		testFullExplorationVsCuttoff(
+				new FewGroupsIncompatibilityFactory(),
+				true );
+	}
+
+	private void testFullExplorationVsCuttoff(
+			final IncompatiblePlansIdentifierFactory incompFactory,
+			final boolean blocking) throws Exception {
 		final HighestScoreSumSelector fastSelector = new HighestScoreSumSelector( blocking );
 		final GroupLevelPlanSelector fullSelector =
 			new FullExplorationSelector(
@@ -87,19 +109,21 @@ public class FullExplorationVsCuttoffTest {
 		final SelectionStopWatch stopWatch = new SelectionStopWatch();
 		final JointPlans jointPlans = new JointPlans();
 		final Random random = new Random( 1234 );
+		final int nTries = 20000;
 		int countNull = 0;
-		for ( int i=0; i < 20000; i++ ) {
+		log.info( nTries+" random test plans" );
+		for ( int i=0; i < nTries; i++ ) {
 			final ReplanningGroup clique = createNextTestClique( jointPlans , random );
 			count.incCounter();
 			stopWatch.startFast();
 			final GroupPlans fastResult = fastSelector.selectPlans(
-					new EmptyIncompatiblePlansIdentifierFactory(),
+					incompFactory,
 					jointPlans,
 					clique );
 			stopWatch.endFast();
 			stopWatch.startFull();
 			final GroupPlans fullResult = fullSelector.selectPlans(
-					new EmptyIncompatiblePlansIdentifierFactory(),
+					incompFactory,
 					jointPlans,
 					clique );
 			stopWatch.endFull();
@@ -236,3 +260,40 @@ public class FullExplorationVsCuttoffTest {
 	}
 }
 
+class FewGroupsIncompatibilityFactory implements IncompatiblePlansIdentifierFactory {
+
+	@Override
+	public IncompatiblePlansIdentifier createIdentifier(
+			final JointPlans jointPlans,
+			final ReplanningGroup group) {
+		final Set<JointPlan> knownJointPlans = new HashSet<JointPlan>();
+		final IncompatiblePlansIdentifierImpl identifier = new IncompatiblePlansIdentifierImpl();
+
+		for ( Person person : group.getPersons() ) {
+			int i = 0;
+			for ( Plan plan : person.getPlans() ) {
+				final JointPlan jp = jointPlans.getJointPlan( plan );
+				final int groupNr =  i++ % 3;
+
+				if ( groupNr == 0 ) continue;
+				final Set<Id> groups =
+						Collections.<Id>singleton(
+							new IdImpl( groupNr ) );
+				if ( jp == null ) {
+					identifier.put(
+							plan,
+							groups );
+				}
+				else if ( !knownJointPlans.add( jp ) ) {
+					for ( Plan p : jp.getIndividualPlans().values() ) {
+						identifier.put(
+								p,
+								groups );
+					}
+				}
+			}
+		}
+
+		return identifier;
+	}
+}

@@ -27,17 +27,17 @@ import org.matsim.api.core.v01.Id;
 
 final class KnownBranches {
 	private final boolean prune;
-	private final List<Set<Id>> branches = new ArrayList<Set<Id>>();
+	private final List<Branch> branches = new ArrayList<Branch>();
 
 	public KnownBranches(final boolean prune) {
 		this.prune = prune;
 	}
 
-	public void tagAsExplored(final Set<Id> branch) {
-		if (prune) branches.add( branch );
+	public void tagAsExplored(final Set<Id> cotravs, final Set<Id> incomp) {
+		if (prune) branches.add( new Branch( cotravs , incomp ) );
 	}
 
-	public boolean isExplored(final Set<Id> branch) {
-		return prune && branches.contains( branch );
+	public boolean isExplored(final Set<Id> cotravs, final Set<Id> incomp) {
+		return prune && branches.contains( new Branch( cotravs , incomp ) );
 	}
 }
