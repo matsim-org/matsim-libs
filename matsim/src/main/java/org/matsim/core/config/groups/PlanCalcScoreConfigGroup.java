@@ -386,7 +386,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
 				hasOpeningAndClosingTime = true;
 			}
-			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() > 0.001)) {
+			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() < -0.001)) {
 				hasOpeningTimeAndLatePenalty = true;
 			}
 			if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {
