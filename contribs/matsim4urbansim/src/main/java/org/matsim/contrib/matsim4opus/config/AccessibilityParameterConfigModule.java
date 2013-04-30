@@ -19,9 +19,11 @@
 
 package org.matsim.contrib.matsim4opus.config;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
 public class AccessibilityParameterConfigModule extends Module{
+	private static Logger log = Logger.getLogger( AccessibilityParameterConfigModule.class ) ;
 
 	public static final String GROUP_NAME = "accessibilityParameter";
 	
@@ -116,6 +118,7 @@ public class AccessibilityParameterConfigModule extends Module{
 	
 	public AccessibilityParameterConfigModule(String name) {
 		super(name);
+		// yyyyyy this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13 
 	}
 	
 	public double getAccessibilityDestinationSamplingRate(){

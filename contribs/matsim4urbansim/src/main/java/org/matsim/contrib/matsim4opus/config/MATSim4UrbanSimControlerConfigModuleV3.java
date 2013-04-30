@@ -58,6 +58,7 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
 		this.isColdStart = false;
 		this.isWarmStart = false;
 		this.isHotStart	 = false;
+		// yyyyyy this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13 
 	}
 
     public boolean isZone2ZoneImpedance() {

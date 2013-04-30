@@ -60,6 +60,7 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	
 	public UrbanSimParameterConfigModuleV3(String name){
 		super(name);
+		// yyyyyy this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13 
 	}
 	
 	@Override

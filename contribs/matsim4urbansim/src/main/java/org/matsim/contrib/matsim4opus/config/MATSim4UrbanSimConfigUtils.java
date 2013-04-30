@@ -92,6 +92,7 @@ public class MATSim4UrbanSimConfigUtils {
 				log.warn("No shape-file given or shape-file not found:" + shapeFile);
 				log.warn("Instead the boundary of the road network is used to determine the area for which the accessibility computation is applied.");
 				log.warn("This may be ok of that was your intention.") ;
+				// yyyyyy the above is automagic; should be replaced by a flag.  kai, apr'13
 			} else {
 				computeCellbasedAccessibilityShapeFile = true;
 			}
@@ -260,22 +261,12 @@ public class MATSim4UrbanSimConfigUtils {
 			if(externalMATSimConfigFilename != null && Paths.pathExsits(externalMATSimConfigFilename)){
 				Config tempConfig = ConfigUtils.loadConfig( externalMATSimConfigFilename.trim() );
 				
-				//"materialize" the local config groups:
-//				tempConfig.addModule(UrbanSimParameterConfigModuleV3.GROUP_NAME, 
-//						new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME) ) ;
-//				tempConfig.addModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME,
-//						new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME));
-//				tempConfig.addModule(AccessibilityParameterConfigModule.GROUP_NAME,
-//						new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME)) ;
-
-				
 				// loading additional matsim4urbansim parameter settings from external config file
 				Module module = tempConfig.getModule(MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
 				if(module == null)
 					log.info("No \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings found in " + externalMATSimConfigFilename);
 				else
 					log.info("Found \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings in " + externalMATSimConfigFilename);
-	//			matsim4UrbanSimModule = module;
 				return module ;
 			}
 			return null ;
@@ -286,6 +277,9 @@ public class MATSim4UrbanSimConfigUtils {
 	 * 
 	 * NOTE: If the MATSim4UrbanSim network section contains a road network 
 	 * this overwrites a previous network, e.g. from an external MATSim configuration
+	 * <p/>
+	 * (The above statement is correct.  But irrelevant, since at the end everything is overwritten 
+	 * again from an external MATSim configuration. kai, apr'13)
 	 * 
 	 * @param matsimParameter
 	 * @param config TODO
@@ -293,12 +287,13 @@ public class MATSim4UrbanSimConfigUtils {
 	static void initNetwork(ConfigType matsimParameter, Config config){
 		log.info("Setting NetworkConfigGroup to config...");
 		String networkFile = matsimParameter.getNetwork().getInputFile();
-		NetworkConfigGroup networkCG = config.network() ;
 		if( !networkFile.isEmpty() )  // the MATSim4UrbanSim config contains a network file
-			networkCG.setInputFile( networkFile );
+			config.network().setInputFile( networkFile );
 		else
 			throw new RuntimeException("Missing MATSim network! The network must be specified either directly in the " +
 					"MATSim4UrbanSim configuration or in an external MATSim configuration.");
+
+		// yyyyyy ???  Aber es gibt die exception doch auch, wenn es in der external matsim config gesetzt ist? kai, apr'13
 
 		log.info("...done!");
 	}

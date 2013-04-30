@@ -82,10 +82,6 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	// JAXB representation of matsim4urbansim config
 	private final MatsimConfigType matsim4urbansimConfig ;
 
-	// MATSim4UrbanSim module from external MATSim config
-	private Module matsim4urbansimModule = null;
-	
-	
 	/**
 	 * constructor
 	 * 
@@ -117,18 +113,16 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			ConfigType matsim4urbansimConfigPart1 = matsim4urbansimConfig.getConfig();
 			Matsim4UrbansimType matsim4urbansimConfigPart2 = matsim4urbansimConfig.getMatsim4Urbansim();
 			
-			// creates an empty config to be filled by settings from the MATSim4UrbanSim
-			// and external config file
-			this.config = MATSim4UrbanSimConfigUtils.createEmptyConfigWithVSPExperimentalAbort();
-
 			// loads the external MATSim config separately (to get additional MATSim4UrbanSim parameters)
 			String externalMATSimConfigFilename = matsim4urbansimConfigPart1.getMatsimConfig().getInputFile();
-			this.matsim4urbansimModule = MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimModule(externalMATSimConfigFilename);
+			Module matsim4urbansimConfigPart3 = MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimModule(externalMATSimConfigFilename);
 
-			
-			MATSim4UrbanSimConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimModule, config);
-			MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimModule, config);
-			MATSim4UrbanSimConfigUtils.initAccessibilityParameter(matsim4urbansimConfigPart2, matsim4urbansimModule, config);
+			// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
+			this.config = MATSim4UrbanSimConfigUtils.createEmptyConfigWithVSPExperimentalAbort();
+
+			MATSim4UrbanSimConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
+			MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
+			MATSim4UrbanSimConfigUtils.initAccessibilityParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
 			
 			MATSim4UrbanSimConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
 			MATSim4UrbanSimConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
