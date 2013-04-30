@@ -21,6 +21,7 @@
 package playground.emission.types;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import playground.julia.emission.types.HbefaVehicleAttributes;
 import playground.julia.emission.types.HbefaWarmEmissionFactorKey;
@@ -33,32 +34,14 @@ import playground.vsp.emissions.types.HbefaVehicleCategory;
 
 public class TestHbefaWarmEmissionFactorKey {
 	
+	//TODO habe ich die kalten nicht schon neu gemacht nach den neuen regeln?
+	//ja, kopieren + anpassen
+	
+	@Ignore
 	@Test
 	public final void testEquals(){
 
-		//default case
-		//TODO HbefaWarmEmissionFactorKey hat keinen DefaultKonstruktor bzw nur einen leeren. Soll das so bleiben?
-		HbefaWarmEmissionFactorKey hcefk1 = new HbefaWarmEmissionFactorKey();
-		HbefaWarmEmissionFactorKey hcefk2 = new HbefaWarmEmissionFactorKey();
-	//	Assert.assertTrue(hcefk1.equals(hcefk2));	
 		
-		//default constructor
-		HbefaWarmEmissionFactorKey hcefk3 = new HbefaWarmEmissionFactorKey();
-		//TODO wenn es defaultwerte gibt, dann hier testen. sonst test unnoetig
-		
-		
-		//test with content
-		//TODO die HbefaWarmEmissionFactorKey hat keinen schoenen Konstruktor... ergaenzt ... uebernehmen?
-		hcefk3.setHbefaComponent(WarmPollutant.FC);
-		hcefk3.setHbefaDistance(4);
-		hcefk3.setHbefaParkingTime(5);
-		HbefaVehicleAttributes abc = new HbefaVehicleAttributes("a","b","c");
-		hcefk3.setHbefaVehicleAttributes(abc);
-		hcefk3.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-		
-		HbefaWarmEmissionFactorKey hcefk4 = new HbefaWarmEmissionFactorKey(WarmPollutant.FC, 4, 5, "a", "b","c",HbefaVehicleCategory.PASSENGER_CAR);
-
-		Assert.assertTrue(hcefk4.toString(),hcefk3.equals(hcefk4));
 	
 		
 	}
