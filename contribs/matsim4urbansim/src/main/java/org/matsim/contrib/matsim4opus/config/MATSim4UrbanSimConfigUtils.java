@@ -434,9 +434,10 @@ public class MATSim4UrbanSimConfigUtils {
 		}
 		
 		// setting number of threads
-		qsimCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
-		log.error("setting qsim number of threads automagically; this is almost certainly not good; fix") ;
-		// yyyy
+//		qsimCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
+		// log.error("setting qsim number of threads automagically; this is almost certainly not good; fix") ;
+		// just changed this, setting it to one:  kai, apr'13
+		qsimCG.setNumberOfThreads(1);
 		
 		double popSampling = matsim4urbansimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
 		log.info("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
@@ -454,11 +455,11 @@ public class MATSim4UrbanSimConfigUtils {
 		// storage capacity == 1).			tnicolai nov'11
 		if(popSampling <= 0.){
 			// yyyyyy how can this happen???? kai, apr'13
-			// yyyyyy if this has happend, it is plausible that the flow cap factor is NOT corrected??? kai, apr'13
+			// yyyyyy if this has happens, it is plausible that the flow cap factor is NOT corrected??? kai, apr'13
 			double popSamplingBefore = popSampling ;
 			popSampling = 0.01;
 			log.warn("Raised popSampling rate from " + popSamplingBefore + 
-					" to " + popSampling + " to to avoid errors while calulating the correction fetch factor ...");
+					" to " + popSampling + " to to avoid errors while calulating the correction factor ...");
 		}
 		// tnicolai dec'11
 		double storageCapCorrectionFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
@@ -484,8 +485,8 @@ public class MATSim4UrbanSimConfigUtils {
 		double defaultBicycleSpeed = 4.16666666;// 4.16666666m/s corresponds to 15 km/h
 		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
 		
-		log.error( "ignoring any external default speeds for walk/bicycle/pt and using internal values.  fix!!" ) ;
-		// yyyyyy
+		//  log.error( "ignoring any external default speeds for walk/bicycle/pt and using internal values.  fix!!" ) ;
+		//  this is not a problem since the complete config is overwritten by the external config at the very end.
 		
 		// setting teleportation speeds in router
 		config.plansCalcRoute().setWalkSpeed( defaultWalkSpeed ); 
@@ -1104,15 +1105,16 @@ public class MATSim4UrbanSimConfigUtils {
 //	}
 //
 	static final void checkConfigConsistencyAndWriteToLog(Config config, final String message) {
-		log.info(message);
 		String newline = System.getProperty("line.separator");// use native line endings for logfile
+		log.info(newline + newline + message);
 		StringWriter writer = new StringWriter();
 		new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
-		log.info(newline + newline + writer.getBuffer().toString());
+		log.info(newline + "Complete config dump:" + newline + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 		log.info("Checking consistency of config...");
 		config.checkConsistency();
 		log.info("Checking consistency of config done.");
+		log.info("("+message+")" + newline + newline ) ;
 	}
 //
 //	/**

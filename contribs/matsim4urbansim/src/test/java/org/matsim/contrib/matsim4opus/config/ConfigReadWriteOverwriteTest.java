@@ -183,8 +183,8 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			System.err.println( "cmp: " + cmpConfigFilename ) ;
 			
 			// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
-			Assert.assertEquals( "config files are different", CRCChecksum.getCRCFromFile(cmpConfigFilename) , 
-					CRCChecksum.getCRCFromFile(outConfigFilename) ) ;
+//			Assert.assertEquals( "config files are different", CRCChecksum.getCRCFromFile(cmpConfigFilename) , 
+//					CRCChecksum.getCRCFromFile(outConfigFilename) ) ;
 			
 			
 		} catch(Exception e){
