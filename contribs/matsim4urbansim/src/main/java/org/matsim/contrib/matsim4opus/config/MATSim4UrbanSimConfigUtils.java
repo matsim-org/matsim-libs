@@ -910,115 +910,115 @@ public class MATSim4UrbanSimConfigUtils {
 //		log.info("GlobalConfigGroup settings:");
 //		log.info("Number of Threads: " + globalCG.getNumberOfThreads() + " ...");
 //	}
-//
-//	/**
-//		 * printing UrbanSimParameterSettings
-//		 */
-//		static void printUrbanSimParameterSettings( UrbanSimParameterConfigModuleV3 module) {
-//			
-//	//		UrbanSimParameterConfigModuleV3 module = this.getUrbanSimParameterConfig();
-//			
-//			log.info("UrbanSimParameter settings:");
-//			log.info("ProjectName: " + module.getProjectName() );
-//			log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
-//			log.info("Year: " + module.getYear() ); 
-//			log.info("OPUS_HOME: " + InternalConstants.OPUS_HOME );
-//			log.info("OPUS_DATA_PATH: " + InternalConstants.OPUS_DATA_PATH );
-//			log.info("MATSIM_4_OPUS: " + InternalConstants.MATSIM_4_OPUS );
-//			log.info("MATSIM_4_OPUS_CONIG: " + InternalConstants.MATSIM_4_OPUS_CONFIG );
-//			log.info("MATSIM_4_OPUS_OUTPUT: " + InternalConstants.MATSIM_4_OPUS_OUTPUT );
-//			log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
-//			log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
-//			log.info("(Custom) Test Parameter: " + module.getTestParameter() );
-//			log.info("UsingShapefileLocationDistribution:" + module.usingShapefileLocationDistribution());
-//			log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
-//			log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
-//			log.info("Backing Up Run Data: " + module.isBackup() );
-//			log.info("Is Test Run: " + module.isTestRun() );
-//		}
-//
-//	/**
-//		 * printing MATSim4UrbanSimControlerSettings
-//		 */
-//		static void printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimControlerConfigModuleV3 module ) {
-//			
-//	//		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
-//			
-//			// view results
-//			log.info("MATSim4UrbanSimControler settings:");
-//			log.info("Compute Agent-performance: " + module.isAgentPerformance() );
-//			log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
-//			log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
-//			log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
-//			log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
-//			log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
-//			log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
-//			log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
-//			log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
-//			log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
-//			log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
-//			log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
-//			log.info("Time of day: " + module.getTimeOfDay() );
-//			log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
-//			log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
-//			log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
-//		}
-//
-//	/**
-//		 * printing AccessibilityParameterSettings
-//		 */
-//		static void printAccessibilityParameterSettings(AccessibilityParameterConfigModule module) {
-//			
-//	//		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
-//			
-//			// display results
-//			log.info("AccessibilityParameter settings:");
-//			
-//			log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
-//			log.info("Compute raw sum (not logsum): " + module.usingRawSumsWithoutLn() );
-//			log.info("Logit Scale Parameter: " + module.usingLogitScaleParameterFromMATSim() ); 
-//			
-//			log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
-//			log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );
-//			log.info("BETA_CAR_LN_TRAVEL_TIMES: " + module.getBetaCarLnTravelTime());
-//			log.info("BETA_CAR_TRAVEL_DISTANCE: " + module.getBetaCarTravelDistance() );
-//			log.info("BETA_CAR_TRAVEL_DISTANCE_POWER: " + module.getBetaCarTravelDistancePower2() );
-//			log.info("BETA_CAR_LN_TRAVEL_DISTANCE: " + module.getBetaCarLnTravelDistance() );
-//			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS: " + module.getBetaCarTravelMonetaryCost() );
-//			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaCarTravelMonetaryCostPower2() );
-//			log.info("BETA_CAR_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaCarLnTravelMonetaryCost());
-//			
-//			log.info("BETA_PT_TRAVEL_TIMES: " + module.getBetaPtTravelTime()  );
-//			log.info("BETA_PT_TRAVEL_TIMES_POWER: " + module.getBetaPtTravelTimePower2() );
-//			log.info("BETA_PT_LN_TRAVEL_TIMES: " + module.getBetaPtLnTravelTime() );
-//			log.info("BETA_PT_TRAVEL_DISTANCE: " + module.getBetaPtTravelDistance() );
-//			log.info("BETA_PT_TRAVEL_DISTANCE_POWER: " + module.getBetaPtTravelDistancePower2() );
-//			log.info("BETA_PT_LN_TRAVEL_DISTANCE: " + module.getBetaPtLnTravelDistance() );
-//			log.info("BETA_PT_TRAVEL_MONETARY_COSTS: " + module.getBetaPtTravelMonetaryCost() );
-//			log.info("BETA_PT_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaPtTravelMonetaryCostPower2() );
-//			log.info("BETA_PT_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaPtLnTravelMonetaryCost() );
-//			
-//			log.info("BETA_BIKE_TRAVEL_TIMES: " + module.getBetaBikeTravelTime()  );
-//			log.info("BETA_BIKE_TRAVEL_TIMES_POWER: " + module.getBetaBikeTravelTimePower2() );
-//			log.info("BETA_BIKE_LN_TRAVEL_TIMES: " + module.getBetaBikeLnTravelTime() );
-//			log.info("BETA_BIKE_TRAVEL_DISTANCE: " + module.getBetaBikeTravelDistance() );
-//			log.info("BETA_BIKE_TRAVEL_DISTANCE_POWER: " + module.getBetaBikeTravelDistancePower2() );
-//			log.info("BETA_BIKE_LN_TRAVEL_DISTANCE: " + module.getBetaBikeLnTravelDistance() );
-//			log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeTravelMonetaryCost() );
-//			log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaBikeTravelMonetaryCostPower2() );
-//			log.info("BETA_BIKE_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeLnTravelMonetaryCost() );
-//			
-//			log.info("BETA_WALK_TRAVEL_TIMES: " + module.getBetaWalkTravelTime()  );
-//			log.info("BETA_WALK_TRAVEL_TIMES_POWER: " + module.getBetaWalkTravelTimePower2() );
-//			log.info("BETA_WALK_LN_TRAVEL_TIMES: " + module.getBetaWalkLnTravelTime() );
-//			log.info("BETA_WALK_TRAVEL_DISTANCE: " + module.getBetaWalkTravelDistance() );
-//			log.info("BETA_WALK_TRAVEL_DISTANCE_POWER: " + module.getBetaWalkTravelDistancePower2() );
-//			log.info("BETA_WALK_LN_TRAVEL_DISTANCE: " + module.getBetaWalkLnTravelDistance() );
-//			log.info("BETA_WALK_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkTravelMonetaryCost() );
-//			log.info("BETA_WALK_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaWalkTravelMonetaryCostPower2() );
-//			log.info("BETA_WALK_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkLnTravelMonetaryCost() );
-//		}
-//
+
+	/**
+		 * printing UrbanSimParameterSettings
+		 */
+		static void printUrbanSimParameterSettings( UrbanSimParameterConfigModuleV3 module) {
+			
+	//		UrbanSimParameterConfigModuleV3 module = this.getUrbanSimParameterConfig();
+			
+			log.info("UrbanSimParameter settings:");
+			log.info("ProjectName: " + module.getProjectName() );
+			log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
+			log.info("Year: " + module.getYear() ); 
+			log.info("OPUS_HOME: " + InternalConstants.OPUS_HOME );
+			log.info("OPUS_DATA_PATH: " + InternalConstants.OPUS_DATA_PATH );
+			log.info("MATSIM_4_OPUS: " + InternalConstants.MATSIM_4_OPUS );
+			log.info("MATSIM_4_OPUS_CONIG: " + InternalConstants.MATSIM_4_OPUS_CONFIG );
+			log.info("MATSIM_4_OPUS_OUTPUT: " + InternalConstants.MATSIM_4_OPUS_OUTPUT );
+			log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
+			log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
+			log.info("(Custom) Test Parameter: " + module.getTestParameter() );
+			log.info("UsingShapefileLocationDistribution:" + module.usingShapefileLocationDistribution());
+			log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
+			log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
+			log.info("Backing Up Run Data: " + module.isBackup() );
+			log.info("Is Test Run: " + module.isTestRun() );
+		}
+
+	/**
+		 * printing MATSim4UrbanSimControlerSettings
+		 */
+		static void printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimControlerConfigModuleV3 module ) {
+			
+	//		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
+			
+			// view results
+			log.info("MATSim4UrbanSimControler settings:");
+			log.info("Compute Agent-performance: " + module.isAgentPerformance() );
+			log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
+			log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
+			log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
+			log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
+			log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
+			log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
+			log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
+			log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
+			log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
+			log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
+			log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
+			log.info("Time of day: " + module.getTimeOfDay() );
+			log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
+			log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
+			log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
+		}
+
+	/**
+		 * printing AccessibilityParameterSettings
+		 */
+		static void printAccessibilityParameterSettings(AccessibilityParameterConfigModule module) {
+			
+	//		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
+			
+			// display results
+			log.info("AccessibilityParameter settings:");
+			
+			log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
+			log.info("Compute raw sum (not logsum): " + module.usingRawSumsWithoutLn() );
+			log.info("Logit Scale Parameter: " + module.usingLogitScaleParameterFromMATSim() ); 
+			
+			log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
+			log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );
+			log.info("BETA_CAR_LN_TRAVEL_TIMES: " + module.getBetaCarLnTravelTime());
+			log.info("BETA_CAR_TRAVEL_DISTANCE: " + module.getBetaCarTravelDistance() );
+			log.info("BETA_CAR_TRAVEL_DISTANCE_POWER: " + module.getBetaCarTravelDistancePower2() );
+			log.info("BETA_CAR_LN_TRAVEL_DISTANCE: " + module.getBetaCarLnTravelDistance() );
+			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS: " + module.getBetaCarTravelMonetaryCost() );
+			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaCarTravelMonetaryCostPower2() );
+			log.info("BETA_CAR_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaCarLnTravelMonetaryCost());
+			
+			log.info("BETA_PT_TRAVEL_TIMES: " + module.getBetaPtTravelTime()  );
+			log.info("BETA_PT_TRAVEL_TIMES_POWER: " + module.getBetaPtTravelTimePower2() );
+			log.info("BETA_PT_LN_TRAVEL_TIMES: " + module.getBetaPtLnTravelTime() );
+			log.info("BETA_PT_TRAVEL_DISTANCE: " + module.getBetaPtTravelDistance() );
+			log.info("BETA_PT_TRAVEL_DISTANCE_POWER: " + module.getBetaPtTravelDistancePower2() );
+			log.info("BETA_PT_LN_TRAVEL_DISTANCE: " + module.getBetaPtLnTravelDistance() );
+			log.info("BETA_PT_TRAVEL_MONETARY_COSTS: " + module.getBetaPtTravelMonetaryCost() );
+			log.info("BETA_PT_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaPtTravelMonetaryCostPower2() );
+			log.info("BETA_PT_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaPtLnTravelMonetaryCost() );
+			
+			log.info("BETA_BIKE_TRAVEL_TIMES: " + module.getBetaBikeTravelTime()  );
+			log.info("BETA_BIKE_TRAVEL_TIMES_POWER: " + module.getBetaBikeTravelTimePower2() );
+			log.info("BETA_BIKE_LN_TRAVEL_TIMES: " + module.getBetaBikeLnTravelTime() );
+			log.info("BETA_BIKE_TRAVEL_DISTANCE: " + module.getBetaBikeTravelDistance() );
+			log.info("BETA_BIKE_TRAVEL_DISTANCE_POWER: " + module.getBetaBikeTravelDistancePower2() );
+			log.info("BETA_BIKE_LN_TRAVEL_DISTANCE: " + module.getBetaBikeLnTravelDistance() );
+			log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeTravelMonetaryCost() );
+			log.info("BETA_BIKE_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaBikeTravelMonetaryCostPower2() );
+			log.info("BETA_BIKE_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaBikeLnTravelMonetaryCost() );
+			
+			log.info("BETA_WALK_TRAVEL_TIMES: " + module.getBetaWalkTravelTime()  );
+			log.info("BETA_WALK_TRAVEL_TIMES_POWER: " + module.getBetaWalkTravelTimePower2() );
+			log.info("BETA_WALK_LN_TRAVEL_TIMES: " + module.getBetaWalkLnTravelTime() );
+			log.info("BETA_WALK_TRAVEL_DISTANCE: " + module.getBetaWalkTravelDistance() );
+			log.info("BETA_WALK_TRAVEL_DISTANCE_POWER: " + module.getBetaWalkTravelDistancePower2() );
+			log.info("BETA_WALK_LN_TRAVEL_DISTANCE: " + module.getBetaWalkLnTravelDistance() );
+			log.info("BETA_WALK_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkTravelMonetaryCost() );
+			log.info("BETA_WALK_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaWalkTravelMonetaryCostPower2() );
+			log.info("BETA_WALK_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkLnTravelMonetaryCost() );
+		}
+
 //	/**
 //	 * printing NetworkConfigGroupSettings
 //	 * @param config TODO

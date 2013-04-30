@@ -22,7 +22,12 @@
  */
 package org.matsim.contrib.matsim4opus.config;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -45,6 +50,10 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
+
+import difflib.Delta;
+import difflib.DiffUtils;
+import difflib.Patch;
 
 /**
  * @author thomas
@@ -171,20 +180,35 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			
 			log.info("Getting config settings in matsim format");
 			Config config = converter.getConfig();
+//			config.controler().setFirstIteration(20) ;
 
+			String revisedFileName = utils.getOutputDirectory()+"/config.xml"  ;
+			log.info( "new: " + revisedFileName ) ;
+			new ConfigWriter(config).write( revisedFileName ) ;
+			final long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName) ;
+
+			String originalFileName = utils.getClassInputDirectory()+"/config.xml" ;
+			log.info( "old: " + originalFileName ) ;
+			final long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
+
+			if ( revisedCheckSum != originalCheckSum ) {
+
+				List<String> original = fileToLines(originalFileName);
+				List<String> revised  = fileToLines(revisedFileName);
+
+				Patch patch = DiffUtils.diff(original, revised);
+
+				for (Delta delta: patch.getDeltas()) {
+					System.out.println(delta);
+				}
+
+			}
+            
 			// checking if overlapping parameter settings are overwritten by the external config
 			checkCoreModulesAndExternalConfigSettings(testExternalConfig, testConfig, config);
 			
-			String outConfigFilename = utils.getOutputDirectory()+"/config.xml"  ;
-			System.err.println( "out: " + outConfigFilename ) ;
-			new ConfigWriter(config).write( outConfigFilename ) ;
-			
-			String cmpConfigFilename = utils.getClassInputDirectory()+"/config.xml" ;
-			System.err.println( "cmp: " + cmpConfigFilename ) ;
-			
 			// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
-//			Assert.assertEquals( "config files are different", CRCChecksum.getCRCFromFile(cmpConfigFilename) , 
-//					CRCChecksum.getCRCFromFile(outConfigFilename) ) ;
+			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
 			
 			
 		} catch(Exception e){
@@ -194,6 +218,21 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		
 	}
+
+	// Helper method for get the file content
+    private static List<String> fileToLines(String filename) {
+            List<String> lines = new LinkedList<String>();
+            String line = "";
+            try {
+                    BufferedReader in = new BufferedReader(new FileReader(filename));
+                    while ((line = in.readLine()) != null) {
+                            lines.add(line);
+                    }
+            } catch (IOException e) {
+                    e.printStackTrace();
+            }
+            return lines;
+    }
 
 	/**
 	 * This tests if overlapping parameter settings are overwritten by the external config.

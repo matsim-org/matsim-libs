@@ -139,9 +139,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			MATSim4UrbanSimConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
 			
 //			// show final settings
-//			MATSim4UrbanSimConfigUtils.printUrbanSimParameterSettings( MATSim4UrbanSimConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
-//			MATSim4UrbanSimConfigUtils.printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
-//			MATSim4UrbanSimConfigUtils.printAccessibilityParameterSettings( MATSim4UrbanSimConfigUtils.getAccessibilityParameterConfigAndPossiblyConvert(config) );
+			// (these are not visible in the matsim config dump :-( :-( and thus need to be done separately. kai, apr'13)
+			MATSim4UrbanSimConfigUtils.printUrbanSimParameterSettings( MATSim4UrbanSimConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
+			MATSim4UrbanSimConfigUtils.printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
+			MATSim4UrbanSimConfigUtils.printAccessibilityParameterSettings( MATSim4UrbanSimConfigUtils.getAccessibilityParameterConfigAndPossiblyConvert(config) );
 			
 			config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() ) ;
 			config.addConfigConsistencyChecker( new MATSim4UrbanSimConfigConsistencyChecker() ) ;
