@@ -107,7 +107,8 @@ public class MyTransitRouterImpl implements TransitRouter {
 			Coord toCoord = node.stop.getStopFacility().getCoord();
 			double initialTime = getWalkTime(person, coord, toCoord);
 			double initialCost = getWalkDisutility(person, coord, toCoord);
-			wrappedNearestNodes.put(node, new InitialNode(node, initialCost, initialTime + departureTime));
+//			wrappedNearestNodes.put(node, new InitialNode(node, initialCost, initialTime + departureTime));
+			wrappedNearestNodes.put(node, new InitialNode(node, initialCost, initialTime));	// only use travel time!
 		}
 		return wrappedNearestNodes;
 	}
@@ -147,7 +148,7 @@ public class MyTransitRouterImpl implements TransitRouter {
 		return convertPathToLegList( departureTime, p, fromCoord, toCoord, person ) ;
 	}
 
-	private List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord){
+	private List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {
 		List<Leg> legs = new ArrayList<Leg>();
 		Leg leg = new LegImpl(TransportMode.transit_walk);
 		double walkTime = getWalkTime(person, fromCoord, toCoord);
