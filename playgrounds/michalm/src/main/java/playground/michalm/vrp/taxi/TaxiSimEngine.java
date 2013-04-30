@@ -95,14 +95,14 @@ public class TaxiSimEngine
 
     public void taxiRequestSubmitted(Request request, double now)
     {
-        optimizer.taxiRequestSubmitted(request, (int)now);
+        optimizer.taxiRequestSubmitted(request);
         notifyAgentLogics();
     }
 
 
-    public void taskEnded(Vehicle vrpVehicle, int time)
+    public void beforeNextTask(Vehicle vrpVehicle, int time)
     {
-        optimizer.beforeNextTask(vrpVehicle, time);
+        optimizer.beforeNextTask(vrpVehicle);
         notifyAgentLogics();
     }
 

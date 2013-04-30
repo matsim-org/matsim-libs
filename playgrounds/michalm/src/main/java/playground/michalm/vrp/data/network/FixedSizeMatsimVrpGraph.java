@@ -29,6 +29,8 @@ import pl.poznan.put.vrp.dynamic.data.network.*;
 /**
  * It consists of ShortestPathsArcs with ShortestPath of any type (Sparse, Full or other)
  * 
+ * In general, use GrowingMatsimVrpGraph instead (smaller memory demand).
+ * 
  * @author michalm
  */
 public class FixedSizeMatsimVrpGraph

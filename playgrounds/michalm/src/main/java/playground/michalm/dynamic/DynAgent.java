@@ -83,11 +83,11 @@ public class DynAgent
 
     public void update()
     {
-        // this agent is right now switching from one task (Act/Leg) to another (Act/Leg)
-        // so he is the source of this schedule updating process and so he will not be handled here
-        // TODO: verify this condition!!!
-        // TODO: should this condition be moved to AgentLogic?
         if (state == null) {
+            // this agent is right now switching from one task (Act/Leg) to another (Act/Leg)
+            // so he is the source of this schedule updating process and so he will not be handled here
+            // TODO: verify this condition!!!
+            // TODO: should this condition be moved to AgentLogic?
             return;
         }
 

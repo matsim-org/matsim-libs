@@ -34,12 +34,15 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
             541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641,
             643, 647, 653 };
 
-    private SingleIterOnlineDvrpLauncher launcher;
+    private final SingleIterOnlineDvrpLauncher launcher;
+    private final TaxiDelaySpeedupStats delaySpeedupStats;
 
 
     /*package*/MultipleSingleIterOnlineDvrpLauncher(String paramFile)
     {
         launcher = new SingleIterOnlineDvrpLauncher(paramFile);
+        delaySpeedupStats = new TaxiDelaySpeedupStats();
+        launcher.delaySpeedupStats = delaySpeedupStats;
     }
 
 
@@ -134,9 +137,8 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
         pw.println();
 
         if (runs > 0) {
-
-            TaxiOptimizerImpl.delaySpeedupStats.printStats(pw2, configIdx + "");
-            TaxiOptimizerImpl.delaySpeedupStats.clearStats();
+            delaySpeedupStats.printStats(pw2, configIdx + "");
+            delaySpeedupStats.clearStats();
         }
     }
 

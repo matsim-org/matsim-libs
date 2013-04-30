@@ -34,21 +34,26 @@ public class MatsimVrpGraphCreator
         throws IOException
     {
         MatsimVrpGraph graph;
-
         if (fixedSizeVrpGraph) {
             int vertexCount = network.getLinks().size();
             graph = new FixedSizeMatsimVrpGraph(vertexCount);
-            ((FixedSizeVrpGraph)graph).initArcs(arcFactory);
         }
         else {
             graph = new GrowingMatsimVrpGraph(arcFactory);
         }
 
         // build vertices for all links...
+        
+        // one can build Arcs with the feature of lazy initialization (even in the case of the fixed
+        // size graph)
         MatsimVertexBuilder vertexBuilder = MatsimVertexImpl.createFromLinkIdBuilder(network);
 
         for (Id id : network.getLinks().keySet()) {
             graph.addVertex(vertexBuilder.setLinkId(id).build());
+        }
+
+        if (fixedSizeVrpGraph) {
+            ((FixedSizeVrpGraph)graph).initArcs(arcFactory);
         }
 
         return graph;

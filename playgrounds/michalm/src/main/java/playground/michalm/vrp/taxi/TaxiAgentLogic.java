@@ -102,7 +102,7 @@ public class TaxiAgentLogic
             //currently I assume that there are no delays (or "speedups") in starting the first task
             //i.e. PLANNED=>STARTED, therefore "updateAndOptimize" function is called only for
             //the already started schedules
-            taxiSimEngine.taskEnded(vrpVehicle, time);
+            taxiSimEngine.beforeNextTask(vrpVehicle, time);
         }
 
         Task task = schedule.nextTask();

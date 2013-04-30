@@ -348,24 +348,6 @@ public class JbSingleIterOnlineDvrpLauncher
 
         OTFLiveUtils.initQueryHandler(qSim, vrpData);
 
-        if (false /*vrpOutFiles*/) {
-            optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                @Override
-                public JFreeChart createChart(VrpData data)
-                {
-                    return RouteChartUtils.chartRoutesByStatus(data);
-                }
-            }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
-
-            optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-                @Override
-                public JFreeChart createChart(VrpData data)
-                {
-                    return ScheduleChartUtils.chartSchedule(data);
-                }
-            }, OutputType.PNG, vrpOutDirName + "\\schedules_", 1200, 800));
-        }
-
         if (otfVis) { // OFTVis visualization
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);

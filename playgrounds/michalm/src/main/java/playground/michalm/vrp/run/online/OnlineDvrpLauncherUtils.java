@@ -3,7 +3,6 @@ package playground.michalm.vrp.run.online;
 import java.io.*;
 import java.util.*;
 
-import org.jfree.chart.JFreeChart;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -20,14 +19,10 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
-import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.util.lang.TimeDiscretizer;
-import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
-import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizer;
-import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.vrp.data.MatsimVrpData;
@@ -201,29 +196,6 @@ public class OnlineDvrpLauncherUtils
         qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
 
         return qSim;
-    }
-
-
-    /**
-     * Optional
-     */
-    public static void addChartFileOptimizerListeners(VrpOptimizer optimizer, String vrpOutDirName)
-    {
-        optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-            @Override
-            public JFreeChart createChart(VrpData data)
-            {
-                return RouteChartUtils.chartRoutesByStatus(data);
-            }
-        }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
-
-        optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
-            @Override
-            public JFreeChart createChart(VrpData data)
-            {
-                return ScheduleChartUtils.chartSchedule(data);
-            }
-        }, OutputType.PNG, vrpOutDirName + "\\schedules_", 1200, 800));
     }
 
 

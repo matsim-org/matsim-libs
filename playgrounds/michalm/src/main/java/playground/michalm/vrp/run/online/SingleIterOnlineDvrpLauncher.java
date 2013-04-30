@@ -35,6 +35,7 @@ import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.withdestination.TaxiOptimizerWithDestinationKnowledge;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.RunningVehicleRegister;
 import playground.michalm.vrp.data.MatsimVrpData;
@@ -66,6 +67,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/AlgorithmConfig algorithmConfig;
     /*package*/LegHistogram legHistogram;
 
+    /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
 
 
     /*package*/SingleIterOnlineDvrpLauncher()
@@ -172,7 +174,9 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         data = OnlineDvrpLauncherUtils.initMatsimVrpData(scenario, algorithmConfig.ttimeSource,
                 algorithmConfig.tcostSource, eventsFileName, depotsFileName);
 
-        TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(data.getVrpData());
+        TaxiOptimizerWithDestinationKnowledge optimizer = algorithmConfig.createTaxiOptimizer(data
+                .getVrpData());
+        optimizer.setDelaySpeedupStats(delaySpeedupStats);
 
         QSim qSim = OnlineDvrpLauncherUtils.initQSim(data, optimizer);
         EventsManager events = qSim.getEventsManager();
@@ -185,11 +189,6 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
         RunningVehicleRegister rvr = new RunningVehicleRegister();
         events.addHandler(rvr);
-
-        // if (vrpOutFiles) {
-        if (Boolean.FALSE) {// <-- never
-            OnlineDvrpLauncherUtils.addChartFileOptimizerListeners(optimizer, vrpOutDirName);
-        }
 
         if (otfVis) { // OFTVis visualization
             OTFLiveUtils.initQueryHandler(qSim, data.getVrpData());

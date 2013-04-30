@@ -25,6 +25,7 @@ import static playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelCo
 import static playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelTimeSource.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.withdestination.*;
 import playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelCostSource;
 import playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelTimeSource;
 
@@ -177,7 +178,7 @@ import playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelTimeSourc
     }
 
 
-    /*package*/TaxiOptimizer createTaxiOptimizer(VrpData data)
+    /*package*/TaxiOptimizerWithDestinationKnowledge createTaxiOptimizer(VrpData data)
     {
         switch (algorithmType) {
             case NO_SCHEDULING:

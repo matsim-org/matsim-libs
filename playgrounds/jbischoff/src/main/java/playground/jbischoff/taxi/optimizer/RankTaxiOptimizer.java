@@ -5,30 +5,18 @@ import java.util.List;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Request;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedules;
-import pl.poznan.put.vrp.dynamic.data.schedule.ServeTask;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
-import pl.poznan.put.vrp.dynamic.data.schedule.WaitTask;
+import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.ServeTaskImpl;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.WaitTaskImpl;
-import pl.poznan.put.vrp.dynamic.optimizer.AbstractVrpOptimizer;
-import pl.poznan.put.vrp.dynamic.optimizer.listener.OptimizerEvent;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.ClosestInTimeVehicleFinder;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.schedule.TaxiDriveTask;
 import playground.jbischoff.taxi.optimizer.BestVehicleFinder.BestVehicle;
 import playground.jbischoff.taxi.rank.BackToRankTask;
 
-public class RankTaxiOptimizer extends AbstractVrpOptimizer {
+public class RankTaxiOptimizer{
 
 	       private VrpData data;
 	       private BestVehicleFinder bestVehicleFinder;
@@ -44,7 +32,7 @@ public class RankTaxiOptimizer extends AbstractVrpOptimizer {
 	       }
 
 
-	       @Override
+	       //@Override
 	       public void optimize()
 	       {
 	           // find new request & dispatch the closest taxi
@@ -56,7 +44,6 @@ public class RankTaxiOptimizer extends AbstractVrpOptimizer {
 	               }
 	           }
 	           
-	           notifyListeners(new OptimizerEvent(data.getTime(), data, taxiEvaluator.evaluateVrp(data)));
 	       }
 
 

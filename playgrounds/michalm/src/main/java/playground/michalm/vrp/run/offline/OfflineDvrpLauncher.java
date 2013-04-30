@@ -155,8 +155,10 @@ public class OfflineDvrpLauncher
         VrpOptimizer optimizer = new EvolutionaryVrpOptimizer(new AlgorithmParams(new File(dirName
                 + "\\" + algParamsFileName)), data.getVrpData());
 
+        //FIXME
+        //ups.... currently unsupported (therefore null) :-/
         DeterministicSimulator simulator = new DeterministicSimulator(vrpData, 24 * 60 * 60,
-                optimizer);
+                null);
 
         String vrpOutDirName = vrpDirName + "\\output";
         new File(vrpOutDirName).mkdir();

@@ -19,6 +19,8 @@
 
 package playground.michalm.vrp.data.network;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.network.NetworkImpl;
@@ -110,14 +112,14 @@ public class MatsimVertexImpl
     {
         private int id = -1;
 
-        private Network network;
+        private final Map<Id, ? extends Link> links;
 
         private Id linkId;
 
 
         private MatsimVertexFromLinkIdBuilder(Network network)
         {
-            this.network = network;
+            this.links = network.getLinks();
         }
 
 
@@ -133,7 +135,7 @@ public class MatsimVertexImpl
         public MatsimVertex build()
         {
             id++;
-            Link link = network.getLinks().get(linkId);
+            Link link = links.get(linkId);
 
             return new MatsimVertexImpl(id, linkId.toString(), link.getCoord(), link);
         }
@@ -145,8 +147,8 @@ public class MatsimVertexImpl
     {
         private int id = -1;
 
-        private Scenario scenario;
-        private NetworkImpl network;
+        private final Scenario scenario;
+        private final NetworkImpl network;
 
         private String name;
         private double x;

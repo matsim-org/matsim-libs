@@ -51,40 +51,26 @@ public class TaxiModeDepartureHandler
     public boolean handleDeparture(double now, MobsimAgent agent, Id linkId)
     {
         if (agent.getMode().equals(TAXI_MODE)) {
-            // mobsim.getEventsManager().processEvent(
-            // new TaxiRequestEventImpl(now, agent.getId(), linkId, agent.getMode()));
-
             MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
-
-            // TODO: Works for FixedSizeVrpGraph!
-            // in case of GrowingVrpGraph: 'addVertex' must be called if 'getVertex' returns 'null'
             MatsimVertex fromVertex = vrpGraph.getVertex(linkId);
-
             Id toLinkId = agent.getDestinationLinkId();
-            // TODO: as above (works for FixedSizeVrpGraph, won't work for GrowingVrpGraph)
             MatsimVertex toVertex = vrpGraph.getVertex(toLinkId);
 
             List<Customer> customers = data.getVrpData().getCustomers();
             List<Request> requests = data.getVrpData().getRequests();
 
-            int id = requests.size();
-
-            // notify the DVRP Optimizer
             // agent -> customerId -> Customer
+            int id = requests.size();
             Customer customer = new TaxiCustomer(id, fromVertex, agent);// TODO
-
             int duration = 120; // approx. 120 s for entering the taxi
             int t0 = (int)now;
             int t1 = t0 + 0; // hardcoded values!
             Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, 1, duration,
                     t0, t1, false);
-
             customers.add(customer);
             requests.add(request);
 
-            // taxiSimEngine.getMobsim().registerAdditionalAgentOnLink(agent);
             taxiSimEngine.getInternalInterface().registerAdditionalAgentOnLink(agent);
-
             taxiSimEngine.taxiRequestSubmitted(request, now);
 
             return true;
