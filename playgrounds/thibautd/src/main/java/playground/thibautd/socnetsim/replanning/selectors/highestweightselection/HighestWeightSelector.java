@@ -292,7 +292,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		// The weight is always computed on the full joint plan, and thus consists
 		// of the weight until now plus the upper bound
 		final List<PlanRecord> records = new ArrayList<PlanRecord>();
-		for ( PlanRecord r : currentPerson.bestPlansPerJointStructure ) {
+		for ( PlanRecord r : currentPerson.prunedPlans ) {
 			if ( r.isStillFeasible ) records.add( r );
 		}
 
@@ -554,7 +554,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			}
 		}
 
-		for (PlanRecord plan : record.bestPlansPerJointStructure ) {
+		for (PlanRecord plan : record.prunedPlans ) {
 			// the plans are sorted by decreasing weight:
 			// consider the first valid plan
 

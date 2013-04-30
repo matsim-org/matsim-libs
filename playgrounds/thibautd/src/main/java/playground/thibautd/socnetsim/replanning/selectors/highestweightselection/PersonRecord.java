@@ -37,7 +37,7 @@ import playground.thibautd.utils.MapUtils;
 final class PersonRecord {
 	final Person person;
 	final List<PlanRecord> plans;
-	final List<PlanRecord> bestPlansPerJointStructure;
+	final List<PlanRecord> prunedPlans;
 
 	public PersonRecord(
 			final Person person,
@@ -58,12 +58,12 @@ final class PersonRecord {
 				});
 
 		if ( incompatiblePlans == null ) {
-			bestPlansPerJointStructure = null;
+			prunedPlans = null;
 			return;
 		}
 
 		// TODO: pass this in the selector, as it is very linked to the way it works
-		bestPlansPerJointStructure = new ArrayList<PlanRecord>();
+		prunedPlans = new ArrayList<PlanRecord>();
 		final Map<Set<Id>, Set<Set<Id>>> knownBranches = new HashMap<Set<Id>, Set<Set<Id>>>();
 		double lastRecordWeight = Double.POSITIVE_INFINITY;
 		for (PlanRecord r : this.plans) {
@@ -76,7 +76,7 @@ final class PersonRecord {
 			// only consider the best plan of each structure for each set of
 			// incompatible plans.
 			if ( MapUtils.getSet( cotravs , knownBranches ).add( incompatiblePlans.identifyIncompatibilityGroups( r.plan ) ) ) {
-				bestPlansPerJointStructure.add( r );
+				prunedPlans.add( r );
 			}
 		}
 	}
