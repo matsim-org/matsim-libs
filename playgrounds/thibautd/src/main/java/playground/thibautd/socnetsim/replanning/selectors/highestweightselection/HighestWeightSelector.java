@@ -106,7 +106,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				new KnownStates(),
 				new KnownFeasibleAllocations( 20 ),
 				incompatibleRecords,
-				toSortedList( personRecords ),
+				SelectorUtils.toSortedList( incompatibleRecords , personRecords ),
 				personRecords,
 				forbidBlockingCombinations ? new PlanAllocation() : null,
 				incompatibleRecords.getAllIncompatibilityGroupIds(),
@@ -123,36 +123,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	// /////////////////////////////////////////////////////////////////////////
 	// "translation" to and from the internal data structures
 	// /////////////////////////////////////////////////////////////////////////
-
-	private List<PersonRecord> toSortedList(final Map<Id, PersonRecord> personRecords) {
-		final List<PersonRecord> list = new ArrayList<PersonRecord>( personRecords.values() );
-
-		Collections.sort(
-				list,
-				new Comparator<PersonRecord>() {
-					@Override
-					public int compare(
-							final PersonRecord o1,
-							final PersonRecord o2) {
-						final int nJp1 = countJp( o1 );
-						final int nJp2 = countJp( o2 );
-						// sort by decreasing number of joint plans.
-						// The idea is that all the combinatorial mess
-						// happens close to the root, to avoid having to go deep
-						// too many times
-						return nJp2 - nJp1;
-					}
-
-					private int countJp(final PersonRecord person) {
-						int c = 0;
-						for ( PlanRecord p : person.prunedPlans ) {
-							if ( p.jointPlan != null ) c++;
-						}
-						return c;
-					}
-				});
-		return list;
-	}
 
 	private Map<Id, PersonRecord> getPersonRecords(
 			final IncompatiblePlansIdentifier incompatiblePlansIdentifier,

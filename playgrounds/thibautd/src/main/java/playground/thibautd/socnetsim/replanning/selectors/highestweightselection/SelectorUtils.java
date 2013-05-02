@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.replanning.selectors.highestweightselectio
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,7 @@ final class SelectorUtils {
 				incompatibleRecords,
 				relevantForbiddenPlans,
 				nonBlockingPlan,
-				new ArrayList<PersonRecord>( personRecords.values() ));
+				toSortedList( incompatibleRecords , personRecords ));
 		infeasibility.resetFeasibilities();
 		everybodyChanger.resetFeasibilities();
 
@@ -107,6 +108,15 @@ final class SelectorUtils {
 			new ArrayList<PersonRecord>( personsStillToAllocate );
 		final PersonRecord currentPerson = remainingPersons.remove(0);
 
+		for ( PersonRecord pr : remainingPersons ) {
+			if ( !remainsPossible( pr.plans ) ) {
+				for ( PlanRecord plan : pr.plans ) {
+					add( relevantForbiddenPlans , plan );
+				}
+				return false;
+			}
+		}
+
 		final Set<Branch> exploredBranches = new HashSet<Branch>();
 		// examine plans from worst to best. This increases a lot the chances
 		// that the non-blocked plan found for a given leave is also non-blocked
@@ -119,12 +129,7 @@ final class SelectorUtils {
 			if ( !r.isStillFeasible ) {
 				// remember that this plan was used for determining if blocking
 				// or not
-				if ( r.jointPlan == null ) {
-					relevantForbiddenPlans.addIndividualPlan( r.plan );
-				}
-				else {
-					relevantForbiddenPlans.addJointPlan( r.jointPlan );
-				}
+				add( relevantForbiddenPlans , r );
 				continue;
 			}
 
@@ -168,6 +173,14 @@ final class SelectorUtils {
 			}
 		}
 
+		return false;
+	}
+
+	private static boolean remainsPossible(
+			final List<PlanRecord> plans) {
+		for ( PlanRecord p : plans ) {
+			if ( p.isStillFeasible ) return true;
+		}
 		return false;
 	}
 
@@ -296,5 +309,39 @@ final class SelectorUtils {
 		copy.addAll( allocation.getPlans() );
 		return copy;
 	}
+
+	public static List<PersonRecord> toSortedList(
+			final IncompatiblePlanRecords incompatibleRecords,
+			final Map<Id, PersonRecord> personRecords) {
+		final List<PersonRecord> list = new ArrayList<PersonRecord>( personRecords.values() );
+
+		Collections.sort(
+				list,
+				new Comparator<PersonRecord>() {
+					@Override
+					public int compare(
+							final PersonRecord o1,
+							final PersonRecord o2) {
+						final int nIncomp1 = countIncomp( o1 );
+						final int nIncomp2 = countIncomp( o2 );
+						// sort by decreasing number of incompatible plans.
+						// The idea is that all the combinatorial mess
+						// happens close to the root, to avoid having to go deep
+						// before realizing we're stuck
+						return nIncomp2 - nIncomp1;
+					}
+
+					private int countIncomp(final PersonRecord person) {
+						int c = 0;
+						for ( PlanRecord p : person.prunedPlans ) {
+							c += incompatibleRecords.getIncompatiblePlans( p ).size();
+						}
+						return c;
+					}
+				});
+		return list;
+	}
+
+
 }
 
