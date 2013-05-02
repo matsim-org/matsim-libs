@@ -27,6 +27,7 @@ import java.util.Collections;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
@@ -70,8 +71,11 @@ public class QVehicle extends QItem implements MobsimVehicle {
 		if (capacity == null) {
 			this.passengerCapacity = 4;
 			if (warnCount < 10) {
-				log.warn("No VehicleCapacity set in Vehicle. Use default value of 4.");
+				log.warn("No VehicleCapacity set in Vehicle. Using default value of 4.");
 				warnCount++;
+				if ( warnCount == 10 ) {
+					log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+				}
 			}
 		} else {
 			this.passengerCapacity = capacity.getSeats().intValue() +

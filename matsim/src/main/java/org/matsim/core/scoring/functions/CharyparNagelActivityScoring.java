@@ -64,6 +64,9 @@ public class CharyparNagelActivityScoring implements ActivityScoring {
 		this.currentActivityStartTime = INITIAL_LAST_TIME;
 		this.firstActivityEndTime = INITIAL_FIRST_ACT_TIME;
 		this.score = INITIAL_SCORE;
+		
+		firstLastActWarning = 0 ;
+		firstLastActOpeningTimesWarning = 0 ;
 	}
 
 	@Override
@@ -257,6 +260,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
 					log.warn("first activity: " + firstActivity ) ;
 					log.warn("last activity: " + lastActivity ) ;
+					log.warn("This may also happen when plans are not completed when the simulation ends.") ;
 					if (firstLastActWarning == 10) {
 						log.warn("Additional warnings of this type are suppressed.");
 					}
