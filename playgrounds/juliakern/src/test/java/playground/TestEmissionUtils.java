@@ -222,10 +222,31 @@ public class TestEmissionUtils {
 		Assert.assertEquals("SO value of person 2 should be" +e2so +"but is ", e2so, a2so, MatsimTestUtils.EPSILON);
 
 	}
+	
 	@Test @Ignore
 	public final void testGetTotalEmissions(){
 		
 	}
+	
+	@Test @Ignore
+	public final void testSetNonCalculatedEmissionsForPopulation(){
+		
+	}
+	@Test @Ignore
+	public final void testSetNonCalculatedEmissionsForNetwork(){
+		
+	}
+	
+	@Test @Ignore
+	public final void testConvertWarmPollutantMap2String(){
+		
+	}
+	
+	@Test @Ignore
+	public final void testConvertColdPollutantMap2String(){
+		
+	}
+	
 	
 }
 	

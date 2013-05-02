@@ -14,5 +14,25 @@ public class CodeList {
 	 * 
 	 * wenn einige Attribute unterschiedlich gesetzt sind, gibt die equals methode false zurueck, bevor 
 	 * sie wegen fehlender werte abstuerzt -> umschreiebn?
+	 * 
+	 * genauso: Hbefa Warm Emission FactorKey
 	 */
+	
+	
+	/*
+	 * HbefaVehicleAttributes - equals:
+	 * 	         return
+	            hbefaTechnology.equals(key.getHbefaTechnology())
+	         && hbefaSizeClass.equals(key.getHbefaSizeClass())
+	         && hbefaEmConcept.equals(key.getHbefaEmConcept()); 
+	 * 
+	 * aehnlich wie oben: ist der erste wert false, kommt false zurueck, auch wenn die anderen keine
+	 * passenden objekte sind.
+	 * 
+	 * */
+	
+	/*
+	 * Warm Pollutant hat keine getValue-Methode, cold schon
+	 */
+	
 }
