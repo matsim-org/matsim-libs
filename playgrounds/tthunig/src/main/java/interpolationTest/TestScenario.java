@@ -1,4 +1,4 @@
-package interpolation.test;
+package interpolationTest;
 
 import java.io.File;
 import java.io.FileWriter;
