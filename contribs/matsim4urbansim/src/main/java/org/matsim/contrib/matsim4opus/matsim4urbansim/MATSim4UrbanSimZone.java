@@ -73,7 +73,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZone.class);
 	
 	static final boolean BRUSSELS_SCENARIO_MODIFY_NETWORK = true ;
-	static final boolean BRUSSELS_SCENARIO_CALCULATE_ACCESSIBILITY = false ;
+	static final boolean BRUSSELS_SCENARIO_CALCULATE_ZONE2ZONE_MATRIX = false ;
 
 	/**
 	 * constructor
