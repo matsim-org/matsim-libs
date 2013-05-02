@@ -50,7 +50,8 @@ public class TestHbefaColdEmissionFactorKey {
 		normal.setHbefaComponent(ColdPollutant.FC);
 		normal.setHbefaDistance(4);
 		normal.setHbefaParkingTime(5);
-		HbefaVehicleAttributes attForNormal = new HbefaVehicleAttributes("a","b","c");
+		HbefaVehicleAttributes attForNormal = new HbefaVehicleAttributes();
+		attForNormal.setHbefaEmConcept("a"); attForNormal.setHbefaSizeClass("b"); attForNormal.setHbefaTechnology("c");
 		normal.setHbefaVehicleAttributes(attForNormal);
 		normal.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 		
@@ -75,7 +76,8 @@ public class TestHbefaColdEmissionFactorKey {
 		third.setHbefaComponent(ColdPollutant.FC);
 		third.setHbefaDistance(4);
 		third.setHbefaParkingTime(5);
-		HbefaVehicleAttributes attForThird = new HbefaVehicleAttributes("att","att", "att");
+		HbefaVehicleAttributes attForThird = new HbefaVehicleAttributes();
+		attForThird.setHbefaEmConcept("att1"); attForThird.setHbefaSizeClass("att2"); attForThird.setHbefaTechnology("att3");
 		third.setHbefaVehicleAttributes(attForThird);
 		third.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 		
