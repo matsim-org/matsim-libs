@@ -185,10 +185,12 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		log.info("-- average of the average leg distance per plan (worst plans only): " + (sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst));
 		log.info("-- average of the average leg distance per plan (all plans): " + (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg));
 		log.info("-- average of the average leg distance per plan (best plans only): " + (sumAvgPlanLegTravelDistanceBest / nofLegTravelDistanceBest));
+		log.info("(TravelDistanceStats takes an average over all legs that have a NetworkRoute.  These are usually all car legs.)") ;
 
 		try {
 			this.out.write(event.getIteration() + "\t" + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted) + "\t" +
-					(sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst) + "\t" + (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg) + "\t" + (sumAvgPlanLegTravelDistanceBest / nofLegTravelDistanceBest) + "\n");
+					(sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst) + "\t" + (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg) 
+					+ "\t" + (sumAvgPlanLegTravelDistanceBest / nofLegTravelDistanceBest) + "\n");
 			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
