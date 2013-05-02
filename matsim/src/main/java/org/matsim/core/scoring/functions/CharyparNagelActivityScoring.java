@@ -242,6 +242,8 @@ public class CharyparNagelActivityScoring implements ActivityScoring {
 				double[] openInterval = this.getOpeningInterval(lastActivity);
 				if (openInterval[0] >= 0 || openInterval[1] >= 0){
 					log.warn("There are opening or closing times defined for the first and last activity. The correctness of the scoring function can thus not be guaranteed.");
+					log.warn("first activity: " + firstActivity ) ;
+					log.warn("last activity: " + lastActivity ) ;
 					if (firstLastActOpeningTimesWarning == 10) {
 						log.warn("Additional warnings of this type are suppressed.");
 					}
@@ -253,6 +255,8 @@ public class CharyparNagelActivityScoring implements ActivityScoring {
 			if (this.params.scoreActs) {
 				if (firstLastActWarning <= 10) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
+					log.warn("first activity: " + firstActivity ) ;
+					log.warn("last activity: " + lastActivity ) ;
 					if (firstLastActWarning == 10) {
 						log.warn("Additional warnings of this type are suppressed.");
 					}
