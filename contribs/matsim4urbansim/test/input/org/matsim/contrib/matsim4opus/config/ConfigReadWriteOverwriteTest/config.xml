@@ -488,60 +488,61 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 <!-- ====================================================================== -->
 
 	<module name="strategy" >
-		<param name="ExternalExeConfigTemplate" value="null" />
-		<param name="ExternalExeTimeOut" value="3600" />
-		<param name="ExternalExeTmpFileRootDir" value="null" />
+
+		<!-- maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number -->
+		<param name="maxAgentPlanMemorySize" value="5" />
+
+		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
+		<param name="Module_1" value="TimeAllocationMutator" />
+
+		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
+		<param name="ModuleProbability_1" value="0.1" />
 
 		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
 		<param name="ModuleDisableAfterIteration_1" value="1" />
 
+		<!-- path to external executable (if applicable) -->
+		<param name="ModuleExePath_1" value="null" />
+
+		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
+		<param name="Module_2" value="ChangeExpBeta" />
+
+		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
+		<param name="ModuleProbability_2" value="0.9" />
+
 		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
 		<param name="ModuleDisableAfterIteration_2" value="null" />
 
+		<!-- path to external executable (if applicable) -->
+		<param name="ModuleExePath_2" value="null" />
+
+		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
+		<param name="Module_3" value="ReRoute" />
+
+		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
+		<param name="ModuleProbability_3" value="0.1" />
+
 		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
 		<param name="ModuleDisableAfterIteration_3" value="1" />
+
+		<!-- path to external executable (if applicable) -->
+		<param name="ModuleExePath_3" value="null" />
+
+		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
+		<param name="Module_4" value="ChangeLegMode" />
+
+		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
+		<param name="ModuleProbability_4" value="0.1" />
 
 		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
 		<param name="ModuleDisableAfterIteration_4" value="null" />
 
 		<!-- path to external executable (if applicable) -->
-		<param name="ModuleExePath_1" value="null" />
-
-		<!-- path to external executable (if applicable) -->
-		<param name="ModuleExePath_2" value="null" />
-
-		<!-- path to external executable (if applicable) -->
-		<param name="ModuleExePath_3" value="null" />
-
-		<!-- path to external executable (if applicable) -->
 		<param name="ModuleExePath_4" value="null" />
 
-		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-		<param name="ModuleProbability_1" value="0.1" />
-
-		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-		<param name="ModuleProbability_2" value="0.9" />
-
-		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-		<param name="ModuleProbability_3" value="0.1" />
-
-		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-		<param name="ModuleProbability_4" value="0.1" />
-
-		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-		<param name="Module_1" value="TimeAllocationMutator" />
-
-		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-		<param name="Module_2" value="ChangeExpBeta" />
-
-		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-		<param name="Module_3" value="ReRoute" />
-
-		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-		<param name="Module_4" value="ChangeLegMode" />
-
-		<!-- maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number -->
-		<param name="maxAgentPlanMemorySize" value="5" />
+		<param name="ExternalExeConfigTemplate" value="null" />
+		<param name="ExternalExeTmpFileRootDir" value="null" />
+		<param name="ExternalExeTimeOut" value="3600" />
 
 		<!-- name of PlanSelector for plans removal.  If not full class name, resolved in StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically tested. kai, feb'12 -->
 		<param name="planSelectorForRemoval" value="null" />
