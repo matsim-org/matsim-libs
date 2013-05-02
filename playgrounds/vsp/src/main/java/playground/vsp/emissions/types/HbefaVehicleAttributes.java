@@ -30,25 +30,6 @@ public class HbefaVehicleAttributes {
 	
 	public HbefaVehicleAttributes(){
 	}
-	
-	public HbefaVehicleAttributes(String hbefaTechnology, String hbefaSizeClass, String hbefaEmConcept){
-		if(hbefaTechnology.isEmpty()){
-			this.hbefaTechnology = "average";
-		}else{
-			this.hbefaTechnology = hbefaTechnology;
-		}
-		if(hbefaSizeClass.isEmpty()){
-			this.hbefaSizeClass ="average";
-		}else{
-			
-		this.hbefaSizeClass = hbefaSizeClass;
-		}
-		if(hbefaEmConcept.isEmpty()){
-			this.hbefaEmConcept = "average";
-		}else{	
-			this.hbefaEmConcept = hbefaEmConcept;
-		}
-	}
 
 	public String getHbefaTechnology(){
 		return this.hbefaTechnology;
