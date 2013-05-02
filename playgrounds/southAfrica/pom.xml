@@ -10,13 +10,13 @@
   <name>southAfrica</name>
   <dependencies>
   	<dependency>
-  		<groupId>playground</groupId>
-  		<artifactId>kai</artifactId>
+  		<groupId>org.matsim.contrib</groupId>
+  		<artifactId>roadpricing</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
-  		<artifactId>roadpricing</artifactId>
+  		<artifactId>matsim4urbansim</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
 		<dependency>

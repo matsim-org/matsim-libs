@@ -6,13 +6,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.matsim4opus.analysis.KaiAnalysisListener;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.roadpricing.RoadPricingScheme;
 
-import playground.kai.run.KaiAnalysisListener;
 import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
 import playground.southafrica.gauteng.routing.GautengTravelDisutilityInclTollFactory;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
