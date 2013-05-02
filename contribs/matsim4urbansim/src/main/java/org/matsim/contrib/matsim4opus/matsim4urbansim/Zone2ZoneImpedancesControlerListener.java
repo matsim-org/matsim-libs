@@ -353,7 +353,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
 		
 		// Travel Data Header
-		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,vehicle_free_speed_travel_time:f4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,bike_time_in_minutes:f4,walk_time_in_minutes:f4,pt_time_in_minutes:f4,vehicle_travel_distance_in_meter:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
+		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,vehicle_free_speed_travel_time:f4,single_vehicle_to_work_travel_cost:f4," +
+				"am_single_vehicle_to_work_travel_time:f4,bike_time_in_minutes:f4,walk_time_in_minutes:f4,pt_time_in_minutes:f4," +
+				"vehicle_travel_distance_in_meter:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
 		// Logger.getLogger(this.getClass()).warn( "add new fields (this message is shown until all travel data attributes are updated)" );
 		travelDataWriter.newLine();
 		return travelDataWriter;

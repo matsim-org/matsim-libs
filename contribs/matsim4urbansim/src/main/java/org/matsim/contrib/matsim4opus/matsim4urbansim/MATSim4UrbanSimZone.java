@@ -71,6 +71,9 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZone.class);
+	
+	static final boolean BRUSSELS_SCENARIO_MODIFY_NETWORK = true ;
+	static final boolean BRUSSELS_SCENARIO_CALCULATE_ACCESSIBILITY = false ;
 
 	/**
 	 * constructor
@@ -87,37 +90,41 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	@Override
 	void modifyNetwork( Network net ) {
 
-		log.error("cutting the Brussels network.  It is really really dangerous to leave this in the code as such.  kai, apr'13") ;
-		Coord min = new CoordImpl(94902.,112575.) ;
-		Coord max = new CoordImpl(220907.,220000.) ;
-		NetworkScenarioCut nsc = new NetworkScenarioCut(min, max) ;
-		nsc.run(net) ;
-		
-		log.error("modifying the Brussels network.  It is really really dangerous to leave this in the code as such.  kai, apr'13") ;
-		long cnt = 0 ;
-		for ( Link link : net.getLinks().values() ) {
-			double spd = link.getFreespeed() ;
-			double cap = link.getCapacity() ;
-			// the free speeds do not seem very reliable (frontage roads sometimes have faster speeds than main roads) 
-			if ( cap <= 1000. ) {
-				// something like a one-lane local street
-				link.setFreespeed(15./3.6) ;
-				cnt++ ;
-			} else if ( cap <= 2000. && spd < 61./3.6 ) {
-				// something like a two-lane slow arterial
-				link.setFreespeed( 20./3.6 ) ;
-				cnt++ ;
-			} else if ( cap <= 3000. && spd < 61/3.6 ) {
-				// something like a three-lane boulevard
-				link.setFreespeed( 25./3.6 ) ;
-				cnt++ ;
-			} else if ( cap <= 3500. && spd < 81/3.6 ) {
-				// something like a narrow two-lane tunnel
-				link.setFreespeed( 60./3.6 ) ;
-				cnt++ ;
+		if ( BRUSSELS_SCENARIO_MODIFY_NETWORK ) {
+
+			log.error("cutting the Brussels network.  It is really really dangerous to leave this in the code as such.  kai, apr'13") ;
+			Coord min = new CoordImpl(94902.,112575.) ;
+			Coord max = new CoordImpl(220907.,220000.) ;
+			NetworkScenarioCut nsc = new NetworkScenarioCut(min, max) ;
+			nsc.run(net) ;
+
+			log.error("modifying the Brussels network.  It is really really dangerous to leave this in the code as such.  kai, apr'13") ;
+			long cnt = 0 ;
+			for ( Link link : net.getLinks().values() ) {
+				double spd = link.getFreespeed() ;
+				double cap = link.getCapacity() ;
+				// the free speeds do not seem very reliable (frontage roads sometimes have faster speeds than main roads) 
+				if ( cap <= 1000. ) {
+					// something like a one-lane local street
+					link.setFreespeed(15./3.6) ;
+					cnt++ ;
+				} else if ( cap <= 2000. && spd < 61./3.6 ) {
+					// something like a two-lane slow arterial
+					link.setFreespeed( 20./3.6 ) ;
+					cnt++ ;
+				} else if ( cap <= 3000. && spd < 61/3.6 ) {
+					// something like a three-lane boulevard
+					link.setFreespeed( 25./3.6 ) ;
+					cnt++ ;
+				} else if ( cap <= 3500. && spd < 81/3.6 ) {
+					// something like a narrow two-lane tunnel
+					link.setFreespeed( 60./3.6 ) ;
+					cnt++ ;
+				}
 			}
+			log.warn("modified the free speed on " + cnt + " of " + net.getLinks().size() + " links.") ;
+			
 		}
-		log.warn("modified the free speed on " + cnt + " of " + net.getLinks().size() + " links.") ;
 
 	}
 	

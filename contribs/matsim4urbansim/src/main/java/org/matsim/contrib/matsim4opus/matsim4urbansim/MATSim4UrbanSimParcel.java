@@ -312,13 +312,17 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	final void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler, PtMatrix ptMatrix) {
 
 		// The following lines register what should be done _after_ the iterations are done:
-		if(computeZone2ZoneImpedance)
+		if(computeZone2ZoneImpedance || MATSim4UrbanSimZone.BRUSSELS_SCENARIO_CALCULATE_ACCESSIBILITY) {
+			// (for the time being, this is computed for the Brussels scenario no matter what, since it is needed for the travel time 
+			// comparisons. kai, apr'13)
+			
 			// creates zone2zone impedance matrix
 			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( this,
 																					  zones, 
 																					  parcels,
 																					  ptMatrix,
 																					  benchmark) );
+		}
 		if(computeAgentPerformance)
 			// creates a persons.csv output for UrbanSim
 			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix));
