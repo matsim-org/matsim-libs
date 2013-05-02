@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*                                                   *
- * TestHbefaColdEmissionFactorKey.java                                     *
+ * project: org.matsim.*
+ * HbefaColdEmissionFactor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,20 +20,13 @@
 
 package playground.emission.types;
 
-public class TestEmissionTypes {
+//test for playground.vsp.emissions.types.HbefaWarmEmissionFactor
+
+
+public class TestHbefaWarmEmissionFactor {
 	
-	/*
-	 * zu testen:
-	 * done --- not much to do --- ColdPollutant
-	 * done --- nothing to do --- HbefaColdEmissionFactor
-	 * done --- HbefaColdEmissionFactorKey
-	 * done --- nothing to do --- HbefaTrafficSituation
-	 * done --- HbefaVehicleAttributes 
-	 * done --- nothing to do --- HbefaWarmEmissionFactor
-	 * done --- HbefaWarmEmissionFactorKey
-	 * done --- nothing to do  --- WarmPollutant
-	 * 
-	 * */
-	
-//MatsimTestUtils brauche ich vermutlich nur bei input- oder outputdateien
+	//nothing to test here
+	//HbefaWarmEmissionFactor consists of two double values 
+	//+ setters and getters
+
 }

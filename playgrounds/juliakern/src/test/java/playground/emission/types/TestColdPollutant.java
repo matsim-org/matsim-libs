@@ -20,20 +20,23 @@
 
 package playground.emission.types;
 
-public class TestEmissionTypes {
+import org.junit.Assert;
+import org.junit.Test;
+import playground.vsp.emissions.types.ColdPollutant;
+
+//test for playground.vsp.emissions.types.ColdPollutant
+
+public class TestColdPollutant {
 	
-	/*
-	 * zu testen:
-	 * done --- not much to do --- ColdPollutant
-	 * done --- nothing to do --- HbefaColdEmissionFactor
-	 * done --- HbefaColdEmissionFactorKey
-	 * done --- nothing to do --- HbefaTrafficSituation
-	 * done --- HbefaVehicleAttributes 
-	 * done --- nothing to do --- HbefaWarmEmissionFactor
-	 * done --- HbefaWarmEmissionFactorKey
-	 * done --- nothing to do  --- WarmPollutant
-	 * 
-	 * */
-	
-//MatsimTestUtils brauche ich vermutlich nur bei input- oder outputdateien
+	@Test
+	public final void testGetValue(){
+		//not much to test here since ColdPollutant is an enum
+		ColdPollutant cp = null;
+		Assert.assertEquals(ColdPollutant.CO, cp.getValue("CO"));
+		Assert.assertNotSame(ColdPollutant.FC, cp.getValue("CO"));
+		Assert.assertEquals(ColdPollutant.HC, cp.getValue("HC"));
+		Assert.assertNotSame(ColdPollutant.getValue("CO"), ColdPollutant.getValue("FC"));
+
+	}
+
 }

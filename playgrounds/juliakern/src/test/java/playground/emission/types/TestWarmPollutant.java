@@ -20,20 +20,10 @@
 
 package playground.emission.types;
 
-public class TestEmissionTypes {
+public class TestWarmPollutant {
 	
-	/*
-	 * zu testen:
-	 * done --- not much to do --- ColdPollutant
-	 * done --- nothing to do --- HbefaColdEmissionFactor
-	 * done --- HbefaColdEmissionFactorKey
-	 * done --- nothing to do --- HbefaTrafficSituation
-	 * done --- HbefaVehicleAttributes 
-	 * done --- nothing to do --- HbefaWarmEmissionFactor
-	 * done --- HbefaWarmEmissionFactorKey
-	 * done --- nothing to do  --- WarmPollutant
-	 * 
-	 * */
-	
-//MatsimTestUtils brauche ich vermutlich nur bei input- oder outputdateien
+	//nothing to test here
+	//warmPollutant is an enum
+	//im Gegensatz zu Cold Pol gibts keine getValue-Methode
+
 }
