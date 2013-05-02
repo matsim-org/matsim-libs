@@ -16,12 +16,6 @@
   </repositories>
   <dependencies>
   	<dependency>
-  		<groupId>playground</groupId>
-  		<artifactId>kai</artifactId>
-  		<version>0.6.0-SNAPSHOT</version>
-  		<scope>compile</scope>
-  	</dependency>
-  	<dependency>
   		<groupId>trove</groupId>
   		<artifactId>trove</artifactId>
   		<version>2.0.3</version>

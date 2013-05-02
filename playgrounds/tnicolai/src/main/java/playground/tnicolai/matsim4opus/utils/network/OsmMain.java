@@ -86,12 +86,6 @@ public class OsmMain {
 				
 			}
 
-			@Override
-			public void initialize(Map<String, Object> metaData) {
-				// TODO Auto-generated method stub
-				
-			}
-			
 		});
 
 		reader.run();
