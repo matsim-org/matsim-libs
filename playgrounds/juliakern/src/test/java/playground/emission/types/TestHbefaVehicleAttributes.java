@@ -23,8 +23,7 @@ package playground.emission.types;
 import org.junit.Assert;
 import org.junit.Test;
 
-import playground.emission.types.*;
-import playground.julia.emission.types.HbefaVehicleAttributes;
+import playground.vsp.emissions.types.HbefaVehicleAttributes;
 
 //test for playground.vsp.emissions.types.HbefaVehicleAttributes
 
@@ -32,6 +31,28 @@ public class TestHbefaVehicleAttributes {
 	
 	@Test
 	public final void testEquals(){
+		
+		//zwei gleiche, korrekte Objekte - keine Defaultwerte!
+		String technology = "technology", sizeClass = "size class", concept = "concept";
+		
+		HbefaVehicleAttributes normal = new HbefaVehicleAttributes();
+		normal.setHbefaEmConcept(concept);
+		normal.setHbefaSizeClass(sizeClass);
+		normal.setHbefaTechnology(technology);
+		
+		HbefaVehicleAttributes compare = new HbefaVehicleAttributes();
+		compare.setHbefaTechnology(technology);
+		compare.setHbefaSizeClass(sizeClass);
+		compare.setHbefaEmConcept(concept);
+		
+		String assertErrorMessage = "These hbefa vehicle attribute objects should be the same:";
+		assertErrorMessage += "st"; 
+		Assert.assertTrue("These hbefa vehicle attribute objects should be the same: ", normal.equals(compare));
+		
+		//TODO check: erlaubte werte
+		//zwei ungleiche, korrekte Objekte
+		//ein korrektes, ein leeres Objekt
+		//ein korrektes, ein unvollstaendiges
 		//default case
 		HbefaVehicleAttributes hva = new HbefaVehicleAttributes();
 		HbefaVehicleAttributes hva2 = new HbefaVehicleAttributes();
@@ -47,11 +68,11 @@ public class TestHbefaVehicleAttributes {
 		hva.setHbefaEmConcept("hbefaEmConcept");
 		hva.setHbefaSizeClass("hbefaSizeClass");
 		hva.setHbefaTechnology("hbefaTechnology");
-		HbefaVehicleAttributes hva3 = new HbefaVehicleAttributes("hbefaTechnology", "hbefaSizeClass", "hbefaEmConcept");
-		Assert.assertTrue(hva3.equals(hva));
+		//HbefaVehicleAttributes hva3 = new HbefaVehicleAttributes("hbefaTechnology", "hbefaSizeClass", "hbefaEmConcept");
+		//Assert.assertTrue(hva3.equals(hva));
 		//TODO null constructor
-		HbefaVehicleAttributes hva4 = new HbefaVehicleAttributes("","","");
-		Assert.assertTrue(hva2.equals(hva4));
+		//HbefaVehicleAttributes hva4 = new HbefaVehicleAttributes("","","");
+		//Assert.assertTrue(hva2.equals(hva4));
 		
 	}
 	
