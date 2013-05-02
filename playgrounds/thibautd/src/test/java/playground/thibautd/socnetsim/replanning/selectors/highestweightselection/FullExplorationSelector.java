@@ -146,7 +146,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 					rs.add( r );
 				}
 			}
-			final PersonRecord pr = new PersonRecord( person , plans , null );
+			final PersonRecord pr = new PersonRecord( person , plans );
 			map.put(
 					person.getId(),
 					pr );

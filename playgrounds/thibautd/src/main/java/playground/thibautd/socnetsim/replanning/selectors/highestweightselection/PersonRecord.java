@@ -22,17 +22,10 @@ package playground.thibautd.socnetsim.replanning.selectors.highestweightselectio
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-
-import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
-import playground.thibautd.utils.MapUtils;
 
 final class PersonRecord {
 	final Person person;
@@ -41,8 +34,7 @@ final class PersonRecord {
 
 	public PersonRecord(
 			final Person person,
-			final List<PlanRecord> plans,
-			final IncompatiblePlansIdentifier incompatiblePlans) {
+			final List<PlanRecord> plans) {
 		this.person = person;
 		this.plans = plans;
 		Collections.sort(
@@ -56,29 +48,7 @@ final class PersonRecord {
 						return -Double.compare( o1.avgJointPlanWeight , o2.avgJointPlanWeight );
 					}
 				});
-
-		if ( incompatiblePlans == null ) {
-			prunedPlans = null;
-			return;
-		}
-
-		// TODO: pass this in the selector, as it is very linked to the way it works
-		prunedPlans = new ArrayList<PlanRecord>();
-		final Map<Set<Id>, Set<Set<Id>>> knownBranches = new HashMap<Set<Id>, Set<Set<Id>>>();
-		double lastRecordWeight = Double.POSITIVE_INFINITY;
-		for (PlanRecord r : this.plans) {
-			assert r.avgJointPlanWeight <= lastRecordWeight : this.plans;
-			lastRecordWeight = r.avgJointPlanWeight;
-
-			final Set<Id> cotravs = r.jointPlan == null ?
-				Collections.<Id>emptySet() :
-				r.jointPlan.getIndividualPlans().keySet();
-			// only consider the best plan of each structure for each set of
-			// incompatible plans.
-			if ( MapUtils.getSet( cotravs , knownBranches ).add( incompatiblePlans.identifyIncompatibilityGroups( r.plan ) ) ) {
-				prunedPlans.add( r );
-			}
-		}
+		this.prunedPlans = new ArrayList<PlanRecord>( plans );
 	}
 
 	public PlanRecord getRecord( final Plan plan ) {

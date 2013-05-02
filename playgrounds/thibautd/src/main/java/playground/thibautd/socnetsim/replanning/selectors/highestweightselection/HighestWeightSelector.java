@@ -198,7 +198,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 					rs.add( r );
 				}
 			}
-			final PersonRecord pr = new PersonRecord( person , plans , incompatiblePlansIdentifier );
+			final PersonRecord pr = new PersonRecord( person , plans );
 			map.put(
 					person.getId(),
 					pr );
@@ -214,6 +214,10 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				pr.linkedPlans.remove( pr );
 			}
 		}
+
+		PersonRecordsPlansPruner.prunePlans(
+				incompatiblePlansIdentifier,
+				map );
 
 		return map;
 	}
