@@ -339,35 +339,21 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 
 		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation().toString()) ;
-
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, Boolean.toString(isRemovingUnneccessaryPlanAttributes()) ) ;
-
 		map.put(INPUT_MZ05_FILE, getInputMZ05File() ) ;
-
 		map.put(MODES_FOR_SUBTOURMODECHOICE, getModesForSubTourModeChoice() ) ;
 		map.put(CHAIN_BASED_MODES, getChainBasedModes() );
-
 		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
 				Boolean.toString( this.isUsingOpportunityCostOfTimeInPtRouting()) ) ;
-
 		map.put(EMISSION_ROADTYPE_MAPPING_FILE, this.getEmissionRoadTypeMappingFile());
-
 		map.put(EMISSION_VEHICLE_FILE, this.getEmissionVehicleFile());
-
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, this.getAverageWarmEmissionFactorsFile());
-
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, this.getAverageColdEmissionFactorsFile());
-
 		map.put(USING_DETAILED_EMISSION_CALCULATION, Boolean.toString( this.isUsingDetailedEmissionCalculation));
-
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED,  this.getDetailedWarmEmissionFactorsFile()) ;
-
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, this.getDetailedColdEmissionFactorsFile());
-
 		map.put( WRITING_OUTPUT_EVENTS, Boolean.toString(this.isWritingOutputEvents()) ) ;
-
 		map.put( MATSIM_GLOBAL_TIME_FORMAT, this.getMatsimGlobalTimeFormat() );
-
 		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
 			map.put( key.toString(), this.getValue(key) ) ;
 		}
