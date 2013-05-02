@@ -140,8 +140,8 @@ public class StrategyConfigGroup extends Module {
 	}
 
 	@Override
-	public TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
+	public Map<String, String> getParams() {
+		Map<String, String> map = new LinkedHashMap<String, String>();
 		map.put(MAX_AGENT_PLAN_MEMORY_SIZE, getValue(MAX_AGENT_PLAN_MEMORY_SIZE));
 		for (Map.Entry<Id, StrategySettings>  entry : this.settings.entrySet()) {
 			map.put(MODULE + entry.getKey().toString(), entry.getValue().getModuleName());
