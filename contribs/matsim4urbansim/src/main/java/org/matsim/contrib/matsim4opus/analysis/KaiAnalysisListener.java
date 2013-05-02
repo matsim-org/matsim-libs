@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.run;
+package org.matsim.contrib.matsim4opus.analysis;
 
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -31,12 +31,12 @@ import org.matsim.core.controler.listener.StartupListener;
  */
 public class KaiAnalysisListener implements StartupListener, AfterMobsimListener {
 	
-	playground.kai.analysis.MyCalcLegTimes calcLegTimes = null ;
+	MyCalcLegTimes calcLegTimes = null ;
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		this.calcLegTimes = new playground.kai.analysis.MyCalcLegTimes( event.getControler().getScenario() ) ;
+		this.calcLegTimes = new MyCalcLegTimes( event.getControler().getScenario() ) ;
 		event.getControler().getEvents().addHandler( this.calcLegTimes ) ;
 
 	}

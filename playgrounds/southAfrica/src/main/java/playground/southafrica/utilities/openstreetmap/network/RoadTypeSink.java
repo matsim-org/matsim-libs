@@ -116,11 +116,13 @@ public class RoadTypeSink implements Sink {
 		return new TreeMap<Long, String>(this.highwayTypeMap);
 	}
 
-	@Override
-	public void initialize(Map<String, Object> metaData) {
-		// TODO Auto-generated method stub
-		
-	}
+//	@Override
+//	public void initialize(Map<String, Object> metaData) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+	// leads to compilation error.  I don't know why; probably inconsistent geotools versions.  Recommendation to 
+	// load geotools directly in pom.xml, rather than via other peoples maven configurations. kai, may'13
 
 }
 

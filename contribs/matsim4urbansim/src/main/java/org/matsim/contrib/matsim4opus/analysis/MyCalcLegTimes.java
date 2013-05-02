@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.analysis;
+package org.matsim.contrib.matsim4opus.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
