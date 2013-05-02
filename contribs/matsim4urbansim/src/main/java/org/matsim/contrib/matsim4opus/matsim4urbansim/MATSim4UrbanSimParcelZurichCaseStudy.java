@@ -27,8 +27,8 @@ package org.matsim.contrib.matsim4opus.matsim4urbansim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
 import scenario.zurich.ZurichUtilities;
 import scenario.zurich.ZurichUtilitiesIVTCHOSMNetwork;
@@ -99,7 +99,7 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 	 * to the super class
 	 */
 	@Override
-	void addFurtherControlerListener(Controler controler, ActivityFacilitiesImpl parcels){
+	void addFurtherControlerListener(Controler controler, ActivityFacilities parcels){
 		
 	}
 	

@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
-import org.matsim.contrib.matsim4opus.config.ConfigurationModule;
+import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
@@ -164,7 +164,7 @@ public class AccessibilityControlerListenerImpl{
 	 */
 	protected final void initAccessibilityParameter(ScenarioImpl scenario){
 		
-		AccessibilityParameterConfigModule moduleAPCM = ConfigurationModule.getAccessibilityParameterConfigModule(scenario);
+		AccessibilityParameterConfigModule moduleAPCM = ConfigurationUtils.getAccessibilityParameterConfigModule(scenario);
 		
 		useRawSum			= moduleAPCM.usingRawSumsWithoutLn();
 		logitScaleParameter = moduleAPCM.getLogitScaleParameter();

@@ -356,7 +356,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
 		log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
 		log.info("(Custom) Test Parameter: " + module.getTestParameter() );
-		log.info("UseShapefileLocationDistribution:" + module.usingShapefileLocationDistribution());
+		log.info("UseShapefileLocationDistribution:" + module.isUsingShapefileLocationDistribution());
 		log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
 		log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
 		log.info("Backing Up Run Data: " + module.isBackup() );

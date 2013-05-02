@@ -22,6 +22,9 @@
  */
 package org.matsim.contrib.matsim4opus.config;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.core.config.Module;
 
 /**
@@ -58,10 +61,33 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
 		this.isColdStart = false;
 		this.isWarmStart = false;
 		this.isHotStart	 = false;
-		// yyyyyy this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13 
+		// This class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13 
+		// The way it (hopefully) works now: as long as the config group is not "materialized", one has to use addParam/getValue.
+		// Once the class is materialized, one can only use the direct getters/setters.  kai, may'13
 	}
 
-    public boolean isZone2ZoneImpedance() {
+	@Override
+	@Deprecated
+	public String getValue(final String key) {
+		throw new RuntimeException(" use direct getter; aborting ... " ) ;
+	}
+
+	@Override
+	@Deprecated
+	public void addParam(String param_name, String value) {
+		throw new RuntimeException(" use direct setter; aborting ... " ) ;
+	}
+	
+	@Override
+	public final Map<String,String> getParams() {
+		Map<String,String> map = new LinkedHashMap<String,String>() ;
+
+		// Maybe we don't want this?  Users should set this via the OPUS GUI, not via the external matsim config file.
+		// ??  kai, may'13
+
+		return map ;
+	}
+   public boolean isZone2ZoneImpedance() {
         return this.zone2ZoneImpedance;
     }
 

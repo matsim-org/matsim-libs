@@ -22,7 +22,7 @@ package org.matsim.contrib.matsim4opus.config;
 import org.matsim.core.config.Module;
 import org.matsim.core.scenario.ScenarioImpl;
 
-public class ConfigurationModule {
+public class ConfigurationUtils {
 	
 	public static AccessibilityParameterConfigModule getAccessibilityParameterConfigModule(ScenarioImpl scenario){
 		Module m = scenario.getConfig().getModule(AccessibilityParameterConfigModule.GROUP_NAME);

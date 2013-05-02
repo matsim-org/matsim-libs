@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.matsim4opus.config.ConfigurationModule;
+import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.ZoneUtil;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
@@ -137,7 +137,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 //		double betaCarTD		= moduleAPCM.getBetaCarTravelDistance();
 //		double betaCarTMC		= moduleAPCM.getBetaCarTravelMonetaryCost();
 		
-		double samplingRate = ConfigurationModule.getUrbanSimParameterConfigModule((ScenarioImpl)sc).getPopulationSampleRate();
+		double samplingRate = ConfigurationUtils.getUrbanSimParameterConfigModule((ScenarioImpl)sc).getPopulationSampleRate();
 		double inverseOfSamplingRate = 1/samplingRate;
 		
 		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.; // corresponds to 5 km/h

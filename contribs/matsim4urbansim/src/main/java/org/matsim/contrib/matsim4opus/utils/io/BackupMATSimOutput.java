@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.config.ConfigurationModule;
+import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
@@ -25,7 +25,7 @@ public class BackupMATSimOutput {
 	
 	public static void runBackup(ScenarioImpl scenario){
 		
-		UrbanSimParameterConfigModuleV3 module = ConfigurationModule.getUrbanSimParameterConfigModule(scenario);
+		UrbanSimParameterConfigModuleV3 module = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
 		
 		if(module == null)
 			log.error("UrbanSimParameterConfigModule module is null. Can't determine if backup option is activated. No backup will be performed.");
@@ -42,8 +42,8 @@ public class BackupMATSimOutput {
 	private static void saveRunOutputs(ScenarioImpl scenario) {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 
-		MATSim4UrbanSimControlerConfigModuleV3 m4ucModule = ConfigurationModule.getMATSim4UrbaSimControlerConfigModule(scenario);
-		UrbanSimParameterConfigModuleV3 uspModule = ConfigurationModule.getUrbanSimParameterConfigModule(scenario);
+		MATSim4UrbanSimControlerConfigModuleV3 m4ucModule = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
+		UrbanSimParameterConfigModuleV3 uspModule = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
 		int currentYear = uspModule.getYear();
 		
 		String saveDirectory = "run" + currentYear;
@@ -112,7 +112,7 @@ public class BackupMATSimOutput {
 	 */
 	public static void prepareHotStart(ScenarioImpl scenario){
 		
-		MATSim4UrbanSimControlerConfigModuleV3 module = ConfigurationModule.getMATSim4UrbaSimControlerConfigModule(scenario);
+		MATSim4UrbanSimControlerConfigModuleV3 module = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
 		
 		if(!module.getHotStartTargetLocation().equals("")){
 			

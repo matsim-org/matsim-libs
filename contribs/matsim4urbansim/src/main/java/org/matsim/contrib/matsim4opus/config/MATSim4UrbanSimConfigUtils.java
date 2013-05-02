@@ -930,7 +930,7 @@ public class MATSim4UrbanSimConfigUtils {
 			log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
 			log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
 			log.info("(Custom) Test Parameter: " + module.getTestParameter() );
-			log.info("UsingShapefileLocationDistribution:" + module.usingShapefileLocationDistribution());
+			log.info("UsingShapefileLocationDistribution:" + module.isUsingShapefileLocationDistribution());
 			log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
 			log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
 			log.info("Backing Up Run Data: " + module.isBackup() );
@@ -972,20 +972,29 @@ public class MATSim4UrbanSimConfigUtils {
 	//		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
 			
 			// display results
-			log.info("AccessibilityParameter settings:");
+			log.info("AccessibilityParameter settings (only non-zero values):");
 			
 			log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
 			log.info("Compute raw sum (not logsum): " + module.usingRawSumsWithoutLn() );
 			log.info("Logit Scale Parameter: " + module.usingLogitScaleParameterFromMATSim() ); 
 			
-			log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
-			log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );
-			log.info("BETA_CAR_LN_TRAVEL_TIMES: " + module.getBetaCarLnTravelTime());
-			log.info("BETA_CAR_TRAVEL_DISTANCE: " + module.getBetaCarTravelDistance() );
+			if ( module.getBetaCarTravelTime()!=0 ) 
+				log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
+			if ( module.getBetaCarTravelTimePower2()!=0 ) 
+				log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );
+			if ( module.getBetaCarLnTravelTime()!=0 ) 
+				log.info("BETA_CAR_LN_TRAVEL_TIMES: " + module.getBetaCarLnTravelTime());
+			if ( module.getBetaCarTravelDistance()!=0 ) 
+				log.info("BETA_CAR_TRAVEL_DISTANCE: " + module.getBetaCarTravelDistance() );
+			if ( module.getBetaCarTravelDistancePower2()!=0 ) 
 			log.info("BETA_CAR_TRAVEL_DISTANCE_POWER: " + module.getBetaCarTravelDistancePower2() );
+			if ( module.getBetaCarLnTravelDistance()!=0 ) 
 			log.info("BETA_CAR_LN_TRAVEL_DISTANCE: " + module.getBetaCarLnTravelDistance() );
+			if ( module.getBetaCarTravelMonetaryCost()!=0 ) 
 			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS: " + module.getBetaCarTravelMonetaryCost() );
+			if ( module.getBetaCarTravelMonetaryCostPower2()!=0 ) 
 			log.info("BETA_CAR_TRAVEL_MONETARY_COSTS_POWER: " + module.getBetaCarTravelMonetaryCostPower2() );
+			if ( module.getBetaCarLnTravelMonetaryCost()!=0 ) 
 			log.info("BETA_CAR_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaCarLnTravelMonetaryCost());
 			
 			log.info("BETA_PT_TRAVEL_TIMES: " + module.getBetaPtTravelTime()  );

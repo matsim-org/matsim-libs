@@ -19,22 +19,26 @@
 
 package org.matsim.contrib.matsim4opus.config;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.core.config.Module;
 
 public class UrbanSimParameterConfigModuleV3 extends Module{
 	
 	public static final String GROUP_NAME = "urbansimParameter";
+
 	public static final String PROJECT_NAME = "projectName";
 	public static final String IS_PARCEL_MODE = "isParcelMode";
 	public static final String POPULATION_SAMPLING_RATE = "populationSampleRate";
 	public static final String YEAR = "year";
-	public static final String OPUS_HOME = "opusHome";
+	public static final String OPUS_HOME_PATH = "opusHome";
 	public static final String OPUS_DATA_PATH = "opusDataPath";
-	public static final String MATSIM4OPUS = "matsim4Opus";
-	public static final String MATSIM4OPUS_OUTPUT = "matsim4OpusOutput";
-	public static final String MATSIM4OPUS_TEMP = "matsim4OpusTemp";
+	public static final String MATSIM4OPUS_PATH = "matsim4Opus";
+	public static final String MATSIM4OPUS_OUTPUT_PATH = "matsim4OpusOutput";
+	public static final String MATSIM4OPUS_TEMP_PATH = "matsim4OpusTemp";
 	public static final String IS_TEST_RUN = "isTestRun";
-	public static final String USE_SHAPEFILE_LOCATION_DISTRIBUTION = "useShapefileLocationDistribution";
+	public static final String USING_SHAPEFILE_LOCATION_DISTRIBUTION = "useShapefileLocationDistribution";
 	public static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
 	public static final String URBANSIM_ZONE_RADIUS_LOCATION_DISTRIBUTION = "urbanSimZoneRadiusLocationDistribution";
 	public static final String TEST_PARAMETER = "testParameter";
@@ -60,12 +64,47 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	
 	public UrbanSimParameterConfigModuleV3(String name){
 		super(name);
-		// yyyyyy this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13 
+		// This class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13
+		// The way it (hopefully) works now: as long as the config group is not "materialized", one has to use addParam/getValue.
+		// Once the class is materialized, one can only use the direct getters/setters.  kai, may'13
 	}
 	
 	@Override
+	@Deprecated
+	public String getValue(final String key) {
+		throw new RuntimeException(" use direct getter; aborting ... " ) ;
+	}
+
+	@Override
+	@Deprecated
 	public void addParam(String param_name, String value) {
-		// not used
+		throw new RuntimeException(" use direct setter; aborting ... " ) ;
+	}
+	
+	@Override
+	public final Map<String,String> getParams() {
+		Map<String,String> map = new LinkedHashMap<String,String>() ;
+
+		// The following is correct but ...
+		// ... maybe we don't want this.  Users should set this via the OPUS GUI, not via the external matsim config file.
+		// ??  kai, may'13
+//		map.put(PROJECT_NAME, this.getProjectName() ) ;
+//		map.put(IS_PARCEL_MODE, Boolean.toString(this.isParcelMode() ) ) ;
+//		map.put(POPULATION_SAMPLING_RATE, Double.toString(this.getPopulationSampleRate() ) ) ;
+//		map.put(YEAR, Integer.toString(this.getYear()) ) ;
+//		map.put(OPUS_HOME_PATH, this.getOpusHome() ) ;
+//		map.put(OPUS_DATA_PATH, this.getOpusDataPath() ) ;
+//		map.put(MATSIM4OPUS_PATH, this.getMATSim4Opus() ) ;
+//		map.put(MATSIM4OPUS_OUTPUT_PATH, this.getMATSim4OpusOutput() ) ;
+//		map.put(MATSIM4OPUS_TEMP_PATH, this.getMATSim4OpusTemp() ) ;
+//		map.put(IS_TEST_RUN, Boolean.toString( this.isTestRun() ) ) ;
+//		map.put(USING_SHAPEFILE_LOCATION_DISTRIBUTION, Boolean.toString( this.isUsingShapefileLocationDistribution() ) ) ;
+//		map.put(URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.getUrbanSimZoneShapefileLocationDistribution() ) ;
+//		map.put(URBANSIM_ZONE_RADIUS_LOCATION_DISTRIBUTION, Double.toString( this.getUrbanSimZoneRadiusLocationDistribution() ) ) ;
+//		map.put(TEST_PARAMETER, this.getTestParameter() ) ;
+//		map.put(IS_BACKUP_RUN_DATA, Boolean.toString( this.isBackup() ) ) ;
+		
+		return map ;
 	}
 	
 	public void setProjectName(String projectName){
@@ -99,7 +138,7 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 		this.usingShapefileLocationDistribution = useShapefileLocationDistribution;
 	}
 	
-	public boolean usingShapefileLocationDistribution(){
+	public boolean isUsingShapefileLocationDistribution(){
 		return this.usingShapefileLocationDistribution;
 	}
 	

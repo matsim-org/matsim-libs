@@ -44,6 +44,7 @@ import org.matsim.contrib.matsim4opus.utils.io.BackupMATSimOutput;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -202,7 +203,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 */
 	protected void readFromUrbanSim() {
 		// get the data from UrbanSim (parcels and persons)
-		if(getUrbanSimParameterConfig().usingShapefileLocationDistribution()){
+		if(getUrbanSimParameterConfig().isUsingShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
 					  getUrbanSimParameterConfig().getUrbanSimZoneShapefileLocationDistribution(),
 					  getUrbanSimParameterConfig().getUrbanSimZoneRadiusLocationDistribution());
@@ -277,8 +278,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			// remove those "configuration" flags completely from the config.  However, then some other mechanism needs to be found 
 			// to be able to configure externally written "scripts" (such as this one) in a simple way.  kai & michael z, feb'13
 		}
-		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
-		controler.setCreateGraphs(true);	// sets, whether output Graphs are created
+		controler.setOverwriteFiles(true);	// sets whether output files are overwritten
+		controler.setCreateGraphs(true);	// sets whether output Graphs are created
 		
 		PtMatrix ptMatrix = null;
 		if(getMATSim4UrbanSimControlerConfig().getPtStopsInputFile() != null){
@@ -412,7 +413,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 * This method allows to add additional listener
 	 * This needs to be implemented by another class
 	 */
-	void addFurtherControlerListener(Controler controler, ActivityFacilitiesImpl parcels){
+	void addFurtherControlerListener(Controler controler, ActivityFacilities parcels){
 		// this is just a stub and does nothing. 
 		// This needs to be implemented/overwritten by an inherited class
 	}
