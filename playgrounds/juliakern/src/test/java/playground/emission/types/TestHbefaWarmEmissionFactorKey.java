@@ -57,13 +57,8 @@ public class TestHbefaWarmEmissionFactorKey{
 
 		setUp();
 		
-		//TODO diesen text anpassen und entsprechend in die codeliste schreiben
-		//TODO equals funktioniert nicht auf leeren Objekten weil getHbefaVehicleCat 'null' ... 
-		//in die eine richtung!!!
-		// vollstaendigeDaten.equals(unvollstaendigeDaten) -> Nullpointer
-		// unvollstaendigeDaten.equals(vollstaendigeDaten) -> laeuft, Rueckgabe false
-		// dass das so ist, wird jetzt getestet!
-		
+		// vollstaendigeDaten.equals(unvollstaendigeDaten) -> Rueckgabe false
+		// unvollstaendigeDaten.equals(vollstaendigeDaten) -> Nullpointer
 		
 		//HbefaVehicleCategory hbefaVehicleCategory; WarmPollutant hbefaComponent; String hbefaRoadCategory;
 		//HbefaTrafficSituation hbefaTrafficSituation; HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();

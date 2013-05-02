@@ -35,7 +35,7 @@ public class TestHbefaVehicleAttributes {
 		//zwei gleiche, korrekte Objekte - keine Defaultwerte!
 		
 		HbefaVehicleAttributes normal = new HbefaVehicleAttributes();
-		setToNormal(normal, technology, sizeClass, concept);
+		setToNormal(normal);
 		
 		HbefaVehicleAttributes compare = new HbefaVehicleAttributes();
 		compare.setHbefaTechnology(technology);
@@ -83,13 +83,13 @@ public class TestHbefaVehicleAttributes {
 	public final void testEqualsForIncorrectObjects(){
 		//korrektes Objekt - keine Defaultwerte!
 
-		String message = ""; //TODO
+		String message; 
 		
 		HbefaVehicleAttributes normal = new HbefaVehicleAttributes();
 		
 		//ein korrektes, ein unvollstaendiges
 		//em concept missing
-		setToNormal(normal, technology, sizeClass, concept);
+		setToNormal(normal);
 		HbefaVehicleAttributes noEmConcept = new HbefaVehicleAttributes();
 		noEmConcept.setHbefaSizeClass(sizeClass);
 		noEmConcept.setHbefaTechnology(technology);
@@ -103,7 +103,7 @@ public class TestHbefaVehicleAttributes {
 		Assert.assertTrue(message, normal.equals(noEmConcept));
 		
 		//technology missing
-		setToNormal(normal, technology, sizeClass, concept);
+		setToNormal(normal);
 		HbefaVehicleAttributes noTechnology = new HbefaVehicleAttributes();
 		noTechnology.setHbefaEmConcept(concept);
 		noTechnology.setHbefaSizeClass(sizeClass);
@@ -117,7 +117,7 @@ public class TestHbefaVehicleAttributes {
 		Assert.assertTrue(message, normal.equals(noTechnology));
 		
 		//size class missing
-		setToNormal(normal, technology, sizeClass, concept);
+		setToNormal(normal);
 		HbefaVehicleAttributes noSize = new HbefaVehicleAttributes();
 		noSize.setHbefaEmConcept(concept);
 		noSize.setHbefaTechnology(technology);
@@ -131,14 +131,14 @@ public class TestHbefaVehicleAttributes {
 		Assert.assertTrue(message, normal.equals(noSize));
 		
 		//ein korrektes, ein nicht-objekt - null?
-		setToNormal(normal, technology, sizeClass, concept);
+		setToNormal(normal);
 		message = "if a HbefaVehicleAttribute is compared to a different object, 'false' shouls be returned";
 		Assert.assertFalse(message, normal.equals(null));
 		Assert.assertFalse(message, normal.equals("a string"));
 		Assert.assertFalse(message, normal.equals(1));
 	}
 
-	private void setToNormal(HbefaVehicleAttributes normal, String technology, String sizeClass, String concept) {
+	private void setToNormal(HbefaVehicleAttributes normal) {
 		normal.setHbefaEmConcept(concept);
 		normal.setHbefaSizeClass(sizeClass);
 		normal.setHbefaTechnology(technology);
