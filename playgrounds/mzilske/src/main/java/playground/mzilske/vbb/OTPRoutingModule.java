@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -71,7 +73,9 @@ public class OTPRoutingModule implements RoutingModule {
 		this.transitSchedule = transitSchedule;
 		this.ct = ct;
 		try {
-			this.day = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			df.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+			this.day = df.parse(date);
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
 		}
@@ -92,12 +96,7 @@ public class OTPRoutingModule implements RoutingModule {
 		LinkedList<Leg> legs = new LinkedList<Leg>();
 		TraverseModeSet modeSet = new TraverseModeSet();
 		modeSet.setWalk(true);
-//		modeSet.setBicycle(false);
-//		modeSet.setFerry(true);
-//		modeSet.setTrainish(true);
-//		modeSet.setBusish(true);
 		modeSet.setTransit(true);
-		modeSet.setCar(false);
 		RoutingRequest options = new RoutingRequest(modeSet);
 		options.setWalkBoardCost(3 * 60); // override low 2-4 minute values
 		options.setBikeBoardCost(3 * 60 * 2);
@@ -105,6 +104,8 @@ public class OTPRoutingModule implements RoutingModule {
 		options.setMaxWalkDistance(Double.MAX_VALUE);
 		 
 		Calendar when = Calendar.getInstance();
+
+		when.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 		when.setTime(day);
 		when.add(Calendar.SECOND, (int) departureTime);
 		
@@ -130,7 +131,7 @@ public class OTPRoutingModule implements RoutingModule {
 		Id currentLinkId = fromFacility.getLinkId();
 		if (paths != null) {
 			GraphPath path = paths.get(0);
-		//	path.dump();
+			path.dump();
 			boolean onBoard = false;
 			String stop = null;
 			long time = 0;

@@ -11,6 +11,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -29,7 +30,7 @@ public class Run {
 
 		{
 			Scenario scenario = loadScenario();
-			scenario.getConfig().controler().setOutputDirectory("/Users/vspuser/gtfs-ulm/output-otp");
+			scenario.getConfig().controler().setOutputDirectory("/Users/michaelzilske/gtfs-ulm/output-otp");
 			Controler controler = new Controler(scenario);
 			controler.setOverwriteFiles(true);
 			controler.setTransitRouterFactory(new TransitRouterFactory() {
@@ -45,7 +46,7 @@ public class Run {
 
 		{
 			Scenario scenario = loadScenario();
-			scenario.getConfig().controler().setOutputDirectory("/Users/vspuser/gtfs-ulm/output-marcel");
+			scenario.getConfig().controler().setOutputDirectory("/Users/michaelzilske/gtfs-ulm/output-marcel");
 			Controler controler = new Controler(scenario);
 			controler.setOverwriteFiles(true);
 			controler.run();
@@ -58,19 +59,21 @@ public class Run {
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
 		config.controler().setMobsim("qsim");
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(1);
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		config.getQSimConfigGroup().setSnapshotPeriod(1);
 		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
+
+		config.getQSimConfigGroup().setEndTime(35*60*60);
 		config.otfVis().setColoringScheme(ColoringScheme.gtfs);
 		config.otfVis().setDrawTransitFacilities(false);
 		config.transitRouter().setMaxBeelineWalkConnectionDistance(1.0);
 
-		config.network().setInputFile("/Users/vspuser/gtfs-ulm/network.xml");
-		config.plans().setInputFile("/Users/vspuser/gtfs-ulm/population.xml");
-		config.transit().setTransitScheduleFile("/Users/vspuser/gtfs-ulm/transit-schedule.xml");
-		config.transit().setVehiclesFile("/Users/vspuser/gtfs-ulm/transit-vehicles.xml");
+		config.network().setInputFile("/Users/michaelzilske/gtfs-ulm/network.xml");
+		config.plans().setInputFile("/Users/michaelzilske/gtfs-ulm/population.xml");
+		config.transit().setTransitScheduleFile("/Users/michaelzilske/gtfs-ulm/transit-schedule.xml");
+		config.transit().setVehiclesFile("/Users/michaelzilske/gtfs-ulm/transit-vehicles.xml");
 
 		StrategySettings best = new StrategySettings(new IdImpl(1));
 		best.setModuleName("ChangeExpBeta");
@@ -93,15 +96,18 @@ public class Run {
 		work.setTypicalDuration(8*60*60);
 		config.planCalcScore().addActivityParams(work);
 		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.global().setNumberOfThreads(4);
+		config.global().setNumberOfThreads(8);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(config.transit().getVehiclesFile());
 		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 		new AltPopulationReaderMatsimV5(scenario).readFile(config.plans().getInputFile());
-
-
+		
+//		PopulationImpl newPop = new PopulationImpl((ScenarioImpl) scenario);
+//		newPop.addPerson(scenario.getPopulation().getPersons().get(new IdImpl("110")));
+//		((ScenarioImpl) scenario).setPopulation(newPop);
+		
 		return scenario;
 	}
 

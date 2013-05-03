@@ -30,7 +30,7 @@ public class ReadGraph {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		try {
-			Graph graph = Graph.load(new File("/Users/vspuser/gtfs-ulm/Graph.obj"), Graph.LoadLevel.DEBUG);
+			Graph graph = Graph.load(new File("/Users/michaelzilske/gtfs-ulm/Graph.obj"), Graph.LoadLevel.DEBUG);
 			for (Vertex v : graph.getVertices()) {
 				if (v instanceof IntersectionVertex) {
 					// Can be an OSM node, but can also be a split OSM way to insert a transit stop.
@@ -53,7 +53,7 @@ public class ReadGraph {
 					}
 				}
 			}
-			new NetworkWriter(scenario.getNetwork()).write("/Users/vspuser/gtfs-ulm/road-network.xml");
+			new NetworkWriter(scenario.getNetwork()).write("/Users/michaelzilske/gtfs-ulm/road-network.xml");
 		} catch (IOException e) {
 			throw new RuntimeException();
 		} catch (ClassNotFoundException e) {

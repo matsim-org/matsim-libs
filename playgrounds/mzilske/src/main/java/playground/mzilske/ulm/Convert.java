@@ -37,9 +37,9 @@ public class Convert {
 		scenario.getConfig().otfVis().setColoringScheme(ColoringScheme.gtfs);
 		scenario.getConfig().otfVis().setDrawTransitFacilities(false);
 		scenario.getConfig().transitRouter().setMaxBeelineWalkConnectionDistance(1.0);
-		new NetworkWriter(scenario.getNetwork()).write("/Users/vspuser/gtfs-ulm/network.xml");
-		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("/Users/vspuser/gtfs-ulm/transit-schedule.xml");
-		new VehicleWriterV1(((ScenarioImpl) scenario).getVehicles()).writeFile("/Users/vspuser/gtfs-ulm/transit-vehicles.xml");		
+		new NetworkWriter(scenario.getNetwork()).write("/Users/michaelzilske/gtfs-ulm/network.xml");
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("/Users/michaelzilske/gtfs-ulm/transit-schedule.xml");
+		new VehicleWriterV1(((ScenarioImpl) scenario).getVehicles()).writeFile("/Users/michaelzilske/gtfs-ulm/transit-vehicles.xml");		
 	}
 	
 	private static Scenario readScenario() {
@@ -50,7 +50,7 @@ public class Convert {
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		GtfsConverter gtfs = new GtfsConverter("/Users/vspuser/gtfs-ulm", scenario, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S));
+		GtfsConverter gtfs = new GtfsConverter("/Users/michaelzilske/gtfs-ulm", scenario, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S));
 		gtfs.setCreateShapedNetwork(false); // Shaped network doesn't work yet.
 		gtfs.setDate(20130824);
 		gtfs.convert();

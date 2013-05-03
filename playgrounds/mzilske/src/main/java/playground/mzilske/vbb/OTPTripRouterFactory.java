@@ -25,11 +25,11 @@ public final class OTPTripRouterFactory implements
 	
 
 	public OTPTripRouterFactory(TransitSchedule transitSchedule, CoordinateTransformation ct, String day) {
-		File path = new File("/Users/vspuser/gtfs-ulm/Graph.obj");
+		File path = new File("/Users/michaelzilske/gtfs-ulm/Graph.obj");
 		try {
 			graph = Graph.load(path, Graph.LoadLevel.FULL);
 		} catch (IOException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException();
 		}

@@ -10,7 +10,7 @@
 					<property name="bundles">
 						<list>
 							<bean class="org.opentripplanner.graph_builder.model.GtfsBundle">
-								<property name="path" value="/Users/vspuser/gtfs-ulm/swu.zip" />
+								<property name="path" value="/Users/michaelzilske/gtfs-ulm/swu.zip" />
 							</bean>
 						</list>
 					</property>
@@ -36,7 +36,7 @@
 			class="org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl" />
 
 		<bean id="graphBuilderTask" class="org.opentripplanner.graph_builder.GraphBuilderTask">
-			<property name="path" value="/Users/vspuser/gtfs-ulm/Graph.obj" />
+			<property name="path" value="/Users/michaelzilske/gtfs-ulm" />
 			<property name="graphBuilders">
 				<list>
 					<!-- GTFS comes before OSM, because we use the loaded set of stops to 

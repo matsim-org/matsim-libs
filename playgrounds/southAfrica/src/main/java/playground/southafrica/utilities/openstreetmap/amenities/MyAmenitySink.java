@@ -620,6 +620,13 @@ public class MyAmenitySink implements Sink {
 	}
 
 
+	@Override
+	public void initialize(Map<String, Object> metaData) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 //	@Override
 //	public void initialize(Map<String, Object> metaData) {
 //		// TODO Auto-generated method stub

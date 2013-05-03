@@ -1,11 +1,10 @@
 package playground.mzilske.ulm;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -31,7 +30,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleReaderV1;
 
 import playground.mzilske.vbb.OTPTripRouterFactory;
@@ -44,12 +45,16 @@ public class GenerateAndRoutePopulation {
 
 	private NetworkImpl network;
 
+	private TransitSchedule transitSchedule;
+
+	private List<TransitStopFacility> facs;
+
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
-		long fourCores = new GenerateAndRoutePopulation().convert(4);
+		//		long fourCores = new GenerateAndRoutePopulation().convert(4);
 		long oneCore = new GenerateAndRoutePopulation().convert(0);
-		
+
 		System.out.println(oneCore);
-		System.out.println(fourCores);
+		//		System.out.println(fourCores);
 	}
 
 
@@ -65,15 +70,16 @@ public class GenerateAndRoutePopulation {
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
-		config.transit().setTransitScheduleFile("/Users/vspuser/gtfs-ulm/transit-schedule.xml");
-		config.transit().setVehiclesFile("/Users/vspuser/gtfs-ulm/transit-vehicles.xml");
-		config.network().setInputFile("/Users/vspuser/gtfs-ulm/network.xml");
+		config.transit().setTransitScheduleFile("/Users/michaelzilske/gtfs-ulm/transit-schedule.xml");
+		config.transit().setVehiclesFile("/Users/michaelzilske/gtfs-ulm/transit-vehicles.xml");
+		config.network().setInputFile("/Users/michaelzilske/gtfs-ulm/network.xml");
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
-		new MatsimNetworkReader(scenario).readFile("/Users/vspuser/gtfs-ulm/network.xml");
+		new MatsimNetworkReader(scenario).readFile("/Users/michaelzilske/gtfs-ulm/network.xml");
 		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(config.transit().getVehiclesFile());
 		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 
+		facs = new ArrayList(scenario.getTransitSchedule().getFacilities().values());
 		// new NetworkCleaner().run(scenario.getNetwork());
 		System.out.println("Scenario has " + scenario.getNetwork().getLinks().size() + " links.");
 
@@ -90,9 +96,10 @@ public class GenerateAndRoutePopulation {
 
 		population = scenario.getPopulation();
 		network = (NetworkImpl) scenario.getNetwork();
-		for (int i=0; i<500; ++i) {
-			Coord source = new CoordImpl(minX + Math.random() * (maxX - minX), minY + Math.random() * (maxY - minY));
-			Coord sink = new CoordImpl(minX + Math.random() * (maxX - minX), minY + Math.random() * (maxY - minY));
+		transitSchedule = scenario.getTransitSchedule();
+		for (int i=0; i<100; ++i) {
+			Coord source = randomCoord(minX, minY, maxX, maxY);
+			Coord sink = randomCoord(minX, minY, maxX, maxY);
 			Person person = population.getFactory().createPerson(new IdImpl(Integer.toString(i)));
 			Plan plan = population.getFactory().createPlan();
 			plan.addActivity(createHome(source));
@@ -110,28 +117,39 @@ public class GenerateAndRoutePopulation {
 			population.addPerson(person);
 		}
 
-//		final OTPTripRouterFactory trf = new OTPTripRouterFactory(scenario.getTransitSchedule(), TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84), "2013-08-24");
+		//		final OTPTripRouterFactory trf = new OTPTripRouterFactory(scenario.getTransitSchedule(), TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84), "2013-08-24");
+		//
+		//		Date begin = new Date();
+		//		
+		//		// make sure all routes are calculated.
+		//		ParallelPersonAlgorithmRunner.run(population, nCores,
+		//				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+		//			@Override
+		//			public AbstractPersonAlgorithm getPersonAlgorithm() {
+		//				return new PersonPrepareForSim(new PlanRouter(
+		//						trf.createTripRouter(),
+		//						((ScenarioImpl)scenario).getActivityFacilities()), scenario);
+		//			}
+		//		});
+		//
+		//		Date end = new Date();
 
-		Date begin = new Date();
-		
-		// make sure all routes are calculated.
-//		ParallelPersonAlgorithmRunner.run(population, nCores,
-//				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-//			@Override
-//			public AbstractPersonAlgorithm getPersonAlgorithm() {
-//				return new PersonPrepareForSim(new PlanRouter(
-//						trf.createTripRouter(),
-//						((ScenarioImpl)scenario).getActivityFacilities()), scenario);
-//			}
-//		});
 
-		Date end = new Date();
-		
-		
-		new PopulationWriter(population, scenario.getNetwork()).writeV5("/Users/vspuser/gtfs-ulm/population.xml");
+		new PopulationWriter(population, scenario.getNetwork()).writeV5("/Users/michaelzilske/gtfs-ulm/population.xml");
 
-		return (end.getTime() - begin.getTime()) / 1000;
+		//	return (end.getTime() - begin.getTime()) / 1000;
+		return 0;
+	}
 
+
+
+	private Coord randomCoord(double minX, double minY, double maxX, double maxY) {
+
+		int nFac = (int) (transitSchedule.getFacilities().size() * Math.random());
+		Coord coord = facs.get(nFac).getCoord();
+
+		return new CoordImpl(coord.getX() + Math.random()*1000, coord.getY() + Math.random()*1000);
+		// return new CoordImpl(minX + Math.random() * (maxX - minX), minY + Math.random() * (maxY - minY));
 	}
 
 	private List<Leg> createLeg(Coord source, Coord sink) {

@@ -202,4 +202,10 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 		this.sink = sink;
 	}
 
+	@Override
+	public void initialize(Map<String, Object> metaData) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

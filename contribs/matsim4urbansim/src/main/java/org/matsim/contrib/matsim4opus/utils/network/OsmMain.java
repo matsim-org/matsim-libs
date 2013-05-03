@@ -17,10 +17,10 @@ import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
-import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
+import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.v0_6.FastXmlReader;
 
 public class OsmMain {
 	/**
@@ -83,6 +83,12 @@ public class OsmMain {
 
 			@Override
 			public void release() {
+				
+			}
+
+			@Override
+			public void initialize(Map<String, Object> metaData) {
+				// TODO Auto-generated method stub
 				
 			}
 			
