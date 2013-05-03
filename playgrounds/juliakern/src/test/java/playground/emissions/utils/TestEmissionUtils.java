@@ -26,15 +26,19 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.emissions.types.ColdPollutant;
@@ -401,14 +405,116 @@ public class TestEmissionUtils {
 	}
 	 */
 	
-	@Test @Ignore
+	//prob no need - there should be no in- or out-files!
+	//@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@Test
 	public final void testSetNonCalculatedEmissionsForPopulation(){
+		//IN: population
+		//		map <personen-id, persoenlicheEmissionsmap>
+		//		persoenlicheEmissionsmap = <Emissionsname, EmissionsWert>
+		
+		//OUT: returnt eine grosse Map: <personen-Id, persoenlicheEmissionsmap>
+		//persoenlicheEmissionsmap = <EmissionsName, EmissionsWert>
+		
+		EmissionUtils eu = new EmissionUtils();
+		SortedSet<String> localPolls = new TreeSet<String>();
+		fillPollutant(localPolls);
+		Map<Id, SortedMap<String, Double>> totalEmissions = new TreeMap<Id, SortedMap<String, Double>>();
+		
+		Config config = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario(config);
+		//Network network = sc.getNetwork();
+		//TODO kann ich ne Population ohne config und scenario haben?
+		Population pop = sc.getPopulation();
+		PopulationFactory populationFactory = pop.getFactory();
+		
+		
+		
+//		Id id = new IdImpl("1");
+//		Person person = populationFactory.createPerson(id);
+//		pop.addPerson(person);
+
+		//TODO logger?
+
+		//korrekte Daten: zwei Personen, jeweils vollstaendige Daten.
+		//dann sollte nichts auf Null gesetzt werden. 
+		
+		//person1
+		Double cov1=.0005, c2v1= .003, fcv1 = .01, hcv1=.2, nmv1=1., n2v1=30., nxv1=200., pmv1 =7000., sov1=70000.;
+		
+		SortedMap<String, Double> p1Emissions = new TreeMap<String, Double>();
+		//complete list of all pollutants - missing data is not tested here
+		p1Emissions.put(co, cov1);
+		p1Emissions.put(c2, c2v1);
+		p1Emissions.put(fc, fcv1);
+		p1Emissions.put(hc, hcv1);
+		p1Emissions.put(nm, nmv1);
+		p1Emissions.put(n2, n2v1);
+		p1Emissions.put(nx, nxv1);
+		p1Emissions.put(pm, pmv1);
+		p1Emissions.put(so, sov1);
+		
+		Id idp1 = new IdImpl("p1");
+		Person p1 = populationFactory.createPerson(idp1);
+		pop.addPerson(p1);
+		totalEmissions.put(idp1, p1Emissions);
+		
+		//person2
+		//TODO werte hier aendern
+		Double cov2=.0005, c2v2= .003, fcv2 = .01, hcv2=.2, nmv2=1., n2v2=30., nxv2=200., pmv2 =7000., sov2=70000.;
+		
+		SortedMap<String, Double> p2Emissions = new TreeMap<String, Double>();
+		//complete list of all pollutants - missing data is not tested here
+		p2Emissions.put(co, cov2);
+		p2Emissions.put(c2, c2v2);
+		p2Emissions.put(fc, fcv2);
+		p2Emissions.put(hc, hcv2);
+		p2Emissions.put(nm, nmv2);
+		p2Emissions.put(n2, n2v2);
+		p2Emissions.put(nx, nxv2);
+		p2Emissions.put(pm, pmv2);
+		p2Emissions.put(so, sov2);
+		
+		Id idp2 = new IdImpl("p2");
+		Person p2 = populationFactory.createPerson(idp2);
+		pop.addPerson(p2);
+		totalEmissions.put(idp2, p2Emissions);
+		
+		Map<Id, SortedMap<String, Double>> finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
+		
+		//check: alle Personen der Population sind auch in der finalMap
+		Assert.assertTrue(finalMap.containsKey(idp1));
+		Assert.assertTrue(finalMap.containsKey(idp2));
+		
+		//check: alle Werte fuer Person 1 und 2 sind ungleich null und ungleich 0, insbesondere sind es Double
+		for(Object id : finalMap.keySet()){
+			Assert.assertTrue(id.getClass()== Id.class||id.getClass()==IdImpl.class);
+			for(Object pollutant: finalMap.get(id).values()){
+				Assert.assertTrue(pollutant.getClass()==Double.class);
+				Assert.assertNotSame(0.0, (Double)pollutant);
+				Assert.assertNotNull(pollutant);
+			}
+			//check: alle Emissionstypen kommen vor
+			for(String emission : localPolls){
+				Assert.assertTrue(finalMap.get(id).containsKey(emission));
+			}
+		}
+		
+		//TODO ....
+		
+		//population stimmt nicht mit id-map ueberein: jemand fehlt/ist zu viel
+		
+		//leere pEM
+		
+		//leere grosse Map
+		
+		
 		
 	}
-	@Test @Ignore
-	public final void testSetNonCalculatedEmissionsForNetwork(){
-		
-	}
+//	@Test
+//	public final void testSetNonCalculatedEmissionsForNetwork(){
+//		
+//	}
 	
 	@Test
 	public final void testConvertWarmPollutantMap2String(){
