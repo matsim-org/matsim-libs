@@ -8,4 +8,7 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>roadpricing</artifactId>
   <name>roadpricing</name>
+  <properties>
+  	<svnRevision>${buildNumber}</svnRevision>
+  </properties>
 </project>

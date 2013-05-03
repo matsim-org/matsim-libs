@@ -46,4 +46,7 @@
     <version>1.2.1</version>
 </dependency>
   </dependencies>
+  <properties>
+  	<svnRevision>${buildNumber}</svnRevision>
+  </properties>
 </project>
