@@ -29,6 +29,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -46,6 +47,13 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	private CalcAverageTolledTripLength cattl = null;
 
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
+	
+	public RoadPricing() {
+		log.info("printing build info for roadpricing contrib:") ;
+		Gbl.printBuildInfo("/META-INF/maven/org.matsim.contrib/roadpricing/pom.properties") ;
+		// lets see if this works. kai & daniel, may'13
+
+	}
 	
 	@Override
 	public void notifyStartup(final StartupEvent event) {

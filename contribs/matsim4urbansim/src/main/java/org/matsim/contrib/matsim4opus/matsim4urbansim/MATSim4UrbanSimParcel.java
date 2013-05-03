@@ -24,6 +24,8 @@
 package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
 
+import java.net.URL;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -48,6 +50,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -124,6 +127,10 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 */
 	MATSim4UrbanSimParcel(String args[]){
 		
+		log.info("printing build info for matsim4urbansim:") ;
+		Gbl.printBuildInfo("/META-INF/maven/org.matsim.contrib/matsim4urbansim/pom.properties") ;
+		// lets see if this works. kai & daniel, may'13
+				
 		// Stores location of MATSim configuration file
 		String matsimConfiFile = (args!= null && args.length==1) ? args[0].trim():null;
 		// checks if args parameter contains a valid path

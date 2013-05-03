@@ -61,14 +61,18 @@ public abstract class Gbl {
 		log.info("max. Memory: " + Runtime.getRuntime().maxMemory() / 1024.0 / 1024.0 + "MB (" + Runtime.getRuntime().maxMemory() + "B)");
 	}
 
+	public static final void printBuildInfo() {
+		printBuildInfo("/revision.txt") ;
+	}
+	
 	/** 
 	 * Prints some information about the current build/revision of this code.
 	 * Currently, this will only work with the Nightly-Build-Jars.
 	 */
-	public static final void printBuildInfo() {
+	public static final void printBuildInfo(String str) {
 		String revision = null;
 		String date = null;
-		URL url = Gbl.class.getResource("/revision.txt");
+		URL url = Gbl.class.getResource(str);
 		if (url != null) {
 			BufferedReader reader = null;
 			try {
