@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*                                                   *
- * TestEmission.java                                                       *
+ * TestHbefaVehicleAttributesEmission.java                                 *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.emissions.utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,11 +31,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.emissions.utils.EmissionUtils;;
-
+import playground.vsp.emissions.utils.EmissionUtils;
 
 //test for playground.vsp.emissions.utils.EmissionUtils
 
@@ -250,6 +248,3 @@ public class TestEmissionUtils {
 	
 }
 	
-
-	
-
