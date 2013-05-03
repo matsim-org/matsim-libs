@@ -52,6 +52,10 @@ public class TransitMultiNodeDijkstra extends MyMultiNodeDijkstra {
 		super(network, costFunction, timeFunction, preProcessData);
 	}
 	
+	public CustomDataManager getCustomDataManager() {
+		return this.customDataManager;
+	}
+	
 	/*
 	 * Re-use logic from super class and reset customDataManager.
 	 */

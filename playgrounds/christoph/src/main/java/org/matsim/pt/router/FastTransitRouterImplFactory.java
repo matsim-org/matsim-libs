@@ -20,6 +20,7 @@
 
 package org.matsim.pt.router;
 
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.util.FastTransitDijkstraFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -44,8 +45,10 @@ public class FastTransitRouterImplFactory implements TransitRouterFactory {
 
 	@Override
 	public TransitRouter createTransitRouter() {
-		MyTransitRouterNetworkTravelTimeAndDisutility ttCalculator = new MyTransitRouterNetworkTravelTimeAndDisutility(this.config, this.preparedTransitSchedule);
-		return new FastTransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, ttCalculator, ttCalculator, this.dijkstraFactory);
+		TransitTravelDisutility ttCalculator = new MyTransitRouterNetworkTravelTimeAndDisutilityWrapper(this.config, 
+				this.preparedTransitSchedule);
+		return new FastTransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, 
+				(TravelTime) ttCalculator, ttCalculator, this.dijkstraFactory);
 	}
 	
 }

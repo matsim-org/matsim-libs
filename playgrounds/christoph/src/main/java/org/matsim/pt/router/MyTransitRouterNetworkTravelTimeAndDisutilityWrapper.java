@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyTransitRouterImplFactory.java
+ * MyTransitRouterNetworkTravelTimeAndDisutilityWrapper.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,32 +20,25 @@
 
 package org.matsim.pt.router;
 
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
+ * Wraps a MyTransitRouterNetworkTravelTimeAndDisutility into a TransitTravelDisutility object.
+ *
  * @author cdobler
  */
-public class MyTransitRouterImplFactory implements TransitRouterFactory {
+public class MyTransitRouterNetworkTravelTimeAndDisutilityWrapper extends MyTransitRouterNetworkTravelTimeAndDisutility
+		implements TransitTravelDisutility {
 
-	private final TransitSchedule schedule;
-	private final TransitRouterConfig config;
-	private final TransitRouterNetwork routerNetwork;
-	private final PreparedTransitSchedule preparedTransitSchedule;
-
-	public MyTransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
-		this.schedule = schedule;
-		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
-		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+	public MyTransitRouterNetworkTravelTimeAndDisutilityWrapper(final TransitRouterConfig config, PreparedTransitSchedule preparedTransitSchedule) {
+		super(config, preparedTransitSchedule);
 	}
 
 	@Override
-	public TransitRouter createTransitRouter() {
-		TransitTravelDisutility ttCalculator = new MyTransitRouterNetworkTravelTimeAndDisutilityWrapper(this.config, 
-				this.preparedTransitSchedule);
-		return new MyTransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, 
-				(TravelTime) ttCalculator, ttCalculator);
+	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle, CustomDataManager dataManager) {
+		return super.getLinkTravelDisutility(link, time, person, vehicle);
 	}
-	
+
 }

@@ -43,11 +43,15 @@ import org.matsim.vehicles.Vehicle;
 public class FastTransitMultiNodeDijkstra extends MyFastDijkstra {
 
 	private final CustomDataManager customDataManager = new CustomDataManager();
-	
+		
 	public FastTransitMultiNodeDijkstra(final Network network, final TravelDisutility costFunction,
 			final TravelTime timeFunction, final PreProcessDijkstra preProcessData, 
 			final RoutingNetwork routingNetwork, final FastRouterDelegateFactory fastRouterFactory) {
 		super(network, costFunction, timeFunction, preProcessData, routingNetwork, fastRouterFactory);
+	}
+	
+	public CustomDataManager getCustomDataManager() {
+		return this.customDataManager;
 	}
 	
 	/*
