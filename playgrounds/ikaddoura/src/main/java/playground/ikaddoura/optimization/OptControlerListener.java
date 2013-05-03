@@ -32,6 +32,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.optimization.externalDelayEffects.InVehicleDelayHandler;
+import playground.ikaddoura.optimization.externalDelayEffects.MarginalCongestionHandler;
 import playground.ikaddoura.optimization.externalDelayEffects.WaitingDelayHandler;
 import playground.ikaddoura.optimization.handler.ConstantFareHandler;
 import playground.ikaddoura.optimization.handler.MarginalCostPricingHandler;
@@ -76,6 +77,8 @@ public class OptControlerListener implements StartupListener {
 		if (this.marginalCostPricing) {
 			event.getControler().getEvents().addHandler(new MarginalCostPricingHandler(eventsManager, scenario));
 		}
+		
+		event.getControler().getEvents().addHandler(new MarginalCongestionHandler(eventsManager, scenario));
 		
 		event.getControler().getEvents().addHandler(new ConstantFareHandler(eventsManager, this.fare));
 		event.getControler().getEvents().addHandler(ptScoringHandler);

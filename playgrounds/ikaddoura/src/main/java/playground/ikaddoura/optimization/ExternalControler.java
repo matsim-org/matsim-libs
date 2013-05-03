@@ -360,7 +360,7 @@ class ExternalControler {
 			String scheduleFile = dir + "transitSchedule_headway" + headway + ".xml";
 			
 			ScheduleFromCorridor sfn = new ScheduleFromCorridor(scenario.getNetwork());
-			sfn.createTransitSchedule("bus", false, true, 60, 0);
+			sfn.createTransitSchedule("bus", false, true, 60., 2.);
 			schedule = sfn.getTransitSchedule();
 			
 			List<Id> lineIDs = new ArrayList<Id>();
