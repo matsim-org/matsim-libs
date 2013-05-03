@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TestControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,45 +20,42 @@
 /**
  * 
  */
-package playground.ikaddoura;
+package playground.ikaddoura.optimization.externalDelayEffects;
 
-
-import java.io.IOException;
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author ikaddoura
  *
  */
-public class IKControler {
+public class LinkEnterLeaveInfo {
 	
-	private static final Logger log = Logger.getLogger(IKControler.class);
+	private Id personId;
+	private double linkEnterTime;
+	private double linkLeaveTime;
 	
-	static String configFile;
-			
-	public static void main(String[] args) throws IOException {
-				
-		if (args.length > 0) {
-			configFile = args[0];		
-			log.info("configFile: "+ configFile);
-			
-		} else {
-			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-		}
-		
-		IKControler main = new IKControler();
-		main.run();
+	public Id getPersonId() {
+		return personId;
 	}
-	
-	private void run() {
-		
-		Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new IKControlerListener((ScenarioImpl) controler.getScenario()));
-//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
-		controler.run();
+	public void setPersonId(Id personId) {
+		this.personId = personId;
 	}
+	public double getLinkEnterTime() {
+		return linkEnterTime;
+	}
+	public void setLinkEnterTime(double linkEnterTime) {
+		this.linkEnterTime = linkEnterTime;
+	}
+	public double getLinkLeaveTime() {
+		return linkLeaveTime;
+	}
+	public void setLinkLeaveTime(double linkLeaveTime) {
+		this.linkLeaveTime = linkLeaveTime;
+	}
+	@Override
+	public String toString() {
+		return "LinkEnterLeaveInfo [personId=" + personId + ", linkEnterTime="
+				+ linkEnterTime + ", linkLeaveTime=" + linkLeaveTime + "]";
+	}	
+
 }
-	

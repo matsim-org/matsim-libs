@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TestControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,45 +20,47 @@
 /**
  * 
  */
-package playground.ikaddoura;
+package playground.ikaddoura.optimization.externalDelayEffects;
 
-
-import java.io.IOException;
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.api.core.v01.Id;
 
 /**
+ * This information only refers to the flow capacity constraint.
+ * Storage capacity constraints are not considered.
+ * 
  * @author ikaddoura
  *
  */
-public class IKControler {
+public class PersonDelayInfo {
 	
-	private static final Logger log = Logger.getLogger(IKControler.class);
 	
-	static String configFile;
-			
-	public static void main(String[] args) throws IOException {
-				
-		if (args.length > 0) {
-			configFile = args[0];		
-			log.info("configFile: "+ configFile);
-			
-		} else {
-			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-		}
-		
-		IKControler main = new IKControler();
-		main.run();
+	private Id personId;
+	private double linkLeaveTime;
+	private double delay;
+	
+	public Id getPersonId() {
+		return personId;
+	}
+	public void setPersonId(Id personId) {
+		this.personId = personId;
+	}
+	public double getLinkLeaveTime() {
+		return linkLeaveTime;
+	}
+	public void setLinkLeaveTime(double linkLeaveTime) {
+		this.linkLeaveTime = linkLeaveTime;
+	}
+	public double getDelay() {
+		return delay;
+	}
+	public void setDelay(double delay) {
+		this.delay = delay;
 	}
 	
-	private void run() {
-		
-		Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new IKControlerListener((ScenarioImpl) controler.getScenario()));
-//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
-		controler.run();
+	@Override
+	public String toString() {
+		return "PersonDelayInfo [personId=" + personId + ", linkLeaveTime="
+				+ linkLeaveTime + ", delay=" + delay + "]";
 	}
+
 }
-	
