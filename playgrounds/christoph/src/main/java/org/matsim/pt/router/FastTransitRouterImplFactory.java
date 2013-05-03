@@ -29,16 +29,18 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 public class FastTransitRouterImplFactory implements TransitRouterFactory {
 
-	private final TransitSchedule schedule;
 	private final TransitRouterConfig config;
 	private final TransitRouterNetwork routerNetwork;
 	private final PreparedTransitSchedule preparedTransitSchedule;
 	private final FastTransitDijkstraFactory dijkstraFactory;
 
 	public FastTransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
-		this.schedule = schedule;
+		this(schedule, config, TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance));
+	}
+	
+	public FastTransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config, TransitRouterNetwork routerNetwork) {
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+		this.routerNetwork = routerNetwork;
 		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
 		this.dijkstraFactory = new FastTransitDijkstraFactory();
 	}
@@ -47,7 +49,7 @@ public class FastTransitRouterImplFactory implements TransitRouterFactory {
 	public TransitRouter createTransitRouter() {
 		TransitTravelDisutility ttCalculator = new MyTransitRouterNetworkTravelTimeAndDisutilityWrapper(this.config, 
 				this.preparedTransitSchedule);
-		return new FastTransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, 
+		return new FastTransitRouterImpl(this.config, this.preparedTransitSchedule, this.routerNetwork, 
 				(TravelTime) ttCalculator, ttCalculator, this.dijkstraFactory);
 	}
 	

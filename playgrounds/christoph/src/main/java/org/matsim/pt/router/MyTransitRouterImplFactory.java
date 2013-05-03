@@ -34,12 +34,15 @@ public class MyTransitRouterImplFactory implements TransitRouterFactory {
 	private final PreparedTransitSchedule preparedTransitSchedule;
 
 	public MyTransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
+		this(schedule, config, TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance));
+	}
+	public MyTransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config, TransitRouterNetwork routerNetwork) {
 		this.schedule = schedule;
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+		this.routerNetwork = routerNetwork;
 		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
 	}
-
+		
 	@Override
 	public TransitRouter createTransitRouter() {
 		TransitTravelDisutility ttCalculator = new MyTransitRouterNetworkTravelTimeAndDisutilityWrapper(this.config, 

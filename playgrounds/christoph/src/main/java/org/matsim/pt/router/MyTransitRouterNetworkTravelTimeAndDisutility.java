@@ -53,17 +53,6 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 	private final ThreadLocal<Double> cachedTravelTimes = new ThreadLocal<Double>();
 
 	private final PreparedTransitSchedule preparedTransitSchedule;
-
-//	/*
-//	 * If this constructor is used, every instance used its own PreparedTransitSchedule which might
-//	 * consume a lot of memory.
-//	 * 
-//	 * cdobler, nov'12
-//	 */
-//	@Deprecated
-//	public MyTransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config) {
-//		this(config, new PreparedTransitSchedule());
-//	}
 	
 	public MyTransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config, PreparedTransitSchedule preparedTransitSchedule) {
 		this.config = config;
@@ -145,6 +134,11 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 		}
 		this.previousLinks.set(link);
 		this.previousTimes.set(time);
+//		if ((link == this.previousLink) && (time == this.previousTime)) {
+//			return this.cachedTravelTime;
+//		}
+//		this.previousLink = link;
+//		this.previousTime = time;
 
 		if (link instanceof RoutingNetworkLink) link = ((RoutingNetworkLink) link).getLink();
 		
@@ -168,12 +162,14 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 				time2 += MIDNIGHT;
 			}
 			this.cachedTravelTimes.set(time2);
+//			this.cachedTravelTime = time2;
 			return time2;
 		}
 		// different transit routes, so it must be a line switch
 		double distance = wrapped.getLength();
 		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
 		this.cachedTravelTimes.set(time2);
+//		this.cachedTravelTime = time2;
 		return time2;
 	}
 	
