@@ -24,6 +24,7 @@ package org.matsim.pt.router;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -35,7 +36,8 @@ import org.matsim.vehicles.Vehicle;
 /**
  * TravelTime and TravelCost calculator to be used with the transit network used for transit routing.
  *
- * <em>This class is NOT thread-safe!</em>
+ * Due to the usage of ThreadLocal variables, this class should be thread-safe.
+ * However, this might be a performance issue...
  *
  * @author cdobler
  */
@@ -44,22 +46,25 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 	final static double MIDNIGHT = 24.0*3600;
 
 	protected final TransitRouterConfig config;
-	private Link previousLink = null;
-	private double previousTime = Double.NaN;
-	private double cachedTravelTime = Double.NaN;
+//	private Link previousLink = null;
+//	private double previousTime = Double.NaN;
+//	private double cachedTravelTime = Double.NaN;
+	private final ThreadLocal<Link> previousLinks = new ThreadLocal<Link>();
+	private final ThreadLocal<Double> previousTimes = new ThreadLocal<Double>();
+	private final ThreadLocal<Double> cachedTravelTimes = new ThreadLocal<Double>();
 
 	private final PreparedTransitSchedule preparedTransitSchedule;
 
-	/*
-	 * If this constructor is used, every instance used its own PreparedTransitSchedule which might
-	 * consume a lot of memory.
-	 * 
-	 * cdobler, nov'12
-	 */
-	@Deprecated
-	public MyTransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config) {
-		this(config, new PreparedTransitSchedule());
-	}
+//	/*
+//	 * If this constructor is used, every instance used its own PreparedTransitSchedule which might
+//	 * consume a lot of memory.
+//	 * 
+//	 * cdobler, nov'12
+//	 */
+//	@Deprecated
+//	public MyTransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config) {
+//		this(config, new PreparedTransitSchedule());
+//	}
 	
 	public MyTransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config, PreparedTransitSchedule preparedTransitSchedule) {
 		this.config = config;
@@ -67,24 +72,24 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+	public double getLinkTravelDisutility(Link link, final double time, final Person person, final Vehicle vehicle) {
 		double cost;
+		
+		if (link instanceof RoutingNetworkLink) link = ((RoutingNetworkLink) link).getLink();
+		
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
 			// "route" here means "pt route".  If no pt route is attached, it means that it is a transfer link.
 
 			cost = defaultTransferCost(link, time, person, vehicle);
-			
 		} else {
 			double offVehWaitTime = offVehicleWaitTime(link, time);		
 			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime;		
 			cost = - inVehTime       * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
 			       -offVehWaitTime   * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 			       -link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
-
 		}
 		return cost;
 	}
-	
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
@@ -135,13 +140,15 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 	}
 	
 	@Override
-	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
-		if ((link == this.previousLink) && (time == this.previousTime)) {
-			return this.cachedTravelTime;
+	public double getLinkTravelTime(Link link, final double time, Person person, Vehicle vehicle) {
+		if ((link == this.previousLinks.get()) && (time == this.previousTimes.get())) {
+			return this.cachedTravelTimes.get();
 		}
-		this.previousLink = link;
-		this.previousTime = time;
+		this.previousLinks.set(link);
+		this.previousTimes.set(time);
 
+		if (link instanceof RoutingNetworkLink) link = ((RoutingNetworkLink) link).getLink();
+		
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
 		TransitRouteStop toStop = wrapped.toNode.stop;
@@ -161,13 +168,13 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 				// ( this can only happen, I think, when ``bestDepartureTime'' is after midnight but ``time'' was before )
 				time2 += MIDNIGHT;
 			}
-			this.cachedTravelTime = time2;
+			this.cachedTravelTimes.set(time2);
 			return time2;
 		}
 		// different transit routes, so it must be a line switch
 		double distance = wrapped.getLength();
 		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
-		this.cachedTravelTime = time2;
+		this.cachedTravelTimes.set(time2);
 		return time2;
 	}
 	

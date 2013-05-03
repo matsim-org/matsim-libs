@@ -51,8 +51,13 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author cdobler
  */
-public class MyTransitRouterImplTest {
+public class FastTransitRouterImplTest {
 
+	private TransitRouter createFastTransitRouterImpl(TransitRouterConfig config,
+			TransitSchedule transitSchedule) {
+		return new FastTransitRouterImplFactory(transitSchedule, config).createTransitRouter();
+	}
+	
 	@Test
 	public void testSingleLine() {
 		Fixture f = new Fixture();
@@ -60,7 +65,7 @@ public class MyTransitRouterImplTest {
 		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(config, f.schedule);
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);
 		Coord toCoord = f.scenario.createCoord(16100, 5050);
 		List<Leg> legs = router.calcRoute(fromCoord, toCoord, 5.0*3600, null);
@@ -90,7 +95,7 @@ public class MyTransitRouterImplTest {
 		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(config, f.schedule);
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);
 		Coord toCoord = f.scenario.createCoord(4100, 5050);
 		List<Leg> legs = router.calcRoute(fromCoord, toCoord, 5.0*3600, null);
@@ -111,7 +116,7 @@ public class MyTransitRouterImplTest {
 		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(config, f.schedule);
 		Coord fromCoord = f.scenario.createCoord(4000, 3000);
 		Coord toCoord = f.scenario.createCoord(8000, 3000);
 		List<Leg> legs = router.calcRoute(fromCoord, toCoord, 5.0*3600, null);
@@ -132,7 +137,7 @@ public class MyTransitRouterImplTest {
 		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(config, f.schedule);
 		Coord fromCoord = f.scenario.createCoord(4000, 5002);
 		Coord toCoord = f.scenario.createCoord(8000, 5002);
 
@@ -156,7 +161,7 @@ public class MyTransitRouterImplTest {
 		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(config, f.schedule);
 		Coord toCoord = f.scenario.createCoord(16100, 10050);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(3800, 5100), toCoord, 6.0*3600, null);
 		assertEquals(5, legs.size());
@@ -193,7 +198,7 @@ public class MyTransitRouterImplTest {
 		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(config, f.schedule);
 		Coord toCoord = f.scenario.createCoord(28100, 4950);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(3800, 5100), toCoord, 5.0*3600 + 40.0*60, null);
 		assertEquals(4, legs.size());
@@ -237,7 +242,7 @@ public class MyTransitRouterImplTest {
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		config.setUtilityOfLineSwitch_utl(0);
-		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(config, f.schedule);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60, null);
 		assertEquals(5, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -274,7 +279,7 @@ public class MyTransitRouterImplTest {
 				f.scenario.getConfig().vspExperimental());
 		config.setUtilityOfLineSwitch_utl(0);
 		assertEquals(0, config.additionalTransferTime, 1e-8);
-		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(config, f.schedule);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60, null);
 		assertEquals(5, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -302,7 +307,7 @@ public class MyTransitRouterImplTest {
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		config.setBeelineWalkSpeed(0.1); // something very slow, so the agent does not walk over night
-		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(config, f.schedule);
 		Coord toCoord = f.scenario.createCoord(16100, 5050);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(3800, 5100), toCoord, 25.0*3600, null);
 		assertEquals(3, legs.size());
@@ -328,7 +333,7 @@ public class MyTransitRouterImplTest {
 	public void testCoordFarAway() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouter router = new MyTransitRouterImpl( new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouter router = createFastTransitRouterImpl( new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental() ), f.schedule ) ;
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(-2000, 0), f.scenario.createCoord(+42000, 0), 5.5*3600, null); // should map to stops A and I
@@ -353,7 +358,7 @@ public class MyTransitRouterImplTest {
 		WalkFixture f = new WalkFixture();
 		f.routerConfig.setMarginalUtilityOfTravelTimePt_utl_s(-1.0 / 3600.0 - 6.0/3600.0);
 		f.routerConfig.setUtilityOfLineSwitch_utl(0.2); // must be relatively low in this example, otherwise it's cheaper to walk the whole distance...
-		TransitRouter router = new MyTransitRouterImpl(f.routerConfig, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(f.routerConfig, f.schedule);
 		List<Leg> legs = router.calcRoute(f.coord1, f.coord7, 990, null);
 		assertEquals(5, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -400,7 +405,7 @@ public class MyTransitRouterImplTest {
 		f.routerConfig.searchRadius = 0.8 * CoordUtils.calcDistance(f.coord2, f.coord4);
 		f.routerConfig.extensionRadius = 0.0;
 
-		TransitRouter router = new MyTransitRouterImpl(f.routerConfig, f.schedule);
+		TransitRouter router = createFastTransitRouterImpl(f.routerConfig, f.schedule);
 		List<Leg> legs = router.calcRoute(f.coord2, f.coord6, 990, null);
 		assertEquals(1, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
