@@ -23,11 +23,17 @@ package playground.emissions.utils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -38,6 +44,40 @@ import playground.vsp.emissions.utils.EmissionUtils;
 //test for playground.vsp.emissions.utils.EmissionUtils
 
 public class TestEmissionUtils {
+	
+	String co="CO", c2="CO2_TOTAL", fc = "FC", hc= "HC",
+			nm ="NMHC", n2="NO2", nx="NOX", pm="PM", so="SO2";
+	
+	@Test
+	public final void testConstructor(){
+		EmissionUtils eu = new EmissionUtils();
+		
+		SortedSet<String> euPollutants = eu.getListOfPollutants();
+		SortedSet<String> localPolls = new TreeSet<String>();
+		fillPollutant(localPolls);
+		SortedSet<String> pollsFromEnum = new TreeSet<String>();
+		
+		//warm and cold pollutant enums match eu.getListOfPollutants
+		for(WarmPollutant wp: WarmPollutant.values()){
+			pollsFromEnum.add(wp.toString());
+			Assert.assertTrue(euPollutants.contains(wp.toString()));
+		}
+		for(ColdPollutant cp: ColdPollutant.values()){
+			pollsFromEnum.add(cp.toString());
+			Assert.assertTrue(euPollutants.contains(cp.toString()));
+		}
+		for(String pollutant: euPollutants){
+			Assert.assertTrue(pollsFromEnum.contains(pollutant));
+		}
+		
+		//local list of pollutants (used here for the test) matches eu.getListOfPolllutants
+		//if this fails there is a problem with the test, not with tested class
+		for(String pollutant: euPollutants){
+			Assert.assertTrue("the list of pollutants used in this test is not correct",localPolls.contains(pollutant));
+		}
+		//sind alle pollutants aus aus der lokalen Liste auch in der euPollutants-Liste?
+		Assert.assertEquals("the list of pollutants used in this test is not correct", localPolls.size(), euPollutants.size());
+	}
 	
 	@Test
 	//SortedMap<String, Double> sumUpEmissions(Map<WarmPollutant, Double> warmEmissions, Map<ColdPollutant, Double> coldEmissions)
@@ -69,7 +109,6 @@ public class TestEmissionUtils {
 		coldEmissions.put(ColdPollutant.NOX, 400.0);
 		coldEmissions.put(ColdPollutant.PM, 9000.0);
 		
-		
 		SortedMap<String, Double> sum = eu.sumUpEmissions(warmEmissions, coldEmissions);
 
 		Double co = (Double)sum.get("CO");
@@ -93,7 +132,6 @@ public class TestEmissionUtils {
 		Assert.assertEquals("Value of SO2 should be 70000.0 .", so, 70000.0, MatsimTestUtils.EPSILON);	
 	}
 	
-	
 	@Test 
 	public final void testSumUpEmissionsPerId(){
 		EmissionUtils eu = new EmissionUtils();
@@ -105,6 +143,8 @@ public class TestEmissionUtils {
 		Map<WarmPollutant, Double> mapWarm2 = new HashMap<WarmPollutant, Double>();
 		Map<ColdPollutant, Double> mapCold1 = new HashMap<ColdPollutant, Double>();
 		Map<ColdPollutant, Double> mapCold2 = new HashMap<ColdPollutant, Double>();
+		
+		//TODO names vs values
 		
 		//what about negativ numbers? ok
 		mapWarm1.put(WarmPollutant.CO, .0002);
@@ -165,7 +205,6 @@ public class TestEmissionUtils {
 		double e2pm = 4000.+2000.;
 		double e2so = 60000;
 
-		
 		//TODO neg numbers
 		
 		//leere Felder? nicht hier testen - solche warm Em. sollten gar nicht entstehen
@@ -221,10 +260,146 @@ public class TestEmissionUtils {
 
 	}
 	
-	@Test @Ignore
+	@Test
 	public final void testGetTotalEmissions(){
+		EmissionUtils eu = new EmissionUtils();
+		boolean nullPointer = false;
+
+		//besser anderes Format? ArrayList?
+		SortedSet<String> listOfPollutants = new TreeSet<String>();
+		fillPollutant(listOfPollutants);
+		
+		//hashmap ist keine sorted map... warum brauchen wir sorted?
+		SortedMap<String, Double> totalEmissions = new TreeMap<String, Double>();
+		//enthaelt mehrere personen mit ihren emissions-maps
+		Map<Id, SortedMap<String, Double>> persons2emissions = new HashMap<Id, SortedMap<String, Double>>();
+		
+		//test empty input
+		try{
+			totalEmissions= eu.getTotalEmissions(null);
+		}
+		catch(NullPointerException e){
+			nullPointer = true;
+		}
+		Assert.assertTrue(nullPointer); nullPointer =false;
+		
+		//test empty list as input		
+		totalEmissions = eu.getTotalEmissions(persons2emissions);
+		Assert.assertEquals("this map should be empty", 0, totalEmissions.size());
+		
+		//put some content into the list
+		//keine Fehlerhaften Eingabedaten hier
+		//warme und kalte Emissionen sind schon zusammengerechnet.. dafuer gibt es sumUpEmissionsPerId
+		
+		//person1
+		SortedMap<String, Double> allEmissionsP1 = new TreeMap<String, Double>();
+		Double p1co = .9, p1c2 = 3.2, p1fc=9.3, p1hc= 1.0, p1nm=-68., p1n2= .87, p1nx= 5., p1pm = 3.22, p1so=79.8;
+		IdImpl p1Id = new IdImpl("p1");
+		allEmissionsP1.put(co, p1co);
+		allEmissionsP1.put(c2, p1c2);
+		allEmissionsP1.put(fc, p1fc);
+		allEmissionsP1.put(hc, p1hc);
+		allEmissionsP1.put(nm, p1nm);
+		allEmissionsP1.put(n2, p1n2);
+		allEmissionsP1.put(nx, p1nx);
+		allEmissionsP1.put(pm, p1pm);
+		allEmissionsP1.put(so, p1so);
+		
+		//person2
+		SortedMap<String, Double> allEmissionsp2 = new TreeMap<String, Double>();
+		Double p2co = .65, p2c2= -7., p2fc=-.3149, p2hc=54., p2nm=7.9, p2n2=.34, p2nx=-.8, p2pm=4., p2so=-750.;
+		IdImpl p2Id = new IdImpl("p2");
+		allEmissionsp2.put(co, p2co);
+		allEmissionsp2.put(c2, p2c2);
+		allEmissionsp2.put(fc, p2fc);
+		allEmissionsp2.put(hc, p2hc);
+		allEmissionsp2.put(nm, p2nm);
+		allEmissionsp2.put(n2, p2n2);
+		allEmissionsp2.put(nx, p2nx);
+		allEmissionsp2.put(pm, p2pm);
+		allEmissionsp2.put(so, p2so);
+		
+		//person3
+		SortedMap<String, Double> allEmissionsp3 = new TreeMap<String, Double>();
+		Double p3co=-970., p3c2=-.000012, p3fc=57.21, p3hc=80.8, p3nm=9.52, p3n2=.0074, p3nx=42., p3pm=.38, p3so=70.;
+		IdImpl p3Id = new IdImpl("p3");
+		allEmissionsp3.put(co, p3co);
+		allEmissionsp3.put(c2, p3c2);
+		allEmissionsp3.put(fc, p3fc);
+		allEmissionsp3.put(hc, p3hc);
+		allEmissionsp3.put(nm, p3nm);
+		allEmissionsp3.put(n2, p3n2);
+		allEmissionsp3.put(nx, p3nx);
+		allEmissionsp3.put(pm, p3pm);
+		allEmissionsp3.put(so, p3so);
+		
+		//personen in die persons2emissionliste einfuegen
+		persons2emissions.put(p1Id, allEmissionsP1);
+		persons2emissions.put(p2Id, allEmissionsp2);
+		persons2emissions.put(p3Id, allEmissionsp3);
+		totalEmissions = eu.getTotalEmissions(persons2emissions);
+		
+		Assert.assertEquals(co+" values are not correct", p1co+p2co+p3co, totalEmissions.get(co), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(c2+" values are not correct", p1c2+p2c2+p3c2, totalEmissions.get(c2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(fc+" values are not correct", p1fc+p2fc+p3fc, totalEmissions.get(fc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(hc+" values are not correct", p1hc+p2hc+p3hc, totalEmissions.get(hc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(nm+" values are not correct", p1nm+p2nm+p3nm, totalEmissions.get(nm), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(n2+" values are not correct", p1n2+p2n2+p3n2, totalEmissions.get(n2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(nx+" values are not correct", p1nx+p2nx+p3nx, totalEmissions.get(nx), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(pm+" values are not correct", p1pm+p2pm+p3pm, totalEmissions.get(pm), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(so+" values are not correct", p1so+p2so+p3so, totalEmissions.get(so), MatsimTestUtils.EPSILON);
+		
+		//das geht davon aus, dass immer vollstaendige maps uebergeben werden
+		for(String emission : listOfPollutants){
+			Assert.assertTrue(totalEmissions.containsKey(emission));
+		}
+		//nichts anderes in der Liste enthalten
+		Assert.assertEquals("this list should be as long as number of pollutants",totalEmissions.keySet().size(), listOfPollutants.size());
 		
 	}
+	
+	private SortedSet<String> fillPollutant(SortedSet<String> listOfPollutants){
+		listOfPollutants.clear();
+		listOfPollutants.add(co);
+		listOfPollutants.add(c2);
+		listOfPollutants.add(fc);
+		listOfPollutants.add(hc);
+		listOfPollutants.add(nm);
+		listOfPollutants.add(n2);
+		listOfPollutants.add(nx);
+		listOfPollutants.add(pm);
+		listOfPollutants.add(so);
+		return listOfPollutants;
+		
+	}
+
+	/*
+	 * 	public Map<Id, SortedMap<String, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id, SortedMap<String, Double>> totalEmissions) {
+		Map<Id, SortedMap<String, Double>> personId2Emissions = new HashMap<Id, SortedMap<String, Double>>();
+
+		for(Person person : population.getPersons().values()){
+			Id personId = person.getId();
+			SortedMap<String, Double> emissionType2Value;
+			if(totalEmissions.get(personId) == null){ // person not in map yet (e.g. pt user)
+				emissionType2Value = new TreeMap<String, Double>();
+				for(String pollutant : listOfPollutants){
+					emissionType2Value.put(pollutant, 0.0);
+				}
+			} else { // person in map, but some emissions are not set; setting these to 0.0 
+				emissionType2Value = totalEmissions.get(personId);
+				for(String pollutant : listOfPollutants){ 
+					if(emissionType2Value.get(pollutant) == null){
+						emissionType2Value.put(pollutant, 0.0);
+					} else {
+						// do nothing
+					}
+				}
+			}
+			personId2Emissions.put(personId, emissionType2Value);
+		}
+		return personId2Emissions;
+	}
+	 */
 	
 	@Test @Ignore
 	public final void testSetNonCalculatedEmissionsForPopulation(){
@@ -235,13 +410,76 @@ public class TestEmissionUtils {
 		
 	}
 	
-	@Test @Ignore
+	@Test
 	public final void testConvertWarmPollutantMap2String(){
+		EmissionUtils eu = new EmissionUtils();
+		
+		Map<WarmPollutant, Double> warmEmissions = new HashMap<WarmPollutant, Double>();	
+		//warm pollutants: CO, CO2_TOTAL, FC, HC, NMHC, NO2, NOX, PM, SO2
+		//values for warm polls
+		Double cov=.0005, c2v= .003, fcv = .01, hcv=.2, nmv=1., n2v=30., nxv=200., pmv =7000., sov=70000.;
+		
+		//complete list of all pollutants - missing data is not tested here
+		warmEmissions.put(WarmPollutant.CO, cov);
+		warmEmissions.put(WarmPollutant.CO2_TOTAL, c2v);
+		warmEmissions.put(WarmPollutant.FC, fcv);
+		warmEmissions.put(WarmPollutant.HC, hcv);
+		warmEmissions.put(WarmPollutant.NMHC, nmv);
+		warmEmissions.put(WarmPollutant.NO2, n2v);
+		warmEmissions.put(WarmPollutant.NOX, nxv);
+		warmEmissions.put(WarmPollutant.PM, pmv);
+		warmEmissions.put(WarmPollutant.SO2, sov);
+		
+		SortedMap<String, Double> convertedWarmMap = eu.convertWarmPollutantMap2String(warmEmissions);
+		
+		Assert.assertEquals(co + " values do not match", cov,convertedWarmMap.get(co), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(c2 + " values do not match", c2v,convertedWarmMap.get(c2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(fc + " values do not match", fcv,convertedWarmMap.get(fc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(hc + " values do not match", hcv,convertedWarmMap.get(hc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(nm + " values do not match", nmv,convertedWarmMap.get(nm), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(n2 + " values do not match", n2v,convertedWarmMap.get(n2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(nx + " values do not match", nxv,convertedWarmMap.get(nx), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(pm + " values do not match", pmv,convertedWarmMap.get(pm), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(so + " values do not match", sov,convertedWarmMap.get(so), MatsimTestUtils.EPSILON);
+		
+		//no unwanted key in the map
+		Assert.assertEquals("something in the converted WarmMap that does not belong here", WarmPollutant.values().length, convertedWarmMap.size());
+		
+	}
+
+	@Test
+	public final void testConvertColdPollutantMap2String(){{
+		EmissionUtils eu = new EmissionUtils();
+		
+		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();	
+		//TODO cold pollutants: CO, CO2_TOTAL, FC, HC, NMHC, NO2, NOX, PM, SO2
+		//values for cold polls
+		Double cov=.0005, fcv = .01, hcv=.2, nmv=1., n2v=30., nxv=200., pmv =7000.;
+		
+		//complete list of all pollutants - missing data is not tested here
+		coldEmissions.put(ColdPollutant.CO, cov);
+		coldEmissions.put(ColdPollutant.FC, fcv);
+		coldEmissions.put(ColdPollutant.HC, hcv);
+		coldEmissions.put(ColdPollutant.NMHC, nmv);
+		coldEmissions.put(ColdPollutant.NO2, n2v);
+		coldEmissions.put(ColdPollutant.NOX, nxv);
+		coldEmissions.put(ColdPollutant.PM, pmv);
+	
+		SortedMap<String, Double> convertedColdMap = eu.convertColdPollutantMap2String(coldEmissions);
+		
+		Assert.assertEquals(co + " values do not match", cov,convertedColdMap.get(co), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(fc + " values do not match", fcv,convertedColdMap.get(fc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(hc + " values do not match", hcv,convertedColdMap.get(hc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(nm + " values do not match", nmv,convertedColdMap.get(nm), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(n2 + " values do not match", n2v,convertedColdMap.get(n2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(nx + " values do not match", nxv,convertedColdMap.get(nx), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(pm + " values do not match", pmv,convertedColdMap.get(pm), MatsimTestUtils.EPSILON);
+		
+		//no unwanted key in the map
+		Assert.assertEquals("something in the converted ColdMap that does not belong here", ColdPollutant.values().length, convertedColdMap.size());
 		
 	}
 	
-	@Test @Ignore
-	public final void testConvertColdPollutantMap2String(){
 		
 	}
 	
