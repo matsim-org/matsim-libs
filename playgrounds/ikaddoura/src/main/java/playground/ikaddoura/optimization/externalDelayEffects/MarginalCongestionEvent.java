@@ -36,25 +36,43 @@ import org.matsim.core.api.internal.HasPersonId;
 public final class MarginalCongestionEvent extends Event implements HasPersonId {
 	
 	public static final String EVENT_TYPE = "MarginalCongestionEffect";
-	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String ATTRIBUTE_PERSON = "causingAgent";
+	public static final String ATTRIBUTE_AFFECTED_AGENT = "affectedAgent";
 	public static final String ATTRIBUTE_DELAY = "delay";
+	public static final String ATTRIBUTE_LINK = "link";
 	
-	private final Id personId;
+	private final Id causingAgentId;
+	private final Id affectedAgentId;
 	private final double delay;
+	private final Id linkId;
 
-	public MarginalCongestionEvent(double time, Id personId, double externalDelay) {
+	public MarginalCongestionEvent(double time, Id causingAgentId, Id affectedAgentId, double externalDelay, Id linkId) {
 		super(time);
-		this.personId = personId;
+		this.causingAgentId = causingAgentId;
+		this.affectedAgentId = affectedAgentId;
 		this.delay = externalDelay;
+		this.linkId = linkId;
 	}
 
 	@Override
 	public Id getPersonId() {
-		return this.personId;
+		return this.causingAgentId;
 	}
 	
 	public double getDelay() {
 		return delay;
+	}
+
+	public Id getCausingAgentId() {
+		return causingAgentId;
+	}
+
+	public Id getAffectedAgentId() {
+		return affectedAgentId;
+	}
+
+	public Id getLinkId() {
+		return linkId;
 	}
 
 	@Override
@@ -65,8 +83,10 @@ public final class MarginalCongestionEvent extends Event implements HasPersonId 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attrs = super.getAttributes();
-		attrs.put(ATTRIBUTE_PERSON, this.personId.toString());
+		attrs.put(ATTRIBUTE_PERSON, this.causingAgentId.toString());
+		attrs.put(ATTRIBUTE_AFFECTED_AGENT, this.affectedAgentId.toString());
 		attrs.put(ATTRIBUTE_DELAY, Double.toString(this.delay));
+		attrs.put(ATTRIBUTE_LINK, this.linkId.toString());
 		return attrs;
 	}
 

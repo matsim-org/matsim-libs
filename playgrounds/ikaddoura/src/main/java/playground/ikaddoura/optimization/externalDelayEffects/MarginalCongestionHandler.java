@@ -51,6 +51,12 @@ import org.matsim.core.scenario.ScenarioImpl;
  * TODO: Adjust for other modes than car and mixed modes.
  * TODO: Adjust for different effective cell sizes than 7.5 meters.
  * 
+ * Not yet tested: combination of flow capacity and storage capacity constraints...
+ * TODO: only throw flow capacity constraints if agent is not affected by storage capacity constraints!
+ * 
+ * When an agent ends an activity on link A, the agent is affected by the flow capacity of link A.
+ * What about the storage capacity?
+ * 
  * @author ikaddoura
  *
  */
@@ -227,14 +233,14 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				double delayToPayFor = delay;
 				for (PersonDelayInfo info : reverseList){
 					if (delayToPayFor > linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
-						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, info.getPersonId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec());
+						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, info.getPersonId(), personId, linkInfo.getMarginalDelayPerLeavingVehicle_sec(), linkId);
 						System.out.println("	Person " + info.getPersonId() + " --> Marginal delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec());
 						this.events.processEvent(congestionEvent);
 												
 						delayToPayFor = delayToPayFor - linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 					} else {
 						if (delayToPayFor > 0) {
-							MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, info.getPersonId(), delayToPayFor);
+							MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, info.getPersonId(), personId, delayToPayFor, linkId);
 							System.out.println("	Person " + info.getPersonId() + " --> Marginal delay: " + delayToPayFor);
 							this.events.processEvent(congestionEvent);
 							delayToPayFor = 0;
@@ -288,6 +294,12 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 						List<Id> causingAgentIDs = new ArrayList<Id>();
 						causingAgentIDs.addAll(getCausingAgentsCurrentLink(event.getLinkId(), linkLeaveTime));
 						causingAgentIDs.addAll(getCausingAgentsFollowingLinks(followingLinkIDs, linkLeaveTime));
+						
+						// throw events
+						for (Id id : causingAgentIDs){
+							MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), id, event.getPersonId(), delay, event.getLinkId());
+							this.events.processEvent(congestionEvent);
+						}
 						
 						System.out.println(causingAgentIDs.size() + " agents in front of me (on the same link or other links downstream) were causing this delay.");
 						System.out.println("Causing agents: " + causingAgentIDs.toString());
