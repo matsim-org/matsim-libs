@@ -214,6 +214,20 @@ public class CreateTestMATSimConfig {
 		this.matsim4opusTemp	= path;
 		this.matsimConfigInputFile = externalConfig;
 	}
+	
+	public CreateTestMATSimConfig(String path, String inputNetworkFile){
+		this.dummyPath = path;
+		this.networkInputFile = inputNetworkFile;
+		this.inputPlansFile		= path + "/dummy.xml";
+		this.hotstartPlansFile	= path + "/dummy.xml";
+		this.opusHome			= path;
+		this.opusDataPath		= path;
+		this.matsim4opus		= path;
+		this.matsim4opusConfig	= path;
+		this.matsim4opusOutput	= path;
+		this.matsim4opusTemp	= path;
+		this.matsimConfigInputFile = "";
+	}
 
 	/**
 	 * generates the external MATSim config file with the specified parameter settings
