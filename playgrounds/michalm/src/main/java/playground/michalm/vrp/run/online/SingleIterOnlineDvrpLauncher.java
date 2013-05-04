@@ -35,7 +35,7 @@ import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.withdestination.TaxiOptimizerWithDestinationKnowledge;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.ImmediateRequestTaxiOptimizer;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.RunningVehicleRegister;
 import playground.michalm.vrp.data.MatsimVrpData;
@@ -174,7 +174,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         data = OnlineDvrpLauncherUtils.initMatsimVrpData(scenario, algorithmConfig.ttimeSource,
                 algorithmConfig.tcostSource, eventsFileName, depotsFileName);
 
-        TaxiOptimizerWithDestinationKnowledge optimizer = algorithmConfig.createTaxiOptimizer(data
+        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(data
                 .getVrpData());
         optimizer.setDelaySpeedupStats(delaySpeedupStats);
 
@@ -220,7 +220,9 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
     /*package*/void generateOutput()
     {
-        new TaxiEvaluator().evaluateVrp(data.getVrpData()).print(new PrintWriter(System.out));
+        PrintWriter pw = new PrintWriter(System.out);
+        new TaxiEvaluator().evaluateVrp(data.getVrpData()).print(pw);
+        pw.flush();
 
         if (vrpOutFiles) {
             new Schedules2GIS(data.getVrpData().getVehicles(), data).write(vrpOutDirName);

@@ -19,11 +19,11 @@
 
 package playground.jbischoff.taxi.launch;
 
-import static pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizationPolicy.*;
+import static pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.TaxiOptimizationPolicy.*;
 import static playground.jbischoff.taxi.launch.AlgorithmConfig.AlgorithmType.*;
 import static playground.jbischoff.taxi.launch.AlgorithmConfig.TravelCostSource.*;
 import static playground.jbischoff.taxi.launch.AlgorithmConfig.TravelTimeSource.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizationPolicy;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.TaxiOptimizationPolicy;
 
 
 public class AlgorithmConfig

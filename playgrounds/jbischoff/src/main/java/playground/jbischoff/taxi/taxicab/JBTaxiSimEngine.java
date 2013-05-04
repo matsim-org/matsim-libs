@@ -27,6 +27,7 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
  * *********************************************************************** */
 
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.TaxiOptimizationPolicy;
 import playground.jbischoff.taxi.optimizer.RankTaxiOptimizer;
 import playground.michalm.dynamic.DynAgentLogic;
 import playground.michalm.vrp.data.MatsimVrpData;

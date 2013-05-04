@@ -53,6 +53,7 @@ import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.TaxiOptimizationPolicy;
 import playground.jbischoff.taxi.optimizer.NOSRankTaxiOptimizer;
 import playground.jbischoff.taxi.optimizer.RankTaxiOptimizer;
 import playground.jbischoff.taxi.optimizer.RankTaxiOptimizerFactory;
@@ -69,7 +70,6 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 import playground.michalm.vrp.run.VrpConfigUtils;
 import playground.jbischoff.taxi.launch.AlgorithmConfig;
 import playground.michalm.vrp.taxi.*;
-import playground.michalm.vrp.taxi.TaxiAgentSource;
 
 
 public class JbSingleIterOnlineDvrpLauncher

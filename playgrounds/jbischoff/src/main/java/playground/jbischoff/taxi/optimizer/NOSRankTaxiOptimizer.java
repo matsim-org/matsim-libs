@@ -5,7 +5,7 @@ import java.util.List;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Request;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizationPolicy;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.TaxiOptimizationPolicy;
 import playground.jbischoff.taxi.optimizer.BestVehicleFinder.BestVehicle;
 
 

@@ -118,6 +118,7 @@ public class TaxiAgentLogic
 
                 switch (tdt.getDriveType()) {
                     case PICKUP:
+                    case CRUISE:
                         return createLeg((DriveTask)task, time);
 
                     case DELIVERY:
@@ -184,9 +185,6 @@ public class TaxiAgentLogic
             throw new IllegalStateException("Passanger and taxi on different links!");
         }
 
-        // if
-        // (taxiSimEngine.getMobsim().unregisterAdditionalAgentOnLink(passenger.getId(),currentLinkId)
-        // == null) {
         if (taxiSimEngine.getInternalInterface().unregisterAdditionalAgentOnLink(passenger.getId(),
                 currentLinkId) == null) {
             throw new RuntimeException("Passenger id=" + passenger.getId()

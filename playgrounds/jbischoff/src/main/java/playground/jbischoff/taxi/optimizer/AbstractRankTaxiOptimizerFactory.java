@@ -1,6 +1,6 @@
 package playground.jbischoff.taxi.optimizer;
 
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizationPolicy;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.TaxiOptimizationPolicy;
 
 
 public abstract class AbstractRankTaxiOptimizerFactory implements
