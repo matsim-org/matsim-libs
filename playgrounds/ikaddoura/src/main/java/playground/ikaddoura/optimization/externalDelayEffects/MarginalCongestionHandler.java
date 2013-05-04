@@ -73,8 +73,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 	public MarginalCongestionHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
-		log.warn("Not tested.");
-		
+				
 		if (this.scenario.getNetwork().getCapacityPeriod() != 3600.) {
 			throw new RuntimeException("Expecting a capacity period of 1h. Aborting...");
 			// TODO: adjust for other capacity periods.
@@ -292,7 +291,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 						
 						// get queue at the linkLeaveTime (when this agent wanted to leave but could not because of storage capacity constraints)
 						List<Id> causingAgentIDs = new ArrayList<Id>();
-						causingAgentIDs.addAll(getCausingAgentsCurrentLink(event.getLinkId(), linkLeaveTime));
+						causingAgentIDs.addAll(getCausingAgentsCurrentLink(event.getLinkId(), event.getPersonId(), linkLeaveTime));
 						causingAgentIDs.addAll(getCausingAgentsFollowingLinks(followingLinkIDs, linkLeaveTime));
 						
 						// throw events
@@ -301,12 +300,14 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 							this.events.processEvent(congestionEvent);
 						}
 						
-						System.out.println(causingAgentIDs.size() + " agents in front of me (on the same link or other links downstream) were causing this delay.");
-						System.out.println("Causing agents: " + causingAgentIDs.toString());
+						System.out.println("Number of agents in front of me (on the same link or other links downstream) causing the delay: " + causingAgentIDs.size());
+						System.out.println("Causing agent(s): " + causingAgentIDs.toString());
 						System.out.println("---------------------------------------------------------------------------------------------------------------------");
 						
 					} else {
 //						System.out.println(event.getPersonId().toString() + " is not delayed due to storage capacity constraints on links behind link " + event.getLinkId() + ".");
+						// Maybe throw congestion effects due to flow capacity constraints only here?!
+						// Maybe it doesn't make sense to throw flow capacity congestion effects, if an agent is further delayed due to capacity constraints. 
 					}
 				}
 			}
@@ -348,13 +349,15 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		return causingAgentIDs;
 	}
 
-	private List<Id> getCausingAgentsCurrentLink(Id linkId, double linkLeaveTime) {
-		// search for agents in queue in front of me when I wanted to leave the link
+	private List<Id> getCausingAgentsCurrentLink(Id linkId, Id personId, double linkLeaveTime) {
+		// search for agents who are in the queue in front of me when I wanted to leave the link
 		List<Id> causingAgentIDs = new ArrayList<Id>();
 		List<LinkEnterLeaveInfo> enterLeaveInfosCurrentLink = this.linkId2congestionInfo.get(linkId).getPersonId2enterLeaveInfo();
 		for (LinkEnterLeaveInfo infoCurrentLink : enterLeaveInfosCurrentLink) {
 			if ((infoCurrentLink.getLinkEnterTime() < linkLeaveTime && infoCurrentLink.getLinkLeaveTime() > linkLeaveTime) || (infoCurrentLink.getLinkEnterTime() < linkLeaveTime && infoCurrentLink.getLinkLeaveTime() == 0)){
-				causingAgentIDs.add(infoCurrentLink.getPersonId());
+				if (!infoCurrentLink.getPersonId().toString().equals(personId.toString())) {
+					causingAgentIDs.add(infoCurrentLink.getPersonId());
+				}
 			} else {
 				// person was not on the link at the linkLeaveTime
 			}
