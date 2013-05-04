@@ -40,7 +40,10 @@ import org.matsim.core.router.old.NetworkLegRouter;
 public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 
 	private final Controler controler;
+
 	private final PtMatrix ptMatrix;
+	// The single instance of ptMatrix is passed to multiple instances of the TripRouter.  Looks to me like this will work, since
+	// there is only read access to ptMatrix.  kai, may'13
 	
 	public MATSim4UrbanSimRouterFactoryImpl(final Controler controler, final PtMatrix ptMatrix) {
 		this.controler = controler;
