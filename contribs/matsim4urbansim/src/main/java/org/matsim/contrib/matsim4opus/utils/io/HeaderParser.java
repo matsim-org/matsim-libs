@@ -1,7 +1,7 @@
 package org.matsim.contrib.matsim4opus.utils.io;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HeaderParser {
 	
@@ -21,7 +21,7 @@ public class HeaderParser {
 	public static Map<String,Integer> createIdxFromKey( String line, String seperator ) {
 		String[] keys = line.split( seperator ) ;
 
-		Map<String,Integer> idxFromKey = new HashMap<String, Integer>() ;
+		Map<String,Integer> idxFromKey = new ConcurrentHashMap<String, Integer>() ;
 		for ( int i=0 ; i<keys.length ; i++ ) {
 			idxFromKey.put(keys[i], i ) ;
 		}
@@ -36,7 +36,7 @@ public class HeaderParser {
 	 */
 	public static Map<Integer,Integer> createIdxFromKey( int keys[]) {
 
-		Map<Integer,Integer> idxFromKey = new HashMap<Integer, Integer>() ;
+		Map<Integer,Integer> idxFromKey = new ConcurrentHashMap<Integer, Integer>() ;
 		for ( int i=0 ; i<keys.length ; i++ ) {
 			idxFromKey.put(keys[i], i ) ;
 		}

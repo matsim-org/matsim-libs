@@ -1,10 +1,10 @@
 package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -296,7 +296,7 @@ public class AccessibilityControlerListenerImpl{
 		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(InternalConstants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
 		
 		log.info("Aggregating workplaces with identical nearest node ...");
-		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
+		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
 		
 		ProgressBar bar = new ProgressBar( jobSampleList.size() );
 
@@ -385,7 +385,7 @@ public class AccessibilityControlerListenerImpl{
 //			measuringPointIterator = testSet.getZones().iterator();
 
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
-		Map<Id,ArrayList<Zone<Id>>> aggregatedMeasurementPoints = new HashMap<Id, ArrayList<Zone<Id>>>();
+		Map<Id,ArrayList<Zone<Id>>> aggregatedMeasurementPoints = new ConcurrentHashMap<Id, ArrayList<Zone<Id>>>();
 
 		// go through all measuring points ...
 		while( measuringPointIterator.hasNext() ){

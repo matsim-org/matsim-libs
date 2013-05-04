@@ -8,11 +8,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -159,7 +159,7 @@ public class ReadFromUrbanSimModel {
 
 		// temporary data structure in order to get coordinates for zones:
 		// Map<Id,Id> zoneFromParcel = new HashMap<Id,Id>();
-		Map<Id,PseudoZone> pseudoZones = new HashMap<Id,PseudoZone>();
+		Map<Id,PseudoZone> pseudoZones = new ConcurrentHashMap<Id,PseudoZone>();
 
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
@@ -751,7 +751,7 @@ public class ReadFromUrbanSimModel {
 	public AggregateObject2NearestNode[] aggregateJobsWithSameParcelID(List<SpatialReferenceObject> jobSampleList) {
 		
 		log.info("Aggregating Job with identical parcel ID ...");
-		Map<Id, AggregateObject2NearestNode> jobClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
+		Map<Id, AggregateObject2NearestNode> jobClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
 		
 		ProgressBar bar = new ProgressBar( jobSampleList.size() );
 		
@@ -1031,8 +1031,8 @@ public class ReadFromUrbanSimModel {
 		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		log.info( "Starting to read persons table from " + filename );
 		
-		Map<Id, SpatialReferenceObject> personLocations = new HashMap<Id, SpatialReferenceObject>();
-		Map<Id, AggregateObject2NearestNode> personClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
+		Map<Id, SpatialReferenceObject> personLocations = new ConcurrentHashMap<Id, SpatialReferenceObject>();
+		Map<Id, AggregateObject2NearestNode> personClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
 		
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );

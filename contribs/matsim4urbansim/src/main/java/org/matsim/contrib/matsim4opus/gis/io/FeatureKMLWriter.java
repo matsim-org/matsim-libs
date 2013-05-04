@@ -20,10 +20,10 @@
 package org.matsim.contrib.matsim4opus.gis.io;
 
 import java.awt.Color;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.opengis.kml._2.BoundaryType;
 import net.opengis.kml._2.DocumentType;
@@ -93,7 +93,7 @@ public class FeatureKMLWriter {
 		 * Create a polygon style type for each color.
 		 */
 		Set<Color> colors = getColors(features);
-		Map<Color, StyleType> styleTypes = new HashMap<Color, StyleType>();
+		Map<Color, StyleType> styleTypes = new ConcurrentHashMap<Color, StyleType>();
 		for(Color color : colors) {
 			PolyStyleType polyStyleType = objectFactory.createPolyStyleType();
 			polyStyleType.setColor(new byte[]{(byte) alpha, (byte)color.getBlue(), (byte)color.getGreen(), (byte)color.getRed()});

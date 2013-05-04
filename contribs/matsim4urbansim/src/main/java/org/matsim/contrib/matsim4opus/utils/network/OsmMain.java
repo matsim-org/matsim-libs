@@ -3,10 +3,10 @@ package org.matsim.contrib.matsim4opus.utils.network;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.network.NetworkWriter;
@@ -40,7 +40,7 @@ public class OsmMain {
 
 	private static Scenario createScenario() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
+		Map<String, Set<String>> tagKeyValues = new ConcurrentHashMap<String, Set<String>>();
 		tagKeyValues.put("highway", new HashSet<String>(Arrays.asList("motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","minor","unclassified","residential","living_street")));
 		Set<String> tagKeys = Collections.emptySet();
 		TagFilter tagFilter = new TagFilter("accept-way", tagKeys, tagKeyValues);

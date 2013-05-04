@@ -1,8 +1,8 @@
 package org.matsim.contrib.matsim4opus.utils.network;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -31,7 +31,7 @@ import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
 public class NetworkSink implements SinkSource {
 
 	private static Logger log = Logger.getLogger(NetworkSink.class);
-	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
+	private final Map<String, OsmHighwayDefaults> highwayDefaults = new ConcurrentHashMap<String, OsmHighwayDefaults>();
 	private final Network network;
 	private final CoordinateTransformation transform;
 	private boolean scaleMaxSpeed = false;

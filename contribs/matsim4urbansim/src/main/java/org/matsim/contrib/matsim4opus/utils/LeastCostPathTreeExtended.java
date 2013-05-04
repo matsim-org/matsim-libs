@@ -22,8 +22,8 @@
  */
 package org.matsim.contrib.matsim4opus.utils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -55,7 +55,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	
 	protected static final Logger log = Logger.getLogger(LeastCostPathTreeExtended.class);
 	
-	private HashMap<Id, NodeDataExtended> nodeDataExt = null;
+	private Map<Id, NodeDataExtended> nodeDataExt = null;
 	private RoadPricingSchemeImpl scheme = null;
 	
 	/**
@@ -75,7 +75,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 */
 	public final void calculateExtended(final Network network, final Node origin, final double time) {
 		
-		this.nodeDataExt = new HashMap<Id, NodeDataExtended>((int) (network.getNodes().size() * 1.1), 0.95f);
+		this.nodeDataExt = new ConcurrentHashMap<Id, NodeDataExtended>((int) (network.getNodes().size() * 1.1), 0.95f);
 		if(this.nodeDataExt.get(origin.getId()) == null){
 			NodeDataExtended nde = new NodeDataExtended();
 			nde.distance = 0.;

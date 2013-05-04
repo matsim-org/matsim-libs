@@ -27,10 +27,10 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -102,8 +102,8 @@ public class VISUM2TransitScheduleConverter {
 		reiseZeitenReader	= IOUtils.getBufferedReader(reiseZeitFile);
 		startWarteZeitenReader=IOUtils.getBufferedReader(startWarteZeitFile);
 		
-		transitStop 	= new HashMap<Long, Coord>();
-		visumData			= new HashMap<Long, ArrayList<VISUMObject>>();
+		transitStop 	= new ConcurrentHashMap<Long, Coord>();
+		visumData			= new ConcurrentHashMap<Long, ArrayList<VISUMObject>>();
 		
 		secondsOfDay	 = 24 * 60 * 60;
 		numberFormat	= new DecimalFormat("000");

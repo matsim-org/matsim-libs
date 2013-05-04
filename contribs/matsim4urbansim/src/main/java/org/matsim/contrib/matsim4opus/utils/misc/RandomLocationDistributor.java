@@ -24,10 +24,10 @@ package org.matsim.contrib.matsim4opus.utils.misc;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -100,7 +100,7 @@ public class RandomLocationDistributor {
 		try {
 			SimpleFeatureSource fts = ShapeFileReader.readDataFile(shapefile); // reads in shape file
 			SimpleFeatureIterator fIt = fts.getFeatures().features();
-			Map<Id, SimpleFeature> featureMap = new HashMap<Id, SimpleFeature>();
+			Map<Id, SimpleFeature> featureMap = new ConcurrentHashMap<Id, SimpleFeature>();
 			
 			while (fIt.hasNext()) {
 				SimpleFeature feature = fIt.next();

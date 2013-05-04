@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.matsim4opus.gis;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
@@ -48,7 +48,7 @@ public class CRSUtils {
 
 	private static Logger logger = Logger.getLogger(CRSUtils.class);
 
-	private static final Map<Integer, CoordinateReferenceSystem> crsMappings = new HashMap<Integer, CoordinateReferenceSystem>();
+	private static final Map<Integer, CoordinateReferenceSystem> crsMappings = new ConcurrentHashMap<Integer, CoordinateReferenceSystem>();
 
 	private static GeometryFactory geoFactory;
 

@@ -25,9 +25,9 @@ package org.matsim.contrib.matsim4opus.improvedpseudopt;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -249,7 +249,7 @@ public class PtMatrix {
 	private void initODMatrixFromFile(QuadTree<PtStop> qTree, Matrix travelTimeOD, Matrix travelDistanceOD, String ptTravelTimeInputFile, String ptTravelDistanceInputFile){
 		
 		// convert qtree into hasMap to query ptStops as origins and destinations
-		HashMap<Id, PtStop> ptStopHashMap = convertQuadTree2HashMap(qTree);
+		Map<Id, PtStop> ptStopHashMap = convertQuadTree2HashMap(qTree);
 		
 		BufferedReader brTravelTimes = IOUtils.getBufferedReader(ptTravelTimeInputFile);
 		BufferedReader brTravelDistances = IOUtils.getBufferedReader(ptTravelDistanceInputFile);
@@ -282,7 +282,7 @@ public class PtMatrix {
 	 * @param br
 	 * @throws IOException
 	 */
-	private void fillODMatrix(Matrix odMatrix, HashMap<Id, PtStop> ptStopHashMap,
+	private void fillODMatrix(Matrix odMatrix, Map<Id, PtStop> ptStopHashMap,
 			BufferedReader br, boolean isTravelTimes) throws IOException {
 		
 		int originPtStopIDX 		= 0;		// column index for origin pt stop id
@@ -366,10 +366,10 @@ public class PtMatrix {
 	// helper method
 	//////////////////////////////////////
 	
-	private HashMap<Id, PtStop> convertQuadTree2HashMap(QuadTree<PtStop> qTree){
+	private Map<Id, PtStop> convertQuadTree2HashMap(QuadTree<PtStop> qTree){
 		
 		Iterator<PtStop> ptStopIterator = qTree.values().iterator();
-		HashMap<Id, PtStop> ptStopHashMap = new HashMap<Id, PtMatrix.PtStop>();
+		Map<Id, PtStop> ptStopHashMap = new ConcurrentHashMap<Id, PtMatrix.PtStop>();
 		
 		while(ptStopIterator.hasNext()){
 			PtStop ptStop = ptStopIterator.next();
