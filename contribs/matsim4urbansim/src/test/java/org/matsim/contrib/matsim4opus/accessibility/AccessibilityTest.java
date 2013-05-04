@@ -1,5 +1,6 @@
 package org.matsim.contrib.matsim4opus.accessibility;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,10 +30,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEventHandler, LinkLeaveEventHandler {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private double resolution = 100.;
 	private int nPersons = 3;
@@ -73,25 +75,26 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 	@Test
 	public void testAccessibilityMeasure(){
 		
-		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
+//		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
+		String path = utils.getOutputDirectory() ;
 		
 		Network net = CreateTestNetwork.createTestNetwork();
-		new NetworkWriter(net).write(path+"\\network.xml");
+		new NetworkWriter(net).write(path+"network.xml");
 		
-		CreateTestMATSimConfig ctmc = new CreateTestMATSimConfig(path, path+"\\network.xml");
+		CreateTestMATSimConfig ctmc = new CreateTestMATSimConfig(path, path+"network.xml");
 		String configLocation = ctmc.generate();
 		
 		InternalConstants.setOpusHomeDirectory(path);
 
-		CreateTestUrbansimPopulation.testUrbanSimPopCreation(path, nPersons);
+		CreateTestUrbansimPopulation.createUrbanSimTestPopulation(path, nPersons);
 
 		MATSim4UrbanSimConfigurationConverterV4 connector = new MATSim4UrbanSimConfigurationConverterV4(configLocation);
 		connector.init();
 		Config config = connector.getConfig();
 
-		Scenario sc = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler ctrl = new Controler(sc);
+		Controler ctrl = new Controler(scenario);
 		ctrl.setOverwriteFiles(true);
 		
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
@@ -108,8 +111,6 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		ActivityFacilitiesImpl zones = new ActivityFacilitiesImpl("zones");
 		
 		this.getReadFromUrbanSimModel().readFacilitiesParcel(parcels, zones);
-		
-		ScenarioImpl scenario = (ScenarioImpl)sc;
 		
 		Benchmark benchmark = new Benchmark();
 

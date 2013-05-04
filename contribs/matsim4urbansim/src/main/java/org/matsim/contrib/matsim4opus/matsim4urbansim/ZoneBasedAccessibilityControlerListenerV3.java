@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
@@ -22,7 +23,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.LeastCostPathTree;
@@ -71,7 +71,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 												   ActivityFacilitiesImpl zones,
 												   PtMatrix ptMatrix,
 												   Benchmark benchmark,
-												   ScenarioImpl scenario){
+												   Scenario scenario){
 		
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		

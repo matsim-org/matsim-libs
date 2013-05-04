@@ -7,6 +7,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
@@ -30,7 +31,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.LeastCostPathTree;
@@ -132,7 +132,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 													 SpatialGrid ptGrid,
 													 PtMatrix ptMatrix,
 													 Benchmark benchmark,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
-													 ScenarioImpl scenario){
+													 Scenario scenario){
 								
 		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
 		

@@ -3,26 +3,26 @@ package org.matsim.contrib.matsim4opus.utils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.junit.Test;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.core.utils.io.IOUtils;
 
 public class CreateTestUrbansimPopulation {
 	
-	@Test
-	public static void testUrbanSimPopCreation(String path, int nPersons){
+//	@Test // I don' think this is a test ... since it actually does not "test" anything.  Rather, it is a helper method for
+	// other test classes. kai
+	public static void createUrbanSimTestPopulation(String path, int nPersons){
 		
-		testCreatePersons(path, nPersons);
+		createPersons(path, nPersons);
 		
-		testCreateJobs(path, nPersons);
+		createJobs(path, nPersons);
 		
-		testCreateParcels(path);
+		createParcels(path);
 		
 	}
 
-	private static void testCreatePersons(String path, int nPersons) {
+	private static void createPersons(String path, int nPersons) {
 		
-		String fileLocation = path + "\\" + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + "2010" + InternalConstants.FILE_TYPE_TAB;
+		String fileLocation = path + "/" + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + "2010" + InternalConstants.FILE_TYPE_TAB;
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileLocation);
 		
@@ -45,8 +45,8 @@ public class CreateTestUrbansimPopulation {
 		
 	}
 
-	private static void testCreateParcels(String path) {
-		String fileLocation = path + "\\" + InternalConstants.URBANSIM_PARCEL_DATASET_TABLE + "2010" + InternalConstants.FILE_TYPE_TAB;
+	private static void createParcels(String path) {
+		String fileLocation = path + "/" + InternalConstants.URBANSIM_PARCEL_DATASET_TABLE + "2010" + InternalConstants.FILE_TYPE_TAB;
 
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileLocation);
 		
@@ -65,9 +65,9 @@ public class CreateTestUrbansimPopulation {
 		}
 	}
 
-	private static void testCreateJobs(String path, int nPersons) {
+	private static void createJobs(String path, int nPersons) {
 		
-		String fileLocation = path + "\\" + InternalConstants.URBANSIM_JOB_DATASET_TABLE + "2010" + InternalConstants.FILE_TYPE_TAB;
+		String fileLocation = path + "/" + InternalConstants.URBANSIM_JOB_DATASET_TABLE + "2010" + InternalConstants.FILE_TYPE_TAB;
 
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileLocation);
 		

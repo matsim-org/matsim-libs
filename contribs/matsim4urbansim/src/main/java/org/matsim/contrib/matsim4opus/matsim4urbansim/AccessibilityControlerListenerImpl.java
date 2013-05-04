@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
@@ -32,7 +33,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
@@ -162,7 +162,7 @@ public class AccessibilityControlerListenerImpl{
 	 * setting parameter for accessibility calculation
 	 * @param scenario
 	 */
-	protected final void initAccessibilityParameter(ScenarioImpl scenario){
+	protected final void initAccessibilityParameter(Scenario scenario){
 		
 		AccessibilityParameterConfigModule moduleAPCM = ConfigurationUtils.getAccessibilityParameterConfigModule(scenario);
 		
