@@ -171,6 +171,8 @@ public class OnlineDvrpLauncherUtils
 
         qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
         qSimConfig.setRemoveStuckVehicles(false);
+        qSimConfig.setStartTime(0);
+        qSimConfig.setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
 
         EventsManager events = EventsUtils.createEventsManager();
 
