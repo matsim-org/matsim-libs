@@ -136,19 +136,16 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 	
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (this.ptDriverIDs.contains(event.getPersonId())
-				|| event.getLegMode().toString().equals(TransportMode.transit_walk.toString())
-				|| event.getLegMode().toString().equals(TransportMode.walk.toString())
-				|| event.getLegMode().toString().equals(TransportMode.pt.toString())){
-			log.warn("Not tested for other modes than car.");
-			// pt vehicle or transit walk or walk
-		} else {
+		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
 			// car!
 			
 			// ??? wenn storage capacity verringert --> analog zu linkEnterEvent
 			
 			boolean useLinkTravelTime = false; // agent was not entering that link before (departure!), use 1.0 second.
-			calculateCongestionEffect(event.getTime(), event.getLinkId(), event.getPersonId(), useLinkTravelTime);			
+			calculateCongestionEffect(event.getTime(), event.getLinkId(), event.getPersonId(), useLinkTravelTime);
+			
+		} else {			
+			log.warn("Not tested for other modes than car.");
 		}
 	}
 
@@ -220,7 +217,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				// delayed!
 				double delay = earliestLinkLeaveTime - uncongestedLinkLeaveTime;
 				System.out.println("---------------------------------------------------------------------------------------------------------------------");
-				System.out.println(personId + " will be delayed on link " + linkId + ". Delay [sec]: " + delay);
+				System.out.println(personId + " will be delayed on link " + linkId + " due to flow capacity constraints. Delay [sec]: " + delay);
 				System.out.println("   Causing agents:");
 			
 				// See who was causing the delay on that link and throw delayEffects for the causing agents.
@@ -232,14 +229,14 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				double delayToPayFor = delay;
 				for (PersonDelayInfo info : reverseList){
 					if (delayToPayFor > linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
-						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, info.getPersonId(), personId, linkInfo.getMarginalDelayPerLeavingVehicle_sec(), linkId);
+						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, "flowCapacity", info.getPersonId(), personId, linkInfo.getMarginalDelayPerLeavingVehicle_sec(), linkId);
 						System.out.println("	Person " + info.getPersonId() + " --> Marginal delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec());
 						this.events.processEvent(congestionEvent);
 												
 						delayToPayFor = delayToPayFor - linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 					} else {
 						if (delayToPayFor > 0) {
-							MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, info.getPersonId(), personId, delayToPayFor, linkId);
+							MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, "flowCapacity", info.getPersonId(), personId, delayToPayFor, linkId);
 							System.out.println("	Person " + info.getPersonId() + " --> Marginal delay: " + delayToPayFor);
 							this.events.processEvent(congestionEvent);
 							delayToPayFor = 0;
@@ -296,7 +293,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 						
 						// throw events
 						for (Id id : causingAgentIDs){
-							MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), id, event.getPersonId(), delay, event.getLinkId());
+							MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", id, event.getPersonId(), delay, event.getLinkId());
 							this.events.processEvent(congestionEvent);
 						}
 						
@@ -305,7 +302,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 						System.out.println("---------------------------------------------------------------------------------------------------------------------");
 						
 					} else {
-//						System.out.println(event.getPersonId().toString() + " is not delayed due to storage capacity constraints on links behind link " + event.getLinkId() + ".");
+						System.out.println(event.getPersonId().toString() + " is not delayed due to storage capacity constraints on links behind link " + event.getLinkId() + ".");
 						// Maybe throw congestion effects due to flow capacity constraints only here?!
 						// Maybe it doesn't make sense to throw flow capacity congestion effects, if an agent is further delayed due to capacity constraints. 
 					}
