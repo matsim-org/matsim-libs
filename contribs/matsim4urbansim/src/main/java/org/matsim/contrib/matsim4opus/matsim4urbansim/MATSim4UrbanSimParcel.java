@@ -301,7 +301,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			
 		log.info("Adding controler listener ...");
 		addControlerListener(zones, parcels, controler, ptMatrix);
-		addFurtherControlerListener(controler, parcels);
+		addFurtherControlerListener(zones, parcels, controler);
 		log.info("Adding controler listener done!");
 	
 		// run the iterations, including post-processing:
@@ -328,7 +328,6 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																					  parcels,
 																					  ptMatrix,
 																					  benchmark) );
-			controler.addControlerListener(new DanielAnalysisListenerEvents(this.getUrbanSimParameterConfig().getMATSim4OpusTemp(), zones));
 		}
 		if(computeAgentPerformance)
 			// creates a persons.csv output for UrbanSim
@@ -423,8 +422,11 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	/**
 	 * This method allows to add additional listener
 	 * This needs to be implemented by another class
+	 * @param zones TODO
+	 * @param parcels 
+	 * @param controler 
 	 */
-	void addFurtherControlerListener(Controler controler, ActivityFacilities parcels){
+	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, Controler controler){
 		// this is just a stub and does nothing. 
 		// This needs to be implemented/overwritten by an inherited class
 	}

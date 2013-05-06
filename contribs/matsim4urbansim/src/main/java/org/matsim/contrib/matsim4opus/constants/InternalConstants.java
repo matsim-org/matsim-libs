@@ -36,7 +36,7 @@ public class InternalConstants {
 	private static final Logger log = Logger.getLogger(InternalConstants.class);
 	
 	/** important system environments */
-	public static String OPUS_HOME;
+	private static String OPUS_HOME;
 	public static String OPUS_DATA_PATH;
 	
 	/** subdirectories in OPUS_HOME */
@@ -55,7 +55,7 @@ public class InternalConstants {
 		if(!opusHome.endsWith("/"))
 			opusHome += "/";
 		
-		OPUS_HOME = opusHome;
+		setOPUS_HOME(opusHome);
 		OPUS_DATA_PATH = opusHome+"data/";
 		MATSIM_4_OPUS = opusHome+"opus_matsim/";
 		MATSIM_4_OPUS_CONFIG = opusHome+"opus_matsim/matsim_config/";
@@ -64,7 +64,7 @@ public class InternalConstants {
 		MATSIM_4_OPUS_BACKUP = opusHome+"opus_matsim/backup/";
 		
 		log.info("");
-		log.info("Set OPUS_HOME to :" + OPUS_HOME);
+		log.info("Set OPUS_HOME to :" + getOPUS_HOME());
 		log.info("Set OPUS_DATA_PATH to :" + OPUS_DATA_PATH);
 		log.info("Set OPUS MATSim directory to :" + MATSIM_4_OPUS);
 		log.info("Set MATSim config directory to :" + MATSIM_4_OPUS_CONFIG);
@@ -74,6 +74,13 @@ public class InternalConstants {
 		log.info("");
 	}
 	
+	public static void setOPUS_HOME(String oPUS_HOME) {
+		OPUS_HOME = oPUS_HOME;
+	}
+	public static String getOPUS_HOME() {
+		return OPUS_HOME;
+	}
+
 	/** subdirectories in MATSim */
 	public static final String MATSIM_WORKING_DIRECTORY = System.getProperty("user.dir");
 	

@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.matsim4opus.analysis.DanielAnalysisListenerEvents;
 import org.matsim.contrib.matsim4opus.analysis.KaiAnalysisListener;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.Controler;
@@ -129,8 +130,9 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	}
 	
 	@Override
-	void addFurtherControlerListener(Controler controler, ActivityFacilities parcels) {
+	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, Controler controler) {
 		controler.addControlerListener(new KaiAnalysisListener()) ;
+		controler.addControlerListener(new DanielAnalysisListenerEvents(this.getUrbanSimParameterConfig().getMATSim4OpusTemp(), zones));
 	}
 
 	/**

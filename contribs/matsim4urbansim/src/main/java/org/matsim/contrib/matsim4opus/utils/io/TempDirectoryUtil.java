@@ -156,7 +156,7 @@ public class TempDirectoryUtil {
 		// set temp directory as opus_home
 		InternalConstants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir"));
 
-		File tempFile = new File(InternalConstants.OPUS_HOME);
+		File tempFile = new File(InternalConstants.getOPUS_HOME());
 		tempFile.mkdirs();
 		
 		tempFile = new File(InternalConstants.MATSIM_4_OPUS);
@@ -180,7 +180,7 @@ public class TempDirectoryUtil {
 	public static void cleaningUpOPUSDirectories(){
 		log.info("Removing temp directories");
 
-		File tempFile = new File(InternalConstants.OPUS_HOME);
+		File tempFile = new File(InternalConstants.getOPUS_HOME());
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
 		tempFile = new File(InternalConstants.MATSIM_4_OPUS);

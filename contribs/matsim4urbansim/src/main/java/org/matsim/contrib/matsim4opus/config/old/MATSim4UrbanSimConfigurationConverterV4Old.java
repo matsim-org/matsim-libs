@@ -336,7 +336,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		module.setTestRun(isTestRun);	
 		
 		// setting paths into constants structure
-		InternalConstants.OPUS_HOME = module.getOpusHome();
+		InternalConstants.setOPUS_HOME(module.getOpusHome());
 		InternalConstants.OPUS_DATA_PATH = module.getOpusDataPath();
 		InternalConstants.MATSIM_4_OPUS = module.getMATSim4Opus();
 		InternalConstants.MATSIM_4_OPUS_CONFIG = module.getMATSim4OpusConfig();
@@ -348,7 +348,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		log.info("ProjectName: " + module.getProjectName() );
 		log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
 		log.info("Year: " + module.getYear() ); 
-		log.info("OPUS_HOME: " + InternalConstants.OPUS_HOME );
+		log.info("OPUS_HOME: " + InternalConstants.getOPUS_HOME() );
 		log.info("OPUS_DATA_PATH: " + InternalConstants.OPUS_DATA_PATH );
 		log.info("MATSIM_4_OPUS: " + InternalConstants.MATSIM_4_OPUS );
 		log.info("MATSIM_4_OPUS_CONIG: " + InternalConstants.MATSIM_4_OPUS_CONFIG );

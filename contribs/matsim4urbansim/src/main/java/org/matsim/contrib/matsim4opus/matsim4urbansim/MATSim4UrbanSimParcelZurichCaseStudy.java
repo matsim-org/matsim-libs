@@ -99,7 +99,7 @@ class MATSim4UrbanSimParcelZurichCaseStudy extends MATSim4UrbanSimParcel{
 	 * to the super class
 	 */
 	@Override
-	void addFurtherControlerListener(Controler controler, ActivityFacilities parcels){
+	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, Controler controler){
 		
 	}
 	
