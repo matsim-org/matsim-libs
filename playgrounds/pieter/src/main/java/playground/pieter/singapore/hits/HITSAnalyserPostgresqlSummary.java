@@ -982,8 +982,7 @@ public class HITSAnalyserPostgresqlSummary {
 									inVehicle = true;
 									Trip trip = journey.addTrip();
 									trip.setStartTime(linkStartTime);
-									trip.setBoardingStop(transitLink
-											.getFromNode().getId());
+									trip.setBoardingStop(journey.getWaits().getLast().getStopId());
 									trip.setLine(transitLink.getLine().getId());
 									trip.setRoute(transitLink.getRoute()
 											.getId());
@@ -1019,8 +1018,7 @@ public class HITSAnalyserPostgresqlSummary {
 								Walk walk;
 								if (substage_id > 1) {
 									Trip trip = journey.getTrips().getLast();
-									trip.setAlightingStop(transitLink
-											.getFromNode().getId());
+									trip.setAlightingStop(l.getToNode().getId());
 									Transfer transfer = new Transfer();
 									journey.setPossibleTransfer(transfer);
 									transfer.setFromTrip(trip);
@@ -1055,6 +1053,7 @@ public class HITSAnalyserPostgresqlSummary {
 
 								Wait wait = journey.addWait();
 								wait.setStartTime(linkStartTime);
+								wait.setStopId(l.getFromNode().getId());
 								linkStartTime += linkTime;
 								wait.setEndTime(linkStartTime);
 								if (i == 0 && j == 0) {
