@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
 import playground.thibautd.utils.MapUtils;
 
 /**
@@ -38,7 +37,7 @@ final class PersonRecordsPlansPruner {
 	private PersonRecordsPlansPruner() {}
 
 	public static void prunePlans(
-			final IncompatiblePlansIdentifier incompatiblePlans,
+			final IncompatiblePlanRecords incompatiblePlans,
 			final Map<Id, PersonRecord> persons) {
 		for ( PersonRecord person : persons.values() ) {
 			pruneAtIndividualLevel( incompatiblePlans , person );
@@ -46,7 +45,7 @@ final class PersonRecordsPlansPruner {
 	}
 
 	private static void pruneAtIndividualLevel(
-			final IncompatiblePlansIdentifier incompatiblePlans,
+			final IncompatiblePlanRecords incompatiblePlans,
 			final PersonRecord person) {
 		final Map<Set<Id>, Set<Set<Id>>> knownBranches = new HashMap<Set<Id>, Set<Set<Id>>>();
 		double lastRecordWeight = Double.POSITIVE_INFINITY;
@@ -61,7 +60,7 @@ final class PersonRecordsPlansPruner {
 				r.jointPlan.getIndividualPlans().keySet();
 			// only consider the best plan of each structure for each set of
 			// incompatible plans.
-			if ( !MapUtils.getSet( cotravs , knownBranches ).add( incompatiblePlans.identifyIncompatibilityGroups( r.plan ) ) ) {
+			if ( !MapUtils.getSet( cotravs , knownBranches ).add( incompatiblePlans.getIncompatibilityGroups( r ) ) ) {
 				iterator.remove();
 			}
 		}

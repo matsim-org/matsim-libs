@@ -105,7 +105,8 @@ public class HighestWeightSelectorTest {
 				new Fixture[]{createOneBigJointPlanDifferentNPlansPerAgentWithNullScores()},
 				new Fixture[]{createPlanWithDifferentSolutionIfBlocked()},
 				new Fixture[]{createPlanWithNoSolutionIfBlocked()},
-				new Fixture[]{createIndividualPlansWithSpecialForbidder()});
+				new Fixture[]{createIndividualPlansWithSpecialForbidder()},
+				new Fixture[]{createDifferentForbidGroupsPerJointPlan()});
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -1069,6 +1070,98 @@ public class HighestWeightSelectorTest {
 				expected,
 				expected,
 				expectedForbid,
+				new IncompatiblePlansIdentifierFactory() {
+					@Override
+					public IncompatiblePlansIdentifier createIdentifier(
+							final JointPlans jps,
+							final ReplanningGroup g) {
+						return identifier;
+					}
+				},
+				jointPlans);
+	}
+
+	public static Fixture createDifferentForbidGroupsPerJointPlan() {
+		final JointPlans jointPlans = new JointPlans();
+		ReplanningGroup group = new ReplanningGroup();
+
+		final Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		final Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+		final Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+		final Map<Id, Plan> jp4 = new HashMap<Id, Plan>();
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		final PlanImpl p11 = person.createAndAddPlan( false );
+		p11.setScore( 1d );
+		jp1.put( id , p11 );
+		final PlanImpl p12 = person.createAndAddPlan( false );
+		p12.setScore( 1d );
+		jp2.put( id , p12 );
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		final PlanImpl p21 = person.createAndAddPlan( false );
+		p21.setScore( 0d );
+		jp1.put( id , p21 );
+		final PlanImpl p22 = person.createAndAddPlan( false );
+		p22.setScore( 10d );
+		jp2.put( id , p22 );
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		final PlanImpl p31 = person.createAndAddPlan( false );
+		p31.setScore( 1d );
+		jp3.put( id , p31 );
+		final PlanImpl p32 = person.createAndAddPlan( false );
+		p32.setScore( 1d );
+		jp4.put( id , p32 );
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		final PlanImpl p41 = person.createAndAddPlan( false );
+		p41.setScore( 0d );
+		jp3.put( id , p41 );
+		final PlanImpl p42 = person.createAndAddPlan( false );
+		p42.setScore( 1d );
+		jp4.put( id , p42 );
+
+		final IncompatiblePlansIdentifierImpl identifier = new IncompatiblePlansIdentifierImpl();
+		identifier.put( p11 , Collections.<Id>singleton( new IdImpl( 1 ) ) );
+		identifier.put( p12 , Collections.<Id>singleton( new IdImpl( 2 ) ) );
+		identifier.put( p31 , Collections.<Id>singleton( new IdImpl( 3 ) ) );
+		identifier.put( p32 , Collections.<Id>singleton( new IdImpl( 3 ) ) );
+		identifier.put( p41 , Collections.<Id>singleton( new IdImpl( 1 ) ) );
+		identifier.put( p42 , Collections.<Id>singleton( new IdImpl( 2 ) ) );
+
+		final JointPlan jointPlan1 = jointPlans.getFactory().createJointPlan( jp1 );
+		jointPlans.addJointPlan( jointPlan1 );
+		final JointPlan jointPlan2 = jointPlans.getFactory().createJointPlan( jp2 );
+		jointPlans.addJointPlan( jointPlan2 );
+		final JointPlan jointPlan3 = jointPlans.getFactory().createJointPlan( jp3 );
+		jointPlans.addJointPlan( jointPlan3 );
+		final JointPlan jointPlan4 = jointPlans.getFactory().createJointPlan( jp4 );
+		jointPlans.addJointPlan( jointPlan4 );
+
+		GroupPlans expected = new GroupPlans(
+					Arrays.asList( jointPlan2 , jointPlan4 ),
+					Collections.<Plan>emptyList()); 
+
+		GroupPlans expectedForbidding = new GroupPlans(
+					Arrays.asList( jointPlan2 , jointPlan3 ),
+					Collections.<Plan>emptyList()); 
+
+		return new Fixture(
+				"different forbids in jointPlans",
+				group,
+				// TODO: tune so that different output in the different situations
+				expected,
+				expected,
+				expectedForbidding,
 				new IncompatiblePlansIdentifierFactory() {
 					@Override
 					public IncompatiblePlansIdentifier createIdentifier(

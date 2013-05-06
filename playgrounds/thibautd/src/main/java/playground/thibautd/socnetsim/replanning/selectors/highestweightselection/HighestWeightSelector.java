@@ -98,13 +98,16 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			incompFactory.createIdentifier( jointPlans , group );
 		final Map<Id, PersonRecord> personRecords =
 			getPersonRecords(
-					incompatiblePlansIdentifier,
 					jointPlans,
 					group );
 		final IncompatiblePlanRecords incompatibleRecords =
 			new IncompatiblePlanRecords(
 					incompatiblePlansIdentifier,
 					personRecords );
+
+		PersonRecordsPlansPruner.prunePlans(
+				incompatibleRecords,
+				personRecords );
 
 		final PlanAllocation allocation = buildPlanString(
 				new KnownStates(),
@@ -129,7 +132,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	// /////////////////////////////////////////////////////////////////////////
 
 	private Map<Id, PersonRecord> getPersonRecords(
-			final IncompatiblePlansIdentifier incompatiblePlansIdentifier,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		final Map<Id, PersonRecord> map = new LinkedHashMap<Id, PersonRecord>();
@@ -188,10 +190,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 				pr.linkedPlans.remove( pr );
 			}
 		}
-
-		PersonRecordsPlansPruner.prunePlans(
-				incompatiblePlansIdentifier,
-				map );
 
 		return map;
 	}
@@ -467,11 +465,7 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final IncompatiblePlanRecords incompatibleRecords,
 			final Set<Id> allowedIncompatibilityGroups,
 			final PlanRecord r ) {
-		final Set<Id> forbid = r.jointPlan == null ?
-				incompatibleRecords.getIncompatiblePlanIdentifier().identifyIncompatibilityGroups(
-						r.plan ) :
-				incompatibleRecords.getIncompatiblePlanIdentifier().identifyIncompatibilityGroups(
-						r.jointPlan );
+		final Set<Id> forbid = incompatibleRecords.getIncompatibilityGroups( r );
 
 		if ( forbid.isEmpty() ) return allowedIncompatibilityGroups;
 

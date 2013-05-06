@@ -133,8 +133,8 @@ final class IncompatiblePlanRecords {
 		}
 	}
 
-	public IncompatiblePlansIdentifier getIncompatiblePlanIdentifier() {
-		return identifier;
+	public Set<Id> getIncompatibilityGroups(final PlanRecord pr) {
+		return identifyGroups( identifier , pr );
 	}
 }
 

@@ -140,7 +140,7 @@ final class SelectorUtils {
 			if ( !exploredBranches.add(
 						new Branch(
 							cotravs,
-							incompatibleRecords.getIncompatiblePlanIdentifier().identifyIncompatibilityGroups( r.plan ) ) ) ) {
+							incompatibleRecords.getIncompatibilityGroups( r ) ) ) ) {
 				continue;
 			}
 
