@@ -39,8 +39,6 @@ public class CreateTikzFigureOfJpStructure {
 	private static final Logger log =
 		Logger.getLogger(CreateTikzFigureOfJpStructure.class);
 
-	private static final boolean VEHICLES = true;
-
 	public static void main(final String[] args) {
 		final String plansFile = args[ 0 ];
 		final String jointPlansFile = args[ 1 ];
@@ -58,7 +56,7 @@ public class CreateTikzFigureOfJpStructure {
 		final JointStructureTikzCreator tikzCreator =
 			new JointStructureTikzCreator();
 		log.info( "load plan infos" );
-		parsePlanInfos( VEHICLES , plansFile , tikzCreator , personIds );
+		parsePlanInfos( plansFile , tikzCreator , personIds );
 		log.info( "load joint plan infos" );
 		parsePlanLinkInfo( jointPlansFile , tikzCreator , personIds );
 
@@ -66,7 +64,6 @@ public class CreateTikzFigureOfJpStructure {
 	}
 
 	private static void parsePlanInfos(
-			final boolean lookAtVehicles,
 			final String plansFile,
 			final JointStructureTikzCreator tikzCreator,
 			final List<String> personIds) {
@@ -110,11 +107,7 @@ public class CreateTikzFigureOfJpStructure {
 					final String content,
 					final Stack<String> context) {
 				if ( name.equals( "person" ) && personIds.contains( id ) ) {
-					tikzCreator.addAgentInfo( id , count );
-					if ( !lookAtVehicles ) {
-						tikzCreator.setPlanProperty( id , selected , "selected" );
-						return;
-					}
+					tikzCreator.addAgentInfo( id , count , selected );
 
 					for ( Map.Entry<Integer, String> e : vehicles.entrySet() ) {
 						final int plan = e.getKey();

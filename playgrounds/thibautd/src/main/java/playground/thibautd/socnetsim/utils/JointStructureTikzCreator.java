@@ -52,6 +52,7 @@ public class JointStructureTikzCreator {
 	private static final String AGENT_STYLE = "agent";
 	private static final String PLAN_STYLE = "plan";
 	private static final String LINK_STYLE = "link";
+	private static final String SELECTED_STYLE = "selected";
 
 	private static final String LEGEND_ANCHOR = "legend-anchor";
 
@@ -62,8 +63,9 @@ public class JointStructureTikzCreator {
 
 	public void addAgentInfo(
 			final String id,
-			final int nPlans) {
-		this.agentInfos.put( id , new AgentPlanInfo( id , nPlans ) );
+			final int nPlans,
+			final int selected) {
+		this.agentInfos.put( id , new AgentPlanInfo( id , nPlans , selected ) );
 	}
 
 	public Property overridePlanProperty(
@@ -233,6 +235,7 @@ public class JointStructureTikzCreator {
 				"\\begin{tikzpicture}",
 				"\\tikzstyle{"+AGENT_STYLE+"}=[rotate=45,anchor=south west]",
 				"\\tikzstyle{"+PLAN_STYLE+"}=[rectangle,fill=white,draw]",
+				"\\tikzstyle{"+SELECTED_STYLE+"}=[thick]",
 				"\\tikzstyle{"+LINK_STYLE+"}=[]");
 
 		MoreIOUtils.writeLines(
@@ -262,15 +265,19 @@ public class JointStructureTikzCreator {
 			String lastPlan = last;
 			for ( int i=0; i < info.nPlans; i++ ) {
 				final Property planProperty = info.planProperties.get( i );
-				final String style =
+				final String propertyStyle =
 					planProperty != null ?
 						styleName( planProperty ) :
 						PLAN_STYLE;
+				final String selectedStyle =
+					i == info.selected ?
+						","+SELECTED_STYLE :
+						"";
 				final String planPos = "[below of="+lastPlan+"]";
 				lastPlan = planString( last , i );
 				MoreIOUtils.writeLines(
 						writer,
-						"\\node ("+lastPlan+") "+planPos+" ["+style+"] {};" );
+						"\\node ("+lastPlan+") "+planPos+" ["+propertyStyle+selectedStyle+"] {};" );
 			}
 
 			if ( info.nPlans > downsize ) {
@@ -428,12 +435,15 @@ class AgentPlanInfo {
 	public final String id;
 	public final int nPlans;
 	public final Map<Integer, Property> planProperties = new HashMap<Integer, Property>();
+	public final int selected;
 
 	public AgentPlanInfo(
 			final String id,
-			final int nPlans) {
+			final int nPlans,
+			final int selected) {
 		this.id = id;
 		this.nPlans = nPlans;
+		this.selected = selected;
 	}
 }
 
