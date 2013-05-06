@@ -118,7 +118,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			Module matsim4urbansimConfigPart3 = MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimModule(externalMATSimConfigFilename);
 
 			// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
-			this.config = MATSim4UrbanSimConfigUtils.createEmptyConfigWithVSPExperimentalAbort();
+			this.config = MATSim4UrbanSimConfigUtils.createEmptyConfigWithSomeDefaults();
 
 			MATSim4UrbanSimConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
 			MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);

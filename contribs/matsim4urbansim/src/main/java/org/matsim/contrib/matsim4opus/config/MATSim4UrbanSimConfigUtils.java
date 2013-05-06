@@ -570,7 +570,7 @@ public class MATSim4UrbanSimConfigUtils {
 	/**
 	 * creates an empty MATSim config to be filled by MATSim4UrbanSim + external MATSim config settings
 	 */
-	static Config createEmptyConfigWithVSPExperimentalAbort() {
+	static Config createEmptyConfigWithSomeDefaults() {
 		log.info("Creating an empty MATSim scenario.");
 		Config config = ConfigUtils.createConfig();
 		
@@ -582,10 +582,12 @@ public class MATSim4UrbanSimConfigUtils {
 		config.addModule(AccessibilityParameterConfigModule.GROUP_NAME,
 				new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME)) ;
 		
-		// set "vsp abort":
+		// set some defaults:
 		VspExperimentalConfigGroup vsp = config.vspExperimental();
 		vsp.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
-
+		vsp.setActivityDurationInterpretation(VspExperimentalConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration) ;
+		vsp.setRemovingUnneccessaryPlanAttributes(true) ;
+		
 		return config ;
 	}
 

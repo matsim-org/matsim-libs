@@ -342,8 +342,7 @@ public class PtMatrix {
 					if(wrnCntId == 20){
 						log.error( "Found " + wrnCntId + " warnings of type 'pt stop id not found'. There is probably something seriously wrong. Please check. Reasons for this error may be:");
 						log.error( "The list of pt stops is incomplete or the stop ids of the VISUM files do not match the ids from the pt stop file.");
-					}
-					else if(! ptStopHashMap.containsKey(originPtStopID) && wrnCntId < 20)
+					} else if(! ptStopHashMap.containsKey(originPtStopID) && wrnCntId < 20)
 						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + originPtStopID);
 					else if(! ptStopHashMap.containsKey(destinationPtStopID) && wrnCntId < 20)
 						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + destinationPtStopID);

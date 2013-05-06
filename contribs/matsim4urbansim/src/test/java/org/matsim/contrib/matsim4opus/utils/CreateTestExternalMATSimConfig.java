@@ -38,6 +38,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
@@ -77,10 +78,10 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 	public final String changeLegModeParamName		= "modes";
 	public final String changeLegModeValue			= "car,pt";
 	public final String strategyModuleName 			= "strategy";
-	public final String startegyModuleProbabilityPramName= "ModuleProbability_4";
+	public final String startegyModule4ProbabilityPramName= "ModuleProbability_4";
 	public final double startegyModuleProbabilityValue= 0.1;
 	public final String startegyModule4ParamName	= "Module_4";
-	public final String startegyModule4Value		= "ChangeLegMode";
+//	private final String startegyModule4Value		= "ChangeLegMode"; // use from PlanStrategyRegistrar instead.  kai, may'13
 	public final String networkParamName			= "inputNetworkFile";
 	public final String controlerFirstIterationPramName = "firstIteration";
 	public final String controlerLastIterationPramName = "lastIteration";
@@ -178,8 +179,8 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		
 		// strategy module
 		Module strategyModule = config.createModule(strategyModuleName);
-		strategyModule.addParam(startegyModuleProbabilityPramName, startegyModuleProbabilityValue + "");
-		strategyModule.addParam(startegyModule4ParamName, startegyModule4Value);
+		strategyModule.addParam(startegyModule4ProbabilityPramName, startegyModuleProbabilityValue + "");
+		strategyModule.addParam(startegyModule4ParamName, PlanStrategyRegistrar.Names.ChangeLegMode.toString() );
 		
 		// generating already existing MATSim4UrbanSim entries in external MATsim config
 		
@@ -242,10 +243,11 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		Module changeLegModeModule = config.createModule(changeLegModeModuleName);
 		changeLegModeModule.addParam(changeLegModeParamName, changeLegModeValue);
 		
-		// strategy module
-		Module strategyModule = config.createModule(strategyModuleName);
-		strategyModule.addParam(startegyModuleProbabilityPramName, startegyModuleProbabilityValue + "");
-		strategyModule.addParam(startegyModule4ParamName, startegyModule4Value);
+//		// strategy module
+//		Module strategyModule = config.createModule(strategyModuleName);
+//		strategyModule.addParam(startegyModule4ProbabilityPramName, startegyModuleProbabilityValue + "");
+//		strategyModule.addParam(startegyModule4ParamName, startegyModule4Value);
+		// I don't think this is part of the "minimal" external config. kai, may'13
 		
 		return writeConfigFile(config);
 	}

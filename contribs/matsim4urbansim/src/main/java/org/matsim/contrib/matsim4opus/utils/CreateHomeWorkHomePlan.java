@@ -42,7 +42,8 @@ public class CreateHomeWorkHomePlan {
 		// complete the first activity (home) by setting end time. 
 		ActivityImpl act = (ActivityImpl)plan.getFirstActivity();
 
-		act.setEndTime( (6.+2.*MatsimRandom.getRandom().nextDouble())*3600. ) ;
+		final double hmDpTime = (6.+2.*MatsimRandom.getRandom().nextDouble())*3600.;
+		act.setEndTime( hmDpTime ) ;
 		// (I just made this random between 6am and 8am to avoid the departure peak at 7.  In particular for pt users, it does not
 		// seem to go away. kai, apr'13)
 		// (tnicolai: make configurable: see actType1.setOpeningTime(7*3600))
@@ -57,7 +58,8 @@ public class CreateHomeWorkHomePlan {
 		// set second activity (work)
 		act = plan.createAndAddActivity( InternalConstants.ACT_WORK, workCoord );
 		act.setFacilityId( jobLocation.getId() );
-		act.setMaximumDuration( 8.*3600. ) ; // tnicolai: make configurable: actType1.setTypicalDuration(8*60*60);
+//		act.setMaximumDuration( 8.*3600. ) ; // tnicolai: make configurable: actType1.setTypicalDuration(8*60*60);
+		act.setEndTime( hmDpTime + 9.*3600. ) ; // avoid durations except when short (e.g. plugging in hybrid veh).  kai, may'13
 		
 		// set Leg
 		plan.createAndAddLeg(TransportMode.car) ;
