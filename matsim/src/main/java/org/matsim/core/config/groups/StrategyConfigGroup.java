@@ -169,6 +169,7 @@ public class StrategyConfigGroup extends Module {
 			map.put(MODULE_PROBABILITY + entry.getKey().toString(), "probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight''");
 			map.put(MODULE_DISABLE_AFTER_ITERATION + entry.getKey().toString(), "iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
 			map.put(MODULE_EXE_PATH + entry.getKey().toString(), "path to external executable (if applicable)" ) ;
+			break ; // put comments only for the first strategy to improve readability
 		}
 		map.put(PLAN_SELECTOR_FOR_REMOVAL,"name of PlanSelector for plans removal.  If not full class name, resolved in " +
 				"StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good " +
