@@ -153,10 +153,10 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	/////////////////////////////////////////////////////
 	
 	/**
-	 * prepare MATSim for traffic flow simulation ...
+	 * prepare MATSim for iterations ...
 	 */
-	@SuppressWarnings("deprecation")
-	void runMATSim(){
+//	@SuppressWarnings("deprecation") // why should these warnings be suppressed? kai, may'12
+	void run(){
 		log.info("Starting MATSim from Urbansim");	
 
 		// checking if this is a test run
@@ -575,7 +575,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		long start = System.currentTimeMillis();
 		
 		MATSim4UrbanSimParcel m4u = new MATSim4UrbanSimParcel(args);
-		m4u.runMATSim();
+		m4u.run();
 		m4u.matsim4UrbanSimShutdown();
 		MATSim4UrbanSimParcel.isSuccessfulMATSimRun = Boolean.TRUE;
 		

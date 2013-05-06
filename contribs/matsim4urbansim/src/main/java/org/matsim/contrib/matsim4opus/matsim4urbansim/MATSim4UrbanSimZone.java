@@ -142,7 +142,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		long start = System.currentTimeMillis();
 		
 		MATSim4UrbanSimZone m4u = new MATSim4UrbanSimZone(args);
-		m4u.runMATSim();
+		m4u.run();
 		m4u.matsim4UrbanSimShutdown();
 		MATSim4UrbanSimZone.isSuccessfulMATSimRun = Boolean.TRUE;
 		
