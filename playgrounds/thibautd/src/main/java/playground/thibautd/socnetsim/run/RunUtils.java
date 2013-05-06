@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -229,9 +228,13 @@ public class RunUtils {
 
 							final Set<Id> vehsOfPlan = 
 								 jp != null && knownJointPlans.add( jp ) ?
-									SharedVehicleUtils.getVehiclesInJointPlan( jp , TransportMode.car ) :
+									SharedVehicleUtils.getVehiclesInJointPlan(
+											jp,
+											SharedVehicleUtils.DEFAULT_VEHICULAR_MODES) :
 									(jp == null ?
-										SharedVehicleUtils.getVehiclesInPlan( plan , TransportMode.car ) :
+										SharedVehicleUtils.getVehiclesInPlan(
+												plan,
+												SharedVehicleUtils.DEFAULT_VEHICULAR_MODES) :
 										Collections.<Id>emptySet());
 
 							for ( Id v : vehsOfPlan ) {

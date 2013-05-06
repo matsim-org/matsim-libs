@@ -20,6 +20,7 @@
 package playground.thibautd.socnetsim.sharedvehicles.replanning;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -119,7 +120,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 						stages,
 						new Random( 1234 ),
 						vehs,
-						MODE,
+						Collections.singleton( MODE ),
 						false );
 			algo.run( optimized );
 			final double optimizedOverlap = algo.calcOverlap( optimized );
@@ -130,7 +131,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 				 new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						new Random( j ),
 						vehs,
-						MODE,
+						Collections.singleton( MODE ), 
 						false,
 						false).run( randomized );
 				 final double randomizedOverlap = algo.calcOverlap( randomized );

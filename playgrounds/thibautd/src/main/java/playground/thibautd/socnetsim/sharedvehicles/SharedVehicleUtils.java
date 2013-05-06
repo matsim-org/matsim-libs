@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.sharedvehicles;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,34 +28,41 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.routes.NetworkRoute;
 
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 
 /**
  * @author thibautd
  */
 public final class SharedVehicleUtils {
+	public static Collection<String> DEFAULT_VEHICULAR_MODES =
+			Arrays.asList(
+					TransportMode.car,
+					JointActingTypes.DRIVER);
+
 	private SharedVehicleUtils() {}
 
 	public static Set<Id> getVehiclesInJointPlan(
 			final JointPlan jointPlan,
-			final String legMode) {
+			final Collection<String> legModes) {
 		final Set<Id> vehs = new HashSet<Id>();
 		for ( Plan p : jointPlan.getIndividualPlans().values() ) {
-			vehs.addAll( getVehiclesInPlan( p , legMode ) );
+			vehs.addAll( getVehiclesInPlan( p , legModes ) );
 		}
 		return vehs;
 	}
 
 	public static Set<Id> getVehiclesInPlan(
 			final Plan plan,
-			final String legMode) {
+			final Collection<String> legModes) {
 		final Set<Id> vehs = new HashSet<Id>();
 		for ( PlanElement pe : plan.getPlanElements() ) {
 			if ( !(pe instanceof Leg) ) continue;
 			final Leg l = (Leg) pe;
-			if ( !l.getMode().equals( legMode ) ) continue;
+			if ( !legModes.contains( l.getMode() ) ) continue;
 			if ( !(l.getRoute() instanceof NetworkRoute) ) continue;
 			vehs.add( ((NetworkRoute) l.getRoute()).getVehicleId() );
 		}

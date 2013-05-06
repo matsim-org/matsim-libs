@@ -25,8 +25,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.TransportMode;
-
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -56,7 +54,7 @@ public class PrepareVehicleAllocationForSimAlgorithm implements GenericPlanAlgor
 			new AllocateVehicleToPlansInGroupPlanAlgorithm(
 					random,
 					vehicles,
-					TransportMode.car,
+					SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
 					true,
 					true);
 

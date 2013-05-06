@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.sharedvehicles;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -35,10 +36,10 @@ import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdent
  * @author thibautd
  */
 public class VehicleBasedIncompatiblePlansIdentifierFactory implements IncompatiblePlansIdentifierFactory {
-	private final String mode;
+	private final Collection<String> modes;
 
-	public VehicleBasedIncompatiblePlansIdentifierFactory(final String mode) {
-		this.mode = mode;
+	public VehicleBasedIncompatiblePlansIdentifierFactory(final Collection<String> modes) {
+		this.modes = modes;
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class VehicleBasedIncompatiblePlansIdentifierFactory implements Incompati
 
 		for ( Person person : group.getPersons() ) {
 			for ( Plan plan : person.getPlans() ) {
-				final Set<Id> vehicles = SharedVehicleUtils.getVehiclesInPlan( plan , mode );
+				final Set<Id> vehicles = SharedVehicleUtils.getVehiclesInPlan( plan , modes );
 				identifier.put( plan , vehicles );
 			}
 		}

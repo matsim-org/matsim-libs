@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.sharedvehicles.replanning;
 
+import java.util.Collection;
+
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -31,19 +33,19 @@ import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
  */
 public class AllocateVehicleToPlansInGroupPlanModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
 	private final VehicleRessources vehicleRessources;
-	private final String mode;
+	private final Collection<String> modes;
 	private final boolean allowNullRoutes;
 	private final boolean preserveAllocations;
 
 	public AllocateVehicleToPlansInGroupPlanModule(
 			final int nThreads,
 			final VehicleRessources vehicleRessources,
-			final String mode,
+			final Collection<String> modes,
 			final boolean allowNullRoutes,
 			final boolean preserveAllocations) {
 		super( nThreads );
 		this.vehicleRessources = vehicleRessources;
-		this.mode = mode;
+		this.modes = modes;
 		this.allowNullRoutes = allowNullRoutes;
 		this.preserveAllocations = preserveAllocations;
 	}
@@ -53,7 +55,7 @@ public class AllocateVehicleToPlansInGroupPlanModule extends AbstractMultithread
 		return new AllocateVehicleToPlansInGroupPlanAlgorithm(
 				MatsimRandom.getLocalInstance(),
 				vehicleRessources,
-				mode,
+				modes,
 				allowNullRoutes,
 				preserveAllocations);
 	}

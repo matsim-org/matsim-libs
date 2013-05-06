@@ -60,7 +60,7 @@ import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 	private final GenericPlanAlgorithm<GroupPlans> randomAllocator;
 	private final StageActivityTypes stageActs;
-	private final String vehicularMode;
+	private final Collection<String> vehicularModes;
 	private final boolean allowNullRoutes;
 	private final VehicleRessources vehicleRessources;
 
@@ -70,15 +70,15 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			final StageActivityTypes stageActivitiesForSubtourDetection,
 			final Random random,
 			final VehicleRessources vehicleRessources,
-			final String mode,
+			final Collection<String> modes,
 			final boolean allowNullRoutes) {
 		this.randomAllocator = new AllocateVehicleToPlansInGroupPlanAlgorithm(
 			random,
 			vehicleRessources,
-			mode,
+			modes,
 			allowNullRoutes,
 			false);
-		this.vehicularMode = mode;
+		this.vehicularModes = modes;
 		this.allowNullRoutes = allowNullRoutes;
 		this.stageActs = stageActivitiesForSubtourDetection;
 		this.vehicleRessources = vehicleRessources;
@@ -101,7 +101,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		for ( SubtourRecord r : vehicularTours ) {
 			for ( Trip t : r.subtour.getTrips() ) {
 				for ( Leg leg : t.getLegsOnly() ) {
-					if ( !vehicularMode.equals( leg.getMode() ) ) continue;
+					if ( !vehicularModes.contains( leg.getMode() ) ) continue;
 
 					if ( allowNullRoutes && leg.getRoute() == null ) {
 						// this is not so nice...
@@ -109,7 +109,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 					}
 
 					if ( !( leg.getRoute() instanceof NetworkRoute ) ) {
-						throw new RuntimeException( "route for mode "+vehicularMode+" has non-network route "+leg.getRoute() );
+						throw new RuntimeException( "route for mode "+leg.getMode()+" has non-network route "+leg.getRoute() );
 					}
 
 					((NetworkRoute) leg.getRoute()).setVehicleId( r.allocatedVehicle );
@@ -253,7 +253,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 
 		// XXX what to do if several legs???
 		final Leg l = legs.get( 0 );
-		if ( !vehicularMode.equals( l.getMode() ) ) return false;
+		if ( !vehicularModes.contains( l.getMode() ) ) return false;
 		if ( !allowNullRoutes && l.getRoute() == null ) return false;
 		if ( l.getRoute() != null && !(l.getRoute() instanceof NetworkRoute) ) return false; 
 		return true;
@@ -265,7 +265,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 
 		// XXX what to do if several legs???
 		final Leg l = legs.get( 0 );
-		if ( !vehicularMode.equals( l.getMode() ) ) return null;
+		if ( !vehicularModes.contains( l.getMode() ) ) return null;
 		if ( !allowNullRoutes && l.getRoute() == null ) return null;
 		if ( l.getRoute() != null && !(l.getRoute() instanceof NetworkRoute) ) return null; 
 		return ((NetworkRoute) l.getRoute()).getVehicleId();

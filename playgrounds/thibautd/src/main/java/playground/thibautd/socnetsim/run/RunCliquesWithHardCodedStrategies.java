@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
@@ -54,6 +53,7 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
 import playground.thibautd.socnetsim.run.WeightsConfigGroup.Synchro;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
+import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
@@ -134,7 +134,8 @@ public class RunCliquesWithHardCodedStrategies {
 					.withIncompatiblePlansIdentifierFactory(
 						!weights.getSynchronize().equals( Synchro.none ) &&
 						scenario.getScenarioElement( VehicleRessources.class ) != null ?
-							new VehicleBasedIncompatiblePlansIdentifierFactory( TransportMode.car ) :
+							new VehicleBasedIncompatiblePlansIdentifierFactory(
+									SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
 							new EmptyIncompatiblePlansIdentifierFactory() )
 					.build();
 

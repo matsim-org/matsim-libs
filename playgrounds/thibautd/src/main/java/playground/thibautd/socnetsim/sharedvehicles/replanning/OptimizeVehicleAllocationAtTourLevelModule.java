@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.sharedvehicles.replanning;
 
+import java.util.Collection;
+
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.StageActivityTypes;
 
@@ -31,7 +33,7 @@ import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
  * @author thibautd
  */
 public class OptimizeVehicleAllocationAtTourLevelModule  extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
-	private final String vehicularMode;
+	private final Collection<String> vehicularModes;
 	private final boolean allowNullRoutes;
 	private final StageActivityTypes stageActs;
 	private final VehicleRessources vehicleRessources;
@@ -40,10 +42,10 @@ public class OptimizeVehicleAllocationAtTourLevelModule  extends AbstractMultith
 			final int nThreads,
 			final StageActivityTypes stageActivitiesForSubtourDetection,
 			final VehicleRessources vehicleRessources,
-			final String mode,
+			final Collection<String> modes,
 			final boolean allowNullRoutes) {
 		super( nThreads );
-		this.vehicularMode = mode;
+		this.vehicularModes = modes;
 		this.allowNullRoutes = allowNullRoutes;
 		this.stageActs = stageActivitiesForSubtourDetection;
 		this.vehicleRessources = vehicleRessources;
@@ -55,7 +57,7 @@ public class OptimizeVehicleAllocationAtTourLevelModule  extends AbstractMultith
 			stageActs,
 			MatsimRandom.getLocalInstance(),
 			vehicleRessources,
-			vehicularMode,
+			vehicularModes,
 			allowNullRoutes);
 	}
 }

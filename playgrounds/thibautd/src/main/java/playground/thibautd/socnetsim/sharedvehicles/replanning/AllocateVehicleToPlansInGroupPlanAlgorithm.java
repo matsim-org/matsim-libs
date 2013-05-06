@@ -55,14 +55,14 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 
 	private final Random random;
 	private final VehicleRessources vehicleRessources;
-	private final String mode;
+	private final Collection<String> modes;
 	private final boolean allowNullRoutes;
 	private final boolean preserveVehicleAllocations;
 
 	/**
 	 * @param random the random generator to use
 	 * @param vehicleRessources the vehicles
-	 * @param mode the mode for which to allocate vehicles
+	 * @param modes the modes for which to allocate vehicles
 	 * @param allowNullRoutes if true, when a leg of mode
 	 * <tt>mode</tt> has a null route, a new empty route
 	 * will be created to receive the vehicle Id. If false,
@@ -71,12 +71,12 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 	public AllocateVehicleToPlansInGroupPlanAlgorithm(
 			final Random random,
 			final VehicleRessources vehicleRessources,
-			final String mode,
+			final Collection<String> modes,
 			final boolean allowNullRoutes,
 			final boolean preserveVehicleAllocations) {
 		this.random = random;
 		this.vehicleRessources = vehicleRessources;
-		this.mode = mode;
+		this.modes = modes;
 		this.allowNullRoutes = allowNullRoutes;
 		this.preserveVehicleAllocations = preserveVehicleAllocations;
 	}
@@ -105,7 +105,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 
 		if ( preserveVehicleAllocations ) {
 			for ( Plan p : preservedPlans ) {
-				final Set<Id> vs = SharedVehicleUtils.getVehiclesInPlan( p , mode );
+				final Set<Id> vs = SharedVehicleUtils.getVehiclesInPlan( p , modes );
 				for ( Id v : vs ) {
 					final Integer c = preservedVehiclesCounts.get( v );
 					preservedVehiclesCounts.put(
@@ -123,10 +123,10 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 			if ( !(pe instanceof Leg) ) continue;
 			final Leg leg = (Leg) pe;
 
-			if ( !mode.equals( leg.getMode() ) ) continue;
+			if ( !modes.contains( leg.getMode() ) ) continue;
 			if ( !( ( allowNullRoutes && leg.getRoute() == null ) ||
 					( leg.getRoute() instanceof NetworkRoute ) ) ) {
-				throw new RuntimeException( "route for mode "+mode+" has non-network route "+leg.getRoute() );
+				throw new RuntimeException( "route for mode "+leg.getMode()+" has non-network route "+leg.getRoute() );
 			}
 			if ( !preserveVehicleAllocations ||
 					leg.getRoute() == null ||
@@ -155,7 +155,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 				if ( !(pe instanceof Leg) ) continue;
 				final Leg leg = (Leg) pe;
 
-				if ( !mode.equals( leg.getMode() ) ) continue;
+				if ( !modes.contains( leg.getMode() ) ) continue;
 
 				if ( allowNullRoutes && leg.getRoute() == null ) {
 					// this is not so nice...
@@ -163,7 +163,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithm implements GenericPlanAl
 				}
 
 				if ( !( leg.getRoute() instanceof NetworkRoute ) ) {
-					throw new RuntimeException( "route for mode "+mode+" has non-network route "+leg.getRoute() );
+					throw new RuntimeException( "route for mode "+leg.getMode()+" has non-network route "+leg.getRoute() );
 				}
 
 				((NetworkRoute) leg.getRoute()).setVehicleId( v );

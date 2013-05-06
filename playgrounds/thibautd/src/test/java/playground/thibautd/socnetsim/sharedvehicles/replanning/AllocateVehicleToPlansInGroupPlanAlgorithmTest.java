@@ -131,7 +131,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						random,
 						vehs,
-						MODE,
+						Collections.singleton( MODE ),
 						false,
 						false);
 			algo.run( testPlan );
@@ -159,7 +159,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						random,
 						vehs,
-						MODE,
+						Collections.singleton( MODE ),
 						false,
 						false);
 			algo.run( testPlan );
@@ -194,7 +194,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						random,
 						vehs,
-						MODE,
+						Collections.singleton( MODE ),
 						false,
 						false);
 			algo.run( testPlan );
@@ -233,7 +233,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				new AllocateVehicleToPlansInGroupPlanAlgorithm(
 						new Random( 1432 ),
 						vehs,
-						MODE,
+						Collections.singleton( MODE ),
 						false,
 						false);
 			algo.run( testPlan );

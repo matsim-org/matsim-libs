@@ -53,6 +53,7 @@ import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelect
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToSubtourModule;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.OptimizeVehicleAllocationAtTourLevelModule;
+import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 /**
@@ -277,7 +278,7 @@ public class GroupPlanStrategyFactory {
 						registry.getScenario().getConfig().global().getNumberOfThreads(),
 						registry.getScenario().getScenarioElement(
 							VehicleRessources.class ),
-						TransportMode.car,
+						SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
 						true,
 						true));
 		}
@@ -342,7 +343,7 @@ public class GroupPlanStrategyFactory {
 					registry.getScenario().getConfig().global().getNumberOfThreads(),
 					registry.getScenario().getScenarioElement(
 						VehicleRessources.class ),
-					TransportMode.car,
+					SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
 					false,
 					false));
 
@@ -377,7 +378,7 @@ public class GroupPlanStrategyFactory {
 						stageActs,
 						registry.getScenario().getScenarioElement(
 							VehicleRessources.class ),
-						TransportMode.car,
+						SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
 						true));
 
 		strategy.addStrategyModule(
