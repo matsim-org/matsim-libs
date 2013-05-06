@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -44,6 +46,8 @@ import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdent
  * @author thibautd
  */
 public final class ControllerRegistry {
+	private static final Logger log = Logger.getLogger( ControllerRegistry.class );
+
 	private final Scenario scenario;
 	private final EventsManager events;
 	private final TravelTimeCalculator travelTime;
@@ -74,20 +78,36 @@ public final class ControllerRegistry {
 			final Iterable<GenericPlanAlgorithm<ReplanningGroup>> prepareForSimAlgorithms,
 			final PlanLinkIdentifier planLinkIdentifier,
 			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+		log.debug( "constructing "+getClass().getSimpleName() );
+		log.debug( "scenario = "+scenario );
 		this.scenario = scenario;
+		log.debug( "events = "+ events );
 		this.events = events;
+		log.debug( "travelTime = "+ travelTime );
 		this.travelTime = travelTime;
+		log.debug( "travelDisutilityFactory = "+ travelDisutilityFactory );
 		this.travelDisutilityFactory = travelDisutilityFactory;
+		log.debug( "scoringFunctionFactory = "+ scoringFunctionFactory );
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		log.debug( "legTimes = "+ legTimes );
 		this.legTimes = legTimes;
+		log.debug( "mobsimFactory = "+ mobsimFactory );
 		this.mobsimFactory = mobsimFactory;
+		log.debug( "tripRouterFactory = "+ tripRouterFactory );
 		this.tripRouterFactory = tripRouterFactory;
+		log.debug( "leastCostPathCalculatorFactory = "+ leastCostPathCalculatorFactory );
 		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
+		log.debug( "planRoutingAlgorithmFactory = "+ planRoutingAlgorithmFactory );
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+		log.debug( "groupIdentifier = "+ groupIdentifier );
 		this.groupIdentifier = groupIdentifier;
+		log.debug( "prepareForSimAlgorithms = "+ prepareForSimAlgorithms );
 		this.prepareForSimAlgorithms = prepareForSimAlgorithms;
+		log.debug( "planLinkIdentifier = "+ planLinkIdentifier );
 		this.planLinkIdentifier = planLinkIdentifier;
+		log.debug( "incompatiblePlansIdentifierFactory = "+ incompatiblePlansIdentifierFactory );
 		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+		log.debug( "constructing "+getClass().getSimpleName()+"... done" );
 	}
 
 	public Scenario getScenario() {

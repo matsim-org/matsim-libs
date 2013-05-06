@@ -244,7 +244,7 @@ public class RunUtils {
 								}
 								else {
 									if ( hadNull ) throw new RuntimeException( "got null and non-null vehicles" );
-									if ( !knownVehicles.add( v ) ) throw new RuntimeException( "inconsistent allocation of vehicle "+v );
+									if ( !knownVehicles.add( v ) ) throw new RuntimeException( "inconsistent allocation of vehicle "+v+" (found in several distinct joint plans)" );
 									hadNonNull = true;
 								}
 							}
