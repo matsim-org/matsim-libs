@@ -202,6 +202,61 @@ public class RecomposeJointPlanAlgorithmTest {
 				jointPlansToExpect);
 	}
 
+	private Fixture createRandomFixtureWithIncompleteLinks(final Random random) {
+		final JointPlanFactory factory = new JointPlanFactory();
+		Map<Id, Plan> currentJointPlan = new HashMap<Id, Plan>();
+		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
+		final List<Plan> plans = new ArrayList<Plan>();
+		Set<Id> currentExpectedJointPlan = new HashSet<Id>();
+		final List<Set<Id>> jointPlansToExpect = new ArrayList<Set<Id>>();
+		jointPlansToExpect.add( currentExpectedJointPlan );
+		final Collection<PlanPair> links = new ArrayList<PlanPair>();
+
+		Plan lastPlan = null;
+		for (int i=0; i < 100; i++) {
+			final Id id = new IdImpl( i );
+			final Person person = new PersonImpl( id );
+			final Plan plan = new PlanImpl( person );
+			if ( random.nextDouble() < 0.2 ) {
+				plans.add( plan );
+			}
+			else {
+				if ( random.nextDouble() < 0.4 ) {
+					final JointPlan jp = factory.createJointPlan( currentJointPlan );
+					jointPlans.add( jp );
+					currentJointPlan = new HashMap<Id, Plan>();
+				}
+				currentJointPlan.put( id , plan );
+			}
+
+			if (random.nextDouble() < 0.2) {
+				currentExpectedJointPlan = new HashSet<Id>();
+				jointPlansToExpect.add( currentExpectedJointPlan );
+			}
+
+			if ( !currentExpectedJointPlan.isEmpty() ) links.add( new PlanPair( lastPlan , plan ) );
+			currentExpectedJointPlan.add( id );
+			lastPlan = plan;
+		}
+
+		if ( !currentJointPlan.isEmpty() ) {
+			final JointPlan jp = factory.createJointPlan( currentJointPlan );
+			jointPlans.add( jp );
+		}
+
+		return new Fixture(
+				new GroupPlans(
+					jointPlans,
+					plans),
+				jointPlansToExpect,
+				new PlanLinkIdentifier() {
+					@Override
+					public boolean areLinked(final Plan p1, final Plan p2) {
+						return links.contains( new PlanPair( p1 , p2 ) );
+					}
+				});
+	}
+
 	@Test
 	public void testIndividualPlans() throws Exception {
 		test( createRandomFixtureWithIndividualPlans( new Random( 1234 ) ) );
@@ -217,13 +272,24 @@ public class RecomposeJointPlanAlgorithmTest {
 		test( createRandomFixtureWithJointAndIndividualPlans( new Random( 1234 ) ) );
 	}
 
+	@Test
+	public void testIncompleteLinks() throws Exception {
+		test( createRandomFixtureWithIncompleteLinks( new Random( 1234 ) ) );
+	}
+
 	private static void test( final Fixture fixture ) {
 		final RecomposeJointPlanAlgorithm algo =
 			new RecomposeJointPlanAlgorithm(
 					new JointPlanFactory(),
 					fixture.identifier );
 
+		final int initialNPlans = fixture.groupPlans.getAllIndividualPlans().size();
 		algo.run( fixture.groupPlans );
+
+		assertEquals(
+				"unexpected number of plans",
+				initialNPlans,
+				fixture.groupPlans.getAllIndividualPlans().size());
 
 		assertEquals(
 				"unexpected number of joint plans",
@@ -251,3 +317,24 @@ public class RecomposeJointPlanAlgorithmTest {
 	}
 }
 
+class PlanPair {
+	private final Plan p1, p2;
+
+	public PlanPair(final Plan p1, final Plan p2) {
+		this.p1 = p1;
+		this.p2 = p2;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if ( !(o instanceof PlanPair) ) return false;
+		if (p1.equals( ((PlanPair) o).p1 ) && p2.equals( ((PlanPair) o).p2 )) return true;
+		if (p1.equals( ((PlanPair) o).p2 ) && p2.equals( ((PlanPair) o).p1 )) return true;
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return p1.hashCode() + p2.hashCode();
+	}
+}
