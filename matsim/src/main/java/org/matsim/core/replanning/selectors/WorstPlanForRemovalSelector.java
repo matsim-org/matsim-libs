@@ -20,7 +20,8 @@
 
 package org.matsim.core.replanning.selectors;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,19 +40,25 @@ import org.matsim.core.population.PlanImpl;
  */
 public class WorstPlanForRemovalSelector implements PlanSelector {
 
+	private static final String UNDEFINED_TYPE = "undefined";
+
 	@Override
 	public Plan selectPlan(Person person) {
 
 		// hashmap that returns "Integer" count for given plans type:
-		HashMap<String, Integer> typeCounts = new HashMap<String, Integer>();
+		Map<String, Integer> typeCounts = new ConcurrentHashMap<String, Integer>();
 
 		// count how many plans per type an agent has:
 		for (Plan plan : person.getPlans()) {
-			Integer cnt = typeCounts.get(((PlanImpl) plan).getType());
+			String type = ((PlanImpl) plan).getType();
+			if ( type==null ) {
+				type = UNDEFINED_TYPE ;
+			}
+			Integer cnt = typeCounts.get(type);
 			if (cnt == null) {
-				typeCounts.put(((PlanImpl) plan).getType(), Integer.valueOf(1));
+				typeCounts.put(type, Integer.valueOf(1));
 			} else {
-				typeCounts.put(((PlanImpl) plan).getType(), Integer.valueOf(cnt.intValue() + 1));
+				typeCounts.put(type, Integer.valueOf(cnt.intValue() + 1));
 			}
 		}
 
@@ -59,11 +66,15 @@ public class WorstPlanForRemovalSelector implements PlanSelector {
 		double worstScore = Double.POSITIVE_INFINITY;
 		for (Plan plan : person.getPlans()) {
 
-			// if we have more than one plan of the same type:
-			if (typeCounts.get(((PlanImpl) plan).getType()).intValue() > 1) {
+			String type = ((PlanImpl) plan).getType();
+			if ( type==null ) {
+				type = UNDEFINED_TYPE;
+			}
+			if (typeCounts.get(type).intValue() > 1) {
+				// (if we have more than one plan of the same type:)
 
-				// if there is a plan without score:
-				if (plan.getScore() == null) {
+				// if this plan has no score yet:
+				if (plan.getScore() == null || plan.getScore().isNaN() ) {
 					// say that the plan without score now is the "worst":
 					worst = plan;
 
@@ -76,15 +87,15 @@ public class WorstPlanForRemovalSelector implements PlanSelector {
 					worstScore = plan.getScore().doubleValue();
 				}
 			}
+			// (otherwise we just keep "worst=null")
 			
-			// (otherwise we just keep "worst=null") 
 		}
 
 		if (worst == null) {
 			// there is exactly one plan, or we have of each plan-type exactly one.
-			// select the one with worst score globally
+			// select the one with worst score globally, or the first one with score=null
 			for (Plan plan : person.getPlans()) {
-				if (plan.getScore() == null) {
+				if (plan.getScore() == null || plan.getScore().isNaN() ) {
 					return plan;
 				}
 				if (plan.getScore().doubleValue() < worstScore) {
