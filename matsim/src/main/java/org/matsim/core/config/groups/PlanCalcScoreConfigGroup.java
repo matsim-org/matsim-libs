@@ -350,7 +350,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		
 		for (int index = 0; index < this.activityTypes.size(); index++) {
 			String key = Integer.toString(index);
-			map.put(ACTIVITY_TYPE + key, " ============================ " );
+			map.put(ACTIVITY_TYPE + key, Gbl.SEPARATOR );
 		}
 		
 		return map;
