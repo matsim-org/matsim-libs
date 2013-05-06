@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -52,7 +53,7 @@ public class GroupPlanStrategy {
 
 	public void run(
 			// XXX what is the best at this level: ReplanningContext or ControllerRegistry?
-			final JointReplanningContext replanningContext,
+			final ReplanningContext replanningContext,
 			final JointPlans jointPlans,
 			final Collection<ReplanningGroup> groups) {
 		List<GroupPlans> plansToHandle = new ArrayList<GroupPlans>();

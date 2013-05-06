@@ -216,7 +216,7 @@ public class GroupPlanStrategyTest {
 		return person;
 	}
 	
-	private static JointReplanningContext createContext() {
+	private static ReplanningContext createContext() {
 		return new ControllerRegistryBuilder(
 				ScenarioUtils.createScenario( ConfigUtils.createConfig() )
 				).build().createReplanningContext( 0 );

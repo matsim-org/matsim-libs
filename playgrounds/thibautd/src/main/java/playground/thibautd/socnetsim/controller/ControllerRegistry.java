@@ -23,6 +23,7 @@ import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -34,7 +35,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.JointReplanningContext;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
@@ -136,9 +136,9 @@ public final class ControllerRegistry {
 
 	// XXX ouch... if this thing starts to provide factory methods, not sure it is a "registry"...
 	// though it is just a wrapper to see the object under another interface, so it is probably ok.
-	public JointReplanningContext createReplanningContext(final int iter) {
+	public ReplanningContext createReplanningContext(final int iter) {
 		final ControllerRegistry registry = this;
-		return new JointReplanningContext() {
+		return new ReplanningContext() {
 			@Override
 			public TripRouterFactory getTripRouterFactory() {
 				return registry.getTripRouterFactory();
@@ -159,11 +159,6 @@ public final class ControllerRegistry {
 			@Override
 			public ScoringFunctionFactory getScoringFunctionFactory() {
 				return registry.getScoringFunctionFactory();
-			}
-
-			@Override
-			public IncompatiblePlansIdentifierFactory getIncompatiblePlansIdentifierFactory() {
-				return registry.getIncompatiblePlansIdentifierFactory();
 			}
 
 			@Override
