@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.agents.*;
@@ -161,21 +160,7 @@ public class OnlineDvrpLauncherUtils
     public static QSim initQSim(MatsimVrpData data, TaxiOptimizer optimizer)
     {
         Scenario scenario = data.getScenario();
-
-        QSimConfigGroup qSimConfig = scenario.getConfig().getQSimConfigGroup();
-
-        if (qSimConfig == null) {
-            qSimConfig = new QSimConfigGroup();
-            scenario.getConfig().addQSimConfigGroup(qSimConfig);
-        }
-
-        qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-        qSimConfig.setRemoveStuckVehicles(false);
-        qSimConfig.setStartTime(0);
-        qSimConfig.setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
-
         EventsManager events = EventsUtils.createEventsManager();
-
         QSim qSim = new QSim(scenario, events);
 
         ActivityEngine activityEngine = new ActivityEngine();

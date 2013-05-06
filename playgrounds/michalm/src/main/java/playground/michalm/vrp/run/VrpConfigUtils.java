@@ -28,9 +28,9 @@ public class VrpConfigUtils
     public static Config createConfig()
     {
         Config config = ConfigUtils.createConfig();
-        QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-        qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-        config.addQSimConfigGroup(qSimConfigGroup);
+        QSimConfigGroup qSimConfig = new QSimConfigGroup();
+        config.addQSimConfigGroup(qSimConfig);
+        updateQSimConfigGroup(qSimConfig);
         return config;
     }
 
@@ -38,17 +38,29 @@ public class VrpConfigUtils
     public static Config loadConfig(final String filename)
     {
         Config config = ConfigUtils.loadConfig(filename);
-        QSimConfigGroup qSimConfigGroup = config.getQSimConfigGroup();
+        QSimConfigGroup qSimConfig = config.getQSimConfigGroup();
 
-        if (qSimConfigGroup == null) {
-            qSimConfigGroup = new QSimConfigGroup();
-        }
-        else if (!qSimConfigGroup.isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
-            System.err.println("isInsertingWaitingVehiclesBeforeDrivingVehicles was FALSE; "
-                    + "has been changed to TRUE!");
+        if (qSimConfig == null) {
+            qSimConfig = new QSimConfigGroup();
+            config.addQSimConfigGroup(qSimConfig);
         }
 
+        updateQSimConfigGroup(qSimConfig);
         config.getQSimConfigGroup().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
         return config;
+    }
+
+
+    /**
+     * Dynamic Taxi (and other VRP's) are designed for and validated against these QSimConfigGroup
+     * settings only.
+     */
+    private static void updateQSimConfigGroup(QSimConfigGroup qSimConfig)
+    {
+        qSimConfig.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+        qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+        qSimConfig.setRemoveStuckVehicles(false);
+        qSimConfig.setStartTime(0);
+        qSimConfig.setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
     }
 }

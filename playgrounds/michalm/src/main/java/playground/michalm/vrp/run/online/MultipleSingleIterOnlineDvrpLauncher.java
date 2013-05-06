@@ -60,6 +60,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
         SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
         SummaryStatistics taxiDeliveryDriveTime = new SummaryStatistics();
         SummaryStatistics taxiServiceTime = new SummaryStatistics();
+        SummaryStatistics taxiCruiseTime = new SummaryStatistics();
         SummaryStatistics taxiWaitTime = new SummaryStatistics();
         SummaryStatistics taxiOverTime = new SummaryStatistics();
         SummaryStatistics passengerWaitTime = new SummaryStatistics();
@@ -91,6 +92,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
             taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());
             taxiDeliveryDriveTime.addValue(evaluation.getTaxiDeliveryDriveTime());
             taxiServiceTime.addValue(evaluation.getTaxiServiceTime());
+            taxiCruiseTime.addValue(evaluation.getTaxiCruiseTime());
             taxiWaitTime.addValue(evaluation.getTaxiWaitTime());
             taxiOverTime.addValue(evaluation.getTaxiOverTime());
             passengerWaitTime.addValue(evaluation.getPassengerWaitTime());
@@ -99,34 +101,38 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
 
         pw.println(configIdx + "\t" + TaxiEvaluation.HEADER);
 
-        pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 taxiPickupDriveTime.getMean(),//
                 taxiDeliveryDriveTime.getMean(),//
                 taxiServiceTime.getMean(),//
+                taxiCruiseTime.getMean(),//
                 taxiWaitTime.getMean(),//
                 taxiOverTime.getMean(),//
                 passengerWaitTime.getMean(),//
                 maxPassengerWaitTime.getMean());
-        pw.printf("Min\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+        pw.printf("Min\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
                 (int)taxiPickupDriveTime.getMin(),//
                 (int)taxiDeliveryDriveTime.getMin(),//
                 (int)taxiServiceTime.getMin(),//
+                (int)taxiCruiseTime.getMin(),//
                 (int)taxiWaitTime.getMin(),//
                 (int)taxiOverTime.getMin(),//
                 (int)passengerWaitTime.getMin(),//
                 (int)passengerWaitTime.getMin());
-        pw.printf("Max\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+        pw.printf("Max\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
                 (int)taxiPickupDriveTime.getMax(),//
                 (int)taxiDeliveryDriveTime.getMax(),//
                 (int)taxiServiceTime.getMax(),//
+                (int)taxiCruiseTime.getMax(),//
                 (int)taxiWaitTime.getMax(),//
                 (int)taxiOverTime.getMax(),//
                 (int)passengerWaitTime.getMax(),//
                 (int)passengerWaitTime.getMax());
-        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
+        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
                 taxiPickupDriveTime.getStandardDeviation(),//
                 taxiDeliveryDriveTime.getStandardDeviation(),//
                 taxiServiceTime.getStandardDeviation(),//
+                taxiCruiseTime.getStandardDeviation(),//
                 taxiWaitTime.getStandardDeviation(),//
                 taxiOverTime.getStandardDeviation(),//
                 passengerWaitTime.getStandardDeviation(),//
