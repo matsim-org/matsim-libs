@@ -24,12 +24,11 @@
 package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
 
-import java.net.URL;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.matsim4opus.analysis.DanielAnalysisListenerEvents;
 import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
@@ -329,6 +328,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																					  parcels,
 																					  ptMatrix,
 																					  benchmark) );
+			controler.addControlerListener(new DanielAnalysisListenerEvents(this.getUrbanSimParameterConfig().getMATSim4OpusTemp(), zones));
 		}
 		if(computeAgentPerformance)
 			// creates a persons.csv output for UrbanSim
