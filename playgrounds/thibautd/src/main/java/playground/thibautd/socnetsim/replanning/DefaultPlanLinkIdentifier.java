@@ -19,13 +19,11 @@
 
 package playground.thibautd.socnetsim.replanning;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -33,6 +31,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 
 // /////////////////////////////////////////////////////////////////////////
 // helpers
@@ -48,30 +47,9 @@ public class DefaultPlanLinkIdentifier implements PlanLinkIdentifier {
 	private static boolean areLinkedByVehicles(
 			final Plan p1,
 			final Plan p2) {
-		final List<Id> vehIdsIn1 = new ArrayList<Id>();
-
-		for ( Trip t : TripStructureUtils.getTrips( p1 , EmptyStageActivityTypes.INSTANCE ) ) {
-			for ( Leg l : t.getLegsOnly() ) {
-				if ( l.getRoute() instanceof NetworkRoute ) {
-					final Id vehId = ((NetworkRoute) l.getRoute()).getVehicleId();
-					if ( vehId == null ) continue;
-					vehIdsIn1.add( vehId );
-				}
-			}
-		}
-
-		if ( vehIdsIn1.isEmpty() ) return false;
-
-		for ( Trip t : TripStructureUtils.getTrips( p2 , EmptyStageActivityTypes.INSTANCE ) ) {
-			for ( Leg l : t.getLegsOnly() ) {
-				if ( l.getRoute() instanceof NetworkRoute &&
-						vehIdsIn1.contains( ((NetworkRoute) l.getRoute()).getVehicleId() ) ) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return !Collections.disjoint(
+			SharedVehicleUtils.getVehiclesInPlan( p1 , SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) ,
+			SharedVehicleUtils.getVehiclesInPlan( p2 , SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) );
 	}
 
 	private static boolean areLinkedByJointTrips(
