@@ -504,42 +504,18 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<!-- path to external executable (if applicable) -->
 		<param name="ModuleExePath_1" value="null" />
 
-		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
 		<param name="Module_2" value="ChangeExpBeta" />
-
-		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
 		<param name="ModuleProbability_2" value="0.9" />
-
-		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
 		<param name="ModuleDisableAfterIteration_2" value="null" />
-
-		<!-- path to external executable (if applicable) -->
 		<param name="ModuleExePath_2" value="null" />
-
-		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
 		<param name="Module_3" value="ReRoute" />
-
-		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
 		<param name="ModuleProbability_3" value="0.1" />
-
-		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
 		<param name="ModuleDisableAfterIteration_3" value="1" />
-
-		<!-- path to external executable (if applicable) -->
 		<param name="ModuleExePath_3" value="null" />
-
-		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
 		<param name="Module_4" value="ChangeLegMode" />
-
-		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
 		<param name="ModuleProbability_4" value="0.1" />
-
-		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
 		<param name="ModuleDisableAfterIteration_4" value="null" />
-
-		<!-- path to external executable (if applicable) -->
 		<param name="ModuleExePath_4" value="null" />
-
 		<param name="ExternalExeConfigTemplate" value="null" />
 		<param name="ExternalExeTmpFileRootDir" value="null" />
 		<param name="ExternalExeTimeOut" value="3600" />
