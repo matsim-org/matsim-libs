@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.
@@ -164,12 +165,19 @@ public class StrategyConfigGroup extends Module {
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
+		int cnt = 0 ;
 		for (Map.Entry<Id, StrategySettings>  entry : this.settings.entrySet()) {
-			map.put(MODULE + entry.getKey().toString(), "name of strategy (if not full class name, resolved in StrategyManagerConfigLoader)");
-			map.put(MODULE_PROBABILITY + entry.getKey().toString(), "probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight''");
-			map.put(MODULE_DISABLE_AFTER_ITERATION + entry.getKey().toString(), "iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
-			map.put(MODULE_EXE_PATH + entry.getKey().toString(), "path to external executable (if applicable)" ) ;
-			break ; // put comments only for the first strategy to improve readability
+			cnt++ ;
+			if ( cnt==1 ) {
+				// put comments only for the first strategy to improve readability
+				map.put(MODULE + entry.getKey().toString(), "name of strategy (if not full class name, resolved in StrategyManagerConfigLoader)");
+				map.put(MODULE_PROBABILITY + entry.getKey().toString(), "probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight''");
+				map.put(MODULE_DISABLE_AFTER_ITERATION + entry.getKey().toString(), "iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
+				map.put(MODULE_EXE_PATH + entry.getKey().toString(), "path to external executable (if applicable)" ) ;
+			} else {
+				map.put(MODULE + entry.getKey().toString(), Gbl.SEPARATOR ); 
+			}
+
 		}
 		map.put(PLAN_SELECTOR_FOR_REMOVAL,"name of PlanSelector for plans removal.  If not full class name, resolved in " +
 				"StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good " +
