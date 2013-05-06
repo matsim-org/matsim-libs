@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -116,6 +117,9 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 			Person person = new PersonImpl(entry.getKey());
 			Plan plan = entry.getValue();
 			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
+			if ( plan.getScore().isNaN() ) {
+				Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
+			}
 			person.addPlan(plan);
 			population.addPerson(person);
 		}
