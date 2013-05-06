@@ -317,7 +317,7 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<!-- write a plans file in each iteration directory which contains what each agent actually did, and the score it received. -->
 		<param name="writeExperiencedPlans" value="false" />
 
-		<!--  ============================  -->
+		<!-- ------------------------------ -->
 		<param name="activityType_0" value="home" />
 
 		<param name="activityPriority_0" value="1.0" />
@@ -328,7 +328,7 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<param name="activityEarliestEndTime_0" value="undefined" />
 		<param name="activityClosingTime_0" value="undefined" />
 
-		<!--  ============================  -->
+		<!-- ------------------------------ -->
 		<param name="activityType_1" value="work" />
 
 		<param name="activityPriority_1" value="1.0" />
@@ -504,15 +504,23 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<!-- path to external executable (if applicable) -->
 		<param name="ModuleExePath_1" value="null" />
 
+		<!-- ------------------------------ -->
 		<param name="Module_2" value="ChangeExpBeta" />
+
 		<param name="ModuleProbability_2" value="0.9" />
 		<param name="ModuleDisableAfterIteration_2" value="null" />
 		<param name="ModuleExePath_2" value="null" />
+
+		<!-- ------------------------------ -->
 		<param name="Module_3" value="ReRoute" />
+
 		<param name="ModuleProbability_3" value="0.1" />
 		<param name="ModuleDisableAfterIteration_3" value="1" />
 		<param name="ModuleExePath_3" value="null" />
+
+		<!-- ------------------------------ -->
 		<param name="Module_4" value="ChangeLegMode" />
+
 		<param name="ModuleProbability_4" value="0.1" />
 		<param name="ModuleDisableAfterIteration_4" value="null" />
 		<param name="ModuleExePath_4" value="null" />
@@ -604,7 +612,7 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 	<module name="vspExperimental" >
 
 		<!-- String: minOfDurationAndEndTime tryEndTimeThenDuration endTimeOnly. Anything besides minOfDurationAndEndTime will internally use a different (simpler) version of the TimeAllocationMutator. -->
-		<param name="activityDurationInterpretation" value="minOfDurationAndEndTime" />
+		<param name="activityDurationInterpretation" value="tryEndTimeThenDuration" />
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average cold emission factors -->
 		<param name="averageFleetColdEmissionFactorsFile" value="null" />
@@ -649,7 +657,7 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<param name="modes" value="car, pt" />
 
 		<!-- (not tested) will remove plan attributes that are presumably not used, such as activityStartTime. default=false -->
-		<param name="removingUnnecessaryPlanAttributes" value="false" />
+		<param name="removingUnnecessaryPlanAttributes" value="true" />
 
 		<!-- first iteration of MSA score averaging. The matsim theory department suggests to use this together with switching of choice set innovation, but it has not been tested yet. -->
 		<param name="scoreMSAStartsAtIteration" value="null" />
