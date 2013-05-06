@@ -39,7 +39,11 @@ import org.matsim.core.replanning.modules.TripTimeAllocationMutatorStrategyFacto
 
 
 public class PlanStrategyRegistrar {
-
+	public static enum Names { ChangeLegMode } ;
+	// (1) I think there should be constants rather than Strings, because these Strings are used elsewhere in the code. kai, may'13
+	// (2) I think enums are better than Strings, since it allows to iterate through the registry.  kai, may'13
+	// (3) "Names" could be refactored into something else if appropriate. kai, may'13
+	
 	private PlanStrategyFactoryRegister register = new PlanStrategyFactoryRegister();
 
 	public PlanStrategyRegistrar() {
@@ -55,7 +59,7 @@ public class PlanStrategyRegistrar {
 		// at least once).
 		register.register("ReRoute", new ReRoutePlanStrategyFactory());		
 		register.register("TimeAllocationMutator", new TimeAllocationMutatorPlanStrategyFactory());
-		register.register("ChangeLegMode", new ChangeLegModeStrategyFactory());
+		register.register(Names.ChangeLegMode.toString(), new ChangeLegModeStrategyFactory());
 		register.register("ChangeSingleLegMode", new ChangeSingleLegModeStrategyFactory());
 		register.register("ChangeSingleTripMode", new ChangeSingleTripModeStrategyFactory());
 		register.register("SubtourModeChoice", new SubtourModeChoiceStrategyFactory());
