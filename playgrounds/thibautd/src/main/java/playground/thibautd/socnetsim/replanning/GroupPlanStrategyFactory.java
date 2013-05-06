@@ -231,6 +231,20 @@ public class GroupPlanStrategyFactory {
 						registry.getTripRouterFactory()) );
 		}
 
+		final VehicleRessources vehicles = 
+					registry.getScenario().getScenarioElement(
+						VehicleRessources.class );
+
+		if ( vehicles != null ) {
+			strategy.addStrategyModule(
+					new AllocateVehicleToPlansInGroupPlanModule(
+						registry.getScenario().getConfig().global().getNumberOfThreads(),
+						vehicles,
+						SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
+						false,
+						true)); // preserve allocation (ie just reallocate for modified plans)
+		}
+
 		strategy.addStrategyModule(
 				createRecomposeJointPlansModule(
 					config,
