@@ -247,10 +247,16 @@ public class PlanImpl implements Plan {
 		if (this.getScore() != null) {
 			scoreString = this.getScore().toString();
 		}
+		String personIdString = "undefined" ;
+		if ( this.getPerson() != null ) {
+			personIdString = this.getPerson().getId().toString() ;
+		}
 
 		return "[score=" + scoreString + "]" +
 				"[selected=" + this.isSelected() + "]" +
-				"[nof_acts_legs=" + getPlanElements().size() + "]";
+				"[nof_acts_legs=" + getPlanElements().size() + "]" +
+				"[type=" + this.type + "]" +
+				"[personId=" + personIdString + "]" ;
 	}
 
 	/** loads a copy of an existing plan, but keeps the person reference
