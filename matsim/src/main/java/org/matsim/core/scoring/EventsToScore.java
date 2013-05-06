@@ -20,6 +20,7 @@
 
 package org.matsim.core.scoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -165,12 +166,21 @@ public class EventsToScore implements BasicEventHandler {
 			Double oldScore = plan.getScore();
 			if (oldScore == null) {
 				plan.setScore(score);
+				if ( plan.getScore().isNaN() ) {
+					Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
+				}
 			} else {
 				if ( this.scoreMSAstartsAtIteration == null || this.iteration < this.scoreMSAstartsAtIteration ) {
 					plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
+					if ( plan.getScore().isNaN() ) {
+						Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
+					}
 				} else {
 					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration + 1) ;
 					plan.setScore( alpha * score + (1.-alpha) * oldScore ) ;
+					if ( plan.getScore().isNaN() ) {
+						Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
+					}
 					// the above is some variant of MSA (method of successive
 					// averages). It is not the same as MSA since
 					// a plan is typically not scored in every iteration.
