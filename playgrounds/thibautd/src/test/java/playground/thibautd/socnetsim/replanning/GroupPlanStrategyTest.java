@@ -47,6 +47,7 @@ import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.HighestScoreSumSelector;
 
 /**
@@ -59,7 +60,9 @@ public class GroupPlanStrategyTest {
 	@Test
 	public void testNewPlanIsSelected() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
-		final GroupPlanStrategy strategy = new GroupPlanStrategy( new HighestScoreSumSelector() );
+		final GroupPlanStrategy strategy = new GroupPlanStrategy(
+				new HighestScoreSumSelector(
+						new EmptyIncompatiblePlansIdentifierFactory()) );
 		strategy.addStrategyModule( new JointStructureInvertingModule( jointPlans.getFactory() ) );
 
 		final List<Plan> selectedPlans = new ArrayList<Plan>();
@@ -89,7 +92,9 @@ public class GroupPlanStrategyTest {
 	@Test
 	public void testNumberOfPlans() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
-		final GroupPlanStrategy strategy = new GroupPlanStrategy( new HighestScoreSumSelector() );
+		final GroupPlanStrategy strategy = new GroupPlanStrategy(
+				new HighestScoreSumSelector(
+						new EmptyIncompatiblePlansIdentifierFactory()) );
 		strategy.addStrategyModule( new JointStructureInvertingModule( jointPlans.getFactory() ) );
 
 		final ReplanningGroup group = createTestGroup( jointPlans );
@@ -105,7 +110,9 @@ public class GroupPlanStrategyTest {
 	@Test
 	public void testNumberOfSelectedJointPlans() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
-		final GroupPlanStrategy strategy = new GroupPlanStrategy( new HighestScoreSumSelector() );
+		final GroupPlanStrategy strategy = new GroupPlanStrategy(
+				new HighestScoreSumSelector(
+						new EmptyIncompatiblePlansIdentifierFactory()) );
 		strategy.addStrategyModule( new JointStructureInvertingModule( jointPlans.getFactory() ) );
 
 		final ReplanningGroup group = createTestGroup( jointPlans );
@@ -137,7 +144,9 @@ public class GroupPlanStrategyTest {
 	@Test
 	public void testNumberOfNonSelectedJointPlans() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
-		final GroupPlanStrategy strategy = new GroupPlanStrategy( new HighestScoreSumSelector() );
+		final GroupPlanStrategy strategy = new GroupPlanStrategy(
+				new HighestScoreSumSelector(
+						new EmptyIncompatiblePlansIdentifierFactory()) );
 		strategy.addStrategyModule( new JointStructureInvertingModule( jointPlans.getFactory() ) );
 
 		final ReplanningGroup group = createTestGroup( jointPlans );

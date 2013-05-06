@@ -145,7 +145,8 @@ public class RunCliquesWithHardCodedStrategies {
 		// create strategy manager
 		final GroupStrategyManager strategyManager =
 			new GroupStrategyManager( 
-					new LowestScoreSumSelectorForRemoval(),
+					new LowestScoreSumSelectorForRemoval(
+							controllerRegistry.getIncompatiblePlansIdentifierFactory()),
 					strategyRegistry,
 					config.strategy().getMaxAgentPlanMemorySize());
 

@@ -33,13 +33,16 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
 public class HighestScoreSumSelector implements GroupLevelPlanSelector {
 	private final GroupLevelPlanSelector delegate;
 	
-	public HighestScoreSumSelector() {
-		delegate = new HighestWeightSelector( new Weight() );
+	public HighestScoreSumSelector(
+			final IncompatiblePlansIdentifierFactory fact) {
+		delegate = new HighestWeightSelector( fact , new Weight() );
 	}
 
 	// for tests
-	HighestScoreSumSelector(final boolean blocking) {
-		delegate = new HighestWeightSelector( blocking , new Weight() );
+	HighestScoreSumSelector(
+			final IncompatiblePlansIdentifierFactory fact,
+			final boolean blocking) {
+		delegate = new HighestWeightSelector( blocking , fact , new Weight() );
 	}
 
 	private static class Weight implements WeightCalculator {
@@ -55,9 +58,8 @@ public class HighestScoreSumSelector implements GroupLevelPlanSelector {
 
 	@Override
 	public GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory factory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		return delegate.selectPlans( factory , jointPlans, group );
+		return delegate.selectPlans( jointPlans, group );
 	}
 }

@@ -1109,7 +1109,10 @@ public class HighestWeightSelectorTest {
 	 */
 	@Test
 	public void testNoSideEffects() throws Exception {
-		HighestScoreSumSelector selector = new HighestScoreSumSelector( false );
+		HighestScoreSumSelector selector =
+				new HighestScoreSumSelector(
+					new EmptyIncompatiblePlansIdentifierFactory(),
+					false );
 		final Map<Id, Integer> planCounts = new HashMap<Id, Integer>();
 
 		final int initialGroupSize = fixture.group.getPersons().size();
@@ -1118,7 +1121,6 @@ public class HighestWeightSelectorTest {
 		}
 
 		selector.selectPlans(
-					new EmptyIncompatiblePlansIdentifierFactory(),
 					fixture.jointPlans,
 					fixture.group );
 
@@ -1139,13 +1141,15 @@ public class HighestWeightSelectorTest {
 			final boolean blocking,
 			final boolean forbidding) {
 		if ( blocking && forbidding ) throw new UnsupportedOperationException();
-		HighestScoreSumSelector selector = new HighestScoreSumSelector( blocking );
-		GroupPlans selected = null;
-		try {
-			selected = selector.selectPlans(
+		HighestScoreSumSelector selector =
+				new HighestScoreSumSelector(
 					forbidding ?
 						fixture.forbidder :
 						new EmptyIncompatiblePlansIdentifierFactory(),
+					blocking );
+		GroupPlans selected = null;
+		try {
+			selected = selector.selectPlans(
 					fixture.jointPlans,
 					fixture.group );
 		}

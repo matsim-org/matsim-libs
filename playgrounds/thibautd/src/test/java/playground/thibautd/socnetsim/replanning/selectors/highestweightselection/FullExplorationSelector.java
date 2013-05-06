@@ -54,16 +54,21 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	private static final double EPSILON = 1E-7;
 	private final boolean forbidBlockingCombinations;
 	private final WeightCalculator weightCalculator;
+	private final IncompatiblePlansIdentifierFactory factory;
 
-	public FullExplorationSelector(final WeightCalculator weightCalculator) {
-		this( false , weightCalculator );
+	public FullExplorationSelector(
+			final IncompatiblePlansIdentifierFactory factory,
+			final WeightCalculator weightCalculator) {
+		this( false , factory , weightCalculator );
 	}
 
 	public FullExplorationSelector(
 			final boolean isForRemoval,
+			final IncompatiblePlansIdentifierFactory factory,
 			final WeightCalculator weightCalculator) {
 		this.forbidBlockingCombinations = isForRemoval;
 		this.weightCalculator = weightCalculator;
+		this.factory = factory;
 	}
 	
 	public static interface WeightCalculator {
@@ -183,7 +188,6 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public final GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory factory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		final Map<Id, PersonRecord> personRecords = getPersonRecords( jointPlans , group );

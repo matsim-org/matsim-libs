@@ -36,8 +36,11 @@ public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
 
 	private final GroupLevelPlanSelector delegate;
 
-	public RandomGroupLevelSelector(final Random random) {
+	public RandomGroupLevelSelector(
+			final Random random,
+			final IncompatiblePlansIdentifierFactory incompFact) {
 		delegate = new HighestWeightSelector(
+				incompFact,
 				new WeightCalculator() {
 					@Override
 					public double getWeight(
@@ -50,10 +53,9 @@ public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
 
 	@Override
 	public GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory factory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		return delegate.selectPlans( factory , jointPlans , group );
+		return delegate.selectPlans( jointPlans , group );
 	}
 }
 

@@ -93,9 +93,7 @@ public class RunUtils {
 				weights.getReRouteWeight());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTimeAllocationMutator(
-					config,
-					controllerRegistry.getPlanRoutingAlgorithmFactory(),
-					controllerRegistry.getTripRouterFactory() ),
+					controllerRegistry ),
 				weights.getTimeMutationWeight());
 		if (weights.getJtmOptimizes()) {
 			strategyRegistry.addStrategy(
@@ -112,7 +110,9 @@ public class RunUtils {
 					controllerRegistry ),
 				weights.getModeMutationWeight());
 		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createSelectExpBeta( config ),
+				GroupPlanStrategyFactory.createSelectExpBeta(
+						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+						config ),
 				weights.getLogitSelectionWeight() );
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTourVehicleAllocation(

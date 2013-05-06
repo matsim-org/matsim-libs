@@ -91,10 +91,14 @@ public class FullExplorationVsCuttoffTest {
 	private void testFullExplorationVsCuttoff(
 			final IncompatiblePlansIdentifierFactory incompFactory,
 			final boolean blocking) throws Exception {
-		final HighestScoreSumSelector fastSelector = new HighestScoreSumSelector( blocking );
+		final HighestScoreSumSelector fastSelector =
+				new HighestScoreSumSelector(
+					incompFactory,
+					blocking );
 		final GroupLevelPlanSelector fullSelector =
 			new FullExplorationSelector(
 					blocking,
+					incompFactory,
 					new FullExplorationSelector.WeightCalculator() {
 						@Override
 						public double getWeight(
@@ -117,13 +121,11 @@ public class FullExplorationVsCuttoffTest {
 			count.incCounter();
 			stopWatch.startFast();
 			final GroupPlans fastResult = fastSelector.selectPlans(
-					incompFactory,
 					jointPlans,
 					clique );
 			stopWatch.endFast();
 			stopWatch.startFull();
 			final GroupPlans fullResult = fullSelector.selectPlans(
-					incompFactory,
 					jointPlans,
 					clique );
 			stopWatch.endFull();

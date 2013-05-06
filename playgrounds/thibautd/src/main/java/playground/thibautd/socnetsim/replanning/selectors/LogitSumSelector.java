@@ -45,16 +45,16 @@ public class LogitSumSelector implements GroupLevelPlanSelector {
 
 	public LogitSumSelector(
 			final Random random,
+			final IncompatiblePlansIdentifierFactory incompFact,
 			final double scaleParameter) {
-		this.delegate = new HighestWeightSelector( new Weight( random , scaleParameter ) );
+		this.delegate = new HighestWeightSelector( incompFact , new Weight( random , scaleParameter ) );
 	}
 	
 	@Override
 	public GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory factory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		return delegate.selectPlans( factory , jointPlans , group);
+		return delegate.selectPlans( jointPlans , group);
 	}
 
 	private static class Weight implements WeightCalculator {

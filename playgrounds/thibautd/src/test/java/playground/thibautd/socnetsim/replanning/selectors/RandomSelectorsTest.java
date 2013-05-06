@@ -277,7 +277,9 @@ public class RandomSelectorsTest {
 		testDeterminism( new SelectorFactory() {
 			@Override
 			public GroupLevelPlanSelector create(final Random r) {
-				return new RandomGroupLevelSelector( r );
+				return new RandomGroupLevelSelector(
+						r,
+						new EmptyIncompatiblePlansIdentifierFactory());
 			}
 		});
 	}
@@ -294,7 +296,6 @@ public class RandomSelectorsTest {
 				GroupLevelPlanSelector selector = factory.create( new Random( seed ) );
 
 				final GroupPlans selected = selector.selectPlans(
-						new EmptyIncompatiblePlansIdentifierFactory(),
 						jointPlans , group );
 				if (previous != null) {
 					assertEquals(

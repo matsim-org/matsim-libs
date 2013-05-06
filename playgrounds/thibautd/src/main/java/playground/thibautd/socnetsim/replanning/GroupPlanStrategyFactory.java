@@ -47,6 +47,7 @@ import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule;
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.IndividualBasedGroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
@@ -70,7 +71,9 @@ public class GroupPlanStrategyFactory {
 	// /////////////////////////////////////////////////////////////////////////
 	public static GroupPlanStrategy createReRoute(
 			final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+		final GroupPlanStrategy strategy =
+				createRandomSelectingStrategy(
+					registry.getIncompatiblePlansIdentifierFactory());
 	
 		strategy.addStrategyModule(
 				createReRouteModule(
@@ -93,10 +96,13 @@ public class GroupPlanStrategyFactory {
 	}
 
 	public static GroupPlanStrategy createTimeAllocationMutator(
-			final Config config,
-			final PlanRoutingAlgorithmFactory planRouterFactory,
-			final TripRouterFactory tripRouterFactory) {
-		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+			final ControllerRegistry registry) {
+		final GroupPlanStrategy strategy =
+				createRandomSelectingStrategy(
+					registry.getIncompatiblePlansIdentifierFactory());
+		final Config config = registry.getScenario().getConfig();
+		final TripRouterFactory tripRouterFactory = registry.getTripRouterFactory();
+		final PlanRoutingAlgorithmFactory planRouterFactory = registry.getPlanRoutingAlgorithmFactory();
 
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
@@ -152,7 +158,10 @@ public class GroupPlanStrategyFactory {
 	private static GroupPlanStrategy createCliqueJointTripMutator(
 			final ControllerRegistry registry,
 			final boolean optimize) {
-		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+		final GroupPlanStrategy strategy =
+				createRandomSelectingStrategy(
+					registry.getIncompatiblePlansIdentifierFactory());
+		
 		final Config config = registry.getScenario().getConfig();
 
 		strategy.addStrategyModule(
@@ -231,16 +240,21 @@ public class GroupPlanStrategyFactory {
 		return strategy;
 	}
 
-	public static GroupPlanStrategy createSelectExpBeta(final Config config) {
+	public static GroupPlanStrategy createSelectExpBeta(
+			final IncompatiblePlansIdentifierFactory incompFact,
+			final Config config) {
 		return new GroupPlanStrategy(
 				new LogitSumSelector(
 					MatsimRandom.getLocalInstance(),
+					incompFact,
 					config.planCalcScore().getBrainExpBeta()) );
 	}
 
 	public static GroupPlanStrategy createSubtourModeChoice(
 			final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+		final GroupPlanStrategy strategy =
+				createRandomSelectingStrategy(
+					registry.getIncompatiblePlansIdentifierFactory());
 
 		// Why the hell did I put this here???
 		//strategy.addStrategyModule(
@@ -291,7 +305,9 @@ public class GroupPlanStrategyFactory {
 
 	public static GroupPlanStrategy createTourVehicleAllocation(
 			final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+		final GroupPlanStrategy strategy =
+				createRandomSelectingStrategy(
+					registry.getIncompatiblePlansIdentifierFactory());
 
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
@@ -318,7 +334,9 @@ public class GroupPlanStrategyFactory {
 
 	public static GroupPlanStrategy createGroupPlanVehicleAllocation(
 			final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+		final GroupPlanStrategy strategy =
+				createRandomSelectingStrategy(
+					registry.getIncompatiblePlansIdentifierFactory());
 
 		strategy.addStrategyModule(
 				new AllocateVehicleToPlansInGroupPlanModule(
@@ -346,7 +364,9 @@ public class GroupPlanStrategyFactory {
 
 	public static GroupPlanStrategy createOptimizingTourVehicleAllocation(
 			final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = createRandomSelectingStrategy();
+		final GroupPlanStrategy strategy =
+				createRandomSelectingStrategy(
+					registry.getIncompatiblePlansIdentifierFactory());
 
 		final CompositeStageActivityTypes stageActs = new CompositeStageActivityTypes();
 		stageActs.addActivityTypes( registry.getTripRouterFactory().createTripRouter().getStageActivityTypes() );
@@ -441,10 +461,12 @@ public class GroupPlanStrategyFactory {
 				linkIdentifier );
 	}
 
-	private static GroupPlanStrategy createRandomSelectingStrategy() {
+	private static GroupPlanStrategy createRandomSelectingStrategy(
+			final IncompatiblePlansIdentifierFactory fact) {
 		return new GroupPlanStrategy(
 				new RandomGroupLevelSelector(
-					MatsimRandom.getLocalInstance() ) );
+					MatsimRandom.getLocalInstance(),
+					fact) );
 	}
 }
 

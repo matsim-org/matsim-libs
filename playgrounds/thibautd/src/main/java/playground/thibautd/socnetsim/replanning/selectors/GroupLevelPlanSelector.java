@@ -28,7 +28,6 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
  */
 public interface GroupLevelPlanSelector {
 	public GroupPlans selectPlans(
-			IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory,
 			JointPlans jointPlans,
 			ReplanningGroup group);
 }

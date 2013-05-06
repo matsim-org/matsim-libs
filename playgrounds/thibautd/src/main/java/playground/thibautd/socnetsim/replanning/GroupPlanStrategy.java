@@ -61,7 +61,6 @@ public class GroupPlanStrategy {
 		for (ReplanningGroup group : groups) {
 			selectCounter.incCounter();
 			GroupPlans plans = selector.selectPlans(
-					replanningContext.getIncompatiblePlansIdentifierFactory(),
 					jointPlans,
 					group );
 

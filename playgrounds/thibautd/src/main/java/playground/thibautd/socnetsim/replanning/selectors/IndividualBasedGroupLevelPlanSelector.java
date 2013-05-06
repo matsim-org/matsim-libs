@@ -46,7 +46,6 @@ public class IndividualBasedGroupLevelPlanSelector implements GroupLevelPlanSele
 
 	@Override
 	public GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		final GroupPlans plans = new GroupPlans();

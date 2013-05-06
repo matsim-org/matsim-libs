@@ -53,16 +53,21 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	private static final double EPSILON = 1E-7;
 	private final boolean forbidBlockingCombinations;
 	private final WeightCalculator weightCalculator;
+	private final IncompatiblePlansIdentifierFactory incompFactory;
 
-	public HighestWeightSelector(final WeightCalculator weightCalculator) {
-		this( false , weightCalculator );
+	public HighestWeightSelector(
+			final IncompatiblePlansIdentifierFactory incompFactory,
+			final WeightCalculator weightCalculator) {
+		this( false , incompFactory , weightCalculator );
 	}
 
 	public HighestWeightSelector(
 			final boolean isForRemoval,
+			final IncompatiblePlansIdentifierFactory incompFactory,
 			final WeightCalculator weightCalculator) {
 		this.forbidBlockingCombinations = isForRemoval;
 		this.weightCalculator = weightCalculator;
+		this.incompFactory = incompFactory;
 	}
 	
 	public static interface WeightCalculator {
@@ -87,7 +92,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public final GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory incompFactory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
 		final IncompatiblePlansIdentifier incompatiblePlansIdentifier =

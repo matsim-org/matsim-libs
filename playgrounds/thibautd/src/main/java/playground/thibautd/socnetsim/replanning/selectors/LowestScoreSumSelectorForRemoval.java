@@ -33,8 +33,11 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
 public class LowestScoreSumSelectorForRemoval implements GroupLevelPlanSelector {
 	private final GroupLevelPlanSelector delegate;
 	
-	public LowestScoreSumSelectorForRemoval() {
-		delegate = new HighestWeightSelector( true ,
+	public LowestScoreSumSelectorForRemoval(
+			final IncompatiblePlansIdentifierFactory incompFact) {
+		delegate = new HighestWeightSelector(
+				true ,
+				incompFact,
 				new WeightCalculator() {
 					@Override
 					public double getWeight(
@@ -49,10 +52,9 @@ public class LowestScoreSumSelectorForRemoval implements GroupLevelPlanSelector 
 
 	@Override
 	public GroupPlans selectPlans(
-			final IncompatiblePlansIdentifierFactory factory,
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		return delegate.selectPlans( factory , jointPlans , group);
+		return delegate.selectPlans( jointPlans , group);
 	}
 }
 
