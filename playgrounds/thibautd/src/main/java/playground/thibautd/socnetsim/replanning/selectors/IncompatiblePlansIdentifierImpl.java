@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
  * It doesn't check the consistency of the data it is fed.
  * @author thibautd
  */
-public final class IncompatiblePlansIdentifierImpl implements IncompatiblePlansIdentifier {
+public final class IncompatiblePlansIdentifierImpl extends IncompatiblePlansIdentifier {
 	private final Map<Plan, Set<Id>> incompatiblePlansPerPlans =
 		new HashMap<Plan, Set<Id>>();
 

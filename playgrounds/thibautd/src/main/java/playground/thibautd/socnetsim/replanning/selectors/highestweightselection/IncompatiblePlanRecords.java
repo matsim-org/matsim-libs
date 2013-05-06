@@ -49,7 +49,7 @@ final class IncompatiblePlanRecords {
 		this.allIncompatibilityGroupIds = Collections.unmodifiableSet( ids );
 		for ( PersonRecord person : personRecords.values() ) {
 			for ( PlanRecord plan : person.plans ) {
-				for ( Id group : identifier.identifyIncompatibilityGroups( plan.plan ) ) {
+				for ( Id group : identifyGroups( identifier , plan ) ) {
 					MapUtils.getCollection( group , plansPerGroup ).add( plan );
 					ids.add( group );
 				}
@@ -66,6 +66,14 @@ final class IncompatiblePlanRecords {
 							plan));
 			}
 		}
+	}
+
+	private static Set<Id> identifyGroups(
+			final IncompatiblePlansIdentifier identifier,
+			final PlanRecord plan) {
+		return plan.jointPlan == null ?
+			identifier.identifyIncompatibilityGroups( plan.plan ) :
+			identifier.identifyIncompatibilityGroups( plan.jointPlan );
 	}
 
 	public Set<Id> getAllIncompatibilityGroupIds() {
@@ -94,7 +102,7 @@ final class IncompatiblePlanRecords {
 			final Map<Id, Collection<PlanRecord>> plansPerGroup,
 			final PlanRecord record,
 			final IncompatiblePlansIdentifier identifier) {
-		for ( Id group : identifier.identifyIncompatibilityGroups( record.plan ) ) {
+		for ( Id group : identifyGroups( identifier , record ) ) {
 			incompatible.addAll( plansPerGroup.get( group ) );
 		}
 	}

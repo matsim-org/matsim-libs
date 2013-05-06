@@ -467,7 +467,11 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 			final IncompatiblePlanRecords incompatibleRecords,
 			final Set<Id> allowedIncompatibilityGroups,
 			final PlanRecord r ) {
-		final Set<Id> forbid = incompatibleRecords.getIncompatiblePlanIdentifier().identifyIncompatibilityGroups( r.plan );
+		final Set<Id> forbid = r.jointPlan == null ?
+				incompatibleRecords.getIncompatiblePlanIdentifier().identifyIncompatibilityGroups(
+						r.plan ) :
+				incompatibleRecords.getIncompatiblePlanIdentifier().identifyIncompatibilityGroups(
+						r.jointPlan );
 
 		if ( forbid.isEmpty() ) return allowedIncompatibilityGroups;
 

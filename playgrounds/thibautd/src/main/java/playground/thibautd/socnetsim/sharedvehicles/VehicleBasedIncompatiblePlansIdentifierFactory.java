@@ -57,7 +57,5 @@ public class VehicleBasedIncompatiblePlansIdentifierFactory implements Incompati
 		
 		return identifier;
 	}
-
-
 }
 

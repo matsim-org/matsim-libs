@@ -19,10 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlans;
 
 /**
  * Allows to define incomaptibility relations between plans.
@@ -33,19 +37,28 @@ import org.matsim.api.core.v01.population.Plan;
  *
  * @author thibautd
  */
-public interface IncompatiblePlansIdentifier {
+public abstract class IncompatiblePlansIdentifier {
 	/**
 	 * @param plan the plan for which the incompatible plans are to identify
 	 * @return a collection containing ids of "incompatibility groups".
 	 * Two plans are considered incompatible if they have at least one group
 	 * in common.
-	 * The general contract is that:
-	 * <ul>
-	 * <li> all plans of a joint plan should pertain to the same groups
-	 * <li> the plans incompatible because of joint plans constraint do not have
-	 * to be identified as such here (but can)
-	 * </ul>
 	 */
-	public Set<Id> identifyIncompatibilityGroups(Plan plan);
+	public abstract Set<Id> identifyIncompatibilityGroups(Plan plan);
+
+	public Set<Id> identifyIncompatibilityGroups(final JointPlan jp) {
+		final Set<Id> groups = new HashSet<Id>();
+		for ( Plan p : jp.getIndividualPlans().values() ) {
+			groups.addAll( identifyIncompatibilityGroups( p ) );
+		}
+		return groups;
+	}
+
+	public Set<Id> identifyIncompatibilityGroups(final JointPlans jointPlans, final Plan plan) {
+		final JointPlan jp = jointPlans.getJointPlan( plan );
+		return jp == null ?
+			identifyIncompatibilityGroups( plan ) :
+			identifyIncompatibilityGroups( jp );
+	}
 }
 
