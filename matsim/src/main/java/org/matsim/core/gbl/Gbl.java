@@ -41,6 +41,8 @@ public abstract class Gbl {
 	
 	public final static String FUTURE_SUPPRESSED = " Future occurences of this warning are suppressed." ;
 	
+	public final static String SEPARATOR = "------------------------------" ;
+	
 	public static final void printMemoryUsage() {
 		long totalMem = Runtime.getRuntime().totalMemory();
 		long freeMem = Runtime.getRuntime().freeMemory();
