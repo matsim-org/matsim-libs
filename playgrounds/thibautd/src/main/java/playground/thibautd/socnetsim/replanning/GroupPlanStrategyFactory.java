@@ -26,7 +26,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
@@ -47,8 +46,8 @@ import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule;
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
+import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.IndividualBasedGroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
@@ -398,11 +397,13 @@ public class GroupPlanStrategyFactory {
 
 	public static GroupPlanStrategy createRandomJointPlansRecomposer(
 			final ControllerRegistry registry) {
+		// Note that this breaks incompatibility constraints, but not
+		// joint plans constraints. Thus, it is not such a "recomposition"
+		// as a grouping of joint plans.
 		final GroupPlanStrategy strategy = new GroupPlanStrategy(
-				new IndividualBasedGroupLevelPlanSelector(
-					new RandomPlanSelector() ) );
-
-		// reallocate vehicles?
+				new RandomGroupLevelSelector(
+					MatsimRandom.getLocalInstance(),
+					new EmptyIncompatiblePlansIdentifierFactory() ) );
 
 		// recompose
 		strategy.addStrategyModule(
