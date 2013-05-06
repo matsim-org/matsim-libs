@@ -41,7 +41,7 @@ public class BestPlanSelector implements PlanSelector {
 
 		for (Plan plan : person.getPlans()) {
 			Double score = plan.getScore();
-			if ((score != null) && (score.doubleValue() > maxScore)) {
+			if ((score != null) && (score.doubleValue() > maxScore) && !score.isNaN() ) {
 				maxScore = plan.getScore().doubleValue();
 				bestPlan = plan;
 			}

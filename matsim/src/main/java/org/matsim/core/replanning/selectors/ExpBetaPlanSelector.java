@@ -23,6 +23,7 @@ package org.matsim.core.replanning.selectors;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -106,6 +107,9 @@ public class ExpBetaPlanSelector implements PlanSelector {
 		// - first find the max. score of all plans of this person
 		double maxScore = Double.NEGATIVE_INFINITY;
 		for (Plan plan1 : person.getPlans()) {
+			if ( plan1.getScore().isNaN() ) {
+				Logger.getLogger(this.getClass()).error("encountering getScore().isNaN().  This class is not well behaved in this situation.  Continuing anyway ...") ;
+			}
 			if ((plan1.getScore() != null) && (plan1.getScore().doubleValue() > maxScore)) {
 				maxScore = plan1.getScore().doubleValue();
 			}

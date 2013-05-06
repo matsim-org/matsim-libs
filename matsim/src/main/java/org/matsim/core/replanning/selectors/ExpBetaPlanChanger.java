@@ -71,6 +71,15 @@ public class ExpBetaPlanChanger implements PlanSelector {
 			}
 			return currentPlan;
 		}
+		
+		// defending against NaN (which should not happen, but happens):
+		if ( currentPlan.getScore().isNaN() ) {
+			return otherPlan ;
+		}
+		if ( otherPlan.getScore().isNaN() ) {
+			return currentPlan ;
+		}
+		
 		double currentScore = currentPlan.getScore().doubleValue();
 		double otherScore = otherPlan.getScore().doubleValue();
 
