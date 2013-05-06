@@ -1,11 +1,13 @@
 package playground.pieter.singapore.utils.postgresql.travelcomponents;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 
 public 	 class Wait extends TravelComponent {
 	public Journey journey;
 	private Coord coord;
 	private boolean accessWait = false;
+	private Id stopId;
 
 	public String toString() {
 		return String.format(
@@ -27,5 +29,13 @@ public 	 class Wait extends TravelComponent {
 
 	public void setCoord(Coord coord) {
 		this.coord = coord;
+	}
+
+	public Id getStopId() {
+		return stopId;
+	}
+
+	public void setStopId(Id stopId) {
+		this.stopId = stopId;
 	}
 }

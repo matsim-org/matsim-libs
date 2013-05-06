@@ -83,6 +83,17 @@ import others.sergioo.util.dataBase.NoConnectionException;
 			e.printStackTrace();
 		}
 	}
+	public void addComment(String comment){
+		try {
+			dba.executeStatement(String.format("COMMENT ON TABLE %s IS \'%s\';", tableName,comment));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public void addLine(Object[] args) {
 		lineCounter++;

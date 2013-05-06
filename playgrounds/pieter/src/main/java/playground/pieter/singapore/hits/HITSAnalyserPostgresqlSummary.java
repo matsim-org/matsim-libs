@@ -145,14 +145,18 @@ public class HITSAnalyserPostgresqlSummary {
 	private static HashMap<String, Coord> mrtCoords;
 	private static HashMap<String, Coord> lrtCoords;
 	public static boolean freeSpeedRouting;
+	private static String eventsFileName;
+	private static String plansFileName;
 
 	static void createRouters(String[] args, boolean fSR) {
 		freeSpeedRouting = fSR;
 		scenario = ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario)).readFile(args[1]);
-		if (!freeSpeedRouting)
+		if (!freeSpeedRouting){
 			(new MatsimPopulationReader(scenario)).readFile(args[2]);
+			plansFileName = args[2];
+		}
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		double startTime = new Double(args[5]), endTime = new Double(args[6]), binSize = new Double(
 				args[7]);
@@ -164,6 +168,7 @@ public class HITSAnalyserPostgresqlSummary {
 						.getConfig().travelTimeCalculator());
 		System.out.println("Loading events");
 		if (!freeSpeedRouting) {
+			eventsFileName = args[4];
 			EventsManager eventsManager = EventsUtils
 					.createEventsManager(scenario.getConfig());
 			eventsManager.addHandler(waitTimeCalculator);
@@ -349,6 +354,9 @@ public class HITSAnalyserPostgresqlSummary {
 		DataBaseAdmin journeyDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",
 				journeyTableName, journeyDBA, 5000, columns);
+		if(!freeSpeedRouting){
+			journeyWriter.addComment(String.format("HITS journeys, routed using events file %s and plans file %s", eventsFileName,plansFileName));
+		}
 
 		String tripTableName = "m_calibration.hits_trips_" + postScript;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
@@ -371,7 +379,10 @@ public class HITSAnalyserPostgresqlSummary {
 		DataBaseAdmin tripDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS",
 				tripTableName, tripDBA, 10000, columns);
-
+		if(!freeSpeedRouting){
+			tripWriter.addComment(String.format("HITS trips, routed using events file %s and plans file %s", eventsFileName,plansFileName));
+		}
+		
 		String transferTableName = "m_calibration.hits_transfers_"
 				+ postScript;
 		columns = new ArrayList<PostgresqlColumnDefinition>();

@@ -129,8 +129,10 @@ public class HITSAnalyser {
 	private static String[] LRT_LINES;
 	private static HashMap<String, Coord> mrtCoords;
 	private static HashMap<String, Coord> lrtCoords;
+	private static boolean freeSpeedRouting;
 
-	static void createRouters(String[] args, boolean freeSpeedRouting) {
+	static void createRouters(String[] args, boolean fSR) {
+		freeSpeedRouting = fSR;
 		scenario = ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario)).readFile(args[1]);
