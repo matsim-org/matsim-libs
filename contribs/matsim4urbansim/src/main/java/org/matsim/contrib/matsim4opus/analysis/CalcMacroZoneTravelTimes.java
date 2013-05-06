@@ -105,6 +105,8 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		// handle only trips that start between 6 and 10 am...
+		if((event.getTime() < (6*3600)) || (event.getTime() > (10 * 3600))) return;
 		LegStore ls = new LegStore();
 		ActivityFacility fac = allFacilities.get(event.getFacilityId());
 		ls.setFromFacility(((Id) fac.getCustomAttributes().get(InternalConstants.ZONE_ID)));
@@ -113,17 +115,23 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
+		// check if agents exists...
+		if(!this.legStore.containsKey(event.getPersonId())) return;
 		this.legStore.get(event.getPersonId()).setDepTime(event.getTime());
 		this.legStore.get(event.getPersonId()).setMode(event.getLegMode());
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
+		// check if agents exists...
+		if(!this.legStore.containsKey(event.getPersonId())) return;
 		this.legStore.get(event.getPersonId()).setArrTime(event.getTime());
 	}
 	
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		// check if agents exists...
+		if(!this.legStore.containsKey(event.getPersonId())) return;
 		LegStore ls = this.legStore.remove(event.getPersonId());
 		ActivityFacility fac = allFacilities.get(event.getFacilityId());
 		ls.setToFacility(((Id) fac.getCustomAttributes().get(InternalConstants.ZONE_ID)));
