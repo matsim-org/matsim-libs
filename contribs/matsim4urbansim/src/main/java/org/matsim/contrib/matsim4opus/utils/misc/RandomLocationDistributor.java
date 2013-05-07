@@ -44,6 +44,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -75,7 +76,7 @@ public class RandomLocationDistributor {
 	 * @param radius
 	 */
 	public RandomLocationDistributor(String shapefile, double radius) {
-		this.random = new Random();
+		this.random = MatsimRandom.getRandom();
 		this.shapefile = shapefile;
 		this.radius = radius;
 
