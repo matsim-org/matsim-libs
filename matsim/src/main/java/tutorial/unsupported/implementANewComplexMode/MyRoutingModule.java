@@ -38,6 +38,9 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
+ * {@link RoutingModule} for a mode consisting in going to a teleportation
+ * station by public transport, being instantly teleported to a second station
+ * and going to the final destination by public transport.
  * @author thibautd
  */
 public class MyRoutingModule implements RoutingModule {
@@ -49,6 +52,13 @@ public class MyRoutingModule implements RoutingModule {
 	private final ModeRouteFactory modeRouteFactory;
 	private final Facility station1, station2;
 
+	/**
+	 * Creates a new instance.
+	 * @param ptDelegate the routing module to use to compute the PT subtrips
+	 * @param populationFactory used to create legs, activities and routes
+	 * @param station1 {@link Facility} representing the first teleport station
+	 * @param station2 {@link Facility} representing the second teleport station
+	 */
 	public MyRoutingModule(
 			final RoutingModule ptDelegate,
 			final PopulationFactory populationFactory,
@@ -79,6 +89,7 @@ public class MyRoutingModule implements RoutingModule {
 		final Facility originStation = from1to2 ? station1 : station2;
 		final Facility destinationStation = from1to2 ? station2 : station1;
 
+		// route the access trip
 		trip.addAll(
 				ptDelegate.calcRoute(
 					fromFacility,
@@ -86,6 +97,7 @@ public class MyRoutingModule implements RoutingModule {
 					departureTime,
 					person ) );
 
+		// create a dummy activity at the teleportation origin
 		final Activity firstInteraction =
 			populationFactory.createActivityFromLinkId(
 					STAGE,
@@ -93,6 +105,7 @@ public class MyRoutingModule implements RoutingModule {
 		firstInteraction.setMaximumDuration( 0 );
 		trip.add( firstInteraction );
 
+		// create the teleportation leg
 		final Leg teleportationLeg =
 			populationFactory.createLeg( TELEPORTATION_LEG_MODE );
 		teleportationLeg.setTravelTime( 0 );
@@ -103,9 +116,9 @@ public class MyRoutingModule implements RoutingModule {
 					destinationStation.getLinkId());
 		teleportationRoute.setTravelTime( 0 );
 		teleportationLeg.setRoute( teleportationRoute );
-
 		trip.add( teleportationLeg );
 
+		// create a dummy activity at the teleportation destination
 		final Activity secondInteraction =
 			populationFactory.createActivityFromLinkId(
 					STAGE,
@@ -113,6 +126,7 @@ public class MyRoutingModule implements RoutingModule {
 		secondInteraction.setMaximumDuration( 0 );
 		trip.add( secondInteraction );
 
+		// route the egress trip
 		trip.addAll(
 				ptDelegate.calcRoute(
 					destinationStation,
@@ -133,6 +147,8 @@ public class MyRoutingModule implements RoutingModule {
 	public StageActivityTypes getStageActivityTypes() {
 		final CompositeStageActivityTypes stageTypes = new CompositeStageActivityTypes();
 
+		// trips for this mode contain the ones we create, plus the ones of the
+		// pt router we use.
 		stageTypes.addActivityTypes( ptDelegate.getStageActivityTypes() );
 		stageTypes.addActivityTypes( new StageActivityTypesImpl( STAGE ) );
 

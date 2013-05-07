@@ -69,21 +69,26 @@ public class SimulateTeleportation {
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		final Controler controler = new Controler( scenario );
 
+		// create the two teleportation station:
+		// - south west
 		final Facility teleport1 =
 			createFacility(
 					new IdImpl( "teleport1" ), 
 					controler.getScenario().getNetwork().getLinks().get( new IdImpl( "1121" ) ));
-
+		// - north east
 		final Facility teleport2 =
 			createFacility(
 					new IdImpl( "teleport2" ), 
 					controler.getScenario().getNetwork().getLinks().get( new IdImpl( "4434" ) ));
 
+		// now, plug our stuff in
 		controler.setTripRouterFactory(
 				new TripRouterFactory() {
 					@Override
 					public TripRouter createTripRouter() {
-						// this factory initializes a TripRouter with default modules.
+						// this factory initializes a TripRouter with default modules,
+						// taking into account what is asked for in the config
+						// (for instance, detailled or teleported pt).
 						// This allows us to just add our module and go.
 						final TripRouterFactory delegate =
 							new TripRouterFactoryImpl(
@@ -95,6 +100,7 @@ public class SimulateTeleportation {
 
 						final TripRouter router = delegate.createTripRouter();
 
+						// add our module to the instance
 						router.setRoutingModule(
 							MAIN_MODE,
 							new MyRoutingModule(
@@ -107,6 +113,9 @@ public class SimulateTeleportation {
 								teleport1,
 								teleport2));
 
+						// we still need to provide a way to identify our trips
+						// as being teleportation trips.
+						// This is for instance used at re-routing.
 						final MainModeIdentifier defaultModeIdentifier =
 							router.getMainModeIdentifier();
 						router.setMainModeIdentifier(
@@ -125,10 +134,10 @@ public class SimulateTeleportation {
 									}
 								});
 
+						// we're done!
 						return router;
 					}
 				});
-
 		controler.run();
 	}
 
