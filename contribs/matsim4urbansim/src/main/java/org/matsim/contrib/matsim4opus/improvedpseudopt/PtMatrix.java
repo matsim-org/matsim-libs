@@ -520,14 +520,14 @@ public class PtMatrix {
 	
 	/**
 	 * 
-	 * @param fromFacilityCoord
-	 * @param toFacilityCoord
+	 * @param fromCoord
+	 * @param toCoord
 	 * @return
 	 */
-	public double getPtTravelDistance_meter(Coord fromFacilityCoord, Coord toFacilityCoord){
+	public double getPtTravelDistance_meter(Coord fromCoord, Coord toCoord){
 		
-		PtStop fromPtStop = this.qTree.get(fromFacilityCoord.getX(), fromFacilityCoord.getY());
-		PtStop toPtStop   = this.qTree.get(toFacilityCoord.getX(), toFacilityCoord.getY());
+		PtStop fromPtStop = this.qTree.get(fromCoord.getX(), fromCoord.getY());
+		PtStop toPtStop   = this.qTree.get(toCoord.getX(), toCoord.getY());
 		
 		Entry entry = originDestinationTravelDistanceMatrix.getEntry(fromPtStop.getId(), toPtStop.getId());
 		double ptTravelDistance = Double.MAX_VALUE;

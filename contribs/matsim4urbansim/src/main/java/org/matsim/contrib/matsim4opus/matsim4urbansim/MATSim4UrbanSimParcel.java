@@ -26,9 +26,15 @@ package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.matsim4opus.analysis.DanielAnalysisListenerEvents;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
@@ -51,6 +57,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricing;
@@ -297,6 +304,24 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 									controler.getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactor(),
 									getMATSim4UrbanSimControlerConfig());	
 			controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
+			
+			log.error("reconstructing pt route distances; not tested ...") ;
+			for ( Person person : scenario.getPopulation().getPersons().values() ) {
+				for ( Plan plan : person.getPlans() ) {
+					for ( PlanElement pe : plan.getPlanElements() ) {
+						if ( pe instanceof Leg ) {
+							Leg leg = (Leg) pe ;
+							if ( leg.getMode().equals(TransportMode.pt) ) {
+								Activity fromAct = ((PlanImpl)plan).getPreviousActivity(leg) ;
+								Activity toAct = ((PlanImpl)plan).getNextActivity(leg) ;
+								Route route = leg.getRoute() ;
+								route.setDistance( ptMatrix.getPtTravelDistance_meter(fromAct.getCoord(), toAct.getCoord()) ) ;
+							}
+						}
+					}
+				}
+			}
+			
 		}
 			
 		log.info("Adding controler listener ...");
@@ -607,4 +632,5 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	public double getTimeOfDay(){
 		return this.timeOfDay;
 	}
+	
 }
