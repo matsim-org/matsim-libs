@@ -37,6 +37,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 
@@ -70,8 +71,7 @@ public class MyRoutingModule implements RoutingModule, BasicEventHandler {
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		// TODO Auto-generated method stub
-		return null;
+		return EmptyStageActivityTypes.INSTANCE;
 	}
 
 	@Override
