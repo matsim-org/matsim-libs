@@ -24,7 +24,9 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -38,34 +40,39 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
+	private final StageActivityTypes blackList;
 	private final double mutationRange;
 	private final Random random;
 
+	/**
+	 * Initializes an instance mutating all activities in a plan
+	 * @param mutationRange
+	 * @param random
+	 */
 	public PlanMutateTimeAllocationSimplified(final double mutationRange, final Random random) {
+		this( EmptyStageActivityTypes.INSTANCE , mutationRange , random );
+	}
+	/**
+	 * Initializes an instance mutating all non-stage activities in a plan
+	 * @param mutationRange
+	 * @param random
+	 */
+	public PlanMutateTimeAllocationSimplified(final StageActivityTypes blackList, final double mutationRange, final Random random) {
+		this.blackList = blackList;
 		this.mutationRange = mutationRange;
 		this.random = random;
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		mutatePlan(plan);
-	}
-
-	private void mutatePlan(final Plan plan) {
-
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
-
-				// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
-				if (act.getEndTime() != Time.UNDEFINED_TIME) {
-					act.setEndTime(mutateTime(act.getEndTime()));
-				}
-				if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
-					act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
-				}
-				
-			} 
+		for ( Activity act : TripStructureUtils.getActivities( plan , blackList ) ) {
+			// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
+			if (act.getEndTime() != Time.UNDEFINED_TIME) {
+				act.setEndTime(mutateTime(act.getEndTime()));
+			}
+			if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+				act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
+			}
 		}
 		// the legs are not doing anything. kai, jun'12
 	}

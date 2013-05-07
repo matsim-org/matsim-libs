@@ -69,7 +69,10 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 			pmta = new PlanMutateTimeAllocation(mutationRange, MatsimRandom.getLocalInstance());
 			break;
 		default:
-			pmta = new PlanMutateTimeAllocationSimplified(mutationRange, MatsimRandom.getLocalInstance());
+			pmta = new PlanMutateTimeAllocationSimplified(
+					getReplanningContext().getTripRouterFactory().createTripRouter().getStageActivityTypes(),
+					mutationRange,
+					MatsimRandom.getLocalInstance());
 		}
 		return pmta;
 	}
