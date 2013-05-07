@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,6 +58,7 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
+import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.RankOfRemovedPlanListener;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
@@ -283,6 +285,44 @@ public class RunUtils {
 										entry.getValue() );
 							}
 						}
+					}
+				});
+
+		controller.addControlerListener(
+				new IterationEndsListener() {
+					@Override
+					public void notifyIterationEnds(final IterationEndsEvent event) {
+						log.info( "Checking minimality of joint plan composition" );
+						final PlanLinkIdentifier links = controller.getRegistry().getPlanLinkIdentifier();
+						final Set<JointPlan> jointPlans = new HashSet<JointPlan>();
+
+						for ( Person person : controller.getRegistry().getScenario().getPopulation().getPersons().values() ) {
+							final Plan plan = person.getSelectedPlan();
+							final JointPlan jp = controller.getRegistry().getJointPlans().getJointPlan( plan );
+
+							if ( jp != null ) {
+								jointPlans.add( jp );
+							}
+						}
+
+						for ( JointPlan jp : jointPlans ) {
+							for ( Plan p : jp.getIndividualPlans().values() ) {
+								if ( !hasLinkedPlan( links , p , jp.getIndividualPlans().values() ) ) {
+									throw new RuntimeException( "plan "+p+" is in "+jp+" but is not linked with any plan" );
+								}
+							}
+						}
+					}
+
+					private boolean hasLinkedPlan(
+							final PlanLinkIdentifier links,
+							final Plan p,
+							final Collection<Plan> plans) {
+						for ( Plan p2 : plans ) {
+							if ( p == p2 ) continue;
+							if ( links.areLinked( p , p2 ) ) return true;
+						}
+						return false;
 					}
 				});
 	}
