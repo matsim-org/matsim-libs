@@ -70,10 +70,10 @@ public final class TripRouter {
 		RoutingModule old = routingModules.put( mainMode , module );
 
 		if (old != null) {
-			final StageActivityTypes oldTypes = module.getStageActivityTypes();
+			final StageActivityTypes oldTypes = old.getStageActivityTypes();
 			final boolean removed = checker.removeActivityTypes( oldTypes );
 			if ( !removed ) {
-				//throw new RuntimeException( "could not remove "+oldTypes+" associated to "+module+". This may be due to a routing module creating a new instance at each call of getStageActivityTypes()" );
+				throw new RuntimeException( "could not remove "+oldTypes+" associated to "+old+". This may be due to a routing module creating a new instance at each call of getStageActivityTypes()" );
 			}
 		}
 
