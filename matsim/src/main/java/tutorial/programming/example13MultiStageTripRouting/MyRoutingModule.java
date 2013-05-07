@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.unsupported.implementANewComplexMode;
+package tutorial.programming.example13MultiStageTripRouting;
 
 import java.util.ArrayList;
 import java.util.List;
