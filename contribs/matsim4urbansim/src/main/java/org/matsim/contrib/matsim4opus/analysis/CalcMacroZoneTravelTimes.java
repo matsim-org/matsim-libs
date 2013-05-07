@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -56,14 +57,23 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 	private Map<Id, ? extends ActivityFacility> allFacilities;
 	private Map<Id, Id> micro2MacroZone;
 	private Map<String, Matrix> mode2zoneTraveltimes;
-	private Map<String, Matrix> mode2zoneTrips; 
+	private Map<String, Matrix> mode2zoneTrips;
+	private int end;
+	private int start; 
 
-	public CalcMacroZoneTravelTimes(Map<Id, ? extends ActivityFacility> map, Map<Id, Id> micro2MacroZone) {
+	/**
+	 * Generates some output for validation reasons for the brussels-scenario. Note it might NOT work for other scenarios...
+	 * @param map
+	 * @param micro2MacroZone
+	 */
+	public CalcMacroZoneTravelTimes(Map<Id, ? extends ActivityFacility> map, Map<Id, Id> micro2MacroZone, int startHour, int endHour) {
 		this.legStore = new HashMap<Id, LegStore>();
 		this.allFacilities = map;
 		this.micro2MacroZone = micro2MacroZone;
 		this.mode2zoneTraveltimes = new HashMap<String, Matrix>();
 		this.mode2zoneTrips = new HashMap<String, Matrix>();
+		this.start = startHour;
+		this.end = endHour;
 	}
 
 	@Override
@@ -78,7 +88,7 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 	public void writeOutput(String outputPath) {
 		//write traveltimes
 		for(java.util.Map.Entry<String, Matrix> e: this.mode2zoneTraveltimes.entrySet()){
-			BufferedWriter writer = IOUtils.getBufferedWriter(outputPath + "/travelTimesAndTrips_" + e.getKey() + ".csv");
+			BufferedWriter writer = IOUtils.getBufferedWriter(outputPath + "/travelTimesAndTrips_" + String.valueOf(start) + "-" + String.valueOf(end) + "_"+ e.getKey() + ".csv");
 			
 			try {
 				writer.write("fromZone;toZone;totalTravelTime[s];Trips[#]; avgTravelTimes[s];");
@@ -106,7 +116,7 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		// handle only trips that start between 6 and 10 am...
-		if((event.getTime() < (6*3600)) || (event.getTime() > (10 * 3600))) return;
+		if((event.getTime() < (this.start*3600)) || (event.getTime() >= (this.end * 3600))) return;
 		LegStore ls = new LegStore();
 		ActivityFacility fac = allFacilities.get(event.getFacilityId());
 		ls.setFromFacility(((Id) fac.getCustomAttributes().get(InternalConstants.ZONE_ID)));
@@ -147,12 +157,14 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 		tt = this.mode2zoneTraveltimes.get(ls.getMode());
 		if(tt == null){
 			tt = new Matrix(ls.getMode()+ "_traveltimes", ls.getMode() + " traveltimes");
+			init(tt);
 			this.mode2zoneTraveltimes.put(ls.getMode(), tt);
 		}
 		// same for the trip-matrix
 		trip = this.mode2zoneTrips.get(ls.getMode());
 		if(trip == null){
 			trip = new Matrix(ls.getMode()+ "_trips", ls.getMode() + " trips");
+			init(trip);
 			this.mode2zoneTrips.put(ls.getMode(), trip);
 		}
 		Id from, to;
@@ -167,6 +179,18 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 		ee = tt.getEntry(from, to);
 		if(ee == null) ee = tt.setEntry(from, to, 0);
 		tt.setEntry(from, to, ee.getValue() + ls.getTravelTime());
+	}
+
+	/**
+	 * initialize the matrix to get it sorted in a proper way...
+	 * @param matrix
+	 */
+	private void init(Matrix matrix) {
+		for(int i = 1; i < 8; i++){
+			for(int j = 1; j < 8; j++){
+				matrix.createEntry(new IdImpl(i), new IdImpl(j), 0.);
+			}
+		}
 	}
 	
 	

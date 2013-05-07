@@ -24,6 +24,10 @@
 package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -33,6 +37,7 @@ import org.matsim.contrib.matsim4opus.analysis.KaiAnalysisListener;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.algorithms.NetworkScenarioCut;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
@@ -132,7 +137,22 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	@Override
 	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, Controler controler) {
 		controler.addControlerListener(new KaiAnalysisListener()) ;
-		controler.addControlerListener(new DanielAnalysisListenerEvents(this.getUrbanSimParameterConfig().getMATSim4OpusTemp(), zones));
+		// not very nice, but the correct folder is not specified anywhere and change with every new urbansim-run... // Daniel May'13
+		String cleFile = this.getUrbanSimParameterConfig().getMATSim4OpusTemp().replaceFirst("/tmp/", "/") + "cle.csv";
+		if(new File(cleFile).exists()){
+			log.info("loading " + DanielAnalysisListenerEvents.class.getSimpleName() + " with " + cleFile + "...");
+			List<Tuple<Integer, Integer>> timeslots = new ArrayList<Tuple<Integer,Integer>>();
+			timeslots.add(new Tuple<Integer, Integer>(0, 6));
+			timeslots.add(new Tuple<Integer, Integer>(6, 10));
+			timeslots.add(new Tuple<Integer, Integer>(10, 14));
+			timeslots.add(new Tuple<Integer, Integer>(14, 18));
+			timeslots.add(new Tuple<Integer, Integer>(18, 24));
+			timeslots.add(new Tuple<Integer, Integer>(0, 24));
+			controler.addControlerListener(new DanielAnalysisListenerEvents(cleFile, zones, timeslots));
+		}else{
+			log.error("can not find " + cleFile);
+//			throw new RuntimeException("can not find " + cleFile);
+		}
 	}
 
 	/**

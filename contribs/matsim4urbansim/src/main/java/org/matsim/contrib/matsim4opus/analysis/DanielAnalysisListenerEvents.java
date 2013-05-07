@@ -21,8 +21,10 @@ package org.matsim.contrib.matsim4opus.analysis;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,6 +38,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -44,31 +47,47 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class DanielAnalysisListenerEvents implements StartupListener, IterationStartsListener, IterationEndsListener {
 	
-	private CalcMacroZoneTravelTimes traveltimes;
+	private List<CalcMacroZoneTravelTimes> traveltimes;
 	private Map<Id, Id> micro2MacroZone;
 	private String micro2macroZonesFile;
 	private ActivityFacilities parcels;
+	private List<Tuple<Integer, Integer>> timeslots;
+	
 	
 	private static final Logger log = Logger
 			.getLogger(DanielAnalysisListenerEvents.class);
 
-	public DanielAnalysisListenerEvents(String matsim4Opustemp, ActivityFacilities parcels) {
-		this.micro2macroZonesFile = matsim4Opustemp + "/cle.csv";
+	/**
+	 * 	 *  a listener to include the additional analysis-class <code>CalcMacroZoneTravelTimes</code>
+	 * @param cleFile, the csv-File 
+	 * @param parcels, parcels from the urbansim-model
+	 * @param timeslots, list of tuples, each defining the start and the end hour of a timeslot
+	 */
+	public DanielAnalysisListenerEvents(String cleFile, ActivityFacilities parcels, List<Tuple<Integer, Integer>> timeslots) {
+		this.micro2macroZonesFile = cleFile ;
 		this.parcels = parcels;
+		this.timeslots = timeslots;
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (0 == event.getIteration() % event.getControler().getConfig().controler().getWriteEventsInterval()){
-			traveltimes = new CalcMacroZoneTravelTimes(this.parcels.getFacilities(), this.micro2MacroZone);
-			event.getControler().getEvents().addHandler(traveltimes);
+			this.traveltimes = new ArrayList<CalcMacroZoneTravelTimes>();
+			CalcMacroZoneTravelTimes traveltimes;
+			for(Tuple<Integer, Integer> t: this.timeslots){
+				traveltimes = new CalcMacroZoneTravelTimes(this.parcels.getFacilities(), this.micro2MacroZone, t.getFirst(), t.getSecond());
+				this.traveltimes.add(traveltimes);
+				event.getControler().getEvents().addHandler(traveltimes);
+			}
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (!(traveltimes == null)){
-			traveltimes.writeOutput(event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+			for(CalcMacroZoneTravelTimes tt: this.traveltimes){
+				tt.writeOutput(event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+			}
 		}
 	}
 
