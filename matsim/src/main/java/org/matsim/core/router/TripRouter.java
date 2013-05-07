@@ -70,9 +70,20 @@ public final class TripRouter {
 		RoutingModule old = routingModules.put( mainMode , module );
 
 		if (old != null) {
-			checker.removeActivityTypes( old.getStageActivityTypes() );
+			final StageActivityTypes oldTypes = module.getStageActivityTypes();
+			final boolean removed = checker.removeActivityTypes( oldTypes );
+			if ( !removed ) {
+				throw new RuntimeException( "could not remove "+oldTypes+" associated to "+module+". This may be due to a routing module creating a new instance at each call of getStageActivityTypes()" );
+			}
 		}
-		checker.addActivityTypes( module.getStageActivityTypes() );
+
+		final StageActivityTypes types = module.getStageActivityTypes();
+		if ( types == null ) {
+			// we do not want to accept that, this would risk to mess up
+			// with replacement, and it generally makes code messy.
+			throw new RuntimeException( module+" returns null stage activity types. This is not a valid value. Return EmptyStageActivityTypes.INSTANCE instead." );
+		}
+		checker.addActivityTypes( types );
 
 		return old;
 	}
