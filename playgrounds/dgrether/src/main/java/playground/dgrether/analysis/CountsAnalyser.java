@@ -23,6 +23,14 @@ package playground.dgrether.analysis;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Scenario;
@@ -45,6 +53,8 @@ import playground.dgrether.utils.DoubleArrayTableWriter;
  * This class is able to compare traffic counts with traffic in the simulation.
  * The results are written to file in a format which has to be specified.
  *
+ * http://stackoverflow.com/questions/367706/is-there-a-good-command-line-argument-parser-for-java
+ * http://commons.apache.org/proper/commons-cli/usage.html
  * @author dgrether
  *
  */
@@ -198,36 +208,71 @@ public class CountsAnalyser {
 		log.info("  - The node id for the center of the distance filter (optinal, however mandatory if distance filter is set)");
 	}
 
+	private static void printHelp(Options options){
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp( "CountsAnalyzer", options );
+	}
+	
 	/**
 	 * See printHelp() method
 	 */
 	public static void main(String[] args) {
-		CountsAnalyser ca = null;
-		if (args.length != 5) {
-			printHelp();
-		}
-		else {
-			String networkFilename = args[0];
-			String countsFilename = args[1];
-			String linkStatsFilename = args[2];
-			String outputFilename = args[3];
-			String outputFormat = args[4];
-			double scaleFactor = Double.parseDouble(args[5]);
-			String coordinateSystem = args[6];
-			
-			ca = new CountsAnalyser();
-			ca.setCountsFilename(countsFilename);
-			ca.setCoordinateSystem(coordinateSystem);
-			ca.setLinkStatsFilename(linkStatsFilename);
-			ca.setNetworkFilename(networkFilename);
-			ca.setScaleFactor(scaleFactor);
-			ca.writeCountsComparisonList(outputFilename, outputFormat);
-			log.info("File written to " + ca.outputFile);
-		}
+		CountsAnalyser ca = new CountsAnalyser();
+		Options options = new Options();
+
+		Option networkOption = OptionBuilder.withArgName( "PATH" ).hasArg().withDescription(  "path to network file" )
+        .withLongOpt("network").create( "n" );
+		Option crsOption = OptionBuilder.withArgName( "CRSID" ).hasArg().withDescription(  "coordinate reference system identifier" )
+				.create( "crs" );
+		Option countsOption = OptionBuilder.withArgName( "PATH" ).hasArg().withDescription(  "path to counts xml file" )
+        .withLongOpt("counts").create( "c" );
+		Option linkstatsOption = OptionBuilder.withArgName( "PATH" ).hasArg().withDescription(  "path to linkstats file" )
+        .withLongOpt("linkstats").create( "ls" );
+		Option scaleOption = OptionBuilder.withArgName( "double" ).hasArg().withDescription(  "scale factor" )
+        .withLongOpt("scale").create( "s" );
+
+		options.addOption(networkOption);
+		options.addOption(crsOption);
+		options.addOption(countsOption);
+		options.addOption(linkstatsOption);
+		options.addOption(crsOption);
+		options.addOption(scaleOption);
+		
+		CommandLineParser parser = new BasicParser();
+    try {
+        CommandLine line = parser.parse( options, args );
+        if (line.hasOption("n")){
+        	ca.setNetworkFilename(line.getOptionValue("n"));
+        }
+        else {
+        	System.err.println("No network file specified");
+        	printHelp(options);
+        }
+        if (line.hasOption("c")) {
+        	ca.setCountsFilename(line.getOptionValue("c"));
+        }
+        else {
+        	System.err.println("No counts file specified");
+        }
+        if (line.hasOption("crs")){
+        	ca.setCoordinateSystem(line.getOptionValue("crs"));
+        }
+        else {
+        	System.err.println("No crs file specified");
+        }
+        if (line.hasOption("ls")){
+        	ca.setLinkStatsFilename(line.getOptionValue("ls"));
+        }
+        else {
+        	System.err.println("No counts file specified");
+        }
+        if (line.hasOption("sf")){
+        	double scale = Double.parseDouble(line.getOptionValue("sf"));
+        	ca.setScaleFactor(scale);
+        }
+    }
+    catch( ParseException exp ) {
+        log.error( "Parsing failed.  Reason: " + exp.getMessage());
+    }
 	}
-
-	
-
-	
-
 }
