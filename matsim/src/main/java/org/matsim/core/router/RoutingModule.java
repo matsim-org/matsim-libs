@@ -59,7 +59,10 @@ public interface RoutingModule {
 
 	/**
 	 * Gives access to the activity types to consider as stages.
-	 * @return a {@link StageActivityTypes}
+	 * </ul>
+	 * @return a non-null {@link StageActivityTypes}. This should always return
+	 * the same instance, or at least return instances which are equal for equals().
+	 * Otherwise, replacement of modules in the {@link TripRouter} will not work.
 	 */
 	public StageActivityTypes getStageActivityTypes();
 }
