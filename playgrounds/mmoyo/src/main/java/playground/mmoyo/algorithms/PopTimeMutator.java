@@ -8,8 +8,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.replanning.TransitPlanMutateTimeAllocation;
 
 import playground.mmoyo.algorithms.PopulationCleaner;
@@ -33,7 +35,11 @@ public class PopTimeMutator {
 	}
 	
 	public void run4transit (Population population){
-		PlanAlgorithm timeMutator = new TransitPlanMutateTimeAllocation(this.mutationRange, MatsimRandom.getLocalInstance());
+		PlanAlgorithm timeMutator =
+				new TransitPlanMutateTimeAllocation(
+						new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
+						this.mutationRange,
+						MatsimRandom.getLocalInstance());
 		for(Person person: population.getPersons().values()){
 			for (Plan plan : person.getPlans()){
 				timeMutator.run(plan);

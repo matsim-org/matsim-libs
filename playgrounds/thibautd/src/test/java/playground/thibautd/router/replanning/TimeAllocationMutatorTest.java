@@ -72,6 +72,7 @@ public class TimeAllocationMutatorTest {
 	public void testAgainstTransitTimeAllocationMutator() {
 		TransitPlanMutateTimeAllocation transit =
 			new TransitPlanMutateTimeAllocation(
+					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 					MUTATION_RANGE,
 					new Random( SEED ));
 

@@ -28,6 +28,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
 
@@ -61,7 +62,11 @@ public class TransitPlanMutateTimeAllocationTest {
 		plan.createAndAddLeg(TransportMode.transit_walk);
 		plan.createAndAddActivity("work", new CoordImpl(0, 500));
 
-		TransitPlanMutateTimeAllocation mutator = new TransitPlanMutateTimeAllocation(3600., new Random(2011));
+		TransitPlanMutateTimeAllocation mutator =
+				new TransitPlanMutateTimeAllocation(
+						new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
+						3600.,
+						new Random(2011));
 		mutator.run(plan);
 
 		Assert.assertEquals(0.0, ptAct1.getMaximumDuration(), 1e-8);

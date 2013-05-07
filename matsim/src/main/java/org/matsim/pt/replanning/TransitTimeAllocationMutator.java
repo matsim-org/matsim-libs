@@ -64,7 +64,11 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TransitPlanMutateTimeAllocation pmta = new TransitPlanMutateTimeAllocation(this.mutationRange, MatsimRandom.getLocalInstance());
+		TransitPlanMutateTimeAllocation pmta =
+			new TransitPlanMutateTimeAllocation(
+					getReplanningContext().getTripRouterFactory().createTripRouter().getStageActivityTypes(),
+					this.mutationRange,
+					MatsimRandom.getLocalInstance());
 		pmta.setUseActivityDurations(this.useActivityDurations);
 		return pmta;
 	}

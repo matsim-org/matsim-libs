@@ -26,24 +26,29 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.PtConstants;
 
 /**
  * Copy/Paste of PlanMutateTimeAllocation, but with special handling
- * for transit interaction activities (like line changes): they are
- * just ignored and not changed at all.
+ * for stage activities (eg transit interaction activities, like line changes):
+ * they are just ignored and not changed at all.
  *
  * @author mrieser
  */
 public class TransitPlanMutateTimeAllocation implements PlanAlgorithm {
 
+	private final  StageActivityTypes stageActivities;
 	private final double mutationRange;
 	private final Random random;
 	private boolean useActivityDurations;
 
-	public TransitPlanMutateTimeAllocation(final double mutationRange, final Random random) {
+	public TransitPlanMutateTimeAllocation(
+			final StageActivityTypes stageActivities,
+			final double mutationRange,
+			final Random random) {
+		this.stageActivities = stageActivities;
 		this.mutationRange = mutationRange;
 		this.random = random;
 	}
@@ -82,7 +87,7 @@ public class TransitPlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-					if (!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+					if ( !stageActivities.isStageActivity( act.getType() ) ) {
 						if (this.useActivityDurations) {
 							if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
 								// mutate the durations of all 'middle' activities
