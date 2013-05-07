@@ -142,7 +142,6 @@ public class SimulateTeleportation {
 	}
 
 	private static void tuneConfig(final Config config) {
-		config.addModule( "changeLegMode" , new Module( "changeLegMode" ) );
 		config.getModule( "changeLegMode" ).addParam( "modes" , "car,pt,"+MAIN_MODE );
 
 		final ActivityParams scoreTelepInteract = new ActivityParams( MyRoutingModule.STAGE );
