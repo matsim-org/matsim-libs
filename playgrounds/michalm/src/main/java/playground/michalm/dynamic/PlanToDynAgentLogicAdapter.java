@@ -55,7 +55,7 @@ public class PlanToDynAgentLogicAdapter
         this.agent = adapterAgent;
 
         Activity act = (Activity)planElemIter.next();
-        return new DynActivityImpl(act.getType(), act.getEndTime());
+        return new StaticDynActivity(act.getType(), act.getEndTime());
     }
 
 
@@ -73,7 +73,7 @@ public class PlanToDynAgentLogicAdapter
 
         if (planElem instanceof Activity) {
             Activity act = (Activity)planElem;
-            return new DynActivityImpl(act.getType(), act.getEndTime());
+            return new StaticDynActivity(act.getType(), act.getEndTime());
         }
         else if (planElem instanceof Leg) {
             NetworkRoute route = (NetworkRoute) ((Leg)planElem).getRoute();

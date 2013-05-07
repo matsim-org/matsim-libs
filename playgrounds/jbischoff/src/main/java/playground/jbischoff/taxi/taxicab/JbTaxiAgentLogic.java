@@ -41,7 +41,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.WaitTask;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.DriveTaskImpl;
 import playground.michalm.dynamic.DynAction;
 import playground.michalm.dynamic.DynActivity;
-import playground.michalm.dynamic.DynActivityImpl;
+import playground.michalm.dynamic.StaticDynActivity;
 import playground.michalm.dynamic.DynAgent;
 import playground.michalm.dynamic.DynAgentLogic;
 import playground.michalm.dynamic.DynLeg;

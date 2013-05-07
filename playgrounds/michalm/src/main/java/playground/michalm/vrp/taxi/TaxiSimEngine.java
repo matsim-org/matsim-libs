@@ -100,9 +100,9 @@ public class TaxiSimEngine
     }
 
 
-    public void beforeNextTask(Vehicle vrpVehicle, int time)
+    public void nextTask(Vehicle vrpVehicle, int time)
     {
-        optimizer.beforeNextTask(vrpVehicle);
+        optimizer.nextTask(vrpVehicle);
         notifyAgentLogics();
     }
 

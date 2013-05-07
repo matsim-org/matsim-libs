@@ -19,24 +19,21 @@
 
 package playground.michalm.dynamic;
 
-public class DynActivityImpl
-    implements DynActivity
+/**
+ * endTime is not subject to change
+ * 
+ * @author michalm
+ */
+public class StaticDynActivity
+    extends AbstractDynActivity
 {
-    private String activityType;
-    private double endTime;
+    private final double endTime;
 
 
-    public DynActivityImpl(String activityType, double endTime)
+    public StaticDynActivity(String activityType, double endTime)
     {
-        this.activityType = activityType;
+        super(activityType);
         this.endTime = endTime;
-    }
-
-
-    @Override
-    public String getActivityType()
-    {
-        return activityType;
     }
 
 

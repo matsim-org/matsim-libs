@@ -89,28 +89,21 @@ public class TaxiAgentLogic
     private DynAction scheduleNextTask(double now)
     {
         Schedule schedule = vrpVehicle.getSchedule();
-        ScheduleStatus status = schedule.getStatus();
 
-        if (status == ScheduleStatus.UNPLANNED) {
+        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
         }
         // else: PLANNED or STARTED
 
         int time = (int)now;
-
-        if (status == ScheduleStatus.STARTED) {// TODO: should also be called if PLANNED???????
-            //currently I assume that there are no delays (or "speedups") in starting the first task
-            //i.e. PLANNED=>STARTED, therefore "updateAndOptimize" function is called only for
-            //the already started schedules
-            taxiSimEngine.beforeNextTask(vrpVehicle, time);
-        }
-
-        Task task = schedule.nextTask();
-        status = schedule.getStatus();// REFRESH status (after schedule.nextTask)!!!
-
-        if (status == ScheduleStatus.COMPLETED) {// this happens as a result of nextTask() call
+        taxiSimEngine.nextTask(vrpVehicle, time);
+        // REFRESH status (after nextTask)!!!
+        
+        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// this happens as a result of nextTask() call
             return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
         }
+        
+        Task task = schedule.getCurrentTask();
 
         switch (task.getType()) {
             case DRIVE: // driving both with and without passengers
@@ -144,9 +137,7 @@ public class TaxiAgentLogic
 
     private DynActivity createBeforeScheduleActivity()
     {
-        return new DynActivityImpl("Before schedule: " + vrpVehicle.getId(), -1) {
-
-            @Override
+        return new AbstractDynActivity("Before schedule: " + vrpVehicle.getId()) {
             public double getEndTime()
             {
                 Schedule s = vrpVehicle.getSchedule();
@@ -167,7 +158,7 @@ public class TaxiAgentLogic
 
     private DynActivity createAfterScheduleActivity()
     {
-        return new DynActivityImpl("After schedule: " + vrpVehicle.getId(),
+        return new StaticDynActivity("After schedule: " + vrpVehicle.getId(),
                 Double.POSITIVE_INFINITY);
     }
 
