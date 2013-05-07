@@ -25,6 +25,7 @@ package playground.ikaddoura.optimization.externalDelayEffects;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -217,7 +218,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				// delayed!
 				double delay = earliestLinkLeaveTime - uncongestedLinkLeaveTime;
 				System.out.println("---------------------------------------------------------------------------------------------------------------------");
-				System.out.println(personId + " will be delayed on link " + linkId + " due to flow capacity constraints. Delay [sec]: " + delay);
+				System.out.println(personId + " may be delayed on link " + linkId + " due to flow capacity constraints. Delay [sec]: " + delay);
 				System.out.println("   Causing agents:");
 			
 				// See who was causing the delay on that link and throw delayEffects for the causing agents.
@@ -225,21 +226,42 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				reverseList.addAll(personDelayInfos);
 				Collections.reverse(reverseList);
 				
-				
 				double delayToPayFor = delay;
 				for (PersonDelayInfo info : reverseList){
 					if (delayToPayFor > linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
+						
 						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, "flowCapacity", info.getPersonId(), personId, linkInfo.getMarginalDelayPerLeavingVehicle_sec(), linkId);
 						System.out.println("	Person " + info.getPersonId() + " --> Marginal delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec());
-						this.events.processEvent(congestionEvent);
+						List<MarginalCongestionEvent> congestionEvents_FlowCapacity = null;
+						if (linkInfo.getflowCapacityCongestionEvents() == null) {
+							congestionEvents_FlowCapacity = new ArrayList<MarginalCongestionEvent>();
+							congestionEvents_FlowCapacity.add(congestionEvent);
+
+						} else {
+							congestionEvents_FlowCapacity = linkInfo.getflowCapacityCongestionEvents();
+							congestionEvents_FlowCapacity.add(congestionEvent);
+						}
+						linkInfo.setflowCapacityCongestionEvents(congestionEvents_FlowCapacity);
+//						this.events.processEvent(congestionEvent);
 												
 						delayToPayFor = delayToPayFor - linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 					} else {
 						if (delayToPayFor > 0) {
 							MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, "flowCapacity", info.getPersonId(), personId, delayToPayFor, linkId);
 							System.out.println("	Person " + info.getPersonId() + " --> Marginal delay: " + delayToPayFor);
-							this.events.processEvent(congestionEvent);
+							
+							List<MarginalCongestionEvent> congestionEvents_FlowCapacity = null;
+							if (linkInfo.getflowCapacityCongestionEvents() == null) {
+								congestionEvents_FlowCapacity = new ArrayList<MarginalCongestionEvent>();
+								congestionEvents_FlowCapacity.add(congestionEvent);
+
+							} else {
+								congestionEvents_FlowCapacity = linkInfo.getflowCapacityCongestionEvents();
+								congestionEvents_FlowCapacity.add(congestionEvent);
+							}
+							linkInfo.setflowCapacityCongestionEvents(congestionEvents_FlowCapacity);
 							delayToPayFor = 0;
+//							this.events.processEvent(congestionEvent);
 						}
 					}
 				}
@@ -301,10 +323,35 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 						System.out.println("Causing agent(s): " + causingAgentIDs.toString());
 						System.out.println("---------------------------------------------------------------------------------------------------------------------");
 						
+						// Delay resulting from storage capacity constraints are higher than delay resulting from flow capacity constraints
+						// Delete marginal congestion events due to flow capacity constraints for this affected agent on this link
+						List<MarginalCongestionEvent> congEvents = this.linkId2congestionInfo.get(event.getLinkId()).getflowCapacityCongestionEvents();
+						for (Iterator<MarginalCongestionEvent> iterator = congEvents.iterator(); iterator.hasNext();){
+							MarginalCongestionEvent congEvent = iterator.next();
+							
+							if (congEvent.getAffectedAgentId().toString().equals(event.getPersonId().toString())) {
+								System.out.println(event.getPersonId() + " is further delayed on link " + event.getLinkId() + " by storage capacity constraints.");
+								System.out.println("Deleting (without throwing) MarginalCongestionEvent: " + congEvent.toString());
+								iterator.remove();
+							}
+						}
+						
 					} else {
-						System.out.println(event.getPersonId().toString() + " is not delayed due to storage capacity constraints on links behind link " + event.getLinkId() + ".");
-						// Maybe throw congestion effects due to flow capacity constraints only here?!
-						// Maybe it doesn't make sense to throw flow capacity congestion effects, if an agent is further delayed due to capacity constraints. 
+//						System.out.println(event.getPersonId().toString() + " is not delayed due to storage capacity constraints on links behind link " + event.getLinkId() + ".");
+					
+						// No delay resulting from storage capacity constraints.
+						// Throw marginal congestion events due to flow capacity constraints for this affected agent on this link and delete this event afterwards
+						List<MarginalCongestionEvent> congEvents = this.linkId2congestionInfo.get(event.getLinkId()).getflowCapacityCongestionEvents();
+						for (Iterator<MarginalCongestionEvent> iterator = congEvents.iterator(); iterator.hasNext();){
+							MarginalCongestionEvent congEvent = iterator.next();
+							
+							if (congEvent.getAffectedAgentId().toString().equals(event.getPersonId().toString())) {
+								System.out.println(event.getPersonId() + " is not further delayed on link " + event.getLinkId() + " by storage capacity constraints.");
+								System.out.println("Throwing and deleting MarginalCongestionEvent: " + congEvent.toString());
+								this.events.processEvent(congEvent);
+								iterator.remove();
+							}
+						}
 					}
 				}
 			}

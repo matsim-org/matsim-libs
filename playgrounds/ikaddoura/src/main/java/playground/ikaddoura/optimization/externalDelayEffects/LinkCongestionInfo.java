@@ -23,9 +23,7 @@
 package playground.ikaddoura.optimization.externalDelayEffects;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
@@ -41,6 +39,7 @@ public class LinkCongestionInfo {
 	private double marginalDelayPerLeavingVehicle_sec;
 	private double storageCapacity;
 	
+	private List<MarginalCongestionEvent> congestionEvents_FlowCapacity = new ArrayList<MarginalCongestionEvent>();
 	private List<PersonDelayInfo> personDelayInfos = new ArrayList<PersonDelayInfo>();
 	private List<LinkEnterLeaveInfo> personId2enterLeaveInfo = new ArrayList<LinkEnterLeaveInfo>();
 	
@@ -89,5 +88,11 @@ public class LinkCongestionInfo {
 	public void setPersonId2enterLeaveInfo(List<LinkEnterLeaveInfo> personId2enterLeaveInfo) {
 		this.personId2enterLeaveInfo = personId2enterLeaveInfo;
 	}
-	
+	public List<MarginalCongestionEvent> getflowCapacityCongestionEvents() {
+		return congestionEvents_FlowCapacity;
+	}
+	public void setflowCapacityCongestionEvents(
+			List<MarginalCongestionEvent> flowCapacityCongestionEvents) {
+		this.congestionEvents_FlowCapacity = flowCapacityCongestionEvents;
+	}
 }
