@@ -20,6 +20,7 @@
 
 package org.matsim.core.scoring.functions;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,6 +29,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
@@ -98,6 +100,8 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 		return this.score;
 	}
 
+	private static int ccc=0 ;
+	
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
@@ -115,14 +119,25 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 			if (this.params.marginalUtilityOfDistancePt_m != 0.0) {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
+				if ( Double.isNaN(dist) ) {
+					if ( ccc<10 ) {
+						ccc++ ;
+						Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: router does not " +
+								"write distance into plan.  Needs to be fixed or these plans will die out.") ;
+						if ( ccc==10 ) {
+							Logger.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
+						}
+					}
+				}
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt_m * dist;
-
-			// (yyyyyy NOTE: pt wait is not separately scored!! --> should be done!  kai, nov'12)
+			
+			// (yy NOTE: pt wait is not separately scored!! --> should be done!  kai, nov'12)
+			// see below, but might be nicer to do it here.  kai, may'13, but added earlier than that
 
 			tmpScore += this.params.constantPt ;
-			// (yyyyyy NOTE: the pt constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
-			// see below.  kai, dec'12
+			// (yy NOTE: the pt constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
+			// see below, but might be nicer to do it here.  kai, dec'12
 
 		} else if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
 			double dist = 0.0; // distance in meters
