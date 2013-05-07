@@ -55,6 +55,10 @@ public class CompositeStageActivityTypes implements StageActivityTypes {
 	 * instances.
 	 */
 	public boolean removeActivityTypes(final StageActivityTypes checker) {
+		if (checker instanceof EmptyStageActivityTypes) {
+			// those checkers are not added: consider them removed.
+			return true;
+		}
 		return checkers.remove( checker );
 	}
 
