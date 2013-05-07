@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -49,9 +48,9 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author dgrether
  *
  */
-public class DgZonesUtils {
+public class DgZoneUtils {
 	
-	private static final Logger log = Logger.getLogger(DgZonesUtils.class);
+	private static final Logger log = Logger.getLogger(DgZoneUtils.class);
 	
 	public static List<DgZone> createZonesFromGrid(DgGrid grid){
 		int id = 1000;
@@ -71,41 +70,32 @@ public class DgZonesUtils {
 		for (DgZone zone : zones){
 			Coord coord = MGC.coordinate2Coord(zone.getCoordinate());
 			Link link = network.getNearestLinkExactly(coord);
+			if (link == null) throw new IllegalStateException("No nearest link found");
 			map.put(zone, link);
 		}
 		return map;
 	}
 
 
-	/**
-	 * Use with care
-	 */
 	public static void writePolygonZones2Shapefile(List<DgZone> cells, CoordinateReferenceSystem crs, String shapeFilename){
 		Collection<SimpleFeature> featureCollection = new ArrayList<SimpleFeature>();
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(crs);
 		b.setName("grid_cell");
 		b.add("location", Polygon.class);
-		b.add("to_cell_id", String.class);
-		b.add("trips", Double.class);
-		SimpleFeatureBuilder factory = new SimpleFeatureBuilder(b.buildFeatureType());
-			
+		b.add("zone_id", String.class);
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		try {
 			for (DgZone cell : cells){
 				log.info("writing cell: " + cell.getId());
 				List<Object> attributes = new ArrayList<Object> ();
 				Polygon p = cell.getPolygon();
 				attributes.add(p);
-				for (Entry<DgZone, Double> entry : cell.getToZoneRelations().entrySet()){
-					log.info("  to cell " + entry.getKey().getId() + " # trips: " + entry.getValue());
-					attributes.add( entry.getKey().getId());
-					attributes.add( entry.getValue());
-					Object[] atts = attributes.toArray();
-					SimpleFeature feature = factory.buildFeature(null, atts);
-					featureCollection.add(feature);
-					attributes.clear();
-					attributes.add(p);
-				}
+				attributes.add(cell.getId());
+				Object[] atts = attributes.toArray();
+				SimpleFeature feature = builder.buildFeature(cell.getId().toString(), atts);
+				attributes.clear();
+				featureCollection.add(feature);
 			}		
 			ShapeFileWriter.writeGeometries(featureCollection, shapeFilename);
 		} catch (Exception  e) {
@@ -114,40 +104,51 @@ public class DgZonesUtils {
 		} 
 	}
 
-
-	public static void writeLineStringOdPairsFromZones2Shapefile(List<DgZone> cells,
-			CoordinateReferenceSystem crs, String shapeFilename) {
+	public static void writeLinksOfZones2Shapefile(List<DgZone> cells, Map<DgZone, Link> zones2LinkMap, 
+			CoordinateReferenceSystem crs, String shapeFilename){
 		List<SimpleFeature> featureCollection = new ArrayList<SimpleFeature>();
-		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-		b.setCRS(crs);
-		b.setName("ls_od_pair");
-		b.add("location", LineString.class);
-		b.add("no trips", Double.class);
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
-		
 		GeometryFactory geoFac = new GeometryFactory();
-		
-		for (DgZone zone : cells){
-			for (DgDestination destination : zone.getDestinations() ){
-				addLineStringFeature(builder, featureCollection, geoFac, zone, destination);
-			}
-			for (DgZoneFromLink fromLink : zone.getFromLinks().values()){
-				for (DgDestination destination : fromLink.getDestinations() ){
-					addLineStringFeature(builder, featureCollection, geoFac, fromLink, destination);
+		SimpleFeatureTypeBuilder linkFeatureTypeBuilder = new SimpleFeatureTypeBuilder();
+		linkFeatureTypeBuilder.setCRS(crs);
+		linkFeatureTypeBuilder.setName("link");
+		linkFeatureTypeBuilder.add("location", LineString.class);
+		linkFeatureTypeBuilder.add("zone", String.class);
+		linkFeatureTypeBuilder.add("is_center_link", Boolean.class);
+		SimpleFeatureBuilder linkBuilder = new SimpleFeatureBuilder(linkFeatureTypeBuilder.buildFeatureType());
+		int featureId = 1;
+		try {
+			for (DgZone zone : cells){
+				for (DgZoneFromLink link : zone.getFromLinks().values()){
+					Link l = link.getLink();
+					Coordinate startCoordinate = MGC.coord2Coordinate(l.getFromNode().getCoord());
+					Coordinate endCoordinate = MGC.coord2Coordinate(l.getToNode().getCoord());
+					Coordinate[] coordinates = {startCoordinate, endCoordinate};
+					LineString lineString = geoFac.createLineString(coordinates);
+					Object[] atts = {lineString, zone.getId().toString(), false};
+					SimpleFeature linkFeature = linkBuilder.buildFeature(Integer.toString(featureId), atts);
+					featureId++;
+					featureCollection.add(linkFeature);
 				}
-			}
-		}
-		ShapeFileWriter.writeGeometries(featureCollection, shapeFilename);
+				Link l = zones2LinkMap.get(zone);
+				Coordinate startCoordinate = MGC.coord2Coordinate(l.getFromNode().getCoord());
+				Coordinate endCoordinate = MGC.coord2Coordinate(l.getToNode().getCoord());
+				Coordinate[] coordinates = {startCoordinate, endCoordinate};
+				LineString lineString = geoFac.createLineString(coordinates);
+				Object[] atts = {lineString, zone.getId().toString(), true};
+				SimpleFeature linkFeature = linkBuilder.buildFeature(Integer.toString(featureId), atts);
+				featureId++;
+				featureCollection.add(linkFeature);
+				
+			}		
+			ShapeFileWriter.writeGeometries(featureCollection, shapeFilename);
+		} catch (Exception  e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} 
+
 	}
 	
-	private static void addLineStringFeature(SimpleFeatureBuilder builder, List<SimpleFeature> featureCollection, GeometryFactory geoFac, DgOrigin origin, DgDestination destination) throws IllegalArgumentException{
-		Coordinate startCoordinate = origin.getCoordinate();
-		Coordinate endCoordinate = destination.getCoordinate();
-		Coordinate[] coordinates = {startCoordinate, endCoordinate};
-		LineString lineString = geoFac.createLineString(coordinates);
-		Object[] atts = {lineString, destination.getNumberOfTrips()};
-		SimpleFeature feature = builder.buildFeature(null, atts);
-		featureCollection.add(feature);
-	}
+
+
 
 }

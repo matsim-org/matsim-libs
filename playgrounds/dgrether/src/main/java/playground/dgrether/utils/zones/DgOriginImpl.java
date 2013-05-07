@@ -63,11 +63,11 @@ public abstract class DgOriginImpl implements DgOrigin {
 	public Collection<DgDestination> getDestinations(){
 		List<DgDestination> dests = new ArrayList<DgDestination>();
 		for (Entry<DgZone, Double> entry : this.toZoneRelations.entrySet()){
-			dests.add(new DgDestinationImpl(entry.getKey().getCoordinate(), entry.getValue()));
+			dests.add(new DgDestinationImpl(entry.getKey().getId().toString(), entry.getKey().getCoordinate(), entry.getValue()));
 		}
 		for (Entry<Link, Double> entry : this.toLinkRelations.entrySet()){
 			Coordinate c = MGC.coord2Coordinate(entry.getKey().getCoord());
-			dests.add(new DgDestinationImpl(c, entry.getValue()));
+			dests.add(new DgDestinationImpl(entry.getKey().getId().toString(),  c, entry.getValue()));
 		}
 		return dests;
 	}
@@ -88,10 +88,16 @@ class DgDestinationImpl implements DgDestination{
 
 	private Coordinate coordinate;
 	private Double noTrips;
+	private String id;
 
-	public DgDestinationImpl(Coordinate c, Double noTrips){
+	public DgDestinationImpl(String id, Coordinate c, Double noTrips){
+		this.id = id;
 		this.coordinate = c;
 		this.noTrips = noTrips;
+	}
+	
+	public String getId(){
+		return this.id;
 	}
 	
 	@Override

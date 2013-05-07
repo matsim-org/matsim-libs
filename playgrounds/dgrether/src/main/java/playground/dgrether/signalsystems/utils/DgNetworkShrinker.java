@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.utils;
 
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.opengis.feature.simple.SimpleFeature;
@@ -29,11 +32,19 @@ import playground.dgrether.analysis.FeatureNetworkLinkStartEndCoordFilter;
 
 public class DgNetworkShrinker {
 
+
+	private Set<Id> signalizedNodes;
+
 	public Network createSmallNetwork(Network net, SimpleFeature boundingBoxFeature, CoordinateReferenceSystem networkCrs) {
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
 		filterManager.addLinkFilter(new FeatureNetworkLinkStartEndCoordFilter(networkCrs, boundingBoxFeature, networkCrs));
+		filterManager.addLinkFilter(new SignalizedNodesSpeedFilter(this.signalizedNodes));
 		Network newNetwork = filterManager.applyFilters();
 		return newNetwork;		
+	}
+
+	public void setSignalizedNodes(Set<Id> signalizedNodes) {
+		this.signalizedNodes = signalizedNodes;
 	}
 
 }

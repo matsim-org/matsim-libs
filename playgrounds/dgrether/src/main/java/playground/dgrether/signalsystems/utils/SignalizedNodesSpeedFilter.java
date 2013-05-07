@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgDestination
+ * SignalizedLinkSpeedFilter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils.zones;
+package playground.dgrether.signalsystems.utils;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.filter.NetworkLinkFilter;
 
 
 /**
  * @author dgrether
  *
  */
-public interface DgDestination {
-	
-	public String getId();
-	
-	public Coordinate getCoordinate();
-	
-	public Double getNumberOfTrips();
+public class SignalizedNodesSpeedFilter implements NetworkLinkFilter {
+
+	private Set<Id> signalizedNodes;
+
+	public SignalizedNodesSpeedFilter(Set<Id> signalizedNodes) {
+		this.signalizedNodes = signalizedNodes;
+	}
+
+	@Override
+	public boolean judgeLink(Link l) {
+		Id fromNodeId = l.getFromNode().getId();
+		Id toNodeId = l.getToNode().getId();
+		if (this.signalizedNodes.contains(fromNodeId) || this.signalizedNodes.contains(toNodeId)) {
+			return true;
+		}
+		if (l.getFreespeed() > 10.0) {
+			return true;
+		}
+		return false;
+	}
+
 }

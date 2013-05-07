@@ -24,7 +24,6 @@ import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -74,6 +73,8 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	private double timeInterval;
 
 	private DgIdConverter idConverter;
+
+	private Set<Id> signalizedLinks;
 	
 	public DgMatsim2KoehlerStrehler2010NetworkConverter(DgIdConverter idConverter){
 		this.idConverter = idConverter;
@@ -122,8 +123,6 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		 */
 		this.convertLinks2Streets(ksnet, net);
 
-		//collect all ids of links that are signalized
-		Set<Id> signalizedLinks = this.getSigalizedLinkIds(signalsData.getSignalSystemsData());
 		//loop over links and create layout of crossing
 		for (Link link : net.getLinks().values()){
 			//prepare some objects/data
@@ -235,14 +234,6 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 
 	
 
-	private Set<Id> getSigalizedLinkIds(SignalSystemsData signals){
-		Map<Id, Set<Id>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
-		Set<Id> signalizedLinks = new HashSet<Id>();
-		for (Set<Id> signalizedLinksOfSystem : signalizedLinksPerSystem.values()){
-			signalizedLinks.addAll(signalizedLinksOfSystem);
-		}
-		return signalizedLinks;
-	}
 	
 	/**
 	 * 
@@ -258,7 +249,8 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		DgCrossingNode outLinkFromNode = crossing.getNodes().get(convertedOutLinkId);
 		if (outLinkFromNode == null){
 			log.error("Crossing " + crossing.getId() + " has no node with id " + convertedOutLinkId);
-			throw new IllegalStateException("outLinkFromNode not found.");
+//			throw new IllegalStateException("outLinkFromNode not found.");
+			return null;
 		}
 		DgStreet street = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
 		crossing.addLight(street);
@@ -461,5 +453,8 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		return outLinks;
 	}
 	
+	public void setSignalizedLinks(Set<Id> signalizedLinks) {
+		this.signalizedLinks = signalizedLinks;
+	}
 	
 }
