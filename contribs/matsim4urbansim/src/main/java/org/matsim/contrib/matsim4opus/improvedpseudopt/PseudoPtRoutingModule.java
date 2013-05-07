@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
@@ -82,7 +83,12 @@ public class PseudoPtRoutingModule implements RoutingModule{
 		// set generic route for teleportation
 		Id startLinkId = network.getNearestLinkExactly(fromFacility.getCoord()).getId();
 		Id endLinkId = network.getNearestLinkExactly(toFacility.getCoord()).getId();
-		newLeg.setRoute(genericRouteFactory.createRoute(startLinkId, endLinkId));
+		final Route route = genericRouteFactory.createRoute(startLinkId, endLinkId);
+
+		double distance = this.ptMatrix.getPtTravelDistance_meter(fromFacility.getCoord(), toFacility.getCoord()) ;
+		route.setDistance(distance) ;
+
+		newLeg.setRoute(route);
 		
 		// done
 		return Arrays.asList( newLeg );
