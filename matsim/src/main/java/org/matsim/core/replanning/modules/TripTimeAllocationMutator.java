@@ -18,13 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.replanning;
+package org.matsim.core.replanning.modules;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 
 /**
  * Copy/Paste of TimeAllocationMutator, that calls TransitPlanMutateTimeAllocation instead
@@ -32,7 +32,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
+public class TripTimeAllocationMutator extends AbstractMultithreadedModule {
 	public final static String CONFIG_GROUP = "TimeAllocationMutator";
 	public final static String CONFIG_MUTATION_RANGE = "mutationRange";
 
@@ -43,7 +43,7 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in
 	 * the configuration (module "TimeAllocationMutator", param "mutationRange").
 	 */
-	public TransitTimeAllocationMutator(Config config) {
+	public TripTimeAllocationMutator(Config config) {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
 		if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.minOfDurationAndEndTime) ) {
@@ -57,15 +57,15 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 		}
 	}
 
-	public TransitTimeAllocationMutator(Config config, final double mutationRange) {
+	public TripTimeAllocationMutator(Config config, final double mutationRange) {
 		super(config.global());
 		this.mutationRange = mutationRange;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TransitPlanMutateTimeAllocation pmta =
-			new TransitPlanMutateTimeAllocation(
+		TripPlanMutateTimeAllocation pmta =
+			new TripPlanMutateTimeAllocation(
 					getReplanningContext().getTripRouterFactory().createTripRouter().getStageActivityTypes(),
 					this.mutationRange,
 					MatsimRandom.getLocalInstance());

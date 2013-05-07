@@ -25,7 +25,6 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 public class TripTimeAllocationMutatorStrategyFactory implements
 		PlanStrategyFactory {
@@ -33,7 +32,7 @@ public class TripTimeAllocationMutatorStrategyFactory implements
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(scenario.getConfig());
+		TripTimeAllocationMutator tam = new TripTimeAllocationMutator(scenario.getConfig());
 		strategy.addStrategyModule(tam);
 		return strategy;
 	}

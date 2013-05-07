@@ -27,7 +27,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.replanning.TransitPlanMutateTimeAllocation;
+import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 
 /**
  * Copy/Paste of TransitTimeAllocationMutator, that calls ParkAndRidePlanMutateTimeAllocation instead

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.replanning;
+package org.matsim.population.algorithms;
 
 import java.util.Random;
 
@@ -28,7 +28,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * Copy/Paste of PlanMutateTimeAllocation, but with special handling
@@ -37,14 +36,14 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-public class TransitPlanMutateTimeAllocation implements PlanAlgorithm {
+public class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private final  StageActivityTypes stageActivities;
 	private final double mutationRange;
 	private final Random random;
 	private boolean useActivityDurations;
 
-	public TransitPlanMutateTimeAllocation(
+	public TripPlanMutateTimeAllocation(
 			final StageActivityTypes stageActivities,
 			final double mutationRange,
 			final Random random) {

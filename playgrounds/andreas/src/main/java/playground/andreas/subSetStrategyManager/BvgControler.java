@@ -37,11 +37,11 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.TripTimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
@@ -97,7 +97,7 @@ public class BvgControler extends Controler {
 			mgr.addStrategy(strategy1, 0.9);
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy2.addStrategyModule(new TransitTimeAllocationMutator(this.config,7200));
+			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.config,7200));
 			strategy2.addStrategyModule(new ReRoute(getScenario()));
 			mgr.addStrategy(strategy2, 0.1);
 			mgr.addChangeRequest(90,strategy2,0.0);

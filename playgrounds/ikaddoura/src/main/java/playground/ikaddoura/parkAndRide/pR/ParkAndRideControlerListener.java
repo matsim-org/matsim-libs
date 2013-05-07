@@ -30,9 +30,9 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.TripTimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
-import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideAddStrategy;
 import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideChangeLocationStrategy;
@@ -149,7 +149,7 @@ public class ParkAndRideControlerListener implements StartupListener {
 		strategyRemovePR.addStrategyModule(new ReRoute(controler.getScenario()));
 		
 		PlanStrategyImpl_workNoPRseq strategyAddPRTimeAllocation = new PlanStrategyImpl_workNoPRseq(new RandomPlanSelector()); // only for plans with at least one home-work-home sequence without park-and-ride
-		strategyAddPRTimeAllocation.addStrategyModule(new TransitTimeAllocationMutator(controler.getConfig()));
+		strategyAddPRTimeAllocation.addStrategyModule(new TripTimeAllocationMutator(controler.getConfig()));
 		strategyAddPRTimeAllocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategyAddPRTimeAllocation.addStrategyModule(new ParkAndRideAddStrategy(controler, id2prFacility, personId2prWeights, gravity)); // adds a P+R to a randomly chosen home-work-home sequence
 		strategyAddPRTimeAllocation.addStrategyModule(new ReRoute(controler.getScenario()));

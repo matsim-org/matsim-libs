@@ -11,8 +11,8 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.replanning.TransitPlanMutateTimeAllocation;
 
 import playground.mmoyo.algorithms.PopulationCleaner;
 import playground.mmoyo.utils.DataLoader;
@@ -36,7 +36,7 @@ public class PopTimeMutator {
 	
 	public void run4transit (Population population){
 		PlanAlgorithm timeMutator =
-				new TransitPlanMutateTimeAllocation(
+				new TripPlanMutateTimeAllocation(
 						new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 						this.mutationRange,
 						MatsimRandom.getLocalInstance());

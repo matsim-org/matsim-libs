@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.replanning;
+package org.matsim.population.algorithms;
 
 import java.util.Random;
 
@@ -35,7 +35,7 @@ import org.matsim.pt.PtConstants;
 /**
  * @author mrieser
  */
-public class TransitPlanMutateTimeAllocationTest {
+public class TripPlanMutateTimeAllocationTest {
 
 	@Test
 	public void testRun() {
@@ -62,8 +62,8 @@ public class TransitPlanMutateTimeAllocationTest {
 		plan.createAndAddLeg(TransportMode.transit_walk);
 		plan.createAndAddActivity("work", new CoordImpl(0, 500));
 
-		TransitPlanMutateTimeAllocation mutator =
-				new TransitPlanMutateTimeAllocation(
+		TripPlanMutateTimeAllocation mutator =
+				new TripPlanMutateTimeAllocation(
 						new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 						3600.,
 						new Random(2011));

@@ -40,9 +40,9 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.replanning.TransitPlanMutateTimeAllocation;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -70,8 +70,8 @@ public class TimeAllocationMutatorTest {
 
 	@Test
 	public void testAgainstTransitTimeAllocationMutator() {
-		TransitPlanMutateTimeAllocation transit =
-			new TransitPlanMutateTimeAllocation(
+		TripPlanMutateTimeAllocation transit =
+			new TripPlanMutateTimeAllocation(
 					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 					MUTATION_RANGE,
 					new Random( SEED ));
