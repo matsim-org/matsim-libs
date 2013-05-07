@@ -954,7 +954,7 @@ public class ReadFromUrbanSimModel {
 		else if(cnt.allowedJobs < jobSampleList.size()){
 			log.info("Actual size of jobs (" + jobSampleList.size() + ") is larger than samplingRate*NumberUrbansimJobs (" + cnt.allowedJobs + "). Removing jobs... ");
 			
-			Random randomGenerator = new Random();
+			Random randomGenerator = MatsimRandom.getRandom();
 			
 			// removes jobs randomly
 			while(cnt.allowedJobs < jobSampleList.size()){
