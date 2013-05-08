@@ -11,8 +11,8 @@ import playground.wdoering.grips.scenariomanager.view.Visualizer;
 
 public abstract class AbstractModule
 {
-	protected static int width = 1024;
-	protected static int height = 768;
+	protected static int width = 800;
+	protected static int height = 600;
 	protected static int border = 30;
 	
 	
