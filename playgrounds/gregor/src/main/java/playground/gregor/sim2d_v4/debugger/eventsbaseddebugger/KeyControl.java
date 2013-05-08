@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ORCALineUniversal.java
+ * KeyControl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,62 +18,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation.physics.orca;
+package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
-import playground.gregor.sim2d_v4.cgal.CGAL;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
-public class ORCALineUniversal implements ORCALine{
-
-	private double x;
-	private double y;
-	private double dx;
-	private double dy;
-	
+public class KeyControl implements KeyListener {
+	private double speedup = 1;
+	private boolean pause = false;
+	private final CyclicBarrier pauseBarrier = new CyclicBarrier(2);
 	@Override
-	public boolean solutionSatisfyConstraint(double[] v) {
-double leftVal = CGAL.isLeftOfLine(v[0], v[1],this.getPointX(), this.getPointY(), this.getPointX()+this.getDirectionX(),this.getPointY()+this.getDirectionY());
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyChar() == '+') {
+			if (this.speedup >= 128) {
+				return;
+			}
+			this.speedup *= 2;
+			System.out.println("speedup:" + this.speedup);
+		} else if (e.getKeyChar() == '-') {
+			if (this.speedup <= 0.125) {
+				return;
+			}
+			this.speedup  /= 2;
+			
+			System.out.println("speedup:" + this.speedup);
+		} else if (e.getKeyChar() == 'p') {
+			if (this.pause) {
+				awaitPause();
+			}
+			this.pause = !this.pause;
+		}
+
+	}
+
+	public void awaitPause() {
+		if(!this.pause) {
+			return;
+		}
+		try {
+			this.pauseBarrier.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
+		}
 		
-		return leftVal > 0;
 	}
 
 	@Override
-	public double getPointX() {
-		return this.x;
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
-	public double getPointY() {
-		return this.y;
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+
 	}
 
-	@Override
-	public void setPointX(double x) {
-		this.x = x;
+	/*package*/ double getSpeedup() {
+		return this.speedup;
 	}
-
-	@Override
-	public void setPointY(double y) {
-		this.y = y;
-	}
-
-	@Override
-	public double getDirectionX() {
-		return this.dx;
-	}
-
-	@Override
-	public double getDirectionY() {
-		return this.dy;
-	}
-
-	@Override
-	public void setDirectionX(double x) {
-		this.dx = x;
-	}
-
-	@Override
-	public void setDirectionY(double y) {
-		this.dy = y;
-	}
-
 }

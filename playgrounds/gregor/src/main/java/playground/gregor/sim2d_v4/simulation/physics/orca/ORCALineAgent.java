@@ -20,11 +20,9 @@
 
 package playground.gregor.sim2d_v4.simulation.physics.orca;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
@@ -41,25 +39,10 @@ public class ORCALineAgent implements ORCALine {
 	private double pointY;
 	private int sign = 1;
 
-	//DEBUG remove after debugging!!!
-	private Id id;
-	private double dbgX;
-	private double dbgY;
-	private VisDebugger debugger;
-	private static final boolean debug = false;
 
 
 	public ORCALineAgent(ORCAVelocityUpdater orcaAgent, Tuple<Double,Sim2DAgent> neighbor, double tau) {
 		construct(orcaAgent,neighbor,tau);
-//		this.id = neighbor.getSecond().getId();
-	}
-
-	//DEBUG
-	public ORCALineAgent(ORCAVelocityUpdater orcaAgent, Tuple<Double,Sim2DAgent> neighbor, double tau, VisDebugger debugger) {
-		this.debugSetOffset(orcaAgent.getPos()[0], orcaAgent.getPos()[1]);
-		this.debugger = debugger;
-		construct(orcaAgent,neighbor,tau);
-		this.id = neighbor.getSecond().getId();
 	}
 
 	private void construct(ORCAVelocityUpdater a, Tuple<Double,Sim2DAgent> neighbor, double tau) {
@@ -69,12 +52,6 @@ public class ORCALineAgent implements ORCALine {
 		final double sqrDist = neighbor.getFirst();
 		Sim2DAgent b = neighbor.getSecond();
 
-		if (ORCALineAgent.debug) {
-			this.debugger.addCircle((float)a.getPos()[0],(float) a.getPos()[1],(float)a.getRadius(), 0, 255, 0, 255, 0, false);
-			this.debugger.addCircle((float)b.getPos()[0],(float) b.getPos()[1],(float)b.getRadius(), 255, 0, 0, 255, 0, false);
-			this.debugger.addAll();
-			System.out.println("debug!!");
-		}
 
 		final double[] aPos = a.getPos();
 		final double[] bPos = b.getPos();
@@ -112,13 +89,6 @@ public class ORCALineAgent implements ORCALine {
 			setDirectionY( xpBpA/norm);
 			this.pointX = aV[0] - xpBpA*moveHalfe;
 			this.pointY = aV[1] - ypBpA*moveHalfe;
-
-			if (ORCALineAgent.debug) {
-				this.id = b.getId();
-				this.debug(this.debugger,0, 255, 255);
-				this.debugger.addAll();
-				System.out.println("debug!!");
-			}
 
 			return;
 		}
@@ -224,12 +194,6 @@ public class ORCALineAgent implements ORCALine {
 
 		calcORCA(aV[0],aV[1]);
 
-				if (ORCALineAgent.debug) {
-					this.id = b.getId();
-					this.debug(this.debugger,0, 255, 255);
-					this.debugger.addAll();
-					System.out.println("debug!!");
-				}
 
 	}
 
@@ -457,49 +421,6 @@ public class ORCALineAgent implements ORCALine {
 //		}
 		this.directionY = directionY;
 		
-	}
-
-	public void debugSetOffset(double x, double y) {
-		this.dbgX = x;
-		this.dbgY = y;
-	}
-
-	@Override
-	public void debug(VisDebugger debugger, int r, int g, int b) {
-		float x0 = (float) (this.pointX - 10*this.directionX);
-		float y0 = (float) (this.pointY - 10*this.directionY);
-		float x1 = (float) (this.pointX + 10*this.directionX);
-		float y1 = (float) (this.pointY + 10*this.directionY);
-		float x2 = (float) (this.pointX + 10*this.directionX + 2*this.directionY);
-		float y2 = (float) (this.pointY + 10*this.directionY -2*this.directionX);
-		float x3 = (float) (this.pointX - 10*this.directionX + 2*this.directionY);
-		float y3 = (float) (this.pointY - 10*this.directionY -2*this.directionX);
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 32, 0);
-		x2 -= this.directionY;
-		y2 += this.directionX;
-		x3 -= this.directionY;
-		y3 += this.directionX;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 32, 0);
-		x2 -= this.directionY/2;
-		y2 += this.directionX/2;
-		x3 -= this.directionY/2;
-		y3 += this.directionX/2;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 32, 0);
-		x2 -= this.directionY/4;
-		y2 += this.directionX/4;
-		x3 -= this.directionY/4;
-		y3 += this.directionX/4;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 32, 0);
-		x2 -= this.directionY/8;
-		y2 += this.directionX/8;
-		x3 -= this.directionY/8;
-		y3 += this.directionX/8;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 64, 0);
-		x2 -= this.directionY/16;
-		y2 += this.directionX/16;
-		x3 -= this.directionY/16;
-		y3 += this.directionX/16;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 128, 0);
 	}
 
 }

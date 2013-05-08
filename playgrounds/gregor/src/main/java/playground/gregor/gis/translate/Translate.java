@@ -32,21 +32,21 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class Translate {
 	
-//	private final static double targetX = 848380;
-//	private final static double targetY = 5921030;
+	private final static double targetY = 7075588;
+	private final static double targetX = 1113551;
 	
 	//sx:-848508.6355312001 sy:-5920911.431172118
 	
 	public static void main(String [] args) {
-		String input = "/Users/laemmel/devel/burgdorf2d/raw_input/raw_env.shp";
-		String output ="/Users/laemmel/devel/burgdorf2d/tmp/offset_raw_env.shp";
+		String input = "/Users/laemmel/devel/sim2dDemoIII/env_gen/floorplan.shp";
+		String output ="/Users/laemmel/devel/sim2dDemoIII/env_gen/floorplan_offset.shp";
 		
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(input);
 		double offsetX = reader.getBounds().getMinX();
 		double offsetY = reader.getBounds().getMinY();
-		double sx = -offsetX;
-		double sy = -offsetY;
+		double sx = -offsetX + targetX;
+		double sy = -offsetY + targetY;
 		System.out.println("sx:" + sx + " sy:" + sy);
 		
 		Set<Coordinate> handled = new HashSet<Coordinate>();

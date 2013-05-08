@@ -27,7 +27,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
@@ -57,7 +56,6 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 	private final Obstacles obst = new Obstacles();
 	private final ORCASolver solver = new ORCASolver();
 	//	private VisDebugger debugger;
-	private final VisDebugger debugger = null;
 	private final double dT;
 	private final double maxDelta;
 	private final DesiredDirectionCalculator dd;
@@ -80,7 +78,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 
 	@Override
-	public void updateVelocity() {
+	public void updateVelocity(double time) {
 
 		List<ORCALine> constr = new ArrayList<ORCALine>();
 		for (Segment seg : this.agent.getPSec().getObstacles()) {
@@ -98,7 +96,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //				}
 //			}
 //		}
-		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors();
+		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors(time);
 		for (Tuple<Double, Sim2DAgent> neighbor : neighbors) {
 //			if (this.debugger != null && ( getId().toString().equals("r876"))){//&& neighbor.getSecond().getId().toString().equals("r5")) {
 //				ORCALine ol = new ORCALineAgent(this, neighbor, this.tau,this.debugger);

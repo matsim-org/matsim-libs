@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FrameSaver.java
+ * Sim2DAgentDestructEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,53 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.debugger;
+package playground.gregor.sim2d_v4.events;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import org.matsim.core.events.handler.EventHandler;
 
-import processing.core.PApplet;
-
-public class FrameSaver {
+public interface Sim2DAgentDestructEventHandler extends EventHandler {
 	
-	private final CyclicBarrier barrier = new CyclicBarrier(2);
-	private final String path;
-	private final String extension;
-	private final int frameSkip;
-	private int skiped;
-
-	public FrameSaver(String path, String extension, int frameSkip) {
-		this.path = path;
-		this.extension = extension;
-		this.frameSkip = frameSkip;
-		this.skiped = frameSkip;
-	}
-	
-	public void saveFrame(PApplet p, String identifier) {
-		if (this.skiped != this.frameSkip) {
-			this.skiped++;
-			this.await();
-			return;
-		}
-		this.skiped = 0;
-		StringBuffer bf = new StringBuffer();
-		bf.append(this.path);
-		bf.append("/");
-		bf.append(identifier);
-		bf.append(".");
-		bf.append(this.extension);
-		p.saveFrame(bf.toString());
-		this.await();
-	}
-	
-	public void await() {
-		try {
-			this.barrier.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
-			e.printStackTrace();
-		}
-	}
+	public void handleEvent(Sim2DAgentDestructEvent event);
 
 }

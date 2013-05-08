@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScaleBarDrawer.java
+ * Sim2DAgentDestructEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,52 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.debugger;
+package playground.gregor.sim2d_v4.events;
 
-public class ScaleBarDrawer implements VisDebuggerAdditionalDrawer {
+import java.util.Map;
+
+import org.matsim.core.api.experimental.events.Event;
+
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+
+public class Sim2DAgentDestructEvent extends Event {
+
+	public static final String EVENT_TYPE = "Sim2DAgentDestructEvent";
+	public static final String ATTRIBUTE_PERSON = "person";
+	private final Sim2DAgent agent;
+	
+	public Sim2DAgentDestructEvent(double time, Sim2DAgent agent) {
+		super(time);
+		this.agent = agent;
+	}
 
 	@Override
-	public void draw(VisDebugger p) {
-		int w = p.getWidth();
-		int h = p.getHeight();
-		float scale = p.getScale();
-		float width = w / scale;
-		if (width > 1000) {
-			draw(p,300,300*scale,h,w);
-		} else if (width > 500) {
-			draw(p,200,200*scale,h,w);
-		} else if (width > 250) {
-			draw(p,100,100*scale,h,w);
-		} else if (width > 100) {
-			draw(p,30,30*scale,h,w);
-		} else if (width > 50) {
-			draw(p,20,20*scale,h,w);
-		} else if (width > 25) {
-			draw(p,10,10*scale,h,w);
-		}else if (width > 10) {
-			draw(p,3,3*scale,h,w);
-		} else if (width > 5) {
-			draw(p,2,2*scale,h,w);
-		} else {
-			draw(p,1,1*scale,h,w);
-		}
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_PERSON, this.agent.getId().toString());
+		return attr;
+	}
+	
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
-	private void draw(VisDebugger p, int meter, float pixel, int h, int w) {
-		
-		p.fill(16, 128);
-		p.stroke(0, 0);
-		
-		p.rect(w-30-pixel, h-45, pixel+20, 40);
-		
-		p.fill(255);
-		p.stroke(255);
-		p.strokeWeight(2);
-		p.line(w-20-pixel, h-20, w-20, h-20);
-		p.line(w-20-pixel, h-10, w-20-pixel, h-30);
-		p.line(w-20, h-10, w-20, h-30);
-		p.text(meter + " meter",w-20-pixel/2, h-30);
-		
+	public Sim2DAgent getSim2DAgent() {
+		return this.agent;
 	}
-
 }

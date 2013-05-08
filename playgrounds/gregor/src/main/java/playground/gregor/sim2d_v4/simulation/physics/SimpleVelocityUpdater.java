@@ -41,7 +41,7 @@ public class SimpleVelocityUpdater implements VelocityUpdater {
 	}
 	
 	@Override
-	public void updateVelocity() {
+	public void updateVelocity(double time) {
 		Id id = this.agent.getCurrentLinkId();
 		LinkInfo li = this.ls.getLinkInfo(id);
 		double[] v = this.agent.getVelocity();

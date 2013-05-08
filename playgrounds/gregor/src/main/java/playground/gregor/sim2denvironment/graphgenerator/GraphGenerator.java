@@ -40,6 +40,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -227,7 +228,9 @@ public class GraphGenerator {
 
 	public static void main(String [] args) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
 		//		String floorplan = "/Users/laemmel/tmp/voronoi/test.shp";
-				String floorplan = "/Users/laemmel/devel/burgdorf/dxf/station-1_1.shp";
+				String dir = "/Users/laemmel/devel/sim2dDemoIII/env_gen/";
+				String floorplan = dir + "floorplan_offset.shp";
+				String net = dir + "raw_network2d_floorplan.xml";
 //		String floorplan = "/Users/laemmel/devel/convexdecomp/03.shp";
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
@@ -239,11 +242,11 @@ public class GraphGenerator {
 		}
 
 		new GraphGenerator(sc,geos,reader.getBounds()).run();
-		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/burgdorf2d2/raw_input/raw_network2d_-1.xml");
+		new NetworkWriter(sc.getNetwork()).write(net);
 		//		String [] argsII = {"/Users/laemmel/devel/sim2dDemoII/input/network.xml","/Users/laemmel/devel/sim2dDemoII/raw_input/networkL.shp","/Users/laemmel/devel/sim2dDemoII/raw_input/networkP.shp","EPSG:3395"};
 		//		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/tmp/vis/network.xml");
-//		String [] argsII = {"/Users/laemmel/devel/burgdorf2d2/raw_input/raw_network2d_0.xml","/Users/laemmel/devel/burgdorf2d2//tmp/networkL.shp","/Users/laemmel/devel/burgdorf2d2/tmp/networkP.shp","EPSG:21781"};
-//		Links2ESRIShape.main(argsII);
+		String [] argsII = {net,dir + "networkL.shp",dir + "networkP.shp","EPSG:3395"};
+		Links2ESRIShape.main(argsII);
 	}
 
 

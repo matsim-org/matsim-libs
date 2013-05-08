@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MousePositionDrawer.java
+ * TileLoader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,42 +18,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.debugger;
+package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
-public class MousePositionDrawer implements VisDebuggerAdditionalDrawer{
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+public class TileLoader implements Runnable{
+
+	
+	
+	private final BlockingDeque<Tile> tiles = new LinkedBlockingDeque<Tile>();
+	private final PApplet p;
+
+	public TileLoader(PApplet p) {
+		this.p = p;
+
+	}
 
 	@Override
-	public void draw(VisDebugger p) {
-		final double scale = p.getScale();
-		p.fill(16,128);
-		p.stroke(0,0);
-		p.rect(10,p.getHeight()-45,120,40);
-		StringBuffer tt = new StringBuffer();
-		
-		double x = p.deScaleX(p.mouseX);
-		double y = p.deScaleY(p.mouseY);
-		int mx = (int) (x);
-		int cmx = (int) ((x - mx)*100);
-		tt.append(mx);
-		tt.append(".");
-		if (cmx < 10) {
-			tt.append(0);
+	public void run() {
+		while (true) {
+			Tile pTile;
+			try {
+				pTile = this.tiles.takeFirst();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+			synchronized (pTile) {
+				String url = pTile.getUrl();
+				PImage img = this.p.loadImage(url,"png");
+				pTile.setPImage(img);
+			}				
 		}
-		tt.append(cmx);
-		tt.append(" ; ");
-		int my = (int) (y);
-		int cmy = (int) ((y - my)*100);
-		tt.append(my);
-		tt.append(".");
-		if (cmy < 10) {
-			tt.append(0);
+	}
+
+	public void addTile(Tile pTile) {
+		try {
+			this.tiles.putFirst(pTile);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		tt.append(cmy);
-		
-		p.fill(255);
-		p.stroke(255);
-		p.text(tt.toString(), 15, p.getHeight()-20);
-		
+
 	}
 
 }

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
@@ -32,7 +31,6 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 public class Obstacles {
 	
 
-	private VisDebugger debugger;
 
 	public List<Segment> computeObstacles(Sim2DAgent agent) {
 		List<Segment> ret = new ArrayList<Segment>(100);
@@ -92,10 +90,6 @@ public class Obstacles {
 			return false;
 		}
 		return true;
-	}
-	
-	public void addDebugger(VisDebugger debug) {
-		this.debugger = debug;
 	}
 	
 	

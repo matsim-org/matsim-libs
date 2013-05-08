@@ -30,13 +30,18 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.cgal.TwoDObject;
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
+import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
 
 
 public class Sim2DAgent implements TwoDObject {
 	
-	private double v0 = 1.34f;
+	//testing only
+	@Deprecated
+	private final double vCoeff =  1+MatsimRandom.getRandom().nextGaussian()*.1;;
+	
+	private double v0 = 1.34*this.vCoeff;
+	
 	
 	private final double [] pos = {0,0};
 	
@@ -64,6 +69,8 @@ public class Sim2DAgent implements TwoDObject {
 
 	private VelocityUpdater vu;
 
+	private boolean emitPosEvents = true;
+	
 	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
@@ -83,8 +90,8 @@ public class Sim2DAgent implements TwoDObject {
 		return this.veh;
 	}
 
-	public void updateVelocity() {
-		this.vu.updateVelocity();
+	public void updateVelocity(double time) {
+		this.vu.updateVelocity(time);
 	}
 
 
@@ -113,8 +120,14 @@ public class Sim2DAgent implements TwoDObject {
 			this.notifyMoveOverNode(nextLinkId);
 			this.pEnv.getEventsManager().processEvent(new LinkEnterEvent(time, getId(), nextLinkId, this.veh.getId()));
 		}
+		
+		
 		this.pos[0] += dx;
 		this.pos[1] += dy;
+		if (this.emitPosEvents) {
+			XYVxVyEventImpl e = new XYVxVyEventImpl(this.getId(), this.pos[0], this.pos[1], this.v[0], this.v[1], time);
+			this.pEnv.getEventsManager().processEvent(e);
+		}
 		return true;
 	}
 
@@ -144,34 +157,6 @@ public class Sim2DAgent implements TwoDObject {
 		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed()+(MatsimRandom.getRandom().nextDouble()*.1)-.05;
 	}
 
-	public void debug(VisDebugger visDebugger) {
-		if (getId().toString().contains("g")) {
-			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1], (float)this.r, 0, 192, 64, 128,0,true);
-		} else if (getId().toString().contains("r")) {
-			visDebugger.addCircle((float)this.getPos()[0], (float)this.getPos()[1],(float) this.r, 192, 0, 64, 128,0,true);
-		} else {
-			int nr = this.hashCode()%3*255;
-			int r,g,b;
-			if (nr > 2*255) {
-				r= nr-2*255;
-				g =0;
-				b=64;
-			} else if (nr > 255) {
-				r=0;
-				g=nr-255;
-				b=64;
-			} else {
-				r=64;
-				g=0;
-				b=nr;
-			}
-			visDebugger.addCircle((float)this.getPos()[0],(float) this.getPos()[1], (float)this.r, r, g, b, 222,0,true);
-		}
-//		visDebugger.fill(0);
-		visDebugger.addText((float)this.getPos()[0],(float)this.getPos()[1], this.getId().toString(), 90);
-		
-		
-	}
 
 	public PhysicalSim2DSection getPSec() {
 		return this.currentPSec;
@@ -192,7 +177,7 @@ public class Sim2DAgent implements TwoDObject {
 	}
 
 	public void setDesiredSpeed(double v) {
-		this.v0 = v;
+		this.v0 = v*this.vCoeff;
 		
 	}
 
@@ -214,5 +199,9 @@ public class Sim2DAgent implements TwoDObject {
 	
 	public double getHeight() {
 		return this.height;
+	}
+	
+	public void setFocusOnAgent(boolean focus) {
+		this.emitPosEvents = focus;
 	}
 }

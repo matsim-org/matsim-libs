@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Polygonizer.java
+ * Neighbors.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,42 +18,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.gis.polygonizer;
+package playground.gregor.sim2d_v4.events.debug;
 
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
+import java.util.List;
+import java.util.Map;
 
-import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.utils.collections.Tuple;
 
-import com.vividsolutions.jts.geom.Geometry;
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
-public class Polygonizer {
+public class NeighborsEvent extends Event {
+
+	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String EVENT_TYPE = "SIM2D_DEBUG_Neighbors";
+	private final Id id;
+	private final List<Tuple<Double, Sim2DAgent>> n;
+	private final Sim2DAgent a;
 	
-	public static void main(String args[]) {
-		String input = "/Users/laemmel/devel/sim2dDemoIII/env_gen/floorplan.shp";
-		ShapeFileReader reader = new ShapeFileReader();
-		reader.readFileAndInitialize(input);
-		Geometry res = null;
-		for (SimpleFeature ft : reader.getFeatureSet()) {
-			Geometry geo = (Geometry) ft.getDefaultGeometry();
-			if (res == null) {
-				res = geo;
-			} else {
-				res = res.union(geo);
-			}
-		}
-		Geometry res2 = res.buffer(.05,1);
-		
-		Geometry e = res.getEnvelope();
-		
-		Geometry e2 = e.difference(res2);
-		GisDebugger.setCRSString("EPSG:3395");
-		GisDebugger.addGeometry(e2);
-		
-		GisDebugger.dump("/Users/laemmel/devel/sim2dDemoIII/env_gen/floorplan_p.shp");
-		
-		System.out.println(res);
-		
+	public NeighborsEvent(double time, Id id, List<Tuple<Double,Sim2DAgent>> n, Sim2DAgent a) {
+		super(time);
+		this.id = id;
+		this.n = n;
+		this.a = a;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_PERSON, this.id.toString());
+		return attr;
+	}
+	
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+	
+	public List<Tuple<Double,Sim2DAgent>> getNeighbors() {
+		return this.n;
+	}
+	
+	public Sim2DAgent getAgent() {
+		return this.a;
 	}
 
 }

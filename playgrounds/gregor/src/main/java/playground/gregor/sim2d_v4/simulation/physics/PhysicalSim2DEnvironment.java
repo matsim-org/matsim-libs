@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -56,9 +55,6 @@ public class PhysicalSim2DEnvironment {
 
 	private final Sim2DScenario sim2dsc;
 
-	private final double offsetX;
-
-	private final double offsetY;
 
 //	//DEBUG
 //	public static boolean DEBUG = false;
@@ -78,8 +74,6 @@ public class PhysicalSim2DEnvironment {
 
 	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc, EventsManager eventsManager) {
 		this.env = env;
-		this.offsetX = sim2dsc.getSim2DConfig().getOffsetX();
-		this.offsetY = sim2dsc.getSim2DConfig().getOffsetY();
 		this.sim2dsc = sim2dsc;
 		this.eventsManager = eventsManager;
 		init();
@@ -99,13 +93,13 @@ public class PhysicalSim2DEnvironment {
 	}
 
 	private PhysicalSim2DSection createAndAddPhysicalSection(Section sec) {
-		PhysicalSim2DSection psec = new PhysicalSim2DSection(sec,this.sim2dsc,this.offsetX,this.offsetY,this);
+		PhysicalSim2DSection psec = new PhysicalSim2DSection(sec,this.sim2dsc,this);
 		this.psecs.put(sec.getId(),psec);
 		return psec;
 	}
 
 	private PhysicalSim2DSection createAndAddDepartureBox(Section sec) {
-		PhysicalSim2DSection psec = new PhysicalSim2DSection(sec,this.sim2dsc,this.offsetX,this.offsetY,this);
+		PhysicalSim2DSection psec = new PhysicalSim2DSection(sec,this.sim2dsc,this);
 		this.psecs.put(sec.getId(),psec);
 		return psec;
 	}
@@ -115,43 +109,12 @@ public class PhysicalSim2DEnvironment {
 	}
 
 	public void doSimStep(double time) {
-		//		log.warn("not implemented yet!");
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			psec.updateAgents();
+			psec.updateAgents(time);
 		}
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
 			psec.moveAgents(time);
 		}
-
-//		//DEBUG
-//		if (DEBUG) {
-//			debug(time);
-//		}
-	}
-	//		}
-	//		log.info("sim step done.");
-
-	//1. update agents' world model (i.e. neighbors, obstacles)
-	//2. update agents' new velocity/acceleration (here the different simulation models will be applied)
-	//3. move agents' 
-	//3. b if agent enters new section:
-	//			precompute relevant exit of new section (needed to recognize that an agent leaves a section) (may be a list of sections to traverse calculated at the beginning would be helpful)
-	//			unregister agent in current section (it.remove());
-	//			register agent in next section (.add(agent) only if sections are not multi-threaded)
-	public void debug(VisDebugger visDebugger) {
-//		visDebugger.setTransformationStuff(this.offsetX, this.offsetY);
-//		boolean hasAgent = false;
-//		for (PhysicalSim2DSection psec : this.psecs.values()) {
-//			if (psec.getNumberOfAllAgents() > 0) {
-//				hasAgent = true;
-//				break;
-//			}
-//		}
-//		if (hasAgent){
-			for (PhysicalSim2DSection psec : this.psecs.values()) {
-				psec.debug(visDebugger);
-			}
-//		}
 
 	}
 
@@ -164,8 +127,8 @@ public class PhysicalSim2DEnvironment {
 		//retrieve opening
 		Segment opening = null;
 		Coord c = hiResLink.getLink().getFromNode().getCoord();
-		double cx = c.getX()-this.offsetX;
-		double cy = c.getY()-this.offsetY;
+		double cx = c.getX();
+		double cy = c.getY();
 		for (Segment op : psec.getOpenings()) {
 			if (CGAL.isOnVector(cx, cy, op.x0, op.y0, op.x1, op.y1)){ //TODO this a necessary but not necessarily a sufficient condition! [gl April '13] 
 				opening = op;
@@ -212,8 +175,8 @@ public class PhysicalSim2DEnvironment {
 		double gap = width - (nrOfBoxes * DEP_BOX_WIDTH);
 		
 		
-		double bottomX = opening.x0+this.offsetX;
-		double bottomY = opening.y0+this.offsetY;
+		double bottomX = opening.x0;
+		double bottomY = opening.y0;
 		
 		bottomX += gap/2 * dx/DEP_BOX_WIDTH;
 		bottomY += gap/2 * dy/DEP_BOX_WIDTH;
@@ -235,8 +198,8 @@ public class PhysicalSim2DEnvironment {
 			Id [] neighbors = {id};
 			int level = sec.getLevel();
 			Section s = this.env.createSection(boxId, p, openings, neighbors, level);
-			double spawnX = bottomX-this.offsetX + bx/1.5f + dx/2;
-			double spawnY = bottomY-this.offsetY + by/1.5f + dy/2;
+			double spawnX = bottomX + bx/1.5f + dx/2;
+			double spawnY = bottomY + by/1.5f + dy/2;
 			PhysicalSim2DSection psecBox = createAndAddDepartureBox(s);
 			
 			//create dbox link info
@@ -281,7 +244,7 @@ public class PhysicalSim2DEnvironment {
 		return this.lowResLinks.get(nextLinkId);
 	}
 
-	/*package*/ EventsManager getEventsManager() {
+	public EventsManager getEventsManager() {
 		return this.eventsManager;
 	}
 

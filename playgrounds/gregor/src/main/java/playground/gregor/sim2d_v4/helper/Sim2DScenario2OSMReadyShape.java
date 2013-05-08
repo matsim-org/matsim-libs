@@ -198,12 +198,12 @@ public class Sim2DScenario2OSMReadyShape {
 	}
 
 	public static void main(String [] args) {
-		String confPath = "/Users/laemmel/devel/burgdorf2d2/input/s2d_config.xml";
+		String confPath = "/Users/laemmel/devel/hhw2/env_gen/sim2dConfig.xml";
 		Sim2DConfig conf = Sim2DConfigUtils.loadConfig(confPath);
 		Sim2DScenario sc = Sim2DScenarioUtils.loadSim2DScenario(conf);
 		Sim2DScenario2OSMReadyShape osm = new Sim2DScenario2OSMReadyShape(sc);
-		osm.writeOSMReadyEnvironmentShape("/Users/laemmel/devel/burgdorf2d2/raw_input_stage3/osmEnv.shp");
-		osm.writeOSMReadyNetworkShape("/Users/laemmel/devel/burgdorf2d2/raw_input_stage3/osmNet.shp");
+		osm.writeOSMReadyEnvironmentShape("/Users/laemmel/devel/hhw2/env_gen_stage2/osmEnv.shp");
+		osm.writeOSMReadyNetworkShape("/Users/laemmel/devel/hhw2/env_gen_stage2/osmNet.shp");
 	}
 
 }

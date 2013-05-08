@@ -28,9 +28,11 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.events.debug.NeighborsEvent;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
@@ -90,13 +92,17 @@ public class Neighbors {
 		}
 	}
 
-	public List<Tuple<Double,Sim2DAgent>> getNeighbors() {//TODO consider adding time as attribute [gl April '13]
+	public List<Tuple<Double,Sim2DAgent>> getNeighbors(double time) {//TODO consider adding time as attribute [gl April '13] ... done [gl April '13]
 		this.timeAfterLastUpdate += this.dT;
 		if (this.timeAfterLastUpdate >= this.updateIntervall) {
 			computeNeighbors();
 			this.timeAfterLastUpdate = 0;
 		} 
 		
+		//DEBUG!!!!
+		if (this.agent.getId().equals(new IdImpl("b982"))) {
+			this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new NeighborsEvent(time, this.agent.getId(), this.cachedNeighbors, this.agent));
+		}
 		
 		return this.cachedNeighbors;
 	}

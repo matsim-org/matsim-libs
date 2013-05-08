@@ -30,8 +30,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
-import playground.gregor.sim2d_v4.debugger.QSimDensityDrawer;
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -40,10 +40,10 @@ import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
 
 public class Sim2DRunner implements IterationStartsListener{
 
-	private VisDebugger visDebugger = null;
 	private Controler controller;
 	private QSimDensityDrawer qSimDrawer;
 	private HybridQ2DMobsimFactory factory;
+	private EventBasedVisDebuggerEngine test;
 
 	public static void main(String [] args) {
 		if (args.length != 3) {
@@ -55,6 +55,7 @@ public class Sim2DRunner implements IterationStartsListener{
 		Sim2DConfig sim2dc = Sim2DConfigUtils.loadConfig(sim2DConf);
 		Sim2DScenario sim2dsc = Sim2DScenarioUtils.loadSim2DScenario(sim2dc);
 		Config c = ConfigUtils.loadConfig(qsimConf);
+		c.controler().setWriteEventsInterval(0);
 //		c.controler().setLastIteration(0);
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		sc.addScenarioElement(sim2dsc);
@@ -73,34 +74,40 @@ public class Sim2DRunner implements IterationStartsListener{
 				minY = n.getCoord().getY(); 
 			}
 		}
-		sim2dc.setOffsets(minX, minY);
+//		sim2dc.setOffsets(minX, minY);
 		
 		Controler controller = new Controler(sc);
 
 		controller.setOverwriteFiles(true);
+		
 
 		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
 		controller.addMobsimFactory("hybridQ2D", factory);
 
 		if (args[2].equals("true")) {
-			Sim2DRunner runner = new Sim2DRunner();
-			runner.visDebugger = new VisDebugger( sim2dc.getTimeStepSize());
-//			runner.visDebugger.setTransformationStuff(minX, minY);
-			controller.addControlerListener(runner);
-			runner.controller = controller;
-			runner.factory = factory;
-			runner.qSimDrawer = new QSimDensityDrawer(sc);
-//			runner.burgdorfInfoDrawer = new BurgdorfInfoDrawer(sc);
-			
-			runner.visDebugger.addAdditionalDrawer(runner.qSimDrawer);
+//			Sim2DRunner runner = new Sim2DRunner();
+//			runner.test = new EventBasedVisDebuggerEngine(sc);
+//
+//			
+//			runner.visDebugger = new VisDebugger( sim2dc.getTimeStepSize(), minX, minY);
+////			runner.visDebugger.setTransformationStuff(minX, minY);
+//			controller.addControlerListener(runner);
+//			runner.controller = controller;
+//			runner.factory = factory;
+//			runner.qSimDrawer = new QSimDensityDrawer(sc);
+////			runner.burgdorfInfoDrawer = new BurgdorfInfoDrawer(sc);
+//			
+//			runner.visDebugger.addAdditionalDrawer(runner.qSimDrawer);
 //			runner.visDebugger.addAdditionalDrawer(runner.burgdorfInfoDrawer);
 //			runner.visDebugger.addAdditionalDrawer();
 //			runner.visDebugger.addAdditionalDrawer(new ScaleBarDrawer());
 //			runner.visDebugger.addAdditionalDrawer(new MousePositionDrawer());
 //			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 3);
 //			runner.visDebugger.setFrameSaver(fs);
+			controller.getEvents().addHandler(new EventBasedVisDebuggerEngine(sc));
 		}
 
+		
 //		controller.setCreateGraphs(false);
 		controller.setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 		controller.run();
@@ -125,14 +132,14 @@ public class Sim2DRunner implements IterationStartsListener{
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 50) {
-			this.factory.debug(this.visDebugger);
+//			this.factory.debug(this.visDebugger);
 			this.controller.getEvents().addHandler(this.qSimDrawer);
 			this.controller.setCreateGraphs(true);
 		} else {
-			this.factory.debug(null);
+//			this.factory.debug(null);
 			this.controller.getEvents().removeHandler(this.qSimDrawer);
 			this.controller.setCreateGraphs(false);
 		}
-		this.visDebugger.setIteration(event.getIteration());
+//		this.visDebugger.setIteration(event.getIteration());
 	}
 }

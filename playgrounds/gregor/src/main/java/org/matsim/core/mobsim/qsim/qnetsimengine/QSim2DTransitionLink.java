@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
+import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEvent;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.Sim2DAgentFactory;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
@@ -102,6 +103,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 			this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(
 					new LinkEnterEvent(now, veh.getDriver().getId(),
 							this.getLink().getId(), veh.getId()));
+			this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new Sim2DAgentConstructEvent(now, agent));
 		}
 	}
 

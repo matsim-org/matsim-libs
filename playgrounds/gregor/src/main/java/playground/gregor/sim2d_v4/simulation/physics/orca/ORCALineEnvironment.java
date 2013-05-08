@@ -21,7 +21,6 @@
 package playground.gregor.sim2d_v4.simulation.physics.orca;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 
@@ -155,44 +154,6 @@ public class ORCALineEnvironment implements ORCALine {
 		throw new RuntimeException("not supported");
 	}
 	
-
-	@Override
-	public void debug(VisDebugger debugger, int r, int g, int b) {
-		float x0 = (float) (this.pointX - 10*this.directionX);
-		float y0 = (float) (this.pointY - 10*this.directionY);
-		float x1 = (float) (this.pointX + 10*this.directionX);
-		float y1 = (float) (this.pointY + 10*this.directionY);
-		float x2 = (float) (this.pointX + 10*this.directionX + 2*this.directionY);
-		float y2 = (float) (this.pointY + 10*this.directionY -2*this.directionX);
-		float x3 = (float) (this.pointX - 10*this.directionX + 2*this.directionY);
-		float y3 = (float) (this.pointY - 10*this.directionY -2*this.directionX);
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 32, 0);
-		x2 -= this.directionY;
-		y2 += this.directionX;
-		x3 -= this.directionY;
-		y3 += this.directionX;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 32, 0);
-		x2 -= this.directionY/2;
-		y2 += this.directionX/2;
-		x3 -= this.directionY/2;
-		y3 += this.directionX/2;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 32, 0);
-		x2 -= this.directionY/4;
-		y2 += this.directionX/4;
-		x3 -= this.directionY/4;
-		y3 += this.directionX/4;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 32, 0);
-		x2 -= this.directionY/8;
-		y2 += this.directionX/8;
-		x3 -= this.directionY/8;
-		y3 += this.directionX/8;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 64, 0);
-		x2 -= this.directionY/16;
-		y2 += this.directionX/16;
-		x3 -= this.directionY/16;
-		y3 += this.directionX/16;
-		debugger.addPolygon(new float[]{x0,x1,x2,x3}, new float[]{y0,y1,y2,y3}, r, g, b, 128, 0);
-	}
 
 	@Override
 	public void setDirectionX(double x) {

@@ -22,6 +22,6 @@ package playground.gregor.sim2d_v4.simulation.physics;
 
 public interface VelocityUpdater {
 
-	public abstract void updateVelocity();
+	public abstract void updateVelocity(double time);
 
 }

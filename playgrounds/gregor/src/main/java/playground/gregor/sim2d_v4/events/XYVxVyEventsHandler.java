@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Polygonizer.java
+ * XYZEventsHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.gregor.sim2d_v4.events;
 
-package playground.gregor.gis.polygonizer;
+import org.matsim.core.events.handler.EventHandler;
 
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
+public interface XYVxVyEventsHandler extends EventHandler {
 
-import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
-
-import com.vividsolutions.jts.geom.Geometry;
-
-public class Polygonizer {
-	
-	public static void main(String args[]) {
-		String input = "/Users/laemmel/devel/sim2dDemoIII/env_gen/floorplan.shp";
-		ShapeFileReader reader = new ShapeFileReader();
-		reader.readFileAndInitialize(input);
-		Geometry res = null;
-		for (SimpleFeature ft : reader.getFeatureSet()) {
-			Geometry geo = (Geometry) ft.getDefaultGeometry();
-			if (res == null) {
-				res = geo;
-			} else {
-				res = res.union(geo);
-			}
-		}
-		Geometry res2 = res.buffer(.05,1);
-		
-		Geometry e = res.getEnvelope();
-		
-		Geometry e2 = e.difference(res2);
-		GisDebugger.setCRSString("EPSG:3395");
-		GisDebugger.addGeometry(e2);
-		
-		GisDebugger.dump("/Users/laemmel/devel/sim2dDemoIII/env_gen/floorplan_p.shp");
-		
-		System.out.println(res);
-		
-	}
+	public void handleEvent(XYVxVyEventImpl event);
 
 }

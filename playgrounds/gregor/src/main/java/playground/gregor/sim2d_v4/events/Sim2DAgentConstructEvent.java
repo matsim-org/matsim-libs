@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VisDebuggerAdditionalDrawer.java
+ * Sim2DAgentConstuctEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,9 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.debugger;
+package playground.gregor.sim2d_v4.events;
 
-public interface VisDebuggerAdditionalDrawer {
+import java.util.Map;
 
-	public void draw(VisDebugger p);
+import org.matsim.core.api.experimental.events.Event;
+
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+
+public class Sim2DAgentConstructEvent extends Event {
+
+	public static final String EVENT_TYPE = "Sim2DAgentConstructEvent";
+	public static final String ATTRIBUTE_PERSON = "person";
+	private final Sim2DAgent agent;
+	
+	public Sim2DAgentConstructEvent(double time, Sim2DAgent agent) {
+		super(time);
+		this.agent = agent;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_PERSON, this.agent.getId().toString());
+		return attr;
+	}
+	
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	public Sim2DAgent getSim2DAgent() {
+		return this.agent;
+	}
 }

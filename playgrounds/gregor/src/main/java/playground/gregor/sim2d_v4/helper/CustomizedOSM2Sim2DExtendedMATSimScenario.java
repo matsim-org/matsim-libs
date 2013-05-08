@@ -168,6 +168,8 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			throw new IllegalArgumentException(e);
 		}
 
+		Set<String> car = new HashSet<String>();
+		car.add("car");
 		Set<String> walk = new HashSet<String>();
 		walk.add("walk");
 		walk.add("car");

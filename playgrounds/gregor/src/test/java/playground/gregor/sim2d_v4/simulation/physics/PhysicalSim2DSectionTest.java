@@ -36,7 +36,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
@@ -199,7 +198,6 @@ public class PhysicalSim2DSectionTest {
 		this.e = new Envelope(-4,6,0,8);
 		env.setEnvelope(this.e);
 		
-		conf.setOffsets(-4, 0);
 
 		sc.connect(msc);
 
@@ -228,10 +226,6 @@ public class PhysicalSim2DSectionTest {
 			throw new RuntimeException("don't call this method!");
 		}
 
-		@Override
-		public void updateVelocity() {
-			throw new RuntimeException("don't call this method!");
-		}
 
 		@Override
 		public void setPSec(PhysicalSim2DSection physicalSim2DSection) {
@@ -272,12 +266,6 @@ public class PhysicalSim2DSectionTest {
 		@Override
 		public void notifyMoveOverNode(Id nextLinkId) {
 			throw new RuntimeException("don't call this method!");
-		}
-
-		@Override
-		public void debug(VisDebugger visDebugger) {
-			throw new RuntimeException("don't call this method!");
-
 		}
 
 		@Override

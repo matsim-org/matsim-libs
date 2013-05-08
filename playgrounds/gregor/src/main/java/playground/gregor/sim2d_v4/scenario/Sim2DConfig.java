@@ -30,8 +30,8 @@ public class Sim2DConfig {
 	//work in progress ...
 	
 	
-	private double offsetX;
-	private double offsetY;
+//	private double offsetX;
+//	private double offsetY;
 	
 	private double timeStepSize = 0.1;
 	private int eventsInterval = 0;
@@ -75,15 +75,15 @@ public class Sim2DConfig {
 		return this.sim2DEnvNetworkMapping.get(sim2DEnvPath);
 	}
 	
-	public void setOffsets(double offsetX, double offsetY) {
-		this.offsetX = offsetX;
-		this.offsetY = offsetY;
-	}
-	public double getOffsetX() {
-		return this.offsetX;
-	}
-	public double getOffsetY() {
-		return this.offsetY; 
-	}
+//	public void setOffsets(double offsetX, double offsetY) {
+//		this.offsetX = offsetX;
+//		this.offsetY = offsetY;
+//	}
+//	public double getOffsetX() {
+//		return this.offsetX;
+//	}
+//	public double getOffsetY() {
+//		return this.offsetY; 
+//	}
 
 }

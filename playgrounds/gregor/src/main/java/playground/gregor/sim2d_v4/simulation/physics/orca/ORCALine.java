@@ -20,7 +20,6 @@
 
 package playground.gregor.sim2d_v4.simulation.physics.orca;
 
-import playground.gregor.sim2d_v4.debugger.VisDebugger;
 
 
 public interface ORCALine {
@@ -45,7 +44,6 @@ public interface ORCALine {
 	
 	public abstract void setDirectionY(double y);
 	
-	public abstract void debug(VisDebugger visDebugger, int r, int g, int b);
 
 
 }

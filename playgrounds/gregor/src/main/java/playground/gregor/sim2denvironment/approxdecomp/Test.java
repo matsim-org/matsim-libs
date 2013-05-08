@@ -71,9 +71,10 @@ public class Test {
 //		String network = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml";
 //		String output = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/sim2dEnv_0.gml.gz";
 
-		String p = "/Users/laemmel/devel/burgdorf2d2/raw_input/station-1_stage1_simple_b.shp";
-		String network = "/Users/laemmel/devel/burgdorf2d2/raw_input/raw_network2d_-1.xml";
-		String output = "/Users/laemmel/devel/burgdorf2d2/raw_input_stage2/sim2dEnv_-1.gml.gz";
+		String dir = "/Users/laemmel/devel/hhw2/env_gen/";
+		String p = dir + "hhw_station_p_it2.shp";
+		String network = dir + "raw_network2d_hhw_station.xml";
+		String output = dir + "sim2dEnv_hhw_station.gml.gz";
 		
 		GeometryFactory geofac = new GeometryFactory();
 
@@ -145,9 +146,9 @@ public class Test {
 			}
 
 		}
-		GisDebugger.dump("/Users/laemmel/devel/convexdecomp/openings.shp");
+		GisDebugger.dump(dir + "openings.shp");
 		int nr = 0;
-		CoordinateReferenceSystem crs = CRS.decode("EPSG:21781");
+		CoordinateReferenceSystem crs = CRS.decode("EPSG:3395");
 		Sim2DEnvironment env = new Sim2DEnvironment();
 		env.setCRS(crs);
 		env.setEnvelope(reader.getBounds());
@@ -197,7 +198,7 @@ public class Test {
 
 		System.out.println(decomposed.size() + " == 105?");
 		GisDebugger.setCRSString("EPSG:3395");
-		GisDebugger.dump("/Users/laemmel/devel/burgdorf2d/tmp/resolved.shp");
+		GisDebugger.dump(dir + "resolved.shp");
 
 		Sim2DEnvironment env2 = new Sim2DEnvironment(); 
 
@@ -208,7 +209,7 @@ public class Test {
 		conf.setTimeStepSize(0.1);
 		conf.addSim2DEnvironmentPath(output);
 		conf.addSim2DEnvNetworkMapping(output, network);
-		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/burgdorf2d2/raw_input_stage2/sim2dConfig.xml");
+		new Sim2DConfigWriter01(conf).write(dir + "sim2dConfig.xml");
 		
 		
 		

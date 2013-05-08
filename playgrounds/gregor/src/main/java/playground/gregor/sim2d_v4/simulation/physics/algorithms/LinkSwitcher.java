@@ -44,8 +44,6 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 
 	private final Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
 
-	private final double offsetX;
-	private final double offsetY;
 
 	private final PhysicalSim2DEnvironment pEnv;
 
@@ -53,8 +51,6 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		this.net = sc.getNetwork();
 		Sim2DScenario s2dsc = sc.getScenarioElement(Sim2DScenario.class);
 		Sim2DConfig s2dc = s2dsc.getSim2DConfig();
-		this.offsetX = s2dc.getOffsetX();
-		this.offsetY = s2dc.getOffsetY();
 		this.pEnv = pEnv;
 	}
 
@@ -82,10 +78,10 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		Coord from = l.getFromNode().getCoord();
 		Coord to = l.getToNode().getCoord();
 		Segment seg = new Segment();
-		seg.x0 = from.getX()-this.offsetX;
-		seg.x1 = to.getX()-this.offsetX;
-		seg.y0 = from.getY()-this.offsetY;
-		seg.y1 = to.getY()-this.offsetY;
+		seg.x0 = from.getX();
+		seg.x1 = to.getX();
+		seg.y0 = from.getY();
+		seg.y1 = to.getY();
 
 		double dx = seg.x1-seg.x0;
 		double dy = seg.y1-seg.y0;

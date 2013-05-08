@@ -74,6 +74,8 @@ public class Sim2DRunnerTest extends MatsimTestCase{
 		c.addModule("qsim", qsim);
 		c.controler().setMobsim("hybridQ2D");
 		
+		c.global().setCoordinateSystem("EPSG:3395");
+		
 		new ConfigWriter(c).write(getOutputDirectory()+"/config.xml");
 		
 		String mconf = getOutputDirectory() + "/config.xml";
