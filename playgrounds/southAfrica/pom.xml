@@ -46,8 +46,31 @@
 			<groupId>net.sf.jung</groupId>
 			<artifactId>jung-algorithms</artifactId>
 			<version>2.0.1</version>
-			<type>jar</type>
-			<scope>compile</scope>
+		</dependency>
+		<dependency>
+  			<groupId>net.sf.jgrapht</groupId>
+  			<artifactId>jgrapht</artifactId>
+  			<version>0.8.3</version>
+		</dependency>
+		<dependency>
+  			<groupId>com.tinkerpop.blueprints</groupId>
+  			<artifactId>blueprints-core</artifactId>
+  			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+  			<groupId>com.tinkerpop.blueprints</groupId>
+  			<artifactId>blueprints-graph-jung</artifactId>
+  			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+  			<groupId>com.tinkerpop.blueprints</groupId>
+  			<artifactId>blueprints-core</artifactId>
+  			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+  			<groupId>com.tinkerpop.blueprints</groupId>
+  			<artifactId>blueprints-orient-graph</artifactId>
+  			<version>2.2.0</version>
 		</dependency>
   </dependencies>
 </project>
