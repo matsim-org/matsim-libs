@@ -64,8 +64,8 @@ public class MZ2010ToXmlFiles {
 	private static String[] getLocalFileArgs() {
 		// from local directory
 		return new String[] {
-				"D:/balmermi/documents/data/mz/2010/3_DB_SPSS/dat files/",
-				"D:/balmermi/documents/eclipse/output/mz/"
+				"C:/Users/staha/dat files/", //"P:/Daten/Mikrozensen Verkehr Schweiz/2010/3_DB_SPSS/dat files/"
+				"C:/Users/staha/output/"
 		};
 	}
 
@@ -82,8 +82,10 @@ public class MZ2010ToXmlFiles {
 		
 		System.out.println("MATSim-DB: creates population, vehicles and households and xml files from MicroCensus 2010 database \n");
 		
-		//args = getLocalFileArgs();
-		args = getNetworkFileArgs();
+		if (args.length != 2) {
+			args = getLocalFileArgs();
+			//args = getNetworkFileArgs();
+		}
 		
 		if (args.length != 2) {
 			log.error("MZ2010ToXmlFiles inputBase outputBase");
@@ -371,11 +373,11 @@ public class MZ2010ToXmlFiles {
 //////////////////////////////////////////////////////////////////////
 
 
-		System.out.println("-----------------------------------------------------------------------------------------------------------");
-		log.info("filtering persons without plan...");
-		MZPopulationUtils.removePersonsWithoutPlan(population);
-		new PopulationWriter(population, null).write(outputBase+"population.14.xml");
-		System.out.println("  done.");
+//		System.out.println("-----------------------------------------------------------------------------------------------------------");
+//		log.info("filtering persons without plan...");
+//		MZPopulationUtils.removePersonsWithoutPlan(population);
+//		new PopulationWriter(population, null).write(outputBase+"population.14.xml");
+//		System.out.println("  done.");
 
 
 
