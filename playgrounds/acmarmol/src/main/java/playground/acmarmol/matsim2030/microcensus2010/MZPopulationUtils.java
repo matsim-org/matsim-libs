@@ -1191,14 +1191,27 @@ public static void recodeActivityTypesHWELS(Population population){
 								|| type.contains(MZConstants.ERRANDS)
 								|| type.contains(MZConstants.OTHER)
 								|| type.contains(MZConstants.FOREIGN_PROPERTY)
-								|| type.contains(MZConstants.OVERNIGHT)
 								|| type.contains(MZConstants.ACCOMPANYING)
-								|| type.contains(MZConstants.ERRANDS)
-								|| type.contains(MZConstants.OTHER)
-								|| type.contains(MZConstants.FOREIGN_PROPERTY)
 								|| type.contains(MZConstants.OVERNIGHT)
 								|| type.contains(MZConstants.PSEUDOETAPPE))
 						{act.setType(MZConstants.LEISURE);}
+						
+						//////////////////////////////////////////////////////////////////////
+						// code added by staheale
+						
+						else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.SHOPPING))){
+							act.setType(MZConstants.SHOPPING);
+						}
+						
+						else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.HOME))){
+							act.setType(MZConstants.HOME);
+						}
+						
+						else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.EDUCATION))){
+							act.setType(MZConstants.EDUCATION);
+						}
+						
+						//////////////////////////////////////////////////////////////////////
 						
 //						else if(type.contains(MZConstants.SHOPPING))
 //						{act.setType(MZConstants.SHOPPING);}
