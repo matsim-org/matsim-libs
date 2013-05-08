@@ -125,8 +125,13 @@ public class MZ2010ZielPersonParser {
 		String employment_status = entries[177];
 		
 		if(!employment_status.equals(" ")){
-		if(Integer.parseInt(employment_status)>4){employed = false;}
+			if(Integer.parseInt(employment_status)>4){employed = false;}
 		}
+		else{
+			employed = false;
+		}
+		
+		//////////////////////////////////////////////////////////////////////
 				
 		if(employment_status.equals("1")){employment_status = MZConstants.INDEPENDENT;}
 		else if(employment_status.equals("2")){employment_status = MZConstants.MITARBEITENDES;}
