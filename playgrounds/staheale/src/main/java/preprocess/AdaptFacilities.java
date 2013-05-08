@@ -30,8 +30,13 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -57,47 +62,73 @@ public class AdaptFacilities {
 	public void run() {
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-
 		MatsimFacilitiesReader FacReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);  
 		System.out.println("Reading facilities xml file... ");
 		FacReader.readFile("./input/facilities.xml.gz");
 		System.out.println("Reading facilities xml file...done.");
 		ActivityFacilitiesImpl facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		log.info("Number of facilities: " +facilities.getFacilities().size());
+		
+		    for (ActivityFacility f : facilities.getFacilities().values()) {
+		    	if (f.getActivityOptions().containsKey("shop_retail")){
+		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
+		    		ActivityOption a = fImpl.getActivityOptions().get("shop_retail");
+		    		double cap = a.getCapacity();
+		    		fImpl.getActivityOptions().put("shop_retail", new ActivityOptionImpl("shop", fImpl));
+		    		
+					if (a.getOpeningTimes(DayType.mon)!=null) {;}
+					
+		    	}
+		    	if (f.getActivityOptions().containsKey("shop_service")){
+		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
+		    		fImpl.getActivityOptions().put("shop_service", new ActivityOptionImpl("shop", fImpl));
+		    	}
+		    	if (f.getActivityOptions().containsKey("leisure_gastro_culture")){
+		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
+		    		fImpl.getActivityOptions().put("leisure_gastro_culture", new ActivityOptionImpl("leisure", fImpl));
+		    	}
+		    	if (f.getActivityOptions().containsKey("leisure_sports_fun")){
+		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
+		    		fImpl.getActivityOptions().put("leisure_sports_fun", new ActivityOptionImpl("leisure", fImpl));
+		    	}
+		    }
+		    
+		    new FacilitiesWriter(facilities).write("./output/facilitiesAdapted2013.xml.gz");
+	
 
 		//    for (ActivityFacility f : facilities.getFacilitiesForActivityType("shop_retail").values()) {
 		//    	double cap = Math.max(10,Math.round((f.getActivityOptions().get("shop_retail").getCapacity())/10));
 		//    	f.getActivityOptions().get("shop_retail").setCapacity(cap);
 		//    }
 
-		try {
-
-			final String header="Facility_id\tx\ty\tdistance\tunder12";
-			final BufferedWriter out =
-					IOUtils.getBufferedWriter("./output/distance.txt");
-
-			out.write(header);
-			out.newLine();
-
-			for (ActivityFacility facility : facilities.getFacilities().values()) {
-				out.write(facility.getId().toString() + "\t"+
-						facility.getCoord().getX() + "\t"+
-						facility.getCoord().getY()
-						+ "\t");
-				double distance = CoordUtils.calcDistance(facility.getCoord(), ZurichCenter);
-				out.write((int) distance +"\t");
-				if (distance < 12000){
-					out.write("1\t");
-				}
-				else {
-					out.write("0\t");
-				}
-				out.newLine();
-			}
-			out.flush();
-			out.close();
-		} catch (final IOException e) {
-			Gbl.errorMsg(e);
-		}
+//		try {
+//
+//			final String header="Facility_id\tx\ty\tdistance\tunder12";
+//			final BufferedWriter out =
+//					IOUtils.getBufferedWriter("./output/distance.txt");
+//
+//			out.write(header);
+//			out.newLine();
+//
+//			for (ActivityFacility facility : facilities.getFacilities().values()) {
+//				out.write(facility.getId().toString() + "\t"+
+//						facility.getCoord().getX() + "\t"+
+//						facility.getCoord().getY()
+//						+ "\t");
+//				double distance = CoordUtils.calcDistance(facility.getCoord(), ZurichCenter);
+//				out.write((int) distance +"\t");
+//				if (distance < 12000){
+//					out.write("1\t");
+//				}
+//				else {
+//					out.write("0\t");
+//				}
+//				out.newLine();
+//			}
+//			out.flush();
+//			out.close();
+//		} catch (final IOException e) {
+//			Gbl.errorMsg(e);
+//		}
 	}
 }

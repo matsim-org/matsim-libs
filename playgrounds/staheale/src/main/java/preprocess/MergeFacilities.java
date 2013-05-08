@@ -48,7 +48,7 @@ public class MergeFacilities {
 
 		MatsimFacilitiesReader workFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioWork);  
 		System.out.println("Reading work facilities xml file... ");
-		workFacReader.readFile("./input/workFacilities.xml.gz");
+		workFacReader.readFile("./input/workFacilitiesNew.xml.gz");
 		System.out.println("Reading work facilities xml file...done.");
 		ActivityFacilitiesImpl workFacilities = ((ScenarioImpl) scenarioWork).getActivityFacilities();
 		log.info("Number of work facilities: " +workFacilities.getFacilities().size());
@@ -60,7 +60,7 @@ public class MergeFacilities {
 
 		MatsimFacilitiesReader homeFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioHome);  
 		System.out.println("Reading home facilities xml file... ");
-		homeFacReader.readFile("./input/homeFacilities.xml");
+		homeFacReader.readFile("./input/homeFacilities.xml.gz");
 		System.out.println("Reading home facilities xml file...done.");
 		ActivityFacilitiesImpl homeFacilities = ((ScenarioImpl) scenarioHome).getActivityFacilities();
 		log.info("Number of home facilities: " +homeFacilities.getFacilities().size());
@@ -96,6 +96,6 @@ public class MergeFacilities {
 		}
 		log.info("Number of work facilities: " +workFacilities.getFacilities().size());
 
-		new FacilitiesWriter(workFacilities).write("./output/facilities.xml.gz");
+		new FacilitiesWriter(workFacilities).write("./output/facilities2012.xml.gz");
 	}
 }
