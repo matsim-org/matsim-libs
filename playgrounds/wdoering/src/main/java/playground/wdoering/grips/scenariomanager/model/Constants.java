@@ -149,6 +149,9 @@ public class Constants
 	public static String IMG_ICON_BUSSTOPS = "BUSSTOPS.png";
 	public static String IMG_ICON_ANALYSIS = "ANALYSIS.png";
 	public static String IMG_ICON_MATSIMSCENARIO = "MATSIMSCENARIO.png";
+	
+	public static int FRAME_MIN_WIDTH = 200;
+	public static int FRAME_MIN_HEIGHT = 200;
 		
 	
 	

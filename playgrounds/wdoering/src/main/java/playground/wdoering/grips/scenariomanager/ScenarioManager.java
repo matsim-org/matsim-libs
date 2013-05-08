@@ -80,6 +80,7 @@ public class ScenarioManager extends DefaultWindow
 		controller.setStandAlone(false);
 		
 		ArrayList<AbstractModule> moduleChain = new ArrayList<AbstractModule>();
+		
 		//current work flow
 		moduleChain.add(new EvacAreaSelector(controller));
 		moduleChain.add(new PopAreaSelector(controller));
@@ -126,6 +127,7 @@ public class ScenarioManager extends DefaultWindow
 		int i = 0;
 		for (AbstractModule module : controller.getModules())
 		{
+			
 			JPanel panel = new JPanel();
 			panel.setPreferredSize(new Dimension(80,100));
 			TabButton button = new TabButton(module.getModuleType(),panel,80,80);

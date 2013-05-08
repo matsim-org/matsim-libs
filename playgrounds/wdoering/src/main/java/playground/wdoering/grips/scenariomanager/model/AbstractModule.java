@@ -2,12 +2,12 @@ package playground.wdoering.grips.scenariomanager.model;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.Constants.ModuleType;
+import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
-import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
-import playground.wdoering.grips.scenariomanager.view.Visualizer;
 
 public abstract class AbstractModule
 {
@@ -25,6 +25,7 @@ public abstract class AbstractModule
 	protected ModuleType moduleType;
 	
 	protected ArrayList<ModuleType> nextModules;
+	protected ArrayList<ModuleType> disableModules;
 	private boolean enabled = false;
 	
 	protected AbstractToolBox toolBox;
@@ -140,17 +141,18 @@ public abstract class AbstractModule
 
 	public void enableNextModules()
 	{
-		System.out.println("this: " + this.getModuleType());
+//		System.out.println("this: " + this.getModuleType());
 		for (ModuleType nextModuleType : nextModules)
 		{
-			System.out.println("next: " + nextModuleType.toString());
+//			System.out.println("next: " + nextModuleType.toString());
 			controller.enableModule(nextModuleType);
 		}
-		System.out.println();
-		
 		this.controller.updateParentUI();
 	
-			
+	}
+	
+	public void disablePastModules()
+	{
 		
 	}
 
@@ -165,6 +167,10 @@ public abstract class AbstractModule
 		return enabled;
 	}
 	
+	public List<AbstractProcess> getProcessChain()
+	{
+		return null;
+	}
 	
 	
 	

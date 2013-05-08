@@ -58,4 +58,8 @@ public abstract class AbstractSlippyMapRenderLayer extends AbstractRenderLayer
 		
 	}
 
+		
+	public void updateMapImage() {
+	}
+
 }

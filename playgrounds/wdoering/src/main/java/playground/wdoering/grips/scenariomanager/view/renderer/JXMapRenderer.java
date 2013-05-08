@@ -33,13 +33,14 @@ public class JXMapRenderer extends AbstractSlippyMapRenderLayer
 //		wms = "http://localhost:8080/geoserver/wms?service=WMS&";
 //		layer = "berlingrouplayer";
 		
-		//create image to use for export
-		mapImage = new BufferedImage(imageContainer.getWidth(), imageContainer.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		mapGraphics = mapImage.getGraphics();
 		
 		//create a new JXMapviewer frame
 		mapViewer = new JXMap(controller);
-		mapViewer.setBounds(0,0,imageContainer.getWidth(),imageContainer.getHeight());
+		
+		//create image to use for export
+		updateMapImage();
+		
+		
 		
 		//add new tile factory, depending on input
 		TileFactory tileFactory;
@@ -128,6 +129,14 @@ public class JXMapRenderer extends AbstractSlippyMapRenderLayer
 	{
 		this.mapViewer.setCenterPosition(new GeoPosition(position.getY(), position.getX()));
 //		this.mapViewer.setCenterPosition(new GeoPosition(controller.getCenterPosition().getY(), controller.getCenterPosition().getX()));
+	}
+	
+	@Override
+	public void updateMapImage()
+	{
+		mapImage = new BufferedImage(imageContainer.getWidth(), imageContainer.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		mapGraphics = mapImage.getGraphics();
+		mapViewer.setBounds(0,0,imageContainer.getWidth(),imageContainer.getHeight());
 	}
 	
 	

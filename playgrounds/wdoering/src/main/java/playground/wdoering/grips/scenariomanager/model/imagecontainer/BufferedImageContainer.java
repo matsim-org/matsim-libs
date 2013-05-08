@@ -183,5 +183,12 @@ public class BufferedImageContainer implements ImageContainerInterface
 		this.imageGraphics.drawImage(image, x, y, w, h, null);
 	}
 	
+	public <T> void setImage(T image)
+	{
+		this.image = (BufferedImage)image;
+		this.imageGraphics = (Graphics2D)this.image.getGraphics();
+	}
+	
+	
 
 }

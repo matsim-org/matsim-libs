@@ -17,6 +17,8 @@ public interface ImageContainerInterface
 	public int getBorderWidth();
 	public void drawBufferedImage(int i, int j, BufferedImage mapImage);
 	
+	public <T> void setImage(T image);
+	
 	
 	//paint methods
 	public void setColor(Color color);

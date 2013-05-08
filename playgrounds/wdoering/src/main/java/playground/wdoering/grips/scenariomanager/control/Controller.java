@@ -343,6 +343,15 @@ public class Controller
 	public void setImageContainer(ImageContainerInterface imageContainer)
 	{
 		this.imageContainer = imageContainer;
+		
+		updateMapLayerImages();
+	}
+	
+
+	public void updateMapLayerImages()
+	{
+		if (hasMapRenderer()) 
+			this.visualizer.getActiveMapRenderLayer().updateMapImage();
 	}
 
 	public void paintLayers()
@@ -444,6 +453,7 @@ public class Controller
 
 	public File getCurrentWorkingDirectory()
 	{
+//		return new File("C:\\temp\\!matsimfiles\\fostercityca\\");
 		return new File(System.getProperty("user.home"));
 	}
 
@@ -478,7 +488,8 @@ public class Controller
 				updateOtherModules();
 
 			return true;
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			System.err.println(e.getMessage());
 			return false;
@@ -510,7 +521,6 @@ public class Controller
 
 	private void updateOtherModules()
 	{
-		// TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	}
 

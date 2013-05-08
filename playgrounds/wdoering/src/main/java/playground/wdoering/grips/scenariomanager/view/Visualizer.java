@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
+import playground.wdoering.grips.scenariomanager.model.imagecontainer.ImageContainerInterface;
 import playground.wdoering.grips.scenariomanager.model.shape.Shape;
 import playground.wdoering.grips.scenariomanager.view.renderer.AbstractRenderLayer;
 import playground.wdoering.grips.scenariomanager.view.renderer.AbstractSlippyMapRenderLayer;
@@ -179,6 +180,10 @@ public class Visualizer
 		return (count>1);
 	}
 	
+	public ImageContainerInterface getImageContainer()
+	{
+		return this.controller.getImageContainer();
+	}
 	
 
 }
