@@ -19,7 +19,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -57,8 +57,6 @@ public class AdvancedPopulationGenerator {
 	public void run() throws Exception {
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population mz_population = sc.getPopulation();
-		Scenario scLimited = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population limited_mz_population = scLimited.getPopulation();
 
 		//////////////////////////////////////////////////////////////////////
 		// preparing output file for population not found in MZ population
@@ -93,11 +91,18 @@ public class AdvancedPopulationGenerator {
 
 		log.info("Reading MZ plans...");	
 		MatsimPopulationReader PlansReader = new MatsimPopulationReader(sc); 
-		MatsimPopulationReader PlansReader2 = new MatsimPopulationReader(scLimited); 
 		PlansReader.readFile("./input/population.15.xml"); //contains also agents without a plan, activity types HWELS
-		PlansReader2.readFile("./input/population.15.xml"); //contains also agents without a plan, activity types HWELS
 		log.info("Reading MZ plans...done.");
 		log.info("MZ population size is " +mz_population.getPersons().size());
+
+		// create empty plan for persons without any activity
+		PopulationFactory populationFactory = mz_population.getFactory();
+		Plan plan = populationFactory.createPlan();
+		for (Person p : mz_population.getPersons().values()) {
+			if (p.getSelectedPlan() == null) {
+				p.addPlan(plan);
+			}
+		}
 
 		//////////////////////////////////////////////////////////////////////
 		// read in mz person info csv file
@@ -128,8 +133,8 @@ public class AdvancedPopulationGenerator {
 			}
 			//set score value to weight
 			Id MZid = sc.createId(hhnr.concat(zielpnr));
-			if (limited_mz_population.getPersons().containsKey(MZid)) {
-				Person p = limited_mz_population.getPersons().get(MZid);
+			if (mz_population.getPersons().containsKey(MZid)) {
+				Person p = mz_population.getPersons().get(MZid);
 				PersonImpl person = (PersonImpl) p;
 				if (person.getSelectedPlan() != null){
 					person.getSelectedPlan().setScore(mzWeight);
@@ -144,11 +149,10 @@ public class AdvancedPopulationGenerator {
 		// create mz data structure according to balmermi
 
 		// remove persons without plan and with weekend plan
-		removePersonsWithoutPlan(limited_mz_population);	
-		removePersonsWithWeekendPlan(limited_mz_population);
+		removePersonsWithWeekendPlan(mz_population);
 
 		log.info("  creating mz data stucture... ");
-		MicroCensus2010 mz = new MicroCensus2010(limited_mz_population);
+		MicroCensus2010 mz = new MicroCensus2010(mz_population);
 		log.info("  done.");
 		mz.print();
 
@@ -267,45 +271,47 @@ public class AdvancedPopulationGenerator {
 					double yHome = Double.parseDouble(homeYcoord)-1000000; //change from CH1903+ to CH1903
 					Coord coordsHome = sc.createCoord(xHome, yHome);
 					List<PlanElement> pes = person.getSelectedPlan().getPlanElements();
-					Activity lastAct = ((Activity) pes.get( pes.size() -1 ));
-					if (lastAct.getType().equals("home") != true) {	
-						//log.warn("last activity for person " +recId+ " is not a home activity!");
-						Leg lastLeg = ((Leg) pes.get(pes.size() -2));
-						String lastLegMode = lastLeg.getMode();
-						double lastTravelTime = lastLeg.getTravelTime();
-						double lastEndTime = lastAct.getEndTime();
-						double newLastActStartTime = lastEndTime+lastTravelTime;
-						Leg newLastLeg = new LegImpl(lastLegMode);
-						newLastLeg.setDepartureTime(lastEndTime);
-						newLastLeg.setTravelTime(lastTravelTime);
-						p.getSelectedPlan().addLeg(newLastLeg);
-						Activity homeLastAct = new ActivityImpl("home", coordsHome);
-						homeLastAct.setStartTime(newLastActStartTime);
-						p.getSelectedPlan().addActivity(homeLastAct);
+					if (pes.size() > 0){
+						Activity lastAct = ((Activity) pes.get( pes.size() -1 ));
+						if (lastAct.getType().equals("home") != true) {	
+							//log.warn("last activity for person " +recId+ " is not a home activity!");
+							Leg lastLeg = ((Leg) pes.get(pes.size() -2));
+							String lastLegMode = lastLeg.getMode();
+							double lastTravelTime = lastLeg.getTravelTime();
+							double lastEndTime = lastAct.getEndTime();
+							double newLastActStartTime = lastEndTime+lastTravelTime;
+							Leg newLastLeg = new LegImpl(lastLegMode);
+							newLastLeg.setDepartureTime(lastEndTime);
+							newLastLeg.setTravelTime(lastTravelTime);
+							p.getSelectedPlan().addLeg(newLastLeg);
+							Activity homeLastAct = new ActivityImpl("home", coordsHome);
+							homeLastAct.setStartTime(newLastActStartTime);
+							p.getSelectedPlan().addActivity(homeLastAct);
 
-					}
-					Iterator<PlanElement> iter = pes.iterator();
-					while (iter.hasNext()) {
-						PlanElement pe = iter.next();
-						if (pe instanceof Activity) {
-							ActivityImpl a = (ActivityImpl) pe;
-							if (a.getType().equals("home")) {
-								a.setCoord(coordsHome);
-								//log.info("home coords for person with recId " +recId+ " changed");
-							}
 						}
-						//deal with leg mode "other" --> if license = yes, change to car, otherwise to pt
-						if (pe instanceof Leg) {
-							LegImpl l = (LegImpl) pe;
-							if (l.getMode().equals("other")) {
-								if (person.getLicense().equals("yes")) {
-									l.setMode("car");
-									//log.info("leg mode of person with recId " +recId+ " is changed to car");
-
+						Iterator<PlanElement> iter = pes.iterator();
+						while (iter.hasNext()) {
+							PlanElement pe = iter.next();
+							if (pe instanceof Activity) {
+								ActivityImpl a = (ActivityImpl) pe;
+								if (a.getType().equals("home")) {
+									a.setCoord(coordsHome);
+									//log.info("home coords for person with recId " +recId+ " changed");
 								}
-								else {
-									l.setMode("pt");
-									//log.info("leg mode of person with recId " +recId+ " is changed to pt");
+							}
+							//deal with leg mode "other" --> if license = yes, change to car, otherwise to pt
+							if (pe instanceof Leg) {
+								LegImpl l = (LegImpl) pe;
+								if (l.getMode().equals("other")) {
+									if (person.getLicense().equals("yes")) {
+										l.setMode("car");
+										//log.info("leg mode of person with recId " +recId+ " is changed to car");
+
+									}
+									else {
+										l.setMode("pt");
+										//log.info("leg mode of person with recId " +recId+ " is changed to pt");
+									}
 								}
 							}
 						}
@@ -381,24 +387,6 @@ public class AdvancedPopulationGenerator {
 		log.info("Writing plans...done");
 		log.info("final population size is: " +countPop);
 
-	}
-
-	public static void removePersonsWithoutPlan(Population population) {
-		final Map<Id, ? extends Person> persons = population.getPersons();
-		ArrayList<Id> toRemove = new ArrayList<Id>(persons.size());
-
-		for (Id id : persons.keySet()) {
-			Person person = persons.get(id);
-			Plan plan = person.getSelectedPlan();
-
-			if(plan == null)
-				toRemove.add(id);
-		}
-
-		for (Id id : toRemove)
-			persons.remove(id);
-
-		log.info("Removed " + toRemove.size() + " persons without plan.");
 	}
 
 	public static void removePersonsWithWeekendPlan(Population population) {
