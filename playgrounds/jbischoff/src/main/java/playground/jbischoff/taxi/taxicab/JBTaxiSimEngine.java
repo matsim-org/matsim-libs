@@ -117,7 +117,7 @@ public class JBTaxiSimEngine
 	    {
 	        boolean scheduleChanged = optimizer.updateSchedule(vrpVehicle);
 
-	        if (scheduleChanged && optimizationPolicy.shouldOptimize(vrpVehicle.getSchedule())) {
+	        if (scheduleChanged && optimizationPolicy.shouldOptimize(vrpVehicle.getSchedule().getCurrentTask())) {
 	            optimize();
 	        }
 	    }

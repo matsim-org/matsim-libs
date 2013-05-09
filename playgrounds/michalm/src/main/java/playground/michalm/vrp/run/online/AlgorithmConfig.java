@@ -181,13 +181,13 @@ import playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelTimeSourc
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizer(data, optimizationPolicy, this == NOS_STRAIGHT_LINE);
+                return new NOSTaxiOptimizerWithoutDestination(data, optimizationPolicy, this == NOS_STRAIGHT_LINE);
 
             case ONE_TIME_SCHEDULING:
-                return new OTSTaxiOptimizer(data, optimizationPolicy);
+                return new OTSTaxiOptimizerWithoutDestination(data, optimizationPolicy);
 
             case RE_SCHEDULING:
-                return new RESTaxiOptimizer(data, optimizationPolicy);
+                return new RESTaxiOptimizerWithoutDestination(data, optimizationPolicy);
 
             default:
                 throw new IllegalStateException();
