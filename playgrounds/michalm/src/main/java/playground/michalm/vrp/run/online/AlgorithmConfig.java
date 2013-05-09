@@ -177,17 +177,18 @@ import playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelTimeSourc
     }
 
 
-    /*package*/ImmediateRequestTaxiOptimizer createTaxiOptimizer(VrpData data)
+    /*package*/ImmediateRequestTaxiOptimizer createTaxiOptimizer(VrpData data,
+            boolean destinationKnown)
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizerWithoutDestination(data, this == NOS_STRAIGHT_LINE);
+                return new NOSTaxiOptimizer(data, destinationKnown, this == NOS_STRAIGHT_LINE);
 
             case ONE_TIME_SCHEDULING:
-                return new OTSTaxiOptimizerWithoutDestination(data, optimizationPolicy);
+                return new OTSTaxiOptimizer(data, destinationKnown, optimizationPolicy);
 
             case RE_SCHEDULING:
-                return new RESTaxiOptimizerWithoutDestination(data, optimizationPolicy);
+                return new RESTaxiOptimizer(data, destinationKnown, optimizationPolicy);
 
             default:
                 throw new IllegalStateException();

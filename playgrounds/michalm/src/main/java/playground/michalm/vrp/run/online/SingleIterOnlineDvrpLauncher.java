@@ -63,10 +63,11 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
     /*package*/final Scenario scenario;
 
-    /*package*/MatsimVrpData data;
     /*package*/AlgorithmConfig algorithmConfig;
-    /*package*/LegHistogram legHistogram;
+    /*package*/final boolean destinationKnown;
 
+    /*package*/LegHistogram legHistogram;
+    /*package*/MatsimVrpData data;
     /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
 
 
@@ -104,6 +105,8 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         // algorithmConfig = AlgorithmConfig.RES_DRV_FREE_FLOW;
         // algorithmConfig = AlgorithmConfig.RES_DRV_24_H;
         // algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
+
+        destinationKnown = true;
 
         otfVis = !true;
 
@@ -151,6 +154,8 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
         algorithmConfig = AlgorithmConfig.ALL[Integer.valueOf(params.get("algorithmConfig"))];
 
+        destinationKnown = Boolean.valueOf(params.get("destinationKnown"));
+
         otfVis = Boolean.valueOf(params.get("otfVis"));
 
         vrpOutFiles = Boolean.valueOf(params.get("vrpOutFiles"));
@@ -174,8 +179,8 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         data = OnlineDvrpLauncherUtils.initMatsimVrpData(scenario, algorithmConfig.ttimeSource,
                 algorithmConfig.tcostSource, eventsFileName, depotsFileName);
 
-        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(data
-                .getVrpData());
+        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(
+                data.getVrpData(), destinationKnown);
         optimizer.setDelaySpeedupStats(delaySpeedupStats);
 
         QSim qSim = OnlineDvrpLauncherUtils.initQSim(data, optimizer);
