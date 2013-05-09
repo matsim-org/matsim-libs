@@ -181,7 +181,7 @@ import playground.michalm.vrp.run.online.OnlineDvrpLauncherUtils.TravelTimeSourc
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizerWithoutDestination(data, optimizationPolicy, this == NOS_STRAIGHT_LINE);
+                return new NOSTaxiOptimizerWithoutDestination(data, this == NOS_STRAIGHT_LINE);
 
             case ONE_TIME_SCHEDULING:
                 return new OTSTaxiOptimizerWithoutDestination(data, optimizationPolicy);
