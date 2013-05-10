@@ -82,7 +82,7 @@ public class LinkCongestionInfo {
 				+ storageCapacity + ", personDelayInfos=" + personDelayInfos
 				+ ", personId2enterLeaveInfo=" + personId2enterLeaveInfo + "]";
 	}
-	public List<LinkEnterLeaveInfo> getPersonId2enterLeaveInfo() {
+	public List<LinkEnterLeaveInfo> getPersonEnterLeaveInfos() {
 		return personId2enterLeaveInfo;
 	}
 	public void setPersonId2enterLeaveInfo(List<LinkEnterLeaveInfo> personId2enterLeaveInfo) {
