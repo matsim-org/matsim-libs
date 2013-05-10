@@ -57,6 +57,7 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	protected Network network;
 	private boolean nextEnterVehicleIsFirstOfTrip = true ;
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
+	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
 
 	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network) {
@@ -71,6 +72,7 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 		this.score = INITIAL_SCORE;
 		this.nextEnterVehicleIsFirstOfTrip = true ;
 		this.nextStartPtLegIsFirstOfTrip = true ;
+		this.currentLegIsPtLeg = false;
 	}
 
 	@Override
@@ -183,7 +185,9 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 				this.nextStartPtLegIsFirstOfTrip = true ;
 			}
 			this.lastActivityEndTime = event.getTime() ;
-		} else if ( event instanceof PersonEntersVehicleEvent ) {
+		}
+
+		if ( event instanceof PersonEntersVehicleEvent && currentLegIsPtLeg ) {
 			if ( !this.nextEnterVehicleIsFirstOfTrip ) {
 				// all vehicle entering after the first triggers the disutility of line switch:
 				this.score  += params.utilityOfLineSwitch ;
@@ -191,8 +195,11 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 			this.nextEnterVehicleIsFirstOfTrip = false ;
 			// add score of waiting, _minus_ score of travelling (since it is added in the legscoring above):
 			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.marginalUtilityOfTravelingPT_s) ;
-		} else if ( event instanceof AgentDepartureEvent ) {
-			if ( TransportMode.pt.equals( ((AgentDepartureEvent)event).getLegMode() ) ) {
+		}
+
+		if ( event instanceof AgentDepartureEvent ) {
+			this.currentLegIsPtLeg = TransportMode.pt.equals( ((AgentDepartureEvent)event).getLegMode() );
+			if ( currentLegIsPtLeg ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {
 					this.score -= params.constantPt ;
 					// (yyyy deducting this again, since is it wrongly added above.  should be consolidated; this is so the code
