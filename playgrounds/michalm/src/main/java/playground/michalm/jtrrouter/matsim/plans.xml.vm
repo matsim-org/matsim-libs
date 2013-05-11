@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans>
+#foreach( $plan in $plans )
+  <person id="$plan.id">
+    <plan>
+      <act type="work" link="$plan.route.inFlow.inLink" end_time="$plan.startTime"/>
+      <leg mode="car">
+        <route>$plan.route.nodes</route>
+      </leg>
+      <act type="home" link="$plan.route.outFlow.outLink" end_time="$plan.endTime"/>
+    </plan>
+  </person>
+#end
+</plans>

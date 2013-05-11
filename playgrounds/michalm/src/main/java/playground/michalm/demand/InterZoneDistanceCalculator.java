@@ -24,7 +24,6 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
