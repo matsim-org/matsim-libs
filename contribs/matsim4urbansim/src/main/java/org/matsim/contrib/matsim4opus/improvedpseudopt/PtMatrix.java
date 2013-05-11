@@ -260,11 +260,11 @@ public class PtMatrix {
 		try{
 			log.info("Creating travel time OD matrix from VISUM pt stop 2 pt stop travel times file: " + ptTravelTimeInputFile);
 			fillODMatrix(travelTimeOD, ptStopHashMap, brTravelTimes, true);
-			log.info("Done creating travel time OD matrix ...");
+			log.info("Done creating travel time OD matrix. " + travelTimeOD.toString());
 			
 			log.info("Creating travel distance OD matrix from VISUM pt stop 2 pt stop travel distance file: " + ptTravelDistanceInputFile);
 			fillODMatrix(travelDistanceOD, ptStopHashMap, brTravelDistances, false);
-			log.info("Done creating travel distance OD matrix ...");
+			log.info("Done creating travel distance OD matrix. " + travelDistanceOD.toString());
 		} catch(Exception e){
 			e.printStackTrace();
 		}
@@ -339,10 +339,12 @@ public class PtMatrix {
 					odMatrix.createEntry(originPtStopID, destinationPtStopID, value);
 				}
 				else{
-					if(wrnCntId == 20){
-						log.error( "Found " + wrnCntId + " warnings of type 'pt stop id not found'. There is probably something seriously wrong. Please check. Reasons for this error may be:");
-						log.error( "The list of pt stops is incomplete or the stop ids of the VISUM files do not match the ids from the pt stop file.");
-					} else if(! ptStopHashMap.containsKey(originPtStopID) && wrnCntId < 20)
+					// Print the warn count after reading is finished. We want to know exactly how many stops are missing. Daniel, may '13
+//					if(wrnCntId == 20){
+//						log.error( "Found " + wrnCntId + " warnings of type 'pt stop id not found'. There is probably something seriously wrong. Please check. Reasons for this error may be:");
+//						log.error( "The list of pt stops is incomplete or the stop ids of the VISUM files do not match the ids from the pt stop file.");
+//					} else 
+					if(! ptStopHashMap.containsKey(originPtStopID) && wrnCntId < 20)
 						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + originPtStopID);
 					else if(! ptStopHashMap.containsKey(destinationPtStopID) && wrnCntId < 20)
 						log.warn("Could not find an item in QuadTree (i.e. pt station has no coordinates) with pt stop id:" + destinationPtStopID);
@@ -358,6 +360,11 @@ public class PtMatrix {
 				wrnCntFormat++;
 				continue;
 			}
+		}
+//		Print the warn count after reading is finished. We want to know exactly how many stops are missing. Daniel, may '13
+		if(wrnCntId > 0){
+			log.error( "Found " + wrnCntId + " warnings of type 'pt stop id not found'. There is probably something seriously wrong. Please check. Reasons for this error may be:");
+			log.error( "The list of pt stops is incomplete or the stop ids of the VISUM files do not match the ids from the pt stop file.");
 		}
 	}
 	
