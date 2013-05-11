@@ -37,7 +37,7 @@ public class LinkCongestionInfo {
 	private double freeTravelTime;
 
 	private double marginalDelayPerLeavingVehicle_sec;
-	private double storageCapacity;
+	private int storageCapacity_cars;
 	
 	private List<MarginalCongestionEvent> congestionEvents_FlowCapacity = new ArrayList<MarginalCongestionEvent>();
 	private List<PersonDelayInfo> personDelayInfos = new ArrayList<PersonDelayInfo>();
@@ -52,11 +52,11 @@ public class LinkCongestionInfo {
 	public void setMarginalDelayPerLeavingVehicle(double flowCapacity_hour) {
 		this.marginalDelayPerLeavingVehicle_sec = (1 / (flowCapacity_hour / 3600.));
 	}
-	public double getStorageCapacity() {
-		return storageCapacity;
+	public int getStorageCapacity_cars() {
+		return storageCapacity_cars;
 	}
-	public void setStorageCapacity(double storageCapacity) {
-		this.storageCapacity = storageCapacity;
+	public void setStorageCapacity_cars(int storageCapacity_cars) {
+		this.storageCapacity_cars = storageCapacity_cars;
 	}
 	public double getMarginalDelayPerLeavingVehicle_sec() {
 		return marginalDelayPerLeavingVehicle_sec;
@@ -79,7 +79,7 @@ public class LinkCongestionInfo {
 		return "LinkCongestionInfo [linkId=" + linkId + ", freeTravelTime="
 				+ freeTravelTime + ", marginalDelayPerLeavingVehicle_sec="
 				+ marginalDelayPerLeavingVehicle_sec + ", storageCapacity="
-				+ storageCapacity + ", personDelayInfos=" + personDelayInfos
+				+ storageCapacity_cars + ", personDelayInfos=" + personDelayInfos
 				+ ", personId2enterLeaveInfo=" + personId2enterLeaveInfo + "]";
 	}
 	public List<LinkEnterLeaveInfo> getPersonEnterLeaveInfos() {

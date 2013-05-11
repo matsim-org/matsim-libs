@@ -285,7 +285,6 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 						System.out.println(personId.toString() + " is delayed due to storage capacity constraints on links behind link " + linkId + ". Delay [sec]: " + delay);
 						
 						List<Id> followingLinkIDs = getFollowingLinkIDs(personId, linkId);
-						System.out.println(followingLinkIDs.toString());
 						double linkLeaveTime = personDelayinfo.getLinkLeaveTime();
 						
 						// get queue at the linkLeaveTime (when this agent wanted to leave but could not because of storage capacity constraints)
@@ -358,7 +357,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				
 				if (congestedLink){
 					List<LinkEnterLeaveInfo> enterLeaveInfosForThisLink = this.linkId2congestionInfo.get(linkId).getPersonEnterLeaveInfos();
-					double storageCapacity_cars = this.linkId2congestionInfo.get(linkId).getStorageCapacity();
+					int storageCapacity_cars = this.linkId2congestionInfo.get(linkId).getStorageCapacity_cars();
 					List<Id> personsOnLink = new ArrayList<Id>();
 					
 					for (LinkEnterLeaveInfo info : enterLeaveInfosForThisLink) {
@@ -368,7 +367,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 							// person was not on the link at the linkLeaveTime
 						}
 					}
-					
+
 					if (personsOnLink.size() == storageCapacity_cars) {
 						causingAgentIDs.addAll(personsOnLink);
 					} else if (personsOnLink.size() < storageCapacity_cars) {
@@ -466,7 +465,8 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		linkInfo.setLinkId(link.getId());
 		linkInfo.setFreeTravelTime(link.getLength() / link.getFreespeed());
 		linkInfo.setMarginalDelayPerLeavingVehicle(link.getCapacity());
-		linkInfo.setStorageCapacity( ( link.getLength() * link.getNumberOfLanes() ) / 7.5);
+		int storageCapacity_cars = (int) ((link.getLength() * link.getNumberOfLanes()) / 7.5);
+		linkInfo.setStorageCapacity_cars(storageCapacity_cars);
 		this.linkId2congestionInfo.put(link.getId(), linkInfo);
 	}
 
