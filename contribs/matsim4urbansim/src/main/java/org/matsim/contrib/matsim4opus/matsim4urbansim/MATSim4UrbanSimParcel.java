@@ -134,7 +134,6 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 */
 	MATSim4UrbanSimParcel(String args[]){
 		OutputDirectoryLogging.catchLogEntries();		
-		// initialize logger early to make sure we catch all logger-messages // Daniel may '13
 		log.info("printing build info for matsim4urbansim:") ;
 		Gbl.printBuildInfo("/META-INF/maven/org.matsim.contrib/matsim4urbansim/pom.properties") ;
 		// lets see if this works. kai & daniel, may'13
