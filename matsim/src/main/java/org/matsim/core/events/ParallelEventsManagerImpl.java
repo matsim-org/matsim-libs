@@ -113,6 +113,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	@Override
 	public void addHandler(final EventHandler handler) {
 		synchronized (this) {
+			log.info("adding Event-Handler " + handler.getClass().getName() + " to thread " + numberOfAddedEventsHandler);
 			events[numberOfAddedEventsHandler].addHandler(handler);
 			numberOfAddedEventsHandler = (numberOfAddedEventsHandler + 1) % numberOfThreads;
 		}
@@ -158,6 +159,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	public void printEventHandlers() {
 		synchronized (this) {
 			for (int i = 0; i < events.length; i++) {
+				log.info("registered event handlers for thread " + i + ":");
 				events[i].printEventHandlers();
 			}
 		}
@@ -193,6 +195,9 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+		// list which threads had which handlers to debug performance issues
+		printEventHandlers();
 
 		/*
 		 * introduction of the parallel mode variable was required, because of
