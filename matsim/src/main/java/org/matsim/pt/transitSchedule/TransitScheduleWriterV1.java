@@ -91,6 +91,9 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 	private void writeTransitLine(final TransitLine line) throws UncheckedIOException {
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
 		attributes.add(this.createTuple(Constants.ID, line.getId().toString()));
+		if (line.getName() != null) {
+			attributes.add(this.createTuple(Constants.NAME, line.getName()));
+		}
 		this.writeStartTag(Constants.TRANSIT_LINE, attributes);
 
 		for (TransitRoute route : line.getRoutes().values()) {

@@ -121,6 +121,9 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 		} else if (Constants.TRANSIT_LINE.equals(name)) {
 			Id id = this.idf.createId(atts.getValue(Constants.ID));
 			this.currentTransitLine = new TransitLineImpl(id);
+			if (atts.getValue(Constants.NAME) != null) {
+				this.currentTransitLine.setName(atts.getValue(Constants.NAME));
+			}
 			this.schedule.addTransitLine(this.currentTransitLine);
 		} else if (Constants.TRANSIT_ROUTE.equals(name)) {
 			Id id = this.idf.createId(atts.getValue(Constants.ID));

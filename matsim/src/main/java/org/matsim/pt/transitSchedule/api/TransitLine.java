@@ -53,4 +53,8 @@ public interface TransitLine extends Identifiable {
 	 */
 	public abstract boolean removeRoute(final TransitRoute route);
 
+	public void setName(final String name);
+	
+	public String getName();
+	
 }

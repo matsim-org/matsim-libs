@@ -15,7 +15,8 @@
 
 <!ELEMENT transitLine      (transitRoute)*>
 <!ATTLIST transitLine
-          id               CDATA   #REQUIRED>
+          id               CDATA   #REQUIRED
+          name             CDATA   #IMPLIED>
 
 <!ELEMENT transitRoute     (description?,transportMode,routeProfile,route?,departures)>
 <!ATTLIST transitRoute
