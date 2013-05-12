@@ -49,10 +49,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
 	
 	public RoadPricing() {
-		log.info("printing build info for roadpricing contrib:") ;
-		Gbl.printBuildInfo("/META-INF/maven/org.matsim.contrib/roadpricing/pom.properties") ;
-		// lets see if this works. kai & daniel, may'13
-
+		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
 	
 	@Override
