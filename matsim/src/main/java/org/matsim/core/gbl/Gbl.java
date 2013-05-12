@@ -64,17 +64,17 @@ public abstract class Gbl {
 	}
 
 	public static final void printBuildInfo() {
-		printBuildInfo("/revision.txt") ;
+		printBuildInfo("MATSim", "/revision.txt");
 	}
 	
 	/** 
 	 * Prints some information about the current build/revision of this code.
 	 * Currently, this will only work with the Nightly-Build-Jars.
 	 */
-	public static final void printBuildInfo(String str) {
+	public static final void printBuildInfo(String component, String resourceFilename) {
 		String revision = null;
 		String date = null;
-		URL url = Gbl.class.getResource(str);
+		URL url = Gbl.class.getResource(resourceFilename);
 		if (url != null) {
 			BufferedReader reader = null;
 			try {
@@ -90,13 +90,12 @@ public abstract class Gbl {
 				}
 			}
 			if (revision == null) {
-				log.info("MATSim-Build: unknown");
+				log.info(component + "-Build: unknown");
 			} else {
-				log.info("MATSim-Build: " + revision + " (" + date + ")");
+				log.info(component + "-Build: " + revision + " (" + date + ")");
 			}
-
 		} else {
-			log.info("MATSim-Build: unknown");
+			log.info(component + "-Build: unknown");
 		}
 	}
 
