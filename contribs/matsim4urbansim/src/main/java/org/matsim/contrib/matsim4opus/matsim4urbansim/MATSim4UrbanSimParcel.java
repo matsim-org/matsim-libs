@@ -134,16 +134,15 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 */
 	MATSim4UrbanSimParcel(String args[]){
 		OutputDirectoryLogging.catchLogEntries();		
-		log.info("printing build info for matsim4urbansim:") ;
-		Gbl.printBuildInfo("/META-INF/maven/org.matsim.contrib/matsim4urbansim/pom.properties") ;
-		// lets see if this works. kai & daniel, may'13
+		log.info("printing build info for matsim4urbansim:");
+		Gbl.printBuildInfo("MATSim4Opus", "/org/matsim/contrib/matsim4opus/revision.txt");
 				
 		// Stores location of MATSim configuration file
 		String matsimConfiFile = (args!= null && args.length==1) ? args[0].trim():null;
 		// checks if args parameter contains a valid path
 		Paths.isValidPath(matsimConfiFile);
 		
-		connector = new MATSim4UrbanSimConfigurationConverterV4( matsimConfiFile ) ;
+		connector = new MATSim4UrbanSimConfigurationConverterV4( matsimConfiFile );
 		if( !(connector.init()) ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
