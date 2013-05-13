@@ -53,7 +53,12 @@ public class ScoredAlternative implements Comparable<ScoredAlternative> {
 		// numerics
 		double epsilon = 0.000001;
 		
-		// reverse order:
+		// usually it is:
+		// this >  o  -> + 1
+		// o  == this ->   0
+		// this <  o  -> - 1
+		
+		// here: reverse order:
 		if (Math.abs(this.score - o.getScore()) > epsilon) {
 			if (this.score > o.getScore()) return -1;
 			else return +1;

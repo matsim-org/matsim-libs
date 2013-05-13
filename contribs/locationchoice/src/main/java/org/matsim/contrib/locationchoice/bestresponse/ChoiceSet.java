@@ -289,6 +289,9 @@ public class ChoiceSet {
 		return totalScore;
 	}
 	
+	/*
+	 * TODO: correct for the case where the smallest score is negative -> set to 0.0 at the moment!
+	 */
 	private double getOffset(ArrayList<ScoredAlternative> list, int nrElements) {
 		double smallestScore = list.get(nrElements - 1).getScore();
 		return Math.min(smallestScore, 0.0) * (-1.0); // if smallest score is negative, then add offsets!
