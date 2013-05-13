@@ -52,6 +52,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * TODO: Adjust for other modes than car and mixed modes. (Adjust for different effective cell sizes than 7.5 meters.)
+ * TODO: Adjust for other flow / storage capacity factors than 1.0.
  * 
  * 
  * @author ikaddoura
