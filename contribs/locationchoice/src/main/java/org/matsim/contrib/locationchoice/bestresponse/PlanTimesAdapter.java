@@ -98,7 +98,7 @@ public class PlanTimesAdapter {
 				
 				double legTravelTime = 0.0;
 				if (approximationLevel == ApproximationLevel.COMPLETE_ROUTING ) {
-					legTravelTime = computeTravelTimeFromCompleteRouting(plan.getPerson(), prevAct, act);
+					legTravelTime = computeTravelTimeFromCompleteRouting(plan.getPerson(), prevAct, act, previousLeg.getMode());
 				} else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
 					legTravelTime = computeTravelTimeFromLocalRouting( plan, actlegIndex, planElementIndex, act);
 				} else if (approximationLevel == ApproximationLevel.NO_ROUTING ) {
@@ -168,7 +168,7 @@ public class PlanTimesAdapter {
 					double legTravelTime = 0.0;
 					if (approximationLevel == ApproximationLevel.COMPLETE_ROUTING ) {
 						legTravelTime = computeTravelTimeFromCompleteRouting(plan.getPerson(),
-							plan.getPreviousActivity(plan.getPreviousLeg(act)), act);
+							plan.getPreviousActivity(plan.getPreviousLeg(act)), act, ((Leg)plan.getPreviousLeg(act)).getMode());
 					} else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
 						legTravelTime = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
 					} else if (approximationLevel == ApproximationLevel.NO_ROUTING ) {
@@ -262,53 +262,87 @@ public class PlanTimesAdapter {
 		Activity actToMove = (Activity) plan.getPlanElements().get(actlegIndex);
 		
 		double legTravelTime;
-		if (planElementIndex == actlegIndex) {
-			// adapt travel times: actPre -> actToMove
-			Activity previousActivity = plan.getPreviousActivity(plan.getPreviousLeg((ActivityImpl)pe));
-			
-			Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
-			Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
-			
-			Path p = this.leastCostPathCalculatorForward.calcLeastCostPath(fromNode, toNode, previousActivity.getEndTime(), plan.getPerson(), null);
-			legTravelTime = p.travelTime;
-			
-			//log.info("planElementIndex: " + planElementIndex + "------------");
-			//log.info("	Forward travel time: " + legTravelTime / 60.0);
-			
-		}
-		else if (planElementIndex == (actlegIndex + 2)) {
-			//adapt travel times: actToMove -> actPost
-			// replaced approximation: legTravelTime = getTravelTimeApproximation((PlanImpl)plan, (ActivityImpl)pe);
-			
-			Node fromNode = network.getLinks().get(((ActivityImpl)pe).getLinkId()).getToNode();
-			Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
-																	
-			Path p = this.leastCostPathCalculatorBackward.calcLeastCostPath(fromNode, toNode, -1.0, plan.getPerson(), null);
-			legTravelTime = p.travelTime;
-			//log.info("	Backward travel time: " + legTravelTime / 60.0);
-		}
-		else {
-			//use travel times from last iteration for efficiency reasons
-			legTravelTime = (plan).getPreviousLeg((Activity)pe).getTravelTime();
+		
+		if  (!plan.getPreviousLeg(actToMove).equals(TransportMode.car)) {
+			legTravelTime = this.getTravelTimeApproximation(plan, (ActivityImpl)actToMove);
+		} else {	
+			if (planElementIndex == actlegIndex) {
+				// adapt travel times: actPre -> actToMove
+				Activity previousActivity = plan.getPreviousActivity(plan.getPreviousLeg((ActivityImpl)pe));
+				
+				Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
+				Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
+				
+				Path p = this.leastCostPathCalculatorForward.calcLeastCostPath(fromNode, toNode, previousActivity.getEndTime(), plan.getPerson(), null);
+				legTravelTime = p.travelTime;	
+			}
+			else if (planElementIndex == (actlegIndex + 2)) {
+				//adapt travel times: actToMove -> actPost
+				// replaced approximation: legTravelTime = getTravelTimeApproximation((PlanImpl)plan, (ActivityImpl)pe);
+				
+				Node fromNode = network.getLinks().get(((ActivityImpl)pe).getLinkId()).getToNode();
+				Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
+																		
+				Path p = this.leastCostPathCalculatorBackward.calcLeastCostPath(fromNode, toNode, -1.0, plan.getPerson(), null);
+				legTravelTime = p.travelTime;
+				//log.info("	Backward travel time: " + legTravelTime / 60.0);
+			}
+			else {
+				//use travel times from last iteration for efficiency reasons
+				legTravelTime = (plan).getPreviousLeg((Activity)pe).getTravelTime();
+			}
 		}
 		return legTravelTime;
 	}
 	
-	private double getTravelTimeApproximation(PlanImpl plan, ActivityImpl pe) {
+	private double getTravelTimeApproximation(PlanImpl plan, ActivityImpl pe) {	
 		Activity actPre = plan.getPreviousActivity(plan.getPreviousLeg(pe));
-		double distance = 1.5 * ((CoordImpl)actPre.getCoord()).calcDistance(pe.getCoord());
-		// TODO: get better speed estimation
+		String mode = plan.getPreviousLeg(pe).getMode();
+		double distance = config.plansCalcRoute().getBeelineDistanceFactor() * ((CoordImpl)actPre.getCoord()).calcDistance(pe.getCoord());
+		
+		// default car
 		double speed = Double.parseDouble(this.config.locationchoice().getRecursionTravelSpeed());
-		return distance / speed;
+		
+		if (mode.equals(TransportMode.car) && 
+				config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.car) != null) {
+				speed = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.car);
+		} else if (mode.equals(TransportMode.pt)) {
+			if (config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt) != null) {
+				speed = config.plansCalcRoute().getPtSpeed();
+			} else {
+				speed = Double.parseDouble(this.config.locationchoice().getRecursionTravelSpeed()) 
+						* config.plansCalcRoute().getPtSpeedFactor();
+			}	
+		} else if (mode.equals(TransportMode.bike)) {
+			speed = config.plansCalcRoute().getBikeSpeed();
+		} else if (mode.equals(TransportMode.walk)) {
+			speed = config.plansCalcRoute().getWalkSpeed();
+		} else {
+			speed = config.plansCalcRoute().getUndefinedModeSpeed();
+		}		
+		return distance / speed;	
 	}
 	
-	private double computeTravelTimeFromCompleteRouting(Person person, Activity fromAct, Activity toAct) {
-		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
-		leg.setDepartureTime(0.0);
-		leg.setTravelTime(0.0);
-		leg.setArrivalTime(0.0);
-		PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());
-		return leg.getTravelTime();
+	private double computeTravelTimeFromCompleteRouting(Person person, Activity fromAct, Activity toAct, String mode) {
+		double legTravelTime = 0.0;
+			
+		if (mode.equals(TransportMode.car)) {
+			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
+			leg.setDepartureTime(0.0);
+			leg.setTravelTime(0.0);
+			leg.setArrivalTime(0.0);
+			PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());		
+			legTravelTime = leg.getTravelTime();
+		} else if (mode.equals(TransportMode.pt) && config.scenario().isUseTransit()) {
+			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
+			leg.setDepartureTime(0.0);
+			leg.setTravelTime(0.0);
+			leg.setArrivalTime(0.0);
+			PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());		
+			legTravelTime = leg.getTravelTime();			
+		} else {
+			legTravelTime = this.getTravelTimeApproximation((PlanImpl)person.getSelectedPlan(), (ActivityImpl)toAct);
+		}
+		return legTravelTime;
 	}
-
 }
