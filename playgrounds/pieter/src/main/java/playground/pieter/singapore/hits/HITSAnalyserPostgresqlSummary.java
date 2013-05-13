@@ -486,6 +486,7 @@ public class HITSAnalyserPostgresqlSummary {
 		journeyWriter.finish();
 		tripWriter.finish();
 		transferWriter.finish();
+		
 		String indexName = actTableName.substring(14);
 		String indexStatement = "CREATE INDEX " + indexName + "_paxidx ON "
 				+ actTableName + "(person_id);\n";
@@ -511,6 +512,19 @@ public class HITSAnalyserPostgresqlSummary {
 		dba.executeStatement(indexStatement);
 		System.out.println(indexStatement);
 
+		// need to update the transit stop ids so they are consistent with LTA
+		// list
+		String update = "		UPDATE " + tripTableName
+				+ " SET boarding_stop = matsim_to_transitstops_lookup.stop_id "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " WHERE boarding_stop = matsim_stop ";
+		dba.executeUpdate(update);
+		update = "		UPDATE "
+				+ tripTableName
+				+ " SET alighting_stop = matsim_to_transitstops_lookup.stop_id "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " WHERE boarding_stop = matsim_stop ";
+		dba.executeUpdate(update);
 		indexName = tripTableName.substring(14);
 		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
 				+ tripTableName + "(journey_id);\n";
@@ -919,8 +933,9 @@ public class HITSAnalyserPostgresqlSummary {
 						TransitStageRoutingInput ts = transitStages.get(i);
 						transitRouter.setAllowedLines(ts.lines);
 						// transitScheduleRouter.setA
-						double[] radiusFactors = { 1.0, 1.1, 1.25, 1.5, 2, 2.5,
-								3, 5, 10, 25 };
+						double[] radiusFactors = { 1.0,  1.5, 2.5,
+								 5, 10, 
+								25 };
 						int radiusIdx = 0;
 						path = null;
 						linkStartTime=getValidStartTime(linkStartTime);

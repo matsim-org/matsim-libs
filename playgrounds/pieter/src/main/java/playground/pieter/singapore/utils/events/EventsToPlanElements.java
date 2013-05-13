@@ -131,6 +131,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	private Map<Id, Integer> acts = new HashMap<Id, Integer>();
 	private int stuck = 0;
 	private final double walkSpeed;
+	private String eventsFileName;
 
 	public EventsToPlanElements(TransitSchedule transitSchedule,
 			Network network, Config config) {
@@ -493,6 +494,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS",
 				actTableName, actDBA, 10000, columns);
+		activityWriter.addComment(String.format("MATSim journeys from events file %s", eventsFileName));
 
 		String journeyTableName = "m_calibration.matsim_journeys_"
 				+ formattedDate;
@@ -664,6 +666,18 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		dba.executeStatement(indexStatement);
 		System.out.println(indexStatement);
 
+		//need to update the transit stop ids so they are consistent with LTA list
+		String update = "		UPDATE " + tripTableName
+				+ " SET boarding_stop = matsim_to_transitstops_lookup.stop_id "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " WHERE boarding_stop = matsim_stop ";
+		dba.executeUpdate(update);
+		update = "		UPDATE "
+				+ tripTableName
+				+ " SET alighting_stop = matsim_to_transitstops_lookup.stop_id "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " WHERE boarding_stop = matsim_stop ";
+		dba.executeUpdate(update);
 		indexName = tripTableName.substring(14);
 		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
 				+ tripTableName + "(journey_id);\n";
@@ -715,8 +729,13 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		// .get(new org.matsim.core.basic.v01.IdImpl("77878"));
 		// System.out.println(chain.planElements);
 		File properties = new File("data/matsim2postgres.properties");
-		test.writeSimulationResultsToSQL(properties);
+		test.writeSimulationResultsToSQL(properties, args[2]);
 		System.out.println(test.stuck);
+	}
+
+	private void writeSimulationResultsToSQL(File properties, String string) {
+		this.eventsFileName = string;
+		
 	}
 
 }
