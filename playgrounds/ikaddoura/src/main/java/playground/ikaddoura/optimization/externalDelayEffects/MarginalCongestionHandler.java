@@ -53,8 +53,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 /**
  * TODO: Adjust for other modes than car and mixed modes. (Adjust for different effective cell sizes than 7.5 meters.)
  * 
- * When an agent ends an activity on link A, the agent is affected by the flow capacity of link A.
- * What about the storage capacity?
  * 
  * @author ikaddoura
  *
@@ -103,15 +101,14 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 	public void handleEvent(AgentDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
 			// car!
-			
-			// wenn storage capacity verringert --> analog zu linkEnterEvent
-			
+						
 			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
 				// no one entered this link before
 				collectLinkInfos(event.getLinkId());
 			}
 			
 			calculateFlowCongestion(event.getTime(), event.getLinkId(), event.getPersonId(), false);
+			updateLinkInfo_agentEntersLink(event.getTime(), event.getPersonId(), event.getLinkId());
 						
 		} else {			
 			log.warn("Not tested for other modes than car.");
