@@ -104,7 +104,12 @@ public class Sim2DRunner implements IterationStartsListener{
 //			runner.visDebugger.addAdditionalDrawer(new MousePositionDrawer());
 //			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 3);
 //			runner.visDebugger.setFrameSaver(fs);
-			controller.getEvents().addHandler(new EventBasedVisDebuggerEngine(sc));
+			
+			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
+			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+			dbg.addAdditionalDrawer(qDbg);
+			controller.getEvents().addHandler(dbg);
+			controller.getEvents().addHandler(qDbg);
 		}
 
 		

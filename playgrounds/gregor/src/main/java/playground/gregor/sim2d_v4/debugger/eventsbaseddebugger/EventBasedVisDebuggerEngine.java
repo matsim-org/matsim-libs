@@ -48,6 +48,7 @@ import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler, NeighborsEventHandler{
 
@@ -69,7 +70,11 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		this.vis.addKeyListener(this.keyControl);
 		init();
 	}
-
+	
+	public void addAdditionalDrawer(VisDebuggerAdditionalDrawer drawer) {
+		this.vis.addAdditionalDrawer(drawer);
+	}
+	
 	private void init() {
 
 		//Links
@@ -122,7 +127,15 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 					Coordinate c1 = sec.getPolygon().getExteriorRing().getCoordinateN(i+1);
 					this.vis.addLineStatic(c0.x, c0.y, c1.x, c1.y, lp.r,lp.g,lp.b,lp.a, 0);
 				}
-
+				Polygon p = (Polygon) sec.getPolygon().buffer(-.1);
+				Coordinate[] coords = p.getExteriorRing().getCoordinates();
+				double [] x = new double [coords.length];
+				double [] y = new double [coords.length];
+				for (int i = 0; i < coords.length; i++) {
+					x[i] = coords[i].x;
+					y[i] = coords[i].y;
+				}
+				this.vis.addPolygonStatic(x, y, 255, 255, 255, 255, 0);
 			}
 		}
 
@@ -253,5 +266,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 			
 		}
 	}
+
+
 
 }

@@ -20,9 +20,8 @@
 
 package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
-import processing.core.PApplet;
 
 public interface VisDebuggerAdditionalDrawer {
 
-	public void draw(PApplet p);
+	public void draw(EventsBasedVisDebugger p);
 }

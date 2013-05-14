@@ -74,7 +74,7 @@ public class Tile {
 			e.printStackTrace();
 		}
 
-		String url = "http://localhost:8080/geoserver/wms?service=WMS&version=1.1.0&request=GetMap&layers=hh&styles=&bbox=" +
+		String url = "http://localhost:8080/geoserver/wms?service=WMS&version=1.1.0&request=GetMap&layers=world&styles=&bbox=" +
 				dest.x +
 				"," +
 				dest.y +
@@ -82,7 +82,7 @@ public class Tile {
 				dest1.x +
 				"," +
 				dest1.y +
-				"&width=256&height=256&srs=EPSG:4326&format=image/png";
+				"&width=256&height=256&srs=EPSG:4326&format=image/png8";
 
 
 		return url;
