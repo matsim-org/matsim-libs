@@ -19,25 +19,18 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.junit.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.FullyExploredPlansProvider.SelectedInformation;
@@ -132,43 +125,5 @@ public class FullExplorationVsCuttoffTest {
 		}
 
 		return score;
-	}
-}
-
-class FewGroupsIncompatibilityFactory implements IncompatiblePlansIdentifierFactory {
-
-	@Override
-	public IncompatiblePlansIdentifier createIdentifier(
-			final JointPlans jointPlans,
-			final ReplanningGroup group) {
-		final Set<JointPlan> knownJointPlans = new HashSet<JointPlan>();
-		final IncompatiblePlansIdentifierImpl identifier = new IncompatiblePlansIdentifierImpl();
-
-		for ( Person person : group.getPersons() ) {
-			int i = 0;
-			for ( Plan plan : person.getPlans() ) {
-				final JointPlan jp = jointPlans.getJointPlan( plan );
-				final int groupNr =  i++ % 3;
-
-				if ( groupNr == 0 ) continue;
-				final Set<Id> groups =
-						Collections.<Id>singleton(
-							new IdImpl( groupNr ) );
-				if ( jp == null ) {
-					identifier.put(
-							plan,
-							groups );
-				}
-				else if ( !knownJointPlans.add( jp ) ) {
-					for ( Plan p : jp.getIndividualPlans().values() ) {
-						identifier.put(
-								p,
-								groups );
-					}
-				}
-			}
-		}
-
-		return identifier;
 	}
 }
