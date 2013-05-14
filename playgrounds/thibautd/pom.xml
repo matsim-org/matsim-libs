@@ -35,6 +35,7 @@
 						<exclude>**/*IntegrationTest.java</exclude>
 					</excludes>
 					<enableAssertions>true</enableAssertions> <!-- this is false in MATSim's pom -->
+					<argLine>-Xmx700m -Djava.awt.headless=true</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
