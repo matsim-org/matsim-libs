@@ -138,11 +138,13 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		OutputDirectoryLogging.catchLogEntries();		
 		// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
 
-		Gbl.printBuildInfo("MATSim4Opus", "/org/matsim/contrib/matsim4opus/revision.txt");
+		Gbl.printBuildInfo("matsim4urbansim", "/org/matsim/contrib/matsim4opus/revision.txt");
 		// yy can't say where the ``component'' name comes from; certainly does nowhere exist in this capitalization (if anything, it is
 		// OPUS). kai, may'13
 		// from the top-level package name. can be replaced with anything, it's just there to better
 		// format the output. mrieser, may'13
+		// For the time being, the maven package shows up as matsim4urbansim, although the contrib itself is under 
+		// org.matsim.contrib.matsim4opus.  Presumably TN's design decision (?), for unknown reasons.  kai, may'13  
 		
 		// Stores location of MATSim configuration file
 		String matsimConfiFile = (args!= null && args.length==1) ? args[0].trim():null;
