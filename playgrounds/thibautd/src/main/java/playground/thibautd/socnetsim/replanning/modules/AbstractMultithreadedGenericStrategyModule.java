@@ -133,7 +133,7 @@ public abstract class AbstractMultithreadedGenericStrategyModule<T> implements G
 
 	@Override
 	public String toString() {
-		return getName();
+		return name;
 	}
 
 	/**
