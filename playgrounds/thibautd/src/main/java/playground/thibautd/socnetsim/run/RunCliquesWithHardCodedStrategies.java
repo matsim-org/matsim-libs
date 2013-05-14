@@ -19,12 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
+import java.util.TreeMap;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
@@ -32,6 +36,9 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
+
+import playground.meisterk.kti.config.KtiConfigGroup;
+import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
 
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
@@ -59,6 +66,7 @@ import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+import playground.thibautd.utils.ReflectiveModule;
 
 /**
  * @author thibautd
@@ -70,6 +78,8 @@ public class RunCliquesWithHardCodedStrategies {
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.loadConfig( configFile );
 		config.addModule( WeightsConfigGroup.GROUP_NAME , new WeightsConfigGroup() );
+		config.addModule( ScoringFunctionConfigGroup.GROUP_NAME , new ScoringFunctionConfigGroup() );
+		config.addModule( KtiConfigGroup.GROUP_NAME , new KtiConfigGroup() );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 
 		if ( config.scenario().isUseHouseholds() ) {
@@ -98,6 +108,8 @@ public class RunCliquesWithHardCodedStrategies {
 					config.getModule( CliquesConfigGroup.GROUP_NAME );
 		final WeightsConfigGroup weights = (WeightsConfigGroup)
 					config.getModule( WeightsConfigGroup.GROUP_NAME );
+		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
+					config.getModule( ScoringFunctionConfigGroup.GROUP_NAME );
 
 		final FixedGroupsIdentifier cliques = 
 			config.scenario().isUseHouseholds() ?
@@ -152,6 +164,16 @@ public class RunCliquesWithHardCodedStrategies {
 							new VehicleBasedIncompatiblePlansIdentifierFactory(
 									SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
 							new EmptyIncompatiblePlansIdentifierFactory() )
+					.withScoringFunctionFactory(
+							scoringFunctionConf.isUseKtiScoring() ?
+							new KTIYear3ScoringFunctionFactory(
+								scenario,
+								(KtiConfigGroup) config.getModule( KtiConfigGroup.GROUP_NAME ),
+								new TreeMap<Id, FacilityPenalty>(),
+								((ScenarioImpl) scenario).getActivityFacilities()) :
+							// if null, default will be used
+							// XXX not nice...
+							null )
 					.build();
 
 		// init strategies
@@ -228,6 +250,28 @@ public class RunCliquesWithHardCodedStrategies {
 		// load "registry"
 		final Scenario scenario = createScenario( configFile );
 		runScenario( scenario , true );
+	}
+
+	/**
+	 * This should not be public, but otherwise the reflection approach doesn't work...
+	 */
+	public static class ScoringFunctionConfigGroup extends ReflectiveModule {
+		public static final String GROUP_NAME = "scoringFunction";
+		private boolean useKtiScoring = false;
+
+		public ScoringFunctionConfigGroup() {
+			super( GROUP_NAME );
+		}
+
+		@StringSetter( "useKtiScoring" )
+		public void setUseKtiScoring(final boolean v) {
+			this.useKtiScoring = v;
+		}
+
+		@StringGetter( "useKtiScoring" )
+		public boolean isUseKtiScoring() {
+			return useKtiScoring;
+		}
 	}
 }
 
