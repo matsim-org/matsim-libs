@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -34,8 +35,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -49,7 +53,7 @@ public class JointPlanIOTest {
 	@Test
 	public void testDumpAndRead() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
-		final Population population = createPopulation( jointPlans );
+		final Population population = createScenario( jointPlans ).getPopulation();
 
 		final String file = utils.getOutputDirectory()+"/jointPlansDump.xml";
 		JointPlansXmlWriter.write( population , jointPlans , file );
@@ -85,12 +89,44 @@ public class JointPlanIOTest {
 		}
 	}
 
-	private static Population createPopulation(
+	@Test
+	public void testPlansOrderIsStableInCoreIO() throws Exception {
+		final JointPlans jointPlans = new JointPlans();
+		final Scenario scenario = createScenario( jointPlans );
+
+		final String file = utils.getOutputDirectory()+"/plans.xml";
+		new PopulationWriter( scenario.getPopulation() , scenario.getNetwork() ).write( file );
+
+		final Scenario scenarioReRead = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new MatsimPopulationReader( scenarioReRead ).parse( file );
+
+		final Iterator<? extends Person> dumpedPersons = scenario.getPopulation().getPersons().values().iterator();
+		final Iterator<? extends Person> readPersons = scenarioReRead.getPopulation().getPersons().values().iterator();
+
+		while ( dumpedPersons.hasNext() ) {
+			final Person dumpedPerson = dumpedPersons.next();
+			final Person readPerson = readPersons.next();
+
+			final Iterator<? extends Plan> dumpedPlans = dumpedPerson.getPlans().iterator();
+			final Iterator<? extends Plan> readPlans = readPerson.getPlans().iterator();
+			while( dumpedPlans.hasNext() ) {
+				// score are set different for every plan in the sequence
+				Assert.assertEquals(
+						"order of plans have changed through IO",
+						dumpedPlans.next().getScore(),
+						readPlans.next().getScore(),
+						MatsimTestUtils.EPSILON );
+			}
+		}
+	}
+
+	private static Scenario createScenario(
 			final JointPlans jointPlans ) {
 		final int nMembers = 2000;
 		final int nPlans = 10;
 		final double pJoin = 0.2;
-		final Population population =  ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation();
+		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		final Population population =  scenario.getPopulation();
 		final PopulationFactory factory = population.getFactory();
 
 		final Map<Id, Queue<Plan>> plansPerPerson = new LinkedHashMap<Id, Queue<Plan>>();
@@ -105,6 +141,7 @@ public class JointPlanIOTest {
 				final Plan plan = factory.createPlan();
 				plan.setPerson( person );
 				person.addPlan( plan );
+				plan.setScore( (double) k );
 			}
 			plansPerPerson.put( id , new LinkedList<Plan>( person.getPlans() ) );
 		}
@@ -123,7 +160,7 @@ public class JointPlanIOTest {
 			jointPlans.addJointPlan( jointPlans.getFactory().createJointPlan( jointPlan ) );
 		}
 
-		return population;
+		return scenario;
 	}
 }
 
