@@ -20,6 +20,7 @@
 package playground.thibautd.socnetsim.replanning.selectors;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -81,9 +82,30 @@ public class FullyExploredPlansProvider {
 		log.info( nTries+" random test plans" );
 		final Counter counter = new Counter( "Create test instance # " );
 		final Random random = new Random( 1234 );
+		final Iterator<Id> ids =
+				new Iterator<Id> () {
+						@Override
+						public boolean hasNext() {
+							return true;
+						}
+
+						int currentId=0;
+						@Override
+						public Id next() {
+							return new IdImpl( currentId++ );
+						}
+
+						@Override
+						public void remove() {
+							throw new UnsupportedOperationException();
+						}
+				};
 		for ( int i=0; i < nTries; i++ ) {
 			counter.incCounter();
-			final ReplanningGroup clique = createNextTestClique( selecteds.getJointPlans() , random );
+			final ReplanningGroup clique = createNextTestClique(
+					ids,
+					selecteds.getJointPlans(),
+					random );
 			final GroupPlans fullResult = fullSelector.selectPlans(
 						selecteds.getJointPlans(),
 						clique );
@@ -97,6 +119,7 @@ public class FullyExploredPlansProvider {
 	}
 
 	private static ReplanningGroup createNextTestClique(
+			final Iterator<Id> idsIterator,
 			final JointPlans jointPlans,
 			final Random random) {
 		// attempt to get a high diversity of joint structures.
@@ -108,12 +131,11 @@ public class FullyExploredPlansProvider {
 		final ReplanningGroup group = new ReplanningGroup();
 		final PopulationFactory factory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
 
-		int currentId = 0;
 		final Map<Id, Queue<Plan>> plansPerPerson = new LinkedHashMap<Id, Queue<Plan>>();
 
 		// create plans
 		for (int j=0; j < nMembers; j++) {
-			final Id id = new IdImpl( currentId++ );
+			final Id id = idsIterator.next();
 			final Person person = factory.createPerson( id );
 			group.addPerson( person );
 			for (int k=0; k < nPlans; k++) {
