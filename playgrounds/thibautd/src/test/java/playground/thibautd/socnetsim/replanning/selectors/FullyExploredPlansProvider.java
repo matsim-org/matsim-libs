@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.replanning.selectors;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -101,9 +102,14 @@ public class FullyExploredPlansProvider {
 
 		if ( !paths.allPathsExist() ) return null;
 
+		log.info( "read cliques from "+paths.cliquesFilePath );
 		final GroupIdentifier cliques = FixedGroupsIdentifierFileParser.readCliquesFile( paths.cliquesFilePath );
+
+		log.info( "read plans from "+paths.plansFilePath );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimPopulationReader( scenario ).readFile( paths.plansFilePath );
+
+		log.info( "read joint plans from "+paths.jointPlansFilePath );
 		final JointPlans jointPlans = JointPlansXmlReader.readJointPlans( scenario.getPopulation() , paths.jointPlansFilePath );
 
 		final SelectedInformation information = new SelectedInformation( jointPlans );
@@ -113,6 +119,13 @@ public class FullyExploredPlansProvider {
 
 			for ( Person person : clique.getPersons() ) {
 				final Plan selectedPlan = person.getSelectedPlan();
+				// this is used as a "flag" for no plan selected,
+				// as PersonImpl is too sentimental to have no plan
+				// selected.
+				if ( selectedPlan.getScore() == null ) {
+					person.getPlans().remove( selectedPlan );
+					continue;
+				}
 				final JointPlan jp = jointPlans.getJointPlan( selectedPlan );
 				assert jp == null || consistentSelectionStatus( jp ) : jp;
 
@@ -342,13 +355,27 @@ public class FullyExploredPlansProvider {
 			}
 
 			if ( info.getSecond() != null ) {
-				for ( Plan p : info.getSecond().getAllIndividualPlans() ) {
+				final Collection<Plan> plans = info.getSecond().getAllIndividualPlans();
+				assert plans.size() == info.getFirst().getPersons().size();
+				for ( Plan p : plans ) {
 					assert p.getPerson().getSelectedPlan() == null;
 					((PersonImpl) p.getPerson()).setSelectedPlan( p );
 				}
 			}
+			else {
+				for ( Person p : info.getFirst().getPersons() ) {
+					// XXX THIS IS UGLY!!!
+					// we HAVE to do something like this because this stupid PersonImpl
+					// doesn't accept to have no plan selected...
+					final Plan dummyPlan = scenario.getPopulation().getFactory().createPlan();
+					dummyPlan.setScore( null );
+					p.addPlan( dummyPlan );
+					((PersonImpl) p).setSelectedPlan( dummyPlan );
+				}
+			}
 
 			assert consistentSelectionStatus( info.getSecond().getJointPlans() );
+			assert !inJointPlans( info.getSecond().getIndividualPlans() , toDump.getJointPlans() );
 		}
 		cliquesWriter.finishAndCloseFile();
 
@@ -361,6 +388,15 @@ public class FullyExploredPlansProvider {
 				scenario.getPopulation(),
 				toDump.getJointPlans(),
 				paths.jointPlansFilePath );
+	}
+
+	private static boolean inJointPlans(
+			final Collection<Plan> individualPlans,
+			final JointPlans jointPlans) {
+		for ( Plan p : individualPlans ) {
+			if ( jointPlans.getJointPlan( p ) != null ) return true;
+		}
+		return false;
 	}
 }
 
