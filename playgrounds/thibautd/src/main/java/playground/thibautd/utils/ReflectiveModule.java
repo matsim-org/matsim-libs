@@ -167,6 +167,13 @@ public abstract class ReflectiveModule extends Module {
 	private void invokeSetter(
 			final Method setter,
 			final String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		// do not care about access modifier:
+		// if a method is tagged with the StringSetter
+		// annotation, we are supposed to access it.
+		// This *is* safe.
+		final boolean accessible = setter.isAccessible();
+		setter.setAccessible( true );
+
 		final Class<?>[] params = setter.getParameterTypes();
 		assert params.length == 1; // already checked at constr.
 
@@ -200,6 +207,8 @@ public abstract class ReflectiveModule extends Module {
 		else if ( type.equals( Short.class ) || type.equals( Short.TYPE ) ) {
 			setter.invoke( this , Short.parseShort( value ) );
 		}
+
+		setter.setAccessible( accessible );
 	}
 
 	@Override
@@ -208,7 +217,16 @@ public abstract class ReflectiveModule extends Module {
 
 		try {
 			if (getter != null) {
-				return ""+getter.invoke( this );
+				// do not care about access modifier:
+				// if a method is tagged with the StringGetter
+				// annotation, we are supposed to access it.
+				// This *is* safe.
+				final boolean accessible = getter.isAccessible();
+				getter.setAccessible( true );
+				final String value =  ""+getter.invoke( this );
+				getter.setAccessible( accessible );
+
+				return value;
 			}
 
 			log.warn( "no getter found for param "+param_name+": trying parent method" );
