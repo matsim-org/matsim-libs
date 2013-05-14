@@ -5,15 +5,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 
 public class MyPlanStrategyFactory implements PlanStrategyFactory {
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-		// also possible: MyStrategy( Scenario scenario ).  But then I do not have events.  kai, aug'10
-
 		// A PlanStrategy is something that can be applied to a person(!).  
 
 		// It first selects one of the plans:
