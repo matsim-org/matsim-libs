@@ -84,7 +84,14 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 
 			for (Id id : groupIds) {
 				countPersonsExplicit++;
-				g.addPerson( persons.remove( id ) );
+				final Person p = persons.remove( id );
+				if ( p == null ) {
+					if ( population.getPersons().containsKey( id ) ) {
+						throw new RuntimeException( "person with id "+id+" was found pertaining to several groups" );
+					}
+					throw new RuntimeException( "no person with id "+id+" in population "+population+" of size "+population.getPersons().size() );
+				}
+				g.addPerson( p );
 			}
 
 			groups.add( g );
