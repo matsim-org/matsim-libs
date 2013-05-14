@@ -102,7 +102,7 @@ public class ControlerListener implements StartupListener, IterationStartsListen
 			if(event.getControler().getConfig().scenario().isUseHouseholds()) {
 				PassivePlannerManager passivePlannerManager = new PassivePlannerManager(1);
 				event.getControler().addControlerListener(passivePlannerManager);
-				event.getControler().setMobsimFactory(new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((ScenarioImpl) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterFactory().createTripRouter()));
+				event.getControler().setMobsimFactory(new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((ScenarioImpl) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter()));
 			}
 			else
 				log.error("Households information is neccesary for passive planning with social");

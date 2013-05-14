@@ -59,10 +59,10 @@ public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 	}
 
 	@Override
-	public TripRouter createTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter() {
 		if (true) 
 			throw new UnsupportedOperationException( "TODO: replace MainModeIdentifier in PlanRouter" );
-		TripRouter instance = super.createTripRouter();
+		TripRouter instance = super.instantiateAndConfigureTripRouter();
 
 		instance.setRoutingModule(
 				HitchHikingConstants.PASSENGER_MODE,

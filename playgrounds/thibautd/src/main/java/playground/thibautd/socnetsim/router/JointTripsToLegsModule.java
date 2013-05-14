@@ -37,7 +37,7 @@ public class JointTripsToLegsModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new JointTripsToLegsAlgorithm( tripRouterFactory.createTripRouter() );
+		return new JointTripsToLegsAlgorithm( tripRouterFactory.instantiateAndConfigureTripRouter() );
 	}
 }
 

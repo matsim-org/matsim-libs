@@ -68,7 +68,7 @@ public class FixedTransitRouteModuleTest {
 				new TransitRouterImplFactory(
 					scenario.getTransitSchedule(),
 					new TransitRouterConfig( config )));
-		TripRouter tripRouter = tripRouterFactory.createTripRouter();
+		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
 		TransitRouterWrapper transitRouter = (TransitRouterWrapper) tripRouter.getRoutingModule( TransportMode.pt );
 
 		PlanRouter router = new PlanRouter( tripRouter );
@@ -76,7 +76,7 @@ public class FixedTransitRouteModuleTest {
 			Plan testPlan = p.getSelectedPlan();
 			router.run( testPlan );
 
-			TripRouter tripRouterWithFixedRoutes = tripRouterFactory.createTripRouter();
+			TripRouter tripRouterWithFixedRoutes = tripRouterFactory.instantiateAndConfigureTripRouter();
 			FixedTransitRouteRoutingModule testee =
 				new FixedTransitRouteRoutingModule(
 						testPlan,

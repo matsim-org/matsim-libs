@@ -74,8 +74,8 @@ public class EstimatorTripRouterFactory implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter createTripRouter() {
-		TripRouter instance = delegate.createTripRouter();
+	public TripRouter instantiateAndConfigureTripRouter() {
+		TripRouter instance = delegate.instantiateAndConfigureTripRouter();
 
 		for ( String mode : config.getNetworkModes() ) {
 			instance.setRoutingModule(

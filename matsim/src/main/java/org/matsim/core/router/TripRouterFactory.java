@@ -28,10 +28,24 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface TripRouterFactory extends MatsimFactory {
 	/**
-	 * Creates a new {@link TripRouter} instance, using the registered
-	 * {@link RoutingModuleFactory}es.
+	 * Creates a new {@link TripRouter} instance.
+	 * <p/>
+	 * This method is not the usual createXxx(...) method to draw attention to the fact that it does not return an interface but a class.  The syntax is roughly
+	 * <pre>
+	 *   public TripRouter instantiateAndConfigureTripRouter() {
+	 *      TripRouter tr = new TripRouter(...) ;
+	 *      tr.setRoutingModule( modeString, routingModule ) ;
+	 *      tr....(...) ;
+	 *      return tr ;
+	 *   }
+	 * </pre>
+	 * The actual router is set by routingModule of type {@link RoutingModule}; it is responsible for the leg mode described by modeString.
+	 * <p/>
+	 * Also see <code> tutorial.programming.example12PluggableTripRouter </code> 
+	 * and <code> tutorial.programming.example13MultiStateTripRouting </code>.
+	 * 
 	 * @return a fully initialised {@link TripRouter}.
 	 */
-	public TripRouter createTripRouter();
+	public TripRouter instantiateAndConfigureTripRouter();
 }
 

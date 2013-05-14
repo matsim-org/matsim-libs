@@ -60,7 +60,7 @@ public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreaded
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		TripRouterFactory tripRouterFactory = controler.getTripRouterFactory();
-		TripRouter tripRouter = tripRouterFactory.createTripRouter();
+		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
 		ParkAndRideFacilities facilities = ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() );
 		ParkAndRideIncluder includer;
 

@@ -108,7 +108,7 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter createTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter() {
 		TripRouter tripRouter = new TripRouter();
 
 		PlansCalcRouteConfigGroup routeConfigGroup = config.plansCalcRoute();

@@ -169,7 +169,7 @@ public class JointTripRouterFactoryTest {
 	public void testPassengerRoute() throws Exception {
 		final PlanAlgorithm planRouter =
 			new JointPlanRouterFactory( null ).createPlanRoutingAlgorithm(
-					factory.createTripRouter() );
+					factory.instantiateAndConfigureTripRouter() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
 			boolean toRoute = false;
@@ -206,7 +206,7 @@ public class JointTripRouterFactoryTest {
 	public void testDriverRoute() throws Exception {
 		final PlanAlgorithm planRouter =
 			new JointPlanRouterFactory( null ).createPlanRoutingAlgorithm(
-					factory.createTripRouter() );
+					factory.instantiateAndConfigureTripRouter() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
 			final List<Id> passengerIds = new ArrayList<Id>();

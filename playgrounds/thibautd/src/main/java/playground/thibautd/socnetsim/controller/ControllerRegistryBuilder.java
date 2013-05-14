@@ -311,10 +311,10 @@ public class ControllerRegistryBuilder {
 						final PersonAlgorithm prepareForSim =
 							new PersonPrepareForSim(
 									planRoutingAlgorithmFactory.createPlanRoutingAlgorithm(
-										tripRouterFactory.createTripRouter() ),
+										tripRouterFactory.instantiateAndConfigureTripRouter() ),
 									scenario);
 						final PersonAlgorithm checkJointRoutes =
-							new ImportedJointRoutesChecker( tripRouterFactory.createTripRouter() );
+							new ImportedJointRoutesChecker( tripRouterFactory.instantiateAndConfigureTripRouter() );
 						return new GenericPlanAlgorithm<ReplanningGroup>() {
 							@Override
 							public void run(final ReplanningGroup group) {

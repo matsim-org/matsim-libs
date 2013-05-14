@@ -51,7 +51,7 @@ public final class OTPTripRouterFactory implements
 	private TransitSchedule transitSchedule;
 	
 	@Override
-	public TripRouter createTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter() {
 		TripRouter tripRouter = new TripRouter();
 		tripRouter.setRoutingModule("pt", new OTPRoutingModule(pathservice, transitSchedule, day, ct));
 		return tripRouter;

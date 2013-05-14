@@ -195,7 +195,7 @@ public class ChoiceSet {
 			Plan plan, ReplanningContext replanningContext) {
 		TravelTime travelTime = replanningContext.getTravelTimeCalculator() ; 
 		TravelDisutility travelCost = replanningContext.getTravelCostCalculator() ;
-		TripRouter router = replanningContext.getTripRouterFactory().createTripRouter() ;
+		TripRouter router = replanningContext.getTripRouterFactory().instantiateAndConfigureTripRouter() ;
 		
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		

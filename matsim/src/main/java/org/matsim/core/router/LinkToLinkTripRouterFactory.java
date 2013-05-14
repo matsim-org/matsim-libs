@@ -58,8 +58,8 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter createTripRouter() {
-		TripRouter instance = delegate.createTripRouter();
+	public TripRouter instantiateAndConfigureTripRouter() {
+		TripRouter instance = delegate.instantiateAndConfigureTripRouter();
 
 		//Note that the inverted network is created once per thread
 		InvertedNetworkLegRouter invertedNetLegRouter =

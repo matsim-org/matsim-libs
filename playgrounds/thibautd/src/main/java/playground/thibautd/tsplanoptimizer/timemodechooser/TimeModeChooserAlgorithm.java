@@ -93,7 +93,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 		Solution<Plan> initialSolution =
 			new TimeModeChooserSolution(
 					plan,
-					tripRouterFactory.createTripRouter() );
+					tripRouterFactory.instantiateAndConfigureTripRouter() );
 
 		FitnessFunction<Plan> fitness = new BasicFitness( scoringFunctionFactory );
 		configuration.setFitnessFunction( fitness );

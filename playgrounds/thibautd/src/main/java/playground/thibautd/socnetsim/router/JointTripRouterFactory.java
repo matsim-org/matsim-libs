@@ -107,8 +107,8 @@ public class JointTripRouterFactory implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter createTripRouter() {
-		TripRouter instance = defaultFactory.createTripRouter();
+	public TripRouter instantiateAndConfigureTripRouter() {
+		TripRouter instance = defaultFactory.instantiateAndConfigureTripRouter();
 
 		instance.setRoutingModule(
 				JointActingTypes.DRIVER,

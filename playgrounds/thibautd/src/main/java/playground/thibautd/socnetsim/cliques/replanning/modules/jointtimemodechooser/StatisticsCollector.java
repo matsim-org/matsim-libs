@@ -40,7 +40,7 @@ class StatisticsCollector {
 	private final Map<String, String> routingModuleClasses = new HashMap<String, String>();
 
 	public synchronized  void notifyTripRouterFactory(final TripRouterFactory factory) {
-		TripRouter router = factory.createTripRouter();
+		TripRouter router = factory.instantiateAndConfigureTripRouter();
 		for (String mode : router.getRegisteredModes()) {
 			routingModuleClasses.put(
 					mode,

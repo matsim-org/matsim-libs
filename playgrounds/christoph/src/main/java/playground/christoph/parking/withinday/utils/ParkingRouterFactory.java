@@ -45,6 +45,6 @@ public class ParkingRouterFactory {
 	}
 	
 	public ParkingRouter createParkingRouter() {
-		return new ParkingRouter(scenario, travelTimes, travelDisutility, tripRouterFactory.createTripRouter(), nodesToCheck);
+		return new ParkingRouter(scenario, travelTimes, travelDisutility, tripRouterFactory.instantiateAndConfigureTripRouter(), nodesToCheck);
 	}
 }

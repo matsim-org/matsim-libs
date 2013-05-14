@@ -125,7 +125,7 @@ public class TripRouterFactoryImplTest {
 							config.transitRouter(),
 							config.vspExperimental())) );
 
-		TripRouter router = factory.createTripRouter();
+		TripRouter router = factory.instantiateAndConfigureTripRouter();
 
 		List<? extends PlanElement> trip = router.calcRoute(
 				TransportMode.car,
@@ -197,7 +197,7 @@ public class TripRouterFactoryImplTest {
 							config.transitRouter(),
 							config.vspExperimental())) );
 
-		TripRouter router = factory.createTripRouter();
+		TripRouter router = factory.instantiateAndConfigureTripRouter();
 
 		List<? extends PlanElement> trip = router.calcRoute(
 				TransportMode.car,

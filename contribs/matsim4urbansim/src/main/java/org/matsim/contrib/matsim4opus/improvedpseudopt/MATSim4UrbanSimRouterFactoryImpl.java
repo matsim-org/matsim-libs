@@ -61,7 +61,7 @@ public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 	}
 	
 	@Override
-	public TripRouter createTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter() {
 		// initialize here - controller should be fully initialized by now
 		// use fields to keep the rest of the code clean and comparable
 		

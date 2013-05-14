@@ -39,7 +39,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
 		scenario = (ScenarioImpl) initializer.getControler().getScenario();
-		return new RecursiveLocationMutator(scenario, initializer.getControler().getTripRouterFactory().createTripRouter(), new Random(4711));
+		return new RecursiveLocationMutator(scenario, initializer.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter(), new Random(4711));
 	}
 
 	public void testConstructor() {

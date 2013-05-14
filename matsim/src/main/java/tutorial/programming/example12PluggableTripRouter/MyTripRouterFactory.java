@@ -47,7 +47,7 @@ class MyTripRouterFactory implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter createTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter() {
 		final MyRoutingModule module = new MyRoutingModule();
 		
 		// my own router could listen to events:

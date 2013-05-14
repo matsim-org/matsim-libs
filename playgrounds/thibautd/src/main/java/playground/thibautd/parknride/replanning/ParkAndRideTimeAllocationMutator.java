@@ -89,7 +89,7 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 			if (blackList == null) {
 				// we need this hack, because when initialising the strategy the router factory
 				// may not be set correctly yet...
-				blackList = controler.getTripRouterFactory().createTripRouter().getStageActivityTypes();
+				blackList = controler.getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes();
 				controler = null;
 			}
 

@@ -87,7 +87,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	}
 	
 	@Override
-	public TripRouter createTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter() {
 		
 		this.config = controler.getScenario().getConfig();
 		this.network = controler.getScenario().getNetwork();

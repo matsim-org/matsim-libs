@@ -85,7 +85,7 @@ public class SimulateTeleportation {
 		controler.setTripRouterFactory(
 				new TripRouterFactory() {
 					@Override
-					public TripRouter createTripRouter() {
+					public TripRouter instantiateAndConfigureTripRouter() {
 						// this factory initializes a TripRouter with default modules,
 						// taking into account what is asked for in the config
 						// (for instance, detailled or teleported pt).
@@ -98,7 +98,7 @@ public class SimulateTeleportation {
 								controler.getLeastCostPathCalculatorFactory(),
 								controler.getTransitRouterFactory() );
 
-						final TripRouter router = delegate.createTripRouter();
+						final TripRouter router = delegate.instantiateAndConfigureTripRouter();
 
 						// add our module to the instance
 						router.setRoutingModule(

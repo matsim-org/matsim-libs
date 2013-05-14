@@ -59,7 +59,7 @@ public class FlightStuckedReplanning implements ReplanningListener, AgentStuckEv
 	@Override
 	public void notifyReplanning(ReplanningEvent e) {
 		ReplanningContext rc = e.getReplanningContext();
-		TripRouter tripRouter = rc.getTripRouterFactory().createTripRouter();
+		TripRouter tripRouter = rc.getTripRouterFactory().instantiateAndConfigureTripRouter();
 		PlanRouter router = new PlanRouter(tripRouter);
 		Scenario  scenario = e.getControler().getScenario();
 		for (Id id : this.stuckedPersonIds){

@@ -110,7 +110,7 @@ public class GroupPlanStrategyFactory {
 						@Override
 						public PlanAlgorithm getPlanAlgoInstance() {
 							final CompositeStageActivityTypes blackList = new CompositeStageActivityTypes();
-							blackList.addActivityTypes( tripRouterFactory.createTripRouter().getStageActivityTypes() );
+							blackList.addActivityTypes( tripRouterFactory.instantiateAndConfigureTripRouter().getStageActivityTypes() );
 							blackList.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 							final BlackListedTimeAllocationMutator algo =
 									new BlackListedTimeAllocationMutator(
@@ -178,7 +178,7 @@ public class GroupPlanStrategyFactory {
 						public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
 							return new JointTripInsertorAndRemoverAlgorithm(
 								config,
-								registry.getTripRouterFactory().createTripRouter(),
+								registry.getTripRouterFactory().instantiateAndConfigureTripRouter(),
 								MatsimRandom.getLocalInstance(),
 								true); // "iterative"
 						}
@@ -383,7 +383,7 @@ public class GroupPlanStrategyFactory {
 					registry.getIncompatiblePlansIdentifierFactory());
 
 		final CompositeStageActivityTypes stageActs = new CompositeStageActivityTypes();
-		stageActs.addActivityTypes( registry.getTripRouterFactory().createTripRouter().getStageActivityTypes() );
+		stageActs.addActivityTypes( registry.getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes() );
 		stageActs.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 		strategy.addStrategyModule(
 				//new AllocateVehicleToPlansInGroupPlanModule(
@@ -440,7 +440,7 @@ public class GroupPlanStrategyFactory {
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override
 					public PlanAlgorithm getPlanAlgoInstance() {
-						return new TripsToLegsAlgorithm( tripRouterFactory.createTripRouter() );
+						return new TripsToLegsAlgorithm( tripRouterFactory.instantiateAndConfigureTripRouter() );
 					}
 				});
 	}
@@ -451,7 +451,7 @@ public class GroupPlanStrategyFactory {
 		return new JointPlanBasedGroupStrategyModule(
 				new SynchronizeCoTravelerPlansModule(
 					config.global().getNumberOfThreads(),
-					tripRouterFactory.createTripRouter().getStageActivityTypes() ) );
+					tripRouterFactory.instantiateAndConfigureTripRouter().getStageActivityTypes() ) );
 	}
 
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(
@@ -462,7 +462,7 @@ public class GroupPlanStrategyFactory {
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override
 					public PlanAlgorithm getPlanAlgoInstance() {
-						return planRouterFactory.createPlanRoutingAlgorithm( tripRouterFactory.createTripRouter() );
+						return planRouterFactory.createPlanRoutingAlgorithm( tripRouterFactory.instantiateAndConfigureTripRouter() );
 					}
 				});
 	}

@@ -178,7 +178,7 @@ public class RunUtils {
 
 		final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
 		actTypesForAnalysis.addActivityTypes(
-				controller.getRegistry().getTripRouterFactory().createTripRouter().getStageActivityTypes() );
+				controller.getRegistry().getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes() );
 		actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 		controller.addControlerListener(
 				new TripModeShares(

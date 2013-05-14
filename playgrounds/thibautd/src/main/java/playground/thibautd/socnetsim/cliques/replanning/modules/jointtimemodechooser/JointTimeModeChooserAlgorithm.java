@@ -120,7 +120,7 @@ public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<Joint
 		Solution<JointPlan> initialSolution = new JointTimeModeChooserSolution(
 						jointPlan,
 						new JointPlanRouterFactory( ((ScenarioImpl) scenario).getActivityFacilities()),
-						estimatorRouterFactory.createTripRouter());
+						estimatorRouterFactory.instantiateAndConfigureTripRouter());
 		builder.buildConfiguration(
 				false,
 				initialSolution,

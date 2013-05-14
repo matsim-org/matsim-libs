@@ -110,7 +110,7 @@ public class BackwardCompatibilityTest {
 		oldControler.run();
 
 		plansCalcRoute = (PlansCalcRoute) oldControler.createRoutingAlgorithm();
-		tripRouter = controler.getTripRouterFactory().createTripRouter();
+		tripRouter = controler.getTripRouterFactory().instantiateAndConfigureTripRouter();
 		planRouter = (PlanRouter) controler.createRoutingAlgorithm();
 	}
 

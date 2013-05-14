@@ -64,7 +64,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			DestinationSampler sampler,
 			ReplanningContext replanningContext) {
 		
-		super(lcContext.getScenario(), replanningContext.getTripRouterFactory().createTripRouter(), quad_trees, facilities_of_type, null);
+		super(lcContext.getScenario(), replanningContext.getTripRouterFactory().instantiateAndConfigureTripRouter(), quad_trees, facilities_of_type, null);
 		this.facilities = (ActivityFacilitiesImpl) ((ScenarioImpl) lcContext.getScenario()).getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
@@ -222,7 +222,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		planTmp.copyFrom(plan);			
 		scoringFunction.reset();
 
-		cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, replanningContext.getTripRouterFactory().createTripRouter(), 
+		cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, replanningContext.getTripRouterFactory().instantiateAndConfigureTripRouter(), 
 				ApproximationLevel.COMPLETE_ROUTING);	
 		double score = scoringFunction.getScore();
 		scoringFunction.reset();

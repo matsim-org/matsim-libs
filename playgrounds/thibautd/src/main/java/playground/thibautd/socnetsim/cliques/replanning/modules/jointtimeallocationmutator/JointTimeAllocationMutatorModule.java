@@ -51,7 +51,7 @@ public class JointTimeAllocationMutatorModule extends AbstractMultithreadedGener
 	public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
 		return new JointTimeAllocationMutatorAlgorithm(
 				MatsimRandom.getLocalInstance(),
-				tripRouterFactory.createTripRouter().getStageActivityTypes(),
+				tripRouterFactory.instantiateAndConfigureTripRouter().getStageActivityTypes(),
 				mutationRange);
 	}
 }

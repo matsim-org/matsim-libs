@@ -139,14 +139,14 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 	}
 	
 	@Override
-	public TripRouter createTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter() {
 		
 		/*
 		 * If a delegateFactory is set, use it to create a TripRouter. By doing so,
 		 * modes not simulated by the multi-modal simulation are also taken into account.
 		 */
 		TripRouter instance = null;
-		if (delegateFactory != null) instance = delegateFactory.createTripRouter();
+		if (delegateFactory != null) instance = delegateFactory.instantiateAndConfigureTripRouter();
 		else instance = new TripRouter();
 					
 		for (String mode : CollectionUtils.stringToArray( configGroup.getSimulatedModes() )) {

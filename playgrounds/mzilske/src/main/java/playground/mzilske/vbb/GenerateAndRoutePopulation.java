@@ -108,7 +108,7 @@ public class GenerateAndRoutePopulation {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return new PersonPrepareForSim(new PlanRouter(
-						trf.createTripRouter(),
+						trf.instantiateAndConfigureTripRouter(),
 						((ScenarioImpl)scenario).getActivityFacilities()), scenario);
 			}
 		});

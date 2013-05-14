@@ -153,7 +153,7 @@ public class InitRoutes {
 				timeCostCalc,
 				new AStarLandmarksFactory( network, timeCostCalc, this.config.global().getNumberOfThreads()),
 				null);
-		plans.addAlgorithm( new PlanRouter( tripRouterFact.createTripRouter() , null ) );
+		plans.addAlgorithm( new PlanRouter( tripRouterFact.instantiateAndConfigureTripRouter() , null ) );
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();

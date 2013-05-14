@@ -292,8 +292,8 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		}
 		
 		@Override
-		public TripRouter createTripRouter() {
-			TripRouter tripRouter = tripRouterFactory.createTripRouter();
+		public TripRouter instantiateAndConfigureTripRouter() {
+			TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
 
 			if (replaceDummyModes) {
 				// replace routing modules for dummy modes

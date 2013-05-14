@@ -865,7 +865,7 @@ public class Controler extends AbstractController {
 		
 		return useTripRouting ?
 			new PlanRouter(
-				getTripRouterFactory().createTripRouter(),
+				getTripRouterFactory().instantiateAndConfigureTripRouter(),
 				((ScenarioImpl)getScenario()).getActivityFacilities()) :
 			createOldRoutingAlgorithm(
 				this.createTravelCostCalculator(),

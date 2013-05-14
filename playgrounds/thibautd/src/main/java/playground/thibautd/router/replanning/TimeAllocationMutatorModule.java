@@ -83,7 +83,7 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 		BlackListedTimeAllocationMutator mutator =
 			new BlackListedTimeAllocationMutator(
-					blackList != null ? blackList : controler.getTripRouterFactory().createTripRouter().getStageActivityTypes(),
+					blackList != null ? blackList : controler.getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes(),
 					this.mutationRange,
 					MatsimRandom.getLocalInstance());
 		mutator.setSetting( useActivityDurations ? Setting.MUTATE_DUR : Setting.MUTATE_END_AS_DUR );

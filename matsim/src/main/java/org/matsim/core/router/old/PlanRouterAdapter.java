@@ -107,7 +107,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	public PlanRouterAdapter(
 			final Controler controler) {
 		this( new PlanRouter(
-					controler.getTripRouterFactory().createTripRouter(),
+					controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
 					((ScenarioImpl) controler.getScenario()).getActivityFacilities() ),
 				controler);
 	}
