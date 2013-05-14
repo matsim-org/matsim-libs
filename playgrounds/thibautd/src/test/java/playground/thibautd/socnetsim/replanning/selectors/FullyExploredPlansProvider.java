@@ -38,18 +38,22 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.thibautd.socnetsim.cliques.population.CliquesWriter;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.JointPlansXmlReader;
+import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -110,6 +114,7 @@ public class FullyExploredPlansProvider {
 			for ( Person person : clique.getPersons() ) {
 				final Plan selectedPlan = person.getSelectedPlan();
 				final JointPlan jp = jointPlans.getJointPlan( selectedPlan );
+				assert jp == null || consistentSelectionStatus( jp ) : jp;
 
 				if ( jp != null && !selectedJointPlans.contains( jp ) ) {
 					selectedJointPlans.add( jp );
@@ -124,25 +129,41 @@ public class FullyExploredPlansProvider {
 					new GroupPlans(
 						selectedJointPlans,
 						selectedPlans );
+			final int nPlans = gps.getAllIndividualPlans().size();
 
-			assert gps.getAllIndividualPlans().size() == clique.getPersons().size();
+			assert nPlans == 0 || nPlans == clique.getPersons().size() : nPlans +" != "+ clique.getPersons().size();
 
 			information.addInformation(
 					clique,
-					gps);
+					nPlans == 0 ? null : gps);
 		}
 
 		return information;
 	}
 
+	private static boolean consistentSelectionStatus(final Iterable<JointPlan> jps) {
+		for ( JointPlan jp : jps ) {
+			if ( !consistentSelectionStatus( jp ) ) return false;
+		}
+		return true;
+	}
+
+	private static boolean consistentSelectionStatus(final JointPlan jp) {
+		boolean foundSelected = false;
+		boolean foundNonSelected = false;
+
+		for ( Plan p : jp.getIndividualPlans().values() ) {
+			if ( p.isSelected() ) foundSelected = true;
+			else foundNonSelected = true;
+		}
+		return !(foundSelected && foundNonSelected);
+	}
+
 	private static StoragePaths getStoragePaths(
 			final IncompatiblePlansIdentifierFactory incompFactory,
 			final boolean isBlocking) {
-		final String baseDir = CACHE_DIRECTORY +"/"+ incompFactory.getClass() +"/"+ isBlocking+"/";
-		return new StoragePaths(
-				baseDir+"plans.xml",
-				baseDir+"jointPlans.xml",
-				baseDir+"cliques.xml" );
+		final String baseDir = CACHE_DIRECTORY +"/"+ incompFactory.getClass().getName() +"/"+ isBlocking+"/";
+		return new StoragePaths( baseDir );
 	}
 
 	private static SelectedInformation createGroupsAndSelected(
@@ -276,18 +297,82 @@ public class FullyExploredPlansProvider {
 			plans.add( new Tuple<ReplanningGroup, GroupPlans>( group , selected ) );
 		}
 	}
+
+	/**
+	 * to generate test data.
+	 * mvn -e exec:java -Dexec.mainClass="playground.thibautd.socnetsim.replanning.selectors.FullyExploredPlansProvider" -Dexec.classpathScope="test"
+	 */
+	public static void main(final String[] args) {
+		generateInputData(
+				new EmptyIncompatiblePlansIdentifierFactory(),
+				true );
+
+		generateInputData(
+				new EmptyIncompatiblePlansIdentifierFactory(),
+				false );
+
+		generateInputData(
+				new FewGroupsIncompatibilityFactory(),
+				true );
+
+		generateInputData(
+				new FewGroupsIncompatibilityFactory(),
+				false );
+	}
+
+	private static void generateInputData(
+			final IncompatiblePlansIdentifierFactory factory,
+			final boolean blocking) {
+		final SelectedInformation toDump = createGroupsAndSelected( factory , blocking );
+		final StoragePaths paths = getStoragePaths( factory , blocking );
+		new File( paths.directoryPath ).mkdirs();
+		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+
+		int id = 0;
+		final CliquesWriter cliquesWriter = new CliquesWriter();
+		cliquesWriter.openAndStartFile( paths.cliquesFilePath );
+		for ( Tuple<ReplanningGroup, GroupPlans> info : toDump.getGroupInfos() ) {
+			cliquesWriter.writeClique(
+					new IdImpl( id++ ),
+					info.getFirst().getPersons() );
+
+			for ( Person p : info.getFirst().getPersons() ) {
+				scenario.getPopulation().addPerson( p );
+				((PersonImpl) p).setSelectedPlan( null );
+			}
+
+			if ( info.getSecond() != null ) {
+				for ( Plan p : info.getSecond().getAllIndividualPlans() ) {
+					assert p.getPerson().getSelectedPlan() == null;
+					((PersonImpl) p.getPerson()).setSelectedPlan( p );
+				}
+			}
+
+			assert consistentSelectionStatus( info.getSecond().getJointPlans() );
+		}
+		cliquesWriter.finishAndCloseFile();
+
+		new PopulationWriter(
+				scenario.getPopulation(),
+				scenario.getNetwork() ).write(
+					paths.plansFilePath );
+
+		JointPlansXmlWriter.write(
+				scenario.getPopulation(),
+				toDump.getJointPlans(),
+				paths.jointPlansFilePath );
+	}
 }
 
 class StoragePaths {
-	public final String plansFilePath, jointPlansFilePath, cliquesFilePath;
+	public final String directoryPath, plansFilePath, jointPlansFilePath, cliquesFilePath;
 
 	public StoragePaths(
-			final String plansFilePath,
-			final String jointPlansFilePath,
-			final String cliquesFilePath) {
-		this.plansFilePath = plansFilePath;
-		this.jointPlansFilePath = jointPlansFilePath;
-		this.cliquesFilePath = cliquesFilePath;
+			final String directoryPath) {
+		this.directoryPath = directoryPath;
+		this.plansFilePath = directoryPath+"/plans.xml";
+		this.jointPlansFilePath = directoryPath+"/jointplans.xml";
+		this.cliquesFilePath = directoryPath+"/cliques.xml";
 	}
 
 	public boolean allPathsExist() {
