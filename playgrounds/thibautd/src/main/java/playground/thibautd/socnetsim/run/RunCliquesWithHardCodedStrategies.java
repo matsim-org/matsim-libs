@@ -128,6 +128,12 @@ public class RunCliquesWithHardCodedStrategies {
 							}
 						};
 				}
+
+				@Override
+				protected String getName() {
+					return "PrepareVehiclesForSim";
+				}
+
 			};
 
 		final ControllerRegistry controllerRegistry =

@@ -325,6 +325,11 @@ public class ControllerRegistryBuilder {
 							}
 						};
 					}
+
+					@Override
+					protected String getName() {
+						return "PrepareRoutesForSim";
+					}
 				});
 	}
 }
