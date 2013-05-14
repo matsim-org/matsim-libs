@@ -36,7 +36,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
@@ -59,7 +59,7 @@ public final class ControllerRegistry {
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final GroupIdentifier groupIdentifier;
-	private final Iterable<GenericPlanAlgorithm<ReplanningGroup>> prepareForSimAlgorithms;
+	private final Iterable<GenericStrategyModule<ReplanningGroup>> prepareForSimModules;
 	private final PlanLinkIdentifier planLinkIdentifier;
 	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 
@@ -75,7 +75,7 @@ public final class ControllerRegistry {
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 			final GroupIdentifier groupIdentifier,
-			final Iterable<GenericPlanAlgorithm<ReplanningGroup>> prepareForSimAlgorithms,
+			final Iterable<GenericStrategyModule<ReplanningGroup>> prepareForSimModules,
 			final PlanLinkIdentifier planLinkIdentifier,
 			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
 		log.debug( "constructing "+getClass().getSimpleName() );
@@ -101,8 +101,8 @@ public final class ControllerRegistry {
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		log.debug( "groupIdentifier = "+ groupIdentifier );
 		this.groupIdentifier = groupIdentifier;
-		log.debug( "prepareForSimAlgorithms = "+ prepareForSimAlgorithms );
-		this.prepareForSimAlgorithms = prepareForSimAlgorithms;
+		log.debug( "prepareForSimModules = "+ prepareForSimModules );
+		this.prepareForSimModules = prepareForSimModules;
 		log.debug( "planLinkIdentifier = "+ planLinkIdentifier );
 		this.planLinkIdentifier = planLinkIdentifier;
 		log.debug( "incompatiblePlansIdentifierFactory = "+ incompatiblePlansIdentifierFactory );
@@ -192,8 +192,8 @@ public final class ControllerRegistry {
 		return groupIdentifier;
 	}
 
-	public Iterable<GenericPlanAlgorithm<ReplanningGroup>> getPrepareForSimAlgorithms() {
-		return prepareForSimAlgorithms;
+	public Iterable<GenericStrategyModule<ReplanningGroup>> getPrepareForSimModules() {
+		return prepareForSimModules;
 	}
 
 	public PlanLinkIdentifier getPlanLinkIdentifier() {

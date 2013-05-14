@@ -40,12 +40,14 @@ import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
@@ -107,17 +109,24 @@ public class RunCliquesWithHardCodedStrategies {
 		final PlanLinkIdentifier planLinkIdentifier =
 			linkIdentifier( weights.getSynchronize() );
 
-		final GenericPlanAlgorithm<ReplanningGroup> additionalPrepareAlgo =
-			scenario.getScenarioElement( VehicleRessources.class ) != null ?
-			new PrepareVehicleAllocationForSimAlgorithm(
-					MatsimRandom.getLocalInstance(),
-					scenario.getScenarioElement( JointPlans.class ),
-					scenario.getScenarioElement( VehicleRessources.class ),
-					planLinkIdentifier) :
-			new GenericPlanAlgorithm<ReplanningGroup>() {
+		final GenericStrategyModule<ReplanningGroup> additionalPrepareModule =
+			new AbstractMultithreadedGenericStrategyModule<ReplanningGroup>(
+					config.global() ) {
 				@Override
-				public void run(final ReplanningGroup plan) {
-					// do nothing more than default
+				public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm() {
+					return 
+						scenario.getScenarioElement( VehicleRessources.class ) != null ?
+						new PrepareVehicleAllocationForSimAlgorithm(
+								MatsimRandom.getLocalInstance(),
+								scenario.getScenarioElement( JointPlans.class ),
+								scenario.getScenarioElement( VehicleRessources.class ),
+								planLinkIdentifier) :
+						new GenericPlanAlgorithm<ReplanningGroup>() {
+							@Override
+							public void run(final ReplanningGroup plan) {
+								// do nothing more than default
+							}
+						};
 				}
 			};
 
@@ -129,8 +138,8 @@ public class RunCliquesWithHardCodedStrategies {
 							cliques )
 					.withPlanLinkIdentifier(
 							planLinkIdentifier )
-					.withAdditionalPrepareForSimAlgorithms(
-							additionalPrepareAlgo )
+					.withAdditionalPrepareForSimModule(
+							additionalPrepareModule )
 					.withIncompatiblePlansIdentifierFactory(
 						!weights.getSynchronize().equals( Synchro.none ) &&
 						scenario.getScenarioElement( VehicleRessources.class ) != null ?

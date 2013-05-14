@@ -53,8 +53,10 @@ import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
@@ -69,8 +71,8 @@ public class ControllerRegistryBuilder {
 	private final Scenario scenario;
 	private final EventsManager events;
 	private final CalcLegTimes legTimes;
-	private final LinkedList<GenericPlanAlgorithm<ReplanningGroup>> prepareForSimAlgorithms =
-			new LinkedList<GenericPlanAlgorithm<ReplanningGroup>>();
+	private final LinkedList<GenericStrategyModule<ReplanningGroup>> prepareForSimModules =
+			new LinkedList<GenericStrategyModule<ReplanningGroup>>();
 
 	// configurable elements
 	// if still null at build time, defaults will be created
@@ -157,9 +159,9 @@ public class ControllerRegistryBuilder {
 		return this;
 	}
 
-	public ControllerRegistryBuilder withAdditionalPrepareForSimAlgorithms(
-			final GenericPlanAlgorithm<ReplanningGroup> algo ) {
-		this.prepareForSimAlgorithms.add( algo );
+	public ControllerRegistryBuilder withAdditionalPrepareForSimModule(
+			final GenericStrategyModule<ReplanningGroup> algo ) {
+		this.prepareForSimModules.add( algo );
 		return this;
 	}
 
@@ -198,7 +200,7 @@ public class ControllerRegistryBuilder {
 			leastCostPathCalculatorFactory,
 			planRoutingAlgorithmFactory,
 			groupIdentifier,
-			prepareForSimAlgorithms,
+			prepareForSimModules,
 			planLinkIdentifier,
 			incompatiblePlansIdentifierFactory);
 	}
@@ -300,22 +302,28 @@ public class ControllerRegistryBuilder {
 		}
 
 		// we do this here, as we need configurable objects
-		final PersonAlgorithm prepareForSim =
-			new PersonPrepareForSim(
-					planRoutingAlgorithmFactory.createPlanRoutingAlgorithm(
-						tripRouterFactory.createTripRouter() ),
-					scenario);
-		final PersonAlgorithm checkJointRoutes =
-			new ImportedJointRoutesChecker( tripRouterFactory.createTripRouter() );
 		// but we want it to be executed at the start!
-		this.prepareForSimAlgorithms.addFirst(
-				new GenericPlanAlgorithm<ReplanningGroup>() {
+		this.prepareForSimModules.addFirst(
+				new AbstractMultithreadedGenericStrategyModule<ReplanningGroup>(
+					scenario.getConfig().global()) {
 					@Override
-					public void run(final ReplanningGroup group) {
-						for ( Person person : group.getPersons() ) {
-							checkJointRoutes.run( person );
-							prepareForSim.run( person );
-						}
+					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm() {
+						final PersonAlgorithm prepareForSim =
+							new PersonPrepareForSim(
+									planRoutingAlgorithmFactory.createPlanRoutingAlgorithm(
+										tripRouterFactory.createTripRouter() ),
+									scenario);
+						final PersonAlgorithm checkJointRoutes =
+							new ImportedJointRoutesChecker( tripRouterFactory.createTripRouter() );
+						return new GenericPlanAlgorithm<ReplanningGroup>() {
+							@Override
+							public void run(final ReplanningGroup group) {
+								for ( Person person : group.getPersons() ) {
+									checkJointRoutes.run( person );
+									prepareForSim.run( person );
+								}
+							}
+						};
 					}
 				});
 	}
