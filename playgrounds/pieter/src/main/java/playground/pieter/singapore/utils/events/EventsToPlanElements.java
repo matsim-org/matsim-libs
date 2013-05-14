@@ -491,10 +491,11 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		columns.add(new PostgresqlColumnDefinition("start_time",
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("sample_selector", PostgresType.FLOAT8));
 		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS",
-				actTableName, actDBA, 10000, columns);
-		activityWriter.addComment(String.format("MATSim journeys from events file %s", eventsFileName));
+				actTableName, actDBA, 100000, columns);
+		activityWriter.addComment(String.format("MATSim activities from events file %s", eventsFileName));
 
 		String journeyTableName = "m_calibration.matsim_journeys_"
 				+ formattedDate;
@@ -526,9 +527,11 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.FLOAT8));
 		columns.add(new PostgresqlColumnDefinition("egress_walk_time",
 				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("sample_selector", PostgresType.FLOAT8));
 		DataBaseAdmin journeyDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",
-				journeyTableName, journeyDBA, 5000, columns);
+				journeyTableName, journeyDBA, 50000, columns);
+		journeyWriter.addComment(String.format("MATSim journeys from events file %s", eventsFileName));
 
 		String tripTableName = "m_calibration.matsim_trips_" + formattedDate;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
@@ -548,9 +551,12 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("alighting_stop",
 				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("sample_selector", PostgresType.FLOAT8));
 		DataBaseAdmin tripDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS",
-				tripTableName, tripDBA, 10000, columns);
+				tripTableName, tripDBA, 100000, columns);
+		tripWriter.addComment(String.format("MATSim trips (stages) from events file %s", eventsFileName));
+
 
 		String transferTableName = "m_calibration.matsim_transfers_"
 				+ formattedDate;
@@ -571,9 +577,12 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("wait_time",
 				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("sample_selector", PostgresType.FLOAT8));
 		DataBaseAdmin transferDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter transferWriter = new PostgresqlCSVWriter(
-				"TRANSFERS", transferTableName, transferDBA, 1000, columns);
+				"TRANSFERS", transferTableName, transferDBA, 100000, columns);
+		transferWriter.addComment(String.format("MATSim transfers from events file %s", eventsFileName));
+
 
 		for (Entry<Id, TravellerChain> entry : chains.entrySet()) {
 			String pax_id = entry.getKey().toString();
@@ -582,7 +591,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				Object[] args = { new Integer(act.getElementId()), pax_id,
 						act.getFacility(), act.getType(),
 						new Integer((int) act.getStartTime()),
-						new Integer((int) act.getEndTime()) };
+						new Integer((int) act.getEndTime()),
+						new Double(Math.random()) };
 				activityWriter.addLine(args);
 			}
 			for (Journey journey : chain.getJourneys()) {
@@ -602,7 +612,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 							new Integer((int) journey.getAccessWalkTime()),
 							new Integer((int) journey.getAccessWaitTime()),
 							new Double(journey.getEgressWalkDistance()),
-							new Integer((int) journey.getEgressWalkTime())
+							new Integer((int) journey.getEgressWalkTime()),
+							new Double(Math.random())
 
 					};
 					journeyWriter.addLine(journeyArgs);
@@ -615,7 +626,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 									new Integer((int) trip.getEndTime()),
 									new Double(trip.getDistance()), trip.getMode(),
 									trip.getLine(), trip.getRoute(), trip.getBoardingStop(),
-									trip.getAlightingStop() };
+									trip.getAlightingStop(),
+									new Double(Math.random()) };
 							tripWriter.addLine(tripArgs);
 						}
 						for (Transfer transfer : journey.getTransfers()) {
@@ -629,7 +641,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 									new Integer(transfer.getToTrip().getElementId()),
 									new Double(transfer.getWalkDistance()),
 									new Integer((int) transfer.getWalkTime()),
-									new Integer((int) transfer.getWaitTime()) };
+									new Integer((int) transfer.getWaitTime()),
+									new Double(Math.random()) };
 							transferWriter.addLine(transferArgs);
 						}
 					}
@@ -733,9 +746,12 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		System.out.println(test.stuck);
 	}
 
-	private void writeSimulationResultsToSQL(File properties, String string) {
+	private void writeSimulationResultsToSQL(File properties, String string)
+			throws InstantiationException, IllegalAccessException,
+			ClassNotFoundException, IOException, SQLException,
+			NoConnectionException {
 		this.eventsFileName = string;
-		
+		writeSimulationResultsToSQL(properties);
 	}
 
 }
