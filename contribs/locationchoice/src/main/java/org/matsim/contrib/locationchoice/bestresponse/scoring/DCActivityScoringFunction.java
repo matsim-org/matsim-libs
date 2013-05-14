@@ -38,9 +38,12 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 
 public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
@@ -48,12 +51,14 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private DestinationScoring destinationChoiceScoring;	
 	private final ActivityFacilities facilities;
 	private Plan plan;
+	private final CharyparNagelScoringParameters params;
 	
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext lcContext) {
 		super(lcContext.getParams());
 		this.destinationChoiceScoring = new DestinationScoring(lcContext);
 		this.facilities = ((ScenarioImpl)lcContext.getScenario()).getActivityFacilities();
 		this.plan = plan;
+		this.params = lcContext.getParams();
 	}
 	
 	@Override
@@ -66,6 +71,108 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 			}
 		}
 	}
+	
+	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
+
+		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		double tmpScore = 0.0;
+
+		if (actParams.isScoreAtAll()) {
+			/* Calculate the times the agent actually performs the
+			 * activity.  The facility must be open for the agent to
+			 * perform the activity.  If it's closed, but the agent is
+			 * there, the agent must wait instead of performing the
+			 * activity (until it opens).
+			 *
+			 *                                             Interval during which
+			 * Relationship between times:                 activity is performed:
+			 *
+			 *      O________C A~~D  ( 0 <= C <= A <= D )   D...D (not performed)
+			 * A~~D O________C       ( A <= D <= O <= C )   D...D (not performed)
+			 *      O__A+++++C~~D    ( O <= A <= C <= D )   A...C
+			 *      O__A++D__C       ( O <= A <= D <= C )   A...D
+			 *   A~~O++++++++C~~D    ( A <= O <= C <= D )   O...C
+			 *   A~~O+++++D__C       ( A <= O <= D <= C )   O...D
+			 *
+			 * Legend:
+			 *  A = arrivalTime    (when agent gets to the facility)
+			 *  D = departureTime  (when agent leaves the facility)
+			 *  O = openingTime    (when facility opens)
+			 *  C = closingTime    (when facility closes)
+			 *  + = agent performs activity
+			 *  ~ = agent waits (agent at facility, but not performing activity)
+			 *  _ = facility open, but agent not there
+			 *
+			 * assume O <= C
+			 * assume A <= D
+			 */
+
+			double[] openingInterval = this.getOpeningInterval(act);
+			double openingTime = openingInterval[0];
+			double closingTime = openingInterval[1];
+
+			double activityStart = arrivalTime;
+			double activityEnd = departureTime;
+
+			if ((openingTime >=  0) && (arrivalTime < openingTime)) {
+				activityStart = openingTime;
+			}
+			if ((closingTime >= 0) && (closingTime < departureTime)) {
+				activityEnd = closingTime;
+			}
+			if ((openingTime >= 0) && (closingTime >= 0)
+					&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
+				// agent could not perform action
+				activityStart = departureTime;
+				activityEnd = departureTime;
+			}
+			double duration = activityEnd - activityStart;
+
+			// disutility if too early
+			if (arrivalTime < activityStart) {
+				// agent arrives to early, has to wait
+				tmpScore += this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime);
+			}
+
+			// disutility if too late
+
+			double latestStartTime = actParams.getLatestStartTime();
+			if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
+				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
+			}
+
+			// utility of performing an action, duration is >= 1, thus log is no problem
+			double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(act.getType());
+
+			if (duration > 0) {
+				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
+						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
+				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
+				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+			} else {
+				tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
+			}
+
+			// disutility if stopping too early
+			double earliestEndTime = actParams.getEarliestEndTime();
+			if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
+			}
+
+			// disutility if going to away to late
+			if (activityEnd < departureTime) {
+				tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
+			}
+
+			// disutility if duration was too short
+			double minimalDuration = actParams.getMinimalDuration();
+			if ((minimalDuration >= 0) && (duration < minimalDuration)) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
+			}
+		}
+		return tmpScore;
+	}
+	
 	
 	@Override
 	protected double[] getOpeningInterval(Activity act) {

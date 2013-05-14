@@ -51,7 +51,13 @@ public class DCControler extends Controler {
 		 */
   		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getConfig(), this, this.lcContext); 	
 		super.setScoringFunctionFactory(dcScoringFunctionFactory);
-		// dcScoringFunctionFactory.setUsingFacilityOpeningTimes(false); // TODO: make this configurable
+		
+		if (!super.getConfig().facilities().getInputFile().equals("null")) {
+			dcScoringFunctionFactory.setUsingFacilityOpeningTimes(true);
+		} else {
+			dcScoringFunctionFactory.setUsingFacilityOpeningTimes(true);
+			log.info("facilities are not used for scoring!");
+		}		
 	}
 	
 	protected void loadControlerListeners() {
