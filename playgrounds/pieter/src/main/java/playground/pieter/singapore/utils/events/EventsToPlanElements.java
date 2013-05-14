@@ -535,8 +535,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 		String tripTableName = "m_calibration.matsim_trips_" + formattedDate;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT,
-				"primary key"));
+		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("start_time",
@@ -692,6 +691,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				+ " WHERE boarding_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		indexName = tripTableName.substring(14);
+		indexStatement = "ALTER TABLE " + tripTableName + " ADD PRIMARY KEY(trip_id);\n ";
 		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
 				+ tripTableName + "(journey_id);\n";
 		indexStatement += "CREATE INDEX " + indexName + "_mode ON "
