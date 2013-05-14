@@ -19,27 +19,39 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
+import java.io.File;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+import org.junit.runners.model.FrameworkMethod;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.testcases.MatsimTestUtils;
 
+import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.population.JointPlansXmlReader;
+import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
+import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.FullExplorationSelector;
@@ -51,12 +63,86 @@ public class FullyExploredPlansProvider {
 	private static final Logger log =
 		Logger.getLogger(FullyExploredPlansProvider.class);
 
+	// XXX: this is hideous, but better than other solutions I could imagine...
+	// I want:
+	// - to use the standard way of getting the input test path provided by MatsimTestUtils
+	// - outside of a test.
+	private static final String CACHE_DIRECTORY;
+	static {
+		final MatsimTestUtils utils = new MatsimTestUtils();
+		utils.starting( new FrameworkMethod( FullyExploredPlansProvider.class.getMethods()[0] ) );
+		CACHE_DIRECTORY = utils.getClassInputDirectory();
+	}
+
 	private FullyExploredPlansProvider() {};
 
 	public static SelectedInformation getGroupsAndSelected(
 			final IncompatiblePlansIdentifierFactory incompFactory,
 			final boolean isBlocking) {
+		final SelectedInformation fromFile = readGroupsAndSelected( incompFactory , isBlocking );
+		if ( fromFile != null ) {
+			log.info( "plans succesfully read" );
+			return fromFile;
+		}
+
+		log.info( "plans reading FAILED" );
 		return createGroupsAndSelected( incompFactory , isBlocking );
+	}
+
+	private static SelectedInformation readGroupsAndSelected(
+			final IncompatiblePlansIdentifierFactory incompFactory,
+			final boolean isBlocking) {
+		log.info( "attempt to read test plans" );
+		final StoragePaths paths = getStoragePaths( incompFactory , isBlocking );
+
+		if ( !paths.allPathsExist() ) return null;
+
+		final GroupIdentifier cliques = FixedGroupsIdentifierFileParser.readCliquesFile( paths.cliquesFilePath );
+		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new MatsimPopulationReader( scenario ).readFile( paths.plansFilePath );
+		final JointPlans jointPlans = JointPlansXmlReader.readJointPlans( scenario.getPopulation() , paths.jointPlansFilePath );
+
+		final SelectedInformation information = new SelectedInformation( jointPlans );
+		for ( ReplanningGroup clique : cliques.identifyGroups( scenario.getPopulation() ) ) {
+			final List<JointPlan> selectedJointPlans = new ArrayList<JointPlan>();
+			final List<Plan> selectedPlans = new ArrayList<Plan>();
+
+			for ( Person person : clique.getPersons() ) {
+				final Plan selectedPlan = person.getSelectedPlan();
+				final JointPlan jp = jointPlans.getJointPlan( selectedPlan );
+
+				if ( jp != null && !selectedJointPlans.contains( jp ) ) {
+					selectedJointPlans.add( jp );
+				}
+
+				if ( jp == null ) {
+					selectedPlans.add( selectedPlan );
+				}
+			}
+
+			final GroupPlans gps =
+					new GroupPlans(
+						selectedJointPlans,
+						selectedPlans );
+
+			assert gps.getAllIndividualPlans().size() == clique.getPersons().size();
+
+			information.addInformation(
+					clique,
+					gps);
+		}
+
+		return information;
+	}
+
+	private static StoragePaths getStoragePaths(
+			final IncompatiblePlansIdentifierFactory incompFactory,
+			final boolean isBlocking) {
+		final String baseDir = CACHE_DIRECTORY +"/"+ incompFactory.getClass() +"/"+ isBlocking+"/";
+		return new StoragePaths(
+				baseDir+"plans.xml",
+				baseDir+"jointPlans.xml",
+				baseDir+"cliques.xml" );
 	}
 
 	private static SelectedInformation createGroupsAndSelected(
@@ -164,9 +250,17 @@ public class FullyExploredPlansProvider {
 	}
 
 	public static class SelectedInformation {
-		private final JointPlans jointPlans = new JointPlans();
+		private final JointPlans jointPlans;
 		private final ArrayList<Tuple<ReplanningGroup, GroupPlans>> plans =
 			new ArrayList<Tuple<ReplanningGroup, GroupPlans>>();
+
+		public SelectedInformation() {
+			this( new JointPlans() );
+		}
+
+		public SelectedInformation(final JointPlans jointPlans) {
+			this.jointPlans = jointPlans;
+		}
 
 		public JointPlans getJointPlans() {
 			return jointPlans;
@@ -184,3 +278,23 @@ public class FullyExploredPlansProvider {
 	}
 }
 
+class StoragePaths {
+	public final String plansFilePath, jointPlansFilePath, cliquesFilePath;
+
+	public StoragePaths(
+			final String plansFilePath,
+			final String jointPlansFilePath,
+			final String cliquesFilePath) {
+		this.plansFilePath = plansFilePath;
+		this.jointPlansFilePath = jointPlansFilePath;
+		this.cliquesFilePath = cliquesFilePath;
+	}
+
+	public boolean allPathsExist() {
+		final boolean plans = new File( plansFilePath ).exists();
+		final boolean jointPlans = new File( jointPlansFilePath ).exists();
+		final boolean cliques = new File( cliquesFilePath ).exists();
+
+		return plans && jointPlans && cliques;
+	}
+}
