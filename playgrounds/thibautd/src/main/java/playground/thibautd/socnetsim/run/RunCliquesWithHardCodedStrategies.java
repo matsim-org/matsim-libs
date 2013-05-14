@@ -251,27 +251,23 @@ public class RunCliquesWithHardCodedStrategies {
 		final Scenario scenario = createScenario( configFile );
 		runScenario( scenario , true );
 	}
-
-	/**
-	 * This should not be public, but otherwise the reflection approach doesn't work...
-	 */
-	public static class ScoringFunctionConfigGroup extends ReflectiveModule {
-		public static final String GROUP_NAME = "scoringFunction";
-		private boolean useKtiScoring = false;
-
-		public ScoringFunctionConfigGroup() {
-			super( GROUP_NAME );
-		}
-
-		@StringSetter( "useKtiScoring" )
-		public void setUseKtiScoring(final boolean v) {
-			this.useKtiScoring = v;
-		}
-
-		@StringGetter( "useKtiScoring" )
-		public boolean isUseKtiScoring() {
-			return useKtiScoring;
-		}
-	}
 }
 
+class ScoringFunctionConfigGroup extends ReflectiveModule {
+	public static final String GROUP_NAME = "scoringFunction";
+	private boolean useKtiScoring = false;
+
+	public ScoringFunctionConfigGroup() {
+		super( GROUP_NAME );
+	}
+
+	@StringSetter( "useKtiScoring" )
+	public void setUseKtiScoring(final boolean v) {
+		this.useKtiScoring = v;
+	}
+
+	@StringGetter( "useKtiScoring" )
+	public boolean isUseKtiScoring() {
+		return useKtiScoring;
+	}
+}
