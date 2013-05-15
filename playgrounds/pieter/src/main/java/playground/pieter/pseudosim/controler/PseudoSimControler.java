@@ -1,4 +1,4 @@
-package playground.pieter.mentalsim.controler;
+package playground.pieter.pseudosim.controler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,13 +26,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.pieter.mentalsim.replanning.MentalSimSubSetSimulationStrategyManager;
+import playground.pieter.pseudosim.replanning.PseudoSimSubSetSimulationStrategyManager;
 
 /**
  * @author fouriep
  * 
  */
-public class MentalSimControler extends Controler{
+public class PseudoSimControler extends Controler{
 	
 	private ObjectAttributes agentPlansMarkedForSubsetMentalSim = new ObjectAttributes();
 	private LinkedHashSet<Plan> plansForMentalSimulation = new LinkedHashSet<Plan>();
@@ -54,7 +54,7 @@ public class MentalSimControler extends Controler{
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = null;
 		if(simulateSubsetPersonsOnly){
-			manager = new MentalSimSubSetSimulationStrategyManager(this);
+			manager = new PseudoSimSubSetSimulationStrategyManager(this);
 		}else{
 			manager = new StrategyManager();
 		}
@@ -96,7 +96,7 @@ public class MentalSimControler extends Controler{
 
 
 
-	public MentalSimControler(String[] args) {
+	public PseudoSimControler(String[] args) {
 		super(args);
 //		initializeObjectAttributes();
 	}

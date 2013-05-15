@@ -1,18 +1,18 @@
-package playground.pieter.mentalsim.controler.listeners;
+package playground.pieter.pseudosim.controler.listeners;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.PersonImpl;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
+import playground.pieter.pseudosim.controler.PseudoSimControler;
 
-public class BeforeMentalSimSelectedPlanNullifier implements
+public class BeforePseudoSimSelectedPlanNullifier implements
 		BeforeMobsimListener {
 
-	private MentalSimControler controler;
+	private PseudoSimControler controler;
 
-	public BeforeMentalSimSelectedPlanNullifier(MentalSimControler c) {
+	public BeforePseudoSimSelectedPlanNullifier(PseudoSimControler c) {
 		controler = c;
 	}
 

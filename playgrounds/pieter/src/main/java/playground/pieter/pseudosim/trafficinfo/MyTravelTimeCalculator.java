@@ -1,14 +1,14 @@
 /**
  * 
  */
-package playground.pieter.mentalsim.trafficinfo;
+package playground.pieter.pseudosim.trafficinfo;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
-import playground.pieter.mentalsim.controler.listeners.MobSimSwitcher;
+import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
 
 /**
  * @author fouriep

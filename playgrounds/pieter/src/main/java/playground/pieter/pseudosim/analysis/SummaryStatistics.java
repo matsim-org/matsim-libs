@@ -1,4 +1,4 @@
-package playground.pieter.mentalsim.analysis;
+package playground.pieter.pseudosim.analysis;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;

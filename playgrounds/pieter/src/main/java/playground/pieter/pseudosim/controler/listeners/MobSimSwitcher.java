@@ -1,4 +1,4 @@
-package playground.pieter.mentalsim.controler.listeners;
+package playground.pieter.pseudosim.controler.listeners;
 
 import java.util.ArrayList;
 
@@ -15,8 +15,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
-import playground.pieter.mentalsim.mobsim.MentalSimFactory;
+import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.mobsim.PseudoSimFactory;
 
 /**
  * @author fouriep
@@ -51,7 +51,7 @@ public class MobSimSwitcher implements ControlerListener,
 	private int startIter;
 	private int endIter;
 	static ArrayList<Integer> expensiveIters = new ArrayList<Integer>();
-	private MentalSimControler controler;
+	private PseudoSimControler controler;
 
 	private enum SwitchType {
 		incrementing, doubling
@@ -60,7 +60,7 @@ public class MobSimSwitcher implements ControlerListener,
 	private SwitchType switchType = SwitchType.incrementing;
 	Logger log = Logger.getLogger(this.getClass());
 
-	public MobSimSwitcher(MentalSimControler c) {
+	public MobSimSwitcher(PseudoSimControler c) {
 		this.controler = c;
 		if (c.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
 			startRate = Math.max(
@@ -126,7 +126,7 @@ public class MobSimSwitcher implements ControlerListener,
 			}
 		} else {
 			log.info("Running a cheap iteration with mental simulation");
-			controler.setMobsimFactory(new MentalSimFactory(ttcalc, controler));
+			controler.setMobsimFactory(new PseudoSimFactory(ttcalc, controler));
 			controler.clearPlansForMentalSimulation();
 
 		}

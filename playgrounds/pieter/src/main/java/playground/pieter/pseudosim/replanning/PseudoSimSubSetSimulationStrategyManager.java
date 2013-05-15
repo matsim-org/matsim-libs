@@ -1,4 +1,4 @@
-package playground.pieter.mentalsim.replanning;
+package playground.pieter.pseudosim.replanning;
 
 import java.util.List;
 
@@ -9,17 +9,17 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
-import playground.pieter.mentalsim.controler.listeners.MobSimSwitcher;
+import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
 
 /**
  * @author fouriep
  *	ensures that persons that are not selected for mental simulation don't have their plans mutated
  */
-public class MentalSimSubSetSimulationStrategyManager extends StrategyManager {
-	MentalSimControler controler;
+public class PseudoSimSubSetSimulationStrategyManager extends StrategyManager {
+	PseudoSimControler controler;
 	PlanStrategy selectorStrategy=new PlanStrategyImpl(new RandomPlanSelector());
-	public MentalSimSubSetSimulationStrategyManager(MentalSimControler controler) {
+	public PseudoSimSubSetSimulationStrategyManager(PseudoSimControler controler) {
 		super();
 		this.controler = controler;
 	}

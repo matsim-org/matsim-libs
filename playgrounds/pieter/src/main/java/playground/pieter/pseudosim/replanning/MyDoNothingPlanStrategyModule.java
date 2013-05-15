@@ -1,17 +1,16 @@
-package playground.pieter.mentalsim.replanning;
+package playground.pieter.pseudosim.replanning;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.ReplanningContext;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
+public class MyDoNothingPlanStrategyModule implements PlanStrategyModule {
 
-public class MentalSimPlanMarkerModule implements PlanStrategyModule {
 
-	private MentalSimControler controler;
 
-	public MentalSimPlanMarkerModule(MentalSimControler controler) {
-		this.controler = controler;
+	public MyDoNothingPlanStrategyModule(Controler controler) {
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -23,8 +22,7 @@ public class MentalSimPlanMarkerModule implements PlanStrategyModule {
 	@Override
 	public void handlePlan(Plan plan) {
 		// TODO Auto-generated method stub
-		plan.setScore(0.0);
-		controler.addPlanForMentalSimulation(plan);
+		
 	}
 
 	@Override

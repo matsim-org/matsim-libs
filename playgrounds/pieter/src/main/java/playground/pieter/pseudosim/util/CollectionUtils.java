@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.pieter.mentalsim.util;
+package playground.pieter.pseudosim.util;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package playground.pieter.mentalsim.replanning;
+package playground.pieter.pseudosim.replanning;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;

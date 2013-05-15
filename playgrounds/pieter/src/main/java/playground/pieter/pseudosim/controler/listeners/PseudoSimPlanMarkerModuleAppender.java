@@ -1,4 +1,4 @@
-package playground.pieter.mentalsim.controler.listeners;
+package playground.pieter.pseudosim.controler.listeners;
 
 import java.util.List;
 
@@ -8,14 +8,14 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
-import playground.pieter.mentalsim.replanning.MentalSimPlanMarkerModule;
+import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.replanning.PseudoSimPlanMarkerModule;
 
-public class MentalSimPlanMarkerModuleAppender implements StartupListener {
+public class PseudoSimPlanMarkerModuleAppender implements StartupListener {
 
-	private MentalSimControler controler;
+	private PseudoSimControler controler;
 
-	public MentalSimPlanMarkerModuleAppender(MentalSimControler c) {
+	public PseudoSimPlanMarkerModuleAppender(PseudoSimControler c) {
 		this.controler = c;
 	}
 
@@ -30,7 +30,7 @@ public class MentalSimPlanMarkerModuleAppender implements StartupListener {
 			if (strategyName.contains("selector") && strategyName.contains("_")
 			// append the ScoreResettingStrategyModule
 			) {
-				((PlanStrategyImpl) strategy).addStrategyModule(new MentalSimPlanMarkerModule(controler));
+				((PlanStrategyImpl) strategy).addStrategyModule(new PseudoSimPlanMarkerModule(controler));
 			}
 		}
 

@@ -1,20 +1,20 @@
-package playground.pieter.mentalsim;
+package playground.pieter.pseudosim;
 
 import org.matsim.core.controler.Controler;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
-import playground.pieter.mentalsim.controler.listeners.ExpensiveSimScoreWriter;
-import playground.pieter.mentalsim.controler.listeners.MentalSimSubSetSimulationListener;
-import playground.pieter.mentalsim.controler.listeners.MobSimSwitcher;
-import playground.pieter.mentalsim.controler.listeners.MentalSimPlanMarkerModuleAppender;
-import playground.pieter.mentalsim.controler.listeners.SimpleAnnealer;
-import playground.pieter.mentalsim.trafficinfo.MyTTCalcFactory;
+import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.listeners.ExpensiveSimScoreWriter;
+import playground.pieter.pseudosim.controler.listeners.PseudoSimPlanMarkerModuleAppender;
+import playground.pieter.pseudosim.controler.listeners.PseudoSimSubSetSimulationListener;
+import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
+import playground.pieter.pseudosim.controler.listeners.SimpleAnnealer;
+import playground.pieter.pseudosim.trafficinfo.MyTTCalcFactory;
 import playground.pieter.router.costcalculators.CapacityFavoringStochasticCostCalculator;
 import playground.pieter.router.costcalculators.CapacityFavoringStochasticCostCalculatorFactory;
 import playground.pieter.router.util.StochasticRouterFactory;
 
 
-public class NoMentalSim {
+public class NoPseudoSim {
 
 	/**
 	 * @param args

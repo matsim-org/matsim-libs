@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.pieter.mentalsim.mobsim;
+package playground.pieter.pseudosim.mobsim;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -39,8 +39,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
-import playground.pieter.mentalsim.util.CollectionUtils;
+import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.util.CollectionUtils;
 
 /**
  * @author illenberger, fouriep
@@ -52,7 +52,7 @@ import playground.pieter.mentalsim.util.CollectionUtils;
  *         object.
  * 
  */
-public class MentalSim implements Mobsim {
+public class PseudoSim implements Mobsim {
 
 	Scenario sc;
 	EventsManager eventManager;
@@ -68,9 +68,9 @@ public class MentalSim implements Mobsim {
 	private final ExecutorService executor;
 	private TravelTime travelTimeCalculator;
 	private boolean linkEvents = false;
-	private MentalSimControler controler;
+	private PseudoSimControler controler;
 
-	public MentalSim(Scenario sc, EventsManager eventsManager) {
+	public PseudoSim(Scenario sc, EventsManager eventsManager) {
 		this.sc = sc;
 		this.eventManager = eventsManager;
 		int numThreads = Integer.parseInt(sc.getConfig().getParam("global",
@@ -86,8 +86,8 @@ public class MentalSim implements Mobsim {
 		futures = new Future[numThreads];
 	}
 
-	public MentalSim(Scenario sc2, EventsManager eventsManager,
-			TravelTime ttcalc, MentalSimControler c) {
+	public PseudoSim(Scenario sc2, EventsManager eventsManager,
+			TravelTime ttcalc, PseudoSimControler c) {
 		this(sc2, eventsManager);
 		this.travelTimeCalculator = ttcalc;
 		this.controler = c;

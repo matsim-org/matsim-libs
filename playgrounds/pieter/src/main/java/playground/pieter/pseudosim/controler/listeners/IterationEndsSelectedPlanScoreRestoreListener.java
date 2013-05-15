@@ -1,4 +1,4 @@
-package playground.pieter.mentalsim.controler.listeners;
+package playground.pieter.pseudosim.controler.listeners;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,11 +10,11 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PersonImpl;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
+import playground.pieter.pseudosim.controler.PseudoSimControler;
 
 public class IterationEndsSelectedPlanScoreRestoreListener implements IterationEndsListener{
-	MentalSimControler c;
-	public IterationEndsSelectedPlanScoreRestoreListener(MentalSimControler c) {
+	PseudoSimControler c;
+	public IterationEndsSelectedPlanScoreRestoreListener(PseudoSimControler c) {
 		super();
 		this.c = c;
 	}

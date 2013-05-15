@@ -1,16 +1,16 @@
-package playground.pieter.mentalsim.controler.listeners;
+package playground.pieter.pseudosim.controler.listeners;
 
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
+import playground.pieter.pseudosim.controler.PseudoSimControler;
 
 /**
  * @author fouriep
  *         <p/>
- *         calls on the {@link MentalSimControler} to replace the orignal
+ *         calls on the {@link PseudoSimControler} to replace the orignal
  *         population with a subsample every n iters, according to the scheme
  *         proposed in the MobSimSwitcher config group.
  *         <p/>
@@ -23,18 +23,18 @@ import playground.pieter.mentalsim.controler.MentalSimControler;
  *         selected persons to replan
  * 
  */
-public class MentalSimSubSetSimulationListener implements ControlerListener,
+public class PseudoSimSubSetSimulationListener implements ControlerListener,
 		IterationStartsListener {
 	final static String CONFIG_MODULE_NAME = "MentalSim";
 	final static String POP_SWAP_ITERS = "populationSwapIters";
 	final static String OFFLINE_PLAN_SIZE = "maxOfflineAgentPlanMemorySize";
-	MentalSimControler controler;
+	PseudoSimControler controler;
 	boolean fakePopulationActive = false;
 	private PlanSelector planselector;
 
 
 
-	public MentalSimSubSetSimulationListener(MentalSimControler controler,
+	public PseudoSimSubSetSimulationListener(PseudoSimControler controler,
 			PlanSelector planselector) {
 		super();
 		this.controler = controler;

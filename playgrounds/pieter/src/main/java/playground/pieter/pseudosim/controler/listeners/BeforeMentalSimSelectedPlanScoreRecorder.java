@@ -1,4 +1,4 @@
-package playground.pieter.mentalsim.controler.listeners;
+package playground.pieter.pseudosim.controler.listeners;
 
 import java.util.LinkedHashSet;
 
@@ -8,12 +8,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 
-import playground.pieter.mentalsim.controler.MentalSimControler;
+import playground.pieter.pseudosim.controler.PseudoSimControler;
 
 public class BeforeMentalSimSelectedPlanScoreRecorder implements
 		BeforeMobsimListener {
-	private MentalSimControler c;
-	public BeforeMentalSimSelectedPlanScoreRecorder(MentalSimControler c) {
+	private PseudoSimControler c;
+	public BeforeMentalSimSelectedPlanScoreRecorder(PseudoSimControler c) {
 		super();
 		this.c = c;
 	}
