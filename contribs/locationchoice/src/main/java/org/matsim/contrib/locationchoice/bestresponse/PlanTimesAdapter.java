@@ -309,7 +309,7 @@ public class PlanTimesAdapter {
 						* config.plansCalcRoute().getPtSpeedFactor();	
 		} else if (mode.equals(TransportMode.bike)) {
 			speed = config.plansCalcRoute().getBikeSpeed();
-		} else if (mode.equals(TransportMode.walk)) {
+		} else if (mode.equals(TransportMode.walk) || mode.equals(TransportMode.transit_walk)) {
 			speed = config.plansCalcRoute().getWalkSpeed();
 		} else {
 			speed = config.plansCalcRoute().getUndefinedModeSpeed();
