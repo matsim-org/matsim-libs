@@ -10,17 +10,26 @@ import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
 
-
+/** converts a MATSIM network to 2 ESRI shape files: links and nodes
+ * 
+ * @author Yi
+ */
 
 public class ConvertNetworkToESRIFile{
 	
 	
 	public static void main(String args[]){
 		
+		/* input:
+		 * [1] empty links.shp file
+		 * [2] empty nodes.shp file
+		 * [3] matsim network file you want to convert
+		 */
 		String LinksFile = args[0];
 		String NodesFile = args[1];
 		String NetworkFile = args[2];
-		String System = "epsg:26917";
+		//String System = "epsg:26917";
+		String System = "epsg:4326";
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
