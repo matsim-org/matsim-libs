@@ -64,7 +64,7 @@ import others.sergioo.util.dataBase.NoConnectionException;
 		String formattedDate = df.format(new Date());
 		try {
 			dba.executeStatement(String.format("ALTER TABLE %s RENAME TO %s;",
-					tableName,tableName+"_replaced_on_"+formattedDate));
+					tableName,tableName.split("\\.")[1]+"_replaced_on_"+formattedDate));
 		} catch (SQLException e) {
 			System.err.println("Table "+tableName+" doesn't exist.");;
 		} catch (NoConnectionException e) {
@@ -76,10 +76,8 @@ import others.sergioo.util.dataBase.NoConnectionException;
 					"CREATE TABLE %s(", tableName));
 			for (int i = 0; i < columns.size(); i++) {
 				PostgresqlColumnDefinition col = columns.get(i);
-
 				createString.append(col.name + " " + col.type + " "
 						+ col.extraParams + " ,");
-
 			}
 			// drop the last comma
 			createString.deleteCharAt(createString.length() - 1);
