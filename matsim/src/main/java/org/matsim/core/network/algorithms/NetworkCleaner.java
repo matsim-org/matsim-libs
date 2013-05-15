@@ -49,13 +49,13 @@ public class NetworkCleaner implements NetworkRunnable {
 	private static final Logger log = Logger.getLogger(NetworkCleaner.class);
 
 	/**
-	 * Finds the cluster of nodes <pre>startNode</pre> is part of. The cluster
+	 * Finds the cluster of nodes of which <code>startNode</code> is part of. The cluster
 	 * contains all nodes which can be reached starting at <code>startNode</code>
 	 * and from where it is also possible to return again to <code>startNode</code>.
 	 *
 	 * @param startNode the node to start building the cluster
 	 * @param network the network the startNode is part of
-	 * @return cluster of nodes <pre>startNode</pre> is part of
+	 * @return cluster of nodes of which <code>startNode</code> is part of
 	 */
 	private Map<Id, Node> findCluster(final Node startNode, final Network network) {
 
