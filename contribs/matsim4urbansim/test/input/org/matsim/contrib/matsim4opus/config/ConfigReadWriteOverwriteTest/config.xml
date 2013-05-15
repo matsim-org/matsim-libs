@@ -136,14 +136,16 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<param name="pBetasFileName" value="null" />
 		<param name="pkValuesFile" value="null" />
 		<param name="planSelector" value="SelectExpBeta" />
+		<param name="prefsFile" value="null" />
 		<param name="probChoiceSetSize" value="10" />
 		<param name="radius" value="null" />
 		<param name="randomSeed" value="221177" />
-		<param name="recursionTravelSpeed" value="8.5" />
 		<param name="recursionTravelSpeedChange" value="0.1" />
 		<param name="restraintFcnExp" value="0.0" />
 		<param name="restraintFcnFactor" value="0.0" />
 		<param name="scaleFactor" value="1" />
+		<param name="travelSpeed_car" value="8.5" />
+		<param name="travelSpeed_pt" value="5.0" />
 		<param name="tt_approximationLevel" value="0" />
 	</module>
 
