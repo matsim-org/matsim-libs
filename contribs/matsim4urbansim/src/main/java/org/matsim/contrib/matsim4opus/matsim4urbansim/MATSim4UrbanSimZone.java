@@ -39,6 +39,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.algorithms.NetworkScenarioCut;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 
 
 
@@ -141,7 +142,8 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, Controler controler) {
 		controler.addControlerListener(new KaiAnalysisListener()) ;
 		// not very nice, but the correct folder is not specified anywhere and change with every new urbansim-run... // Daniel May'13
-		String cleFile = this.getUrbanSimParameterConfig().getMATSim4OpusTemp().replaceFirst("/tmp/", "/") + "cle.csv";
+//		String cleFile = this.getUrbanSimParameterConfig().getMATSim4OpusTemp().replaceFirst("/tmp/", "/") + "cle.csv";
+		String cleFile = this.getUrbanSimParameterConfig().getMATSim4Opus() + "cle.csv";
 		if(new File(cleFile).exists()){
 			log.info("loading " + DanielAnalysisListenerEvents.class.getSimpleName() + " with " + cleFile + "...");
 			List<Tuple<Integer, Integer>> timeslots = new ArrayList<Tuple<Integer,Integer>>();
@@ -170,6 +172,9 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		m4u.run();
 		m4u.matsim4UrbanSimShutdown();
 		MATSim4UrbanSimZone.isSuccessfulMATSimRun = Boolean.TRUE;
+		// copy the zones file to the outputfolder...
+		IOUtils.copyFile(new File(m4u.getUrbanSimParameterConfig().getMATSim4OpusTemp() + "/zones.csv"), 
+				new File(m4u.getUrbanSimParameterConfig().getMATSim4OpusOutput() + "/zones.csv"));
 		
 		log.info("Computation took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
