@@ -523,7 +523,7 @@ public class HITSAnalyserPostgresqlSummary {
 				+ tripTableName
 				+ " SET alighting_stop = matsim_to_transitstops_lookup.stop_id "
 				+ " FROM m_calibration.matsim_to_transitstops_lookup "
-				+ " WHERE boarding_stop = matsim_stop ";
+				+ " WHERE alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		indexName = tripTableName.substring(14);
 		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
