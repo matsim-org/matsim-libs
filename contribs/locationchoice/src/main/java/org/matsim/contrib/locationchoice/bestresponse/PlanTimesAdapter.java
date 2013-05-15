@@ -325,6 +325,9 @@ public class PlanTimesAdapter {
 			leg.setDepartureTime(0.0);
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
+			
+			log.info(person.getId().toString() + " " + toAct.getType());
+			
 			PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());		
 			legTravelTime = leg.getTravelTime();
 //		} else if (mode.equals(TransportMode.pt) && config.scenario().isUseTransit()) {
