@@ -19,14 +19,20 @@
 
 package org.matsim.contrib.locationchoice;
 
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.controler.Controler;
 
 public class DCControler extends Controler {
 	
 	private DestinationChoiceBestResponseContext dcContext;
+	
 				
 	public DCControler(final String[] args) {
 		super(args);	
@@ -63,6 +69,10 @@ public class DCControler extends Controler {
 	
 	protected void loadControlerListeners() {
 		this.dcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
+		
+		TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
+		this.getScenario().addScenarioElement(facilityPenalties);
+		this.addControlerListener(new FacilitiesLoadCalculator(facilityPenalties));
 		
 		this.addControlerListener(new DestinationChoiceInitializer(this.dcContext));
 		super.loadControlerListeners();

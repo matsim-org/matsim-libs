@@ -57,6 +57,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
 	private ActTypeConverter converter;
 	private ObjectAttributes prefs;
+	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 		
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext dcContext) {
 		super(dcContext.getParams());
@@ -66,6 +67,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		this.params = dcContext.getParams();
 		this.converter = dcContext.getConverter();
 		this.prefs = dcContext.getPrefsAttributes();
+		this.facilityPenalties = facilityPenalties;
 	}
 	
 	@Override
@@ -159,9 +161,13 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				this.zeroUtilityDurations.put(act.getType(), zeroUtilityDuration);
 			}
 
-			if (duration > 0) {
-				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
+			if (duration > 0) {				
+				FacilityPenalty penalty = this.facilityPenalties.get(act.getFacilityId());
+				double penaltyFactor = penalty.getCapacityPenaltyFactor(activityStart, activityEnd);
+				
+				double utilPerf = penaltyFactor * this.params.marginalUtilityOfPerforming_s * typicalDuration
 						* Math.log((duration / 3600.0) / zeroUtilityDuration);
+				
 				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 			} else {
