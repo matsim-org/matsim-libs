@@ -327,13 +327,13 @@ public class PlanTimesAdapter {
 			leg.setArrivalTime(0.0);
 			PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());		
 			legTravelTime = leg.getTravelTime();
-		} else if (mode.equals(TransportMode.pt) && config.scenario().isUseTransit()) {
-			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
-			leg.setDepartureTime(0.0);
-			leg.setTravelTime(0.0);
-			leg.setArrivalTime(0.0);
-			PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());		
-			legTravelTime = leg.getTravelTime();			
+//		} else if (mode.equals(TransportMode.pt) && config.scenario().isUseTransit()) {
+//			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
+//			leg.setDepartureTime(0.0);
+//			leg.setTravelTime(0.0);
+//			leg.setArrivalTime(0.0);
+//			PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());		
+//			legTravelTime = leg.getTravelTime();			
 		} else {
 			legTravelTime = this.getTravelTimeApproximation((PlanImpl)person.getSelectedPlan(), (ActivityImpl)toAct);
 		}
