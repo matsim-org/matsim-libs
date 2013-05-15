@@ -300,19 +300,13 @@ public class PlanTimesAdapter {
 		String mode = plan.getPreviousLeg(pe).getMode();
 		double distance = config.plansCalcRoute().getBeelineDistanceFactor() * ((CoordImpl)actPre.getCoord()).calcDistance(pe.getCoord());
 		
-		// default car
-		double speed = Double.parseDouble(this.config.locationchoice().getRecursionTravelSpeed());
+		// TODO: as soon as plansCalcRoute provides defaults for all modes use them 
+		// I do not want users having to set dc parameters in other config modules!
+		double speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_car());
 		
-		if (mode.equals(TransportMode.car) && 
-				config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.car) != null) {
-				speed = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.car);
-		} else if (mode.equals(TransportMode.pt)) {
-			if (config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt) != null) {
-				speed = config.plansCalcRoute().getPtSpeed();
-			} else {
-				speed = Double.parseDouble(this.config.locationchoice().getRecursionTravelSpeed()) 
-						* config.plansCalcRoute().getPtSpeedFactor();
-			}	
+		if (mode.equals(TransportMode.pt)) {
+				speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_car()) 
+						* config.plansCalcRoute().getPtSpeedFactor();	
 		} else if (mode.equals(TransportMode.bike)) {
 			speed = config.plansCalcRoute().getBikeSpeed();
 		} else if (mode.equals(TransportMode.walk)) {

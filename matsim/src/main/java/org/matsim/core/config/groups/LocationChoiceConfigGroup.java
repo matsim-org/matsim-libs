@@ -33,7 +33,8 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String RESTR_FCN_EXP = "restraintFcnExp";
 	private static final String SCALEFACTOR = "scaleFactor";
 	private static final String GLOBALTRAVELSPEEDCHANGE = "recursionTravelSpeedChange";
-	private static final String GLOBALTRAVELSPEED = "recursionTravelSpeed";
+	private static final String GLOBALTRAVELSPEED_CAR = "travelSpeed_car";
+	private static final String GLOBALTRAVELSPEED_PT = "travelSpeed_pt";
 	private static final String MAX_RECURSIONS = "maxRecursions";
 	private static final String CENTER_NODE = "centerNode";
 	private static final String RADIUS = "radius";
@@ -55,6 +56,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String PBETAS_FILE = "pBetasFileName";
 	private static final String FATTRS_FILE = "fAttributesFileName";
 	private static final String MAXDCS_FILE = "maxDCScoreFile";
+	private static final String PREFS_FILE = "prefsFile";
 	
 	private static final String ANALYSIS_BOUNDARY = "analysisBoundary";
 	private static final String ANALYSIS_BINSIZE = "analysisBinSize";
@@ -67,7 +69,8 @@ public class LocationChoiceConfigGroup extends Module {
 	private String restraintFcnExp = "0.0";
 	private String scaleFactor = "1";
 	private String recursionTravelSpeedChange = "0.1";
-	private String recursionTravelSpeed = "8.5";
+	private String travelSpeed_car = "8.5";
+	private String travelSpeed_pt = "5.0";
 	private String maxRecursions = "1";
 	private String centerNode = "null";
 	private String radius = "null";
@@ -87,6 +90,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String pBetasFile = "null";
 	private String fAttributesFile = "null";
 	private String maxDCScoreFile = "null";
+	private String prefsFile = "null";
 	
 	private String analysisBoundary = "200000.0";
 	private String analysisBinSize = "20000.0";
@@ -115,8 +119,11 @@ public class LocationChoiceConfigGroup extends Module {
 		if (GLOBALTRAVELSPEEDCHANGE.equals(key)) {
 			return getRecursionTravelSpeedChange();
 		}
-		if (GLOBALTRAVELSPEED.equals(key)) {
-			return getRecursionTravelSpeed();
+		if (GLOBALTRAVELSPEED_CAR.equals(key)) {
+			return getTravelSpeed_car();
+		}
+		if (GLOBALTRAVELSPEED_PT.equals(key)) {
+			return getTravelSpeed_pt();
 		}
 		if (MAX_RECURSIONS.equals(key)) {
 			return getMaxRecursions();
@@ -168,7 +175,10 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (MAXDCS_FILE.equals(key)) {
 			return getMaxEpsFile();
-		}		
+		}
+		if (PREFS_FILE.equals(key)) {
+			return getPrefsFile();
+		}
 		if (ANALYSIS_BOUNDARY.equals(key)) {
 			return getAnalysisBoundary();
 		}
@@ -214,13 +224,21 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setRecursionTravelSpeedChange(value);
 			}
-		} else if (GLOBALTRAVELSPEED.equals(key)) {
+		} else if (GLOBALTRAVELSPEED_CAR.equals(key)) {
 			if (Double.parseDouble(value) < 0.0 ) {
-				log.warn("'recursionTravelSpeed' must be positive! Set to default value 8.5");
-				setRecursionTravelSpeed("8.5");
+				log.warn("'travelSpeed' must be positive! Set to default value 8.5");
+				setTravelSpeed_car("8.5");
 			}
 			else {
-				setRecursionTravelSpeed(value);
+				setTravelSpeed_car(value);
+			}
+		} else if (GLOBALTRAVELSPEED_PT.equals(key)) {
+			if (Double.parseDouble(value) < 0.0 ) {
+				log.warn("'travelSpeed' must be positive! Set to default value 5.0");
+				setTravelSpeed_pt("5.0");
+			}
+			else {
+				setTravelSpeed_car(value);
 			}
 		} else if (MAX_RECURSIONS.equals(key)) {
 			if (Double.parseDouble(value) < 0.0) {
@@ -337,6 +355,13 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setMaxEpsFile(value);
 			}
+		} else if (PREFS_FILE.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define a prefs file if available. Set to default value 'null' now");
+			}
+			else {
+				setPrefsFile(value);
+			}
 		} else if (ANALYSIS_BOUNDARY.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define an analysis region. Set to default value '200km' now");
@@ -375,7 +400,8 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, RESTR_FCN_EXP);
 		this.addParameterToMap(map, SCALEFACTOR);
 		this.addParameterToMap(map, GLOBALTRAVELSPEEDCHANGE);
-		this.addParameterToMap(map, GLOBALTRAVELSPEED);
+		this.addParameterToMap(map, GLOBALTRAVELSPEED_CAR);
+		this.addParameterToMap(map, GLOBALTRAVELSPEED_PT);
 		this.addParameterToMap(map, MAX_RECURSIONS);
 		this.addParameterToMap(map, CENTER_NODE);
 		this.addParameterToMap(map, RADIUS);
@@ -392,7 +418,8 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, FKVALS_FILE);
 		this.addParameterToMap(map, PBETAS_FILE);
 		this.addParameterToMap(map, FATTRS_FILE);
-		this.addParameterToMap(map, MAXDCS_FILE);		
+		this.addParameterToMap(map, MAXDCS_FILE);
+		this.addParameterToMap(map, PREFS_FILE);
 		this.addParameterToMap(map, ANALYSIS_BOUNDARY);
 		this.addParameterToMap(map, ANALYSIS_BINSIZE);
 		this.addParameterToMap(map, IDEXCLUSION);
@@ -430,11 +457,17 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setMaxRecursions(final String maxRecursions) {
 		this.maxRecursions = maxRecursions;
 	}
-	public String getRecursionTravelSpeed() {
-		return this.recursionTravelSpeed;
+	public String getTravelSpeed_car() {
+		return this.travelSpeed_car;
 	}
-	public void setRecursionTravelSpeed(final String recursionTravelSpeed) {
-		this.recursionTravelSpeed = recursionTravelSpeed;
+	public void setTravelSpeed_car(final String travelSpeed_car) {
+		this.travelSpeed_car = travelSpeed_car;
+	}
+	public String getTravelSpeed_pt() {
+		return this.travelSpeed_pt;
+	}
+	public void setTravelSpeed_pt(final String travelSpeed_pt) {
+		this.travelSpeed_pt = travelSpeed_pt;
 	}
 	public String getCenterNode() {
 		return this.centerNode;
@@ -531,6 +564,12 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setMaxEpsFile(String maxEpsFile) {
 		this.maxDCScoreFile = maxEpsFile;
+	}
+	public String getPrefsFile() {
+		return prefsFile;
+	}
+	public void setPrefsFile(String prefsFile) {
+		this.prefsFile = prefsFile;
 	}
 	public String getAnalysisBoundary() {
 		return this.analysisBoundary;
