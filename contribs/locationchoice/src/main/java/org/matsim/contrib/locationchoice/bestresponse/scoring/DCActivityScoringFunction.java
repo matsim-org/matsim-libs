@@ -22,9 +22,7 @@ package org.matsim.contrib.locationchoice.bestresponse.scoring;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,7 +37,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -93,6 +90,8 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	}
 	
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
+		
+		if (act.getType().equals("pt interaction")) return 0.0;
 
 		double tmpScore = 0.0;
 
@@ -207,11 +206,13 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		// openInterval[1] will be the closing time
 		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
 		boolean foundAct = false;
+		
+		if (act.getType().equals("pt interaction")) {
+			double [] ot = {Double.MIN_VALUE, Double.MAX_VALUE};
+			return ot;
+		}
 
-		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
-		if (facility == null) {
-			log.error("facility " + act.getFacilityId().toString() + " not found!");
-		}		
+		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());		
 		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
 		String facilityActType = null;
 		Set<OpeningTime> opentimes = null;
