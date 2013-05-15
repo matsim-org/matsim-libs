@@ -187,7 +187,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// set scoring function
 		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(config, controler, lcContext);
-		scoringFunctionFactory.setUsingFacilityOpeningTimes(false) ;
+		scoringFunctionFactory.setUsingConfigParamsForScoring(true) ;
 
 		controler.setScoringFunctionFactory(scoringFunctionFactory);
 		

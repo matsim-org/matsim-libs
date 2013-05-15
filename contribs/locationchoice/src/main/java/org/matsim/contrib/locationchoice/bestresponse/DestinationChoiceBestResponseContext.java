@@ -53,6 +53,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	private ObjectAttributes personsKValues;
 	private ObjectAttributes personsBetas = new ObjectAttributes();
 	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
+	private ObjectAttributes prefsAttributes = new ObjectAttributes();
 
 	public DestinationChoiceBestResponseContext(Scenario scenario) {
 		this.scenario = scenario;	
@@ -69,6 +70,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		
 		this.readOrCreateKVals(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
 		this.readFacilitesAttributesAndBetas();
+		this.readPrefs();
 		log.info("dc context initialized");
 	}
 	
@@ -92,6 +94,20 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
 				log.error("unsuccessful betas and facilities attributes from files!\n" + pBetasFileName + "\n" + fAttributesFileName);
+			}
+		}
+	}
+	
+	private void readPrefs() {
+		String prefsFileName = this.scenario.getConfig().locationchoice().getPrefsFile();
+		if (!prefsFileName.equals("null")) {			
+			ObjectAttributesXmlReader prefsReader = new ObjectAttributesXmlReader(this.prefsAttributes);
+			try {
+				prefsReader.parse(prefsFileName);
+				log.info("reading prefs attributes from: \n"+ prefsFileName);
+			} catch  (UncheckedIOException e) {
+				// reading was not successful
+				log.error("unsuccessful prefs reading from files!\n" + prefsFileName);
 			}
 		}
 	}
@@ -139,5 +155,9 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	@Override
 	public MatsimFactory getFactory() {
 		return null;
+	}
+
+	public ObjectAttributes getPrefsAttributes() {
+		return prefsAttributes;
 	}
 }

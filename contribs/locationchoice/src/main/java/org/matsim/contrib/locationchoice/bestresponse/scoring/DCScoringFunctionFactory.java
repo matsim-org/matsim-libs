@@ -49,9 +49,9 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 		log.info("creating DCScoringFunctionFactory");
 	}
 		
-	private boolean usingFacilityOpeningTimes = true ;
-	public void setUsingFacilityOpeningTimes( boolean val ) {
-		usingFacilityOpeningTimes = val ;
+	private boolean usingConfigParamsForScoring = true ;
+	public void setUsingConfigParamsForScoring( boolean val ) {
+		usingConfigParamsForScoring = val ;
 	}
 
 	@Override
@@ -59,15 +59,15 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		CharyparNagelActivityScoring scoringFunction ;
-		if ( usingFacilityOpeningTimes ) {
+		if ( usingConfigParamsForScoring ) {
+			scoringFunction = new DCActivityWOFacilitiesScoringFunction(
+					(PlanImpl)plan, 
+					this.lcContext);
+		} else {
 			scoringFunction = new DCActivityScoringFunction(
 					(PlanImpl)plan, 
 					this.controler.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(), 
 					lcContext);
-		} else {
-			scoringFunction = new DCActivityWOFacilitiesScoringFunction(
-					(PlanImpl)plan, 
-					this.lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);		
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getNetwork()));

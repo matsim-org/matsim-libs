@@ -26,7 +26,7 @@ import org.matsim.core.controler.Controler;
 
 public class DCControler extends Controler {
 	
-	private DestinationChoiceBestResponseContext lcContext;
+	private DestinationChoiceBestResponseContext dcContext;
 				
 	public DCControler(final String[] args) {
 		super(args);	
@@ -44,27 +44,27 @@ public class DCControler extends Controler {
 		 * would be muuuuch nicer to have this in DestinationChoiceInitializer, but startupListeners are called after corelisteners are called
 		 * -> scoringFunctionFactory cannot be replaced
 		 */
-		this.lcContext = new DestinationChoiceBestResponseContext(super.getScenario());	
+		this.dcContext = new DestinationChoiceBestResponseContext(super.getScenario());	
 		/* 
 		 * add ScoringFunctionFactory to controler
 		 *  in this way scoringFunction does not need to create new, identical k-vals by itself    
 		 */
-  		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getConfig(), this, this.lcContext); 	
+  		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getConfig(), this, this.dcContext); 	
 		super.setScoringFunctionFactory(dcScoringFunctionFactory);
 		
-		if (super.getConfig().scenario().isUseKnowledges() &&
+		if (!super.getConfig().locationchoice().getPrefsFile().equals("null") &&
 				!super.getConfig().facilities().getInputFile().equals("null")) {
-			dcScoringFunctionFactory.setUsingFacilityOpeningTimes(true);
+			dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
 		} else {
-			dcScoringFunctionFactory.setUsingFacilityOpeningTimes(false);
-			log.info("facilities are not used for scoring!");
+			dcScoringFunctionFactory.setUsingConfigParamsForScoring(true);
+			log.info("external prefs are not used for scoring!");
 		}		
 	}
 	
 	protected void loadControlerListeners() {
-		this.lcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
+		this.dcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
 		
-		this.addControlerListener(new DestinationChoiceInitializer(this.lcContext));
+		this.addControlerListener(new DestinationChoiceInitializer(this.dcContext));
 		super.loadControlerListeners();
 	}
 }

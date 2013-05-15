@@ -40,12 +40,12 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
@@ -55,27 +55,17 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private final CharyparNagelScoringParameters params;
 	public static final int DEFAULT_PRIORITY = 1;
 	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
-	// as in KTI project 
-	// TODO: get from knowledge!
-	public static final double MINIMUM_DURATION = 0.5 * 3600;
-	public static final double EARLIEST_ENDTIME = 0.0; 
-	public static final double LATEST_STARTTIME = 24 * 3600.0;
 	private ActTypeConverter converter;
-	
-//	private static final DayType DEFAULT_DAY = DayType.wed;
-//	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
-//	static {
-//		OpeningTime defaultOpeningTime = new OpeningTimeImpl(DCActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
-//		DCActivityScoringFunction.DEFAULT_OPENING_TIME.add(defaultOpeningTime);
-//	}
-	
-	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext lcContext) {
-		super(lcContext.getParams());
-		this.destinationChoiceScoring = new DestinationScoring(lcContext);
-		this.facilities = ((ScenarioImpl)lcContext.getScenario()).getActivityFacilities();
+	private ObjectAttributes prefs;
+		
+	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext dcContext) {
+		super(dcContext.getParams());
+		this.destinationChoiceScoring = new DestinationScoring(dcContext);
+		this.facilities = ((ScenarioImpl)dcContext.getScenario()).getActivityFacilities();
 		this.plan = plan;
-		this.params = lcContext.getParams();
-		this.converter = lcContext.getConverter();
+		this.params = dcContext.getParams();
+		this.converter = dcContext.getConverter();
+		this.prefs = dcContext.getPrefsAttributes();
 	}
 	
 	@Override
@@ -153,14 +143,13 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 
 			// disutility if too late
 
-			double latestStartTime = DCActivityScoringFunction.LATEST_STARTTIME;
+			double latestStartTime = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "latestStartTime_" + act.getType());	
 			if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
 			}
 
 			// utility of performing an action, duration is >= 1, thus log is no problem
-			double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(act.getType());
-			
+			double typicalDuration = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "typicalDuration_" + act.getType());			
 			// initialize zero utility durations here for better code readability, because we only need them here
 			double zeroUtilityDuration;
 			if (this.zeroUtilityDurations.containsKey(act.getType())) {
@@ -180,7 +169,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 			}
 
 			// disutility if stopping too early
-			double earliestEndTime = DCActivityScoringFunction.EARLIEST_ENDTIME;
+			double earliestEndTime = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "earliestEndTime_" + act.getType());	
 			if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
 				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
 			}
@@ -191,7 +180,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 			}
 
 			// disutility if duration was too short
-			double minimalDuration = DCActivityScoringFunction.MINIMUM_DURATION;
+			double minimalDuration = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "minimalDuration_" + act.getType());	
 			if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
 			}
