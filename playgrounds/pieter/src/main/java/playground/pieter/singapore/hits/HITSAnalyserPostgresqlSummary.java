@@ -328,7 +328,7 @@ public class HITSAnalyserPostgresqlSummary {
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT, "primary key"));
-		columns.add(new PostgresqlColumnDefinition("pax_idx_hits",
+		columns.add(new PostgresqlColumnDefinition("person_id",
 				PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("trip_idx_hits",
 				PostgresType.TEXT));
@@ -499,31 +499,7 @@ public class HITSAnalyserPostgresqlSummary {
 		tripWriter.finish();
 		transferWriter.finish();
 		
-		String indexName = actTableName.substring(14);
-		String indexStatement = "CREATE INDEX " + indexName + "_paxidx ON "
-				+ actTableName + "(person_id);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_pcode ON "
-				+ actTableName + "(pcode);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_type ON "
-				+ actTableName + "(type);\n";
 		DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
-		dba.executeStatement(indexStatement);
-		System.out.println(indexStatement);
-
-		indexName = journeyTableName.substring(14);
-		indexStatement = "CREATE INDEX " + indexName + "_paxidx ON "
-				+ journeyTableName + "(pax_idx_hits);\n";
-		indexStatement = "CREATE INDEX " + indexName + "_tripidx ON "
-				+ journeyTableName + "(trip_idx_hits);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_from_act ON "
-				+ journeyTableName + "(from_act);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_to_act ON "
-				+ journeyTableName + "(to_act);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_mainmode ON "
-				+ journeyTableName + "(main_mode);\n";
-		dba.executeStatement(indexStatement);
-		System.out.println(indexStatement);
-
 		// need to update the transit stop ids so they are consistent with LTA
 		// list
 		String update = "		UPDATE " + tripTableName
@@ -537,31 +513,45 @@ public class HITSAnalyserPostgresqlSummary {
 				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
-		indexName = tripTableName.substring(14);
-		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
-				+ tripTableName + "(journey_id);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_mode ON "
-				+ tripTableName + "(mode);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_line ON "
-				+ tripTableName + "(line);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_route ON "
-				+ tripTableName + "(route);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_board ON "
-				+ tripTableName + "(boarding_stop);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_alight ON "
-				+ tripTableName + "(alighting_stop);\n";
-		dba.executeStatement(indexStatement);
-		System.out.println(indexStatement);
-
-		indexName = transferTableName.substring(14);
-		indexStatement = "CREATE INDEX " + indexName + "_journey_id ON "
-				+ transferTableName + "(journey_id);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_from_trip ON "
-				+ transferTableName + "(from_trip);\n";
-		indexStatement += "CREATE INDEX " + indexName + "_to_trip ON "
-				+ transferTableName + "(to_trip);\n";
-		dba.executeStatement(indexStatement);
-		System.out.println(indexStatement);
+		//drop and write a number of indices
+		
+		HashMap<String,String[]> idxNames = new HashMap<String, String[]>();
+		String[] idx1 = {"person_id","pcode","type"};
+		idxNames.put(actTableName, idx1);
+		String[] idx2 = {"person_id","trip_idx_hits","from_act","to_act","main_mode"};
+		idxNames.put(journeyTableName, idx2);
+		String[] idx3 = {"journey_id","mode","line","route","boarding_stop","alighting_stop"};
+		idxNames.put(tripTableName, idx3);
+		String[] idx4 = {"journey_id","from_trip","to_trip"};
+		idxNames.put(transferTableName, idx4);
+		for(Entry<String,String[]> entry:idxNames.entrySet()){
+			String tableName = entry.getKey();
+			String[] columnNames = entry.getValue();
+			for(String columnName:columnNames){
+				String indexName = tableName.split("\\.")[1] + "_" + columnName;
+				String fullIndexName = tableName.split("\\.")[0] + "." + indexName;
+				String indexStatement;
+				try{
+					indexStatement = "DROP INDEX " + fullIndexName + " ;\n ";
+					dba.executeStatement(indexStatement);
+					System.out.println(indexStatement);
+				}catch(SQLException e){
+					e.printStackTrace();
+				}
+				
+				try{
+					indexStatement = "CREATE INDEX " + indexName + " ON "
+							+ tableName + "("+ columnName +");\n";
+					dba.executeStatement(indexStatement);
+					System.out.println(indexStatement);
+				}catch(SQLException e){
+					e.printStackTrace();
+				}	
+				
+			}
+		}
+		
+		
 
 	}
 	public HITSAnalyserPostgresqlSummary() throws ParseException {
