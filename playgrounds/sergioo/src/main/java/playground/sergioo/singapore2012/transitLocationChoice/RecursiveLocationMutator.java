@@ -59,7 +59,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		super(scenario, quad_trees, facilities_of_type, random);
 		this.recursionTravelSpeedChange = Double.parseDouble(scenario.getConfig().locationchoice().getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(scenario.getConfig().locationchoice().getMaxRecursions());
-		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().locationchoice().getRecursionTravelSpeed());
+		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().locationchoice().getTravelSpeed_car());
 		this.router = router;
 	}
 
@@ -67,7 +67,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		super(scenario, random);
 		this.recursionTravelSpeedChange = Double.parseDouble(scenario.getConfig().locationchoice().getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(scenario.getConfig().locationchoice().getMaxRecursions());
-		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().locationchoice().getRecursionTravelSpeed());
+		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().locationchoice().getTravelSpeed_car());
 		this.router = router;
 	}
 
