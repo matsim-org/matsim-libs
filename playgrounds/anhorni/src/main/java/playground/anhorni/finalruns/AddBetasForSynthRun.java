@@ -64,6 +64,7 @@ public class AddBetasForSynthRun {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {	
 			betas.putAttribute(p.getId().toString(), "size", 1.0);
 			betas.putAttribute(p.getId().toString(), "price", -1.0);
+			betas.putAttribute(p.getId().toString(), "tauagglo", 1.0);
 			counter++;
 			if (counter % nextMsg == 0) {
 				nextMsg *= 2;

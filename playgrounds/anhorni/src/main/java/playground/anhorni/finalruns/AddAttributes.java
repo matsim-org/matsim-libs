@@ -30,6 +30,9 @@ public class AddAttributes {
 	
 	private String outdir;
 	
+	private TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();
+	private QuadTree<ActivityFacility> shopTree;
+	
 	public static void main(final String[] args) {		
 		AddAttributes adapter = new AddAttributes();		
 		adapter.run(args[0], args[1], args[2], args[3], args[4], args[5]);		
@@ -52,11 +55,11 @@ public class AddAttributes {
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);
+		
+		shopTree = Utils.buildLocationQuadTreeFacilities(this.scenario.getActivityFacilities().getFacilitiesForActivityType("s"));
 	}
 	
-	private void assignSizeAndPrice(final String bzFile, final String csFile) {
-		TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();		
-		
+	private void assignSizeAndPrice(final String bzFile, final String csFile) {		
 		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
 		TreeMap<Id, ShopLocation> shopsCS = ucsReader.readUniversalCS(csFile);
 		
@@ -106,11 +109,11 @@ public class AddAttributes {
 //			}
 			
 		}			
-		this.computeAttributeAverages(shops);
-		this.writeScaledValues(shops);
+		this.computeAttributeAverages();
+		this.writeScaledValues();
 	}
 	
-	private void computeAttributeAverages(TreeMap<Id, ShopLocation> shops) {
+	private void computeAttributeAverages() {
 		int cntSize = 0;
 		int cntPrice = 0;
 		for (ShopLocation shop:shops.values()) {
@@ -128,7 +131,14 @@ public class AddAttributes {
 		this.avg_size /= cntSize;
 	}
 	
-	private void writeScaledValues(TreeMap<Id, ShopLocation> shops) {
+	private double computeTauAgglo(ShopLocation shop) {
+		double tauagglo = 0.0;
+		int numberOfCloseByFacilities = this.shopTree.get(shop.getCoord().getX(), shop.getCoord().getY(), 300.0).size();
+		if (numberOfCloseByFacilities > 10) tauagglo = 1.0;
+		return tauagglo;
+	}
+	
+	private void writeScaledValues() {
 		ObjectAttributes facilitiyAttributes = new ObjectAttributes();	
 		for (ShopLocation shop:shops.values()) {
 			double priceScaled = this.avg_price;
@@ -147,6 +157,7 @@ public class AddAttributes {
 			}
 			facilitiyAttributes.putAttribute(shop.getId().toString(), "size", sizeScaled);
 			facilitiyAttributes.putAttribute(shop.getId().toString(), "price", priceScaled);
+			facilitiyAttributes.putAttribute(shop.getId().toString(), "tauagglo", this.computeTauAgglo(shop));
 		}
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(facilitiyAttributes);
 		attributesWriter.writeFile(this.outdir + "/facilityAttributes.xml");
