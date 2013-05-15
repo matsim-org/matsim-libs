@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.StringReader;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.postgresql.PGConnection;
@@ -57,9 +60,18 @@ import others.sergioo.util.dataBase.NoConnectionException;
 	}
 
 	public void init() {
+		DateFormat df = new SimpleDateFormat("yyyyMMdd_hhmm");
+		String formattedDate = df.format(new Date());
 		try {
-			dba.executeStatement(String.format("DROP TABLE IF EXISTS %s;",
-					tableName));
+			dba.executeStatement(String.format("ALTER TABLE %s RENAME TO %s;",
+					tableName,tableName+"_replaced_on_"+formattedDate));
+		} catch (SQLException e) {
+			System.err.println("Table "+tableName+" doesn't exist.");;
+		} catch (NoConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
 			StringBuilder createString = new StringBuilder(String.format(
 					"CREATE TABLE %s(", tableName));
 			for (int i = 0; i < columns.size(); i++) {

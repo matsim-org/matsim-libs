@@ -300,10 +300,10 @@ public class HITSAnalyserPostgresqlSummary {
 			NoConnectionException {
 		System.out.println("starting summary");
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd") ;
-		String postScript = df.format(new Date())+ (freeSpeedRouting?"freespeedrouted":"");
+		String formattedDate = df.format(new Date());
+		String postScript = freeSpeedRouting?"_freespeedrouted":"";
 		// start with activities
-		String actTableName = "m_calibration.hits_activities_"
-				+ postScript;
+		String actTableName = "m_calibration.hits_activities"+postScript;
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("activity_id",
 				PostgresType.INT, "primary key"));
@@ -318,9 +318,13 @@ public class HITSAnalyserPostgresqlSummary {
 		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS",
 				actTableName, actDBA, 10000, columns);
+		if(!freeSpeedRouting){
+			activityWriter.addComment(
+					String.format("HITS activities, routed using events file %s and plans file %s",
+							eventsFileName,plansFileName,formattedDate));
+		}
 
-		String journeyTableName = "m_calibration.hits_journeys_"
-				+ postScript;
+		String journeyTableName = "m_calibration.hits_journeys"+postScript;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT, "primary key"));
@@ -355,10 +359,12 @@ public class HITSAnalyserPostgresqlSummary {
 		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",
 				journeyTableName, journeyDBA, 5000, columns);
 		if(!freeSpeedRouting){
-			journeyWriter.addComment(String.format("HITS journeys, routed using events file %s and plans file %s", eventsFileName,plansFileName));
+			journeyWriter.addComment(
+					String.format("HITS journeys, routed using events file %s and plans file %s on %s", 
+							eventsFileName,plansFileName, formattedDate));
 		}
 
-		String tripTableName = "m_calibration.hits_trips_" + postScript;
+		String tripTableName = "m_calibration.hits_trips"+postScript;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT,
 				"primary key"));
@@ -380,11 +386,12 @@ public class HITSAnalyserPostgresqlSummary {
 		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS",
 				tripTableName, tripDBA, 10000, columns);
 		if(!freeSpeedRouting){
-			tripWriter.addComment(String.format("HITS trips, routed using events file %s and plans file %s", eventsFileName,plansFileName));
+			tripWriter.addComment(
+					String.format("HITS trips, routed using events file %s and plans file %s",
+							eventsFileName,plansFileName,formattedDate));
 		}
 		
-		String transferTableName = "m_calibration.hits_transfers_"
-				+ postScript;
+		String transferTableName = "m_calibration.hits_transfers"+postScript;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("transfer_id",
 				PostgresType.INT, "primary key"));
@@ -405,6 +412,11 @@ public class HITSAnalyserPostgresqlSummary {
 		DataBaseAdmin transferDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter transferWriter = new PostgresqlCSVWriter(
 				"TRANSFERS", transferTableName, transferDBA, 1000, columns);
+		if(!freeSpeedRouting){
+			transferWriter.addComment(
+					String.format("HITS transfers, routed using events file %s and plans file %s on %s", 
+							eventsFileName,plansFileName,formattedDate));
+		}
 
 		for (Entry<String, TravellerChain> entry : chains.entrySet()) {
 			String pax_id = entry.getKey().toString();

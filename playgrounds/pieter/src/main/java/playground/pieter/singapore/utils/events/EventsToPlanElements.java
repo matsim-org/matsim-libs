@@ -478,8 +478,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		String formattedDate = df.format(new Date());
 		// start with activities
-		String actTableName = "m_calibration.matsim_activities_"
-				+ formattedDate;
+		String actTableName = "m_calibration.matsim_activities";
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("activity_id",
 				PostgresType.INT, "primary key"));
@@ -495,10 +494,9 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS",
 				actTableName, actDBA, 100000, columns);
-		activityWriter.addComment(String.format("MATSim activities from events file %s", eventsFileName));
+		activityWriter.addComment(String.format("MATSim activities from events file %s, created on %s.", eventsFileName, formattedDate));
 
-		String journeyTableName = "m_calibration.matsim_journeys_"
-				+ formattedDate;
+		String journeyTableName = "m_calibration.matsim_journeys";
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT, "primary key"));
@@ -531,9 +529,9 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		DataBaseAdmin journeyDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",
 				journeyTableName, journeyDBA, 50000, columns);
-		journeyWriter.addComment(String.format("MATSim journeys from events file %s", eventsFileName));
+		journeyWriter.addComment(String.format("MATSim journeys from events file %s, created on %s.", eventsFileName, formattedDate));
 
-		String tripTableName = "m_calibration.matsim_trips_" + formattedDate;
+		String tripTableName = "m_calibration.matsim_trips";
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("journey_id",
@@ -554,11 +552,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		DataBaseAdmin tripDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS",
 				tripTableName, tripDBA, 100000, columns);
-		tripWriter.addComment(String.format("MATSim trips (stages) from events file %s", eventsFileName));
+		tripWriter.addComment(String.format("MATSim trips (stages) from events file %s, created on %s.", eventsFileName, formattedDate));
 
 
-		String transferTableName = "m_calibration.matsim_transfers_"
-				+ formattedDate;
+		String transferTableName = "m_calibration.matsim_transfers";
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("transfer_id",
 				PostgresType.INT, "primary key"));
@@ -580,7 +577,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		DataBaseAdmin transferDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter transferWriter = new PostgresqlCSVWriter(
 				"TRANSFERS", transferTableName, transferDBA, 100000, columns);
-		transferWriter.addComment(String.format("MATSim transfers from events file %s", eventsFileName));
+		transferWriter.addComment(String.format("MATSim transfers from events file %s, created on %s.", eventsFileName, formattedDate));
 
 
 		for (Entry<Id, TravellerChain> entry : chains.entrySet()) {
