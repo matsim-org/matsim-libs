@@ -305,8 +305,7 @@ public class PlanTimesAdapter {
 		double speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_car());
 		
 		if (mode.equals(TransportMode.pt)) {
-				speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_car()) 
-						* config.plansCalcRoute().getPtSpeedFactor();	
+			speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_pt());	
 		} else if (mode.equals(TransportMode.bike)) {
 			speed = config.plansCalcRoute().getBikeSpeed();
 		} else if (mode.equals(TransportMode.walk) || mode.equals(TransportMode.transit_walk)) {
