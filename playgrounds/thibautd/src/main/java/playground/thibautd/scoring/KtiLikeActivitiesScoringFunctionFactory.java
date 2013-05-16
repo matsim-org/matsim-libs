@@ -35,6 +35,8 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
+import playground.meisterk.kti.scoring.ActivityScoringFunction;
+
 import playground.thibautd.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
@@ -79,11 +81,15 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
 		scoringFunctionAccumulator.addScoringFunction(
-				new CarPoolingOpeningTimesActivityScoringFunction(
-					plan, 
-					params,
-					facilityPenalties,
-					((ScenarioImpl) scenario).getActivityFacilities() ));
+				new BlackListedActivityScoringFunction(
+					// TODO also use types from TripRouter
+					JointActingTypes.JOINT_STAGE_ACTS,
+					// note: this is the meisterk's KTI one
+					new ActivityScoringFunction(
+						plan,
+						params,
+						facilityPenalties,
+						((ScenarioImpl) scenario).getActivityFacilities() )) );
 
 		// standard modes
 		scoringFunctionAccumulator.addScoringFunction(
@@ -92,7 +98,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					LegScoringParameters.createForCar(
 						params ),
 					scenario.getNetwork()));
-		// TODO: adapt costs to travel card.
+		// TODO: adapt costs to travel card (KTI like).
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
 					TransportMode.pt,
