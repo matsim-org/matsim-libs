@@ -105,14 +105,18 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 */
 	private final Map<QVehicle, Double> linkEnterTimeMap = new ConcurrentHashMap<QVehicle, Double>();
 
+	private double storageCapacity;
+
+	private double usedStorageCapacity;
+	
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
 	/*package*/ final Queue<QVehicle> buffer = new LinkedList<QVehicle>();
-
-	private double storageCapacity;
-
-	private double usedStorageCapacity;
+	
+	private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
+	
+	private double usedBufferStorageCapacity = 0.0;
 
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
@@ -121,7 +125,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	/*package*/ double inverseSimulatedFlowCapacityCache; // optimization, cache 1.0 / simulatedFlowCapacity
 
-	private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
 
 	private double flowCapFractionCache; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
 
@@ -238,6 +241,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
 		this.buffer.clear();
+		this.usedBufferStorageCapacity = 0;
 	}
 
 
@@ -557,7 +561,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			}
 			this.storageCapacity = tempStorageCapacity;
 		}
-
+		
 		if ( HOLES ) {
 			// yyyy number of initial holes (= max number of vehicles on link given bottleneck spillback) is, in fact, dicated
 			// by the bottleneck flow capacity, together with the fundamental diagram. :-(  kai, ???'10
@@ -693,12 +697,12 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
 		return (
-				(this.buffer.size() < this.bufferStorageCapacity) 
+				(usedBufferStorageCapacity < this.bufferStorageCapacity) 
 				&& 
 				((this.remainingflowCap >= 1.0) || (this.flowcap_accumulate >= 1.0))
 				);
 	}
-	
+
 	private double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
 //		return Math.min(1.0, veh.getSizeInEquivalents() ) ;
 		return veh.getSizeInEquivalents();
@@ -722,7 +726,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			throw new IllegalStateException("Buffer of link " + this.getLink().getId() + " has no space left!");
 		}
 		this.buffer.add(veh);
-		if (this.buffer.size() == 1) {
+		this.usedBufferStorageCapacity = this.usedBufferStorageCapacity + veh.getSizeInEquivalents();
+		if (buffer.size() == 1) {
 			this.bufferLastMovedTime = now;
 			// (if there is one vehicle in the buffer now, there were zero vehicles in the buffer before.  in consequence,
 			// need to reset the lastMovedTime.  If, in contrast, there was already a vehicle in the buffer before, we can
@@ -735,6 +740,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	QVehicle popFirstVehicle() {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
+		this.usedBufferStorageCapacity = this.usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		this.linkEnterTimeMap.remove(veh);
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
