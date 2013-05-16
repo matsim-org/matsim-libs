@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.scoring;
 
+import java.util.Collection;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
@@ -105,8 +106,9 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					scenario.getNetwork()));
 		// KTI like consideration of influence of travel card
 		// (except that is was not expressed as a ratio)
+		final Collection<String> travelCards = ((PersonImpl) plan.getPerson()).getTravelcards();
 		final double utilityOfDistancePt =
-			((PersonImpl) plan.getPerson()).getTravelcards().isEmpty() ?
+			travelCards == null || travelCards.isEmpty() ?
 				params.marginalUtilityOfDistancePt_m :
 				params.marginalUtilityOfDistancePt_m * ktiConfig.getTravelCardRatio();
 		scoringFunctionAccumulator.addScoringFunction(
