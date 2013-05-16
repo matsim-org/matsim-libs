@@ -48,6 +48,10 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouterImplFactory;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
@@ -289,12 +293,21 @@ public class ControllerRegistryBuilder {
 		}
 
 		if ( tripRouterFactory == null ) {
+			final TransitSchedule schedule = scenario.getTransitSchedule();
+			final TransitRouterFactory transitRouterFactory =
+				schedule != null ?
+					new TransitRouterImplFactory(
+							schedule,
+							new TransitRouterConfig(
+								scenario.getConfig() ) ) :
+					null;
+
 			this.tripRouterFactory = new JointTripRouterFactory(
 					scenario,
 					travelDisutilityFactory,
 					travelTime.getLinkTravelTimes(),
 					leastCostPathCalculatorFactory,
-					null); // last arg: transit router factory.
+					transitRouterFactory);
 		}
 
 		if ( incompatiblePlansIdentifierFactory == null ) {
