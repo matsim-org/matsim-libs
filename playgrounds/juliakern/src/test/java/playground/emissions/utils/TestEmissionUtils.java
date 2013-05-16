@@ -31,6 +31,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -38,19 +41,35 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
 import playground.vsp.emissions.utils.EmissionUtils;
 
-//test for playground.vsp.emissions.utils.EmissionUtils
+/*
+ * test for playground.vsp.emissions.utils.EmissionUtils
+ * missing data is not tested here
+ * negative emission values are allowed
+ * 1 test constructor
+ * 2 test sumUpEmissions 
+ * 3 test sumUpEmissionPerId 
+ * 4 test getTotalEmissions
+ * 5 test SetNonCalculatedEmissionsForPopulation
+ * - correct input - population does not match map of emissions - empty map of emissions
+ * 6 test SetNonCalculatedEmissionsForNetwork
+ * 7 test ConvertWarmPollutantMap2String
+ * 8 test ConvertColdPollutantMap2String
+ */
 
 public class TestEmissionUtils {
 	
 	String co="CO", c2="CO2_TOTAL", fc = "FC", hc= "HC",
 			nm ="NMHC", n2="NO2", nx="NOX", pm="PM", so="SO2";
+	int numOfPolls;
 	
 	@Test
 	public final void testConstructor(){
@@ -74,17 +93,17 @@ public class TestEmissionUtils {
 			Assert.assertTrue(pollsFromEnum.contains(pollutant));
 		}
 		
-		//local list of pollutants (used here for the test) matches eu.getListOfPolllutants
-		//if this fails there is a problem with the test, not with tested class
+		// assure that the local list of pollutants (used here for the test) matches eu.getListOfPolllutants
+		// if this fails there is a problem with the test, not with tested class
 		for(String pollutant: euPollutants){
 			Assert.assertTrue("the list of pollutants used in this test is not correct",localPolls.contains(pollutant));
 		}
-		//sind alle pollutants aus aus der lokalen Liste auch in der euPollutants-Liste?
+		// are all of the pollutants from the local list
+		// also in the euPollutants list?
 		Assert.assertEquals("the list of pollutants used in this test is not correct", localPolls.size(), euPollutants.size());
 	}
 	
 	@Test
-	//SortedMap<String, Double> sumUpEmissions(Map<WarmPollutant, Double> warmEmissions, Map<ColdPollutant, Double> coldEmissions)
 	public final void testSumUpEmissions(){
 		EmissionUtils eu = new EmissionUtils();
 		
@@ -211,7 +230,6 @@ public class TestEmissionUtils {
 
 		//TODO neg numbers
 		
-		//leere Felder? nicht hier testen - solche warm Em. sollten gar nicht entstehen
 		warmEmissions.put(new IdImpl("id1"), mapWarm1);
 		warmEmissions.put(new IdImpl("id2"), mapWarm2);
 		coldEmissions.put(new IdImpl("id1"), mapCold1);
@@ -241,7 +259,7 @@ public class TestEmissionUtils {
 		double a2pm = sums.get(new IdImpl("id2")).get("PM");
 		double a2so = sums.get(new IdImpl("id2")).get("SO2");
 		
-		//stellt auch sicher, dass die Personen korrekt auseinander gehalten werden
+		//assures simultaneously that persons/ids are distinguished correctly
 		Assert.assertEquals("CO value of person 1 should be" +e1co +"but is ", e1co, a1co, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("CO2 value of person 1 should be" +e1c2 +"but is ", e1c2, a1c2, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("FC value of person 1 should be" +e1fc +"but is ", e1fc, a1fc, MatsimTestUtils.EPSILON);
@@ -269,13 +287,13 @@ public class TestEmissionUtils {
 		EmissionUtils eu = new EmissionUtils();
 		boolean nullPointer = false;
 
-		//besser anderes Format? ArrayList?
+		//would another format be better? arraylist?
 		SortedSet<String> listOfPollutants = new TreeSet<String>();
 		fillPollutant(listOfPollutants);
 		
-		//hashmap ist keine sorted map... warum brauchen wir sorted?
+		//TODO why do we need sorted maps? 
 		SortedMap<String, Double> totalEmissions = new TreeMap<String, Double>();
-		//enthaelt mehrere personen mit ihren emissions-maps
+		//contains some persons with their emission maps
 		Map<Id, SortedMap<String, Double>> persons2emissions = new HashMap<Id, SortedMap<String, Double>>();
 		
 		//test empty input
@@ -285,15 +303,16 @@ public class TestEmissionUtils {
 		catch(NullPointerException e){
 			nullPointer = true;
 		}
-		Assert.assertTrue(nullPointer); nullPointer =false;
+		Assert.assertTrue(nullPointer); 
+		nullPointer =false;
 		
 		//test empty list as input		
 		totalEmissions = eu.getTotalEmissions(persons2emissions);
 		Assert.assertEquals("this map should be empty", 0, totalEmissions.size());
 		
 		//put some content into the list
-		//keine Fehlerhaften Eingabedaten hier
-		//warme und kalte Emissionen sind schon zusammengerechnet.. dafuer gibt es sumUpEmissionsPerId
+		// no incorrect/incomplete input data here
+		// warm and cold emissions are already sumed up -> sumUpEmissionsPerId
 		
 		//person1
 		SortedMap<String, Double> allEmissionsP1 = new TreeMap<String, Double>();
@@ -337,7 +356,7 @@ public class TestEmissionUtils {
 		allEmissionsp3.put(pm, p3pm);
 		allEmissionsp3.put(so, p3so);
 		
-		//personen in die persons2emissionliste einfuegen
+		// put persons into persons2emission list
 		persons2emissions.put(p1Id, allEmissionsP1);
 		persons2emissions.put(p2Id, allEmissionsp2);
 		persons2emissions.put(p3Id, allEmissionsp3);
@@ -353,11 +372,11 @@ public class TestEmissionUtils {
 		Assert.assertEquals(pm+" values are not correct", p1pm+p2pm+p3pm, totalEmissions.get(pm), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(so+" values are not correct", p1so+p2so+p3so, totalEmissions.get(so), MatsimTestUtils.EPSILON);
 		
-		//das geht davon aus, dass immer vollstaendige maps uebergeben werden
+		// assume that all maps are complete 
 		for(String emission : listOfPollutants){
 			Assert.assertTrue(totalEmissions.containsKey(emission));
 		}
-		//nichts anderes in der Liste enthalten
+		// nothing else in the list
 		Assert.assertEquals("this list should be as long as number of pollutants",totalEmissions.keySet().size(), listOfPollutants.size());
 		
 	}
@@ -376,46 +395,17 @@ public class TestEmissionUtils {
 		return listOfPollutants;
 		
 	}
-
-	/*
-	 * 	public Map<Id, SortedMap<String, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id, SortedMap<String, Double>> totalEmissions) {
-		Map<Id, SortedMap<String, Double>> personId2Emissions = new HashMap<Id, SortedMap<String, Double>>();
-
-		for(Person person : population.getPersons().values()){
-			Id personId = person.getId();
-			SortedMap<String, Double> emissionType2Value;
-			if(totalEmissions.get(personId) == null){ // person not in map yet (e.g. pt user)
-				emissionType2Value = new TreeMap<String, Double>();
-				for(String pollutant : listOfPollutants){
-					emissionType2Value.put(pollutant, 0.0);
-				}
-			} else { // person in map, but some emissions are not set; setting these to 0.0 
-				emissionType2Value = totalEmissions.get(personId);
-				for(String pollutant : listOfPollutants){ 
-					if(emissionType2Value.get(pollutant) == null){
-						emissionType2Value.put(pollutant, 0.0);
-					} else {
-						// do nothing
-					}
-				}
-			}
-			personId2Emissions.put(personId, emissionType2Value);
-		}
-		return personId2Emissions;
-	}
-	 */
 	
-	//prob no need - there should be no in- or out-files!
-	//@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	@Test
 	public final void testSetNonCalculatedEmissionsForPopulation(){
 		//IN: population
-		//		map <personen-id, persoenlicheEmissionsmap>
-		//		persoenlicheEmissionsmap = <Emissionsname, EmissionsWert>
+		//		map <person id, personal emission map>
+		//		personal emission map = <name of emission, value of emission>
 		
-		//OUT: returnt eine grosse Map: <personen-Id, persoenlicheEmissionsmap>
-		//persoenlicheEmissionsmap = <EmissionsName, EmissionsWert>
+		//OUT: returns a big map: <person id, personal emission map>
+		//personal emission map = <name of emission, value of emission>
 		
+		boolean nullPointerEx = false;
 		EmissionUtils eu = new EmissionUtils();
 		SortedSet<String> localPolls = new TreeSet<String>();
 		fillPollutant(localPolls);
@@ -423,21 +413,11 @@ public class TestEmissionUtils {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
-		//Network network = sc.getNetwork();
-		//TODO kann ich ne Population ohne config und scenario haben?
 		Population pop = sc.getPopulation();
 		PopulationFactory populationFactory = pop.getFactory();
 		
-		
-		
-//		Id id = new IdImpl("1");
-//		Person person = populationFactory.createPerson(id);
-//		pop.addPerson(person);
-
-		//TODO logger?
-
-		//korrekte Daten: zwei Personen, jeweils vollstaendige Daten.
-		//dann sollte nichts auf Null gesetzt werden. 
+		//correct data: two persons with complete data
+		//nothing should be set to zero 
 		
 		//person1
 		Double cov1=.0005, c2v1= .003, fcv1 = .01, hcv1=.2, nmv1=1., n2v1=30., nxv1=200., pmv1 =7000., sov1=70000.;
@@ -460,8 +440,7 @@ public class TestEmissionUtils {
 		totalEmissions.put(idp1, p1Emissions);
 		
 		//person2
-		//TODO werte hier aendern
-		Double cov2=.0005, c2v2= .003, fcv2 = .01, hcv2=.2, nmv2=1., n2v2=30., nxv2=200., pmv2 =7000., sov2=70000.;
+		Double cov2=.0007, c2v2= .006, fcv2 = .04, hcv2=.5, nmv2=7., n2v2=60., nxv2=800., pmv2 =1000., sov2=90000.;
 		
 		SortedMap<String, Double> p2Emissions = new TreeMap<String, Double>();
 		//complete list of all pollutants - missing data is not tested here
@@ -482,11 +461,15 @@ public class TestEmissionUtils {
 		
 		Map<Id, SortedMap<String, Double>> finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
 		
-		//check: alle Personen der Population sind auch in der finalMap
-		Assert.assertTrue(finalMap.containsKey(idp1));
-		Assert.assertTrue(finalMap.containsKey(idp2));
+		//check: all persons added to the population are contained in the finalMap
+		Assert.assertTrue("the calculated map should contain person 1", finalMap.containsKey(idp1));
+		Assert.assertTrue("the calculated map should contain person 2", finalMap.containsKey(idp2));
+		//nothing else in the finalMap
+		Assert.assertEquals("the calculated map should contain two persons but contains "+
+		finalMap.size() + "persons." ,pop.getPersons().keySet().size(), finalMap.size());
 		
-		//check: alle Werte fuer Person 1 und 2 sind ungleich null und ungleich 0, insbesondere sind es Double
+		//check: all values for person 1 and 2 are not null or zero
+		// and of type double
 		for(Object id : finalMap.keySet()){
 			Assert.assertTrue(id.getClass()== Id.class||id.getClass()==IdImpl.class);
 			for(Object pollutant: finalMap.get(id).values()){
@@ -498,24 +481,337 @@ public class TestEmissionUtils {
 			for(String emission : localPolls){
 				Assert.assertTrue(finalMap.get(id).containsKey(emission));
 			}
+			//nothing else in the list
+			int numOfPolls = localPolls.size();
+			Assert.assertEquals("the number of pullutants is " + finalMap.get(id).keySet().size()+ " but should be" + numOfPolls, 
+					numOfPolls, finalMap.get(id).keySet().size());
 		}
 		
-		//TODO ....
+		//check: values for all emissions are correct -person 1
+		Assert.assertEquals("CO value for person 1 is not correct", cov1, finalMap.get(idp1).get(co), MatsimTestUtils.EPSILON);	
+		Assert.assertEquals("CO2 value for person 1 is not correct", c2v1, finalMap.get(idp1).get(c2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("FC value for person 1 is not correct", fcv1, finalMap.get(idp1).get(fc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("HC value for person 1 is not correct", hcv1, finalMap.get(idp1).get(hc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("NMHC value for person 1 is not correct", nmv1, finalMap.get(idp1).get(nm), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("NO2 value for person 1 is not correct", n2v1, finalMap.get(idp1).get(n2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("NOX value for person 1 is not correct", nxv1, finalMap.get(idp1).get(nx), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("PM value for person 1 is not correct", pmv1, finalMap.get(idp1).get(pm), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("SO value for person 1 is not correct", sov1, finalMap.get(idp1).get(so), MatsimTestUtils.EPSILON);
 		
-		//population stimmt nicht mit id-map ueberein: jemand fehlt/ist zu viel
+		//check: values for all emissions are correct -person 2
+		Assert.assertEquals("CO value for person 2 is not correct", cov2, finalMap.get(idp2).get(co), MatsimTestUtils.EPSILON);	
+		Assert.assertEquals("CO2 value for person 2 is not correct", c2v2, finalMap.get(idp2).get(c2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("FC value for person 2 is not correct", fcv2, finalMap.get(idp2).get(fc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("HC value for person 2 is not correct", hcv2, finalMap.get(idp2).get(hc), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("NMHC value for person 2 is not correct", nmv2, finalMap.get(idp2).get(nm), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("NO2 value for person 2 is not correct", n2v2, finalMap.get(idp2).get(n2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("NOX value for person 2 is not correct", nxv2, finalMap.get(idp2).get(nx), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("PM value for person 2 is not correct", pmv2, finalMap.get(idp2).get(pm), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("SO value for person 2 is not correct", sov2, finalMap.get(idp2).get(so), MatsimTestUtils.EPSILON);
+				
+		//person 3 in population but not in totalEmissions
+				Id idp3 = new IdImpl("p3");
+				Person p3 = populationFactory.createPerson(idp3);
+				pop.addPerson(p3);
+				
+				finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
+				
+				//check: all persons added to the population are contained in the finalMap
+				Assert.assertTrue("the calculated map should contain person 1", finalMap.containsKey(idp1));
+				Assert.assertTrue("the calculated map should contain person 2", finalMap.containsKey(idp2));
+				Assert.assertTrue("the calculated map should contain person 3", finalMap.containsKey(idp3));
+				
+				//nothing else in the finalMap
+				Assert.assertEquals("the calculated map should contain three persons but contains "+
+				finalMap.size() + "persons." ,pop.getPersons().keySet().size(), finalMap.size());
+				
+				//check: all values for the third are zero and of type double
+				Assert.assertTrue(finalMap.keySet().contains(idp3));
+				Assert.assertTrue(finalMap.get(idp3).getClass()== Id.class||idp3.getClass()==IdImpl.class);
+					for(Object pollutant: finalMap.get(idp3).values()){
+						Assert.assertTrue(pollutant.getClass()==Double.class);
+						Assert.assertEquals(0.0, (Double)pollutant, MatsimTestUtils.EPSILON);
+						Assert.assertNotNull(pollutant);
+					}
+					//check: alle Emissionstypen kommen vor
+					for(String emission : localPolls){
+						Assert.assertTrue(finalMap.get(idp3).containsKey(emission));
+					}
+					//nothing else in the list
+					numOfPolls = localPolls.size();
+					Assert.assertEquals("the number of pullutants is " + finalMap.get(idp3).keySet().size()+ " but should be" + numOfPolls, 
+							numOfPolls, finalMap.get(idp3).keySet().size());
+				
 		
-		//leere pEM
-		
-		//leere grosse Map
-		
+		//person 4 in totalEmissions but not in population
+					Double cov4=.0008, c2v4= .004, fcv4 = .07, hcv4=.9, nmv4=1., n2v4=50., nxv4=700., pmv4 =4000., sov4=30000.;
+					
+					SortedMap<String, Double> p4Emissions = new TreeMap<String, Double>();
+					//complete list of all pollutants - missing data is not tested here
+					p4Emissions.put(co, cov4);
+					p4Emissions.put(c2, c2v4);
+					p4Emissions.put(fc, fcv4);
+					p4Emissions.put(hc, hcv4);
+					p4Emissions.put(nm, nmv4);
+					p4Emissions.put(n2, n2v4);
+					p4Emissions.put(nx, nxv4);
+					p4Emissions.put(pm, pmv4);
+					p4Emissions.put(so, sov4);
+					
+					Id idp4 = new IdImpl("p4");
+					Person p4 = populationFactory.createPerson(idp4);
+					totalEmissions.put(idp4, p4Emissions);
+					
+					finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
+					
+					//check: person 4 is not in the finalMap
+					Assert.assertFalse("the calculated map should not contain person 4", finalMap.containsKey(idp4));
+					//nothing else in the finalMap
+					Assert.assertEquals("the calculated map should contain three persons but contains "+
+					finalMap.size() + "persons." ,pop.getPersons().keySet().size(), finalMap.size());
+							
+		//missing emissions map 
+					//TODO -> benjamin fragen
+					try {
+						Map<Id, SortedMap<String, Double>> missingMap = eu.setNonCalculatedEmissionsForPopulation(pop, null);
+						//check: all persons added to the population are contained in the finalMap
+						Assert.assertTrue("the calculated map should contain person 1", missingMap.containsKey(idp1));
+						Assert.assertTrue("the calculated map should contain person 2", missingMap.containsKey(idp2));
+						Assert.assertTrue("the calculated map should contain person 3", missingMap.containsKey(idp3));
+						//nothing else in the finalMap
+						Assert.assertEquals("the calculated map should contain three persons but contains "+
+						finalMap.size() + "persons." ,pop.getPersons().keySet().size(), missingMap.size());
+						
+						//check: all values for all persons are zero and of type double
+						for(Object id : finalMap.keySet()){
+							Assert.assertTrue(id.getClass()== Id.class||id.getClass()==IdImpl.class);
+							for(Object pollutant: finalMap.get(id).values()){
+								Assert.assertTrue(pollutant.getClass()==Double.class);
+								Assert.assertEquals("map of pollutants was missing. Therefore all values should be set to zero.", 
+										0.0, (Double)pollutant, MatsimTestUtils.EPSILON);
+								Assert.assertNotNull(pollutant);
+							}
+							//check: alle types of emissions appear
+							for(String emission : localPolls){
+								Assert.assertTrue(finalMap.get(id).containsKey(emission));
+							}
+							//nothing else in the list
+							int numOfPolls = localPolls.size();
+							Assert.assertEquals("the number of pullutants is " + finalMap.get(id).keySet().size()+ " but should be" + numOfPolls, 
+									numOfPolls, finalMap.get(id).keySet().size());
+						}
+					} catch (NullPointerException e) {
+						nullPointerEx=true;
+					}
+					Assert.assertTrue(nullPointerEx);
+					nullPointerEx = false;
+
+					//empty emissions map 
+					Map<Id, SortedMap<String, Double>> emptyEmissions = new TreeMap<Id, SortedMap<String, Double>>();
+					Map<Id, SortedMap<String, Double>> emptyMap = eu.setNonCalculatedEmissionsForPopulation(pop, emptyEmissions );
+					
+					
+
+			//check: all persons added to the population are contained in the finalMap
+			Assert.assertTrue("the calculated map should contain person 1", emptyMap.containsKey(idp1));
+			Assert.assertTrue("the calculated map should contain person 2", emptyMap.containsKey(idp2));
+			Assert.assertTrue("the calculated map should contain person 3", emptyMap.containsKey(idp3));
+			//nothing else in the finalMap
+			Assert.assertEquals("the calculated map should contain three persons but contains "+
+			emptyMap.size() + "persons." ,pop.getPersons().keySet().size(), emptyMap.size());
+			
+			//check: all values for all persons are zero and of type double
+			for(Object id : emptyMap.keySet()){
+				Assert.assertTrue(id.getClass()== Id.class||id.getClass()==IdImpl.class);
+				for(Object pollutant: emptyMap.get(id).values()){
+					Assert.assertTrue(pollutant.getClass()==Double.class);
+					Assert.assertEquals("map of pollutants was missing. Therefore all values should be set to zero.", 
+							0.0, (Double)pollutant, MatsimTestUtils.EPSILON);
+					Assert.assertNotNull(pollutant);
+				}
+				//check: alle Emissionstypen kommen vor
+				for(String emission : localPolls){
+					Assert.assertTrue(emptyMap.get(id).containsKey(emission));
+				}
+				//nothing else in the list
+				int numOfPolls = localPolls.size();
+				Assert.assertEquals("the number of pullutants is " + emptyMap.get(id).keySet().size()+ " but should be" + numOfPolls, 
+						numOfPolls, emptyMap.get(id).keySet().size());
+			}
+					
+			// throw exception if population isnt set	
+			try{
+				Map<Id, SortedMap<String, Double>> noPopulation = eu.setNonCalculatedEmissionsForPopulation(null, totalEmissions);
+			}
+			catch(NullPointerException e){
+				nullPointerEx = true;
+			}
+			Assert.assertTrue("setNonCalculatedEmissionForPopulation should throw an exeption for empty population as input", nullPointerEx);
+			nullPointerEx = false;
+
+			Config config2 = ConfigUtils.createConfig();
+			Scenario sc2 = ScenarioUtils.createScenario(config2);
+			Population pop2 = sc2.getPopulation();
+			
+			Map<Id, SortedMap<String, Double>> emptyPopulation = eu.setNonCalculatedEmissionsForPopulation(pop2, totalEmissions);
+			Assert.assertEquals("this list should be empty", 0, emptyPopulation.keySet().size());
 		
 		
 	}
-//	@Test
-//	public final void testSetNonCalculatedEmissionsForNetwork(){
-//		
-//	}
 	
+	
+
+
+	@Test
+	//TODO
+	public final void testSetNonCalculatedEmissionsForNetwork(){
+		
+		//IN: network,totalEmissions 
+		//totalEmissions = map <linkId, SpecificEmissionMap>
+		
+		//OUT: map <linkId, SpecificEmissionMap>
+		//SpecificEmissionMap= <pollutant, value>
+		
+		EmissionUtils eu = new EmissionUtils();
+		
+		SortedSet<String> localPolls = new TreeSet<String>();
+		fillPollutant(localPolls);
+		
+		Config config = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario(config);
+		Network network = sc.getNetwork();
+		addLinksToNetwork(network, sc);
+		
+		Map<Id, SortedMap<String, Double>> totalEmissions = new HashMap<Id, SortedMap<String, Double>>();
+	
+		//complete link - link12
+		Id link12id = new IdImpl("link12");
+		SortedMap<String, Double> emLink12 = new TreeMap<String, Double>();
+		Double c2link12v=.0008, colink12v=.001, fclink12v=.05,
+				hclink12v=.8, nmlink12v=1., n2link12v=50.,
+				nxlink12v=600., pmlink12v=2000., solink12v=60000.;
+		emLink12.put(c2, c2link12v); emLink12.put(co, colink12v); emLink12.put(fc, fclink12v); 
+		emLink12.put(hc, hclink12v); emLink12.put(nm, nmlink12v); emLink12.put(n2, n2link12v); 
+		emLink12.put(nx, nxlink12v); emLink12.put(pm, pmlink12v); emLink12.put(so, solink12v);
+		totalEmissions.put(link12id, emLink12 );
+		
+		//complete link - link13
+		Id link13id = new IdImpl("link13");
+		SortedMap<String, Double> emLink13 = new TreeMap<String, Double>();
+		Double c2link13v=.0003, colink13v=.008, fclink13v=.03,
+				hclink13v=.7, nmlink13v=6., n2link13v=40.,
+				nxlink13v=800., pmlink13v=1000., solink13v=90000.;
+		emLink13.put(c2, c2link13v); emLink13.put(co, colink13v); emLink13.put(fc, fclink13v); 
+		emLink13.put(hc, hclink13v); emLink13.put(nm, nmlink13v); emLink13.put(n2, n2link13v); 
+		emLink13.put(nx, nxlink13v); emLink13.put(pm, pmlink13v); emLink13.put(so, solink13v);
+		totalEmissions.put(new IdImpl("link13"), emLink13 );
+		
+		//missing map - link14
+		Id link14id = new IdImpl("link14");
+		//TODO does not work
+		totalEmissions.put(new IdImpl("link14"), null);
+		//TODO delete this workaround!
+		SortedMap<String, Double> emLink14 = new TreeMap<String, Double>();
+		totalEmissions.put(new IdImpl("link14"), emLink14);
+		
+		//partial map - link 23
+		Id link23id = new IdImpl("link23");
+		SortedMap<String, Double> emLink23 = new TreeMap<String, Double>();
+		Double nxlink23v=900., pmlink23v=6000., solink23v=20000.;
+		emLink23.put(nx, nxlink23v); emLink23.put(pm, pmlink23v); emLink23.put(so, solink23v);
+		totalEmissions.put(new IdImpl("link23"), emLink23 );
+		
+		//empty map - link 24
+		Id link24id = new IdImpl("link24");
+		SortedMap<String, Double> emLink24 = new TreeMap<String, Double>();
+		totalEmissions.put(new IdImpl("link24"), emLink24);
+		
+		//not put into totalEmissionsMap - link 34
+		Id link34id = new IdImpl("link34");
+		
+		eu.setNonCalculatedEmissionsForNetwork(network, totalEmissions);
+		//each link of the network and each type of emission
+		for(Link link: network.getLinks().values()){
+			
+			Id linkId = sc.createId(link.getId().toString());
+
+			if(link.getId().toString()!=sc.createId("link34").toString()){
+				Assert.assertTrue(totalEmissions.containsKey(linkId));
+				SortedMap<String, Double> emissionMapForLink = totalEmissions.get(linkId);
+				for(String pollutant: localPolls){
+					Assert.assertTrue(pollutant + "not found for link " +linkId.toString(), 
+							emissionMapForLink.containsKey(pollutant));
+					Assert.assertEquals(Double.class, emissionMapForLink.get(pollutant).getClass());
+				}
+			}else{
+				//TODO benjamin fragen
+				Assert.assertFalse("not in emission map", totalEmissions.containsKey(sc.createId(link.getId().toString())));
+			}			
+		}
+		//check values
+		//link 12 and 13
+		Assert.assertEquals(totalEmissions.get(link12id).get(c2), c2link12v, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link12id).get(co), colink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link12id).get(fc), fclink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link12id).get(hc), hclink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link12id).get(nm), nmlink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link12id).get(n2), n2link12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link12id).get(nx), nxlink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link12id).get(pm), pmlink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link12id).get(so), solink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link13id).get(c2), c2link13v, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link13id).get(co), colink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link13id).get(fc), fclink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link13id).get(hc), hclink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link13id).get(nm), nmlink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link13id).get(n2), n2link13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link13id).get(nx), nxlink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link13id).get(pm), pmlink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link13id).get(so), solink13v,  MatsimTestUtils.EPSILON);
+		
+		//link 14
+		//TODO siehe oben -> benjamin fragen
+		
+		//link 23 - partial
+		Assert.assertEquals(totalEmissions.get(link23id).get(c2), .0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link23id).get(co), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link23id).get(fc), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link23id).get(hc), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link23id).get(nm), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link23id).get(n2), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link23id).get(nx), nxlink23v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link23id).get(pm), pmlink23v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link23id).get(so), solink23v,  MatsimTestUtils.EPSILON);
+		
+		//link 24 - empty
+		Assert.assertEquals(totalEmissions.get(link24id).get(c2), .0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link24id).get(co), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link24id).get(fc), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link24id).get(hc), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link24id).get(nm), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link24id).get(n2), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link24id).get(nx), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link24id).get(pm), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissions.get(link24id).get(so), .0,  MatsimTestUtils.EPSILON);
+		
+	}
+	
+
+	private void addLinksToNetwork(Network nw, Scenario sc) {
+		NetworkImpl network = (NetworkImpl) sc.getNetwork();
+		Node node1 = network.createAndAddNode(sc.createId("node1"), sc.createCoord(.0, .0));
+		Node node2 = network.createAndAddNode(sc.createId("node2"), sc.createCoord(.0, 1000.));
+		Node node3 = network.createAndAddNode(sc.createId("node3"), sc.createCoord(1000., .0));
+		Node node4 = network.createAndAddNode(sc.createId("node4"), sc.createCoord(1000., 1000.));
+		
+		network.createAndAddLink(sc.createId("link12"), node1, node2, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(sc.createId("link13"), node1, node3, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(sc.createId("link14"), node1, node4, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(sc.createId("link23"), node2, node3, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(sc.createId("link24"), node2, node4, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(sc.createId("link34"), node3, node4, 1000., 20., 3600, 2); //w/o orig id and type
+	}
+
 	@Test
 	public final void testConvertWarmPollutantMap2String(){
 		EmissionUtils eu = new EmissionUtils();

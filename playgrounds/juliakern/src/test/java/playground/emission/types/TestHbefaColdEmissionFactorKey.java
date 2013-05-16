@@ -28,7 +28,14 @@ import playground.vsp.emissions.types.HbefaColdEmissionFactorKey;
 import playground.vsp.emissions.types.HbefaVehicleAttributes;
 import playground.vsp.emissions.types.HbefaVehicleCategory;
 
-//test for playground.vsp.emissions.types.HbefaColdEmissionFactorKey
+/*
+	* test for playground.vsp.emissions.types.HbefaColdEmissionFactorKey
+	* 1 test equals method for correct input: two equal hbefaColdEmissionFactorKey objects, two unequal objects
+	* 2 test equals method for incorrect input: one correct hbefaColdEmissionFactorKey against one with a missing 
+	* argument
+	*  
+	*  @author julia
+	*/
 
 public class TestHbefaColdEmissionFactorKey {
 	
@@ -54,13 +61,6 @@ public class TestHbefaColdEmissionFactorKey {
 	public final void testEqualsForCorrectObjects(){
 
 		setUp();
-
-		//TODO equals funktioniert nicht auf leeren Objekten weil getHbefaVehicleCat 'null' ... 
-		//in die eine richtung!!!
-		// vollstaendigeDaten.equals(unvollstaendigeDaten) -> Nullpointer
-		// unvollstaendigeDaten.equals(vollstaendigeDaten) -> laeuft, Rueckgabe false
-		// dass das so ist, wird jetzt getestet!
-
 
 		//normal HbefaColdEmissionFactorKey	- default case
 		HbefaColdEmissionFactorKey normal = new HbefaColdEmissionFactorKey();
@@ -105,8 +105,8 @@ public class TestHbefaColdEmissionFactorKey {
 		boolean equalErr = false;
 		String message2;
 		
-		//wenn eins der 'ersten' vier Attribute fehlt, soll equal fehlschlagen
-		//HbefaVehicleCategory hbefaVehicleCategory; ColdPollutant hbefaComponent;Integer hbefaParkingTime;Integer hbefaDistance;
+		// completeData.equals(partialData) -> return false
+		// uncompleteData.equals(completeData) -> throw nullpointer
 		
 		//normal HbefaColdEmissionFactorKey
 		HbefaColdEmissionFactorKey normal = new HbefaColdEmissionFactorKey();

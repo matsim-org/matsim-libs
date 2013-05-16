@@ -25,14 +25,20 @@ import org.junit.Test;
 
 import playground.vsp.emissions.types.HbefaVehicleAttributes;
 
-//test for playground.vsp.emissions.types.HbefaVehicleAttributes
+/*
+ * test for playground.vsp.emissions.types.HbefaVehicleAttributes
+ * 1 test equals method for two correct objects
+ * 2 test equals method for one correct and one partially initiated object
+ * 3 test the initialization
+ */
 
 public class TestHbefaVehicleAttributes {
 	String technology = "technology", sizeClass = "size class", concept = "concept";
 	
 	@Test
 	public final void testEqualsForCorrectObjects(){
-		//zwei gleiche, korrekte Objekte - keine Defaultwerte!
+		
+		//two equal objects - no default values
 		
 		HbefaVehicleAttributes normal = new HbefaVehicleAttributes();
 		setToNormal(normal);
@@ -47,7 +53,7 @@ public class TestHbefaVehicleAttributes {
 		Assert.assertTrue(assertErrorMessage, normal.equals(compare));
 		Assert.assertTrue(assertErrorMessage, compare.equals(normal));
 		
-		//zwei ungleiche, korrekte Objekte
+		//two unequal but correct objects
 		HbefaVehicleAttributes differentValues = new HbefaVehicleAttributes();
 		
 		//different em concepts
@@ -81,13 +87,14 @@ public class TestHbefaVehicleAttributes {
 	
 	@Test
 	public final void testEqualsForIncorrectObjects(){
-		//korrektes Objekt - keine Defaultwerte!
+		//correct object - no default values
 
 		String message; 
 		
 		HbefaVehicleAttributes normal = new HbefaVehicleAttributes();
 		
-		//ein korrektes, ein unvollstaendiges
+		//one correct object, one partial objects
+		
 		//em concept missing
 		setToNormal(normal);
 		HbefaVehicleAttributes noEmConcept = new HbefaVehicleAttributes();

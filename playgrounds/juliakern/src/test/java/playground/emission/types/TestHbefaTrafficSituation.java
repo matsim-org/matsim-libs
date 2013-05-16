@@ -28,7 +28,7 @@ package playground.emission.types;
 
 public class TestHbefaTrafficSituation {
 
-	//nothing to test here?
+	//nothing to test here
 	//HbefaTrafficSituation is an enum and an empty constructor
 
 }

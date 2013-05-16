@@ -20,10 +20,15 @@
 
 package playground.emission.types;
 
+
+/*
+ * 	nothing to test here
+ * warmPollutant is an enum
+ * unlike cold pollutant warmPollutant has no getValues method
+ */
+
 public class TestWarmPollutant {
 	
-	//nothing to test here
-	//warmPollutant is an enum
-	//im Gegensatz zu Cold Pol gibts keine getValue-Methode
+
 
 }

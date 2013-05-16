@@ -24,7 +24,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import playground.vsp.emissions.types.ColdPollutant;
 
-//test for playground.vsp.emissions.types.ColdPollutant
+/*
+ * test for playground.vsp.emissions.types.ColdPollutant
+ * test getValues method
+ */
+
+
 
 public class TestColdPollutant {
 	
@@ -32,6 +37,12 @@ public class TestColdPollutant {
 	public final void testGetValue(){
 		//not much to test here since ColdPollutant is an enum
 		ColdPollutant cp = null;
+		Assert.assertEquals(ColdPollutant.CO, cp.getValue("CO"));
+		Assert.assertNotSame(ColdPollutant.FC, cp.getValue("CO"));
+		Assert.assertEquals(ColdPollutant.HC, cp.getValue("HC"));
+		Assert.assertNotSame(ColdPollutant.getValue("CO"), ColdPollutant.getValue("FC"));
+
+		cp = ColdPollutant.NO2;
 		Assert.assertEquals(ColdPollutant.CO, cp.getValue("CO"));
 		Assert.assertNotSame(ColdPollutant.FC, cp.getValue("CO"));
 		Assert.assertEquals(ColdPollutant.HC, cp.getValue("HC"));
