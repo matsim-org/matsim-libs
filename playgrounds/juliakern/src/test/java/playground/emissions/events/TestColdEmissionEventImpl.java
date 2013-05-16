@@ -38,9 +38,6 @@ public class TestColdEmissionEventImpl {
 	@Test
 	public final void testGetAttributes(){
 		
-		//TODO error messages
-		
-		String message ="";
 		//values
 		Double co = 20., fc = 30., hc=4., nm=5., n2=6., nx=7., pm=8.;
 		
@@ -58,16 +55,15 @@ public class TestColdEmissionEventImpl {
 		ColdEmissionEventImpl ce = new ColdEmissionEventImpl(0.0, linkId, vehicleId, coldEmissionsMap);
 		
 		Map<String, String> ceg = ce.getAttributes();
-		Assert.assertEquals(message, Double.parseDouble(ceg.get("CO")), co, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(message, Double.parseDouble(ceg.get("FC")), fc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(message, Double.parseDouble(ceg.get("HC")), hc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(message, Double.parseDouble(ceg.get("NMHC")), nm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(message, Double.parseDouble(ceg.get("NO2")), n2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(message, Double.parseDouble(ceg.get("NOX")), nx, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(message, Double.parseDouble(ceg.get("PM")), pm, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the CO value of this cold emission event was "+ Double.parseDouble(ceg.get("CO"))+ "but should have been "+ co, Double.parseDouble(ceg.get("CO")), co, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the FC value of this cold emission event was "+ Double.parseDouble(ceg.get("FC"))+ "but should have been "+ fc, Double.parseDouble(ceg.get("FC")), fc, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the HC value of this cold emission event was "+ Double.parseDouble(ceg.get("HC"))+ "but should have been "+ hc, Double.parseDouble(ceg.get("HC")), hc, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NMHC value of this cold emission event was "+ Double.parseDouble(ceg.get("NMHC"))+ "but should have been "+ nm, Double.parseDouble(ceg.get("NMHC")), nm, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NO2 value of this cold emission event was "+ Double.parseDouble(ceg.get("NO2"))+ "but should have been "+ n2, Double.parseDouble(ceg.get("NO2")), n2, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NOX value of this cold emission event was "+ Double.parseDouble(ceg.get("NOX"))+ "but should have been "+ nx, Double.parseDouble(ceg.get("NOX")), nx, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the PM value of this cold emission event was "+ Double.parseDouble(ceg.get("PM"))+ "but should have been "+ pm, Double.parseDouble(ceg.get("PM")), pm, MatsimTestUtils.EPSILON);
 		
-		
-		//hier: leere Map, null usw.
+		//empty map, no map
 		Map<ColdPollutant, Double> emptyMap = new HashMap<ColdPollutant, Double>();
 		ColdEmissionEventImpl emptyMapEvent = new ColdEmissionEventImpl(22., linkId, vehicleId, emptyMap);
 		
@@ -86,7 +82,6 @@ public class TestColdEmissionEventImpl {
 		int numberOfColdPollutants = ColdPollutant.values().length;	
 
 
-		//neben den emissionen kennen events time, type, linkId, vehicleId = 4
 		int halfNullPointers =0;
 		
 		for(ColdPollutant cp : ColdPollutant.values()){
@@ -110,15 +105,16 @@ public class TestColdEmissionEventImpl {
 		}
 		Assert.assertEquals(numberOfColdPollutants, halfNullPointers);
 		
+		//event parameters beside emissions: time, type, linkId, vehicleId = 4
 		int numberOfEventAttributes; // = 4; 
 		//linkId, vehicleId, coldEmissions
 		numberOfEventAttributes = ColdEmissionEventImpl.class.getDeclaredFields().length;
 		//time as double, time as string, type
 		numberOfEventAttributes += ColdEmissionEventImpl.class.getSuperclass().getDeclaredFields().length;
 
-		//-1 weil die Zeit in der Ausgabe von getAttributes nur einmal auftaucht
-		//-1 weil in der Ausgabe von getAttributes die Map der Pollutants nicht mehr als ein Attribut auftaucht
-		//stattdessen werden die Polls einzeln aufgezaehlt, also plus deren Anzahl
+		//-1 because the time parameter appears only once in the output of getAttributes
+		//-1 because getAttributes does not return the list of pollutants
+		//but each pollutant seperatly -> +1 for each
 		Assert.assertEquals(numberOfEventAttributes -1 -1 +numberOfColdPollutants, ceg.size());
 
 		

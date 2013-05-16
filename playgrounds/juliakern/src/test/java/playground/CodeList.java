@@ -35,4 +35,11 @@ public class CodeList {
 	 * Warm Pollutant hat keine getValue-Methode, cold schon
 	 */
 	
+	/*
+	 * EmissionUtils
+	 * testEmissionUtils - 290 warum sortierte listen?
+	 * ursprueglich EmissionUtils 258
+	 * viel oefter zugreifen als schreiben?
+	 */
+	
 }
