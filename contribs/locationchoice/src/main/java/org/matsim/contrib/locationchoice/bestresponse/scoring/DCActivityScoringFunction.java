@@ -173,6 +173,23 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / DCActivityScoringFunction.DEFAULT_PRIORITY);
 				this.zeroUtilityDurations.put(act.getType(), zeroUtilityDuration);
 			}
+			
+			// disutility if stopping too early
+			double earliestEndTime = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "earliestEndTime_" + act.getType());	
+			if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
+			}
+
+			// disutility if going to away to late
+			if (activityEnd < departureTime) {
+				tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
+			}
+
+			// disutility if duration was too short
+			double minimalDuration = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "minimalDuration_" + act.getType());	
+			if ((minimalDuration >= 0) && (duration < minimalDuration)) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
+			}
 
 			if (duration > 0) {
 				
@@ -200,23 +217,6 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				}
 			} else {
 				tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
-			}
-
-			// disutility if stopping too early
-			double earliestEndTime = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "earliestEndTime_" + act.getType());	
-			if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
-			}
-
-			// disutility if going to away to late
-			if (activityEnd < departureTime) {
-				tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
-			}
-
-			// disutility if duration was too short
-			double minimalDuration = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "minimalDuration_" + act.getType());	
-			if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
 			}
 		return tmpScore;
 	}
