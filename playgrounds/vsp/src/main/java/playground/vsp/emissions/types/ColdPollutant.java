@@ -39,6 +39,7 @@ public enum ColdPollutant {
 		return key;
 	}
 	
+	//TODO: Is this really neccessary? WarmPollutant does not have this method...jk, bk mai'13
 	public static ColdPollutant getValue(String key){
 		for(ColdPollutant cp : ColdPollutant.values()){
 			String cpString = cp.getText();
