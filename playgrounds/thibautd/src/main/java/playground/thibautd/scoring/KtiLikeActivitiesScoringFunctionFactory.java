@@ -38,8 +38,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.meisterk.kti.scoring.ActivityScoringFunction;
-
 import playground.thibautd.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
@@ -85,8 +83,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
 					blackList,
-					// note: this is the meisterk's KTI one
-					new ActivityScoringFunction(
+					new KtiActivityScoring(
 						plan,
 						params,
 						facilityPenalties,
