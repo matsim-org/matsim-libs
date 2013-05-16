@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -57,7 +58,6 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
 	private ActTypeConverter converter;
 	private ObjectAttributes prefs;
-	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private DestinationChoiceBestResponseContext dcContext;
 		
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext dcContext) {
@@ -68,7 +68,6 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		this.params = dcContext.getParams();
 		this.converter = dcContext.getConverter();
 		this.prefs = dcContext.getPrefsAttributes();
-		this.facilityPenalties = facilityPenalties;
 		this.dcContext = dcContext;
 	}
 	
@@ -169,7 +168,12 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				if (this.converter.convertType(act.getType()).equals(this.converter.convertType("s")) &&
 						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnExp()) > 0.0 &&
 						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnFactor()) > 0.0) {
-					FacilityPenalty penalty = this.facilityPenalties.get(act.getFacilityId());
+					FacilityPenalty penalty = this.dcContext.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties().get(act.getFacilityId());
+					
+					if (penalty == null) {
+						log.info(act.getFacilityId().toString() + " " + act.getType());
+					}
+					
 					penaltyFactor = penalty.getCapacityPenaltyFactor(activityStart, activityEnd);
 				}
 				
