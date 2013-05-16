@@ -21,8 +21,10 @@ package org.matsim.contrib.locationchoice.bestresponse.scoring;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,6 +35,7 @@ import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -59,6 +62,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private ActTypeConverter converter;
 	private ObjectAttributes prefs;
 	private DestinationChoiceBestResponseContext dcContext;
+	private List<ScoringPenalty> penalty = null;
 		
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext dcContext) {
 		super(dcContext.getParams());
@@ -69,6 +73,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		this.converter = dcContext.getConverter();
 		this.prefs = dcContext.getPrefsAttributes();
 		this.dcContext = dcContext;
+		this.penalty = new Vector<ScoringPenalty>();
 	}
 	
 	@Override
@@ -80,6 +85,13 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 						BestReplyDestinationChoice.useScaleEpsilonFromConfig);
 			}
 		}
+		// reduce score by penalty from capacity restraints
+		Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
+		while (pen_it.hasNext()){
+			ScoringPenalty penalty = pen_it.next();
+			this.score -=penalty.getPenalty();
+		}
+		this.penalty.clear();
 	}
 	
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
@@ -162,27 +174,30 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				this.zeroUtilityDurations.put(act.getType(), zeroUtilityDuration);
 			}
 
-			if (duration > 0) {		
+			if (duration > 0) {
 				
-				double penaltyFactor = 0.0;
-				if (this.converter.convertType(act.getType()).equals(this.converter.convertType("s")) &&
-						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnExp()) > 0.0 &&
-						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnFactor()) > 0.0) {
-					FacilityPenalty penalty = this.dcContext.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties().get(act.getFacilityId());
-					
-					if (penalty == null) {
-						log.info(act.getFacilityId().toString() + " " + act.getType());
-						log.info(this.dcContext.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties().size());
-					}
-					
-					penaltyFactor = penalty.getCapacityPenaltyFactor(activityStart, activityEnd);
-				}
-				
-				double utilPerf = (1.0 - penaltyFactor) * this.params.marginalUtilityOfPerforming_s * typicalDuration
+				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 						* Math.log((duration / 3600.0) / zeroUtilityDuration);
 				
 				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+				
+				if (this.converter.convertType(act.getType()).equals(this.converter.convertType("s")) &&
+						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnExp()) > 0.0 &&
+						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnFactor()) > 0.0) {
+					
+						/* Penalty due to facility load: --------------------------------------------
+						 * Store the temporary score to reduce it in finish() proportionally
+						 * to score and dep. on facility load.
+						 * TODO: maybe checking if activity is movable for this person (discussion)
+						 */
+						if (!act.getType().startsWith("h")) {
+							this.penalty.add(new ScoringPenalty(activityStart, activityEnd,
+									this.dcContext.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties().
+									get(act.getFacilityId()), tmpScore));
+						}
+						//---------------------------------------------------------------------------
+				}
 			} else {
 				tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
 			}
