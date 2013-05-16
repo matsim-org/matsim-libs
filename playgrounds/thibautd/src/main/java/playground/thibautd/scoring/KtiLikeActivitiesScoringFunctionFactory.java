@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -56,6 +57,7 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
  */
 public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionFactory {
 
+	private final StageActivityTypes blackList;
 	private final KtiLikeScoringConfigGroup ktiConfig;
 	private final CharyparNagelScoringParameters params;
     private final Scenario scenario;
@@ -65,21 +67,15 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 	// constructors
 	// /////////////////////////////////////////////////////////////////////////
     public KtiLikeActivitiesScoringFunctionFactory(
+			final StageActivityTypes typesNotToScore,
 			final KtiLikeScoringConfigGroup ktiConfig,
 			final PlanCalcScoreConfigGroup config,
-			final Scenario scenario) {
-		this( ktiConfig , config , new TreeMap<Id, FacilityPenalty>() , scenario );
-	}
-
-    public KtiLikeActivitiesScoringFunctionFactory(
-			final KtiLikeScoringConfigGroup ktiConfig,
-			final PlanCalcScoreConfigGroup config,
-			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final Scenario scenario) {
 		this.ktiConfig = ktiConfig;
 		this.params = new CharyparNagelScoringParameters(config);
 		this.scenario = scenario;
-		this.facilityPenalties = facilityPenalties;
+		this.facilityPenalties = new TreeMap<Id, FacilityPenalty>();
+		this.blackList = typesNotToScore;
 	}
 
 	@Override
@@ -88,8 +84,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
-					// TODO also use types from TripRouter
-					JointActingTypes.JOINT_STAGE_ACTS,
+					blackList,
 					// note: this is the meisterk's KTI one
 					new ActivityScoringFunction(
 						plan,

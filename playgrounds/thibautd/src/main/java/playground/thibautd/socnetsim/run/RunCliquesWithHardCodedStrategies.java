@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
+import java.util.Arrays;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -30,8 +32,10 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.pt.PtConstants;
 
 import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
 import playground.thibautd.scoring.KtiLikeScoringConfigGroup;
@@ -39,6 +43,7 @@ import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -162,6 +167,11 @@ public class RunCliquesWithHardCodedStrategies {
 					.withScoringFunctionFactory(
 							scoringFunctionConf.isUseKtiScoring() ?
 							new KtiLikeActivitiesScoringFunctionFactory(
+								new StageActivityTypesImpl(
+										Arrays.asList(
+												PtConstants.TRANSIT_ACTIVITY_TYPE,
+												JointActingTypes.PICK_UP,
+												JointActingTypes.DROP_OFF) ),
 								(KtiLikeScoringConfigGroup) config.getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
 								config.planCalcScore(),
 								scenario) :
