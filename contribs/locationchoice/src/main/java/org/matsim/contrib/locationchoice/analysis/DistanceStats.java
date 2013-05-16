@@ -20,6 +20,7 @@
 package org.matsim.contrib.locationchoice.analysis;
 
 import org.matsim.analysis.Bins;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -76,7 +77,8 @@ public class DistanceStats implements IterationEndsListener {
 			}		
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
-					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type))) {
+					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
+							plan.getPreviousLeg((Activity)pe).getMode().equals(TransportMode.car)) {
 						double distance = ((CoordImpl)((Activity) pe).getCoord()).calcDistance(
 								plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
 						this.bins.addVal(distance, 1.0);
