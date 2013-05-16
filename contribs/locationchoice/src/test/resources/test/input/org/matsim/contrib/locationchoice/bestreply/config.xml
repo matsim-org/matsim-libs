@@ -42,7 +42,7 @@
 	<!-- ====================================================================== -->
 	
 	<module name="locationchoice">
-		<param name="flexible_types" value="shopping,leisure"/>
+		<param name="flexible_types" value="shop,leisure"/>
 		<param name="algorithm" value="bestResponse" />	
 		<param name="destinationSamplePercent" value="50"/>
 		<param name="epsilonScaleFactors" value="1.0, 1.0"/>
