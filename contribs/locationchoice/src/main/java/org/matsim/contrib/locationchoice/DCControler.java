@@ -70,9 +70,12 @@ public class DCControler extends Controler {
 	protected void loadControlerListeners() {
 		this.dcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
 		
+		if (Double.parseDouble(super.getConfig().locationchoice().getRestraintFcnExp()) > 0.0 &&
+		Double.parseDouble(super.getConfig().locationchoice().getRestraintFcnFactor()) > 0.0) {
 		TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
-		this.getScenario().addScenarioElement(facilityPenalties);
-		this.addControlerListener(new FacilitiesLoadCalculator(facilityPenalties));
+			this.getScenario().addScenarioElement(facilityPenalties);
+			this.addControlerListener(new FacilitiesLoadCalculator(facilityPenalties));
+		}
 		
 		this.addControlerListener(new DestinationChoiceInitializer(this.dcContext));
 		super.loadControlerListeners();

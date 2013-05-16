@@ -58,6 +58,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private ActTypeConverter converter;
 	private ObjectAttributes prefs;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
+	private DestinationChoiceBestResponseContext dcContext;
 		
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext dcContext) {
 		super(dcContext.getParams());
@@ -68,6 +69,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		this.converter = dcContext.getConverter();
 		this.prefs = dcContext.getPrefsAttributes();
 		this.facilityPenalties = facilityPenalties;
+		this.dcContext = dcContext;
 	}
 	
 	@Override
@@ -161,11 +163,17 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				this.zeroUtilityDurations.put(act.getType(), zeroUtilityDuration);
 			}
 
-			if (duration > 0) {				
-				FacilityPenalty penalty = this.facilityPenalties.get(act.getFacilityId());
-				double penaltyFactor = penalty.getCapacityPenaltyFactor(activityStart, activityEnd);
+			if (duration > 0) {		
 				
-				double utilPerf = penaltyFactor * this.params.marginalUtilityOfPerforming_s * typicalDuration
+				double penaltyFactor = 0.0;
+				if (this.converter.convertType(act.getType()).equals(this.converter.convertType("s")) &&
+						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnExp()) > 0.0 &&
+						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnFactor()) > 0.0) {
+					FacilityPenalty penalty = this.facilityPenalties.get(act.getFacilityId());
+					penaltyFactor = penalty.getCapacityPenaltyFactor(activityStart, activityEnd);
+				}
+				
+				double utilPerf = (1.0 - penaltyFactor) * this.params.marginalUtilityOfPerforming_s * typicalDuration
 						* Math.log((duration / 3600.0) / zeroUtilityDuration);
 				
 				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
