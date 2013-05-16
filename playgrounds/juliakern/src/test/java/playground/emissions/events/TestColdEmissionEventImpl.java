@@ -33,25 +33,24 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.vsp.emissions.events.ColdEmissionEventImpl;
 import playground.vsp.emissions.types.ColdPollutant;
 
+/*
+ * test for playground.vsp.emissions.events.ColdEmissionEventImpl
+ * 1 test normal functionality
+ * 2 test incomplete data
+ * 3 test the number of attributes returned
+ */
+
 public class TestColdEmissionEventImpl {
-	
+			Double co = 20., fc = 30., hc=4., nm=5., n2=6., nx=7., pm=8.;
+					Id vehicleId =new IdImpl("veh 1");
+					Id linkId = new IdImpl("link 1");
 	@Test
-	public final void testGetAttributes(){
-		
-		//values
-		Double co = 20., fc = 30., hc=4., nm=5., n2=6., nx=7., pm=8.;
-		
+	public final void testGetAttributesForCompleteEmissionMaps(){
+		//test normal functionality
+
+		//create a normal event impl
 		Map<ColdPollutant, Double> coldEmissionsMap = new HashMap<ColdPollutant, Double>();
-		coldEmissionsMap.put(ColdPollutant.CO, co);
-		coldEmissionsMap.put(ColdPollutant.FC, fc);
-		coldEmissionsMap.put(ColdPollutant.HC, hc);
-		coldEmissionsMap.put(ColdPollutant.NMHC, nm);
-		coldEmissionsMap.put(ColdPollutant.NO2, n2);
-		coldEmissionsMap.put(ColdPollutant.NOX, nx);
-		coldEmissionsMap.put(ColdPollutant.PM, pm);
-		
-		Id vehicleId =new IdImpl("veh 1");
-		Id linkId = new IdImpl("link 1");
+		setColdEmissions(coldEmissionsMap);
 		ColdEmissionEventImpl ce = new ColdEmissionEventImpl(0.0, linkId, vehicleId, coldEmissionsMap);
 		
 		Map<String, String> ceg = ce.getAttributes();
@@ -63,53 +62,95 @@ public class TestColdEmissionEventImpl {
 		Assert.assertEquals("the NOX value of this cold emission event was "+ Double.parseDouble(ceg.get("NOX"))+ "but should have been "+ nx, Double.parseDouble(ceg.get("NOX")), nx, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("the PM value of this cold emission event was "+ Double.parseDouble(ceg.get("PM"))+ "but should have been "+ pm, Double.parseDouble(ceg.get("PM")), pm, MatsimTestUtils.EPSILON);
 		
-		//empty map, no map
+	}
+
+	private void setColdEmissions(Map<ColdPollutant, Double> coldEmissionsMap) {
+		coldEmissionsMap.put(ColdPollutant.CO, co);
+		coldEmissionsMap.put(ColdPollutant.FC, fc);
+		coldEmissionsMap.put(ColdPollutant.HC, hc);
+		coldEmissionsMap.put(ColdPollutant.NMHC, nm);
+		coldEmissionsMap.put(ColdPollutant.NO2, n2);
+		coldEmissionsMap.put(ColdPollutant.NOX, nx);
+		coldEmissionsMap.put(ColdPollutant.PM, pm);
+	}
+	
+	@Test
+	public final void testGetAttributesForIncompleteMaps(){
+		//the getAttributesMethod should
+		// - return null if the emission map is empty
+		// - throw NullPointerExceptions if the emission values are not set
+		// - throw NullPointerExceptions if no emission map is assigned 
+		
+		//empty map
 		Map<ColdPollutant, Double> emptyMap = new HashMap<ColdPollutant, Double>();
 		ColdEmissionEventImpl emptyMapEvent = new ColdEmissionEventImpl(22., linkId, vehicleId, emptyMap);
 		
-		Map<ColdPollutant, Double> halfMap = new HashMap<ColdPollutant, Double>();
-		halfMap.put(ColdPollutant.CO, null);
-		halfMap.put(ColdPollutant.FC, null);
-		halfMap.put(ColdPollutant.HC, null);
-		halfMap.put(ColdPollutant.NMHC, null);
-		halfMap.put(ColdPollutant.NO2, null);
-		halfMap.put(ColdPollutant.NOX, null);
-		halfMap.put(ColdPollutant.PM, null);
+		//values not set
+		Map<ColdPollutant, Double> valuesNotSet = new HashMap<ColdPollutant, Double>();
+		valuesNotSet.put(ColdPollutant.CO, null);
+		valuesNotSet.put(ColdPollutant.FC, null);
+		valuesNotSet.put(ColdPollutant.HC, null);
+		valuesNotSet.put(ColdPollutant.NMHC, null);
+		valuesNotSet.put(ColdPollutant.NO2, null);
+		valuesNotSet.put(ColdPollutant.NOX, null);
+		valuesNotSet.put(ColdPollutant.PM, null);
+		ColdEmissionEventImpl valuesNotSetEvent = new ColdEmissionEventImpl(44., linkId, vehicleId, valuesNotSet);
 		
-		ColdEmissionEventImpl halfEvent = new ColdEmissionEventImpl(44., linkId, vehicleId, halfMap);
+		//no map
+		ColdEmissionEventImpl noMap = new ColdEmissionEventImpl(50., linkId, vehicleId, null);
 		
 		int numberOfColdPollutants = ColdPollutant.values().length;	
 
-		int halfNullPointers = 0;
+		int valNullPointers = 0, noMapNullPointers=0;
 		
 		for(ColdPollutant cp : ColdPollutant.values()){
 			String key= cp.toString();
-			
-			//TODO codeliste: half empty event -- this should fail -> nullpointer
-			//aber es wird null zurueck gegeben... ggf den test hier aendern
 
+			//empty map
 			Assert.assertNull(emptyMapEvent.getAttributes().get(key));
 			
-			//half empty map event
+			//values not set
 			try{
-				halfEvent.getAttributes().get(key);
+				valuesNotSetEvent.getAttributes().get(key);
 			}
 			catch(NullPointerException e){
-				halfNullPointers ++;
+				valNullPointers ++;
+			}
+			
+			//no map
+			try{
+				noMap.getAttributes().get(key);
+			}
+			catch(NullPointerException e){
+				noMapNullPointers++;
 			}
 		}
-		Assert.assertEquals(numberOfColdPollutants, halfNullPointers);
+		Assert.assertEquals(numberOfColdPollutants, valNullPointers);
+		Assert.assertEquals(numberOfColdPollutants, noMapNullPointers);
+	}
+	
+	@Test
+	public final void testgetAttributes_numberOfAttributes(){
+		//the number of attributes returned by getAttributes is related to the number of fields of coldEmissionEvent
 		
-		//event parameters beside emissions: time, type, linkId, vehicleId = 4
-		int numberOfEventAttributes; // = 4; 
-		//linkId, vehicleId, coldEmissions
-		numberOfEventAttributes = ColdEmissionEventImpl.class.getDeclaredFields().length;
-		//time as double, time as string, type
-		numberOfEventAttributes += ColdEmissionEventImpl.class.getSuperclass().getDeclaredFields().length;
+		// create a normal event impl
+		Map<ColdPollutant, Double> coldEmissionsMap = new HashMap<ColdPollutant, Double>();
+		setColdEmissions(coldEmissionsMap);
+		ColdEmissionEventImpl ce = new ColdEmissionEventImpl(0.0, linkId, vehicleId, coldEmissionsMap);
+		Map<String, String> ceg = ce.getAttributes();
 
-		//-1 because the time parameter appears only once in the output of getAttributes
-		//-1 because getAttributes does not return the list of pollutants
-		//but each pollutant seperatly -> +1 for each
-		Assert.assertEquals(numberOfEventAttributes -1 -1 + numberOfColdPollutants, ceg.size());
+		int numberOfColdPollutants = ColdPollutant.values().length;	
+		
+		// event parameters beside emissions: time, type, linkId, vehicleId = 4
+		int numberOfEventAttributes; // = 4; 
+		// linkId, vehicleId, coldEmissions
+		numberOfEventAttributes = ColdEmissionEventImpl.class.getFields().length;
+		//time as double, time as string, type
+
+		// -1 because the event type appears twice - once from the coldEmissionEvent and once from the superclass event
+		// the list of pollutants is not a field of coldEmissionEventImpl
+		// getAttributes does return each pollutant separately
+		// -> +1 for each pollutant
+		Assert.assertEquals(numberOfEventAttributes -1 + numberOfColdPollutants, ceg.size());
 	}
 }
