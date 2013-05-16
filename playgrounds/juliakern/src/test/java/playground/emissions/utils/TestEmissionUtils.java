@@ -28,7 +28,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -656,7 +655,7 @@ public class TestEmissionUtils {
 	
 
 
-	@Test @Ignore
+	@Test 
 	public final void testSetNonCalculatedEmissionsForNetwork(){
 		
 		//IN: network,totalEmissions 
@@ -701,11 +700,7 @@ public class TestEmissionUtils {
 		
 		//missing map - link14
 		Id link14id = new IdImpl("link14");
-		//TODO does not work
 		totalEmissions.put(new IdImpl("link14"), null);
-		//TODO delete this workaround!
-		SortedMap<String, Double> emLink14 = new TreeMap<String, Double>();
-		totalEmissions.put(new IdImpl("link14"), emLink14);
 		
 		//partial map - link 23
 		Id link23id = new IdImpl("link23");
@@ -727,7 +722,6 @@ public class TestEmissionUtils {
 		for(Link link: network.getLinks().values()){
 			
 			Id linkId = sc.createId(link.getId().toString());
-
 
 				Assert.assertTrue(totalEmissions.containsKey(linkId));
 				SortedMap<String, Double> emissionMapForLink = totalEmissions.get(linkId);
@@ -759,8 +753,11 @@ public class TestEmissionUtils {
 		Assert.assertEquals(totalEmissions.get(link13id).get(pm), pmlink13v,  MatsimTestUtils.EPSILON);
 		Assert.assertEquals(totalEmissions.get(link13id).get(so), solink13v,  MatsimTestUtils.EPSILON);
 		
-		//link 14
-		//TODO siehe oben -> benjamin fragen
+		//link 14 and 34
+		for(String pollutant: localPolls){
+			Assert.assertEquals(totalEmissions.get(link14id).get(pollutant), .0, MatsimTestUtils.EPSILON);
+			Assert.assertEquals(totalEmissions.get(link34id).get(pollutant), .0, MatsimTestUtils.EPSILON);
+		}
 		
 		//link 23 - partial
 		Assert.assertEquals(totalEmissions.get(link23id).get(c2), .0, MatsimTestUtils.EPSILON);
