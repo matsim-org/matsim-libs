@@ -136,9 +136,13 @@ public class EmissionUtils {
 			Id linkId = link.getId();
 			SortedMap<String, Double> emissionType2Value;
 			if(!totalEmissions.containsKey(linkId)){ //link not in map (e.g. no cars on link)
-				totalEmissions.put(linkId, null);
+				emissionType2Value = new TreeMap<String, Double>();
+				for(String pollutant : listOfPollutants){
+					emissionType2Value.put(pollutant, 0.0);
+				}
+				totalEmissions.put(linkId, emissionType2Value);
 			}
-			if(totalEmissions.get(linkId) == null){ // link in map but emissions not set (e.g. no cars on link)
+			else if(totalEmissions.get(linkId) == null){ // link in map but emissions not set (e.g. no cars on link)
 				emissionType2Value = new TreeMap<String, Double>();
 				for(String pollutant : listOfPollutants){
 					emissionType2Value.put(pollutant, 0.0);
