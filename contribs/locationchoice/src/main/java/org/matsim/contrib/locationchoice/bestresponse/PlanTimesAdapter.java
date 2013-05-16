@@ -325,10 +325,14 @@ public class PlanTimesAdapter {
 			leg.setTravelTime(0.0);
 			leg.setArrivalTime(0.0);
 			
-			log.info(person.getId().toString() + " " + toAct.getType());
+			try {
+				PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());	
+				legTravelTime = leg.getTravelTime();
+			} catch (Exception e) {
+				log.info("plan routing not working for person " + person.getId().toString());
+				legTravelTime = Double.MAX_VALUE;
+			}
 			
-			PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());		
-			legTravelTime = leg.getTravelTime();
 //		} else if (mode.equals(TransportMode.pt) && config.scenario().isUseTransit()) {
 //			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
 //			leg.setDepartureTime(0.0);
