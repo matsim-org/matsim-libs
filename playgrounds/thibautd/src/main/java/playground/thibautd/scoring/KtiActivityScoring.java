@@ -109,7 +109,7 @@ public class KtiActivityScoring implements ActivityScoring {
 		final double endTime = act.getEndTime();
 
 		if ( startTime == Time.UNDEFINED_TIME ) {
-			if ( activityWithoutStart == null ) throw new IllegalStateException( "several acts without start" );
+			if ( activityWithoutStart != null ) throw new IllegalStateException( "several acts without start" );
 			activityWithoutStart = act;
 		}
 		else if ( endTime == Time.UNDEFINED_TIME ) {
