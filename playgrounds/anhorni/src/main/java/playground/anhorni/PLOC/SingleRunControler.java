@@ -71,7 +71,7 @@ public class SingleRunControler extends Controler {
 //			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon, actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
   	
 //		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
-		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter));
+		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter, "car"));
 		
 		throw new RuntimeException("integrate LC with listener!");
 	}  

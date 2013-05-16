@@ -75,7 +75,7 @@ public class RunControler extends Controler {
 
 		addControlerListener(new FacilitiesOccupancyCalculator(this.facilityOccupancies, AgentInteraction.numberOfTimeBins, AgentInteraction.scaleNumberOfPersons));
 
-		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter));
-		this.addControlerListener(new DistanceStats(this.config, "best", "l", actTypeConverter));
+		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter, "car"));
+		this.addControlerListener(new DistanceStats(this.config, "best", "l", actTypeConverter, "car"));
 	}
 }
