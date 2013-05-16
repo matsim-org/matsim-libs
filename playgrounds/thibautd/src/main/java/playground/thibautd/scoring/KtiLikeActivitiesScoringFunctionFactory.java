@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -54,6 +55,7 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
  */
 public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionFactory {
 
+	private final KtiLikeScoringConfigGroup ktiConfig;
 	private final CharyparNagelScoringParameters params;
     private final Scenario scenario;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
@@ -62,15 +64,18 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 	// constructors
 	// /////////////////////////////////////////////////////////////////////////
     public KtiLikeActivitiesScoringFunctionFactory(
+			final KtiLikeScoringConfigGroup ktiConfig,
 			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
-		this( config , new TreeMap<Id, FacilityPenalty>() , scenario );
+		this( ktiConfig , config , new TreeMap<Id, FacilityPenalty>() , scenario );
 	}
 
     public KtiLikeActivitiesScoringFunctionFactory(
+			final KtiLikeScoringConfigGroup ktiConfig,
 			final PlanCalcScoreConfigGroup config,
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final Scenario scenario) {
+		this.ktiConfig = ktiConfig;
 		this.params = new CharyparNagelScoringParameters(config);
 		this.scenario = scenario;
 		this.facilityPenalties = facilityPenalties;
@@ -98,12 +103,19 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					LegScoringParameters.createForCar(
 						params ),
 					scenario.getNetwork()));
-		// TODO: adapt costs to travel card (KTI like).
+		// KTI like consideration of influence of travel card
+		// (except that is was not expressed as a ratio)
+		final double utilityOfDistancePt =
+			((PersonImpl) plan.getPerson()).getTravelcards().isEmpty() ?
+				params.marginalUtilityOfDistancePt_m :
+				params.marginalUtilityOfDistancePt_m * ktiConfig.getTravelCardRatio();
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
 					TransportMode.pt,
-					LegScoringParameters.createForPt(
-						params ),
+					new LegScoringParameters(
+						params.constantPt,
+						params.marginalUtilityOfTravelingPT_s,
+						utilityOfDistancePt),
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
