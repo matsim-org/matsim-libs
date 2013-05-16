@@ -172,6 +172,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 					
 					if (penalty == null) {
 						log.info(act.getFacilityId().toString() + " " + act.getType());
+						log.info(this.dcContext.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties().size());
 					}
 					
 					penaltyFactor = penalty.getCapacityPenaltyFactor(activityStart, activityEnd);
