@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -109,6 +110,34 @@ public class ElementalCharyparNagelLegScoringFunction implements LegScoring {
 			this.marginalUtilityOfTraveling_s = marginalUtilityOfTraveling_s;
 			this.marginalUtilityOfDistance_m = marginalUtilityOfDistance_m;
 		}
-	}
 
+		public static LegScoringParameters createForCar(final CharyparNagelScoringParameters params) {
+			return new LegScoringParameters(
+					params.constantCar,
+					params.marginalUtilityOfTraveling_s,
+					params.marginalUtilityOfDistanceCar_m);
+		}
+
+		public static LegScoringParameters createForPt(final CharyparNagelScoringParameters params) {
+			return new LegScoringParameters(
+					params.constantPt,
+					params.marginalUtilityOfTravelingPT_s,
+					params.marginalUtilityOfDistancePt_m);
+		}
+
+		public static LegScoringParameters createForBike(final CharyparNagelScoringParameters params) {
+			return new LegScoringParameters(
+					params.constantBike,
+					params.marginalUtilityOfTravelingBike_s,
+					// Bike has no such setting.
+					0 );
+		}
+
+		public static LegScoringParameters createForWalk(final CharyparNagelScoringParameters params) {
+			return new LegScoringParameters(
+					params.constantWalk,
+					params.marginalUtilityOfTravelingWalk_s,
+					params.marginalUtilityOfDistanceWalk_m);
+		}
+	}
 }

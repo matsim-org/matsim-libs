@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -33,6 +34,9 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+import playground.thibautd.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * This factory creates "CharyparNagel" scoring functions, but with
@@ -80,10 +84,58 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					params,
 					facilityPenalties,
 					((ScenarioImpl) scenario).getActivityFacilities() ));
+
+		// standard modes
 		scoringFunctionAccumulator.addScoringFunction(
-				new CarPoolingLegScoringFunction(
-					params,
+				new ElementalCharyparNagelLegScoringFunction(
+					TransportMode.car,
+					LegScoringParameters.createForCar(
+						params ),
 					scenario.getNetwork()));
+		// TODO: adapt costs to travel card.
+		scoringFunctionAccumulator.addScoringFunction(
+				new ElementalCharyparNagelLegScoringFunction(
+					TransportMode.pt,
+					LegScoringParameters.createForPt(
+						params ),
+					scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(
+				new ElementalCharyparNagelLegScoringFunction(
+					TransportMode.walk,
+					LegScoringParameters.createForWalk(
+						params ),
+					scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(
+				new ElementalCharyparNagelLegScoringFunction(
+					TransportMode.bike,
+					LegScoringParameters.createForBike(
+						params ),
+					scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(
+				new ElementalCharyparNagelLegScoringFunction(
+					TransportMode.transit_walk,
+					LegScoringParameters.createForWalk(
+						params ),
+					scenario.getNetwork()));
+
+		// joint modes
+		scoringFunctionAccumulator.addScoringFunction(
+				new ElementalCharyparNagelLegScoringFunction(
+					JointActingTypes.DRIVER,
+					LegScoringParameters.createForCar(
+						params ),
+					scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(
+				new ElementalCharyparNagelLegScoringFunction(
+					JointActingTypes.DRIVER,
+					new LegScoringParameters(
+						params.constantCar,
+						params.marginalUtilityOfTraveling_s,
+						// passenger doesn't pay gasoline
+						0 ),
+					scenario.getNetwork()));
+
+		// other standard stuff
 		scoringFunctionAccumulator.addScoringFunction(
 				new CharyparNagelMoneyScoring( params ));
 		scoringFunctionAccumulator.addScoringFunction(
