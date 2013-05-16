@@ -45,6 +45,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.population.Desires;
 
 /**
  * Due to the abusive use of extension, the meisterk's KTI activity scoring
@@ -267,7 +268,9 @@ public class KtiActivityScoring implements ActivityScoring {
 	}
 
 	protected double getPerformanceScore(String actType, double duration) {
-		double typicalDuration = ((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
+		final PersonImpl person = (PersonImpl) plan.getPerson();
+		final Desires desires = person.getDesires();
+		final double typicalDuration = desires.getActivityDuration(actType);
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		double zeroUtilityDuration;
