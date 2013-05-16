@@ -33,6 +33,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -62,6 +63,7 @@ public class FixModeChainingPopulation {
 			new PopulationWriter(
 					scenario.getPopulation(),
 					scenario.getNetwork() );
+		writer.setWriterHandler( new PopulationWriterHandlerImplV4( scenario.getNetwork() ) );
 		writer.writeStartPlans( outPopulation );
 
 		final Counter correctionCounter = new Counter( "correcting plan # " );
