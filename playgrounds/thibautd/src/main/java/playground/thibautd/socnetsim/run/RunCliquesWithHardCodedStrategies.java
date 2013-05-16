@@ -214,6 +214,7 @@ public class RunCliquesWithHardCodedStrategies {
 			// do not ad if not used
 			RunUtils.addConsistencyCheckingListeners( controller );
 		}
+		RunUtils.addDistanceFillerListener( controller );
 
 		// run it
 		controller.run();

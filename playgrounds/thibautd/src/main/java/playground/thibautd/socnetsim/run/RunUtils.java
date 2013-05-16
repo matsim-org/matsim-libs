@@ -35,8 +35,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
@@ -63,6 +66,7 @@ import playground.thibautd.socnetsim.replanning.RankOfRemovedPlanListener;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
+import playground.thibautd.utils.DistanceFillerAlgorithm;
 
 /**
  * @author thibautd
@@ -323,6 +327,33 @@ public class RunUtils {
 							if ( links.areLinked( p , p2 ) ) return true;
 						}
 						return false;
+					}
+				});
+	}
+
+	public static void addDistanceFillerListener(final ImmutableJointController controller) {
+		final DistanceFillerAlgorithm algo = new DistanceFillerAlgorithm();
+
+		algo.putEstimator(
+				TransportMode.transit_walk,
+				new DistanceFillerAlgorithm.CrowFlyEstimator(
+					controller.getRegistry().getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactor(), 
+					controller.getRegistry().getScenario().getNetwork() ) );
+		algo.putEstimator(
+				TransportMode.pt,
+				new DistanceFillerAlgorithm.CrowFlyEstimator(
+					// this was the hard-coded factor for in-vehicle distance in KTI...
+					// XXX not sure it makes sense to use the same approach with detailed pt
+					1.5,
+					controller.getRegistry().getScenario().getNetwork() ) );
+
+		controller.addControlerListener(
+				new BeforeMobsimListener() {
+					@Override
+					public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+						for ( Person person : controller.getRegistry().getScenario().getPopulation().getPersons().values() ) {
+							algo.run( person.getSelectedPlan() );
+						}
 					}
 				});
 	}
