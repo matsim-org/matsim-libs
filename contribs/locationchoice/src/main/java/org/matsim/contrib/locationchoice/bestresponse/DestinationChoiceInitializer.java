@@ -20,6 +20,7 @@
 package org.matsim.contrib.locationchoice.bestresponse;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
@@ -54,8 +55,14 @@ public class DestinationChoiceInitializer implements StartupListener {
   		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
   		this.personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
   		 				
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter()));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter()));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter(), TransportMode.car));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter(), TransportMode.car));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter(), TransportMode.pt));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter(), TransportMode.pt));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter(), TransportMode.bike));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter(), TransportMode.bike));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter(), TransportMode.walk));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter(), TransportMode.walk));
 				
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);

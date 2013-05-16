@@ -40,15 +40,17 @@ public class DistanceStats implements IterationEndsListener {
 	private String bestOrSelected = "selected";
 	private String type = null;
 	private ActTypeConverter actTypeConverter;
+	private String mode;
 	
-	public DistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter) {	
+	public DistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode) {	
 		this.analysisBoundary = Double.parseDouble(config.locationchoice().getAnalysisBoundary()); 
 		this.config = config;
 		this.bestOrSelected = bestOrSelected;
 		this.type = type;
 		this.actTypeConverter = actTypeConverter;
+		this.mode = mode;
 		this.bins = new Bins(Double.parseDouble(config.locationchoice().getAnalysisBinSize()),
-				analysisBoundary, type + "_distance");
+				analysisBoundary, type + "_" + mode + "_distance");
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {	
@@ -78,7 +80,7 @@ public class DistanceStats implements IterationEndsListener {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
-							plan.getPreviousLeg((Activity)pe).getMode().equals(TransportMode.car)) {
+							plan.getPreviousLeg((Activity)pe).getMode().equals(this.mode)) {
 						double distance = ((CoordImpl)((Activity) pe).getCoord()).calcDistance(
 								plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
 						this.bins.addVal(distance, 1.0);
