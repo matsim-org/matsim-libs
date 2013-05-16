@@ -109,7 +109,7 @@ public class EmissionUtils {
 		for(Person person : population.getPersons().values()){
 			Id personId = person.getId();
 			SortedMap<String, Double> emissionType2Value;
-			if(totalEmissions.get(personId) == null){ // person not in map yet (e.g. pt user)
+			if(totalEmissions.get(personId) == null){ // person not in map (e.g. pt user)
 				emissionType2Value = new TreeMap<String, Double>();
 				for(String pollutant : listOfPollutants){
 					emissionType2Value.put(pollutant, 0.0);
@@ -135,7 +135,7 @@ public class EmissionUtils {
 		for(Link link: network.getLinks().values()){
 			Id linkId = link.getId();
 			SortedMap<String, Double> emissionType2Value;
-			if(totalEmissions.get(linkId) == null){ // link not in map yet (e.g. pt user)
+			if(totalEmissions.get(linkId) == null){ // link not in map (e.g. no cars on link)
 				emissionType2Value = new TreeMap<String, Double>();
 				for(String pollutant : listOfPollutants){
 					emissionType2Value.put(pollutant, 0.0);
