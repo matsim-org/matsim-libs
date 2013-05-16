@@ -49,8 +49,8 @@ public class KtiToSimiliKtiConfig {
 		planCalcScore.setConstantCar( ktiConfigGroup.getConstCar() );
 		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
 		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
-		planCalcScore.setMonetaryDistanceCostRatePt( (ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) / planCalcScore.getMarginalUtilityOfMoney() );
-		planCalcScore.setMonetaryDistanceCostRateCar( (ktiConfigGroup.getDistanceCostCar() / 1000d) / planCalcScore.getMarginalUtilityOfMoney() );
+		planCalcScore.setMonetaryDistanceCostRatePt( (-ktiConfigGroup.getDistanceCostPtNoTravelCard() / 1000d ) / planCalcScore.getMarginalUtilityOfMoney() );
+		planCalcScore.setMonetaryDistanceCostRateCar( (-ktiConfigGroup.getDistanceCostCar() / 1000d) / planCalcScore.getMarginalUtilityOfMoney() );
 
 		final KtiLikeScoringConfigGroup ktiLikeConfigGroup = new KtiLikeScoringConfigGroup();
 		outputConfig.addModule( KtiLikeScoringConfigGroup.GROUP_NAME , ktiLikeConfigGroup );
