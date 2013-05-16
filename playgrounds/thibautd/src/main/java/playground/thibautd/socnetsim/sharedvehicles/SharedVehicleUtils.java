@@ -64,7 +64,9 @@ public final class SharedVehicleUtils {
 			final Leg l = (Leg) pe;
 			if ( !legModes.contains( l.getMode() ) ) continue;
 			if ( !(l.getRoute() instanceof NetworkRoute) ) continue;
-			vehs.add( ((NetworkRoute) l.getRoute()).getVehicleId() );
+			final Id v = ((NetworkRoute) l.getRoute()).getVehicleId();
+			if ( v == null ) continue;
+			vehs.add( v );
 		}
 		return vehs;
 	}
