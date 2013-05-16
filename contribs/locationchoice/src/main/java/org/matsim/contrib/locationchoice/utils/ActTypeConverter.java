@@ -31,7 +31,7 @@ public class ActTypeConverter {
 		if (this.isV1) {
 			return convert2MinimalType(actType);
 		}
-		else return actType;
+		else return convert2FullType(actType);
 	}
 	
 	public static String convert2FullType(String type) {
