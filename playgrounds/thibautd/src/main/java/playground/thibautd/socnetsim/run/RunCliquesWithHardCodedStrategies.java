@@ -74,6 +74,7 @@ import playground.thibautd.utils.ReflectiveModule;
 public class RunCliquesWithHardCodedStrategies {
 	private static final boolean DO_STRATEGY_TRACE = false;
 	private static final boolean DO_SELECT_TRACE = false;
+	private static final boolean DO_SCORING_TRACE = false;
 
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.loadConfig( configFile );
@@ -249,6 +250,7 @@ public class RunCliquesWithHardCodedStrategies {
 		OutputDirectoryLogging.catchLogEntries();
 		if (DO_STRATEGY_TRACE) Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
 		if (DO_SELECT_TRACE) Logger.getLogger( HighestWeightSelector.class.getName() ).setLevel( Level.TRACE );
+		if (DO_SCORING_TRACE) Logger.getLogger( "playground.thibautd.scoring" ).setLevel( Level.TRACE );
 		final String configFile = args[ 0 ];
 
 		// load "registry"

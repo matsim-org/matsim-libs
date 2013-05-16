@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.scoring;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
@@ -31,6 +33,9 @@ import org.matsim.core.utils.misc.RouteUtils;
  * @author thibautd
  */
 public class ElementalCharyparNagelLegScoringFunction implements LegScoring {
+	private static final Logger log =
+		Logger.getLogger(ElementalCharyparNagelLegScoringFunction.class);
+
 	private double score = 0;
 
 	private final String mode;
@@ -54,6 +59,9 @@ public class ElementalCharyparNagelLegScoringFunction implements LegScoring {
 
 	public void handleLeg( final Leg leg ) {
 		score += calcLegScore( leg );
+		if ( log.isTraceEnabled() ) {
+			log.trace( "new score for mode "+mode+" for leg "+leg+": "+score );
+		}
 	}
 
 	@Override

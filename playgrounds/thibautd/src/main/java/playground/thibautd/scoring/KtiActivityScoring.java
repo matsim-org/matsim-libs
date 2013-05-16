@@ -247,11 +247,27 @@ public class KtiActivityScoring implements ActivityScoring {
 		//	// the activity never ends and never starts.
 		//	this.score += calcActScore(0, 24*3600.0, (Activity) plan.getPlanElements().get(0)); // SCENARIO_DURATION
 		//}
+		this.score = 0;
 		this.score += this.getTooShortDurationScore();
+		if ( logger.isTraceEnabled() ) {
+			logger.trace( "score after too short duration: "+score );
+		}
 		this.score += this.getWaitingTimeScore();
+		if ( logger.isTraceEnabled() ) {
+			logger.trace( "score after waiting time: "+score );
+		}
 		this.score += this.getPerformanceScore();
+		if ( logger.isTraceEnabled() ) {
+			logger.trace( "score after performance: "+score );
+		}
 		this.score += this.getFacilityPenaltiesScore();
+		if ( logger.isTraceEnabled() ) {
+			logger.trace( "score after facility penalty: "+score );
+		}
 		this.score += this.getNegativeDurationScore();
+		if ( logger.isTraceEnabled() ) {
+			logger.trace( "score after negative duration: "+score );
+		}
 	}
 	
 	public double getFacilityPenaltiesScore() {
