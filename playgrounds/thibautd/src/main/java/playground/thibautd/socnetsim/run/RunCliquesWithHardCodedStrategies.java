@@ -19,16 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
-import java.util.TreeMap;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
@@ -37,9 +33,8 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.meisterk.kti.config.KtiConfigGroup;
-import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
-
+import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
+import playground.thibautd.scoring.KtiLikeScoringConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
@@ -79,7 +74,7 @@ public class RunCliquesWithHardCodedStrategies {
 		final Config config = JointScenarioUtils.loadConfig( configFile );
 		config.addModule( WeightsConfigGroup.GROUP_NAME , new WeightsConfigGroup() );
 		config.addModule( ScoringFunctionConfigGroup.GROUP_NAME , new ScoringFunctionConfigGroup() );
-		config.addModule( KtiConfigGroup.GROUP_NAME , new KtiConfigGroup() );
+		config.addModule( KtiLikeScoringConfigGroup.GROUP_NAME , new KtiLikeScoringConfigGroup() );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 
 		if ( config.scenario().isUseHouseholds() ) {
@@ -166,11 +161,10 @@ public class RunCliquesWithHardCodedStrategies {
 							new EmptyIncompatiblePlansIdentifierFactory() )
 					.withScoringFunctionFactory(
 							scoringFunctionConf.isUseKtiScoring() ?
-							new KTIYear3ScoringFunctionFactory(
-								scenario,
-								(KtiConfigGroup) config.getModule( KtiConfigGroup.GROUP_NAME ),
-								new TreeMap<Id, FacilityPenalty>(),
-								((ScenarioImpl) scenario).getActivityFacilities()) :
+							new KtiLikeActivitiesScoringFunctionFactory(
+								(KtiLikeScoringConfigGroup) config.getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
+								config.planCalcScore(),
+								scenario) :
 							// if null, default will be used
 							// XXX not nice...
 							null )
