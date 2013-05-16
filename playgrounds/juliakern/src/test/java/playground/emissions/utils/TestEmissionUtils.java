@@ -167,8 +167,6 @@ public class TestEmissionUtils {
 		Map<ColdPollutant, Double> mapCold1 = new HashMap<ColdPollutant, Double>();
 		Map<ColdPollutant, Double> mapCold2 = new HashMap<ColdPollutant, Double>();
 		
-		//TODO names vs values
-		
 		//what about negativ numbers? ok
 		mapWarm1.put(WarmPollutant.CO, .0002);
 		mapWarm1.put(WarmPollutant.CO2_TOTAL, .004);
@@ -227,8 +225,6 @@ public class TestEmissionUtils {
 		double e2nx = 400.+100.;
 		double e2pm = 4000.+2000.;
 		double e2so = 60000;
-
-		//TODO neg numbers
 		
 		warmEmissions.put(new IdImpl("id1"), mapWarm1);
 		warmEmissions.put(new IdImpl("id2"), mapWarm2);
@@ -291,7 +287,7 @@ public class TestEmissionUtils {
 		SortedSet<String> listOfPollutants = new TreeSet<String>();
 		fillPollutant(listOfPollutants);
 		
-		//TODO why do we need sorted maps? 
+		//why do we need sorted maps? 
 		SortedMap<String, Double> totalEmissions = new TreeMap<String, Double>();
 		//contains some persons with their emission maps
 		Map<Id, SortedMap<String, Double>> persons2emissions = new HashMap<Id, SortedMap<String, Double>>();
@@ -663,7 +659,6 @@ public class TestEmissionUtils {
 
 
 	@Test
-	//TODO
 	public final void testSetNonCalculatedEmissionsForNetwork(){
 		
 		//IN: network,totalEmissions 
@@ -854,7 +849,6 @@ public class TestEmissionUtils {
 		EmissionUtils eu = new EmissionUtils();
 		
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();	
-		//TODO cold pollutants: CO, CO2_TOTAL, FC, HC, NMHC, NO2, NOX, PM, SO2
 		//values for cold polls
 		Double cov=.0005, fcv = .01, hcv=.2, nmv=1., n2v=30., nxv=200., pmv =7000.;
 		
