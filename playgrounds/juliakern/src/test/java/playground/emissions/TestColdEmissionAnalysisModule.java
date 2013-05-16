@@ -1,4 +1,4 @@
-/*/* *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*                                                   *
  * TestEmission.java                                                       *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,25 +31,40 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.analysis.modules.emissionsAnalyzer.*;
+import playground.vsp.emissions.ColdEmissionAnalysisModule;
 import playground.vsp.emissions.events.ColdEmissionEvent;
 import playground.vsp.emissions.events.ColdEmissionEventImpl;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
 
 
-public class TestEmissionAnalyzer {
-	
+public class TestColdEmissionAnalysisModule {
+
 	@Test @Ignore
-	public final void testEmissionAnalyzing(){
+	public void calculateColdEmissionsAndThrowEventTest() {
 		
-		//TODO write test
+		//TODO kann ich das ohne Inputdateien initialisieren?
+		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule(null, null, null);
+		//warum ist hier die Parkzeti als Double in anderen Methoden aber als int?
+		ceam.calculateColdEmissionsAndThrowEvent(new IdImpl("coldEmissionEventLinkId"), 
+				new IdImpl("personId"),
+				10.0,
+				2.0,
+				50.0,
+				"vehicleInformation") ;
+		Assert.assertEquals("something", true, true);
 	}
 	
+	@Test @Ignore //is private.... test it anyway?
+	public void calculateColdEmissionsTest() {
+		Assert.assertEquals("something", true, true);
+	}
+	
+	@Test @Ignore //is private.... test it anyway?
+	public void convertString2TupleTest(){
+		Assert.assertEquals("something", true, true);
+	}
+
+	//is private.... test it anyway?
+	//TODO sollte rescale Emissions auch getestet werden? 
 }
-		
-
-
-	
-
-	
-

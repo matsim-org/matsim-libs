@@ -18,41 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.emissions.types;
 
-import java.util.HashMap;
-import java.util.Map;
+//import org.junit.Test;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.testcases.MatsimTestUtils;
+//import playground.vsp.emissions.types.HbefaTrafficSituation;
 
-import playground.vsp.analysis.modules.emissionsAnalyzer.*;
-import playground.vsp.emissions.events.ColdEmissionEvent;
-import playground.vsp.emissions.events.ColdEmissionEventImpl;
-import playground.vsp.emissions.types.ColdPollutant;
-import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
+//test for playground.vsp.emissions.types.HbefaTrafficSituation
 
+public class TestHbefaTrafficSituation {
 
-public class TestWarmEmissionsAnalysisModule {
+	//nothing to test here
+	//HbefaTrafficSituation is an enum and an empty constructor
 
-	@Test @Ignore
-	public void calculateColdEmissionsAndThrowEventTest() {
-		Assert.assertEquals("something", true, true);
-	}
-	
-	@Test @Ignore
-	public void calculateColdEmissionsTest() {
-		Assert.assertEquals("something", true, true);
-	}
-	
-	@Test @Ignore
-	public void convertString2TupleTest(){
-		Assert.assertEquals("something", true, true);
-	}
-
-	//TODO sollte rescale Emissions auch getestet werden? 
 }

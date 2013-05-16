@@ -1,4 +1,4 @@
-/* *********************************************************************** *
+/*/* *********************************************************************** *
  * project: org.matsim.*                                                   *
  * TestEmission.java                                                       *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.misc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,35 +31,24 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.analysis.modules.emissionsAnalyzer.*;
-import playground.vsp.emissions.WarmEmissionAnalysisModule;
-import playground.vsp.emissions.events.WarmEmissionEvent;
-import playground.vsp.emissions.events.WarmEmissionEventImpl;
-import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
+import playground.vsp.emissions.events.ColdEmissionEvent;
+import playground.vsp.emissions.events.ColdEmissionEventImpl;
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
 
 
-
-public class TestWarmEmissionAnalysisModule {
+public class TestEmissionAnalyzer {
 	
-	//TODO copy from TestColdEmissionAnalysisModule
-	@Test
-	public final void testCalculateWarmEmissionsAndThrowEvent(){
+	@Test @Ignore
+	public final void testEmissionAnalyzing(){
 		
-		//setup? rather without inputfiles
-		/*(
-			Id coldEmissionEventLinkId,
-			Id personId,
-			Double startEngineTime,
-			Double parkingDuration,
-			Double accumulatedDistance,
-			String vehicleInformation)*/
-		
-		//WarmEmissionAnalysisModule weam = new ColdEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);
-		//TODO can i setup a analysismodule without inputfiles? ->ihab/benjamin
-		
+		//TODO write test
 	}
 	
 }
+		
+
+
 	
 
 	

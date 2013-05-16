@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*                                                   *
- * TestHbefaColdEmissionFactorKey.java                                     *
+ * TestEmission.java                                                       *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.emission.types;
+package playground.emissions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
-import playground.vsp.emissions.types.ColdPollutant;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.testcases.MatsimTestUtils;
 
-/*
- * test for playground.vsp.emissions.types.ColdPollutant
- * test getValues method
- */
+import playground.vsp.analysis.modules.emissionsAnalyzer.*;
+import playground.vsp.emissions.WarmEmissionAnalysisModule;
+import playground.vsp.emissions.events.WarmEmissionEvent;
+import playground.vsp.emissions.events.WarmEmissionEventImpl;
+import playground.vsp.emissions.types.WarmPollutant;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
 
 
 
-public class TestColdPollutant {
+public class TestWarmEmissionAnalysisModule {
 	
+	//TODO copy from TestColdEmissionAnalysisModule
 	@Test
-	public final void testGetValue(){
-		//not much to test here since ColdPollutant is an enum
-		ColdPollutant cp = null;
-		Assert.assertEquals(ColdPollutant.CO, cp.getValue("CO"));
-		Assert.assertNotSame(ColdPollutant.FC, cp.getValue("CO"));
-		Assert.assertEquals(ColdPollutant.HC, cp.getValue("HC"));
-		Assert.assertNotSame(ColdPollutant.getValue("CO"), ColdPollutant.getValue("FC"));
-
-		cp = ColdPollutant.NO2;
-		Assert.assertEquals(ColdPollutant.CO, cp.getValue("CO"));
-		Assert.assertNotSame(ColdPollutant.FC, cp.getValue("CO"));
-		Assert.assertEquals(ColdPollutant.HC, cp.getValue("HC"));
-		Assert.assertNotSame(ColdPollutant.getValue("CO"), ColdPollutant.getValue("FC"));
-
+	public final void testCalculateWarmEmissionsAndThrowEvent(){
+		
+		//setup? rather without inputfiles
+		/*(
+			Id coldEmissionEventLinkId,
+			Id personId,
+			Double startEngineTime,
+			Double parkingDuration,
+			Double accumulatedDistance,
+			String vehicleInformation)*/
+		
+		//WarmEmissionAnalysisModule weam = new ColdEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);
+		//TODO can i setup a analysismodule without inputfiles? ->ihab/benjamin
+		
 	}
-
+	
 }
+	
+
+	
+

@@ -1,4 +1,4 @@
-package playground;
+package playground.misc;
 
 public class CodeList {
 

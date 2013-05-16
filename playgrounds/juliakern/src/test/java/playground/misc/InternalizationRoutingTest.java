@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground;
+package playground.misc;
 /*
 import java.util.HashMap;
 import java.util.HashSet;

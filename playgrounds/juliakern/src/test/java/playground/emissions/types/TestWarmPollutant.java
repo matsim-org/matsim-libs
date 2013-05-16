@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * HbefaColdEmissionFactor.java
+ * project: org.matsim.*                                                   *
+ * TestHbefaColdEmissionFactorKey.java                                     *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,15 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.emission.types;
-
-//test for playground.vsp.emissions.types.HbefaColdEmissionFactor
+package playground.emissions.types;
 
 
-public class TestHbefaColdEmissionFactor {
+/*
+ * 	nothing to test here
+ * warmPollutant is an enum
+ * unlike cold pollutant warmPollutant has no getValues method
+ */
+
+public class TestWarmPollutant {
 	
-	//nothing to test here
-	//HbefaColdEmissionFactor is a double 
-	//+ setter and getter
+
 
 }

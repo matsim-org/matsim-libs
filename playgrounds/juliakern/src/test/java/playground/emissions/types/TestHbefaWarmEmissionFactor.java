@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.emission.types;
+package playground.emissions.types;
 
 //test for playground.vsp.emissions.types.HbefaWarmEmissionFactor
 

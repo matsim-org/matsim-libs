@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.emission.types;
+package playground.emissions.types;
 
 import org.junit.Assert;
 import org.junit.Test;

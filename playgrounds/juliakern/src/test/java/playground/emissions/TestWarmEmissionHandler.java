@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
