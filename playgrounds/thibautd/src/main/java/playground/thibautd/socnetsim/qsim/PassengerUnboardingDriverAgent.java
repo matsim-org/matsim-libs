@@ -34,13 +34,20 @@ import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
-class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, PassengerAgent {
+class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, PassengerAgent, PTPassengerAgent {
 	private final MobsimDriverAgent delegate;
+	private final PTPassengerAgent ptDelegate;
 	private final PlanAgent planDelegate;
 	private final QNetsimEngine netsimEngine;
 	private final InternalInterface internalInterface;
@@ -52,6 +59,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 			final QNetsimEngine netsimEngine,
 			final InternalInterface internalInterface) {
 		this.delegate = (MobsimDriverAgent) delegate;
+		this.ptDelegate = delegate instanceof PTPassengerAgent ? (PTPassengerAgent) delegate : null;
 		this.planDelegate = (PlanAgent) delegate;
 		this.netsimEngine = netsimEngine;
 		this.internalInterface = internalInterface;
@@ -207,5 +215,39 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	@Override
 	public String toString() {
 		return "["+getClass().getSimpleName()+": id="+getId()+"]";
+	}
+
+	@Override
+	public boolean getEnterTransitRoute(
+			final TransitLine line,
+			final TransitRoute transitRoute,
+			final List<TransitRouteStop> stopsToCome,
+			final TransitVehicle transitVehicle) {
+		if ( ptDelegate == null ) throw new UnsupportedOperationException( delegate.getClass().getName()+" do not provide PTPassengerAgent" );
+		return ptDelegate.getEnterTransitRoute( line , transitRoute , stopsToCome , transitVehicle );
+	}
+
+	@Override
+	public boolean getExitAtStop(final TransitStopFacility stop) {
+		if ( ptDelegate == null ) throw new UnsupportedOperationException( delegate.getClass().getName()+" do not provide PTPassengerAgent" );
+		return ptDelegate.getExitAtStop( stop );
+	}
+
+	@Override
+	public Id getDesiredAccessStopId() {
+		if ( ptDelegate == null ) throw new UnsupportedOperationException( delegate.getClass().getName()+" do not provide PTPassengerAgent" );
+		return ptDelegate.getDesiredAccessStopId();
+	}
+
+	@Override
+	public Id getDesiredDestinationStopId() {
+		if ( ptDelegate == null ) throw new UnsupportedOperationException( delegate.getClass().getName()+" do not provide PTPassengerAgent" );
+		return ptDelegate.getDesiredDestinationStopId();
+	}
+
+	@Override
+	public double getWeight() {
+		if ( ptDelegate == null ) throw new UnsupportedOperationException( delegate.getClass().getName()+" do not provide PTPassengerAgent" );
+		return ptDelegate.getWeight();
 	}
 }
