@@ -76,18 +76,14 @@ public class TestColdEmissionEventImpl {
 		halfMap.put(ColdPollutant.NOX, null);
 		halfMap.put(ColdPollutant.PM, null);
 		
-
 		ColdEmissionEventImpl halfEvent = new ColdEmissionEventImpl(44., linkId, vehicleId, halfMap);
 		
 		int numberOfColdPollutants = ColdPollutant.values().length;	
 
-
-		int halfNullPointers =0;
+		int halfNullPointers = 0;
 		
 		for(ColdPollutant cp : ColdPollutant.values()){
 			String key= cp.toString();
-			//normal event
-			Assert.assertNotNull("A value for " +key+ " was initialised.", ce.getAttributes().get(key));
 			
 			//TODO codeliste: half empty event -- this should fail -> nullpointer
 			//aber es wird null zurueck gegeben... ggf den test hier aendern
@@ -101,7 +97,6 @@ public class TestColdEmissionEventImpl {
 			catch(NullPointerException e){
 				halfNullPointers ++;
 			}
-
 		}
 		Assert.assertEquals(numberOfColdPollutants, halfNullPointers);
 		
@@ -115,9 +110,6 @@ public class TestColdEmissionEventImpl {
 		//-1 because the time parameter appears only once in the output of getAttributes
 		//-1 because getAttributes does not return the list of pollutants
 		//but each pollutant seperatly -> +1 for each
-		Assert.assertEquals(numberOfEventAttributes -1 -1 +numberOfColdPollutants, ceg.size());
-
-		
+		Assert.assertEquals(numberOfEventAttributes -1 -1 + numberOfColdPollutants, ceg.size());
 	}
-
 }

@@ -36,7 +36,7 @@ public class TestHbefaVehicleAttributes {
 	String technology = "technology", sizeClass = "size class", concept = "concept";
 	
 	@Test
-	public final void testEqualsForCorrectObjects(){
+	public final void testEqualsForCompleteKeys(){
 		
 		//two equal objects - no default values
 		
@@ -86,7 +86,7 @@ public class TestHbefaVehicleAttributes {
 	}
 	
 	@Test
-	public final void testEqualsForIncorrectObjects(){
+	public final void testEqualsForIncompleteKeys(){
 		//correct object - no default values
 
 		String message; 

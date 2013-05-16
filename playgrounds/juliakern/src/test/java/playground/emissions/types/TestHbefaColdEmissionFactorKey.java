@@ -58,7 +58,7 @@ public class TestHbefaColdEmissionFactorKey {
 	
 	
 	@Test
-	public final void testEqualsForCorrectObjects(){
+	public final void testEqualsForCompleteKeys(){
 
 		setUp();
 
@@ -99,7 +99,7 @@ public class TestHbefaColdEmissionFactorKey {
 	}
 	
 	@Test
-	public final void testEqualsForIncorrectObjects(){
+	public final void testEqualsForIncompleteKeys(){
 		
 		setUp();
 		boolean equalErr = false;
@@ -126,7 +126,7 @@ public class TestHbefaColdEmissionFactorKey {
 		catch(NullPointerException e){
 			equalErr = true;
 		}	
-		message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehCat.toString();
+		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehCat.toString();
 		message2 = "this key should not be comparable since no vehicle category is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noVehCat));
@@ -145,7 +145,7 @@ public class TestHbefaColdEmissionFactorKey {
 		catch(NullPointerException e){
 			equalErr = true;
 		}	
-		message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noColdPollutant.toString();
+		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noColdPollutant.toString();
 		message2 = "this key should not be comparable since no cold pollutant is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noColdPollutant));
@@ -165,7 +165,7 @@ public class TestHbefaColdEmissionFactorKey {
 		catch(NullPointerException e){
 			equalErr = true;
 		}
-		message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noParkingTime.toString();
+		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noParkingTime.toString();
 		message2 = "this key should not be comparable since no parking time is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noParkingTime));
@@ -184,7 +184,7 @@ public class TestHbefaColdEmissionFactorKey {
 		catch(NullPointerException e){
 			equalErr = true;
 		}	
-		message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noDistance.toString();
+		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noDistance.toString();
 		message2 = "this key should not be comparable since no distance is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noDistance));
@@ -197,7 +197,7 @@ public class TestHbefaColdEmissionFactorKey {
 		noVehAtt.setHbefaVehicleCategory(hbefaVehCategory);
 		
 		equalErr = false;
-		message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
+		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
 		try{
 			noVehAtt.equals(normal);
 			Assert.assertFalse(noVehAtt.equals(normal));
@@ -223,7 +223,7 @@ public class TestHbefaColdEmissionFactorKey {
 		catch(NullPointerException e){
 			equalErr = true;
 		}
-		message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
+		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
 		Assert.assertFalse(message2, equalErr);
 		Assert.assertTrue(message, normal.equals(noVehAtt));
 
@@ -238,7 +238,7 @@ public class TestHbefaColdEmissionFactorKey {
 		catch(NullPointerException e){
 			equalErr = true;
 		}
-		message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + emptyKey.toString();
+		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + emptyKey.toString();
 		message2 = "this key should not be comparable since nothing is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(emptyKey)); 

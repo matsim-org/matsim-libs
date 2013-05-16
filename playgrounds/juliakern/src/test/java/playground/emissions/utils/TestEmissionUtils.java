@@ -40,11 +40,9 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
@@ -134,15 +132,15 @@ public class TestEmissionUtils {
 		
 		SortedMap<String, Double> sum = eu.sumUpEmissions(warmEmissions, coldEmissions);
 
-		Double co = (Double)sum.get("CO");
-		Double c2 = (Double)sum.get("CO2_TOTAL");
-		Double fc = (Double)sum.get("FC");
-		Double hc = (Double)sum.get("HC");
-		Double nm = (Double)sum.get("NMHC");
-		Double n2 = (Double)sum.get("NO2");
-		Double nx = (Double)sum.get("NOX");
-		Double pm = (Double)sum.get("PM");
-		Double so = (Double)sum.get("SO2");
+		Double co = sum.get("CO");
+		Double c2 = sum.get("CO2_TOTAL");
+		Double fc = sum.get("FC");
+		Double hc = sum.get("HC");
+		Double nm = sum.get("NMHC");
+		Double n2 = sum.get("NO2");
+		Double nx = sum.get("NOX");
+		Double pm = sum.get("PM");
+		Double so = sum.get("SO2");
 		
 		Assert.assertEquals("Value of CO should be 0.0008 .", co, 0.0008, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Value of CO2_TOTAL should be 0.003 .", c2, 0.003, MatsimTestUtils.EPSILON);
@@ -470,7 +468,7 @@ public class TestEmissionUtils {
 			Assert.assertTrue(id.getClass()== Id.class||id.getClass()==IdImpl.class);
 			for(Object pollutant: finalMap.get(id).values()){
 				Assert.assertTrue(pollutant.getClass()==Double.class);
-				Assert.assertNotSame(0.0, (Double)pollutant);
+				Assert.assertNotSame(0.0, pollutant);
 				Assert.assertNotNull(pollutant);
 			}
 			//check: alle Emissionstypen kommen vor
@@ -566,8 +564,7 @@ public class TestEmissionUtils {
 					Assert.assertEquals("the calculated map should contain three persons but contains "+
 					finalMap.size() + "persons." ,pop.getPersons().keySet().size(), finalMap.size());
 							
-		//missing emissions map 
-					//TODO -> benjamin fragen
+		//missing emissions map
 					try {
 						Map<Id, SortedMap<String, Double>> missingMap = eu.setNonCalculatedEmissionsForPopulation(pop, null);
 						//check: all persons added to the population are contained in the finalMap

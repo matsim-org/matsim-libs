@@ -61,7 +61,7 @@ public class TestHbefaWarmEmissionFactorKey{
 	}
 
 	@Test
-	public final void testEqualsForCorrectObjects(){
+	public final void testEqualsForCompleteKeys(){
 
 		setUp();
 		
@@ -100,7 +100,7 @@ public class TestHbefaWarmEmissionFactorKey{
 	}
 	
 	@Test
-	public final void testEqualsForIncorrectObjects(){
+	public final void testEqualsForIncompleteKeys(){
 	
 		setUp();
 		boolean equalErr = false;
