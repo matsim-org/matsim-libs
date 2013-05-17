@@ -47,7 +47,8 @@ public class OptSettings {
 	private String populationPathsFile = null;
 	private boolean calculate_inVehicleTimeDelayEffects = false;
 	private boolean calculate_waitingTimeDelayEffects = false;
-	private boolean marginalCostPricing = false;
+	private boolean marginalCostPricingPt = false;
+	private boolean marginalCostPricingCar = false;
 
 	public double getIncrHeadway() {
 		return incrHeadway;
@@ -157,11 +158,17 @@ public class OptSettings {
 	public void setCalculating_waitingTimeDelayEffects(boolean marginalCostPricing_waitingTimeDelayEffects) {
 		this.calculate_waitingTimeDelayEffects = marginalCostPricing_waitingTimeDelayEffects;
 	}
-	public boolean isMarginalCostPricing() {
-		return marginalCostPricing;
+	public boolean isMarginalCostPricingPt() {
+		return marginalCostPricingPt;
 	}
-	public void setMarginalCostPricing(boolean marginalCostPricing) {
-		this.marginalCostPricing = marginalCostPricing;
+	public void setMarginalCostPricingPt(boolean marginalCostPricing) {
+		this.marginalCostPricingPt = marginalCostPricing;
+	}
+	public boolean isMarginalCostPricingCar() {
+		return marginalCostPricingCar;
+	}
+	public void setMarginalCostPricingCar(boolean marginalCostPricingCar) {
+		this.marginalCostPricingCar = marginalCostPricingCar;
 	}
 	
 }

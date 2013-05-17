@@ -31,7 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.optimization.externalDelayEffects.InVehicleDelayHandler;
 import playground.ikaddoura.optimization.externalDelayEffects.WaitingDelayHandler;
-import playground.ikaddoura.optimization.handler.MarginalCostPricingHandler;
+import playground.ikaddoura.optimization.handler.MarginalCostPricingPtHandler;
 import playground.ikaddoura.optimization.handler.MoneyDetailEventHandler;
 import playground.ikaddoura.optimization.handler.MoneyEventHandler;
 import playground.ikaddoura.optimization.io.TextFileWriter;
@@ -66,7 +66,7 @@ public class DefaultAnalysisMain {
 		events.addHandler(inVehDelayHandler);
 		WaitingDelayHandler waitingDelayHandler = new WaitingDelayHandler(events, scenario);
 		events.addHandler(waitingDelayHandler);
-		MarginalCostPricingHandler mcpHandler = new MarginalCostPricingHandler(events, scenario);
+		MarginalCostPricingPtHandler mcpHandler = new MarginalCostPricingPtHandler(events, scenario);
 		events.addHandler(mcpHandler);
 		
 		EventWriterXML eventWriter = new EventWriterXML(eventsFile_withExtDelayEvents);

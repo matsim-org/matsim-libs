@@ -31,11 +31,12 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
 import playground.ikaddoura.optimization.externalDelayEffects.InVehicleDelayHandler;
 import playground.ikaddoura.optimization.externalDelayEffects.MarginalCongestionHandler;
 import playground.ikaddoura.optimization.externalDelayEffects.WaitingDelayHandler;
 import playground.ikaddoura.optimization.handler.ConstantFareHandler;
-import playground.ikaddoura.optimization.handler.MarginalCostPricingHandler;
+import playground.ikaddoura.optimization.handler.MarginalCostPricingPtHandler;
 import playground.ikaddoura.optimization.handler.PtLegHandler;
 
 /**
@@ -50,15 +51,17 @@ public class OptControlerListener implements StartupListener {
 	private final ScenarioImpl scenario;
 	private final boolean calculate_inVehicleTimeDelayEffects;
 	private final boolean calculate_waitingTimeDelayEffects;
-	private final boolean marginalCostPricing;
-
-	public OptControlerListener(double fare, PtLegHandler ptLegHandler, ScenarioImpl scenario, boolean calculate_inVehicleTimeDelayEffects, boolean calculate_waitingTimeDelayEffects, boolean marginalCostPricing){
+	private final boolean marginalCostPricingPt;
+	private final boolean marginalCostPricingCar;
+	
+	public OptControlerListener(double fare, PtLegHandler ptLegHandler, ScenarioImpl scenario, boolean calculate_inVehicleTimeDelayEffects, boolean calculate_waitingTimeDelayEffects, boolean marginalCostPricingPt, boolean marginalCostPricingCar){
 		this.fare = fare;
 		this.ptScoringHandler = ptLegHandler;
 		this.scenario = scenario;
 		this.calculate_inVehicleTimeDelayEffects = calculate_inVehicleTimeDelayEffects;
 		this.calculate_waitingTimeDelayEffects = calculate_waitingTimeDelayEffects;
-		this.marginalCostPricing = marginalCostPricing;
+		this.marginalCostPricingPt = marginalCostPricingPt;
+		this.marginalCostPricingCar = marginalCostPricingCar;
 	}
 	
 	@Override
@@ -74,12 +77,15 @@ public class OptControlerListener implements StartupListener {
 			event.getControler().getEvents().addHandler(new WaitingDelayHandler(eventsManager, scenario));
 		}
 		
-		if (this.marginalCostPricing) {
-			event.getControler().getEvents().addHandler(new MarginalCostPricingHandler(eventsManager, scenario));
+		if (this.marginalCostPricingPt) {
+			event.getControler().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));
 		}
 		
-		event.getControler().getEvents().addHandler(new MarginalCongestionHandler(eventsManager, scenario));
-		
+		if (this.marginalCostPricingCar) {
+			event.getControler().getEvents().addHandler(new MarginalCongestionHandler(eventsManager, scenario));
+			event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
+		}
+				
 		event.getControler().getEvents().addHandler(new ConstantFareHandler(eventsManager, this.fare));
 		event.getControler().getEvents().addHandler(ptScoringHandler);
 	}

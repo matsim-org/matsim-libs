@@ -23,7 +23,9 @@
 package playground.ikaddoura.optimization.externalDelayEffects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
@@ -39,9 +41,19 @@ public class LinkCongestionInfo {
 	private double marginalDelayPerLeavingVehicle_sec;
 	private int storageCapacity_cars;
 	
+	private Map<Id, Double> personId2linkEnterTime = new HashMap<Id, Double>();
+	private Map<Id, Double> personId2linkLeaveTime = new HashMap<Id, Double>();
+	private List<Id> leavingAgents = new ArrayList<Id>();
+
 	private List<MarginalCongestionEvent> congestionEvents_FlowCapacity = new ArrayList<MarginalCongestionEvent>();
-	private List<PersonDelayInfo> personDelayInfos = new ArrayList<PersonDelayInfo>();
-	private List<LinkEnterLeaveInfo> personId2enterLeaveInfo = new ArrayList<LinkEnterLeaveInfo>();
+	private List<LinkEnterLeaveInfo> personEnterLeaveInfos = new ArrayList<LinkEnterLeaveInfo>();
+	
+	public Map<Id, Double> getPersonId2linkEnterTime() {
+		return personId2linkEnterTime;
+	}
+	public void setPersonId2linkEnterTime(Map<Id, Double> personId2linkEnterTime) {
+		this.personId2linkEnterTime = personId2linkEnterTime;
+	}
 	
 	public Id getLinkId() {
 		return linkId;
@@ -50,7 +62,7 @@ public class LinkCongestionInfo {
 		this.linkId = linkId;
 	}
 	public void setMarginalDelayPerLeavingVehicle(double flowCapacity_hour) {
-		this.marginalDelayPerLeavingVehicle_sec = (1 / (flowCapacity_hour / 3600.));
+		this.marginalDelayPerLeavingVehicle_sec = (1 / (flowCapacity_hour / 3600.) );
 	}
 	public int getStorageCapacity_cars() {
 		return storageCapacity_cars;
@@ -67,32 +79,29 @@ public class LinkCongestionInfo {
 	public void setFreeTravelTime(double freeTravelTime) {
 		this.freeTravelTime = freeTravelTime;
 	}
-	public List<PersonDelayInfo> getPersonDelayInfos() {
-		return personDelayInfos;
+	public Map<Id, Double> getPersonId2linkLeaveTime() {
+		return personId2linkLeaveTime;
 	}
-	public void setPersonDelayInfos(List<PersonDelayInfo> personDelayInfos) {
-		this.personDelayInfos = personDelayInfos;
+	public void setPersonId2linkLeaveTime(Map<Id, Double> personId2linkLeaveTime) {
+		this.personId2linkLeaveTime = personId2linkLeaveTime;
 	}
-	
-	@Override
-	public String toString() {
-		return "LinkCongestionInfo [linkId=" + linkId + ", freeTravelTime="
-				+ freeTravelTime + ", marginalDelayPerLeavingVehicle_sec="
-				+ marginalDelayPerLeavingVehicle_sec + ", storageCapacity="
-				+ storageCapacity_cars + ", personDelayInfos=" + personDelayInfos
-				+ ", personId2enterLeaveInfo=" + personId2enterLeaveInfo + "]";
+	public List<Id> getLeavingAgents() {
+		return leavingAgents;
+	}
+	public void setLeavingAgents(List<Id> leavingAgents) {
+		this.leavingAgents = leavingAgents;
 	}
 	public List<LinkEnterLeaveInfo> getPersonEnterLeaveInfos() {
-		return personId2enterLeaveInfo;
+		return personEnterLeaveInfos;
 	}
-	public void setPersonId2enterLeaveInfo(List<LinkEnterLeaveInfo> personId2enterLeaveInfo) {
-		this.personId2enterLeaveInfo = personId2enterLeaveInfo;
+	public void setPersonEnterLeaveInfos(List<LinkEnterLeaveInfo> personEnterLeaveInfos) {
+		this.personEnterLeaveInfos = personEnterLeaveInfos;
 	}
-	public List<MarginalCongestionEvent> getflowCapacityCongestionEvents() {
+	public List<MarginalCongestionEvent> getCongestionEvents_FlowCapacity() {
 		return congestionEvents_FlowCapacity;
 	}
-	public void setflowCapacityCongestionEvents(
-			List<MarginalCongestionEvent> flowCapacityCongestionEvents) {
-		this.congestionEvents_FlowCapacity = flowCapacityCongestionEvents;
+	public void setCongestionEvents_FlowCapacity(
+			List<MarginalCongestionEvent> congestionEvents_FlowCapacity) {
+		this.congestionEvents_FlowCapacity = congestionEvents_FlowCapacity;
 	}
 }

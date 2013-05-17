@@ -37,7 +37,7 @@ public class PopulationWorkOtherGeneratorMain {
 
 	public static void main(String[] args) {
 		
-		String networkFile = "/Users/Ihab/Desktop/network_busLane_capacity99999.xml";
+		String networkFile = "/Users/Ihab/Desktop/internalization_input/network_car.xml";
 		String dir = "/Users/Ihab/Desktop/";
 		int totalDemand = 5000;
 		

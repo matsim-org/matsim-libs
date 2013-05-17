@@ -44,7 +44,8 @@ public class InternalControler {
 	private final static Logger log = Logger.getLogger(InternalControler.class);
 
 	private PtLegHandler ptScoringHandler;
-	private final boolean marginalCostPricing;
+	private final boolean marginalCostPricingPt;
+	private final boolean marginalCostPricingCar;
 	private final boolean calculate_inVehicleTimeDelayEffects;
 	private final boolean calculate_waitingTimeDelayEffects;
 	
@@ -74,10 +75,11 @@ public class InternalControler {
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
 
-	public InternalControler(ScenarioImpl scenario, double fare, boolean calculate_inVehicleTimeDelayEffects, boolean calculate_waitingTimeDelayEffects, boolean marginalCostPricing) {
+	public InternalControler(ScenarioImpl scenario, double fare, boolean calculate_inVehicleTimeDelayEffects, boolean calculate_waitingTimeDelayEffects, boolean marginalCostPricingPt, boolean marginalCostPricingCar) {
 		this.calculate_inVehicleTimeDelayEffects = calculate_inVehicleTimeDelayEffects;
 		this.calculate_waitingTimeDelayEffects = calculate_waitingTimeDelayEffects;
-		this.marginalCostPricing = marginalCostPricing;
+		this.marginalCostPricingPt = marginalCostPricingPt;
+		this.marginalCostPricingCar = marginalCostPricingCar;
 		this.scenario = scenario;
 		this.fare = fare;
 		this.ptScoringHandler = new PtLegHandler();
@@ -98,7 +100,7 @@ public class InternalControler {
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler, this.scenario, this.calculate_inVehicleTimeDelayEffects, this.calculate_waitingTimeDelayEffects, this.marginalCostPricing));
+		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler, this.scenario, this.calculate_inVehicleTimeDelayEffects, this.calculate_waitingTimeDelayEffects, this.marginalCostPricingPt, this.marginalCostPricingCar));
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		if (controlerConfGroup.getLastIteration() == 0) {

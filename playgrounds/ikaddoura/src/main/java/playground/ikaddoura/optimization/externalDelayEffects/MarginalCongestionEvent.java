@@ -26,14 +26,13 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.internal.HasPersonId;
 
 /**
  * Event to indicate that an agent entering or leaving a link is delaying other agents on that link later on.
  * 
  * @author ikaddoura
  */
-public final class MarginalCongestionEvent extends Event implements HasPersonId {
+public final class MarginalCongestionEvent extends Event {
 	
 	public static final String EVENT_TYPE = "MarginalCongestionEffect";
 	public static final String EVENT_CAPACITY_CONSTRAINT = "capacityConstraint";
@@ -55,11 +54,6 @@ public final class MarginalCongestionEvent extends Event implements HasPersonId 
 		this.affectedAgentId = affectedAgentId;
 		this.delay = externalDelay;
 		this.linkId = linkId;
-	}
-
-	@Override
-	public Id getPersonId() {
-		return this.causingAgentId;
 	}
 	
 	public double getDelay() {

@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura;
+package playground.ikaddoura.internalizationCar;
 
 
 import java.io.IOException;
@@ -34,9 +34,9 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
  * @author ikaddoura
  *
  */
-public class IKControler {
+public class InternalizationControler {
 	
-	private static final Logger log = Logger.getLogger(IKControler.class);
+	private static final Logger log = Logger.getLogger(InternalizationControler.class);
 	
 	static String configFile;
 			
@@ -47,11 +47,10 @@ public class IKControler {
 			log.info("configFile: "+ configFile);
 			
 		} else {
-//			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-			configFile = "/Users/Ihab/Desktop/cottbus_input/config.xml";
+			configFile = "/Users/Ihab/Desktop/internalization_input/config.xml";
 		}
 		
-		IKControler main = new IKControler();
+		InternalizationControler main = new InternalizationControler();
 		main.run();
 	}
 	
@@ -59,7 +58,7 @@ public class IKControler {
 		
 		Controler controler = new Controler(configFile);
 		controler.setOverwriteFiles(true);
-//		controler.addControlerListener(new IKControlerListener((ScenarioImpl) controler.getScenario()));
+		controler.addControlerListener(new InternalizationControlerListener( (ScenarioImpl) controler.getScenario()));
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.run();
 	}

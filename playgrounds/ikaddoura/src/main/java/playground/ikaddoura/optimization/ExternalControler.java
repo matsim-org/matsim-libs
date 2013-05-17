@@ -77,8 +77,9 @@ class ExternalControler {
 	static boolean usePopulationPathsFile;
 	static boolean calculate_inVehicleTimeDelayEffects;
 	static boolean calculate_waitingTimeDelayEffects;
-	static boolean marginalCostPricing;
-
+	static boolean marginalCostPricingPt;
+	static boolean marginalCostPricingCar;
+	
 	static long randomSeed;
 	static String populationFile;
 	
@@ -109,9 +110,9 @@ class ExternalControler {
 		
 		log.info("Setting parameters...");
 		if (args.length == 0){
-			settingsFile = "/Users/Ihab/Desktop/testScenario_input/settingsFile.csv";
-			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-			outputPath = "/Users/Ihab/Desktop/testScenario_outputTEST";
+			settingsFile = "/Users/Ihab/Desktop/internalization_input/settingsFile.csv";
+			configFile = "/Users/Ihab/Desktop/internalization_input/config.xml";
+			outputPath = "/Users/Ihab/Desktop/internalization_output";
 			
 		} else {
 			settingsFile = args[0];
@@ -142,7 +143,8 @@ class ExternalControler {
 		
 		calculate_inVehicleTimeDelayEffects = settings.isCalculating_inVehicleTimeDelayEffects();
 		calculate_waitingTimeDelayEffects = settings.isCalculating_waitingTimeDelayEffects();
-		marginalCostPricing = settings.isMarginalCostPricing();		
+		marginalCostPricingPt = settings.isMarginalCostPricingPt();
+		marginalCostPricingCar = settings.isMarginalCostPricingCar();		
 		
 		if (useRandomSeedsFile){
 			String randomSeedsFile = settings.getRandomSeedsFile();
@@ -269,7 +271,7 @@ class ExternalControler {
 			scenario.getConfig().global().setRandomSeed(randomSeed);
 		}
 		
-		InternalControler internalControler = new InternalControler(scenario, fare, calculate_inVehicleTimeDelayEffects, calculate_waitingTimeDelayEffects, marginalCostPricing);
+		InternalControler internalControler = new InternalControler(scenario, fare, calculate_inVehicleTimeDelayEffects, calculate_waitingTimeDelayEffects, marginalCostPricingPt, marginalCostPricingCar);
 		internalControler.run();
 		
 		deleteUnnecessaryInternalIterations(scenario); 
@@ -446,7 +448,7 @@ class ExternalControler {
 			log.info("Calculating waitingTimeDelayEffects disabled.");
 		}
 		
-		if (marginalCostPricing){
+		if (marginalCostPricingPt){
 			log.info("Marginal cost pricing enabled.");
 		} else {
 			log.info("Marginal cost pricing disabled.");

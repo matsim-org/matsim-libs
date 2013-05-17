@@ -36,16 +36,16 @@ import playground.ikaddoura.optimization.externalDelayEffects.WaitingDelayEventH
  * @author ikaddoura
  *
  */
-public class MarginalCostPricingHandler implements InVehicleDelayEventHandler, WaitingDelayEventHandler {
+public class MarginalCostPricingPtHandler implements InVehicleDelayEventHandler, WaitingDelayEventHandler {
 
-	private final static Logger log = Logger.getLogger(MarginalCostPricingHandler.class);
+	private final static Logger log = Logger.getLogger(MarginalCostPricingPtHandler.class);
 
 	private final EventsManager events;
 	private final ScenarioImpl scenario;
 	private final double vtts_inVehicle;
 	private final double vtts_waiting;
 
-	public MarginalCostPricingHandler(EventsManager eventsManager, ScenarioImpl scenario) {
+	public MarginalCostPricingPtHandler(EventsManager eventsManager, ScenarioImpl scenario) {
 		this.events = eventsManager;
 		this.scenario = scenario;
 		this.vtts_inVehicle = (this.scenario.getConfig().planCalcScore().getTravelingPt_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();	

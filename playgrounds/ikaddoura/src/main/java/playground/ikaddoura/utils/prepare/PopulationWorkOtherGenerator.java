@@ -75,20 +75,20 @@ public class PopulationWorkOtherGenerator {
 			
 			double homeEndTimeRnd = calculateNormallyDistributedTime(8.0*3600.0, 3600.0);
 
-			if (i <= ((double)quantity / 2.0)){
-				Person person = this.population.getFactory().createPerson(createId("person_WorkPt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
-				Plan plan = this.population.getFactory().createPlan();
-	
-				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
-				plan.addLeg(createDriveLegPt());
-				plan.addActivity(createWorkWhite(workLocation, homeEndTimeRnd + (8*60*60)));
-				plan.addLeg(createDriveLegPt());
-				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
-				person.addPlan(plan);
-				this.population.addPerson(person);
-			}
+//			if (i <= ((double)quantity / 2.0)){
+//				Person person = this.population.getFactory().createPerson(createId("person_WorkPt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
+//				Plan plan = this.population.getFactory().createPlan();
+//	
+//				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
+//				plan.addLeg(createDriveLegPt());
+//				plan.addActivity(createWorkWhite(workLocation, homeEndTimeRnd + (8*60*60)));
+//				plan.addLeg(createDriveLegPt());
+//				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
+//				person.addPlan(plan);
+//				this.population.addPerson(person);
+//			}
 			
-			if (i > ((double)quantity / 2.0)){
+//			if (i > ((double)quantity / 2.0)){
 				Person person = this.population.getFactory().createPerson(createId("person_WorkCar_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
@@ -99,7 +99,7 @@ public class PopulationWorkOtherGenerator {
 				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
 				person.addPlan(plan);
 				this.population.addPerson(person);
-			}
+//			}
 		}
 	}
 
@@ -109,20 +109,20 @@ public class PopulationWorkOtherGenerator {
 			Coord otherLocation = getRndCoord();
 			double homeEndTimeRnd = calculateRandomlyDistributedValue(12.5 * 60*60, 4.5*60*60); // 8 - 17 Uhr
 
-			if (i <= ((double)quantity / 2.0)){
-				Person person = this.population.getFactory().createPerson(createId("person_OtherPt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)otherLocation.getX()), i));
-				Plan plan = this.population.getFactory().createPlan();
-	
-				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
-				plan.addLeg(createDriveLegPt());
-				plan.addActivity(createOther(otherLocation, homeEndTimeRnd + (2*60*60)));
-				plan.addLeg(createDriveLegPt());
-				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
-				person.addPlan(plan);
-				this.population.addPerson(person);
-			}
-			
-			if (i > ((double)quantity / 2.0)){
+//			if (i <= ((double)quantity / 2.0)){
+//				Person person = this.population.getFactory().createPerson(createId("person_OtherPt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)otherLocation.getX()), i));
+//				Plan plan = this.population.getFactory().createPlan();
+//	
+//				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
+//				plan.addLeg(createDriveLegPt());
+//				plan.addActivity(createOther(otherLocation, homeEndTimeRnd + (2*60*60)));
+//				plan.addLeg(createDriveLegPt());
+//				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
+//				person.addPlan(plan);
+//				this.population.addPerson(person);
+//			}
+//			
+//			if (i > ((double)quantity / 2.0)){
 				Person person = this.population.getFactory().createPerson(createId("person_OtherCar_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)otherLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
@@ -133,7 +133,7 @@ public class PopulationWorkOtherGenerator {
 				plan.addActivity(createHome(homeLocation, homeEndTimeRnd));
 				person.addPlan(plan);
 				this.population.addPerson(person);
-			}
+//			}
 		}
 	}
 	

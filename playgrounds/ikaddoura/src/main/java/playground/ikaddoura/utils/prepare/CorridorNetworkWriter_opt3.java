@@ -73,15 +73,15 @@ public class CorridorNetworkWriter_opt3 {
 		createNodes(linkNr);
 		
 //		createBusLinks(linkNr);
-//		createCarLinks(linkNr);
+		createCarLinks(linkNr);
 		
-		createMixedLinks(linkNr);
+//		createMixedLinks(linkNr);
 		
 		setLinks();
 		
 		NetworkWriter networkWriter = new NetworkWriter(network);
 //		networkWriter.write("/Users/Ihab/Desktop/network_busLane.xml");
-		networkWriter.write("/Users/Ihab/Desktop/network_mixed.xml");
+		networkWriter.write("/Users/Ihab/Desktop/network_car.xml");
 
 	}
 	

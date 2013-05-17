@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TestControler.java
+ * MyControlerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,47 +21,37 @@
 /**
  * 
  */
-package playground.ikaddoura;
 
+package playground.ikaddoura.internalizationCar;
 
-import java.io.IOException;
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.api.experimental.events.EventsManager;
+
+import org.matsim.core.controler.events.StartupEvent;
+
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
+
+import playground.ikaddoura.optimization.externalDelayEffects.MarginalCongestionHandler;
 
 /**
- * @author ikaddoura
+ * @author Ihab
  *
  */
-public class IKControler {
-	
-	private static final Logger log = Logger.getLogger(IKControler.class);
-	
-	static String configFile;
-			
-	public static void main(String[] args) throws IOException {
-				
-		if (args.length > 0) {
-			configFile = args[0];		
-			log.info("configFile: "+ configFile);
-			
-		} else {
-//			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-			configFile = "/Users/Ihab/Desktop/cottbus_input/config.xml";
-		}
-		
-		IKControler main = new IKControler();
-		main.run();
+
+public class InternalizationControlerListener implements StartupListener {
+
+	private final ScenarioImpl scenario;
+
+	public InternalizationControlerListener(ScenarioImpl scenario){
+		this.scenario = scenario;
 	}
 	
-	private void run() {
+	@Override
+	public void notifyStartup(StartupEvent event) {
 		
-		Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
-//		controler.addControlerListener(new IKControlerListener((ScenarioImpl) controler.getScenario()));
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
-		controler.run();
+		EventsManager eventsManager = event.getControler().getEvents();
+		event.getControler().getEvents().addHandler(new MarginalCongestionHandler(eventsManager, scenario));
+		event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
 	}
+
 }
-	
