@@ -27,8 +27,6 @@ import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.optimization.externalDelayEffects.MarginalCongestionEvent;
-import playground.ikaddoura.optimization.externalDelayEffects.MarginalCongestionEventHandler;
 
 /**
  * @author ikaddoura
