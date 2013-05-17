@@ -43,9 +43,12 @@ public class TestHbefaColdEmissionFactorKey {
 	ColdPollutant coldPollutant;
 	HbefaVehicleAttributes hbefaVehicleAttributes;
 	HbefaVehicleCategory hbefaVehCategory;
-	String message;
+	String message, message2;
+	boolean equalErr;
+	HbefaColdEmissionFactorKey normal;
 	
 	private void setUp(){
+		normal = new HbefaColdEmissionFactorKey();
 		hbefaVehicleAttributes = new HbefaVehicleAttributes();
 		hbefaVehicleAttributes.setHbefaEmConcept("concept");
 		hbefaVehicleAttributes.setHbefaSizeClass("size class");
@@ -54,6 +57,7 @@ public class TestHbefaColdEmissionFactorKey {
 		parkingTime = 5;
 		coldPollutant = ColdPollutant.FC;
 		hbefaVehCategory = HbefaVehicleCategory.PASSENGER_CAR;
+		equalErr = false;
 	}
 	
 	
@@ -98,15 +102,17 @@ public class TestHbefaColdEmissionFactorKey {
 		Assert.assertFalse(message, different.equals(normal));
 	}
 	
+	// the following tests each compare a incomplete key to a complete key
+	// wanted result:
+	// completeData.equals(partialData) -> return false
+	// uncompleteData.equals(completeData) -> throw nullpointer
+	//exception: if the vehicleAttributes are set to 'average' by default
+	
 	@Test
-	public final void testEqualsForIncompleteKeys(){
-		
+	public final void testEqualsForIncompleteKeys_vehicleCategory(){
 		setUp();
 		boolean equalErr = false;
 		String message2;
-		
-		// completeData.equals(partialData) -> return false
-		// uncompleteData.equals(completeData) -> throw nullpointer
 		
 		//normal HbefaColdEmissionFactorKey
 		HbefaColdEmissionFactorKey normal = new HbefaColdEmissionFactorKey();
@@ -130,7 +136,17 @@ public class TestHbefaColdEmissionFactorKey {
 		message2 = "this key should not be comparable since no vehicle category is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noVehCat));
+		
+	}
 
+	@Test
+	public final void testEqualsForIncompleteKeys_pollutant(){
+		
+		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
+		// and set some parameters
+		setUp();
+		setToNormal(normal);
+		
 		//no pollutant set
 		HbefaColdEmissionFactorKey noColdPollutant = new HbefaColdEmissionFactorKey();
 		noColdPollutant.setHbefaDistance(distance);
@@ -149,7 +165,15 @@ public class TestHbefaColdEmissionFactorKey {
 		message2 = "this key should not be comparable since no cold pollutant is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noColdPollutant));
+	}
+	
+	@Test
+	public final void testEqualsForIncompleteKeys_parkingTime(){
 
+		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
+		// and set some parameters
+		setUp();
+		setToNormal(normal);
 
 		//no parking time set
 		HbefaColdEmissionFactorKey noParkingTime = new HbefaColdEmissionFactorKey();
@@ -169,6 +193,15 @@ public class TestHbefaColdEmissionFactorKey {
 		message2 = "this key should not be comparable since no parking time is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noParkingTime));
+	}
+	
+	@Test
+	public final void testEqualsForIncompleteKeys_distance(){
+
+		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
+		// and set some parameters
+		setUp();
+		setToNormal(normal);
 		
 		//no distance set
 		HbefaColdEmissionFactorKey noDistance = new HbefaColdEmissionFactorKey();
@@ -188,6 +221,45 @@ public class TestHbefaColdEmissionFactorKey {
 		message2 = "this key should not be comparable since no distance is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noDistance));
+	}
+	
+	@Test
+	public final void testEqualsForIncompleteKeys_emptyKey(){
+
+		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
+		// and set some parameters
+		setUp();
+		setToNormal(normal);
+		
+		//empty HbefaColdEmissionFactorKey
+				HbefaColdEmissionFactorKey emptyKey = new HbefaColdEmissionFactorKey();
+				equalErr = false;
+				try{
+					emptyKey.equals(normal);
+				}
+				catch(NullPointerException e){
+					equalErr = true;
+				}
+				message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + emptyKey.toString();
+				message2 = "this key should not be comparable since nothing is set";
+				Assert.assertTrue(message2, equalErr);
+				Assert.assertFalse(message, normal.equals(emptyKey)); 
+	}
+	
+	@Test
+	public final void testEqualsForIncompleteKeys_VehicleAttributes(){
+		
+		//if no vehicle attributes are set manually they are set to 'average' by default
+		// thus, the equals method should not throw nullpointer exceptions but return false or respectively true
+
+		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
+		// and set some parameters
+		setUp();
+		setToNormal(normal);		
+		
+		//normal HbefaColdEmissionFactorKey
+		HbefaColdEmissionFactorKey normal = new HbefaColdEmissionFactorKey();
+		setToNormal(normal);
 		
 		//no veh attributes
 		HbefaColdEmissionFactorKey noVehAtt = new HbefaColdEmissionFactorKey();
@@ -209,6 +281,9 @@ public class TestHbefaColdEmissionFactorKey {
 		Assert.assertFalse(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noVehAtt));
 		
+		
+		//set the vehicle attributes of the normal hbefacoldemissionfactorkey to 'average'
+		//then noVehAtt is equal to normal
 		HbefaVehicleAttributes hbefaVehicleAttributesAverage = new HbefaVehicleAttributes();
 		hbefaVehicleAttributesAverage.setHbefaEmConcept("average");
 		hbefaVehicleAttributesAverage.setHbefaSizeClass("average");
@@ -226,22 +301,8 @@ public class TestHbefaColdEmissionFactorKey {
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
 		Assert.assertFalse(message2, equalErr);
 		Assert.assertTrue(message, normal.equals(noVehAtt));
-
-		setToNormal(normal);
 		
-		//empty HbefaColdEmissionFactorKey
-		HbefaColdEmissionFactorKey emptyKey = new HbefaColdEmissionFactorKey();
-		equalErr = false;
-		try{
-			emptyKey.equals(normal);
-		}
-		catch(NullPointerException e){
-			equalErr = true;
-		}
-		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + emptyKey.toString();
-		message2 = "this key should not be comparable since nothing is set";
-		Assert.assertTrue(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(emptyKey)); 
+		
 	}
 
 
