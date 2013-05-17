@@ -40,7 +40,9 @@ public class Main {
 	public static void main(String[] args) {
 		Controler ctrl = new Controler( args ) ;
 		
-		PlanSelector planSelector = new PathSizeLogitSelector( ctrl.getConfig().planCalcScore(), ctrl.getNetwork() );
+		double logitScaleFactor = ctrl.getConfig().planCalcScore().getBrainExpBeta() ;
+		double pathSizeLogitExponent = ctrl.getConfig().planCalcScore().getPathSizeLogitBeta() ; 
+		PlanSelector planSelector = new PathSizeLogitSelector( pathSizeLogitExponent, - logitScaleFactor, ctrl.getNetwork() );
 
 		ctrl.getStrategyManager().setPlanSelectorForRemoval(planSelector) ;
 		// yy should probably be replaced by a factory pattern

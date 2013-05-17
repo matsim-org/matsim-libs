@@ -275,6 +275,24 @@ public class StrategyManager implements MatsimManager {
 	 * Sets a plan selector to be used for choosing plans for removal, if they
 	 * have more plans than the specified maximum. This defaults to
 	 * {@link WorstPlanForRemovalSelector}.
+	 * <p/>
+	 * Thoughts about using the logit-type selectors with negative logit model scale parameter:<ul>
+	 * <li> Look at one agent.
+	 * <li> Assume she has the choice between <i>n</i> different plans.
+	 * <li> (Continuous) fraction <i>f(i)</i> of plan <i>i</i> develops as (master equation) 
+	 * <i>
+	 * df(i)/dt = - p(i) * f(i) + 1/n
+	 * </i>
+	 * where <i>p(i)</i> is from the choice model. 
+	 * <li> Steady state solution (<i>df/dt=0</i>) <i> f(i) = 1/n * 1/p(i) </i>.
+	 * <li> If <i> p(i) = e<sup>-b*U(i)</sup></i>, then <i> f(i) = e<sup>b*U(i)</sup> / n </i>.  Or in words:
+	 * <i><b> If you use a logit model with a minus in front of the beta for plans removal, the resulting steady state distribution is
+	 * the same logit model with normal beta.</b></i> 
+	 * 
+	 * </ul>
+	 * The implication seems to be: divide the user-configured beta by two, use one half for choice and the other for plans removal.
+	 * <p/>
+	 * The path size version still needs to be tested (both for choice and for plans removal).
 	 *
 	 * @param planSelector
 	 *
