@@ -39,9 +39,13 @@ public class ExpBetaPlanSelector implements PlanSelector {
 
 	protected static final double MIN_WEIGHT = Double.MIN_VALUE;
 	protected final double beta;
+	
+	public ExpBetaPlanSelector( final double logitScaleFactor ) {
+		this.beta = logitScaleFactor ;
+	}
 
 	public ExpBetaPlanSelector(PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {
-		this.beta = charyparNagelScoringConfigGroup.getBrainExpBeta();
+		this( charyparNagelScoringConfigGroup.getBrainExpBeta() ) ;
 	}
 
 	/**

@@ -46,17 +46,18 @@ import org.matsim.core.utils.misc.RouteUtils;
  */
 public final class PathSizeLogitSelector implements PlanSelector {
 
-	private final double beta;
-	private final double tau;
+	private final double pathSizeLogitExponent;
+	private final double logitScaleFactor;
 	private Network network;
+	
+	public PathSizeLogitSelector( final double pathSizeLogitExponent, final double logitScaleFactor, final Network network ) {
+		this.pathSizeLogitExponent = pathSizeLogitExponent ;
+		this.logitScaleFactor = logitScaleFactor ;
+		this.network = network ;
+	}
 
 	public PathSizeLogitSelector(final PlanCalcScoreConfigGroup config, final Network network) {
-		this.beta = config.getPathSizeLogitBeta();
-		
-		//in PSL tau is  the equivalent to BrainExpBeta in the multinomial logit model
-		this.tau = config.getBrainExpBeta();
-		this.network = network;
-
+		this( config.getPathSizeLogitBeta(), config.getBrainExpBeta(), network ) ;
 	}
 
 	@Override
@@ -166,7 +167,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 			}
 			// tmp is now a number that contains the ``reduced'' travel distance of the plan.  Divide it by the full travel distance
 			// of the plan, and take to the power of this.beta:
-			double PSi = Math.pow(tmp/planLength.get(plan.hashCode()), this.beta);
+			double PSi = Math.pow(tmp/planLength.get(plan.hashCode()), this.pathSizeLogitExponent);
 			
 			double weight;
 			if (Double.isInfinite(wc.maxScore)) {
@@ -180,7 +181,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 				// (or NaN or null or something similar).  In this case, plans are simply weighted by their PSi, so that 
 				// overlapping plans get less weight than very different plans. kai, oct'12)
 			} else {
-				weight = Math.exp(this.tau * (plan.getScore() - wc.maxScore))*PSi;
+				weight = Math.exp(this.logitScaleFactor * (plan.getScore() - wc.maxScore))*PSi;
 				// (this is essentially $PSi * exp( tau * score )$, the "-wc.maxScore" is (presumably) the computational trick
 				// to avoid overflow)
 			}
