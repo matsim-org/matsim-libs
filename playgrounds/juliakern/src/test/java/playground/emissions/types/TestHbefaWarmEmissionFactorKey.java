@@ -35,9 +35,8 @@ public class TestHbefaWarmEmissionFactorKey{
 
 	/*
  	* test for playground.vsp.emissions.types.HbefaWarmEmissionFactorKey
- 	* 1 test equals method for correct input: two equal hbefaWarmEmissionFactorKey objects, two unequal objects
- 	* 2 test equals method for incorrect input: one correct hbefaWarmEmissionFactorKey against one with a missing 
- 	* argument
+ 	* 1 test equals method for complete input: two equal hbefaWarmEmissionFactorKey objects, two unequal objects
+ 	* 2 test equals method for incomplete input: one complete hbefaWarmEmissionFactorKey against one with a missing argument
  	*  
  	*  @author julia
  	*/
@@ -47,9 +46,13 @@ public class TestHbefaWarmEmissionFactorKey{
 	HbefaTrafficSituation hbefaTrafficSituation;
 	HbefaVehicleCategory hbefaVehicleCategory;
 	WarmPollutant warmPollutant;
-	String message;
+	String message, message2;
+	HbefaWarmEmissionFactorKey normal;
+	boolean equalErr;
 	
 	private void setUp(){
+		equalErr = false;
+		normal = new HbefaWarmEmissionFactorKey();
 		hbefaVehicleAttributes = new HbefaVehicleAttributes();
 		hbefaVehicleAttributes.setHbefaEmConcept("concept");
 		hbefaVehicleAttributes.setHbefaSizeClass("size class");
@@ -58,20 +61,20 @@ public class TestHbefaWarmEmissionFactorKey{
 		hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
 		hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		warmPollutant = WarmPollutant.FC;
+		
 	}
 
 	@Test
 	public final void testEqualsForCompleteKeys(){
 
+		// generate a complete HbefaWarmEmissionFactorKey: 'normal' 
+		// and set some parameters
 		setUp();
-		
-		//normal HbefaWarmEmissionFactorKey	- default case
-		HbefaWarmEmissionFactorKey normal = new HbefaWarmEmissionFactorKey();
 		setToNormal(normal);
 		
-		//two equal correct objects 
+		// generate a warm emission factor key equal to 'normal' 
 		HbefaWarmEmissionFactorKey compare = new HbefaWarmEmissionFactorKey();
-		compare.setHbefaComponent(warmPollutant);
+		compare.setHbefaComponent(WarmPollutant.FC);
 		compare.setHbefaRoadCategory(hbefaRoadCategory);
 		compare.setHbefaTrafficSituation(hbefaTrafficSituation);
 		compare.setHbefaVehicleAttributes(hbefaVehicleAttributes);
@@ -81,7 +84,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		Assert.assertTrue(message, normal.equals(compare));
 		Assert.assertTrue(message, compare.equals(normal));
 		
-		//two unequal but correct objects
+		//two unequal but complete objects
 		HbefaWarmEmissionFactorKey different = new HbefaWarmEmissionFactorKey();
 		different.setHbefaComponent(WarmPollutant.CO);
 		different.setHbefaRoadCategory("another road category");
@@ -99,60 +102,75 @@ public class TestHbefaWarmEmissionFactorKey{
 		Assert.assertFalse(message, normal.equals(different));
 	}
 	
-	@Test
-	public final void testEqualsForIncompleteKeys(){
+	// the following tests each compare a incomplete key to a complete key
+	// wanted result:
+	// completeData.equals(partialData) -> return false
+	// uncompleteData.equals(completeData) -> throw nullpointer
+	// exception: if the vehicleAttributes are set to 'average' by default
 	
+	@Test
+	public final void testEqualsForIncompleteKeys_vehicleCategory() {
+		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
+		// and set some parameters
 		setUp();
-		boolean equalErr = false;
-		String message2;
-		
-
-		// completeData.equals(partialData) -> return false
-		// uncompleteData.equals(completeData) -> throw nullpointer
-		
-		//normal HbefaWarmEmissionFactorKey	- default case
-		HbefaWarmEmissionFactorKey normal = new HbefaWarmEmissionFactorKey();
 		setToNormal(normal);
 
-		//empty VehicleCategory
+		// empty VehicleCategory
 		HbefaWarmEmissionFactorKey noVehCat = new HbefaWarmEmissionFactorKey();
 		noVehCat.setHbefaComponent(warmPollutant);
 		noVehCat.setHbefaRoadCategory(hbefaRoadCategory);
 		noVehCat.setHbefaTrafficSituation(hbefaTrafficSituation);
 		noVehCat.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		
+
 		equalErr = false;
-		try{
+		try {
 			noVehCat.equals(normal);
+		} catch (NullPointerException e) {
+			equalErr = true;
 		}
-		catch(NullPointerException e){
-			equalErr= true;
-		}
-		
-		message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehCat.toString();
+
+		message = "these two HbefaWarmEmissionFactorKeys should not be the same: "
+				+ normal.toString() + " and " + noVehCat.toString();
 		message2 = "this key should not be comparable since no vehicle category is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noVehCat));
-		
-		//empty warm pollutant
+
+	}
+	
+	@Test
+	public final void testEqualsForIncompleteKeys_pollutant() {
+		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
+		// and set some parameters
+		setUp();
+		setToNormal(normal);
+
+		// empty warm pollutant
 		HbefaWarmEmissionFactorKey noPollutant = new HbefaWarmEmissionFactorKey();
 		noPollutant.setHbefaRoadCategory(hbefaRoadCategory);
 		noPollutant.setHbefaTrafficSituation(hbefaTrafficSituation);
 		noPollutant.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 		noPollutant.setHbefaVehicleCategory(hbefaVehicleCategory);
-		
+
 		equalErr = false;
-		try{
+		try {
 			noPollutant.equals(normal);
-		}
-		catch(NullPointerException e){
-			equalErr= true;
+		} catch (NullPointerException e) {
+			equalErr = true;
 		}
 
-		message ="these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noPollutant.toString();
+		message = "these two HbefaWarmEmissionFactorKeys should not be the same: "
+				+ normal.toString() + " and " + noPollutant.toString();
 		message2 = "this key should not be comparable since no pollutant is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noPollutant));
+	}
+	
+	@Test
+	public final void testEqualsForIncompleteKeys_roadCategory() {
+		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
+		// and set some parameters
+		setUp();
+		setToNormal(normal);
 		
 		//empty road category
 		HbefaWarmEmissionFactorKey noRoadCat = new HbefaWarmEmissionFactorKey();
@@ -173,6 +191,14 @@ public class TestHbefaWarmEmissionFactorKey{
 		message2 = "this key should not be comparable since no road category is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noRoadCat));
+	}
+	
+	@Test
+	public final void testEqualsForIncompleteKeys_trafficSituation() {
+		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
+		// and set some parameters
+		setUp();
+		setToNormal(normal);	
 		
 		//empty traffic situation
 		HbefaWarmEmissionFactorKey noTrafficSit = new HbefaWarmEmissionFactorKey();
@@ -192,7 +218,41 @@ public class TestHbefaWarmEmissionFactorKey{
 		message ="these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noTrafficSit.toString();
 		message2 = "this key should not be comparable since no traffic situation is set";
 		Assert.assertTrue(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noTrafficSit));
+		Assert.assertFalse(message, normal.equals(noTrafficSit));		
+}
+	
+	@Test
+	public final void testEqualsForIncompleteKeys_emptyKey() {
+		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
+		// and set some parameters
+		setUp();
+		setToNormal(normal);	
+		
+		//empty HbefaWarmEmissionFactorKey
+		HbefaWarmEmissionFactorKey emptyKey = new HbefaWarmEmissionFactorKey();
+		equalErr = false;
+		try{
+			emptyKey.equals(normal);
+		}
+		catch(NullPointerException e){
+			equalErr = true;
+		}
+		message ="these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + emptyKey.toString();
+		message2 = "this key should not be comparable since it is not initiated";
+		Assert.assertTrue(message2, equalErr);
+		Assert.assertFalse(message, normal.equals(emptyKey)); 
+	}
+	
+	@Test
+	public final void testEqualsForIncompleteKeys_vehicleAttributes(){
+		
+		// if no vehicle attributes are set manually they are set to 'average' by default
+		// thus, the equals method should not throw nullpointer exceptions but return false or respectively true
+		
+		// generate a complete HbefaWarmEmissionFactorKey: 'normal' 
+		// and set some parameters
+		setUp();
+		setToNormal(normal);
 		
 		//empty vehicle attributes
 		HbefaWarmEmissionFactorKey noVehAtt = new HbefaWarmEmissionFactorKey();
@@ -216,6 +276,8 @@ public class TestHbefaWarmEmissionFactorKey{
 		// therefore this should not throw a nullpointer but return false
 		Assert.assertFalse(message, normal.equals(noVehAtt));
 		
+		//set the vehicle attributes of the normal hbefacoldemissionfactorkey to 'average'
+		//then noVehAtt is equal to normal
 		HbefaVehicleAttributes hbefaVehicleAttributesAverage = new HbefaVehicleAttributes();
 		hbefaVehicleAttributesAverage.setHbefaEmConcept("average");
 		hbefaVehicleAttributesAverage.setHbefaSizeClass("average");
@@ -226,21 +288,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		Assert.assertTrue(message, normal.equals(noVehAtt));
 		Assert.assertTrue(message, noVehAtt.equals(normal));
 		
-		setToNormal(normal);
-		
-		//empty HbefaWarmEmissionFactorKey
-		HbefaWarmEmissionFactorKey emptyKey = new HbefaWarmEmissionFactorKey();
-		equalErr = false;
-		try{
-			emptyKey.equals(normal);
-		}
-		catch(NullPointerException e){
-			equalErr = true;
-		}
-		message ="these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + emptyKey.toString();
-		message2 = "this key should not be comparable since it is not initiated";
-		Assert.assertTrue(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(emptyKey)); 
+
 	}
 	
 	private void setToNormal(HbefaWarmEmissionFactorKey normal) {

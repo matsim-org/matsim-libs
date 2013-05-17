@@ -27,20 +27,21 @@ import playground.vsp.emissions.types.HbefaVehicleAttributes;
 
 /*
  * test for playground.vsp.emissions.types.HbefaVehicleAttributes
- * 1 test equals method for two correct objects
- * 2 test equals method for one correct and one partially initiated object
+ * 1 test equals method for two complete vehicle attributes
+ * 2 test equals method for one complete and one incomplete vehicle attributes
  * 3 test the initialization
  */
 
 public class TestHbefaVehicleAttributes {
 	String technology = "technology", sizeClass = "size class", concept = "concept";
+	String message, assertErrorMessage; 
+	HbefaVehicleAttributes normal, differentValues;
 	
 	@Test
-	public final void testEqualsForCompleteKeys(){
+	public final void testEqualsForCompleteAttributes(){
 		
 		//two equal objects - no default values
-		
-		HbefaVehicleAttributes normal = new HbefaVehicleAttributes();
+		normal = new HbefaVehicleAttributes();
 		setToNormal(normal);
 		
 		HbefaVehicleAttributes compare = new HbefaVehicleAttributes();
@@ -53,8 +54,16 @@ public class TestHbefaVehicleAttributes {
 		Assert.assertTrue(assertErrorMessage, normal.equals(compare));
 		Assert.assertTrue(assertErrorMessage, compare.equals(normal));
 		
-		//two unequal but correct objects
-		HbefaVehicleAttributes differentValues = new HbefaVehicleAttributes();
+	}
+	
+	@Test
+	public final void testEqualsForCompleteAttributes_emConcept(){
+		
+		//two unequal but complete objects
+		normal = new HbefaVehicleAttributes();
+		setToNormal(normal);
+		
+		differentValues = new HbefaVehicleAttributes();
 		
 		//different em concepts
 		differentValues.setHbefaEmConcept("concept2");
@@ -64,6 +73,15 @@ public class TestHbefaVehicleAttributes {
 		assertErrorMessage += normal.toString() + " and " + differentValues.toString();
 		Assert.assertFalse(assertErrorMessage, normal.equals(differentValues));
 		Assert.assertFalse(assertErrorMessage, differentValues.equals(normal));
+	}
+	
+	@Test
+	public final void testEqualsForCompleteAttributes_sizeClass(){
+		
+		//two unequal but complete objects
+		normal = new HbefaVehicleAttributes();
+		setToNormal(normal);
+		differentValues = new HbefaVehicleAttributes();
 
 		//different size classes
 		differentValues.setHbefaEmConcept(concept);
@@ -73,6 +91,16 @@ public class TestHbefaVehicleAttributes {
 		assertErrorMessage += normal.toString() + " and " + differentValues.toString();
 		Assert.assertFalse(assertErrorMessage, normal.equals(differentValues));
 		Assert.assertFalse(assertErrorMessage, differentValues.equals(normal));
+		
+	}
+	
+	@Test
+	public final void testEqualsForCompleteAttributes_technologies(){
+		
+		//two unequal but complete objects
+		normal = new HbefaVehicleAttributes();
+		setToNormal(normal);
+		differentValues = new HbefaVehicleAttributes();
 		
 		//different technologies
 		differentValues.setHbefaEmConcept(concept);
@@ -85,44 +113,62 @@ public class TestHbefaVehicleAttributes {
 		
 	}
 	
+	// the following tests each compare incomplete to complete attribute data
+	// if some of the vehicle attributes are not set manually they are set to 'average' by default
+	// thus, the equals method should not throw nullpointer exceptions but return false or respectively true
+	
 	@Test
-	public final void testEqualsForIncompleteKeys(){
-		//correct object - no default values
+	public final void testEqualsForIncompleteAttributes_emConcept(){
+		//generate a complete key and set its parameters
+				normal = new HbefaVehicleAttributes();
+				setToNormal(normal);
+				
+				//em concept missing
+				HbefaVehicleAttributes noEmConcept = new HbefaVehicleAttributes();
+				noEmConcept.setHbefaSizeClass(sizeClass);
+				noEmConcept.setHbefaTechnology(technology);
+				message = "no em concept was set, therefore " + normal.getHbefaEmConcept() + " should not equal " + noEmConcept.getHbefaEmConcept();
+				Assert.assertFalse(message, noEmConcept.equals(normal));
+				Assert.assertFalse(message, normal.equals(noEmConcept));
+				
+				normal.setHbefaEmConcept("average");
+				message = "no em concept was set, therefore " + noEmConcept.getHbefaEmConcept() + "should be set to 'average'";
+				Assert.assertTrue(message, noEmConcept.equals(normal));
+				Assert.assertTrue(message, normal.equals(noEmConcept));
+	}
+	
+	
+	@Test
+	public final void testEqualsForIncompleteAttributes_technology() {
+		
+		// generate a complete key and set its parameters
+		normal = new HbefaVehicleAttributes();
+		setToNormal(normal);
 
-		String message; 
-		
-		HbefaVehicleAttributes normal = new HbefaVehicleAttributes();
-		
-		//one correct object, one partial objects
-		
-		//em concept missing
-		setToNormal(normal);
-		HbefaVehicleAttributes noEmConcept = new HbefaVehicleAttributes();
-		noEmConcept.setHbefaSizeClass(sizeClass);
-		noEmConcept.setHbefaTechnology(technology);
-		message = "no em concept was set, therefore " + normal.getHbefaEmConcept() + " should not equal " + noEmConcept.getHbefaEmConcept();
-		Assert.assertFalse(message, noEmConcept.equals(normal));
-		Assert.assertFalse(message, normal.equals(noEmConcept));
-		
-		normal.setHbefaEmConcept("average");
-		message = "no em concept was set, therefore " + noEmConcept.getHbefaEmConcept() + "should be set to 'average'";
-		Assert.assertTrue(message, noEmConcept.equals(normal));
-		Assert.assertTrue(message, normal.equals(noEmConcept));
-		
-		//technology missing
-		setToNormal(normal);
+		// technology missing
 		HbefaVehicleAttributes noTechnology = new HbefaVehicleAttributes();
 		noTechnology.setHbefaEmConcept(concept);
 		noTechnology.setHbefaSizeClass(sizeClass);
-		message = "no technology was set, therefore " + normal.getHbefaTechnology() + " should not equal " + noEmConcept.getHbefaTechnology();
+		message = "no technology was set, therefore " + normal.getHbefaTechnology() + " should not equal " + noTechnology.getHbefaTechnology();
 		Assert.assertFalse(message, noTechnology.equals(normal));
 		Assert.assertFalse(message, normal.equals(noTechnology));
-		
+
+		//set the hbefa technology of the normal vehicle attributes to 'average'
+		//then noTechnology is equal to normal
 		normal.setHbefaTechnology("average");
-		message = "no em concept was set, therefore " + noEmConcept.getHbefaEmConcept() + "should be set to 'average'";
+		message = "no em concept was set, therefore " + noTechnology.getHbefaEmConcept() + "should be set to 'average'";
 		Assert.assertTrue(message, noTechnology.equals(normal));
 		Assert.assertTrue(message, normal.equals(noTechnology));
+
+	}
+	
+	@Test
+	public final void testEqualsForIncompleteAttributes_sizeClass(){
 		
+		//generate a complete key and set its parameters
+		normal = new HbefaVehicleAttributes();
+		setToNormal(normal);
+
 		//size class missing
 		setToNormal(normal);
 		HbefaVehicleAttributes noSize = new HbefaVehicleAttributes();
@@ -137,8 +183,16 @@ public class TestHbefaVehicleAttributes {
 		Assert.assertTrue(message, noSize.equals(normal));
 		Assert.assertTrue(message, normal.equals(noSize));
 		
-		//ein korrektes, ein nicht-objekt - null?
+}
+	
+	@Test
+	public final void testEqualsForIncompleteAttributes_wrongType(){
+		
+		//generate a complete key and set its parameters
+		normal = new HbefaVehicleAttributes();
 		setToNormal(normal);
+		
+		//diffent data types
 		message = "if a HbefaVehicleAttribute is compared to a different object, 'false' shouls be returned";
 		Assert.assertFalse(message, normal.equals(null));
 		Assert.assertFalse(message, normal.equals("a string"));
@@ -152,13 +206,14 @@ public class TestHbefaVehicleAttributes {
 	}
 	
 	public final void testInit(){
-		//leeres Objekt soll mit "average" initialisiert werden
+		
+		// missing attributes should be initilized with 'average' by default
 		HbefaVehicleAttributes emptyAttributes = new HbefaVehicleAttributes();
 		HbefaVehicleAttributes average = new  HbefaVehicleAttributes();
 		average.setHbefaEmConcept("average");
 		average.setHbefaSizeClass("average");
 		average.setHbefaTechnology("average");
-		String message = "The empty and the average initialization of an HbefaVehicleAttributes should be the same: ";
+		message = "The empty and the average initialization of an HbefaVehicleAttributes should be the same: ";
 		message += emptyAttributes.toString() + " and " + average.toString();
 		Assert.assertTrue(message, emptyAttributes.equals(average));
 		Assert.assertTrue(message, average.equals(emptyAttributes));

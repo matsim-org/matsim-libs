@@ -30,9 +30,8 @@ import playground.vsp.emissions.types.HbefaVehicleCategory;
 
 /*
 	* test for playground.vsp.emissions.types.HbefaColdEmissionFactorKey
-	* 1 test equals method for correct input: two equal hbefaColdEmissionFactorKey objects, two unequal objects
-	* 2 test equals method for incorrect input: one correct hbefaColdEmissionFactorKey against one with a missing 
-	* argument
+	* 1 test equals method for complete input: two equal hbefaColdEmissionFactorKey objects, two unequal objects
+	* 2 test equals method for incomplete input: one complete hbefaColdEmissionFactorKey against one with a missing argument
 	*  
 	*  @author julia
 	*/
