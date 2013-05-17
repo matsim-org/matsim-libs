@@ -42,4 +42,6 @@ public class CodeList {
 	 * viel oefter zugreifen als schreiben?
 	 */
 	
+
+	
 }

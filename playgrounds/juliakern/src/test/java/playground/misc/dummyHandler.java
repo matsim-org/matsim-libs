@@ -6,6 +6,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
 public class dummyHandler implements EventsManager {
+	static Double sumOverAll=0.0;
 
 	@Override
 	public EventsFactory getFactory() {
@@ -15,6 +16,9 @@ public class dummyHandler implements EventsManager {
 
 	@Override
 	public void processEvent(Event event) {
+		for(String attribute: event.getAttributes().keySet()){
+			sumOverAll =+ Double.parseDouble(event.getAttributes().get(attribute));
+		}
 		// TODO Auto-generated method stub
 
 	}
@@ -82,6 +86,11 @@ public class dummyHandler implements EventsManager {
 	//TODO
 	public Double getFirstParameter(){
 		return 10.0;
+	}
+
+	public static Double getSum() {
+		return sumOverAll;
+
 	}
 
 }
