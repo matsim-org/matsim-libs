@@ -21,7 +21,6 @@ package org.matsim.contrib.locationchoice.bestresponse.scoring;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
@@ -66,7 +65,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 		} else {
 			scoringFunction = new DCActivityScoringFunction(
 					(PlanImpl)plan, 
-					this.controler.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(), 
+					this.lcContext.getFacilityPenalties(), 
 					lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);		

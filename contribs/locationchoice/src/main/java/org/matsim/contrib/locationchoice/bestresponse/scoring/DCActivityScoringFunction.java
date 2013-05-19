@@ -209,8 +209,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 						 * TODO: maybe checking if activity is movable for this person (discussion)
 						 */
 						this.penalty.add(new ScoringPenalty(activityStart, activityEnd,
-									this.dcContext.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties().
-									get(act.getFacilityId()), tmpScore));
+									this.dcContext.getFacilityPenalties().get(act.getFacilityId()), tmpScore));
 						//---------------------------------------------------------------------------
 				}
 			} else {

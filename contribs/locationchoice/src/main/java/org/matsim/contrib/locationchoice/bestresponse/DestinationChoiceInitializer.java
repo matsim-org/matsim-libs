@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.controler.Controler;
@@ -39,6 +38,7 @@ public class DestinationChoiceInitializer implements StartupListener {
 	private DestinationChoiceBestResponseContext dcContext;
 	private ObjectAttributes personsMaxDCScoreUnscaled;
 	private static final Logger log = Logger.getLogger(DestinationChoiceInitializer.class);
+	
 	
 	public DestinationChoiceInitializer(DestinationChoiceBestResponseContext lcContext) {
 		this.dcContext = lcContext;
@@ -68,7 +68,7 @@ public class DestinationChoiceInitializer implements StartupListener {
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
 		controler.getScenario().addScenarioElement(dcContext);
 		controler.getScenario().addScenarioElement(dcScore);
-	
+			
 		log.info("dc initialized");
 	}	
 }

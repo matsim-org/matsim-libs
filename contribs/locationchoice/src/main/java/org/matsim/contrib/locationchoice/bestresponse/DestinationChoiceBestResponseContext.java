@@ -23,10 +23,14 @@
 package org.matsim.contrib.locationchoice.bestresponse;
 
 import java.util.HashSet;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrCreateKVals;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.api.internal.MatsimFactory;
@@ -54,6 +58,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	private ObjectAttributes personsBetas = new ObjectAttributes();
 	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
 	private ObjectAttributes prefsAttributes = new ObjectAttributes();
+	TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 
 	public DestinationChoiceBestResponseContext(Scenario scenario) {
 		this.scenario = scenario;	
@@ -159,5 +164,9 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 
 	public ObjectAttributes getPrefsAttributes() {
 		return prefsAttributes;
+	}
+
+	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
+		return facilityPenalties;
 	}
 }

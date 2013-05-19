@@ -37,7 +37,6 @@ import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapp
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -167,12 +166,6 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Link ll1 = scenario.getNetwork().getLinks().get(new IdImpl(1)) ;
 		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
 		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
-
-		FacilityPenalties facPenalties = scenario.getScenarioElement(FacilityPenalties.class);
-		if (facPenalties == null) {
-			facPenalties = new FacilityPenalties();
-			scenario.addScenarioElement( facPenalties );
-		}
 
 		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
 		lcContext.init();
