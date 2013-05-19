@@ -36,12 +36,12 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * no further coding should be required 
  */
 public class DestinationChoiceInitializer implements StartupListener {
-	private DestinationChoiceBestResponseContext lcContext;
+	private DestinationChoiceBestResponseContext dcContext;
 	private ObjectAttributes personsMaxDCScoreUnscaled;
 	private static final Logger log = Logger.getLogger(DestinationChoiceInitializer.class);
 	
 	public DestinationChoiceInitializer(DestinationChoiceBestResponseContext lcContext) {
-		this.lcContext = lcContext;
+		this.dcContext = lcContext;
 	}
 	
 
@@ -51,26 +51,24 @@ public class DestinationChoiceInitializer implements StartupListener {
   				  		
   		// compute or read maxDCScore but do not add it to the context:
   		// context can then be given to scoring classes both during regular scoring and in pre-processing 
-  		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
-  		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
+  		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(dcContext);
+  		computer.readOrCreateMaxDCScore(controler, dcContext.kValsAreRead());
   		this.personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
   		 				
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter(), TransportMode.car));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter(), TransportMode.car));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter(), TransportMode.pt));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter(), TransportMode.pt));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter(), TransportMode.bike));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter(), TransportMode.bike));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", lcContext.getConverter(), TransportMode.walk));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", lcContext.getConverter(), TransportMode.walk));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", dcContext.getConverter(), TransportMode.car));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", dcContext.getConverter(), TransportMode.car));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", dcContext.getConverter(), TransportMode.pt));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", dcContext.getConverter(), TransportMode.pt));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", dcContext.getConverter(), TransportMode.bike));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", dcContext.getConverter(), TransportMode.bike));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", dcContext.getConverter(), TransportMode.walk));
+		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", dcContext.getConverter(), TransportMode.walk));
 				
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-		controler.getScenario().addScenarioElement(lcContext);
+		controler.getScenario().addScenarioElement(dcContext);
 		controler.getScenario().addScenarioElement(dcScore);
-		
-		// TODO: check why this is required here now. order of calling probably.
-		controler.getScenario().addScenarioElement(new FacilityPenalties()); 
-		log.info("lc initialized");
+	
+		log.info("dc initialized");
 	}	
 }
