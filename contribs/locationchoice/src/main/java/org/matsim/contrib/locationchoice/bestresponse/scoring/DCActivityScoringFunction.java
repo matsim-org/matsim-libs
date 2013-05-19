@@ -199,7 +199,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 				
-				if (this.converter.convertType(act.getType()).equals(this.converter.convertType("s")) &&
+				if (this.dcContext.getScaleEpsilon().isFlexibleType(this.converter.convertType(act.getType())) &&
 						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnExp()) > 0.0 &&
 						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnFactor()) > 0.0) {
 					
@@ -208,11 +208,9 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 						 * to score and dep. on facility load.
 						 * TODO: maybe checking if activity is movable for this person (discussion)
 						 */
-						if (!act.getType().startsWith("h")) {
-							this.penalty.add(new ScoringPenalty(activityStart, activityEnd,
+						this.penalty.add(new ScoringPenalty(activityStart, activityEnd,
 									this.dcContext.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties().
 									get(act.getFacilityId()), tmpScore));
-						}
 						//---------------------------------------------------------------------------
 				}
 			} else {
