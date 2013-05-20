@@ -7,7 +7,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -33,7 +32,6 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
 	//Attributes
 	private final PassivePlannerManager passivePlannerManager;
 	private final PersonHouseholdMapping personHouseholdMapping;
-	private final TripRouter tripRouter;
 	
 	//Constructors
 	/**
@@ -44,7 +42,6 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
 	public PassivePlanningSocialFactory(PassivePlannerManager passivePlannerManager, PersonHouseholdMapping personHouseholdMapping, TripRouter tripRouter) {
 		this.passivePlannerManager = passivePlannerManager;
 		this.personHouseholdMapping = personHouseholdMapping;
-		this.tripRouter = tripRouter;
 	}
 
 	//Methods
@@ -80,7 +77,7 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory;
 		if(sc.getConfig().scenario().isUseTransit()) {
-			agentFactory = new PassivePlannerTransitSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping, tripRouter);
+			agentFactory = new PassivePlannerTransitSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setUseUmlaeufe(true);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
@@ -89,7 +86,7 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
 			qSim.addMobsimEngine(transitEngine);
 		}
 		else
-			agentFactory = new PassivePlannerSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping, tripRouter);
+			agentFactory = new PassivePlannerSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;

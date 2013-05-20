@@ -15,17 +15,15 @@ public class SimpleModeRouteDecisionMaker implements ModeRouteDecisionMaker {
 
 	//Attributes
 	private final Set<String> modes;
-	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
 	
 	//Methods
-	public SimpleModeRouteDecisionMaker(Set<String> modes, TripRouter tripRouter, ActivityFacilities facilities) {
+	public SimpleModeRouteDecisionMaker(Set<String> modes, ActivityFacilities facilities) {
 		this.modes = modes;
-		this.tripRouter = tripRouter;
 		this.facilities = facilities;
 	}
 	@Override
-	public List<? extends PlanElement> decideModeRoute(double time, Id startFacilityId, Id endFacilityId) {
+	public List<? extends PlanElement> decideModeRoute(double time, Id startFacilityId, Id endFacilityId, TripRouter tripRouter) {
 		double lessTime = Double.MAX_VALUE;
 		List<? extends PlanElement> shortestTrip = null;
 		for (String mode : modes) {

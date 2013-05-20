@@ -23,6 +23,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -217,7 +218,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 		return options.get((int) (Math.random()*options.size()));
 	}
 	@Override
-	public List<? extends PlanElement> decideModeRoute(double time, Id startLinkId, Id endLinkId) {
+	public List<? extends PlanElement> decideModeRoute(double time, Id startLinkId, Id endLinkId, TripRouter tripRouter) {
 		String bestMode = null;
 		List<Link> bestPath = null;
 		double minTime = Double.MAX_VALUE;

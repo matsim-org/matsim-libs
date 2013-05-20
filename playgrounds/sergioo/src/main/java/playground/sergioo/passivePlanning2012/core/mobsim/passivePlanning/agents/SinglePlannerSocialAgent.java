@@ -23,13 +23,13 @@ import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwo
 public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 
 	//Constructors
-	public SinglePlannerSocialAgent(ScenarioSimplerNetwork scenario, boolean carAvailability, Household household, TripRouter tripRouter, Plan plan, Set<String> modes, PassivePlannerDriverAgent agent) {
-		super(new DecisionMaker[]{new SocialDecisionMaker(scenario, carAvailability, household, tripRouter, modes)}, plan, agent);
+	public SinglePlannerSocialAgent(ScenarioSimplerNetwork scenario, boolean carAvailability, Household household, Plan plan, Set<String> modes, PassivePlannerDriverAgent agent) {
+		super(new DecisionMaker[]{new SocialDecisionMaker(scenario, carAvailability, household, modes)}, plan, agent);
 	}
 
 	//Methods
 	@Override
-	public List<? extends PlanElement> getLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId) {
+	public List<? extends PlanElement> getLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId, TripRouter tripRouter) {
 		SocialDecisionMaker socialDecisionMaker = ((SocialDecisionMaker)decisionMakers[0]);
 		Tuple<String, Id> typeOfActivityFacility = socialDecisionMaker.decideTypeOfActivityFacility(startTime, startFacilityId);
 		if(typeOfActivityFacility==null)
@@ -37,11 +37,11 @@ public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 		ActivityFacility facility = socialDecisionMaker.getScenario().getActivityFacilities().getFacilities().get(typeOfActivityFacility.getSecond());
 		Activity activity = new ActivityImpl(typeOfActivityFacility.getFirst(), facility.getLinkId());
 		((ActivityImpl)activity).setFacilityId(typeOfActivityFacility.getSecond());
-		List<? extends PlanElement> trip = socialDecisionMaker.decideModeRoute(startTime, startFacilityId, facility.getId());
+		List<? extends PlanElement> trip = socialDecisionMaker.decideModeRoute(startTime, startFacilityId, facility.getId(), tripRouter);
 		if(trip==null)
 			return null;
 		double tripTravelTime = TripUtils.calcTravelTime(trip);
-		List<? extends PlanElement> trip2 = socialDecisionMaker.decideModeRoute(endTime-tripTravelTime, facility.getId(), endFacilityId);
+		List<? extends PlanElement> trip2 = socialDecisionMaker.decideModeRoute(endTime-tripTravelTime, facility.getId(), endFacilityId, tripRouter);
 		if(trip2==null)
 			return null;
 		double tripTravelTime2 = TripUtils.calcTravelTime(trip2);

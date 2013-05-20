@@ -19,8 +19,10 @@
 
 package playground.sergioo.singapore2012.transitRouterVariable;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -31,22 +33,30 @@ import org.matsim.pt.router.TransitRouterFactory;
  * 
  * @author sergioo
  */
-public class TransitRouterWSImplFactory implements TransitRouterFactory {
+public class TransitRouterWWImplFactory2 implements TransitRouterFactory, AfterMobsimListener {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Network network;
-	private TransitRouterNetworkTravelTimeAndDisutilityWS2 transitRouterNetworkTravelTimeAndDisutilityWS;
+	private TransitRouterNetworkTravelTimeAndDisutilityWW2 transitRouterNetworkTravelTimeAndDisutilityWW;
+	private Controler controler;
+	private final WaitTime2 waitTime;
 	
-	public TransitRouterWSImplFactory(final TransitRouterConfig config, final Scenario scenario, final WaitTime2 waitTime, final StopStopTime stopStopTime) {
+	public TransitRouterWWImplFactory2(final TransitRouterConfig config, final Controler controler, final WaitTime2 waitTime) {
 		this.config = config;
-		this.network = scenario.getNetwork();
-		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, scenario.getTransitSchedule(), this.config.beelineWalkConnectionDistance);
-		transitRouterNetworkTravelTimeAndDisutilityWS = new TransitRouterNetworkTravelTimeAndDisutilityWS2(config, network, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(scenario.getTransitSchedule()));
+		this.network = controler.getNetwork();
+		this.controler = controler;
+		this.waitTime = waitTime;
+		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, controler.getScenario().getTransitSchedule(), this.config.beelineWalkConnectionDistance);
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		return new TransitRouterVariableImpl(config, transitRouterNetworkTravelTimeAndDisutilityWS, routerNetwork, network);
+		transitRouterNetworkTravelTimeAndDisutilityWW = new TransitRouterNetworkTravelTimeAndDisutilityWW2(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule()));
+		return new TransitRouterVariableImpl(config, transitRouterNetworkTravelTimeAndDisutilityWW, routerNetwork, network);
+	}
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		transitRouterNetworkTravelTimeAndDisutilityWW.initTravelTimes();
 	}
 
 }

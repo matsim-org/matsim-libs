@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.router.TripRouter;
 import org.matsim.households.PersonHouseholdMapping;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
@@ -38,18 +37,16 @@ public final class PassivePlannerTransitSocialAgentFactory implements AgentFacto
 	private final Netsim simulation;
 	private final PassivePlannerManager passivePlannerManager;
 	private final PersonHouseholdMapping personHouseholdMapping;
-	private final TripRouter tripRouter;
 	private Set<String> modes;
 
 	//Constructors
-	public PassivePlannerTransitSocialAgentFactory(final Netsim simulation, final PersonHouseholdMapping personHouseholdMapping, final TripRouter tripRouter) {
-		this(simulation, null, personHouseholdMapping, tripRouter);
+	public PassivePlannerTransitSocialAgentFactory(final Netsim simulation, final PersonHouseholdMapping personHouseholdMapping) {
+		this(simulation, null, personHouseholdMapping);
 	}
-	public PassivePlannerTransitSocialAgentFactory(final Netsim simulation, final PassivePlannerManager passivePlannerManager, final PersonHouseholdMapping personHouseholdMapping, final TripRouter tripRouter) {
+	public PassivePlannerTransitSocialAgentFactory(final Netsim simulation, final PassivePlannerManager passivePlannerManager, final PersonHouseholdMapping personHouseholdMapping) {
 		this.simulation = simulation;
 		this.passivePlannerManager = passivePlannerManager;
 		this.personHouseholdMapping = personHouseholdMapping;
-		this.tripRouter = tripRouter;
 		modes = new HashSet<String>();
 		modes.addAll(simulation.getScenario().getConfig().plansCalcRoute().getNetworkModes());
 		if(simulation.getScenario().getConfig().scenario().isUseTransit())
@@ -59,7 +56,7 @@ public final class PassivePlannerTransitSocialAgentFactory implements AgentFacto
 	//Methods
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person person) {
-		PassivePlannerTransitAgent agent = new PassivePlannerTransitSocialAgent((BasePerson)person, simulation, passivePlannerManager, personHouseholdMapping.getHousehold(person.getId()), tripRouter, modes); 
+		PassivePlannerTransitAgent agent = new PassivePlannerTransitSocialAgent((BasePerson)person, simulation, passivePlannerManager, personHouseholdMapping.getHousehold(person.getId()), modes); 
 		return agent;
 	}
 

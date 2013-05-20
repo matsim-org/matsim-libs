@@ -11,6 +11,7 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.router.TripRouter;
 
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.definitions.SinglePlannerAgent;
 import playground.sergioo.passivePlanning2012.core.utils.misc.Counter;
@@ -43,10 +44,12 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 		private final List<PlanningInfo> planners = new LinkedList<PlanningInfo>();
 		private Counter counter;
 		private boolean mobSimEnds = false;
+		private final TripRouter tripRouter;
 		
 		//Constructors
-		public ParallelPassivePlanners(Counter counter) {
+		public ParallelPassivePlanners(Counter counter, TripRouter tripRouter) {
 			this.counter = counter;
+			this.tripRouter = tripRouter;
 		}
 		public int getNumPlanners() {
 			return planners.size();
@@ -70,7 +73,7 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 					double endTime = ((Activity)plannerInfo.planner.getPlan().getPlanElements().get(plannerInfo.planner.getPlanElementIndex()-1)).getEndTime();
 					endTime += ((Leg)plannerInfo.planner.getPlan().getPlanElements().get(plannerInfo.planner.getPlanElementIndex())).getTravelTime();
 					double nowCopy=now;
-					if(nowCopy>endTime || plannerInfo.planner.planLegActivityLeg(nowCopy, plannerInfo.startFacilityId, endTime, plannerInfo.endFacilityId)) {
+					if(nowCopy>endTime || plannerInfo.planner.planLegActivityLeg(nowCopy, plannerInfo.startFacilityId, endTime, plannerInfo.endFacilityId, tripRouter)) {
 						planners.remove(plannerInfo);
 						i.decrementAndGet();
 						counter.decCounter();
@@ -132,7 +135,7 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		for(int i=0; i<parallelPlanners.length; i++) {
-			parallelPlanners[i] = new ParallelPassivePlanners(counter);
+			parallelPlanners[i] = new ParallelPassivePlanners(counter, event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter());
 			parallelPlanners[i].setDaemon(true);
 			parallelPlanners[i].start();
 		}

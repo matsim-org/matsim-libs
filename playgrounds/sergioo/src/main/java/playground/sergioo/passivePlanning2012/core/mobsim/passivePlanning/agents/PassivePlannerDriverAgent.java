@@ -75,9 +75,12 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 			abort(now);
 			return;
 		}
-		if(getCurrentPlanElement() instanceof EmptyTime)
-			passivePlannerManager.addPlanner(planner, prevAct.getFacilityId(), ((Activity)getNextPlanElement()).getFacilityId());
-		advancePlan(now);
+		if(getCurrentPlanElement() instanceof EmptyTime) {
+			if(passivePlannerManager.addPlanner(planner, prevAct.getFacilityId(), ((Activity)getNextPlanElement()).getFacilityId()))
+				advancePlan(now);
+		}
+		else
+			advancePlan(now);
 	}
 	
 	@Override
@@ -246,7 +249,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 		return 1/simulation.getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 	}
 	public void advanceToNextActivity(double now) {
-		this.simulation.getEventsManager().processEvent(this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(now, getId(), getDestinationLinkId(), "empty"));
+		//this.simulation.getEventsManager().processEvent(this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(now, getId(), getDestinationLinkId(), "empty"));
 		initializeActivity((Activity) getNextPlanElement(), now);
 	}
 

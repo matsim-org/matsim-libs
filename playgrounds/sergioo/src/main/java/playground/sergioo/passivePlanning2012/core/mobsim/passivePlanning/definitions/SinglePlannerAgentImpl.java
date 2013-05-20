@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
@@ -46,9 +47,9 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 		currentElementIndex.set(index);
 	}
 	@Override
-	public boolean planLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId) {
+	public boolean planLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId, TripRouter tripRouter) {
 		((BasePersonImpl)plan.getPerson()).startPlanning();
-		List<? extends PlanElement> legActLeg = getLegActivityLeg(startTime, startFacilityId, endTime, endFacilityId);
+		List<? extends PlanElement> legActLeg = getLegActivityLeg(startTime, startFacilityId, endTime, endFacilityId, tripRouter);
 		if(legActLeg == null || legActLeg.size()==0)
 			return false;
 		else {
@@ -94,7 +95,7 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 			return !emptySpace;
 		}
 	}
-	protected abstract List<? extends PlanElement> getLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId);
+	protected abstract List<? extends PlanElement> getLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId, TripRouter tripRouter);
 	@Override
 	public void advanceToNextActivity(double now) {
 		agent.advanceToNextActivity(now);

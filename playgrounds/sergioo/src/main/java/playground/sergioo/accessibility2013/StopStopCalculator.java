@@ -23,6 +23,7 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -63,6 +64,9 @@ public class StopStopCalculator extends Thread{
 		private Double distance = 0.0;
 		private Double numberOfTransfers = 0.0;
 		private String transfers = ":";
+		private String transfersM = ":";
+		private String lines = ":";
+		private String routes = ":";
 	}
 	private static final String S = ",";
 	private TransitRouterNetworkWW network;
@@ -212,18 +216,23 @@ public class StopStopCalculator extends Thread{
 		try {
 			writer.write("time of the day"+S+
 					"origin"+S+
+					"originM"+S+
 					"destination"+S+
+					"destinationM"+S+
 					"travel time"+S+
 					"distance"+S+
 					"number of transfers"+S+
-					"transfers\n");
+					"transfers"+S+
+					"transfersM"+S+
+					"lines"+S+
+					"routes"+S+"\n");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		for(double time = start + binSize/2; time<end; time+=binSize) {
 			System.out.println(time+": "+(System.currentTimeMillis()-milis));
 			int s=0;
-			Map<String, Path> finalPaths = new HashMap<String, Path>();
+			Map<String, Tuple<String, Path>> finalPaths = new HashMap<String, Tuple<String, Path>>();
 			for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values())
 				if(network.getNodes().get(stop.getId())!=null) {
 					System.out.println(s+++" "+time+" "+stop.getId()+": "+(System.currentTimeMillis()-milis));
@@ -231,15 +240,16 @@ public class StopStopCalculator extends Thread{
 					for(Entry<Id, Path> entry:paths.entrySet()) {
 						Path path = entry.getValue();
 						if(path!=null) {
-							String origDest = ((TransitRouterNetworkNode)path.nodes.get(0)).getStop().getStopFacility().getName()+S+((TransitRouterNetworkNode)path.nodes.get(path.nodes.size()-1)).getStop().getStopFacility().getName();
-							Path oldPath = finalPaths.get(origDest);
-							if(oldPath==null || oldPath.travelCost>path.travelCost)
-								finalPaths.put(origDest, path);
+							String origDest = ((TransitRouterNetworkNode)path.nodes.get(0)).getStop().getStopFacility().getName()+S+
+									((TransitRouterNetworkNode)path.nodes.get(path.nodes.size()-1)).getStop().getStopFacility().getName();
+							Tuple<String, Path> oldPathT = finalPaths.get(origDest);
+							if(oldPathT==null || oldPathT.getSecond().travelCost>path.travelCost || (oldPathT.getSecond().travelCost==path.travelCost && oldPathT.getSecond().links.size()>path.links.size()))
+								finalPaths.put(origDest, new Tuple<String, Path>(((TransitRouterNetworkNode)path.nodes.get(0)).getStop().getStopFacility().getId()+S+((TransitRouterNetworkNode)path.nodes.get(path.nodes.size()-1)).getStop().getStopFacility().getId(), path));
 						}
 					}
 				}
-			for(Entry<String, Path> pathE:finalPaths.entrySet()) {
-				Path path = pathE.getValue();
+			for(Entry<String, Tuple<String, Path>> pathE:finalPaths.entrySet()) {
+				Path path = pathE.getValue().getSecond();
 				RouteInfo2 routeInfo = new RouteInfo2();
 				if(path!=null) {
 					if(path.links.size()>0) {
@@ -253,16 +263,29 @@ public class StopStopCalculator extends Thread{
 								first = false;
 								if(tToNode.getRoute()==null)
 									first = true;
+								else {
+									routeInfo.lines+=tToNode.getLine().getId()+":";
+									routeInfo.routes+=tToNode.getRoute().getId()+":";
+								}
 							}
 							else if(tLink.getRoute()==null) {
 								if(tToNode.getRoute()!=null) {
 									routeInfo.transfers+=tToNode.stop.getStopFacility().getName()+":";
+									routeInfo.transfersM+=tToNode.stop.getStopFacility().getId()+":";
+									routeInfo.lines+=tToNode.getLine().getId()+":";
+									routeInfo.routes+=tToNode.getRoute().getId()+":";
 									routeInfo.numberOfTransfers ++;
 								}
 							}
 							else
 								routeInfo.distance += scenario.getNetwork().getLinks().get(tToNode.stop.getStopFacility().getLinkId()).getLength();
 							travelTime += travelFunction.getLinkTravelTime(link, startTime+travelTime, null, null);
+						}
+						for(int i=5; i>routeInfo.numberOfTransfers; i--) {
+							routeInfo.transfers+=":";
+							routeInfo.transfersM+=":";
+							routeInfo.lines+=":";
+							routeInfo.routes+=":";
 						}
 					}
 				}
@@ -273,10 +296,14 @@ public class StopStopCalculator extends Thread{
 				}
 				try {
 					writer.write(time+S+pathE.getKey()+S+
+							pathE.getValue().getFirst()+S+
 							routeInfo.travelTime+S+
 							routeInfo.distance+S+
 							routeInfo.numberOfTransfers+S+
-							routeInfo.transfers+"\n");
+							routeInfo.transfers+S+
+							routeInfo.transfersM+S+
+							routeInfo.lines+S+
+							routeInfo.routes+"\n");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

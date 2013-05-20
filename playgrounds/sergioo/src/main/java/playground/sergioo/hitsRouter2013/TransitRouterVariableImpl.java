@@ -37,6 +37,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra.InitialNode;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW2;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkNode;
 
@@ -46,13 +47,13 @@ public class TransitRouterVariableImpl {
 
 	private final MultiNodeDijkstra dijkstra;
 	private final TransitRouterConfig config;
-	private final TransitRouterNetworkTravelTimeAndDisutilityWW ttCalculator;
+	private final TransitRouterNetworkTravelTimeAndDisutilityWW2 ttCalculator;
 
 	public TransitRouterVariableImpl(final TransitRouterConfig config,
 			final TransitRouterNetworkTravelTimeAndDisutility ttCalculator, final TransitRouterNetworkWW routerNetwork, final Network network) {
 		this.config = config;
 		this.transitNetwork = routerNetwork;
-		this.ttCalculator = (TransitRouterNetworkTravelTimeAndDisutilityWW) ttCalculator;
+		this.ttCalculator = (TransitRouterNetworkTravelTimeAndDisutilityWW2) ttCalculator;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.ttCalculator, this.ttCalculator);
 	}
 	

@@ -77,10 +77,9 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 			if(link.route!=null) {
 				linkTravelTimes.put(link.getId(), new double[numSlots]);
 				for(int slot = 0; slot<numSlots; slot++) {
-					double linksTime = 0;
+					double linksTime = travelTime.getLinkTravelTime(network.getLinks().get(link.fromNode.stop.getStopFacility().getLinkId()), startTime+slot*timeSlot, null, null);
 					for(Id linkId:link.route.getRoute().getSubRoute(link.fromNode.stop.getStopFacility().getLinkId(), link.toNode.stop.getStopFacility().getLinkId()).getLinkIds())
 						linksTime += travelTime.getLinkTravelTime(network.getLinks().get(linkId), startTime+slot*timeSlot, null, null);
-					linksTime += travelTime.getLinkTravelTime(network.getLinks().get(link.toNode.stop.getStopFacility().getLinkId()), startTime+slot*timeSlot, null, null);
 					linkTravelTimes.get(link.getId())[slot] = linksTime;
 				}
 			}

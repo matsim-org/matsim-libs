@@ -93,15 +93,13 @@ public class SocialDecisionMaker implements EndTimeDecisionMaker, TypeOfActivity
 	private final Set<SocialDecisionMaker> knownPeople = new HashSet<SocialDecisionMaker>();
 	private final Map<Id, KnownPlace> knownPlaces = new ConcurrentHashMap<Id, KnownPlace>();
 	private final Map<String, Map<Id, Double[]>> knownTravelTimes = new HashMap<String, Map<Id, Double[]>>();
-	private final TripRouter tripRouter;
 	private Set<String> modes;
 	private boolean carAvailability;
 	
 	//Constructors
-	public SocialDecisionMaker(ScenarioSimplerNetwork scenario, boolean carAvailability, Household household, TripRouter tripRouter, Set<String> modes) {
+	public SocialDecisionMaker(ScenarioSimplerNetwork scenario, boolean carAvailability, Household household, Set<String> modes) {
 		this.scenario = scenario;
 		this.household = household;
-		this.tripRouter = tripRouter;
 		for(String mode:scenario.getConfig().plansCalcRoute().getNetworkModes())
 			knownTravelTimes.put(mode, new HashMap<Id, Double[]>());
 		this.carAvailability = carAvailability;
@@ -166,7 +164,7 @@ public class SocialDecisionMaker implements EndTimeDecisionMaker, TypeOfActivity
 		return options.size()==0?null:options.get((int) (Math.random()*options.size()));
 	}
 	@Override
-	public List<? extends PlanElement> decideModeRoute(double time, Id startFacilityId, Id endFacilityId) {
+	public List<? extends PlanElement> decideModeRoute(double time, Id startFacilityId, Id endFacilityId, TripRouter tripRouter) {
 		List<? extends PlanElement> bestTrip = null;
 		double minTime = Double.MAX_VALUE;
 		ActivityFacility startFacility = scenario.getActivityFacilities().getFacilities().get(startFacilityId);

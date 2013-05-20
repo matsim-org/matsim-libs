@@ -18,7 +18,7 @@ import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning
 public class PassivePlannerSocialAgent extends PassivePlannerDriverAgent  {
 
 	//Constructors
-	public PassivePlannerSocialAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, final Household household, final TripRouter tripRouter, Set<String> modes) {
+	public PassivePlannerSocialAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, final Household household, Set<String> modes) {
 		super(basePerson, simulation, passivePlannerManager);
 		boolean carAvailability = false;
 		Collection<String> mainModes = simulation.getScenario().getConfig().getQSimConfigGroup().getMainMode();
@@ -26,7 +26,7 @@ public class PassivePlannerSocialAgent extends PassivePlannerDriverAgent  {
 			if(planElement instanceof Leg)
 				if(mainModes.contains(((Leg)planElement).getMode()))
 					carAvailability = true;
-		planner = new SinglePlannerSocialAgent((ScenarioSimplerNetwork) simulation.getScenario(), carAvailability, household, tripRouter, basePerson.getBasePlan(), modes, this);
+		planner = new SinglePlannerSocialAgent((ScenarioSimplerNetwork) simulation.getScenario(), carAvailability, household, basePerson.getBasePlan(), modes, this);
 		planner.setPlanElementIndex(0);
 	}
 	

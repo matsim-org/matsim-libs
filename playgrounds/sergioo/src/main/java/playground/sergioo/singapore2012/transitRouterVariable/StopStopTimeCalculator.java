@@ -21,10 +21,12 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class StopStopTimeCalculator implements VehicleDepartsAtFacilityEventHandler, VehicleArrivesAtFacilityEventHandler {
 	
 	private final Map<String, StopStopTimeData> stopStopTimes = new ConcurrentHashMap<String, StopStopTimeData>(6602);
-	private final Map<String, Double> cacheScheduledStopStopTimes = new ConcurrentHashMap<String, Double>(6602);
-	private final Map<Id, Tuple<Id, Double>> inTransitVehicles = new ConcurrentHashMap<Id, Tuple<Id,Double>>();
+	private final Map<String, Double> scheduledStopStopTimes = new ConcurrentHashMap<String, Double>(6602);
+	private final Map<Id, Tuple<Id, Double>> inTransitVehicles = new ConcurrentHashMap<Id, Tuple<Id,Double>>(1000);
 	private final Set<Id> vehicleIds = new HashSet<Id>();
 	private double timeSlot;
+	public static int scheduled = 0;
+	public static int recorded = 0;
 	
 	//Constructors
 	public StopStopTimeCalculator(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
@@ -33,21 +35,21 @@ public class StopStopTimeCalculator implements VehicleDepartsAtFacilityEventHand
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values())
 				for(int s=0; s<route.getStops().size()-1; s++) {
-					String key = route.getStops().get(s).getStopFacility().getId()+"-->"+route.getStops().get(s+1).getStopFacility().getId();
+					String key = route.getStops().get(s).getStopFacility().getId()+">"+route.getStops().get(s+1).getStopFacility().getId();
 					stopStopTimes.put(key, new StopStopTimeDataArray((int) (totalTime/timeSlot)+1));
-					Double stopStopTime = cacheScheduledStopStopTimes.get(key);
+					Double stopStopTime = scheduledStopStopTimes.get(key);
 					Integer num;
 					if(stopStopTime == null) {
-						stopStopTime=0.0;
+						stopStopTime = 0.0;
 						num = 0; 
 					}
 					else
 						num = numObservations.get(key);
-					cacheScheduledStopStopTimes.put(key, stopStopTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset());
+					scheduledStopStopTimes.put(key, stopStopTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset());
 					numObservations.put(key, ++num);
 				}
-		for(Entry<String, Double> entry:cacheScheduledStopStopTimes.entrySet())
-			cacheScheduledStopStopTimes.put(entry.getKey(), entry.getValue()/numObservations.get(entry.getKey()));
+		for(Entry<String, Double> entry:scheduledStopStopTimes.entrySet())
+			scheduledStopStopTimes.put(entry.getKey(), entry.getValue()/numObservations.get(entry.getKey()));
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values())
 				for(Departure departure:route.getDepartures().values()) {
@@ -66,17 +68,22 @@ public class StopStopTimeCalculator implements VehicleDepartsAtFacilityEventHand
 		};
 	}
 	private double getStopStopTime(Id stopOId, Id stopDId, double time) {
-		String key = stopOId.toString()+"-->"+stopDId.toString();
+		String key = stopOId.toString()+">"+stopDId.toString();
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(key);
-		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0)
-			return cacheScheduledStopStopTimes.get(key);
-		else
+		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0) {
+			scheduled++;
+			return scheduledStopStopTimes.get(key);
+		}
+		else {
+			recorded++;
 			return stopStopTimeData.getStopStopTime((int) (time/timeSlot));
+		}
 	}
 	@Override
 	public void reset(int iteration) {
 		for(StopStopTimeData stopStopTimeData:stopStopTimes.values())
 			stopStopTimeData.resetStopStopTimes();
+		inTransitVehicles.clear();
 	}
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
@@ -88,7 +95,7 @@ public class StopStopTimeCalculator implements VehicleDepartsAtFacilityEventHand
 		if(vehicleIds.contains(event.getVehicleId())) {
 			Tuple<Id, Double> route = inTransitVehicles.remove(event.getVehicleId());
 			if(!route.getFirst().equals(event.getVehicleId())) {
-				String key = route.getFirst().toString()+"-->"+event.getFacilityId().toString();
+				String key = route.getFirst().toString()+">"+event.getFacilityId().toString();
 				stopStopTimes.get(key).addStopStopTime((int) (route.getSecond()/timeSlot), event.getTime()-route.getSecond());
 			}
 		}
