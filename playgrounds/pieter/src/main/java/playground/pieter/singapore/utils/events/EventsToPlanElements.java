@@ -74,12 +74,12 @@ import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import playground.pieter.singapore.utils.postgresql.*;
 import playground.pieter.singapore.utils.postgresql.travelcomponents.*;
+
 /**
  * 
  * @author sergioo, pieterfourie
  * 
  */
-
 
 public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
@@ -98,6 +98,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		private Map<Id, Double> passengers = new HashMap<Id, Double>();
 		private double distance;
 		Id lastStop;
+		private double linkEnterTime = 0.0;
 
 		// Constructors
 		public PTVehicle(Id transitLineId, Id transitRouteId) {
@@ -118,9 +119,15 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			return distance - passengers.remove(passengerId);
 		}
 
-	}
+		public double getLinkEnterTime() {
+			return linkEnterTime;
+		}
 
-	
+		public void setLinkEnterTime(double linkEnterTime) {
+			this.linkEnterTime = linkEnterTime;
+		}
+
+	}
 
 	// Attributes
 	private Map<Id, TravellerChain> chains = new HashMap<Id, TravellerChain>();
@@ -132,12 +139,49 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	private int stuck = 0;
 	private final double walkSpeed;
 	private String eventsFileName;
+	// a writer to record the ids entering and exiting each link
+	private PostgresqlCSVWriter linkWriter;
+	private boolean writeIdsForLinks = false;
 
 	public EventsToPlanElements(TransitSchedule transitSchedule,
 			Network network, Config config) {
 		this.transitSchedule = transitSchedule;
 		this.network = network;
 		this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
+	}
+
+	public EventsToPlanElements(TransitSchedule transitSchedule,
+			Network network, Config config, File connectionProperties) {
+		this(transitSchedule, network, config);
+		this.writeIdsForLinks = true;
+		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns.add(new PostgresqlColumnDefinition("link_id", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("person_id",
+				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("enter_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("exit_time",
+				PostgresType.INT));
+		try {
+			linkWriter = new PostgresqlCSVWriter("LINKWRITER",
+					"m_calibration.matsim_link_traffic", new DataBaseAdmin(
+							connectionProperties), 100000, columns);
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	// Methods
@@ -187,7 +231,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				act.setEndTime(event.getTime());
 			}
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -207,7 +252,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				chain.setInPT(false);
 				chain.traveling = false;
 				Activity act = chain.addActivity();
-				act.setCoord(network.getLinks().get(event.getLinkId()).getCoord());
+				act.setCoord(network.getLinks().get(event.getLinkId())
+						.getCoord());
 				act.setFacility(event.getFacilityId());
 				act.setStartTime(event.getTime());
 				act.setType(event.getActType());
@@ -220,7 +266,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 					journey.getWalks().getLast().setEgressWalk(true);
 			}
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -257,7 +304,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				chain.inCar = true;
 				journey = chain.addJourney();
 				journey.setCarJourney(true);
-				journey.setOrig(network.getLinks().get(event.getLinkId()).getCoord());
+				journey.setOrig(network.getLinks().get(event.getLinkId())
+						.getCoord());
 				journey.setFromAct(chain.getActs().getLast());
 				journey.setStartTime(event.getTime());
 				Trip trip = journey.addTrip();
@@ -270,13 +318,15 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				if (journey.getWaits().size() == 1)
 					wait.setAccessWait(true);
 				wait.setStartTime(event.getTime());
-				wait.setCoord(network.getLinks().get(event.getLinkId()).getCoord());
+				wait.setCoord(network.getLinks().get(event.getLinkId())
+						.getCoord());
 				if (!wait.isAccessWait()) {
 					journey.getPossibleTransfer().getWaits().add(wait);
 				}
 			}
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -290,26 +340,30 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			TravellerChain chain = chains.get(event.getPersonId());
 			if (event.getLegMode().equals("car")) {
 				Journey journey = chain.getJourneys().getLast();
-				journey.setDest(network.getLinks().get(event.getLinkId()).getCoord());
+				journey.setDest(network.getLinks().get(event.getLinkId())
+						.getCoord());
 				journey.setEndTime(event.getTime());
 				chain.inCar = false;
 			} else if (event.getLegMode().equals("transit_walk")) {
 				Journey journey = chain.getJourneys().getLast();
 				Walk walk = journey.getWalks().getLast();
-				walk.setDest(network.getLinks().get(event.getLinkId()).getCoord());
+				walk.setDest(network.getLinks().get(event.getLinkId())
+						.getCoord());
 				walk.setEndTime(event.getTime());
 				walk.setDistance(walk.getDuration() * walkSpeed);
 			} else if (event.getLegMode().equals("pt")) {
 				Journey journey = chain.getJourneys().getLast();
 				Trip trip = journey.getTrips().getLast();
-				trip.setDest(network.getLinks().get(event.getLinkId()).getCoord());
+				trip.setDest(network.getLinks().get(event.getLinkId())
+						.getCoord());
 				trip.setEndTime(event.getTime());
 				journey.setPossibleTransfer(new Transfer());
 				journey.getPossibleTransfer().setStartTime(event.getTime());
 				journey.getPossibleTransfer().setFromTrip(trip);
 			}
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -349,7 +403,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				}
 			}
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -365,13 +420,15 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 					PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
 					double stageDistance = vehicle.removePassenger(event
 							.getPersonId());
-					Trip trip = chain.getJourneys().getLast().getTrips().getLast();
+					Trip trip = chain.getJourneys().getLast().getTrips()
+							.getLast();
 					trip.setDistance(stageDistance);
 					trip.setAlightingStop(vehicle.lastStop);
 				}
 			}
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -380,10 +437,17 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		try {
-			if (event.getVehicleId().toString().startsWith("tr"))
-				ptVehicles.get(event.getVehicleId()).in = true;
+			if (event.getVehicleId().toString().startsWith("tr")){
+				PTVehicle ptVehicle = ptVehicles.get(event.getVehicleId());
+				ptVehicle.in = true;
+				ptVehicle.setLinkEnterTime(event.getTime());
+			}else{
+				chains.get(event.getPersonId()).setLinkEnterTime(event.getTime());
+			}
+			
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -399,20 +463,50 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 					vehicle.in = false;
 				vehicle.incDistance(network.getLinks().get(event.getLinkId())
 						.getLength());
+				if (writeIdsForLinks)
+					writeTransitIdsForLink(vehicle, event);
 			} else {
 				TravellerChain chain = chains.get(event.getPersonId());
 				if (chain.inCar) {
 					Journey journey = chain.getJourneys().getLast();
-					journey.incrementCarDistance( network.getLinks()
+					journey.incrementCarDistance(network.getLinks()
 							.get(event.getLinkId()).getLength());
-					journey.getTrips().getLast().setDistance(journey.getDistance());
+					journey.getTrips().getLast()
+							.setDistance(journey.getDistance());
+					if (writeIdsForLinks)
+						writePersonOnLink(event, chain);
 				}
 			}
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
+	}
+
+	private void writePersonOnLink(LinkLeaveEvent event, TravellerChain chain) {
+		Object[] linkArgs = {
+				event.getLinkId().toString(),
+				event.getPersonId().toString(),
+				new Integer((int) chain.getLinkEnterTime()),
+				new Integer((int) event.getTime())
+		};
+		linkWriter.addLine(linkArgs);
+	}
+
+	private void writeTransitIdsForLink(PTVehicle vehicle, LinkLeaveEvent event) {
+		for(Id i: vehicle.passengers.keySet()){
+			Object[] linkArgs = {
+					event.getLinkId().toString(),
+					i.toString(),
+					new Integer((int) vehicle.getLinkEnterTime()),
+					new Integer((int) event.getTime())
+			};
+			linkWriter.addLine(linkArgs);
+		}
+		
+
 	}
 
 	@Override
@@ -425,7 +519,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 					chain.getJourneys().removeLast();
 			}
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -440,7 +535,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			if (chain.traveledVehicle)
 				chain.traveledVehicle = false;
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -454,7 +550,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 					new PTVehicle(event.getTransitLineId(), event
 							.getTransitRouteId()));
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -463,9 +560,11 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		try {
-			ptVehicles.get(event.getVehicleId()).lastStop = event.getFacilityId();
+			ptVehicles.get(event.getVehicleId()).lastStop = event
+					.getFacilityId();
 		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
@@ -490,11 +589,14 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		columns.add(new PostgresqlColumnDefinition("start_time",
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("sample_selector", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("sample_selector",
+				PostgresType.FLOAT8));
 		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS",
 				actTableName, actDBA, 100000, columns);
-		activityWriter.addComment(String.format("MATSim activities from events file %s, created on %s.", eventsFileName, formattedDate));
+		activityWriter.addComment(String.format(
+				"MATSim activities from events file %s, created on %s.",
+				eventsFileName, formattedDate));
 
 		String journeyTableName = "m_calibration.matsim_journeys";
 		columns = new ArrayList<PostgresqlColumnDefinition>();
@@ -525,11 +627,14 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.FLOAT8));
 		columns.add(new PostgresqlColumnDefinition("egress_walk_time",
 				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("sample_selector", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("sample_selector",
+				PostgresType.FLOAT8));
 		DataBaseAdmin journeyDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",
 				journeyTableName, journeyDBA, 50000, columns);
-		journeyWriter.addComment(String.format("MATSim journeys from events file %s, created on %s.", eventsFileName, formattedDate));
+		journeyWriter.addComment(String.format(
+				"MATSim journeys from events file %s, created on %s.",
+				eventsFileName, formattedDate));
 
 		String tripTableName = "m_calibration.matsim_trips";
 		columns = new ArrayList<PostgresqlColumnDefinition>();
@@ -548,12 +653,14 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("alighting_stop",
 				PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("sample_selector", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("sample_selector",
+				PostgresType.FLOAT8));
 		DataBaseAdmin tripDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS",
 				tripTableName, tripDBA, 100000, columns);
-		tripWriter.addComment(String.format("MATSim trips (stages) from events file %s, created on %s.", eventsFileName, formattedDate));
-
+		tripWriter.addComment(String.format(
+				"MATSim trips (stages) from events file %s, created on %s.",
+				eventsFileName, formattedDate));
 
 		String transferTableName = "m_calibration.matsim_transfers";
 		columns = new ArrayList<PostgresqlColumnDefinition>();
@@ -573,12 +680,14 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("wait_time",
 				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("sample_selector", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("sample_selector",
+				PostgresType.FLOAT8));
 		DataBaseAdmin transferDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter transferWriter = new PostgresqlCSVWriter(
 				"TRANSFERS", transferTableName, transferDBA, 100000, columns);
-		transferWriter.addComment(String.format("MATSim transfers from events file %s, created on %s.", eventsFileName, formattedDate));
-
+		transferWriter.addComment(String.format(
+				"MATSim transfers from events file %s, created on %s.",
+				eventsFileName, formattedDate));
 
 		for (Entry<Id, TravellerChain> entry : chains.entrySet()) {
 			String pax_id = entry.getKey().toString();
@@ -620,8 +729,9 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 									new Integer(journey.getElementId()),
 									new Integer((int) trip.getStartTime()),
 									new Integer((int) trip.getEndTime()),
-									new Double(trip.getDistance()), trip.getMode(),
-									trip.getLine(), trip.getRoute(), trip.getBoardingStop(),
+									new Double(trip.getDistance()),
+									trip.getMode(), trip.getLine(),
+									trip.getRoute(), trip.getBoardingStop(),
 									trip.getAlightingStop(),
 									new Double(Math.random()) };
 							tripWriter.addLine(tripArgs);
@@ -632,9 +742,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 									new Integer(journey.getElementId()),
 									new Integer((int) transfer.getStartTime()),
 									new Integer((int) transfer.getEndTime()),
-									new Integer(
-											transfer.getFromTrip().getElementId()),
-									new Integer(transfer.getToTrip().getElementId()),
+									new Integer(transfer.getFromTrip()
+											.getElementId()),
+									new Integer(transfer.getToTrip()
+											.getElementId()),
 									new Double(transfer.getWalkDistance()),
 									new Integer((int) transfer.getWalkTime()),
 									new Integer((int) transfer.getWaitTime()),
@@ -652,9 +763,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		journeyWriter.finish();
 		tripWriter.finish();
 		transferWriter.finish();
-		
+
 		DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
-		//need to update the transit stop ids so they are consistent with LTA list
+		// need to update the transit stop ids so they are consistent with LTA
+		// list
 		String update = "		UPDATE " + tripTableName
 				+ " SET boarding_stop = matsim_to_transitstops_lookup.stop_id "
 				+ " FROM m_calibration.matsim_to_transitstops_lookup "
@@ -666,43 +778,45 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
-		
-		HashMap<String,String[]> idxNames = new HashMap<String, String[]>();
-		String[] idx1 = {"person_id","facility_id","type"};
+
+		HashMap<String, String[]> idxNames = new HashMap<String, String[]>();
+		String[] idx1 = { "person_id", "facility_id", "type" };
 		idxNames.put(actTableName, idx1);
-		String[] idx2 = {"person_id","from_act","to_act","main_mode"};
+		String[] idx2 = { "person_id", "from_act", "to_act", "main_mode" };
 		idxNames.put(journeyTableName, idx2);
-		String[] idx3 = {"journey_id","mode","line","route","boarding_stop","alighting_stop"};
+		String[] idx3 = { "journey_id", "mode", "line", "route",
+				"boarding_stop", "alighting_stop" };
 		idxNames.put(tripTableName, idx3);
-		String[] idx4 = {"journey_id","from_trip","to_trip"};
+		String[] idx4 = { "journey_id", "from_trip", "to_trip" };
 		idxNames.put(transferTableName, idx4);
-		for(Entry<String,String[]> entry:idxNames.entrySet()){
+		for (Entry<String, String[]> entry : idxNames.entrySet()) {
 			String tableName = entry.getKey();
 			String[] columnNames = entry.getValue();
-			for(String columnName:columnNames){
+			for (String columnName : columnNames) {
 				String indexName = tableName.split("\\.")[1] + "_" + columnName;
-				String fullIndexName = tableName.split("\\.")[0] + "." + indexName;
+				String fullIndexName = tableName.split("\\.")[0] + "."
+						+ indexName;
 				String indexStatement;
-				try{
+				try {
 					indexStatement = "DROP INDEX " + fullIndexName + " ;\n ";
 					dba.executeStatement(indexStatement);
 					System.out.println(indexStatement);
-				}catch(SQLException e){
+				} catch (SQLException e) {
 					e.printStackTrace();
 				}
-				
-				try{
+
+				try {
 					indexStatement = "CREATE INDEX " + indexName + " ON "
-							+ tableName + "("+ columnName +");\n";
+							+ tableName + "(" + columnName + ");\n";
 					dba.executeStatement(indexStatement);
 					System.out.println(indexStatement);
-				}catch(SQLException e){
+				} catch (SQLException e) {
 					e.printStackTrace();
-				}	
-				
+				}
+
 			}
 		}
-		
+
 	}
 
 	public static void main(String[] args) throws IOException,
@@ -715,9 +829,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		new MatsimNetworkReader(scenario).readFile(args[1]);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+		File properties = new File("data/matsim2postgres.properties");
 		EventsToPlanElements test = new EventsToPlanElements(
 				scenario.getTransitSchedule(), scenario.getNetwork(),
-				scenario.getConfig());
+				scenario.getConfig(),properties);
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(args[2]);
 		// TravellerChain chain = test.chains
@@ -727,8 +842,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		// chain = test.chains
 		// .get(new org.matsim.core.basic.v01.IdImpl("77878"));
 		// System.out.println(chain.planElements);
-		File properties = new File("data/matsim2postgres.properties");
-		test.writeSimulationResultsToSQL(properties, args[2]);
+		if(Boolean.parseBoolean(args[4]))				
+			test.writeSimulationResultsToSQL(properties, args[2]);
 		System.out.println(test.stuck);
 	}
 
@@ -741,4 +856,3 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	}
 
 }
-

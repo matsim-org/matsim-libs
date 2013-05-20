@@ -95,11 +95,9 @@ import playground.pieter.singapore.utils.postgresql.travelcomponents.Wait;
 import playground.pieter.singapore.utils.postgresql.travelcomponents.Walk;
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra;
 import playground.sergioo.hitsRouter2013.TransitRouterVariableImpl;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW2;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeCalculator2;
 
 public class HITSAnalyserPostgresqlSummary {

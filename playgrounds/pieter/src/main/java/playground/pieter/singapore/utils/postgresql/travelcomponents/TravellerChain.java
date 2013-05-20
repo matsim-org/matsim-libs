@@ -51,5 +51,14 @@ public 	 class TravellerChain {
 	public boolean inCar;
 	public boolean traveledVehicle;
 	public boolean traveling;
+	private double linkEnterTime;
+
+	public double getLinkEnterTime() {
+		return linkEnterTime;
+	}
+
+	public void setLinkEnterTime(double linkEnterTime) {
+		this.linkEnterTime = linkEnterTime;
+	}
 
 }
