@@ -32,6 +32,10 @@ public interface PlanSelector {
 
 	/**
 	 * Select and return a plan of a person.
+	 * Note that is is <b>NOT</b> the responsibility of this method to set the 
+	 * plan status as "selected". It is the responsability of the caller code,
+	 * which may decide to select, copy, remove, modify, or do whatever with the
+	 * returned plan.
 	 *
 	 * @param person
 	 * @return selected plan, or null if the person has no plans.
