@@ -82,7 +82,12 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		}
 		
 		// "select" that plan:
-		((PersonImpl) person).setSelectedPlan(plan);
+		if ( plan != null ) {
+			((PersonImpl) person).setSelectedPlan(plan);
+		}
+		else {
+			log.error( planSelector+" returned no plan: not changing selected plan for person "+person );
+		}
 		
 		// if there is a "module" (i.e. "innovation"):
 		if (this.firstModule != null) {

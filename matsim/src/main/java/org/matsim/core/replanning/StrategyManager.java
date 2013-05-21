@@ -198,7 +198,11 @@ public class StrategyManager implements MatsimManager {
 			Plan plan = this.removalPlanSelector.selectPlan(person);
 			person.getPlans().remove(plan);
 			if (plan == person.getSelectedPlan()) {
-				person.setSelectedPlan(person.getRandomPlan());
+				final Plan newPlanToSelect = person.getRandomPlan();
+				if ( newPlanToSelect == null ) {
+					throw new IllegalStateException( "could not find a plan to select for person "+person );
+				}
+				person.setSelectedPlan( newPlanToSelect );
 			}
 			afterRemovePlanHook( plan ) ;
 		}
