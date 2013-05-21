@@ -83,12 +83,12 @@ public class SurveyAnalyzer {
 	
 	public void analyzeHomeSets(String cl) {
 		log.info("analyzeHomeSets ...");
-		Bins awareness = new Bins(1, 11, cl + "_awareness");
-		Bins frequently = new Bins(1, 11, cl + "_frequently");
-		Bins distance10 = new Bins(250, 3000, cl + "_distance10");
-		Bins distance9 = new Bins(250, 3000, cl + "_distance9");
-		Bins distance8 = new Bins(250, 3000, cl + "_distance8");
-		Bins distanceAwareness = new Bins(250, 3000, cl + "_dist_awareness");
+		Bins awareness = new Bins(1, 11, cl + "_Hawareness");
+		Bins frequently = new Bins(1, 11, cl + "_Hfrequently");
+		Bins distance10 = new Bins(250, 3000, cl + "_Hdistance10");
+		Bins distance9 = new Bins(250, 3000, cl + "_Hdistance9");
+		Bins distance8 = new Bins(250, 3000, cl + "_Hdistance8");
+		Bins distanceAwareness = new Bins(250, 3000, cl + "_Hdist_awareness");
 		
 		for (EstimationPerson p : this.population.values()) {
 			double awarenessCnt = p.getHomeset().getAwarenessCnt();				
@@ -117,10 +117,10 @@ public class SurveyAnalyzer {
 		}
 		awareness.plotBinnedDistribution(this.outdir, "", "");
 		frequently.plotBinnedDistribution(this.outdir, "", "");
-		distance10.plotBinnedDistribution(this.outdir, "distance10", "[m]");
-		distance9.plotBinnedDistribution(this.outdir, "distance9", "[m]");
-		distance8.plotBinnedDistribution(this.outdir, "distance8", "[m]");
-		distanceAwareness.plotBinnedDistribution(this.outdir, "distance_aware", "[m]");
+		distance10.plotBinnedDistribution(this.outdir, "Hdistance10", "[m]");
+		distance9.plotBinnedDistribution(this.outdir, "Hdistance9", "[m]");
+		distance8.plotBinnedDistribution(this.outdir, "Hdistance8", "[m]");
+		distanceAwareness.plotBinnedDistribution(this.outdir, "Hdistance_aware", "[m]");
 	}
 		
 	private void analyzeVariableBinSizeMZ() {
