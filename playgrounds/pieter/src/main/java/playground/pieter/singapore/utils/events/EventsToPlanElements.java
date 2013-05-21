@@ -1,25 +1,15 @@
 package playground.pieter.singapore.utils.events;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.PushbackReader;
-import java.io.StringReader;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
@@ -45,31 +35,22 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.TravelledEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.postgresql.PGConnection;
-import org.postgresql.copy.CopyManager;
-
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import playground.pieter.singapore.utils.postgresql.*;
@@ -158,6 +139,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		columns.add(new PostgresqlColumnDefinition("link_id", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("person_id",
 				PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("mode", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("line", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("enter_time",
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("exit_time",
@@ -489,6 +472,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		Object[] linkArgs = {
 				event.getLinkId().toString(),
 				event.getPersonId().toString(),
+				"",
+				"",
 				new Integer((int) chain.getLinkEnterTime()),
 				new Integer((int) event.getTime())
 		};
@@ -500,6 +485,11 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			Object[] linkArgs = {
 					event.getLinkId().toString(),
 					i.toString(),
+					getMode(transitSchedule.getTransitLines()
+							.get(vehicle.transitLineId).getRoutes()
+							.get(vehicle.transitRouteId).getTransportMode(),
+							vehicle.transitLineId),
+					vehicle.transitLineId.toString(),
 					new Integer((int) vehicle.getLinkEnterTime()),
 					new Integer((int) event.getTime())
 			};
@@ -844,7 +834,44 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		// System.out.println(chain.planElements);
 		if(Boolean.parseBoolean(args[4]))				
 			test.writeSimulationResultsToSQL(properties, args[2]);
+		test.indexLinkRecords(properties);
 		System.out.println(test.stuck);
+	}
+
+	public void indexLinkRecords(File properties) {
+		if(!writeIdsForLinks)
+			return;
+		String indexStatement = "DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_link_id;" +
+				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_person_id;" +
+				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_mode;" +
+				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_line;" +
+				"CREATE INDEX matsim_link_traffic_link_id ON m_calibration.matsim_link_traffic(link_id);" +
+				"CREATE INDEX matsim_link_traffic_link_id ON m_calibration.matsim_link_traffic(person_id);" +
+				"CREATE INDEX matsim_link_traffic_link_id ON m_calibration.matsim_link_traffic(mode);" +
+				"CREATE INDEX matsim_link_traffic_link_id ON m_calibration.matsim_link_traffic(line);";
+		try {
+			new DataBaseAdmin(properties).executeStatement(indexStatement);
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+				
+		
 	}
 
 	public void writeSimulationResultsToSQL(File properties, String string)
