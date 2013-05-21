@@ -80,7 +80,6 @@ public final class PathSizeLogitSelector implements PlanSelector {
 		for (Plan plan : person.getPlans()) {
 			selnum -= wc.weights[idx];
 			if (selnum <= 0.0) {
-				((PersonImpl) person).setSelectedPlan(plan);
 				return plan;
 			}
 			idx++;
