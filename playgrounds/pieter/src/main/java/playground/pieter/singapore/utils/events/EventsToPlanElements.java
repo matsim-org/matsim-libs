@@ -118,25 +118,24 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		scenario.getConfig().scenario().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		new MatsimNetworkReader(scenario).readFile(args[1]);
-	
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		File properties = new File("data/matsim2postgres.properties");
 		String suffix = args[5];
 		EventsToPlanElements test = new EventsToPlanElements(
 				scenario.getTransitSchedule(), scenario.getNetwork(),
-				scenario.getConfig(),suffix);
+				scenario.getConfig(), suffix);
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(args[2]);
-		test.getLinkWriter().finish();
-		if(Boolean.parseBoolean(args[4]))				
+		if (test.writeIdsForLinks)
+			test.getLinkWriter().finish();
+		if (Boolean.parseBoolean(args[4]))
 			test.writeSimulationResultsToSQL(properties, args[2], suffix);
 		System.out.println(test.stuck);
-		test.indexLinkRecords(properties,suffix);
+		test.indexLinkRecords(properties, suffix);
 	}
 
-
-
-	public  void indexLinkRecords(File properties, String suffix) {
+	public void indexLinkRecords(File properties, String suffix) {
 
 		String[] indexStatements = {
 				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic"
@@ -159,8 +158,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				"CREATE INDEX matsim_link_traffic" + suffix
 						+ "_line ON m_calibration.matsim_link_traffic" + suffix
 						+ "(line);" };
-		for(String indexStatement:indexStatements){
-			
+		for (String indexStatement : indexStatements) {
+
 			try {
 				System.out.println(indexStatement);
 				new DataBaseAdmin(properties).executeStatement(indexStatement);
@@ -169,8 +168,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				e.printStackTrace();
 			}
 		}
-				
-		
+
 	}
 
 	private Map<Id, Integer> acts = new HashMap<Id, Integer>();
@@ -195,7 +193,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	}
 
 	public EventsToPlanElements(TransitSchedule transitSchedule,
-			Network network, Config config, File connectionProperties, String suffix) {
+			Network network, Config config, File connectionProperties,
+			String suffix) {
 		this(transitSchedule, network, config, suffix);
 		this.writeIdsForLinks = true;
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
@@ -210,8 +209,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.INT));
 		try {
 			linkWriter = new PostgresqlCSVWriter("LINKWRITER",
-					"m_calibration.matsim_link_traffic"+suffix, new DataBaseAdmin(
-							connectionProperties), 100000, columns);
+					"m_calibration.matsim_link_traffic" + suffix,
+					new DataBaseAdmin(connectionProperties), 100000, columns);
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -247,19 +246,15 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	}
 
 	private void writePersonOnLink(LinkLeaveEvent event, TravellerChain chain) {
-		Object[] linkArgs = {
-				event.getLinkId().toString(),
-				event.getPersonId().toString(),
-				"",
-				"",
+		Object[] linkArgs = { event.getLinkId().toString(),
+				event.getPersonId().toString(), "", "",
 				new Integer((int) chain.getLinkEnterTime()),
-				new Integer((int) event.getTime())
-		};
+				new Integer((int) event.getTime()) };
 		linkWriter.addLine(linkArgs);
 	}
 
 	private void writeTransitIdsForLink(PTVehicle vehicle, LinkLeaveEvent event) {
-		for(Id i: vehicle.passengers.keySet()){
+		for (Id i : vehicle.passengers.keySet()) {
 			Object[] linkArgs = {
 					event.getLinkId().toString(),
 					i.toString(),
@@ -269,19 +264,15 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 							vehicle.transitLineId),
 					vehicle.transitLineId.toString(),
 					new Integer((int) vehicle.getLinkEnterTime()),
-					new Integer((int) event.getTime())
-			};
+					new Integer((int) event.getTime()) };
 			linkWriter.addLine(linkArgs);
 		}
-		
-	
+
 	}
 
 	public PostgresqlCSVWriter getLinkWriter() {
 		return linkWriter;
 	}
-
-
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
@@ -531,14 +522,15 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		try {
-			if (event.getVehicleId().toString().startsWith("tr")){
+			if (event.getVehicleId().toString().startsWith("tr")) {
 				PTVehicle ptVehicle = ptVehicles.get(event.getVehicleId());
 				ptVehicle.in = true;
 				ptVehicle.setLinkEnterTime(event.getTime());
-			}else{
-				chains.get(event.getPersonId()).setLinkEnterTime(event.getTime());
+			} else {
+				chains.get(event.getPersonId()).setLinkEnterTime(
+						event.getTime());
 			}
-			
+
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
 					.getFullStackTrace(e);
@@ -626,17 +618,17 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	// Methods
 	@Override
 	public void reset(int iteration) {
-	
+
 	}
 
-	public void writeSimulationResultsToSQL(File connectionProperties, String suffix)
-			throws InstantiationException, IllegalAccessException,
-			ClassNotFoundException, IOException, SQLException,
-			NoConnectionException {
+	public void writeSimulationResultsToSQL(File connectionProperties,
+			String suffix) throws InstantiationException,
+			IllegalAccessException, ClassNotFoundException, IOException,
+			SQLException, NoConnectionException {
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		String formattedDate = df.format(new Date());
 		// start with activities
-		String actTableName = "m_calibration.matsim_activities"+suffix;
+		String actTableName = "m_calibration.matsim_activities" + suffix;
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("activity_id",
 				PostgresType.INT, "primary key"));
@@ -657,7 +649,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				"MATSim activities from events file %s, created on %s.",
 				eventsFileName, formattedDate));
 
-		String journeyTableName = "m_calibration.matsim_journeys"+suffix;
+		String journeyTableName = "m_calibration.matsim_journeys" + suffix;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT, "primary key"));
@@ -695,7 +687,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				"MATSim journeys from events file %s, created on %s.",
 				eventsFileName, formattedDate));
 
-		String tripTableName = "m_calibration.matsim_trips"+suffix;
+		String tripTableName = "m_calibration.matsim_trips" + suffix;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("journey_id",
@@ -721,7 +713,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				"MATSim trips (stages) from events file %s, created on %s.",
 				eventsFileName, formattedDate));
 
-		String transferTableName = "m_calibration.matsim_transfers"+suffix;
+		String transferTableName = "m_calibration.matsim_transfers" + suffix;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("transfer_id",
 				PostgresType.INT, "primary key"));
@@ -760,8 +752,9 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 							new Double(Math.random()) };
 					activityWriter.addLine(args);
 				} catch (Exception e) {
-					
-					System.err.println(act);;
+
+					System.err.println(act);
+					;
 				}
 			}
 			for (Journey journey : chain.getJourneys()) {
@@ -883,10 +876,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	}
 
-	public void writeSimulationResultsToSQL(File properties, String string, String suffix)
-			throws InstantiationException, IllegalAccessException,
-			ClassNotFoundException, IOException, SQLException,
-			NoConnectionException {
+	public void writeSimulationResultsToSQL(File properties, String string,
+			String suffix) throws InstantiationException,
+			IllegalAccessException, ClassNotFoundException, IOException,
+			SQLException, NoConnectionException {
 		this.eventsFileName = string;
 		writeSimulationResultsToSQL(properties, suffix);
 	}
