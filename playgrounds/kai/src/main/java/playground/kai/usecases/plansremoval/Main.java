@@ -22,8 +22,6 @@
  */
 package playground.kai.usecases.plansremoval;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -43,6 +41,8 @@ public class Main {
 		double logitScaleFactor = ctrl.getConfig().planCalcScore().getBrainExpBeta() ;
 		double pathSizeLogitExponent = ctrl.getConfig().planCalcScore().getPathSizeLogitBeta() ; 
 		PlanSelector planSelector = new PathSizeLogitSelector( pathSizeLogitExponent, - logitScaleFactor, ctrl.getNetwork() );
+//		PlanSelector planSelector = new RandomPlanSelector() ;
+		
 
 		ctrl.getStrategyManager().setPlanSelectorForRemoval(planSelector) ;
 		// yy should probably be replaced by a factory pattern
