@@ -74,8 +74,11 @@ public class SurveyReader {
 				person.setModesForShopping(SurveyControler.modes.indexOf("bike"), SurveyControler.frequency.indexOf(entrs[15].trim().substring(1)));
 				person.setModesForShopping(SurveyControler.modes.indexOf("walk"), SurveyControler.frequency.indexOf(entrs[16].trim().substring(1)));
 				
-				if (entrs[17].trim().equals("yes")) {
+				boolean hasJob = entrs[17].trim().equals("yes");
+				
+				if (hasJob) {
 					Location wlocation = new Location(new IdImpl(-2));
+					person.setEmployed(hasJob);
 					person.setWorkLocation(wlocation);
 					wlocation.setCity(entrs[21].trim());
 					wlocation.setCoord(new CoordImpl(Double.parseDouble(entrs[22].trim()), Double.parseDouble(entrs[23].trim())));

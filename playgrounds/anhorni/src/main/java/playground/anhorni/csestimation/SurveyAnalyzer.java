@@ -39,7 +39,33 @@ public class SurveyAnalyzer {
 		}
 	}
 	
+	public void analyzePS() {
+		
+	}
+	
+	public void analyzeArea() {
+		log.info("analyzeArea ...");
+		Bins areaHome = new Bins(1, 7, "harea");
+		Bins areaWork = new Bins(1, 7, "warea");
+		Bins areaInter = new Bins(1, 7, "iarea");
+		Bins areaOther = new Bins(1, 7, "oarea");
+		
+		for (EstimationPerson p : this.population.values()) {
+			if (p.isEmployed()) {
+				areaHome.addVal(p.getAreaToShop()[0], 1.0);
+				areaWork.addVal(p.getAreaToShop()[1], 1.0);
+				areaInter.addVal(p.getAreaToShop()[2], 1.0);
+				areaOther.addVal(p.getAreaToShop()[3], 1.0);
+			}
+		}	
+		areaHome.plotBinnedDistribution(this.outdir, "areaHome", "");
+		areaWork.plotBinnedDistribution(this.outdir, "areaWork", "");
+		areaInter.plotBinnedDistribution(this.outdir, "areaInter", "");
+		areaOther.plotBinnedDistribution(this.outdir, "areaOther", "");
+	}
+	
 	public void analyzeHomeSets(String cl) {
+		log.info("analyzeHomeSets ...");
 		Bins awareness = new Bins(1, 11, cl + "_awareness");
 		Bins frequently = new Bins(1, 11, cl + "_frequently");
 		Bins distance10 = new Bins(250, 3000, cl + "_distance10");
@@ -80,7 +106,8 @@ public class SurveyAnalyzer {
 		distanceAwareness.plotBinnedDistribution(this.outdir, "distance_aware", "[m]");
 	}
 		
-	private void analyzeVariableBinSizeMZ() {	
+	private void analyzeVariableBinSizeMZ() {
+		log.info("analyzeVariableBinSizeMZ ...");
 		double totalGenderWeight = 0.0;
 		double totalAgeWeight = 0.0;
 		double totalIncomeWeight = 0.0;
@@ -151,6 +178,7 @@ public class SurveyAnalyzer {
 	}
 	
 	private void analyzeVariableBinSize() {
+		log.info("analyzeVariableBinSize ...");
 		double totalIncomeWeight = 0.0;
 		double totalAgeWeight = 0.0;
 		double totalGenderWeight = 0.0;
@@ -266,6 +294,7 @@ public class SurveyAnalyzer {
 	}
 	
 	public void analyze() {
+		this.analyzeArea();
 		this.analyzeVariableBinSize();
 		log.info("=====================================");
 	}

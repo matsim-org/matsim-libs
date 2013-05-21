@@ -33,8 +33,7 @@ public class EstimationPerson extends MZPerson {
 	private int nbrPersonShoppingTripsMonth = -99;
 	private String nbrShoppingTripsMonth = "-99";		
 		
-	// ----------------------------------------------------
-	private boolean isWorker;		
+	// ----------------------------------------------------	
 	private int areaToShop[] = new int[4]; 	
 	private ArrayList<Coord> workRoute = new ArrayList<Coord>();
 	// ----------------------------------------------------
@@ -108,9 +107,6 @@ public class EstimationPerson extends MZPerson {
 	public String getNbrShoppingTripsMonth() {
 		return nbrShoppingTripsMonth;
 	}
-	public boolean isWorker() {
-		return isWorker;
-	}
 	public int[] getAreaToShop() {
 		return areaToShop;
 	}
@@ -119,9 +115,6 @@ public class EstimationPerson extends MZPerson {
 	}
 	public void setNbrPersonShoppingTripsMonth(int nbrPersonShoppingTripsMonth) {
 		this.nbrPersonShoppingTripsMonth = nbrPersonShoppingTripsMonth;
-	}
-	public void setWorker(boolean isWorker) {
-		this.isWorker = isWorker;
 	}
 	public void setAreaToShop(int[] areaToShop) {
 		this.areaToShop = areaToShop;

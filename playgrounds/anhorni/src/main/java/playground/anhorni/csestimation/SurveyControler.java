@@ -54,8 +54,7 @@ public class SurveyControler {
 		cleaner.clean(population);
 		analyzer.analyze();
 		
-		
-		
+
 		// create and analyze home sets
 		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
 		TreeMap<Id, ShopLocation> ucs = ucsReader.readUniversalCS(shopsFile);
