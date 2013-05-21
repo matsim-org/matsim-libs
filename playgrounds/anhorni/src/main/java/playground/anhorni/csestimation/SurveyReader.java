@@ -9,10 +9,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 public class SurveyReader {
 	private TreeMap<Id, EstimationPerson> population;
 	private final static Logger log = Logger.getLogger(SurveyReader.class);
+	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 
 	public TreeMap<Id, EstimationPerson> getPopulation() {
 		return population;
@@ -67,7 +69,10 @@ public class SurveyReader {
 				Location hlocation = new Location(new IdImpl(-1));
 				person.setHomeLocation(hlocation);
 				hlocation.setCity(entrs[10].trim());
-				hlocation.setCoord(new CoordImpl(Double.parseDouble(entrs[12].trim()), Double.parseDouble(entrs[11].trim()))); // TODO: prüfen bei NULL
+				
+				CoordImpl hcoords = new CoordImpl(Double.parseDouble(entrs[12].trim()), Double.parseDouble(entrs[11].trim()));
+				
+				hlocation.setCoord(this.trafo.transform(hcoords)); // TODO: prüfen bei NULL
 				
 				person.setModesForShopping(SurveyControler.modes.indexOf("car"), SurveyControler.frequency.indexOf(entrs[13].trim().replaceAll("car", "")));
 				person.setModesForShopping(SurveyControler.modes.indexOf("pt"), SurveyControler.frequency.indexOf(entrs[14].trim().replaceAll("pt", "")));
@@ -81,7 +86,7 @@ public class SurveyReader {
 					person.setEmployed(hasJob);
 					person.setWorkLocation(wlocation);
 					wlocation.setCity(entrs[21].trim());
-					wlocation.setCoord(new CoordImpl(Double.parseDouble(entrs[22].trim()), Double.parseDouble(entrs[23].trim())));
+					wlocation.setCoord(this.trafo.transform(new CoordImpl(Double.parseDouble(entrs[22].trim()), Double.parseDouble(entrs[23].trim()))));
 				
 					if (entrs[25].trim().contains("car")) person.setModeForWorking(SurveyControler.modes.indexOf("car"), true);
 					if (entrs[25].trim().contains("pt")) person.setModeForWorking(SurveyControler.modes.indexOf("pt"), true);

@@ -8,14 +8,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 public class HomeSet {
 	
 	private EstimationPerson person;
 	private TreeMap<Double, ShopLocation> shops = new TreeMap<Double, ShopLocation>();
 	private final static Logger log = Logger.getLogger(HomeSet.class);
-	private WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();		
+
 	
 	public void create(EstimationPerson person, QuadTree<Location> shopQuadTree) {
 		this.person = person;
@@ -25,7 +24,7 @@ public class HomeSet {
 		
 		Collection<Location> stores = new Vector<Location>();
 		while (storeCnt < 10) {
-			r += 0.0000001;
+			r += 0.1;
 			stores = shopQuadTree.get(person.getHomeLocation().getCoord().getX(),
 					person.getHomeLocation().getCoord().getY(), 
 					r);
@@ -36,9 +35,9 @@ public class HomeSet {
 			System.exit(-1);
 		}
 		else {
-			Coord hCoord = this.trafo.transform(person.getHomeLocation().getCoord());
+			Coord hCoord = person.getHomeLocation().getCoord();
 			for (Location loc : stores) {
-				Coord sCoord = this.trafo.transform(loc.getCoord());
+				Coord sCoord = loc.getCoord();
 				double dist = CoordUtils.calcDistance(hCoord, sCoord);
 				this.shops.put(dist, (ShopLocation)loc);
 			}
@@ -46,11 +45,11 @@ public class HomeSet {
 	}
 	
 	public double getMaxDistanceAwareness() {
-		Coord hCoord = this.trafo.transform(person.getHomeLocation().getCoord());
+		Coord hCoord = person.getHomeLocation().getCoord();
 		double maxDistAware = 0.0;
 		for (ShopLocation shop:this.shops.values()) {	
 			if (person.getPersonLocations().getAwareStoresInQuerySet().contains(shop.getId())) {
-				Coord sCoord = this.trafo.transform(shop.getCoord());
+				Coord sCoord = shop.getCoord();
 				double dist = CoordUtils.calcDistance(hCoord, sCoord);
 				maxDistAware = dist;
 			}
