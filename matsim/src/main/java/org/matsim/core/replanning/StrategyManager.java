@@ -284,9 +284,9 @@ public class StrategyManager implements MatsimManager {
 	 * <li> Look at one agent.
 	 * <li> Assume she has the choice between <i>n</i> different plans.
 	 * <li> (Continuous) fraction <i>f(i)</i> of plan <i>i</i> develops as (master equation) 
-	 * <i>
+	 * <blockquote><i>
 	 * df(i)/dt = - p(i) * f(i) + 1/n
-	 * </i>
+	 * </i></blockquote>
 	 * where <i>p(i)</i> is from the choice model. 
 	 * <li> Steady state solution (<i>df/dt=0</i>) <i> f(i) = 1/n * 1/p(i) </i>.
 	 * <li> If <i> p(i) = e<sup>-b*U(i)</sup></i>, then <i> f(i) = e<sup>b*U(i)</sup> / n </i>.  Or in words:
