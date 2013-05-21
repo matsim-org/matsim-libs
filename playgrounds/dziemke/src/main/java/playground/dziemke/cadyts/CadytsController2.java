@@ -23,7 +23,6 @@ package playground.dziemke.cadyts;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.cadyts.car.CadytsCarScoring;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.car.CadytsPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -81,24 +80,24 @@ public class CadytsController2 {
 		
 		
 		// 2013-05-20, before run_37: create new scoring function directly here
-		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
-		
-		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {
-				
-				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
-				final CadytsCarScoring scoringFunction = new CadytsCarScoring(plan,config, cContext);
-				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
-				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
-
-				return scoringFunctionAccumulator;
-			}
-		}) ;
+//		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
+//		
+//		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+//			@Override
+//			public ScoringFunction createNewScoringFunction(Plan plan) {
+//				
+//				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+//
+//				final CadytsCarScoring scoringFunction = new CadytsCarScoring(plan,config, cContext);
+//				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+//				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+//
+//				return scoringFunctionAccumulator;
+//			}
+//		}) ;
 		// end 2013-05-20
 		
 		
