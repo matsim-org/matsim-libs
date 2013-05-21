@@ -124,7 +124,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		String suffix = args[5];
 		EventsToPlanElements test = new EventsToPlanElements(
 				scenario.getTransitSchedule(), scenario.getNetwork(),
-				scenario.getConfig(),properties,suffix);
+				scenario.getConfig(),suffix);
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(args[2]);
 		test.getLinkWriter().finish();
@@ -752,12 +752,17 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			String pax_id = entry.getKey().toString();
 			TravellerChain chain = entry.getValue();
 			for (Activity act : chain.getActs()) {
-				Object[] args = { new Integer(act.getElementId()), pax_id,
-						act.getFacility(), act.getType(),
-						new Integer((int) act.getStartTime()),
-						new Integer((int) act.getEndTime()),
-						new Double(Math.random()) };
-				activityWriter.addLine(args);
+				try {
+					Object[] args = { new Integer(act.getElementId()), pax_id,
+							act.getFacility(), act.getType(),
+							new Integer((int) act.getStartTime()),
+							new Integer((int) act.getEndTime()),
+							new Double(Math.random()) };
+					activityWriter.addLine(args);
+				} catch (Exception e) {
+					
+					System.err.println(act);;
+				}
 			}
 			for (Journey journey : chain.getJourneys()) {
 				try {
