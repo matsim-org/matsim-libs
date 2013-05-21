@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
+package org.matsim.core.config.experimental;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

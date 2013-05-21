@@ -20,8 +20,8 @@
 package playground.thibautd.parknride;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.experimental.ReflectiveModule;
 
-import playground.thibautd.utils.ReflectiveModule;
 
 /**
  * @author thibautd

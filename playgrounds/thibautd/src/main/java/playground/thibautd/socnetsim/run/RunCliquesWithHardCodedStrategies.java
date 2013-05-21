@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -66,7 +67,6 @@ import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
-import playground.thibautd.utils.ReflectiveModule;
 
 /**
  * @author thibautd

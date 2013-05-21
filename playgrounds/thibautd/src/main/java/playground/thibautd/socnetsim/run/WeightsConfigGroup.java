@@ -19,7 +19,7 @@
 
 package playground.thibautd.socnetsim.run;
 
-import playground.thibautd.utils.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveModule;
 
 public class WeightsConfigGroup extends ReflectiveModule {
 	public final static String GROUP_NAME = "groupReplanningWeights";
