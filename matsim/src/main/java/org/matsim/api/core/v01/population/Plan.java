@@ -25,6 +25,14 @@ import java.util.List;
 import org.matsim.core.api.internal.MatsimPopulationObject;
 import org.matsim.utils.customize.Customizable;
 
+/**
+ * A plan contains the intention of an agent.  In consequence, all information is <i>expected</i>.  For example,
+ * travel times and travel distances in routes are expected.  Even something like mode could be expected, if the
+ * plan is fed into a mobsim that is within-day replanning capable at the mode level.
+ * <p/>
+ * The only thing which is not "expected" in the same sense is the score.
+ *
+ */
 public interface Plan extends MatsimPopulationObject, Customizable {
 
 	public List<PlanElement> getPlanElements();
@@ -41,7 +49,7 @@ public interface Plan extends MatsimPopulationObject, Customizable {
 
 	public Person getPerson();
 	/**
-	 * Sets the reference to the person in the BasicPlan instance.
+	 * Sets the reference to the person.
 	 * This is done automatically if using Person.addPlan(). Make
 	 * sure that the bidirectional reference is set correctly if
 	 * you are using this method!.

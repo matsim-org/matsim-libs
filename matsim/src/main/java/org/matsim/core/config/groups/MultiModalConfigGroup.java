@@ -107,8 +107,9 @@ public class MultiModalConfigGroup extends Module {
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads.");
-		map.put(CREATE_MULTI_MODAL_NETWORK, "Use this, if your network is not multi modal. Links with free speeds that are lower than the specified cutoff value will be usable for walk and bike trips.");
-		map.put(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES, "Only used, if createMultiModalNetwork is enabled (set value in m/s).");
+		map.put(CREATE_MULTI_MODAL_NETWORK, "Use this if your network is not multi modal. Links with free speeds that are lower than " +
+				"the specified cutoff value will be usable for walk and bike trips.");
+		map.put(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES, "Only used if createMultiModalNetwork is enabled (set value in m/s).");
 		return map;
 	}
 	
@@ -134,6 +135,9 @@ public class MultiModalConfigGroup extends Module {
 	}
 
 	public String getSimulatedModes() {
+		// used in core at following places:
+		// (1) In the Controler where it may configure the router for "prepareForSim".
+		// (2) In within-day
 		return this.simulatedModes;
 	}
 
