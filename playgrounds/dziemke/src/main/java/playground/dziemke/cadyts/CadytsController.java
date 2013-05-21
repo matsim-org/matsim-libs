@@ -26,6 +26,8 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.car.CadytsPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -40,7 +42,17 @@ public class CadytsController {
 	//
 
 	public static void main(String[] args) {
-		Controler controler = new Controler(args);
+		Config config = ConfigUtils.loadConfig(args[0]) ;
+		
+		// changed id to 3
+		// before run_34_c: change id to 2
+		StrategySettings stratSets = new StrategySettings(new IdImpl(2));
+		stratSets.setModuleName("ccc");
+		// before run_34_c: change probability from 1.0 to 0.9; set back before run_36_c
+		stratSets.setProbability(1.0);
+		config.strategy().addStrategySettings(stratSets);
+		
+		Controler controler = new Controler(config);
 		
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		// 2013-04-23, switch on brute force
@@ -49,18 +61,14 @@ public class CadytsController {
 		//
 		controler.addControlerListener(cContext);
 		
-		// changed id to 3
-		// before run_34_c: change id to 2
-		StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-		stratSets.setModuleName("ccc");
-		// before run_34_c: change probability from 1.0 to 0.9; set back before run_36_c
-		stratSets.setProbability(1.0);
-		controler.getConfig().strategy().addStrategySettings(stratSets);
-		
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				final CadytsPlanChanger planSelector = new CadytsPlanChanger(cContext);
+
+				planSelector.setCadytsWeight(30.*scenario2.getConfig().planCalcScore().getBrainExpBeta() ) ;
+				// set cadyts weight very high = close to brute force
+				
 				return new PlanStrategyImpl(planSelector);
 			}
 		});

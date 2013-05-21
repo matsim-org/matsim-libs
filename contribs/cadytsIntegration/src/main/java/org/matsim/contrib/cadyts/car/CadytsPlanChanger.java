@@ -104,7 +104,7 @@ public class CadytsPlanChanger implements PlanSelector {
 		return selectedPlan;
 	}
 	
-	void setCadytsWeight(double cadytsWeight) {
+	public void setCadytsWeight(double cadytsWeight) {
 		this.cadytsWeight = cadytsWeight;
 	}
 }

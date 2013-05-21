@@ -145,6 +145,9 @@ public class CadytsIntegrationTest {
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(scenario2, cContext);
 				planSelector.setCadytsWeight(0.) ;
+				// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
+				// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
+				// kai, may'13
 				return new PlanStrategyImpl(planSelector);
 			}
 		} ) ;
