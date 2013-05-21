@@ -110,18 +110,67 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	}
 
+	public static void main(String[] args) throws IOException,
+			InstantiationException, IllegalAccessException,
+			ClassNotFoundException, SQLException, NoConnectionException {
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.loadConfig(args[3]));
+		scenario.getConfig().scenario().setUseTransit(true);
+		new TransitScheduleReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario).readFile(args[1]);
+	
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		File properties = new File("data/matsim2postgres.properties");
+		EventsToPlanElements test = new EventsToPlanElements(
+				scenario.getTransitSchedule(), scenario.getNetwork(),
+				scenario.getConfig(),properties);
+		eventsManager.addHandler(test);
+		new MatsimEventsReader(eventsManager).readFile(args[2]);
+		test.getLinkWriter().finish();
+		if(Boolean.parseBoolean(args[4]))				
+			test.writeSimulationResultsToSQL(properties, args[2]);
+		System.out.println(test.stuck);
+		EventsToPlanElements.indexLinkRecords(properties);
+	}
+
+
+
+	public static void indexLinkRecords(File properties) {
+
+		String[] indexStatements = {"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_link_id;" ,
+				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_person_id;",
+				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_mode;" ,
+				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_line;",
+				"CREATE INDEX matsim_link_traffic_link_id ON m_calibration.matsim_link_traffic(link_id);" ,
+				"CREATE INDEX matsim_link_traffic_person_id ON m_calibration.matsim_link_traffic(person_id);",
+				"CREATE INDEX matsim_link_traffic_mode ON m_calibration.matsim_link_traffic(mode);" ,
+				"CREATE INDEX matsim_link_traffic_line ON m_calibration.matsim_link_traffic(line);"};
+		for(String indexStatement:indexStatements){
+			
+			try {
+				System.out.println(indexStatement);
+				new DataBaseAdmin(properties).executeStatement(indexStatement);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+				
+		
+	}
+
+	private Map<Id, Integer> acts = new HashMap<Id, Integer>();
 	// Attributes
 	private Map<Id, TravellerChain> chains = new HashMap<Id, TravellerChain>();
-	private Map<Id, PTVehicle> ptVehicles = new HashMap<Id, PTVehicle>();
-	private TransitSchedule transitSchedule;
 	private Map<Id, Coord> locations = new HashMap<Id, Coord>();
-	private Network network;
-	private Map<Id, Integer> acts = new HashMap<Id, Integer>();
-	private int stuck = 0;
-	private final double walkSpeed;
 	private String eventsFileName;
 	// a writer to record the ids entering and exiting each link
 	private PostgresqlCSVWriter linkWriter;
+	private Network network;
+	private Map<Id, PTVehicle> ptVehicles = new HashMap<Id, PTVehicle>();
+	private int stuck = 0;
+	private TransitSchedule transitSchedule;
+	private final double walkSpeed;
 	private boolean writeIdsForLinks = false;
 
 	public EventsToPlanElements(TransitSchedule transitSchedule,
@@ -167,12 +216,6 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		}
 	}
 
-	// Methods
-	@Override
-	public void reset(int iteration) {
-
-	}
-
 	private String getMode(String transportMode, Id line) {
 		if (transportMode.contains("bus"))
 			return "bus";
@@ -187,6 +230,37 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				return "mrt";
 		else
 			return "other";
+	}
+
+	private void writePersonOnLink(LinkLeaveEvent event, TravellerChain chain) {
+		Object[] linkArgs = {
+				event.getLinkId().toString(),
+				event.getPersonId().toString(),
+				"",
+				"",
+				new Integer((int) chain.getLinkEnterTime()),
+				new Integer((int) event.getTime())
+		};
+		linkWriter.addLine(linkArgs);
+	}
+
+	private void writeTransitIdsForLink(PTVehicle vehicle, LinkLeaveEvent event) {
+		for(Id i: vehicle.passengers.keySet()){
+			Object[] linkArgs = {
+					event.getLinkId().toString(),
+					i.toString(),
+					getMode(transitSchedule.getTransitLines()
+							.get(vehicle.transitLineId).getRoutes()
+							.get(vehicle.transitRouteId).getTransportMode(),
+							vehicle.transitLineId),
+					vehicle.transitLineId.toString(),
+					new Integer((int) vehicle.getLinkEnterTime()),
+					new Integer((int) event.getTime())
+			};
+			linkWriter.addLine(linkArgs);
+		}
+		
+	
 	}
 
 	@Override
@@ -257,6 +331,43 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	}
 
 	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		try {
+			if (event.getPersonId().toString().startsWith("pt_tr"))
+				return;
+			TravellerChain chain = chains.get(event.getPersonId());
+			if (event.getLegMode().equals("car")) {
+				Journey journey = chain.getJourneys().getLast();
+				journey.setDest(network.getLinks().get(event.getLinkId())
+						.getCoord());
+				journey.setEndTime(event.getTime());
+				chain.inCar = false;
+			} else if (event.getLegMode().equals("transit_walk")) {
+				Journey journey = chain.getJourneys().getLast();
+				Walk walk = journey.getWalks().getLast();
+				walk.setDest(network.getLinks().get(event.getLinkId())
+						.getCoord());
+				walk.setEndTime(event.getTime());
+				walk.setDistance(walk.getDuration() * walkSpeed);
+			} else if (event.getLegMode().equals("pt")) {
+				Journey journey = chain.getJourneys().getLast();
+				Trip trip = journey.getTrips().getLast();
+				trip.setDest(network.getLinks().get(event.getLinkId())
+						.getCoord());
+				trip.setEndTime(event.getTime());
+				journey.setPossibleTransfer(new Transfer());
+				journey.getPossibleTransfer().setStartTime(event.getTime());
+				journey.getPossibleTransfer().setFromTrip(trip);
+			}
+		} catch (Exception e) {
+			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(e);
+			System.err.println(fullStackTrace);
+			System.err.println(event.toString());
+		}
+	}
+
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		try {
 			if (event.getPersonId().toString().startsWith("pt_tr"))
@@ -316,33 +427,13 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(AgentStuckEvent event) {
 		try {
-			if (event.getPersonId().toString().startsWith("pt_tr"))
-				return;
-			TravellerChain chain = chains.get(event.getPersonId());
-			if (event.getLegMode().equals("car")) {
-				Journey journey = chain.getJourneys().getLast();
-				journey.setDest(network.getLinks().get(event.getLinkId())
-						.getCoord());
-				journey.setEndTime(event.getTime());
-				chain.inCar = false;
-			} else if (event.getLegMode().equals("transit_walk")) {
-				Journey journey = chain.getJourneys().getLast();
-				Walk walk = journey.getWalks().getLast();
-				walk.setDest(network.getLinks().get(event.getLinkId())
-						.getCoord());
-				walk.setEndTime(event.getTime());
-				walk.setDistance(walk.getDuration() * walkSpeed);
-			} else if (event.getLegMode().equals("pt")) {
-				Journey journey = chain.getJourneys().getLast();
-				Trip trip = journey.getTrips().getLast();
-				trip.setDest(network.getLinks().get(event.getLinkId())
-						.getCoord());
-				trip.setEndTime(event.getTime());
-				journey.setPossibleTransfer(new Transfer());
-				journey.getPossibleTransfer().setStartTime(event.getTime());
-				journey.getPossibleTransfer().setFromTrip(trip);
+			if (!event.getPersonId().toString().startsWith("pt_tr")) {
+				TravellerChain chain = chains.get(event.getPersonId());
+				stuck++;
+				if (chain.getJourneys().size() > 0)
+					chain.getJourneys().removeLast();
 			}
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
@@ -468,46 +559,13 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		}
 	}
 
-	private void writePersonOnLink(LinkLeaveEvent event, TravellerChain chain) {
-		Object[] linkArgs = {
-				event.getLinkId().toString(),
-				event.getPersonId().toString(),
-				"",
-				"",
-				new Integer((int) chain.getLinkEnterTime()),
-				new Integer((int) event.getTime())
-		};
-		linkWriter.addLine(linkArgs);
-	}
-
-	private void writeTransitIdsForLink(PTVehicle vehicle, LinkLeaveEvent event) {
-		for(Id i: vehicle.passengers.keySet()){
-			Object[] linkArgs = {
-					event.getLinkId().toString(),
-					i.toString(),
-					getMode(transitSchedule.getTransitLines()
-							.get(vehicle.transitLineId).getRoutes()
-							.get(vehicle.transitRouteId).getTransportMode(),
-							vehicle.transitLineId),
-					vehicle.transitLineId.toString(),
-					new Integer((int) vehicle.getLinkEnterTime()),
-					new Integer((int) event.getTime())
-			};
-			linkWriter.addLine(linkArgs);
-		}
-		
-
-	}
-
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(TransitDriverStartsEvent event) {
 		try {
-			if (!event.getPersonId().toString().startsWith("pt_tr")) {
-				TravellerChain chain = chains.get(event.getPersonId());
-				stuck++;
-				if (chain.getJourneys().size() > 0)
-					chain.getJourneys().removeLast();
-			}
+			ptVehicles.put(
+					event.getVehicleId(),
+					new PTVehicle(event.getTransitLineId(), event
+							.getTransitRouteId()));
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
 					.getFullStackTrace(e);
@@ -533,21 +591,6 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	}
 
 	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		try {
-			ptVehicles.put(
-					event.getVehicleId(),
-					new PTVehicle(event.getTransitLineId(), event
-							.getTransitRouteId()));
-		} catch (Exception e) {
-			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
-					.getFullStackTrace(e);
-			System.err.println(fullStackTrace);
-			System.err.println(event.toString());
-		}
-	}
-
-	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		try {
 			ptVehicles.get(event.getVehicleId()).lastStop = event
@@ -558,6 +601,12 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
+	}
+
+	// Methods
+	@Override
+	public void reset(int iteration) {
+	
 	}
 
 	public void writeSimulationResultsToSQL(File connectionProperties)
@@ -809,77 +858,18 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	}
 
-	public static void main(String[] args) throws IOException,
-			InstantiationException, IllegalAccessException,
-			ClassNotFoundException, SQLException, NoConnectionException {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
-				.createScenario(ConfigUtils.loadConfig(args[3]));
-		scenario.getConfig().scenario().setUseTransit(true);
-		new TransitScheduleReader(scenario).readFile(args[0]);
-		new MatsimNetworkReader(scenario).readFile(args[1]);
-
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		File properties = new File("data/matsim2postgres.properties");
-		EventsToPlanElements test = new EventsToPlanElements(
-				scenario.getTransitSchedule(), scenario.getNetwork(),
-				scenario.getConfig(),properties);
-		eventsManager.addHandler(test);
-		new MatsimEventsReader(eventsManager).readFile(args[2]);
-		// TravellerChain chain = test.chains
-		// .get(new org.matsim.core.basic.v01.IdImpl("4101962"));
-		// System.out.println(chain.planElements);
-		//
-		// chain = test.chains
-		// .get(new org.matsim.core.basic.v01.IdImpl("77878"));
-		// System.out.println(chain.planElements);
-		if(Boolean.parseBoolean(args[4]))				
-			test.writeSimulationResultsToSQL(properties, args[2]);
-		test.indexLinkRecords(properties);
-		System.out.println(test.stuck);
-	}
-
-	public void indexLinkRecords(File properties) {
-		if(!writeIdsForLinks)
-			return;
-		String indexStatement = "DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_link_id;" +
-				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_person_id;" +
-				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_mode;" +
-				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic_line;" +
-				"CREATE INDEX matsim_link_traffic_link_id ON m_calibration.matsim_link_traffic(link_id);" +
-				"CREATE INDEX matsim_link_traffic_link_id ON m_calibration.matsim_link_traffic(person_id);" +
-				"CREATE INDEX matsim_link_traffic_link_id ON m_calibration.matsim_link_traffic(mode);" +
-				"CREATE INDEX matsim_link_traffic_link_id ON m_calibration.matsim_link_traffic(line);";
-		try {
-			new DataBaseAdmin(properties).executeStatement(indexStatement);
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-				
-		
-	}
-
 	public void writeSimulationResultsToSQL(File properties, String string)
 			throws InstantiationException, IllegalAccessException,
 			ClassNotFoundException, IOException, SQLException,
 			NoConnectionException {
 		this.eventsFileName = string;
 		writeSimulationResultsToSQL(properties);
+	}
+
+
+
+	public PostgresqlCSVWriter getLinkWriter() {
+		return linkWriter;
 	}
 
 }
