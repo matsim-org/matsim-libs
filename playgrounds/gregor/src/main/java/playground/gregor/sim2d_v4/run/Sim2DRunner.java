@@ -31,6 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.GregorsOffice;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
@@ -108,6 +109,7 @@ public class Sim2DRunner implements IterationStartsListener{
 			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 			dbg.addAdditionalDrawer(qDbg);
+			dbg.addAdditionalDrawer(new GregorsOffice());
 			controller.getEvents().addHandler(dbg);
 			controller.getEvents().addHandler(qDbg);
 		}

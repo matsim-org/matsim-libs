@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TileLoader.java
+ * GregorsOffice.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,65 +20,24 @@
 
 package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
-import java.io.File;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+public class GregorsOffice implements VisDebuggerAdditionalDrawer {
 
-import processing.core.PApplet;
-import processing.core.PImage;
-
-public class TileLoader implements Runnable{
-
+	double x = 713016.11+8;
+	double y = 6572166.05+4;
 	
-	
-	private final BlockingDeque<Tile> tiles = new LinkedBlockingDeque<Tile>();
-	private final PApplet p;
-
-	public TileLoader(PApplet p) {
-		this.p = p;
-
-	}
-
 	@Override
-	public void run() {
-		while (true) {
-			Tile pTile;
-			try {
-				pTile = this.tiles.takeFirst();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-			String url;
-			synchronized (pTile) {
-				url = pTile.getUrl();
-			}
-			
-			String path = "/Users/laemmel/tmp/cache/"+url + ".jpeg";
-			if (new File(path).isFile()) {
-				url = path;
-			}
-			PImage img = this.p.loadImage(url,"jpeg");
-			synchronized (pTile) {
-				pTile.setPImage(img);
-			}
-			if (!new File(path).isFile()) {
-				img.save(path);
-			}
-		}
-	}
-
-	public void addTile(Tile pTile) {
-		try {
-			this.tiles.putFirst(pTile);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-	}
-	
-	public void loadDirectly(Tile t, String path) {
-		PImage img = this.p.loadImage(path,"jpeg");
-		t.setPImage(img);
+	public void draw(EventsBasedVisDebugger p) {
+		double ox = p.offsetX;
+		double oy = p.offsetY;
+		float fx = (float) (this.x+ox);
+		float fy = (float) -(this.y + oy);
+		
+		p.fill(255,0,0,255);
+		p.strokeWeight(1);
+		p.ellipse(fx, fy, 3, 3);
+		p.stroke(192,128,128,255);
+		p.fill(192,128,128,255);
+		p.text("Gregor's office", fx+3, fy+3);
 	}
 
 }

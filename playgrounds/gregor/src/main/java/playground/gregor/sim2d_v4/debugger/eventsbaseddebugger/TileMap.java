@@ -86,6 +86,7 @@ public class TileMap implements ZoomPanListener {
 		//		System.out.println(this.zoomer.getPanOffset());
 		//		this.zoomer.get
 		this.viewChanged = true;
+		zoomEnded();
 	}
 
 	@Override
@@ -155,6 +156,7 @@ public class TileMap implements ZoomPanListener {
 		double ty = y - (y%(this.tileSize*this.currentZoom));
 		Tile ret = new Tile(tx,ty,tx+this.tileSize*this.currentZoom,ty+this.tileSize*this.currentZoom,this.transform);
 		this.currentQuad.put((ret.getTx()+ret.getBx())/2 , (ret.getTy()+ret.getBy())/2, ret);
+		
 		this.loader.addTile(ret);
 		return ret;
 	}

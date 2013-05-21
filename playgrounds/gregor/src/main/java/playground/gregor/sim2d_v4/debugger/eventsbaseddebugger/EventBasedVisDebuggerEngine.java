@@ -65,8 +65,8 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	public EventBasedVisDebuggerEngine(Scenario sc) {
 		this.sc = sc;
 		this.dT = sc.getScenarioElement(Sim2DScenario.class).getSim2DConfig().getTimeStepSize();
-		this.keyControl = new KeyControl();
 		this.vis = new EventsBasedVisDebugger(sc);
+		this.keyControl = new KeyControl(this.vis.zoomer);
 		this.vis.addKeyListener(this.keyControl);
 		init();
 	}
