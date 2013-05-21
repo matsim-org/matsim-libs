@@ -75,7 +75,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	private static int congDensWarnCnt2 = 0;
 
 	// instance variables (problem with memory)
-	private final Queue<QItem> holes = new LinkedList<QItem>() ;
+	private final Queue<Hole> holes = new LinkedList<Hole>() ;
 
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
@@ -177,6 +177,15 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 		this.calculateCapacities();
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
+		
+		if ( HOLES ) {
+			for ( int ii=0 ; ii<this.storageCapacity; ii++ ) {
+				Hole hole = new Hole() ;	
+				hole.setEarliestLinkExitTime( Double.NEGATIVE_INFINITY ) ;
+				this.holes.add(hole) ;
+			}
+			// yyyyyy this does, once more, not work with variable vehicle sizes.  kai, may'13
+		}
 		
 	}
 
