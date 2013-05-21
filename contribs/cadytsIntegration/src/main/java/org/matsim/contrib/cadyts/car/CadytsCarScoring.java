@@ -37,48 +37,48 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
  * @author nagel
  *
  */
-//public class CadytsCarScoring implements ArbitraryEventScoring {
-//	private static final Logger log = Logger.getLogger(CadytsCarScoring.class);
-//
-//	private double score = 0. ;
-//	private PlanToPlanStepBasedOnEvents PlanToPlanStep;
-//	private AnalyticalCalibrator<Link> matsimCalibrator;
-//	private Plan plan;
-//	private final double beta ;
-//	private double weightOfCadytsCorrection = 1. ;
-//
-//	public CadytsCarScoring(final Plan plan, Config config, final CadytsContext context ) {
-//		// this.PlanToPlanStep = context.getPtStep() ;
-//		this.PlanToPlanStep = context.getPlanToPlanStepBasedOnEvents();
-//		this.matsimCalibrator = context.getCalibrator() ;
-//		this.plan = plan ;
-//		this.beta = config.planCalcScore().getBrainExpBeta() ;
-//	}
-//	
-//	@Override
-//	public void finish() {
-//		cadyts.demand.Plan<Link> currentPlanSteps = this.PlanToPlanStep.getPlanSteps(plan);
-//		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
-//		this.score = weightOfCadytsCorrection * currentPlanCadytsCorrection ;
-//	}
-//
-//	@Override
-//	public double getScore() {
-//		return score ;
-//	}
-//
-//	@Override
-//	public void reset() {
-//		score = 0. ;
-//	}
-//
-//	@Override
-//	public void handleEvent(Event event) {
-//		
-//	}
-//
-//	public void setWeightOfCadytsCorrection(double weightOfCadytsCorrection) {
-//		this.weightOfCadytsCorrection = weightOfCadytsCorrection;
-//	}
-//
-//}
+public class CadytsCarScoring implements ArbitraryEventScoring {
+	private static final Logger log = Logger.getLogger(CadytsCarScoring.class);
+
+	private double score = 0. ;
+	private PlanToPlanStepBasedOnEvents PlanToPlanStep;
+	private AnalyticalCalibrator<Link> matsimCalibrator;
+	private Plan plan;
+	private final double beta ;
+	private double weightOfCadytsCorrection = 1. ;
+
+	public CadytsCarScoring(final Plan plan, Config config, final CadytsContext context ) {
+		// this.PlanToPlanStep = context.getPtStep() ;
+		this.PlanToPlanStep = context.getPlanToPlanStepBasedOnEvents();
+		this.matsimCalibrator = context.getCalibrator() ;
+		this.plan = plan ;
+		this.beta = config.planCalcScore().getBrainExpBeta() ;
+	}
+	
+	@Override
+	public void finish() {
+		cadyts.demand.Plan<Link> currentPlanSteps = this.PlanToPlanStep.getPlanSteps(plan);
+		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
+		this.score = weightOfCadytsCorrection * currentPlanCadytsCorrection ;
+	}
+
+	@Override
+	public double getScore() {
+		return score ;
+	}
+
+	@Override
+	public void reset() {
+		score = 0. ;
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		
+	}
+
+	public void setWeightOfCadytsCorrection(double weightOfCadytsCorrection) {
+		this.weightOfCadytsCorrection = weightOfCadytsCorrection;
+	}
+
+}
