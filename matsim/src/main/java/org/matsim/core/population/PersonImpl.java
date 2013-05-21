@@ -84,11 +84,10 @@ public class PersonImpl implements Person {
 	}
 
 	public final void setSelectedPlan(final Plan selectedPlan) {
-		if (this.getPlans().contains(selectedPlan)) {
-			this.selectedPlan = selectedPlan;
-		} else if (selectedPlan != null) {
-			throw new IllegalStateException("The plan to be set as selected is not stored in the person's plans");
+		if (selectedPlan != null && !plans.contains( selectedPlan )) {
+			throw new IllegalStateException("The plan to be set as selected is not null nor stored in the person's plans");
 		}
+		this.selectedPlan = selectedPlan;
 	}
 
 	public void removeUnselectedPlans() {
