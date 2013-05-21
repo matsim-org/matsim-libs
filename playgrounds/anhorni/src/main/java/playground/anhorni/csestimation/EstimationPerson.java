@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
@@ -43,6 +44,7 @@ public class EstimationPerson extends MZPerson {
 	private HomeSet homeset;
 	
 	private List<ShoppingTrip> shoppingTrips = new Vector<ShoppingTrip>();
+	private final static Logger log = Logger.getLogger(EstimationPerson.class);
 	
 	public EstimationPerson(Id id) {
 		super(id);
@@ -132,6 +134,7 @@ public class EstimationPerson extends MZPerson {
 		this.homeset = homeset;
 	}
 	public void createHomeSet(QuadTree<Location> shopQuadTree) {
+		log.info("create home sets...");
 		this.homeset = new HomeSet();
 		this.homeset.create(this, shopQuadTree);
 	}
