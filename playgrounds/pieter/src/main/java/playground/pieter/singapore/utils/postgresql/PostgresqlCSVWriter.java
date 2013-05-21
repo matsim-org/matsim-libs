@@ -162,4 +162,8 @@ import others.sergioo.util.dataBase.NoConnectionException;
 		sb.delete(0, sb.length());
 		System.out.println(writerName + ": Processed line no " + lineCounter);
 	}
+
+	public String getTableName() {
+		return tableName;
+	}
 }
