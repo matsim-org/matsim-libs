@@ -39,13 +39,17 @@ import org.matsim.core.config.Module;
  * to manually implement when extending module (usually forgetting half of it).
  * <br>
  * For each field in the xml file, just implement a setter taking a String,
- * and a getter returning a value which String representation must be writen to
+ * and a getter returning a value which String representation must be written to
  * the xml file, and annotate them with the {@link StringSetter} and
  * {@link StringGetter} annotation
  * types.
  * <br>
  * Those annotations take a mandatory String argument, which is the parameter name
  * in the xml.
+ * <br>
+ * Note that there is no restriction on access modifiers for those methods: they
+ * can even be private, if for instance you do not want to confuse the users with dozens
+ * of methods of the type "getStringRepresentationOfParameterX()".
  * <br>
  * If something is wrong (missing setter or getter, wrong parameter or return type),
  * an {@link InconsistentModuleException} will be thrown at construction.
