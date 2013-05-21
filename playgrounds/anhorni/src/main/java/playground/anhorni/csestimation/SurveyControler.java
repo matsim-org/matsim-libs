@@ -52,7 +52,7 @@ public class SurveyControler {
 		SurveyAnalyzer analyzer = new SurveyAnalyzer(this.population, outdir);
 		SurveyCleaner cleaner = new SurveyCleaner();
 		cleaner.clean(population);
-		analyzer.analyze();
+		analyzer.analyzeVariableBinSize();
 		
 
 		// create and analyze home sets
@@ -67,7 +67,12 @@ public class SurveyControler {
 		
 		this.population = cleaner.removeNonAgeNonIncomePersons(this.population);
 		analyzer.setPopulation(this.population);
-		analyzer.analyze();
+		
+		analyzer.setUcs(ucs);
+		analyzer.analyzeArea();
+		analyzer.analyzePS();
+		
+		analyzer.analyzeVariableBinSize();
 		
 		analyzer.analyzeHomeSets("cleaned");
 		

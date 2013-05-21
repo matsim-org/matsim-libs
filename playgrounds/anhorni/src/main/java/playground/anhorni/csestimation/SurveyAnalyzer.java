@@ -9,12 +9,15 @@ import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class SurveyAnalyzer {
 	private final static Logger log = Logger.getLogger(SurveyAnalyzer.class);	
 	private TreeMap<Id, EstimationPerson> population;
 	private String outdir;
 	private DecimalFormat formatter = new DecimalFormat("0.0");
+	TreeMap<Id, ShopLocation> ucs;
 	
 	public SurveyAnalyzer(TreeMap<Id, EstimationPerson> population, String outdir) {
 		this.population = population;
@@ -40,7 +43,21 @@ public class SurveyAnalyzer {
 	}
 	
 	public void analyzePS() {
+		Bins sizePS = new Bins(1, 20, "sizePS");
+		Bins distPS = new Bins(0.2, 10, "distPS");
 		
+		for (EstimationPerson p : this.population.values()) {
+			sizePS.addVal(p.getPersonLocations().getVisitedStoresInQuerySet().size(), 1.0);
+			
+			for (Id storeId : p.getPersonLocations().getVisitedStoresInQuerySet()) {
+				ShopLocation store = this.ucs.get(storeId);
+			
+				double dist2Home = CoordUtils.calcDistance(p.getHomeLocation().getCoord(), store.getCoord());
+				distPS.addVal(dist2Home / 1000.0, 1.0);
+			}
+		}
+		sizePS.plotBinnedDistribution(this.outdir, "sizePS", "");
+		distPS.plotBinnedDistribution(this.outdir, "distPS", "");
 	}
 	
 	public void analyzeArea() {
@@ -177,7 +194,7 @@ public class SurveyAnalyzer {
 		log.info("-------------------------");
 	}
 	
-	private void analyzeVariableBinSize() {
+	public void analyzeVariableBinSize() {
 		log.info("analyzeVariableBinSize ...");
 		double totalIncomeWeight = 0.0;
 		double totalAgeWeight = 0.0;
@@ -293,9 +310,7 @@ public class SurveyAnalyzer {
 		incomeBins.plotBinnedDistribution(outdir, "income bins", " income cat");		
 	}
 	
-	public void analyze() {
-		this.analyzeArea();
-		this.analyzeVariableBinSize();
-		log.info("=====================================");
+	public void setUcs(TreeMap<Id, ShopLocation> ucs) {
+		this.ucs = ucs;
 	}
 }

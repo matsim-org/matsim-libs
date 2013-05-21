@@ -21,8 +21,8 @@ package playground.anhorni.csestimation;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
+
 
 public class PersonLocations {
 	private TreeMap<Id, ShopLocation> locations = new TreeMap<Id, ShopLocation>();
