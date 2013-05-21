@@ -43,6 +43,7 @@ public class DepotReader
     private MatsimVrpGraph graph;
 
     private List<Depot> depots = new ArrayList<Depot>();
+    private List<Id> depotLinks = new ArrayList<Id>();
     private List<Vehicle> vehicles = new ArrayList<Vehicle>();
 
     private Depot currentDepot;
@@ -97,6 +98,7 @@ public class DepotReader
 
         currentDepot = new DepotImpl(id, name, vertex);
         depots.add(currentDepot);
+        depotLinks.add(linkId);
     }
 
 
@@ -145,4 +147,10 @@ public class DepotReader
             return defaultValue;
         }
     }
+
+
+	public List<Id> getDepotLinks() {
+		return depotLinks;
+	}
+    
 }
