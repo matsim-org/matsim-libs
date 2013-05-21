@@ -752,8 +752,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 							new Double(Math.random()) };
 					activityWriter.addLine(args);
 				} catch (Exception e) {
-
-					System.err.println(act);
+					System.out.println("HARK!");
+//					System.err.println(act);
 					;
 				}
 			}
