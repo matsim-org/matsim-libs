@@ -34,7 +34,7 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
 
 /**
- * @author dziemke, nagel
+ * @author nagel
  *
  */
 //public class CadytsCarScoring implements ArbitraryEventScoring {
