@@ -32,8 +32,6 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 
-import playground.kai.run.KaiAnalysisListener;
-
 public class CadytsController {
 	// new
 	private final static Logger log = Logger.getLogger(CadytsController.class);
@@ -74,7 +72,7 @@ public class CadytsController {
 		//
 		
 		
-		controler.addControlerListener(new KaiAnalysisListener());
+//		controler.addControlerListener(new KaiAnalysisListener());
 		
 		controler.run();
 	}

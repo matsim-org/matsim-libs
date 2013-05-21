@@ -4,8 +4,6 @@ package playground.dziemke.potsdam;
 // import org.matsim.run.Controler;
 import org.matsim.core.controler.Controler;
 
-import playground.kai.run.KaiAnalysisListener;
-
 public class PotsdamControler {
 
 	public static void main(final String[] args) {
@@ -19,7 +17,7 @@ public class PotsdamControler {
 		
 		
 		// new
-		controler.addControlerListener(new KaiAnalysisListener()) ;
+		// controler.addControlerListener(new KaiAnalysisListener()) ;
 		
 		controler.run() ;
 		// (original 2011) outcommented:

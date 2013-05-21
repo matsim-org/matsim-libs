@@ -44,8 +44,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.kai.run.KaiAnalysisListener;
-
 public class CadytsController2 {
 	// new
 	private final static Logger log = Logger.getLogger(CadytsController2.class);
@@ -104,7 +102,7 @@ public class CadytsController2 {
 		// end 2013-05-20
 		
 		
-		controler.addControlerListener(new KaiAnalysisListener());
+//		controler.addControlerListener(new KaiAnalysisListener());
 		
 		controler.run();
 	}
