@@ -119,7 +119,7 @@ import others.sergioo.util.dataBase.NoConnectionException;
 				// }else{
 				// sqlInserter += "\'"+args[i].toString()+"\',";
 				// }
-				sqlInserter += args[i].toString() + ",";
+				sqlInserter += (args[i]==null?"NULL":args[i].toString()) + ",";
 			}
 			// trim the last comma, add a newline
 			sb.append(sqlInserter);

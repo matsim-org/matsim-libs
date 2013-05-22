@@ -2,12 +2,14 @@ package playground.pieter.singapore.utils.events;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +37,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -124,7 +127,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		String suffix = args[5];
 		EventsToPlanElements test = new EventsToPlanElements(
 				scenario.getTransitSchedule(), scenario.getNetwork(),
-				scenario.getConfig(), suffix);
+				scenario.getConfig(), properties, suffix);
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(args[2]);
 		if (test.writeIdsForLinks)
@@ -132,11 +135,11 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		if (Boolean.parseBoolean(args[4]))
 			test.writeSimulationResultsToSQL(properties, args[2], suffix);
 		System.out.println(test.stuck);
-		test.indexLinkRecords(properties, suffix);
+		if (test.writeIdsForLinks)
+			test.indexLinkRecords(properties, suffix);
 	}
 
 	public void indexLinkRecords(File properties, String suffix) {
-
 		String[] indexStatements = {
 				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic"
 						+ suffix + "_link_id;",
@@ -184,6 +187,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	private TransitSchedule transitSchedule;
 	private final double walkSpeed;
 	private boolean writeIdsForLinks = false;
+	private HashSet<Id> personIdsForLinks;
 
 	public EventsToPlanElements(TransitSchedule transitSchedule,
 			Network network, Config config, String suffix) {
@@ -197,6 +201,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			String suffix) {
 		this(transitSchedule, network, config, suffix);
 		this.writeIdsForLinks = true;
+		samplePersonIdsForLinkWriting(connectionProperties);
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("link_id", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("person_id",
@@ -245,7 +250,41 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			return "other";
 	}
 
+	private void samplePersonIdsForLinkWriting(File connectionProperties) {
+		try {
+			DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
+			String idSelectionStatement = "SELECT person_id FROM m_calibration.matsim_persons where sample_selector <= 0.01";
+			ResultSet rs = dba.executeQuery(idSelectionStatement);
+			this.personIdsForLinks = new HashSet<Id>();
+			while(rs.next()){
+				personIdsForLinks.add(new IdImpl(rs.getString("person_id")));
+			}
+			
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
 	private void writePersonOnLink(LinkLeaveEvent event, TravellerChain chain) {
+		if(!personIdsForLinks.contains(event.getPersonId()))
+			return;
 		Object[] linkArgs = { event.getLinkId().toString(),
 				event.getPersonId().toString(), "", "",
 				new Integer((int) chain.getLinkEnterTime()),
@@ -255,6 +294,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	private void writeTransitIdsForLink(PTVehicle vehicle, LinkLeaveEvent event) {
 		for (Id i : vehicle.passengers.keySet()) {
+			if(!personIdsForLinks.contains(i))
+				continue;
 			Object[] linkArgs = {
 					event.getLinkId().toString(),
 					i.toString(),
