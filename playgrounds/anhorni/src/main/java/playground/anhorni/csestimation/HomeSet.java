@@ -54,7 +54,9 @@ public class HomeSet {
 			if (person.getPersonLocations().getAwareStoresInQuerySet().contains(shop.getId())) {
 				Coord sCoord = shop.getCoord();
 				double dist = CoordUtils.calcDistance(hCoord, sCoord);
-				maxDistAware = dist;
+				if (dist > maxDistAware) {
+					maxDistAware = dist;
+				}
 			}
 		}
 		return maxDistAware;
