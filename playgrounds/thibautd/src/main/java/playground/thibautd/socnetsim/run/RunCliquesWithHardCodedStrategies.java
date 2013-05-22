@@ -20,6 +20,7 @@
 package playground.thibautd.socnetsim.run;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -27,17 +28,23 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
 
+import playground.thibautd.router.KtiPtRoutingModule;
 import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
 import playground.thibautd.scoring.KtiLikeScoringConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
@@ -60,6 +67,7 @@ import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgori
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.run.WeightsConfigGroup.Synchro;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
@@ -81,6 +89,7 @@ public class RunCliquesWithHardCodedStrategies {
 		config.addModule( WeightsConfigGroup.GROUP_NAME , new WeightsConfigGroup() );
 		config.addModule( ScoringFunctionConfigGroup.GROUP_NAME , new ScoringFunctionConfigGroup() );
 		config.addModule( KtiLikeScoringConfigGroup.GROUP_NAME , new KtiLikeScoringConfigGroup() );
+		config.addModule( KtiInputFilesConfigGroup.GROUP_NAME , new KtiInputFilesConfigGroup() );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 
 		if ( config.scenario().isUseHouseholds() ) {
@@ -111,6 +120,8 @@ public class RunCliquesWithHardCodedStrategies {
 					config.getModule( WeightsConfigGroup.GROUP_NAME );
 		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
 					config.getModule( ScoringFunctionConfigGroup.GROUP_NAME );
+		final KtiInputFilesConfigGroup ktiInputFilesConf = (KtiInputFilesConfigGroup)
+					config.getModule( KtiInputFilesConfigGroup.GROUP_NAME );
 
 		final FixedGroupsIdentifier cliques = 
 			config.scenario().isUseHouseholds() ?
@@ -149,7 +160,7 @@ public class RunCliquesWithHardCodedStrategies {
 
 			};
 
-		final ControllerRegistry controllerRegistry =
+		final ControllerRegistryBuilder builder =
 			new ControllerRegistryBuilder( scenario )
 					.withPlanRoutingAlgorithmFactory(
 							RunUtils.createPlanRouterFactory( scenario ) )
@@ -178,8 +189,52 @@ public class RunCliquesWithHardCodedStrategies {
 								scenario) :
 							// if null, default will be used
 							// XXX not nice...
-							null )
-					.build();
+							null );
+
+		if ( scoringFunctionConf.isUseKtiScoring() ) {
+			builder.withTripRouterFactory(
+					new TripRouterFactory() {
+						private final TripRouterFactory delegate =
+							new JointTripRouterFactory(
+								scenario,
+								builder.getTravelDisutilityFactory(),
+								builder.getTravelTime().getLinkTravelTimes(),
+								builder.getLeastCostPathCalculatorFactory(),
+								null);
+						@Override
+						public TripRouter instantiateAndConfigureTripRouter() {
+							final TripRouter tripRouter = delegate.instantiateAndConfigureTripRouter();
+
+							tripRouter.setRoutingModule(
+								TransportMode.pt,
+								new KtiPtRoutingModule(
+									scenario.getConfig().plansCalcRoute(),
+									ktiInputFilesConf.getWorldFile(),
+									ktiInputFilesConf.getTravelTimesFile(),
+									ktiInputFilesConf.getPtStopsFile(),
+									scenario.getNetwork()) );
+
+							final MainModeIdentifier identifier = tripRouter.getMainModeIdentifier();
+							tripRouter.setMainModeIdentifier(
+								new MainModeIdentifier() {
+									@Override
+									public String identifyMainMode(
+											final List<PlanElement> tripElements) {
+										for ( PlanElement pe : tripElements ) {
+											if ( pe instanceof Activity && ((Activity) pe).getType().equals( PtConstants.TRANSIT_ACTIVITY_TYPE ) ) {
+												return TransportMode.pt;
+											}
+										}
+										return identifier.identifyMainMode( tripElements );
+									}
+								});
+
+							return tripRouter;
+						}
+					});
+		}
+
+		final ControllerRegistry controllerRegistry = builder.build();
 
 		// init strategies
 		final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
@@ -276,5 +331,47 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	@StringGetter( "useKtiScoring" )
 	public boolean isUseKtiScoring() {
 		return useKtiScoring;
+	}
+}
+
+class KtiInputFilesConfigGroup extends ReflectiveModule {
+	public static final String GROUP_NAME = "ktiInputFiles";
+
+	private String worldFile = null;
+	private String travelTimesFile = null;
+	private String ptStopsFile = null;
+
+	public KtiInputFilesConfigGroup() {
+		super( GROUP_NAME );
+	}
+
+	@StringGetter( "worldFile" )
+	public String getWorldFile() {
+		return this.worldFile;
+	}
+
+	@StringSetter( "worldFile" )
+	public void setWorldFile(String worldFile) {
+		this.worldFile = worldFile;
+	}
+
+	@StringGetter( "travelTimesFile" )
+	public String getTravelTimesFile() {
+		return this.travelTimesFile;
+	}
+
+	@StringSetter( "travelTimesFile" )
+	public void setTravelTimesFile(String travelTimesFile) {
+		this.travelTimesFile = travelTimesFile;
+	}
+
+	@StringGetter( "ptStopsFile" )
+	public String getPtStopsFile() {
+		return this.ptStopsFile;
+	}
+
+	@StringSetter( "ptStopsFile" )
+	public void setPtStopsFile(String ptStopsFile) {
+		this.ptStopsFile = ptStopsFile;
 	}
 }
