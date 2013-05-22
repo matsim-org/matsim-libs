@@ -23,8 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -33,6 +36,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.RoutingModule;
@@ -97,6 +101,11 @@ public class KtiPtRoutingModule implements RoutingModule {
 		walk1.setRoute( route1 );
 		trip.add( walk1 );
 
+		trip.add(
+				createInteraction(
+					stop1.getCoord(),
+					endWalk1.getId() ) );
+
 		// pt
 		// ---------------------------------------------------------------------
 		final Layer municipalities = info.world.getLayer("municipality");
@@ -118,6 +127,11 @@ public class KtiPtRoutingModule implements RoutingModule {
 		ptLeg.setRoute( ptRoute );
 		trip.add( ptLeg );
 
+		trip.add(
+				createInteraction(
+					stop2.getCoord(),
+					startWalk2.getId() ) );
+
 		// egress
 		// ---------------------------------------------------------------------
 		final double distanceLeg2 =
@@ -133,8 +147,15 @@ public class KtiPtRoutingModule implements RoutingModule {
 		walk2.setRoute( route2 );
 		trip.add( walk2 );
 
-		assert trip.size() == 3;
 		return trip;
+	}
+
+	private static Activity createInteraction(
+			final Coord coord,
+			final Id link) {
+		final Activity act = new ActivityImpl( PtConstants.TRANSIT_ACTIVITY_TYPE , coord , link );
+		act.setMaximumDuration( 0 );
+		return act;
 	}
 
 	@Override
