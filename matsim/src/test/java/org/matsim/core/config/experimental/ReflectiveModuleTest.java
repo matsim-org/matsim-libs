@@ -29,6 +29,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.experimental.ReflectiveModule.InconsistentModuleException;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -58,6 +59,104 @@ public class ReflectiveModuleTest {
 		readConfig.addModule( TestModule.GROUP_NAME , readModule );
 
 		assertSame( dumpedModule , readModule );
+	}
+
+	@Test
+	public void testFailOnConstructingOrphanSetter() {
+		try {
+			new ReflectiveModule( "name" ) {
+				@StringSetter( "setterWithoutGetter" )
+				public void setStuff(String s) {}
+			};
+			// should not get here because of exception
+			Assert.fail( "no exception when orphan setter" );
+		}
+		catch (InconsistentModuleException e) {
+			// gulp! swallow exception
+		}
+	}
+
+	@Test
+	public void testFailOnConstructingOrphanGetter() {
+		try {
+			new ReflectiveModule( "name" ) {
+				@StringGetter( "getterWithoutSetter" )
+				public Coord getStuff() { return null;}
+			};
+			// should not get here because of exception
+			Assert.fail( "no exception when orphan getter" );
+		}
+		catch (InconsistentModuleException e) {
+			// gulp! swallow exception
+		}
+	}
+
+	@Test
+	public void testFailOnConstructingInvalidSetter() {
+		try {
+			new ReflectiveModule( "name" ) {
+				// no arg: no good
+				@StringSetter( "field" )
+				public Object setStuff() { return null;}
+
+				@StringGetter( "field" )
+				public Object getStuff() { return null;}
+			};
+			// should not get here because of exception
+			Assert.fail( "no exception when no arg on setter" );
+		}
+		catch (InconsistentModuleException e) {
+			// gulp! swallow exception
+		}
+
+		try {
+			new ReflectiveModule( "name" ) {
+				// bad arg type: no good
+				@StringSetter( "field" )
+				public Object setStuff(Coord stuff) { return null;}
+
+				@StringGetter( "field" )
+				public Object getStuff() { return null;}
+			};
+			// should not get here because of exception
+			Assert.fail( "no exception when bad type on setter" );
+		}
+		catch (InconsistentModuleException e) {
+			// gulp! swallow exception
+		}
+	}
+
+	@Test
+	public void testFailOnConstructingInvalidGetter() {
+		try {
+			new ReflectiveModule( "name" ) {
+				@StringSetter( "field" )
+				public Object setStuff(String s) { return null;}
+
+				@StringGetter( "field" )
+				public void getStuff() { }
+			};
+			// should not get here because of exception
+			Assert.fail( "no exception when void returning getter" );
+		}
+		catch (InconsistentModuleException e) {
+			// gulp! swallow exception
+		}
+
+		try {
+			new ReflectiveModule( "name" ) {
+				@StringSetter( "field" )
+				public Object setStuff(String stuff) { return null;}
+
+				@StringGetter( "field" )
+				public Object getStuff(Object someArg) { return null;}
+			};
+			// should not get here because of exception
+			Assert.fail( "no exception when args on getter" );
+		}
+		catch (InconsistentModuleException e) {
+			// gulp! swallow exception
+		}
 	}
 
 	private static void assertSame(
