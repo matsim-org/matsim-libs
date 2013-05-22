@@ -1,5 +1,6 @@
 package playground.anhorni.csestimation;
 
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -7,6 +8,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class HomeSet {
@@ -91,9 +93,11 @@ public class HomeSet {
 		this.shops = shops;
 	}
 	private void print() {
-		String str = "person " + this.person.getId().toString();
+		DecimalFormat formatter = new DecimalFormat("0.00");
+		String str = "person " + this.person.getId().toString() + " " + person.getHomeLocation().getCoord().toString();
 		for (ShopLocation shop:this.shops.values()) {
-			str += " " + shop.getId().toString();
+			str += " " + shop.getId().toString() + shop.getCoord().toString() + " d2h: " +
+		formatter.format(((CoordImpl)person.getHomeLocation().getCoord()).calcDistance(shop.getCoord()));
 		}
 		log.info(str);
 	}
