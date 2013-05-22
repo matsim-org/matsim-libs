@@ -3,8 +3,7 @@ package org.matsim.contrib.freight.mobsim;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
+import org.matsim.contrib.freight.carrier.TimeWindow;
 
 class FreightActivity implements Activity{
 

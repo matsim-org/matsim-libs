@@ -64,7 +64,8 @@ public class CarrierVehicle {
 			return this;
 		}
 		
-		public Builder setTypeId(Id typeId){
+		
+		Builder setTypeId(Id typeId){
 			this.typeId = typeId;
 			return this;
 		}
@@ -72,6 +73,7 @@ public class CarrierVehicle {
 		/**
 		 * capacity should be part of vehicleType
 		 */
+		@Deprecated
 		public Builder setCapacity(int capacity){
 			this.capacity = capacity;
 			return this;
@@ -133,7 +135,8 @@ public class CarrierVehicle {
 	public Id getVehicleId() {
 		return vehicleId;
 	}
-
+	
+	@Deprecated
 	public int getCapacity() {
 		return capacity;
 	}
@@ -194,7 +197,8 @@ public class CarrierVehicle {
 		return latestEndTime;
 	}
 
-	public Id getVehicleTypeId() {
+	
+	Id getVehicleTypeId() {
 		return typeId;
 	}
 

@@ -9,7 +9,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
+import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.Tour.TourActivity;
+import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -30,8 +32,6 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 	private InternalInterface internalInterface;
 	
 	private CarrierAgentTracker carrierAgentTracker;
-	
-	private MobsimAgent.State lastState = null;
 	
 	WithinDayActivityReScheduling(FreightAgentSource freightAgentSource, InternalInterface internalInterface, CarrierAgentTracker carrierAgentTracker) {
 		super();
@@ -67,54 +67,23 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 		if (plan == null) {
 			logger.info(" we don't have a selected plan; returning ... ");
 			return false;
-		}
-
-//		if(withindayAgent.getId().toString().equals("freight_carrier1_veh_vehicle_c1")){
-//			if(lastState == null){
-//				lastState = withindayAgent.getState();
-//				logger.info(withindayAgent.getId() + " has state " + withindayAgent.getState()  + " time " + time);
-//			}
-//			if(!(lastState.toString().equals(withindayAgent.getState().toString()))){
-//				lastState = withindayAgent.getState();
-//				logger.info(withindayAgent.getId() + " has state " + withindayAgent.getState() + " time " + time);
-//			}
-//		}
-//				
-//		
+		}	
 		
 		if (withindayAgent.getCurrentPlanElement() instanceof Activity) {
 			ActivityImpl act = (ActivityImpl) withindayAgent.getCurrentPlanElement();
 			if(encounteredActivities.contains(act)){
 				return false;
 			}
-			if(act.getType().equals(FreightConstants.PICKUP)){	
-				CarrierShipment shipment = carrierAgentTracker.getAssociatedShipment(withindayAgent.getId(), act, withindayAgent.getCurrentPlanElementIndex());
-				assert shipment != null : "shipment must not be null";
-				double endTime = determineActEnd(time,shipment.getPickupServiceTime(),shipment.getPickupTimeWindow());
-				if(act.getEndTime() != endTime) logger.info(withindayAgent.getId() + " changed pickupEndTime (" + act.getEndTime() +","+endTime+")");
-				act.setEndTime(endTime);
-				withindayAgent.calculateAndSetDepartureTime(act);
-				internalInterface.rescheduleActivityEnd(withindayAgent);
-			}
-			else if(act.getType().equals(FreightConstants.DELIVERY)){
-				CarrierShipment shipment = carrierAgentTracker.getAssociatedShipment(withindayAgent.getId(), act, withindayAgent.getCurrentPlanElementIndex());
-				assert shipment != null : "shipment must not be null";
-				double endTime = determineActEnd(time,shipment.getDeliveryServiceTime(),shipment.getDeliveryTimeWindow());
-				if(act.getEndTime() != endTime) logger.info(withindayAgent.getId() + " changed deliveryEndTime (" + act.getEndTime() +","+endTime+")");
-				act.setEndTime(endTime);
-				withindayAgent.calculateAndSetDepartureTime(act);
-				internalInterface.rescheduleActivityEnd(withindayAgent);
-				encounteredActivities.add(act);
-			}
+			CarrierDriverAgent driver = carrierAgentTracker.getDriver(withindayAgent.getId());
+			TourActivity plannedActivity = (TourActivity) driver.getPlannedTourElement(withindayAgent.getCurrentPlanElementIndex());
+			double newEndTime = Math.max(time, plannedActivity.getTimeWindow().getStart()) + plannedActivity.getDuration();
+			if(act.getEndTime() != newEndTime) logger.info(withindayAgent.getId() + " changed actEndTime (" + act.getEndTime() +","+newEndTime+")");
+			act.setEndTime(newEndTime);
+			withindayAgent.calculateAndSetDepartureTime(act);
+			internalInterface.rescheduleActivityEnd(withindayAgent);
 			encounteredActivities.add(act);
-
 		} 	
 		return true;
-	}
-
-	private double determineActEnd(double time, double actServiceTime, TimeWindow actTimeWindow) {
-		double operationStartTime = Math.max(time, actTimeWindow.getStart());
-		return operationStartTime + actServiceTime;
 	}
 
 	

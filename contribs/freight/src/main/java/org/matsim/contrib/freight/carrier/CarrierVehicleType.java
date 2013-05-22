@@ -42,6 +42,7 @@ public class CarrierVehicleType extends VehicleTypeImpl {
 		private double perTimeUnit = 0.0;
 		private String description;
 		private EngineInformation engineInfo;
+		private int capacity = 0;
 		
 		public Builder(Id typeId){
 			this.typeId = typeId;
@@ -64,6 +65,11 @@ public class CarrierVehicleType extends VehicleTypeImpl {
 		
 		public Builder setDescription(String description){
 			this.description = description;
+			return this;
+		}
+		
+		public Builder setCapacity(int capacity){
+			this.capacity = capacity;
 			return this;
 		}
 		
@@ -101,7 +107,7 @@ public class CarrierVehicleType extends VehicleTypeImpl {
 
 	private VehicleCostInformation vehicleCostInformation = new VehicleCostInformation(0.0, 1.0, 0.0);
 
-//	private int capacity;
+	private int capacity;
 	
 	private CarrierVehicleType(Id typeId) {
 		super(typeId);
@@ -112,6 +118,7 @@ public class CarrierVehicleType extends VehicleTypeImpl {
 		this.vehicleCostInformation = new VehicleCostInformation(builder.fix, builder.perDistanceUnit, builder.perTimeUnit);
 		if(builder.engineInfo != null) this.setEngineInformation(builder.engineInfo);
 		if(builder.description != null) this.setDescription(builder.description);
+		capacity = builder.capacity;
 	}
 
 	public void setVehicleCostParams(VehicleCostInformation vehicleCosts) {
@@ -127,6 +134,17 @@ public class CarrierVehicleType extends VehicleTypeImpl {
 	 */
 	public VehicleCostInformation getVehicleCostInformation() {
 		return vehicleCostInformation;
+	}
+	
+	/**
+	 * Returns the capacity of carrierVehicleType.
+	 * 
+	 * <p>This might be replaced in future by a more complex concept of capacity (considering volume and different units).
+	 * 
+	 * @return integer
+	 */
+	public int getCarrierVehicleCapacity(){
+		return capacity;
 	}
 	
 }

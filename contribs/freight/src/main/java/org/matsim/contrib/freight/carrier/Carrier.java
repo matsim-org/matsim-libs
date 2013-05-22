@@ -16,11 +16,11 @@ public interface Carrier {
 
 	public abstract Id getId();
 
-	public abstract Id getDepotLinkId();
-
 	public abstract Collection<CarrierPlan> getPlans();
 
 	public abstract Collection<CarrierShipment> getShipments();
+	
+	public abstract Collection<CarrierService> getServices();
 
 	public abstract CarrierPlan getSelectedPlan();
 

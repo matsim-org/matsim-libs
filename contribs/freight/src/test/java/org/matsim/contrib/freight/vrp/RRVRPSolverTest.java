@@ -147,7 +147,7 @@ public class RRVRPSolverTest extends TestCase {
 		vehicle.setVehicleType(CarrierVehicleType.Builder.newInstance(makeId("standard")).build());
 //		vehicle.setCapacity(10);
 		vehicles.add(vehicle);
-		Carrier carrier = CarrierImpl.newInstance(makeId("c"), makeId("l1"));
+		Carrier carrier = CarrierImpl.newInstance(makeId("c"));
 		carrier.setCarrierCapabilities(CarrierCapabilities.newInstance());
 		carrier.getCarrierCapabilities().getCarrierVehicles().add(vehicle);
 		carrier.getShipments().addAll(shipments);
@@ -158,7 +158,7 @@ public class RRVRPSolverTest extends TestCase {
 	public void testSolveWithNoVehicles() {
 		vehicles.clear();
 		shipments.add(makeShipment("depotLocation", "customerLocation", 20));
-		Carrier carrier = CarrierImpl.newInstance(makeId("c"), makeId("l1"));
+		Carrier carrier = CarrierImpl.newInstance(makeId("c"));
 		carrier.setCarrierCapabilities(CarrierCapabilities.newInstance());
 		carrier.getShipments().addAll(shipments);
 		try {

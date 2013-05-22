@@ -15,8 +15,8 @@ import org.matsim.api.core.v01.Id;
  */
 public class CarrierImpl implements Carrier {
 
-	public static Carrier newInstance(Id id, Id linkId){
-		return new CarrierImpl(id,linkId);
+	public static Carrier newInstance(Id id){
+		return new CarrierImpl(id);
 	}
 	
 	/**
@@ -34,26 +34,24 @@ public class CarrierImpl implements Carrier {
 		 * the existing CarrierCapabilities are lost.
 		 * 
 		 * @param id
-		 * @param linkId
 		 * @return
 		 */
-		public static Builder newInstance(Id id, Id linkId){
-			return new Builder(id,linkId);
+		public static Builder newInstance(Id id){
+			return new Builder(id);
 		}
 		
 		private List<CarrierShipment> shipments;
-		private List<CarrierVehicle> vehicles;
+		private List<CarrierService> services;
 		private List<CarrierPlan> plans;
 		private Id id;
-		private Id linkId;
 		private CarrierPlan selectedPlan;
+		private CarrierCapabilities capabilities;
 		
-		private Builder(Id id, Id linkId) {
+		private Builder(Id id) {
 			shipments = new ArrayList<CarrierShipment>();
-			vehicles = new ArrayList<CarrierVehicle>();
+			services = new ArrayList<CarrierService>();
 			plans = new ArrayList<CarrierPlan>();
 			this.id = id;
-			this.linkId = linkId;
 		}
 		
 		public Builder addShipment(CarrierShipment shipment){
@@ -61,8 +59,21 @@ public class CarrierImpl implements Carrier {
 			return this;
 		}
 		
+		public Builder addService(CarrierService service){
+			services.add(service);
+			return this;
+		}
+		
+		public Builder setCapabilities(CarrierCapabilities capabilities){
+			this.capabilities = capabilities;
+			return this;
+		}
+		
 		public Builder addVehicle(CarrierVehicle vehicle){
-			vehicles.add(vehicle);
+			if(capabilities == null){
+				capabilities = new CarrierCapabilities();
+			}
+			capabilities.getCarrierVehicles().add(vehicle);
 			return this;
 		}
 		
@@ -93,30 +104,29 @@ public class CarrierImpl implements Carrier {
 
 	private final Collection<CarrierPlan> plans = new ArrayList<CarrierPlan>();
 
-	private final Id depotLinkId;
-
 	private final Collection<CarrierShipment> shipments = new ArrayList<CarrierShipment>();
 
+	private final Collection<CarrierService> services;
+	
 	private CarrierPlan selectedPlan;
 
 	private CarrierCapabilities carrierCapabilities;
 	
 	
 	private CarrierImpl(Builder builder){
-		this.carrierCapabilities = CarrierCapabilities.newInstance();
-		this.carrierCapabilities.getCarrierVehicles().addAll(builder.vehicles);
+		this.carrierCapabilities = builder.capabilities;
 		shipments.addAll(builder.shipments);
+		services = builder.services;
 		plans.addAll(builder.plans);
 		selectedPlan = builder.selectedPlan;
-		id = builder.id;
-		depotLinkId = builder.linkId;		
+		id = builder.id;	
 	}
 	
-	private CarrierImpl(final Id id, final Id depotLinkId) {
+	private CarrierImpl(final Id id) {
 		super();
 		this.carrierCapabilities = CarrierCapabilities.newInstance();
 		this.id = id;
-		this.depotLinkId = depotLinkId;
+		services = new ArrayList<CarrierService>();
 	}
 
 	/*
@@ -134,10 +144,10 @@ public class CarrierImpl implements Carrier {
 	 * 
 	 * @see playground.mzilske.freight.Carrier#getDepotLinkId()
 	 */
-	@Override
-	public Id getDepotLinkId() {
-		return depotLinkId;
-	}
+//	@Override
+//	public Id getDepotLinkId() {
+//		return depotLinkId;
+//	}
 
 	/*
 	 * (non-Javadoc)
@@ -204,5 +214,8 @@ public class CarrierImpl implements Carrier {
 		return carrierCapabilities;
 	}
 
+	public Collection<CarrierService> getServices(){
+		return services;
+	}
 
 }

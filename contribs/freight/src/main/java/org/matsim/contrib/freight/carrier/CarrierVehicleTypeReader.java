@@ -36,6 +36,8 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 
 	private EngineInformation currentEngineInfo;
 
+	private String currentCapacity;
+
 	public CarrierVehicleTypeReader(CarrierVehicleTypes carrierVehicleTypes) {
 		super();
 		this.carrierVehicleTypes = carrierVehicleTypes;
@@ -104,6 +106,9 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 		if(name.equals("description")){
 			this.currentDescription = content;
 		}
+		if(name.equals("capacity")){
+			this.currentCapacity = content;
+		}
 		if(name.equals("vehicleType")){
 			CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(currentTypeId);
 			if(currentDescription != null) typeBuilder.setDescription(currentDescription);
@@ -111,6 +116,8 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 //			if(currentCap != null) vehType.setFreightCapacity(currentCap);
 			if(currentVehicleCosts != null) typeBuilder.setVehicleCostInformation(currentVehicleCosts);
 			if(currentEngineInfo != null) typeBuilder.setEngineInformation(currentEngineInfo);
+			if(currentCapacity == null) throw new IllegalStateException("vehicleType.capacity is missing.");
+			typeBuilder.setCapacity(Integer.parseInt(currentCapacity));
 			CarrierVehicleType vehType = typeBuilder.build();
 			carrierVehicleTypes.getVehicleTypes().put(vehType.getId(), vehType);
 			reset();

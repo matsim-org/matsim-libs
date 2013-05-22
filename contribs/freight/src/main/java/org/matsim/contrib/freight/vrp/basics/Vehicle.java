@@ -11,7 +11,7 @@ public interface Vehicle {
 	public abstract String getLocationId();
 
 	public abstract Type getType();
-
+	
 	public abstract String getId();
 
 	public abstract int getCapacity();

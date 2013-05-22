@@ -23,7 +23,6 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
-import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -31,13 +30,11 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -56,10 +53,12 @@ import org.matsim.core.utils.misc.Time;
  * @author mzilske, sschroeder
  *
  */
-class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler{
+class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler,  LinkEnterEventHandler{
 
 	/**
 	 * This keeps track of a scheduledTour during simulation and can thus be seen as the driver of the vehicle that runs the tour.
+	 * 
+	 * <p>In addition, the driver knows which planElement is associated to a shipment and service, respectively.
 	 * 
 	 * @author mzilske, sschroeder
 	 *
@@ -84,21 +83,22 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		
 		private int activityCounter = 1;
 
-		private Map<Integer, CarrierShipment> activity2shipment;
-
 		CarrierDriverAgent(CarrierAgent carrierAgent, Id driverId, ScheduledTour tour, ScoringFunction scoringFunction) {
 			this.driverId = driverId;
 			this.scheduledTour = tour;
 			this.carrierAgent = carrierAgent;
 			this.scoringFunction = scoringFunction;
-			activity2shipment = new HashMap<Integer, CarrierShipment>();
+			new HashMap<Integer, CarrierShipment>();
 		}
 		
+		/**
+		 * 
+		 * @param event
+		 */
 		public void handleEvent(AgentArrivalEvent event) {
 	        currentLeg.setArrivalTime(event.getTime());
 	        double travelTime = currentLeg.getArrivalTime() - currentLeg.getDepartureTime();
 	        currentLeg.setTravelTime(travelTime);
-//	        assert currentRoute.size() >= 1;
 	        if (currentRoute.size() > 1) {
 	            NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
 	            networkRoute.setTravelTime(travelTime);
@@ -133,17 +133,11 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 //			logger.info(driverId + " enters link " + event.getLinkId() + " at time " + Time.writeTime(event.getTime()));
 			currentRoute.add(event.getLinkId());
 		}
-		
-		public void handleEvent(LinkLeaveEvent event) {
-//			logger.info(driverId + " left link " + event.getLinkId() + " at time " + Time.writeTime(event.getTime()));
-		}
 
 		public void handleEvent(ActivityEndEvent event) {
 			if (currentActivity == null) {
 				ActivityImpl firstActivity = new ActivityImpl(event.getActType(), event.getLinkId());
 				firstActivity.setFacilityId(event.getFacilityId());
-//				TourActivity tourActivity = getTourActivity();
-//				FreightActivity firstFreightActivity = new FreightActivity(firstActivity, tourActivity.getTimeWindow());
 				currentActivity = firstActivity;
 			}
 //			logger.info(driverId + " ends " + currentActivity.getType() + " time " + Time.writeTime(event.getTime()));
@@ -171,6 +165,12 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			 }
 		 }
 
+		/**
+		 * Informs the carrierAgent that an activity has been finished.
+		 * 
+		 * @param activityType
+		 * @param time
+		 */
 		private void activityFinished(String activityType, double time) {
 			Tour tour = this.scheduledTour.getTour();
 			if (FreightConstants.PICKUP.equals(activityType)) {
@@ -188,16 +188,17 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		CarrierVehicle getVehicle() {
 			return scheduledTour.getVehicle();
 		}
-
-		public CarrierShipment getShipment(Activity act, int planElementIndex) {
-			if(activity2shipment.containsKey(planElementIndex)) return activity2shipment.get(planElementIndex);
-			return null;
+	
+		TourElement getPlannedTourElement(int elementIndex){
+			int index = elementIndex-1;
+			int elementsSize = scheduledTour.getTour().getTourElements().size();
+			if(index < 0) return scheduledTour.getTour().getStart();
+			else if(index == elementsSize) return scheduledTour.getTour().getEnd();
+			else if(index < elementsSize){
+				return scheduledTour.getTour().getTourElements().get(index);
+			}
+			else throw new IllegalStateException("index out of bounds");
 		}
-
-		public void register(Integer planElementIndex,CarrierShipment shipment) {
-			activity2shipment.put(planElementIndex,shipment);
-		}
-		
 	}
 
 	private static Logger logger = Logger.getLogger(CarrierAgent.class);
@@ -254,11 +255,11 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			countPlanElements++;
-			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
+			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {				
 				if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
 					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
 					Route route = tourLeg.getRoute();
-					assert route != null : "missing route for carrier " + this.getId() + ". route must not be null";
+					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());
 					LegImpl leg = new LegImpl(TransportMode.car);
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getDepartureTime());
@@ -272,9 +273,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 					double endTime = act.getExpectedActEnd();
 					tourElementActivity.setEndTime(endTime);
 					plan.addActivity(tourElementActivity);
-					if(act instanceof ShipmentBasedActivity){
-						carrierDriverAgent.register(countPlanElements,((ShipmentBasedActivity) act).getShipment());
-					}
 					countPlanElements++;
 				}
 			}
@@ -308,7 +306,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private Id createDriverId(CarrierVehicle carrierVehicle) {
 		IdImpl id = new IdImpl("freight_" + carrier.getId() + "_veh_"
-				+ carrierVehicle.getVehicleId());
+				+ carrierVehicle.getVehicleId() + "_" + nextId);
 		driverIds.add(id);
 		++nextId;
 		return id;
@@ -346,10 +344,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
@@ -366,12 +360,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
 	
-	private CarrierDriverAgent getDriver(Id driverId){
+	CarrierDriverAgent getDriver(Id driverId){
 		return carrierDriverAgents.get(driverId);
-	}
-
-	public CarrierShipment getShipment(Id driverId, Activity act, int planElementIndex) {
-		return getDriver(driverId).getShipment(act,planElementIndex);
 	}
 
 }

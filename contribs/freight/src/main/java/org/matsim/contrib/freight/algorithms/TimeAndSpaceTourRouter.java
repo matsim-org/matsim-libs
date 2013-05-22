@@ -74,7 +74,6 @@ public class TimeAndSpaceTourRouter {
 				act.setExpectedArrival(expectedArrival);
 				double startAct = Math.max(expectedArrival, act.getTimeWindow().getStart()); 
 				currTime = startAct + act.getDuration();
-				act.setExpectedActStart(startAct);
 				act.setExpectedActEnd(currTime);
 				prevLink = act.getLocation();
 			}

@@ -1,5 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
@@ -36,14 +38,19 @@ public class CarrierVehicleTypeLoader {
 				Id typeId = v.getVehicleTypeId();
 				if(typeId != null){
 					if(types.getVehicleTypes().containsKey(typeId)){
-						v.setVehicleType(types.getVehicleTypes().get(typeId));
+						CarrierVehicleType vehicleType = types.getVehicleTypes().get(typeId);
+						v.setVehicleType(vehicleType);
+						Collection<CarrierVehicleType> vTypes = c.getCarrierCapabilities().getVehicleTypes();
+						if(!vTypes.contains(vehicleType)){
+							vTypes.add(vehicleType);
+						}
 					}
 					else{
-						logger.warn("vehicleType without vehicleTypeInformation. set default vehicleType");
+						throw new IllegalStateException("cannot assign all vehicleTypes, since vehicleType to typeId \"" + typeId + "\" is missing.");
 					}
 				}
 				else{
-					logger.warn("no vehicleTypeInformation. set default vehicleType");
+					logger.warn("vehicleTypeId is missing, thus no vehicleType can be assigned.");
 				}
 			}
 		}

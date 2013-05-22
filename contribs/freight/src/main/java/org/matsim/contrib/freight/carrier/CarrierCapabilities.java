@@ -3,8 +3,9 @@ package org.matsim.contrib.freight.carrier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
@@ -22,6 +23,50 @@ import org.matsim.api.core.v01.Id;
  */
 public class CarrierCapabilities {
 
+	public enum FleetSize {
+		INFINITE, FINITE
+	}
+	
+	public static class Builder {
+		
+		public static Builder newInstance(){ return new Builder(); }
+		
+		private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
+		
+		private Collection<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>();
+		
+		private Set<Id> typeIds = new HashSet<Id>();
+		
+		private FleetSize fleetSize = FleetSize.FINITE;
+		
+		public Builder setFleetSize(FleetSize fleetSize){
+			this.fleetSize = fleetSize;
+			return this;
+		}
+		
+		public Builder addType(CarrierVehicleType type){
+			vehicleTypes.add(type);
+			typeIds.add(type.getId());
+			return this;
+		}
+		
+		public Builder addVehicle(CarrierVehicle carrierVehicle){
+			vehicles.add(carrierVehicle);
+			return this;
+		}
+		
+		public CarrierCapabilities build(){
+//			for(CarrierVehicle v : vehicles) {
+//				CarrierVehicleType vehicleType = v.getVehicleType();
+//				if(vehicleType == null) throw new IllegalStateException("vehicleType is missing in vehicle " + v);
+//				if(!typeIds.contains(vehicleType.getId())) throw new IllegalStateException("typeId " + vehicleType.getId() + " is missing in type-collection.");
+//			}
+			return new CarrierCapabilities(this);
+		}
+		
+		
+	}
+	
 	/**
 	 * Returns a new instance of CarrierCapabilities.
 	 * 
@@ -33,13 +78,32 @@ public class CarrierCapabilities {
 		return new CarrierCapabilities();
 	}
 	
+	public CarrierCapabilities(){}
+	
+	private CarrierCapabilities(Builder builder){
+		this.carrierVehicles = builder.vehicles;
+		this.vehicleTypes = builder.vehicleTypes;
+		this.fleetSize = builder.fleetSize;
+	}
+	
 	private Collection<CarrierVehicle> carrierVehicles = new ArrayList<CarrierVehicle>();
-
-	private Collection<Id> depots = new ArrayList<Id>();
 	
 	private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
 	
-	private Map<Id, Collection<CarrierVehicleType>> depotToTypes = new HashMap<Id, Collection<CarrierVehicleType>>();
+	
+	/**
+	 * Sets the fleetSize.
+	 * 
+	 * <p>FleetSize can be FleetSize.INFINITE and FleetSize.FINITE. If fleetSize is FleetSize.INFINITE then the vehicles in carrierVehicles are representative vehicles.
+	 * Each representative vehicle can be employed infinite times.  
+	 * <p>If fleetSize is FleetSize.FINITE then the vehicles in carrierVehicles are exactly the vehicles
+	 * the carrier can employ.
+	 * 
+	 * <p>By default, it is FleetSize.FINITE
+	 * 
+	 * @see FleetSize
+	 */
+	private FleetSize fleetSize = FleetSize.FINITE;
 	
 	/**
 	 * Returns a collection of carrierVehicles, a carrier has to its disposal.
@@ -54,21 +118,16 @@ public class CarrierCapabilities {
 	
 	
 	
-	public Map<Id, Collection<CarrierVehicleType>> getDepotToTypes() {
-		return depotToTypes;
+	public FleetSize getFleetSize() {
+		return fleetSize;
 	}
 
 
-	/**
-	 * Returns a collection of depotIds.
-	 * 
-	 * <p>This collection is intended to contain the linkIds of available depots.
-	 * 
-	 * @return collection of ids
-	 */
-	public Collection<Id> getDepots() {
-		return depots;
+
+	public void setFleetSize(FleetSize fleetSize) {
+		this.fleetSize = fleetSize;
 	}
+
 
 	/**
 	 * Returns a collection of CarrierVehicleTypes.
@@ -80,23 +139,4 @@ public class CarrierCapabilities {
 		return vehicleTypes;
 	}
 
-	/**
-	 * Assigns a vehicleType to a certain depot.
-	 * 
-	 * <p>If the depotList does not contain the depotId, it is added. If the vehicleType is not in the vehicleTypeList it is added as well.
-	 * 
-	 * @param depotId the vehicleType is assigned to
-	 * @param vehicleType to be assigned
-	 *  
-	 */
-	public void assignTypeToDepot(Id depotId, CarrierVehicleType vehicleType){
-		if(!depots.contains(depotId)) depots.add(depotId);
-		if(!vehicleTypes.contains(vehicleType)) vehicleTypes.add(vehicleType);
-		if(!depotToTypes.containsKey(depotId)){
-			List<CarrierVehicleType> types = new ArrayList<CarrierVehicleType>();
-			types.add(vehicleType);
-			depotToTypes.put(depotId, types);
-		}
-		else depotToTypes.get(depotId).add(vehicleType);
-	}
 }

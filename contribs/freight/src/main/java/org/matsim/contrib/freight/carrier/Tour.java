@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -45,42 +44,11 @@ public class Tour {
 
 		private Set<CarrierShipment> openPickups = new HashSet<CarrierShipment>();
 
-		private Id startLinkId;
-
-		private Id endLinkId;
-
-		private double earliestDeparture = 0.0;
-
-		private double latestDeparture = Integer.MAX_VALUE;
-
 		private boolean previousElementIsActivity;
 
+		private Start start;
 		
-		/**
-		 * Schedules the earliest possible time the tour can start.
-		 * 
-		 * <p>default is 0.0
-		 * 
-		 * @param earliestDeparture
-		 * @return tour builder
-		 */
-		public Builder scheduleEarliestDeparture(double earliestDeparture){
-			this.earliestDeparture = earliestDeparture;
-			return this;
-		}
-		
-		/**
-		 * Schedules the earliest possible time the tour can start.
-		 * 
-		 * <p>default is Integer.MaxValue()
-		 * 
-		 * @param latestDeparture
-		 * @return tour builder
-		 */
-		public Builder scheduleLatestDeparture(double latestDeparture){
-			this.latestDeparture = latestDeparture;
-			return this;
-		}
+		private End end;
 		
 		/**
 		 * Schedules the start of the tour.
@@ -91,11 +59,24 @@ public class Tour {
 		 * @return the builder again
 		 */
 		public Builder scheduleStart(Id startLinkId) {
-			this.startLinkId = startLinkId;
+			scheduleStart(startLinkId, TimeWindow.newInstance(0.0, Double.MAX_VALUE));
+			return this;
+		}
+		
+		public Builder scheduleStart(Id startLinkId, TimeWindow timeWindow){
+			this.start = new Start(startLinkId, timeWindow);
 			previousElementIsActivity = true;
 			return this;
 		}
-
+		
+		public Builder scheduleEnd(Id endLinkId, TimeWindow timeWindow){
+			assertLastElementIsLeg();
+			End end = new End(endLinkId, timeWindow);
+			this.end = end;
+			previousElementIsActivity = true;
+			return this;
+		}
+		
 		/**
 		 * Schedules the end of the tour (in terms of locationId).
 		 * 
@@ -103,8 +84,7 @@ public class Tour {
 		 * @return the builder
 		 */
 		public Builder scheduleEnd(Id endLinkId) {
-			assertLastElementIsLeg();
-			this.endLinkId = endLinkId;
+			scheduleEnd(endLinkId, TimeWindow.newInstance(0.0, Double.MAX_VALUE));
 			return this;
 		}
 
@@ -126,6 +106,14 @@ public class Tour {
 			return this;
 		}
 		
+		public Leg createLeg(Route route, double dep_time, double transportTime) {
+			Leg leg = new Leg();
+			leg.setRoute(route);
+			leg.setDepartureTime(dep_time);
+			leg.setExpectedTransportTime(transportTime);
+			return leg;
+		}
+		
 		/**
 		 * Inserts leg at the beginning of a tour.
 		 * 
@@ -133,6 +121,7 @@ public class Tour {
 		 * @return the builder
 		 * @throws IllegalStateException if leg is null
 		 */
+		@Deprecated
 		public Builder insertLegAtBeginning(Leg leg) {
 			assertIsNotNull(leg);
 //			if (!previousElementIsActivity) {
@@ -150,6 +139,8 @@ public class Tour {
 			}
 
 		}
+		
+		
 
 		/**
 		 * Schedules a pickup of a shipment with an expected endTime.
@@ -180,6 +171,7 @@ public class Tour {
 		 * @return the builder
 		 * @throws IllegalStateException if shipment is null or shipment has already been picked up.
 		 */
+		@Deprecated
 		public Builder schedulePickupAtBeginning(CarrierShipment shipment) {
 			assertIsNotNull(shipment);
 			boolean wasNew = openPickups.add(shipment);
@@ -263,6 +255,20 @@ public class Tour {
 			previousElementIsActivity = true;
 			return this;
 		}
+		
+		public Builder scheduleService(CarrierService service){
+			scheduleService(service, 0.0);
+			return this;
+		}
+		
+		public Builder scheduleService(CarrierService service, double endTime){
+			ServiceActivity act = new ServiceActivity(service);
+			act.setExpectedActEnd(endTime);
+			assertLastElementIsLeg();
+			tourElements.add(act);
+			previousElementIsActivity = true;
+			return this;
+		}
 
 		/**
 		 * Finally builds the tour.
@@ -270,9 +276,6 @@ public class Tour {
 		 * @return the tour that has been built
 		 */
 		public Tour build() {
-			Tour tour = new Tour(startLinkId, tourElements, endLinkId);
-			tour.setEarliestDeparture(earliestDeparture);
-			tour.setLatestDeparture(latestDeparture);
 			return new Tour(this);
 		}
 
@@ -330,15 +333,11 @@ public class Tour {
 
 		public abstract TimeWindow getTimeWindow();
 
-		public abstract void setExpectedActStart(double startTime);
-
-		public abstract double getExpectedActStart();
-
 		public abstract void setExpectedArrival(double arrivalTime);
 
 		public abstract double getExpectedArrival();
 
-		public abstract void setExpectedActEnd(double currTime);
+		public abstract void setExpectedActEnd(double endTime);
 
 		public abstract double getExpectedActEnd();
 	}
@@ -393,12 +392,213 @@ public class Tour {
 			return new Leg(this);
 		}
 	}
+	
+	public static class ServiceActivity extends TourActivity {
 
+		private CarrierService service;
+		
+		private double arrTime;
+		
+		private double endTime;
+		
+		public ServiceActivity(CarrierService service) {
+			super();
+			this.service = service;
+		}
+
+		private ServiceActivity(ServiceActivity serviceActivity) {
+			this.service = serviceActivity.getService();
+			this.arrTime = serviceActivity.getExpectedArrival();
+			this.endTime = serviceActivity.getExpectedActEnd();
+		}
+
+		public CarrierService getService(){
+			return service;
+		}
+		
+		@Override
+		public String getActivityType() {
+			return service.getType();
+		}
+
+		@Override
+		public Id getLocation() {
+			return service.getLocationLinkId();
+		}
+
+		@Override
+		public double getDuration() {
+			return service.getServiceTime();
+		}
+
+		@Override
+		public TimeWindow getTimeWindow() {
+			return service.getTimeWindow();
+		}
+
+		@Override
+		public void setExpectedArrival(double arrivalTime) {
+			this.arrTime = arrivalTime;
+		}
+
+		@Override
+		public double getExpectedArrival() {
+			return arrTime;
+		}
+
+		@Override
+		public void setExpectedActEnd(double endTime) {
+			this.endTime = endTime;
+		}
+
+		@Override
+		public double getExpectedActEnd() {
+			return this.endTime;
+		}
+
+		@Override
+		public TourElement duplicate() {
+			return new ServiceActivity(this);
+		}
+		
+	}
+
+	public static class Start extends TourActivity {
+
+		private Id locationLinkId;
+		
+		private TimeWindow timeWindow;
+
+		private double endTime;
+		
+		public Start(Id locationLinkId, TimeWindow timeWindow) {
+			super();
+			this.locationLinkId = locationLinkId;
+			this.timeWindow = timeWindow;
+		}
+
+		private Start(Start start) {
+			this.locationLinkId = start.getLocation();
+			this.timeWindow = start.getTimeWindow();
+			this.endTime = start.getExpectedActEnd();
+		}
+
+		@Override
+		public String getActivityType() {
+			return "start";
+		}
+
+		@Override
+		public Id getLocation() {
+			return locationLinkId;
+		}
+
+		@Override
+		public double getDuration() {
+			return 0;
+		}
+
+		@Override
+		public TimeWindow getTimeWindow() {
+			return timeWindow;
+		}
+
+		@Override
+		public void setExpectedArrival(double arrivalTime) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public double getExpectedArrival() {
+			return 0;
+		}
+
+		@Override
+		public void setExpectedActEnd(double endTime) {
+			this.endTime = endTime;
+		}
+
+		@Override
+		public double getExpectedActEnd() {
+			return endTime;
+		}
+
+		@Override
+		public TourElement duplicate() {
+			return new Start(this);
+		}
+		
+	}
+	
+	public static class End extends TourActivity {
+		private Id locationLinkId;
+		
+		private TimeWindow timeWindow;
+
+		private double arrTime;
+		
+		public End(Id locationLinkId, TimeWindow timeWindow) {
+			super();
+			this.locationLinkId = locationLinkId;
+			this.timeWindow = timeWindow;
+		}
+
+		private End(End end) {
+			this.locationLinkId = end.getLocation();
+			this.timeWindow = end.getTimeWindow();
+			end.getExpectedActEnd();
+		}
+
+		@Override
+		public String getActivityType() {
+			return "end";
+		}
+
+		@Override
+		public Id getLocation() {
+			return locationLinkId;
+		}
+
+		@Override
+		public double getDuration() {
+			return 0;
+		}
+
+		@Override
+		public TimeWindow getTimeWindow() {
+			return timeWindow;
+		}
+
+		@Override
+		public void setExpectedArrival(double arrivalTime) {
+			this.arrTime = arrivalTime;
+		}
+
+		@Override
+		public double getExpectedArrival() {
+			return this.arrTime;
+		}
+
+		@Override
+		public void setExpectedActEnd(double endTime) {
+		
+		}
+
+		@Override
+		public double getExpectedActEnd() {
+			return 0;
+		}
+
+		@Override
+		public TourElement duplicate() {
+			return new End(this);
+		}
+	}
+	
 	public static class Pickup extends ShipmentBasedActivity {
 
 		private final CarrierShipment shipment;
-
-		private double expActStartTime;
 
 		private double expActArrTime;
 
@@ -412,7 +612,6 @@ public class Tour {
 			this.shipment = pickup.getShipment();
 			this.expActArrTime = pickup.getExpectedArrival();
 			this.expActEndTime = pickup.getExpectedActEnd();
-			this.expActStartTime = pickup.getExpectedActStart();
 		}
 
 		@Override
@@ -438,16 +637,6 @@ public class Tour {
 		@Override
 		public CarrierShipment getShipment() {
 			return shipment;
-		}
-
-		@Override
-		public void setExpectedActStart(double startTime) {
-			expActStartTime = startTime;
-		}
-
-		@Override
-		public double getExpectedActStart() {
-			return expActStartTime;
 		}
 
 		@Override
@@ -483,8 +672,6 @@ public class Tour {
 
 		private final CarrierShipment shipment;
 
-		private double expActStartTime;
-
 		private double expArrTime;
 
 		private double expActEndTime;
@@ -497,7 +684,6 @@ public class Tour {
 			this.shipment = delivery.getShipment();
 			this.expArrTime = delivery.getExpectedArrival();
 			this.expActEndTime = delivery.getExpectedActEnd();
-			this.expActStartTime = delivery.getExpectedActStart();
 		}
 
 		@Override
@@ -523,16 +709,6 @@ public class Tour {
 		@Override
 		public CarrierShipment getShipment() {
 			return shipment;
-		}
-
-		@Override
-		public void setExpectedActStart(double startTime) {
-			expActStartTime = startTime;
-		}
-
-		@Override
-		public double getExpectedActStart() {
-			return expActStartTime;
 		}
 
 		@Override
@@ -564,42 +740,25 @@ public class Tour {
 	};
 
 	private final List<TourElement> tourElements;
-
-	private final Id startLinkId;
-
-	private final Id endLinkId;
-
-	private double earliestDeparture;
-
-	private double latestDeparture;
+	
+	private Start start;
+	
+	private End end;
 	
 	private Tour(Builder builder){
 		tourElements = builder.tourElements;
-		startLinkId = builder.startLinkId;
-		endLinkId = builder.endLinkId;
-		earliestDeparture = builder.earliestDeparture;
-		latestDeparture = builder.latestDeparture;
-	}
-
-	Tour(final Id startLinkId, final List<TourElement> tourElements,
-			final Id endLinkId) {
-		this.startLinkId = startLinkId;
-		this.tourElements = Collections.unmodifiableList(tourElements);
-		this.endLinkId = endLinkId;
-		this.earliestDeparture = 0.0;
-		this.latestDeparture = 0.0;
+		start = builder.start;
+		end = builder.end;
 	}
 
 	private Tour(Tour tour) {
-		this.startLinkId = tour.getStartLinkId();
+		this.start = (Start) tour.start.duplicate();
+		this.end = (End) tour.end.duplicate();
 		List<TourElement> elements = new ArrayList<Tour.TourElement>();
 		for (TourElement element : tour.getTourElements()) {
 			elements.add(element.duplicate());
 		}
 		this.tourElements = elements;
-		this.endLinkId = tour.getEndLinkId();
-		this.earliestDeparture = tour.getEarliestDeparture();
-		this.latestDeparture = tour.getLatestDeparture();
 	}
 
 	public Tour duplicate() {
@@ -609,55 +768,26 @@ public class Tour {
 	public List<TourElement> getTourElements() {
 		return Collections.unmodifiableList(tourElements);
 	}
-
-	/**
-	 * Returns the list of shipments in this tour.
-	 * 
-	 * <p>It retrieves the shipments by going through the tour-elements. Once a pickup activity occurs the picked shipment is 
-	 * added to the list to be returned. 
-	 * 
-	 * @return a list with carrierShipment
-	 * @see CarrierShipment
-	 */
-	public List<CarrierShipment> getShipments() {
-		List<CarrierShipment> shipments = new ArrayList<CarrierShipment>();
-		for (TourElement tourElement : tourElements) {
-			if (tourElement instanceof Pickup) {
-				Pickup pickup = (Pickup) tourElement;
-				shipments.add(pickup.shipment);
-			}
-		}
-		return shipments;
+	
+	public Start getStart(){
+		return start;
+	}
+	
+	public End getEnd(){
+		return end;
 	}
 
 	public Id getStartLinkId() {
-		return startLinkId;
+		return start.getLocation();
 	}
 
 	public Id getEndLinkId() {
-		return endLinkId;
-	}
-
-	public double getEarliestDeparture() {
-		return earliestDeparture;
-	}
-
-	public void setEarliestDeparture(double earliestDeparture) {
-		this.earliestDeparture = earliestDeparture;
-	}
-
-	public double getLatestDeparture() {
-		return latestDeparture;
-	}
-
-	public void setLatestDeparture(double latestDeparture) {
-		this.latestDeparture = latestDeparture;
+		return end.getLocation();
 	}
 	
 	@Override
 	public String toString() {
-		return "[startLinkId="+startLinkId+"][endLinkId="+endLinkId+"[nOfTourElements=" + tourElements.size() + "]" +
-				"[earliestDepartureTime=" + earliestDeparture + "][latestDepartureTime=" + latestDeparture + "]";
+		return "[startLinkId="+getStartLinkId()+"][endLinkId="+getEndLinkId()+"[#tourElements=" + tourElements.size() + "]";
 	}
 
 }

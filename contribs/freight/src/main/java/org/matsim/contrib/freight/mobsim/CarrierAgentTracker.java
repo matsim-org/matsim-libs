@@ -8,16 +8,14 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
 import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
-import org.matsim.contrib.freight.events.ShipmentPickedUpEventHandler;
+import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -25,13 +23,11 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
 
 /**
@@ -40,7 +36,7 @@ import org.matsim.core.events.EventsUtils;
  * @author mzilske, sschroeder
  *
  */
-public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler {
+public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler,  LinkEnterEventHandler {
 
 	private final Carriers carriers;
 
@@ -153,12 +149,6 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		carrierAgent.handleEvent(event);
 	}
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId());
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);
-	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
@@ -187,14 +177,9 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		return null;	
 	}
 	
-	CarrierShipment getAssociatedShipment(Id driverId, Activity act, int planElementIndex){
-		if(!(act.getType().equals(FreightConstants.PICKUP) || act.getType().equals(FreightConstants.DELIVERY))){
-			return null;
-		}
-		else{
-			CarrierAgent a = getCarrierAgent(driverId);
-			return a.getShipment(driverId,act,planElementIndex);
-		}
+	CarrierDriverAgent getDriver(Id driverId){
+		CarrierAgent carrierAgent = getCarrierAgent(driverId);
+		if(carrierAgent == null) throw new IllegalStateException("missing carrier agent. cannot find carrierAgent to driver " + driverId);
+		return carrierAgent.getDriver(driverId);
 	}
-
 }

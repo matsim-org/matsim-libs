@@ -10,7 +10,6 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierShipment.Builder;
-import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -69,7 +68,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	private CarrierVehicle currentVehicle = null;
 
-	private ScheduledTour.Builder currentTourBuilder = null;
+	private Tour.Builder currentTourBuilder = null;
 
 	private Double currentStartTime = null;
 
@@ -130,8 +129,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equals(CARRIER)) {
 			String id = atts.getValue(ID);
-			String linkId = atts.getValue(LINKID);
-			currentCarrier = CarrierImpl.newInstance(createId(id), createId(linkId)); 
+			currentCarrier = CarrierImpl.newInstance(createId(id)); 
 		}
 		if (name.equals(SHIPMENTS)) {
 			currentShipments = new HashMap<String, CarrierShipment>();
@@ -208,7 +206,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 		if (name.equals("tour")) {
 			String vehicleId = atts.getValue("vehicleId");
 			currentVehicle = vehicles.get(vehicleId);
-			currentTourBuilder = ScheduledTour.Builder.newInstance(currentVehicle);
+			currentTourBuilder = Tour.Builder.newInstance();
 		}
 		if (name.equals("leg")) {
 			currentLegDepTime = getDouble(atts.getValue("dep_time"));
@@ -216,26 +214,24 @@ public class CarrierPlanReader extends MatsimXmlParser {
 		}
 		if (name.equals(ACTIVITY)) {
 			if (atts.getValue(TYPE).equals("start")) {
-				currentTourBuilder.scheduleStart(getDouble(atts
-						.getValue("end_time")));
+				currentStartTime = getDouble(atts.getValue("end_time"));
 				previousActLoc = currentVehicle.getLocation();
+				currentTourBuilder.scheduleStart(currentVehicle.getLocation(),TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
 			} else if (atts.getValue(TYPE).equals("pickup")) {
 				String id = atts.getValue(SHIPMENTID);
 				CarrierShipment s = currentShipments.get(id);
 				finishLeg(s.getFrom());
-				currentTourBuilder.schedulePickup(s,
-						getDouble(atts.getValue("end_time")));
+				currentTourBuilder.schedulePickup(s,getDouble(atts.getValue("end_time")));
 				previousActLoc = s.getFrom();
 			} else if (atts.getValue(TYPE).equals("delivery")) {
 				String id = atts.getValue(SHIPMENTID);
 				CarrierShipment s = currentShipments.get(id);
 				finishLeg(s.getTo());
-				currentTourBuilder.scheduleDelivery(s,
-						getDouble(atts.getValue("end_time")));
+				currentTourBuilder.scheduleDelivery(s,getDouble(atts.getValue("end_time")));
 				previousActLoc = s.getTo();
 			} else if (atts.getValue(TYPE).equals("end")) {
 				finishLeg(currentVehicle.getLocation());
-				currentTourBuilder.scheduleEnd();
+				currentTourBuilder.scheduleEnd(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(),currentVehicle.getLatestEndTime()));
 			}
 		}
 	}
@@ -249,7 +245,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				route.setLinkIds(previousActLoc, linkIds, toLocation);
 			}
 		}
-		currentTourBuilder.scheduleLeg(route, currentLegDepTime,currentLegTransTime);
+		currentTourBuilder.addLeg(currentTourBuilder.createLeg(route, currentLegDepTime, currentLegTransTime));
 		currentLeg = null;
 		previousRouteContent = null;
 	}
@@ -280,7 +276,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			}
 		}
 		if (name.equals("tour")) {
-			ScheduledTour sTour = currentTourBuilder.build();
+			ScheduledTour sTour = ScheduledTour.newInstance(currentTourBuilder.build(), currentVehicle, currentStartTime);
 			scheduledTours.add(sTour);
 		}
 	}

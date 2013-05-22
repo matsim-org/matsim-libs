@@ -26,7 +26,7 @@ class Matsim2VrpUtils {
 		Collection<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
 		for (VehicleRoute route : vehicleRoutes) {
 			org.matsim.contrib.freight.carrier.Tour vehicleTour = createTour(matsim2vrpMap, route);
-			ScheduledTour scheduledTour = ScheduledTour.newInstance(vehicleTour,matsim2vrpMap.getCarrierVehicle(route.getVehicle()),vehicleTour.getEarliestDeparture());
+			ScheduledTour scheduledTour = ScheduledTour.newInstance(vehicleTour,matsim2vrpMap.getCarrierVehicle(route.getVehicle()),vehicleTour.getStart().getExpectedActEnd());
 			scheduledTours.add(scheduledTour);
 		}
 		return scheduledTours;
