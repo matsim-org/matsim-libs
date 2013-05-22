@@ -38,7 +38,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
-import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.vehicles.Vehicle;
 
 
