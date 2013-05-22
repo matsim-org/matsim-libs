@@ -204,6 +204,7 @@ public class RunCliquesWithHardCodedStrategies {
 								null);
 						private final KtiPtRoutingModuleInfo info =
 							new KtiPtRoutingModuleInfo(
+									ktiInputFilesConf.getIntrazonalPtSpeed(),
 									ktiInputFilesConf.getWorldFile(),
 									ktiInputFilesConf.getTravelTimesFile(),
 									ktiInputFilesConf.getPtStopsFile(),
@@ -346,6 +347,7 @@ class KtiInputFilesConfigGroup extends ReflectiveModule {
 	private String worldFile = null;
 	private String travelTimesFile = null;
 	private String ptStopsFile = null;
+	private double intrazonalPtSpeed = 4.361111;
 
 	public KtiInputFilesConfigGroup() {
 		super( GROUP_NAME );
@@ -379,5 +381,15 @@ class KtiInputFilesConfigGroup extends ReflectiveModule {
 	@StringSetter( "ptStopsFile" )
 	public void setPtStopsFile(String ptStopsFile) {
 		this.ptStopsFile = ptStopsFile;
+	}
+
+	@StringGetter( "intrazonalPtSpeed" )
+	public double getIntrazonalPtSpeed() {
+		return intrazonalPtSpeed;
+	}
+
+	@StringSetter( "intrazonalPtSpeed" )
+	public void setIntrazonalPtSpeed(final double v) {
+		this.intrazonalPtSpeed = v;
 	}
 }

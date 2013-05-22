@@ -118,12 +118,21 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final Leg ptLeg = new LegImpl( TransportMode.pt );
 		final Route ptRoute = new GenericRouteImpl( endWalk1.getId() , startWalk2.getId() );
-		ptRoute.setTravelTime( ptTravelTimeEntry.getValue() );
-		ptRoute.setDistance(
-				// factor hard-coded KTI-like
-				1.5 * CoordUtils.calcDistance(
-					stop1.getCoord(),
-					stop2.getCoord() ) );
+
+		final double ptDistance =
+			// factor hard-coded KTI-like
+			1.5 * CoordUtils.calcDistance(
+				stop1.getCoord(),
+				stop2.getCoord() );
+		final double ptTravelTime =
+			Double.isNaN( ptTravelTimeEntry.getValue() ) ?
+			ptDistance / info.intrazonalSpeed :
+			// A value of NaN in the travel time matrix indicates that the matrix contains no valid value for this entry.
+			// In this case, the travel time is calculated with the distance of the relation and an average speed.
+			ptTravelTimeEntry.getValue() * 60;
+
+		ptRoute.setTravelTime( ptTravelTime );
+		ptRoute.setDistance( ptDistance );
 		ptLeg.setRoute( ptRoute );
 		trip.add( ptLeg );
 
@@ -167,14 +176,17 @@ public class KtiPtRoutingModule implements RoutingModule {
 		private final Matrix ptTravelTimes;
 		private final SwissHaltestellen ptStops;
 		private final World world;
+		private final double intrazonalSpeed;
 
 		public KtiPtRoutingModuleInfo(
+				final double intrazonalSpeed,
 				// I hate constuctors which read into files,
 				// but do not want to let the dirtyness out of here
 				final String worldFile,
 				final String travelTimeMatrixFile,
 				final String ptStopsFile,
 				final Network network) {
+			this.intrazonalSpeed = intrazonalSpeed;
 			final KtiConfigGroup dummyGroup = new KtiConfigGroup();
 			dummyGroup.setWorldInputFilename( worldFile );
 			dummyGroup.setPtTraveltimeMatrixFilename( travelTimeMatrixFile );
