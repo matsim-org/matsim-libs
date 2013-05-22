@@ -488,6 +488,10 @@ public class MATSim4UrbanSimConfigUtils {
 		//  log.error( "ignoring any external default speeds for walk/bicycle/pt and using internal values.  fix!!" ) ;
 		//  this is not a problem since the complete config is overwritten by the external config at the very end.
 		
+		/*
+		 * To me this seems to be a problem. PlansCalcRoute is intialized with some defaults. Using the direct setters will NOT clear
+		 * the defaults, but only add the new values. E.g. the for pt the default is FreespeedFactor. Daniel, May '13
+		 */
 		// setting teleportation speeds in router
 		config.plansCalcRoute().setWalkSpeed( defaultWalkSpeed ); 
 		config.plansCalcRoute().setBikeSpeed( defaultBicycleSpeed );

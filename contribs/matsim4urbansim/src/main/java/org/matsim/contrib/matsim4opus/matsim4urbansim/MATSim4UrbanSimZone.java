@@ -175,6 +175,8 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		// copy the zones file to the outputfolder...
 		IOUtils.copyFile(new File(m4u.getUrbanSimParameterConfig().getMATSim4OpusTemp() + "/zones.csv"), 
 				new File(m4u.getUrbanSimParameterConfig().getMATSim4OpusOutput() + "/zones.csv"));
+		IOUtils.copyFile(new File(m4u.getUrbanSimParameterConfig().getMATSim4OpusTemp() + "/zones_complete.csv"), 
+				new File(m4u.getUrbanSimParameterConfig().getMATSim4OpusOutput() + "/zones_complete.csv"));
 		
 		log.info("Computation took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
