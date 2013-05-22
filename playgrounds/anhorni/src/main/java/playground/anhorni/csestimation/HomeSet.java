@@ -42,6 +42,7 @@ public class HomeSet {
 				this.shops.put(dist, (ShopLocation)loc);
 			}
 		}
+		this.print();
 	}
 	
 	public double getMaxDistanceAwareness() {
@@ -88,5 +89,12 @@ public class HomeSet {
 	}
 	public void setShops(TreeMap<Double, ShopLocation> shops) {
 		this.shops = shops;
+	}
+	private void print() {
+		String str = "person " + this.person.getId().toString();
+		for (ShopLocation shop:this.shops.values()) {
+			str += " " + shop.getId().toString();
+		}
+		log.info(str);
 	}
 }
