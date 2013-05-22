@@ -63,16 +63,17 @@ public class SurveyControler {
 		for (EstimationPerson person : this.population.values()) {
 			person.createHomeSet(shopQuadTree);
 		}		
-		analyzer.analyzeHomeSets("uncleaned");
-		analyzer.setUcs(ucs);
-		analyzer.analyzeArea();
-		analyzer.analyzePS();
-		
+
 		// cleaned
 		this.population = cleaner.removeNonAgeNonIncomePersons(this.population);
 		analyzer.setPopulation(this.population);
+		log.info("population size " + this.population.size());
 		analyzer.analyzeVariableBinSize();		
 		analyzer.analyzeHomeSets("cleaned");
+		
+		analyzer.setUcs(ucs);
+		analyzer.analyzeArea();
+		analyzer.analyzePS();
 		
 		log.info("finished .......................................");
 	}
