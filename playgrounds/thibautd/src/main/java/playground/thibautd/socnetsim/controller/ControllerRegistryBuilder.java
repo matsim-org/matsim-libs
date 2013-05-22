@@ -117,48 +117,56 @@ public class ControllerRegistryBuilder {
 	// "with" methods
 	public ControllerRegistryBuilder withTravelTimeCalculator(
 			final TravelTimeCalculator travelTime2) {
+		if ( this.travelTime != null ) throw new IllegalStateException( "object already set" );
 		this.travelTime = travelTime2;
 		return this;
 	}
 
 	public ControllerRegistryBuilder withTravelDisutilityFactory(
 			final TravelDisutilityFactory travelDisutilityFactory2) {
+		if ( this.travelDisutilityFactory != null ) throw new IllegalStateException( "object already set" );
 		this.travelDisutilityFactory = travelDisutilityFactory2;
 		return this;
 	}
 
 	public ControllerRegistryBuilder withScoringFunctionFactory(
 			final ScoringFunctionFactory scoringFunctionFactory2) {
+		if ( this.scoringFunctionFactory != null ) throw new IllegalStateException( "object already set" );
 		this.scoringFunctionFactory = scoringFunctionFactory2;
 		return this;
 	}
 
 	public ControllerRegistryBuilder withMobsimFactory(
 			final MobsimFactory mobsimFactory2) {
+		if ( this.mobsimFactory != null ) throw new IllegalStateException( "object already set" );
 		this.mobsimFactory = mobsimFactory2;
 		return this;
 	}
 
 	public ControllerRegistryBuilder withTripRouterFactory(
 			final TripRouterFactory tripRouterFactory2) {
+		if ( this.tripRouterFactory != null ) throw new IllegalStateException( "object already set" );
 		this.tripRouterFactory = tripRouterFactory2;
 		return this;
 	}
 
 	public ControllerRegistryBuilder withLeastCostPathCalculatorFactory(
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory2) {
+		if ( this.leastCostPathCalculatorFactory != null ) throw new IllegalStateException( "object already set" );
 		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory2;
 		return this;
 	}
 
 	public ControllerRegistryBuilder withPlanRoutingAlgorithmFactory(
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory2) {
+		if ( this.planRoutingAlgorithmFactory != null ) throw new IllegalStateException( "object already set" );
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory2;
 		return this;
 	}
 
 	public ControllerRegistryBuilder withGroupIdentifier(
 			final GroupIdentifier groupIdentifier2) {
+		if ( this.groupIdentifier != null ) throw new IllegalStateException( "object already set" );
 		this.groupIdentifier = groupIdentifier2;
 		return this;
 	}
@@ -171,12 +179,14 @@ public class ControllerRegistryBuilder {
 
 	public ControllerRegistryBuilder withPlanLinkIdentifier(
 			final PlanLinkIdentifier identifier) {
+		if ( this.planLinkIdentifier != null ) throw new IllegalStateException( "object already set" );
 		this.planLinkIdentifier = identifier;
 		return this;
 	}
 
 	public ControllerRegistryBuilder withIncompatiblePlansIdentifierFactory(
 			final IncompatiblePlansIdentifierFactory factory) {
+		if ( this.incompatiblePlansIdentifierFactory != null ) throw new IllegalStateException( "object already set" );
 		this.incompatiblePlansIdentifierFactory = factory;
 		return this;
 	}
@@ -195,21 +205,23 @@ public class ControllerRegistryBuilder {
 		return new ControllerRegistry(
 			scenario,
 			events,
-			travelTime,
-			travelDisutilityFactory,
-			scoringFunctionFactory,
+			getTravelTime(),
+			getTravelDisutilityFactory(),
+			getScoringFunctionFactory(),
 			legTimes,
-			mobsimFactory,
-			tripRouterFactory,
-			leastCostPathCalculatorFactory,
-			planRoutingAlgorithmFactory,
-			groupIdentifier,
+			getMobsimFactory(),
+			getTripRouterFactory(),
+			getLeastCostPathCalculatorFactory(),
+			getPlanRoutingAlgorithmFactory(),
+			getGroupIdentifier(),
 			prepareForSimModules,
-			planLinkIdentifier,
-			incompatiblePlansIdentifierFactory);
+			getPlanLinkIdentifier(),
+			getIncompatiblePlansIdentifierFactory());
 	}
 
-	private final void setDefaults() {
+	// /////////////////////////////////////////////////////////////////////////
+	// getters, which initialize to defaults if nothing. SHould be renamed.
+	public GroupIdentifier getGroupIdentifier() {
 		// by default, no groups (results in individual replanning)
 		if ( groupIdentifier == null ) {
 			this.groupIdentifier = new GroupIdentifier() {
@@ -220,14 +232,20 @@ public class ControllerRegistryBuilder {
 				}
 			};
 		}
+		return groupIdentifier;
+	}
 
+	public ScoringFunctionFactory getScoringFunctionFactory() {
 		if ( scoringFunctionFactory == null ) {
 			this.scoringFunctionFactory =
 					new CharyparNagelScoringFunctionFactory(
 						scenario.getConfig().planCalcScore(),
 						scenario.getNetwork());
 		}
+		return scoringFunctionFactory;
+	}
 
+	public PlanRoutingAlgorithmFactory getPlanRoutingAlgorithmFactory() {
 		if ( planRoutingAlgorithmFactory == null ) {
 			// by default: do not care about joint trips, vehicles or what not
 			this.planRoutingAlgorithmFactory = new PlanRoutingAlgorithmFactory() {
@@ -238,15 +256,24 @@ public class ControllerRegistryBuilder {
 				}
 			};
 		}
+		return planRoutingAlgorithmFactory;
+	}
 
+	public MobsimFactory getMobsimFactory() {
 		if ( mobsimFactory == null ) {
 			this.mobsimFactory = new JointQSimFactory();
 		}
+		return mobsimFactory;
+	}
 
+	public PlanLinkIdentifier getPlanLinkIdentifier() {
 		if ( planLinkIdentifier == null ) {
 			this.planLinkIdentifier = new DefaultPlanLinkIdentifier();
 		}
+		return planLinkIdentifier;
+	}
 
+	public TravelTimeCalculator getTravelTime() {
 		if ( travelTime == null ) {
 			this.travelTime =
 				new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
@@ -254,19 +281,25 @@ public class ControllerRegistryBuilder {
 						scenario.getConfig().travelTimeCalculator());
 			this.events.addHandler(travelTime);	
 		}
+		return travelTime;
+	}
 
+	public TravelDisutilityFactory getTravelDisutilityFactory() {
 		if ( travelDisutilityFactory == null ) {
 			this.travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
 		}
+		return travelDisutilityFactory;
+	}
 
+	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
 		if ( leastCostPathCalculatorFactory == null ) {
 			switch (scenario.getConfig().controler().getRoutingAlgorithmType()) {
 				case AStarLandmarks:
 					this.leastCostPathCalculatorFactory =
 							new AStarLandmarksFactory(
 										scenario.getNetwork(),
-										travelDisutilityFactory.createTravelDisutility(
-											travelTime.getLinkTravelTimes(),
+										getTravelDisutilityFactory().createTravelDisutility(
+											getTravelTime().getLinkTravelTimes(),
 											scenario.getConfig().planCalcScore()));
 					break;
 				case Dijkstra:
@@ -278,8 +311,8 @@ public class ControllerRegistryBuilder {
 					this.leastCostPathCalculatorFactory =
 							new FastAStarLandmarksFactory(
 										scenario.getNetwork(),
-										travelDisutilityFactory.createTravelDisutility(
-											travelTime.getLinkTravelTimes(),
+										getTravelDisutilityFactory().createTravelDisutility(
+											getTravelTime().getLinkTravelTimes(),
 											scenario.getConfig().planCalcScore()));
 					break;
 				case FastDijkstra:
@@ -291,7 +324,10 @@ public class ControllerRegistryBuilder {
 					throw new IllegalArgumentException( "unkown algorithm "+scenario.getConfig().controler().getRoutingAlgorithmType() );
 			}
 		}
+		return leastCostPathCalculatorFactory;
+	}
 
+	public TripRouterFactory getTripRouterFactory() {
 		if ( tripRouterFactory == null ) {
 			final TransitSchedule schedule = scenario.getTransitSchedule();
 			final TransitRouterFactory transitRouterFactory =
@@ -304,16 +340,22 @@ public class ControllerRegistryBuilder {
 
 			this.tripRouterFactory = new JointTripRouterFactory(
 					scenario,
-					travelDisutilityFactory,
-					travelTime.getLinkTravelTimes(),
-					leastCostPathCalculatorFactory,
+					getTravelDisutilityFactory(),
+					getTravelTime().getLinkTravelTimes(),
+					getLeastCostPathCalculatorFactory(),
 					transitRouterFactory);
 		}
+		return tripRouterFactory;
+	}
 
+	public IncompatiblePlansIdentifierFactory getIncompatiblePlansIdentifierFactory() {
 		if ( incompatiblePlansIdentifierFactory == null ) {
 			incompatiblePlansIdentifierFactory = new EmptyIncompatiblePlansIdentifierFactory();
 		}
+		return incompatiblePlansIdentifierFactory;
+	}
 
+	private void setDefaults() {
 		// we do this here, as we need configurable objects
 		// but we want it to be executed at the start!
 		this.prepareForSimModules.addFirst(
@@ -323,11 +365,11 @@ public class ControllerRegistryBuilder {
 					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm() {
 						final PersonAlgorithm prepareForSim =
 							new PersonPrepareForSim(
-									planRoutingAlgorithmFactory.createPlanRoutingAlgorithm(
-										tripRouterFactory.instantiateAndConfigureTripRouter() ),
+									getPlanRoutingAlgorithmFactory().createPlanRoutingAlgorithm(
+										getTripRouterFactory().instantiateAndConfigureTripRouter() ),
 									scenario);
 						final PersonAlgorithm checkJointRoutes =
-							new ImportedJointRoutesChecker( tripRouterFactory.instantiateAndConfigureTripRouter() );
+							new ImportedJointRoutesChecker( getTripRouterFactory().instantiateAndConfigureTripRouter() );
 						return new GenericPlanAlgorithm<ReplanningGroup>() {
 							@Override
 							public void run(final ReplanningGroup group) {
