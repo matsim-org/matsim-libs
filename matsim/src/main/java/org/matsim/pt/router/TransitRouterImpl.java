@@ -75,7 +75,6 @@ public class TransitRouterImpl implements TransitRouter {
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
 		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
-		//		this.transitNetwork = null; // enable to save memory if no routing should be done
 	}
 
 	public TransitRouterImpl(
@@ -90,7 +89,6 @@ public class TransitRouterImpl implements TransitRouter {
 		this.travelDisutility = travelDisutility;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
 		this.preparedTransitSchedule = preparedTransitSchedule;
-		//		this.dijkstra = null; // enable to save memory if no routing should be done
 	}
 
 	private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime){
