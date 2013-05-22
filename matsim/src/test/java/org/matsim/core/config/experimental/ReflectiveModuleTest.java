@@ -104,9 +104,13 @@ public class ReflectiveModuleTest {
 			return this.doubleField;
 		}
 
+		// there should be no restriction on return type of
+		// setters
 		@StringSetter( "doubleField" )
-		public void setDoubleField(double doubleField) {
+		public double setDoubleField(double doubleField) {
+			final double old = this.doubleField;
 			this.doubleField = doubleField;
+			return old;
 		}
  
 		// /////////////////////////////////////////////////////////////////////
