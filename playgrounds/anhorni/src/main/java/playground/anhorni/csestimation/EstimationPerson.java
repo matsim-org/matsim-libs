@@ -134,7 +134,6 @@ public class EstimationPerson extends MZPerson {
 		this.homeset = homeset;
 	}
 	public void createHomeSet(QuadTree<Location> shopQuadTree) {
-		log.info("create home sets for person " + this.id.toString());
 		this.homeset = new HomeSet();
 		this.homeset.create(this, shopQuadTree);
 	}
