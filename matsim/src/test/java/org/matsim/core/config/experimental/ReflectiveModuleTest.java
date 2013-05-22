@@ -1,0 +1,164 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ReflectiveModuleTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package org.matsim.core.config.experimental;
+
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.testcases.MatsimTestUtils;
+
+/**
+ * @author thibautd
+ */
+public class ReflectiveModuleTest {
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	public void testDumpAndRead() {
+		final TestModule dumpedModule = new TestModule();
+		dumpedModule.setDoubleField( 1000 );
+		dumpedModule.setIdField( new IdImpl( 123 ) );
+		dumpedModule.setCoordField( new CoordImpl( 265 , 463 ) );
+
+		final Config dumpedConfig = new Config();
+		dumpedConfig.addModule( TestModule.GROUP_NAME , dumpedModule );
+
+		final String fileName = utils.getOutputDirectory() + "/dump.xml";
+
+		new ConfigWriter( dumpedConfig ).write( fileName );
+		final Config readConfig = ConfigUtils.loadConfig( fileName );
+		final TestModule readModule = new TestModule();
+		// ass a side effect, this loads the information
+		readConfig.addModule( TestModule.GROUP_NAME , readModule );
+
+		assertSame( dumpedModule , readModule );
+	}
+
+	private static void assertSame(
+			final TestModule dumpedModule,
+			final TestModule readModule) {
+		Assert.assertEquals(
+				"incompatible double fields",
+				dumpedModule.getDoubleField(),
+				readModule.getDoubleField(),
+				MatsimTestUtils.EPSILON);
+
+		Assert.assertEquals(
+				"incompatible id fields",
+				dumpedModule.getIdField(),
+				readModule.getIdField());
+
+		Assert.assertEquals(
+				"incompatible coord fields",
+				dumpedModule.getCoordField(),
+				readModule.getCoordField());
+	}
+
+	// TODO: move to tutorial?
+	public static class TestModule extends ReflectiveModule {
+		public static final String GROUP_NAME = "testModule";
+
+		// TODO: test for ALL primitive types
+		private double doubleField = Double.NaN;
+
+		// Object fields:
+		// Id: string representation is toString
+		private Id idField = null;
+		// Coord: some conversion needed
+		private Coord coordField = null;
+
+		public TestModule() {
+			super( GROUP_NAME );
+		}
+
+		// /////////////////////////////////////////////////////////////////////
+		// double field
+		@StringGetter( "doubleField" )
+		public double getDoubleField() {
+			return this.doubleField;
+		}
+
+		@StringSetter( "doubleField" )
+		public void setDoubleField(double doubleField) {
+			this.doubleField = doubleField;
+		}
+ 
+		// /////////////////////////////////////////////////////////////////////
+		// id field
+		/**
+		 * string representation of Id is result of
+		 * toString: just annotate getter
+		 */
+		@StringGetter( "idField" )
+		public Id getIdField() {
+			return this.idField;
+		}
+
+		public void setIdField(Id idField) {
+			this.idField = idField;
+		}
+
+		/**
+		 * We need to do the conversion from string to Id
+		 * ourselves. We do not want the user to access that:
+		 * make private.
+		 */
+		@StringSetter( "idField" )
+		private void setIdField(String s) {
+			this.idField = new IdImpl( s );
+		}
+
+		// /////////////////////////////////////////////////////////////////////
+		// coord field
+		public Coord getCoordField() {
+			return this.coordField;
+		}
+
+		public void setCoordField(Coord coordField) {
+			this.coordField = coordField;
+		}
+
+		// we have to convert both ways here
+		@StringGetter( "coordField" )
+		private String getCoordFieldString() {
+			return this.coordField.getX()+","+this.coordField.getY();
+		}
+
+		@StringSetter( "coordField" )
+		private void setCoordField(String coordField) {
+			final String[] coords = coordField.split( "," );
+			if ( coords.length != 2 ) throw new IllegalArgumentException( coordField );
+
+			this.coordField = new CoordImpl(
+					Double.parseDouble( coords[ 0 ] ),
+					Double.parseDouble( coords[ 1 ] ) );
+		}
+	}
+}
+
