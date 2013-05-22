@@ -85,8 +85,8 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
-		final Link endWalk1 = network.getNearestLink( stop1.getCoord() );
-		final Link startWalk2 = network.getNearestLink( stop2.getCoord() );
+		final Link linkStartPt = network.getNearestLink( stop1.getCoord() );
+		final Link linkEndPt = network.getNearestLink( stop2.getCoord() );
 		// access
 		// ---------------------------------------------------------------------
 		final double distanceLeg1 =
@@ -96,7 +96,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		final double travelTimeLeg1 = distanceLeg1 * config.getWalkSpeed();
 
 		final Leg walk1 = new LegImpl( TransportMode.walk );
-		final Route route1 = new GenericRouteImpl( fromFacility.getLinkId() , endWalk1.getId() );
+		final Route route1 = new GenericRouteImpl( fromFacility.getLinkId() , linkStartPt.getId() );
 		route1.setTravelTime( travelTimeLeg1 );
 		walk1.setRoute( route1 );
 		trip.add( walk1 );
@@ -104,7 +104,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		trip.add(
 				createInteraction(
 					stop1.getCoord(),
-					endWalk1.getId() ) );
+					linkStartPt.getId() ) );
 
 		// pt
 		// ---------------------------------------------------------------------
@@ -117,7 +117,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		final Entry ptTravelTimeEntry = info.ptTravelTimes.getEntry( fromMunicipality.getId() , toMunicipality.getId() );
 
 		final Leg ptLeg = new LegImpl( TransportMode.pt );
-		final Route ptRoute = new GenericRouteImpl( endWalk1.getId() , startWalk2.getId() );
+		final Route ptRoute = new GenericRouteImpl( linkStartPt.getId() , linkEndPt.getId() );
 
 		final double ptDistance =
 			// factor hard-coded KTI-like
@@ -139,7 +139,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		trip.add(
 				createInteraction(
 					stop2.getCoord(),
-					startWalk2.getId() ) );
+					linkEndPt.getId() ) );
 
 		// egress
 		// ---------------------------------------------------------------------
@@ -150,7 +150,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		final double travelTimeLeg2 = distanceLeg2 * config.getWalkSpeed();
 
 		final Leg walk2 = new LegImpl( TransportMode.walk );
-		final Route route2 = new GenericRouteImpl( startWalk2.getId() , toFacility.getLinkId() );
+		final Route route2 = new GenericRouteImpl( linkEndPt.getId() , toFacility.getLinkId() );
 		route2.setTravelTime( travelTimeLeg2 );
 		route2.setDistance( distanceLeg2 );
 		walk2.setRoute( route2 );
