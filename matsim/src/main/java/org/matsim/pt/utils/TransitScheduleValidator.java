@@ -182,22 +182,27 @@ public abstract class TransitScheduleValidator {
 				ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(route.getStops());
 				int stopCount = stops.size();
 				
-				TransitRouteStop stop = stops.get(0);
-				if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
-					result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The first stop does not contain any departure offset.");
+				if (stopCount > 0) {
+					TransitRouteStop stop = stops.get(0);
+					if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
+						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The first stop does not contain any departure offset.");
+					}
+					
+					for (int i = 1; i < stopCount - 1; i++) {
+						stop = stops.get(i);
+						if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
+							result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": Stop " + i + " does not contain any departure offset.");
+						}
+					}
+					
+					stop = stops.get(stopCount - 1);
+					if (stop.getArrivalOffset() == Time.UNDEFINED_TIME) {
+						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The last stop does not contain any arrival offset.");
+					}
+				} else {
+					result.addWarning("Transit line " + line.getId() + ", route " + route.getId() + ": The route has not stops assigned, looks suspicious.");
 				}
 				
-				for (int i = 1; i < stopCount - 1; i++) {
-					stop = stops.get(i);
-					if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
-						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": Stop " + i + " does not contain any departure offset.");
-					}
-				}
-
-				stop = stops.get(stopCount - 1);
-				if (stop.getArrivalOffset() == Time.UNDEFINED_TIME) {
-					result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The last stop does not contain any arrival offset.");
-				}
 			}
 		}
 		
