@@ -339,6 +339,14 @@ public class RunUtils {
 				new DistanceFillerAlgorithm.CrowFlyEstimator(
 					controller.getRegistry().getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactor(), 
 					controller.getRegistry().getScenario().getNetwork() ) );
+
+		// this is done by the routing module, but not at import
+		algo.putEstimator(
+				TransportMode.walk,
+				new DistanceFillerAlgorithm.CrowFlyEstimator(
+					controller.getRegistry().getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactor(), 
+					controller.getRegistry().getScenario().getNetwork() ) );
+
 		algo.putEstimator(
 				TransportMode.pt,
 				new DistanceFillerAlgorithm.CrowFlyEstimator(
