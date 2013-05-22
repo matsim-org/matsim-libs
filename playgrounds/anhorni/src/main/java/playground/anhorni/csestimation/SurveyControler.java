@@ -64,16 +64,14 @@ public class SurveyControler {
 			person.createHomeSet(shopQuadTree);
 		}		
 		analyzer.analyzeHomeSets("uncleaned");
-		
-		this.population = cleaner.removeNonAgeNonIncomePersons(this.population);
-		analyzer.setPopulation(this.population);
-		
 		analyzer.setUcs(ucs);
 		analyzer.analyzeArea();
 		analyzer.analyzePS();
 		
-		analyzer.analyzeVariableBinSize();
-		
+		// cleaned
+		this.population = cleaner.removeNonAgeNonIncomePersons(this.population);
+		analyzer.setPopulation(this.population);
+		analyzer.analyzeVariableBinSize();		
 		analyzer.analyzeHomeSets("cleaned");
 		
 		log.info("finished .......................................");
