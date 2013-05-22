@@ -53,32 +53,17 @@ import playground.meisterk.kti.router.SwissHaltestellen;
 public class KtiPtRoutingModule implements RoutingModule {
 	private final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
 
-	private final Matrix ptTravelTimes;
-	private final SwissHaltestellen ptStops;
-	private final PlansCalcRouteConfigGroup config;
+	private final  PlansCalcRouteConfigGroup config;
 	private final NetworkImpl network;
+	private final KtiPtRoutingModuleInfo info;
 
 	public KtiPtRoutingModule(
 			final PlansCalcRouteConfigGroup config,
-			// I hate constuctors which read into files,
-			// but do not want to let the dirtyness out of here
-			final String worldFile,
-			final String travelTimeMatrixFile,
-			final String ptStopsFile,
+			final KtiPtRoutingModuleInfo info,
 			final Network network) {
 		this.network = (NetworkImpl) network;
 		this.config = config;
-
-		final KtiConfigGroup dummyGroup = new KtiConfigGroup();
-		dummyGroup.setWorldInputFilename( worldFile );
-		dummyGroup.setPtTraveltimeMatrixFilename( travelTimeMatrixFile );
-		dummyGroup.setPtHaltestellenFilename( ptStopsFile );
-
-		final PlansCalcRouteKtiInfo ptInfo = new PlansCalcRouteKtiInfo( dummyGroup );
-		ptInfo.prepare( network );
-
-		this.ptTravelTimes = ptInfo.getPtTravelTimes();
-		this.ptStops = ptInfo.getHaltestellen();
+		this.info = info;
 	}
 
 	@Override
@@ -87,8 +72,8 @@ public class KtiPtRoutingModule implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		final SwissHaltestelle stop1 = ptStops.getClosestLocation( fromFacility.getCoord() );
-		final SwissHaltestelle stop2 = ptStops.getClosestLocation( toFacility.getCoord() );
+		final SwissHaltestelle stop1 = info.ptStops.getClosestLocation( fromFacility.getCoord() );
+		final SwissHaltestelle stop2 = info.ptStops.getClosestLocation( toFacility.getCoord() );
 
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
@@ -110,7 +95,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		// pt
 		// ---------------------------------------------------------------------
-		final Entry ptTravelTimeEntry = ptTravelTimes.getEntry( stop1.getId() , stop2.getId() );
+		final Entry ptTravelTimeEntry = info.ptTravelTimes.getEntry( stop1.getId() , stop2.getId() );
 
 		final Leg ptLeg = new LegImpl( TransportMode.pt );
 		final Route ptRoute = new GenericRouteImpl( endWalk1.getId() , startWalk2.getId() );
@@ -145,6 +130,30 @@ public class KtiPtRoutingModule implements RoutingModule {
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
 		return stages;
+	}
+
+	public static class KtiPtRoutingModuleInfo {
+		private final Matrix ptTravelTimes;
+		private final SwissHaltestellen ptStops;
+
+		public KtiPtRoutingModuleInfo(
+				// I hate constuctors which read into files,
+				// but do not want to let the dirtyness out of here
+				final String worldFile,
+				final String travelTimeMatrixFile,
+				final String ptStopsFile,
+				final Network network) {
+			final KtiConfigGroup dummyGroup = new KtiConfigGroup();
+			dummyGroup.setWorldInputFilename( worldFile );
+			dummyGroup.setPtTraveltimeMatrixFilename( travelTimeMatrixFile );
+			dummyGroup.setPtHaltestellenFilename( ptStopsFile );
+
+			final PlansCalcRouteKtiInfo ptInfo = new PlansCalcRouteKtiInfo( dummyGroup );
+			ptInfo.prepare( network );
+
+			this.ptTravelTimes = ptInfo.getPtTravelTimes();
+			this.ptStops = ptInfo.getHaltestellen();
+		}
 	}
 }
 

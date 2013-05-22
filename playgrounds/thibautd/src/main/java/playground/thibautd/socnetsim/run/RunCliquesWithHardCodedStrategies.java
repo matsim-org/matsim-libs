@@ -45,6 +45,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
 
 import playground.thibautd.router.KtiPtRoutingModule;
+import playground.thibautd.router.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
 import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
 import playground.thibautd.scoring.KtiLikeScoringConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
@@ -201,6 +202,13 @@ public class RunCliquesWithHardCodedStrategies {
 								builder.getTravelTime().getLinkTravelTimes(),
 								builder.getLeastCostPathCalculatorFactory(),
 								null);
+						private final KtiPtRoutingModuleInfo info =
+							new KtiPtRoutingModuleInfo(
+									ktiInputFilesConf.getWorldFile(),
+									ktiInputFilesConf.getTravelTimesFile(),
+									ktiInputFilesConf.getPtStopsFile(),
+									scenario.getNetwork());
+
 						@Override
 						public TripRouter instantiateAndConfigureTripRouter() {
 							final TripRouter tripRouter = delegate.instantiateAndConfigureTripRouter();
@@ -209,9 +217,7 @@ public class RunCliquesWithHardCodedStrategies {
 								TransportMode.pt,
 								new KtiPtRoutingModule(
 									scenario.getConfig().plansCalcRoute(),
-									ktiInputFilesConf.getWorldFile(),
-									ktiInputFilesConf.getTravelTimesFile(),
-									ktiInputFilesConf.getPtStopsFile(),
+									info,
 									scenario.getNetwork()) );
 
 							final MainModeIdentifier identifier = tripRouter.getMainModeIdentifier();
