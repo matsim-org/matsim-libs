@@ -22,31 +22,12 @@
  */
 package org.matsim.contrib.matsim4opus.improvedpseudopt;
 
-import java.util.Collections;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.PseudoTransitLegRouter;
-import org.matsim.core.router.old.TeleportationLegRouter;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.router.TripRouterFactoryImpl;
 
 /**
  * @author thomas
@@ -56,12 +37,21 @@ public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 	private static final Logger log = Logger
 			.getLogger(MATSim4UrbanSimRouterFactoryImpl.class);
 
+	private final Controler controler;
 
 	private final PtMatrix ptMatrix;
 	// The single instance of ptMatrix is passed to multiple instances of the TripRouter.  Looks to me like this will work, since
 	// there is only read access to ptMatrix.  kai, may'13
 
-	private Controler  controler; 
+//	private PopulationFactory populationFactory;
+//
+//	private ModeRouteFactory modeRouteFactory;
+//
+//	private PlansCalcRouteConfigGroup routeConfigGroup;
+
+	private TripRouterFactoryImpl delegate;
+
+	private boolean firstCall = true;
 	
 	public MATSim4UrbanSimRouterFactoryImpl(final Controler controler, final PtMatrix ptMatrix) {
 		this.controler = controler;
@@ -70,119 +60,57 @@ public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 	
 	@Override
 	public TripRouter instantiateAndConfigureTripRouter() {
+//		// initialize here - controller should be fully initialized by now
+//		// use fields to keep the rest of the code clean and comparable
+//		
+//		Config config = controler.getScenario().getConfig();
+//		Network network= controler.getScenario().getNetwork();
+//		Scenario scenario= controler.getScenario();
+//		this.populationFactory = controler.getPopulation().getFactory();
+//		this.modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+//		this.routeConfigGroup = controler.getConfig().plansCalcRoute();
+//		
+//		TripRouter tripRouter = new TripRouter();
+//		
+//		// car routing
+//		tripRouter.setRoutingModule(TransportMode.car, new LegRouterWrapper(
+//				TransportMode.car,
+//				scenario.getPopulation().getFactory(),
+//				new NetworkLegRouter(
+//					network,
+//					controler.getLeastCostPathCalculatorFactory().createPathCalculator(
+//							scenario.getNetwork(), 
+//							controler.getTravelDisutilityFactory().createTravelDisutility(controler.getLinkTravelTimes(), config.planCalcScore()), 
+//							controler.getLinkTravelTimes()),
+//					((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory())));
+//		
+		//initialize TripRouterFactoyImpl only once
+		if(firstCall){
+			this.delegate = new TripRouterFactoryImpl(
+					controler.getScenario(),
+					controler.getTravelDisutilityFactory(), 
+					controler.getLinkTravelTimes(), 
+					controler.getLeastCostPathCalculatorFactory(), 
+					controler.getScenario().getConfig().scenario().isUseTransit() ? controler.getTransitRouterFactory() : null);
+			log.warn("overriding default Pt-RoutingModule with PseudoPtRoutingModule. Message thrown only once.");
+			firstCall = false;
+		}
 		//initialize triprouter
-		TripRouter tripRouter = new TripRouter();
+		TripRouter tripRouter = this.delegate.instantiateAndConfigureTripRouter();
 
-		// initialize here - controller should be fully initialized by now
-		// use fields to keep the rest of the code clean and comparable
-		Config config = controler.getScenario().getConfig();
-		Network network= controler.getScenario().getNetwork();
-		TravelDisutilityFactory travelDisutilityFactory = controler.getTravelDisutilityFactory();
-		TravelTime travelTime = controler.getLinkTravelTimes();
-		LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory = controler.getLeastCostPathCalculatorFactory();
-		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().
-				getFactory()).getModeRouteFactory();
-		PopulationFactory populationFactory = controler.getPopulation().getFactory();
-		PlansCalcRouteConfigGroup routeConfigGroup = controler.getConfig().plansCalcRoute();
-		
-
-		
-		/*
-		 *  c&p code from TripRouterFactoryImpl. Might be easier to extend TripRouterFactoryImpl, 
-		 *  as only the pt-routing-module is overwritten here compared to TripRouterFactoryImpl. However, not all fields
-		 *  are initialized when the constructor of this class is called. Daniel, May '13
-		 */
-		TravelDisutility travelCost =
-				travelDisutilityFactory.createTravelDisutility(
-						travelTime,
-						config.planCalcScore() );
-		
-		LeastCostPathCalculator routeAlgo =
-				leastCostPathAlgorithmFactory.createPathCalculator(
-						network,
-						travelCost,
-						travelTime);
-		
-		FreespeedTravelTimeAndDisutility ptTimeCostCalc =
-				new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
-		LeastCostPathCalculator routeAlgoPtFreeFlow =
-				leastCostPathAlgorithmFactory.createPathCalculator(
-						network,
-						ptTimeCostCalc,
-						ptTimeCostCalc);
-
-		if ( NetworkUtils.isMultimodal( network ) ) {
-			// note: LinkImpl has a default allowed mode of "car" so that all links
-			// of a monomodal network are actually restricted to car, making the check
-			// of multimodality unecessary from a behavioral point of view.
-			// However, checking the mode restriction for each link is expensive,
-			// so it is not worth doing it if it is not necessary. (td, oct. 2012)
-			if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-				((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(
-					Collections.singleton( TransportMode.car ));
-				((IntermodalLeastCostPathCalculator) routeAlgoPtFreeFlow).setModeRestriction(
-					Collections.singleton( TransportMode.car ));
-				log.warn("You use a multi-modal simulation with matsim4urbansim. Make sure this is what you want. Functionallity has not been tested yet.");
-			}
-			else {
-				// this is impossible to reach when using the algorithms of org.matsim.*
-				// (all implement IntermodalLeastCostPathCalculator)
-				log.warn( "network is multimodal but least cost path algorithm is not an instance of IntermodalLeastCostPathCalculator!" );
-			}
-		}
-		
-		// the way teleported modes are initialized is very dangerous. routingmodules for freespeed-factors are overwritten without any
-		// warning when freespeedFactor and speed are set in config. However, this is the way MATSim is initialized per default.
-		// Because of that I decided to use reimplement the default behavior here. Daniel, May '13
-		for (String mainMode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
-			tripRouter.setRoutingModule(
-					mainMode,
-					new LegRouterWrapper(
-						mainMode,
-						populationFactory,
-						new PseudoTransitLegRouter(
-							network,
-							routeAlgoPtFreeFlow,
-							routeConfigGroup.getTeleportedModeFreespeedFactors().get( mainMode ),
-							routeConfigGroup.getBeelineDistanceFactor(),
-							modeRouteFactory)));
-		}
-
-		for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
-			tripRouter.setRoutingModule(
-					mainMode,
-					new LegRouterWrapper(
-						mainMode,
-						populationFactory,
-						new TeleportationLegRouter(
-							modeRouteFactory,
-							routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
-							routeConfigGroup.getBeelineDistanceFactor())));
-		}
-
-		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
-			tripRouter.setRoutingModule(
-					mainMode,
-					new LegRouterWrapper(
-						mainMode,
-						populationFactory,
-						new NetworkLegRouter(
-							network,
-							routeAlgo,
-							modeRouteFactory)));
-		}
-		// end c&p from TripRouterFactoryImpl
-		
-		if ( config.scenario().isUseTransit() ) {
-			throw new IllegalArgumentException("You try to use the physical simulation of transit in combination with the enhanced " +
-					"pseudo-pt-router from matsim4urbansim. This will lead to confusing results. Please make sure to use either the physical" +
-					"transit simulation or the enhanced pseudo pt and restart the simulation.");
-		}
-		
-		
-		// overwrite setting for pt with enhanced pt routing (teleportation)
+		// add improved pseudo-pt-routing
 		tripRouter.setRoutingModule(TransportMode.pt, 
 				new PseudoPtRoutingModule(controler, ptMatrix));
+
+//		//walk routing
+//		tripRouter.setRoutingModule(TransportMode.walk, 
+//				new LegRouterWrapper(
+//						TransportMode.walk,
+//						populationFactory,
+//						new TeleportationLegRouter(
+//							modeRouteFactory,
+//							routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk),
+//							routeConfigGroup.getBeelineDistanceFactor())));
 		
 		return tripRouter;
 	}
