@@ -2,6 +2,7 @@ package playground.anhorni.csestimation;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -44,17 +45,34 @@ public class SurveyAnalyzer {
 	public void analyzePS() {
 		Bins sizePS = new Bins(1, 14, "sizePS");
 		Bins distPS = new Bins(250.0, 6250.0, "distPS");
-		
+				
 		for (EstimationPerson p : this.population.values()) {
-			sizePS.addVal(p.getPersonLocations().getVisitedStoresInQuerySet().size(), 1.0);
-			
-			for (Id storeId : p.getPersonLocations().getVisitedStoresInQuerySet()) {
-				ShopLocation store = this.ucs.get(storeId);
-			
-				if (storeId.equals("200023") || storeId.equals("200025")) continue;
-				double dist2Home = CoordUtils.calcDistance(p.getHomeLocation().getCoord(), store.getCoord());
-				distPS.addVal(dist2Home, 1.0);
+			ArrayList<Double> dist2Home = new ArrayList<Double>();	
+			boolean exclude = false;
+			int frequentlyCnt = 0;			
+			for (Id storeId : p.getPersonLocations().getVisitedStoresInQuerySet()) {				
+				if (p.getPersonLocations().getNullAwareOrnullVisitedStoresInQuerySet().contains(storeId)) {
+					exclude = true;
+					break;
+				}
+				else {	
+					frequentlyCnt++;
+					ShopLocation store = this.ucs.get(storeId);
+					if (storeId.equals("200023") || storeId.equals("200025")) continue;
+					dist2Home.add(CoordUtils.calcDistance(p.getHomeLocation().getCoord(), store.getCoord()));					
+				}
 			}
+			if (!exclude) {
+				for (double v : dist2Home) {
+					distPS.addVal(v, 1.0);
+				}
+				sizePS.addVal(frequentlyCnt, 1.0);
+				
+				if (frequentlyCnt == 0) {
+					log.info("person " + p.getId().toString() + " has no PS");
+				}
+				
+			}	
 		}
 		sizePS.plotBinnedDistribution(this.outdir, "sizePS", "");
 		distPS.plotBinnedDistribution(this.outdir, "distPS", "");
