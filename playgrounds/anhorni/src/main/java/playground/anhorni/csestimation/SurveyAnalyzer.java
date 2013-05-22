@@ -42,8 +42,8 @@ public class SurveyAnalyzer {
 	}
 	
 	public void analyzePS() {
-		Bins sizePS = new Bins(1, 20, "sizePS");
-		Bins distPS = new Bins(0.2, 10, "distPS");
+		Bins sizePS = new Bins(1, 14, "sizePS");
+		Bins distPS = new Bins(250.0, 6250.0, "distPS");
 		
 		for (EstimationPerson p : this.population.values()) {
 			sizePS.addVal(p.getPersonLocations().getVisitedStoresInQuerySet().size(), 1.0);
@@ -53,7 +53,7 @@ public class SurveyAnalyzer {
 			
 				if (storeId.equals("200023") || storeId.equals("200025")) continue;
 				double dist2Home = CoordUtils.calcDistance(p.getHomeLocation().getCoord(), store.getCoord());
-				distPS.addVal(dist2Home / 1000.0, 1.0);
+				distPS.addVal(dist2Home, 1.0);
 			}
 		}
 		sizePS.plotBinnedDistribution(this.outdir, "sizePS", "");
