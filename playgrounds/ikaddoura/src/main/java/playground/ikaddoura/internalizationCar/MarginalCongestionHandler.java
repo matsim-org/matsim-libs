@@ -71,7 +71,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 	private final Map<Id, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfo>();
 	private Map<Id, Boolean> personId2isDeparting = new HashMap<Id, Boolean>();
 	
-	private final boolean withStorageCapacityConstraint = true;
+	private final boolean withStorageCapacityConstraint = false;
 
 	public MarginalCongestionHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
