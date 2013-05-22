@@ -147,7 +147,7 @@ public class ParkingStrategyManager {
 	}
 
 	public void printStrategyStatistics(){
-		IntegerValueHashMap<FullParkingSearchStrategy> numberOfTimesStrategySelected=new IntegerValueHashMap<FullParkingSearchStrategy>();
+		IntegerValueHashMap<String> numberOfTimesStrategySelected=new IntegerValueHashMap<String>();
 		log.info(" --- start strategy stats ---");
 		
 		for (Id personId:strategyEvaluations.keySet()){
@@ -155,10 +155,10 @@ public class ParkingStrategyManager {
 				for (Id linkId:strategyEvaluations.get(personId).get(legIndex).keySet()){
 					EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex).get(linkId);
 					
-					log.info("legIndex: " + legIndex);
-					evaluationContainer.printAllScores();
+					//log.info("legIndex: " + legIndex);
+					//evaluationContainer.printAllScores();
 					
-					numberOfTimesStrategySelected.increment(evaluationContainer.getCurrentSelectedStrategy().strategy);
+					numberOfTimesStrategySelected.increment(evaluationContainer.getCurrentSelectedStrategy().strategy.getStrategyName());
 				}
 			}
 		}

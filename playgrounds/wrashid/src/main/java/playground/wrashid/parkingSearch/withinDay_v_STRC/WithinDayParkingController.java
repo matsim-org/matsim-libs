@@ -163,7 +163,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		LinkedList<FullParkingSearchStrategy> strategies=new LinkedList<FullParkingSearchStrategy>();
 		strategies.add(new GarageParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
 		strategies.add(new StreetParkingStrategy((ParkingInfrastructure_v2) parkingInfrastructure, this.scenarioData));
-		strategies.add(new OptimalParkingStrategy(parkingRouterFactory.createParkingRouter(), this.scenarioData, parkingAgentsTracker,  parkingInfrastructure));
+		//strategies.add(new OptimalParkingStrategy(parkingRouterFactory.createParkingRouter(), this.scenarioData, parkingAgentsTracker,  parkingInfrastructure));
 		//strategies.add(new FakeStrategy());
 		return strategies;
 	}
@@ -229,8 +229,10 @@ public class WithinDayParkingController extends WithinDayController implements R
 			if (parkingOption != null) {
 				if (random.nextBoolean()){
 					parkingTypes.put(facility.getId(), "streetParking");
+					parkingOption.setCapacity(3.0);
 				} else {
 					parkingTypes.put(facility.getId(), "garageParking");
+					parkingOption.setCapacity(20.0);
 				}
 			}
 		}

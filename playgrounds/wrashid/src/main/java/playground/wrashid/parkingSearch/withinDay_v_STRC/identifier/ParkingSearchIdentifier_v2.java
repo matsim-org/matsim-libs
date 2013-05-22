@@ -105,27 +105,7 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 					
 					ParkAgentPaperStrategy parkAgentPaperStrategy = (ParkAgentPaperStrategy) parkingStrategyForCurrentLeg;
 					
-					Link currentLink = parkingAgentsTracker.getScenario().getNetwork().getLinks().get(agent.getCurrentLinkId());
-					Link destinationLink = parkingAgentsTracker.getScenario().getNetwork().getLinks().get(agent.getCurrentLeg().getRoute().getEndLinkId());
-					
-					
-					if (GeneralLib.getDistance(currentLink.getCoord(), destinationLink.getCoord()) <1000){
-						
-					}
-					
-					//parkAgentPaperStrategy.startDawarenessMode();
-					//parkAgentPaperStrategy.registerNumberOfFreeParkingOnLink();
-					
-					
-					//Id facilityId = parkAgentPaperStrategy.reserveBestParking(agent, parkingAgentsTracker, time);
-					
-					
-					
-					//if (facilityId != null) {
-					//	parkingAgentsTracker.setSelectedParking(agentId, facilityId);
-					//	identifiedAgents.add(agent);
-					//	continue;
-					//}
+					parkAgentPaperStrategy.handleAgent(agent,time);
 				}
 				
 				

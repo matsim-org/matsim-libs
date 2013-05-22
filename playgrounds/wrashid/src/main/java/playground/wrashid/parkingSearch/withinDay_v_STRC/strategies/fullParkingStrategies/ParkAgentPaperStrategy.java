@@ -19,80 +19,87 @@
 package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.christoph.parking.core.mobsim.ParkingInfrastructure.ParkingFacility;
 import playground.christoph.parking.withinday.replanner.strategy.RandomParkingSearch;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 
 public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 
 	private RandomParkingSearch randomParkingSearch;
 	private ParkingInfrastructure_v2 parkingInfrastructure;
 	private ScenarioImpl scenarioData;
+	private double distance_awareNess;
+	private double distance_parking;
+	private double sizeOfParkingSpace = 6.5; // in [m]
+	private double minParkingExpectancyForContinueDriving = 3;
 
-	public ParkAgentPaperStrategy(ParkingInfrastructure_v2 parkingInfrastructure, ScenarioImpl scenarioData) {
+	private HashMap<Id, ParkAgent> parkAgents;
+	private ParkingAgentsTracker_v2 parkingAgentsTracker;
+
+	public ParkAgentPaperStrategy(ParkingInfrastructure_v2 parkingInfrastructure, ScenarioImpl scenarioData,
+			double distance_awareNess, double distance_parking, ParkingAgentsTracker_v2 parkingAgentsTracker) {
 		this.parkingInfrastructure = parkingInfrastructure;
 		this.scenarioData = scenarioData;
-		randomParkingSearch = new RandomParkingSearch(scenarioData.getNetwork());
+		this.distance_awareNess = distance_awareNess;
+		this.distance_parking = distance_parking;
+		this.parkingAgentsTracker = parkingAgentsTracker;
+		this.randomParkingSearch = new RandomParkingSearch(scenarioData.getNetwork());
+		this.parkAgents = new HashMap<Id, ParkAgentPaperStrategy.ParkAgent>();
 	}
-	
+
 	@Override
 	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time) {
-		if (isStillInRangeForParking(agent)){
-			randomParkingSearch.applySearchStrategy(agent, time);
-		} else {
-			// try get closer to destination			
-			
-			Id currentLinkId = agent.getCurrentLinkId();
-			
-			Leg leg = agent.getCurrentLeg();
+		Id currentLinkId = agent.getCurrentLinkId();
+		int currentPlanElementIndex = agent.getCurrentPlanElementIndex();
 
-			Link currentLink = scenarioData.getNetwork().getLinks().get(currentLinkId);
+		Leg leg = agent.getCurrentLeg();
+
+		Link currentLink = scenarioData.getNetwork().getLinks().get(currentLinkId);
+
+	//	if (isStillInRangeForParking(agent, currentLink)) {
+	//		randomParkingSearch.applySearchStrategy(agent, time);
+	//	} else {
+			// try get closer to destination
 
 			int routeIndex = agent.getCurrentRouteLinkIdIndex();
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 
-			
 			Id startLink = route.getStartLinkId();
-			List<Id> links = new ArrayList<Id>(route.getLinkIds()); // create a copy that can be modified
+			List<Id> links = new ArrayList<Id>(route.getLinkIds()); // create a
+																	// copy that
+																	// can be
+																	// modified
 			Id endLink = route.getEndLinkId();
-			
+
 			links.add(endLink);
-			endLink = getLinkWhichIsClosestToDestination(currentLink).getId();
-			
+
+			ActivityImpl nextActivity = (ActivityImpl) agent.getSelectedPlan().getPlanElements().get(currentPlanElementIndex + 3);
+
+		//	endLink = getLinkWhichIsClosestToDestination(currentLink, nextActivity.getCoord()).getId();
+
 			// update agent's route
 			route.setLinkIds(startLink, links, endLink);
-		}
-	}
-
-	private Link getLinkWhichIsClosestToDestination(Link currentLink) {
-		Map<Id, ? extends Link> outLinks = currentLink.getToNode().getOutLinks();
-
-		Link bestLink=null;
-		double distance=0;
-		
-		for (Link link:outLinks.values()){
-				
-		}
-		
-		return null;
-	}
-
-	private boolean isStillInRangeForParking(PlanBasedWithinDayAgent agent) {
-		// TODO Auto-generated method stub
-		return false;
+	//	}
 	}
 
 	@Override
@@ -104,10 +111,238 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 	@Override
 	public String getStrategyName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "ParkAgentPaperStrategy";
 	}
 
-	
+	public class ParkAgent {
+
+		boolean parkingFound = false;
+		private PlanBasedWithinDayAgent agent;
+		int stage = 1;
+		Id lastLinkHandled = null;
+		int numberOfFreeParking = 0;
+		int numberOfTotalParking = 0;
+		private double time;
+		private double stage3StartTime = 0;
+
+		public ParkAgent(PlanBasedWithinDayAgent agent) {
+			this.agent = agent;
+		}
+
+		public boolean isStillInRangeForParking() {
+			return false;
+		}
+
+		public void updateStage1And2() {
+
+		}
+
+		public int getStage() {
+			return stage;
+		}
+
+		public void updateOccupancyInformation() {
+			if (lastLinkHandled != agent.getCurrentLinkId()) {
+				lastLinkHandled = agent.getCurrentLinkId();
+				List<Id> freeParkingFacilitiesOnLink = parkingInfrastructure.getFreeParkingFacilitiesOnLink(
+						agent.getCurrentLinkId(), "streetParking");
+
+				for (Id facilityId : freeParkingFacilitiesOnLink) {
+					ParkingFacility parkingFacility = ((ParkingInfrastructure_v2) parkingInfrastructure)
+							.getParkingFacility(facilityId);
+
+				//	numberOfFreeParking += parkingFacility.getFreeCapacity();
+				//	numberOfTotalParking += parkingFacility.getCapacity();
+				}
+
+			}
+		}
+
+		public void handleStage1() {
+			if (lastLinkHandled != agent.getCurrentLinkId()) {
+				lastLinkHandled = agent.getCurrentLinkId();
+				if (stage == 1 && distance_parking > getDistanceToDestination()) {
+					stage = 2;
+				}
+			}
+		}
+
+		public double getDistanceToDestination() {
+			Link currentLink = scenarioData.getNetwork().getLinks().get(agent.getCurrentLinkId());
+			ActivityImpl destination = (ActivityImpl) agent.getSelectedPlan().getPlanElements().get(agent.getCurrentPlanElementIndex() + 3);
+			return GeneralLib.getDistance(currentLink.getCoord(), destination.getCoord());
+		}
+
+		private Link getNextLinkClosestToDestination() {
+			Link currentLink = scenarioData.getNetwork().getLinks().get(agent.getCurrentLinkId());
+			Coord destinationCoord = ((ActivityImpl) agent.getSelectedPlan().getPlanElements().get(agent.getCurrentPlanElementIndex() + 3)).getCoord();
+			
+			Map<Id, ? extends Link> outLinks = currentLink.getToNode().getOutLinks();
+
+			Link bestLink = null;
+			double shortestDistance = Double.POSITIVE_INFINITY;
+
+			for (Link link : outLinks.values()) {
+				double distanceToDestination = GeneralLib.getDistance(destinationCoord, link.getToNode().getCoord());
+				if (distanceToDestination < shortestDistance) {
+					shortestDistance = distanceToDestination;
+					bestLink = link;
+				}
+			}
+
+			return bestLink;
+		}
+
+		public void handleStage2() {
+			if (lastLinkHandled != agent.getCurrentLinkId()) {
+				lastLinkHandled = agent.getCurrentLinkId();
+
+				if (isCarAtEndOfCurrentRoute()) {
+					List<Id> freeParkingFacilitiesOnLink = parkingInfrastructure.getFreeParkingFacilitiesOnLink(
+							agent.getCurrentLinkId(), "streetParking");
+					if (freeParkingFacilitiesOnLink.size() > 0) {
+						parkingAgentsTracker.setSelectedParking(agent.getId(), freeParkingFacilitiesOnLink.get(0), false);
+					} else {
+						randomParkingSearch.applySearchStrategy(agent, 0);
+						stage = 3;
+						stage3StartTime = time;
+					}
+				} else {
+					if (shouldContinueDriving_Stage2()) {
+						// TODO: handle driving => especially, if end of
+					} else {
+
+					}
+				}
+			}
+		}
+
+		public void updateTime(double time) {
+			this.time = time;
+		}
+
+		private boolean isCarAtEndOfCurrentRoute() {
+			Leg leg = agent.getCurrentLeg();
+
+			int routeIndex = agent.getCurrentRouteLinkIdIndex();
+
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
+
+			List<Id> links = new ArrayList<Id>(route.getLinkIds()); // create a
+																	// copy that
+																	// can be
+																	// modified
+
+			// end link
+			if (routeIndex == links.size() + 1) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		private boolean shouldContinueDriving_Stage2() {
+			double p_unoccupied = numberOfFreeParking / numberOfTotalParking;
+			double f_exp = p_unoccupied * getDistanceToDestination() / sizeOfParkingSpace;
+			if (f_exp > 1 + MatsimRandom.getRandom().nextDouble() * (minParkingExpectancyForContinueDriving - 1)) {
+				return true;
+			} else
+				return false;
+		}
+
+		public void handleStage3() {
+			if (lastLinkHandled != agent.getCurrentLinkId()) {
+				lastLinkHandled = agent.getCurrentLinkId();
+			double maxDistanceToDestination=distance_parking + 30*(time-stage3StartTime)/60.0;
+			
+			// if parking available accept immediatly
+			//if (){
+				
+			//}
+			
+			if (getDistanceToDestination()>maxDistanceToDestination){
+				Id currentLinkId = agent.getCurrentLinkId();
+				
+				Leg leg = agent.getCurrentLeg();
+
+				//Link currentLink = this.network.getLinks().get(currentLinkId);
+
+				int routeIndex = agent.getCurrentRouteLinkIdIndex();
+
+				NetworkRoute route = (NetworkRoute) leg.getRoute();
+
+				
+				Id startLink = route.getStartLinkId();
+				List<Id> links = new ArrayList<Id>(route.getLinkIds()); // create a copy that can be modified
+				Id endLink = route.getEndLinkId();
+				
+				// check whether the car is at the routes start link
+				if (routeIndex == 0) {
+					
+					// if the route ends at the same link
+					if (startLink.equals(endLink)) {
+						//Link l = randomNextLink(currentLink);
+						//links.add(l.getId());
+						
+						//log.warn("Car trip ends as the same link as it started - this should not happen since " + 
+						//		"such trips should be replaced by walk trips!");
+					} else {
+						// nothing to do here since more links available in the route
+					}
+				}
+				// end link
+				else if (routeIndex == links.size() + 1) {
+					links.add(endLink);
+					//endLink = randomNextLink(currentLink).getId();
+				}
+				// link in between
+				else {
+					// nothing to do here since more links available in the route
+				}
+				
+				// update agent's route
+				route.setLinkIds(startLink, links, endLink);
+				
+				
+				
+				
+				
+				
+				
+				
+				//getNextLinkClosestToDestination
+			}
+			
+			}
+		}
+	}
+
+	private ParkAgent getParkAgent(PlanBasedWithinDayAgent agent) {
+		// TODO: perhaps also check, if correct leg.
+		if (!parkAgents.containsKey(agent.getId())) {
+			parkAgents.put(agent.getId(), new ParkAgent(agent));
+		}
+
+		ParkAgent parkAgent = parkAgents.get(agent.getId());
+		return parkAgent;
+	}
+
+	public void handleAgent(PlanBasedWithinDayAgent agent, double time) {
+		ParkAgent parkAgent = getParkAgent(agent);
+		parkAgent.updateTime(time);
+
+		if (parkAgent.getStage() == 1) {
+			parkAgent.updateOccupancyInformation();
+			parkAgent.handleStage1();
+		} else if (parkAgent.getStage() == 2) {
+			parkAgent.updateOccupancyInformation();
+			parkAgent.handleStage2();
+		} else if (parkAgent.getStage() == 3) {
+			parkAgent.handleStage3();
+		} else if (parkAgent.getStage() == 4) {
+
+		}
+
+	}
 
 }
-

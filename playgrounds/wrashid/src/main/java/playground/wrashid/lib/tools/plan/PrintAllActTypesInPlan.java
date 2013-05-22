@@ -18,7 +18,7 @@ public class PrintAllActTypesInPlan {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String base="H:/data/experiments/TRBAug2011/runs/ktiRun22/output/";
+		String base="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/";
 		String inputPlansFile= base +"output_plans.xml.gz";
 		String inputNetworkFile=base+"output_network.xml.gz";
 		String inputFacilities=base+"output_facilities.xml.gz";
