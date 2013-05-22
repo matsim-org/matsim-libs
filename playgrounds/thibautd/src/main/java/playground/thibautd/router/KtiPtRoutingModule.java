@@ -22,6 +22,7 @@ package playground.thibautd.router;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -41,6 +42,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.pt.PtConstants;
+
+import playground.balmermi.world.Layer;
+import playground.balmermi.world.World;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
@@ -95,7 +99,13 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		// pt
 		// ---------------------------------------------------------------------
-		final Entry ptTravelTimeEntry = info.ptTravelTimes.getEntry( stop1.getId() , stop2.getId() );
+		final Layer municipalities = info.world.getLayer("municipality");
+		final List<? extends BasicLocation> froms = municipalities.getNearestLocations( stop1.getCoord() );
+		final List<? extends BasicLocation> tos = municipalities.getNearestLocations( stop2.getCoord() );
+		final BasicLocation fromMunicipality = froms.get(0);
+		final BasicLocation toMunicipality = tos.get(0);
+
+		final Entry ptTravelTimeEntry = info.ptTravelTimes.getEntry( fromMunicipality.getId() , toMunicipality.getId() );
 
 		final Leg ptLeg = new LegImpl( TransportMode.pt );
 		final Route ptRoute = new GenericRouteImpl( endWalk1.getId() , startWalk2.getId() );
@@ -135,6 +145,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 	public static class KtiPtRoutingModuleInfo {
 		private final Matrix ptTravelTimes;
 		private final SwissHaltestellen ptStops;
+		private final World world;
 
 		public KtiPtRoutingModuleInfo(
 				// I hate constuctors which read into files,
@@ -153,6 +164,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 			this.ptTravelTimes = ptInfo.getPtTravelTimes();
 			this.ptStops = ptInfo.getHaltestellen();
+			this.world = ptInfo.getLocalWorld();
 		}
 	}
 }
