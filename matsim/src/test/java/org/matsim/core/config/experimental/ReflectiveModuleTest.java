@@ -159,6 +159,48 @@ public class ReflectiveModuleTest {
 		}
 	}
 
+	@Test
+	public void testFailOnConstructingSeveralGetters() {
+		try {
+			new ReflectiveModule( "name" ) {
+				@StringSetter( "field" )
+				public Object setStuff(String s) { return null;}
+
+				@StringGetter( "field" )
+				public void getStuff() { }
+
+				@StringGetter( "field" )
+				public void getStuff2() { }
+			};
+			// should not get here because of exception
+			Assert.fail( "no exception when 2 getters for one field" );
+		}
+		catch (InconsistentModuleException e) {
+			// gulp! swallow exception
+		}
+	}
+
+	@Test
+	public void testFailOnConstructingSeveralSetters() {
+		try {
+			new ReflectiveModule( "name" ) {
+				@StringSetter( "field" )
+				public Object setStuff(String s) { return null;}
+
+				@StringSetter( "field" )
+				public void setStuff(Object s) {}
+
+				@StringGetter( "field" )
+				public void getStuff() { }
+			};
+			// should not get here because of exception
+			Assert.fail( "no exception when 2 getters for one field" );
+		}
+		catch (InconsistentModuleException e) {
+			// gulp! swallow exception
+		}
+	}
+
 	private static void assertSame(
 			final TestModule dumpedModule,
 			final TestModule readModule) {
