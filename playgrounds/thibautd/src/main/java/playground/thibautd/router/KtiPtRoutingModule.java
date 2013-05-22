@@ -87,6 +87,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final Link linkStartPt = network.getNearestLink( stop1.getCoord() );
 		final Link linkEndPt = network.getNearestLink( stop2.getCoord() );
+
 		// access
 		// ---------------------------------------------------------------------
 		final double distanceLeg1 =
@@ -98,6 +99,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		final Leg walk1 = new LegImpl( TransportMode.walk );
 		final Route route1 = new GenericRouteImpl( fromFacility.getLinkId() , linkStartPt.getId() );
 		route1.setTravelTime( travelTimeLeg1 );
+		route1.setDistance( distanceLeg1 );
 		walk1.setRoute( route1 );
 		trip.add( walk1 );
 
