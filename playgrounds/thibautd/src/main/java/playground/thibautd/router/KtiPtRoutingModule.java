@@ -111,12 +111,15 @@ public class KtiPtRoutingModule implements RoutingModule {
 		// pt
 		// ---------------------------------------------------------------------
 		final Layer municipalities = info.world.getLayer("municipality");
-		final List<? extends BasicLocation> froms = municipalities.getNearestLocations( stop1.getCoord() );
-		final List<? extends BasicLocation> tos = municipalities.getNearestLocations( stop2.getCoord() );
+		final List<BasicLocation> froms = municipalities.getNearestLocations( stop1.getCoord() );
+		final List<BasicLocation> tos = municipalities.getNearestLocations( stop2.getCoord() );
 		final BasicLocation fromMunicipality = froms.get(0);
 		final BasicLocation toMunicipality = tos.get(0);
 
-		final Entry ptTravelTimeEntry = info.ptTravelTimes.getEntry( fromMunicipality.getId() , toMunicipality.getId() );
+		final Entry ptTravelTimeEntry =
+			info.ptTravelTimes.getEntry(
+					fromMunicipality.getId(),
+					toMunicipality.getId() );
 
 		final Leg ptLeg = new LegImpl( TransportMode.pt );
 		final Route ptRoute = new GenericRouteImpl( linkStartPt.getId() , linkEndPt.getId() );
@@ -129,8 +132,10 @@ public class KtiPtRoutingModule implements RoutingModule {
 		final double ptTravelTime =
 			Double.isNaN( ptTravelTimeEntry.getValue() ) ?
 			ptDistance / info.intrazonalSpeed :
-			// A value of NaN in the travel time matrix indicates that the matrix contains no valid value for this entry.
-			// In this case, the travel time is calculated with the distance of the relation and an average speed.
+			// A value of NaN in the travel time matrix indicates that the matrix
+			// contains no valid value for this entry.
+			// In this case, the travel time is calculated with the distance of
+			// the relation and an average speed.
 			ptTravelTimeEntry.getValue() * 60;
 
 		ptRoute.setTravelTime( ptTravelTime );
