@@ -55,8 +55,6 @@ public class SurveyCleaner {
 	}
 	
 	public void cleanIncome(TreeMap<Id, EstimationPerson> population) {
-		population.get(new IdImpl(1962)).setHhIncome(
-				(int)(population.get(new IdImpl(1962)).getHhIncome() / 12.0));
 		population.get(new IdImpl(1298)).setHhIncome(
 				(int)(population.get(new IdImpl(1298)).getHhIncome() / 12.0));
 		population.get(new IdImpl(1512)).setHhIncome(
