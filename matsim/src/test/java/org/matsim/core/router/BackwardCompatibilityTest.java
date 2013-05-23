@@ -103,7 +103,7 @@ public class BackwardCompatibilityTest {
 		controler.run();
 
 		Controler oldControler = new Controler( config );
-		oldControler.setUseTripRouting( false );
+//		oldControler.setUseTripRouting( false );
 		oldControler.setOverwriteFiles( true );
 		oldControler.setDumpDataAtEnd(false);
 		oldControler.setCreateGraphs(false);
@@ -118,6 +118,7 @@ public class BackwardCompatibilityTest {
 	// "handleLeg" methods check-
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
+	@Ignore // precursor of trip routing is no longer around. kai, may'13
 	public void testTravelTime() {
 		for (Person person : controler.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -201,6 +202,7 @@ public class BackwardCompatibilityTest {
 	// plan routing methods check-
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
+	@Ignore // precursor of trip routing is no longer around. kai, may'13
 	public void testPlanRouting() {
 		for (Person person : controler.getPopulation().getPersons().values()) {
 			for (Plan withNew : person.getPlans()) {

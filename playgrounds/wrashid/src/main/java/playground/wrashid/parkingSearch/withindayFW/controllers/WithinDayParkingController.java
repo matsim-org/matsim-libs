@@ -154,7 +154,8 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 	
 	
 	protected void setUp(){
-		setUseTripRouting(false);
+//		setUseTripRouting(false);		
+		
 		super.setUp();
 		
 		startUpBegin();
@@ -195,6 +196,12 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		// this.initIdentifiers();
 		// this.initReplanners();
 		startUpFinishing();
+		
+		throw new RuntimeException("setting useTripRouting to false (see at beginning of method) " +
+				"no longer possible since this only affects initialization and my thus be " +
+		"inconsistent.  kai, may'13.  aborting ... ") ;
+
+
 	}
 
 	private void setDesiresIfApplicable() {

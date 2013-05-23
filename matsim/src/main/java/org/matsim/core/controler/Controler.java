@@ -230,7 +230,7 @@ public class Controler extends AbstractController {
 	private boolean overwriteFiles = false;
 	private Map<String, TravelTime> multiModalTravelTimes;
 
-	private boolean useTripRouting = true;
+	private final boolean useTripRouting = true;
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -863,14 +863,17 @@ public class Controler extends AbstractController {
 	public final PlanAlgorithm createRoutingAlgorithm() {
 		// yyyy can't make this final: overridden at about 20 locations.  kai, jan'13
 		
-		return useTripRouting ?
+		return 
+//		useTripRouting ?
 			new PlanRouter(
 				getTripRouterFactory().instantiateAndConfigureTripRouter(),
-				((ScenarioImpl)getScenario()).getActivityFacilities()) :
-			createOldRoutingAlgorithm(
-				this.createTravelCostCalculator(),
-				travelTimeCalculator.getLinkTravelTimes(),
-				travelTimeCalculator.getLinkToLinkTravelTimes());
+				((ScenarioImpl)getScenario()).getActivityFacilities()) 
+//		:
+//			createOldRoutingAlgorithm(
+//				this.createTravelCostCalculator(),
+//				travelTimeCalculator.getLinkTravelTimes(),
+//				travelTimeCalculator.getLinkToLinkTravelTimes())
+			;
 	}
 
 	private PlanAlgorithm createOldRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes, LinkToLinkTravelTime linkToLinkTravelTime) {
@@ -985,9 +988,9 @@ public class Controler extends AbstractController {
 		tripRouterFactory = factory;
 	}
 
-	public final void setUseTripRouting(final boolean useTripRouting) {
-		this.useTripRouting = useTripRouting;
-	}
+//	public final void setUseTripRouting(final boolean useTripRouting) {
+//		this.useTripRouting = useTripRouting;
+//	}
 
 	public final boolean getUseTripRouting() {
 		return useTripRouting;

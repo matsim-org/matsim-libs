@@ -103,9 +103,11 @@ public class RsaRunnerOld {
 		controler.setMobsimFactory(new TransitSubModeQSimFactory(fixedSubMode));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.setUseTripRouting(false);
+//		controler.setUseTripRouting(false);
+		throw new RuntimeException("setting useTripRouting to false no longer possible since this only affects initialization and my thus be " +
+				"inconsistent.  kai, may'13.  aborting ... ") ;
 
-		controler.run();
+//		controler.run();
 		
 
 	}

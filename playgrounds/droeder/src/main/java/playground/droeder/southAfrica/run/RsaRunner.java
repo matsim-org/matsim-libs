@@ -128,7 +128,8 @@ public class RsaRunner {
 		controler.setMobsimFactory(new TransitSubModeQSimFactory(fixedSubMode));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.setUseTripRouting(true);
+//		controler.setUseTripRouting(true);
+		// now always true.  kai, may'13
 
 		controler.run();
 	}
