@@ -67,6 +67,7 @@ public class MSGMask extends JPanel
 		// this.defaultOut = System.out;
 		// this.outputRedirect = new Interceptor(this, System.out);
 		//
+		
 		this.controller = controller;
 		this.locale = this.controller.getLocale();
 		this.setLayout(new BorderLayout());
@@ -164,6 +165,7 @@ public class MSGMask extends JPanel
 								
 //								Controler matsimController = new Controler(MSGMask.this.controller.getMatsimConfigFile());
 								Controler matsimController = new Controler(config);
+								matsimController.setOverwriteFiles(true);
 								matsimController.run();
 	
 								MSGMask.this.controller.setGoalAchieved(true);
