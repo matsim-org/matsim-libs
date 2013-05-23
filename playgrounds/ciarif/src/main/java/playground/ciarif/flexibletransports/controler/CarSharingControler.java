@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -44,7 +45,7 @@ import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
 import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
-public class CarSharingControler extends Controler
+public final class CarSharingControler extends Controler
 {
   protected static final String SVN_INFO_FILE_NAME = "svninfo.txt";
   protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
@@ -67,6 +68,7 @@ public class CarSharingControler extends Controler
     ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
     //this.getNetwork().getFactory().setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
     ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
+	throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
   }
 
   @Override
@@ -114,14 +116,14 @@ public class CarSharingControler extends Controler
     this.addControlerListener(new CarSharingListener(this.ftConfigGroup));
   }
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return this.ftConfigGroup.isUsePlansCalcRouteFt() ?
-				createFtRoutingAlgorithm(
-						this.createTravelCostCalculator(),
-						this.getLinkTravelTimes()) :
-				super.createRoutingAlgorithm();
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return this.ftConfigGroup.isUsePlansCalcRouteFt() ?
+//				createFtRoutingAlgorithm(
+//						this.createTravelCostCalculator(),
+//						this.getLinkTravelTimes()) :
+//				super.createRoutingAlgorithm();
+//	}
 
   private PlanAlgorithm createFtRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes)
   {

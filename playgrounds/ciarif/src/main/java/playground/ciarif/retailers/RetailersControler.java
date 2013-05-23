@@ -20,6 +20,7 @@
 package playground.ciarif.retailers;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 import playground.meisterk.kti.controler.KTIControler;
 
@@ -28,6 +29,7 @@ public class RetailersControler extends KTIControler {
 
 	public RetailersControler(String[] args) {
 		super(args);
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	@Override

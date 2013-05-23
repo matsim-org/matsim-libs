@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -68,6 +69,7 @@ public class KTIControler extends Controler {
 		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), new PlanomatConfigGroup()));
 		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	@Override
@@ -111,14 +113,14 @@ public class KTIControler extends Controler {
 		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
 	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
-				createKtiRoutingAlgorithm(
-						this.createTravelCostCalculator(),
-						this.getLinkTravelTimes()) :
-				super.createRoutingAlgorithm();
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
+//				createKtiRoutingAlgorithm(
+//						this.createTravelCostCalculator(),
+//						this.getLinkTravelTimes()) :
+//				super.createRoutingAlgorithm();
+//	}
 
 	public PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		return new PlansCalcRouteKti(

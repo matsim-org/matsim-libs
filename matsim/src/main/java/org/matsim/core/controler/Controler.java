@@ -860,7 +860,7 @@ public class Controler extends AbstractController {
 	 *  is neither a good reason (any more) to override this method nor to call it.  kai, apr'13
 	 */
 	@Deprecated
-	public PlanAlgorithm createRoutingAlgorithm() {
+	public final PlanAlgorithm createRoutingAlgorithm() {
 		// yyyy can't make this final: overridden at about 20 locations.  kai, jan'13
 		
 		return useTripRouting ?

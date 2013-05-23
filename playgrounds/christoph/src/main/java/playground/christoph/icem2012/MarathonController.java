@@ -50,6 +50,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -133,7 +134,7 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class MarathonController extends WithinDayController implements StartupListener, 
+public final class MarathonController extends WithinDayController implements StartupListener, 
 	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 
 	private final static Logger log = Logger.getLogger(MarathonController.class);
@@ -241,6 +242,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		
 		this.addCoreControlerListener(this);
 		this.getFixedOrderSimulationListener().addSimulationListener(this);
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 	
 	@Override
@@ -338,12 +340,12 @@ public class MarathonController extends WithinDayController implements StartupLi
 		}
 	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return createRoutingAlgorithm(
-				this.createTravelCostCalculator(),
-				this.getLinkTravelTimes());
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return createRoutingAlgorithm(
+//				this.createTravelCostCalculator(),
+//				this.getLinkTravelTimes());
+//	}
 
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
 		

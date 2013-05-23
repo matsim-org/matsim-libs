@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -39,7 +40,7 @@ import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
  * @author droeder
  *
  */
-public class PtSubModeControlerOld extends Controler {
+public final class PtSubModeControlerOld extends Controler {
 	private static final Logger log = Logger
 			.getLogger(PtSubModeControlerOld.class);
 	
@@ -65,6 +66,7 @@ public class PtSubModeControlerOld extends Controler {
 
 		throw new RuntimeException("overriding of the run() method is no longer possible.  if this is needed, " +
 		"please talk to me for alternatives.  There is also no test for this execution path, otherwise I might have tried fixing it myself. Thanks, kai, feb'13") ;
+//		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 	
 	/**
@@ -104,10 +106,10 @@ public class PtSubModeControlerOld extends Controler {
 //		super.run();
 //	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm(){
-		return this.createRoutingAlgorithm(super.createTravelCostCalculator(), super.getLinkTravelTimes());
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm(){
+//		return this.createRoutingAlgorithm(super.createTravelCostCalculator(), super.getLinkTravelTimes());
+//	}
 	
 	private boolean thrown =  false;
 

@@ -27,6 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -48,7 +49,7 @@ import playground.gregor.sim2d_v3.simulation.HybridQ2DMobsimFactory;
 import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
 
 @Deprecated // should not be derived from Controler
-public class Controller2D extends Controler implements StartupListener {
+public final class Controller2D extends Controler implements StartupListener {
 
 	public Controller2D(String[] args) {
 		super(args[0]);
@@ -57,6 +58,7 @@ public class Controller2D extends Controler implements StartupListener {
 //		this.config.getQSimConfigGroup().setEndTime( 9*3600 + 5* 60);
 		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 		this.addMobsimFactory("hybridQ2D", new HybridQ2DMobsimFactory());
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	public Controller2D(Scenario sc) {
@@ -76,6 +78,7 @@ public class Controller2D extends Controler implements StartupListener {
 		}
 		
 		this.addCoreControlerListener(this);
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	@Override
@@ -85,12 +88,12 @@ public class Controller2D extends Controler implements StartupListener {
 		loader.load2DScenario();
 	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return createRoutingAlgorithm(
-				this.createTravelCostCalculator(),
-				this.getLinkTravelTimes());
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return createRoutingAlgorithm(
+//				this.createTravelCostCalculator(),
+//				this.getLinkTravelTimes());
+//	}
 
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
 		

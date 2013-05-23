@@ -31,6 +31,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -84,6 +85,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		String vehiclesFilesPath = args[2];
 		if (!vehiclesFilesPath.endsWith("/")) vehiclesFilesPath = vehiclesFilesPath + "/";
 		for (int i = 0; i < householdVehicleFiles.length; i++) householdVehicleFiles[i] = vehiclesFilesPath + householdVehicleFiles[i];
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 	
 	/*

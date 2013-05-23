@@ -22,6 +22,7 @@ package playground.mmoyo.zz_archive.TransitSimulation;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -34,7 +35,7 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-public class MMoyoTransitControler extends Controler {
+public final class MMoyoTransitControler extends Controler {
 	boolean launchOTFDemo=false;
 	private Config config;
 	
@@ -43,6 +44,7 @@ public class MMoyoTransitControler extends Controler {
 		this.config = scenario.getConfig();
 		this.setOverwriteFiles(true);   
 		this.launchOTFDemo = launchOTFDemo;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 	
 	@Override
@@ -61,12 +63,12 @@ public class MMoyoTransitControler extends Controler {
 		*/
 	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return createRoutingAlgorithm(
-				this.createTravelCostCalculator(),
-				this.getLinkTravelTimes());
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return createRoutingAlgorithm(
+//				this.createTravelCostCalculator(),
+//				this.getLinkTravelTimes());
+//	}
 
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		return new MMoyoPlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,

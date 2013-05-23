@@ -1,6 +1,7 @@
 package playground.ciarif.carpooling;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 import playground.meisterk.kti.controler.KTIControler;
 
@@ -9,6 +10,7 @@ public class CarPoolingControler extends KTIControler {
 	
 	public CarPoolingControler (String[] args){
 		super(args);
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 	@Override
 	protected void loadControlerListeners() {

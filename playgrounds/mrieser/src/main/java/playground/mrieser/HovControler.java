@@ -25,6 +25,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -39,7 +40,7 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 /**
  * @author mrieser / senozon
  */
-public class HovControler extends Controler {
+public final class HovControler extends Controler {
 
 	private final static Logger log = Logger.getLogger(HovControler.class);
 
@@ -51,6 +52,7 @@ public class HovControler extends Controler {
 
 		this.hovModes = new HashSet<String>(5);
 		this.hovModes.add("hov");
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	public HovControler(final Config config) {
@@ -58,14 +60,15 @@ public class HovControler extends Controler {
 
 		this.hovModes = new HashSet<String>(5);
 		this.hovModes.add("hov");
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return createRoutingAlgorithm(
-				this.createTravelCostCalculator(),
-				this.getLinkTravelTimes());
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return createRoutingAlgorithm(
+//				this.createTravelCostCalculator(),
+//				this.getLinkTravelTimes());
+//	}
 
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();

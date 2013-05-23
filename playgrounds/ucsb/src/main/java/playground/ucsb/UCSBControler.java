@@ -25,6 +25,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -40,7 +41,7 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 import playground.ucsb.analysis.VolumeCounterControlerListener;
 import playground.ucsb.network.algorithms.SCAGShp2Links;
 
-public class UCSBControler extends Controler {
+public final class UCSBControler extends Controler {
 
 	private final static Logger log = Logger.getLogger(UCSBControler.class);
 
@@ -52,6 +53,7 @@ public class UCSBControler extends Controler {
 
 		this.hovModes = new HashSet<String>(5);
 		this.hovModes.add(SCAGShp2Links.HOV);
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	public UCSBControler(final Config config) {
@@ -59,14 +61,15 @@ public class UCSBControler extends Controler {
 
 		this.hovModes = new HashSet<String>(5);
 		this.hovModes.add(SCAGShp2Links.HOV);
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return createRoutingAlgorithm(
-				this.createTravelCostCalculator(),
-				this.getLinkTravelTimes());
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return createRoutingAlgorithm(
+//				this.createTravelCostCalculator(),
+//				this.getLinkTravelTimes());
+//	}
 
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, final TravelTime travelTimes) {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();

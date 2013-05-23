@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.Module;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.TravelDisutility;
@@ -70,6 +71,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		 */
 		this.ktiConfigGroup = new KtiConfigGroup();
 		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(this.ktiConfigGroup);
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 	
 	@Override
@@ -150,14 +152,14 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
 	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
-				createKtiRoutingAlgorithm(
-						this.createTravelCostCalculator(),
-						this.getLinkTravelTimes()) :
-				super.createRoutingAlgorithm();
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
+//				createKtiRoutingAlgorithm(
+//						this.createTravelCostCalculator(),
+//						this.getLinkTravelTimes()) :
+//				super.createRoutingAlgorithm();
+//	}
 
 	private PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		return new PlansCalcRouteKti(

@@ -42,6 +42,8 @@ public abstract class Gbl {
 	public final static String FUTURE_SUPPRESSED = " Future occurences of this warning are suppressed." ;
 	
 	public final static String SEPARATOR = "****************************" ;
+
+	public static final String CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE = "This class wants to overwrite createRoutingAlgorithm(), which is no longer possible.  Making createRoutingAlgorithm() non-final would not help since, after recent code changes, it is only used during initialization but not in replanning.  kai, may'13.  Aborting ...";
 	
 	public static final void printMemoryUsage() {
 		long totalMem = Runtime.getRuntime().totalMemory();

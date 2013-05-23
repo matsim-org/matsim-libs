@@ -36,6 +36,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -61,7 +62,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 /**
  * @author mrieser
  */
-public class TransitControler extends Controler {
+public final class TransitControler extends Controler {
 
 	private final static Logger logger = Logger.getLogger(TransitControler.class);
 
@@ -75,12 +76,14 @@ public class TransitControler extends Controler {
 		super(args);
 		this.transitConfig = new TransitConfigGroup();
 		init();
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	public TransitControler(final ScenarioImpl scenario) {
 		super(scenario);
 		this.transitConfig = new TransitConfigGroup();
 		init();
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	private final void init() {
@@ -144,12 +147,12 @@ public class TransitControler extends Controler {
 		sim.run();
 	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return createRoutingAlgorithm(
-				this.createTravelCostCalculator(),
-				this.getLinkTravelTimes());
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return createRoutingAlgorithm(
+//				this.createTravelCostCalculator(),
+//				this.getLinkTravelTimes());
+//	}
 
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		TransitRouterConfig trConfig = new TransitRouterConfig(this.config.planCalcScore(), this.config.plansCalcRoute(), this.config.transitRouter(),
