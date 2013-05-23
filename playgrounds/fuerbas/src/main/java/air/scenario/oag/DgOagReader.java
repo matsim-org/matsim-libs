@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgFlightDelay
+ * DgOagReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,67 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.analysis;
+package air.scenario.oag;
 
-import air.scenario.oag.DgOagFlight;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgFlightDelay {
+public class DgOagReader {
 
-
-	private DgOagFlight flight;
-	private Double departureDelay = null;
-	private Double arrivalDelay = null;
-	private double actualDepartureTime;
-	private double actualArrivalTime;
-
-	public DgFlightDelay(DgOagFlight flight) {
-		this.flight = flight;
-	}
+	private static final Logger log = Logger.getLogger(DgOagReader.class);
 	
-	public void setDepartureDelay(Double departureDelay){
-		this.departureDelay = departureDelay;
-	}
-	
-	public void setArrivalDelay(Double arrivalDelay){
-		this.arrivalDelay  = arrivalDelay;
-	}
+	public List<DgOagLine> readOagLines(String inputOagFile) throws Exception {
+		List<DgOagLine> ret = new ArrayList<DgOagLine>();
+		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFile)));
+		int lines = 0;
+		while (br.ready()) {
+			String oneLine = br.readLine();
+			lines++;
+			String[] lineEntries = new String[81];
+			lineEntries = oneLine.split(",");
+			if (lines > 1) {
+				for (int jj = 0; jj < 81; jj++) {
+					lineEntries[jj] = lineEntries[jj].replaceAll("\"", "");
+				}
 
-	
-	public DgOagFlight getFlight() {
-		return flight;
-	}
-
-	
-	public Double getDepartureDelay() {
-		return departureDelay;
+				DgOagLine l = new DgOagLine(lineEntries);
+				ret.add(l);
+			}
+			if (lines % 50000 == 0){
+				log.info("Read " + lines +  " lines of oag data...");
+			}
+		}
+		log.info("Anzahl der Zeilen mit Flügen: " + (lines - 1));
+		return ret;
 	}
 
 	
-	public Double getArrivalDelay() {
-		return arrivalDelay;
-	}
-
-	public void setActualDepartureTime(double timeSec) {
-		this.actualDepartureTime = timeSec;
-	}
-
-	public void setActualArrivalTime(double timeSec) {
-		this.actualArrivalTime = timeSec;
-	}
-
-	
-	public double getActualDepartureTime() {
-		return actualDepartureTime;
-	}
-
-	
-	public double getActualArrivalTime() {
-		return actualArrivalTime;
-	}
-
 }
+
+

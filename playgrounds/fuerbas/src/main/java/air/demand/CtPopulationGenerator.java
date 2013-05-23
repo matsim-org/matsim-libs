@@ -36,9 +36,11 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 
 
@@ -54,39 +56,35 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class CtPopulationGenerator {
 	
 	private static final Logger log = Logger.getLogger(CtPopulationGenerator.class);
+	private double startTimeUtcSeconds;
+	private double durationAirportOpen;
 	
-	/*
-	 * Setze startzeit (3 Uhr UTC)
-		 * airportoffen (15 Stunden) 
-		 * 5-20 Uhr => Ausgabewert 15:00:00 (15 Stunden) 
-		 * bzw. auf UTC umgerechnet Zeitfenster 03-18 Uhr UTC
-		 
-	 */
-	private static final double startzeit = 3.0 * 3600.0;	
-	private static final double airportoffen = 15.0 * 3600.0;
-	private static final String repos = "/media/data/work/repos/";
-	private static final String inputFlightOdDemand = repos + "lehre-svn/abschlussarbeiten/2011/christopher_treczka/treczka/Modellierung_DE/input/Eingangsdaten_September2010.txt";
-	private static final String inputNetworkFile = repos + "shared-svn/studies/countries/de/flight/dg_oag_tuesday_flight_model_2_runways_60vph/air_network.xml";
-//	private static final String outputPopulation = repos + "shared-svn/studies/countries/de/flight/ct_demand/population.xml.gz";
+	public CtPopulationGenerator(double startTimeUtcSeconds, double durationAirportOpen){
+		this.startTimeUtcSeconds = startTimeUtcSeconds;
+		this.durationAirportOpen = durationAirportOpen;
+	}
 	
-	private static final String odDemand = "/media/data/work/repos/shared-svn/studies/countries/de/flight/demand/destatis/2011_september/demand_september_2011_tabelle_2.2.2.csv";
-	private static final String outputPopulation = repos + "shared-svn/studies/countries/de/flight/demand/destatis/2011_september/population_september_2011_tabelle_2.2.2_new.xml.gz";
-	
-	public static void ctmain(String[] args) {
+	public void createAirTransportDemand(String inputNetworkFile, String odDemand,
+			String outputDirectory, String outputPopulationFile) {
+		List<FlightODRelation> demandList;
+		IOUtils.createDirectory(outputDirectory);
+		try {
+			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
+			demandList = new DgDemandReader().readFile(odDemand);
+			DgDemandUtils.convertToDailyDemand(demandList);
+			Network network = this.readNetwork(inputNetworkFile);
+			Population population = createPopulation(network, demandList);
+			MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
+			popWriter.write(outputPopulationFile);
+			OutputDirectoryLogging.closeOutputDirLogging();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		CtPopulationGenerator ctPopGen = new CtPopulationGenerator();
-		List<FlightODRelation> demandList = ctPopGen.readCtEingangsdaten(inputFlightOdDemand);
-		ctPopGen.createPopulation(demandList);
 	}
 	
-	public static void main(String[] args) throws IOException {
-		List<FlightODRelation> demandList = new DgDemandReader().readFile(odDemand);
-		CtPopulationGenerator ctPopGen = new CtPopulationGenerator();
-		DgDemandUtils.convertToDailyDemand(demandList);
-		ctPopGen.createPopulation(demandList);
-	}
-
-	public List<FlightODRelation> readCtEingangsdaten(String inputFile){
+	
+	private List<FlightODRelation> readCtEingangsdaten(String inputFile){
 		List<FlightODRelation> airportdaten = null;
 		CtFlightDemandReader eingang;
 		eingang = new CtFlightDemandReader();
@@ -98,16 +96,19 @@ public class CtPopulationGenerator {
 		return airportdaten;
 	}
 	
-	
-
-	
-	public void createPopulation(List<FlightODRelation> airportdaten){
+	private Network readNetwork(String inputNetworkFile){
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(inputNetworkFile);
 		Scenario sc = ScenarioUtils.loadScenario(config);
-		Random random = MatsimRandom.getLocalInstance();
 		Network network = sc.getNetwork();
+		return network;
+	}
+
+	
+	private Population createPopulation(Network network, List<FlightODRelation> airportdaten){
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = sc.getPopulation();
+		Random random = MatsimRandom.getLocalInstance();
 		PopulationFactory populationFactory = population.getFactory();
 		int personIdCounter = 1;
 		int removedTripsCounter = 0;
@@ -121,7 +122,7 @@ public class CtPopulationGenerator {
 
 			String fromLinkIdString = od.getFromAirportCode();
 			Id fromLinkId = sc.createId(fromLinkIdString);
-			Link fromLink = sc.getNetwork().getLinks().get(fromLinkId);
+			Link fromLink = network.getLinks().get(fromLinkId);
 			if (fromLink == null) {
 				log.warn("Link id " + fromLinkIdString + " not found in network!");
 				missingOriginAirports.add(fromLinkIdString);
@@ -136,7 +137,7 @@ public class CtPopulationGenerator {
 					removedTripsCounter += od.getNumberOfTrips();
 					continue;
 				}
-				Link destinationLink = sc.getNetwork().getLinks().get(toLinkId);
+				Link destinationLink = network.getLinks().get(toLinkId);
 				if (destinationLink == null) {	// abfangen von Flughäfen die in den Passagierdaten von DeStatis vorkommen, allerdings nicht im verwendeten Flugnetzwerk vorkommen
 					log.warn("Link id " + toLinkIdString + " not found in network!");
 					missingOdPais = missingOdPais + "; " + fromLinkIdString + " -> " + toLinkIdString; 
@@ -153,7 +154,7 @@ public class CtPopulationGenerator {
 				activity1.setCoord(fromLink.getCoord());
 				plan.addActivity(activity1); // add the Activity to the Plan
 				
-				double firstActEndTime = random.nextDouble() * airportoffen + startzeit;
+				double firstActEndTime = random.nextDouble() * durationAirportOpen + startTimeUtcSeconds;
 				activity1.setEndTime(firstActEndTime); // zufällig generierte ActivityStartTime als Endzeit gesetzt
 
 				plan.addLeg(populationFactory.createLeg("pt"));
@@ -163,14 +164,15 @@ public class CtPopulationGenerator {
 				plan.addActivity(destinationActivity);
 			}
 		}
-		MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
-		popWriter.write(outputPopulation);
 		log.info("# Persons created: " + (personIdCounter - 1));
 		log.info("# trips removed " + removedTripsCounter);
 		log.info("missing origin airports: " + missingOriginAirports);
 		log.info("missing destination airports: " + missingDestinationAirports);
 		log.info("missing od pairs: " + missingOdPais);
+		return population;
 	}
+
+
 	
 	
 }		

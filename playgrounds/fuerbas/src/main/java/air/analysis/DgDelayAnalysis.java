@@ -35,8 +35,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import air.scenario.DgOagFlightsData;
-import air.scenario.DgOagFlightsReader;
+import air.scenario.oag.DgOagFlightsData;
+import air.scenario.oag.DgOagFlightsReader;
 
 
 

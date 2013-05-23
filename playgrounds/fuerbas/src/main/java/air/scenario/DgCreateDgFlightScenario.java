@@ -39,6 +39,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import air.analysis.DgNet2Shape;
+import air.scenario.oag.DgOagFlightsData;
+import air.scenario.oag.DgOagLine;
+import air.scenario.oag.DgOagReader;
 
 
 /**

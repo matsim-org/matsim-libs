@@ -32,8 +32,8 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
-import air.scenario.DgOagFlight;
-import air.scenario.DgOagFlightsData;
+import air.scenario.oag.DgOagFlight;
+import air.scenario.oag.DgOagFlightsData;
 
 
 /**

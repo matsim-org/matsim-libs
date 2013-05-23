@@ -43,6 +43,9 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
+import air.scenario.oag.DgOagFlight;
+import air.scenario.oag.DgOagFlightsData;
+
 
 public class DgTransitBuilder {
 

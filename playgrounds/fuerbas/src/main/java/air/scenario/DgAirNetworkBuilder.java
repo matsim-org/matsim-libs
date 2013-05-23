@@ -37,6 +37,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
+import air.scenario.oag.DgOagFlight;
+import air.scenario.oag.DgOagFlightsData;
+
 /**
  * @author dgrether
  * 

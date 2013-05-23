@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgFlightDelay
+ * DgOagFlightsData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,67 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.analysis;
+package air.scenario.oag;
 
-import air.scenario.oag.DgOagFlight;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgFlightDelay {
-
-
-	private DgOagFlight flight;
-	private Double departureDelay = null;
-	private Double arrivalDelay = null;
-	private double actualDepartureTime;
-	private double actualArrivalTime;
-
-	public DgFlightDelay(DgOagFlight flight) {
-		this.flight = flight;
-	}
-	
-	public void setDepartureDelay(Double departureDelay){
-		this.departureDelay = departureDelay;
-	}
-	
-	public void setArrivalDelay(Double arrivalDelay){
-		this.arrivalDelay  = arrivalDelay;
-	}
+public class DgOagFlightsData {
 
 	
-	public DgOagFlight getFlight() {
-		return flight;
-	}
-
+	private static final Logger log = Logger.getLogger(DgOagFlightsData.class);
 	
-	public Double getDepartureDelay() {
-		return departureDelay;
-	}
-
+	private Map<String, DgOagFlight> flightDesignatorFlightMap = new HashMap<String, DgOagFlight>();
 	
-	public Double getArrivalDelay() {
-		return arrivalDelay;
+	public void addFlight(DgOagFlight flight) {
+		if (this.flightDesignatorFlightMap.containsKey(flight.getFlightDesignator())){
+			log.warn("Flight designator " + flight.getFlightDesignator() + " already exists, will be overwritten...");
+		}
+		this.flightDesignatorFlightMap.put(flight.getFlightDesignator(), flight);
 	}
 
-	public void setActualDepartureTime(double timeSec) {
-		this.actualDepartureTime = timeSec;
+	public Map<String, DgOagFlight> getFlightDesignatorFlightMap(){
+		return this.flightDesignatorFlightMap;
 	}
-
-	public void setActualArrivalTime(double timeSec) {
-		this.actualArrivalTime = timeSec;
-	}
-
 	
-	public double getActualDepartureTime() {
-		return actualDepartureTime;
-	}
-
-	
-	public double getActualArrivalTime() {
-		return actualArrivalTime;
-	}
-
 }

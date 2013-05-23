@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOagFlightsData
+ * package-info
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scenario;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-
-
 /**
+ * Contains classes to read oag data
  * @author dgrether
  *
  */
-public class DgOagFlightsData {
-
-	
-	private static final Logger log = Logger.getLogger(DgOagFlightsData.class);
-	
-	private Map<String, DgOagFlight> flightDesignatorFlightMap = new HashMap<String, DgOagFlight>();
-	
-	public void addFlight(DgOagFlight flight) {
-		if (this.flightDesignatorFlightMap.containsKey(flight.getFlightDesignator())){
-			log.warn("Flight designator " + flight.getFlightDesignator() + " already exists, will be overwritten...");
-		}
-		this.flightDesignatorFlightMap.put(flight.getFlightDesignator(), flight);
-	}
-
-	public Map<String, DgOagFlight> getFlightDesignatorFlightMap(){
-		return this.flightDesignatorFlightMap;
-	}
-	
-}
+package air.scenario.oag;

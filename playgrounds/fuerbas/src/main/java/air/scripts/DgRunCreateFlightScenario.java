@@ -17,7 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scenario;
+package air.scripts;
+
+import air.scenario.DgCreateDgFlightScenario;
 
 
 /**

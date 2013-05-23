@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOagReader
+ * DgOagLine
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,55 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scenario;
+package air.scenario.oag;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
-
-/**
- * @author dgrether
- *
- */
-public class DgOagReader {
-
-	private static final Logger log = Logger.getLogger(DgOagReader.class);
-	
-	public List<DgOagLine> readOagLines(String inputOagFile) throws Exception {
-		List<DgOagLine> ret = new ArrayList<DgOagLine>();
-		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFile)));
-		int lines = 0;
-		while (br.ready()) {
-			String oneLine = br.readLine();
-			lines++;
-			String[] lineEntries = new String[81];
-			lineEntries = oneLine.split(",");
-			if (lines > 1) {
-				for (int jj = 0; jj < 81; jj++) {
-					lineEntries[jj] = lineEntries[jj].replaceAll("\"", "");
-				}
-
-				DgOagLine l = new DgOagLine(lineEntries);
-				ret.add(l);
-			}
-			if (lines % 50000 == 0){
-				log.info("Read " + lines +  " lines of oag data...");
-			}
-		}
-		log.info("Anzahl der Zeilen mit Flügen: " + (lines - 1));
-		return ret;
-	}
-
-	
-}
-
-
-class DgOagLine{
+public class DgOagLine{
 
 	private String originCountry;
 	private String destinationCountry;
@@ -193,5 +147,3 @@ class DgOagLine{
 	
 	
 }
-
-

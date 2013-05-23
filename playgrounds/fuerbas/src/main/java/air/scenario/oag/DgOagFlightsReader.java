@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scenario;
+package air.scenario.oag;
 
 import java.io.BufferedReader;
 import java.io.IOException;
