@@ -20,44 +20,15 @@
 
 package playground.emissions;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.testcases.MatsimTestUtils;
-
-import playground.vsp.analysis.modules.emissionsAnalyzer.*;
-import playground.vsp.emissions.WarmEmissionAnalysisModule;
-import playground.vsp.emissions.events.WarmEmissionEvent;
-import playground.vsp.emissions.events.WarmEmissionEventImpl;
-import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
 
 
 
 public class TestWarmEmissionAnalysisModule {
 	
 	//TODO copy from TestColdEmissionAnalysisModule
-	@Test
-	public final void testCalculateWarmEmissionsAndThrowEvent(){
+
+	// TODO warmes module hat wesentlich mehr methoden! -> tests?
 		
-		//setup? rather without inputfiles
-		/*(
-			Id coldEmissionEventLinkId,
-			Id personId,
-			Double startEngineTime,
-			Double parkingDuration,
-			Double accumulatedDistance,
-			String vehicleInformation)*/
-		
-		//WarmEmissionAnalysisModule weam = new ColdEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);
-		//TODO can i setup a analysismodule without inputfiles? ->ihab/benjamin
-		
-	}
 	
 }
 	

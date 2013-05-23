@@ -42,6 +42,12 @@ public class CodeList {
 	 * viel oefter zugreifen als schreiben?
 	 */
 	
+	/*
+	 * ColdEmissionAnalysisModule 123
+	 * das faengt nicht alle faelle ab, bei denen convertTupel2String schief laeuft
+	 * leere Strings "" fuehren auch zu exceptions, 
+	 */
+	
 
 	
 }

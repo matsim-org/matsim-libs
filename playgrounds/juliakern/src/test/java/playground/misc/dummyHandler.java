@@ -1,5 +1,6 @@
 package playground.misc;
 
+import org.junit.Assert;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -15,10 +16,22 @@ public class dummyHandler implements EventsManager {
 	}
 
 	@Override
-	public void processEvent(Event event) {
+	public void processEvent(Event event) {	
 		for(String attribute: event.getAttributes().keySet()){
-			sumOverAll =+ Double.parseDouble(event.getAttributes().get(attribute));
+			try {
+				sumOverAll += Double.parseDouble(event.getAttributes().get(attribute));
+			} catch (NumberFormatException e) {
+				String notANumber = event.getAttributes().get(attribute).toString();
+				if(notANumber.equals("coldEmissionEvent")||notANumber.equals("coldEmissionEventLinkId")||notANumber.equals("personId")){
+					//everything ok
+					//TODO ueberdenken
+				}else{
+					//Assert.fail("this is not an expected cold emission event attribute: "+notANumber);
+				}
+				
+			}
 		}
+		System.out.println(sumOverAll);
 		// TODO Auto-generated method stub
 
 	}
@@ -91,6 +104,12 @@ public class dummyHandler implements EventsManager {
 	public static Double getSum() {
 		return sumOverAll;
 
+	}
+
+	public static void reset() {
+		sumOverAll=.0;
+		// TODO Auto-generated method stub
+		
 	}
 
 }
