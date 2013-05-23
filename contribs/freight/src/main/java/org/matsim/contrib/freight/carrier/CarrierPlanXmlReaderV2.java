@@ -144,7 +144,8 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 		if (name.equals(CARRIER)) {
 			String id = atts.getValue(ID);
 			if(id == null) throw new IllegalStateException("carrierId is missing.");
-			carrierBuilder = CarrierImpl.Builder.newInstance(createId(id));
+			currentCarrier = CarrierImpl.Builder.newInstance(createId(id)).build();
+//			carrierBuilder = CarrierImpl.Builder.newInstance(createId(id));
 		}
 		//services
 		else if (name.equals("services")) {
@@ -171,7 +172,7 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 			if(serviceTimeString != null) serviceBuilder.setServiceTime(parseTimeToDouble(serviceTimeString));
 			CarrierService service = serviceBuilder.build();
 			serviceMap.put(service.getId(), service);
-			carrierBuilder.addService(service);
+			currentCarrier.getServices().add(service);
 		}
 		
 		//shipments
@@ -202,7 +203,7 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 			
 			CarrierShipment shipment = shipmentBuilder.build();
 			currentShipments.put(atts.getValue(ID), shipment);
-			carrierBuilder.addShipment(shipment);
+			currentCarrier.getShipments().add(shipment);
 		}
 		
 		//capabilities
@@ -336,7 +337,7 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equals("capabilities")){
-			carrierBuilder.setCapabilities(capabilityBuilder.build());
+			currentCarrier.setCarrierCapabilities(capabilityBuilder.build());
 		}
 		else if(name.equals("capacity")){
 			if(content == null) throw new IllegalStateException("vehicle-capacity is missing.");
@@ -349,10 +350,6 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 		}
 		else if (name.equals("route")) {
 			this.previousRouteContent = content;
-		}
-		
-		else if(name.equals("shipments")){
-			currentCarrier = carrierBuilder.build();
 		}
 		
 		else if (name.equals("carrier")) {

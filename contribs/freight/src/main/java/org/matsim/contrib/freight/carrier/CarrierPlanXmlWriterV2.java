@@ -114,6 +114,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 	}
 
 	private void writeShipments(Carrier carrier, BufferedWriter writer) throws IOException {
+		if(carrier.getShipments().isEmpty()) return;
 		writer.write("\t\t\t<shipments>\n");
 		for (CarrierShipment s : carrier.getShipments()) {
 			// CarrierShipment s = contract.getShipment();
