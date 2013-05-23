@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountryFilter
+ * DgGermanyCountryFilter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,15 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scenario;
+package air.scenario.countryfilter;
 
 
 /**
  * @author dgrether
  *
  */
-public interface DgCountryFilter {
+public class DgGermanyCountryFilter implements DgCountryFilter{
 
-	public boolean isCountryOfInterest(String originCountry, String destinationCountry);
+	private static final String de = "DE";
 	
+	private boolean doAndFilter = false;
+	
+	public DgGermanyCountryFilter(boolean doAndFilter) {
+		this.doAndFilter = doAndFilter;
+	}
+
+	@Override
+	public boolean isCountryOfInterest(String originCountry, String destinationCountry) {
+		if (doAndFilter){
+			return de.equalsIgnoreCase(originCountry) && de.equalsIgnoreCase(destinationCountry);
+		}
+		else {
+			return de.equalsIgnoreCase(originCountry) || de.equalsIgnoreCase(destinationCountry);
+		}
+	}
+
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgGermanyCountryFilter
+ * package-info
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scenario;
-
-
 /**
- * @author dgrether
+ * Tools to gather utc offsets
+ * @author sfuerbas
  *
  */
-public class DgGermanyCountryFilter implements DgCountryFilter{
-
-	private static final String de = "DE";
-	
-	private boolean doAndFilter = false;
-	
-	public DgGermanyCountryFilter(boolean doAndFilter) {
-		this.doAndFilter = doAndFilter;
-	}
-
-	@Override
-	public boolean isCountryOfInterest(String originCountry, String destinationCountry) {
-		if (doAndFilter){
-			return de.equalsIgnoreCase(originCountry) && de.equalsIgnoreCase(destinationCountry);
-		}
-		else {
-			return de.equalsIgnoreCase(originCountry) || de.equalsIgnoreCase(destinationCountry);
-		}
-	}
-
-}
+package air.scenario.utcoffsets;

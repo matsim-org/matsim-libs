@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgWorldCountryFilter
+ * DgEuropeCountryFilter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +17,74 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scenario;
+package air.scenario.countryfilter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgWorldCountryFilter implements DgCountryFilter {
+public class DgEuropeCountryFilter implements DgCountryFilter {
+
+	private final static String[] EURO_COUNTRIES = {
+		"AT",
+		"BE",
+		"BG",
+		"CY",
+		"CZ",
+		"DE",
+		"DK",
+		"EE",
+		"EL",
+		"ES",
+		"FI",
+		"FR",
+		"GB",
+		"GR",
+		"HU",
+		"IE",
+		"IT",
+		"LV",
+		"LT",
+		"LU",
+		"MT",
+		"NL",
+		"PL",
+		"PT",
+		"RO",
+		"SE",
+		"SI",
+		"SK",
+		"CR", //candidates
+		"ME",
+		"IS",
+		"RS",
+		"TR"
+	}; 
+	
+	private Set<String> countryFilter;
+
+	private boolean doAndFilter = false;
+	
+	public DgEuropeCountryFilter(boolean doAndfilter) {
+		this.doAndFilter  = doAndfilter;
+		countryFilter = new HashSet<String>();
+		for (String s : EURO_COUNTRIES){
+			this.countryFilter.add(s.toUpperCase());
+		}
+	}
 
 	@Override
 	public boolean isCountryOfInterest(String originCountry, String destinationCountry) {
-		return true;
+		if (doAndFilter){
+			return countryFilter.contains(originCountry) && countryFilter.contains(destinationCountry);
+		}
+		else {
+			return countryFilter.contains(originCountry) || countryFilter.contains(destinationCountry);
+		}
 	}
 
 }

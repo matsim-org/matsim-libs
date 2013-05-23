@@ -29,10 +29,10 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import air.analysis.DgNet2Shape;
+import air.scenario.countryfilter.DgGermanyCountryFilter;
 
 /**
  * @author dgrether, sfuerbas
- *
  */
 
 public class DgCreateSfFlightScenario {

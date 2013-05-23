@@ -130,7 +130,7 @@ public class CtPopulationGenerator {
 				continue;
 			}
 			
-			for ( int i=0; i< od.getNumberOfTrips(); i++){		// eingangsdatearraynindex+2 ist aktuelle Passagieranzahl
+			for ( int i=0; i< od.getNumberOfTrips(); i++){	
 				String toLinkIdString = od.getToAirportCode();
 				Id toLinkId = sc.createId(toLinkIdString);
 				if (fromLinkIdString.compareTo(toLinkIdString) == 0) {

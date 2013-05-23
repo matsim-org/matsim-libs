@@ -39,6 +39,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import air.analysis.DgNet2Shape;
+import air.scenario.countryfilter.DgGermanyCountryFilter;
 import air.scenario.oag.DgOagFlightsData;
 import air.scenario.oag.DgOagLine;
 import air.scenario.oag.DgOagReader;
@@ -65,10 +66,11 @@ public class DgCreateDgFlightScenario {
 	public static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
 	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
 	
-	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/";
+//	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/";
+	private String flightScenarioDirectoryName ="dg_oag_tuesday_flight_model_2_runways_60vph/";
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 	private DgFlightScenarioData flightScenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
-	private boolean useAirportCapacities = true;
+	private boolean useAirportCapacities = false;
 	public static final boolean useSingleDayOfOperation = true;
 	private String airportCapacityFile = dataBaseDirectory + "shared-svn/projects/throughFlightData/airportCapacityData/2012-08-14_airport_capacity_from_www.csv";
 	

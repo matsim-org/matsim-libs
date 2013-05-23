@@ -22,6 +22,8 @@ package air.scenario;
 import java.util.HashSet;
 import java.util.Set;
 
+import air.scenario.countryfilter.DgCountryFilter;
+
 /**
  * @author dgrether
  * 
