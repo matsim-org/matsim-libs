@@ -100,7 +100,7 @@ public class TransitControler {
 		tc.setMobsimFactory(new MyMobsimFactory()) ;
 		tc.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		//		tc.setCreateGraphs(false);
-
+		
 		tc.run();
 	}
 
