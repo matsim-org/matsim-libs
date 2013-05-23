@@ -165,7 +165,8 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 		}
 
 		for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
-			tripRouter.setRoutingModule(
+			final RoutingModule old =
+				tripRouter.setRoutingModule(
 					mainMode,
 					new LegRouterWrapper(
 						mainMode,
@@ -174,10 +175,16 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 							modeRouteFactory,
 							routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
 							routeConfigGroup.getBeelineDistanceFactor())));
+			if ( old != null ) {
+				log.error( "inconsistent router configuration for mode "+mainMode );
+				throw new RuntimeException( "there was already a module set when trying to set teleporting module for mode "+mainMode+
+						": "+old );
+			}
 		}
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
-			tripRouter.setRoutingModule(
+			final RoutingModule old =
+				tripRouter.setRoutingModule(
 					mainMode,
 					new LegRouterWrapper(
 						mainMode,
@@ -186,6 +193,11 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 							network,
 							routeAlgo,
 							modeRouteFactory)));
+			if ( old != null ) {
+				log.error( "inconsistent router configuration for mode "+mainMode );
+				throw new RuntimeException( "there was already a module set when trying to set network routing module for mode "+mainMode+
+						": "+old );
+			}
 		}
 
 		if ( config.scenario().isUseTransit() ) {
@@ -201,6 +213,10 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 									routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
 									routeConfigGroup.getBeelineDistanceFactor())));
 			for (String mode : this.config.transit().getTransitModes()) {
+				// XXX one can't check for inconsistent setting here...
+				// because the setting is inconsistent by default (defaults
+				// set a teleportation setting for pt routing, which is overriden
+				// here) (td, may 2013)
 				tripRouter.setRoutingModule(mode, routingModule);
 			}
 		}
