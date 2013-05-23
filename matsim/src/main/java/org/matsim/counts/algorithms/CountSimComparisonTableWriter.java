@@ -79,6 +79,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 		else {
 			this.numberFormat = NumberFormat.getInstance(l);
 		}
+		this.numberFormat.setGroupingUsed(false);
 	}
 
 	/**
