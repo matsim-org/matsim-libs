@@ -140,12 +140,14 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * @throws UncheckedIOException
 	 */
 	public void parse(final String filename) throws UncheckedIOException {
+		log.info("starting to parse xml from file " + filename + " ...");
 		this.source = filename;
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));
 	}
 
 	public void parse(final URL url) throws UncheckedIOException {
 		this.source = url.toString();
+		log.info("starting to parse xml from url " + this.source + " ...");
 		parse(new InputSource(url.toExternalForm()));
 	}
 
