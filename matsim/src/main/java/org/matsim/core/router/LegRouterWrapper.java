@@ -89,6 +89,11 @@ public class LegRouterWrapper implements RoutingModule {
 		return EmptyStageActivityTypes.INSTANCE;
 	}
 
+	@Override
+	public String toString() {
+		return "[LegRouterWrapper: mode="+mode+"; delegate="+wrapped+"]";
+	}
+
 	private static class FacilityWrapper implements Activity {
 		private final Facility wrapped;
 
