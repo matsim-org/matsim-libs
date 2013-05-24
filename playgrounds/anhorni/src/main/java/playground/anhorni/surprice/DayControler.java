@@ -50,12 +50,17 @@ public class DayControler extends Controler {
 		this.day = day;
 		this.preferences = preferences;
 		this.populationPreviousDay = populationPreviousDay;
+		
+		this.setScoringFunctionFactory(
+				new SurpriceScoringFunctionFactory(
+			  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences)
+				);
 	} 
 			
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new SurpriceScoringFunctionFactory(
-	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
-	}
+//	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+//		return new SurpriceScoringFunctionFactory(
+//	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
+//	}
 	
 	protected void setUp() {
 		this.generateAlphaGammaTrip();
