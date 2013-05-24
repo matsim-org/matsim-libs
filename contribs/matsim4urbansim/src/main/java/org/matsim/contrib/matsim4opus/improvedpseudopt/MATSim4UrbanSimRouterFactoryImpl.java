@@ -93,6 +93,9 @@ public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 					controler.getLeastCostPathCalculatorFactory(), 
 					controler.getScenario().getConfig().scenario().isUseTransit() ? controler.getTransitRouterFactory() : null);
 			log.warn("overriding default Pt-RoutingModule with PseudoPtRoutingModule. Message thrown only once.");
+			if ( controler.getConfig().scenario().isUseTransit() ) {
+				log.warn("you try to use PseudoPtRoutingModule and physical transit simulation at the same time. This probably will not work!");
+			}
 			firstCall = false;
 		}
 		//initialize triprouter

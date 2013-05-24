@@ -53,6 +53,7 @@ import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -306,11 +307,28 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		PtMatrix ptMatrix = null;
 		if(getMATSim4UrbanSimControlerConfig().getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
+			// will lead to a null pointer anyway, but since the 
+			// routerFactory has changed an initialization of plansCalcRoute
+			// as it was done before is no longer possible. Thus, I think a 
+			// more meaningful message seems to be helpful. Daniel, May '13
+			if(getMATSim4UrbanSimControlerConfig().getPtTravelDistancesInputFile() == null || 
+					getMATSim4UrbanSimControlerConfig().getPtTravelTimesInputFile() == null){
+				if(controler.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt) == null){
+					throw new RuntimeException("you try to run the pseudo-pt-router without distances and/or traveltimes, " +
+							"but without a teleportedModeSpeed for pt as well. Default is teleportedModeFreespeedFactor...");
+				}
+				if(controler.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) == null){
+					throw new RuntimeException("you try to run the pseudo-pt-router without distances and/or traveltimes, " +
+							"but without a teleportedModeSpeed for walk as well. Default is teleportedModeFreespeed...");
+				}
+			}
+			
 			// if ptStops etc are given in config
+			PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
 			ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
-									controler.getScenario().getConfig().plansCalcRoute().getWalkSpeed(),
-									controler.getScenario().getConfig().plansCalcRoute().getPtSpeed(),
-									controler.getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactor(),
+									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk),
+									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
+									plansCalcRoute.getBeelineDistanceFactor(),
 									getMATSim4UrbanSimControlerConfig());	
 			controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 			

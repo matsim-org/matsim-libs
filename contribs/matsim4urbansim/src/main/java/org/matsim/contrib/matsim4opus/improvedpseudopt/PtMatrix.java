@@ -73,7 +73,7 @@ public class PtMatrix {
 	private long wrnCntSkip = 0;
 	private long wrnCntParse = 0;
 	
-	public PtMatrix(Network network, double meterPerSecWalkSpeed, double meterPerSecPtSpeed, double beelineDistanceFactor, MATSim4UrbanSimControlerConfigModuleV3 m4uccm){
+	public PtMatrix(Network network, Double meterPerSecWalkSpeed, Double meterPerSecPtSpeed, Double beelineDistanceFactor, MATSim4UrbanSimControlerConfigModuleV3 m4uccm){
 
 		// get the locations for ptStops, travel times and distances from controler
 		String ptStopInputFile = m4uccm.getPtStopsInputFile();

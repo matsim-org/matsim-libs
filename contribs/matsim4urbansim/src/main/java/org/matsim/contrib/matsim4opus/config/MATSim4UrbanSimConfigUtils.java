@@ -534,6 +534,7 @@ public class MATSim4UrbanSimConfigUtils {
 		config.strategy().addStrategySettings(reroute);
 		
 		// check if a 4th module is given in the external MATSim config
+		// the external config is not loaded at this point. Thus, a possible 4th module is only load with the settings from the external config...
 		StrategyConfigGroup.StrategySettings changeLegMode = getChangeLegModeStrategySettings(config);
 		boolean set4thStrategyModule = ( changeLegMode != null && 
 									   ( changeLegMode.getModuleName().equalsIgnoreCase("ChangeLegMode") || changeLegMode.getModuleName().equalsIgnoreCase("ChangeSingleLegMode")) && 

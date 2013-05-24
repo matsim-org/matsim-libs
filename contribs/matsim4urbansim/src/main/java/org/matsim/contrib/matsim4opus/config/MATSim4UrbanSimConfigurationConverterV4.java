@@ -129,8 +129,14 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			MATSim4UrbanSimConfigUtils.initControler(matsim4urbansimConfigPart1, config);
 			MATSim4UrbanSimConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
 			MATSim4UrbanSimConfigUtils.initStrategy(matsim4urbansimConfigPart1, config);
-
-			MATSim4UrbanSimConfigUtils.initPlanCalcRoute(config);
+			
+			/*
+			 *  why is it necessary to set some other defaults than the defaults from MATSim?
+			 *  With the newest TripRouterFactory (r24248) this will lead to to a runtime-error
+			 *  when for any of the intialized modes a different behavior (e.g. freespeedfactor 
+			 *  instead of freespeed) is set. Daniel, May '13
+			 */
+//			MATSim4UrbanSimConfigUtils.initPlanCalcRoute(config);
 			MATSim4UrbanSimConfigUtils.initQSim(matsim4urbansimConfig, config);
 			
 			// loading the external MATSim config in to the initialized config
