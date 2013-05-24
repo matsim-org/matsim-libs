@@ -46,6 +46,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.VehicleReaderV1;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -56,6 +57,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
+import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
 import playground.andreas.utils.pop.FilterPopulationByShape;
 import playground.andreas.utils.pt.TransitLineRemover;
 import playground.vsp.analysis.modules.transitSchedule2Shp.TransitSchedule2Shp;
@@ -74,45 +76,66 @@ public class ScenarioGenerator {
 
 
 	
-	public ScenarioGenerator(String netFile, String scheduleFile, String outputDir) {
+	public ScenarioGenerator(String netFile, String scheduleFile, String vehiclesFile, String outputDir) {
+		log.info("Network: " + netFile);
+		log.info("Schedule: " + scheduleFile);
+		log.info("Vehicles: " + vehiclesFile);
+		log.info("OutputDir: " + outputDir);
+		
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		this.baseScenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(this.baseScenario).readFile(netFile);
 		new TransitScheduleReaderV1(this.baseScenario).readFile(scheduleFile);
+		new VehicleReaderV1(this.baseScenario.getVehicles()).readFile(vehiclesFile);
 		this.outputDir = outputDir;
 	}
 
 	public static void main(String[] args) {
-		String outputdir = "e:/_shared-svn/andreas/paratransit/bvg5/output/b100200/";
+		String outputdir = "e:/_shared-svn/andreas/paratransit/b285/run/output/";
 		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
 		double distance = 1000.0;
 		
-		String netFile = "e:/_shared-svn/andreas/paratransit/bvg5/input/network.final.xml.gz";
-		String scheduleFile = "e:/_shared-svn/andreas/paratransit/bvg5/input/transitSchedule_basecase.xml.gz";
+		String netFile = "e:/_shared-svn/andreas/paratransit/b285/run/input/network.final.xml.gz";
+		String scheduleFile = "e:/_shared-svn/andreas/paratransit/b285/common_ana/baseSchedule/transitSchedule_basecase.xml.gz";
+		String vehiclesFile = "e:/_shared-svn/andreas/paratransit/b285/run/input/transitVehicles100.final.xml.gz";
 
-		String popInFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.plans.selected.xml.gz";
-		String eventsFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.xml.gz";
+//		String popInFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.plans.selected.xml.gz";
+//		String eventsFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.xml.gz";
 		
-//		String popInFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.plans.selected.xml.gz";
-//		String eventsFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events.xml.gz";
+		String popInFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.plans.selected.xml.gz";
+		String eventsFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events_enriched.xml.gz";
+		String scenarioAreaFilename = "e:/_shared-svn/andreas/paratransit/b285/run/input/scenarioArea.shp";
 		
 		Set<Id> linesToSimulatePara = new TreeSet<Id>();
-//		linesToSimulatePara.add(new IdImpl("285-B-285"));
-		linesToSimulatePara.add(new IdImpl("100-B-100"));
-		linesToSimulatePara.add(new IdImpl("200-B-200"));
+		linesToSimulatePara.add(new IdImpl("285-B-285"));
+//		linesToSimulatePara.add(new IdImpl("100-B-100"));
+//		linesToSimulatePara.add(new IdImpl("200-B-200"));
 		
-		ScenarioGenerator sG = new ScenarioGenerator(netFile, scheduleFile, outputdir);
+		ScenarioGenerator sG = new ScenarioGenerator(netFile, scheduleFile, vehiclesFile, outputdir);
 		TransitSchedule paraSchedule = sG.createParaSchedule(linesToSimulatePara, targetCoordinateSystem);
-		String scenarioAreaFilename = sG.createServiceArea(paraSchedule, targetCoordinateSystem, distance);
+//		String scenarioAreaFilename = sG.createServiceArea(paraSchedule, targetCoordinateSystem, distance);
+		sG.cutTransitSchedule(scenarioAreaFilename);
 
 		sG = null;
 		new FilterPopulationByShape(netFile, popInFile, eventsFile, scenarioAreaFilename, outputdir + "scenarioPopulation.xml.gz");
 	}
 
+	private void cutTransitSchedule(String scenarioAreaFilename) {
+		BVGLines2PtModes lines2Modes = new BVGLines2PtModes();
+		lines2Modes.setPtModesForEachLine(this.baseScenario.getTransitSchedule(), "none");
+		TreeSet<String> modes2Cut = new TreeSet<String>();
+		modes2Cut.add("bvg_bus");
+		TransitScheduleAreaCut2 cutter = new TransitScheduleAreaCut2(this.baseScenario.getTransitSchedule(), scenarioAreaFilename, lines2Modes, modes2Cut, this.baseScenario.getVehicles());
+		cutter.run(this.outputDir);		
+	}
+	
 	private String createServiceArea(TransitSchedule paraSchedule, String targetCoordinateSystem, double distance) {
 		log.info("Creating operation area and scenario area with buffer size: " + distance);
+		log.info("Target coord system: " + targetCoordinateSystem);
+		log.info("Lines in para schedule: " + paraSchedule.getTransitLines().keySet());
+		
 		// get all link ids
 		Set<Id> linksToConvert = new TreeSet<Id>();
 		for (TransitLine line : paraSchedule.getTransitLines().values()) {
@@ -207,6 +230,7 @@ public class ScenarioGenerator {
 
 	private TransitSchedule createParaSchedule(Set<Id> linesToSimulateAsPara, String targetCoordinateSystem) {
 		log.info("Extracting the following lines from schedule: " + linesToSimulateAsPara);
+		log.info("Target coord system: " + targetCoordinateSystem);
 		TransitSchedule remainingSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(this.baseScenario.getTransitSchedule(), linesToSimulateAsPara);
 		new TransitScheduleWriterV1(remainingSchedule).write(this.outputDir + "remainingSchedule.xml.gz");
 
