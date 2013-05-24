@@ -92,6 +92,10 @@ public class ElementalCharyparNagelLegScoringFunction implements LegScoring {
 				getDistance( leg.getRoute() ) :
 				0;
 
+		// we really do not want that, even if marginal utility of
+		// distance is 0, as any computation including NaN gives NaN.
+		if ( Double.isNaN( dist ) ) throw new RuntimeException( "NaN dist with leg "+leg );
+
 		return params.constant +
 			params.marginalUtilityOfTraveling_s * leg.getTravelTime() +
 			params.marginalUtilityOfDistance_m * dist;
