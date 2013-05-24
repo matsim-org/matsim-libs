@@ -80,7 +80,7 @@ public class KtiActivityScoring implements ActivityScoring {
 	private CharyparNagelScoringParameters params;
 	
 	static {
-		OpeningTime defaultOpeningTime = new OpeningTimeImpl(DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
+		OpeningTime defaultOpeningTime = new OpeningTimeImpl(DEFAULT_DAY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 		DEFAULT_OPENING_TIME.add(defaultOpeningTime);
 	}
 
