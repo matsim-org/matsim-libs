@@ -67,7 +67,8 @@ public class DgCreateDgFlightScenario {
 	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
 	
 //	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/";
-	private String flightScenarioDirectoryName ="dg_oag_tuesday_flight_model_2_runways_60vph/";
+//	private String flightScenarioDirectoryName ="dg_oag_tuesday_flight_model_2_runways_60vph/";
+	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_3600vph_storage_restriction/";
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 	private DgFlightScenarioData flightScenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
 	private boolean useAirportCapacities = false;
