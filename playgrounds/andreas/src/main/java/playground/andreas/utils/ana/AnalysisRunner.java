@@ -150,23 +150,31 @@ public class AnalysisRunner {
 		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath() + "_ana/", dir.getIterationFilename(iteration, Controler.FILENAME_EVENTS_XML));
 		
 		// works
-		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, quadrantSegments, activityCluster, targetCoordinateSystem, gridSize);
-		analyzer.addAnalysisModule(ptAccessibility);
-		
+		TravelStatsAnalyzer travelStatsAnalyzer = new TravelStatsAnalyzer(sc, 3600.0);
+		analyzer.addAnalysisModule(travelStatsAnalyzer);
+
 		GetStuckEventsAndPlans getStuckEventsAndPlans = new GetStuckEventsAndPlans(sc);
 		analyzer.addAnalysisModule(getStuckEventsAndPlans);
+
+		TransitSchedule2Shp transitSchedule2Shp = new TransitSchedule2Shp(sc, targetCoordinateSystem);
+		analyzer.addAnalysisModule(transitSchedule2Shp);
 		
+		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
+		analyzer.addAnalysisModule(ptRoutes2PaxAnalysis);
+
 		TransitVehicleVolumeAnalyzer transitVehicleVolumeAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600., targetCoordinateSystem);
 		analyzer.addAnalysisModule(transitVehicleVolumeAnalyzer);
 		
 		PtPaxVolumesAnalyzer ptPaxVolumesAnalyzer = new PtPaxVolumesAnalyzer(sc, 3600., targetCoordinateSystem);
 		analyzer.addAnalysisModule(ptPaxVolumesAnalyzer);
+
+		analyzer.addAnalysisModule(new MyPtCount(sc.getNetwork()));
+
+		PtAccessibility ptAccessibility = new PtAccessibility(sc, cluster, quadrantSegments, activityCluster, targetCoordinateSystem, gridSize);
+		analyzer.addAnalysisModule(ptAccessibility);
 		
 		TTtripAnalysis ttTripAnalysis = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());	ttTripAnalysis.addZones(zones);
 		analyzer.addAnalysisModule(ttTripAnalysis);
-		
-		TransitSchedule2Shp transitSchedule2Shp = new TransitSchedule2Shp(sc, targetCoordinateSystem);
-		analyzer.addAnalysisModule(transitSchedule2Shp);
 		
 		ActivityToModeAnalysis activityToModeAnalysis = new ActivityToModeAnalysis(sc, null, 3600, targetCoordinateSystem);
 		analyzer.addAnalysisModule(activityToModeAnalysis);
@@ -174,14 +182,6 @@ public class AnalysisRunner {
 		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = new BoardingAlightingCountAnalyzer(sc, 3600, targetCoordinateSystem);
 		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, gridSize);
 		analyzer.addAnalysisModule(boardingAlightingCountAnalyzes);
-
-		analyzer.addAnalysisModule(new MyPtCount(sc.getNetwork()));
-
-		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
-		analyzer.addAnalysisModule(ptRoutes2PaxAnalysis);
-		
-		TravelStatsAnalyzer travelStatsAnalyzer = new TravelStatsAnalyzer(sc, 3600.0);
-		analyzer.addAnalysisModule(travelStatsAnalyzer);
 		
 		analyzer.run();
 		
