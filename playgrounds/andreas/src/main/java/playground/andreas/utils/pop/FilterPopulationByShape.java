@@ -74,6 +74,12 @@ public class FilterPopulationByShape implements LinkEnterEventHandler, PersonEnt
 		Gbl.startMeasurement();
 		Gbl.printMemoryUsage();
 		
+		log.info("Network: " + netFile);
+		log.info("Population: " + popInFile);
+		log.info("Events: " + eventsFile);
+		log.info("Shape: " + areaShapeFile);
+		log.info("Population out: " + popOutFile);
+		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().network().setInputFile(netFile);
 		ScenarioUtils.loadScenario(sc);
