@@ -37,14 +37,14 @@ public class TelAvivControler extends Controler {
 		super(args);
 	}
 	
-	/*
-	 * We use a Scoring Function that get the Facility Opening Times from
-	 * the Facilities instead of the Config File.
-	 */
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario());
-	}
+//	/*
+//	 * We use a Scoring Function that get the Facility Opening Times from
+//	 * the Facilities instead of the Config File.
+//	 */
+//	@Override
+//	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+//		return new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario());
+//	}
 	
 	@Override
 	protected void loadData() {
@@ -79,6 +79,14 @@ public class TelAvivControler extends Controler {
 			// use an adapted MobsimFactory
 			controler.setMobsimFactory(new TTAQSimFactory());
 			
+			/*
+			 * We use a Scoring Function that get the Facility Opening Times from
+			 * the Facilities instead of the Config File.
+			 */
+			controler.setScoringFunctionFactory(
+					new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario())
+					) ;
+
 			controler.run();
 		}
 		System.exit(0);
