@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -40,7 +41,6 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
@@ -146,21 +146,23 @@ public class KtiActivityScoring implements ActivityScoring {
 		///////////////////////////////////////////////////////////////////
 		else {
 
-			SortedSet<OpeningTime> openTimes = DEFAULT_OPENING_TIME;
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,
 			// assume facility is always open
 			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
-			if (actOpt != null) {
-				openTimes = actOpt.getOpeningTimes(DEFAULT_DAY);
-				if (openTimes == null) {
-					openTimes = DEFAULT_OPENING_TIME;
-				}
-			} else {
+
+			if (actOpt == null) {
 				logger.error("Agent wants to perform an activity whose type is not available in the planned facility.");
 				logger.error("facility id: " + act.getFacilityId());
 				logger.error("activity type: " + act.getType());
-				Gbl.errorMsg("Agent wants to perform an activity whose type is not available in the planned facility.");
+				throw new RuntimeException("Agent wants to perform an activity whose type is not available in the planned facility.");
 			}
+
+			final Set<OpeningTime> openTimes =
+				actOpt.getOpeningTimes(DEFAULT_DAY) != null ?
+					actOpt.getOpeningTimes(DEFAULT_DAY) :
+					// if there is an activity option but no opening times,
+					// assume always open.
+					DEFAULT_OPENING_TIME;
 
 			// calculate effective activity duration bounded by opening times
 			double timeSpentPerforming = 0.0; // accumulates performance intervals for this activity
