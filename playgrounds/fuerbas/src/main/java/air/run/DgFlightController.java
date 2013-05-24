@@ -22,7 +22,6 @@ package air.run;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
@@ -39,13 +38,13 @@ public class DgFlightController extends Controler {
 		super(scenario);
 	}
 
-	/**
-	 * Want to have the default scoring function -> overriding
-	 */
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new DgFlightScoringFunctionFactory(this.config.planCalcScore(), this.getNetwork());
-	}
+//	/**
+//	 * Want to have the default scoring function -> overriding
+//	 */
+//	@Override
+//	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+//		return new DgFlightScoringFunctionFactory(this.config.planCalcScore(), this.getNetwork());
+//	}
 
 	public static void main(String[] args) {
 //		String[] args2 = {"/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_tuesday_flight_model_2_runways_3600vph/air_config.xml"};
@@ -57,6 +56,9 @@ public class DgFlightController extends Controler {
 		controler.setOverwriteFiles(true);
 		ControlerListener lis = new SfFlightTimeControlerListener();
 		controler.addControlerListener(lis);
+		
+		controler.setScoringFunctionFactory( new DgFlightScoringFunctionFactory( controler.getConfig().planCalcScore(), controler.getNetwork() ) ) ;
+		
 		controler.run();
 	}
 }
