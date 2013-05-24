@@ -59,6 +59,7 @@ import playground.meisterk.kti.router.SwissHaltestellen;
  * @author thibautd
  */
 public class KtiPtRoutingModule implements RoutingModule {
+	private static final double KTI_CROWFLY_FACTOR = 1.5;
 	private final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
 
 	private final  PlansCalcRouteConfigGroup config;
@@ -93,7 +94,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		final double distanceLeg1 =
 			CoordUtils.calcDistance( 
 					fromFacility.getCoord(),
-					stop1.getCoord() ) * config.getBeelineDistanceFactor();
+					stop1.getCoord() ) * KTI_CROWFLY_FACTOR;
 		final double travelTimeLeg1 = distanceLeg1 * config.getWalkSpeed();
 
 		final Leg walk1 = new LegImpl( TransportMode.walk );
@@ -126,7 +127,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final double ptDistance =
 			// factor hard-coded KTI-like
-			1.5 * CoordUtils.calcDistance(
+			KTI_CROWFLY_FACTOR * CoordUtils.calcDistance(
 				stop1.getCoord(),
 				stop2.getCoord() );
 		final double ptTravelTime =
@@ -153,7 +154,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		final double distanceLeg2 =
 			CoordUtils.calcDistance( 
 					stop2.getCoord(),
-					toFacility.getCoord() ) * config.getBeelineDistanceFactor();
+					toFacility.getCoord() ) * KTI_CROWFLY_FACTOR;
 		final double travelTimeLeg2 = distanceLeg2 * config.getWalkSpeed();
 
 		final Leg walk2 = new LegImpl( TransportMode.walk );
