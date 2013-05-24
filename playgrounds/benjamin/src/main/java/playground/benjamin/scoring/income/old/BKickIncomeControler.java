@@ -22,12 +22,7 @@ package playground.benjamin.scoring.income.old;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.benjamin.BkControler;
 
@@ -56,10 +51,10 @@ public final class BKickIncomeControler extends BkControler {
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BKickIncomeScoringFunctionFactory(this.config.planCalcScore(), this.hhdb, network);
-	}
+//	@Override
+//	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+//		return new BKickIncomeScoringFunctionFactory(this.config.planCalcScore(), this.hhdb, network);
+//	}
 	
 	@Override
 	protected void setUp(){	
@@ -71,6 +66,7 @@ public final class BKickIncomeControler extends BkControler {
 //		}
 //		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
 		super.setUp();
+		this.setScoringFunctionFactory( new BKickIncomeScoringFunctionFactory(this.getConfig().planCalcScore(), this.hhdb, this.getNetwork() ) ) ;
 	}
 	
 //	@Override
@@ -80,9 +76,9 @@ public final class BKickIncomeControler extends BkControler {
 //				this.getLinkTravelTimes());
 //	}
 
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory(), this.hhdb);
-	}
+//	private PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+//		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory(), this.hhdb);
+//	}
 
 	
 	public static void main(String[] args) {
@@ -95,6 +91,7 @@ public final class BKickIncomeControler extends BkControler {
 			System.out.println();
 		} else {
 			final Controler controler = new BKickIncomeControler(args);
+			
 			controler.run();
 		}
 	}

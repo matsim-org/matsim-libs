@@ -413,7 +413,7 @@ public class Controler extends AbstractController {
 	
 	
 		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = loadScoringFunctionFactory();
+			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.planCalcScore(), this.getNetwork());
 		}
 	
 		// the default handling of plans
@@ -449,21 +449,6 @@ public class Controler extends AbstractController {
 	}
 
 	/**
-	 * Loads the {@link ScoringFunctionFactory} to be used for plans-scoring.
-	 * This method will only be called if the user has not yet manually set a
-	 * custom scoring function with
-	 * {@link #setScoringFunctionFactory(ScoringFunctionFactory)}.
-	 *
-	 * @return The ScoringFunctionFactory to be used for plans-scoring.
-	 */
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		// yyyy cannot make this final since it is overridden about 10 times. kai, jan'13
-		
-		return new CharyparNagelScoringFunctionFactory(
-				this.config.planCalcScore(), this.getNetwork());
-	}
-
-	/**
 	 * Loads the default set of {@link org.matsim.core.controler.listener
 	 * ControlerListener} to provide some more basic functionality. Unlike the
 	 * core ControlerListeners the order in which the listeners of this method
@@ -473,6 +458,8 @@ public class Controler extends AbstractController {
 		// Cannot make this method final since is is overridden about 13 times.  kai, jan'13
 		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
 		// The core controler listeners are separate, after all.  kai, feb'13
+		// yy On the other hand, we could write a method clearControlerListeners() and one would have a similar flexibility without
+		// inheritance.  kai, may'13
 
 		// optional: LegHistogram
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
@@ -645,6 +632,7 @@ public class Controler extends AbstractController {
 	 */
 	protected StrategyManager loadStrategyManager() {
 		// yyyy cannot make this final: overridden at about 40 locations.  kai, jan'2013
+		// now about 20 locations.  kai, may'2013
 		StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(this, manager, this.planStrategyFactoryRegister);
 		return manager;
@@ -861,7 +849,6 @@ public class Controler extends AbstractController {
 	 */
 	@Deprecated
 	public final PlanAlgorithm createRoutingAlgorithm() {
-		// yyyy can't make this final: overridden at about 20 locations.  kai, jan'13
 		
 		return 
 //		useTripRouting ?
@@ -892,6 +879,7 @@ public class Controler extends AbstractController {
 //		this.useTripRouting = useTripRouting;
 //	}
 
+	@Deprecated // always true (I think)
 	public final boolean getUseTripRouting() {
 		return useTripRouting;
 	}

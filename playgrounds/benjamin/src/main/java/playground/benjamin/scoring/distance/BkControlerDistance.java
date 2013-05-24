@@ -31,7 +31,7 @@ import playground.benjamin.BkControler;
  * @author dgrether
  *
  */
-public class BkControlerDistance extends BkControler {
+public final class BkControlerDistance extends BkControler {
 
 	public BkControlerDistance(String configFileName) {
 		super(configFileName);
@@ -45,10 +45,10 @@ public class BkControlerDistance extends BkControler {
 		super(args);
 	}
 
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BkScoringFunctionFactory(this.config.planCalcScore());
-	}
+//	@Override
+//	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+//		return new BkScoringFunctionFactory(this.config.planCalcScore());
+//	}
 
 	
 	public static void main(final String[] args) {
@@ -58,6 +58,9 @@ public class BkControlerDistance extends BkControler {
 			System.out.println();
 		} else {
 			final Controler controler = new BkControlerDistance(args);
+			
+			controler.setScoringFunctionFactory( new BkScoringFunctionFactory( controler.getConfig().planCalcScore() ) ) ;
+			
 			controler.run();
 		}
 		System.exit(0);

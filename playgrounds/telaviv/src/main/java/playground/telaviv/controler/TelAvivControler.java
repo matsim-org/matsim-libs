@@ -24,14 +24,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;
 import playground.telaviv.replanning.TTAStrategyManager;
 
-public class TelAvivControler extends Controler {
+public final class TelAvivControler extends Controler {
 
 	public TelAvivControler(final String[] args) {
 		super(args);

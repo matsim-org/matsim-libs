@@ -53,7 +53,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  * @author yu
  *
  */
-public class MyControler extends Controler {
+public final class MyControler extends Controler {
 	private static class MyCharyparNagelScoringFunctionFactory extends
 			CharyparNagelScoringFunctionFactory {
 
@@ -199,16 +199,19 @@ public class MyControler extends Controler {
 		super(scenario);
 	}
 
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new MyCharyparNagelScoringFunctionFactory(
-				config.planCalcScore(), network);
-	}
+//	@Override
+//	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+//		return new MyCharyparNagelScoringFunctionFactory(
+//				config.planCalcScore(), network);
+//	}
 
 	public static void main(String[] args) {
 		Controler controler = new MyControler(args[0]);
 		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);
+		
+		controler.setScoringFunctionFactory( new MyCharyparNagelScoringFunctionFactory( controler.getConfig().planCalcScore(), controler.getNetwork() ) ) ;
+		
 		controler.run();
 	}
 }
