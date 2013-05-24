@@ -12,6 +12,12 @@
   <dependencies>
   	<dependency>
   		<groupId>playground</groupId>
+  		<artifactId>dgrether</artifactId>
+  		<version>0.6.0-SNAPSHOT</version>
+  		<scope>compile</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>playground</groupId>
   		<artifactId>johannes</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   		<scope>compile</scope>
@@ -20,7 +26,6 @@
   		<groupId>playground</groupId>
   		<artifactId>benjamin</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
-  		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
 		<dependency>
