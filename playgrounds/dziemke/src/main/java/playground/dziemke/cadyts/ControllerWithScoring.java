@@ -21,52 +21,16 @@
 package playground.dziemke.cadyts;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.cadyts.car.CadytsContext;
-import org.matsim.contrib.cadyts.car.CadytsPlanChanger;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
-import org.matsim.core.replanning.PlanStrategyImpl;
 
-public class CadytsController {
-	private final static Logger log = Logger.getLogger(CadytsController.class);
+public class ControllerWithScoring {
+	private final static Logger log = Logger.getLogger(ControllerWithScoring.class);
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]) ;
-		
-		StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-		stratSets.setModuleName("ccc");
-				
-		stratSets.setProbability(1.0);
-		config.strategy().addStrategySettings(stratSets);
-		
 		Controler controler = new Controler(config);
-		
-		final CadytsContext cContext = new CadytsContext(controler.getConfig());
-		
-		controler.addControlerListener(cContext);
-		
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
-			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(cContext);
-
-				planSelector.setCadytsWeight(30.*scenario2.getConfig().planCalcScore().getBrainExpBeta() ) ;
-				// set cadyts weight very high = close to brute force
-				
-				return new PlanStrategyImpl(planSelector);
-			}
-		});
-		
-		
-//		controler.addControlerListener(new KaiAnalysisListener());
-		
 		controler.run();
 	}
 }
