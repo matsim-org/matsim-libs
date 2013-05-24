@@ -164,17 +164,14 @@ public class CarrierPlanReader extends MatsimXmlParser {
 		if (name.equals(VEHICLE)) {
 			String vId = atts.getValue(ID);
 			String linkId = atts.getValue(LINKID);
-			String capacity = atts.getValue(CAPACITY);
 			String startTime = atts.getValue(VEHICLESTART);
 			String endTime = atts.getValue(VEHICLEEND);
-			Integer cap = getInt(capacity);
 			String typeId = atts.getValue("typeId");
 			if (typeId == null) {
 				logger.warn("no vehicle type. set type='default' -> defaultVehicleType (see CarrierVehicleTypeImpl)");
 				typeId = "default";
 			}
 			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(createId(vId), createId(linkId));
-			vehicleBuilder.setCapacity(cap);
 			vehicleBuilder.setTypeId(createId(typeId));
 			vehicleBuilder.setType(CarrierVehicleType.Builder.newInstance(createId(typeId)).build());
 			if (startTime != null) vehicleBuilder.setEarliestStart(getDouble(startTime));

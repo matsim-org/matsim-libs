@@ -23,7 +23,7 @@ public class VRPVehicleAdapter implements org.matsim.contrib.freight.vrp.basics.
 	private final Type createType(CarrierVehicle carrierVehicle) {
 		Type type = VehicleImpl.getFactory().createType(
 				carrierVehicle.getVehicleType().getId().toString(),
-				carrierVehicle.getCapacity(),
+				carrierVehicle.getVehicleType().getCarrierVehicleCapacity(),
 				VehicleImpl.getFactory().createVehicleCostParams(
 						carrierVehicle.getVehicleType()
 								.getVehicleCostInformation().fix,
@@ -65,7 +65,7 @@ public class VRPVehicleAdapter implements org.matsim.contrib.freight.vrp.basics.
 
 	@Override
 	public int getCapacity() {
-		return carrierVehicle.getCapacity();
+		return carrierVehicle.getVehicleType().getCarrierVehicleCapacity();
 	}
 
 }

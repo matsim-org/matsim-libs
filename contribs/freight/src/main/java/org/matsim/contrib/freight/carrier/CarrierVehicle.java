@@ -65,19 +65,11 @@ public class CarrierVehicle {
 		}
 		
 		
-		Builder setTypeId(Id typeId){
+		public Builder setTypeId(Id typeId){
 			this.typeId = typeId;
 			return this;
 		}
 		
-		/**
-		 * capacity should be part of vehicleType
-		 */
-		@Deprecated
-		public Builder setCapacity(int capacity){
-			this.capacity = capacity;
-			return this;
-		}
 		
 		public Builder setEarliestStart(double earliestStart){
 			this.earliestStart=earliestStart;
@@ -136,32 +128,10 @@ public class CarrierVehicle {
 		return vehicleId;
 	}
 	
-	@Deprecated
-	public int getCapacity() {
-		return capacity;
-	}
-
-	@Deprecated
-	public boolean isActive() {
-		return active;
-	}
-
-//	public void setCapacity(int capacity) {
-//		this.capacity = capacity;
-//	}
-
 	@Override
 	public String toString() {
 		return vehicleId + " stationed at " + location;
 	}
-
-//	public void setLatestEndTime(double endTime) {
-//		this.latestEndTime = endTime;
-//	}
-//
-//	public void setActive(boolean active) {
-//		this.active = active;
-//	}
 
 	public CarrierVehicleType getVehicleType() {
 		return vehicleType;
@@ -170,10 +140,7 @@ public class CarrierVehicle {
 	public void setVehicleType(CarrierVehicleType vehicleType) {
 		this.vehicleType = vehicleType;
 	}
-//
-//	public void setEarliestStartTime(double startTime) {
-//		this.earliestStartTime = startTime;
-//	}
+
 
 	/**
 	 * Returns the earliest time a vehicle can be deployed (and thus can departure from its origin).

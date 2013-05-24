@@ -141,19 +141,6 @@ public class RRVRPSolverTest extends TestCase {
 		return new IdImpl(string);
 	}
 
-	public void testSolveWithNoShipments() {
-		
-		CarrierVehicle vehicle = CarrierVehicle.Builder.newInstance(makeId("vehicle"),makeId("vehicleLocation")).setCapacity(10).build();
-		vehicle.setVehicleType(CarrierVehicleType.Builder.newInstance(makeId("standard")).build());
-//		vehicle.setCapacity(10);
-		vehicles.add(vehicle);
-		Carrier carrier = CarrierImpl.newInstance(makeId("c"));
-		carrier.setCarrierCapabilities(CarrierCapabilities.newInstance());
-		carrier.getCarrierCapabilities().getCarrierVehicles().add(vehicle);
-		carrier.getShipments().addAll(shipments);
-		Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(carrier, scenario.getNetwork(), tourCost,costs).solve();
-		assertTrue(tours.isEmpty());
-	}
 
 	public void testSolveWithNoVehicles() {
 		vehicles.clear();
