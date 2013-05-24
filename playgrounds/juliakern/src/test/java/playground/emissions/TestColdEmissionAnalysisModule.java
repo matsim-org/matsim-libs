@@ -20,10 +20,12 @@
 
 package playground.emissions;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,17 +35,13 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.misc.dummyHandler;
-import playground.vsp.analysis.modules.emissionsAnalyzer.*;
 import playground.vsp.emissions.ColdEmissionAnalysisModule;
 import playground.vsp.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
-import playground.vsp.emissions.events.ColdEmissionEvent;
-import playground.vsp.emissions.events.ColdEmissionEventImpl;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.HbefaColdEmissionFactor;
 import playground.vsp.emissions.types.HbefaColdEmissionFactorKey;
 import playground.vsp.emissions.types.HbefaVehicleAttributes;
 import playground.vsp.emissions.types.HbefaVehicleCategory;
-import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
 
 
 public class TestColdEmissionAnalysisModule {
@@ -60,112 +58,113 @@ public class TestColdEmissionAnalysisModule {
 		EventsManager emissionEventManager = new dummyHandler();
 		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule(new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable), emissionEventManager, null);
 		
-
 		
-		//ceam.calculateColdEmissionsAndThrowEvent(coldEmissionEventLinkId, personId, startEngineTime, parkingDuration, accumulatedDistance, vehicleInformation)
-		//TODO warum ist hier die Parkzeti als Double in anderen Methoden aber als int?
-		//ceam.calculateColdEmissionsAndThrowEvent(coldEmissionEventLinkId, personId, 10.0, 2.0, 	50.0, "PASSENGER_CAR") ;
-		//ceam.calculateColdEmissionsAndThrowEvent(new IdImpl("coldEmissionEventLinkId2"),	new IdImpl("personId"), 10.0, 2.0, 	50.0, "PASSENGER_CAR") ;
-		
-		// 1. Test a cold emission event appearing in the avg. table
-		//zeiteinheiten?
-		// TODO benennung sinnvoll
-		// wird an ; getrennt, sollte vier lang sein, sonst avg. vehicle
-		// 1. veh cat, 2. technology, 3. size class, 4. emconcept -- datei die sowas enthaelt ist zbsp efa_coldstart_subsegm_205detailed
-		// veh cat "pass. car"
-		// technology "PC petrol <1,4L <ECE"
-		// size class "petrol (4S)"
-		// em concept "<1,4L"
-		
-		//erste zwei zeilen der coldstart-vehcat-2005average
-		/*
-		 * Case;VehCat;Year;TrafficScenario;Component;RoadCat;AmbientCondPattern;EFA_weighted;EFA_km_weighted
-2005ColdAverage[3.1];pass. car;2005;"BAU" (D);FC;Urban;TØ,0-1h,0-1km;0.99;
-		 */
-		
-		//erluabte strings fuer veh. categorie sind genau und keine anderen!!!
+		//erluabte strings fuer veh. categorie sind genau folgende und keine anderen!!!
 		//PASSENGER_CAR und HEAVY_GOODS_VEHICLE
-		//TODO im moment runtime exception wenn etwas anderes uebrgeben wird...
-		//-cold emission analysis module convertString2Tuple 
-		// XXX falls der erste eintrag einer hbefa veh. category entspricht -> tuple <hbefa veh cat, <'average', 'average', 'average'>> oder tuple < hbefa veh cat, hbefavehattributes>
-		// XXX falls der erste eintrag keiner hbefa veh. category entspricht -> tuple <null, <'average', 'average', 'average'>> oder tuple <null, hbefavehattributes>
-		// XXX falls der string nicht aus vier teilen besteht -> <hbefa veh cat, <'average', 'average', 'average'>> oder tuple <null, <'average', 'average', 'average'>>
-		// TODO soll das so sein? wird mit allen faellen ok umgegangen?
+		
+		int numberOfColdEmissions = 7;
+		Double startTime = 0.0, parkingDuration =1., accDistance = 1.;
+		//String startTime = "0.0", parkingDuration ="1.", accDistance = "1.";
+		List<ArrayList> testCases = new ArrayList<ArrayList>();		
+
+		ArrayList<Object> testCase1= new ArrayList<Object>(), testCase2= new ArrayList<Object>();
+		ArrayList<Object> testCase3= new ArrayList<Object>(), testCase4= new ArrayList<Object>();
+		ArrayList<Object> testCase5= new ArrayList<Object>(), testCase6= new ArrayList<Object>();
 		
 		// erster Fall: alle Angaben korrekt: veh cat, technology, size class, em concept
 		// passender eintrag im avg table
-		
-		String vehicleInfoForAvgCase = "PASSENGER_CAR;PC petrol;petrol;none";
-		Id idForAvgTable = new IdImpl("link id avg"), personIdForAvgTable = new IdImpl("person avg");
-		ceam.calculateColdEmissionsAndThrowEvent(idForAvgTable, personIdForAvgTable, .0, 1., 1., vehicleInfoForAvgCase);
-		
-		Assert.assertEquals(.07, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
-		
+		Collections.addAll(testCase1, "PASSENGER_CAR", "PC petrol", "petrol", "none", startTime, parkingDuration, accDistance, .01);
 		// zweiter Fall: alle Angaben korrekt: veh cat, technology, size class, em concept
 		// passender eintrag im detailed table
-		dummyHandler.reset();
-		String vehicleInfoForDetCase = "PASSENGER_CAR;PC petrol <1,4L <ECE;petrol (4S);<1,4L";
-		Id idForDetTable = new IdImpl("linkIddet"), personIdForDetTable = new IdImpl("person det");
-		ceam.calculateColdEmissionsAndThrowEvent(idForDetTable, personIdForDetTable, .0, 1., 1., vehicleInfoForDetCase);
-		Assert.assertEquals(700., dummyHandler.getSum(), MatsimTestUtils.EPSILON);
-		
+		Collections.addAll(testCase2, "PASSENGER_CAR", "PC petrol <1,4L <ECE", "petrol (4S)", "<1,4L", startTime, parkingDuration, accDistance, 100.);
 		// dritter Fall: alle Angaben korrekt: veh cat, technology, size class, em concept
 		// passender eintrag im detailed und avg table -> dann soll detailed gewaehlt werden
-		dummyHandler.reset();
-		String vehicleInfoForBothCase = "PASSENGER_CAR;PC diesel;diesel;>=2L";
-		Id idForbothTables = new IdImpl("linkId both"), personIdForBothTables = new IdImpl("person both");
-		ceam.calculateColdEmissionsAndThrowEvent(idForbothTables, personIdForBothTables, .0, 1., 1., vehicleInfoForBothCase);
-		Assert.assertEquals(70., dummyHandler.getSum(), MatsimTestUtils.EPSILON);
+		Collections.addAll(testCase3, "PASSENGER_CAR", "PC diesel", "diesel", ">=2L", startTime, parkingDuration, accDistance, 10.);
+		// sechster Fall: keine Angaben zu: technology, size class, em concept	
+		Collections.addAll(testCase4, "PASSENGER_CAR", "", "", "", startTime, parkingDuration, accDistance, .1);		
+		// neunter fall cold emission factor nicht gesetzt - TODO benjamin-> kann das passieren?
+				// wird wie 0.0 behandelt
+		Collections.addAll(testCase5, "PASSENGER_CAR", "PC petrol", "petrol", "nullCase", startTime, parkingDuration, accDistance, .0);		
+		// achter fall heavy goods soll warnmeldung werfen
+				// soll table fuer pass cars nehmen -> detailed wenn vorhanden
+		Collections.addAll(testCase6, "HEAVY_GOODS_VEHICLE", "PC petrol", "petrol", "none", startTime, parkingDuration, accDistance, .01);
 		
-		// vierter Fall: 
-		// kein passender eintrag im detailed oder avg table
-		dummyHandler.reset();
-		String vehicleInfoForNoCase = "PASSENGER_CAR;PC diesel;;>=2L";
-		Id idForNoTable = new IdImpl("linkId "), personIdForNoTable = new IdImpl("person");
-		/**
-		 *das wirf nullpointer, da kein passender eintrag im avg. table gefunden wird
-		 *TODO soll das so sein? nullpointer garantieren?  
-		 *
-		ceam.calculateColdEmissionsAndThrowEvent(idForNoTable, personIdForNoTable, .0, 1., 1., vehicleInfoForNoCase);
-		Assert.assertEquals(70., dummyHandler.getSum(), MatsimTestUtils.EPSILON);
-		*/
+		testCases.add(testCase1);testCases.add(testCase2);testCases.add(testCase3);
+		testCases.add(testCase4);testCases.add(testCase5);testCases.add(testCase6);
 
-		// fuenfter Fall: keine Angaben zu: veh cat, technology, size class, em concept
-		dummyHandler.reset();
-				String vehInfo5 = ";;;";
-				Id linkId5 = new IdImpl("link id 5"), personId5 = new IdImpl("person 5");
-				//TODO das macht arrayindex ex. in convertString2Tuple - genauso wie vehInfo5="";
-				//ceam.calculateColdEmissionsAndThrowEvent(linkId5, personId5, .0, 1., 1., vehInfo5);
-				//Assert.assertEquals(.07, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
 		
+		for(List<Object> tc : testCases){
+			dummyHandler.reset();
+			Id linkId = new IdImpl("linkId"+testCases.indexOf(tc));
+			Id personId = new IdImpl("personId"+testCases.indexOf(tc));
+			String vehicleInfo = (String) tc.get(0)+";"+(String) tc.get(1)+";"+(String) tc.get(2)+";"+(String) tc.get(3);
+			ceam.calculateColdEmissionsAndThrowEvent(linkId, personId, (Double)tc.get(4), (Double)tc.get(5), (Double)tc.get(6), vehicleInfo);
+			Assert.assertEquals(numberOfColdEmissions*(Double)tc.get(7), dummyHandler.getSum(), MatsimTestUtils.EPSILON);
+
+		}
 				
-		// sechster Fall: keine Angaben zu: technology, size class, em concept		
+				
+				// vierter Fall: 
+				// kein passender eintrag im detailed oder avg table
 				dummyHandler.reset();
-				String vehInfo6 = "PASSENGER_CAR;;;";
-				Id linkId6 = new IdImpl("link id 6"), personId6 = new IdImpl("person 6");
-				ceam.calculateColdEmissionsAndThrowEvent(linkId6, personId6, .0, 1., 1., vehInfo6);
-				Assert.assertEquals(.7, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
+				String vehicleInfoForNoCase = "PASSENGER_CAR;PC diesel;;>=2L";
+				Id idForNoTable = new IdImpl("linkId "), personIdForNoTable = new IdImpl("person");
+				boolean excep =false;
+				try{
+							ceam.calculateColdEmissionsAndThrowEvent(idForNoTable, personIdForNoTable, .0, 1., 1., vehicleInfoForNoCase);
+				Assert.assertEquals(70., dummyHandler.getSum(), MatsimTestUtils.EPSILON);
+				}catch(NullPointerException e){
+					//TODO soll das so sein? nullpointer garantieren?  
+					excep  = true;
+				}
+				Assert.assertTrue(excep);
+				excep=false;
 				
-				// siebter Fall: keine Angaben zu: technology, size class, em concept	
+
+				// fuenfter Fall: keine Angaben zu: veh cat, technology, size class, em concept
+				dummyHandler.reset();
+						String vehInfo5 = ";;;";
+						Id linkId5 = new IdImpl("link id 5"), personId5 = new IdImpl("person 5");
+						try{
+							ceam.calculateColdEmissionsAndThrowEvent(linkId5, personId5, .0, 1., 1., vehInfo5);
+							Assert.assertEquals(.07, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
+						}catch(ArrayIndexOutOfBoundsException e){
+							excep = true;
+						}
+						Assert.assertTrue(excep);
+						//TODO das macht arrayindex ex. in convertString2Tuple - genauso wie vehInfo5="";	
+						
+						// siebter Fall: keine Angaben zu: technology, size class, em concept	
 				dummyHandler.reset();	
 				String vehInfo7 = "PASSENGER_CAR";
 				Id linkId7 = new IdImpl("link id 7"), personId7 = new IdImpl("person 7");
 				ceam.calculateColdEmissionsAndThrowEvent(linkId7, personId7, .0, 1., 1., vehInfo7);
 				Assert.assertEquals(.7, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
-				
-		// siebter fall heavy goods soll warnmeldung werfen
-				// soll table fuer pass cars nehmen -> detailed wenn vorhanden
-				dummyHandler.reset();
-				String vehInfo8 = "HEAVY_GOODS_VEHICLE;PC petrol;petrol;none";
-				Id linkId8= new IdImpl("link id 8"), personId8 = new IdImpl("person 8");
-				ceam.calculateColdEmissionsAndThrowEvent(linkId8, personId8, .0, .1, 1., vehInfo8);
-				Assert.assertEquals(.07, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
-				
-		
-		//cold emission analysis module mit faktor ungleich 0 - das testet rescale emissions
 	}
 	
-					//TODO varnamen...
+	@Test 
+	public void rescaleColdEmissionsTest() {
+				//cold emission analysis module mit faktor ungleich 0 - das testet rescale emissions
+		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
+				
+		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
+		fillAverageTable(avgHbefaColdTable);
+		//fillDetailedTable(detailedHbefaColdTable);
+
+		EventsManager emissionEventManager = new dummyHandler();
+		Double rescaleFactor = -.001;
+		ColdEmissionAnalysisModule ceam = 
+				new ColdEmissionAnalysisModule(new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable), emissionEventManager, rescaleFactor );
+		dummyHandler.reset();
+		String vehicleInfoForAvgCase = "PASSENGER_CAR;PC petrol;petrol;none";
+		Id idForAvgTable = new IdImpl("link id avg"), personIdForAvgTable = new IdImpl("person avg");
+		ceam.calculateColdEmissionsAndThrowEvent(idForAvgTable, personIdForAvgTable, .0, 1., 1., vehicleInfoForAvgCase);
+		Assert.assertEquals(.07*rescaleFactor, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
+		//TODO cold emission factor koennte 'null' sein
+		
+	}
+	
+					//TODO varnamen... von oben auslesen
 	private void fillDetailedTable(
 			Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable) {
 		
@@ -226,6 +225,26 @@ public class TestColdEmissionAnalysisModule {
 		detColdKey.setHbefaComponent(cp);
 		detailedHbefaColdTable.put(detColdKey, detColdFactor);
 	}
+	//"PASSENGER_CAR;PC petrol;petrol;nullCase"
+	vehAtt = new HbefaVehicleAttributes();
+	vehAtt.setHbefaTechnology("PC petrol");
+	vehAtt.setHbefaSizeClass("petrol");
+	vehAtt.setHbefaEmConcept("nullCase");
+
+	
+	detColdFactor = new HbefaColdEmissionFactor();
+	//detColdFactor.setColdEmissionFactor(null); 
+	
+for (ColdPollutant cp: ColdPollutant.values()) {			
+	HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
+	detColdKey.setHbefaDistance(1);
+	detColdKey.setHbefaParkingTime(1);	
+	detColdKey.setHbefaVehicleAttributes(vehAtt);
+	detColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+	detColdKey.setHbefaComponent(cp);
+	detailedHbefaColdTable.put(detColdKey, detColdFactor);
+}
+	
 	}
 
 	private void fillAverageTable(
