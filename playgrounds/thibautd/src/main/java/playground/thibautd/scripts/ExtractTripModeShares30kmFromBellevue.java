@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -43,6 +45,7 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -90,8 +93,13 @@ public class ExtractTripModeShares30kmFromBellevue {
 	public static void main(final String[] args) throws IOException {
 		final String plansFile = args[ 0 ];
 		final String outputFile = args[ 1 ];
+		// useful for V4 only
+		final String facilitiesFile = args.length > 2 ? args[ 2 ] : null;
+		final String networkFile = args.length > 3 ? args[ 3 ] : null;
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		if ( facilitiesFile != null ) new MatsimFacilitiesReader( (ScenarioImpl) scenario ).parse( facilitiesFile );
+		if ( networkFile != null ) new MatsimNetworkReader( scenario ).parse( networkFile );
 		new MatsimPopulationReader( scenario ).parse( plansFile );
 
 		final Map<String, Integer> counts = new TreeMap<String, Integer>();
