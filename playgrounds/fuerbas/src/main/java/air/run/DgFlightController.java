@@ -50,8 +50,8 @@ public class DgFlightController extends Controler {
 //		String[] args2 = {"/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_tuesday_flight_model_2_runways_3600vph/air_config.xml"};
 //		String[] args2 = {"/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph_one_line/air_config.xml"};
 //	String[] args2 = {"/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_tuesday_flight_model_2_runways_60vph_storage_restriction/air_config.xml"};
-	String[] args2 = {"/home/dgrether/lehre-svn/abschlussarbeiten/2012/felix_windisch/rotationen/air_config.xml"};
-		Controler controler = new DgFlightController(args2); 
+//	String[] args2 = {"/home/dgrether/lehre-svn/abschlussarbeiten/2012/felix_windisch/rotationen/air_config.xml"};
+		Controler controler = new DgFlightController(args); 
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.setOverwriteFiles(true);
 		ControlerListener lis = new SfFlightTimeControlerListener();
