@@ -23,6 +23,7 @@ package playground.emissions;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -59,15 +60,7 @@ public class TestColdEmissionAnalysisModule {
 		EventsManager emissionEventManager = new dummyHandler();
 		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule(new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable), emissionEventManager, null);
 		
-		//TODO
-		/*
-		 * testen: event, dass im averageTable auftaucht
-		 * event, dass im detTable auftaucht
-		 * testen: fehlerhaftes event -> runtime ex, gemeint: vehattributes unvollst
-		 * event, dass in beiden auftaucht -> dann soll detailed gewaehlt werden?
-		 * event, dass in keinem auftaucht - das geht gar nicht... wird dann nicht avg gewaelt?
-		 * handler entsprechend...
-		 */
+
 		
 		//ceam.calculateColdEmissionsAndThrowEvent(coldEmissionEventLinkId, personId, startEngineTime, parkingDuration, accumulatedDistance, vehicleInformation)
 		//TODO warum ist hier die Parkzeti als Double in anderen Methoden aber als int?
@@ -105,6 +98,7 @@ public class TestColdEmissionAnalysisModule {
 		String vehicleInfoForAvgCase = "PASSENGER_CAR;PC petrol;petrol;none";
 		Id idForAvgTable = new IdImpl("link id avg"), personIdForAvgTable = new IdImpl("person avg");
 		ceam.calculateColdEmissionsAndThrowEvent(idForAvgTable, personIdForAvgTable, .0, 1., 1., vehicleInfoForAvgCase);
+		
 		Assert.assertEquals(.07, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
 		
 		// zweiter Fall: alle Angaben korrekt: veh cat, technology, size class, em concept
@@ -158,98 +152,162 @@ public class TestColdEmissionAnalysisModule {
 				Id linkId7 = new IdImpl("link id 7"), personId7 = new IdImpl("person 7");
 				ceam.calculateColdEmissionsAndThrowEvent(linkId7, personId7, .0, 1., 1., vehInfo7);
 				Assert.assertEquals(.7, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
+				
+		// siebter fall heavy goods soll warnmeldung werfen
+				// soll table fuer pass cars nehmen -> detailed wenn vorhanden
+				dummyHandler.reset();
+				String vehInfo8 = "HEAVY_GOODS_VEHICLE;PC petrol;petrol;none";
+				Id linkId8= new IdImpl("link id 8"), personId8 = new IdImpl("person 8");
+				ceam.calculateColdEmissionsAndThrowEvent(linkId8, personId8, .0, .1, 1., vehInfo8);
+				Assert.assertEquals(.07, dummyHandler.getSum(), MatsimTestUtils.EPSILON);
+				
 		
 		//cold emission analysis module mit faktor ungleich 0 - das testet rescale emissions
 	}
-
+	
+					//TODO varnamen...
 	private void fillDetailedTable(
 			Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable) {
 		
+		HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
+		vehAtt.setHbefaTechnology("PC petrol <1,4L <ECE");
+		vehAtt.setHbefaSizeClass("petrol (4S)");
+		vehAtt.setHbefaEmConcept("<1,4L");
+		
+		HbefaColdEmissionFactor detColdFactor = new HbefaColdEmissionFactor();
+		detColdFactor.setColdEmissionFactor(100.); 
+
 		for (ColdPollutant cp: ColdPollutant.values()) {
-			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
-			detColdKey.setHbefaComponent(cp);
+			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();	
 			detColdKey.setHbefaDistance(1);
 			detColdKey.setHbefaParkingTime(1);
-			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-			//TODO varnamen...
-			vehAtt.setHbefaTechnology("PC petrol <1,4L <ECE");
-			vehAtt.setHbefaSizeClass("petrol (4S)");
-			vehAtt.setHbefaEmConcept("<1,4L");
 			detColdKey.setHbefaVehicleAttributes(vehAtt);
 			detColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			HbefaColdEmissionFactor detColdFactor = new HbefaColdEmissionFactor();
-			detColdFactor.setColdEmissionFactor(100.); 
+			detColdKey.setHbefaComponent(cp);
 			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 		
-		//"PASSENGER_CAR;PC diesel;diesel;>=2L"
-		for (ColdPollutant cp: ColdPollutant.values()) {
-			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
-			detColdKey.setHbefaComponent(cp);
-			detColdKey.setHbefaDistance(1);
-			detColdKey.setHbefaParkingTime(1);
-			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-			//TODO varnamen...
+		//"PASSENGER_CAR;PC diesel;diesel;>=2L"		
+			vehAtt = new HbefaVehicleAttributes();
 			vehAtt.setHbefaTechnology("PC diesel");
 			vehAtt.setHbefaSizeClass("diesel");
 			vehAtt.setHbefaEmConcept(">=2L");
+
+			
+			detColdFactor = new HbefaColdEmissionFactor();
+			detColdFactor.setColdEmissionFactor(10.); 
+			
+		for (ColdPollutant cp: ColdPollutant.values()) {			
+			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
+			detColdKey.setHbefaDistance(1);
+			detColdKey.setHbefaParkingTime(1);	
 			detColdKey.setHbefaVehicleAttributes(vehAtt);
 			detColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			HbefaColdEmissionFactor detColdFactor = new HbefaColdEmissionFactor();
-			detColdFactor.setColdEmissionFactor(10.); 
+			detColdKey.setHbefaComponent(cp);
 			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 		
+		//HEAVY_GOODS_VEHICLE;PC petrol;petrol;none sollte nciht benutzt werden
+		vehAtt = new HbefaVehicleAttributes();
+		vehAtt.setHbefaTechnology("PC petrol");
+		vehAtt.setHbefaSizeClass("petrol");
+		vehAtt.setHbefaEmConcept("none");
+
+		
+		detColdFactor = new HbefaColdEmissionFactor();
+		detColdFactor.setColdEmissionFactor(-1.); 
+		
+	for (ColdPollutant cp: ColdPollutant.values()) {			
+		HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
+		detColdKey.setHbefaDistance(1);
+		detColdKey.setHbefaParkingTime(1);	
+		detColdKey.setHbefaVehicleAttributes(vehAtt);
+		detColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		detColdKey.setHbefaComponent(cp);
+		detailedHbefaColdTable.put(detColdKey, detColdFactor);
+	}
 	}
 
 	private void fillAverageTable(
 			Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable) {
-		for (ColdPollutant cp: ColdPollutant.values()) {
-			HbefaColdEmissionFactorKey avColdKey = new HbefaColdEmissionFactorKey();
-			avColdKey.setHbefaComponent(cp);
-			avColdKey.setHbefaDistance(1);
-			avColdKey.setHbefaParkingTime(1);
 			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
+			
 			vehAtt.setHbefaEmConcept("average");
 			vehAtt.setHbefaSizeClass("average");
 			vehAtt.setHbefaTechnology("average");
-			avColdKey.setHbefaVehicleAttributes(vehAtt);
-			avColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+
+			
 			HbefaColdEmissionFactor avColdFactor = new HbefaColdEmissionFactor();
-			avColdFactor.setColdEmissionFactor(.1);
-			avgHbefaColdTable.put(avColdKey, avColdFactor);
-		}
-		//2005ColdAverage[3.1];pass. car;2005;"BAU" (D);PM;Urban;TØ,0-1h,0-1km;3.55342356488109e-03;
-		for (ColdPollutant cp: ColdPollutant.values()) {
+			avColdFactor.setColdEmissionFactor(.1);	
+			
+		for (ColdPollutant cp: ColdPollutant.values()) {			
 			HbefaColdEmissionFactorKey avColdKey = new HbefaColdEmissionFactorKey();
-			avColdKey.setHbefaComponent(cp);
 			avColdKey.setHbefaDistance(1);
 			avColdKey.setHbefaParkingTime(1);
-			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-			vehAtt.setHbefaTechnology("PC petrol");
-			vehAtt.setHbefaSizeClass("petrol");
-			vehAtt.setHbefaEmConcept("none");
 			avColdKey.setHbefaVehicleAttributes(vehAtt);
 			avColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			HbefaColdEmissionFactor avColdFactor = new HbefaColdEmissionFactor();
-			avColdFactor.setColdEmissionFactor(.01);
+			avColdKey.setHbefaComponent(cp);
 			avgHbefaColdTable.put(avColdKey, avColdFactor);
 		}
 		
+				
+		/*
+		 * 		String vehicleInfoForAvgCase = "PASSENGER_CAR;PC petrol;petrol;none";
+		ceam.calculateColdEmissionsAndThrowEvent(idForAvgTable, personIdForAvgTable, .0, 1., 1., vehicleInfoForAvgCase);
+		 */
+		
+		vehAtt = new HbefaVehicleAttributes();
+		vehAtt.setHbefaTechnology("PC petrol");
+		vehAtt.setHbefaSizeClass("petrol");
+		vehAtt.setHbefaEmConcept("none");
+
+		avColdFactor = new HbefaColdEmissionFactor();
+		avColdFactor.setColdEmissionFactor(.01);
+		
+		for (ColdPollutant cp: ColdPollutant.values()) {	
+		HbefaColdEmissionFactorKey avColdKey = new HbefaColdEmissionFactorKey();
+		avColdKey.setHbefaDistance(1);
+		avColdKey.setHbefaParkingTime(1);
+		avColdKey.setHbefaVehicleAttributes(vehAtt);
+		avColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			avColdKey.setHbefaComponent(cp);
+			avgHbefaColdTable.put(avColdKey, avColdFactor);
+		}
+		
+		vehAtt = new HbefaVehicleAttributes();
+		vehAtt.setHbefaTechnology("PC diesel");
+		vehAtt.setHbefaSizeClass("diesel");
+		vehAtt.setHbefaEmConcept(">=2L");
+		
+		avColdFactor = new HbefaColdEmissionFactor();
+		avColdFactor.setColdEmissionFactor(.001); 
+		
 		for (ColdPollutant cp: ColdPollutant.values()) {
 			HbefaColdEmissionFactorKey avColdKey = new HbefaColdEmissionFactorKey();
-			avColdKey.setHbefaComponent(cp);
 			avColdKey.setHbefaDistance(1);
 			avColdKey.setHbefaParkingTime(1);
-			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-			//TODO varnamen...
-			vehAtt.setHbefaTechnology("PC diesel");
-			vehAtt.setHbefaSizeClass("diesel");
-			vehAtt.setHbefaEmConcept(">=2L");
 			avColdKey.setHbefaVehicleAttributes(vehAtt);
 			avColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			HbefaColdEmissionFactor avColdFactor = new HbefaColdEmissionFactor();
-			avColdFactor.setColdEmissionFactor(.001); 
+			avColdKey.setHbefaComponent(cp);			
+			avgHbefaColdTable.put(avColdKey, avColdFactor);
+		}
+		
+		//HEAVY_GOODS_VEHICLE;PC petrol;petrol;none sollte nciht benutzt werden
+		vehAtt = new HbefaVehicleAttributes();
+		vehAtt.setHbefaTechnology("PC petrol");
+		vehAtt.setHbefaSizeClass("petrol");
+		vehAtt.setHbefaEmConcept("none");
+		
+		avColdFactor = new HbefaColdEmissionFactor();
+		avColdFactor.setColdEmissionFactor(-1.); 
+		
+		for (ColdPollutant cp: ColdPollutant.values()) {
+			HbefaColdEmissionFactorKey avColdKey = new HbefaColdEmissionFactorKey();
+			avColdKey.setHbefaDistance(1);
+			avColdKey.setHbefaParkingTime(1);
+			avColdKey.setHbefaVehicleAttributes(vehAtt);
+			avColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+			avColdKey.setHbefaComponent(cp);			
 			avgHbefaColdTable.put(avColdKey, avColdFactor);
 		}
 	}
@@ -261,6 +319,7 @@ public class TestColdEmissionAnalysisModule {
 	}
 	
 	@Test @Ignore //is private.... test it anyway?
+	//wird implizit oben getestet
 	public void convertString2TupleTest(){
 		Assert.assertEquals("something", true, true);
 	}

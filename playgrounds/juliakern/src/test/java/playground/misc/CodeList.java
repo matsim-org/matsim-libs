@@ -46,6 +46,12 @@ public class CodeList {
 	 * ColdEmissionAnalysisModule 123
 	 * das faengt nicht alle faelle ab, bei denen convertTupel2String schief laeuft
 	 * leere Strings "" fuehren auch zu exceptions, 
+	 * 
+	 * ColdEmissionAnalysisModule
+	 * parkingduration, accumulated distance, startenginetime als double
+	 * startenginetime als double vorgesehen fuer coldeventimpl
+	 * pd und ad an calculate cold ev. uebergeben 
+	 * - Parkzeit und Startzeit als Double, 
 	 */
 	
 

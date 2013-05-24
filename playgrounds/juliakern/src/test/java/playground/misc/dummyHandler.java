@@ -1,6 +1,5 @@
 package playground.misc;
 
-import org.junit.Assert;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -31,8 +30,6 @@ public class dummyHandler implements EventsManager {
 				
 			}
 		}
-		System.out.println(sumOverAll);
-		// TODO Auto-generated method stub
 
 	}
 
