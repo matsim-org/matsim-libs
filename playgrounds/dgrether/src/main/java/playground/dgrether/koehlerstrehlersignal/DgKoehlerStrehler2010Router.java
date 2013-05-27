@@ -124,7 +124,7 @@ public class DgKoehlerStrehler2010Router {
 			Node fromNode = network.getNodes().get(commodity.getSourceNode());
 			Node toNode = network.getNodes().get(commodity.getDrainNodeId());
 			log.info("Searching path from,to node " + fromNode.getId() + "," + toNode.getId());
-			Path path = dijkstra.calcLeastCostPath(fromNode, toNode, 1.0, fakePerson, fakeVehicle);
+			Path path = dijkstra.calcLeastCostPath(fromNode, toNode, 1.0, fakePerson, fakeVehicle); //call for dijkstra
 			log.info("Found path for commodity id " + commodity.getId() + " " + path);
 			if (path == null) {
 				invalidCommodities.add(commodity.getId());

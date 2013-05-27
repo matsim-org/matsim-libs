@@ -108,13 +108,15 @@ public class DgMATSimScenario2KoehlerStrehler2010 {
 		DgNetworkShrinker netShrinker = new DgNetworkShrinker();
 		netShrinker.setSignalizedNodes(signalizedNodes);
 		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), bb, crs);
+		//TODO code mit shortest path between signalized nodes
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(smallNetwork);
 		
 		this.writeNetwork(smallNetwork, smallNetworkFile);
 		this.writeNetwork2Shape(fullScenario.getNetwork(), shapeFileDirectory + "network_full");
 		this.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small");
-
+		System.exit(0);
+		
 //		String smallNetworkClean = outputDirectory + "network_small_clean.xml.gz";
 //		this.writeNetwork(smallNetwork, smallNetworkClean);
 //		this.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small_clean");
