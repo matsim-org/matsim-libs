@@ -27,8 +27,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import air.analysis.BoardingDeniedStuckEvaluator;
-import air.analysis.CollectBoardingDeniedStuckEventHandler;
+import air.analysis.stuck.BoardingDeniedStuckEvaluator;
+import air.analysis.stuck.CollectBoardingDeniedStuckEventHandler;
 
 
 /**

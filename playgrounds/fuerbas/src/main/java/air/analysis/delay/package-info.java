@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CreateAirTransportDemand
+ * package-info
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scripts;
-
-import air.demand.CtPopulationGenerator;
-
-
 /**
+ * Contains classes to analyze delay in flight model. 
  * @author dgrether
  *
  */
-public class CreateAirTransportDemand {
-
-	
-	private static final String repos = "/media/data/work/repos/";
-
-	private static final String inputNetworkFile = repos + "shared-svn/studies/countries/de/flight/dg_oag_tuesday_flight_model_2_runways_60vph/air_network.xml";
-	private static final String odDemand = "/media/data/work/repos/shared-svn/studies/countries/de/flight/demand/destatis/2011_september/demand_september_2011_tabelle_2.2.2.csv";
-	private static final String outputDirectory = repos + "shared-svn/studies/countries/de/flight/demand/destatis/2011_september/";
-	private static final String outputPopulation = outputDirectory + "population_september_2011_tabelle_2.2.2_train_mode.xml.gz";
-
-	private static final double startzeit = 3.0 * 3600.0;	
-	private static final double airportoffen = 15.0 * 3600.0;
-
-	
-	public static void main(String[] args) {
-		CtPopulationGenerator ctPopGen = new CtPopulationGenerator(startzeit, airportoffen);
-		ctPopGen.setCreateOtherModePlan(true);
-		ctPopGen.createAirTransportDemand(inputNetworkFile, odDemand, outputDirectory, outputPopulation);
-	}
-
-}
+package air.analysis.delay;

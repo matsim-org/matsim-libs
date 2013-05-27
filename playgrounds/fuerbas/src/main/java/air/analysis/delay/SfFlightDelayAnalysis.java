@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package air.analysis;
+package air.analysis.delay;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

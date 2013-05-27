@@ -36,9 +36,9 @@ import org.matsim.core.events.MatsimEventsReader;
  * @author dgrether
  *
  */
-public class DgCalcFlightLineswitch implements ActivityEndEventHandler {
+public class DgFlightLineSwitchEventHandler implements ActivityEndEventHandler {
 
-	private static final Logger log = Logger.getLogger(DgCalcFlightLineswitch.class);
+	private static final Logger log = Logger.getLogger(DgFlightLineSwitchEventHandler.class);
 	
 	private Map<Id, Integer> personIdPtInteractionMap = new HashMap<Id, Integer>();
 	
@@ -82,7 +82,7 @@ public class DgCalcFlightLineswitch implements ActivityEndEventHandler {
 		}
 	}
 
-	private void calcLineswitch(String eventsFile) {
+	public void calcLineswitch(String eventsFile) {
 		log.info("Processing: " + eventsFile);
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(this);
@@ -93,12 +93,7 @@ public class DgCalcFlightLineswitch implements ActivityEndEventHandler {
 		log.info("done.");
 	}
 	
-	public static void main(String[] args) {
-		String events = "/home/dgrether/data/work/repos/runs-svn/run1835/ITERS/it.500/1835.500.events.xml.gz";
-		new DgCalcFlightLineswitch().calcLineswitch(events);
-		
-		
-	}
+	
 
 
 }

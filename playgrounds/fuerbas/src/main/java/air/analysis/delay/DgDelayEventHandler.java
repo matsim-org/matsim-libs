@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.analysis;
+package air.analysis.delay;
 
 import java.util.HashMap;
 import java.util.Map;

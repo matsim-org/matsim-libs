@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.analysis;
+package air.scripts;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 
+import air.analysis.DgFlightDemandEventHandler;
 import air.demand.DgDemandReader;
 import air.demand.DgDemandUtils;
 import air.demand.DgDemandWriter;
@@ -114,7 +115,7 @@ public class DgFlightSimDemandAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 		reader.readFile(events);
 		SortedMap<String, SortedMap<String, FlightODRelation>> simulatedDirectFlights = handler.getDirectFlightODRelations();
-		writer.writeFlightODRelations(outputFile, simulatedDirectFlights, handler.getNumberOfDirectFlights(), (int)handler.getStucked());
+		writer.writeFlightODRelations(outputFile, simulatedDirectFlights, handler.getNumberOfDirectFlights(), (int)handler.getStuck());
 		
 		diffMap = DgDemandUtils.createDifferenceMap(destatisDemand21, simulatedDirectFlights);
 		variance = DgDemandUtils.calcVariance(diffMap);
@@ -125,7 +126,7 @@ public class DgFlightSimDemandAnalyzer {
 		writer.writeFlightODRelations(outputRelativeErrorFile, relativeErrorMap);
 		relErrorSum = DgDemandUtils.calcRelativeErrorSum(relativeErrorMap);
 		double boardingDenied = handler.getBoardingDenied();
-		double stucked = handler.getStucked();
+		double stucked = handler.getStuck();
 		
 		populationVariance = variance.getFirst() / (double)variance.getSecond();
 		meanRelError = relErrorSum.getFirst()/(double)relErrorSum.getSecond();

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.analysis;
+package air.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,6 +34,7 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.dgrether.events.EventsFilterManager;
 import playground.dgrether.events.EventsFilterManagerImpl;
+import air.analysis.DgSeatsODTableEventHandler;
 import air.demand.DgDemandReader;
 import air.demand.DgDemandUtils;
 import air.demand.FlightODRelation;
@@ -68,7 +69,7 @@ public class DemandVSSeatsAnalysis {
 			String demandVsSeatsFile = out.getOutputFilename("demand_vs_seats_by_od_pair.csv");
 			
 			EventsFilterManager eventsManager = new EventsFilterManagerImpl();
-			CreateSeatsODTable seatsODTable = new CreateSeatsODTable(veh);
+			DgSeatsODTableEventHandler seatsODTable = new DgSeatsODTableEventHandler(veh);
 			eventsManager.addHandler(seatsODTable);
 			MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 			reader.readFile(eventsFilename);

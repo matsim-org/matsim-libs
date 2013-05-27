@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CreateSeatsODTable
+ * DgSeatsODTable
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,94 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.analysis;
+package air.scripts;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import playground.dgrether.events.EventsFilterManager;
 import playground.dgrether.events.EventsFilterManagerImpl;
+import air.analysis.DgSeatsODTableEventHandler;
 import air.demand.DgDemandWriter;
-import air.demand.FlightODRelation;
 
 
-/**
- * @author dgrether
- *
- */
-public class CreateSeatsODTable implements
-VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
+public class DgSeatsODTable {
 
-	private SortedMap<String, SortedMap<String, FlightODRelation>> fromAirport2FlightOdRelMap;
-	private Vehicles vehicles;
-	private Map<Id, VehicleDepartsAtFacilityEvent> vehDepartsEventsByVehicleId = new HashMap<Id, VehicleDepartsAtFacilityEvent>();
-	
-	public CreateSeatsODTable(Vehicles vehicles){
-		this.vehicles = vehicles;
-		this.reset(0);
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		this.fromAirport2FlightOdRelMap = new TreeMap<String, SortedMap<String, FlightODRelation>>();
-		this.vehDepartsEventsByVehicleId.clear();
-	}
-
-	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		this.vehDepartsEventsByVehicleId.put(event.getVehicleId(), event);
-	}
-
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		VehicleDepartsAtFacilityEvent departureEvent = this.vehDepartsEventsByVehicleId.get(event.getVehicleId());
-		if (departureEvent != null){
-			Vehicle vehicle = this.vehicles.getVehicles().get(event.getVehicleId());
-			int seats = vehicle.getType().getCapacity().getSeats() - 1;
-			this.addSeats(departureEvent.getFacilityId().toString(), event.getFacilityId().toString(), seats);
-		}
-	}
-	
-	private void addSeats(String from, String to, int seats){
-		SortedMap<String, FlightODRelation> m = this.fromAirport2FlightOdRelMap.get(from);
-		if (m == null){
-			m = new TreeMap<String, FlightODRelation>();
-			this.fromAirport2FlightOdRelMap.put(from, m);
-		}
-		FlightODRelation odRel = m.get(to);
-		if (odRel == null){
-			odRel = new FlightODRelation(from, to, (double) seats);
-			m.put(to, odRel);
-		}
-		else {
-			odRel.setNumberOfTrips(odRel.getNumberOfTrips() + seats);
-		}
-	}
-
-	public SortedMap<String, SortedMap<String, FlightODRelation>> getODSeats() {
-		return this.fromAirport2FlightOdRelMap;
-	}
-
-	
-	/**
-	 * @param args
-	 * @throws Exception 
-	 */
 	public static void main(String[] args) throws Exception {
 		String baseDirectory = "/media/data/work/repos/";
 		Tuple[] runs = { new Tuple<String, Integer>("1836", 600)
@@ -128,7 +57,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
 			String seatsOdOutputFile = out.getOutputFilename("seats_by_od_pair.csv");
 			
 			EventsFilterManager eventsManager = new EventsFilterManagerImpl();
-			CreateSeatsODTable seatsODTable = new CreateSeatsODTable(veh);
+			DgSeatsODTableEventHandler seatsODTable = new DgSeatsODTableEventHandler(veh);
 			eventsManager.addHandler(seatsODTable);
 			MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 			reader.readFile(eventsFilename);
@@ -137,8 +66,5 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
 		
 		
 	}
-
-
-
 
 }

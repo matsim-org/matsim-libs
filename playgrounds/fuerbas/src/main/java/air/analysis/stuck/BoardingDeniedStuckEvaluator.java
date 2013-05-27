@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.analysis;
+package air.analysis.stuck;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
-import air.analysis.CollectBoardingDeniedStuckEventHandler.PersonEvents;
+import air.analysis.stuck.CollectBoardingDeniedStuckEventHandler.PersonEvents;
 
 
 /**

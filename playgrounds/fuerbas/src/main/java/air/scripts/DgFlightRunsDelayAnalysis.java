@@ -17,7 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.analysis;
+package air.scripts;
+
+import air.analysis.delay.DgDelayAnalysis;
+import air.analysis.delay.SfFlightDelayAnalysis;
 
 
 /**

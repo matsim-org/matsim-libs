@@ -38,6 +38,7 @@ import air.demand.FlightODRelation;
 
 
 /**
+ * Collects data from events for analysis of flight scenario passenger demand. 
  * @author dgrether
  *
  */
@@ -111,7 +112,7 @@ public class DgFlightDemandEventHandler implements AgentArrivalEventHandler, Age
 		return this.fromAirport2FlightOdRelMap;
 	}
 	
-	public double getStucked() {
+	public double getStuck() {
 		return this.totalStuck;
 	}
 

@@ -58,6 +58,7 @@ public class CtPopulationGenerator {
 	private static final Logger log = Logger.getLogger(CtPopulationGenerator.class);
 	private double startTimeUtcSeconds;
 	private double durationAirportOpen;
+	private boolean createOtherModePlan = false;
 	
 	public CtPopulationGenerator(double startTimeUtcSeconds, double durationAirportOpen){
 		this.startTimeUtcSeconds = startTimeUtcSeconds;
@@ -145,23 +146,17 @@ public class CtPopulationGenerator {
 					continue;
 				}
 				Person person = populationFactory.createPerson(sc.createId(String.valueOf(personIdCounter)));	// ID für aktuellen Passagier
-				Plan plan = populationFactory.createPlan();
-				person.addPlan(plan);
 				personIdCounter++;
 				population.addPerson(person);
 
-				ActivityImpl activity1 = (ActivityImpl) populationFactory.createActivityFromLinkId("home", fromLink.getId());
-				activity1.setCoord(fromLink.getCoord());
-				plan.addActivity(activity1); // add the Activity to the Plan
+				Plan plan = this.createPlan(populationFactory, fromLink, destinationLink, random, "pt");
+				person.addPlan(plan);
+				if (this.createOtherModePlan) {
+					plan = this.createPlan(populationFactory, fromLink, destinationLink, random, "train");
+					person.addPlan(plan);
+				}
 				
-				double firstActEndTime = random.nextDouble() * durationAirportOpen + startTimeUtcSeconds;
-				activity1.setEndTime(firstActEndTime); // zufällig generierte ActivityStartTime als Endzeit gesetzt
 
-				plan.addLeg(populationFactory.createLeg("pt"));
-
-				ActivityImpl destinationActivity = (ActivityImpl) populationFactory.createActivityFromLinkId("home", destinationLink.getId());
-				destinationActivity.setCoord(destinationLink.getCoord());
-				plan.addActivity(destinationActivity);
 			}
 		}
 		log.info("# Persons created: " + (personIdCounter - 1));
@@ -172,6 +167,34 @@ public class CtPopulationGenerator {
 		return population;
 	}
 
+	
+	private Plan createPlan(PopulationFactory populationFactory, Link fromLink, Link destinationLink, Random random, String legmode) {
+		Plan plan = populationFactory.createPlan();
+
+		ActivityImpl activity1 = (ActivityImpl) populationFactory.createActivityFromLinkId("home", fromLink.getId());
+		activity1.setCoord(fromLink.getCoord());
+		plan.addActivity(activity1); // add the Activity to the Plan
+		
+		double firstActEndTime = random.nextDouble() * durationAirportOpen + startTimeUtcSeconds;
+		activity1.setEndTime(firstActEndTime); // zufällig generierte ActivityStartTime als Endzeit gesetzt
+
+		plan.addLeg(populationFactory.createLeg(legmode));
+
+		ActivityImpl destinationActivity = (ActivityImpl) populationFactory.createActivityFromLinkId("home", destinationLink.getId());
+		destinationActivity.setCoord(destinationLink.getCoord());
+		plan.addActivity(destinationActivity);
+		return plan;
+	}
+
+	
+	public boolean isCreateOtherModePlan() {
+		return createOtherModePlan;
+	}
+
+	
+	public void setCreateOtherModePlan(boolean createOtherModePlan) {
+		this.createOtherModePlan = createOtherModePlan;
+	}
 
 	
 	
