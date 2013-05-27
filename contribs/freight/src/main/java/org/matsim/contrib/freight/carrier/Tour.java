@@ -428,12 +428,12 @@ public class Tour {
 
 		@Override
 		public double getDuration() {
-			return service.getServiceTime();
+			return service.getServiceDuration();
 		}
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return service.getTimeWindow();
+			return service.getServiceStartTimeWindow();
 		}
 
 		@Override

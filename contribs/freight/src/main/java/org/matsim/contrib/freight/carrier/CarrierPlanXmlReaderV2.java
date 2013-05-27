@@ -98,8 +98,6 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 	private double currentLegDepTime;
 	
 	
-	private CarrierImpl.Builder carrierBuilder;
-
 	private Builder capabilityBuilder;
 
 	private org.matsim.contrib.freight.carrier.CarrierVehicleType.Builder vehicleTypeBuilder;
@@ -144,8 +142,7 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 		if (name.equals(CARRIER)) {
 			String id = atts.getValue(ID);
 			if(id == null) throw new IllegalStateException("carrierId is missing.");
-			currentCarrier = CarrierImpl.Builder.newInstance(createId(id)).build();
-//			carrierBuilder = CarrierImpl.Builder.newInstance(createId(id));
+			currentCarrier = CarrierImpl.newInstance(createId(id));
 		}
 		//services
 		else if (name.equals("services")) {
@@ -161,15 +158,15 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 			CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, to);
 			String capDemandString = atts.getValue("capacityDemand");
 			if(capDemandString != null) serviceBuilder.setCapacityDemand(getInt(capDemandString));
-			String startString = atts.getValue("earliestStart");
+			String startString = atts.getValue("start");
 			double start = 0.0;
 			if(startString != null) start = parseTimeToDouble(startString);
 			double end = Double.MAX_VALUE;
-			String endString = atts.getValue("latestEnd");
+			String endString = atts.getValue("end");
 			if(endString != null) end = parseTimeToDouble(endString);
-			serviceBuilder.setTimeWindow(TimeWindow.newInstance(start, end));
-			String serviceTimeString = atts.getValue("serviceTime");
-			if(serviceTimeString != null) serviceBuilder.setServiceTime(parseTimeToDouble(serviceTimeString));
+			serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
+			String serviceTimeString = atts.getValue("serviceDuration");
+			if(serviceTimeString != null) serviceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));
 			CarrierService service = serviceBuilder.build();
 			serviceMap.put(service.getId(), service);
 			currentCarrier.getServices().add(service);

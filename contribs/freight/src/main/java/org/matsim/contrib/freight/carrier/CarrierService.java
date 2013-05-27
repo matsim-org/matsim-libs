@@ -16,7 +16,7 @@ public class CarrierService  {
 		private String name = "service";
 		
 		private double serviceTime = 0.0;
-		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Double.MAX_VALUE);
+		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private int capacityDemand = 0;
 		
 		private Builder(Id id, Id locationLinkId) {
@@ -30,13 +30,28 @@ public class CarrierService  {
 			return this;
 		}
 		
-		public Builder setServiceTime(double serviceTime){
-			this.serviceTime = serviceTime;
+		/**
+		 * By default it is [0.0,Integer.MaxValue].
+		 * 
+		 * @param serviceDuration
+		 * @return
+		 */
+		public Builder setServiceDuration(double serviceDuration){
+			this.serviceTime = serviceDuration;
 			return this;
 		}
 		
-		public Builder setTimeWindow(TimeWindow tw){
-			this.timeWindow = tw;
+		/**
+		 * Sets a time-window for the service.
+		 * 
+		 * <p>Note that the time-window restricts the start-time of the service (i.e. serviceActivity). If one works with hard time-windows (which means that
+		 * time-windows must be met) than the service is allowed to start between startTimeWindow.getStart() and startTimeWindow.getEnd().
+		 * 
+		 * @param startTimeWindow
+		 * @return
+		 */
+		public Builder setServiceStartTimeWindow(TimeWindow startTimeWindow){
+			this.timeWindow = startTimeWindow;
 			return this;
 		}
 		
@@ -58,7 +73,7 @@ public class CarrierService  {
 	
 	private final String name;
 	
-	private final double serviceTime;
+	private final double serviceDuration;
 
 	private final TimeWindow timeWindow;
 
@@ -67,7 +82,7 @@ public class CarrierService  {
 	private CarrierService(Builder builder){
 		id = builder.id;
 		locationId = builder.locationLinkId;
-		serviceTime = builder.serviceTime;
+		serviceDuration = builder.serviceTime;
 		timeWindow = builder.timeWindow;
 		demand = builder.capacityDemand;
 		name = builder.name;
@@ -81,11 +96,11 @@ public class CarrierService  {
 		return locationId;
 	}
 
-	public double getServiceTime() {
-		return serviceTime;
+	public double getServiceDuration() {
+		return serviceDuration;
 	}
 
-	public TimeWindow getTimeWindow(){
+	public TimeWindow getServiceStartTimeWindow(){
 		return timeWindow;
 	}
 	
@@ -102,7 +117,7 @@ public class CarrierService  {
 
 	@Override
 	public String toString() {
-		return "[id=" + id + "][locationId=" + locationId + "][capacityDemand=" + demand + "][serviceTime=" + serviceTime + "][timeWindow=" + timeWindow + "]";
+		return "[id=" + id + "][locationId=" + locationId + "][capacityDemand=" + demand + "][serviceDuration=" + serviceDuration + "][startTimeWindow=" + timeWindow + "]";
 	}
 
 	/* (non-Javadoc)
