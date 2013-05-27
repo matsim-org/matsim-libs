@@ -36,14 +36,15 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 	public EventWriterXML(final String filename) {
 		init(filename);
 	}
-	/**Constructor so you can pass System.out or System.err to the writer to see the result on the console.
+	/**
+	 * Constructor so you can pass System.out or System.err to the writer to see the result on the console.
 	 * 
 	 * @param stream
 	 */
 	public EventWriterXML(final PrintStream stream ) {
-		this.out = new BufferedWriter(new OutputStreamWriter(stream)) ;
+		this.out = new BufferedWriter(new OutputStreamWriter(stream));
 		try {
-			this.out.write("<events>\n") ;
+			this.out.write("<events>\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -89,7 +90,7 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 		for (Map.Entry<String, String> entry : attr.entrySet()) {
 			eventXML.append(entry.getKey());
 			eventXML.append("=\"");
-			eventXML.append(entry.getValue());
+			eventXML.append(encodeAttributeValue(entry.getValue()));
 			eventXML.append("\" ");
 		}
 		eventXML.append(" />\n");
@@ -99,4 +100,22 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 			e.printStackTrace();
 		}
 	}
+
+	// the following method was taken from MatsimXmlWriter in order to correctly encode attributes, but
+	// to forego the overhead of using the full MatsimXmlWriter.
+	/**
+	 * Encodes the given string in such a way that it no longer contains
+	 * characters that have a special meaning in xml.
+	 * 
+	 * @see <a href="http://www.w3.org/International/questions/qa-escapes#use">http://www.w3.org/International/questions/qa-escapes#use</a>
+	 * @param attributeValue
+	 * @return String with some characters replaced by their xml-encoding.
+	 */
+	private String encodeAttributeValue(final String attributeValue) {
+		if (attributeValue.contains("&") || attributeValue.contains("\"") || attributeValue.contains("<") || attributeValue.contains(">")) {
+			return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
+		}
+		return attributeValue;
+	}
+
 }
