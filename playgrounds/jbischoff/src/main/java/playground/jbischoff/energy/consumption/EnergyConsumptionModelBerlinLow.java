@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package energy.consumption;
+package playground.jbischoff.energy.consumption;
 
 
 public class EnergyConsumptionModelBerlinLow extends

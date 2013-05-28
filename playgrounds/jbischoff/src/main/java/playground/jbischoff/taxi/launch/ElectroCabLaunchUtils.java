@@ -4,10 +4,17 @@ import java.io.*;
 import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
+
+import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.agents.*;
@@ -18,11 +25,16 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
+
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
+import playground.jbischoff.energy.charging.ChargeUponDepotArrival;
+import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
+import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
+import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.file.DepotReader;
@@ -33,7 +45,7 @@ import playground.michalm.vrp.run.VrpConfigUtils;
 import playground.michalm.vrp.taxi.*;
 
 
-public class OnlineDvrpLauncherUtils
+public class ElectroCabLaunchUtils
 {
     public enum TravelTimeSource
     {
@@ -58,7 +70,10 @@ public class OnlineDvrpLauncherUtils
         TIME, // travel time
         DISTANCE; // travel distance
     }
-
+    private EnergyConsumptionTracker energyConsumptionTracker ;
+//    private ChargeUponDepotArrival chargeUponDepotArrival;
+    private DepotReader depotReader;
+    private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
 
     /**
      * Mandatory
@@ -92,7 +107,7 @@ public class OnlineDvrpLauncherUtils
     /**
      * Mandatory
      */
-    public static MatsimVrpData initMatsimVrpData(Scenario scenario, TravelTimeSource ttimeSource,
+    public  MatsimVrpData initMatsimVrpData(Scenario scenario, TravelTimeSource ttimeSource,
             TravelCostSource tcostSource, String eventsFileName, String depotsFileName)
     {
         int travelTimeBinSize = ttimeSource.travelTimeBinSize;
@@ -148,8 +163,9 @@ public class OnlineDvrpLauncherUtils
         vrpData.setVrpGraph(graph);
         vrpData.setCustomers(new ArrayList<Customer>());
         vrpData.setRequests(new ArrayList<Request>());
-        new DepotReader(scenario, vrpData).readFile(depotsFileName);
-
+        this.depotReader =  new DepotReader(scenario, vrpData);
+        this.depotReader.readFile(depotsFileName);
+       
         return new MatsimVrpData(vrpData, scenario);
     }
 
@@ -157,16 +173,34 @@ public class OnlineDvrpLauncherUtils
     /**
      * Mandatory
      */
-    public static QSim initQSim(MatsimVrpData data, TaxiOptimizer optimizer)
+    public  QSim initQSim(MatsimVrpData data, TaxiOptimizer optimizer)
     {
         Scenario scenario = data.getScenario();
         EventsManager events = EventsUtils.createEventsManager();
-        QSim qSim = new QSim(scenario, events);
+		EventHandlerGroup handlerGroup = new EventHandlerGroup();
+		
+		EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
+		HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> elvehicles=new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
+		
+		for (Vehicle v : data.getVrpData().getVehicles()){
+			elvehicles.put(new IdImpl(v.getName()), new BatteryElectricVehicleImpl(ecm,20*1000*3600));
+			
+		}
+		
+		energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles, scenario.getNetwork());
+		depotArrivalDepartureCharger =new DepotArrivalDepartureCharger(elvehicles);
+		
+		handlerGroup.addHandler(energyConsumptionTracker);
+		handlerGroup.addHandler(depotArrivalDepartureCharger);
+		depotArrivalDepartureCharger.setDepotLocations(this.depotReader.getDepotLinks());
+		events.addHandler(handlerGroup);
+		
+		
+        QSim qSim = new QSim(scenario, events);
         ActivityEngine activityEngine = new ActivityEngine();
         qSim.addMobsimEngine(activityEngine);
         qSim.addActivityHandler(activityEngine);
-
         QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim);
         qSim.addMobsimEngine(netsimEngine);
         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
@@ -174,7 +208,7 @@ public class OnlineDvrpLauncherUtils
         TeleportationEngine teleportationEngine = new TeleportationEngine();
         qSim.addMobsimEngine(teleportationEngine);
 
-        TaxiSimEngine taxiSimEngine = new TaxiSimEngine(qSim, data, optimizer);
+        TaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(qSim, data, optimizer,depotArrivalDepartureCharger);
         qSim.addMobsimEngine(taxiSimEngine);
 
         qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
@@ -182,8 +216,16 @@ public class OnlineDvrpLauncherUtils
         qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
         qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
 
+        
+        
+//    	chargeUponDepotArrival = new ChargeUponDepotArrival(elvehicles);
+//    	chargeUponDepotArrival.setDepotLocations(this.depotReader.getDepotLinks());
+    	
+//      handlerGroup.addHandler(chargeUponDepotArrival);
         return qSim;
     }
+    
+    
 
 
     /**
@@ -199,4 +241,27 @@ public class OnlineDvrpLauncherUtils
                     legMode);
         }
     }
+    
+	public void printStatisticsToConsole() {
+		System.out.println("energy consumption stats");
+		depotArrivalDepartureCharger.getSoCLog().printToConsole();
+		System.out.println("===");
+
+	}
+	public void writeStatisticsToFile(String filename) {
+		System.out.println("writing energy consumption stats to "+ filename);
+		depotArrivalDepartureCharger.getSoCLog().writeToFile(filename);
+		System.out.println("...done");
+
+	
+	}
+	
+	public void writeStatisticsToFiles(String dirname) {
+		System.out.println("writing energy consumption stats directory to "+ dirname);
+		depotArrivalDepartureCharger.getSoCLog().writeToFiles(dirname);
+		System.out.println("...done");
+
+	
+	}
+	
 }

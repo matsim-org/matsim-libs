@@ -35,7 +35,6 @@ import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.ImmediateRequestTaxiOptimizer;
 import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.RunningVehicleRegister;
@@ -69,13 +68,16 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/LegHistogram legHistogram;
 
     /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
+    private String electricStatsFilename;
+    private String electricStatsDir;
 
 
     /*package*/JbSingleIterOnlineDvrpLauncher()
     {
     	dirName = "Z:\\WinHome\\Docs\\maciejewski\\jbtest\\";
         netFileName = dirName + "network.xml";
-
+        electricStatsFilename = dirName + "elstats.txt";
+        electricStatsDir = dirName +"elstatsoutput";
         plansFileName = dirName + "20.plans.xml.gz";
 
         taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
@@ -116,7 +118,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
         writeSimEvents = true;
 
-        scenario = OnlineDvrpLauncherUtils.initMatsimData(netFileName, plansFileName,
+        scenario = ElectroCabLaunchUtils.initMatsimData(netFileName, plansFileName,
                 taxiCustomersFileName);
     }
 
@@ -162,7 +164,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
         writeSimEvents = Boolean.valueOf(params.get("writeSimEvents"));
 
-        scenario = OnlineDvrpLauncherUtils.initMatsimData(netFileName, plansFileName,
+        scenario = ElectroCabLaunchUtils.initMatsimData(netFileName, plansFileName,
                 taxiCustomersFileName);
     }
 
@@ -172,13 +174,13 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
      */
     /*package*/void go()
     {
-    	
+    	ElectroCabLaunchUtils olutils = new ElectroCabLaunchUtils();
     	if (scenario == null) System.out.println("scen");
     	if (algorithmConfig.ttimeSource == null) System.out.println("ttsource");
     	if (algorithmConfig.tcostSource == null) System.out.println("tcostSource");
     	if (eventsFileName == null) System.out.println("eventsFileName");
     	if (depotsFileName == null) System.out.println("depotsFileName");
-        data = OnlineDvrpLauncherUtils.initMatsimVrpData(scenario, algorithmConfig.ttimeSource,
+        data = olutils.initMatsimVrpData(scenario, algorithmConfig.ttimeSource,
                 algorithmConfig.tcostSource, eventsFileName, depotsFileName);
 
         RankTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(data
@@ -186,7 +188,8 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 //        optimizer.setDelaySpeedupStats(delaySpeedupStats);
         
 
-        QSim qSim = OnlineDvrpLauncherUtils.initQSim(data, optimizer);
+        QSim qSim = olutils.initQSim(data, optimizer);
+        
         EventsManager events = qSim.getEventsManager();
 
         EventWriter eventWriter = null;
@@ -216,7 +219,10 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         if (writeSimEvents) {
             eventWriter.closeFile();
         }
-
+//        olutils.printStatisticsToConsole();
+        olutils.writeStatisticsToFile(electricStatsFilename);
+        olutils.writeStatisticsToFiles(electricStatsDir);
+        
         // check if all reqs have been served
         for (Request r : data.getVrpData().getRequests()) {
             if (r.getStatus() != ReqStatus.PERFORMED) {
@@ -240,7 +246,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
 
         if (outHistogram) {
-            OnlineDvrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
+            ElectroCabLaunchUtils.writeHistograms(legHistogram, histogramOutDirName);
         }
     }
 

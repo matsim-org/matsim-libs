@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package energy.controlers;
+package playground.jbischoff.energy.controlers;
 
 import java.util.HashMap;
 

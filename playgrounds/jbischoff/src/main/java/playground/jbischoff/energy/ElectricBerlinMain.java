@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package energy;
+package playground.jbischoff.energy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,11 +39,12 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import energy.consumption.EnergyConsumptionModelBerlinHigh;
-import energy.consumption.EnergyConsumptionModelBerlinLow;
-import energy.consumption.EnergyConsumptionModelBerlinMedium;
-import energy.controlers.DisChargingControler;
-import energy.vehicles.BatteryElectricVehicleImpl;
+import playground.jbischoff.energy.consumption.EnergyConsumptionModelBerlinHigh;
+import playground.jbischoff.energy.consumption.EnergyConsumptionModelBerlinLow;
+import playground.jbischoff.energy.consumption.EnergyConsumptionModelBerlinMedium;
+import playground.jbischoff.energy.controlers.DisChargingControler;
+import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
+
 
 
 
