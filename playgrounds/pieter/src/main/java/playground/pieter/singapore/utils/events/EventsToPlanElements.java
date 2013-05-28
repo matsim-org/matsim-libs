@@ -832,10 +832,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 							journey.getFirstBoardingStop(),
 							new Integer((int) journey.getEgressWalkDistance()),
 							new Integer((int) journey.getEgressWalkTime()),
+							journey.getLastAlightingStop(),
 							new Integer((int) journey.getTransferWalkDistance()),
 							new Integer((int) journey.getTransferWalkTime()),
 							new Integer((int) journey.getTransferWaitTime()),
-							journey.getLastAlightingStop(),
 							new Double(Math.random())
 
 					};
