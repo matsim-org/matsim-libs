@@ -13,13 +13,13 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.IdleVehicleFind
 public class NOSRankTaxiOptimizer
     extends RankTaxiOptimizer
 {
-    private final IdleVehicleFinder idleVehicleFinder;
+    private final IdleRankVehicleFinder idleVehicleFinder;
 
 
     public NOSRankTaxiOptimizer(VrpData data, boolean destinationKnown, boolean straightLineDistance)
     {
         super(data, destinationKnown);
-        idleVehicleFinder = new IdleVehicleFinder(data, straightLineDistance);
+        idleVehicleFinder = new IdleRankVehicleFinder(data, straightLineDistance);
     }
 
 
