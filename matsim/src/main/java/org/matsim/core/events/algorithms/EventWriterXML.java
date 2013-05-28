@@ -112,6 +112,9 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 	 * @return String with some characters replaced by their xml-encoding.
 	 */
 	private String encodeAttributeValue(final String attributeValue) {
+		if (attributeValue == null) {
+			return null;
+		}
 		if (attributeValue.contains("&") || attributeValue.contains("\"") || attributeValue.contains("<") || attributeValue.contains(">")) {
 			return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 		}

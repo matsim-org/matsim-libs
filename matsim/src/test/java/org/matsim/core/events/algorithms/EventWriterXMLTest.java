@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
@@ -70,5 +71,25 @@ public class EventWriterXMLTest {
 		Assert.assertEquals("agent 2", event2.getPersonId().toString());
 		Assert.assertEquals("link'3", event2.getLinkId().toString());
 		Assert.assertEquals("vehicle\"4", event2.getVehicleId().toString());
+	}
+
+	@Test
+	public void testNullAttribute() {
+		String filename = this.utils.getOutputDirectory() + "testEvents.xml";
+		EventWriterXML writer = new EventWriterXML(filename);
+		
+		GenericEvent event = new GenericEvent("TEST", 3600.0);
+		event.getAttributes().put("dummy", null);
+		writer.handleEvent(event);
+		writer.closeFile();
+		Assert.assertTrue(new File(filename).exists());
+		
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsCollector collector = new EventsCollector();
+		events.addHandler(collector);
+		// this is already a test: is the XML valid so it can be parsed again?
+		new MatsimEventsReader(events).readFile(filename);
+		
+		Assert.assertEquals("there must be 1 event.", 1, collector.getEvents().size());
 	}
 }
