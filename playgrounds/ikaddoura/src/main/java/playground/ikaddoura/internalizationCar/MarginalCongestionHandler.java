@@ -101,6 +101,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		if (!this.ptDriverIDs.contains(event.getDriverId())){
 			this.ptDriverIDs.add(event.getDriverId());
 		}
+		
 	}
 
 	@Override

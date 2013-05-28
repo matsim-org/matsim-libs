@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TestControler.java
+ * LinksEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,47 +21,35 @@
 /**
  * 
  */
-package playground.ikaddoura.internalizationCar;
+package playground.ikaddoura.analysis;
 
 
-import java.io.IOException;
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 /**
- * @author ikaddoura
+ * @author Ihab
  *
  */
-public class InternalizationControler {
+public class IKEventHandler implements  LinkLeaveEventHandler {
+
+	private final Network network;
 	
-	private static final Logger log = Logger.getLogger(InternalizationControler.class);
-	
-	static String configFile;
-			
-	public static void main(String[] args) throws IOException {
-				
-		if (args.length > 0) {
-			configFile = args[0];		
-			log.info("configFile: "+ configFile);
-			
-		} else {
-			configFile = "/Users/Ihab/Desktop/internalization_input/config.xml";
-		}
-		
-		InternalizationControler main = new InternalizationControler();
-		main.run();
+	public IKEventHandler(Network network) {
+		this.network = network;
 	}
-	
-	private void run() {
-		
-		Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new InternalizationControlerListener( (ScenarioImpl) controler.getScenario()));
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
-		controler.run();
+
+
+	@Override
+	public void reset(int iteration) {
 		
 	}
+
+	
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		
+	}
+
 }
-	
