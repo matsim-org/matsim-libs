@@ -927,7 +927,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 						+ indexName;
 				String indexStatement;
 				try {
-					indexStatement = "DROP INDEX IF EXISTS" + fullIndexName + " ;\n ";
+					indexStatement = "DROP INDEX IF EXISTS " + fullIndexName + " ;\n ";
 					dba.executeStatement(indexStatement);
 					System.out.println(indexStatement);
 				} catch (SQLException e) {
