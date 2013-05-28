@@ -125,9 +125,12 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		File properties = new File("data/matsim2postgres.properties");
 		String suffix = args[5];
+//		EventsToPlanElements test = new EventsToPlanElements(
+//				scenario.getTransitSchedule(), scenario.getNetwork(),
+//				scenario.getConfig(), properties, suffix);
 		EventsToPlanElements test = new EventsToPlanElements(
 				scenario.getTransitSchedule(), scenario.getNetwork(),
-				scenario.getConfig(), properties, suffix);
+				scenario.getConfig(),  suffix);
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(args[2]);
 		if (test.writeIdsForLinks)
@@ -235,11 +238,11 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	}
 
 	private String getMode(String transportMode, Id line) {
-		if (transportMode.contains("bus"))
+		if (transportMode.toLowerCase().contains("bus"))
 			return "bus";
-		else if (transportMode.contains("rail"))
+		else if (transportMode.toLowerCase().contains("rail"))
 			return "lrt";
-		else if (transportMode.contains("subway"))
+		else if (transportMode.toLowerCase().contains("subway"))
 			if (line.toString().contains("PE")
 					|| line.toString().contains("SE")
 					|| line.toString().contains("SW"))
@@ -286,7 +289,9 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		if(!personIdsForLinks.contains(event.getPersonId()))
 			return;
 		Object[] linkArgs = { event.getLinkId().toString(),
-				event.getPersonId().toString(), "", "",
+				event.getPersonId().toString(),
+				"car",
+				"",
 				new Integer((int) chain.getLinkEnterTime()),
 				new Integer((int) event.getTime()) };
 		linkWriter.addLine(linkArgs);
@@ -700,25 +705,35 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("distance",
-				PostgresType.FLOAT8));
+				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("main_mode",
 				PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("from_act", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("to_act", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("in_vehicle_distance",
-				PostgresType.FLOAT8));
+				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("in_vehicle_time",
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("access_walk_distance",
-				PostgresType.FLOAT8));
+				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("access_walk_time",
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("access_wait_time",
 				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("first_boarding_stop",
+				PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("egress_walk_distance",
-				PostgresType.FLOAT8));
+				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("egress_walk_time",
 				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("last_alighting_stop",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("transfer_walk_distance",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("transfer_walk_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("transfer_wait_time",
+				PostgresType.INT));		
 		columns.add(new PostgresqlColumnDefinition("sample_selector",
 				PostgresType.FLOAT8));
 		DataBaseAdmin journeyDBA = new DataBaseAdmin(connectionProperties);
@@ -737,7 +752,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("distance",
-				PostgresType.FLOAT8));
+				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("mode", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("line", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("route", PostgresType.TEXT));
@@ -767,7 +782,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("to_trip", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("walk_distance",
-				PostgresType.FLOAT8));
+				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("walk_time",
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("wait_time",
@@ -805,17 +820,22 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 							new Integer(journey.getElementId()), pax_id,
 							new Integer((int) journey.getStartTime()),
 							new Integer((int) journey.getEndTime()),
-							new Double(journey.getDistance()),
+							new Integer((int) journey.getDistance()),
 							journey.getMainMode(),
 							new Integer(journey.getFromAct().getElementId()),
 							new Integer(journey.getToAct().getElementId()),
-							new Double(journey.getInVehDistance()),
+							new Integer((int) journey.getInVehDistance()),
 							new Integer((int) journey.getInVehTime()),
-							new Double(journey.getAccessWalkDistance()),
+							new Integer((int) journey.getAccessWalkDistance()),
 							new Integer((int) journey.getAccessWalkTime()),
 							new Integer((int) journey.getAccessWaitTime()),
-							new Double(journey.getEgressWalkDistance()),
+							journey.getFirstBoardingStop(),
+							new Integer((int) journey.getEgressWalkDistance()),
 							new Integer((int) journey.getEgressWalkTime()),
+							new Integer((int) journey.getTransferWalkDistance()),
+							new Integer((int) journey.getTransferWalkTime()),
+							new Integer((int) journey.getTransferWaitTime()),
+							journey.getLastAlightingStop(),
 							new Double(Math.random())
 
 					};
@@ -827,7 +847,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 									new Integer(journey.getElementId()),
 									new Integer((int) trip.getStartTime()),
 									new Integer((int) trip.getEndTime()),
-									new Double(trip.getDistance()),
+									new Integer((int) trip.getDistance()),
 									trip.getMode(), trip.getLine(),
 									trip.getRoute(), trip.getBoardingStop(),
 									trip.getAlightingStop(),
@@ -844,7 +864,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 											.getElementId()),
 									new Integer(transfer.getToTrip()
 											.getElementId()),
-									new Double(transfer.getWalkDistance()),
+									new Integer((int) transfer.getWalkDistance()),
 									new Integer((int) transfer.getWalkTime()),
 									new Integer((int) transfer.getWaitTime()),
 									new Double(Math.random()) };
