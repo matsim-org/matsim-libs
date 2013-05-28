@@ -896,6 +896,17 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
+		update = "		UPDATE " + journeyTableName
+				+ " SET first_boarding_stop = matsim_to_transitstops_lookup.stop_id "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " WHERE first_boarding_stop = matsim_stop ";
+		dba.executeUpdate(update);
+		update = "		UPDATE "
+				+ journeyTableName
+				+ " SET last_alighting_stop = matsim_to_transitstops_lookup.stop_id "
+				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " WHERE last_alighting_stop = matsim_stop ";
+		dba.executeUpdate(update);
 
 		HashMap<String, String[]> idxNames = new HashMap<String, String[]>();
 		String[] idx1 = { "person_id", "facility_id", "type" };
@@ -916,7 +927,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 						+ indexName;
 				String indexStatement;
 				try {
-					indexStatement = "DROP INDEX " + fullIndexName + " ;\n ";
+					indexStatement = "DROP INDEX IF EXISTS" + fullIndexName + " ;\n ";
 					dba.executeStatement(indexStatement);
 					System.out.println(indexStatement);
 				} catch (SQLException e) {
