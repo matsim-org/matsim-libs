@@ -727,7 +727,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		columns.add(new PostgresqlColumnDefinition("egress_walk_time",
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("last_alighting_stop",
-				PostgresType.INT));
+				PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("transfer_walk_distance",
 				PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("transfer_walk_time",
