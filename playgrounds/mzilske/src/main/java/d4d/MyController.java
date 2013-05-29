@@ -238,7 +238,7 @@ public class MyController extends AbstractController {
 								Sighting sighting = sightingsForThisAgent.sightings.next();
 								ActivityImpl activity = (ActivityImpl) planElement;
 								activity.setLinkId(null);
-								Geometry cell = scenarioReader.getCell(sighting.getCellTowerId());
+								Geometry cell = scenarioReader.getCellTowers().getCell(sighting.getCellTowerId());
 								Point p = getRandomPointInFeature(cell);
 								Coord newCoord = new CoordImpl(p.getX(), p.getY());
 								activity.setCoord(newCoord);

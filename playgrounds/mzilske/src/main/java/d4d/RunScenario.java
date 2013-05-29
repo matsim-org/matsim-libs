@@ -20,32 +20,19 @@
 package d4d;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 
-import org.geotools.data.shapefile.ShpFiles;
-import org.geotools.data.shapefile.shp.ShapeType;
-import org.geotools.data.shapefile.shp.ShapefileException;
-import org.geotools.data.shapefile.shp.ShapefileReader;
-import org.geotools.data.shapefile.shp.ShapefileWriter;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -76,40 +63,23 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner.PersonAlgorithmProvider;
 import org.matsim.population.algorithms.PersonAlgorithm;
-import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import playground.mzilske.cdr.CellTower;
+import playground.mzilske.cdr.CellTowers;
+
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
-import com.vividsolutions.jts.operation.distance.DistanceOp;
-import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 public class RunScenario {
 
-	public class CellTower {
-		public CellTower(String id, Coord coord) {
-			super();
-			this.id = id;
-			this.coord = coord;
-		}
-		String id;
-		Coord coord;
-	}
-
 	private static final int POP_REAL = 22000000;
 
-	Map<String,CellTower> cellTowers = new HashMap<String, CellTower>();
 
 	double minLong = -4.265;
+	public CellTowers getCellTowers() {
+		return cellTowers;
+	}
+
 	double maxLong = -3.671;
 	double minLat = 5.175;
 	double maxLat = 5.53;
@@ -117,10 +87,11 @@ public class RunScenario {
 	Random rnd = new Random();
 
 	boolean filter = true;
+	
+	CellTowers cellTowers;
 
 	private ScenarioImpl scenario;
 
-	GeometryFactory gf = new GeometryFactory();
 
 	public Scenario readScenario(Config config) throws FileNotFoundException  {
 		final Map<Id, List<Sighting>> readAllSightings = readNetworkAndSightings(config);
@@ -178,7 +149,7 @@ public class RunScenario {
 							Sighting sighting = sightingsForThisAgent.sightings.next();
 							ActivityImpl activity = (ActivityImpl) planElement;
 							activity.setLinkId(null);
-							Geometry cell = getCell(sighting.getCellTowerId());
+							Geometry cell = cellTowers.getCell(sighting.getCellTowerId());
 							Point p = getRandomPointInFeature(cell);
 							Coord newCoord = new CoordImpl(p.getX(), p.getY());
 							activity.setCoord(newCoord);
@@ -268,13 +239,10 @@ public class RunScenario {
 
 	Coord min = ct.transform(new CoordImpl(minLong, minLat));
 	Coord max = ct.transform(new CoordImpl(minLat, maxLat));
-	private Map<Coordinate, Geometry> siteToCell;
 
-	private GeometryCollection clippedCells;
-
-	private MultiPoint sites;
-
-	private void readPosts() {
+	
+	void readPosts() {
+		final Map<String, CellTower> cellTowerMap = new HashMap<String, CellTower>();
 		TabularFileParser tfp = new TabularFileParser();
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();
 		tabularFileParserConfig.setFileName("/Users/zilske/d4d/ANT_POS.TSV");
@@ -289,111 +257,17 @@ public class RunScenario {
 					throw new RuntimeException("Bad latlong: " + coord);
 				}
 				String cellTowerId = row[0];
-				cellTowers.put(cellTowerId, new CellTower(cellTowerId,coord));
+				cellTowerMap.put(cellTowerId, new CellTower(cellTowerId,coord));
 			}
 		});
-		buildCells();
+		
+		cellTowers = new CellTowers(cellTowerMap);
 		// getLinksCrossingCells();
 	}
 
-	private Geometry getIvoryCoast() {
-		try {
-			ShapefileReader r = new ShapefileReader(new ShpFiles("/Users/zilske/d4d/10m-admin-0-countries/ci.shp"), true, true);
-			Geometry shape = (Geometry)r.nextRecord().shape(); // do stuff 
-			r.close();
-			return JTS.transform(shape, CRS.findMathTransform(MGC.getCRS(TransformationFactory.WGS84), MGC.getCRS("EPSG:3395"),true)) ;
-		} catch (ShapefileException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (MismatchedDimensionException e) {
-			throw new RuntimeException(e);
-		} catch (TransformException e) {
-			throw new RuntimeException(e);
-		} catch (FactoryException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void buildCells() {
-		List<Polygon> unrolledCells = new ArrayList<Polygon>();
-
-		VoronoiDiagramBuilder vdb = new VoronoiDiagramBuilder();
-		Collection<Point> coords = new ArrayList<Point>();
-		for (CellTower cellTower : cellTowers.values()) {
-			coords.add(gf.createPoint(coordinate(cellTower)));
-		}
-		sites = new MultiPoint(coords.toArray(new Point[]{}), gf);
-		vdb.setSites(sites);
-		Geometry ivoryCoast = getIvoryCoast();
-		vdb.setClipEnvelope(ivoryCoast.getEnvelopeInternal());
-		GeometryCollection diagram = (GeometryCollection) vdb.getDiagram(gf);
-		siteToCell = new HashMap<Coordinate, Geometry>();
-		for (int i=0; i<diagram.getNumGeometries(); i++) {
-			Polygon cell = (Polygon) diagram.getGeometryN(i);
-			Coordinate siteCoordinate = (Coordinate) cell.getUserData();
-			Geometry clippedCell = cell.intersection(ivoryCoast);
-			siteToCell.put(siteCoordinate, clippedCell); // user data of the cell is set to the Coordinate of the site by VoronoiDiagramBuilder
-			if (clippedCell instanceof GeometryCollection) {
-				GeometryCollection multiCell = (GeometryCollection) clippedCell;
-				for (int j=0; j<multiCell.getNumGeometries(); j++) {
-					Polygon cellPart = (Polygon) multiCell.getGeometryN(j);
-					unrolledCells.add(cellPart);
-				}
-				System.out.println("Added multicell with " +multiCell.getNumGeometries()+ " parts.");
-			} else {
-				unrolledCells.add((Polygon) clippedCell);
-			}
-		}
-		clippedCells = new MultiPolygon(unrolledCells.toArray(new Polygon[]{}),gf);
-		writeToShapefile(clippedCells, "clipped");
-		writeToShapefile(diagram, "unclipped");
-		voronoiStatistics();
-	}
 	
-	private void getLinksCrossingCells() {
-		Set<Link> linksCrossingCells = new HashSet<Link>();
-		PreparedGeometry preparedCells = PreparedGeometryFactory.prepare(clippedCells.getBoundary());
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			if (preparedCells.intersects(gf.createLineString(new Coordinate[]{
-					new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()), 
-					new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY())
-			}))) {
-				linksCrossingCells.add(link);
-			}
-			System.out.println("Links crossing cells: " + linksCrossingCells.size() + " of " + scenario.getNetwork().getLinks().size());
-		}
-	}
 
-	private void writeToShapefile(GeometryCollection clippedSites,
-			String filename) {
-		FileOutputStream shp = null;
-		FileOutputStream shx = null;
-		try {
-			shp = new FileOutputStream("/Users/zilske/d4d/output/"+filename+".shp");
-			shx = new FileOutputStream("/Users/zilske/d4d/output/"+filename+".shx");
-			ShapefileWriter writer = new ShapefileWriter( shp.getChannel(),shx.getChannel());
-			writer.write(clippedSites, ShapeType.POLYGON);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				shp.close();
-				shx.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
 
-	private Coordinate coordinate(CellTower cellTower) {
-		return new Coordinate(cellTower.coord.getX(), cellTower.coord.getY());
-	}
 
 	private void readNetwork() {
 		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
@@ -403,7 +277,7 @@ public class RunScenario {
 		final Map<Activity, Geometry> cellsOfSightings = new HashMap<Activity, Geometry>();
 		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
 			for (Sighting sighting : sightingsPerPerson.getValue()) {
-				Geometry cell = siteToCell.get(coordinate(cellTowers.get(sighting.getCellTowerId())));
+				Geometry cell = cellTowers.getCell(sighting.getCellTowerId());
 				Point p = getRandomPointInFeature(cell);
 				Coord coord = new CoordImpl(p.getX(), p.getY());
 				Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("sighting", coord);
@@ -454,7 +328,7 @@ public class RunScenario {
 
 
 				if (!cellTowerId.equals("-1")) {
-					Geometry cell = siteToCell.get(coordinate(cellTowers.get(cellTowerId)));
+					Geometry cell = cellTowers.getCell(cellTowerId);
 					if (cell.getNumGeometries() != 0) {
 						if (interestedInTime(timeInSeconds)) {
 							List<Sighting> sightingsOfPerson = sightings.get(personId);
@@ -486,15 +360,6 @@ public class RunScenario {
 		return sightings;
 	}
 
-	private void voronoiStatistics() {
-		for (CellTower cellTower : cellTowers.values()) {
-			Geometry cell = siteToCell.get(coordinate(cellTower));
-			System.out.println(cell.getArea());
-			Coordinate[] nearestPoints = new DistanceOp(gf.createPoint(coordinate(cellTower)), sites).nearestPoints();
-			System.out.println(cellTower.coord + " --- " + nearestPoints[0] + " --- " + nearestPoints[1]);
-		}
-
-	}
 
 	private Point getRandomPointInFeature(Geometry ft) {
 		Point p = null;
@@ -555,8 +420,6 @@ public class RunScenario {
 		System.out.println("Created " + sampleSize + " people. That's a " + ((double) sampleSize) / POP_REAL  + " sample.");
 	}
 
-	public Geometry getCell(String cellTowerId) {
-		return siteToCell.get(coordinate(cellTowers.get(cellTowerId)));
-	}
+
 
 }
